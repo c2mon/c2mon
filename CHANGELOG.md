@@ -11,6 +11,7 @@ For more details on a given release, please check also the [Milestone planning](
 - Runtime support for HTTP via ActiveMQ (#113)
 
 ### Changed
+- Updated logback dependency from v1.1.7 to v1.1.8 due to a serious runtime bug
 
 ### Fixed
 
