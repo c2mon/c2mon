@@ -24,8 +24,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import cern.c2mon.server.common.config.ServerProperties;
-import cern.c2mon.server.configuration.config.ConfigurationProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.convert.AnnotationStrategy;
@@ -33,13 +31,17 @@ import org.simpleframework.xml.core.Persister;
 import org.simpleframework.xml.strategy.Strategy;
 import org.simpleframework.xml.transform.RegistryMatcher;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
 
 import cern.c2mon.server.cache.ClusterCache;
 import cern.c2mon.server.cache.ProcessCache;
 import cern.c2mon.server.cache.ProcessFacade;
 import cern.c2mon.server.cache.loading.SequenceDAO;
+import cern.c2mon.server.common.config.ServerProperties;
 import cern.c2mon.server.configuration.ConfigProgressMonitor;
 import cern.c2mon.server.configuration.ConfigurationLoader;
+import cern.c2mon.server.configuration.config.ConfigurationProperties;
 import cern.c2mon.server.configuration.dao.ConfigurationDAO;
 import cern.c2mon.server.configuration.handler.*;
 import cern.c2mon.server.configuration.handler.impl.CommandTagConfigHandler;
@@ -47,14 +49,13 @@ import cern.c2mon.server.configuration.parser.ConfigurationParser;
 import cern.c2mon.server.daq.JmsContainerManager;
 import cern.c2mon.server.daq.out.ProcessCommunicationManager;
 import cern.c2mon.shared.client.configuration.*;
+import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Status;
 import cern.c2mon.shared.client.configuration.api.Configuration;
 import cern.c2mon.shared.client.configuration.converter.DateFormatConverter;
 import cern.c2mon.shared.daq.config.Change;
 import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
-import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Component;
 
 /**
  * Implementation of the server ConfigurationLoader bean.
@@ -300,11 +301,11 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
     ConfigurationReport report = new ConfigurationReport(configId, configName, "");
 
     //map of element reports that need a DAQ child report adding
-    Map<Long, ConfigurationElementReport> daqReportPlaceholder = new HashMap<Long, ConfigurationElementReport>();
+    Map<Long, ConfigurationElementReport> daqReportPlaceholder = new HashMap<>();
     //map of elements themselves elt_seq_id -> element
-    Map<Long, ConfigurationElement> elementPlaceholder = new HashMap<Long, ConfigurationElement>();
+    Map<Long, ConfigurationElement> elementPlaceholder = new HashMap<>();
     //map of lists, where each list needs sending to a particular DAQ (processId -> List of events)
-    Map<Long, List<Change>> processLists = new HashMap<Long, List<Change>>();
+    Map<Long, List<Change>> processLists = new HashMap<>();
 
     if (configProgressMonitor != null){
       configProgressMonitor.serverTotalParts(configElements.size());
@@ -424,8 +425,9 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
   private boolean runInParallel(List<ConfigurationElement> elements) {
     return !elements.stream().anyMatch(element ->
         element.getEntity().equals(ConfigConstants.Entity.SUBEQUIPMENT) ||
-            element.getEntity().equals(ConfigConstants.Entity.EQUIPMENT) ||
-            element.getEntity().equals(ConfigConstants.Entity.PROCESS));
+        element.getEntity().equals(ConfigConstants.Entity.EQUIPMENT) ||
+        element.getEntity().equals(ConfigConstants.Entity.PROCESS) ||
+        element.getAction().equals(Action.REMOVE));
   }
 
   /**
@@ -526,7 +528,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
                                                  final ConfigurationElementReport elementReport) throws IllegalAccessException {
 
     //initialize the DAQ config event
-    List<ProcessChange> daqConfigEvents = new ArrayList<ProcessChange>();
+    List<ProcessChange> daqConfigEvents = new ArrayList<>();
       if (log.isTraceEnabled()) {
         log.trace(element.getConfigId() + " Applying configuration element with sequence id " + element.getSequenceId());
       }
@@ -664,7 +666,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
 
     // Read all report files and deserialise them
     try {
-      ArrayList<File> files = new ArrayList<File>(Arrays.asList(new File(reportDirectory).listFiles(new ConfigurationReportFileFilter())));
+      ArrayList<File> files = new ArrayList<>(Arrays.asList(new File(reportDirectory).listFiles(new ConfigurationReportFileFilter())));
       Serializer serializer = getSerializer();
 
       for (File file : files) {
@@ -685,7 +687,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
     List<ConfigurationReport> reports = new ArrayList<>();
 
     try {
-      ArrayList<File> files = new ArrayList<File>(Arrays.asList(new File(reportDirectory).listFiles(new ConfigurationReportFileFilter(id))));
+      ArrayList<File> files = new ArrayList<>(Arrays.asList(new File(reportDirectory).listFiles(new ConfigurationReportFileFilter(id))));
       Serializer serializer = getSerializer();
 
       for (File file : files) {
