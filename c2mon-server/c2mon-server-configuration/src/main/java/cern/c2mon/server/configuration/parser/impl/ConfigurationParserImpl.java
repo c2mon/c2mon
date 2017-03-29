@@ -16,6 +16,13 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.parser.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import cern.c2mon.server.configuration.parser.ConfigurationParser;
 import cern.c2mon.server.configuration.parser.exception.ConfigurationParseException;
 import cern.c2mon.server.configuration.parser.factory.*;
@@ -27,11 +34,6 @@ import cern.c2mon.shared.client.configuration.api.equipment.SubEquipment;
 import cern.c2mon.shared.client.configuration.api.process.Process;
 import cern.c2mon.shared.client.configuration.api.tag.*;
 import cern.c2mon.shared.client.configuration.api.util.ConfigurationEntity;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -40,6 +42,7 @@ import java.util.List;
  *
  * @author Franz Ritter
  */
+@Slf4j
 @Component
 public class ConfigurationParserImpl implements ConfigurationParser {
 
@@ -85,6 +88,7 @@ public class ConfigurationParserImpl implements ConfigurationParser {
    * @param entities Objects which holds the information to create a {@link ConfigurationElement}.
    * @return A {@link ConfigurationElement} for the server configuration.
    */
+  @SuppressWarnings("unchecked")
   private List<ConfigurationElement> parseConfigurationList(List<? extends ConfigurationEntity> entities) {
     List<ConfigurationElement> results = new ArrayList<>();
     EntityFactory entityFactory;
@@ -93,7 +97,11 @@ public class ConfigurationParserImpl implements ConfigurationParser {
       entityFactory = getEntityFactory(configurationEntity);
 
       if (configurationEntity.isDeleted()) {
-        results.add(entityFactory.deleteInstance(configurationEntity));
+        try {
+          results.add(entityFactory.deleteInstance(configurationEntity));
+        } catch (ConfigurationParseException ex) {
+          log.debug("Already deleted! : ", ex.getMessage());
+        }
       } else if (configurationEntity.isUpdated()) {
         results.add(entityFactory.updateInstance(configurationEntity));
       } else if (configurationEntity.isCreated()) {
