@@ -17,6 +17,21 @@
 
 package cern.c2mon.server.configuration.parser.configuration;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Properties;
+
+import org.easymock.EasyMock;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
 import cern.c2mon.server.cache.DataTagCache;
 import cern.c2mon.server.cache.EquipmentCache;
 import cern.c2mon.server.cache.SubEquipmentCache;
@@ -35,22 +50,9 @@ import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.address.impl.PLCHardwareAddressImpl;
 
-import org.easymock.EasyMock;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Properties;
-
-import static cern.c2mon.server.configuration.parser.util.ConfigurationDataTagUtil.*;
+import static cern.c2mon.server.configuration.parser.util.ConfigurationDataTagUtil.buildCreateAllFieldsDataTag;
+import static cern.c2mon.server.configuration.parser.util.ConfigurationDataTagUtil.buildCreateBasicDataTag;
+import static cern.c2mon.server.configuration.parser.util.ConfigurationDataTagUtil.buildUpdateDataTagWithSomeFields;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -629,9 +631,6 @@ public class ConfigureDataTagTest {
 
   @Test
   public void deleteNonExistentDataTag() {
-    // Setup Exception
-    tagException.expect(ConfigurationParseException.class);
-
     // setup Configuration:
     DataTag dataTag = new DataTag();
     dataTag.setId(20L);
@@ -646,7 +645,7 @@ public class ConfigureDataTagTest {
     EasyMock.expect(tagFacadeGateway.isInTagCache(20L)).andReturn(false);
     EasyMock.replay(tagFacadeGateway);
 
-    parser.parse(config);
+    assertEquals(0, parser.parse(config).size());
 
     EasyMock.verify(tagFacadeGateway);
   }

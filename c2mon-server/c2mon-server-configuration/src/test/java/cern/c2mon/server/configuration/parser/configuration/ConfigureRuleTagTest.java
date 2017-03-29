@@ -339,9 +339,6 @@ public class ConfigureRuleTagTest {
 
   @Test
   public void deleteNonExistentRuleTag() {
-    // Setup Exception
-    tagException.expect(ConfigurationParseException.class);
-
     // setup Configuration:
     RuleTag ruleTag = new RuleTag();
     ruleTag.setId(20L);
@@ -353,11 +350,11 @@ public class ConfigureRuleTagTest {
     config.setEntities(tagUpdateList);
 
     // setUp Mocks:
-    EasyMock.expect(ruleTagCache.hasKey(20L)).andReturn(false);
-    EasyMock.replay(ruleTagCache);
+    EasyMock.expect(tagFacade.isInTagCache(20L)).andReturn(false);
+    EasyMock.replay(tagFacade);
 
-    parser.parse(config);
+    assertEquals(0, parser.parse(config).size());
 
-    EasyMock.verify(ruleTagCache);
+    EasyMock.verify(tagFacade);
   }
 }

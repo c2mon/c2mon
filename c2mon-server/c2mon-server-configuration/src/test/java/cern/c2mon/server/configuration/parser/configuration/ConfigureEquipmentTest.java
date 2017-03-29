@@ -17,15 +17,10 @@
 
 package cern.c2mon.server.configuration.parser.configuration;
 
-import cern.c2mon.server.cache.*;
-import cern.c2mon.server.cache.loading.EquipmentDAO;
-import cern.c2mon.server.cache.loading.SequenceDAO;
-import cern.c2mon.server.configuration.parser.ConfigurationParser;
-import cern.c2mon.server.configuration.parser.exception.ConfigurationParseException;
-import cern.c2mon.shared.client.configuration.ConfigConstants;
-import cern.c2mon.shared.client.configuration.ConfigurationElement;
-import cern.c2mon.shared.client.configuration.api.Configuration;
-import cern.c2mon.shared.client.configuration.api.equipment.Equipment;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Properties;
+
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Rule;
@@ -36,9 +31,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
+import cern.c2mon.server.cache.*;
+import cern.c2mon.server.cache.loading.EquipmentDAO;
+import cern.c2mon.server.cache.loading.SequenceDAO;
+import cern.c2mon.server.configuration.parser.ConfigurationParser;
+import cern.c2mon.server.configuration.parser.exception.ConfigurationParseException;
+import cern.c2mon.shared.client.configuration.ConfigConstants;
+import cern.c2mon.shared.client.configuration.ConfigurationElement;
+import cern.c2mon.shared.client.configuration.api.Configuration;
+import cern.c2mon.shared.client.configuration.api.equipment.Equipment;
 
 import static cern.c2mon.server.configuration.parser.util.ConfigurationEquipmentUtil.*;
 import static org.junit.Assert.assertEquals;
@@ -515,9 +516,6 @@ public class ConfigureEquipmentTest {
 
   @Test
   public void deleteNonExistentEquipment() {
-    // Setup Exception
-    tagException.expect(ConfigurationParseException.class);
-
     // setup Configuration:
     Equipment equipment = buildDeleteEquipment(10L);
 
@@ -530,7 +528,7 @@ public class ConfigureEquipmentTest {
     EasyMock.expect(equipmentCache.hasKey(10L)).andReturn(false);
     EasyMock.replay(equipmentCache);
 
-    parser.parse(config);
+    assertEquals(0, parser.parse(config).size());
 
     EasyMock.verify(equipmentCache);
   }

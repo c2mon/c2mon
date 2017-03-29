@@ -19,6 +19,16 @@ package cern.c2mon.server.configuration.parser.configuration;
 
 import java.util.*;
 
+import org.easymock.EasyMock;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
 import cern.c2mon.server.cache.CommandTagCache;
 import cern.c2mon.server.cache.EquipmentCache;
 import cern.c2mon.server.cache.loading.SequenceDAO;
@@ -30,15 +40,6 @@ import cern.c2mon.shared.client.configuration.api.Configuration;
 import cern.c2mon.shared.client.configuration.api.tag.CommandTag;
 import cern.c2mon.shared.client.configuration.api.tag.Tag;
 import cern.c2mon.shared.common.datatag.address.impl.SimpleHardwareAddressImpl;
-import org.easymock.EasyMock;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static cern.c2mon.server.configuration.parser.util.ConfigurationCommandTagUtil.*;
 import static org.junit.Assert.assertEquals;
@@ -358,9 +359,6 @@ public class ConfigureCommandTagTest {
 
   @Test
   public void deleteNonExistentCommandTag() {
-    // Setup Exception
-    tagException.expect(ConfigurationParseException.class);
-
     // setup Configuration:
     CommandTag dataTag = new CommandTag();
     dataTag.setId(20L);
@@ -375,7 +373,7 @@ public class ConfigureCommandTagTest {
     EasyMock.expect(commandTagCache.hasKey(20L)).andReturn(false);
     EasyMock.replay(commandTagCache);
 
-    parser.parse(config);
+    assertEquals(0, parser.parse(config).size());
 
     EasyMock.verify(commandTagCache);
   }

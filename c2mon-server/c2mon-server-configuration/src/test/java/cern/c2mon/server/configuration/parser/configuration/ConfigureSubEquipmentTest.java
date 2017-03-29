@@ -17,17 +17,10 @@
 
 package cern.c2mon.server.configuration.parser.configuration;
 
-import cern.c2mon.server.cache.*;
-import cern.c2mon.server.cache.loading.EquipmentDAO;
-import cern.c2mon.server.cache.loading.SequenceDAO;
-import cern.c2mon.server.cache.loading.SubEquipmentDAO;
-import cern.c2mon.server.configuration.parser.ConfigurationParser;
-import cern.c2mon.server.configuration.parser.exception.ConfigurationParseException;
-import cern.c2mon.shared.client.configuration.ConfigConstants;
-import cern.c2mon.shared.client.configuration.ConfigurationElement;
-import cern.c2mon.shared.client.configuration.api.Configuration;
-import cern.c2mon.shared.client.configuration.api.equipment.SubEquipment;
-import cern.c2mon.shared.client.configuration.api.tag.RuleTag;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Properties;
+
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Rule;
@@ -38,9 +31,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
+import cern.c2mon.server.cache.*;
+import cern.c2mon.server.cache.loading.EquipmentDAO;
+import cern.c2mon.server.cache.loading.SequenceDAO;
+import cern.c2mon.server.cache.loading.SubEquipmentDAO;
+import cern.c2mon.server.configuration.parser.ConfigurationParser;
+import cern.c2mon.server.configuration.parser.exception.ConfigurationParseException;
+import cern.c2mon.shared.client.configuration.ConfigConstants;
+import cern.c2mon.shared.client.configuration.ConfigurationElement;
+import cern.c2mon.shared.client.configuration.api.Configuration;
+import cern.c2mon.shared.client.configuration.api.equipment.SubEquipment;
 
 import static cern.c2mon.server.configuration.parser.util.ConfigurationSubEquipmentUtil.*;
 import static org.junit.Assert.assertEquals;
@@ -502,9 +502,6 @@ public class ConfigureSubEquipmentTest {
 
   @Test
   public void deleteNonExistentSubEquipment() {
-    // Setup Exception
-    tagException.expect(ConfigurationParseException.class);
-
     // setup Configuration:
     SubEquipment subEquipment = buildDeleteSubEquipment(10L);
 
@@ -517,7 +514,7 @@ public class ConfigureSubEquipmentTest {
     EasyMock.expect(subEquipmentCache.hasKey(10L)).andReturn(false);
     EasyMock.replay(subEquipmentCache);
 
-    parser.parse(config);
+    assertEquals(0, parser.parse(config).size());
 
     EasyMock.verify(subEquipmentCache);
   }

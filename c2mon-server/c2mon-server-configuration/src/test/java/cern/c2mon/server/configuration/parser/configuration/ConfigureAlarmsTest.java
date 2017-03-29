@@ -299,7 +299,7 @@ public class ConfigureAlarmsTest {
 
     List<ConfigurationElement> parsed = parser.parse(config);
 
-    assertEquals(parsed.size(), 1);
+    assertEquals(1, parsed.size());
     assertEquals((long) parsed.get(0).getEntityId(), 200L);
     assertEquals(parsed.get(0).getAction(), ConfigConstants.Action.REMOVE);
     assertEquals(parsed.get(0).getEntity(), ConfigConstants.Entity.ALARM);
@@ -310,9 +310,6 @@ public class ConfigureAlarmsTest {
 
   @Test
   public void deleteNonExistentAlarm() {
-    // Setup Exception
-    alarmException.expect(ConfigurationParseException.class);
-
     // setup Configuration:
     Alarm alarm = buildDeleteAlarm(200L);
 
@@ -325,8 +322,7 @@ public class ConfigureAlarmsTest {
     EasyMock.expect(alarmCache.hasKey(200L)).andReturn(false);
     EasyMock.replay(alarmCache);
 
-    parser.parse(config);
-
+    assertEquals(0, parser.parse(config).size());
     EasyMock.verify(alarmCache);
   }
 }

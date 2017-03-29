@@ -17,6 +17,20 @@
 
 package cern.c2mon.server.configuration.parser.configuration;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Properties;
+
+import org.easymock.EasyMock;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
 import cern.c2mon.server.cache.AliveTimerCache;
 import cern.c2mon.server.cache.ControlTagCache;
 import cern.c2mon.server.cache.ProcessCache;
@@ -29,19 +43,6 @@ import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.api.Configuration;
 import cern.c2mon.shared.client.configuration.api.process.Process;
-import org.easymock.EasyMock;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
 
 import static cern.c2mon.server.configuration.parser.util.ConfigurationProcessUtil.*;
 import static org.junit.Assert.assertEquals;
@@ -451,9 +452,6 @@ public class ConfigureProcessTest {
 
   @Test
   public void deleteNonExistentProcess() {
-    // Setup Exception
-    tagException.expect(ConfigurationParseException.class);
-
     // setup Configuration:
     Process process = buildDeleteProcess(1L);
 
@@ -466,7 +464,7 @@ public class ConfigureProcessTest {
     EasyMock.expect(processCache.hasKey(1L)).andReturn(false);
     EasyMock.replay(processCache);
 
-    parser.parse(config);
+    assertEquals(0, parser.parse(config).size());
 
     EasyMock.verify(processCache);
   }
