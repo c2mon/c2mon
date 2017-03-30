@@ -75,6 +75,7 @@ public class ActiveProcessOut implements JmsProcessOut {
         try {
 
             replyQueue = session.createTemporaryTopic();
+            consumer = session.createConsumer(replyQueue);
 
             //TemporaryTopic replyTopic = session.createTemporaryTopic();
             TextMessage textMessage = session.createTextMessage();
@@ -87,8 +88,6 @@ public class ActiveProcessOut implements JmsProcessOut {
             messageProducer.send(textMessage);
 
             //wait for reply
-            consumer = session.createConsumer(replyQueue);
-
             Message replyMessage = consumer.receive(timeout);
             if (replyMessage != null) {
               if (replyMessage instanceof TextMessage) {
