@@ -45,7 +45,7 @@ import cern.c2mon.shared.common.type.TypeConverter;
  */
 @Slf4j
 @Component
-public class TagDocumentConverter implements Converter<Tag, TagDocument> {
+public class TagDocumentConverter implements Converter<Tag, Optional<TagDocument>> {
 
   private final ProcessCache processCache;
   private final EquipmentCache equipmentCache;
@@ -61,9 +61,7 @@ public class TagDocumentConverter implements Converter<Tag, TagDocument> {
   }
 
   @Override
-  public TagDocument convert(final Tag tag) {
-    TagDocument tagDocument = null;
-
+  public Optional<TagDocument> convert(final Tag tag) {
     try {
       Map<String, Object> map = new HashMap<>();
 
@@ -103,15 +101,13 @@ public class TagDocumentConverter implements Converter<Tag, TagDocument> {
         map.put("valueObject", tag.getValue());
       }
 
-      tagDocument = new TagDocument();
+      TagDocument tagDocument = new TagDocument();
       tagDocument.putAll(map);
-
-
+      return Optional.of(tagDocument);
     } catch (Exception e) {
-      log.error("Error occured during conversion of Tag #{} ({}) to Elasticsearch document. Unable to store update to Elasticsearch!", tag.getId(), tag.getName(), e);
+      log.error("Error occurred during conversion of Tag #{} ({}) to Elasticsearch document. Unable to store update to Elasticsearch!", tag.getId(), tag.getName(), e);
     }
-
-    return tagDocument;
+    return Optional.empty();
   }
 
   private Map<String, Object> getC2monMetadata(Tag tag) {
@@ -168,11 +164,11 @@ public class TagDocumentConverter implements Converter<Tag, TagDocument> {
 
     if (metadata != null) {
       return metadata.getMetadata().entrySet().stream()
-          .filter(Objects::nonNull)
+          .filter(entry -> Objects.nonNull(entry.getKey()) && Objects.nonNull(entry.getValue()))
           .collect(Collectors.toMap(
-          Map.Entry::getKey,
-          e -> e.getValue()
-      ));
+              Map.Entry::getKey,
+              Map.Entry::getValue
+          ));
     }
 
     return Collections.emptyMap();

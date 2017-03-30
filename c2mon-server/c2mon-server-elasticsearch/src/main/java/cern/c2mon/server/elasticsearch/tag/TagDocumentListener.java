@@ -19,6 +19,7 @@ package cern.c2mon.server.elasticsearch.tag;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -81,7 +82,8 @@ public class TagDocumentListener implements C2monBufferedCacheListener<Tag>, Sma
 
     List<TagDocument> tagDocuments = loggables.stream()
         .map(tag -> converter.convert(tag))
-        .filter(Objects::nonNull)
+        .filter(Optional::isPresent)
+        .map(Optional::get)
         .collect(Collectors.toList());
 
     persistenceManager.storeData(tagDocuments);

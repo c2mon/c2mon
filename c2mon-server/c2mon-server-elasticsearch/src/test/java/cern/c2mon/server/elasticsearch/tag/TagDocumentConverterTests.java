@@ -17,6 +17,7 @@
 package cern.c2mon.server.elasticsearch.tag;
 
 import java.util.Map;
+import java.util.Optional;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,6 +33,7 @@ import cern.c2mon.server.common.process.ProcessCacheObject;
 import cern.c2mon.server.elasticsearch.util.EntityUtils;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 
@@ -57,7 +59,7 @@ public class TagDocumentConverterTests {
     DataTag tag = EntityUtils.createDataTag();
     when(processCache.get(any())).thenReturn(new ProcessCacheObject(1L));
     when(equipmentCache.get(any())).thenReturn(new EquipmentCacheObject(1L));
-    TagDocument document = converter.convert(tag);
+    TagDocument document = converter.convert(tag).orElseThrow(()->new IllegalArgumentException("TagDocument conversion failed"));
 
     // Serialize
     String json = document.toString();
@@ -86,5 +88,14 @@ public class TagDocumentConverterTests {
     assertEquals(tag.getMetadata().getMetadata().get("building"), metadata.get("building"));
     assertEquals(tag.getMetadata().getMetadata().get("array"), metadata.get("array"));
     assertEquals(tag.getMetadata().getMetadata().get("responsiblePerson"), metadata.get("responsiblePerson"));
+  }
+
+  @Test
+  public void convertMetadataWithNullValue(){
+    DataTag tag = EntityUtils.createDataTag();
+    tag.getMetadata().addMetadata("SomeKey", null);
+    Optional<TagDocument> document = converter.convert(tag);
+
+    assertTrue("We expect the converter not to fail.",document.isPresent());
   }
 }
