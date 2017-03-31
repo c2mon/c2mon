@@ -96,6 +96,6 @@ public class TagDocumentConverterTests {
     tag.getMetadata().addMetadata("SomeKey", null);
     Optional<TagDocument> document = converter.convert(tag);
 
-    assertTrue("We expect the converter not to fail.",document.isPresent());
+    assertTrue("We expect the converter not to fail.", document.isPresent());
   }
 }
