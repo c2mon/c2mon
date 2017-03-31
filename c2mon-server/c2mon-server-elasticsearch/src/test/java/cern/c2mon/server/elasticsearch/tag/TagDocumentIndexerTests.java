@@ -62,7 +62,7 @@ public class TagDocumentIndexerTests extends BaseElasticsearchIntegrationTest {
   public void indexTags() throws IDBPersistenceException, InterruptedException {
     DataTagCacheObject tag = (DataTagCacheObject) EntityUtils.createDataTag();
 
-    TagDocument document = converter.convert(tag).orElseThrow(()->new IllegalArgumentException("TagDocument conversion failed"));
+    TagDocument document = converter.convert(tag).orElseThrow(() -> new IllegalArgumentException("TagDocument conversion failed"));
     indexer.storeData(document);
 
     // Refresh the index to make sure the document is searchable
