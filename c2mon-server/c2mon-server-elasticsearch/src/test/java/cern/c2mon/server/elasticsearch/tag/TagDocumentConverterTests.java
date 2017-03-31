@@ -59,7 +59,7 @@ public class TagDocumentConverterTests {
     DataTag tag = EntityUtils.createDataTag();
     when(processCache.get(any())).thenReturn(new ProcessCacheObject(1L));
     when(equipmentCache.get(any())).thenReturn(new EquipmentCacheObject(1L));
-    TagDocument document = converter.convert(tag).orElseThrow(()->new IllegalArgumentException("TagDocument conversion failed"));
+    TagDocument document = converter.convert(tag).orElseThrow(() -> new IllegalArgumentException("TagDocument conversion failed"));
 
     // Serialize
     String json = document.toString();
@@ -91,7 +91,7 @@ public class TagDocumentConverterTests {
   }
 
   @Test
-  public void convertMetadataWithNullValue(){
+  public void convertMetadataWithNullValue() {
     DataTag tag = EntityUtils.createDataTag();
     tag.getMetadata().addMetadata("SomeKey", null);
     Optional<TagDocument> document = converter.convert(tag);
