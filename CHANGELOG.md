@@ -14,6 +14,9 @@ For more details on a given release, please check also the [Milestone planning](
 - Updated logback dependency from v1.1.7 to v1.1.8 due to a serious runtime bug
 
 ### Fixed
+- Fixed NPE problem when value of metadata is `null` (#139)
+- Fixed frequent configuration timeout when waiting for DAQ response (#140)
+- Prevent exception when trying to delete not existing entity (#141)
 
 ## [1.8.14] - 2017-03-14
 ### Added
