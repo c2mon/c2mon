@@ -16,18 +16,10 @@
  *****************************************************************************/
 package cern.c2mon.server.daq.out;
 
-import javax.jms.Destination;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageProducer;
-import javax.jms.Session;
-import javax.jms.TemporaryTopic;
-import javax.jms.TextMessage;
+import javax.jms.*;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.command.ActiveMQQueue;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jms.core.JmsTemplate;
@@ -41,13 +33,9 @@ import org.springframework.stereotype.Service;
  * @author Mark Brightwell
  *
  */
+@Slf4j
 @Service("jmsProcessOut")
 public class ActiveProcessOut implements JmsProcessOut {
-
-  /**
-   * Private class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(ActiveProcessOut.class);
 
   /**
    * Reference to the JmsTemplate, instantiated in the Spring XML.
@@ -70,17 +58,17 @@ public class ActiveProcessOut implements JmsProcessOut {
         String returnString = null;
         MessageConsumer consumer = null;
         MessageProducer messageProducer = null;
-        TemporaryTopic replyQueue = null;
+        TemporaryTopic replyTopic = null;
 
         try {
 
-            replyQueue = session.createTemporaryTopic();
-            consumer = session.createConsumer(replyQueue);
+            replyTopic = session.createTemporaryTopic();
+            consumer = session.createConsumer(replyTopic);
 
             //TemporaryTopic replyTopic = session.createTemporaryTopic();
             TextMessage textMessage = session.createTextMessage();
             textMessage.setText(text);
-            textMessage.setJMSReplyTo(replyQueue);
+            textMessage.setJMSReplyTo(replyTopic);
 
             Destination requestDestination = new ActiveMQQueue(jmsListenerQueue);
             messageProducer = session.createProducer(requestDestination);
@@ -93,21 +81,18 @@ public class ActiveProcessOut implements JmsProcessOut {
               if (replyMessage instanceof TextMessage) {
                 returnString = ((TextMessage) replyMessage).getText();
               } else {
-                LOGGER.warn("Non-text message received as reply to SourceDataTagRequest - unable to process");
+                log.warn("Non-text message received as reply to SourceDataTagRequest - unable to process");
               }
             }
         } finally {
             if (consumer != null) {
-                try {consumer.close();}catch(JMSException ex) {//IGNORE
-                    }
+                try {consumer.close();} catch (JMSException ex) {/** IGNORE */}
             }
             if (messageProducer != null) {
-                try {messageProducer.close();}catch(JMSException ex) {//IGNORE
-                    }
+                try {messageProducer.close();} catch (JMSException ex) {/** IGNORE */}
             }
-            if (replyQueue != null) {
-                try {replyQueue.delete();}catch(JMSException ex) {//IGNORE
-                }
+            if (replyTopic != null) {
+                try {replyTopic.delete();} catch (JMSException ex) {/** IGNORE */}
             }
         }
         return returnString;
