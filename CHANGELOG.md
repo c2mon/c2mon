@@ -8,6 +8,13 @@ For more details on a given release, please check also the [Milestone planning](
 
 ## [Unreleased]
 ### Added
+
+### Changed
+
+### Fixed
+
+## [1.8.15] - 2017-03-31
+### Added
 - Runtime support for HTTP via ActiveMQ (#113)
 
 ### Changed
@@ -109,7 +116,8 @@ This patch contains bug fixes for the DAQ layer.
 - Remove of EquipmentLogger concept from DAQ Core (#56)
 
 
-[Unreleased]: https://gitlab.cern.ch/c2mon/c2mon/milestones/13
+[Unreleased]: https://gitlab.cern.ch/c2mon/c2mon/milestones/14
+[1.8.15]: https://gitlab.cern.ch/c2mon/c2mon/milestones/13
 [1.8.14]: https://gitlab.cern.ch/c2mon/c2mon/milestones/12
 [1.8.12]: https://gitlab.cern.ch/c2mon/c2mon/milestones/11
 [1.8.9]: https://gitlab.cern.ch/c2mon/c2mon/milestones/10
