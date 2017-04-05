@@ -3,7 +3,8 @@ package cern.c2mon.client.ext.dynconfig.strategy;
 import java.net.URI;
 import java.util.Collection;
 
-import cern.accsoft.commons.util.collections.MultiValueMap;
+import org.springframework.util.MultiValueMap;
+
 import cern.c2mon.shared.client.configuration.api.tag.DataTag;
 
 public interface IConfigurationStrategy {

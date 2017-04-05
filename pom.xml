@@ -6,7 +6,7 @@
   <parent>
     <groupId>cern.c2mon.client</groupId>
     <artifactId>c2mon-client</artifactId>
-    <version>1.8.3</version>
+    <version>1.8.15</version>
   </parent>
 
   <artifactId>c2mon-client-ext-dynconfig</artifactId>
@@ -30,9 +30,6 @@
       <groupId>cern.c2mon.client</groupId>
       <artifactId>c2mon-client-core</artifactId>
     </dependency>
-    <!-- fix for TIMS-1129 - remove later -->
-    <!--dependency> <groupId>org.hibernate</groupId> <artifactId>hibernate-validator</artifactId> 
-      <version>5.2.2.Final</version> </dependency -->
 
     <!-- 3rd party dependencies -->
     <dependency>
@@ -44,6 +41,7 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 

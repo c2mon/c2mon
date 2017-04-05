@@ -7,9 +7,10 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
-import cern.accsoft.commons.util.collections.MultiValueMap;
-import cern.c2mon.client.core.ConfigurationService;
+import cern.c2mon.client.core.service.ConfigurationService;
 import cern.c2mon.client.ext.dynconfig.DynConfigService;
 import cern.c2mon.client.ext.dynconfig.SupportedProtocolsEnum;
 import cern.c2mon.shared.client.configuration.api.tag.DataTag;
@@ -32,7 +33,9 @@ public class OpcUaConfigStrategy implements IConfigurationStrategy {
 	
 	public static final String PROCESS_NAME = "P_DYNOPCUA";
 	public static final String EQUIPMENT_NAME = "dynopcua.equipment";
-
+	
+	private ConfigurationService configurationService;
+	
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	public OpcUaConfigStrategy(DynConfigService dynConfServ, ConfigurationService configurationService){
@@ -92,7 +95,7 @@ public class OpcUaConfigStrategy implements IConfigurationStrategy {
 	
 	@Override
 	public MultiValueMap<String, DataTag> getConfigurations(Collection<URI> uris) {
-		MultiValueMap<String, DataTag> dataTags = new MultiValueMap<>();
+		MultiValueMap<String, DataTag> dataTags = new LinkedMultiValueMap<String, DataTag>();
 		for (URI uri : uris) {
 			if (uri.getScheme().equals(SupportedProtocolsEnum.PROTOCOL_OPCUA.getUrlScheme())) {
 				OPCHardwareAddressImpl hwAddr = new OPCHardwareAddressImpl(uri.getPath().substring(1) );
@@ -101,7 +104,7 @@ public class OpcUaConfigStrategy implements IConfigurationStrategy {
 				DataTagAddress address = new DataTagAddress(hwAddr);
 				
 				DataTag tagToCreate = DataTag.create(uri.toString(), Object.class, address).description(uri.toString()).build();
-				dataTags.put(EQUIPMENT_NAME, tagToCreate);
+				dataTags.add(EQUIPMENT_NAME, tagToCreate);
 			}
 		}
 			

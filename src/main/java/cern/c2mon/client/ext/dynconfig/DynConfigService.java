@@ -9,21 +9,16 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.springframework.stereotype.Component;
+import org.springframework.util.MultiValueMap;
 
-import cern.accsoft.commons.util.collections.MultiValueMap;
-import cern.accsoft.commons.util.value.Pair;
-import cern.c2mon.client.common.listener.ClientRequestReportListener;
 import cern.c2mon.client.common.tag.Tag;
-import cern.c2mon.client.core.ConfigurationService;
-import cern.c2mon.client.core.TagService;
+import cern.c2mon.client.core.service.ConfigurationService;
+import cern.c2mon.client.core.service.TagService;
 import cern.c2mon.client.ext.dynconfig.strategy.DipConfigStrategy;
 import cern.c2mon.client.ext.dynconfig.strategy.IConfigurationStrategy;
 import cern.c2mon.client.ext.dynconfig.strategy.OpcUaConfigStrategy;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
-import cern.c2mon.shared.client.configuration.api.Configuration;
 import cern.c2mon.shared.client.configuration.api.tag.DataTag;
-import cern.c2mon.shared.client.request.ClientRequestErrorReport;
-import cern.c2mon.shared.client.request.ClientRequestProgressReport;
 
 @Component
 public class DynConfigService {
@@ -73,8 +68,8 @@ public class DynConfigService {
 			
 			MultiValueMap<String,DataTag> equipmentToTags = strategy.getConfigurations(Arrays.asList(new URI[]{uri}));
 			
-			for (String eq : equipmentToTags.getKeys()) {
-				ConfigurationReport rep = configurationService.createDataTags(eq, new ArrayList<DataTag>(equipmentToTags.getValues(eq)));
+			for (String eq : equipmentToTags.keySet()) {
+				ConfigurationReport rep = configurationService.createDataTags(eq, new ArrayList<DataTag>(equipmentToTags.get(eq)));
 				// Test the result
 			}
 			
