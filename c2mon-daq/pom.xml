@@ -167,6 +167,7 @@
             <env>
               <basedir>${project.artifactId}</basedir>
               <LD_LIBRARY_PATH>/${project.artifactId}/lib_so</LD_LIBRARY_PATH>
+              <C2MON_DAQ_JMS_URL>tcp://0.0.0.0:61616</C2MON_DAQ_JMS_URL>
             </env>
             <volumes>
               <volume>/${project.artifactId}/log</volume>
