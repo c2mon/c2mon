@@ -38,6 +38,27 @@
       <groupId>org.apache.activemq</groupId>
       <artifactId>activemq-openwire-legacy</artifactId>
     </dependency>
+    
+    <!-- Runtime dependencies required to support HTTP via ActiveMQ -->
+    <!-- Note that these dependencies are optional, they must be redeclared... -->
+    <!-- ...if you wish to deploy them. -->
+    <dependency>
+      <groupId>org.apache.activemq</groupId>
+      <artifactId>activemq-http</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-server</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+	  <optional>true</optional>
+    </dependency>
+
+    
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-context</artifactId>
