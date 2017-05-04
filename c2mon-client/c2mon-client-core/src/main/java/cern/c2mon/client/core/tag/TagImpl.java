@@ -245,17 +245,11 @@ public class TagImpl implements Tag, TopicRegistrationDetails, Cloneable {
     getDataTagQuality().setInvalidStatus(TagQualityStatus.UNDEFINED_TAG, "Tag is not known by the system");
   }
 
-  /* (non-Javadoc)
-   * @see cern.c2mon.client.tag.Tag#getId()
-   */
   @Override
   public Long getId() {
     return this.id;
   }
 
-  /* (non-Javadoc)
-   * @see cern.c2mon.client.tag.Tag#getName()
-   */
   @Override
   public String getName() {
     updateTagLock.readLock().lock();
@@ -334,8 +328,13 @@ public class TagImpl implements Tag, TopicRegistrationDetails, Cloneable {
   }
 
   @Override
+  public String getDescription() {
+    return getLockedString(description);
+  }
+
+  @Override
   public String getValueDescription() {
-    return this.getLockedString(description);
+    return this.getLockedString(valueDescription);
   }
 
   @Override
@@ -343,14 +342,11 @@ public class TagImpl implements Tag, TopicRegistrationDetails, Cloneable {
     return this.getLockedString(unit);
   }
 
-  /* (non-Javadoc)
-   * @see cern.c2mon.client.tag.Tag#getAlarms()
-   */
   @Override
   public final Collection<AlarmValue> getAlarms() {
     updateTagLock.readLock().lock();
     try {
-      return new ArrayList<AlarmValue>(alarms);
+      return new ArrayList<>(alarms);
     } finally {
       updateTagLock.readLock().unlock();
     }
@@ -360,7 +356,7 @@ public class TagImpl implements Tag, TopicRegistrationDetails, Cloneable {
   public Collection<Long> getAlarmIds() {
     updateTagLock.readLock().lock();
     try {
-      Collection<Long> alarmIds = new ArrayList<Long>(alarms.size());
+      Collection<Long> alarmIds = new ArrayList<>(alarms.size());
       for (AlarmValue alarmValue : alarms) {
         alarmIds.add(alarmValue.getId());
       }
@@ -386,9 +382,6 @@ public class TagImpl implements Tag, TopicRegistrationDetails, Cloneable {
     return processSupervisionStatus.keySet();
   }
 
-  /* (non-Javadoc)
-   * @see cern.c2mon.client.tag.Tag#isRuleResult()
-   */
   @Override
   public boolean isRuleResult() {
     updateTagLock.readLock().lock();
@@ -399,30 +392,11 @@ public class TagImpl implements Tag, TopicRegistrationDetails, Cloneable {
     }
   }
 
-  /* (non-Javadoc)
-   * @see cern.c2mon.client.tag.Tag#getRuleExpression()
-   */
   @Override
   public RuleExpression getRuleExpression() {
     updateTagLock.readLock().lock();
     try {
       return this.ruleExpression;
-    } finally {
-      updateTagLock.readLock().unlock();
-    }
-  }
-
-  /* (non-Javadoc)
-     * @see cern.c2mon.client.tag.Tag#getDescription()
-     */
-  @Override
-  public String getDescription() {
-    updateTagLock.readLock().lock();
-    try {
-      if (this.description != null) {
-        return this.description;
-      }
-      return "";
     } finally {
       updateTagLock.readLock().unlock();
     }
@@ -490,6 +464,7 @@ public class TagImpl implements Tag, TopicRegistrationDetails, Cloneable {
    *
    * @return the metadata of the object.
    */
+  @Override
   public Map<String, Object> getMetadata() {
     return this.metadata;
   }
@@ -504,9 +479,6 @@ public class TagImpl implements Tag, TopicRegistrationDetails, Cloneable {
     return controlTagFlag;
   }
 
-  /* (non-Javadoc)
-   * @see cern.c2mon.client.tag.Tag#getTopicName()
-   */
   @Override
   public String getTopicName() {
     updateTagLock.readLock().lock();
@@ -614,17 +586,11 @@ public class TagImpl implements Tag, TopicRegistrationDetails, Cloneable {
     }
   }
 
-  /* (non-Javadoc)
- * @see cern.c2mon.client.tag.Tag#hashCode()
- */
   @Override
   public int hashCode() {
     return this.id.hashCode();
   }
 
-  /* (non-Javadoc)
-   * @see cern.c2mon.client.tag.Tag#equals(java.lang.Object)
-   */
   @Override
   public boolean equals(Object pRight) {
     if (pRight instanceof TagImpl) {
