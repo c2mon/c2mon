@@ -12,6 +12,7 @@ For more details on a given release, please check also the [Milestone planning](
 ### Changed
 
 ### Fixed
+- Client API: Fixed bug in `TagImpl` class, which returned the tag description instead of the value description (#147)
 
 ## [1.8.15] - 2017-03-31
 ### Added
