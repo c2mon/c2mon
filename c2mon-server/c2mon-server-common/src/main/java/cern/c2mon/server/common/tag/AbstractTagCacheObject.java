@@ -203,6 +203,7 @@ public abstract class AbstractTagCacheObject implements DataTagConstants, Clonea
     alarmIds = new ArrayList<>();
     ruleIds = new ArrayList<>();
     cacheTimestamp = new Timestamp(System.currentTimeMillis());
+    metadata = new Metadata();
   }
 
   /**
@@ -357,34 +358,11 @@ public abstract class AbstractTagCacheObject implements DataTagConstants, Clonea
     return (mode == MODE_NOTCONFIGURED);
   }
 
-  public final boolean isLogged() {
-    return this.logged;
-  }
-
-  public final String getUnit() {
-    return this.unit;
-  }
-
   public final Metadata getMetadata() {
+    if (this.metadata == null) {
+      this.metadata = new Metadata();
+    }
     return this.metadata;
-  }
-
-  public void setMetadata(Metadata data) {
-    this.metadata = data;
-  }
-
-  /**
-   * @param description the description to set
-   */
-  public void setDescription(String description) {
-    this.description = description;
-  }
-
-  /**
-   * @param logged the logged to set
-   */
-  public void setLogged(boolean logged) {
-    this.logged = logged;
   }
 
   /**
