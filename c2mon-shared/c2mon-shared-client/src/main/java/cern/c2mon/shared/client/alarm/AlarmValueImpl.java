@@ -68,6 +68,7 @@ public final class AlarmValueImpl extends ClientRequestReport implements AlarmVa
   @Element
   private String faultFamily;
 
+  //ToDo: correct typo in next major release -> https://gitlab.cern.ch/c2mon/c2mon/issues/149
   /** LASER alarm fault member */
   @NotNull
   @Element
