@@ -71,7 +71,7 @@ public final class AlarmValueImpl extends ClientRequestReport implements AlarmVa
   /** LASER alarm fault member */
   @NotNull
   @Element
-  private String faultMember;
+  private String faultMemeber;
 
   /** Free text for additional information about the alarm */
   @Element(required = false)
@@ -129,7 +129,7 @@ public final class AlarmValueImpl extends ClientRequestReport implements AlarmVa
                         final boolean isActive) {
     id = pId;
     faultCode = pFaultCode;
-    faultMember = pFaultMember;
+    faultMemeber = pFaultMember;
     faultFamily = pFaultFamily;
     info = pInfo;
     tagId = pTagId;
@@ -160,7 +160,7 @@ public final class AlarmValueImpl extends ClientRequestReport implements AlarmVa
                         final boolean isActive) {
     id = pId;
     faultCode = pFaultCode;
-    faultMember = pFaultMember;
+    faultMemeber = pFaultMember;
     faultFamily = pFaultFamily;
     info = pInfo;
     tagId = pTagId;
@@ -173,7 +173,7 @@ public final class AlarmValueImpl extends ClientRequestReport implements AlarmVa
   @Override
   @JsonIgnore
   public String getFaultMember() {
-    return this.faultMember;
+    return this.faultMemeber;
   }
 
   @Override
