@@ -288,10 +288,12 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
    *
    * Note: configuration lock must be acquired before entering.
    *
-   * @param id
-   * @param elements
-   * @param monitor
-   * @return
+   * @param configId
+   * @param configName
+   * @param configElements
+   * @param configProgressMonitor
+   * @param isDBConfig
+   * @return the configuration report
    */
   private ConfigurationReport applyConfiguration(final int configId, final String configName,
                                                  final List<ConfigurationElement> configElements,

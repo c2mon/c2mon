@@ -93,8 +93,9 @@ public class DataTagFacadeImpl extends AbstractDataTagFacade<DataTag> implements
    * To be called internally only within a dataTag synchronized block (if object in cache).
    * Does not notify listeners. Only cache timestamp is set (others are null). Should not be made public.
    *
-   * @param dataTag
-   * @param dataTagQuality
+   * @param tag the tag whose status is to be changed
+   * @param statusToAdd the quality status to be added to the data tag
+   * @param description the description of the change of quality
    * @param timestamp the cache timestamp to set (others left unchanged)
    */
   @Override
@@ -127,7 +128,8 @@ public class DataTagFacadeImpl extends AbstractDataTagFacade<DataTag> implements
   /**
    * Public method returning the configuration XML string for a given {@link DataTagCacheObject}
    * (was previously static in SourceDataTag class). Currently used for DAQ start up: TODO switch to generateSourceDataTag method.
-   * @param dataTagCacheObject the cache object
+   *
+   * @param dataTag the cache object
    * @return the XML string
    */
   @Override
