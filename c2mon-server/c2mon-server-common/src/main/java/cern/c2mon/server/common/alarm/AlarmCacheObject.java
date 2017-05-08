@@ -210,13 +210,6 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
     published = false;
   }
 
-  /**
-   * @return the published
-   */
-  public boolean isPublished() {
-    return published;
-  }
-
   @Override
   public boolean isPublishedToLaser() {
     return isPublished();
