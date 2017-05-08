@@ -18,8 +18,10 @@ package cern.c2mon.server.common.alarm;
 
 import java.sql.Timestamp;
 
-import cern.c2mon.shared.common.Cacheable;
+import lombok.Data;
+
 import cern.c2mon.server.common.metadata.Metadata;
+import cern.c2mon.shared.common.Cacheable;
 
 /**
  * Alarm object held in the cache.
@@ -31,7 +33,7 @@ import cern.c2mon.server.common.metadata.Metadata;
  * @author Mark Brightwell
  * 
  */
-
+@Data
 public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
 
   /** Serial version UID */
@@ -167,17 +169,16 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
      return alarmCacheObject;
   }
 
-  /**
-   * Getter method.
-   * @return the alarm's unique identifier
-   */
-  @Override
-  public final Long getId() {
-    return this.id;
+  public final Metadata getMetadata() {
+    if (this.metadata == null) {
+      this.metadata = new Metadata();
+    }
+    return this.metadata;
   }
 
   /**
    * Getter method.
+   *
    * @return the unique identifier of the DataTag to which the alarm is attached
    */
   @Override
@@ -186,187 +187,11 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
   }
 
   /**
-   * Getter method.
-   * @return the alarm's LASER fault family
-   */
-  @Override
-  public final String getFaultFamily() {
-    return this.faultFamily;
-  }
-
-  /**
-   * Getter method.
-   * @return the alarm's LASER fault member
-   */
-  @Override
-  public final String getFaultMember() {
-    return this.faultMember;
-  }
-
-  /**
-   * Getter method.
-   * @return the alarm's LASER fault code
-   */
-  @Override
-  public final int getFaultCode() {
-    return this.faultCode;
-  }
-
-  /**
-   * Getter method.
-   * @return the alarm's current state.
-   */
-  @Override
-  public final String getState() {
-    return this.state;
-  }
-
-  /**
-   * Getter method.
-   * @return the UTC timestamp of the alarm's last state change
-   */
-  @Override
-  public final Timestamp getTimestamp() {
-    return this.timestamp;
-  }
-
-  /**
-   * Getter method.
-   * @return the optional additional info on the alarm that is to be sent to
-   *         LASER as a "user-defined" fault state property.
-   */
-  @Override
-  public final String getInfo() {
-    return this.info;
-  }
-
-  /**
-   * Get the AlarmCondition object associated with this AlarmCacheObject.
-   * 
-   * @return the AlarmCondition object associated with this AlarmCacheObject
-   */
-  @Override
-  public final AlarmCondition getCondition() {
-    return this.condition;
-  }
-
-  public final Metadata getMetadata(){
-    return this.metadata;
-  }
-
-  public void setMetadata(Metadata data){
-    this.metadata = data;
-  }
-  /**
-   * Getter method.
-   * @return the TIM topic to publish to to clients on
-   */
-  public String getTopic() {
-    return this.topic;
-  }
-
-  /**
    * Checks if the Alarm state is ACTIVE.
    * @return true if the alarm is currently active.
    */
   public boolean isActive() {
     return this.state != null && this.state.equals(AlarmCondition.ACTIVE);
-  }
-
-  /**
-   * Setter method.
-   * @param id the id to set
-   */
-  public void setId(final Long id) {
-    this.id = id;
-  }
-
-  /**
-   * Setter method.
-   * @param datatagId the datatagId to set
-   */
-  public void setDataTagId(final Long datatagId) {
-    this.dataTagId = datatagId;
-  }
-
-  /**
-   * Setter method.
-   * @param faultFamily the faultFamily to set
-   */
-  public void setFaultFamily(final String faultFamily) {
-    this.faultFamily = faultFamily;
-  }
-
-  /**
-   * Setter method.
-   * @param faultMember the faultMember to set
-   */
-  public void setFaultMember(final String faultMember) {
-    this.faultMember = faultMember;
-  }
-
-  /**
-   * Setter method.
-   * @param faultCode the faultCode to set
-   */
-  public void setFaultCode(final int faultCode) {
-    this.faultCode = faultCode;
-  }
-
-  /**
-   * Setter method.
-   * @param condition the condition to set
-   */
-  public void setCondition(final AlarmCondition condition) {
-    this.condition = condition;
-  }
-
-  /**
-   * Setter method.
-   * @param state the state to set
-   */
-  public void setState(final String state) {
-    this.state = state;
-  }
-
-    
-  @Override
-  public AlarmChangeState getAlarmChangeState() {
-    return alarmChangeState;
-  }
-    
-  /**
-   * Setter method.
-   * @param changeState The new alarm state which should be update whenever changes
-   *                    on the cache object are applied.
-   */
-  public final void setAlarmChangeState(final AlarmChangeState changeState) {
-    this.alarmChangeState = changeState;
-  }
-
-  /**
-   * Setter method.
-   * 
-   * @param timestamp the timestamp to set
-   */
-  public void setTimestamp(final Timestamp timestamp) {
-    this.timestamp = timestamp;
-  }
-
-  /**
-   * Setter method.
-   * @param info the info to set
-   */
-  public void setInfo(final String info) {
-    this.info = info;
-  }
-
-  /**
-   * Setter method.
-   * @param topic the topic to set
-   */
-  public void setTopic(final String topic) {
-    this.topic = topic;
   }
   
   @Override
@@ -386,25 +211,10 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
   }
 
   /**
-   * @return the last publication
-   */
-  @Override
-  public AlarmPublication getLastPublication() {
-    return lastPublication;
-  }
-
-  /**
    * @return the published
    */
   public boolean isPublished() {
     return published;
-  }
-
-  /**
-   * @param published the published to set
-   */
-  public void setPublished(boolean published) {
-    this.published = published;
   }
 
   @Override
