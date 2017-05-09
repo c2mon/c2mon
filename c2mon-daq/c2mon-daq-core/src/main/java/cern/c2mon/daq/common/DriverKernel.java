@@ -16,6 +16,19 @@
  ******************************************************************************/
 package cern.c2mon.daq.common;
 
+import java.util.Iterator;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.stereotype.Component;
+
 import cern.c2mon.daq.common.conf.core.ConfigurationController;
 import cern.c2mon.daq.common.conf.core.EquipmentConfigurationFactory;
 import cern.c2mon.daq.common.conf.core.EquipmentConfigurationHandler;
@@ -42,18 +55,6 @@ import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
 import cern.c2mon.shared.daq.config.EquipmentUnitAdd;
 import cern.c2mon.shared.daq.config.EquipmentUnitRemove;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.stereotype.Component;
-
-import java.util.Iterator;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 /**
  * This Kernel is the main class of the daq. It aggregates other classes
@@ -166,15 +167,12 @@ public class DriverKernel implements ApplicationContextAware {
      * The thread's run method
      */
     @Override
-    @SuppressWarnings("synthetic-access")
     public void run() {
-      shutdownInternal();
+      doShutdown();
     }
   }
 
-  private void shutdownInternal() {
-    log.info("calling DAQ shutdownInternal() ...");
-
+  private synchronized void doShutdown() {
     log.debug("Stopping DAQ alive timer.");
     processMessageSender.stopAliveTimer();
 
@@ -221,7 +219,7 @@ public class DriverKernel implements ApplicationContextAware {
   }
 
   public void shutdown(){
-    shutdownInternal();
+    doShutdown();
     Runtime.getRuntime().removeShutdownHook(this.ksh);
   }
 
