@@ -8,11 +8,14 @@ For more details on a given release, please check also the [Milestone planning](
 
 ## [Unreleased]
 ### Added
+- DAQ: Possibility to start/stop DAQ module from inside the JVM (!130). Many thanks to Martin Heck from TU Berlin!
 
 ### Changed
 
 ### Fixed
 - Client API: Fixed bug in `TagImpl` class, which returned the tag description instead of the value description (#147)
+- Server: Runtime Exception when updating Metadata (#148)
+- Docker: Fix configuration issues for ElasticSearch in Docker image (!148)
 
 ## [1.8.15] - 2017-03-31
 ### Added
