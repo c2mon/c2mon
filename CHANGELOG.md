@@ -8,14 +8,21 @@ For more details on a given release, please check also the [Milestone planning](
 
 ## [Unreleased]
 ### Added
-- DAQ: Possibility to start/stop DAQ module from inside the JVM (!130). Many thanks to Martin Heck from TU Berlin!
 
 ### Changed
+
+### Fixed
+
+
+## [1.8.16] - 2017-05-10
+### Added
+- DAQ: Possibility to start/stop DAQ module from inside the JVM (!130). Many thanks to Martin Heck from TU Berlin!
 
 ### Fixed
 - Client API: Fixed bug in `TagImpl` class, which returned the tag description instead of the value description (#147)
 - Server: Runtime Exception when updating Metadata (#148)
 - Docker: Fix configuration issues for ElasticSearch in Docker image (!148)
+
 
 ## [1.8.15] - 2017-03-31
 ### Added
@@ -28,6 +35,7 @@ For more details on a given release, please check also the [Milestone planning](
 - Server: Fixed NPE problem when value of metadata is `null` (#139)
 - Server: Fixed frequent configuration timeout when waiting for DAQ response (#140)
 - Server: Prevent exception when trying to delete not existing entity (#141)
+
 
 ## [1.8.14] - 2017-03-14
 ### Added
@@ -49,6 +57,7 @@ This patch contains bug fixes for the DAQ layer.
 
 ### Removed
 - DAQ: Removed obsolete `conf/log4j.properties` file from tarball
+
 
 ## [1.8.12] - 2017-03-10
 ### Added
@@ -120,7 +129,8 @@ This patch contains bug fixes for the DAQ layer.
 - Remove of EquipmentLogger concept from DAQ Core (#56)
 
 
-[Unreleased]: https://gitlab.cern.ch/c2mon/c2mon/milestones/14
+[Unreleased]: https://gitlab.cern.ch/c2mon/c2mon/milestones/15
+[1.8.16]: https://gitlab.cern.ch/c2mon/c2mon/milestones/14
 [1.8.15]: https://gitlab.cern.ch/c2mon/c2mon/milestones/13
 [1.8.14]: https://gitlab.cern.ch/c2mon/c2mon/milestones/12
 [1.8.12]: https://gitlab.cern.ch/c2mon/c2mon/milestones/11
