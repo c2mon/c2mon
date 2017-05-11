@@ -14,7 +14,8 @@ import cern.c2mon.client.core.service.TagService;
 public class DynConfigServiceIT {
 	@Test
 	public void testDynConfigService() throws Exception {
-		System.setProperty("c2mon.client.conf.url", "classpath:c2mon-dynconfig-client.properties");
+		//System.setProperty("c2mon.client.conf.url", "classpath:c2mon-dynconfig-client.properties");
+		System.setProperty("c2mon.client.jms.url", "http://dash.web.cern.ch");
 		C2monServiceGateway.startC2monClientSynchronous();
 		DynConfigService dcs = new DynConfigService();
 		dcs.setConfigurationService(C2monServiceGateway.getConfigurationService());
@@ -48,7 +49,7 @@ public class DynConfigServiceIT {
 		
 
 		System.out.println("Waiting for updates...");
-		Thread.sleep(10000l);
+		Thread.sleep(3000l);
 		System.out.println("Done.");
 	}
 

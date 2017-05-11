@@ -6,7 +6,7 @@
   <parent>
     <groupId>cern.c2mon.client</groupId>
     <artifactId>c2mon-client</artifactId>
-    <version>1.8.15</version>
+    <version>1.8.15-SNAPSHOT</version>
   </parent>
 
   <artifactId>c2mon-client-ext-dynconfig</artifactId>
@@ -37,12 +37,29 @@
       <artifactId>slf4j-api</artifactId>
     </dependency>
 
+
+    <!-- Runtime dependencies required to support HTTP via ActiveMQ -->
+    <dependency>
+      <groupId>org.apache.activemq</groupId>
+      <artifactId>activemq-http</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-server</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+    </dependency>
+    
     <!--  Test dependencies -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
     </dependency>
+    
+    
   </dependencies>
 
 
@@ -53,7 +70,6 @@
       </testResource>
     </testResources>
     <plugins>
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
