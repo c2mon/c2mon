@@ -4,9 +4,17 @@
                       http://maven.apache.org/xsd/settings-1.0.0.xsd">
   <servers>
     <server>
-      <id>artifactory</id>
+      <id>c2mon-releases</id>
       <username>${env.ARTIFACTORY_USERNAME}</username>
       <password>${env.ARTIFACTORY_PASSWORD}</password>
+    </server>
+    <server>
+      <id>gitlab-registry.cern.ch</id>
+      <username>${env.DOCKER_USERNAME}</username>
+      <password>${env.DOCKER_PASSWORD}</password>
+      <configuration>
+        <email>${env.DOCKER_EMAIL}</email>
+      </configuration>
     </server>
   </servers>
 
@@ -16,6 +24,11 @@
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
+      <properties>
+        <repository.releases.url>http://artifactory/beco-release-local</repository.releases.url>
+        <repository.snapshots.url>http://artifactory/beco-development-local</repository.snapshots.url>
+      </properties>
+      
       <repositories>
         <repository>
           <id>central</id>
