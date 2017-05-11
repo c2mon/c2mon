@@ -9,7 +9,7 @@ import org.junit.Test;
 import cern.c2mon.client.common.listener.TagListener;
 import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.core.C2monServiceGateway;
-import cern.c2mon.client.core.TagService;
+import cern.c2mon.client.core.service.TagService;
 
 public class DynConfigServiceIT {
 	@Test
