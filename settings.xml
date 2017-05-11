@@ -20,7 +20,7 @@
 
   <profiles>
     <profile>
-      <id>artifactory</id>
+      <id>c2mon-releases</id>
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
