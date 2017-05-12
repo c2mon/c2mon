@@ -40,7 +40,7 @@ public class DipConfigStrategy implements IConfigurationStrategy {
 
 	@Override
 	public boolean init() {
-		Collection<ProcessNameResponse> processes = C2monServiceGateway.getConfigurationService().getProcessNames();
+		Collection<ProcessNameResponse> processes = configurationService.getProcessNames();
 		if (! processes.contains(PROCESS_NAME)) {
 			Process process = Process.create(PROCESS_NAME).id(DIP_PROCESS_ID).description("DYNDIP Process").build();
 			

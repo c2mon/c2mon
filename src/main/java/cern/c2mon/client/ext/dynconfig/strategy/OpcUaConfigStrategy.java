@@ -47,7 +47,7 @@ public class OpcUaConfigStrategy implements IConfigurationStrategy {
 	
 	@Override
 	public boolean init() {
-//		Tag opcuaProcessAliveTag = C2monServiceGateway.getTagService().get(OPCUA_PROCESS_ALIVE_TAG_ID);
+//		Tag opcuaProcessAliveTag = configurationService.getTagService().get(OPCUA_PROCESS_ALIVE_TAG_ID);
 //		if (!opcuaProcessAliveTag.isValid()) {
 //			StatusTag eqStatusTag = StatusTag.builder().id(OPCUA_EQUIPMENT_STATUS_TAG_ID).name("dynopcua.equipment.status")
 //					.description("DYN OPCUA Equipment status tag").build();

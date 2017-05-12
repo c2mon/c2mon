@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
 
@@ -21,10 +23,12 @@ import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.api.tag.DataTag;
 
 @Component
-public class DynConfigService {
+public class DynConfigService implements InitializingBean{
 	
+	@Autowired
 	ConfigurationService configurationService;
 	
+	@Autowired
 	TagService tagService;
 	
 	AtomicLong dataTagSequence = new AtomicLong(100000L);
@@ -43,7 +47,7 @@ public class DynConfigService {
 	 * Initialize the configuration service and all configuration strategies
 	 * @return <b>true</b> if all went well
 	 */
-	public boolean init() throws Exception {
+	public boolean init() {
 		configurationStrategies.put(SupportedProtocolsEnum.PROTOCOL_DIP.getUrlScheme(), new DipConfigStrategy(this,configurationService ));
 		configurationStrategies.put(SupportedProtocolsEnum.PROTOCOL_OPCUA.getUrlScheme(), new OpcUaConfigStrategy(this,configurationService));
 		for(IConfigurationStrategy strategy : configurationStrategies.values()){
@@ -109,6 +113,13 @@ public class DynConfigService {
 	public Long getNewDataTagId(){
 		return dataTagSequence.getAndIncrement();
 	}
-	
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		init();
+		
+	}
+
+
 	
 }
