@@ -21,8 +21,7 @@ import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import cern.c2mon.server.cache.CacheRegistrationService;
 import cern.c2mon.server.cache.C2monCacheListener;
@@ -46,12 +45,8 @@ import cern.c2mon.shared.common.Cacheable;
  * @param <T> type of cache object expected by listener
  *
  */
+@Slf4j
 public class MultiThreadedCacheListener<T extends Cacheable> implements C2monCacheListener<T>, Lifecycle {
-  
-  /**
-   * Private class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(MultiThreadedCacheListener.class);
   
   /**
    * The number of milliseconds a thread waits between checking for shutdown requests.
@@ -91,7 +86,7 @@ public class MultiThreadedCacheListener<T extends Cacheable> implements C2monCac
   
   /**
    * Constructor.
-   * @param c2monCacheListener the listener wrapped by this class 
+   * @param timCacheListener the listener wrapped by this class
    *        (the module listener)
    * @param queueCapacity the capacity of the blocking queue 
    *        containing the cache objects to pass to the listeners
@@ -115,11 +110,11 @@ public class MultiThreadedCacheListener<T extends Cacheable> implements C2monCac
       if (!shutdownRequestMade) {              
         taskQueue.put(new ObjectAndMethod(cacheable, SupportedMethods.STATUS_CONFIRMATION));        
       } else {
-        LOGGER.warn("Attempt at notifying of element update after shutdown started "
+        log.warn("Attempt at notifying of element update after shutdown started "
             + "- should not happen and indicates incorrect shutdown sequence!");       
       }            
     } catch (InterruptedException interEx) {
-      LOGGER.error("InterruptedExcetion caught while waiting for MultiThreadedListener queue to free space: ", interEx);
+      log.error("InterruptedExcetion caught while waiting for MultiThreadedListener queue to free space: ", interEx);
     }
   }
 
@@ -131,11 +126,11 @@ public class MultiThreadedCacheListener<T extends Cacheable> implements C2monCac
       if (!shutdownRequestMade) {        
         taskQueue.put(new ObjectAndMethod(cacheable, SupportedMethods.ON_UPDATE));        
       } else {
-        LOGGER.warn("Attempt at notifying of element update after shutdown started "
+        log.warn("Attempt at notifying of element update after shutdown started "
             + "- should not happen and indicates incorrect shutdown sequence!");
       }            
     } catch (InterruptedException interEx) {
-      LOGGER.error("InterruptedExcetion caught while waiting for MultiThreadedListener queue to free space: ", interEx);
+      log.error("InterruptedExcetion caught while waiting for MultiThreadedListener queue to free space: ", interEx);
     }
   }
 
@@ -163,7 +158,7 @@ public class MultiThreadedCacheListener<T extends Cacheable> implements C2monCac
   @Override
   public synchronized void stop() {
     if (running) {
-      LOGGER.debug("Shutting down Multithreaded cache listener.");
+      log.debug("Shutting down Multithreaded cache listener.");
       running = false;      
       shutdownRequestMade = true;        
       //wait for the queue to empty
@@ -171,14 +166,14 @@ public class MultiThreadedCacheListener<T extends Cacheable> implements C2monCac
         try {
           Thread.sleep(100);
         } catch (InterruptedException ex) {
-          LOGGER.error("Interrupted while waiting for shutdown to complete", ex);
+          log.error("Interrupted while waiting for shutdown to complete", ex);
         }
       }
       //wait the queue polling time, by which all worker threads should have terminated
       try {
         Thread.sleep(THREAD_SHUTDOWN_CHECK_INTERVAL);
       } catch (InterruptedException ex) {
-        LOGGER.error("Interrupted while waiting for shutdown to complete", ex);
+        log.error("Interrupted while waiting for shutdown to complete", ex);
       }
     }    
   }
@@ -254,7 +249,7 @@ public class MultiThreadedCacheListener<T extends Cacheable> implements C2monCac
             callCorrectMethod(objectAndMethod);
           }          
         } catch (InterruptedException e) {
-          LOGGER.warn("Cache Listener thread interrupted in MultiThreadedListener.", e);
+          log.warn("Cache Listener thread interrupted in MultiThreadedListener.", e);
         }                         
       }
       
@@ -278,10 +273,8 @@ public class MultiThreadedCacheListener<T extends Cacheable> implements C2monCac
           c2monCacheListener.confirmStatus(objectAndMethod.cacheable);
         }
       } catch (Exception e) {
-        LOGGER.error("Exception caught when notifying listener: the update could not be processed.", e);
+        log.error("Exception caught when notifying listener: the update could not be processed.", e);
       }           
     }
-    
   }
- 
 }

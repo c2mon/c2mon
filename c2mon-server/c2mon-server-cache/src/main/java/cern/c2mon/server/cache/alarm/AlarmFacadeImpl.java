@@ -20,8 +20,8 @@ import java.sql.Timestamp;
 import java.util.Properties;
 
 import cern.c2mon.server.common.metadata.Metadata;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -44,6 +44,7 @@ import cern.c2mon.server.common.alarm.AlarmCondition;
  * @author Mark Brightwell
  *
  */
+@Slf4j
 @Service
 public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacade {
 
@@ -56,11 +57,6 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
    * Default max length for fault member
    */
   public static final int MAX_FAULT_MEMBER_LENGTH = 64;
-
-  /**
-   * Private class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(AlarmFacadeImpl.class);
 
   /**
    * Reference to the Alarm cache.
@@ -279,7 +275,7 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
     // not possible to evaluate alarms with associated null tag; occurs during normal operation
     // (may change in future is alarm state depends on quality f.eg.)
     if (tag.getValue() == null) {
-      LOGGER.debug("Alarm update called with null Tag value - leaving Alarm status unchanged at " + alarm.getState());
+      log.debug("Alarm update called with null Tag value - leaving Alarm status unchanged at " + alarm.getState());
 
       // change the alarm timestamp if the alarm has never been initialised
       if (alarmCacheObject.getTimestamp().equals(new Timestamp(0)) ){
@@ -289,13 +285,13 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
     }
 
     if (!tag.getDataTagQuality().isInitialised()) {
-      LOGGER.debug("Alarm update called with uninitialised Tag - leaving Alarm status unchanged.");
+      log.debug("Alarm update called with uninitialised Tag - leaving Alarm status unchanged.");
       return alarm;
     }
 
     // timestamp should never be null
     if (tag.getTimestamp() == null) {
-      LOGGER.warn("update() : tag value or timestamp null -> no update");
+      log.warn("update() : tag value or timestamp null -> no update");
       throw new IllegalArgumentException("update method called on Alarm facade with either null tag value or null tag timestamp.");
     }
 
@@ -304,7 +300,7 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
 
     // Return immediately if the alarm new state is null
     if (newState == null) {
-      LOGGER.error("update() : new state would be NULL -> no update.");
+      log.error("update() : new state would be NULL -> no update.");
       throw new IllegalStateException("Alarm evaluated to null state!");
     }
 
@@ -349,10 +345,10 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
     // (2) if tag is VALID and the alarm changes from ACTIVE->TERMINATE or TERMIATE->ACTIVE
     if (alarmCacheObject.getTimestamp().equals(new Timestamp(0))
         || (tag.isValid() && !alarmCacheObject.getState().equals(newState))) {
-      if (LOGGER.isTraceEnabled()) {
-        LOGGER.trace(new StringBuffer("update(): alarm ").append(alarmCacheObject.getId())
-            .append(" changed STATE to ").append(newState).toString());
-      }
+
+      log.trace(new StringBuffer("update(): alarm ").append(alarmCacheObject.getId())
+          .append(" changed STATE to ").append(newState).toString());
+
       alarmCacheObject.setState(newState);
       alarmCacheObject.setTimestamp(alarmTime);
       alarmCacheObject.setInfo(additionalInfo);
@@ -371,10 +367,9 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
       alarmCacheObject.setInfo("");
     }
     if (!alarmCacheObject.getInfo().equals(additionalInfo)) {
-      if (LOGGER.isTraceEnabled()) {
-        LOGGER.trace(new StringBuffer("update(): alarm ").append(alarmCacheObject.getId())
-            .append(" changed INFO to ").append(additionalInfo).toString());
-      }
+      log.trace(new StringBuffer("update(): alarm ").append(alarmCacheObject.getId())
+          .append(" changed INFO to ").append(additionalInfo).toString());
+
       alarmCacheObject.setInfo(additionalInfo);
       alarmCacheObject.setAlarmChangeState(AlarmChangeState.CHANGE_PROPERTIES);
       alarmCacheObject.setTimestamp(alarmTime);
@@ -389,10 +384,9 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
 
     // In all other cases, the value of the alarm related to the DataTag has
     // not changed. No need to publish an alarm change.
-    if (LOGGER.isTraceEnabled()) {
-      LOGGER.trace(new StringBuffer("update(): alarm ").append(alarmCacheObject.getId())
-          .append(" has not changed.").toString());
-    }
+    log.trace(new StringBuffer("update(): alarm ").append(alarmCacheObject.getId())
+        .append(" has not changed.").toString());
+
     //no change so no listener notification in this case
 
     //this.alarmChange = CHANGE_NONE;
@@ -434,5 +428,4 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"alarmCondition\" cannot be null");
     }
   }
-
 }

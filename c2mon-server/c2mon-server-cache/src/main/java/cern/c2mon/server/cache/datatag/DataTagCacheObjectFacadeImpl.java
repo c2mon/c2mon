@@ -60,7 +60,8 @@ public class DataTagCacheObjectFacadeImpl extends AbstractTagObjectFacade<DataTa
    * Should always be used for modifying the timestamps.
    * @param dataTag
    * @param sourceTimestamp
-   * @param srvTimestamp
+   * @param daqTimestamp
+   * @param cacheTimestamp
    */
   @Override
   public void setTimestamps(DataTag dataTag, Timestamp sourceTimestamp, Timestamp daqTimestamp, Timestamp cacheTimestamp) {    

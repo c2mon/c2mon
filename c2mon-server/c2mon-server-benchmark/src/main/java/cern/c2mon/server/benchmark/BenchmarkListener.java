@@ -18,6 +18,7 @@ package cern.c2mon.server.benchmark;
 
 import javax.annotation.PostConstruct;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,10 +34,9 @@ import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
 
+@Slf4j
 @Service
 public class BenchmarkListener implements C2monCacheListener<Tag>, SmartLifecycle {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(BenchmarkListener.class);
 
   private Logger dataTagLogger = LoggerFactory.getLogger("BenchmarkDataTag");
 
@@ -80,7 +80,7 @@ public class BenchmarkListener implements C2monCacheListener<Tag>, SmartLifecycl
   @Override
   public void notifyElementUpdated(Tag tag) {
     if (!running){
-      LOGGER.warn("Received notification while component not running - will process anyway");
+      log.warn("Received notification while component not running - will process anyway");
     }
     if (tag instanceof DataTag) {
       DataTagCacheObject dataTag = (DataTagCacheObject) tag;
@@ -152,7 +152,7 @@ public class BenchmarkListener implements C2monCacheListener<Tag>, SmartLifecycl
 
   @Override
   public void stop(Runnable runnable) {
-    LOGGER.debug("Stopping Benchmark listener");
+    log.debug("Stopping Benchmark listener");
     stop();
     runnable.run();
   }
@@ -164,7 +164,7 @@ public class BenchmarkListener implements C2monCacheListener<Tag>, SmartLifecycl
 
   @Override
   public void start() {
-    LOGGER.debug("Starting Benchmark listener");
+    log.debug("Starting Benchmark listener");
     running = true;
     listenerContainer.start();
   }

@@ -27,11 +27,11 @@ import java.util.concurrent.TimeUnit;
 
 import cern.c2mon.server.cache.loading.common.BatchCacheLoader;
 import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
+
+import lombok.extern.slf4j.Slf4j;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import cern.c2mon.server.cache.ClusterCache;
@@ -58,12 +58,8 @@ import cern.c2mon.shared.common.Cacheable;
  * @deprecated use {@link BatchCacheLoader} instead if starting from scratch
  *              as better performance for large caches
  */
+@Slf4j
 public class SimpleC2monCacheLoader<T extends Cacheable> implements C2monCacheLoader {
-
-  /**
-   * Private logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(SimpleC2monCacheLoader.class);
 
   /**
    * Reference to the distributed parameters (used to lock server start up).
@@ -122,11 +118,11 @@ public class SimpleC2monCacheLoader<T extends Cacheable> implements C2monCacheLo
 
       //load the cache from the buffer
       if (preloadBuffer != null) {
-        LOGGER.debug("Loading the cache from the buffer...");
+        log.debug("Loading the cache from the buffer...");
         loadCacheFromBuffer(preloadBuffer);
-        LOGGER.debug("\t...done");
+        log.debug("\t...done");
       } else {
-        LOGGER.error("Attempt to call loadCacheFromBuffer with null buffer: "
+        log.error("Attempt to call loadCacheFromBuffer with null buffer: "
             + "this should not happen and needs investigating!");
       }
       //loading is done on one node only; if the design is switched to multiple nodes, then need to wait for
@@ -135,14 +131,6 @@ public class SimpleC2monCacheLoader<T extends Cacheable> implements C2monCacheLo
     } finally {
       clusterCache.releaseReadLockOnKey(aliveStatusInitialized);
     }
-
-//    try {
-//      cache.setNodeCoherent(true);
-//    } catch (UnsupportedOperationException ex) {
-//      LOGGER.warn("setNodeCoherent() method threw an exception when "
-//          + "loading the cache (UnsupportedOperationException) - this is "
-//          + "normal behaviour in a single-server mode and can be ignored");
-//    }
   }
 
   /**
@@ -153,7 +141,6 @@ public class SimpleC2monCacheLoader<T extends Cacheable> implements C2monCacheLo
     //set the local Ehcache node to incoherent, which speeds up the loading process in the Terracotta setup
     //(when in single server mode, will throw an exception which we catch and log)
     loadCache(preloadBuffer.keySet());
-
   }
 
   /**
@@ -163,7 +150,7 @@ public class SimpleC2monCacheLoader<T extends Cacheable> implements C2monCacheLo
     try {
       cache.setNodeBulkLoadEnabled(true);
     } catch (UnsupportedOperationException ex) {
-      LOGGER.warn("setNodeBulkLoadEnabled() method threw an exception when "
+      log.warn("setNodeBulkLoadEnabled() method threw an exception when "
           + "loading the cache (UnsupportedOperationException) - this is "
           + "normal behaviour in a single-server mode and can be ignored");
     }
@@ -171,7 +158,7 @@ public class SimpleC2monCacheLoader<T extends Cacheable> implements C2monCacheLo
     try {
       cache.setNodeBulkLoadEnabled(false);
     } catch (UnsupportedOperationException ex) {
-      LOGGER.warn("setNodeBulkLoadEnabled() method threw an exception when "
+      log.warn("setNodeBulkLoadEnabled() method threw an exception when "
           + "loading the cache (UnsupportedOperationException) - this is "
           + "normal behaviour in a single-server mode and can be ignored");
     }
@@ -205,10 +192,8 @@ public class SimpleC2monCacheLoader<T extends Cacheable> implements C2monCacheLo
     try {
       threadPoolExecutor.awaitTermination(1200, TimeUnit.SECONDS); //TODO move to config?constant?
     } catch (InterruptedException e) {
-      LOGGER.warn("Exception caught while waiting for cache loading threads to complete (waited longer then timeout?): ", e);
+      log.warn("Exception caught while waiting for cache loading threads to complete (waited longer then timeout?): ", e);
     }
-
-
   }
 
   private Map<Long, T> fillBufferFromDB() {
@@ -249,7 +234,5 @@ public class SimpleC2monCacheLoader<T extends Cacheable> implements C2monCacheLo
           cache.putQuiet(new Element(key, preloadBuffer.get(key)));
       }
     }
-
   }
-
 }

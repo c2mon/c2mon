@@ -18,8 +18,7 @@ package cern.c2mon.server.configuration.handler.transacted;
 
 import java.util.Properties;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.UnexpectedRollbackException;
@@ -41,13 +40,9 @@ import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
  * @author Mark Brightwell
  *
  */
+@Slf4j
 @Service
 public class AlarmConfigTransactedImpl implements AlarmConfigTransacted {
-
-  /**
-   * Class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(AlarmConfigTransactedImpl.class);
 
   /**
    * Reference to the alarm facade.
@@ -75,7 +70,6 @@ public class AlarmConfigTransactedImpl implements AlarmConfigTransacted {
    * @param alarmFacade the alarm facade bean
    * @param alarmDAO the alarm DAO bean
    * @param alarmCache the alarm cache bean
-   * @param tagConfigGateway the tag configuration gateway bean
    */
   @Autowired
   public AlarmConfigTransactedImpl(final AlarmFacade alarmFacade, final AlarmLoaderDAO alarmDAO,
@@ -102,14 +96,14 @@ public class AlarmConfigTransactedImpl implements AlarmConfigTransacted {
     
     alarmCache.acquireWriteLockOnKey(element.getEntityId());
     try {
-      LOGGER.trace("Creating alarm " + element.getEntityId());
+      log.trace("Creating alarm " + element.getEntityId());
       alarm = alarmFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
       
       try {
         alarmDAO.insert(alarm);
         alarmCache.putQuiet(alarm);
       } catch (Exception e) {
-        LOGGER.error("Exception caught while loading creating alarm with id " + element.getEntityId(), e);
+        log.error("Exception caught while loading creating alarm with id " + element.getEntityId(), e);
         throw new UnexpectedRollbackException("Unexpected exception while creating an Alarm " + element.getEntityId() + ": rolling back the creation", e);
       }
     } finally {
@@ -120,7 +114,7 @@ public class AlarmConfigTransactedImpl implements AlarmConfigTransacted {
     try {
       tagConfigGateway.addAlarmToTag(alarm.getTagId(), alarm.getId());
     } catch (Exception e) {
-      LOGGER.error("Exception caught while adding new Alarm " + alarm.getId() + " to Tag " + alarm.getId(), e);
+      log.error("Exception caught while adding new Alarm " + alarm.getId() + " to Tag " + alarm.getId(), e);
       alarmCache.remove(alarm.getId());
       tagConfigGateway.removeAlarmFromTag(alarm.getTagId(), alarm.getId());
       throw new UnexpectedRollbackException("Unexpected exception while creating a Alarm " + alarm.getId() + ": rolling back the creation", e);
@@ -141,7 +135,7 @@ public class AlarmConfigTransactedImpl implements AlarmConfigTransacted {
   public void doUpdateAlarm(final Long alarmId, final Properties properties) {
     //reject if trying to change datatag it is attached to - not currently allowed
     if (properties.containsKey("dataTagId")) {
-      LOGGER.warn("Attempting to change the tag to which an alarm is attached - this is not currently supported!");
+      log.warn("Attempting to change the tag to which an alarm is attached - this is not currently supported!");
       properties.remove("dataTagId");
     }
     
@@ -154,7 +148,7 @@ public class AlarmConfigTransactedImpl implements AlarmConfigTransacted {
     } catch (CacheElementNotFoundException ex) {
       throw ex;
     } catch (Exception ex) {
-      LOGGER.error("Exception caught while updating alarm" + alarmId, ex);
+      log.error("Exception caught while updating alarm" + alarmId, ex);
       throw new UnexpectedRollbackException("Unexpected exception caught while updating Alarm " + alarmId, ex);
     } finally {
       alarmCache.releaseWriteLockOnKey(alarmId);
@@ -171,13 +165,13 @@ public class AlarmConfigTransactedImpl implements AlarmConfigTransacted {
       try {
         removeDataTagReference(alarm);
       } catch (CacheElementNotFoundException e) {
-        LOGGER.warn("Unable to remove Alarm reference from Tag, as could not locate Tag " + alarm.getTagId() + " in cache");
+        log.warn("Unable to remove Alarm reference from Tag, as could not locate Tag " + alarm.getTagId() + " in cache");
       }
     } catch (CacheElementNotFoundException e) {
-      LOGGER.debug("Attempting to remove a non-existent Alarm - no action taken.");
+      log.debug("Attempting to remove a non-existent Alarm - no action taken.");
       alarmReport.setWarning("Attempting to remove a non-existent Alarm");
     } catch (Exception ex) {
-      LOGGER.error("Exception caught while removing Alarm " + alarmId, ex);
+      log.error("Exception caught while removing Alarm " + alarmId, ex);
       alarmReport.setFailure("Unable to remove Alarm with id " + alarmId);
       throw new UnexpectedRollbackException("Exception caught while attempting to remove an alarm", ex);
     } finally {

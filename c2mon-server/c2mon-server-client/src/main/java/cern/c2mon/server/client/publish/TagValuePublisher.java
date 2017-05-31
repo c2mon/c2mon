@@ -22,15 +22,11 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import cern.c2mon.server.client.config.ClientProperties;
-import cern.c2mon.server.common.control.ControlTag;
-import cern.c2mon.server.common.datatag.DataTag;
-import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.shared.client.serializer.TransferTagSerializer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.env.Environment;
 import org.springframework.jms.JmsException;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
@@ -73,11 +69,10 @@ import cern.c2mon.shared.util.jms.JmsSender;
  * @see ConfigurationUpdateListener
  * @see TagValueUpdate
  */
+@Slf4j
 @Service
 @ManagedResource(description = "Bean publishing tag updates to the clients")
 public class TagValuePublisher implements AlarmAggregatorListener, ConfigurationUpdateListener, Publisher<TagWithAlarms> {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(TagValuePublisher.class);
 
   /** Bean providing for sending JMS messages and waiting for a response */
   private final JmsSender jmsSender;
@@ -140,15 +135,13 @@ public class TagValuePublisher implements AlarmAggregatorListener, Configuration
    */
   @PostConstruct
   public void init() {
-    LOGGER.info("init - Starting Tag publisher.");
-    if (LOGGER.isTraceEnabled()) {
-    	LOGGER.trace("init - Registering for Tag Updates.");
-    }
+    log.info("init - Starting Tag publisher.");
+    log.trace("init - Registering for Tag Updates.");
+
     this.alarmAggregator.registerForTagUpdates(this);
 
-    if (LOGGER.isTraceEnabled()) {
-    	LOGGER.trace("init - Registering for Configuration Updates.");
-    }
+    log.trace("init - Registering for Configuration Updates.");
+
     this.configurationUpdate.registerForConfigurationUpdates(this);
 
     if (republicationDelay != 0)
@@ -161,7 +154,7 @@ public class TagValuePublisher implements AlarmAggregatorListener, Configuration
    */
   @PreDestroy
   public void shutdown() {
-    LOGGER.info("shutdown - Stopping tag publisher.");
+    log.info("shutdown - Stopping tag publisher.");
     republisher.stop();
   }
 
@@ -179,7 +172,7 @@ public class TagValuePublisher implements AlarmAggregatorListener, Configuration
     try {
       publish(tagWithAlarms);
     } catch (JmsException e) {
-      LOGGER.error("notifyOnUpdate - Error publishing tag update to topic for tag " + tagWithAlarms.getTag().getId() + " - submitting for republication", e);
+      log.error("notifyOnUpdate - Error publishing tag update to topic for tag " + tagWithAlarms.getTag().getId() + " - submitting for republication", e);
       republisher.publicationFailed(tagWithAlarms);
     }
   }
@@ -187,9 +180,8 @@ public class TagValuePublisher implements AlarmAggregatorListener, Configuration
   @Override
   public void publish(final TagWithAlarms tagWithAlarms) {
     TransferTagValueImpl tagValue = TransferObjectFactory.createTransferTagValue(tagWithAlarms);
-    if (LOGGER.isTraceEnabled()) {
-      LOGGER.trace("publish - Publishing tag update to client: " + TransferTagSerializer.toJson(tagValue));
-    }
+    log.trace("publish - Publishing tag update to client: " + TransferTagSerializer.toJson(tagValue));
+
     jmsSender.sendToTopic(TransferTagSerializer.toJson(tagValue), TopicProvider.topicFor(tagWithAlarms.getTag(), properties));
   }
 
@@ -201,12 +193,12 @@ public class TagValuePublisher implements AlarmAggregatorListener, Configuration
       try {
         String topic = TopicProvider.topicFor(tagWithAlarms.getTag(), properties);
         TransferTagImpl tag = TransferObjectFactory.createTransferTag(tagWithAlarms, aliveTimerFacade.isRegisteredAliveTimer(tagId), topic);
-        if (LOGGER.isTraceEnabled()) {
-          LOGGER.trace("notifyOnConfigurationUpdate - Publishing configuration update to client: " + TransferTagSerializer.toJson(tag));
-        }
+
+        log.trace("notifyOnConfigurationUpdate - Publishing configuration update to client: " + TransferTagSerializer.toJson(tag));
+
         jmsSender.sendToTopic(TransferTagSerializer.toJson(tag), topic);
       } catch (JmsException e) {
-        LOGGER.error("notifyOnConfigurationUpdate - Error publishing configuration update to topic for tag " + tagWithAlarms.getTag().getId()
+        log.error("notifyOnConfigurationUpdate - Error publishing configuration update to topic for tag " + tagWithAlarms.getTag().getId()
             + " - submitting for republication", e);
         republisher.publicationFailed(tagWithAlarms);
       }

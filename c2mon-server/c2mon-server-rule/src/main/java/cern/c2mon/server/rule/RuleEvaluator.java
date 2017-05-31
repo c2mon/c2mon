@@ -33,6 +33,4 @@ public interface RuleEvaluator {
    * @param ruleId id of the rule
    */
   void evaluateRule(Long ruleId);
-
-  
 }

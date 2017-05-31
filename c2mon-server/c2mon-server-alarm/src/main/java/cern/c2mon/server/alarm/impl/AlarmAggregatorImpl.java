@@ -21,8 +21,7 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -47,14 +46,10 @@ import cern.c2mon.server.common.tag.Tag;
  * @author Mark Brightwell
  *
  */
+@Slf4j
 @Service
 public class AlarmAggregatorImpl implements AlarmAggregator, C2monCacheListener<Tag>, CacheSupervisionListener<Tag> {
 
-  /**
-   * Class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(AlarmAggregatorImpl.class);
-  
   /**
    * List of registered listeners.
    */
@@ -137,18 +132,17 @@ public class AlarmAggregatorImpl implements AlarmAggregator, C2monCacheListener<
       try {
         listener.notifyOnUpdate((Tag) tag.clone(), alarmList);
       } catch (CloneNotSupportedException e) {
-        LOGGER.error("Unexpected exception caught: clone should be implemented for this class! "
+        log.error("Unexpected exception caught: clone should be implemented for this class! "
             + "Alarm & tag listener was not notified: " + listener.getClass().getSimpleName());
       }
     }
   }
 
   @Override
-  public void onSupervisionChange(final Tag tag) {       
-    if (LOGGER.isTraceEnabled()) {
-      LOGGER.trace("Evaluating alarm for tag " + tag.getId() + " due to supervision status notification.");
-    }      
-    evaluateAlarms(tag);              
+  public void onSupervisionChange(final Tag tag) {
+    log.trace("Evaluating alarm for tag " + tag.getId() + " due to supervision status notification.");
+
+    evaluateAlarms(tag);
   }
 
   private List<Alarm> evaluateAlarms(final Tag tag) {
@@ -157,11 +151,11 @@ public class AlarmAggregatorImpl implements AlarmAggregator, C2monCacheListener<
       try {
         alarmList = tagFacadeGateway.evaluateAlarms(tag);
         if (alarmList.isEmpty()) {
-          LOGGER.warn("Empty alarm list returned when evaluating alarms for tag " + tag.getId() 
+          log.warn("Empty alarm list returned when evaluating alarms for tag " + tag.getId()
               + " - this should not be happening (possible timestamp filtering problem)");
         }        
       } catch (Exception e) {
-        LOGGER.error("Exception caught when attempting to evaluate the alarms for tag " + tag.getId() 
+        log.error("Exception caught when attempting to evaluate the alarms for tag " + tag.getId()
             + " - publishing to the client with no attached alarms.", e);
       }       
     }

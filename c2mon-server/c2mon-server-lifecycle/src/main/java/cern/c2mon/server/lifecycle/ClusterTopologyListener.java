@@ -20,6 +20,7 @@ import java.net.InetAddress;
 
 import javax.annotation.PostConstruct;
 
+import lombok.extern.slf4j.Slf4j;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.cluster.CacheCluster;
 import net.sf.ehcache.cluster.ClusterNode;
@@ -44,9 +45,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Justin Lewis Salmon
  *
  */
+@Slf4j
 public class ClusterTopologyListener implements net.sf.ehcache.cluster.ClusterTopologyListener {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(ClusterTopologyListener.class);
 
   private final static Logger SMS_LOGGER = LoggerFactory.getLogger("AdminSmsLogger");
 
@@ -62,39 +62,39 @@ public class ClusterTopologyListener implements net.sf.ehcache.cluster.ClusterTo
   /**
    * A node has joined the cluster
    *
-   * @param node The joining node
+   * @param clusterNode The joining node
    */
   @Override
   public void nodeJoined(final ClusterNode clusterNode) {
-    LOGGER.info("Detected Terracotta node joined cluster: " + clusterNode.getId());
+    log.info("Detected Terracotta node joined cluster: " + clusterNode.getId());
   }
 
   /**
    * A node has left the cluster
    *
-   * @param node The departing node
+   * @param clusterNode The departing node
    */
   @Override
   public void nodeLeft(final ClusterNode clusterNode) {
-    LOGGER.info("Detected Terracotta node left cluster: " + clusterNode.getId());
+    log.info("Detected Terracotta node left cluster: " + clusterNode.getId());
   }
 
   /**
    * This node has lost contact (possibly temporarily) with the cluster and
    * cannot execute clustered operations
    *
-   * @param node The current node
+   * @param clusterNode The current node
    */
   @Override
   public void clusterOffline(ClusterNode clusterNode) {
     // Send a warning message that the node lost contact with the cluster
-    LOGGER.warn("Detected Terracotta cluster offline event for node: " + clusterNode.getId());
+    log.warn("Detected Terracotta cluster offline event for node: " + clusterNode.getId());
 
     String hostname;
     try {
       hostname = InetAddress.getLocalHost().getHostName();
     } catch (Exception e) {
-      LOGGER.error("Unable to get local hostname", e);
+      log.error("Unable to get local hostname", e);
       hostname = "#unknown host#";
     }
 
@@ -106,11 +106,11 @@ public class ClusterTopologyListener implements net.sf.ehcache.cluster.ClusterTo
    * This node has established contact with the cluster and can execute
    * clustered operations.
    *
-   * @param node The current node
+   * @param clusterNode The current node
    */
   @Override
   public void clusterOnline(ClusterNode clusterNode) {
-    LOGGER.info("Detected Terracotta cluster online event for node: " + clusterNode.getId());
+    log.info("Detected Terracotta cluster online event for node: " + clusterNode.getId());
   }
 
   /**
@@ -122,6 +122,6 @@ public class ClusterTopologyListener implements net.sf.ehcache.cluster.ClusterTo
    */
   @Override
   public void clusterRejoined(ClusterNode oldNode, ClusterNode newNode) {
-    LOGGER.info("Detected Terracotta cluster rejoined event. Old node: " + oldNode.getId() + " New node: " + newNode.getId());
+    log.info("Detected Terracotta cluster rejoined event. Old node: " + oldNode.getId() + " New node: " + newNode.getId());
   }
 }

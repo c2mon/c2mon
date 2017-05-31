@@ -19,8 +19,7 @@ package cern.c2mon.server.configuration.handler.impl;
 import java.sql.Timestamp;
 import java.util.Properties;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.UnexpectedRollbackException;
@@ -41,14 +40,10 @@ import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
  * @author Mark Brightwell
  *
  */
+@Slf4j
 @Service
 public class AlarmConfigHandlerImpl implements AlarmConfigHandler {
 
-  /**
-   * Class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(AlarmConfigHandlerImpl.class);  
-  
   /**
    * Transacted bean.
    */
@@ -109,13 +104,10 @@ public class AlarmConfigHandlerImpl implements AlarmConfigHandler {
       alarmConfigTransacted.doUpdateAlarm(alarmId, properties);
       alarmFacade.evaluateAlarm(alarmId);
     } catch (UnexpectedRollbackException e) {
-      LOGGER.error("Rolling back Alarm update in cache");
+      log.error("Rolling back Alarm update in cache");
       alarmCache.remove(alarmId);
       alarmCache.loadFromDb(alarmId);
       throw e;      
     }    
   }
-  
-  
-
 }

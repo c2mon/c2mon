@@ -19,8 +19,7 @@ package cern.c2mon.server.client.publish;
 import javax.annotation.PostConstruct;
 
 import com.google.gson.Gson;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.SmartLifecycle;
@@ -55,12 +54,10 @@ import cern.c2mon.shared.util.json.GsonFactory;
  * @author Manos, Mark Brightwell
  *
  */
+@Slf4j
 @Service
 @ManagedResource(description = "Bean publishing Alarm updates to the clients")
 public class AlarmPublisher implements C2monCacheListener<Alarm>, SmartLifecycle, Publisher<AlarmValue>  {
-
-  /** Class logger */
-  private static final Logger LOGGER = LoggerFactory.getLogger(AlarmPublisher.class);
 
   /** Bean providing for sending JMS messages and waiting for a response */
   private final JmsSender jmsSender;
@@ -131,13 +128,13 @@ public class AlarmPublisher implements C2monCacheListener<Alarm>, SmartLifecycle
       alarmValue = (TransferObjectFactory.createAlarmValue(alarm, tag));
     }
     else {
-      LOGGER.warn("notifyElementUpdated() - unrecognized Tag with id " + tagId);
+      log.warn("notifyElementUpdated() - unrecognized Tag with id " + tagId);
       alarmValue = (TransferObjectFactory.createAlarmValue(alarm));
     }
     try {
       publish(alarmValue);
     } catch (JmsException e) {
-      LOGGER.error("Error publishing alarm to clients - submitting for republication. Alarm id is " + alarmValue.getId(), e);
+      log.error("Error publishing alarm to clients - submitting for republication. Alarm id is " + alarmValue.getId(), e);
       republisher.publicationFailed(alarmValue);
     }
   }
@@ -160,7 +157,7 @@ public class AlarmPublisher implements C2monCacheListener<Alarm>, SmartLifecycle
 
   @Override
   public void start() {
-    LOGGER.debug("Starting Alarm publisher");
+    log.debug("Starting Alarm publisher");
     running = true;
     republisher.start();
     listenerContainer.start();
@@ -168,7 +165,7 @@ public class AlarmPublisher implements C2monCacheListener<Alarm>, SmartLifecycle
 
   @Override
   public void stop() {
-    LOGGER.debug("Stopping Alarm publisher");
+    log.debug("Stopping Alarm publisher");
     listenerContainer.stop();
     republisher.stop();
     running = false;
@@ -182,7 +179,7 @@ public class AlarmPublisher implements C2monCacheListener<Alarm>, SmartLifecycle
   @Override
   public void publish(final AlarmValue alarmValue) {
     String jsonAlarm = GSON.toJson(alarmValue);
-    LOGGER.debug("Publishing alarm: " + jsonAlarm);
+    log.debug("Publishing alarm: " + jsonAlarm);
     jmsSender.send(jsonAlarm);
   }
 
@@ -201,5 +198,4 @@ public class AlarmPublisher implements C2monCacheListener<Alarm>, SmartLifecycle
   public int getSizeUnpublishedList() {
     return republisher.getSizeUnpublishedList();
   }
-
 }

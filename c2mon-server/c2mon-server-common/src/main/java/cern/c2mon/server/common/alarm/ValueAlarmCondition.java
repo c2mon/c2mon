@@ -58,23 +58,19 @@ public class ValueAlarmCondition extends AlarmCondition {
   /**
    * Constructor
    *
-   * @param alarmValue
-   *          the value for which the condition is considered to return ACTIVE
+   * @param pAlarmValue the value for which the condition is considered to return ACTIVE
    */
   public ValueAlarmCondition(final Object pAlarmValue) {
     setAlarmValue(pAlarmValue);
   }
 
   /**
-   * @param value
-   *          the value to be compared to the condition's alarm value
-   * @return a string representing the LASER fault state descriptor for the
-   *         alarm. If the value to be evaluated is null, the method will return
-   *         null.
-   * @throws NullPointerException
-   *           if called with null parameter
-   * @throws IllegalStateException
-   *           if type of alarm condition and tag value do not match
+   * @param pValue the value to be compared to the condition's alarm value
+   *
+   * @return a string representing the LASER fault state descriptor for the alarm.
+   * If the value to be evaluated is null, the method will return null.
+   * @throws NullPointerException  if called with null parameter
+   * @throws IllegalStateException if type of alarm condition and tag value do not match
    */
   @Override
   public String evaluateState(final Object pValue) {
@@ -104,8 +100,7 @@ public class ValueAlarmCondition extends AlarmCondition {
   /**
    * Set a new alarm value for the ValueAlarmCondition
    *
-   * @param alarmValue
-   *          the value for which the condition is supposed to return ACTIVE
+   * @param pAlarmValue the value for which the condition is supposed to return ACTIVE
    */
   public final void setAlarmValue(final Object pAlarmValue) {
     this.alarmValue = pAlarmValue;
@@ -145,7 +140,5 @@ public class ValueAlarmCondition extends AlarmCondition {
     } else {
       return false;
     }
-
   }
-
 }

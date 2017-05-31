@@ -16,8 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.lifecycle;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.jmx.export.annotation.ManagedOperation;
@@ -44,14 +43,10 @@ import cern.c2mon.server.supervision.SupervisionFacade;
  * @author Mark Brightwell
  *
  */
+@Slf4j
 @Service
 @ManagedResource(objectName = "cern.c2mon:name=recoveryManager")
 public class RecoveryManager implements SmartLifecycle {
-
-  /**
-   * Class logger.
-   */
-  public static final Logger LOGGER = LoggerFactory.getLogger(RecoveryManager.class);
 
   /**
    * Delay at server start-up before current supervision status saved to the DB.
@@ -131,7 +126,7 @@ public class RecoveryManager implements SmartLifecycle {
         new Thread(new Runnable() {
           @Override
           public void run() {
-            LOGGER.info("Running server recovery tasks.");
+            log.info("Running server recovery tasks.");
             recover();
           }
         }, "ServerRecovery").start();
@@ -139,7 +134,7 @@ public class RecoveryManager implements SmartLifecycle {
         new Thread(new Runnable() {
           @Override
           public void run() {
-            LOGGER.info("Running standard start-up tasks (none configured so far)");
+            log.info("Running standard start-up tasks (none configured so far)");
             refreshAfterStandardRestart();
           }
         }, "ServerStartup").start();
@@ -186,9 +181,9 @@ public class RecoveryManager implements SmartLifecycle {
    */
   @ManagedOperation(description = "Refreshes all supervision status.")
   public void refreshSupervisionStatus() {
-    LOGGER.info("Recovery task: notifying all supervision listeners of current status.");
+    log.info("Recovery task: notifying all supervision listeners of current status.");
     supervisionFacade.refreshAllSupervisionStatus();
-    LOGGER.info("Recovery task: finished notifying supervision status (notice all alarms are now re-evaluated on a separate thread"
+    log.info("Recovery task: finished notifying supervision status (notice all alarms are now re-evaluated on a separate thread"
     		+ " - this may take some time!)");
   }
 
@@ -197,9 +192,9 @@ public class RecoveryManager implements SmartLifecycle {
    */
   @ManagedOperation(description = "Refreshes all state tags (new timestamp).")
   public void refreshStateTags() {
-    LOGGER.info("Recovery task: refreshing state tags.");
+    log.info("Recovery task: refreshing state tags.");
     supervisionFacade.refreshStateTags();
-    LOGGER.info("Recovery task: finished refreshing state tags.");
+    log.info("Recovery task: finished refreshing state tags.");
   }
 
   /**
@@ -208,9 +203,9 @@ public class RecoveryManager implements SmartLifecycle {
    */
   @ManagedOperation(description = "Refreshes DataTags from DAQ cache. Refresh supervision status after this call!")
   public void refreshDataTags() {
-    LOGGER.info("Recovery task: refreshing DataTags from DAQ (using DAQ cache).");
+    log.info("Recovery task: refreshing DataTags from DAQ (using DAQ cache).");
     dataRefreshManager.refreshTagsForAllProcess();
-    LOGGER.info("Recovery task: finished refreshing all DataTags from DAQ.");
+    log.info("Recovery task: finished refreshing all DataTags from DAQ.");
   }
 
   /**
@@ -223,7 +218,7 @@ public class RecoveryManager implements SmartLifecycle {
    */
   @ManagedOperation(description = "Notifies all Tag cache listeners (status confirmation). Refresh supervision status after this call!")
   public void notifyAllTagCacheListeners() {
-    LOGGER.info("Recovery task: notifying all tag listeners.");
+    log.info("Recovery task: notifying all tag listeners.");
     for (Long key : controlTagCache.getKeys()) {
       controlTagCache.acquireWriteLockOnKey(key);
       try {
@@ -244,7 +239,7 @@ public class RecoveryManager implements SmartLifecycle {
         dataTagCache.releaseWriteLockOnKey(key);
       }
     }
-    LOGGER.info("Recovery task: finished notifying all tag listeners.");
+    log.info("Recovery task: finished notifying all tag listeners.");
   }
 
   /**
@@ -259,7 +254,7 @@ public class RecoveryManager implements SmartLifecycle {
    */
   @ManagedOperation(description = "Notifies all Alarm cache listeners (status confirmation).")
   public void notifyAllAlarmCacheListeners() {
-    LOGGER.info("Recovery task: notifying all alarm cache listeners (cache persistence to DB, re-publication to clients, publication to LASER if not already done)");
+    log.info("Recovery task: notifying all alarm cache listeners (cache persistence to DB, re-publication to clients, publication to LASER if not already done)");
     for (Long key : alarmCache.getKeys()) {
       alarmCache.acquireWriteLockOnKey(key);
       try {
@@ -270,7 +265,7 @@ public class RecoveryManager implements SmartLifecycle {
         alarmCache.releaseWriteLockOnKey(key);
       }
     }
-    LOGGER.info("Recovery task: finished notifying all alarm cache listeners.");
+    log.info("Recovery task: finished notifying all alarm cache listeners.");
   }
 
   /**
@@ -286,14 +281,14 @@ public class RecoveryManager implements SmartLifecycle {
    */
   @ManagedOperation(description="Republish all non-published alarms (use if alarm publication thread did not shutdown correctly)")
   public void publishUnpublishedAlarms() {
-    LOGGER.info("Publishing all unpublished alarms to LASER and re-publishing to clients.");
+    log.info("Publishing all unpublished alarms to LASER and re-publishing to clients.");
     for (Long key : alarmCache.getKeys()) {
       alarmCache.acquireWriteLockOnKey(key);
       try {
         Alarm alarm = alarmCache.get(key);
         alarmCache.notifyListenersOfUpdate(alarm);
       } catch (Exception e) {
-        LOGGER.error("Exception caught while checking for unpublished alarms", e);
+        log.error("Exception caught while checking for unpublished alarms", e);
       } finally {
         alarmCache.releaseWriteLockOnKey(key);
       }

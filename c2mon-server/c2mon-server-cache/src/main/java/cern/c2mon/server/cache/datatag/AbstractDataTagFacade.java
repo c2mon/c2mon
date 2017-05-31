@@ -20,8 +20,6 @@ import java.sql.Timestamp;
 import java.util.Properties;
 
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import cern.c2mon.server.cache.AlarmCache;
 import cern.c2mon.server.cache.AlarmFacade;
@@ -338,9 +336,7 @@ public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractT
         if (sourceDataTagValue.getValue() == null) {
 
           if (sourceDataTagValue.isValid()) {
-            if (log.isDebugEnabled()) {
-              log.debug("Null value received from source for datatag " + sourceDataTagValue.getId() + " - invalidating with quality UNKNOWN_REASON");
-            }
+            log.debug("Null value received from source for datatag " + sourceDataTagValue.getId() + " - invalidating with quality UNKNOWN_REASON");
             invalidateQuietly(dataTag, TagQualityStatus.UNKNOWN_REASON,
                                 "Null value received from DAQ",
                                 new Timestamp(System.currentTimeMillis()));
@@ -363,13 +359,10 @@ public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractT
             dataTagCacheObjectFacade.updateAndInvalidate(dataTag, sourceDataTagValue.getValue(), sourceDataTagValue.getValueDescription(),
                 sourceDataTagValue.getTimestamp(), sourceDataTagValue.getDaqTimestamp(), new Timestamp(System.currentTimeMillis()), newTagQuality);
           }
-
         }
         updated = true;
       } else {
-        if (log.isTraceEnabled()) {
-          log.trace("Filtering out source update for tag " + dataTag.getId());
-        }
+        log.trace("Filtering out source update for tag " + dataTag.getId());
       }
     } else {
       log.error("Attempting to update a dataTag with a null source value - ignoring update.");
@@ -396,7 +389,6 @@ public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractT
     tagCache.acquireWriteLockOnKey(dataTagId);
     try {
       T dataTag = tagCache.get(dataTagId);
-
 
       // Before updating the new value to the cache convert the value to the proper type.
       // In the process of the deserialization the dataType can still divert from the defined dataType.
@@ -496,5 +488,4 @@ public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractT
     }
     return sourceDataTag;
   }
-
 }

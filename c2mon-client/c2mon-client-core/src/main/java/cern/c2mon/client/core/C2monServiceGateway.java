@@ -17,6 +17,9 @@
 package cern.c2mon.client.core;
 
 import cern.c2mon.client.core.config.C2monAutoConfiguration;
+
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -46,11 +49,9 @@ import org.springframework.stereotype.Component;
  * @author Matthias Braeger
  * @author Justin Lewis Salmon
  */
+@Slf4j
 @Component
 public class C2monServiceGateway implements ApplicationContextAware {
-
-  /** Class logger */
-  private static final Logger LOG = LoggerFactory.getLogger(C2monServiceGateway.class);
 
   /** The SPRING application context, which can be used as parent context */
   private static ApplicationContext context = null;
@@ -177,7 +178,7 @@ public class C2monServiceGateway implements ApplicationContextAware {
    */
   public static synchronized void startC2monClient() {
     if (context == null) {
-      LOG.info("Starting C2MON client core.");
+      log.info("Starting C2MON client core.");
 
       context = new SpringApplicationBuilder().sources(C2monAutoConfiguration.class).bannerMode(Banner.Mode.OFF).run();
       initiateGatewayFields(context);
@@ -185,7 +186,7 @@ public class C2monServiceGateway implements ApplicationContextAware {
       ((AbstractApplicationContext) context).registerShutdownHook();
     }
     else {
-      LOG.debug("startC2monClient() - C2MON client core already started.");
+      log.debug("startC2monClient() - C2MON client core already started.");
     }
   }
 
@@ -213,7 +214,7 @@ public class C2monServiceGateway implements ApplicationContextAware {
     if (context == null) {
       startC2monClient();
 
-      LOG.info("Waiting for C2MON server connection (max " + MAX_INITIALIZATION_TIME / 1000  + " sec)...");
+      log.info("Waiting for C2MON server connection (max " + MAX_INITIALIZATION_TIME / 1000  + " sec)...");
 
       Long startTime = System.currentTimeMillis();
       while (!supervisionServiceImpl.isServerConnectionWorking()) {
@@ -225,7 +226,7 @@ public class C2monServiceGateway implements ApplicationContextAware {
               + " seconds and the connection to C2MON server could still not be established.");
         }
       }
-      LOG.info("C2MON server connection established!");
+      log.info("C2MON server connection established!");
     }
   }
 

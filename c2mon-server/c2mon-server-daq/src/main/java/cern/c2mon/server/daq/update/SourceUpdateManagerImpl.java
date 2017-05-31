@@ -24,6 +24,8 @@ import javax.jms.Message;
 import javax.jms.Session;
 
 import cern.c2mon.server.common.config.ServerProperties;
+
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,11 +55,10 @@ import cern.c2mon.shared.daq.datatag.DataTagValueUpdateConverter;
  *
  * @author Mark Brightwell
  */
+@Slf4j
 @Service("sourceUpdateManager")
 @ManagedResource(objectName = "cern.c2mon:name=sourceUpdateManager")
 public class SourceUpdateManagerImpl implements SourceUpdateManager, SessionAwareMessageListener<Message> {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(SourceUpdateManagerImpl.class);
 
   private static final Logger SMSLOGGER = LoggerFactory.getLogger("AdminSmsLogger");
 
@@ -206,12 +207,12 @@ public class SourceUpdateManagerImpl implements SourceUpdateManager, SessionAwar
         processUpdates(update);
       }
       else {
-        LOGGER.warn("Received update(s) for Process #" + update.getProcessId()
+        log.warn("Received update(s) for Process #" + update.getProcessId()
             + " with wrong PIK: Ignoring " + update.getValues().size() + " updates");
       }
     } catch (MessageConversionException ex) {
       String errorMessage = "Error processing incoming update from DAQ: message is being discarded!";
-      LOGGER.error(errorMessage, ex);
+      log.error(errorMessage, ex);
       if (System.currentTimeMillis() - lastEmailLog > EMAIL_FREQUENCY_MILLIS) {
         EMAILLOGGER.error(errorMessage, ex);
         lastEmailLog = System.currentTimeMillis();
@@ -232,15 +233,14 @@ public class SourceUpdateManagerImpl implements SourceUpdateManager, SessionAwar
    */
   private void processControl(final SourceDataTagValue sourceDataTagValue) {
     try {
-      if (LOGGER.isTraceEnabled()) {
-        LOGGER.trace("Processing incoming update for control tag #" + sourceDataTagValue.getId());
-      }
+      log.trace("Processing incoming update for control tag #" + sourceDataTagValue.getId());
+
       Event<Boolean> updatedInCache = controlTagFacade.updateFromSource(sourceDataTagValue.getId(), sourceDataTagValue);
       if (updatedInCache.getReturnValue()) {
         supervisionManager.processControlTag(sourceDataTagValue); //filter out events that were updated later in the cache
       }
     } catch (CacheElementNotFoundException cacheEx) {
-      LOGGER.warn("Received unrecognized control tag #" + sourceDataTagValue.getId() + ": ignoring the update");
+      log.warn("Received unrecognized control tag #" + sourceDataTagValue.getId() + ": ignoring the update");
     }
   }
 
@@ -251,14 +251,11 @@ public class SourceUpdateManagerImpl implements SourceUpdateManager, SessionAwar
    */
   private void processDataTag(final SourceDataTagValue sourceDataTagValue) {
     try {
-      if (LOGGER.isTraceEnabled()) {
-        LOGGER.trace("Processing incoming update for datatag #" + sourceDataTagValue.getId());
-      }
-
+      log.trace("Processing incoming update for datatag #" + sourceDataTagValue.getId());
       dataTagFacade.updateFromSource(sourceDataTagValue.getId(), sourceDataTagValue);
 
     } catch (CacheElementNotFoundException cacheEx) {
-      LOGGER.warn("Received unrecognized data tag #" + sourceDataTagValue.getId() + ": ignoring the update");
+      log.warn("Received unrecognized data tag #" + sourceDataTagValue.getId() + ": ignoring the update");
     }
   }
 
@@ -289,19 +286,15 @@ public class SourceUpdateManagerImpl implements SourceUpdateManager, SessionAwar
       if (process.getProcessPIK() != null) {
         // If no PIK sent by the DAQ update or wrong PIK is sent by DAQ update ignore message
         if (dataTagValueUpdate.getProcessPIK() == null) {
-          if (LOGGER.isTraceEnabled()) {
-            LOGGER.warn(" Processing incoming update for Process " + process.getName() +
-                ": PIK registered (" + process.getProcessPIK() + ") but no PIK received from update: Ignoring the update");
-          }
+          log.warn(" Processing incoming update for Process " + process.getName() +
+              ": PIK registered (" + process.getProcessPIK() + ") but no PIK received from update: Ignoring the update");
 
           // TODO: Send disconnection
           return IGNORE_UPDATE;
         } else if (!process.getProcessPIK().equals(dataTagValueUpdate.getProcessPIK())) {
-          if (LOGGER.isTraceEnabled()) {
-            LOGGER.warn("Processing incoming updates for Process " + process.getName() +
-                ": Received wrong PIK - cache vs update (" + process.getProcessPIK() + " vs " +
-                dataTagValueUpdate.getProcessPIK() + "): Ignoring the update");
-          }
+          log.warn("Processing incoming updates for Process " + process.getName() +
+              ": Received wrong PIK - cache vs update (" + process.getProcessPIK() + " vs " +
+              dataTagValueUpdate.getProcessPIK() + "): Ignoring the update");
 
           // TODO: Send disconnection
           return IGNORE_UPDATE;
@@ -311,28 +304,22 @@ public class SourceUpdateManagerImpl implements SourceUpdateManager, SessionAwar
       else {
         // If no PIK sent by the DAQ update ignore message
         if (dataTagValueUpdate.getProcessPIK() == null) {
-          if (LOGGER.isTraceEnabled()) {
-            LOGGER.warn("Processing incoming update for Process " + process.getName() + " with no PIK: Ignoring the update");
-          }
+          log.warn("Processing incoming update for Process " + process.getName() + " with no PIK: Ignoring the update");
 
           return IGNORE_UPDATE;
         }
 
         // If the Test Mode is on we don't save the PIK
         if (properties.isTestMode()) {
-          if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("[TEST] Processing incoming update for Process " + process.getName());
-          }
+          log.trace("[TEST] Processing incoming update for Process " + process.getName());
         } else {
-          if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("Processing incoming update for Process " + process.getName() + " and saving PIK " + dataTagValueUpdate.getProcessPIK());
-          }
+          log.trace("Processing incoming update for Process " + process.getName() + " and saving PIK " + dataTagValueUpdate.getProcessPIK());
 
           this.processFacade.setProcessPIK(process.getId(), dataTagValueUpdate.getProcessPIK());
         }
       }
     } catch (CacheElementNotFoundException cacheEx) {
-      LOGGER.warn("Receive updates from unrecognized Process #" + dataTagValueUpdate.getProcessId() +  ": Ignoring the updates", cacheEx);
+      log.warn("Receive updates from unrecognized Process #" + dataTagValueUpdate.getProcessId() +  ": Ignoring the updates", cacheEx);
     } finally {
       processCache.releaseWriteLockOnKey(dataTagValueUpdate.getProcessId());
     }

@@ -35,17 +35,14 @@ import cern.c2mon.server.common.tag.Tag;
 class AlarmEvaluator implements C2monCacheListener<Tag> {
   
   //TODO register to alarm cache
-  
+
   @Override
   public void notifyElementUpdated(final Tag object) {
-    // TODO call alarm evaluation in alarm facade    
+    // TODO call alarm evaluation in alarm facade
   }
 
   @Override
   public void confirmStatus(Tag cacheable) {
-    // TODO Auto-generated method stub    
+    // TODO Auto-generated method stub
   }
-  
-   
-  
 }

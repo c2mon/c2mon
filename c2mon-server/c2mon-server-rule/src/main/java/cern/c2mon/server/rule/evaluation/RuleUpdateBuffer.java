@@ -19,15 +19,13 @@ package cern.c2mon.server.rule.evaluation;
 import java.sql.Timestamp;
 import java.util.*;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.cache.RuleTagFacade;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
-
 
 /**
  * This temporary buffer is used to filter out intermediate rule evaluation results.
@@ -40,11 +38,9 @@ import cern.c2mon.shared.common.datatag.TagQualityStatus;
  *
  * @author Matthias Braeger
  */
+@Slf4j
 @Service
 public final class RuleUpdateBuffer {
-
-  /** LOG4J logger instance */
-  private static final Logger LOG = LoggerFactory.getLogger(RuleUpdateBuffer.class);    
   
   /** The initial buffer size */
   private static final int INITIAL_BUFFER_SIZE = 1000;
@@ -98,7 +94,6 @@ public final class RuleUpdateBuffer {
     RuleUpdateBuffer.ruleTagFacade = ruleTagFacade;
   }
 
-
   /**
    * Updates the internal rule buffer
    * @param pId data tag id
@@ -109,7 +104,7 @@ public final class RuleUpdateBuffer {
   public void update(final Long pId, final Object pValue, final String pValueDesc, final Timestamp pTimestamp) {
     final RuleBufferObject bufferObj;
     
-    LOG.trace(pId + " entering update()");
+    log.trace(pId + " entering update()");
     synchronized (BUFFER_LOCK) {
       if (!RULE_OBJECT_BUF.containsKey(pId)) {
         bufferObj = new RuleBufferObject(pId, pValue, pValueDesc, pTimestamp);
@@ -121,9 +116,8 @@ public final class RuleUpdateBuffer {
       }
       scheduleCacheUpdaterTask(pId);
     }
-    LOG.trace(pId + " leaving update()");
+    log.trace(pId + " leaving update()");
   }
-
 
   /**
    * Updates the internal rule buffer with an invalidation message
@@ -135,7 +129,7 @@ public final class RuleUpdateBuffer {
   public void invalidate(final Long pId, final TagQualityStatus pReason, final String pDescription, final Timestamp pTimestamp) {
     final RuleBufferObject bufferObj;
     
-    LOG.trace(pId + " entering invalidate()");
+    log.trace(pId + " entering invalidate()");
     synchronized (BUFFER_LOCK) {
       if (!RULE_OBJECT_BUF.containsKey(pId)) {
         bufferObj = new RuleBufferObject(pId, null, pReason, pDescription, null, pTimestamp);
@@ -147,9 +141,8 @@ public final class RuleUpdateBuffer {
       }
       scheduleCacheUpdaterTask(pId);
     }
-    LOG.trace(pId + " leaving invalidate()");
+    log.trace(pId + " leaving invalidate()");
   }
-
 
   /**
    * Registers an update for the given rule id and triggers
@@ -161,16 +154,14 @@ public final class RuleUpdateBuffer {
     UPDATE_RECEIVED_FLAGS.put(pId, Boolean.TRUE);
     if (!isCacheUpdaterRunning) {
       try {
-        if (LOG.isTraceEnabled())
-          LOG.trace(pId + " scheduleCacheUpdaterTask() - Initialize new cache updater task");
+        log.trace(pId + " scheduleCacheUpdaterTask() - Initialize new cache updater task");
         timer.schedule(new CacheUpdaterTask(), BUFFER_TIMER_MILLIS, BUFFER_TIMER_MILLIS);
         isCacheUpdaterRunning = true;
       } catch (IllegalStateException ise) {
-        LOG.error(pId + "scheduleCacheUpdaterTask() - Catched illegal state exception", ise);
+        log.error(pId + "scheduleCacheUpdaterTask() - Catched illegal state exception", ise);
       }      
     }
   }
-
   
   /**
    * Inner class which is used to store the rule update
@@ -192,7 +183,6 @@ public final class RuleUpdateBuffer {
     /** rule evaluation timestamp */
     private Timestamp timestamp = null;
 
-
     /**
      * Copy Constructor
      * @param rbo The object to be copied
@@ -207,7 +197,6 @@ public final class RuleUpdateBuffer {
       this.timestamp = new Timestamp(rbo.timestamp.getTime());
     }
 
-
     /**
      * Constructor
      * @param pId rule data tag id
@@ -218,7 +207,6 @@ public final class RuleUpdateBuffer {
     private RuleBufferObject(final Long pId, final Object pValue, final String pValueDesc, final Timestamp pTimestamp) {
       this(pId, pValue, null, null, pValueDesc, pTimestamp);
     }
-
 
     /**
      * Constructor
@@ -240,7 +228,6 @@ public final class RuleUpdateBuffer {
         this.valueDesc = pValueDesc;
         this.timestamp = pTimestamp;
     }
-
 
     /**
      * Updates the values of this <code>BufferObject</code> instance (all invalid status' are removed)
@@ -264,7 +251,6 @@ public final class RuleUpdateBuffer {
       return retval;
     }
 
-
     /**
      * Updates the values of this <code>BufferObject</code> instance
      * @param pQuality the error quality code
@@ -286,7 +272,6 @@ public final class RuleUpdateBuffer {
       return retval;
     }
   } // end of RuleBufferObject class
-
 
   /**
    * This class extends the Java <code>TimerTask</code> and
@@ -323,7 +308,7 @@ public final class RuleUpdateBuffer {
               RuleBufferObject rbo = new RuleBufferObject((RuleBufferObject) RULE_OBJECT_BUF.get(actTagId));
               rulesToUpdate.add(rbo);
               if (forceCacheUpdate) {
-                LOG.debug("CacheUpdaterTask() - Forcing a cache update for rule "
+                log.debug("CacheUpdaterTask() - Forcing a cache update for rule "
                     + actTagId + " since it was already delayed by "
                     + MAX_CYCLES_WAIT * BUFFER_TIMER_MILLIS + " ms.");
               }
@@ -350,8 +335,7 @@ public final class RuleUpdateBuffer {
           }
           
           if (UPDATE_RECEIVED_FLAGS.size() == 0) {
-            if (LOG.isTraceEnabled())
-              LOG.trace("CacheUpdaterTask() - Canceling next cache updater check, because there are no more updates registered.");
+            log.trace("CacheUpdaterTask() - Canceling next cache updater check, because there are no more updates registered.");
             this.cancel();
             isCacheUpdaterRunning = false;
           }
@@ -361,35 +345,32 @@ public final class RuleUpdateBuffer {
           // Updating the cache
           for (RuleBufferObject rbo : rulesToUpdate) {
             if (rbo.qualityCollection.isEmpty()) {
-              if (LOG.isTraceEnabled())
-                LOG.trace("CacheUpdaterTask() - updating cache for rule id " + rbo.id 
-                          + ": value=" + rbo.value
-                          + ", description=" + rbo.valueDesc
-                          + ", timestamp=" + rbo.timestamp);
+              log.trace("CacheUpdaterTask() - updating cache for rule id " + rbo.id
+                  + ": value=" + rbo.value
+                  + ", description=" + rbo.valueDesc
+                  + ", timestamp=" + rbo.timestamp);
               try {
                 ruleTagFacade.updateAndValidate(rbo.id, rbo.value, rbo.valueDesc, rbo.timestamp);            
               } catch (CacheElementNotFoundException cacheEx) {
-                LOG.warn("Unable to update rule (can happen during rule reconfiguration)", cacheEx);
+                log.warn("Unable to update rule (can happen during rule reconfiguration)", cacheEx);
               } catch (Exception exception) {
-                LOG.warn("Unexpected error during rule evaluation", exception);
+                log.warn("Unexpected error during rule evaluation", exception);
               }
-            }
-            else {
-              if (LOG.isTraceEnabled())
-                LOG.trace("CacheUpdaterTask() - invalidating cache for rule id " + rbo.id 
-                    + ": reasons=" + rbo.qualityCollection 
-                    + ", descriptions=" + rbo.qualityDescriptions
-                    + ", timestamp=" + rbo.timestamp);
+            } else {
+              log.trace("CacheUpdaterTask() - invalidating cache for rule id " + rbo.id
+                  + ": reasons=" + rbo.qualityCollection
+                  + ", descriptions=" + rbo.qualityDescriptions
+                  + ", timestamp=" + rbo.timestamp);
               try {                
                 ruleTagFacade.setQuality(rbo.id, rbo.qualityCollection, null, rbo.qualityDescriptions, rbo.timestamp);
               } catch (CacheElementNotFoundException cacheEx) {
-                LOG.warn("Unable to update rule as could not be located in cache (normal during rule reconfiguration)", cacheEx);
+                log.warn("Unable to update rule as could not be located in cache (normal during rule reconfiguration)", cacheEx);
               }                          
             }
           } // end for                    
         }      
       } catch (Exception ex) {
-        LOG.error("Exception caught during rule update - should not be ignored!", ex);
+        log.error("Exception caught during rule update - should not be ignored!", ex);
       }
     }
   } // end of CacheUpdaterTask class
