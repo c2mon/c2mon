@@ -1,4 +1,4 @@
-package cern.c2mon.server.jcacheref;
+package cern.c2mon.server.jcacheref.prototype;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
