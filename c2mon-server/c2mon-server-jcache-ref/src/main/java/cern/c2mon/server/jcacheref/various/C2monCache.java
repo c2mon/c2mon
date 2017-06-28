@@ -1,4 +1,4 @@
-package cern.c2mon.server.jcacheref;
+package cern.c2mon.server.jcacheref.various;
 
 import javax.cache.Cache;
 import javax.cache.Caching;
@@ -18,7 +18,7 @@ public class C2monCache<K, V> {
   private Configuration<K, V> cacheConfiguration;
 
   public C2monCache(String cacheName) {
-    cacheConfiguration = new MutableConfiguration<>(createConfiguration());
+    cacheConfiguration = new MutableConfiguration<>();
     cache = Caching.getCachingProvider().getCacheManager().createCache(cacheName, cacheConfiguration);
   }
 
@@ -30,12 +30,12 @@ public class C2monCache<K, V> {
     return configuration;
   }
 
-  @ReadCacheGuard
+//  @ReadCacheGuard
   public V get(K key) {
     return cache.get(key);
   }
 
-  @WriteCacheGuard
+//  @WriteCacheGuard
   public void put(K key, V value) {
     cache.put(key, value);
   }

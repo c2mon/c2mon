@@ -1,4 +1,4 @@
-package cern.c2mon.server.jcacheref;
+package cern.c2mon.server.jcacheref.various.aspects;
 
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
@@ -10,12 +10,12 @@ import org.aspectj.lang.annotation.Pointcut;
 @Aspect
 public class AspectsSystem {
 
-  @Pointcut("@@annotation(cern.c2mon.server.jcacheref.WriteCacheGuard)")
+  @Pointcut("@@annotation(cern.c2mon.server.jcacheref.various.annotations.WriteCacheGuard)")
   public void SafeWriteCache() {
 
   }
 
-  @Pointcut("@@annotation(cern.c2mon.server.jcacheref.ReadCacheGuard)")
+  @Pointcut("@@annotation(cern.c2mon.server.jcacheref.various.annotations.ReadCacheGuard)")
   public void SafeReadCache() {
 
   }

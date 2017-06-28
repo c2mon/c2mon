@@ -1,4 +1,4 @@
-package cern.c2mon.server.jcacheref;
+package cern.c2mon.server.jcacheref.various.providers;
 
 import javax.annotation.PostConstruct;
 import javax.cache.Caching;
