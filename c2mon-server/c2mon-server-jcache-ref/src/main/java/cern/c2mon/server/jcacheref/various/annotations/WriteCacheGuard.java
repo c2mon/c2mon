@@ -1,4 +1,4 @@
-package cern.c2mon.server.jcacheref;
+package cern.c2mon.server.jcacheref.various.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

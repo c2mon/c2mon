@@ -1,4 +1,4 @@
-package cern.c2mon.server.jcacheref.utils;
+package cern.c2mon.server.jcacheref.various.utils;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;

@@ -1,0 +1,26 @@
+<hazelcast xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://www.hazelcast.com/schema/config
+                               http://www.hazelcast.com/schema/config/hazelcast-config-3.8.xsd"
+           xmlns="http://www.hazelcast.com/schema/config">
+  <group>
+    <name>c2mon</name>
+    <password>c2mon</password>
+  </group>
+  <network>
+    <join>
+      <multicast enabled="true"/>
+    </join>
+  </network>
+  <cache name="commandTagCache">
+    <key-type class-name="java.lang.Long"/>
+    <value-type class-name="cern.c2mon.shared.common.command.CommandTag"/>
+    <statistics-enabled>true</statistics-enabled>
+    <management-enabled>true</management-enabled>
+  </cache>
+  <cache name="dataTagCache">
+    <key-type class-name="java.lang.Long"/>
+    <value-type class-name="cern.c2mon.server.common.datatag.DataTag"/>
+    <statistics-enabled>true</statistics-enabled>
+    <management-enabled>true</management-enabled>
+  </cache>
+</hazelcast>

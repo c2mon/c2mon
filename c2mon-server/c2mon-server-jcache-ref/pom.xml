@@ -13,6 +13,18 @@
   <artifactId>c2mon-server-jcacheref</artifactId>
 
   <dependencies>
+    <dependency>
+      <groupId>cern.c2mon.server</groupId>
+      <artifactId>c2mon-server-cacheloading</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.shared</groupId>
+      <artifactId>c2mon-shared-common</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.shared</groupId>
+      <artifactId>c2mon-shared-daq</artifactId>
+    </dependency>
     <!-- 3rd party dependencies -->
     <dependency>
       <groupId>org.springframework</groupId>
@@ -20,12 +32,24 @@
       <version>4.3.8.RELEASE</version>
     </dependency>
     <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context-support</artifactId>
+      <version>4.3.9.RELEASE</version>
+    </dependency>
+
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-cache</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.hazelcast</groupId>
+      <artifactId>hazelcast-all</artifactId>
+      <version>3.8.2</version>
     </dependency>
     <dependency>
       <groupId>javax.cache</groupId>
