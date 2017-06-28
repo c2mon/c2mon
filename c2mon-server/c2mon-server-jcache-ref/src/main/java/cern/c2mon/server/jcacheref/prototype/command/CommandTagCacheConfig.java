@@ -18,7 +18,7 @@ import cern.c2mon.shared.common.command.CommandTag;
  */
 
 @Configuration
-public class CommandCacheConfig implements BasicCache, Serializable {
+public class CommandTagCacheConfig implements BasicCache, Serializable {
 
   private static final String COMMAND_TAG_CACHE = "commandTagCache";
 

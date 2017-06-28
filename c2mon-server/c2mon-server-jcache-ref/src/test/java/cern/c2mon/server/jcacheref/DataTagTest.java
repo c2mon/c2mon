@@ -4,11 +4,19 @@ import java.sql.Timestamp;
 
 import javax.cache.Cache;
 
+import com.hazelcast.config.ClasspathXmlConfig;
+import com.hazelcast.config.Config;
+import com.hazelcast.core.Hazelcast;
+import com.hazelcast.core.HazelcastInstance;
+import lombok.extern.slf4j.Slf4j;
 import org.easymock.EasyMock;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.hazelcast.HazelcastAutoConfiguration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -27,22 +35,33 @@ import static org.junit.Assert.assertTrue;
  * @author Szymon Halastra
  */
 
+@Slf4j
 @RunWith(SpringJUnit4ClassRunner.class)
 @TestPropertySource("classpath:c2mon-cache.properties")
 @ContextConfiguration(classes = {
         C2monCacheConfiguration.class,
         DataTagCacheConfig.class
 })
-public class DataTagTest<T extends DataTag> {
+public class DataTagTest {
 
-  DataTagCacheService dataTagCacheService;
-  
   @Autowired
-  Cache<Long, T> dataTagCache;
+  DataTagCacheService dataTagCacheService;
+
+  Cache<Long, DataTag> dataTagCache;
 
   @Before
   public void setUp() {
-    dataTagCacheService = EasyMock.createMock(DataTagCacheService.class);
+    dataTagCache = EasyMock.createMock(Cache.class);
+
+    Config config = new ClasspathXmlConfig("hazelcast.xml");
+    HazelcastInstance instance = Hazelcast.newHazelcastInstance(config);
+
+    log.info(instance.getConfig().toString());
+  }
+
+  @After
+  public void close() {
+    Hazelcast.shutdownAll();
   }
 
   @Test
@@ -62,7 +81,7 @@ public class DataTagTest<T extends DataTag> {
     dataTag.getDataTagQuality().validate();
     dataTag.setCacheTimestamp(oldTime);
 
-    EasyMock.expect(dataTagCache.get(dataTag.getId())).andReturn((T) dataTag);
+    EasyMock.expect(dataTagCache.get(dataTag.getId())).andReturn(dataTag);
 
 
     boolean updated = (boolean) dataTagCacheService.updateFromSource(dataTag.getId(), sourceTag).getReturnValue();
