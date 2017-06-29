@@ -3,6 +3,8 @@ package cern.c2mon.server.jcacheref;
 import java.sql.Timestamp;
 
 import javax.cache.Cache;
+import javax.cache.Caching;
+import javax.cache.spi.CachingProvider;
 
 import com.hazelcast.config.ClasspathXmlConfig;
 import com.hazelcast.config.Config;
@@ -15,16 +17,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.hazelcast.HazelcastAutoConfiguration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
-import cern.c2mon.server.jcacheref.prototype.C2monCacheConfiguration;
-import cern.c2mon.server.jcacheref.prototype.datatag.DataTagCacheConfig;
+import cern.c2mon.server.jcacheref.prototype.C2monCacheModule;
 import cern.c2mon.server.jcacheref.prototype.datatag.DataTagCacheService;
 import cern.c2mon.shared.common.datatag.DataTagConstants;
 import cern.c2mon.shared.common.datatag.SourceDataTagValue;
@@ -39,8 +38,7 @@ import static org.junit.Assert.assertTrue;
 @RunWith(SpringJUnit4ClassRunner.class)
 @TestPropertySource("classpath:c2mon-cache.properties")
 @ContextConfiguration(classes = {
-        C2monCacheConfiguration.class,
-        DataTagCacheConfig.class
+        C2monCacheModule.class
 })
 public class DataTagTest {
 
@@ -51,17 +49,8 @@ public class DataTagTest {
 
   @Before
   public void setUp() {
+    CachingProvider provider = Caching.getCachingProvider();
     dataTagCache = EasyMock.createMock(Cache.class);
-
-    Config config = new ClasspathXmlConfig("hazelcast.xml");
-    HazelcastInstance instance = Hazelcast.newHazelcastInstance(config);
-
-    log.info(instance.getConfig().toString());
-  }
-
-  @After
-  public void close() {
-    Hazelcast.shutdownAll();
   }
 
   @Test

@@ -1,0 +1,22 @@
+<hazelcast xmlns="http://www.hazelcast.com/schema/config">
+  <cache name="alarmTagCache">
+    <key-type class-name="java.lang.Long"/>
+    <value-type class-name="cern.c2mon.server.common.alarm.Alarm"/>
+  </cache>
+  <cache name="aliveTimerCache">
+    <key-type class-name="java.lang.Long"/>
+    <value-type class-name="cern.c2mon.server.common.alive.AliveTimer"/>
+  </cache>
+  <cache name="commandTagCache">
+    <key-type class-name="java.lang.Long"/>
+    <value-type class-name="cern.c2mon.shared.common.command.CommandTag"/>
+  </cache>
+  <cache name="commFaultTagCache">
+    <key-type class-name="java.lang.Long"/>
+    <value-type class-name="cern.c2mon.server.common.commfault.CommFaultTag"/>
+  </cache>
+  <cache name="dataTagCache">
+    <key-type class-name="java.lang.Long"/>
+    <value-type class-name="cern.c2mon.server.common.datatag.DataTag"/>
+  </cache>
+</hazelcast>
