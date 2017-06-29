@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Bean;
 
 import cern.c2mon.server.common.config.C2monCacheName;
 import cern.c2mon.server.common.datatag.DataTag;
-import cern.c2mon.server.jcacheref.prototype.BasicCache;
+import cern.c2mon.server.jcacheref.prototype.common.BasicCache;
 
 /**
  * @author Szymon Halastra

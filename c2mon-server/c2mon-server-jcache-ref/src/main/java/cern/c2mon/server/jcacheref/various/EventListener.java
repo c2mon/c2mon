@@ -1,4 +1,4 @@
-package cern.c2mon.server.jcacheref.prototype;
+package cern.c2mon.server.jcacheref.various;
 
 import javax.cache.event.*;
 
