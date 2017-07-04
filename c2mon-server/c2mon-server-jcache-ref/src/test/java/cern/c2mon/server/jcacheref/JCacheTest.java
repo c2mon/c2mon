@@ -10,9 +10,7 @@ import com.hazelcast.config.Config;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
@@ -27,16 +25,19 @@ public class JCacheTest {
 
   CachingProvider provider;
 
-  @Before
-  public void init() {
+  @BeforeClass
+  public static void init() {
     Config config = new ClasspathXmlConfig("hazelcast-test.xml");
     HazelcastInstance instance = Hazelcast.newHazelcastInstance(config);
+  }
 
+  @Before
+  public void setup() {
     provider = Caching.getCachingProvider();
   }
 
-  @After
-  public void clean() {
+  @AfterClass
+  public static void clean() {
     Hazelcast.shutdownAll();
   }
 
