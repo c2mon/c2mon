@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.common.equipment;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -26,7 +27,7 @@ import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEnti
  *
  * @author Mark Brightwell
  */
-public class EquipmentCacheObject extends AbstractEquipmentCacheObject implements Equipment, Cloneable {
+public class EquipmentCacheObject extends AbstractEquipmentCacheObject implements Equipment, Cloneable, Serializable {
 
     private static final long serialVersionUID = -7917360710791608270L;
 

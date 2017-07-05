@@ -54,6 +54,4 @@ public interface Equipment extends AbstractEquipment, Cacheable {
    * @return list of CommandTag ids
    */
   Collection<Long> getCommandTagIds();
-
-
 }
