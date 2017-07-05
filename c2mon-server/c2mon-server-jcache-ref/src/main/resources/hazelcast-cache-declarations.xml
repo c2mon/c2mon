@@ -19,4 +19,8 @@
     <key-type class-name="java.lang.Long"/>
     <value-type class-name="cern.c2mon.server.common.datatag.DataTag"/>
   </cache>
+  <cache name="equipmentTagCache">
+    <key-type class-name="java.lang.Long"/>
+    <value-type class-name="cern.c2mon.server.common.equipment.Equipment"/>
+  </cache>
 </hazelcast>
