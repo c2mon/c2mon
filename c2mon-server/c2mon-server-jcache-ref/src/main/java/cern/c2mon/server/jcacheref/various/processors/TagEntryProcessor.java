@@ -1,5 +1,7 @@
 package cern.c2mon.server.jcacheref.various.processors;
 
+import javax.cache.Cache;
+import javax.cache.Caching;
 import javax.cache.processor.EntryProcessor;
 import javax.cache.processor.EntryProcessorException;
 import javax.cache.processor.MutableEntry;
@@ -23,4 +25,20 @@ public class TagEntryProcessor<K, V, T> implements EntryProcessor<K, V, T> {
   }
 
 
+  public void example() {
+    Cache cache = Caching.getCachingProvider().getCacheManager().createCache("cache", null);
+
+    cache.invoke(1L, (entry, arguments) -> {
+      if(entry.exists()) {
+        entry.setValue(entry.getValue());
+      }
+
+      return null;
+    });
+  }
+
+  /**
+   * “EntryProcessors execute on the partition thread in a member. Multiple operations on the same partition are queued.
+   While executing partition migrations are not allowed. Any migrations are queued on the partition thread.“
+   */
 }
