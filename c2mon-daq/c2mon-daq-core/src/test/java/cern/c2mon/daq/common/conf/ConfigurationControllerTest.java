@@ -22,19 +22,20 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import cern.c2mon.daq.common.IEquipmentMessageSender;
-import cern.c2mon.daq.common.timer.FreshnessMonitor;
-import org.easymock.EasyMock;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.junit.Before;
 import org.junit.Test;
 
 import cern.c2mon.daq.common.conf.core.ConfigurationController;
 import cern.c2mon.daq.common.conf.core.DefaultCommandTagChanger;
 import cern.c2mon.daq.common.conf.core.DefaultEquipmentConfigurationChanger;
+import cern.c2mon.daq.common.conf.core.EquipmentConfigurationFactory;
 import cern.c2mon.daq.common.conf.core.ProcessConfigurationLoader;
 import cern.c2mon.daq.common.conf.equipment.ICommandTagChanger;
 import cern.c2mon.daq.common.conf.equipment.IDataTagChanger;
 import cern.c2mon.daq.common.conf.equipment.IEquipmentConfigurationChanger;
+import cern.c2mon.daq.common.timer.FreshnessMonitor;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.command.ISourceCommandTag;
 import cern.c2mon.shared.common.command.SourceCommandTag;
@@ -42,7 +43,12 @@ import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.ISourceDataTag;
 import cern.c2mon.shared.common.datatag.SourceDataTag;
 import cern.c2mon.shared.common.datatag.address.HardwareAddress;
+import cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl;
+import cern.c2mon.shared.common.process.EquipmentConfiguration;
+import cern.c2mon.shared.common.process.IEquipmentConfiguration;
+import cern.c2mon.shared.common.process.ProcessConfiguration;
 import cern.c2mon.shared.daq.config.ChangeReport;
+import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
 import cern.c2mon.shared.daq.config.CommandTagAdd;
 import cern.c2mon.shared.daq.config.CommandTagRemove;
 import cern.c2mon.shared.daq.config.DataTagAdd;
@@ -51,11 +57,8 @@ import cern.c2mon.shared.daq.config.DataTagRemove;
 import cern.c2mon.shared.daq.config.DataTagUpdate;
 import cern.c2mon.shared.daq.config.EquipmentConfigurationUpdate;
 import cern.c2mon.shared.daq.config.ProcessConfigurationUpdate;
-import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
-import cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl;
-import cern.c2mon.shared.common.process.EquipmentConfiguration;
-import cern.c2mon.shared.common.process.IEquipmentConfiguration;
-import cern.c2mon.shared.common.process.ProcessConfiguration;
+import cern.c2mon.shared.daq.config.SubEquipmentUnitAdd;
+
 
 public class ConfigurationControllerTest {
 
@@ -65,11 +68,13 @@ public class ConfigurationControllerTest {
 
     private static final long TEST_NOT_EXIST_ID = 1337L;
 
-    private static final Long TEST_EQUIPMENT_ID = 1L;
+    private static final long TEST_EQUIPMENT_ID = 1L;
+    
+    private static final long TEST_SUB_EQUIPMENT_ID = 2L;
 
     private static final String DEFAULT_NAME = "default";
 
-    private static final Long TEST_PROCESS_ID = 31415926L;
+    private static final long TEST_PROCESS_ID = 31415926L;
 
     private ConfigurationController configurationController;
 
@@ -82,8 +87,9 @@ public class ConfigurationControllerTest {
     private static final String PROCESS_CONFIGURATION_REJECTED_XML = "RejectedProcessConfiguration.xml";
 
     @Before
-    public void setUp() {
+    public void setUp() throws ParserConfigurationException {
         configurationController = new ConfigurationController();
+        configurationController.setEquipmentConfigurationFactory(new EquipmentConfigurationFactory());
         configurationController.setFreshnessMonitor(new FreshnessMonitor());
         processConfiguration = new ProcessConfiguration();
         processConfiguration.setProcessID(TEST_PROCESS_ID);
@@ -376,6 +382,17 @@ public class ConfigurationControllerTest {
         ISourceCommandTag commandTag = configurationController.findCommandTag(TEST_NOT_EXIST_ID);
         assertNull(commandTag);
     }
+    
+	@Test
+	public void testAddSubEquipmentUnitSuccess() throws ConfigurationException {
+		String xml = "<SubEquipmentUnit  id=\"" + TEST_SUB_EQUIPMENT_ID + "\" name=\"E_TEST\">"
+				+ "<commfault-tag-id>201498</commfault-tag-id>" + "<commfault-tag-value>false</commfault-tag-value>"
+				+ "</SubEquipmentUnit>";
+
+		ChangeReport report = configurationController
+				.onSubEquipmentUnitAdd(new SubEquipmentUnitAdd(100L, TEST_SUB_EQUIPMENT_ID, TEST_EQUIPMENT_ID, xml));
+		assertFalse(report.isFail());
+	}
 
     //@Test
     public void testAddEquipmentUnitSuccess() throws ConfigurationException {

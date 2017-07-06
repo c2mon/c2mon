@@ -28,16 +28,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import cern.c2mon.daq.config.DaqProperties;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.w3c.dom.Document;
 
 import cern.c2mon.daq.common.conf.core.EquipmentConfigurationFactory;
 import cern.c2mon.daq.common.conf.core.ProcessConfigurationLoader;
+import cern.c2mon.daq.config.DaqProperties;
 import cern.c2mon.daq.tools.processexceptions.ConfRejectedTypeException;
 import cern.c2mon.daq.tools.processexceptions.ConfUnknownTypeException;
 import cern.c2mon.shared.common.datatag.SourceDataTag;
@@ -49,9 +47,8 @@ import cern.c2mon.shared.common.process.SubEquipmentConfiguration;
 
 public class ProcessConfigurationLoaderTest {
 
-  @Autowired
   private ProcessConfigurationLoader processConfigurationLoader;
-
+  
   private static final String PROCESS_CONFIGURATION_XML = "ProcessConfiguration.xml";
 
   private static final String PROCESS_CONFIGURATION_UNKNOWN_TYPE_XML = "UnknownTypeProcessConfiguration.xml";
@@ -67,9 +64,9 @@ public class ProcessConfigurationLoaderTest {
   private DaqProperties properties = new DaqProperties();
 
   @Before
-  public void setUp() {
+  public void setUp() throws Exception {
     processConfigurationLoader = new ProcessConfigurationLoader();
-    processConfigurationLoader.setEquipmentConfigurationFactory(EquipmentConfigurationFactory.getInstance());
+    processConfigurationLoader.setEquipmentConfigurationFactory(new EquipmentConfigurationFactory());
 
     try {
       this.processHostName = InetAddress.getLocalHost().getHostName();

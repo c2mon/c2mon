@@ -184,7 +184,7 @@ public abstract class GenericMessageHandlerTest {
       rootConfElement.getElementsByTagName("handler-class-name").item(0).getFirstChild().setNodeValue(
               getHandlerClass());
 
-      equipmentConfiguration = EquipmentConfigurationFactory.getInstance().createEquipmentConfiguration(rootConfElement);
+      equipmentConfiguration = new EquipmentConfigurationFactory().createEquipmentConfiguration(rootConfElement);
       long equipmentId = equipmentConfiguration.getId();
       msgHandler = EquipmentMessageHandler.createEquipmentMessageHandler(
               equipmentConfiguration.getHandlerClassName(),

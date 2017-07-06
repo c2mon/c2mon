@@ -16,10 +16,8 @@
  *****************************************************************************/
 package cern.c2mon.daq.common.conf.core;
 
-import javax.annotation.PostConstruct;
 import javax.xml.parsers.ParserConfigurationException;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -32,27 +30,18 @@ import cern.c2mon.shared.common.process.IEquipmentConfiguration;
 import cern.c2mon.shared.common.process.SubEquipmentConfiguration;
 import cern.c2mon.shared.daq.config.ConfigurationXMLConstants;
 import cern.c2mon.shared.util.parser.SimpleXMLParser;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
 public class EquipmentConfigurationFactory extends XMLTagValueExtractor implements ConfigurationXMLConstants {
 
-  private static EquipmentConfigurationFactory theInstance;
-
-  SimpleXMLParser parser;
-
-  public static EquipmentConfigurationFactory getInstance() {
-    if (theInstance == null)
-      theInstance = new EquipmentConfigurationFactory();
-
-    return theInstance;
+  private final SimpleXMLParser parser;
+  
+  public EquipmentConfigurationFactory() throws ParserConfigurationException {
+	  this.parser = new SimpleXMLParser();
   }
-
-  @PostConstruct
-  public void init() throws ParserConfigurationException {
-    this.parser = new SimpleXMLParser();
-  }
-
+  
   /**
    * Creates the equipment configuration from the matching subelement in the DOM
    * tree.
