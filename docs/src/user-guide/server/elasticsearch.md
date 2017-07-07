@@ -1,6 +1,6 @@
 # Elasticsearch
 
-C2MON comes integrates with [Elasticsearch](https://www.elastic.co/guide/index.html) 
+C2MON comes with integrated [Elasticsearch](https://www.elastic.co/guide/index.html) 
 out-of-the-box for time series data storage. It uses a combination of the fast 
 [TransportConnector](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-transport.html)
 and the bulk API to achieve highly performant indexing speeds.
