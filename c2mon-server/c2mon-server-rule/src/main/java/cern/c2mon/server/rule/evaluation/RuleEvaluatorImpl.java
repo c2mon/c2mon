@@ -24,13 +24,9 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
-import cern.c2mon.server.rule.config.RuleProperties;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.SmartLifecycle;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.cache.C2monCacheListener;
@@ -43,10 +39,11 @@ import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.rule.RuleEvaluator;
+import cern.c2mon.server.rule.config.RuleProperties;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
 import cern.c2mon.shared.rule.RuleEvaluationException;
 
-import static cern.c2mon.shared.common.type.TypeConverter.*;
+import static cern.c2mon.shared.common.type.TypeConverter.getType;
 
 /**
  * Contains evaluate methods wrapping calls to the rule engine.
@@ -58,10 +55,9 @@ import static cern.c2mon.shared.common.type.TypeConverter.*;
  * @author mbrightw
  *
  */
+@Slf4j
 @Service
 public class RuleEvaluatorImpl implements C2monCacheListener<Tag>, SmartLifecycle, RuleEvaluator {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(RuleEvaluatorImpl.class);
 
   private final RuleTagCache ruleTagCache;
 
@@ -111,7 +107,7 @@ public class RuleEvaluatorImpl implements C2monCacheListener<Tag>, SmartLifecycl
     try {
       evaluateRules(tag);
     } catch (Exception e) {
-      LOGGER.error(tag.getId() + " Error caught when evaluating rules (these are " + tag.getRuleIds() + ")", e);
+      log.error(tag.getId() + " Error caught when evaluating rules (these are " + tag.getRuleIds() + ")", e);
     }
   }
 
@@ -133,7 +129,7 @@ public class RuleEvaluatorImpl implements C2monCacheListener<Tag>, SmartLifecycl
     Iterator<Long> rulesIterator = tag.getRuleIds().iterator(); // Rule Ids Collection
     // For each rule id related to the tag
     if (tag.getRuleIds().size() > 0) {
-        LOGGER.trace(tag.getId() + " Triggering re-evaluation for " + tag.getRuleIds().size() + " rules : " + tag.getRuleIds());
+        log.trace(tag.getId() + " Triggering re-evaluation for " + tag.getRuleIds().size() + " rules : " + tag.getRuleIds());
 
         while (rulesIterator.hasNext()) {
            evaluateRule(rulesIterator.next());
@@ -146,28 +142,27 @@ public class RuleEvaluatorImpl implements C2monCacheListener<Tag>, SmartLifecycl
    * the id does not belong to a rule a warning message is logged to
    * log4j. Please note, that the rule will always use the time stamp
    * of the latest incoming data tag update.
-   * @param pRuleId The id of a rule.
+   * @param ruleId The id of a rule.
    */
   @Override
-  public final void evaluateRule(final Long pRuleId) {
-    if (LOGGER.isTraceEnabled()) {
-      StringBuffer str = new StringBuffer("").append(pRuleId).append(" evaluateRule() called");
-      LOGGER.trace(str.toString());
-    }
+  public final void evaluateRule(final Long ruleId) {
+
+      StringBuffer str = new StringBuffer("").append(ruleId).append(" evaluateRule() called");
+      log.trace(str.toString());
 
     final Timestamp ruleResultTimestamp = new Timestamp(System.currentTimeMillis());
 
     // We synchronize on the rule reference object from the cache
     // in order to avoid simultaneous evaluations for the same rule
 
-    if (ruleTagCache.isWriteLockedByCurrentThread(pRuleId)) {
-        LOGGER.info(pRuleId + " Attention: I already have a write lock on rule " + pRuleId);
+    if (ruleTagCache.isWriteLockedByCurrentThread(ruleId)) {
+        log.info(ruleId + " Attention: I already have a write lock on rule " + ruleId);
     }
 
-    ruleTagCache.acquireWriteLockOnKey(pRuleId);
+    ruleTagCache.acquireWriteLockOnKey(ruleId);
 
     try {
-      RuleTag rule = ruleTagCache.get(pRuleId);
+      RuleTag rule = ruleTagCache.get(ruleId);
 
       if (rule.getRuleExpression() != null) {
         final Collection<Long> ruleInputTagIds = rule.getRuleExpression().getInputTagIds();
@@ -194,36 +189,36 @@ public class RuleEvaluatorImpl implements C2monCacheListener<Tag>, SmartLifecycl
           Class<?> ruleResultClass = getType(rule.getDataType());
 
           Object value = rule.getRuleExpression().evaluate(tags, ruleResultClass);
-          ruleUpdateBuffer.update(pRuleId, value, "Rule result", ruleResultTimestamp);
+          ruleUpdateBuffer.update(ruleId, value, "Rule result", ruleResultTimestamp);
         } catch (CacheElementNotFoundException cacheEx) {
-          LOGGER.warn(pRuleId + " evaluateRule - Failed to locate tag with id " + actualTag + " in any tag cache (during rule evaluation) - unable to evaluate rule.",
+          log.warn(ruleId + " evaluateRule - Failed to locate tag with id " + actualTag + " in any tag cache (during rule evaluation) - unable to evaluate rule.",
               cacheEx);
-          ruleUpdateBuffer.invalidate(pRuleId, TagQualityStatus.UNKNOWN_REASON,
+          ruleUpdateBuffer.invalidate(ruleId, TagQualityStatus.UNKNOWN_REASON,
               "Unable to evaluate rule as cannot find required Tag in cache: " + cacheEx.getMessage(), ruleResultTimestamp);
         } catch (RuleEvaluationException re) {
           // TODO change in rule engine: this should NOT be done using an
           // exception since it is normal behavior switched to trace
-          LOGGER.trace(pRuleId + " evaluateRule - Problem evaluating expresion for rule with Id (" + pRuleId + ") - invalidating rule with quality UNKNOWN_REASON ("
+          log.trace(ruleId + " evaluateRule - Problem evaluating expresion for rule with Id (" + ruleId + ") - invalidating rule with quality UNKNOWN_REASON ("
               + re.getMessage() + ").");
           // switched from INACCESSIBLE in old code
-          ruleUpdateBuffer.invalidate(pRuleId, TagQualityStatus.UNKNOWN_REASON, re.getMessage(), ruleResultTimestamp);
+          ruleUpdateBuffer.invalidate(ruleId, TagQualityStatus.UNKNOWN_REASON, re.getMessage(), ruleResultTimestamp);
         } catch (Exception e) {
-          LOGGER.error(pRuleId +
-              " evaluateRule - Unexpected Error evaluating expresion of rule with Id (" + pRuleId + ") - invalidating rule with quality UNKNOWN_REASON", e);
+          log.error(ruleId +
+              " evaluateRule - Unexpected Error evaluating expresion of rule with Id (" + ruleId + ") - invalidating rule with quality UNKNOWN_REASON", e);
           // switched from INACCESSIBLE in old code
-          ruleUpdateBuffer.invalidate(pRuleId, TagQualityStatus.UNKNOWN_REASON, e.getMessage(), ruleResultTimestamp);
+          ruleUpdateBuffer.invalidate(ruleId, TagQualityStatus.UNKNOWN_REASON, e.getMessage(), ruleResultTimestamp);
         }
       } else {
-        LOGGER.error(pRuleId + " evaluateRule - Unable to evaluate rule with Id (" + pRuleId + ") as RuleExpression is null.");
+        log.error(ruleId + " evaluateRule - Unable to evaluate rule with Id (" + ruleId + ") as RuleExpression is null.");
       }
     } catch (CacheElementNotFoundException cacheEx) {
-      LOGGER.error(pRuleId + " evaluateRule - Rule with id " + pRuleId + " not found in cache - unable to evaluate it.", cacheEx);
+      log.error(ruleId + " evaluateRule - Rule with id " + ruleId + " not found in cache - unable to evaluate it.", cacheEx);
     } catch (Exception e) {
-      LOGGER.error("evaluateRule - Unexpected Error caught while retrieving " + pRuleId + " from rule cache.", e);
+      log.error("evaluateRule - Unexpected Error caught while retrieving " + ruleId + " from rule cache.", e);
       // switched from INACCESSIBLE in old code
-      ruleUpdateBuffer.invalidate(pRuleId, TagQualityStatus.UNKNOWN_REASON, e.getMessage(), ruleResultTimestamp);
+      ruleUpdateBuffer.invalidate(ruleId, TagQualityStatus.UNKNOWN_REASON, e.getMessage(), ruleResultTimestamp);
     } finally {
-      ruleTagCache.releaseWriteLockOnKey(pRuleId);
+      ruleTagCache.releaseWriteLockOnKey(ruleId);
     }
   }
 
@@ -253,14 +248,14 @@ public class RuleEvaluatorImpl implements C2monCacheListener<Tag>, SmartLifecycl
 
   @Override
   public void start() {
-    LOGGER.debug("Starting rule evaluator");
+    log.debug("Starting rule evaluator");
     running = true;
     listenerContainer.start();
   }
 
   @Override
   public void stop() {
-    LOGGER.debug("Stopping rule evaluator");
+    log.debug("Stopping rule evaluator");
     listenerContainer.stop();
     running = false;
   }

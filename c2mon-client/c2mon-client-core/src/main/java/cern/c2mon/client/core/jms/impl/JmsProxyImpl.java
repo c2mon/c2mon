@@ -992,7 +992,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
       try {
         unsubscribeFromAlarmTopic();
       } catch (JMSException e) {
-        log.error("Did not manage to subscribe To Alarm Topic.", e);
+        log.error("Did not manage to unsubscribe from alarm topic.", e);
         throw e;
       }
     }
@@ -1011,7 +1011,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
       try {
         unsubscribeFromAlarmTopic();
       } catch (JMSException e) {
-        log.error("Did not manage to subscribe To Alarm Topic.", e);
+        log.error("Did not manage to unsubscribe from alarm topic.", e);
         throw e;
       }
     }

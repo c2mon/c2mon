@@ -23,6 +23,7 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.TextMessage;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,10 +39,8 @@ import com.google.gson.Gson;
  * class then notifies all registered listeners.<br/>
  * <br/>
  */
+@Slf4j
 class AlarmListenerWrapper extends AbstractListenerWrapper<AlarmListener, AlarmValue> {
-  
-  /** Class logger. */
-  private static final Logger LOGGER = LoggerFactory.getLogger(AlarmListenerWrapper.class);
   
   /** Json message serializer/deserializer */
   private static final Gson GSON = GsonFactory.createGson();
@@ -70,7 +69,7 @@ class AlarmListenerWrapper extends AbstractListenerWrapper<AlarmListener, AlarmV
   @Override
   protected void invokeListener(final AlarmListener listener, final AlarmValue alarm) {
     
-    LOGGER.debug("AlarmListenerWrapper invokeListener: " + listener.getClass()
+    log.debug("AlarmListenerWrapper invokeListener: " + listener.getClass()
         + " for alarm id:" + alarm.getId());
     listener.onAlarmUpdate(alarm);
   }

@@ -22,8 +22,7 @@ import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.jms.JmsException;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
@@ -41,10 +40,9 @@ import org.springframework.jmx.export.annotation.ManagedResource;
  * @author Mark Brightwell
  *
  */
+@Slf4j
 @ManagedResource
 class RepublisherImpl<T> implements Republisher<T> {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(RepublisherImpl.class);
 
   private int republicationDelay = 10000;
 
@@ -67,7 +65,7 @@ class RepublisherImpl<T> implements Republisher<T> {
    * Ids of tags that need re-publishing as publication failed (local collection not shared across cluster)
    * (map used as set, with value set as constant).
    */
-  private ConcurrentHashMap<T, Long> toBePublished = new ConcurrentHashMap<T, Long>();
+  private ConcurrentHashMap<T, Long> toBePublished = new ConcurrentHashMap<>();
 
   /** For scheduling re-publication task */
   private Object republicatonLock = new Object();
@@ -91,7 +89,7 @@ class RepublisherImpl<T> implements Republisher<T> {
       synchronized (republicatonLock) { //lock required for if logic, to make sure the added publication is picked up in other thread
         toBePublished.put(event, Long.valueOf(1));
         if (publicationTask == null) {
-          LOGGER.debug("Unpublished " + eventName + " detected: scheduling new republication task in " + republicationDelay + " milliseconds");
+          log.debug("Unpublished " + eventName + " detected: scheduling new republication task in " + republicationDelay + " milliseconds");
           publicationTask = new PublicationTask();
           timer.schedule(publicationTask, republicationDelay);
         }
@@ -120,7 +118,7 @@ class RepublisherImpl<T> implements Republisher<T> {
   }
 
   /**
-   * Checks if un-published evemts need publishing. If so, will publish them.
+   * Checks if un-published events need publishing. If so, will publish them.
    *
    * @author Mark Brightwell
    *
@@ -130,18 +128,18 @@ class RepublisherImpl<T> implements Republisher<T> {
     @Override
     public void run() {
 
-        LOGGER.debug("Checking for " + eventName + " re-publications");
+        log.debug("Checking for " + eventName + " re-publications");
         if (!toBePublished.isEmpty()) {
-          LOGGER.info("Detected " + eventName +  " events that failed to be published - will attempt republication of these");
+          log.info("Detected " + eventName +  " events that failed to be published - will attempt republication of these");
           for (T event : Collections.list(toBePublished.keys())) {  //take copy as these tasks also add to this map if publication fails again
             try {
               publisher.publish(event);
               toBePublished.remove(event);
             } catch (JmsException e) {
-              LOGGER.error("JMS exception caught while attempting re-publication. Will retry shortly.");
+              log.error("JMS exception caught while attempting re-publication. Will retry shortly.");
               totalRepublicationAttempts.incrementAndGet();
             } catch (Exception e) {
-              LOGGER.error("Unexpected exception caught while checking for failed " + eventName + " publications: this event will not be re-published", e);
+              log.error("Unexpected exception caught while checking for failed " + eventName + " publications: this event will not be re-published", e);
               totalRepublicationAttempts.incrementAndGet();
               toBePublished.remove(event);
             }
@@ -151,7 +149,7 @@ class RepublisherImpl<T> implements Republisher<T> {
         if (toBePublished.isEmpty()) {
           publicationTask = null;
         } else {
-          LOGGER.debug("Rescheduling " + eventName + " republication task in " + republicationDelay + " milliseconds");
+          log.debug("Rescheduling " + eventName + " republication task in " + republicationDelay + " milliseconds");
           timer.schedule(new PublicationTask(), republicationDelay);
         }
       }

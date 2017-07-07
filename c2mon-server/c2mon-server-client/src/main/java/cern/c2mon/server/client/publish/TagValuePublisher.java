@@ -22,8 +22,8 @@ import javax.annotation.PreDestroy;
 import cern.c2mon.server.cache.*;
 import cern.c2mon.server.client.config.ClientProperties;
 import cern.c2mon.shared.client.serializer.TransferTagSerializer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jms.JmsException;
@@ -63,10 +63,9 @@ import cern.c2mon.shared.util.jms.JmsSender;
  * @see TagValueUpdate
  */
 @Service
+@Slf4j
 @ManagedResource(description = "Bean publishing tag updates to the clients")
 public class TagValuePublisher implements C2monCacheListener<Tag>, ConfigurationUpdateListener, Publisher<Tag> {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(TagValuePublisher.class);
 
   /** Bean providing for sending JMS messages and waiting for a response */
   private final JmsSender jmsSender;
@@ -137,12 +136,12 @@ public class TagValuePublisher implements C2monCacheListener<Tag>, Configuration
    */
   @PostConstruct
   public void init() {
-    LOGGER.info("init - Starting Tag publisher.");
-    LOGGER.trace("init - Registering for Tag Updates.");
+    log.info("init - Starting Tag publisher.");
+    log.trace("init - Registering for Tag Updates.");
 //    this.alarmAggregator.registerForTagUpdates(this);
     cacheRegistrationService.registerSynchronousToAllTags(this);
 
-    LOGGER.trace("init - Registering for Configuration Updates.");
+    log.trace("init - Registering for Configuration Updates.");
 
     this.configurationUpdate.registerForConfigurationUpdates(this);
 
@@ -157,7 +156,7 @@ public class TagValuePublisher implements C2monCacheListener<Tag>, Configuration
    */
   @PreDestroy
   public void shutdown() {
-    LOGGER.info("Stopping tag publisher");
+    log.info("Stopping tag publisher");
     republisher.stop();
   }
 
@@ -175,7 +174,7 @@ public class TagValuePublisher implements C2monCacheListener<Tag>, Configuration
 //    try {
 //      publish(tagWithAlarms);
 //    } catch (JmsException e) {
-//      LOGGER.error("notifyOnUpdate - Error publishing tag update to topic for tag " + tagWithAlarms.getTag().getId() + " - submitting for republication", e);
+//      log.error("notifyOnUpdate - Error publishing tag update to topic for tag " + tagWithAlarms.getTag().getId() + " - submitting for republication", e);
 //      republisher.publicationFailed(tagWithAlarms);
 //    }
 //  }
@@ -183,8 +182,8 @@ public class TagValuePublisher implements C2monCacheListener<Tag>, Configuration
   @Override
   public void publish(final Tag tag) {
     TransferTagValueImpl tagValue = TransferObjectFactory.createTransferTagValue(tag);
-    if (LOGGER.isTraceEnabled()) {
-      LOGGER.trace("Publishing tag update to client: " + TransferTagSerializer.toJson(tagValue));
+    if (log.isTraceEnabled()) {
+      log.trace("Publishing tag update to client: " + TransferTagSerializer.toJson(tagValue));
     }
     jmsSender.sendToTopic(TransferTagSerializer.toJson(tagValue), TopicProvider.topicFor(tag, properties));
   }
@@ -198,12 +197,12 @@ public class TagValuePublisher implements C2monCacheListener<Tag>, Configuration
       try {
         String topic = TopicProvider.topicFor(tag, properties);
         TransferTagImpl transferTag = TransferObjectFactory.createTransferTag(tag, aliveTimerFacade.isRegisteredAliveTimer(tagId), topic);
-        if (LOGGER.isTraceEnabled()) {
-          LOGGER.trace("Publishing configuration update to client: " + TransferTagSerializer.toJson(transferTag));
+        if (log.isTraceEnabled()) {
+          log.trace("Publishing configuration update to client: " + TransferTagSerializer.toJson(transferTag));
         }
         jmsSender.sendToTopic(TransferTagSerializer.toJson(transferTag), topic);
       } catch (JmsException e) {
-        LOGGER.error("Error publishing configuration update to topic for tag " + tagId
+        log.error("Error publishing configuration update to topic for tag " + tagId
             + " - submitting for republication", e);
         republisher.publicationFailed(tag);
       }
@@ -234,7 +233,7 @@ public class TagValuePublisher implements C2monCacheListener<Tag>, Configuration
     try {
       publish(tag);
     } catch (JmsException e) {
-      LOGGER.error("Error publishing tag update to topic for tag " + tag.getId() + " - submitting for republication", e);
+      log.error("Error publishing tag update to topic for tag " + tag.getId() + " - submitting for republication", e);
       republisher.publicationFailed(tag);
     }
 

@@ -155,7 +155,6 @@ public abstract class BaseScript extends Script {
     return service.q(name, params, interval);
   }
 
-
   private static void log(Object object) throws IOException {
     String json = new ObjectMapper().writer().withDefaultPrettyPrinter().writeValueAsString(object);
     System.out.println(json + "\n");

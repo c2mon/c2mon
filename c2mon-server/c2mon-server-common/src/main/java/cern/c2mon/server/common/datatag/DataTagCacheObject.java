@@ -272,17 +272,6 @@ public class DataTagCacheObject extends AbstractTagCacheObject implements DataTa
     return this.sourceTimestamp;
   }
 
-
-//  public final String toString() {
-//    StringBuffer str = new StringBuffer("<DataTag ");
-//
-//    str.append("id=\"");
-//    str.append(id);
-//    str.append("\"/>");
-//    str.append("</DataTag>");
-//    return str.toString();
-//  }
-
   /**
    * @param minValue the minValue to set
    */
