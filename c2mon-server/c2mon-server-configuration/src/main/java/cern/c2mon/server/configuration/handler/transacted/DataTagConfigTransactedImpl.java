@@ -59,7 +59,7 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
 
   @Autowired
   private ConfigurationProperties properties;
-  
+
   /**
    * Reference to the equipment facade.
    */

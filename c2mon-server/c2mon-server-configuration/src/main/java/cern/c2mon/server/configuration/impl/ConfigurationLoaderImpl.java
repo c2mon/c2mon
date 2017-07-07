@@ -45,9 +45,9 @@ import cern.c2mon.server.cache.RuleTagCache;
 import cern.c2mon.server.cache.TagLocationService;
 import cern.c2mon.server.cache.loading.SequenceDAO;
 import cern.c2mon.server.common.config.ServerProperties;
+import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.tag.Tag;
-import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.configuration.ConfigProgressMonitor;
 import cern.c2mon.server.configuration.ConfigurationLoader;
 import cern.c2mon.server.configuration.config.ConfigurationProperties;
@@ -137,6 +137,8 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
 
   private final RuleTagCache ruleTagCache;
 
+  private final TagLocationService tagLocationService;
+
   private Environment environment;
 
   /**
@@ -181,6 +183,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
                                  SequenceDAO sequenceDAO,
                                  ConfigurationProperties properties,
                                  ServerProperties serverProperties,
+                                 TagLocationService tagLocationService,
                                  RuleTagCache ruleTagCache) {
     super();
     this.processCommunicationManager = processCommunicationManager;
@@ -202,6 +205,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
     this.sequenceDAO = sequenceDAO;
     this.daqConfigEnabled = properties.isDaqConfigEnabled();
     this.reportDirectory = serverProperties.getHome() + "/reports";
+    this.tagLocationService = tagLocationService;
     this.ruleTagCache = ruleTagCache;
   }
 
@@ -485,7 +489,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
    * @param elements List of {@Link ConfigurationElement}s to check.
    */
   private void resubscribeExistingRulesToTags(List<ConfigurationElement> elements) {
-    log.info("Adding existing rules to tags");    
+    log.info("Adding existing rules to tags");
     for (ConfigurationElement element : elements) {
         Collection<RuleTag> tags = this.ruleTagCache.findByRuleInputTagId(element.getEntityId());
         for (RuleTag t : tags) {

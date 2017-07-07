@@ -195,7 +195,7 @@ public class ControlTagConfigTransactedImpl extends TagConfigTransactedImpl<Cont
     } catch (CacheElementNotFoundException ex) {
       throw ex;
     } catch (Exception ex) {
-      log.error("Exception caught while updating a ControlTag - rolling back DB transaction", ex);      
+      log.error("Exception caught while updating a ControlTag - rolling back DB transaction", ex);
       throw new UnexpectedRollbackException("Unexpected exception caught while updating a ControlTag configuration", ex);
     } finally {
       if (tagCache.isWriteLockedByCurrentThread(id)) {
