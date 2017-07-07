@@ -38,6 +38,7 @@ import cern.c2mon.server.cache.loading.DataTagLoaderDAO;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.configuration.config.ConfigurationProperties;
 import cern.c2mon.server.common.listener.ConfigurationEventListener;
+import cern.c2mon.server.configuration.config.ConfigurationProperties;
 import cern.c2mon.server.configuration.handler.AlarmConfigHandler;
 import cern.c2mon.server.configuration.handler.RuleTagConfigHandler;
 import cern.c2mon.server.configuration.impl.ProcessChange;

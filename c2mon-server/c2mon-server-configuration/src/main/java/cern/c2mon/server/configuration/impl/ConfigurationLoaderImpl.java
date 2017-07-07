@@ -356,7 +356,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
                     configElements.parallelStream().forEach(element -> {
                       applyConfigurationElement(element, processLists, elementPlaceholder, daqReportPlaceholder, report, configId, configProgressMonitor);
                       if (element.getAction() == Action.CREATE) {
-                        elementsToCheckRules.put(element.getEntityId(), element);
+                        elementsToCheckRules.add(element);
                       }
                     }
                 ).get(300, TimeUnit.SECONDS);

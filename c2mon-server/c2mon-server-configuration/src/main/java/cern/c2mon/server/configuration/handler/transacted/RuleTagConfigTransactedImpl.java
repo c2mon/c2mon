@@ -256,7 +256,7 @@ public class RuleTagConfigTransactedImpl extends TagConfigTransactedImpl<RuleTag
           }
         }
       }
-      tagCache.acquireWriteLockOnKey(id);      
+      tagCache.acquireWriteLockOnKey(id);
       Collection<Long> ruleInputTagIds = Collections.EMPTY_LIST;
       try {
         ruleInputTagIds = ruleTag.getCopyRuleInputTagIds();                
