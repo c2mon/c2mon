@@ -87,7 +87,10 @@ import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
 public class ConfigurationLoaderImpl implements ConfigurationLoader {
 
   //TODO element & element report status always both need updating - redesign this part
-
+    
+  @Autowired
+  private ConfigurationProperties properties;
+  
   /**
    * Avoids interfering with running cache persistence jobs.
    * To avoid a direct dependency to the c2mon-server-cachepersistence module
@@ -370,7 +373,9 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
             });
         }
 
-        this.addExistingRulesToTags(elementsToCheckRules);
+        if (!this.properties.isDeleteRulesAfterTagDeletion()) {
+            this.addExistingRulesToTags(elementsToCheckRules);
+        }
     } finally {
       clusterCache.releaseWriteLockOnKey(this.cachePersistenceLock);
     }

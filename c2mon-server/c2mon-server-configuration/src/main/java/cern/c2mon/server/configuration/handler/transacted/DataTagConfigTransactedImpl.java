@@ -36,6 +36,7 @@ import cern.c2mon.server.cache.*;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.cache.loading.DataTagLoaderDAO;
 import cern.c2mon.server.common.datatag.DataTag;
+import cern.c2mon.server.configuration.config.ConfigurationProperties;
 import cern.c2mon.server.common.listener.ConfigurationEventListener;
 import cern.c2mon.server.configuration.handler.AlarmConfigHandler;
 import cern.c2mon.server.configuration.handler.RuleTagConfigHandler;
@@ -61,6 +62,9 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
    * Class logger.
    */
   private static final Logger LOGGER = LoggerFactory.getLogger(DataTagConfigTransactedImpl.class);
+
+  @Autowired
+  private ConfigurationProperties properties;
 
   /**
    * Reference to the equipment facade.
@@ -220,14 +224,16 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
     ProcessChange processChange = new ProcessChange();
     try {
       DataTag tagCopy = tagCache.getCopy(id);
-      Collection<Long> ruleIds = tagCopy.getCopyRuleIds();
-      if (!ruleIds.isEmpty()) {
-        LOGGER.trace("Removing Rules dependent on DataTag " + id);
-        for (Long ruleId : new ArrayList<Long>(ruleIds)) {
-          if (tagLocationService.isInTagCache(ruleId)) { //may already have been removed if a previous rule in the list was used in this rule! {
-            ConfigurationElementReport newReport = new ConfigurationElementReport(Action.REMOVE, Entity.RULETAG, ruleId);
-            elementReport.addSubReport(newReport);
-            ruleTagConfigHandler.removeRuleTag(ruleId, newReport);
+      if (this.properties.isDeleteRulesAfterTagDeletion()) {
+        Collection<Long> ruleIds = tagCopy.getCopyRuleIds();
+        if (!ruleIds.isEmpty()) {
+          LOGGER.trace("Removing Rules dependent on DataTag " + id);
+          for (Long ruleId : new ArrayList<Long>(ruleIds)) {
+            if (tagLocationService.isInTagCache(ruleId)) { //may already have been removed if a previous rule in the list was used in this rule! {
+              ConfigurationElementReport newReport = new ConfigurationElementReport(Action.REMOVE, Entity.RULETAG, ruleId);
+              elementReport.addSubReport(newReport);
+              ruleTagConfigHandler.removeRuleTag(ruleId, newReport);
+            }
           }
         }
       }

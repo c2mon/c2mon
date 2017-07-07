@@ -21,6 +21,7 @@ import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.cache.loading.ControlTagLoaderDAO;
 import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.control.ControlTagCacheObject;
+import cern.c2mon.server.configuration.config.ConfigurationProperties;
 import cern.c2mon.server.common.listener.ConfigurationEventListener;
 import cern.c2mon.server.configuration.handler.AlarmConfigHandler;
 import cern.c2mon.server.configuration.handler.RuleTagConfigHandler;
@@ -56,6 +57,9 @@ public class ControlTagConfigTransactedImpl extends TagConfigTransactedImpl<Cont
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ControlTagConfigTransactedImpl.class);
   
+  @Autowired
+  private ConfigurationProperties properties;
+
   private DataTagFacade dataTagFacade;
   
   private EquipmentFacade equipmentFacade;
@@ -131,7 +135,7 @@ public class ControlTagConfigTransactedImpl extends TagConfigTransactedImpl<Cont
           listener.onConfigurationEvent(controlTag, Action.CREATE);
         }
 
-        tagCache.putQuiet(controlTag);      
+        tagCache.putQuiet(controlTag);
         ProcessChange processChange = new ProcessChange();
         if (processFacade.getProcessIdFromControlTag(controlTag.getId()) != null) {
           processChange = new ProcessChange(processFacade.getProcessIdFromControlTag(controlTag.getId()));
@@ -205,7 +209,18 @@ public class ControlTagConfigTransactedImpl extends TagConfigTransactedImpl<Cont
   public ProcessChange doRemoveControlTag(Long id, ConfigurationElementReport tagReport) {
     LOGGER.trace("Removing ControlTag " + id);
     try {      
-      tagCache.acquireWriteLockOnKey(id);      
+      if (this.properties.isDeleteRulesAfterTagDeletion()) {
+        Collection<Long> ruleIds = tagCache.get(id).getCopyRuleIds();
+        if (!ruleIds.isEmpty()) {
+          LOGGER.trace("Removing rules dependent on ControlTag " + id);
+          for (Long ruleId : ruleIds) {
+            ConfigurationElementReport newReport = new ConfigurationElementReport(Action.REMOVE, Entity.RULETAG, ruleId);
+            tagReport.addSubReport(newReport);
+            ruleTagConfigHandler.removeRuleTag(ruleId, newReport);
+          }
+        }
+      }
+      tagCache.acquireWriteLockOnKey(id);
       try {                
         ControlTag controlTag = tagCache.get(id);
         if (!controlTag.getAlarmIds().isEmpty()) {

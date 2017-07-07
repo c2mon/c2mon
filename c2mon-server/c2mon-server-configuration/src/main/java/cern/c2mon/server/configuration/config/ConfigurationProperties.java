@@ -21,6 +21,8 @@ public class ConfigurationProperties {
    */
   private boolean allowRunningProcessRemoval = true;
 
+  private boolean deleteRulesAfterTagDeletion = true;
+  
   /**
    * JDBC properties
    */
