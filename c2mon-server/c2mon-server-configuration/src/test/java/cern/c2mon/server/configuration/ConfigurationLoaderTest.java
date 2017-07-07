@@ -39,6 +39,7 @@ import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.configuration.config.ConfigurationModule;
+import cern.c2mon.server.configuration.config.ConfigurationProperties;
 import cern.c2mon.server.configuration.config.ProcessCommunicationManagerMock;
 import cern.c2mon.server.configuration.junit.ConfigurationCachePopulationRule;
 import cern.c2mon.server.configuration.junit.ConfigurationDatabasePopulationRule;
@@ -114,6 +115,9 @@ public class ConfigurationLoaderTest {
   @Autowired
   public ConfigurationCachePopulationRule configurationCachePopulationRule;
 
+  @Autowired
+  private ConfigurationProperties properties;
+  
   /**
    * Mocked daqcommunication-out module.
    */
@@ -532,7 +536,9 @@ public class ConfigurationLoaderTest {
   @Test
   public void testRemoveRuleTag() throws ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException,
       NoSuchFieldException, NoSimpleValueParseException {
-
+      
+    this.properties.setDeleteRulesAfterTagDeletion(true);
+    
     replay(mockManager);
 
     // remove ruletag
@@ -552,10 +558,12 @@ public class ConfigurationLoaderTest {
   /**
    * Tests a dependent rule is removed when a tag is.
    */
-
   @Test
   public void testRuleRemovedOnTagRemoval() throws ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException,
       NoSuchFieldException, NoSimpleValueParseException {
+      
+    this.properties.setDeleteRulesAfterTagDeletion(true);
+    
     Long tagId = 200001L;
     Long ruleId1 = 60000L; // two of the rules that should be removed
     Long ruleId2 = 59999L;
@@ -583,6 +591,44 @@ public class ConfigurationLoaderTest {
 
     verify(mockManager);
   }
+  
+  /**
+   * Tests a dependent rule is removed when a tag is.
+   */
+  @Test
+  public void testRuleNotRemovedOnTagRemoval() throws ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException,
+      NoSuchFieldException, NoSimpleValueParseException {
+      
+    this.properties.setDeleteRulesAfterTagDeletion(false);
+    
+    Long tagId = 200001L;
+    Long ruleId1 = 60000L; // two of the rules that should be removed
+    Long ruleId2 = 59999L;
+    assertTrue(ruleTagCache.hasKey(ruleId1));
+    assertNotNull(ruleTagMapper.getItem(ruleId1));
+    assertTrue(ruleTagCache.hasKey(ruleId2));
+    assertNotNull(ruleTagMapper.getItem(ruleId2));
+    assertTrue(dataTagCache.hasKey(tagId));
+    assertNotNull(dataTagMapper.getItem(tagId));
+
+    // for tag removal
+    expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
+
+    replay(mockManager);
+
+    // test removal of tag 20004L removes the rule also
+    configurationLoader.applyConfiguration(7);
+
+    assertTrue(ruleTagCache.hasKey(ruleId1));
+    assertNotNull(ruleTagMapper.getItem(ruleId1));
+    assertTrue(ruleTagCache.hasKey(ruleId2));
+    assertNotNull(ruleTagMapper.getItem(ruleId2));
+    
+    assertFalse(dataTagCache.hasKey(tagId));
+    assertNull(dataTagMapper.getItem(tagId));
+
+    verify(mockManager);
+  }  
 
   /**
    * Tests that a tag removal does indeed remove an associated alarm.
@@ -807,6 +853,8 @@ public class ConfigurationLoaderTest {
    */
   @Test
   public void testRemoveProcess() {
+    this.properties.setDeleteRulesAfterTagDeletion(true);
+    
     // stop DAQ else remove not allowed
     processFacade.stop(50L, new Timestamp(System.currentTimeMillis()));
 
@@ -825,7 +873,7 @@ public class ConfigurationLoaderTest {
     assertFalse(ruleTagCache.hasKey(60010L));
     assertNull(ruleTagMapper.getItem(60010L));
     assertFalse(ruleTagCache.hasKey(60002L));
-    assertNull(ruleTagMapper.getItem(60002L));
+    assertNull(ruleTagMapper.getItem(60002L));            
     // tags
     assertFalse(dataTagCache.hasKey(200002L));
     assertNull(dataTagMapper.getItem(200002L));
@@ -847,11 +895,70 @@ public class ConfigurationLoaderTest {
     assertFalse(aliveTimerCache.hasKey(1221L));
     // alarms
     assertFalse(alarmCache.hasKey(350000L));
-    assertNull(alarmMapper.getItem(350000L));
+    assertNull(alarmMapper.getItem(350000L));        
     assertFalse(alarmCache.hasKey(350001L));
     assertNull(alarmMapper.getItem(350001L));
     verify(mockManager);
   }
+  
+  /**
+   * Tests the removal of a process succeeds, with dependent alarms.
+   * Relies on permanent test data in test account and must be rolled back. No
+   * changes should be sent to the DAQ layer.
+   */
+  @Test
+  public void testRemoveProcessDoNotDeleteRules() {
+    this.properties.setDeleteRulesAfterTagDeletion(false);
+    
+    // stop DAQ else remove not allowed
+    processFacade.stop(50L, new Timestamp(System.currentTimeMillis()));
+
+    replay(mockManager);
+
+    ConfigurationReport report = configurationLoader.applyConfiguration(28);
+
+    assertFalse(report.toXML().contains(Status.FAILURE.toString()));
+    verify(mockManager);
+    // check process, tags and alarms are gone
+    assertFalse(processCache.hasKey(50L));
+    assertNull(processMapper.getItem(50L));
+    assertFalse(equipmentCache.hasKey(150L));
+    assertNull(equipmentMapper.getItem(150L));
+    // they should still be there; since 
+    // c2mon.server.configuration.deleteRulesAfterTagDeletion=true we keep rules
+    // when deleting tags that they are attached to        
+    assertTrue(ruleTagCache.hasKey(60010L));
+    assertNotNull(ruleTagMapper.getItem(60010L));
+    assertTrue(ruleTagCache.hasKey(60002L));
+    assertNotNull(ruleTagMapper.getItem(60002L));            
+    // tags
+    assertFalse(dataTagCache.hasKey(200002L));
+    assertNull(dataTagMapper.getItem(200002L));
+    assertFalse(dataTagCache.hasKey(200003L));
+    assertNull(dataTagMapper.getItem(200003L));
+    // control tags
+    assertFalse(controlTagCache.hasKey(1220L));
+    assertNull(controlTagMapper.getItem(1220L));
+    assertFalse(controlTagCache.hasKey(1221L));
+    assertNull(controlTagMapper.getItem(1221L));
+    // equipment control tags
+    assertFalse(controlTagCache.hasKey(1222L));
+    assertNull(controlTagMapper.getItem(1222L));
+    assertFalse(controlTagCache.hasKey(1223L));
+    assertNull(controlTagMapper.getItem(1223L));
+    // equipment commfault
+    assertFalse(commFaultTagCache.hasKey(1223L));
+    // process alive
+    assertFalse(aliveTimerCache.hasKey(1221L));
+    // alarm - will still exist because it is attached to rule tag ID 60000
+    assertTrue(alarmCache.hasKey(350000L));
+    assertNotNull(alarmMapper.getItem(350000L));
+    // alarm - won't exist because it is attached to data tag ID 20000
+    assertFalse(alarmCache.hasKey(350003L));
+    assertNull(alarmMapper.getItem(350003L));
+    
+    verify(mockManager);
+  }  
 
   /**
    * Tests the removal of a process succeeds, with dependent rules and alarms.
@@ -868,7 +975,8 @@ public class ConfigurationLoaderTest {
   @Test
   public void testRemoveEquipmentDependentObjects() throws ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException,
       NoSuchFieldException, NoSimpleValueParseException {
-
+    this.properties.setDeleteRulesAfterTagDeletion(true);
+    
     // expect equipment remove message to DAQ
     expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andAnswer(new IAnswer<ConfigurationChangeEventReport>() {
 
@@ -896,7 +1004,7 @@ public class ConfigurationLoaderTest {
     assertFalse(ruleTagCache.hasKey(60005L));
     assertNull(ruleTagMapper.getItem(60005L));
     assertFalse(ruleTagCache.hasKey(60004L));
-    assertNull(ruleTagMapper.getItem(60004L));
+    assertNull(ruleTagMapper.getItem(60004L));            
     // tags
     assertFalse(dataTagCache.hasKey(200001L));
     assertNull(dataTagMapper.getItem(200001L));
@@ -920,6 +1028,79 @@ public class ConfigurationLoaderTest {
 
     verify(mockManager);
   }
+  
+  /**
+   * Tests the removal of a process succeeds, with dependent rules and alarms.
+   * Relies on permanent test data in test account and must be rolled back. No
+   * changes should be sent to the DAQ layer.
+   *
+   * @throws NoSimpleValueParseException
+   * @throws NoSuchFieldException
+   * @throws TransformerException
+   * @throws InstantiationException
+   * @throws IllegalAccessException
+   * @throws ParserConfigurationException
+   */
+  @Test
+  public void testRemoveEquipmentDependentObjectsDoNotDeleteRules() throws ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException,
+      NoSuchFieldException, NoSimpleValueParseException {
+      
+    this.properties.setDeleteRulesAfterTagDeletion(false);
+    
+    // expect equipment remove message to DAQ
+    expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andAnswer(new IAnswer<ConfigurationChangeEventReport>() {
+
+      @Override
+      public ConfigurationChangeEventReport answer() throws Throwable {
+        List<Change> changeList = (List<Change>) EasyMock.getCurrentArguments()[1];
+        ConfigurationChangeEventReport report = new ConfigurationChangeEventReport();
+        for (Change change : changeList) {
+          ChangeReport changeReport = new ChangeReport(change);
+          changeReport.setState(CHANGE_STATE.SUCCESS);
+          report.appendChangeReport(changeReport);
+        }
+        return report;
+      }
+    });
+
+    replay(mockManager);
+
+    ConfigurationReport report = configurationLoader.applyConfiguration(29);
+    verify(mockManager);
+    // check equipment, tag, rules and alarms are gone
+    assertFalse(equipmentCache.hasKey(150L));
+    assertNull(equipmentMapper.getItem(150L));
+    // they should still be there; since 
+    // c2mon.server.configuration.deleteRulesAfterTagDeletion=true we keep rules
+    // when deleting tags that they are attached to        
+    assertTrue(ruleTagCache.hasKey(60005L));
+    assertNotNull(ruleTagMapper.getItem(60005L));
+    assertTrue(ruleTagCache.hasKey(60004L));
+    assertNotNull(ruleTagMapper.getItem(60004L));        
+    // tags
+    assertFalse(dataTagCache.hasKey(200001L));
+    assertNull(dataTagMapper.getItem(200001L));
+    assertFalse(dataTagCache.hasKey(200004L));
+    assertNull(dataTagMapper.getItem(200004L));
+    // control tags
+    assertFalse(controlTagCache.hasKey(1222L));
+    assertNull(controlTagMapper.getItem(1222L));
+    assertFalse(controlTagCache.hasKey(1223L));
+    assertNull(controlTagMapper.getItem(1223L));
+    assertFalse(controlTagCache.hasKey(1224L));
+    assertNull(controlTagMapper.getItem(1224L));
+    // alivetimer & commfault
+    assertFalse(aliveTimerCache.hasKey(1224L));
+    assertFalse(commFaultTagCache.hasKey(1223L));
+    // alarm - will still exist because it is attached to rule tag ID 60000
+    assertTrue(alarmCache.hasKey(350000L));
+    assertNotNull(alarmMapper.getItem(350000L));
+    // alarm - won't exist because it is attached to data tag ID 20000
+    assertFalse(alarmCache.hasKey(350003L));
+    assertNull(alarmMapper.getItem(350003L));
+   
+    verify(mockManager);
+  }  
 
   /**
    * Test the creation, update and removal of equipment.
