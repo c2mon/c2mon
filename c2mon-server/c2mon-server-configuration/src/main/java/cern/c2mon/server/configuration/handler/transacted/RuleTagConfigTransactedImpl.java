@@ -61,7 +61,7 @@ public class RuleTagConfigTransactedImpl extends TagConfigTransactedImpl<RuleTag
   
   @Autowired
   private ConfigurationProperties properties;
-    
+
   /**
    * Circular dependency between RuleTagConfigHandler
    * and TagConfigGateway, so autowire field.
@@ -125,7 +125,7 @@ public class RuleTagConfigTransactedImpl extends TagConfigTransactedImpl<RuleTag
           listener.onConfigurationEvent(ruleTag, Action.CREATE);
         }
 
-        tagCache.putQuiet(ruleTag); 
+        tagCache.putQuiet(ruleTag);
       } catch (RuntimeException e) {
         String errMessage = "Exception caught while adding a RuleTag - rolling back DB transaction.";
         LOGGER.error(errMessage, e);
@@ -244,7 +244,7 @@ public class RuleTagConfigTransactedImpl extends TagConfigTransactedImpl<RuleTag
     try {
       RuleTag ruleTag = tagCache.get(id);
       if (this.properties.isDeleteRulesAfterTagDeletion()) {
-        Collection<Long> ruleIds = ruleTag.getCopyRuleIds();  
+        Collection<Long> ruleIds = ruleTag.getCopyRuleIds();
         if (!ruleIds.isEmpty()) {
           LOGGER.debug("Removing rules dependent on RuleTag " + id);
           for (Long ruleId : ruleIds) { //concurrent modifcation as a rule is removed from the list during the remove call!
@@ -277,7 +277,7 @@ public class RuleTagConfigTransactedImpl extends TagConfigTransactedImpl<RuleTag
           listener.onConfigurationEvent(ruleTag, Action.REMOVE);
         }
 
-        configurableDAO.deleteItem(ruleTag.getId());                                           
+        configurableDAO.deleteItem(ruleTag.getId());
       }
       catch (RuntimeException rEx) {
         String errMessage = "Exception caught when removing rule tag with id " + id;

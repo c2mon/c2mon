@@ -45,6 +45,9 @@ import cern.c2mon.server.cache.RuleTagCache;
 import cern.c2mon.server.cache.TagLocationService;
 import cern.c2mon.server.cache.loading.SequenceDAO;
 import cern.c2mon.server.common.config.ServerProperties;
+import cern.c2mon.server.common.datatag.DataTag;
+import cern.c2mon.server.common.rule.RuleTag;
+import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.configuration.ConfigProgressMonitor;
 import cern.c2mon.server.configuration.ConfigurationLoader;
@@ -86,10 +89,10 @@ import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
 public class ConfigurationLoaderImpl implements ConfigurationLoader {
 
   //TODO element & element report status always both need updating - redesign this part
-    
+
   @Autowired
   private ConfigurationProperties properties;
-  
+
   /**
    * Avoids interfering with running cache persistence jobs.
    * To avoid a direct dependency to the c2mon-server-cachepersistence module
