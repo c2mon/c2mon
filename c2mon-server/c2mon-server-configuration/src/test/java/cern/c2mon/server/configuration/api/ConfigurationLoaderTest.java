@@ -1480,7 +1480,79 @@ public class ConfigurationLoaderTest {
   }
 
   @Test
+  public void deleteDataTagDoesNotDeleteRule() throws IllegalAccessException, TransformerException, InstantiationException, NoSimpleValueParseException, ParserConfigurationException, NoSuchFieldException, InterruptedException {
+    this.properties.setDeleteRulesAfterTagDeletion(false);
+
+    // called once when updating the equipment;
+    // mock returns a list with the correct number of SUCCESS ChangeReports
+    expect(communicationManager.sendConfiguration(eq(5L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
+    replay(communicationManager);
+    Configuration createProcess = TestConfigurationProvider.createProcess();
+    configurationLoader.applyConfiguration(createProcess);
+    Configuration createEquipment = TestConfigurationProvider.createEquipment();
+    configurationLoader.applyConfiguration(createEquipment);
+    Configuration createSubEquipment = TestConfigurationProvider.createSubEquipment();
+    configurationLoader.applyConfiguration(createSubEquipment);
+    Configuration createDataTag = TestConfigurationProvider.createEquipmentDataTag(15L);
+    configurationLoader.applyConfiguration(createDataTag);
+    processFacade.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
+    Configuration createRuleTag = TestConfigurationProvider.createRuleTag();
+    configurationLoader.applyConfiguration(createRuleTag);
+
+    // TEST:
+    // check if the DataTag and rules are in the cache
+    assertTrue(ruleTagCache.hasKey(1500L));
+    assertNotNull(ruleTagMapper.getItem(1500L));
+    assertTrue(dataTagCache.hasKey(1000L));
+    assertNotNull(dataTagMapper.getItem(1000L));
+
+    // Build configuration to remove the DataTag
+    Configuration removeTag = TestConfigurationProvider.deleteDataTag();
+    ConfigurationReport report = configurationLoader.applyConfiguration(removeTag);
+
+    //check report result
+    assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
+    assertTrue(report.getStatus() == ConfigConstants.Status.OK);
+    assertTrue(report.getElementReports().size() == 1);
+
+    //rule is still there
+    assertTrue(ruleTagCache.hasKey(1500L));
+    assertNotNull(ruleTagMapper.getItem(1500L));
+    //tag is not there
+    assertFalse(dataTagCache.hasKey(1000L));
+    assertNull(dataTagMapper.getItem(1000L));
+
+    verify(communicationManager);
+
+    // remove the rest for finishing the test
+    processFacade.stop(5L, new Timestamp(System.currentTimeMillis()));
+    Configuration remove = TestConfigurationProvider.deleteProcess();
+    report = configurationLoader.applyConfiguration(remove);
+    assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
+    assertTrue(report.getStatus() == ConfigConstants.Status.OK);
+
+    assertFalse(processCache.hasKey(5L));
+    assertNull(processMapper.getItem(5L));
+    assertFalse(controlTagCache.hasKey(100L));
+    assertNull(controlTagMapper.getItem(100L));
+    assertFalse(aliveTimerCache.hasKey(101L));
+
+    // equipment stuff
+    assertFalse(equipmentCache.hasKey(15L));
+    assertNull(equipmentMapper.getItem(15L));
+    assertFalse(controlTagCache.hasKey(200L));
+    assertNull(controlTagMapper.getItem(200L));
+    assertFalse(commFaultTagCache.hasKey(201L));
+    assertFalse(controlTagCache.hasKey(201L));
+    assertNull(controlTagMapper.getItem(202L));
+
+    verify(communicationManager);
+  }
+
+  @Test
   public void deleteRuleWithDeleteDataTag() throws IllegalAccessException, TransformerException, InstantiationException, NoSimpleValueParseException, ParserConfigurationException, NoSuchFieldException, InterruptedException {
+    this.properties.setDeleteRulesAfterTagDeletion(true);
+
     this.properties.setDeleteRulesAfterTagDeletion(true);
 
     // called once when updating the equipment;
