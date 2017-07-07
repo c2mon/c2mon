@@ -1549,10 +1549,9 @@ public class ConfigurationLoaderTest {
     verify(communicationManager);
   }
 
+
   @Test
   public void deleteRuleWithDeleteDataTag() throws IllegalAccessException, TransformerException, InstantiationException, NoSimpleValueParseException, ParserConfigurationException, NoSuchFieldException, InterruptedException {
-    this.properties.setDeleteRulesAfterTagDeletion(true);
-
     this.properties.setDeleteRulesAfterTagDeletion(true);
 
     // called once when updating the equipment;
