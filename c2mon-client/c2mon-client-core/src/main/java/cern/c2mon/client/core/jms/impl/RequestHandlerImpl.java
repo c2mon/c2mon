@@ -31,8 +31,7 @@ import javax.jms.JMSException;
 import cern.c2mon.client.core.config.C2monClientProperties;
 import cern.c2mon.client.core.jms.JmsProxy;
 import lombok.Setter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -65,13 +64,9 @@ import org.springframework.util.Assert;
  * @author Mark Brightwell
  *
  */
+@Slf4j
 @Service("coreRequestHandler")
 public class RequestHandlerImpl implements RequestHandler {
-
-  /**
-   * Class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(RequestHandlerImpl.class);
 
   /**
    * The maximum number of tags in a single request. Each request runs in its
@@ -212,17 +207,17 @@ public class RequestHandlerImpl implements RequestHandler {
 
     if (report.isEmpty()) {
       final String errorMsg = "applyConfiguration returned an empty Collection";
-      LOGGER.error(errorMsg);
+      log.error(errorMsg);
       throw new RuntimeException(errorMsg);
     }
     if (report.size() > 1) {
       final String errorMsg = "applyConfiguration returned a Collection with more than 1 result";
-      LOGGER.error(errorMsg);
+      log.error(errorMsg);
       throw new RuntimeException(errorMsg);
     }
     final ConfigurationReport receivedReport = report.iterator().next();
     if (receivedReport != null)
-      LOGGER.trace("applyConfiguration(): Received Configuration report Report="
+      log.trace("applyConfiguration(): Received Configuration report Report="
           + receivedReport.toXML());
 
     return receivedReport;
@@ -259,7 +254,7 @@ public class RequestHandlerImpl implements RequestHandler {
   private <T extends ClientRequestResult> Collection<T> executeRequest(
       final Collection<Long> ids, final Class<T> clazz, final ClientRequestReportListener reportListener, final String requestQueue) {
 
-    LOGGER.debug("Initiating client request.");
+    log.debug("Initiating client request.");
     ClientRequestImpl<T> clientRequest = new ClientRequestImpl<T>(clazz);
     Iterator<Long> it = ids.iterator();
     Collection<Future<Collection<T>>> results = new ArrayList<Future<Collection<T>>>();
@@ -279,14 +274,14 @@ public class RequestHandlerImpl implements RequestHandler {
       try {
         finalCollection.addAll(result.get());
       } catch (InterruptedException e) {
-        LOGGER.error("InterruptedException caught while executing RequestValuesTask.", e);
+        log.error("InterruptedException caught while executing RequestValuesTask.", e);
         throw new RuntimeException(e);
       } catch (ExecutionException e) {
-        LOGGER.error("ExecutionException caught while executing RequestValuesTask.", e);
+        log.error("ExecutionException caught while executing RequestValuesTask.", e);
         throw new RuntimeException(e);
       }
     }
-    LOGGER.debug("Client request completed.");
+    log.debug("Client request completed.");
     return finalCollection;
   }
 
@@ -305,7 +300,7 @@ public class RequestHandlerImpl implements RequestHandler {
   private <T extends ClientRequestResult> Collection<T> executeNameRequest(
       final Collection<String> regexList, final Class<T> clazz, final ClientRequestReportListener reportListener, final String requestQueue) {
 
-    LOGGER.debug("Initiating client request.");
+    log.debug("Initiating client request.");
     ClientRequestImpl<T> clientRequest = new ClientRequestImpl<T>(clazz);
     Iterator<String> it = regexList.iterator();
     Collection<Future<Collection<T>>> results = new ArrayList<Future<Collection<T>>>();
@@ -325,14 +320,14 @@ public class RequestHandlerImpl implements RequestHandler {
       try {
         finalCollection.addAll(result.get());
       } catch (InterruptedException e) {
-        LOGGER.error("InterruptedException caught while executing RequestValuesTask.", e);
+        log.error("InterruptedException caught while executing RequestValuesTask.", e);
         throw new RuntimeException(e);
       } catch (ExecutionException e) {
-        LOGGER.error("ExecutionException caught while executing RequestValuesTask.", e);
+        log.error("ExecutionException caught while executing RequestValuesTask.", e);
         throw new RuntimeException(e);
       }
     }
-    LOGGER.debug("Client request completed.");
+    log.debug("Client request completed.");
     return finalCollection;
   }
 
@@ -388,10 +383,10 @@ public class RequestHandlerImpl implements RequestHandler {
     Collection<ConfigurationReportHeader> reports = jmsProxy.sendRequest(clientRequest, defaultRequestQueue, clientRequest.getTimeout());
 
     if (reports.isEmpty()) {
-      LOGGER.warn("getConfigurationReports() returned an empty collection");
+      log.warn("getConfigurationReports() returned an empty collection");
     }
 
-    LOGGER.trace("getConfigurationReports(): Received " + reports.size() + " configuration report headers");
+    log.trace("getConfigurationReports(): Received " + reports.size() + " configuration report headers");
     return reports;
   }
 
@@ -404,10 +399,10 @@ public class RequestHandlerImpl implements RequestHandler {
     Collection<ConfigurationReport> reports = jmsProxy.sendRequest(clientRequest, defaultRequestQueue, clientRequest.getTimeout());
 
     if (reports.isEmpty()) {
-      LOGGER.warn("getConfigurationReports() returned an empty collection");
+      log.warn("getConfigurationReports() returned an empty collection");
     }
 
-    LOGGER.trace("getConfigurationReports(): Received " + reports.size() + " reports for configuration " + id);
+    log.trace("getConfigurationReports(): Received " + reports.size() + " reports for configuration " + id);
     return reports;
   }
 

@@ -139,8 +139,7 @@ public class TagValuePublisher implements C2monCacheListener<Tag>, Configuration
   public void init() {
     log.info("init - Starting Tag publisher.");
     log.trace("init - Registering for Tag Updates.");
-
-//  this.alarmAggregator.registerForTagUpdates(this);
+//    this.alarmAggregator.registerForTagUpdates(this);
     cacheRegistrationService.registerSynchronousToAllTags(this);
 
     log.trace("init - Registering for Configuration Updates.");
@@ -176,7 +175,7 @@ public class TagValuePublisher implements C2monCacheListener<Tag>, Configuration
 //    try {
 //      publish(tagWithAlarms);
 //    } catch (JmsException e) {
-//      LOGGER.error("notifyOnUpdate - Error publishing tag update to topic for tag " + tagWithAlarms.getTag().getId() + " - submitting for republication", e);
+//      log.error("notifyOnUpdate - Error publishing tag update to topic for tag " + tagWithAlarms.getTag().getId() + " - submitting for republication", e);
 //      republisher.publicationFailed(tagWithAlarms);
 //    }
 //  }
@@ -234,7 +233,7 @@ public class TagValuePublisher implements C2monCacheListener<Tag>, Configuration
       TagWithAlarms tagWithAlarms = this.tagFacadeGateway.getTagWithAlarms(tag.getId();
       publish(tagWithAlarms);
     } catch (JmsException e) {
-      log.error("notifyOnUpdate - Error publishing tag update to topic for tag " + tag.getId() + " - submitting for republication", e);
+      log.error("Error publishing tag update to topic for tag " + tag.getId() + " - submitting for republication", e);
       republisher.publicationFailed(tag);
     }
   }

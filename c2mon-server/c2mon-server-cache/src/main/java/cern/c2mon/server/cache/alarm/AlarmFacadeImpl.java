@@ -16,6 +16,15 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.alarm;
 
+import java.sql.Timestamp;
+import java.util.Properties;
+
+import cern.c2mon.server.common.metadata.Metadata;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import cern.c2mon.server.cache.AlarmCache;
 import cern.c2mon.server.cache.AlarmFacade;
 import cern.c2mon.server.cache.TagLocationService;
@@ -29,7 +38,6 @@ import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.datatag.DataTagConstants;
 import cern.c2mon.shared.daq.config.Change;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -257,7 +265,7 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
 
   /**
    * Logic kept the same as in TIM1 (see {@link AlarmFacade}).
-   * The locking of the objets is done in the public class.
+   * The locking of the objects is done in the public class.
    * Notice, in this case the update() method is putting the changes back into the cache.
    */
   private Alarm update(final Alarm alarm, final Tag tag) {

@@ -296,9 +296,8 @@ public class TagController implements TagUpdateListener, SupervisionListener {
    * <code>TagImpl</code> object.
    * <p>
    * Please note that the <code>TagImpl</code> gets only updated, if the tag id's
-   * matches and if the server time stamp
-   * of the update is older thatn the current time
-   * stamp set.
+   * matches and if the server timestamp of the update is older thatn the current
+   * time stamp set.
    *
    * @param tagUpdate The object that contains the updates.
    *
