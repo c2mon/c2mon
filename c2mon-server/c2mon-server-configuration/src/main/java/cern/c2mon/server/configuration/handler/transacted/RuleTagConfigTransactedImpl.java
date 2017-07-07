@@ -239,17 +239,6 @@ public class RuleTagConfigTransactedImpl extends TagConfigTransactedImpl<RuleTag
     LOGGER.trace("Removing RuleTag " + id);
     try {
       RuleTag ruleTag = tagCache.get(id);
-      Collection<Long> ruleIds = ruleTag.getCopyRuleIds();  
-      if (!ruleIds.isEmpty()) {
-        LOGGER.debug("Removing rules dependent on RuleTag " + id);
-        for (Long ruleId : ruleIds) { //concurrent modifcation as a rule is removed from the list during the remove call!
-          if (tagLocationService.isInTagCache(ruleId)) { //may already have been removed if a previous rule in the list was used in this rule!
-            ConfigurationElementReport newReport = new ConfigurationElementReport(Action.REMOVE, Entity.RULETAG, ruleId);
-            elementReport.addSubReport(newReport);
-            ruleTagConfigHandler.removeRuleTag(ruleId, newReport); //call config handler bean so transaction annotation is noticed
-          }         
-        }                
-      }
       tagCache.acquireWriteLockOnKey(id);      
       Collection<Long> ruleInputTagIds = Collections.EMPTY_LIST;
       try {

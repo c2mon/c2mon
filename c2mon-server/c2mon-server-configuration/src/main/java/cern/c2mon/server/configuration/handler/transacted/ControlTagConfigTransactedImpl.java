@@ -205,15 +205,6 @@ public class ControlTagConfigTransactedImpl extends TagConfigTransactedImpl<Cont
   public ProcessChange doRemoveControlTag(Long id, ConfigurationElementReport tagReport) {
     LOGGER.trace("Removing ControlTag " + id);
     try {      
-      Collection<Long> ruleIds = tagCache.get(id).getCopyRuleIds();
-      if (!ruleIds.isEmpty()) {
-        LOGGER.trace("Removing rules dependent on ControlTag " + id);
-        for (Long ruleId : ruleIds) {
-          ConfigurationElementReport newReport = new ConfigurationElementReport(Action.REMOVE, Entity.RULETAG, ruleId);
-          tagReport.addSubReport(newReport);
-          ruleTagConfigHandler.removeRuleTag(ruleId, newReport);
-        }       
-      }
       tagCache.acquireWriteLockOnKey(id);      
       try {                
         ControlTag controlTag = tagCache.get(id);

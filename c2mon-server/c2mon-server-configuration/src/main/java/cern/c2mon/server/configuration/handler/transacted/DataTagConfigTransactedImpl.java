@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Properties;
 
+import javax.naming.ConfigurationException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +47,7 @@ import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import cern.c2mon.shared.daq.config.Change;
 import cern.c2mon.shared.daq.config.DataTagAdd;
 import cern.c2mon.shared.daq.config.DataTagRemove;
+import cern.c2mon.shared.daq.config.DataTagUpdate;
 
 /**
  * Implementation of transacted methods.
@@ -220,7 +223,7 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
       Collection<Long> ruleIds = tagCopy.getCopyRuleIds();
       if (!ruleIds.isEmpty()) {
         LOGGER.trace("Removing Rules dependent on DataTag " + id);
-        for (Long ruleId : new ArrayList<>(ruleIds)) {
+        for (Long ruleId : new ArrayList<Long>(ruleIds)) {
           if (tagLocationService.isInTagCache(ruleId)) { //may already have been removed if a previous rule in the list was used in this rule! {
             ConfigurationElementReport newReport = new ConfigurationElementReport(Action.REMOVE, Entity.RULETAG, ruleId);
             elementReport.addSubReport(newReport);
