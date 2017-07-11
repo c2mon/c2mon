@@ -45,9 +45,7 @@ import cern.c2mon.server.cache.RuleTagCache;
 import cern.c2mon.server.cache.TagLocationService;
 import cern.c2mon.server.cache.loading.SequenceDAO;
 import cern.c2mon.server.common.config.ServerProperties;
-import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.rule.RuleTag;
-import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.configuration.ConfigProgressMonitor;
 import cern.c2mon.server.configuration.ConfigurationLoader;
 import cern.c2mon.server.configuration.config.ConfigurationProperties;
@@ -59,6 +57,7 @@ import cern.c2mon.server.daq.JmsContainerManager;
 import cern.c2mon.server.daq.out.ProcessCommunicationManager;
 import cern.c2mon.shared.client.configuration.*;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
+import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Status;
 import cern.c2mon.shared.client.configuration.api.Configuration;
 import cern.c2mon.shared.client.configuration.converter.DateFormatConverter;
@@ -321,7 +320,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
                                                  final boolean isDBConfig
   ) {
 
-    Map<Long, ConfigurationElement> elementsToCheckRules = new HashMap<>();
+    List<ConfigurationElement> elementsToCheckRules = new ArrayList<>();
 
     ConfigurationReport report = new ConfigurationReport(configId, configName, "");
 
@@ -342,6 +341,12 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
         clusterCache.acquireWriteLockOnKey(this.cachePersistenceLock);
         if (!isDBConfig && runInParallel(configElements)) {
             log.debug("Enter parallel configuration");
+            configElements.parallelStream().forEach(element -> {
+                applyConfigurationElement(element, processLists, elementPlaceholder, daqReportPlaceholder, report, configId, configProgressMonitor);
+                if (element.getAction() == Action.CREATE && canHaveRule(element)) {
+                    elementsToCheckRules.add(element);
+                }
+            });
             ForkJoinPool forkJoinPool = new ForkJoinPool(10);
             try {          //https://blog.krecan.net/2014/03/18/how-to-specify-thread-pool-for-java-8-parallel-streams/
                 forkJoinPool.submit(() ->
@@ -367,8 +372,8 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
             log.debug("Enter serialized configuration");
             configElements.stream().forEach(element -> {
                 applyConfigurationElement(element, processLists, elementPlaceholder, daqReportPlaceholder, report, configId, configProgressMonitor);
-                if (element.getAction() == Action.CREATE) {
-                    elementsToCheckRules.put(element.getEntityId(), element);
+                if (element.getAction() == Action.CREATE && canHaveRule(element)) {
+                    elementsToCheckRules.add(element);
                 }
             });
         }
@@ -469,28 +474,28 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
     return report;
   }
 
+  private static boolean canHaveRule(ConfigurationElement element) {
+      return element.getEntity() == Entity.DATATAG
+            || element.getEntity() == Entity.CONTROLTAG
+            || element.getEntity() == Entity.RULETAG;
+  }
+
   /**
    * Iterate through existing RuleTags to check if they reference any of the
    * given elements.
    *
-   * @param elements A map, ID -> ConfigurationElement of elements to check.
+   * @param elements List of {@Link ConfigurationElement}s to check.
    */
-  private void addExistingRulesToTags(Map<Long, ConfigurationElement> elements) {
+  private void addExistingRulesToTags(List<ConfigurationElement> elements) {
     log.info("Adding existing rules to tags");
-
-    for (Long ruleId : this.ruleTagCache.getKeys()) {
-        RuleTag t =  (RuleTag)this.tagLocationService.get(ruleId);
-
-        for (Long tagId :  t.getRuleInputTagIds()) {
-            if (elements.containsKey(tagId)) {
-                ConfigurationElement element = elements.get(tagId);
-
-                switch (element.getEntity()) {
-                    case DATATAG: dataTagConfigHandler.addRuleToTag(tagId, ruleId); break;
-                    case CONTROLTAG: controlTagConfigHandler.addRuleToTag(tagId, ruleId); break;
-                    case RULETAG: ruleTagConfigHandler.addRuleToTag(tagId, ruleId); break;
-                    default: break; //cannot add rules to other types of tags
-                }
+    for (ConfigurationElement element : elements) {
+        Collection<RuleTag> tags = this.tagLocationService.findByRuleInputTagId(element.getEntityId());
+        for (RuleTag t : tags) {
+            switch (element.getEntity()) {
+                case DATATAG: dataTagConfigHandler.addRuleToTag(element.getEntityId(), t.getId()); break;
+                case CONTROLTAG: controlTagConfigHandler.addRuleToTag(element.getEntityId(), t.getId()); break;
+                case RULETAG: ruleTagConfigHandler.addRuleToTag(element.getEntityId(), t.getId()); break;
+                default: break; //cannot add rules to other types of tags
             }
         }
     }

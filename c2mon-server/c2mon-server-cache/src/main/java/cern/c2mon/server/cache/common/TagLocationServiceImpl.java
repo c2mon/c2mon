@@ -30,6 +30,7 @@ import cern.c2mon.server.cache.DataTagCache;
 import cern.c2mon.server.cache.RuleTagCache;
 import cern.c2mon.server.cache.TagLocationService;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
+import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.tag.Tag;
 
 /**
@@ -66,9 +67,6 @@ public class TagLocationServiceImpl implements TagLocationService {
    * @param dataTagCache
    * @param controlTagCache
    * @param ruleTagCache
-   * @param dataTagFacade
-   * @param controlTagFacade
-   * @param ruleTagFacade
    */
   @Autowired
   public TagLocationServiceImpl(DataTagCache dataTagCache, ControlTagCache controlTagCache, RuleTagCache ruleTagCache) {
@@ -168,5 +166,10 @@ public class TagLocationServiceImpl implements TagLocationService {
   @Override
   public void releaseWriteLockOnKey(Long id) {
     getCache(id).releaseWriteLockOnKey(id);
+  }
+
+  @Override
+  public Collection<RuleTag> findByRuleInputTagId(Long id) {
+    return this.ruleTagCache.findByRuleInputTagId(id);
   }
 }

@@ -23,8 +23,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import cern.c2mon.server.cache.config.CacheProperties;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import cern.c2mon.server.cache.C2monCacheWithSupervision;
 import cern.c2mon.server.cache.CacheSupervisionListener;

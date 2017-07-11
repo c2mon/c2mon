@@ -17,6 +17,7 @@
 package cern.c2mon.server.cache;
 
 import cern.c2mon.server.common.rule.RuleTag;
+import java.util.Collection;
 
 /**
  * The module public interface that should be used to access the RuleTag's
@@ -46,4 +47,13 @@ public interface RuleTagCache extends C2monCacheWithSupervision<Long, RuleTag> {
    * @param ruleTag the RuleTag for which the fields should be set
    */
   void setParentSupervisionIds(RuleTag ruleTag);
+
+  /**
+   * Find all {@link RuleTag}s that reference the given tag ID.
+   *
+   * @param tagId
+   *
+   * @return a collection of {@link RuleTag}s
+   */
+  Collection<RuleTag> findByRuleInputTagId(long tagId);
 }

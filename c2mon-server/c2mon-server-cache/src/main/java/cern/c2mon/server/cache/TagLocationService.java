@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.cache;
 
+import cern.c2mon.server.common.rule.RuleTag;
 import java.util.Collection;
 
 import cern.c2mon.server.common.tag.Tag;
@@ -95,6 +96,15 @@ public interface TagLocationService {
    * @see #get(String)
    */
   Collection<Tag> findByNameWildcard(String regex);
+
+  /**
+   * Get all the {@link RuleTag}s that reference the given tag ID.
+   *
+   * @param id tag ID.
+   *
+   * @return collection of RuleTag objects.
+   */
+  Collection<RuleTag> findByRuleInputTagId(Long id);
   
   /**
    * Determines whether one of the tag caches already contains

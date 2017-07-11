@@ -25,8 +25,6 @@ import lombok.extern.slf4j.Slf4j;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.loader.CacheLoader;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jmx.export.annotation.ManagedResource;
@@ -42,6 +40,12 @@ import cern.c2mon.server.cache.tag.AbstractTagCache;
 import cern.c2mon.server.common.config.C2monCacheName;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.rule.RuleTag;
+import java.util.ArrayList;
+import java.util.Collection;
+import net.sf.ehcache.search.Attribute;
+import net.sf.ehcache.search.Query;
+import net.sf.ehcache.search.Result;
+import net.sf.ehcache.search.Results;
 
 /**
  * Implementation of the Rule cache.
@@ -150,6 +154,47 @@ public class RuleTagCacheImpl extends AbstractTagCache<RuleTag> implements RuleT
     ruleTag.setEquipmentIds(equipmentIds);
     ruleTag.setSubEquipmentIds(subEquipmentIds);
   }
+    
+  /**
+   * Find all RuleTags that reference the given tag ID.
+   * 
+   * @param tagId
+   * 
+   * @return A collection of {@link RuleTag}s
+   */
+    @Override
+    public Collection<RuleTag> findByRuleInputTagId(long tagId) {
+        Results results = null;
+        Collection<RuleTag> resultList = new ArrayList<>();
 
+        try {
+            Ehcache ehcache = getCache();
 
+            Attribute<String> tagRule = ehcache.getSearchAttribute("ruleInputTagId");
+
+            Query query = ehcache.createQuery();
+
+            String regex = "*#" + tagId + "#*";
+            results = query.includeKeys().addCriteria(tagRule.ilike(regex)).execute();
+
+            log.debug(String.format("findByRuleInputTagId() - Got %d results for regex \"%s\"", results.size(), regex));
+
+            Long key;
+            for (Result result : results.all()) {
+                key = (Long) result.getKey();
+                if (key != null) {
+                    resultList.add(get(key));
+                } else {
+                    log.warn(String.format("findByRuleInputTagId() - Regex \"%s\" returned a null key for cache %s", regex, getCacheName()));
+                }
+            }
+        } finally {
+            if (results != null) {
+                // Discard the results when done to free up cache resources.
+                results.discard();
+            }
+        }
+
+        return resultList;
+    }
 }

@@ -25,7 +25,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import cern.c2mon.server.cache.AbstractCacheIntegrationTest;
-import cern.c2mon.server.cache.junit.CachePopulationRule;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -137,6 +136,21 @@ public class RuleTagCacheTest extends AbstractCacheIntegrationTest {
     Assert.assertEquals("Integer", tag.getDataType()); 
   }
   
+  /**
+   * Tag 60001 is referenced by rules 60008, 60009, 60010, 60011.
+   */
+  @Test
+  public void testSearchByRuleInputTagId() {
+    Collection<RuleTag> resultList = ruleTagCache.findByRuleInputTagId(60001L);
+    Assert.assertNotNull(resultList);
+    Assert.assertEquals(4, resultList.size());
+
+    Assert.assertTrue(resultList.stream().anyMatch(tag -> tag.getId() == 60008L));
+    Assert.assertTrue(resultList.stream().anyMatch(tag -> tag.getId() == 60009L));
+    Assert.assertTrue(resultList.stream().anyMatch(tag -> tag.getId() == 60010L));
+    Assert.assertTrue(resultList.stream().anyMatch(tag -> tag.getId() == 60011L));
+  }
+
   @Test
   public void testSearchWithNameWildcard() {
     Collection<RuleTag> resultList = ruleTagCache.findByNameWildcard("does not exist");

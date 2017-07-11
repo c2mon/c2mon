@@ -44,6 +44,7 @@
     <terracotta clustered="true" consistency="strong" />
     <searchable keys="false" values="false">
         <searchAttribute name="tagName" expression="value.getName()"/>
+        <searchAttribute name="ruleInputTagId" class="cern.c2mon.server.cache.rule.RuleIdAttributeExtractor" />
     </searchable>
   </cache>
 
