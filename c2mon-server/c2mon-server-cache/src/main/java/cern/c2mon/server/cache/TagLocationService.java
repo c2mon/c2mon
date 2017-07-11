@@ -97,7 +97,15 @@ public interface TagLocationService {
    */
   Collection<Tag> findByNameWildcard(String regex);
 
-  
+  /**
+   * Get all the {@link RuleTag}s that reference the given tag ID.
+   *
+   * @param id tag ID.
+   *
+   * @return collection of RuleTag objects.
+   */
+  Collection<RuleTag> findByRuleInputTagId(Long id);
+
   /**
    * Determines whether one of the tag caches already contains
    * an element with the specified id (looks in rule, control

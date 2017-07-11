@@ -153,12 +153,12 @@ public class RuleTagCacheImpl extends AbstractTagCache<RuleTag> implements RuleT
     ruleTag.setEquipmentIds(equipmentIds);
     ruleTag.setSubEquipmentIds(subEquipmentIds);
   }
-    
+
   /**
    * Find all RuleTags that reference the given tag ID.
-   * 
+   *
    * @param tagId
-   * 
+   *
    * @return A collection of {@link RuleTag}s
    */
     @Override
