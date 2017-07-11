@@ -45,7 +45,6 @@ import cern.c2mon.server.cache.RuleTagCache;
 import cern.c2mon.server.cache.TagLocationService;
 import cern.c2mon.server.cache.loading.SequenceDAO;
 import cern.c2mon.server.common.config.ServerProperties;
-import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.common.rule.RuleTag;
