@@ -1,14 +1,12 @@
 package cern.c2mon.server.jcacheref.prototype.equipment;
 
-import javax.cache.Cache;
 import javax.cache.processor.EntryProcessorException;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.server.common.equipment.Equipment;
-import cern.c2mon.server.jcacheref.prototype.common.SerializableEntryProcessor;
+import cern.c2mon.server.jcacheref.prototype.common.RuntimeCacheReconfigurator;
 
 /**
  * @author Szymon Halastra
@@ -16,38 +14,24 @@ import cern.c2mon.server.jcacheref.prototype.common.SerializableEntryProcessor;
 
 @Slf4j
 @Service
-public class EquipmentCacheService {
+public class EquipmentCacheService implements EquipmentCommandCRUD {
 
-  private Cache<Long, Equipment> equipmentTagCache;
+  private RuntimeCacheReconfigurator runtimeCacheReconfigurator;
+
+  private EquipmentCommandCRUD equipmentCommandCRUD;
 
   @Autowired
-  public EquipmentCacheService(Cache<Long, Equipment> equipmentTagCache) {
-    this.equipmentTagCache = equipmentTagCache;
+  public EquipmentCacheService(EquipmentCommandCRUD equipmentCommandCRUD) {
+    this.equipmentCommandCRUD = equipmentCommandCRUD;
   }
 
+  @Override
   public void addCommandToEquipment(Long equipmentId, Long commandId) throws EntryProcessorException {
-    log.trace("Adding Command to Equipment");
-    equipmentTagCache.invoke(equipmentId, (SerializableEntryProcessor<Long, Equipment, Object[]>) (entry, arguments) -> {
-      if (entry.exists()) {
-        Equipment equipment = entry.getValue();
-        equipment.getCommandTagIds().add(commandId);
-        entry.setValue(equipment);
-      }
-
-      return null;
-    });
+    equipmentCommandCRUD.addCommandToEquipment(equipmentId, commandId);
   }
 
+  @Override
   public void removeCommandFromEquipment(Long equipmentId, Long commandId) {
-    log.trace("Removing Command from Equipment");
-    equipmentTagCache.invoke(equipmentId, (SerializableEntryProcessor<Long, Equipment, Object[]>) (entry, arguments) -> {
-      if(entry.exists()) {
-        Equipment equipment = entry.getValue();
-        equipment.getCommandTagIds().remove(commandId);
-        entry.setValue(equipment);
-      }
-
-      return null;
-    });
+    equipmentCommandCRUD.removeCommandFromEquipment(equipmentId, commandId);
   }
 }

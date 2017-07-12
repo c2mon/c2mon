@@ -11,7 +11,8 @@ import org.junit.Test;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.equipment.EquipmentCacheObject;
 import cern.c2mon.server.jcacheref.HazelcastBaseTestingSetup;
-import cern.c2mon.server.jcacheref.prototype.equipment.EquipmentCacheService;
+import cern.c2mon.server.jcacheref.prototype.equipment.EquipmentCommandCRUD;
+import cern.c2mon.server.jcacheref.prototype.equipment.EquipmentCommandCRUDImpl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -22,7 +23,7 @@ import static org.junit.Assert.assertNotNull;
 
 public class EquipmentCacheTest extends HazelcastBaseTestingSetup {
 
-  EquipmentCacheService equipmentCacheService;
+  EquipmentCommandCRUD equipmentCommandCRUD;
 
   private Cache<Long, Equipment> equipmentTagCache;
 
@@ -33,7 +34,7 @@ public class EquipmentCacheTest extends HazelcastBaseTestingSetup {
 
     equipmentTagCache = cacheManager.getCache("equipmentTagCache", Long.class, Equipment.class);
 
-    equipmentCacheService = new EquipmentCacheService(equipmentTagCache);
+    equipmentCommandCRUD = new EquipmentCommandCRUDImpl(equipmentTagCache);
   }
 
   @Test
@@ -44,7 +45,7 @@ public class EquipmentCacheTest extends HazelcastBaseTestingSetup {
     equipmentTagCache.put(equipment.getId(), equipment);
     assertNotNull("Element with an id=1 expected in cache", equipmentTagCache.containsKey(1L));
 
-    equipmentCacheService.addCommandToEquipment(1L, 2L);
+    equipmentCommandCRUD.addCommandToEquipment(1L, 2L);
     assertEquals("Two items in the collection expected", 2, equipmentTagCache.get(1L).getCommandTagIds().size());
   }
 
@@ -59,7 +60,7 @@ public class EquipmentCacheTest extends HazelcastBaseTestingSetup {
     equipmentTagCache.put(equipment.getId(), equipment);
     assertNotNull("Element with an id=1 expected in cache", equipmentTagCache.containsKey(1L));
 
-    equipmentCacheService.removeCommandFromEquipment(1L, 2L);
+    equipmentCommandCRUD.removeCommandFromEquipment(1L, 2L);
     assertEquals("Two items in the collection expected", 2, equipmentTagCache.get(1L).getCommandTagIds().size());
   }
 }

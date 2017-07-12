@@ -22,5 +22,12 @@
   <cache name="equipmentTagCache">
     <key-type class-name="java.lang.Long"/>
     <value-type class-name="cern.c2mon.server.common.equipment.Equipment"/>
+    <read-through>true</read-through>
+    <write-through>true</write-through>
+    <cache-loader-factory class-name="ch.cern.c2mon.server.jcacheref.prototype.equipment.integration.EquipmentCacheLoaderFactory"/>
+    <cache-writer-factory class-name="ch.cern.c2mon.server.jcacheref.prototype.equipment.integration.EquipmentCacheWriterFactory"/>
+    <in-memory-format>OBJECT</in-memory-format>
+    <backup-count>1</backup-count>
+    <async-backup-count>1</async-backup-count>
   </cache>
 </hazelcast>
