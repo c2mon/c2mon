@@ -31,8 +31,14 @@ public class AliveTimerManager implements EntryProcessor<Long, AliveTimer, Objec
         }
       }
 
-      if(arguments[0].equals(UPDATE)) {
+      if (arguments[0].equals(UPDATE)) {
         entry.setValue(update(entry.getValue()));
+      }
+
+      if (arguments[0].equals(STOP)) {
+        if (entry.getValue().isActive()) {
+          entry.setValue(stop(entry.getValue()));
+        }
       }
 
       if (arguments[0].equals(HAS_EXPIRED)) {
@@ -73,8 +79,18 @@ public class AliveTimerManager implements EntryProcessor<Long, AliveTimer, Objec
     return aliveTimer;
   }
 
-  private AliveTimer stop() {
-    return null;
+  private AliveTimer stop(AliveTimer aliveTimer) {
+    if (log.isDebugEnabled()) {
+      StringBuffer str = new StringBuffer("stop() : stopping alive for ")
+              .append(aliveTimer.getAliveTypeDescription() + " ")
+              .append(aliveTimer.getRelatedName())
+              .append(".");
+      log.debug(str.toString());
+    }
+    aliveTimer.setActive(false);
+    aliveTimer.setLastUpdate(System.currentTimeMillis());
+
+    return aliveTimer;
   }
 
   private Boolean hasExpired(AliveTimer aliveTimer) {
