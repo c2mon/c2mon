@@ -6,9 +6,7 @@ import javax.cache.spi.CachingProvider;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.cache.CacheProperties;
 import org.springframework.boot.autoconfigure.hazelcast.HazelcastAutoConfiguration;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.jcache.JCacheCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -35,7 +33,6 @@ import cern.c2mon.server.jcacheref.prototype.datatag.DataTagCacheConfig;
         AliveTimerCacheConfig.class,
         CommandTagCacheConfig.class
 })
-@EnableConfigurationProperties(CacheProperties.class)
 public class C2monCacheModule {
 
   @Value("${cache.provider}")
