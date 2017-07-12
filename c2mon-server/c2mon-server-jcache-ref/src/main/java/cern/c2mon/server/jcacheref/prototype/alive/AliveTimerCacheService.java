@@ -10,6 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.common.alive.AliveTimer;
+import cern.c2mon.server.common.alive.AliveTimerCacheObject;
+import cern.c2mon.server.common.equipment.AbstractEquipment;
+import cern.c2mon.server.common.equipment.Equipment;
+import cern.c2mon.server.common.process.Process;
 
 /**
  * @author Szymon Halastra
@@ -43,6 +47,7 @@ public class AliveTimerCacheService implements Serializable {
 
   /**
    * Check whether this alive timer has expired.
+   *
    * @return true if the alive timer is active and it has not been updated since
    * at least "aliveInterval" milliseconds.
    */
@@ -53,11 +58,12 @@ public class AliveTimerCacheService implements Serializable {
   public void startAllTimers() {
     log.debug("Starting all alive timers in cache.");
     try {
-      Iterator<Cache.Entry<Long, AliveTimer>> entries= aliveTimerCache.iterator();
-      while(entries.hasNext()) {
+      Iterator<Cache.Entry<Long, AliveTimer>> entries = aliveTimerCache.iterator();
+      while (entries.hasNext()) {
         start(entries.next().getValue().getId());
       }
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       log.error("Unable to retrieve list of alive timers from cache when attempting to start the timers.", e);
     }
   }
@@ -65,32 +71,32 @@ public class AliveTimerCacheService implements Serializable {
   public void stopAllTimers() {
     log.debug("Stopping all alive timers in the cache.");
     try {
-      Iterator<Cache.Entry<Long, AliveTimer>> entries= aliveTimerCache.iterator();
-      while(entries.hasNext()) {
+      Iterator<Cache.Entry<Long, AliveTimer>> entries = aliveTimerCache.iterator();
+      while (entries.hasNext()) {
         stop(entries.next().getValue().getId());
       }
-    } catch (Exception e) {
+    }
+    catch (Exception e) {
       log.error("Unable to retrieve list of alive timers from cache when attempting to stop all timers.", e);
     }
   }
 
-//  @Override
-//  public void generateFromEquipment(AbstractEquipment abstractEquipment) {
-//    String type;
-//    if (abstractEquipment instanceof Equipment) {
-//      type = AliveTimer.ALIVE_TYPE_EQUIPMENT;
-//    } else {
-//      type = AliveTimer.ALIVE_TYPE_SUBEQUIPMENT;
-//    }
-//    AliveTimer aliveTimer = new AliveTimerCacheObject(abstractEquipment.getAliveTagId(), abstractEquipment.getId(), abstractEquipment.getName(),
-//            abstractEquipment.getStateTagId(), type, abstractEquipment.getAliveInterval());
-//    aliveTimerCache.put(aliveTimer.getId(), aliveTimer);
-//  }
-//
-//  @Override
-//  public void generateFromProcess(Process process) {
-//    AliveTimer aliveTimer = new AliveTimerCacheObject(process.getAliveTagId(), process.getId(), process.getName(),
-//            process.getStateTagId(), AliveTimer.ALIVE_TYPE_PROCESS, process.getAliveInterval());
-//    aliveTimerCache.put(aliveTimer.getId(), aliveTimer);
-//  }
+  public void generateFromEquipment(AbstractEquipment abstractEquipment) {
+    String type;
+    if (abstractEquipment instanceof Equipment) {
+      type = AliveTimer.ALIVE_TYPE_EQUIPMENT;
+    }
+    else {
+      type = AliveTimer.ALIVE_TYPE_SUBEQUIPMENT;
+    }
+    AliveTimer aliveTimer = new AliveTimerCacheObject(abstractEquipment.getAliveTagId(), abstractEquipment.getId(), abstractEquipment.getName(),
+            abstractEquipment.getStateTagId(), type, abstractEquipment.getAliveInterval());
+    aliveTimerCache.put(aliveTimer.getId(), aliveTimer);
+  }
+
+  public void generateFromProcess(Process process) {
+    AliveTimer aliveTimer = new AliveTimerCacheObject(process.getAliveTagId(), process.getId(), process.getName(),
+            process.getStateTagId(), AliveTimer.ALIVE_TYPE_PROCESS, process.getAliveInterval());
+    aliveTimerCache.put(aliveTimer.getId(), aliveTimer);
+  }
 }

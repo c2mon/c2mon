@@ -8,7 +8,8 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-        AliveTimerServiceTest.class
+        AliveTimerManagerTest.class,
+        AliveTimerCacheServiceTest.class
 })
 public class AliveTimerCacheTestSuite {
 }
