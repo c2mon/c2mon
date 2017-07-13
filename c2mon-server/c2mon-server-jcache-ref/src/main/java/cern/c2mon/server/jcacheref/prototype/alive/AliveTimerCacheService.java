@@ -14,6 +14,8 @@ import cern.c2mon.server.common.alive.AliveTimerCacheObject;
 import cern.c2mon.server.common.equipment.AbstractEquipment;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.process.Process;
+import cern.c2mon.server.jcacheref.prototype.alive.operations.AliveTimerManager;
+import cern.c2mon.server.jcacheref.prototype.alive.operations.AliveTimerOperation;
 
 /**
  * @author Szymon Halastra
@@ -23,7 +25,7 @@ import cern.c2mon.server.common.process.Process;
 @Service
 public class AliveTimerCacheService implements Serializable {
 
-  private Cache<Long, AliveTimer> aliveTimerCache;
+  private final Cache<Long, AliveTimer> aliveTimerCache;
 
   @Autowired
   public AliveTimerCacheService(Cache<Long, AliveTimer> aliveTimerCache) {
@@ -34,15 +36,15 @@ public class AliveTimerCacheService implements Serializable {
    * Activate this alive timer.
    */
   public void start(final Long id) {
-    aliveTimerCache.invoke(id, new AliveTimerManager(), AliveTimerManager.START);
+    aliveTimerCache.invoke(id, new AliveTimerManager(), AliveTimerOperation.START);
   }
 
   public void stop(final Long id) {
-    aliveTimerCache.invoke(id, new AliveTimerManager(), AliveTimerManager.STOP);
+    aliveTimerCache.invoke(id, new AliveTimerManager(), AliveTimerOperation.STOP);
   }
 
   public void update(final Long id) {
-    aliveTimerCache.invoke(id, new AliveTimerManager(), AliveTimerManager.UPDATE);
+    aliveTimerCache.invoke(id, new AliveTimerManager(), AliveTimerOperation.UPDATE);
   }
 
   /**
@@ -52,7 +54,7 @@ public class AliveTimerCacheService implements Serializable {
    * at least "aliveInterval" milliseconds.
    */
   public boolean hasExpired(final Long aliveTimerId) {
-    return (boolean) aliveTimerCache.invoke(aliveTimerId, new AliveTimerManager(), AliveTimerManager.HAS_EXPIRED);
+    return (boolean) aliveTimerCache.invoke(aliveTimerId, new AliveTimerManager(), AliveTimerOperation.HAS_EXPIRED);
   }
 
   public void startAllTimers() {
