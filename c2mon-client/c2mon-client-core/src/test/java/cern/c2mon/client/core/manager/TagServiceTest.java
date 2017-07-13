@@ -34,6 +34,7 @@ import cern.c2mon.client.core.config.mock.RequestHandlerMock;
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -222,7 +223,7 @@ public class TagServiceTest {
   }
 
   @Test @DirtiesContext
-  //@Ignore("This test is flaky!")
+  @Ignore("This test is flaky!")
   public void testUnsubscribeDataTags() throws JMSException, InterruptedException {
     Set<Long> tagIds1 = new HashSet<>();
     for (long i = 1L; i <= 1000; i++) {
