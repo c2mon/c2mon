@@ -11,10 +11,11 @@ import javax.cache.spi.CachingProvider;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import cern.c2mon.server.common.alive.AliveTimer;
 import cern.c2mon.server.common.alive.AliveTimerCacheObject;
-import cern.c2mon.server.jcacheref.HazelcastBaseTestingSetup;
+import cern.c2mon.server.jcacheref.IgniteBaseTestingSetup;
 import cern.c2mon.server.jcacheref.prototype.alive.AliveTimerCacheService;
 
 import static org.junit.Assert.assertFalse;
@@ -23,19 +24,19 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Szymon Halastra
  */
-public class AliveTimerManagerTest extends HazelcastBaseTestingSetup {
 
+public class AliveTimerManagerTest extends IgniteBaseTestingSetup {
+
+  @Autowired
   Cache<Long, AliveTimer> aliveTimerCache;
+
+  @Autowired
   AliveTimerCacheService aliveTimerCacheService;
 
   @Before
   public void setup() {
     CachingProvider provider = Caching.getCachingProvider();
     CacheManager cacheManager = provider.getCacheManager();
-
-    aliveTimerCache = cacheManager.getCache("aliveTimerCache", Long.class, AliveTimer.class);
-
-    aliveTimerCacheService = new AliveTimerCacheService(aliveTimerCache);
   }
 
   @Test

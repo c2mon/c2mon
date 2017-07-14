@@ -6,6 +6,7 @@ import javax.cache.processor.EntryProcessorException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.jcacheref.prototype.common.SerializableEntryProcessor;
@@ -14,6 +15,7 @@ import cern.c2mon.server.jcacheref.prototype.common.SerializableEntryProcessor;
  * @author Szymon Halastra
  */
 @Slf4j
+@Service
 public class EquipmentCommandCRUDImpl implements EquipmentCommandCRUD {
 
   private Cache<Long, Equipment> equipmentTagCache;

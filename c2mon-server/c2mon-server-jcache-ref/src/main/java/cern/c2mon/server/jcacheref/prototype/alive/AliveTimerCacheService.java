@@ -70,6 +70,7 @@ public class AliveTimerCacheService implements Serializable {
     }
   }
 
+  /** Not tested */
   public void stopAllTimers() {
     log.debug("Stopping all alive timers in the cache.");
     try {
@@ -83,6 +84,7 @@ public class AliveTimerCacheService implements Serializable {
     }
   }
 
+  /** Not tested */
   public void generateFromEquipment(AbstractEquipment abstractEquipment) {
     String type;
     if (abstractEquipment instanceof Equipment) {
@@ -96,6 +98,7 @@ public class AliveTimerCacheService implements Serializable {
     aliveTimerCache.put(aliveTimer.getId(), aliveTimer);
   }
 
+  /** Not tested */
   public void generateFromProcess(Process process) {
     AliveTimer aliveTimer = new AliveTimerCacheObject(process.getAliveTagId(), process.getId(), process.getName(),
             process.getStateTagId(), AliveTimer.ALIVE_TYPE_PROCESS, process.getAliveInterval());
