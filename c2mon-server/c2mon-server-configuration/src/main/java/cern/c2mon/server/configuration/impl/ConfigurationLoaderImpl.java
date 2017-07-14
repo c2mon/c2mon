@@ -318,7 +318,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
                                                  final boolean isDBConfig
   ) {
 
-    List<ConfigurationElement> elementsToCheckRules = new ArrayList<>();
+    List<ConfigurationElement> elementsToCheckRules = Collections.synchronizedList(new ArrayList<>());
 
     ConfigurationReport report = new ConfigurationReport(configId, configName, "");
 
