@@ -135,8 +135,6 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
 
   private final DeviceConfigHandler deviceConfigHandler;
 
-  private final TagLocationService tagLocationService;
-
   private final RuleTagCache ruleTagCache;
 
   private Environment environment;
@@ -183,7 +181,6 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
                                  SequenceDAO sequenceDAO,
                                  ConfigurationProperties properties,
                                  ServerProperties serverProperties,
-                                 TagLocationService tagLocationService,
                                  RuleTagCache ruleTagCache) {
     super();
     this.processCommunicationManager = processCommunicationManager;
@@ -205,7 +202,6 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
     this.sequenceDAO = sequenceDAO;
     this.daqConfigEnabled = properties.isDaqConfigEnabled();
     this.reportDirectory = serverProperties.getHome() + "/reports";
-    this.tagLocationService = tagLocationService;
     this.ruleTagCache = ruleTagCache;
   }
 
