@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2017 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -84,9 +84,9 @@ public class RuleTagCacheImpl extends AbstractTagCache<RuleTag> implements RuleT
 
   @Override
   protected void doPostDbLoading(RuleTag ruleTag) {
-    log.trace("doPostDbLoading() - Post processing RuleTag " + ruleTag.getId() + " ...");
+    log.trace("doPostDbLoading() - Post processing RuleTag {} ...", ruleTag.getId());
     setParentSupervisionIds(ruleTag);
-    log.trace("doPostDbLoading() - ... RuleTag " + ruleTag.getId() + " done!");
+    log.trace("doPostDbLoading() - ... RuleTag {} done!", ruleTag.getId());
   }
 
   @Override
@@ -108,18 +108,18 @@ public class RuleTagCacheImpl extends AbstractTagCache<RuleTag> implements RuleT
    */
   @Override
   public void setParentSupervisionIds(final RuleTag ruleTag) {
-    log.trace("setParentSupervisionIds() - Setting supervision ids for rule " + ruleTag.getId() + " ...");
+    log.trace("setParentSupervisionIds() - Setting supervision ids for rule {} ...", ruleTag.getId());
     //sets for this ruleTag
     HashSet<Long> processIds = new HashSet<Long>();
     HashSet<Long> equipmentIds = new HashSet<Long>();
     HashSet<Long> subEquipmentIds = new HashSet<Long>();
     int cnt = 0;
 
-    log.trace(ruleTag.getId() + " Has "+ ruleTag.getRuleInputTagIds().size() + " input rule tags");
+    log.trace("{} Has {} input rule tags", ruleTag.getId(), ruleTag.getRuleInputTagIds().size());
     for (Long tagKey : ruleTag.getRuleInputTagIds()) {
 
       cnt++;
-      log.trace(ruleTag.getId() + " Trying to find rule input tag No#" + cnt + " with id=" + tagKey + " in caches.. ");
+      log.trace("{} Trying to find rule input tag No#{} with id={} in caches.. ", ruleTag.getId(), cnt, tagKey);
       if (dataTagCache.hasKey(tagKey)) {
         DataTag dataTag = dataTagCache.getCopy(tagKey);
         processIds.add(dataTag.getProcessId());
@@ -148,8 +148,7 @@ public class RuleTagCacheImpl extends AbstractTagCache<RuleTag> implements RuleT
       }
 
     }
-    log.debug("setParentSupervisionIds() - Setting parent ids for rule " + ruleTag.getId() + "; process ids: " + processIds + "; equipment ids: " + equipmentIds
-        + "; subequipmnet ids: " + subEquipmentIds);
+    log.debug("setParentSupervisionIds() - Setting parent ids for rule {}; process ids: {}; equipment ids: {}; subequipmnet ids: {}",  ruleTag.getId(), processIds, equipmentIds, subEquipmentIds);
     ruleTag.setProcessIds(processIds);
     ruleTag.setEquipmentIds(equipmentIds);
     ruleTag.setSubEquipmentIds(subEquipmentIds);
@@ -177,7 +176,7 @@ public class RuleTagCacheImpl extends AbstractTagCache<RuleTag> implements RuleT
             String regex = "*#" + tagId + "#*";
             results = query.includeKeys().addCriteria(tagRule.ilike(regex)).execute();
 
-            log.debug(String.format("findByRuleInputTagId() - Got %d results for regex \"%s\"", results.size(), regex));
+            log.debug("findByRuleInputTagId() - Got {} results for regex \"{}\"", results.size(), regex);
 
             Long key;
             for (Result result : results.all()) {
@@ -185,7 +184,7 @@ public class RuleTagCacheImpl extends AbstractTagCache<RuleTag> implements RuleT
                 if (key != null) {
                     resultList.add(get(key));
                 } else {
-                    log.warn(String.format("findByRuleInputTagId() - Regex \"%s\" returned a null key for cache %s", regex, getCacheName()));
+                    log.warn("findByRuleInputTagId() - Regex \"{}\" returned a null key for cache {}", regex, getCacheName());
                 }
             }
         } finally {

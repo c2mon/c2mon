@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2017 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -20,10 +20,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Properties;
 
-import javax.naming.ConfigurationException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.stereotype.Service;
@@ -50,6 +46,7 @@ import cern.c2mon.shared.daq.config.Change;
 import cern.c2mon.shared.daq.config.DataTagAdd;
 import cern.c2mon.shared.daq.config.DataTagRemove;
 import cern.c2mon.shared.daq.config.DataTagUpdate;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Implementation of transacted methods.
@@ -57,16 +54,12 @@ import cern.c2mon.shared.daq.config.DataTagUpdate;
  * @author Mark Brightwell
  */
 @Service
+@Slf4j
 public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag> implements DataTagConfigTransacted {
-
-  /**
-   * Class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(DataTagConfigTransactedImpl.class);
 
   @Autowired
   private ConfigurationProperties properties;
-
+  
   /**
    * Reference to the equipment facade.
    */
@@ -119,12 +112,12 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
 
     tagCache.acquireWriteLockOnKey(element.getEntityId());
     try {
-      LOGGER.trace("Creating DataTag " + element.getEntityId());
-      DataTag dataTag = commonTagFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
+      log.trace("Creating DataTag {}", element.getEntityId());
+      DataTag dataTag = (DataTag) commonTagFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
       try {
         configurableDAO.insert(dataTag);
       } catch (Exception e) {
-        LOGGER.error("Exception caught while inserting a new DataTag into the DB - rolling back changes", e);
+        log.error("Exception caught while inserting a new DataTag into the DB - rolling back changes", e);
         throw new UnexpectedRollbackException("Unexpected exception while creating a DataTag: rolling back the change", e);
       }
       try {
@@ -151,7 +144,7 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
 
 
       } catch (Exception ex) {
-        LOGGER.error("Exception caught when attempting to create a DataTag - rolling back the DB transaction and undoing cache changes.");
+        log.error("Exception caught when attempting to create a DataTag - rolling back the DB transaction and undoing cache changes.");
         tagCache.remove(dataTag.getId());
 
         throw new UnexpectedRollbackException("Unexpected exception while creating a DataTag: rolling back the change", ex);
@@ -179,10 +172,10 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
   @Override
   @Transactional(value = "cacheTransactionManager", propagation = Propagation.REQUIRES_NEW) //("cacheTransactionManager")
   public ProcessChange doUpdateDataTag(final Long id, final Properties properties) {
-    LOGGER.trace("Updating DataTag " + id);
+    log.trace("Updating DataTag {}", id);
     // Warn if trying to change equipment it is attached to - not currently allowed
     if (properties.containsKey("equipmentId") || properties.containsKey("subEquipmentId")) {
-      LOGGER.warn("Attempting to change the equipment/subequipment to which a tag is attached - this is not currently supported!");
+      log.warn("Attempting to change the equipment/subequipment to which a tag is attached - this is not currently supported!");
       properties.remove("equipmentId");
       properties.remove("subEquipmentId");
     }
@@ -212,7 +205,7 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
     } catch (CacheElementNotFoundException ex) { //tag not found
       throw ex;
     } catch (Exception ex) {
-      LOGGER.error("Exception caught while updating a datatag. Rolling back transaction and removing from cache.", ex);
+      log.error("Exception caught while updating a datatag. Rolling back transaction and removing from cache.", ex);
       throw new UnexpectedRollbackException("Unexpected exception caught while updating a DataTag configuration.", ex);
     } finally {
       tagCache.releaseWriteLockOnKey(id);
@@ -228,7 +221,7 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
       if (this.properties.isDeleteRulesAfterTagDeletion()) {
         Collection<Long> ruleIds = tagCopy.getCopyRuleIds();
         if (!ruleIds.isEmpty()) {
-          LOGGER.trace("Removing Rules dependent on DataTag " + id);
+          log.trace("Removing Rules dependent on DataTag {}", id);
           for (Long ruleId : new ArrayList<Long>(ruleIds)) {
             if (tagLocationService.isInTagCache(ruleId)) { //may already have been removed if a previous rule in the list was used in this rule! {
               ConfigurationElementReport newReport = new ConfigurationElementReport(Action.REMOVE, Entity.RULETAG, ruleId);
@@ -242,7 +235,7 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
       try {
         Collection<Long> alarmIds = tagCopy.getCopyAlarmIds();
         if (!alarmIds.isEmpty()) {
-          LOGGER.trace("Removing Alarms dependent on DataTag " + id);
+          log.trace("Removing Alarms dependent on DataTag {}", id);
           for (Long alarmId : new ArrayList<>(alarmIds)) {
             ConfigurationElementReport alarmReport = new ConfigurationElementReport(Action.REMOVE, Entity.ALARM, alarmId);
             elementReport.addSubReport(alarmReport);
@@ -258,7 +251,7 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
       } catch (Exception ex) {
         //commonTagFacade.setStatus(dataTag, Status.RECONFIGURATION_ERROR);
         elementReport.setFailure("Exception caught while removing datatag", ex);
-        LOGGER.error("Exception caught while removing datatag with id " + id + "; rolling back DB transaction.", ex);
+        log.error("Exception caught while removing datatag with id " + id + "; rolling back DB transaction.", ex);
         throw new UnexpectedRollbackException("Exception caught while removing datatag.", ex);
       } finally {
         if (tagCache.isWriteLockedByCurrentThread(id)) {
@@ -280,10 +273,10 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
         processChange = new ProcessChange(subEquipmentFacade.getProcessIdForAbstractEquipment(tagCopy.getSubEquipmentId()), removeEvent);
       }
       else {
-        LOGGER.warn("doRemoveDataTag() - data tag #" + tagCopy.getId() + " is not attached to any Equipment or Sub-Equipment. This should normally never happen.");
+        log.warn("doRemoveDataTag() - data tag #{} is not attached to any Equipment or Sub-Equipment. This should normally never happen.", tagCopy.getId());
       }
     } catch (CacheElementNotFoundException e) {
-      LOGGER.warn("doRemoveDataTag() - Attempting to remove a non-existent DataTag - no action taken.");
+      log.warn("doRemoveDataTag() - Attempting to remove a non-existent DataTag - no action taken.");
       throw new CacheElementNotFoundException("Attempting to remove a non-existent DataTag - no action taken", e);
     }
     return processChange;

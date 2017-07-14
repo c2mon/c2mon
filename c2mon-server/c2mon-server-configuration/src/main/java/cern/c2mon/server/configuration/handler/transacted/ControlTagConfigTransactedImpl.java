@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2017 CERN. All rights not expressly granted are reserved.
  * 
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -46,6 +46,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Properties;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * See interface for doc.
@@ -54,10 +55,9 @@ import java.util.Properties;
  *
  */
 @Service
+@Slf4j
 public class ControlTagConfigTransactedImpl extends TagConfigTransactedImpl<ControlTag> implements ControlTagConfigTransacted {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ControlTagConfigTransactedImpl.class);
-  
   @Autowired
   private ConfigurationProperties properties;
 
@@ -118,7 +118,7 @@ public class ControlTagConfigTransactedImpl extends TagConfigTransactedImpl<Cont
     
     tagCache.acquireWriteLockOnKey(element.getEntityId());
     try {
-      LOGGER.trace("Creating ControlTag " + element.getEntityId());
+      log.trace("Creating ControlTag {}", element.getEntityId());
       ControlTag controlTag = commonTagFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
 
       if (controlTag.getEquipmentId() != null) {
@@ -128,7 +128,7 @@ public class ControlTagConfigTransactedImpl extends TagConfigTransactedImpl<Cont
       try {
         configurableDAO.insert(controlTag);
       } catch (Exception e) {
-        LOGGER.error("Exception caught while inserting a new Control Tag into the DB - rolling back changes", e);
+        log.error("Exception caught while inserting a new Control Tag into the DB - rolling back changes", e);
         throw new UnexpectedRollbackException("Unexpected exception while creating a Control Tag: rolling back the change", e);
       }
       try {
@@ -143,7 +143,7 @@ public class ControlTagConfigTransactedImpl extends TagConfigTransactedImpl<Cont
         }
         return processChange;
       } catch (Exception e) {
-        LOGGER.error("Exception caught while creating a ControlTag in cache - "
+        log.error("Exception caught while creating a ControlTag in cache - "
             + "rolling back DB transaction and removing from cache.", e);
         tagCache.remove(controlTag.getId());
         throw new UnexpectedRollbackException("Unexpected exception while creating a Control Tag: rolling back the change", e);
@@ -161,7 +161,7 @@ public class ControlTagConfigTransactedImpl extends TagConfigTransactedImpl<Cont
   @Override
   @Transactional(value = "cacheTransactionManager", propagation = Propagation.REQUIRES_NEW)
   public ProcessChange doUpdateControlTag(Long id, Properties elementProperties) {
-    LOGGER.trace("Updating ControlTag " + id);
+    log.trace("Updating ControlTag {}", id);
     Change controlTagUpdate;       
     tagCache.acquireWriteLockOnKey(id);
     try {      
@@ -195,7 +195,7 @@ public class ControlTagConfigTransactedImpl extends TagConfigTransactedImpl<Cont
     } catch (CacheElementNotFoundException ex) {
       throw ex;
     } catch (Exception ex) {
-      LOGGER.error("Exception caught while updating a ControlTag - rolling back DB transaction", ex);      
+      log.error("Exception caught while updating a ControlTag - rolling back DB transaction", ex);      
       throw new UnexpectedRollbackException("Unexpected exception caught while updating a ControlTag configuration", ex);
     } finally {
       if (tagCache.isWriteLockedByCurrentThread(id)) {
@@ -208,12 +208,12 @@ public class ControlTagConfigTransactedImpl extends TagConfigTransactedImpl<Cont
   @Override
   @Transactional(value = "cacheTransactionManager", propagation=Propagation.REQUIRES_NEW)
   public ProcessChange doRemoveControlTag(Long id, ConfigurationElementReport tagReport) {
-    LOGGER.trace("Removing ControlTag " + id);
+    log.trace("Removing ControlTag {}", id);
     try {      
       if (this.properties.isDeleteRulesAfterTagDeletion()) {
         Collection<Long> ruleIds = tagCache.get(id).getCopyRuleIds();
         if (!ruleIds.isEmpty()) {
-          LOGGER.trace("Removing rules dependent on ControlTag " + id);
+          log.trace("Removing rules dependent on ControlTag {}", id);
           for (Long ruleId : ruleIds) {
             ConfigurationElementReport newReport = new ConfigurationElementReport(Action.REMOVE, Entity.RULETAG, ruleId);
             tagReport.addSubReport(newReport);
@@ -225,7 +225,7 @@ public class ControlTagConfigTransactedImpl extends TagConfigTransactedImpl<Cont
       try {                
         ControlTag controlTag = tagCache.get(id);
         if (!controlTag.getAlarmIds().isEmpty()) {
-          LOGGER.trace("Removing Alarms dependent on ControlTag " + controlTag.getId());
+          log.trace("Removing Alarms dependent on ControlTag " + controlTag.getId());
           for (Long alarmId : new ArrayList<Long>(controlTag.getAlarmIds())) {
             ConfigurationElementReport alarmReport = new ConfigurationElementReport(Action.REMOVE, Entity.ALARM, alarmId);
             tagReport.addSubReport(alarmReport);
@@ -251,7 +251,7 @@ public class ControlTagConfigTransactedImpl extends TagConfigTransactedImpl<Cont
         }
       } catch (Exception ex) {
         //commonTagFacade.setStatus(controlTag, Status.RECONFIGURATION_ERROR);
-        LOGGER.error("Exception caught while removing a control tag.", ex);
+        log.error("Exception caught while removing a control tag.", ex);
         tagReport.setFailure("Unable to remove ControlTag with id " + id); 
         throw new UnexpectedRollbackException("Unable to remove control tag " + id, ex);
       } finally {
@@ -260,7 +260,7 @@ public class ControlTagConfigTransactedImpl extends TagConfigTransactedImpl<Cont
         }      
       } 
     } catch (CacheElementNotFoundException e) {
-      LOGGER.warn("Attempting to remove a non-existent ControlTag - no action taken.");
+      log.warn("Attempting to remove a non-existent ControlTag - no action taken.");
       tagReport.setWarning("Attempting to removed a non-existent ControlTag");
       return new ProcessChange();
     }          
