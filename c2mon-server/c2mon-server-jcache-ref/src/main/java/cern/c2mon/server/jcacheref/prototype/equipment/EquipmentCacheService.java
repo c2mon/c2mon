@@ -14,9 +14,7 @@ import cern.c2mon.server.jcacheref.prototype.common.RuntimeCacheReconfigurator;
 
 @Slf4j
 @Service
-public class EquipmentCacheService implements EquipmentCommandCRUD {
-
-  private RuntimeCacheReconfigurator runtimeCacheReconfigurator;
+public class EquipmentCacheService {
 
   private EquipmentCommandCRUD equipmentCommandCRUD;
 
@@ -25,12 +23,10 @@ public class EquipmentCacheService implements EquipmentCommandCRUD {
     this.equipmentCommandCRUD = equipmentCommandCRUD;
   }
 
-  @Override
   public void addCommandToEquipment(Long equipmentId, Long commandId) throws EntryProcessorException {
     equipmentCommandCRUD.addCommandToEquipment(equipmentId, commandId);
   }
 
-  @Override
   public void removeCommandFromEquipment(Long equipmentId, Long commandId) {
     equipmentCommandCRUD.removeCommandFromEquipment(equipmentId, commandId);
   }

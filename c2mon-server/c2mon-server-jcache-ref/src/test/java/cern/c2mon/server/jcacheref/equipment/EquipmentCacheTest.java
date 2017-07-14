@@ -1,18 +1,15 @@
 package cern.c2mon.server.jcacheref.equipment;
 
 import javax.cache.Cache;
-import javax.cache.CacheManager;
-import javax.cache.Caching;
-import javax.cache.spi.CachingProvider;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.equipment.EquipmentCacheObject;
-import cern.c2mon.server.jcacheref.HazelcastBaseTestingSetup;
+import cern.c2mon.server.jcacheref.IgniteBaseTestingSetup;
 import cern.c2mon.server.jcacheref.prototype.equipment.EquipmentCommandCRUD;
-import cern.c2mon.server.jcacheref.prototype.equipment.EquipmentCommandCRUDImpl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -20,21 +17,17 @@ import static org.junit.Assert.assertNotNull;
 /**
  * @author Szymon Halastra
  */
+public class EquipmentCacheTest extends IgniteBaseTestingSetup {
 
-public class EquipmentCacheTest extends HazelcastBaseTestingSetup {
-
+  @Autowired
   EquipmentCommandCRUD equipmentCommandCRUD;
 
+  @Autowired
   private Cache<Long, Equipment> equipmentTagCache;
 
   @Before
   public void setup() {
-    CachingProvider provider = Caching.getCachingProvider();
-    CacheManager cacheManager = provider.getCacheManager();
 
-    equipmentTagCache = cacheManager.getCache("equipmentTagCache", Long.class, Equipment.class);
-
-    equipmentCommandCRUD = new EquipmentCommandCRUDImpl(equipmentTagCache);
   }
 
   @Test

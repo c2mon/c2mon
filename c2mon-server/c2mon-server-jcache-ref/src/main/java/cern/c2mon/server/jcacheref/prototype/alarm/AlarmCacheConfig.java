@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import javax.cache.Cache;
 import javax.cache.CacheManager;
+import javax.cache.configuration.MutableConfiguration;
 
 import org.springframework.cache.jcache.JCacheCacheManager;
 import org.springframework.context.annotation.Bean;
@@ -25,7 +26,10 @@ public class AlarmCacheConfig implements BasicCache, Serializable {
   @Bean(name = ALARM_TAG_CACHE)
   public Cache<Long, Alarm> getAlarmTagCache(JCacheCacheManager cacheManager) {
     CacheManager cm = cacheManager.getCacheManager();
-    return cm.getCache(ALARM_TAG_CACHE, Long.class, Alarm.class);
+    MutableConfiguration<Long, Alarm> config = new MutableConfiguration<>();
+    config.setTypes(Long.class, Alarm.class);
+
+    return cm.createCache(ALARM_TAG_CACHE, config);
   }
 
   @Override

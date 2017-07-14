@@ -4,7 +4,9 @@ import java.io.Serializable;
 
 import javax.cache.Cache;
 import javax.cache.CacheManager;
+import javax.cache.configuration.MutableConfiguration;
 
+import com.google.common.collect.ImmutableRangeMap;
 import org.springframework.cache.jcache.JCacheCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,7 +27,11 @@ public class AliveTimerCacheConfig implements BasicCache, Serializable {
   @Bean(name = ALIVE_TIMER_CACHE)
   public Cache<Long, AliveTimer> getAliveTimerCache(JCacheCacheManager cacheManager) {
     CacheManager cm = cacheManager.getCacheManager();
-    return cm.getCache(ALIVE_TIMER_CACHE, Long.class, AliveTimer.class);
+
+    MutableConfiguration<Long, AliveTimer> config = new MutableConfiguration<>();
+    config.setTypes(Long.class, AliveTimer.class);
+
+    return cm.createCache(ALIVE_TIMER_CACHE, config);
   }
 
   @Override
