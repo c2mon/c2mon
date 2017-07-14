@@ -377,7 +377,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
         }
 
         if (!this.properties.isDeleteRulesAfterTagDeletion()) {
-            this.addExistingRulesToTags(elementsToCheckRules);
+            this.resubscribeExistingRulesToTags(elementsToCheckRules);
         }
     } finally {
       clusterCache.releaseWriteLockOnKey(this.cachePersistenceLock);
@@ -484,8 +484,8 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
    *
    * @param elements List of {@Link ConfigurationElement}s to check.
    */
-  private void addExistingRulesToTags(List<ConfigurationElement> elements) {
-    log.info("Adding existing rules to tags");
+  private void resubscribeExistingRulesToTags(List<ConfigurationElement> elements) {
+    log.info("Adding existing rules to tags");    
     for (ConfigurationElement element : elements) {
         Collection<RuleTag> tags = this.ruleTagCache.findByRuleInputTagId(element.getEntityId());
         for (RuleTag t : tags) {
