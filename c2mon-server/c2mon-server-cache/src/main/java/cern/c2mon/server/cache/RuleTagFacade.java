@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2017 CERN. All rights not expressly granted are reserved.
  * 
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -18,6 +18,7 @@ package cern.c2mon.server.cache;
 
 import java.sql.Timestamp;
 import cern.c2mon.server.common.rule.RuleTag;
+import java.util.Collection;
 
 /**
  * Bean that should be used to access and update rule cache objects.
@@ -105,5 +106,12 @@ public interface RuleTagFacade extends CommonTagFacade<RuleTag> {
    */
   //void configureCacheObject(RuleTag ruleTag, Properties properties) throws ConfigurationException;
 
-  
+  /**
+   * Get all the {@link RuleTag}s that reference the given tag ID.
+   *
+   * @param id tag ID.
+   *
+   * @return collection of RuleTag objects.
+   */
+   Collection<RuleTag> findByRuleInputTagId(Long id);
 }

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2017 CERN. All rights not expressly granted are reserved.
  * 
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -19,8 +19,6 @@ package cern.c2mon.server.cache.common;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +28,6 @@ import cern.c2mon.server.cache.DataTagCache;
 import cern.c2mon.server.cache.RuleTagCache;
 import cern.c2mon.server.cache.TagLocationService;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
-import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.tag.Tag;
 
 /**
@@ -41,26 +38,20 @@ import cern.c2mon.server.common.tag.Tag;
 @Service
 public class TagLocationServiceImpl implements TagLocationService {
 
-  
-  /**
-   * Class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(TagLocationServiceImpl.class);
-  
   /**
    * Reference to data tag cache.
    */
-  private DataTagCache dataTagCache;
+  private final DataTagCache dataTagCache;
   
   /**
    * Reference to control tag cache.
    */
-  private ControlTagCache controlTagCache;
+  private final ControlTagCache controlTagCache;
   
   /**
    * Reference to rule tag cache.
    */
-  private RuleTagCache ruleTagCache;
+  private final RuleTagCache ruleTagCache;
   
   /**
    * 
@@ -166,10 +157,5 @@ public class TagLocationServiceImpl implements TagLocationService {
   @Override
   public void releaseWriteLockOnKey(Long id) {
     getCache(id).releaseWriteLockOnKey(id);
-  }
-
-  @Override
-  public Collection<RuleTag> findByRuleInputTagId(Long id) {
-    return this.ruleTagCache.findByRuleInputTagId(id);
   }
 }

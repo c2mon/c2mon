@@ -491,7 +491,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
   private void addExistingRulesToTags(List<ConfigurationElement> elements) {
     log.info("Adding existing rules to tags");
     for (ConfigurationElement element : elements) {
-        Collection<RuleTag> tags = this.tagLocationService.findByRuleInputTagId(element.getEntityId());
+        Collection<RuleTag> tags = this.ruleTagCache.findByRuleInputTagId(element.getEntityId());
         for (RuleTag t : tags) {
             switch (element.getEntity()) {
                 case DATATAG: dataTagConfigHandler.addRuleToTag(element.getEntityId(), t.getId()); break;

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2017 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -17,14 +17,11 @@
 package cern.c2mon.server.cache.rule;
 
 import java.sql.Timestamp;
-import java.util.HashSet;
 import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.cache.AlarmCache;
@@ -34,13 +31,14 @@ import cern.c2mon.server.cache.RuleTagCache;
 import cern.c2mon.server.cache.RuleTagFacade;
 import cern.c2mon.server.cache.common.AbstractTagFacade;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
-import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.rule.RuleTagCacheObject;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
 import cern.c2mon.shared.daq.config.Change;
 import cern.c2mon.shared.rule.RuleExpression;
+import java.util.Collection;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Facade object for manipulating server rules.
@@ -49,6 +47,7 @@ import cern.c2mon.shared.rule.RuleExpression;
  *
  */
 @Service
+@Slf4j
 public class RuleTagFacadeImpl extends AbstractTagFacade<RuleTag> implements RuleTagFacade {
 
   /**
@@ -60,11 +59,6 @@ public class RuleTagFacadeImpl extends AbstractTagFacade<RuleTag> implements Rul
    * Logger for logging updates made to rules.
    */
   private static final Logger RULELOG = LoggerFactory.getLogger("RuleTagLogger");
-
-  /**
-   * Class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(RuleTagFacadeImpl.class);
 
   /**
    * Reference to the low level Rule Facade bean.
@@ -164,12 +158,12 @@ public class RuleTagFacadeImpl extends AbstractTagFacade<RuleTag> implements Rul
         updateCount++;
         log((RuleTagCacheObject) ruleTag);
       } else {
-        if (LOGGER.isTraceEnabled()) {
-          LOGGER.trace("Filtering out repeated update for rule " + id);
+        if (log.isTraceEnabled()) {
+          log.trace("Filtering out repeated update for rule " + id);
         }
       }
     } catch (CacheElementNotFoundException cacheEx) {
-      LOGGER.error("Unable to locate rule in cache (id " + id + ") - no update performed.", cacheEx);
+      log.error("Unable to locate rule in cache (id " + id + ") - no update performed.", cacheEx);
     } finally {
       tagCache.releaseWriteLockOnKey(id);
     }
@@ -234,6 +228,11 @@ public class RuleTagFacadeImpl extends AbstractTagFacade<RuleTag> implements Rul
     } else {
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"ruleText\" is null for rule " + ruleTag.getId() + " - unable to configure it correctly.");
     }
+  }
+
+  @Override
+  public Collection<RuleTag> findByRuleInputTagId(Long id) {
+    return ((RuleTagCache)this.tagCache).findByRuleInputTagId(id);
   }
 
   @Override
