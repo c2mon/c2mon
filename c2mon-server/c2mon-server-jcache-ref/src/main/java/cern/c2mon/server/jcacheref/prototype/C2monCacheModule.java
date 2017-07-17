@@ -38,9 +38,7 @@ public class C2monCacheModule {
 
   @Bean(name = "springCacheManager")
   public JCacheCacheManager getSpringCacheManager(CacheManager cacheManager) {
-    JCacheCacheManager jCacheCacheManager = new JCacheCacheManager(cacheManager);
-
-    return jCacheCacheManager;
+    return new JCacheCacheManager(cacheManager);
   }
 
   @Bean(name = "cacheManager")

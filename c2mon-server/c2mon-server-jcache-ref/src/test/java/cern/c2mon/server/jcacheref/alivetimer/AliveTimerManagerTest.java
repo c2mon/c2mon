@@ -5,17 +5,16 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import javax.cache.Cache;
-import javax.cache.CacheManager;
 import javax.cache.Caching;
-import javax.cache.spi.CachingProvider;
+import javax.cache.configuration.MutableConfiguration;
 
+import org.easymock.EasyMock;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import cern.c2mon.server.common.alive.AliveTimer;
 import cern.c2mon.server.common.alive.AliveTimerCacheObject;
-import cern.c2mon.server.jcacheref.IgniteBaseTestingSetup;
 import cern.c2mon.server.jcacheref.prototype.alive.AliveTimerCacheService;
 
 import static org.junit.Assert.assertFalse;
@@ -25,18 +24,28 @@ import static org.junit.Assert.assertTrue;
  * @author Szymon Halastra
  */
 
-public class AliveTimerManagerTest extends IgniteBaseTestingSetup {
+public class AliveTimerManagerTest {
 
-  @Autowired
   Cache<Long, AliveTimer> aliveTimerCache;
 
-  @Autowired
   AliveTimerCacheService aliveTimerCacheService;
 
   @Before
   public void setup() {
-    CachingProvider provider = Caching.getCachingProvider();
-    CacheManager cacheManager = provider.getCacheManager();
+    aliveTimerCache = EasyMock.mock(Cache.class);
+
+    aliveTimerCache = Caching.getCachingProvider()
+            .getCacheManager()
+            .createCache("aliveTimerCache",
+                    new MutableConfiguration<Long, AliveTimer>().setTypes(Long.class, AliveTimer.class)
+            );
+
+    aliveTimerCacheService = new AliveTimerCacheService(aliveTimerCache);
+  }
+
+  @After
+  public void cleanup() {
+    Caching.getCachingProvider().getCacheManager().close();
   }
 
   @Test
