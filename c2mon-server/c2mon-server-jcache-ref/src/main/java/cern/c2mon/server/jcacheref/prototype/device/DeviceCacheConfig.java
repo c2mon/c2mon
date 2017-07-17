@@ -27,6 +27,6 @@ public class DeviceCacheConfig implements BasicCache {
 
   @Override
   public C2monCacheName getName() {
-    return C2monCacheName.DEVICE
+    return C2monCacheName.DEVICE;
   }
 }
