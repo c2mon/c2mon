@@ -1,15 +1,16 @@
 package cern.c2mon.server.jcacheref.equipment;
 
 import javax.cache.Cache;
+import javax.cache.Caching;
+import javax.cache.configuration.MutableConfiguration;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.equipment.EquipmentCacheObject;
-import cern.c2mon.server.jcacheref.IgniteBaseTestingSetup;
 import cern.c2mon.server.jcacheref.prototype.equipment.EquipmentCommandCRUD;
+import cern.c2mon.server.jcacheref.prototype.equipment.EquipmentCommandCRUDImpl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -17,17 +18,22 @@ import static org.junit.Assert.assertNotNull;
 /**
  * @author Szymon Halastra
  */
-public class EquipmentCacheTest extends IgniteBaseTestingSetup {
+public class EquipmentCacheTest {
 
-  @Autowired
+
   EquipmentCommandCRUD equipmentCommandCRUD;
 
-  @Autowired
   private Cache<Long, Equipment> equipmentTagCache;
 
   @Before
   public void setup() {
+    equipmentTagCache = Caching.getCachingProvider()
+            .getCacheManager()
+            .createCache("equipmentTagCache",
+                    new MutableConfiguration<Long, Equipment>().setTypes(Long.class, Equipment.class)
+            );
 
+    equipmentCommandCRUD = new EquipmentCommandCRUDImpl(equipmentTagCache);
   }
 
   @Test

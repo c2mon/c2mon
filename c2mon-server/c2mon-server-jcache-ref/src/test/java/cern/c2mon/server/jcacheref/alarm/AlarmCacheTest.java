@@ -16,29 +16,12 @@ import static org.junit.Assert.assertNotNull;
  * @author Szymon Halastra
  */
 
-public class AlarmCacheTest extends IgniteBaseTestingSetup {
+public class AlarmCacheTest {
 
-  @Autowired
   Cache<Long, Alarm> alarmTagCache;
 
   @Before
   public void setup() {
 
-  }
-
-  @Test
-  public void checkAlarmCacheExistence() {
-    assertNotNull(alarmTagCache);
-  }
-
-  @Test
-  public void putAndGetAlarmFromCache() {
-    AlarmCacheObject alarm = new AlarmCacheObject(10L);
-
-    assertNotNull(alarmTagCache);
-
-    alarmTagCache.put(alarm.getId(), alarm);
-
-    assertNotNull(alarmTagCache.get(10L));
   }
 }
