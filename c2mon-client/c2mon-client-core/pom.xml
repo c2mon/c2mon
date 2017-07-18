@@ -81,10 +81,6 @@
       <artifactId>hibernate-validator</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.elasticsearch</groupId>
-      <artifactId>elasticsearch</artifactId>
-    </dependency>
-    <dependency>
       <groupId>io.searchbox</groupId>
       <artifactId>jest</artifactId>
     </dependency>
@@ -109,6 +105,30 @@
     <dependency>
       <groupId>org.apache.activemq</groupId>
       <artifactId>activemq-broker</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.powermock</groupId>
+      <artifactId>powermock-api-easymock</artifactId>
+      <version>1.6.3</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.powermock</groupId>
+      <artifactId>powermock-core</artifactId>
+      <version>1.6.3</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.server</groupId>
+      <artifactId>c2mon-server-elasticsearch</artifactId>
+      <version>${project.parent.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.powermock</groupId>
+      <artifactId>powermock-module-junit4</artifactId>
+      <version>1.6.3</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

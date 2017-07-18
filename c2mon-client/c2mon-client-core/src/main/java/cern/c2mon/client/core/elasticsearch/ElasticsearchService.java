@@ -1,14 +1,6 @@
 package cern.c2mon.client.core.elasticsearch;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
+import cern.c2mon.client.core.config.C2monClientProperties;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import io.searchbox.client.JestClient;
@@ -22,16 +14,12 @@ import io.searchbox.core.search.aggregation.DateHistogramAggregation;
 import io.searchbox.core.search.aggregation.DateHistogramAggregation.DateHistogram;
 import io.searchbox.indices.mapping.GetMapping;
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.client.core.config.C2monClientProperties;
-
-import static org.elasticsearch.index.query.QueryBuilders.*;
+import java.io.IOException;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author Justin Lewis Salmon
@@ -76,47 +64,81 @@ public class ElasticsearchService {
    * @return list of [timestamp (ms), value] pairs
    */
   public List<Object[]> getHistory(Long id, Long min, Long max, String aggregate) {
-
     if (aggregate.equals("none")) {
       return getRawHistory(id, min, max);
+    }else{
+      return getAggregatedHistory(id, min, max, aggregate);
     }
+  }
 
-    List<Object[]> results = new ArrayList<>();
-
+  private List<Object[]> getAggregatedHistory(Long id, Long min, Long max, String aggregate){
     // Figure out the right interval
     String interval = aggregate.equals("auto") ? getInterval(min, max) : aggregate;
     log.info("Using interval: " + interval);
-
-    SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-    searchSourceBuilder.query(termQuery("id", id))
-        .size(0)
-        .aggregation(AggregationBuilders.filter("time-range")
-            .filter(rangeQuery("timestamp").from(min).to(max)).subAggregation(
-                AggregationBuilders.dateHistogram("events-per-interval")
-                    .field("timestamp")
-                    .interval(new DateHistogramInterval(interval))
-                    .subAggregation(
-                        AggregationBuilders.avg("avg-value").field("value")
-                    )));
-
-    SearchResult result;
-    Search search = new Search.Builder(searchSourceBuilder.toString()).addIndex(timeSeriesIndex).build();
+//    SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+//    searchSourceBuilder.query(termQuery("id", id))
+//        .size(0)
+//        .aggregation(AggregationBuilders.filter("time-range")
+//            .filter(rangeQuery("timestamp").from(min).to(max)).subAggregation(
+//                AggregationBuilders.dateHistogram("events-per-interval")
+//                    .field("timestamp")
+//                    .interval(new DateHistogramInterval(interval))
+//                    .subAggregation(
+//                        AggregationBuilders.avg("avg-value").field("value")
+//                    )));
+//    String query = searchSourceBuilder.toString();
+    String query = String.format("{\n" +
+            "  \"size\" : 0,\n" +
+            "  \"query\" : {\n" +
+            "    \"term\" : {\n" +
+            "      \"id\" : %d\n" +
+            "    }\n" +
+            "  },\n" +
+            "  \"aggregations\" : {\n" +
+            "    \"time-range\" : {\n" +
+            "      \"filter\" : {\n" +
+            "        \"range\" : {\n" +
+            "          \"timestamp\" : {\n" +
+            "            \"from\" : %d,\n" +
+            "            \"to\" : %d,\n" +
+            "            \"include_lower\" : true,\n" +
+            "            \"include_upper\" : true\n" +
+            "          }\n" +
+            "        }\n" +
+            "      },\n" +
+            "      \"aggregations\" : {\n" +
+            "        \"events-per-interval\" : {\n" +
+            "          \"date_histogram\" : {\n" +
+            "            \"field\" : \"timestamp\",\n" +
+            "            \"interval\" : \"%s\"\n" +
+            "          },\n" +
+            "          \"aggregations\" : {\n" +
+            "            \"avg-value\" : {\n" +
+            "              \"avg\" : {\n" +
+            "                \"field\" : \"value\"\n" +
+            "              }\n" +
+            "            }\n" +
+            "          }\n" +
+            "        }\n" +
+            "      }\n" +
+            "    }\n" +
+            "  }\n" +
+            "}", id,min, max, aggregate);
+    Search search = new Search.Builder(query).addIndex(timeSeriesIndex).build();
     long start = System.currentTimeMillis();
-
     try {
-      result = client.execute(search);
+      List<Object[]> results = new ArrayList<>();
+      SearchResult result = client.execute(search);
+      DateHistogramAggregation aggregation = result.getAggregations().getFilterAggregation("time-range").getDateHistogramAggregation("events-per-interval");
+      for (DateHistogram bucket : aggregation.getBuckets()) {
+        AvgAggregation avg = bucket.getAvgAggregation("avg-value");
+        results.add(new Object[]{Long.parseLong(bucket.getTimeAsString()), avg.getAvg()});
+      }
+      log.info("Loaded {} values in {}ms", results.size(), System.currentTimeMillis() - start);
+      return results;
     } catch (IOException e) {
       throw new RuntimeException("Error querying history for tag #" + id, e);
     }
-
-    DateHistogramAggregation aggregation = result.getAggregations().getFilterAggregation("time-range").getDateHistogramAggregation("events-per-interval");
-    for (DateHistogram bucket : aggregation.getBuckets()) {
-      AvgAggregation avg = bucket.getAvgAggregation("avg-value");
-      results.add(new Object[]{Long.parseLong(bucket.getTimeAsString()), avg.getAvg()});
-    }
-
-    log.info("Loaded {} values in {}ms", results.size(), System.currentTimeMillis() - start);
-    return results;
   }
 
   private String getInterval(Long min, Long max) {
@@ -152,29 +174,51 @@ public class ElasticsearchService {
   }
 
   private List<Object[]> getRawHistory(Long id, Long min, Long max) {
-    List<Object[]> results = new ArrayList<>();
-
-    SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-    searchSourceBuilder.query(boolQuery()
-        .must(termQuery("id", id))
-        .must(rangeQuery("timestamp").from(min).to(max)))
-        .sort("timestamp", SortOrder.ASC)
-        .size(1000);
-
-    SearchResult result;
-    Search search = new Search.Builder(searchSourceBuilder.toString()).addIndex(timeSeriesIndex).build();
-
+//    SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+//    searchSourceBuilder.query(boolQuery()
+//        .must(termQuery("id", id))
+//        .must(rangeQuery("timestamp").from(min).to(max)))
+//        .sort("timestamp", SortOrder.ASC)
+//        .size(1000);
+//    String query = searchSourceBuilder.toString();
+    String query = String.format("{\n" +
+            "  \"size\" : 1000,\n" +
+            "  \"query\" : {\n" +
+            "    \"bool\" : {\n" +
+            "      \"must\" : [ {\n" +
+            "        \"term\" : {\n" +
+            "          \"id\" : %d\n" +
+            "        }\n" +
+            "      }, {\n" +
+            "        \"range\" : {\n" +
+            "          \"timestamp\" : {\n" +
+            "            \"from\" : %d,\n" +
+            "            \"to\" : %d,\n" +
+            "            \"include_lower\" : true,\n" +
+            "            \"include_upper\" : true\n" +
+            "          }\n" +
+            "        }\n" +
+            "      } ]\n" +
+            "    }\n" +
+            "  },\n" +
+            "  \"sort\" : [ {\n" +
+            "    \"timestamp\" : {\n" +
+            "      \"order\" : \"asc\"\n" +
+            "    }\n" +
+            "  } ]\n" +
+            "}", id, min, max);
+    Search search = new Search.Builder(query).addIndex(timeSeriesIndex).build();
     try {
-      result = client.execute(search);
+      SearchResult result = client.execute(search);
+      List<Object[]> results = new ArrayList<>();
+      for (SearchResult.Hit<Map, Void> hit : result.getHits(Map.class)) {
+        results.add(new Object[]{hit.source.get("timestamp"), hit.source.get("value")});
+      }
+      return results;
     } catch (IOException e) {
       throw new RuntimeException("Error querying raw tag history", e);
     }
 
-    for (SearchResult.Hit<Map, Void> hit : result.getHits(Map.class)) {
-      results.add(new Object[]{hit.source.get("timestamp"), hit.source.get("value")});
-    }
-
-    return results;
   }
 
   /**
@@ -185,60 +229,70 @@ public class ElasticsearchService {
    * @return a list of tag ids
    */
   public List<Long> getTopTags(Integer size) {
-    List<Long> tagIds = new ArrayList<>();
-
-    SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-    searchSourceBuilder.aggregation(AggregationBuilders.terms("group-by-id")
-        .field("id")
-        .size(size))
-        .sort("timestamp", SortOrder.DESC);
-
-    SearchResult result;
-    Search search = new Search.Builder(searchSourceBuilder.toString()).addIndex(timeSeriesIndex).build();
-
+//    SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+//    searchSourceBuilder.aggregation(AggregationBuilders.terms("group-by-id")
+//        .field("id")
+//        .size(size))
+//        .sort("timestamp", SortOrder.DESC);
+//    String query = searchSourceBuilder.toString();
+    String query = String.format("{\n" +
+            "  \"sort\" : [ {\n" +
+            "    \"timestamp\" : {\n" +
+            "      \"order\" : \"desc\"\n" +
+            "    }\n" +
+            "  } ],\n" +
+            "  \"aggregations\" : {\n" +
+            "    \"group-by-id\" : {\n" +
+            "      \"terms\" : {\n" +
+            "        \"field\" : \"id\",\n" +
+            "        \"size\" : %d\n" +
+            "      }\n" +
+            "    }\n" +
+            "  }\n" +
+            "}", size);
+    Search search = new Search.Builder(query).addIndex(timeSeriesIndex).build();
     try {
-      result = client.execute(search);
+      SearchResult result = client.execute(search);
+      return new ArrayList<>(result.getAggregations().getTermsAggregation("group-by-id").getBuckets()
+              .stream()
+              .map(bucket -> Long.valueOf(bucket.getKey()))
+              .collect(Collectors.toList()));
     } catch (IOException e) {
       throw new RuntimeException("Error querying top most active tags", e);
     }
-
-    tagIds.addAll(result.getAggregations().getTermsAggregation("group-by-id").getBuckets()
-        .stream()
-        .map(bucket -> Long.valueOf(bucket.getKey())).collect(Collectors.toList()));
-
-    return tagIds;
   }
 
   /**
    * Find all tags by name with a given prefix.
    *
-   * @param query the tag name prefix
+   * @param regexQuery the tag name prefix
    *
    * @return a list of tags whose names match the given prefix
    */
-  public Collection<Long> findByName(String query) {
-    List<Long> tagIds = new ArrayList<>();
-
-    SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-    searchSourceBuilder
-        .query(regexpQuery("name", query));
-
-    SearchResult result;
-    Search search = new Search.Builder(searchSourceBuilder.toString())
-            .addIndex(configIndex).build();
-
+  public Collection<Long> findByName(String regexQuery) {
+//    SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+//    searchSourceBuilder.query(regexpQuery("name", regexQuery));
+//    String query = searchSourceBuilder.toString();
+    String query = String.format("{\n" +
+            "  \"query\" : {\n" +
+            "    \"regexp\" : {\n" +
+            "      \"name\" : {\n" +
+            "        \"value\" : \"%s\",\n" +
+            "        \"flags_value\" : 65535\n" +
+            "      }\n" +
+            "    }\n" +
+            "  }\n" +
+            "}", regexQuery);
+    Search search = new Search.Builder(query).addIndex(configIndex).build();
     try {
-      result = client.execute(search);
+      SearchResult result = client.execute(search);
+      return new ArrayList<>(result.getHits(Map.class)
+              .stream()
+              .map(hit ->(long)hit.source.get("id"))
+              .collect(Collectors.toList()));
     } catch (IOException e) {
       throw new RuntimeException("Error querying tags", e);
     }
-
-    for (SearchResult.Hit<Map, Void> hit : result.getHits(Map.class)) {
-      double id = (double) hit.source.get("id");
-      tagIds.add((long) id);
-    }
-
-    return tagIds;
   }
 
   /**
@@ -250,31 +304,44 @@ public class ElasticsearchService {
    * @return a list of tags containing the exact metadata requested
    */
   public Collection<Long> findByMetadata(String key, String value) {
-    List<Long> tagIds = new ArrayList<>();
-
-    SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-    searchSourceBuilder
-        .query(prefixQuery("metadata." + key, value))
-        .size(0)
-        .aggregation(AggregationBuilders.terms("group-by-id")
-            .field("id")
-        );
-
-    SearchResult result;
-    Search search = new Search.Builder(searchSourceBuilder.toString()).addIndex(configIndex).build();
-
+//    SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+//    searchSourceBuilder.query(matchQuery("metadata." + key, value))
+//            .aggregation(AggregationBuilders.terms("group-by-id")
+//                    .field("id")
+//                    .size(0)
+//            );
+//    String queryString = searchSourceBuilder.toString();
+    String queryString = String.format("{\n" +
+            "  \"query\" : {\n" +
+            "    \"match\" : {\n" +
+            "      \"metadata.%s\" : {\n" +
+            "        \"query\" : \"%s\",\n" +
+            "        \"type\" : \"boolean\"\n" +
+            "      }\n" +
+            "    }\n" +
+            "  },\n" +
+            "  \"aggregations\" : {\n" +
+            "    \"group-by-id\" : {\n" +
+            "      \"terms\" : {\n" +
+            "        \"field\" : \"id\",\n" +
+            "        \"size\" : 0\n" +
+            "      }\n" +
+            "    }\n" +
+            "  }\n" +
+            "}", key, value);
+    Search search = new Search.Builder(queryString).addIndex(configIndex).build();
     try {
-      result = client.execute(search);
+      SearchResult result = client.execute(search);
+      return result
+              .getAggregations()
+              .getTermsAggregation("group-by-id")
+              .getBuckets()
+              .stream()
+              .map(bucket -> Long.valueOf(bucket.getKey()))
+              .collect(Collectors.toList());
     } catch (IOException e) {
-      throw new RuntimeException("Error querying tags", e);
+      throw new RuntimeException("Error querying Tags list for metadata", e);
     }
-
-    for (SearchResult.Hit<Map, Void> hit : result.getHits(Map.class)) {
-      double id = (double) hit.source.get("id");
-      tagIds.add((long) id);
-    }
-
-    return tagIds;
   }
 
   /**
@@ -287,108 +354,149 @@ public class ElasticsearchService {
    * @return a set of all distinct metadata keys in use across all mappings
    */
   public Set<String> getDistinctMetadataKeys() {
-    Set<String> keys = new HashSet<>();
-
-    JestResult result;
     GetMapping get = new GetMapping.Builder().addIndex(timeSeriesIndex).build();
-
     try {
-      result = client.execute(get);
+      Set<String> keys = new HashSet<>();
+      JestResult result = client.execute(get);
+      for (Map.Entry<String, JsonElement> index : result.getJsonObject().entrySet()) {
+        for (Map.Entry<String, JsonElement> mapping : index.getValue().getAsJsonObject().entrySet()) {
+          for (Map.Entry<String, JsonElement> type : mapping.getValue().getAsJsonObject().entrySet()) {
+            JsonObject metadata = type.getValue().getAsJsonObject()
+                    .getAsJsonObject("properties")
+                    .getAsJsonObject("metadata")
+                    .getAsJsonObject("properties");
+            if (metadata == null) {
+              continue;
+            }
+            keys.addAll(metadata.entrySet()
+                    .stream()
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.toList()));
+          }
+        }
+      }
+      return keys;
     } catch (IOException e) {
       throw new RuntimeException("Error getting index mapping", e);
     }
-
-    for (Map.Entry<String, JsonElement> index : result.getJsonObject().entrySet()) {
-      for (Map.Entry<String, JsonElement> mapping : index.getValue().getAsJsonObject().entrySet()) {
-        for (Map.Entry<String, JsonElement> type : mapping.getValue().getAsJsonObject().entrySet()) {
-          JsonObject metadata = type.getValue().getAsJsonObject()
-              .getAsJsonObject("properties")
-              .getAsJsonObject("metadata")
-              .getAsJsonObject("properties");
-
-          if (metadata == null) continue;
-          keys.addAll(metadata.entrySet().stream().map(Map.Entry::getKey).collect(Collectors.toList()));
-        }
-      }
-    }
-
-    return keys;
   }
 
   public List<Long> getTopAlarms(Integer size) {
-    List<Long> tagIds = new ArrayList<>();
-
-    SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-    searchSourceBuilder.aggregation(AggregationBuilders.terms("group-by-id")
-        .field("id")
-        .size(size));
-
-    SearchResult result;
-    Search search = new Search.Builder(searchSourceBuilder.toString()).addIndex(alarmIndex).build();
-
+//    SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+//    searchSourceBuilder.aggregation(AggregationBuilders.terms("group-by-id")
+//        .field("id")
+//        .size(size));
+//    String query = searchSourceBuilder.toString();
+    String query = String.format("{\n" +
+            "  \"aggregations\" : {\n" +
+            "    \"group-by-id\" : {\n" +
+            "      \"terms\" : {\n" +
+            "        \"field\" : \"id\",\n" +
+            "        \"size\" : %d\n" +
+            "      }\n" +
+            "    }\n" +
+            "  }\n" +
+            "}", size);
+    Search search = new Search.Builder(query).addIndex(alarmIndex).build();
     try {
-      result = client.execute(search);
+      SearchResult result = client.execute(search);
+      return new ArrayList<>(result.getAggregations().getTermsAggregation("group-by-id").getBuckets()
+              .stream()
+              .map(bucket -> Long.valueOf(bucket.getKey()))
+              .collect(Collectors.toList()));
     } catch (IOException e) {
       throw new RuntimeException("Error querying top most active alarms", e);
     }
-
-    tagIds.addAll(result.getAggregations().getTermsAggregation("group-by-id").getBuckets()
-        .stream()
-        .map(bucket -> Long.valueOf(bucket.getKey())).collect(Collectors.toList()));
-
-    return tagIds;
   }
 
   public List<Object[]> getAlarmHistory(Long id, Long min, Long max) {
-    List<Object[]> results = new ArrayList<>();
-
-    SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-    searchSourceBuilder.query(boolQuery()
-        .must(termQuery("id", id))
-        .must(rangeQuery("timestamp").from(min).to(max)))
-        .sort("timestamp", SortOrder.DESC)
-        .size(100);
-
-    SearchResult result;
-    Search search = new Search.Builder(searchSourceBuilder.toString()).addIndex(alarmIndex).build();
-
+//    SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+//    searchSourceBuilder.query(boolQuery()
+//        .must(termQuery("id", id))
+//        .must(rangeQuery("timestamp").from(min).to(max)))
+//        .sort("timestamp", SortOrder.DESC)
+//        .size(100);
+//    String query = searchSourceBuilder.toString();
+    String query = String.format("{\n" +
+            "  \"size\" : 100,\n" +
+            "  \"query\" : {\n" +
+            "    \"bool\" : {\n" +
+            "      \"must\" : [ {\n" +
+            "        \"term\" : {\n" +
+            "          \"id\" : %d\n" +
+            "        }\n" +
+            "      }, {\n" +
+            "        \"range\" : {\n" +
+            "          \"timestamp\" : {\n" +
+            "            \"from\" : %d,\n" +
+            "            \"to\" : %d,\n" +
+            "            \"include_lower\" : true,\n" +
+            "            \"include_upper\" : true\n" +
+            "          }\n" +
+            "        }\n" +
+            "      } ]\n" +
+            "    }\n" +
+            "  },\n" +
+            "  \"sort\" : [ {\n" +
+            "    \"timestamp\" : {\n" +
+            "      \"order\" : \"desc\"\n" +
+            "    }\n" +
+            "  } ]\n" +
+            "}", id, min, max);
+    Search search = new Search.Builder(query).addIndex(alarmIndex).build();
     try {
-      result = client.execute(search);
+      SearchResult result = client.execute(search);
+      return new ArrayList<>(result.getHits(Map.class)
+              .stream()
+              .map(hit -> new Object[]{hit.source.get("timestamp"), hit.source.get("active")})
+              .collect(Collectors.toList()));
     } catch (IOException e) {
       throw new RuntimeException("Error querying alarm history", e);
     }
-
-    for (SearchResult.Hit<Map, Void> hit : result.getHits(Map.class)) {
-      results.add(new Object[]{hit.source.get("timestamp"), hit.source.get("active")});
-    }
-
-    return results;
   }
 
-  public Collection<Long> findAlarmsByName(String query) {
-    List<Long> tagIds = new ArrayList<>();
-
-    SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-    searchSourceBuilder.query(boolQuery()
-        .should(regexpQuery("faultFamily", query))
-        .should(regexpQuery("faultMember", query)))
-        .sort("timestamp", SortOrder.DESC);
-
-    SearchResult result;
-    Search search = new Search.Builder(searchSourceBuilder.toString())
-        .addIndex(alarmIndex).build();
-
+  public Collection<Long> findAlarmsByName(String name) {
+//    SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+//    searchSourceBuilder.query(boolQuery()
+//        .should(regexpQuery("faultFamily", name))
+//        .should(regexpQuery("faultMember", name)))
+//        .sort("timestamp", SortOrder.DESC);
+//    String query = searchSourceBuilder.toString();
+    String query = String.format("{\n" +
+            "  \"query\" : {\n" +
+            "    \"bool\" : {\n" +
+            "      \"should\" : [ {\n" +
+            "        \"regexp\" : {\n" +
+            "          \"faultFamily\" : {\n" +
+            "            \"value\" : \"%s\",\n" +
+            "            \"flags_value\" : 65535\n" +
+            "          }\n" +
+            "        }\n" +
+            "      }, {\n" +
+            "        \"regexp\" : {\n" +
+            "          \"faultMember\" : {\n" +
+            "            \"value\" : \"%s\",\n" +
+            "            \"flags_value\" : 65535\n" +
+            "          }\n" +
+            "        }\n" +
+            "      } ]\n" +
+            "    }\n" +
+            "  },\n" +
+            "  \"sort\" : [ {\n" +
+            "    \"timestamp\" : {\n" +
+            "      \"order\" : \"desc\"\n" +
+            "    }\n" +
+            "  } ]\n" +
+            "}", name, name);
+    Search search = new Search.Builder(query).addIndex(alarmIndex).build();
     try {
-      result = client.execute(search);
+      SearchResult result = client.execute(search);
+      return new ArrayList<>(result.getHits(Map.class)
+              .stream()
+              .map(hit -> (long)hit.source.get("id"))
+              .collect(Collectors.toList()));
     } catch (IOException e) {
       throw new RuntimeException("Error querying alarms by name", e);
     }
-
-    for (SearchResult.Hit<Map, Void> hit : result.getHits(Map.class)) {
-      double id = (double) hit.source.get("id");
-      tagIds.add((long) id);
-    }
-
-    return tagIds;
   }
 }
