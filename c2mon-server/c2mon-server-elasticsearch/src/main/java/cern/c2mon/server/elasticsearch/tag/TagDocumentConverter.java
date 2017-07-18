@@ -16,26 +16,23 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch.tag;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.convert.converter.Converter;
-import org.springframework.stereotype.Component;
-
 import cern.c2mon.server.cache.EquipmentCache;
 import cern.c2mon.server.cache.ProcessCache;
 import cern.c2mon.server.cache.SubEquipmentCache;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.equipment.Equipment;
-import cern.c2mon.server.common.metadata.Metadata;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
 import cern.c2mon.shared.common.type.TypeConverter;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Converts {@link Tag} instances to {@link TagDocument} instances.
@@ -45,177 +42,161 @@ import cern.c2mon.shared.common.type.TypeConverter;
  */
 @Slf4j
 @Component
-public class TagDocumentConverter extends BaseTagDocumentConverter {
+public class TagDocumentConverter extends BaseTagDocumentConverter<TagDocument> {
 
-  @Autowired
-  public TagDocumentConverter(final ProcessCache processCache, final EquipmentCache equipmentCache, final SubEquipmentCache subEquipmentCache) {
-    super(processCache, equipmentCache, subEquipmentCache);
-  }
-
-  @Override
-  public Optional<TagDocument> convert(final Tag tag) {
-      try{
-    Map<String, Object> map = Map<String, Object> map = super.convert(tag);
-
-    map.put("timestamp", tag.getTimestamp().getTime());
-    map.put("quality", getQuality(tag));
-    map.put("valueDescription", tag.getValueDescription());
-
-    Class<?> clazz = TypeConverter.getType(tag.getDataType());
-
-    if (clazz == null) {
-      map.put("valueObject", tag.getValue());
-
-    } else if (Number.class.isAssignableFrom(clazz)) {
-      map.put("value", tag.getValue());
-
-      if (Long.class.isAssignableFrom(clazz)) {
-        map.put("valueLong", tag.getValue());
-      }
-    } else if (Boolean.class.isAssignableFrom(clazz)) {
-      map.put("valueBoolean", tag.getValue());
-
-      if (tag.getValue() != null) {
-        map.put("value", tag.getValue() != null ? 1 : 0);
-      }
-    } else if (String.class.isAssignableFrom(clazz)) {
-      map.put("valueString", tag.getValue());
-
-    } else {
-      map.put("valueObject", tag.getValue());
+    @Autowired
+    public TagDocumentConverter(final ProcessCache processCache, final EquipmentCache equipmentCache, final SubEquipmentCache subEquipmentCache) {
+        super(processCache, equipmentCache, subEquipmentCache, TagDocument::new);
     }
 
-    TagDocument tagDocument = new TagDocument();
-    tagDocument.putAll(map);
-    return Optional.of(tagDocument);
-      } catch (Exception e) {
-          log.error("Error occurred during conversion of Tag #{} ({}) to Elasticsearch document. Unable to store update to Elasticsearch!", tag.getId(), tag.getName(), e);
-      }
-  }
+    @Override
+    public Optional<TagDocument> convert(final Tag tag) {
+        try {
+            return super.convert(tag)
+                    .map(tagDocument -> fillAdditionalData(tagDocument, tag));
+        } catch (Exception e) {
+            log.error("Error occurred during conversion of Tag #{} ({}) to Elasticsearch document. Unable to store update to Elasticsearch!", tag.getId(), tag.getName(), e);
+        }
+        return Optional.empty();
+    }
+
+    private TagDocument fillAdditionalData(TagDocument tagDocument, Tag tag) {
+        tagDocument.put("timestamp", tag.getTimestamp().getTime());
+        tagDocument.put("quality", getQuality(tag));
+        tagDocument.put("valueDescription", tag.getValueDescription());
+        Class<?> clazz = TypeConverter.getType(tag.getDataType());
+        if (clazz == null) {
+            tagDocument.put("valueObject", tag.getValue());
+
+        } else if (Number.class.isAssignableFrom(clazz)) {
+            tagDocument.put("value", tag.getValue());
+
+            if (Long.class.isAssignableFrom(clazz)) {
+                tagDocument.put("valueLong", tag.getValue());
+            }
+        } else if (Boolean.class.isAssignableFrom(clazz)) {
+            tagDocument.put("valueBoolean", tag.getValue());
+
+            if (tag.getValue() != null) {
+                tagDocument.put("value", tag.getValue() != null ? 1 : 0);
+            }
+        } else if (String.class.isAssignableFrom(clazz)) {
+            tagDocument.put("valueString", tag.getValue());
+
+        } else {
+            tagDocument.put("valueObject", tag.getValue());
+        }
+        return tagDocument;
+    }
 
     @Override
     protected Map<String, Object> getC2monMetadata(Tag tag) {
         Map<String, Object> map = super.getC2monMetadata(tag);
 
-    map.put("dataType", tag.getDataType());
+        map.put("dataType", tag.getDataType());
 
-    if (!tag.getProcessIds().isEmpty()) {
-        try {
-            Process process = processCache.get(tag.getProcessIds().iterator().next());
-            map.put("process", process.getName());
-        } catch (Exception e) {
-            log.warn("Could not get Process name for tag #{} ({}) from cache. Reason: {}", tag.getId(), tag.getName(), e.getMessage());
+        if (!tag.getProcessIds().isEmpty()) {
+            try {
+                Process process = processCache.get(tag.getProcessIds().iterator().next());
+                map.put("process", process.getName());
+            } catch (Exception e) {
+                log.warn("Could not get Process name for tag #{} ({}) from cache. Reason: {}", tag.getId(), tag.getName(), e.getMessage());
+            }
         }
-    }
 
-    if (!tag.getEquipmentIds().isEmpty()) {
-        try {
-            Equipment equipment = equipmentCache.get(tag.getEquipmentIds().iterator().next());
-            map.put("equipment", equipment.getName());
-        } catch (Exception e) {
-            log.warn("Could not get Equipment name for tag #{} ({}) from cache. Reason: {}", tag.getId(), tag.getName(), e.getMessage());
+        if (!tag.getEquipmentIds().isEmpty()) {
+            try {
+                Equipment equipment = equipmentCache.get(tag.getEquipmentIds().iterator().next());
+                map.put("equipment", equipment.getName());
+            } catch (Exception e) {
+                log.warn("Could not get Equipment name for tag #{} ({}) from cache. Reason: {}", tag.getId(), tag.getName(), e.getMessage());
+            }
         }
-    }
 
-    if (!tag.getSubEquipmentIds().isEmpty()) {
-        try {
-            SubEquipment subEquipment = subEquipmentCache.get(tag.getSubEquipmentIds().iterator().next());
-            map.put("subEquipment", subEquipment.getName());
-        } catch (Exception e) {
-            log.warn("Could not get SubEquipment name for tag #{} ({}) from cache. Reason: {}", tag.getId(), tag.getName(), e.getMessage());
+        if (!tag.getSubEquipmentIds().isEmpty()) {
+            try {
+                SubEquipment subEquipment = subEquipmentCache.get(tag.getSubEquipmentIds().iterator().next());
+                map.put("subEquipment", subEquipment.getName());
+            } catch (Exception e) {
+                log.warn("Could not get SubEquipment name for tag #{} ({}) from cache. Reason: {}", tag.getId(), tag.getName(), e.getMessage());
+            }
         }
+
+        map.put("serverTimestamp", tag.getCacheTimestamp().getTime());
+
+        if (tag instanceof DataTag) {
+            DataTag dataTag = (DataTag) tag;
+
+            if (dataTag.getDaqTimestamp() != null) {
+                map.put("daqTimestamp", dataTag.getDaqTimestamp().getTime());
+            }
+
+            if (dataTag.getSourceTimestamp() != null) {
+                map.put("sourceTimestamp", dataTag.getSourceTimestamp().getTime());
+            }
+        }
+
+        return map;
     }
 
-    map.put("serverTimestamp", tag.getCacheTimestamp().getTime());
+    private Map<String, Object> getQuality(Tag tag) {
+        Map<String, Object> map = new HashMap<>();
+        DataTagQuality quality = tag.getDataTagQuality();
 
-    if (tag instanceof DataTag) {
-      DataTag dataTag = (DataTag) tag;
+        map.put("valid", quality.isValid());
+        map.put("status", calculateStatus(tag));
+        map.put("statusInfo", collectStatusInfo(quality));
 
-      if (dataTag.getDaqTimestamp() != null) {
-        map.put("daqTimestamp", dataTag.getDaqTimestamp().getTime());
-      }
-
-      if (dataTag.getSourceTimestamp() != null) {
-        map.put("sourceTimestamp", dataTag.getSourceTimestamp().getTime());
-      }
+        return map;
     }
 
-    return map;
-  }
-
-  private Map<String, Object> getMetadata(Tag tag) {
-    Metadata metadata = tag.getMetadata();
-
-    if (metadata != null) {
-      return metadata.getMetadata().entrySet().stream()
-          .filter(entry -> Objects.nonNull(entry.getKey()) && Objects.nonNull(entry.getValue()))
-          .collect(Collectors.toMap(
-              Map.Entry::getKey,
-              Map.Entry::getValue
-          ));
+    /**
+     * Calculates the accumulated status of a {@link Tag}, based on the
+     * individual quality statuses that it contains.
+     *
+     * TODO: rewrite this to be somewhat readable. It looks like the guy who
+     * wrote it just found out about java 8 and got a bit over-excited.
+     *
+     * @param tag the {@link Tag} instance that is used to calculate the status
+     * @return the result of the accumulated statuses.
+     * If no invalid status was found (good quality) the result will be {@code 0}.
+     */
+    private int calculateStatus(final Tag tag) {
+        return Optional.ofNullable(tag.getDataTagQuality())
+                .map(DataTagQuality::getInvalidQualityStates)
+                .map(Map::keySet)
+                .map(tagQualityStatuses -> tagQualityStatuses.stream()
+                        .mapToInt(TagQualityStatus::getCode)
+                        .map(statusCode -> (int) Math.pow(2, statusCode))
+                        .sum())
+                .orElse(0);
     }
 
-    return Collections.emptyMap();
-  }
+    /**
+     * Collects the individual statuses with their description, if any, based on
+     * a {@link DataTagQuality} instance.
+     *
+     * @param dataTagQuality the tag quality instance, that contains the
+     *                       individual quality information
+     * @return a {@link Collection} of invalid statuses or a {@link Collection}
+     * with a single value {@code "OK"}, if no invalid qualities were found
+     */
+    private Collection<String> collectStatusInfo(final DataTagQuality dataTagQuality) {
+        Map<TagQualityStatus, String> invalidQualityStates = dataTagQuality.getInvalidQualityStates();
 
-  private Map<String, Object> getQuality(Tag tag) {
-    Map<String, Object> map = new HashMap<>();
-    DataTagQuality quality = tag.getDataTagQuality();
+        if (invalidQualityStates == null) {
+            return Collections.singleton("OK");
+        }
 
-    map.put("valid", quality.isValid());
-    map.put("status", calculateStatus(tag));
-    map.put("statusInfo", collectStatusInfo(quality));
+        Collection<String> invalidQualityInfo = invalidQualityStates.entrySet().stream()
+                .map(invalidQualityState -> String.format("%s : %s",
+                        invalidQualityState.getKey().name(), invalidQualityState.getValue()))
+                .collect(Collectors.toSet());
 
-    return map;
-  }
+        if (invalidQualityInfo.isEmpty()) {
+            return Collections.singleton("OK");
+        }
 
-  /**
-   * Calculates the accumulated status of a {@link Tag}, based on the
-   * individual quality statuses that it contains.
-   *
-   * TODO: rewrite this to be somewhat readable. It looks like the guy who
-   * wrote it just found out about java 8 and got a bit over-excited.
-   *
-   * @param tag the {@link Tag} instance that is used to calculate the status
-   * @return the result of the accumulated statuses.
-   *         If no invalid status was found (good quality) the result will be {@code 0}.
-   */
-  private int calculateStatus(final Tag tag) {
-    return Optional.ofNullable(tag.getDataTagQuality())
-        .map(DataTagQuality::getInvalidQualityStates)
-        .map(Map::keySet)
-        .map(tagQualityStatuses -> tagQualityStatuses.stream()
-            .mapToInt(TagQualityStatus::getCode)
-            .map(statusCode -> (int) Math.pow(2, statusCode))
-            .sum())
-        .orElse(0);
-  }
-
-  /**
-   * Collects the individual statuses with their description, if any, based on
-   * a {@link DataTagQuality} instance.
-   *
-   * @param dataTagQuality the tag quality instance, that contains the
-   *                       individual quality information
-   * @return a {@link Collection} of invalid statuses or a {@link Collection}
-   * with a single value {@code "OK"}, if no invalid qualities were found
-   */
-  private Collection<String> collectStatusInfo(final DataTagQuality dataTagQuality) {
-    Map<TagQualityStatus, String> invalidQualityStates = dataTagQuality.getInvalidQualityStates();
-
-    if (invalidQualityStates == null) {
-      return Collections.singleton("OK");
+        return invalidQualityInfo;
     }
-
-    Collection<String> invalidQualityInfo = invalidQualityStates.entrySet().stream()
-        .map(invalidQualityState -> String.format("%s : %s",
-            invalidQualityState.getKey().name(), invalidQualityState.getValue()))
-        .collect(Collectors.toSet());
-
-    if (invalidQualityInfo.isEmpty()) {
-      return Collections.singleton("OK");
-    }
-
-    return invalidQualityInfo;
-  }
 }

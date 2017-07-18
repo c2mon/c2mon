@@ -17,36 +17,36 @@
 
 package cern.c2mon.server.elasticsearch.tag.config;
 
-import java.util.Map;
-
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import cern.c2mon.server.cache.EquipmentCache;
 import cern.c2mon.server.cache.ProcessCache;
 import cern.c2mon.server.cache.SubEquipmentCache;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.elasticsearch.tag.BaseTagDocumentConverter;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author Szymon Halastra
  */
 @Component
 @Slf4j
-public class TagConfigDocumentConverter extends BaseTagDocumentConverter {
+public class TagConfigDocumentConverter extends BaseTagDocumentConverter<TagConfigDocument> {
 
   @Autowired
   public TagConfigDocumentConverter(final ProcessCache processCache, final EquipmentCache equipmentCache, final SubEquipmentCache subEquipmentCache) {
-    super(processCache, equipmentCache, subEquipmentCache);
+    super(processCache, equipmentCache, subEquipmentCache, TagConfigDocument::new);
   }
 
   @Override
-  public TagConfigDocument convert(Tag tag) {
+  public Optional<TagConfigDocument> convert(Tag tag) {
     TagConfigDocument document = new TagConfigDocument();
-    document.putAll(super.convert(tag));
+    document.putAll(super.convert(tag).orElse(new TagConfigDocument()));
     document.put("timestamp", System.currentTimeMillis());
-    return document;
+    return Optional.of(document);
   }
 
   @Override

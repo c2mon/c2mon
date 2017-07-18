@@ -17,8 +17,12 @@
 
 package cern.c2mon.server.elasticsearch.tag.config;
 
-import java.util.Map;
-
+import cern.c2mon.server.common.datatag.DataTagCacheObject;
+import cern.c2mon.server.elasticsearch.Indices;
+import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
+import cern.c2mon.server.elasticsearch.config.BaseElasticsearchIntegrationTest;
+import cern.c2mon.server.elasticsearch.junit.CachePopulationRule;
+import cern.c2mon.server.elasticsearch.util.EntityUtils;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.search.SearchHit;
@@ -26,12 +30,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import cern.c2mon.server.common.datatag.DataTagCacheObject;
-import cern.c2mon.server.elasticsearch.Indices;
-import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
-import cern.c2mon.server.elasticsearch.config.BaseElasticsearchIntegrationTest;
-import cern.c2mon.server.elasticsearch.junit.CachePopulationRule;
-import cern.c2mon.server.elasticsearch.util.EntityUtils;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -56,16 +55,15 @@ public class TagConfigDocumentIndexerTests extends BaseElasticsearchIntegrationT
   private ElasticsearchClient client;
 
   @Test
-  public void addDataTag() {
+  public void addDataTag() throws Exception {
     DataTagCacheObject tag = (DataTagCacheObject) EntityUtils.createDataTag();
 
-    TagConfigDocument document = converter.convert(tag);
+    TagConfigDocument document = converter.convert(tag)
+            .orElseThrow(()->new Exception("Tag conversion failed"));
     String index = Indices.indexFor(document);
 
-    // The index should already exist
-    assertTrue(Indices.exists(index));
-
     indexer.indexTagConfig(document);
+    assertTrue(Indices.exists(index));
 
     // Refresh the index to make sure the document is searchable
     client.getClient().admin().indices().prepareRefresh(index).get();
@@ -81,17 +79,16 @@ public class TagConfigDocumentIndexerTests extends BaseElasticsearchIntegrationT
   }
 
   @Test
-  public void updateDataTag() {
+  public void updateDataTag() throws Exception {
     DataTagCacheObject tag = (DataTagCacheObject) EntityUtils.createDataTag();
 
-    TagConfigDocument document = converter.convert(tag);
+    TagConfigDocument document = converter.convert(tag)
+            .orElseThrow(()->new Exception("Tag conversion failed"));
     String index = Indices.indexFor(document);
 
-    // The index should already exist
-    assertTrue(Indices.exists(index));
-
-    // Insert the document
-    indexer.indexTagConfig(document);
+      // Insert the document
+      indexer.indexTagConfig(document);
+      assertTrue(Indices.exists(index));
 
     // Refresh the index to make sure the document is searchable
     client.getClient().admin().indices().prepareRefresh(index).get();
@@ -103,7 +100,7 @@ public class TagConfigDocumentIndexerTests extends BaseElasticsearchIntegrationT
 
     // Update the document
     document.put("description", "A better description");
-    ((Map) document.get("metadata")).put("spam", "eggs");
+    ((Map<String, Object>) document.get("metadata")).put("spam", "eggs");
     indexer.updateTagConfig(document);
 
     // Refresh again
@@ -120,17 +117,17 @@ public class TagConfigDocumentIndexerTests extends BaseElasticsearchIntegrationT
   }
 
   @Test
-  public void removeDataTag() {
+  public void removeDataTag() throws Exception {
     DataTagCacheObject tag = (DataTagCacheObject) EntityUtils.createDataTag();
 
-    TagConfigDocument document = converter.convert(tag);
-    String index = Indices.indexFor(document);
+    TagConfigDocument document = converter.convert(tag)
+            .orElseThrow(()->new Exception("Tag conversion failed"));
 
-    // The index should already exist
-    assertTrue(Indices.exists(index));
+      String index = Indices.indexFor(document);
 
-    // Insert the document
-    indexer.indexTagConfig(document);
+      // Insert the document
+      indexer.indexTagConfig(document);
+      assertTrue(Indices.exists(index));
 
     // Refresh the index to make sure the document is searchable
     client.getClient().admin().indices().prepareRefresh(index).get();

@@ -50,13 +50,13 @@ public class TagConfigDocumentListener implements ConfigurationEventListener {
     try {
       switch (action) {
         case CREATE:
-          indexer.indexTagConfig(converter.convert(tag));
+          converter.convert(tag).ifPresent(indexer::indexTagConfig);
           break;
         case UPDATE:
-          indexer.updateTagConfig(converter.convert(tag));
+          converter.convert(tag).ifPresent(indexer::updateTagConfig);
           break;
         case REMOVE:
-          indexer.removeTagConfig(converter.convert(tag));
+          converter.convert(tag).ifPresent(indexer::removeTagConfig);
           break;
         default:
           break;

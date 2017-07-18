@@ -1,12 +1,5 @@
 package cern.c2mon.server.elasticsearch.tag;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import org.springframework.core.convert.converter.Converter;
-
 import cern.c2mon.server.cache.EquipmentCache;
 import cern.c2mon.server.cache.ProcessCache;
 import cern.c2mon.server.cache.SubEquipmentCache;
@@ -15,70 +8,77 @@ import cern.c2mon.server.common.metadata.Metadata;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.common.tag.Tag;
+import org.springframework.core.convert.converter.Converter;
+
+import java.util.*;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * @author Justin Lewis Salmon
  */
-public class BaseTagDocumentConverter implements Converter<Tag, Map<String, Object>> {
+public class BaseTagDocumentConverter<T extends Map<String, Object>> implements Converter<Tag, Optional<T>> {
 
-  private final ProcessCache processCache;
-  private final EquipmentCache equipmentCache;
-  private final SubEquipmentCache subEquipmentCache;
+    final ProcessCache processCache;
+    final EquipmentCache equipmentCache;
+    final SubEquipmentCache subEquipmentCache;
+    private final Supplier<T> containerSupplier;
 
-  public BaseTagDocumentConverter(final ProcessCache processCache, final EquipmentCache equipmentCache, final SubEquipmentCache subEquipmentCache) {
-    this.processCache = processCache;
-    this.equipmentCache = equipmentCache;
-    this.subEquipmentCache = subEquipmentCache;
-  }
-
-  @Override
-  public Map<String, Object> convert(Tag tag) {
-    Map<String, Object> map = new HashMap<>();
-
-    map.put("id", tag.getId());
-    map.put("name", tag.getName());
-    map.put("description", tag.getDescription());
-    map.put("unit", tag.getUnit());
-    map.put("mode", tag.getMode());
-    map.put("metadata", getMetadata(tag));
-    map.put("c2mon", getC2monMetadata(tag));
-
-    return map;
-  }
-
-  protected Map<String, Object> getMetadata(Tag tag) {
-    Metadata metadata = tag.getMetadata();
-
-    if (metadata != null) {
-      return metadata.getMetadata().entrySet().stream().collect(Collectors.toMap(
-          Map.Entry::getKey,
-          e -> e.getValue() == null ? null : e.getValue()
-      ));
+    public BaseTagDocumentConverter(final ProcessCache processCache, final EquipmentCache equipmentCache, final SubEquipmentCache subEquipmentCache, final Supplier<T> containerSupplier) {
+        this.processCache = processCache;
+        this.equipmentCache = equipmentCache;
+        this.subEquipmentCache = subEquipmentCache;
+        this.containerSupplier = containerSupplier;
     }
 
-    return Collections.emptyMap();
-  }
-
-  protected Map<String, Object> getC2monMetadata(Tag tag) {
-    Map<String, Object> map = new HashMap<>();
-
-    map.put("dataType", tag.getDataType());
-
-    if (!tag.getProcessIds().isEmpty()) {
-      Process process = processCache.get(tag.getProcessIds().iterator().next());
-      map.put("process", process.getName());
+    @Override
+    public Optional<T> convert(Tag tag) {
+        T map = containerSupplier.get();
+        map.put("id", tag.getId());
+        map.put("name", tag.getName());
+        map.put("description", tag.getDescription());
+        map.put("unit", tag.getUnit());
+        map.put("mode", tag.getMode());
+        map.put("metadata", getMetadata(tag));
+        map.put("c2mon", getC2monMetadata(tag));
+        return Optional.of(map);
     }
 
-    if (!tag.getEquipmentIds().isEmpty()) {
-      Equipment equipment = equipmentCache.get(tag.getEquipmentIds().iterator().next());
-      map.put("equipment", equipment.getName());
+    private T getMetadata(Tag tag) {
+        Metadata metadata = tag.getMetadata();
+        if (metadata != null) {
+            return metadata.getMetadata().entrySet().stream()
+                    .filter(entry -> Objects.nonNull(entry.getKey()) && Objects.nonNull(entry.getValue()))
+                    .collect(Collectors.toMap(
+                            Map.Entry::getKey,
+                            Map.Entry::getValue,
+                            (u,v) -> { throw new IllegalStateException(String.format("Duplicate key %s", u)); },
+                            containerSupplier
+                    ));
+        }
+        return containerSupplier.get();
     }
 
-    if (!tag.getSubEquipmentIds().isEmpty()) {
-      SubEquipment subEquipment = subEquipmentCache.get(tag.getSubEquipmentIds().iterator().next());
-      map.put("subEquipment", subEquipment.getName());
-    }
+    protected Map<String, Object> getC2monMetadata(Tag tag) {
+        Map<String, Object> map = new HashMap<>();
 
-    return map;
-  }
+        map.put("dataType", tag.getDataType());
+
+        if (!tag.getProcessIds().isEmpty()) {
+            Process process = processCache.get(tag.getProcessIds().iterator().next());
+            map.put("process", process.getName());
+        }
+
+        if (!tag.getEquipmentIds().isEmpty()) {
+            Equipment equipment = equipmentCache.get(tag.getEquipmentIds().iterator().next());
+            map.put("equipment", equipment.getName());
+        }
+
+        if (!tag.getSubEquipmentIds().isEmpty()) {
+            SubEquipment subEquipment = subEquipmentCache.get(tag.getSubEquipmentIds().iterator().next());
+            map.put("subEquipment", subEquipment.getName());
+        }
+
+        return map;
+    }
 }

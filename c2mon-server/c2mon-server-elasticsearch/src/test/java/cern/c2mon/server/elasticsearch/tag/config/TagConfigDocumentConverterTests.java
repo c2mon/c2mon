@@ -17,18 +17,16 @@
 
 package cern.c2mon.server.elasticsearch.tag.config;
 
-import java.io.IOException;
-import java.util.Map;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Test;
-import org.mockito.InjectMocks;
-
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.equipment.EquipmentCacheObject;
 import cern.c2mon.server.common.process.ProcessCacheObject;
 import cern.c2mon.server.elasticsearch.tag.BaseTagDocumentConverterTest;
 import cern.c2mon.server.elasticsearch.util.EntityUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.Test;
+import org.mockito.InjectMocks;
+
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
@@ -45,7 +43,7 @@ public class TagConfigDocumentConverterTests extends BaseTagDocumentConverterTes
   private TagConfigDocumentConverter converter;
 
   @Test
-  public void toAndFromJson() throws IOException {
+  public void toAndFromJson() throws Exception {
     DataTag tag = EntityUtils.createDataTag();
 
     ProcessCacheObject process = new ProcessCacheObject(1L);
@@ -56,7 +54,8 @@ public class TagConfigDocumentConverterTests extends BaseTagDocumentConverterTes
 
     when(processCache.get(any())).thenReturn(process);
     when(equipmentCache.get(any())).thenReturn(equipment);
-    TagConfigDocument document = converter.convert(tag);
+    TagConfigDocument document = converter.convert(tag)
+            .orElseThrow(()->new Exception("Tag conversion failed"));
 
     // Serialize
     String json = document.toString();
