@@ -1,12 +1,11 @@
 package cern.c2mon.server.elasticsearch;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-
-import javax.annotation.PostConstruct;
-
+import cern.c2mon.server.elasticsearch.alarm.AlarmDocument;
+import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
+import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
+import cern.c2mon.server.elasticsearch.supervision.SupervisionEventDocument;
+import cern.c2mon.server.elasticsearch.tag.TagDocument;
+import cern.c2mon.server.elasticsearch.tag.config.TagConfigDocument;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
@@ -15,12 +14,10 @@ import org.elasticsearch.indices.IndexAlreadyExistsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import cern.c2mon.server.elasticsearch.alarm.AlarmDocument;
-import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
-import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
-import cern.c2mon.server.elasticsearch.supervision.SupervisionEventDocument;
-import cern.c2mon.server.elasticsearch.tag.TagDocument;
-import cern.c2mon.server.elasticsearch.tag.config.TagConfigDocument;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Static utility singleton for working with Elasticsearch indices.
@@ -43,11 +40,6 @@ public class Indices {
   public Indices(ElasticsearchProperties properties, ElasticsearchClient client) {
     this.properties = properties;
     this.client = client;
-    ;
-  }
-
-  @PostConstruct
-  public void init() {
     self = this;
   }
 
