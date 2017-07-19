@@ -31,7 +31,7 @@ public class ElasticsearchServiceTest {
         Whitebox.setInternalState(client,"properties", elasticsearchProperties);
         client.init();
         try {
-            client.getClient().admin().indices().prepareDelete(properties.getElasticsearch().getTagConfigIndex()).execute().actionGet();
+            client.getClient().admin().indices().prepareDelete("_all").execute().actionGet();
             client.getClient().admin().indices().flush(new FlushRequest()).actionGet();
         }catch(Exception e){
             // maybe index was not there yet
