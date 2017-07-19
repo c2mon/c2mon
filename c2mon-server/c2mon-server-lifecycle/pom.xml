@@ -15,6 +15,12 @@
 
   <dependencies>
     <!-- Internal C2MON dependencies -->
+
+    <dependency>
+      <groupId>cern.c2mon.server</groupId>
+      <artifactId>c2mon-server-jcacheref</artifactId>
+      <version>1.8.17-SNAPSHOT</version>
+    </dependency>
     <dependency>
       <groupId>cern.c2mon.server</groupId>
       <artifactId>c2mon-server-cache</artifactId>

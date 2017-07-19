@@ -5,6 +5,7 @@ import java.io.Serializable;
 import javax.cache.Cache;
 import javax.cache.CacheManager;
 
+import org.apache.ignite.configuration.CacheConfiguration;
 import org.springframework.cache.jcache.JCacheCacheManager;
 import org.springframework.context.annotation.Bean;
 
@@ -20,10 +21,12 @@ public class DataTagCacheConfig implements BasicCache, Serializable {
   private static final String DATA_TAG_CACHE = "dataTagCache";
 
   @Bean(name = DATA_TAG_CACHE)
-  public Cache<Long, DataTag> getDataTagCache(JCacheCacheManager cacheManager) {
-    CacheManager cm = cacheManager.getCacheManager();
+  public Cache<Long, DataTag> getDataTagCache() {
+//    CacheManager cm = cacheManager.getCacheManager();
+//
+//    return cm.getCache(DATA_TAG_CACHE, Long.class, DataTag.class);
 
-    return cm.getCache(DATA_TAG_CACHE, Long.class, DataTag.class);
+    return null;
   }
 
   @Override

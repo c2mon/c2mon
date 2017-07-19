@@ -3,6 +3,7 @@ package cern.c2mon.server.jcacheref.prototype.process;
 import javax.cache.Cache;
 import javax.cache.CacheManager;
 
+import org.apache.ignite.configuration.CacheConfiguration;
 import org.springframework.cache.jcache.JCacheCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,14 +17,15 @@ import cern.c2mon.server.jcacheref.prototype.common.BasicCache;
  */
 
 @Configuration
-public class ProcessCacheConfig implements BasicCache {
+public class ProcessCacheConfigRef implements BasicCache {
 
-  private static final String PROCESS_CACHE = "processCache";
+  private static final String PROCESS_CACHE = "processCacheRef";
 
   @Bean(name = PROCESS_CACHE)
-  public Cache<Long, Process> getProcessCache(JCacheCacheManager cacheManager) {
-    CacheManager cm = cacheManager.getCacheManager();
-    return cm.getCache(PROCESS_CACHE, Long.class, Process.class);
+  public Cache<Long, Process> getProcessCache() {
+//    CacheManager cm = cacheManager.getCacheManager();
+//    return cm.getCache(PROCESS_CACHE, Long.class, Process.class);
+    return null;
   }
 
   @Override
