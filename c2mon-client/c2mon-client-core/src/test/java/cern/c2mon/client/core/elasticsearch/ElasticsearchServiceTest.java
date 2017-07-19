@@ -52,14 +52,16 @@ public class ElasticsearchServiceTest {
 
         C2monClientProperties properties = new C2monClientProperties();
         ElasticsearchService service = new ElasticsearchService(properties);
-        assertEquals("There should be only 2 tags, one for responsible and one for 1234", 2, service.getDistinctMetadataKeys().size());
+        assertEquals("There should be 2 tags, one for responsible and one for 1234", 2, service.getDistinctMetadataKeys().size());
 
         Collection<Long> tagsForResponsibleUser = service.findByMetadata(responsible, testUser);
-        assertEquals("There should be only one tag with responsible user set to requested value",1,tagsForResponsibleUser.size());
+        assertEquals("There should be one tag with responsible user set to requested value",1,tagsForResponsibleUser.size());
         assertEquals(testUserTagId, tagsForResponsibleUser.stream().findFirst().get());
 
         Collection<Long> tags1234 = service.findByMetadata(key1234, value1234);
-        assertEquals("There should be only one tag with 1234 parameter set to requested value",1,tags1234.size());
+        assertEquals("There should be one tag with 1234 parameter set to requested value",1,tags1234.size());
         assertEquals(tag1234Id, tags1234.stream().findFirst().get());
+        client.close(client.getClient());
+        client.closeEmbeddedNode();
     }
 }

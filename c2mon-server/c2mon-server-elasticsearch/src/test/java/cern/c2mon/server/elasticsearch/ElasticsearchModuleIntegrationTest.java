@@ -45,5 +45,6 @@ public class ElasticsearchModuleIntegrationTest extends BaseElasticsearchIntegra
     for (String index : indices) {
       log.info(index);
     }
+    client.closeEmbeddedNode();
   }
 }
