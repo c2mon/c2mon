@@ -15,41 +15,41 @@ import cern.c2mon.server.jcacheref.prototype.common.SerializableEntryProcessor;
  * @author Szymon Halastra
  */
 @Slf4j
-@Service
+//@Service
 public class EquipmentCommandCRUDImpl implements EquipmentCommandCRUD {
 
-  private Cache<Long, Equipment> equipmentTagCache;
-
-  @Autowired
-  public EquipmentCommandCRUDImpl(Cache<Long, Equipment> equipmentTagCache) {
-    this.equipmentTagCache = equipmentTagCache;
-  }
+//  private Cache<Long, Equipment> equipmentTagCache;
+//
+//  @Autowired
+//  public EquipmentCommandCRUDImpl(Cache<Long, Equipment> equipmentTagCache) {
+//    this.equipmentTagCache = equipmentTagCache;
+//  }
 
   @Override
   public void addCommandToEquipment(Long equipmentId, Long commandId) throws EntryProcessorException {
     log.trace("Adding Command to Equipment");
-    equipmentTagCache.invoke(equipmentId, (SerializableEntryProcessor<Long, Equipment, Object[]>) (entry, arguments) -> {
-      if (entry.exists()) {
-        Equipment equipment = entry.getValue();
-        equipment.getCommandTagIds().add(commandId);
-        entry.setValue(equipment);
-      }
-
-      return null;
-    });
+//    equipmentTagCache.invoke(equipmentId, (SerializableEntryProcessor<Long, Equipment, Object[]>) (entry, arguments) -> {
+//      if (entry.exists()) {
+//        Equipment equipment = entry.getValue();
+//        equipment.getCommandTagIds().add(commandId);
+//        entry.setValue(equipment);
+//      }
+//
+//      return null;
+//    });
   }
 
   @Override
   public void removeCommandFromEquipment(Long equipmentId, Long commandId) {
     log.trace("Removing Command from Equipment");
-    equipmentTagCache.invoke(equipmentId, (SerializableEntryProcessor<Long, Equipment, Object[]>) (entry, arguments) -> {
-      if (entry.exists()) {
-        Equipment equipment = entry.getValue();
-        equipment.getCommandTagIds().remove(commandId);
-        entry.setValue(equipment);
-      }
-
-      return null;
-    });
+//    equipmentTagCache.invoke(equipmentId, (SerializableEntryProcessor<Long, Equipment, Object[]>) (entry, arguments) -> {
+//      if (entry.exists()) {
+//        Equipment equipment = entry.getValue();
+//        equipment.getCommandTagIds().remove(commandId);
+//        entry.setValue(equipment);
+//      }
+//
+//      return null;
+//    });
   }
 }

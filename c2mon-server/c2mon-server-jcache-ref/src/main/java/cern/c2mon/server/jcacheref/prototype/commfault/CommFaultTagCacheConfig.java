@@ -5,6 +5,7 @@ import java.io.Serializable;
 import javax.cache.Cache;
 import javax.cache.CacheManager;
 
+import org.apache.ignite.configuration.CacheConfiguration;
 import org.springframework.cache.jcache.JCacheCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,12 +20,13 @@ import cern.c2mon.server.jcacheref.prototype.common.BasicCache;
 @Configuration
 public class CommFaultTagCacheConfig implements BasicCache, Serializable {
 
-  private static final String COMM_FAULT_TAG_CACHE = "commFaultTagCache";
+  private static final String COMM_FAULT_TAG_CACHE = "commFaultTagCacheRef";
 
   @Bean(name = COMM_FAULT_TAG_CACHE)
-  public Cache<Long, CommFaultTag> getCommFaultTagCache(JCacheCacheManager cacheManager) {
-    CacheManager cm = cacheManager.getCacheManager();
-    return cm.getCache(COMM_FAULT_TAG_CACHE, Long.class, CommFaultTag.class);
+  public Cache<Long, CommFaultTag> getCommFaultTagCache() {
+//    CacheManager cm = cacheManager.getCacheManager();
+//    return cm.getCache(COMM_FAULT_TAG_CACHE, Long.class, CommFaultTag.class);
+    return null;
   }
 
   @Override

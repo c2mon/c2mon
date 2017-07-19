@@ -3,6 +3,7 @@ package cern.c2mon.server.jcacheref.prototype.deviceclass;
 import javax.cache.Cache;
 import javax.cache.CacheManager;
 
+import org.apache.ignite.configuration.CacheConfiguration;
 import org.springframework.cache.jcache.JCacheCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,12 +19,13 @@ import cern.c2mon.server.jcacheref.prototype.common.BasicCache;
 @Configuration
 public class DeviceClassCacheConfig implements BasicCache {
 
-  private static final String DEVICE_CLASS_CACHE = "deviceClassCache";
+  private static final String DEVICE_CLASS_CACHE = "deviceClassCacheRef";
 
   @Bean(name = DEVICE_CLASS_CACHE)
-  public Cache<Long, DeviceClass> getDeviceClassCache(JCacheCacheManager cacheManager) {
-    CacheManager cm = cacheManager.getCacheManager();
-    return cm.getCache(DEVICE_CLASS_CACHE, Long.class, DeviceClass.class);
+  public Cache<Long, DeviceClass> getDeviceClassCache() {
+//    CacheManager cm = cacheManager.getCacheManager();
+//    return cm.getCache(DEVICE_CLASS_CACHE, Long.class, DeviceClass.class);
+    return null;
   }
 
   @Override

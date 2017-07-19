@@ -33,7 +33,7 @@ public class EquipmentCacheTest {
                     new MutableConfiguration<Long, Equipment>().setTypes(Long.class, Equipment.class)
             );
 
-    equipmentCommandCRUD = new EquipmentCommandCRUDImpl(equipmentTagCache);
+//    equipmentCommandCRUD = new EquipmentCommandCRUDImpl(equipmentTagCache);
   }
 
   @Test

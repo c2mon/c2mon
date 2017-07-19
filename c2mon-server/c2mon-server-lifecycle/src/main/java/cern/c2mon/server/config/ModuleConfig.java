@@ -13,6 +13,7 @@ import cern.c2mon.server.configuration.config.ConfigurationModule;
 import cern.c2mon.server.daq.config.DaqModule;
 import cern.c2mon.server.elasticsearch.config.ElasticsearchModule;
 import cern.c2mon.server.history.config.HistoryModule;
+import cern.c2mon.server.jcacheref.prototype.C2monCacheModule;
 import cern.c2mon.server.rule.config.RuleModule;
 import cern.c2mon.server.supervision.config.SupervisionModule;
 import org.springframework.boot.context.event.ApplicationEnvironmentPreparedEvent;
@@ -34,6 +35,7 @@ import java.io.IOException;
 @Import({
     CommonModule.class,
     CacheModule.class,
+        C2monCacheModule.class,
     CacheDbAccessModule.class,
     CacheLoadingModule.class,
     CachePersistenceModule.class,
