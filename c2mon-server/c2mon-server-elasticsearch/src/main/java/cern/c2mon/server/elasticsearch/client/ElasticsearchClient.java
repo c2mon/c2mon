@@ -16,11 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch.client;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-
-import javax.annotation.PostConstruct;
-
+import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
@@ -30,10 +26,13 @@ import org.elasticsearch.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.node.Node;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
+import javax.annotation.PostConstruct;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 
@@ -56,6 +55,8 @@ public class ElasticsearchClient {
 
   @Getter
   private boolean isClusterYellow;
+
+  private Node embeddedNode = null;
 
   @PostConstruct
   public void init() {
@@ -133,7 +134,7 @@ public class ElasticsearchClient {
     log.debug("Elasticsearch cluster is yellow");
   }
 
-  private ClusterHealthResponse getClusterHealth() {
+  public ClusterHealthResponse getClusterHealth() {
     return client.admin().cluster().prepareHealth()
         .setWaitForYellowStatus()
         .setTimeout(TimeValue.timeValueMillis(100))
@@ -143,7 +144,7 @@ public class ElasticsearchClient {
   private void startEmbeddedNode() {
     log.info("Launching an embedded Elasticsearch cluster: {}", properties.getClusterName());
 
-    nodeBuilder().settings(Settings.settingsBuilder()
+    embeddedNode = nodeBuilder().settings(Settings.settingsBuilder()
         .put("path.home", properties.getEmbeddedStoragePath())
         .put("cluster.name", properties.getClusterName())
         .put("node.name", properties.getNodeName())
@@ -161,6 +162,12 @@ public class ElasticsearchClient {
     if (client != null) {
       client.close();
       log.info("Closed client {}", client.settings().get("node.name"));
+    }
+  }
+
+  public void closeEmbeddedNode(){
+    if(embeddedNode != null) {
+      embeddedNode.close();
     }
   }
 }
