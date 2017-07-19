@@ -44,14 +44,14 @@ public class ElasticsearchServiceTest {
         TagConfigDocumentConverter converter = new TagConfigDocumentConverter(processCache, equipmentCache, subequipmentCache);
         TagConfigDocumentListener tagDocumentListener = new TagConfigDocumentListener(indexer, converter);
 
-        Long testUserTagId = 99999L;
-        String testUser = "testUser";
+        Long testUserTagId = Double.doubleToLongBits(Math.random())%10000;
+        String testUser = Long.toHexString(Double.doubleToLongBits(Math.random()));
         String responsible = "responsible";
         DataTagCacheObject tag = new DataTagCacheObject(testUserTagId);
         tag.getMetadata().getMetadata().put(responsible, testUser);
         tagDocumentListener.onConfigurationEvent(tag, ConfigConstants.Action.CREATE);
 
-        Long tag1234Id = 9999L;
+        Long tag1234Id = Double.doubleToLongBits(Math.random())%10000;
         String value1234 = "1234";
         tag = new DataTagCacheObject(tag1234Id);
         String key1234 = "1234";
