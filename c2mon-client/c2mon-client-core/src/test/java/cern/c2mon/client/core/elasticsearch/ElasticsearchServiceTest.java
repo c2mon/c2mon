@@ -12,6 +12,7 @@ import cern.c2mon.server.elasticsearch.tag.config.TagConfigDocumentConverter;
 import cern.c2mon.server.elasticsearch.tag.config.TagConfigDocumentIndexer;
 import cern.c2mon.server.elasticsearch.tag.config.TagConfigDocumentListener;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
+import org.elasticsearch.action.admin.indices.flush.FlushRequest;
 import org.junit.Test;
 import org.powermock.reflect.Whitebox;
 
@@ -24,10 +25,17 @@ public class ElasticsearchServiceTest {
 
     @Test
     public void testSearchByMetadata() throws InterruptedException {
+        C2monClientProperties properties = new C2monClientProperties();
         ElasticsearchProperties elasticsearchProperties = new ElasticsearchProperties();
         ElasticsearchClient client = new ElasticsearchClient();
         Whitebox.setInternalState(client,"properties", elasticsearchProperties);
         client.init();
+        try {
+            client.getClient().admin().indices().prepareDelete(properties.getElasticsearch().getTagConfigIndex()).execute().actionGet();
+            client.getClient().admin().indices().flush(new FlushRequest()).actionGet();
+        }catch(Exception e){
+            // maybe index was not there yet
+        }
         TagConfigDocumentIndexer indexer = new TagConfigDocumentIndexer(client, elasticsearchProperties);
         ProcessCache processCache = createNiceMock(ProcessCache.class);
         EquipmentCache equipmentCache = createNiceMock(EquipmentCache.class);
@@ -49,10 +57,10 @@ public class ElasticsearchServiceTest {
         String key1234 = "1234";
         tag.getMetadata().getMetadata().put(key1234, value1234);
         tagDocumentListener.onConfigurationEvent(tag, ConfigConstants.Action.CREATE);
-        Thread.sleep(10000); // let's hope it's enough time for elasticsearch to process new tags...
+        client.getClient().admin().indices().flush(new FlushRequest()).actionGet();
 
-        C2monClientProperties properties = new C2monClientProperties();
         ElasticsearchService service = new ElasticsearchService(properties);
+
         assertEquals("There should be 2 tags, one for responsible and one for 1234", 2, service.getDistinctMetadataKeys().size());
 
         Collection<Long> tagsForResponsibleUser = service.findByMetadata(responsible, testUser);
