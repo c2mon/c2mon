@@ -56,7 +56,7 @@ public class ElasticsearchServiceTest {
     }
 
     @Test
-    public void testSearchByMetadata() throws InterruptedException {
+    public void testSearchByMetadata() {
         Long testUserTagId = Double.doubleToLongBits(Math.random()) % 10000;
         String testUser = Long.toHexString(Double.doubleToLongBits(Math.random()));
         String responsible = "responsible";
@@ -86,35 +86,31 @@ public class ElasticsearchServiceTest {
     }
 
     @Test
-    public void testSearchByNameAndMetadata() throws InterruptedException {
+    public void testSearchByNameAndMetadata() {
         Long testUserTagId = Double.doubleToLongBits(Math.random()) % 10000;
         String testUser = Long.toHexString(Double.doubleToLongBits(Math.random()));
-        String responsible = "responsible";
+        String metadataKey = "metadataKey";
         DataTagCacheObject tag = new DataTagCacheObject(testUserTagId);
         String tagname = "tagname";
         tag.setName(tagname);
-        tag.getMetadata().getMetadata().put(responsible, testUser);
+        tag.getMetadata().getMetadata().put(metadataKey, testUser);
         tagDocumentListener.onConfigurationEvent(tag, ConfigConstants.Action.CREATE);
 
-        testUserTagId = Double.doubleToLongBits(Math.random()) % 10000;
-        tag = new DataTagCacheObject(testUserTagId);
+        tag = new DataTagCacheObject(Double.doubleToLongBits(Math.random()) % 10000);
         tag.setName(tagname);
-        tag.getMetadata().getMetadata().put(responsible, "some other metadata value");
+        tag.getMetadata().getMetadata().put(metadataKey, "some other metadata value");
         tagDocumentListener.onConfigurationEvent(tag, ConfigConstants.Action.CREATE);
 
-        testUserTagId = Double.doubleToLongBits(Math.random()) % 10000;
-        testUser = Long.toHexString(Double.doubleToLongBits(Math.random()));
-        tag = new DataTagCacheObject(testUserTagId);
-        tagname = "other_tagname";
-        tag.setName(tagname);
-        tag.getMetadata().getMetadata().put(responsible, testUser);
+        tag = new DataTagCacheObject(Double.doubleToLongBits(Math.random()) % 10000);
+        tag.setName("other_tagname");
+        tag.getMetadata().getMetadata().put(metadataKey, testUser);
         tagDocumentListener.onConfigurationEvent(tag, ConfigConstants.Action.CREATE);
 
         client.getClient().admin().indices().flush(new FlushRequest()).actionGet();
 
         ElasticsearchService service = new ElasticsearchService(properties);
 
-        Collection<Long> tagsForResponsibleUser = service.findByNameAndMetadata(tagname, responsible, testUser);
+        Collection<Long> tagsForResponsibleUser = service.findByNameAndMetadata(tagname, metadataKey, testUser);
         assertEquals("There should be one tag with given name and metadata", 1, tagsForResponsibleUser.size());
         assertEquals(testUserTagId, tagsForResponsibleUser.stream().findFirst().get());
     }
