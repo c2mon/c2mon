@@ -16,17 +16,14 @@ import cern.c2mon.shared.common.command.CommandTag;
 @Service
 public class CommandTagCacheService {
 
-  Cache<Long, CommandTag> commandTagCache;
-
-  @Autowired
-  public CommandTagCacheService(Cache<Long, CommandTag> commandTagCache) {
-    this.commandTagCache = commandTagCache;
-  }
+//  @Autowired
+//  public CommandTagCacheService() {
+//  }
 
   public Long getCommandTagId(final String name) {
     Long commandTagKey = null;
 
-    Iterator<Cache.Entry<Long, CommandTag>> entries = commandTagCache.iterator();
+    Iterator<Cache.Entry<Long, CommandTag>> entries = null /*commandTagCache.iterator()*/;
 
     while(entries.hasNext()) {
       Cache.Entry<Long, CommandTag> entry = entries.next();
