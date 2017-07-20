@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * @author Szymon Halastra
  */
-public abstract class AbstractCacheRef<K, V> {
+public abstract class AbstractCacheRef<K, V> implements C2monCacheConfiguration {
 
   @Autowired
   protected IgniteSpringBean C2monIgnite;
@@ -21,6 +21,7 @@ public abstract class AbstractCacheRef<K, V> {
   }
 
   @PostConstruct
+  @Override
   public void init() {
     CacheConfiguration<K, V> cacheCfg = configureCache();
     cache = C2monIgnite.getOrCreateCache(cacheCfg);

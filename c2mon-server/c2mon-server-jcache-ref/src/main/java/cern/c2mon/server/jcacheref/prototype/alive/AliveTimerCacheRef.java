@@ -9,7 +9,6 @@ import java.util.Set;
 import javax.cache.Cache;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.ignite.IgniteCache;
 import org.apache.ignite.cache.CacheAtomicityMode;
 import org.apache.ignite.configuration.CacheConfiguration;
 import org.springframework.stereotype.Component;
@@ -31,13 +30,11 @@ public class AliveTimerCacheRef extends AbstractCacheRef<Long, AliveTimer> imple
 
   public static final String ALIVE_TIMER_CACHE = "aliveTimerCacheRef";
 
-  private IgniteCache<Long, AliveTimer> aliveTimerCache;
-
   public AliveTimerCacheRef() {
     super();
-    this.cache = aliveTimerCache;
   }
 
+  @Override
   protected CacheConfiguration<Long, AliveTimer> configureCache() {
     CacheConfiguration<Long, AliveTimer> config = new CacheConfiguration<>(ALIVE_TIMER_CACHE);
 
