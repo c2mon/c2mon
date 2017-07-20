@@ -30,7 +30,7 @@ public class ElasticsearchServiceTest {
     private C2monClientProperties properties = new C2monClientProperties();
 
     @Before
-    public void setupElasticsearch() {
+    public void setupElasticsearch() throws InterruptedException {
         ElasticsearchProperties elasticsearchProperties = new ElasticsearchProperties();
         Whitebox.setInternalState(client, "properties", elasticsearchProperties);
         client.init();
@@ -40,6 +40,7 @@ public class ElasticsearchServiceTest {
         } catch (Exception e) {
             // maybe index was not there yet
         }
+        Thread.sleep(10000);
         TagConfigDocumentIndexer indexer = new TagConfigDocumentIndexer(client, elasticsearchProperties);
         ProcessCache processCache = createNiceMock(ProcessCache.class);
         EquipmentCache equipmentCache = createNiceMock(EquipmentCache.class);
@@ -56,7 +57,7 @@ public class ElasticsearchServiceTest {
     }
 
     @Test
-    public void testSearchByMetadata() {
+    public void testSearchByMetadata() throws InterruptedException {
         Long testUserTagId = Double.doubleToLongBits(Math.random()) % 10000;
         String testUser = Long.toHexString(Double.doubleToLongBits(Math.random()));
         String responsible = "responsible";
@@ -70,7 +71,9 @@ public class ElasticsearchServiceTest {
         String key1234 = "1234";
         tag.getMetadata().getMetadata().put(key1234, value1234);
         tagDocumentListener.onConfigurationEvent(tag, ConfigConstants.Action.CREATE);
+
         client.getClient().admin().indices().flush(new FlushRequest()).actionGet();
+        Thread.sleep(10000);
 
         ElasticsearchService service = new ElasticsearchService(properties);
 
@@ -86,7 +89,7 @@ public class ElasticsearchServiceTest {
     }
 
     @Test
-    public void testSearchByNameAndMetadata() {
+    public void testSearchByNameAndMetadata() throws InterruptedException {
         Long testUserTagId = Double.doubleToLongBits(Math.random()) % 10000;
         String testUser = Long.toHexString(Double.doubleToLongBits(Math.random()));
         String metadataKey = "metadataKey";
@@ -107,6 +110,7 @@ public class ElasticsearchServiceTest {
         tagDocumentListener.onConfigurationEvent(tag, ConfigConstants.Action.CREATE);
 
         client.getClient().admin().indices().flush(new FlushRequest()).actionGet();
+        Thread.sleep(10000);
 
         ElasticsearchService service = new ElasticsearchService(properties);
 
