@@ -262,6 +262,51 @@ public class ElasticsearchService {
     }
   }
 
+  public Collection<Long> findByQuery(String query){
+    Search search = new Search.Builder(query).addIndex(configIndex).build();
+    try {
+      SearchResult result = client.execute(search);
+      return new ArrayList<>(result.getHits(Map.class)
+              .stream()
+              .map(hit ->(long)(double)hit.source.get("id"))
+              .collect(Collectors.toList()));
+    } catch (IOException e) {
+      throw new RuntimeException("Error querying Tags list for metadata", e);
+    }
+  }
+
+  public Collection<Long> findByNameAndMetadata(String tagNameRegex, String key, String value) {
+//  SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+//  searchSourceBuilder
+//          .query(boolQuery()
+//                    .must(regexpQuery("name", tagNameRegex))
+//                    .must(matchQuery("metadata." + key, value))
+//            );
+//  String query = searchSourceBuilder.toString();
+  String query = String.format("{\n" +
+          "  \"query\" : {\n" +
+          "    \"bool\" : {\n" +
+          "      \"must\" : [ {\n" +
+          "        \"regexp\" : {\n" +
+          "          \"name\" : {\n" +
+          "            \"value\" : \"%s\",\n" +
+          "            \"flags_value\" : 65535\n" +
+          "          }\n" +
+          "        }\n" +
+          "      }, {\n" +
+          "        \"match\" : {\n" +
+          "          \"metadata.%s\" : {\n" +
+          "            \"query\" : \"%s\",\n" +
+          "            \"type\" : \"boolean\"\n" +
+          "          }\n" +
+          "        }\n" +
+          "      } ]\n" +
+          "    }\n" +
+          "  }\n" +
+          "}", tagNameRegex, key, value);
+  return findByQuery(query);
+  }
+
   /**
    * Find all tags by name with a given prefix.
    *
@@ -283,16 +328,7 @@ public class ElasticsearchService {
             "    }\n" +
             "  }\n" +
             "}", regexQuery);
-    Search search = new Search.Builder(query).addIndex(configIndex).build();
-    try {
-      SearchResult result = client.execute(search);
-      return new ArrayList<>(result.getHits(Map.class)
-              .stream()
-              .map(hit ->(long)hit.source.get("id"))
-              .collect(Collectors.toList()));
-    } catch (IOException e) {
-      throw new RuntimeException("Error querying tags", e);
-    }
+    return findByQuery(regexQuery);
   }
 
   /**
@@ -319,29 +355,9 @@ public class ElasticsearchService {
             "        \"type\" : \"boolean\"\n" +
             "      }\n" +
             "    }\n" +
-            "  },\n" +
-            "  \"aggregations\" : {\n" +
-            "    \"group-by-id\" : {\n" +
-            "      \"terms\" : {\n" +
-            "        \"field\" : \"id\",\n" +
-            "        \"size\" : 0\n" +
-            "      }\n" +
-            "    }\n" +
             "  }\n" +
             "}", key, value);
-    Search search = new Search.Builder(queryString).addIndex(configIndex).build();
-    try {
-      SearchResult result = client.execute(search);
-      return result
-              .getAggregations()
-              .getTermsAggregation("group-by-id")
-              .getBuckets()
-              .stream()
-              .map(bucket -> Long.valueOf(bucket.getKey()))
-              .collect(Collectors.toList());
-    } catch (IOException e) {
-      throw new RuntimeException("Error querying Tags list for metadata", e);
-    }
+    return findByQuery(queryString);
   }
 
   /**
