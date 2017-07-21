@@ -17,7 +17,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.powermock.reflect.Whitebox;
+import org.springframework.util.FileSystemUtils;
 
+import java.io.File;
 import java.util.Collection;
 
 import static org.easymock.EasyMock.createNiceMock;
@@ -33,14 +35,8 @@ public class ElasticsearchServiceTest {
     public void setupElasticsearch() throws InterruptedException {
         ElasticsearchProperties elasticsearchProperties = new ElasticsearchProperties();
         Whitebox.setInternalState(client, "properties", elasticsearchProperties);
+        FileSystemUtils.deleteRecursively(new File(elasticsearchProperties.getEmbeddedStoragePath()));
         client.init();
-        try {
-            client.getClient().admin().indices().prepareDelete("_all").execute().actionGet();
-            client.getClient().admin().indices().flush(new FlushRequest()).actionGet();
-        } catch (Exception e) {
-            // maybe index was not there yet
-        }
-        Thread.sleep(10000);
         TagConfigDocumentIndexer indexer = new TagConfigDocumentIndexer(client, elasticsearchProperties);
         ProcessCache processCache = createNiceMock(ProcessCache.class);
         EquipmentCache equipmentCache = createNiceMock(EquipmentCache.class);
