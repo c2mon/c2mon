@@ -241,10 +241,19 @@ public abstract class AbstractCache<K, T extends Cacheable> extends BasicCache<K
    */
   @Override
   public void put(K key, T value) {
-    T originalValue = getCopy(key);
+    T originalValue = null;
+    acquireReadLockOnKey(key);
+    if (cache.isKeyInCache(key)) {
+      originalValue = getCopy(key);
+    }
+    releaseReadLockOnKey(key);
+
     super.put(key, value);
-    notifyListenersOfUpdate(originalValue, value);
     notifyListenersOfUpdate(value);
+
+    if (originalValue != null) {
+      notifyListenersOfUpdate(originalValue, value);
+    }
   }
 
   public void notifyListenersOfUpdate(final K id) {
