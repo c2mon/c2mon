@@ -24,8 +24,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.stream.Collectors;
 
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
@@ -59,6 +62,7 @@ public class TagImpl implements Tag, TopicRegistrationDetails, Cloneable {
   /**
    * The value of the tag
    */
+  @Getter(AccessLevel.NONE)
   @Element(required = false)
   private Object tagValue;
 
@@ -114,6 +118,7 @@ public class TagImpl implements Tag, TopicRegistrationDetails, Cloneable {
   /**
    * The unique name of the tag
    */
+  @Getter(AccessLevel.NONE)
   @Element(required = false)
   private String tagName = null;
 
@@ -343,25 +348,10 @@ public class TagImpl implements Tag, TopicRegistrationDetails, Cloneable {
   }
 
   @Override
-  public final Collection<AlarmValue> getAlarms() {
-    updateTagLock.readLock().lock();
-    try {
-      return new ArrayList<>(alarms);
-    } finally {
-      updateTagLock.readLock().unlock();
-    }
-  }
-
-  @Override
   public Collection<Long> getAlarmIds() {
     updateTagLock.readLock().lock();
     try {
-      Collection<Long> alarmIds = new ArrayList<>(alarms.size());
-      for (AlarmValue alarmValue : alarms) {
-        alarmIds.add(alarmValue.getId());
-      }
-
-      return alarmIds;
+      return alarms.stream().map(AlarmValue::getId).collect(Collectors.toList());
     } finally {
       updateTagLock.readLock().unlock();
     }
