@@ -21,6 +21,10 @@ import org.springframework.util.FileSystemUtils;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import static org.easymock.EasyMock.createNiceMock;
 import static org.junit.Assert.assertEquals;
@@ -34,8 +38,8 @@ public class ElasticsearchServiceTest {
   @Before
   public void setupElasticsearch() throws InterruptedException {
     ElasticsearchProperties elasticsearchProperties = new ElasticsearchProperties();
-    Whitebox.setInternalState(client, "properties", elasticsearchProperties);
     FileSystemUtils.deleteRecursively(new File(elasticsearchProperties.getEmbeddedStoragePath()));
+    Whitebox.setInternalState(client, "properties", elasticsearchProperties);
     client.init();
     TagConfigDocumentIndexer indexer = new TagConfigDocumentIndexer(client, elasticsearchProperties);
     ProcessCache processCache = createNiceMock(ProcessCache.class);
@@ -44,6 +48,12 @@ public class ElasticsearchServiceTest {
     Indices indices = new Indices(elasticsearchProperties, client);
     TagConfigDocumentConverter converter = new TagConfigDocumentConverter(processCache, equipmentCache, subequipmentCache);
     tagDocumentListener = new TagConfigDocumentListener(indexer, converter);
+    try {
+      CompletableFuture<Void> nodeReady = CompletableFuture.runAsync(() -> client.waitForYellowStatus());
+      nodeReady.get(120, TimeUnit.SECONDS);
+    } catch (ExecutionException | TimeoutException e) {
+      throw new RuntimeException("Timeout when waiting for embedded elasticsearch node to start!");
+    }
   }
 
   @After
