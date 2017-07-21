@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -28,7 +29,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ElasticsearchService {
 
-  private JestClient client;
+  private final JestClient client;
 
   private final String timeSeriesIndex;
 
@@ -55,23 +56,22 @@ public class ElasticsearchService {
    * A suitable average aggregation interval is automatically calculated if
    * the given aggregate parameter is set to "auto"
    *
-   * @param id  the id of the tag
-   * @param min the beginning of the requested date range (ms)
-   * @param max the end of the requested date range (ms)
+   * @param id        the id of the tag
+   * @param min       the beginning of the requested date range (ms)
+   * @param max       the end of the requested date range (ms)
    * @param aggregate the aggregation interval (bucket size). Possible values
    *                  are "auto", "1s", "1m", "1h", "none"
-   *
    * @return list of [timestamp (ms), value] pairs
    */
   public List<Object[]> getHistory(Long id, Long min, Long max, String aggregate) {
     if (aggregate.equals("none")) {
       return getRawHistory(id, min, max);
-    }else{
+    } else {
       return getAggregatedHistory(id, min, max, aggregate);
     }
   }
 
-  private List<Object[]> getAggregatedHistory(Long id, Long min, Long max, String aggregate){
+  private List<Object[]> getAggregatedHistory(Long id, Long min, Long max, String aggregate) {
     // Figure out the right interval
     String interval = aggregate.equals("auto") ? getInterval(min, max) : aggregate;
     log.info("Using interval: " + interval);
@@ -88,42 +88,42 @@ public class ElasticsearchService {
 //                    )));
 //    String query = searchSourceBuilder.toString();
     String query = String.format("{\n" +
-            "  \"size\" : 0,\n" +
-            "  \"query\" : {\n" +
-            "    \"term\" : {\n" +
-            "      \"id\" : %d\n" +
-            "    }\n" +
-            "  },\n" +
-            "  \"aggregations\" : {\n" +
-            "    \"time-range\" : {\n" +
-            "      \"filter\" : {\n" +
-            "        \"range\" : {\n" +
-            "          \"timestamp\" : {\n" +
-            "            \"from\" : %d,\n" +
-            "            \"to\" : %d,\n" +
-            "            \"include_lower\" : true,\n" +
-            "            \"include_upper\" : true\n" +
-            "          }\n" +
-            "        }\n" +
-            "      },\n" +
-            "      \"aggregations\" : {\n" +
-            "        \"events-per-interval\" : {\n" +
-            "          \"date_histogram\" : {\n" +
-            "            \"field\" : \"timestamp\",\n" +
-            "            \"interval\" : \"%s\"\n" +
-            "          },\n" +
-            "          \"aggregations\" : {\n" +
-            "            \"avg-value\" : {\n" +
-            "              \"avg\" : {\n" +
-            "                \"field\" : \"value\"\n" +
-            "              }\n" +
-            "            }\n" +
-            "          }\n" +
-            "        }\n" +
-            "      }\n" +
-            "    }\n" +
-            "  }\n" +
-            "}", id,min, max, aggregate);
+        "  \"size\" : 0,\n" +
+        "  \"query\" : {\n" +
+        "    \"term\" : {\n" +
+        "      \"id\" : %d\n" +
+        "    }\n" +
+        "  },\n" +
+        "  \"aggregations\" : {\n" +
+        "    \"time-range\" : {\n" +
+        "      \"filter\" : {\n" +
+        "        \"range\" : {\n" +
+        "          \"timestamp\" : {\n" +
+        "            \"from\" : %d,\n" +
+        "            \"to\" : %d,\n" +
+        "            \"include_lower\" : true,\n" +
+        "            \"include_upper\" : true\n" +
+        "          }\n" +
+        "        }\n" +
+        "      },\n" +
+        "      \"aggregations\" : {\n" +
+        "        \"events-per-interval\" : {\n" +
+        "          \"date_histogram\" : {\n" +
+        "            \"field\" : \"timestamp\",\n" +
+        "            \"interval\" : \"%s\"\n" +
+        "          },\n" +
+        "          \"aggregations\" : {\n" +
+        "            \"avg-value\" : {\n" +
+        "              \"avg\" : {\n" +
+        "                \"field\" : \"value\"\n" +
+        "              }\n" +
+        "            }\n" +
+        "          }\n" +
+        "        }\n" +
+        "      }\n" +
+        "    }\n" +
+        "  }\n" +
+        "}", id, min, max, aggregate);
     Search search = new Search.Builder(query).addIndex(timeSeriesIndex).build();
     long start = System.currentTimeMillis();
     try {
@@ -182,31 +182,31 @@ public class ElasticsearchService {
 //        .size(1000);
 //    String query = searchSourceBuilder.toString();
     String query = String.format("{\n" +
-            "  \"size\" : 1000,\n" +
-            "  \"query\" : {\n" +
-            "    \"bool\" : {\n" +
-            "      \"must\" : [ {\n" +
-            "        \"term\" : {\n" +
-            "          \"id\" : %d\n" +
-            "        }\n" +
-            "      }, {\n" +
-            "        \"range\" : {\n" +
-            "          \"timestamp\" : {\n" +
-            "            \"from\" : %d,\n" +
-            "            \"to\" : %d,\n" +
-            "            \"include_lower\" : true,\n" +
-            "            \"include_upper\" : true\n" +
-            "          }\n" +
-            "        }\n" +
-            "      } ]\n" +
-            "    }\n" +
-            "  },\n" +
-            "  \"sort\" : [ {\n" +
-            "    \"timestamp\" : {\n" +
-            "      \"order\" : \"asc\"\n" +
-            "    }\n" +
-            "  } ]\n" +
-            "}", id, min, max);
+        "  \"size\" : 1000,\n" +
+        "  \"query\" : {\n" +
+        "    \"bool\" : {\n" +
+        "      \"must\" : [ {\n" +
+        "        \"term\" : {\n" +
+        "          \"id\" : %d\n" +
+        "        }\n" +
+        "      }, {\n" +
+        "        \"range\" : {\n" +
+        "          \"timestamp\" : {\n" +
+        "            \"from\" : %d,\n" +
+        "            \"to\" : %d,\n" +
+        "            \"include_lower\" : true,\n" +
+        "            \"include_upper\" : true\n" +
+        "          }\n" +
+        "        }\n" +
+        "      } ]\n" +
+        "    }\n" +
+        "  },\n" +
+        "  \"sort\" : [ {\n" +
+        "    \"timestamp\" : {\n" +
+        "      \"order\" : \"asc\"\n" +
+        "    }\n" +
+        "  } ]\n" +
+        "}", id, min, max);
     Search search = new Search.Builder(query).addIndex(timeSeriesIndex).build();
     try {
       SearchResult result = client.execute(search);
@@ -222,10 +222,29 @@ public class ElasticsearchService {
   }
 
   /**
+   * Send query to elasticsearch and convert the results with supplied converter
+   *
+   * @param query           string with elasticsearch query
+   * @param outputConverter function to convert query results into output format
+   * @param indexName       name of index to use
+   * @param errorMessage    message to log in case of an error
+   * @param <T>             type of output format
+   * @return converted query results
+   */
+  public <T> T findByQuery(String query, Function<SearchResult, T> outputConverter, String indexName, String errorMessage) {
+    Search search = new Search.Builder(query).addIndex(indexName).build();
+    try {
+      SearchResult result = client.execute(search);
+      return outputConverter.apply(result);
+    } catch (IOException e) {
+      throw new RuntimeException(errorMessage, e);
+    }
+  }
+
+  /**
    * Get the top {@literal size} most active tags.
    *
    * @param size the number of top tags to retrieve
-   *
    * @return a list of tag ids
    */
   public List<Long> getTopTags(Integer size) {
@@ -236,46 +255,45 @@ public class ElasticsearchService {
 //        .sort("timestamp", SortOrder.DESC);
 //    String query = searchSourceBuilder.toString();
     String query = String.format("{\n" +
-            "  \"sort\" : [ {\n" +
-            "    \"timestamp\" : {\n" +
-            "      \"order\" : \"desc\"\n" +
-            "    }\n" +
-            "  } ],\n" +
-            "  \"aggregations\" : {\n" +
-            "    \"group-by-id\" : {\n" +
-            "      \"terms\" : {\n" +
-            "        \"field\" : \"id\",\n" +
-            "        \"size\" : %d\n" +
-            "      }\n" +
-            "    }\n" +
-            "  }\n" +
-            "}", size);
-    Search search = new Search.Builder(query).addIndex(timeSeriesIndex).build();
-    try {
-      SearchResult result = client.execute(search);
-      return new ArrayList<>(result.getAggregations().getTermsAggregation("group-by-id").getBuckets()
-              .stream()
-              .map(bucket -> Long.valueOf(bucket.getKey()))
-              .collect(Collectors.toList()));
-    } catch (IOException e) {
-      throw new RuntimeException("Error querying top most active tags", e);
-    }
+        "  \"sort\" : [ {\n" +
+        "    \"timestamp\" : {\n" +
+        "      \"order\" : \"desc\"\n" +
+        "    }\n" +
+        "  } ],\n" +
+        "  \"aggregations\" : {\n" +
+        "    \"group-by-id\" : {\n" +
+        "      \"terms\" : {\n" +
+        "        \"field\" : \"id\",\n" +
+        "        \"size\" : %d\n" +
+        "      }\n" +
+        "    }\n" +
+        "  }\n" +
+        "}", size);
+    Function<SearchResult, List<Long>> converter = result ->
+        new ArrayList<>(result.getAggregations().getTermsAggregation("group-by-id").getBuckets()
+            .stream()
+            .map(bucket -> Long.valueOf(bucket.getKey()))
+            .collect(Collectors.toList()));
+    return findByQuery(query, converter, timeSeriesIndex, "Error querying top most active tags");
   }
 
-  public Collection<Long> findByQuery(String query){
-    Search search = new Search.Builder(query).addIndex(configIndex).build();
-    try {
-      SearchResult result = client.execute(search);
-      return new ArrayList<>(result.getHits(Map.class)
-              .stream()
-              .map(hit ->(long)(double)hit.source.get("id"))
-              .collect(Collectors.toList()));
-    } catch (IOException e) {
-      throw new RuntimeException("Error querying Tags list for metadata", e);
-    }
+  /**
+   * Send query to elasticsearch and collect a list of tag ids matching the query
+   *
+   * @param query        string with elasticsearch query
+   * @param errorMessage message to log in case of an error
+   * @return list of tag ids returned from elasticsearch
+   */
+  public Collection<Long> findTagsByQuery(String query, String errorMessage) {
+    Function<SearchResult, Collection<Long>> converter =
+        result -> new ArrayList<>(result.getHits(Map.class)
+            .stream()
+            .map(hit -> (long) (double) hit.source.get("id"))
+            .collect(Collectors.toList()));
+    return findByQuery(query, converter, configIndex, errorMessage);
   }
 
-  public Collection<Long> findByNameAndMetadata(String tagNameRegex, String key, String value) {
+  public Collection<Long> findTagsByNameAndMetadata(String tagNameRegex, String key, String value) {
 //  SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
 //  searchSourceBuilder
 //          .query(boolQuery()
@@ -283,35 +301,34 @@ public class ElasticsearchService {
 //                    .must(matchQuery("metadata." + key, value))
 //            );
 //  String query = searchSourceBuilder.toString();
-  String query = String.format("{\n" +
-          "  \"query\" : {\n" +
-          "    \"bool\" : {\n" +
-          "      \"must\" : [ {\n" +
-          "        \"regexp\" : {\n" +
-          "          \"name\" : {\n" +
-          "            \"value\" : \"%s\",\n" +
-          "            \"flags_value\" : 65535\n" +
-          "          }\n" +
-          "        }\n" +
-          "      }, {\n" +
-          "        \"match\" : {\n" +
-          "          \"metadata.%s\" : {\n" +
-          "            \"query\" : \"%s\",\n" +
-          "            \"type\" : \"boolean\"\n" +
-          "          }\n" +
-          "        }\n" +
-          "      } ]\n" +
-          "    }\n" +
-          "  }\n" +
-          "}", tagNameRegex, key, value);
-  return findByQuery(query);
+    String query = String.format("{\n" +
+        "  \"query\" : {\n" +
+        "    \"bool\" : {\n" +
+        "      \"must\" : [ {\n" +
+        "        \"regexp\" : {\n" +
+        "          \"name\" : {\n" +
+        "            \"value\" : \"%s\",\n" +
+        "            \"flags_value\" : 65535\n" +
+        "          }\n" +
+        "        }\n" +
+        "      }, {\n" +
+        "        \"match\" : {\n" +
+        "          \"metadata.%s\" : {\n" +
+        "            \"query\" : \"%s\",\n" +
+        "            \"type\" : \"boolean\"\n" +
+        "          }\n" +
+        "        }\n" +
+        "      } ]\n" +
+        "    }\n" +
+        "  }\n" +
+        "}", tagNameRegex, key, value);
+    return findTagsByQuery(query, "Error when collecting tags for given name and metadata");
   }
 
   /**
    * Find all tags by name with a given prefix.
    *
    * @param regexQuery the tag name prefix
-   *
    * @return a list of tags whose names match the given prefix
    */
   public Collection<Long> findByName(String regexQuery) {
@@ -319,16 +336,16 @@ public class ElasticsearchService {
 //    searchSourceBuilder.query(regexpQuery("name", regexQuery));
 //    String query = searchSourceBuilder.toString();
     String query = String.format("{\n" +
-            "  \"query\" : {\n" +
-            "    \"regexp\" : {\n" +
-            "      \"name\" : {\n" +
-            "        \"value\" : \"%s\",\n" +
-            "        \"flags_value\" : 65535\n" +
-            "      }\n" +
-            "    }\n" +
-            "  }\n" +
-            "}", regexQuery);
-    return findByQuery(regexQuery);
+        "  \"query\" : {\n" +
+        "    \"regexp\" : {\n" +
+        "      \"name\" : {\n" +
+        "        \"value\" : \"%s\",\n" +
+        "        \"flags_value\" : 65535\n" +
+        "      }\n" +
+        "    }\n" +
+        "  }\n" +
+        "}", regexQuery);
+    return findTagsByQuery(query, "Error when collecting tags for given name and metadata");
   }
 
   /**
@@ -336,7 +353,6 @@ public class ElasticsearchService {
    *
    * @param key   the metadata key
    * @param value the metadata value
-   *
    * @return a list of tags containing the exact metadata requested
    */
   public Collection<Long> findByMetadata(String key, String value) {
@@ -348,16 +364,16 @@ public class ElasticsearchService {
 //            );
 //    String queryString = searchSourceBuilder.toString();
     String queryString = String.format("{\n" +
-            "  \"query\" : {\n" +
-            "    \"match\" : {\n" +
-            "      \"metadata.%s\" : {\n" +
-            "        \"query\" : \"%s\",\n" +
-            "        \"type\" : \"boolean\"\n" +
-            "      }\n" +
-            "    }\n" +
-            "  }\n" +
-            "}", key, value);
-    return findByQuery(queryString);
+        "  \"query\" : {\n" +
+        "    \"match\" : {\n" +
+        "      \"metadata.%s\" : {\n" +
+        "        \"query\" : \"%s\",\n" +
+        "        \"type\" : \"boolean\"\n" +
+        "      }\n" +
+        "    }\n" +
+        "  }\n" +
+        "}", key, value);
+    return findTagsByQuery(queryString, "Error when collecting tags for given metadata");
   }
 
   /**
@@ -378,16 +394,16 @@ public class ElasticsearchService {
         for (Map.Entry<String, JsonElement> mapping : index.getValue().getAsJsonObject().entrySet()) {
           for (Map.Entry<String, JsonElement> type : mapping.getValue().getAsJsonObject().entrySet()) {
             JsonObject metadata = type.getValue().getAsJsonObject()
-                    .getAsJsonObject("properties")
-                    .getAsJsonObject("metadata")
-                    .getAsJsonObject("properties");
+                .getAsJsonObject("properties")
+                .getAsJsonObject("metadata")
+                .getAsJsonObject("properties");
             if (metadata == null) {
               continue;
             }
             keys.addAll(metadata.entrySet()
-                    .stream()
-                    .map(Map.Entry::getKey)
-                    .collect(Collectors.toList()));
+                .stream()
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList()));
           }
         }
       }
@@ -404,25 +420,21 @@ public class ElasticsearchService {
 //        .size(size));
 //    String query = searchSourceBuilder.toString();
     String query = String.format("{\n" +
-            "  \"aggregations\" : {\n" +
-            "    \"group-by-id\" : {\n" +
-            "      \"terms\" : {\n" +
-            "        \"field\" : \"id\",\n" +
-            "        \"size\" : %d\n" +
-            "      }\n" +
-            "    }\n" +
-            "  }\n" +
-            "}", size);
-    Search search = new Search.Builder(query).addIndex(alarmIndex).build();
-    try {
-      SearchResult result = client.execute(search);
-      return new ArrayList<>(result.getAggregations().getTermsAggregation("group-by-id").getBuckets()
-              .stream()
-              .map(bucket -> Long.valueOf(bucket.getKey()))
-              .collect(Collectors.toList()));
-    } catch (IOException e) {
-      throw new RuntimeException("Error querying top most active alarms", e);
-    }
+        "  \"aggregations\" : {\n" +
+        "    \"group-by-id\" : {\n" +
+        "      \"terms\" : {\n" +
+        "        \"field\" : \"id\",\n" +
+        "        \"size\" : %d\n" +
+        "      }\n" +
+        "    }\n" +
+        "  }\n" +
+        "}", size);
+    Function<SearchResult, List<Long>> converter = result ->
+        new ArrayList<>(result.getAggregations().getTermsAggregation("group-by-id").getBuckets()
+            .stream()
+            .map(bucket -> Long.valueOf(bucket.getKey()))
+            .collect(Collectors.toList()));
+    return findByQuery(query, converter, alarmIndex,"Error querying top most active alarms");
   }
 
   public List<Object[]> getAlarmHistory(Long id, Long min, Long max) {
@@ -434,41 +446,37 @@ public class ElasticsearchService {
 //        .size(100);
 //    String query = searchSourceBuilder.toString();
     String query = String.format("{\n" +
-            "  \"size\" : 100,\n" +
-            "  \"query\" : {\n" +
-            "    \"bool\" : {\n" +
-            "      \"must\" : [ {\n" +
-            "        \"term\" : {\n" +
-            "          \"id\" : %d\n" +
-            "        }\n" +
-            "      }, {\n" +
-            "        \"range\" : {\n" +
-            "          \"timestamp\" : {\n" +
-            "            \"from\" : %d,\n" +
-            "            \"to\" : %d,\n" +
-            "            \"include_lower\" : true,\n" +
-            "            \"include_upper\" : true\n" +
-            "          }\n" +
-            "        }\n" +
-            "      } ]\n" +
-            "    }\n" +
-            "  },\n" +
-            "  \"sort\" : [ {\n" +
-            "    \"timestamp\" : {\n" +
-            "      \"order\" : \"desc\"\n" +
-            "    }\n" +
-            "  } ]\n" +
-            "}", id, min, max);
-    Search search = new Search.Builder(query).addIndex(alarmIndex).build();
-    try {
-      SearchResult result = client.execute(search);
-      return new ArrayList<>(result.getHits(Map.class)
-              .stream()
-              .map(hit -> new Object[]{hit.source.get("timestamp"), hit.source.get("active")})
-              .collect(Collectors.toList()));
-    } catch (IOException e) {
-      throw new RuntimeException("Error querying alarm history", e);
-    }
+        "  \"size\" : 100,\n" +
+        "  \"query\" : {\n" +
+        "    \"bool\" : {\n" +
+        "      \"must\" : [ {\n" +
+        "        \"term\" : {\n" +
+        "          \"id\" : %d\n" +
+        "        }\n" +
+        "      }, {\n" +
+        "        \"range\" : {\n" +
+        "          \"timestamp\" : {\n" +
+        "            \"from\" : %d,\n" +
+        "            \"to\" : %d,\n" +
+        "            \"include_lower\" : true,\n" +
+        "            \"include_upper\" : true\n" +
+        "          }\n" +
+        "        }\n" +
+        "      } ]\n" +
+        "    }\n" +
+        "  },\n" +
+        "  \"sort\" : [ {\n" +
+        "    \"timestamp\" : {\n" +
+        "      \"order\" : \"desc\"\n" +
+        "    }\n" +
+        "  } ]\n" +
+        "}", id, min, max);
+    Function<SearchResult,List<Object[]>> converter = result ->
+        new ArrayList<>(result.getHits(Map.class)
+        .stream()
+        .map(hit -> new Object[]{hit.source.get("timestamp"), hit.source.get("active")})
+        .collect(Collectors.toList()));
+    return findByQuery(query, converter,  alarmIndex,"Error querying alarm history");
   }
 
   public Collection<Long> findAlarmsByName(String name) {
@@ -479,40 +487,36 @@ public class ElasticsearchService {
 //        .sort("timestamp", SortOrder.DESC);
 //    String query = searchSourceBuilder.toString();
     String query = String.format("{\n" +
-            "  \"query\" : {\n" +
-            "    \"bool\" : {\n" +
-            "      \"should\" : [ {\n" +
-            "        \"regexp\" : {\n" +
-            "          \"faultFamily\" : {\n" +
-            "            \"value\" : \"%s\",\n" +
-            "            \"flags_value\" : 65535\n" +
-            "          }\n" +
-            "        }\n" +
-            "      }, {\n" +
-            "        \"regexp\" : {\n" +
-            "          \"faultMember\" : {\n" +
-            "            \"value\" : \"%s\",\n" +
-            "            \"flags_value\" : 65535\n" +
-            "          }\n" +
-            "        }\n" +
-            "      } ]\n" +
-            "    }\n" +
-            "  },\n" +
-            "  \"sort\" : [ {\n" +
-            "    \"timestamp\" : {\n" +
-            "      \"order\" : \"desc\"\n" +
-            "    }\n" +
-            "  } ]\n" +
-            "}", name, name);
-    Search search = new Search.Builder(query).addIndex(alarmIndex).build();
-    try {
-      SearchResult result = client.execute(search);
-      return new ArrayList<>(result.getHits(Map.class)
-              .stream()
-              .map(hit -> (long)hit.source.get("id"))
-              .collect(Collectors.toList()));
-    } catch (IOException e) {
-      throw new RuntimeException("Error querying alarms by name", e);
-    }
+        "  \"query\" : {\n" +
+        "    \"bool\" : {\n" +
+        "      \"should\" : [ {\n" +
+        "        \"regexp\" : {\n" +
+        "          \"faultFamily\" : {\n" +
+        "            \"value\" : \"%s\",\n" +
+        "            \"flags_value\" : 65535\n" +
+        "          }\n" +
+        "        }\n" +
+        "      }, {\n" +
+        "        \"regexp\" : {\n" +
+        "          \"faultMember\" : {\n" +
+        "            \"value\" : \"%s\",\n" +
+        "            \"flags_value\" : 65535\n" +
+        "          }\n" +
+        "        }\n" +
+        "      } ]\n" +
+        "    }\n" +
+        "  },\n" +
+        "  \"sort\" : [ {\n" +
+        "    \"timestamp\" : {\n" +
+        "      \"order\" : \"desc\"\n" +
+        "    }\n" +
+        "  } ]\n" +
+        "}", name, name);
+    Function<SearchResult, Collection<Long>> converter = result ->
+        new ArrayList<>(result.getHits(Map.class)
+        .stream()
+        .map(hit -> (long) hit.source.get("id"))
+        .collect(Collectors.toList()));
+    return findByQuery(query, converter, alarmIndex,"Error querying alarms by name");
   }
 }

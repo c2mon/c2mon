@@ -114,7 +114,7 @@ public class ElasticsearchServiceTest {
 
         ElasticsearchService service = new ElasticsearchService(properties);
 
-        Collection<Long> tagsForResponsibleUser = service.findByNameAndMetadata(tagname, metadataKey, testUser);
+        Collection<Long> tagsForResponsibleUser = service.findTagsByNameAndMetadata(tagname, metadataKey, testUser);
         assertEquals("There should be one tag with given name and metadata", 1, tagsForResponsibleUser.size());
         assertEquals(testUserTagId, tagsForResponsibleUser.stream().findFirst().get());
     }
