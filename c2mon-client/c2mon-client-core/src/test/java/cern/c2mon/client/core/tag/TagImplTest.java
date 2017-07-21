@@ -20,15 +20,16 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
-import cern.c2mon.client.common.listener.BaseTagListener;
-import cern.c2mon.shared.client.alarm.AlarmValue;
-import cern.c2mon.shared.client.alarm.AlarmValueImpl;
 import org.easymock.EasyMock;
 import org.junit.Test;
 
+import cern.c2mon.client.common.listener.BaseTagListener;
 import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.common.tag.TypeNumeric;
+import cern.c2mon.shared.client.alarm.AlarmValue;
+import cern.c2mon.shared.client.alarm.AlarmValueImpl;
 import cern.c2mon.shared.client.metadata.Metadata;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.client.tag.TagUpdate;
@@ -36,8 +37,9 @@ import cern.c2mon.shared.client.tag.TransferTagImpl;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
+import cern.c2mon.shared.rule.RuleFormatException;
 
-import static junit.framework.Assert.*;
+import static org.junit.Assert.*;
 
 public class TagImplTest {
 
@@ -75,6 +77,7 @@ public class TagImplTest {
     tagUpdate.setValueClassName(value !=null ? value.getClass().getName() : null);
     tagUpdate.setMetadata(metadata.getMetadata());
     tagUpdate.addAlarmValue(createAlarmValue(tagId));
+    tagUpdate.setUnit("kw");
     return tagUpdate;
   }
 
@@ -225,10 +228,12 @@ public class TagImplTest {
   }
 
   @Test
-  public void testUpdateListenerIntialUpdate() throws CloneNotSupportedException {
+  public void testUpdateListenerIntialUpdate() throws CloneNotSupportedException, RuleFormatException {
     //test setup
     TagController tagController = new TagController(1234L);
-    tagController.onUpdate(createValidTransferTag(1234L));
+    TagUpdate tagUpdate = createValidTransferTag(1234L);
+
+    tagController.update(tagUpdate);
     BaseTagListener mockUpdateListener = EasyMock.createMock(BaseTagListener.class);
     mockUpdateListener.onUpdate(EasyMock.and(EasyMock.not(EasyMock.same(tagController.getTagImpl())), EasyMock.eq(tagController.getTagImpl())));
 
@@ -238,6 +243,33 @@ public class TagImplTest {
 
     //check test success
     EasyMock.verify(mockUpdateListener);
+
+    TagImpl tag = tagController.getTagImpl();
+
+    assertEquals(tagUpdate.getAlarms(), tag.getAlarms());
+    assertEquals(tagUpdate.getAlarms().size(), tag.getAlarmIds().size());
+    assertEquals(tagUpdate.getDaqTimestamp(), tag.getDaqTimestamp());
+    assertEquals(tagUpdate.getServerTimestamp(), tag.getServerTimestamp());
+    assertEquals(tagUpdate.getSourceTimestamp(), tag.getSourceTimestamp());
+    assertEquals(tagUpdate.getDataTagQuality(), tag.getDataTagQuality());
+    assertEquals(tagUpdate.getDescription(), tag.getDescription());
+    tagUpdate.getEquipmentIds().stream().forEach(id -> assertTrue(tag.getEquipmentIds().contains(id)));
+    assertEquals(tagUpdate.getId(), tag.getId());
+
+    for (Entry<String, Object> entrySet : tag.getMetadata().entrySet()) {
+      assertEquals(entrySet.getValue(), tag.getMetadata().get(entrySet.getKey()));
+    }
+
+    assertEquals(tagUpdate.getMode(), tag.getMode());
+    tagUpdate.getProcessIds().stream().forEach(id -> assertTrue(tag.getProcessIds().contains(id)));
+    assertEquals(tagUpdate.getRuleExpression(), tag.getRuleExpression());
+    tagUpdate.getSubEquipmentIds().stream().forEach(id -> assertTrue(tag.getSubEquipmentIds().contains(id)));
+    assertEquals(tagUpdate.getName(), tag.getName());
+    assertEquals(tagUpdate.getTopicName(), tag.getTopicName());
+    assertEquals(tagUpdate.getUnit(), tag.getUnit());
+    assertEquals(tagUpdate.getValue(), tag.getValue());
+    assertEquals(tagUpdate.getValueDescription(), tag.getValueDescription());
+
   }
 
   @Test
@@ -253,7 +285,7 @@ public class TagImplTest {
       }
     });
 
-    ((TagController) tagController).onUpdate(createValidTransferTag(1234L));
+    tagController.onUpdate(createValidTransferTag(1234L));
   }
 
   @Test
