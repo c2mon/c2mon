@@ -14,6 +14,16 @@ For more details on a given release, please check also the [Milestone planning](
 ### Fixed
 
 
+## [1.8.17] - 2017-07-31
+### Added
+- Documentation: Added information about how to configure the server database
+
+### Fixed
+- Added maven-wrapper.jar to fix compilation via `./mvnw` (#121)
+- DAQ: Fixed runtime exception when creating a new Sub-Equipment (#146)
+- Client API: Tag did not contain alarm value updates after refactoring of `TagImpl` (#159)
+
+
 ## [1.8.16] - 2017-05-10
 ### Added
 - DAQ: Possibility to start/stop DAQ module from inside the JVM (!130). Many thanks to Martin Heck from TU Berlin!
@@ -128,8 +138,8 @@ This patch contains bug fixes for the DAQ layer.
 ### Removed
 - Remove of EquipmentLogger concept from DAQ Core (#56)
 
-
-[Unreleased]: https://gitlab.cern.ch/c2mon/c2mon/milestones/15
+[Unreleased]: https://gitlab.cern.ch/c2mon/c2mon/milestones/16
+[1.8.17]: https://gitlab.cern.ch/c2mon/c2mon/milestones/15
 [1.8.16]: https://gitlab.cern.ch/c2mon/c2mon/milestones/14
 [1.8.15]: https://gitlab.cern.ch/c2mon/c2mon/milestones/13
 [1.8.14]: https://gitlab.cern.ch/c2mon/c2mon/milestones/12
