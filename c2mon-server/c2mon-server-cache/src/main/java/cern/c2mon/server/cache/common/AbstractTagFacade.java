@@ -16,21 +16,14 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.common;
 
-import java.lang.reflect.Field;
-import java.sql.Timestamp;
-import java.util.*;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.extern.slf4j.Slf4j;
-
 import cern.c2mon.server.cache.AlarmCache;
 import cern.c2mon.server.cache.AlarmFacade;
 import cern.c2mon.server.cache.C2monCacheWithListeners;
 import cern.c2mon.server.cache.CommonTagFacade;
+import cern.c2mon.server.cache.util.MetadataUtils;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.TagWithAlarms;
 import cern.c2mon.server.common.alarm.TagWithAlarmsImpl;
-import cern.c2mon.shared.client.metadata.Metadata;
 import cern.c2mon.server.common.tag.AbstractTagCacheObject;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.common.ConfigurationException;
@@ -42,6 +35,11 @@ import cern.c2mon.shared.common.datatag.TagQualityStatus;
 import cern.c2mon.shared.daq.config.DataTagAddressUpdate;
 import cern.c2mon.shared.daq.config.DataTagUpdate;
 import cern.c2mon.shared.daq.config.HardwareAddressUpdate;
+import lombok.extern.slf4j.Slf4j;
+
+import java.lang.reflect.Field;
+import java.sql.Timestamp;
+import java.util.*;
 
 /**
  * Common implementation of the Tag facade logic.
@@ -158,8 +156,7 @@ public abstract class AbstractTagFacade<T extends Tag> extends AbstractFacade<T>
         try {
           tag.setMode(Short.parseShort(tmpStr));
           dataTagUpdate.setMode(Short.parseShort(tmpStr));
-        }
-        catch (NumberFormatException e) {
+        } catch (NumberFormatException e) {
           throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "NumberFormatException: Unable to convert parameter \"mode\" to short: " + tmpStr);
         }
       }
@@ -186,25 +183,8 @@ public abstract class AbstractTagFacade<T extends Tag> extends AbstractFacade<T>
       }
 
       // TAG metadata
-      tmpStr = properties.getProperty("metadata");
-      if (tmpStr != null) {
-        Metadata clientMetadata = Metadata.fromJSON(tmpStr);
-
-        if (clientMetadata.isUpdate()) {
-          if (!clientMetadata.getRemoveList().isEmpty()) {
-            for (String key : clientMetadata.getRemoveList()) {
-              tag.getMetadata().getMetadata().remove(key);
-            }
-          }
-          for (Map.Entry<String, Object> entry : clientMetadata.getMetadata().entrySet()) {
-            tag.getMetadata().addMetadata(entry.getKey(), entry.getValue());
-          }
-        } else {
-          cern.c2mon.server.common.metadata.Metadata metadata = new cern.c2mon.server.common.metadata.Metadata();
-          metadata.setMetadata(clientMetadata.getMetadata());
-          tag.setMetadata(metadata);
-        }
-      }
+      cern.c2mon.server.common.metadata.Metadata newMetadata = MetadataUtils.parseMetadataConfiguration(properties, tag.getMetadata());
+      tag.setMetadata(newMetadata);
     }
     catch (Exception e) {
       throw new RuntimeException("Something went wrong while setting the common properties", e);

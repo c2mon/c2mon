@@ -16,27 +16,25 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.alarm;
 
-import java.sql.Timestamp;
-import java.util.Properties;
-
-import cern.c2mon.server.common.metadata.Metadata;
-
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import cern.c2mon.server.cache.AlarmCache;
 import cern.c2mon.server.cache.AlarmFacade;
 import cern.c2mon.server.cache.TagLocationService;
 import cern.c2mon.server.cache.common.AbstractFacade;
+import cern.c2mon.server.cache.util.MetadataUtils;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.AlarmCacheObject.AlarmChangeState;
+import cern.c2mon.server.common.alarm.AlarmCondition;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.datatag.DataTagConstants;
 import cern.c2mon.shared.daq.config.Change;
-import cern.c2mon.server.common.alarm.AlarmCondition;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.sql.Timestamp;
+import java.util.Properties;
 
 /**
  * Implementation of the AlarmFacade.
@@ -225,12 +223,8 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
     }
 
     // ALARM metadata
-    tmpStr = alarmProperties.getProperty("metadata");
-    if (tmpStr != null) {
-      Metadata metadata = new Metadata();
-      metadata.setMetadata(Metadata.fromJSON(tmpStr));
-      alarmCacheObject.setMetadata(metadata);
-    }
+    cern.c2mon.server.common.metadata.Metadata newMetadata = MetadataUtils.parseMetadataConfiguration(alarmProperties, alarmCacheObject.getMetadata());
+    alarmCacheObject.setMetadata(newMetadata);
 
     // set the JMS topic
     alarmCacheObject.setTopic(getTopicForAlarm(alarmCacheObject));
