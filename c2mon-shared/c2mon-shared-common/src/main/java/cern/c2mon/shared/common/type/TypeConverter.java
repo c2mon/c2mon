@@ -600,4 +600,17 @@ public final class TypeConverter  {
       return null;
     }
   }
+
+  /**
+   * Is the given type name a primitive type?
+   * 
+   * @param typeName a simple class name within the java.lang.* package or the
+   *                 fully qualified class name
+   * 
+   * @return true if primitive
+   */
+  public static boolean isPrimitive(String typeName) {
+	  String fullPath = !typeName.contains(".") ? "java.lang." + typeName : typeName;
+	  return fullPath.startsWith("java.lang.") && !fullPath.equals("java.lang.Object");
+  }
 }
