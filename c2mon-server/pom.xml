@@ -31,6 +31,7 @@
     <module>c2mon-server-test</module>
     <module>distribution</module>
     <module>c2mon-server-jcache-ref</module>
+    <module>c2mon-server-cache-ref</module>
   </modules>
 
   <dependencies>
