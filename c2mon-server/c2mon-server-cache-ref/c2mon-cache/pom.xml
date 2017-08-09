@@ -27,6 +27,11 @@
       <artifactId>spring-context-support</artifactId>
       <version>4.3.9.RELEASE</version>
     </dependency>
+    <dependency>
+      <groupId>cern.c2mon.server</groupId>
+      <artifactId>c2mon-server-common</artifactId>
+      <version>1.8.9-SNAPSHOT</version>
+    </dependency>
   </dependencies>
 
 </project>
