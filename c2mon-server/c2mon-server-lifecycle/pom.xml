@@ -18,7 +18,7 @@
 
     <dependency>
       <groupId>cern.c2mon.server</groupId>
-      <artifactId>c2mon-server-jcacheref</artifactId>
+      <artifactId>c2mon-cache</artifactId>
       <version>1.8.17-SNAPSHOT</version>
     </dependency>
     <dependency>
