@@ -3,7 +3,7 @@ package cern.c2mon.server.cache.commfault;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import cern.c2mon.cache.api.AbstractFactory;
+import cern.c2mon.cache.api.factory.AbstractFactory;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.shared.client.configuration.api.tag.CommFaultTag;
 

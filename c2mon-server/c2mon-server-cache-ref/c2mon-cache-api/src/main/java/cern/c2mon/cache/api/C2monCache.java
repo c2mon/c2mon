@@ -2,15 +2,17 @@ package cern.c2mon.cache.api;
 
 import java.util.List;
 
+import org.springframework.context.support.ApplicationObjectSupport;
+
 /**
  * @param <K> cache key type
  * @param <V> cache element type
  *
  * @author Szymon Halastra
  */
-public abstract class C2monCache<K, V> {
+public abstract class C2monCache<K, V> extends ApplicationObjectSupport {
 
-  public C2monCache() {
+  protected C2monCache() {
 
   }
 

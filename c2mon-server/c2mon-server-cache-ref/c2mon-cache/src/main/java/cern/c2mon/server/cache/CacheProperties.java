@@ -4,7 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
-import cern.c2mon.cache.api.AbstractFactory;
+import cern.c2mon.cache.api.factory.AbstractFactory;
 import cern.c2mon.cache.impl.IgniteFactory;
 
 /**
