@@ -1,4 +1,6 @@
-package cern.c2mon.cache.api;
+package cern.c2mon.cache.api.factory;
+
+import cern.c2mon.cache.api.C2monCache;
 
 /**
  * @author Szymon Halastra

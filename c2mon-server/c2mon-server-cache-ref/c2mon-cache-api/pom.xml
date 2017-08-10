@@ -23,5 +23,13 @@
       <artifactId>spring-context-support</artifactId>
       <version>4.3.9.RELEASE</version>
     </dependency>
+    <dependency>
+      <groupId>cern.c2mon.shared</groupId>
+      <artifactId>c2mon-shared-common</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.server</groupId>
+      <artifactId>c2mon-server-cacheloading</artifactId>
+    </dependency>
   </dependencies>
 </project>

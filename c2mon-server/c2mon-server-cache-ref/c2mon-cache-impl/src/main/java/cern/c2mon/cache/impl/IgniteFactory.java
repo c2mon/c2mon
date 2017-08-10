@@ -3,7 +3,7 @@ package cern.c2mon.cache.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ignite.configuration.CacheConfiguration;
 
-import cern.c2mon.cache.api.AbstractFactory;
+import cern.c2mon.cache.api.factory.AbstractFactory;
 import cern.c2mon.cache.api.C2monCache;
 
 /**
@@ -22,7 +22,7 @@ public class IgniteFactory extends AbstractFactory {
 
     log.info("And here it is, working IgniteFactory");
 
-    return new IgniteCache(cacheConfiguration);
+    return new IgniteC2monCache(cacheConfiguration);
   }
 
   @Override
