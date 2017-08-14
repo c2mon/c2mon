@@ -15,7 +15,7 @@ import cern.c2mon.shared.common.Cacheable;
  *
  * @author Szymon Halastra
  */
-public abstract class C2monCache<K, V> extends ApplicationObjectSupport implements C2monListener {
+public abstract class C2monCache<K, V> extends ApplicationObjectSupport implements C2monListener, C2monCacheLoader {
 
   C2monListener<Cacheable> listenerService;
 

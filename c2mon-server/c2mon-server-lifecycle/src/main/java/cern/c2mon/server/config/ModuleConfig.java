@@ -29,7 +29,7 @@ import cern.c2mon.server.supervision.config.SupervisionModule;
 @Import({
         CommonModule.class,
         CacheModule.class,
-        cern.c2mon.server.cache.CacheModule.class,
+        cern.c2mon.server.cache.CacheModuleRef.class,
         CacheDbAccessModule.class,
         CacheLoadingModule.class,
         CachePersistenceModule.class,
