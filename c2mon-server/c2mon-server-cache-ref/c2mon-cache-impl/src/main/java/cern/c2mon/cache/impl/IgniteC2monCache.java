@@ -73,4 +73,9 @@ public class IgniteC2monCache<K, V> extends C2monCache<K, V> {
   public void releaseLockOnKey(K key) {
     lock.unlock();
   }
+
+  @Override
+  public void preload() {
+    cache.loadCacheAsync(null);
+  }
 }

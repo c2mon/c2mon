@@ -37,16 +37,6 @@ public class C2monListenerService<K, V extends Cacheable> implements C2monListen
    * abstracted and explicit call to cache should be in IMPL module
    */
 
-  /**
-   * Creates a new cache element and calls the Ehcache notifyElementUpdated
-   * method.
-   * <p>
-   * Notifies the listeners that an update occurred for this DataTag. Should
-   * be called *within a lock on the cache object* so the object is not modified
-   * before being passed to the listeners (using a clone).
-   *
-   * @param cacheable the cache object that has been updated
-   */
   @Override
   public void notifyListenersOfUpdate(final V cacheable) {
 //    registeredEventListeners.notifyElementUpdated(new Element(cacheable.getId(), null), false); //only for monitoring via Ehcache: not using Ehcache listeners o.w.
