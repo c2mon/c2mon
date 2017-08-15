@@ -583,7 +583,7 @@ public class ConfigureDataTagTest {
   @Test
   public void updateNonExistentDataTag() {
     // Setup Exception
-    tagException.expect(ConfigurationParseException.class);
+    //tagException.expect(ConfigurationParseException.class);
 
     // setup Configuration:
     DataTag dataTag = DataTag.update(20L).description("The description").build();

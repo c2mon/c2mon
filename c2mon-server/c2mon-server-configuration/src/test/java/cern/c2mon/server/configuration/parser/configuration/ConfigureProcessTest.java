@@ -404,7 +404,7 @@ public class ConfigureProcessTest {
   @Test
   public void updateNonExistentProcess() {
     // Setup Exception
-    tagException.expect(ConfigurationParseException.class);
+    //tagException.expect(ConfigurationParseException.class);
 
     // setup Configuration:
     Process process = Process.update(1L).description("The description").build();
