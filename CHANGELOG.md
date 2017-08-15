@@ -12,6 +12,7 @@ For more details on a given release, please check also the [Milestone planning](
 ### Changed
 
 ### Fixed
+- Fixed problem of alarm metadata that were wrongly stored the alarm cache object (#160). Bug got introduced with #89
 
 
 ## [1.8.17] - 2017-07-31
