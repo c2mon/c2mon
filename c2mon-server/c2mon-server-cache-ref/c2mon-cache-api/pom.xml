@@ -31,6 +31,13 @@
       <groupId>cern.c2mon.server</groupId>
       <artifactId>c2mon-server-cacheloading</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>javax.cache</groupId>
+      <artifactId>cache-api</artifactId>
+      <version>1.0.0</version>
+    </dependency>
+    
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
