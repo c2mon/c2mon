@@ -20,6 +20,7 @@ package cern.c2mon.server.configuration.parser.factory;
 import java.util.List;
 import java.util.Properties;
 
+import cern.c2mon.server.configuration.parser.exception.EntityDoesNotExistException;
 import lombok.RequiredArgsConstructor;
 
 import cern.c2mon.server.cache.C2monCache;
@@ -88,9 +89,7 @@ public abstract class EntityFactory<T extends ConfigurationEntity> {
       return element;
 
     } else {
-      throw new ConfigurationParseException("Error updating entity: "
-          + configurationEntity.getClass().getSimpleName() + " (name = " + configurationEntity.getName() + ", id = "
-          + entityId + ") does not exist!");
+      throw new EntityDoesNotExistException(entityId, configurationEntity.getClass().getSimpleName(), configurationEntity.getName());
     }
   }
 
@@ -110,9 +109,7 @@ public abstract class EntityFactory<T extends ConfigurationEntity> {
       return element;
 
     } else {
-      throw new ConfigurationParseException("Error deleting entity: "
-          + configurationEntity.getClass().getSimpleName() + " (name = " + configurationEntity.getName() + ", id = "
-          + entityId + ") does not exist!");
+      throw new EntityDoesNotExistException(entityId, configurationEntity.getClass().getSimpleName(), configurationEntity.getName());
     }
   }
 

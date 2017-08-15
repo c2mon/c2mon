@@ -45,6 +45,7 @@ import cern.c2mon.server.daq.out.ProcessCommunicationManager;
 import cern.c2mon.server.rule.config.RuleModule;
 import cern.c2mon.server.supervision.config.SupervisionModule;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
+import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.api.Configuration;
 import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
@@ -64,6 +65,13 @@ import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
 
 import junit.framework.Assert;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.log4j.Appender;
+import org.apache.log4j.Logger;
+import org.apache.log4j.spi.ErrorHandler;
+import org.apache.log4j.spi.Filter;
+import org.apache.log4j.spi.Layout;
+import org.apache.log4j.spi.LoggingEvent;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.junit.*;
@@ -86,6 +94,7 @@ import static org.junit.Assert.*;
 /**
  * @author Franz Ritter
  */
+@Slf4j
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {
     CommonModule.class,
@@ -246,6 +255,53 @@ public class ConfigurationLoaderTest {
     assertFalse(aliveTimerCache.hasKey(300_001L));
 
     verify(communicationManager);
+  }
+
+  @Test
+  public void updateNonExistingEntity() throws IllegalAccessException, TransformerException, InstantiationException, NoSimpleValueParseException, ParserConfigurationException, NoSuchFieldException {
+    expect(communicationManager.sendConfiguration(eq(5L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
+    replay(communicationManager);
+    Configuration createProcess = TestConfigurationProvider.createProcess();
+    configurationLoader.applyConfiguration(createProcess);
+    Configuration newEquipmentConfig = TestConfigurationProvider.createEquipment();
+    configurationLoader.applyConfiguration(newEquipmentConfig);
+    processFacade.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
+
+    DataTag dataTag = DataTag.create("DataTag", Integer.class, new DataTagAddress())
+            .id(1000L)
+            .description("foo")
+            .mode(TagMode.OPERATIONAL)
+            .isLogged(false)
+            .minValue(0)
+            .maxValue(10)
+            .unit("testUnit")
+            .addMetadata("testMetadata1", 11)
+            .addMetadata("testMetadata2", 22)
+            .addMetadata("testMetadata3", 33)
+            .build();
+    dataTag.setEquipmentId(15L);
+
+    Configuration configuration = new Configuration();
+    configuration.addEntity(dataTag);
+    //apply the configuration to the server
+    configurationLoader.applyConfiguration(configuration);
+
+    //now add some tags
+    DataTag updatedDataTag = DataTag.update(1000L)
+        .removeMetadata("testMetadata2")
+        .removeMetadata("testMetadata3")
+        .build();
+    configuration = new Configuration();
+    configuration.addEntity(updatedDataTag);
+
+    //1010L does not exist
+    DataTag updatedDataTag2 = DataTag.update(1010L).build();
+    configuration.addEntity(updatedDataTag2);
+    //apply the configuration to the server
+    //should not throw an exception for 1010L
+    ConfigurationReport report = configurationLoader.applyConfiguration(configuration);
+    assertEquals(1, report.getElementReports().size());
+    assertEquals(1000L, (long)report.getElementReports().get(0).getId());
   }
 
   @Test

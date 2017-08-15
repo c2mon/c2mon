@@ -19,6 +19,7 @@ package cern.c2mon.server.configuration.parser.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import cern.c2mon.server.configuration.parser.exception.EntityDoesNotExistException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -103,7 +104,11 @@ public class ConfigurationParserImpl implements ConfigurationParser {
           log.debug("Element {} (name = {}) already deleted. Detailed reason: {}", configurationEntity.getId(), configurationEntity.getName(), ex.getMessage());
         }
       } else if (configurationEntity.isUpdated()) {
-        results.add(entityFactory.updateInstance(configurationEntity));
+        try {
+          results.add(entityFactory.updateInstance(configurationEntity));
+        } catch (EntityDoesNotExistException e) {
+          log.warn(e.getMessage());
+        }
       } else if (configurationEntity.isCreated()) {
         results.addAll(entityFactory.createInstance(configurationEntity));
       } else {
