@@ -1,6 +1,12 @@
 package cern.c2mon.cache.api;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.cache.processor.EntryProcessor;
+import javax.cache.processor.EntryProcessorException;
+import javax.cache.processor.EntryProcessorResult;
 
 import org.springframework.context.support.ApplicationObjectSupport;
 
@@ -19,21 +25,29 @@ public abstract class C2monCache<K, V> extends ApplicationObjectSupport implemen
 
   C2monListener<Cacheable> listenerService;
 
-  protected C2monCache() {
+  public C2monCache() {
     this.listenerService = new C2monListenerService();
   }
 
-  protected abstract V get(K key);
+  public abstract V get(K key);
 
-  protected abstract boolean containsKey(K key);
+  public abstract boolean containsKey(K key);
 
-  protected abstract void put(K key, V value);
+  public abstract void put(K key, V value);
 
-  protected abstract boolean remove(K key);
+  public abstract boolean remove(K key);
 
-  protected abstract String getName();
+  public abstract String getName();
 
-  protected abstract List<K> getKeys();
+  public abstract List<K> getKeys();
+
+  /**
+   * Add invoke method using my EntryProcessor from old package
+   */
+
+  public abstract <T> T invoke(K var1, EntryProcessor<K, V, T> var2, Object... var3) throws EntryProcessorException;
+
+  public abstract <T> Map<K, EntryProcessorResult<T>> invokeAll(Set<? extends K> var1, EntryProcessor<K, V, T> var2, Object... var3);
 
   @Override
   public void notifyListenersOfUpdate(Cacheable cacheable) {

@@ -1,9 +1,14 @@
 package cern.c2mon.cache.impl;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.locks.Lock;
 
 import javax.annotation.PostConstruct;
+import javax.cache.processor.EntryProcessor;
+import javax.cache.processor.EntryProcessorException;
+import javax.cache.processor.EntryProcessorResult;
 
 import org.apache.ignite.IgniteCache;
 import org.apache.ignite.IgniteSpringBean;
@@ -36,33 +41,43 @@ public class IgniteC2monCache<K, V> extends C2monCache<K, V> {
   }
 
   @Override
-  protected V get(K key) {
+  public V get(K key) {
     return cache.get(key);
   }
 
   @Override
-  protected boolean containsKey(K key) {
+  public boolean containsKey(K key) {
     return cache.containsKey(key);
   }
 
   @Override
-  protected void put(K key, V value) {
+  public void put(K key, V value) {
     cache.put(key, value);
   }
 
   @Override
-  protected boolean remove(K key) {
+  public boolean remove(K key) {
     return cache.remove(key);
   }
 
   @Override
-  protected String getName() {
+  public String getName() {
     return ""; //TODO: rethink if this method should be here
   }
 
   @Override
-  protected List getKeys() {
+  public List getKeys() {
     return null; //TODO: rethink if this method is required
+  }
+
+  @Override
+  public <T> T invoke(K var1, EntryProcessor<K, V, T> var2, Object... var3) throws EntryProcessorException {
+    return cache.invoke(var1, var2, var3);
+  }
+
+  @Override
+  public <T> Map<K, EntryProcessorResult<T>> invokeAll(Set<? extends K> var1, EntryProcessor<K, V, T> var2, Object... var3) {
+    return cache.invokeAll(var1, var2, var3);
   }
 
   public void acquireLockOnKey(K key) {
