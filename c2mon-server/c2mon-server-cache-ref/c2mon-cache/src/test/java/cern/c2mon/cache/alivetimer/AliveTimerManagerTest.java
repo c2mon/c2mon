@@ -1,49 +1,76 @@
 package cern.c2mon.cache.alivetimer;
 
-import javax.cache.Caching;
-
+import org.apache.ignite.Ignition;
+import org.apache.ignite.configuration.CacheConfiguration;
 import org.easymock.EasyMock;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
 import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.impl.IgniteC2monCache;
+import cern.c2mon.server.cache.CacheModuleRef;
+import cern.c2mon.server.cache.alivetimer.AliveTimerOperation;
 import cern.c2mon.server.cache.alivetimer.AliveTimerService;
 import cern.c2mon.server.common.alive.AliveTimer;
 import cern.c2mon.server.common.alive.AliveTimerCacheObject;
 
+import static org.easymock.EasyMock.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
  * @author Szymon Halastra
  */
-
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = CacheModuleRef.class,
+        loader = AnnotationConfigContextLoader.class)
 public class AliveTimerManagerTest {
 
-  private static C2monCache<Long, AliveTimer> aliveTimerCache;
+  @Autowired
+  private C2monCache<Long, AliveTimer> aliveTimerCache;
 
-  private static AliveTimerService aliveTimerService;
-
-  @BeforeClass
-  public static void setup() {
-    aliveTimerCache = EasyMock.mock(C2monCache.class);
-
-    aliveTimerService = new AliveTimerService(aliveTimerCache);
-  }
-
-  @AfterClass
-  public static void cleanup() {
-    Caching.getCachingProvider().getCacheManager().destroyCache("aliveTimerCache");
-  }
+  private AliveTimerService aliveTimerService;
 
   @Test
   public void startAliveTimer() {
+    aliveTimerCache = EasyMock.createNiceMock(IgniteC2monCache.class);
+
+    aliveTimerService = new AliveTimerService(aliveTimerCache);
+
     AliveTimer aliveTimer = new AliveTimerCacheObject(1L);
     aliveTimer.setActive(false);
 
-    aliveTimerCache.put(aliveTimer.getId(), aliveTimer);
+    AliveTimer startedAliveTimer = new AliveTimerCacheObject(1L);
+    startedAliveTimer.setActive(true);
+    startedAliveTimer.setLastUpdate(System.currentTimeMillis());
+
+//    expect(aliveTimerCache.get(1L)).andReturn(startedAliveTimer);
+
+    expect(aliveTimerCache.invoke(EasyMock.eq(1L), anyObject(), EasyMock.eq(AliveTimerOperation.START))).andReturn(startedAliveTimer);
+
+    replay(aliveTimerCache);
+
+    aliveTimerCache.put(1L, aliveTimer);
+
+    aliveTimerService.start(1L);
+
+    verify(aliveTimerCache);
+//    assertTrue("Test if AliveTimer is started, set as active", aliveTimerCache.get(1L).isActive());
+//    assertTrue("Test if last update is set up", aliveTimerCache.get(1L).getLastUpdate() != 0);
+  }
+
+  @Test
+  public void startTest() {
+    aliveTimerService = new AliveTimerService(aliveTimerCache);
+
+    AliveTimer aliveTimer = new AliveTimerCacheObject(1L);
+    aliveTimer.setActive(false);
+
+    aliveTimerCache.put(1L, aliveTimer);
 
     aliveTimerService.start(1L);
 

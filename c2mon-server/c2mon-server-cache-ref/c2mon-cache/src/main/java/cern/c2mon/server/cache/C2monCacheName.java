@@ -78,9 +78,6 @@ public enum C2monCacheName {
   private final String label;
 
   private C2monCacheName(final String label) {
-    if(!label.equals(this.name())) {
-      throw new IllegalArgumentException();
-    }
     this.label = label;
   }
 

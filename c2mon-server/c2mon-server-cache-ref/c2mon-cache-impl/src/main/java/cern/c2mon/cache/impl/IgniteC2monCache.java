@@ -16,13 +16,12 @@ import org.apache.ignite.configuration.CacheConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.lock.C2monLock;
 
 /**
  * @author Szymon Halastra
  */
-public class IgniteC2monCache<K, V> extends C2monCache<K, V> {
-
-  private Lock lock; //TODO: move to external class
+public class IgniteC2monCache<K, V> extends C2monCache<K, V> implements C2monLock<K> {
 
   @Autowired
   private IgniteSpringBean C2monIgnite;
@@ -80,17 +79,22 @@ public class IgniteC2monCache<K, V> extends C2monCache<K, V> {
     return cache.invokeAll(var1, var2, var3);
   }
 
-  public void acquireLockOnKey(K key) {
-    Lock lock = cache.lock(key);
-    lock.lock();
-  }
-
-  public void releaseLockOnKey(K key) {
-    lock.unlock();
-  }
-
   @Override
   public void preload() {
     cache.loadCacheAsync(null);
+  }
+
+  @Override
+  public void lockOnKey(K key) {
+    Lock lock = cache.lock(key);
+
+    lock.lock();
+  }
+
+  @Override
+  public void unlockOnKey(K key) {
+    Lock lock = cache.lock(key);
+
+    lock.unlock();
   }
 }
