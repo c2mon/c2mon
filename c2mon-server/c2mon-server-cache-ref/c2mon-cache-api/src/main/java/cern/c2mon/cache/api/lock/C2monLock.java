@@ -1,13 +1,11 @@
 package cern.c2mon.cache.api.lock;
 
-import cern.c2mon.cache.api.C2monCache;
-
 /**
  * @author Szymon Halastra
  */
-public interface C2monLock {
+public interface C2monLock<K> {
 
-  void acquireLockOnKey(C2monCache cache, Object key);
+  void lockOnKey(K key);
 
-  void releaseLockOnKey(C2monCache cache, Object key);
+  void unlockOnKey(K key);
 }

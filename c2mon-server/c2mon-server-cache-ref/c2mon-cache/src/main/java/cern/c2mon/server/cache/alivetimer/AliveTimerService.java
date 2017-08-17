@@ -50,12 +50,11 @@ public class AliveTimerService {
    * at least "aliveInterval" milliseconds.
    */
   public boolean hasExpired(final Long aliveTimerId) {
-    return false;
-//    return (boolean) aliveTimerCacheRef.invoke(aliveTimerId, new AliveTimerManager(), AliveTimerOperation.HAS_EXPIRED);
+    return (boolean) aliveTimerCache.invoke(aliveTimerId, new AliveTimerManager(), AliveTimerOperation.HAS_EXPIRED);
   }
 
   public void startAllTimers() {
-    log.debug("Starting all alive timers in cache.");
+//    log.debug("Starting all alive timers in cache.");
 //    try {
 //      Iterator<Cache.Entry<Long, AliveTimer>> entries = aliveTimerCacheRef.iterator();
 //      while (entries.hasNext()) {
@@ -67,7 +66,9 @@ public class AliveTimerService {
 //    }
   }
 
-  /** Not tested */
+  /**
+   * Not tested
+   */
   public void stopAllTimers() {
     log.debug("Stopping all alive timers in the cache.");
 //    try {
@@ -81,7 +82,9 @@ public class AliveTimerService {
 //    }
   }
 
-  /** Not tested */
+  /**
+   * Not tested
+   */
   public void generateFromEquipment(AbstractEquipment abstractEquipment) {
     String type;
     if (abstractEquipment instanceof Equipment) {
@@ -95,7 +98,9 @@ public class AliveTimerService {
 //    aliveTimerCacheRef.put(aliveTimer.getId(), aliveTimer);
   }
 
-  /** Not tested */
+  /**
+   * Not tested
+   */
   public void generateFromProcess(Process process) {
     AliveTimer aliveTimer = new AliveTimerCacheObject(process.getAliveTagId(), process.getId(), process.getName(),
             process.getStateTagId(), AliveTimer.ALIVE_TYPE_PROCESS, process.getAliveInterval());

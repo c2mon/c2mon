@@ -1,5 +1,6 @@
 package cern.c2mon.cache.api;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -21,7 +22,7 @@ import cern.c2mon.shared.common.Cacheable;
  *
  * @author Szymon Halastra
  */
-public abstract class C2monCache<K, V> extends ApplicationObjectSupport implements C2monListener, C2monCacheLoader {
+public abstract class C2monCache<K, V> extends ApplicationObjectSupport implements C2monListener, C2monCacheLoader, Serializable {
 
   C2monListener<Cacheable> listenerService;
 
