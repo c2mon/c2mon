@@ -16,12 +16,11 @@ import org.apache.ignite.configuration.CacheConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.cache.api.lock.C2monLock;
 
 /**
  * @author Szymon Halastra
  */
-public class IgniteC2monCache<K, V> extends C2monCache<K, V> implements C2monLock<K> {
+public class IgniteC2monCache<K, V> extends C2monCache<K, V> {
 
   @Autowired
   private IgniteSpringBean C2monIgnite;
