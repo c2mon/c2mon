@@ -13,6 +13,7 @@ import org.springframework.context.support.ApplicationObjectSupport;
 
 import cern.c2mon.cache.api.listener.C2monBufferedCacheListener;
 import cern.c2mon.cache.api.listener.C2monCacheListener;
+import cern.c2mon.cache.api.lock.C2monLock;
 import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.shared.common.Cacheable;
 
@@ -22,7 +23,7 @@ import cern.c2mon.shared.common.Cacheable;
  *
  * @author Szymon Halastra
  */
-public abstract class C2monCache<K, V> extends ApplicationObjectSupport implements C2monListener, C2monCacheLoader, Serializable {
+public abstract class C2monCache<K, V> extends ApplicationObjectSupport implements C2monListener, C2monCacheLoader, C2monLock<K>, Serializable {
 
   C2monListener<Cacheable> listenerService;
 

@@ -19,6 +19,6 @@ public class DeviceService {
 
   @Autowired
   public DeviceService(final C2monCache<Long, Device> deviceCache) {
-    this.deviceCache = deviceCache
+    this.deviceCache = deviceCache;
   }
 }
