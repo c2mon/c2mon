@@ -7,7 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.server.cache.TagLocationService;
+import cern.c2mon.cache.api.TagLocationService;
 import cern.c2mon.server.cache.alarm.AlarmHandler;
 import cern.c2mon.server.cache.alarm.AlarmUpdateHandler;
 import cern.c2mon.server.common.alarm.Alarm;

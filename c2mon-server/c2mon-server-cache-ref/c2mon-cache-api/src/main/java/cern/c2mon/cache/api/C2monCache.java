@@ -13,6 +13,8 @@ import org.springframework.context.support.ApplicationObjectSupport;
 
 import cern.c2mon.cache.api.listener.C2monBufferedCacheListener;
 import cern.c2mon.cache.api.listener.C2monCacheListener;
+import cern.c2mon.cache.api.listener.C2monListener;
+import cern.c2mon.cache.api.listener.C2monListenerService;
 import cern.c2mon.cache.api.lock.C2monLock;
 import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.shared.common.Cacheable;

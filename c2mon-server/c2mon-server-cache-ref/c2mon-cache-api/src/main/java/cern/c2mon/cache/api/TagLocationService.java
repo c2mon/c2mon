@@ -1,7 +1,8 @@
-package cern.c2mon.server.cache;
+package cern.c2mon.cache.api;
 
 import java.util.Collection;
 
+import cern.c2mon.cache.api.lock.C2monLock;
 import cern.c2mon.server.common.tag.Tag;
 
 /**
@@ -15,8 +16,9 @@ import cern.c2mon.server.common.tag.Tag;
  * in cache, but should also check the DB store... need to add DAO method for this
  *
  * @author Mark Brightwell
+ * @author Szymon Halastra
  */
-public interface TagLocationService {
+public interface TagLocationService extends C2monLock<Long> {
 
   /**
    * Returns the tag located if it can be located in any of the rule, control
@@ -112,14 +114,6 @@ public interface TagLocationService {
    * @param id id of the Tag cache element
    */
   void remove(Long id);
-
-  void acquireReadLockOnKey(Long id);
-
-  void acquireWriteLockOnKey(Long id);
-
-  void releaseReadLockOnKey(Long id);
-
-  void releaseWriteLockOnKey(Long id);
 
   /**
    * Replaces the current cache object tag by the passed reference and informs all cache listeners

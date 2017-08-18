@@ -1,4 +1,4 @@
-package cern.c2mon.cache.api;
+package cern.c2mon.cache.api.listener;
 
 import cern.c2mon.cache.api.listener.C2monBufferedCacheListener;
 import cern.c2mon.cache.api.listener.C2monCacheListener;
