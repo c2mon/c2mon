@@ -16,9 +16,13 @@
  *****************************************************************************/
 package cern.c2mon.shared.common;
 
+import cern.c2mon.shared.common.datatag.address.OPCCommandHardwareAddress;
 import org.junit.Test;
 
+import cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl;
 import cern.c2mon.shared.common.datatag.address.impl.PLCHardwareAddressImpl;
+
+import static org.junit.Assert.assertEquals;
 
 public class SimpleTypeReflectionHandlerTest {
 
@@ -27,10 +31,17 @@ public class SimpleTypeReflectionHandlerTest {
   @Test
   public void testSetSimpleField() throws NoSuchFieldException, IllegalAccessException {
 
-    PLCHardwareAddressImpl address = new PLCHardwareAddressImpl(1, 1, 3, 1, 34.5f, 37.8f, "TEST");
+    PLCHardwareAddressImpl plcAddress = new PLCHardwareAddressImpl(1, 1, 3, 1, 34.5f, 37.8f, "TEST");
 
-    handler.setSimpleField(address, "physicalMinVal", Float.valueOf(40.234f));
-    handler.setSimpleField(address, "physicalMaxVal", Double.valueOf(40.234d));
-    handler.setSimpleField(address, "physicalMaxVal", Long.valueOf(40L));
+    handler.setSimpleField(plcAddress, "physicalMinVal", Float.valueOf(40.234f));
+    handler.setSimpleField(plcAddress, "physicalMaxVal", Double.valueOf(40.234d));
+    handler.setSimpleField(plcAddress, "physicalMaxVal", Long.valueOf(40L));
+
+    OPCHardwareAddressImpl opcAddress = new OPCHardwareAddressImpl("TEST");
+    //conversion from String -> enum
+    handler.setSimpleField(opcAddress, "commandType", "CLASSIC");
+    assertEquals(OPCCommandHardwareAddress.COMMAND_TYPE.class, handler.getField(opcAddress.getClass(), "commandType").getType());
+    handler.setSimpleField(opcAddress, "commandType", "METHOD");
+    assertEquals(OPCCommandHardwareAddress.COMMAND_TYPE.class, handler.getField(opcAddress.getClass(), "commandType").getType());
   }
 }
