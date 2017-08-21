@@ -15,7 +15,7 @@ c2mon.server.history.jdbc.url=jdbc:hsqldb:hsql://localhost/c2mondb;sql.syntax_or
 ```
 These settings can also be set as Java VM options with the ```-D``` parameter.
 
-See also [Configuring the module](user-guide/client-api/history/#configuring-the-module).
+See also [Configuring the module](user-guide/client-api/history).
 
 !!! warning "Be careful!"
     If the URL contains ``hsql://``, C2MON uses an in-memory HSQL with a hardcoded path at ``/tmp/c2mondb``.
