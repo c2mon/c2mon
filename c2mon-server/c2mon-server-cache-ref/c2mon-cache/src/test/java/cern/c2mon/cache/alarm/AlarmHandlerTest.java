@@ -14,10 +14,13 @@ import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.AlarmCondition;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
+import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.test.CacheObjectCreation;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
 
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.*;
 
 /**
@@ -35,7 +38,47 @@ public class AlarmHandlerTest {
   public void setup() {
     alarmCache = EasyMock.createNiceMock(C2monCache.class);
     tagLocationService = EasyMock.createStrictMock(TagLocationService.class);
-    alarmHandler = new AlarmUpdateHandler(alarmCache);
+    alarmHandler = new AlarmUpdateHandler(alarmCache, tagLocationService);
+  }
+
+  @Test
+  public void evaluateAlarmWithNullTag() {
+    AlarmCacheObject alarm = new AlarmCacheObject(1L);
+    alarm.setState(AlarmCondition.ACTIVE);
+    alarm.setDataTagId(1L);
+
+    DataTagCacheObject tag = new DataTagCacheObject(1L);
+    tag.setValue(null);
+
+    expect(alarmCache.get(1L)).andReturn(alarm);
+    expect(tagLocationService.get(alarm.getTagId())).andReturn(tag);
+    replay(alarmCache, tagLocationService);
+
+    alarmHandler.evaluateAlarm(alarm.getId());
+
+    assertEquals("Alarm should have the same state as before evaluation", true, alarm.getState().equals(AlarmCondition.ACTIVE));
+  }
+
+  @Test
+  public void evaluateAlarmWithUninitialisedTag() {
+    AlarmCacheObject alarmCacheObject = new AlarmCacheObject(1L);
+    alarmCacheObject.setState(AlarmCondition.ACTIVE);
+    alarmCacheObject.setDataTagId(1L);
+
+    DataTagCacheObject tagCacheObject = new DataTagCacheObject(1L);
+    DataTagQualityImpl dataTagQuality = new DataTagQualityImpl(TagQualityStatus.UNINITIALISED);
+    tagCacheObject.setDataTagQuality(dataTagQuality);
+
+    tagCacheObject.setValue("value");
+
+    expect(alarmCache.get(1L)).andReturn(alarmCacheObject);
+    expect(tagLocationService.get(1L)).andReturn(tagCacheObject);
+
+    replay(alarmCache, tagLocationService);
+
+    alarmHandler.evaluateAlarm(alarmCacheObject.getId());
+
+    assertEquals("Alarm should have the same status as before evaluation", true, alarmCacheObject.getState().equals(AlarmCondition.ACTIVE));
   }
 
   /**
@@ -61,7 +104,7 @@ public class AlarmHandlerTest {
 
 
     alarmCache.lockOnKey(currentAlarmState.getId());
-    EasyMock.expect(alarmCache.get(currentAlarmState.getId())).andReturn(currentAlarmState);
+    expect(alarmCache.get(currentAlarmState.getId())).andReturn(currentAlarmState);
     alarmCache.unlockOnKey(currentAlarmState.getId());
     EasyMock.replay(alarmCache, tagLocationService);
     //(1)test update works
@@ -98,7 +141,7 @@ public class AlarmHandlerTest {
 
     // Recording Mock calls
     alarmCache.lockOnKey(currentAlarmState.getId());
-    EasyMock.expect(alarmCache.get(currentAlarmState.getId())).andReturn(currentAlarmState);
+    expect(alarmCache.get(currentAlarmState.getId())).andReturn(currentAlarmState);
     alarmCache.put(currentAlarmState.getId(), currentAlarmState);
     alarmCache.unlockOnKey(currentAlarmState.getId());
     EasyMock.replay(alarmCache, tagLocationService);
@@ -135,7 +178,7 @@ public class AlarmHandlerTest {
     alarm.hasBeenPublished(new Timestamp(System.currentTimeMillis()));
 
     alarmCache.lockOnKey(alarm.getId());
-    EasyMock.expect(alarmCache.get(alarm.getId())).andReturn(alarm);
+    expect(alarmCache.get(alarm.getId())).andReturn(alarm);
     // record expected notification call with EasyMock
     alarmCache.put(alarm.getId(), alarm);
     alarmCache.unlockOnKey(alarm.getId());
@@ -161,7 +204,7 @@ public class AlarmHandlerTest {
 
     EasyMock.reset(alarmCache, tagLocationService);
     alarmCache.lockOnKey(alarm2.getId());
-    EasyMock.expect(alarmCache.get(alarm2.getId())).andReturn(alarm2);
+    expect(alarmCache.get(alarm2.getId())).andReturn(alarm2);
     alarmCache.unlockOnKey(alarm2.getId());
     EasyMock.replay(alarmCache, tagLocationService);
 
