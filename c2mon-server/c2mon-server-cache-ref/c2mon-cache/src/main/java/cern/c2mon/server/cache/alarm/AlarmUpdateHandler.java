@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.TagLocationService;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.AlarmCondition;
@@ -24,14 +25,23 @@ public class AlarmUpdateHandler implements AlarmHandler {
 
   private C2monCache<Long, Alarm> alarmCache;
 
+  private TagLocationService tagLocationService;
+
   @Autowired
-  public AlarmUpdateHandler(final C2monCache<Long, Alarm> alarmCache) {
+  public AlarmUpdateHandler(final C2monCache<Long, Alarm> alarmCache, final TagLocationService tagLocationService) {
     this.alarmCache = alarmCache;
+    this.tagLocationService = tagLocationService;
   }
 
   @Override
   public void evaluateAlarm(Long alarmId) {
-
+    alarmCache.lockOnKey(alarmId);
+    try {
+      Alarm alarm = alarmCache.get(alarmId);
+      Tag tag = tagLocationService.get(alarm.getTagId());
+    } finally {
+      alarmCache.unlockOnKey(alarmId);
+    }
   }
 
   @Override
@@ -152,6 +162,19 @@ public class AlarmUpdateHandler implements AlarmHandler {
     return alarmCacheObject;
   }
 
+  /**
+   * Derives a valid JMS topic name for distributing the alarm's values to
+   * clients (currently the same for all alarms, so returns a constant).
+   *
+   * @param alarm the alarm for which the topic should be provided
+   *
+   * @return a valid JMS topic name for the alarm
+   */
+  @Override
+  public String getTopicForAlarm(final Alarm alarm) {
+    return "tim.alarm";
+  }
+
   @NotNull
   private String buildPrefix(Tag tag) {
     String additionalInfo = null;
@@ -187,18 +210,5 @@ public class AlarmUpdateHandler implements AlarmHandler {
       additionalInfo = additionalInfo + "[SIM]";
     }
     return additionalInfo;
-  }
-
-  /**
-   * Derives a valid JMS topic name for distributing the alarm's values to
-   * clients (currently the same for all alarms, so returns a constant).
-   *
-   * @param alarm the alarm for which the topic should be provided
-   *
-   * @return a valid JMS topic name for the alarm
-   */
-  @Override
-  public String getTopicForAlarm(final Alarm alarm) {
-    return "tim.alarm";
   }
 }
