@@ -29,6 +29,7 @@ import cern.c2mon.server.cache.CommandTagFacade;
 import cern.c2mon.server.cache.EquipmentFacade;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.cache.loading.CommandTagDAO;
+import cern.c2mon.server.common.command.CommandTagCacheObject;
 import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;

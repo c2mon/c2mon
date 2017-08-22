@@ -64,14 +64,4 @@ public interface ConfigurableCacheService<T extends Cacheable> {
    * @throws IllegalAccessException 
    */
   Change updateConfig(T cacheable, Properties properties) throws IllegalAccessException;
-  
-  /**
-   * Determines whether this cache object is the result
-   * of a failed call to the cache. Usually, such a cache
-   * object should be ignored and an error or warning logged.
-   * @param cacheable
-   * @return
-   */
-  //boolean isFakeCacheObject(Cacheable cacheable);
-  
 }

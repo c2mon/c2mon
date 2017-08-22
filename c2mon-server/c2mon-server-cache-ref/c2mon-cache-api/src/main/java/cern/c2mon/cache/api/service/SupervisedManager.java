@@ -21,6 +21,7 @@ import java.sql.Timestamp;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.supervision.Supervised;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
+import cern.c2mon.shared.common.supervision.SupervisionConstants;
 
 /**
  * Implemented by Facade beans linked to Supervised cache
@@ -30,7 +31,7 @@ import cern.c2mon.shared.client.supervision.SupervisionEvent;
  *
  * @author Mark Brightwell
  */
-public interface SupervisedService<T extends Supervised> {
+public interface SupervisedManager<T extends Supervised> {
 
   /**
    * Returns the last supervision event that occured
@@ -51,7 +52,7 @@ public interface SupervisedService<T extends Supervised> {
    *
    * @param id id of the cache element
    */
-  void refreshAndnotifyCurrentSupervisionStatus(Long id);
+  void refreshAndNotifyCurrentSupervisionStatus(Long id);
 
   /**
    * Sets the status of the Supervised object to STARTUP,
@@ -154,5 +155,7 @@ public interface SupervisedService<T extends Supervised> {
    */
   void removeAliveDirectly(Long aliveId);
 
+  SupervisionConstants.SupervisionEntity getSupervisionEntity();
 
+  void setSupervisionEntity(SupervisionConstants.SupervisionEntity entity);
 }

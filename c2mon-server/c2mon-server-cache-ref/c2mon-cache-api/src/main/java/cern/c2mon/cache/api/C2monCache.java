@@ -87,4 +87,6 @@ public abstract class C2monCache<K, V> extends ApplicationObjectSupport implemen
   public Lifecycle registerKeyBufferedListener(C2monBufferedCacheListener bufferedCacheListener, int frequency) {
     return this.listenerService.registerKeyBufferedListener(bufferedCacheListener, frequency);
   }
+
+  public abstract void loadFromDb(K aliveId);
 }
