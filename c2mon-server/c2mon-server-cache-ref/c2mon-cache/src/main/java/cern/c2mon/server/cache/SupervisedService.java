@@ -26,15 +26,15 @@ public class SupervisedService<T extends Supervised> implements SupervisedManage
 
   private AliveTimerService aliveTimerService;
 
-  private C2monCache<Long, AliveTimer> aliveTimerCache;
+  private C2monCache aliveTimerCache;
 
   private SupervisionConstants.SupervisionEntity supervisionEntity;
 
   @Autowired
-  public SupervisedService(final C2monCache<Long, T> cache, final AliveTimerService aliveTimerService, final C2monCache<Long, AliveTimer> aliveTimerCache) {
+  public SupervisedService(final C2monCache<Long, T> cache, final AliveTimerService aliveTimerService) {
     this.cache = cache;
     this.aliveTimerService = aliveTimerService;
-    this.aliveTimerCache = aliveTimerCache;
+    this.aliveTimerCache = aliveTimerService.getCache();
   }
 
   @Override

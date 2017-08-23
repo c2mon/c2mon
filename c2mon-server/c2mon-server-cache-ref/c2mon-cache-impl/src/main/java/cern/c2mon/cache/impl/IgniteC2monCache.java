@@ -79,6 +79,11 @@ public class IgniteC2monCache<K, V> extends C2monCache<K, V> {
   }
 
   @Override
+  public void loadFromDb(K aliveId) {
+
+  }
+
+  @Override
   public void preload() {
     cache.loadCacheAsync(null);
   }

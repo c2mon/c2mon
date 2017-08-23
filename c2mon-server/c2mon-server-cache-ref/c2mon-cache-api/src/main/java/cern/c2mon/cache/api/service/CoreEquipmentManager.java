@@ -2,6 +2,8 @@ package cern.c2mon.cache.api.service;
 
 import java.util.Map;
 
+import cern.c2mon.cache.api.C2monCache;
+
 /**
  * Common Service methods for Equipment and SubEquipment.
  *
