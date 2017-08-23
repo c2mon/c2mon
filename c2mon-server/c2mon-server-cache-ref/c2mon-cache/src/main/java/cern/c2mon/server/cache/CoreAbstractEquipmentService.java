@@ -7,6 +7,7 @@ import java.util.Map;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.service.AbstractEquipmentService;
 import cern.c2mon.server.cache.commfault.CommFaultService;
+import cern.c2mon.server.common.commfault.CommFaultTag;
 import cern.c2mon.server.common.equipment.AbstractEquipment;
 
 /**
@@ -16,7 +17,7 @@ public class CoreAbstractEquipmentService<T extends AbstractEquipment> implement
 
   private C2monCache<Long, T> cache;
 
-  private C2monCache commFaultTagCache;
+  private C2monCache<Long, CommFaultTag> commFaultTagCache;
 
   public CoreAbstractEquipmentService(C2monCache<Long, T> cache, CommFaultService commFaultService) {
     this.cache = cache;

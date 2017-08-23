@@ -55,7 +55,7 @@ public class ProcessOperationServiceImpl implements ProcessOperationService {
 
   @Override
   public Process start(Long processId, String hostName, Timestamp startupTime) {
-    Process process = null;
+    Process process;
     processCache.lockOnKey(processId);
     try {
       process = processCache.get(processId);

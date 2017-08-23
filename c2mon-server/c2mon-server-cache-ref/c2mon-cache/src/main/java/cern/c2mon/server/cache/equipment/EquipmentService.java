@@ -30,15 +30,15 @@ import cern.c2mon.shared.common.supervision.SupervisionConstants;
 @Service
 public class EquipmentService implements CoreService, SupervisedService<Equipment>, AbstractEquipmentService {
 
-  private C2monCache<Long, Equipment> equipmentCache;
+  private final C2monCache<Long, Equipment> equipmentCache;
 
-  private C2monCache<Long, Process> processCache;
+  private final C2monCache<Long, Process> processCache;
 
-  private C2monCache<Long, DataTag> dataTagCache;
+  private final C2monCache<Long, DataTag> dataTagCache;
 
-  private SupervisedService<Equipment> supervisedService;
+  private final SupervisedService<Equipment> supervisedService;
 
-  private AbstractEquipmentService coreEquipmentService;
+  private final AbstractEquipmentService coreEquipmentService;
 
   @Autowired
   public EquipmentService(final C2monCache<Long, Equipment> equipmentCache, final C2monCache<Long, Process> processCache,

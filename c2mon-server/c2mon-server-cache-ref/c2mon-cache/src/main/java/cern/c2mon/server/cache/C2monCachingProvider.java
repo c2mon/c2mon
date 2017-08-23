@@ -14,8 +14,7 @@ import cern.c2mon.cache.api.C2monCache;
 public class C2monCachingProvider {
 
   @Autowired
-  private
-  ApplicationContext applicationContext;
+  private ApplicationContext applicationContext;
 
   private List<String> caches;
 

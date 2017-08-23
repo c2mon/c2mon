@@ -113,8 +113,8 @@ public class AlarmUpdateHandler implements AlarmHandler {
     if (alarmCacheObject.getTimestamp().equals(new Timestamp(0))
             || (tag.isValid() && !alarmCacheObject.getState().equals(newState))) {
       if (log.isTraceEnabled()) {
-        log.trace(new StringBuffer("update(): alarm ").append(alarmCacheObject.getId())
-                .append(" changed STATE to ").append(newState).toString());
+        log.trace("update(): alarm " + alarmCacheObject.getId() +
+                " changed STATE to " + newState);
       }
       alarmCacheObject.setState(newState);
       alarmCacheObject.setTimestamp(alarmTime);
@@ -135,8 +135,8 @@ public class AlarmUpdateHandler implements AlarmHandler {
     }
     if (!alarmCacheObject.getInfo().equals(additionalInfo)) {
       if (log.isTraceEnabled()) {
-        log.trace(new StringBuffer("update(): alarm ").append(alarmCacheObject.getId())
-                .append(" changed INFO to ").append(additionalInfo).toString());
+        log.trace("update(): alarm " + alarmCacheObject.getId() +
+                " changed INFO to " + additionalInfo);
       }
       alarmCacheObject.setInfo(additionalInfo);
       alarmCacheObject.setAlarmChangeState(AlarmCacheObject.AlarmChangeState.CHANGE_PROPERTIES);
@@ -153,8 +153,8 @@ public class AlarmUpdateHandler implements AlarmHandler {
     // In all other cases, the value of the alarm related to the DataTag has
     // not changed. No need to publish an alarm change.
     if (log.isTraceEnabled()) {
-      log.trace(new StringBuffer("update(): alarm ").append(alarmCacheObject.getId())
-              .append(" has not changed.").toString());
+      log.trace("update(): alarm " + alarmCacheObject.getId() +
+              " has not changed.");
     }
     //no change so no listener notification in this case
 
@@ -177,7 +177,7 @@ public class AlarmUpdateHandler implements AlarmHandler {
 
   @NotNull
   private String buildPrefix(Tag tag) {
-    String additionalInfo = null;
+    String additionalInfo;
 
     switch (tag.getMode()) {
       case DataTagConstants.MODE_MAINTENANCE:
