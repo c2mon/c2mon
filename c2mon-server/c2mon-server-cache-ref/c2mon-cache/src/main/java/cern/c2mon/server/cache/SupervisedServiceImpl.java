@@ -19,7 +19,7 @@ import cern.c2mon.shared.common.supervision.SupervisionConstants;
  */
 
 @Slf4j
-public class AbstractEquipmentSupervisedService<T extends Supervised> implements SupervisedService<T> {
+public class SupervisedServiceImpl<T extends Supervised> implements SupervisedService<T> {
 
   private C2monCache<Long, T> cache;
 
@@ -30,7 +30,7 @@ public class AbstractEquipmentSupervisedService<T extends Supervised> implements
   private SupervisionConstants.SupervisionEntity supervisionEntity;
 
   @Autowired
-  public AbstractEquipmentSupervisedService(final C2monCache<Long, T> cache, final AliveTimerService aliveTimerService) {
+  public SupervisedServiceImpl(final C2monCache<Long, T> cache, final AliveTimerService aliveTimerService) {
     this.cache = cache;
     this.aliveTimerService = aliveTimerService;
     this.aliveTimerCache = aliveTimerService.getCache();
@@ -214,7 +214,7 @@ public class AbstractEquipmentSupervisedService<T extends Supervised> implements
    * @param supervised supervised object
    * @param timestamp  time of the start
    */
-  private void start(final T supervised, final Timestamp timestamp) {
+  public void start(final T supervised, final Timestamp timestamp) {
     if (supervised.getAliveTagId() != null) {
       aliveTimerService.start(supervised.getAliveTagId());
     }

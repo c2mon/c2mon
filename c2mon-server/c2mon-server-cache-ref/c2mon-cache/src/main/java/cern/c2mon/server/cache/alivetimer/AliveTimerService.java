@@ -18,9 +18,9 @@ import cern.c2mon.server.common.process.Process;
 
 @Slf4j
 @Service
-public class AliveTimerService implements CoreService {
+public class AliveTimerService implements CoreService<Long, AliveTimer> {
 
-  C2monCache<Long, AliveTimer> aliveTimerCache;
+  private C2monCache<Long, AliveTimer> aliveTimerCache;
 
   @Autowired
   public AliveTimerService(C2monCache<Long, AliveTimer> aliveTimerCache) {
@@ -30,7 +30,7 @@ public class AliveTimerService implements CoreService {
   }
 
   @Override
-  public C2monCache getCache() {
+  public C2monCache<Long, AliveTimer> getCache() {
     return aliveTimerCache;
   }
 

@@ -1,6 +1,7 @@
 package cern.c2mon.server.cache.equipment;
 
 import java.sql.Timestamp;
+import java.util.Collection;
 import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +12,7 @@ import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.CoreService;
 import cern.c2mon.cache.api.service.AbstractEquipmentService;
 import cern.c2mon.cache.api.service.SupervisedService;
-import cern.c2mon.server.cache.AbstractEquipmentSupervisedService;
+import cern.c2mon.server.cache.SupervisedServiceImpl;
 import cern.c2mon.server.cache.CoreAbstractEquipmentService;
 import cern.c2mon.server.cache.alivetimer.AliveTimerService;
 import cern.c2mon.server.cache.commfault.CommFaultService;
@@ -45,8 +46,13 @@ public class EquipmentService implements CoreService, SupervisedService<Equipmen
     this.equipmentCache = equipmentCache;
     this.processCache = processCache;
     this.dataTagCache = dataTagCache;
-    this.supervisedService = new AbstractEquipmentSupervisedService(equipmentCache, aliveTimerService);
+    this.supervisedService = new SupervisedServiceImpl(equipmentCache, aliveTimerService);
     this.coreEquipmentService = new CoreAbstractEquipmentService<>(equipmentCache, commFaultService);
+  }
+
+  //TODO: write this method
+  public Collection<? extends Long> getDataTagIds(long equipmentId) {
+    return null;
   }
 
   @Override
