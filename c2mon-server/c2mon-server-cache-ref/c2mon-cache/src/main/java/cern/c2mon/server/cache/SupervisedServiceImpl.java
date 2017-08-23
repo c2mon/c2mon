@@ -214,6 +214,7 @@ public class SupervisedServiceImpl<T extends Supervised> implements SupervisedSe
    * @param supervised supervised object
    * @param timestamp  time of the start
    */
+  @Override
   public void start(final T supervised, final Timestamp timestamp) {
     if (supervised.getAliveTagId() != null) {
       aliveTimerService.start(supervised.getAliveTagId());
@@ -223,7 +224,8 @@ public class SupervisedServiceImpl<T extends Supervised> implements SupervisedSe
     supervised.setStatusTime(new Timestamp(System.currentTimeMillis()));
   }
 
-  private void stop(final T supervised, final Timestamp timestamp) {
+  @Override
+  public void stop(final T supervised, final Timestamp timestamp) {
     if (supervised.getAliveTagId() != null) {
       aliveTimerService.stop(supervised.getAliveTagId());
     }

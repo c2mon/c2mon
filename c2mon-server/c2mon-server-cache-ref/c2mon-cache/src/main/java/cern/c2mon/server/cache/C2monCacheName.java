@@ -77,7 +77,7 @@ public enum C2monCacheName {
   @Getter
   private final String label;
 
-  private C2monCacheName(final String label) {
+  C2monCacheName(final String label) {
     this.label = label;
   }
 

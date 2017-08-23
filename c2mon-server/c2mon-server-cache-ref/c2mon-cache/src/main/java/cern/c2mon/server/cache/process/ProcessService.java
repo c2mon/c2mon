@@ -15,7 +15,6 @@ import cern.c2mon.server.cache.equipment.EquipmentService;
 import cern.c2mon.server.common.config.ServerProperties;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.process.ProcessCacheObject;
-import cern.c2mon.server.common.supervision.Supervised;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.common.supervision.SupervisionConstants;
 
@@ -24,7 +23,7 @@ import cern.c2mon.shared.common.supervision.SupervisionConstants;
  */
 @Slf4j
 @Service
-public class ProcessService implements CoreService, ProcessOperationService, SupervisedService {
+public class ProcessService implements CoreService, ProcessOperationService, SupervisedService<Process> {
 
   private SupervisedService<Process> supervisedService;
 
@@ -103,72 +102,88 @@ public class ProcessService implements CoreService, ProcessOperationService, Sup
 
   @Override
   public SupervisionEvent getSupervisionStatus(Long id) {
-    return null;
+    return supervisedService.getSupervisionStatus(id);
   }
 
   @Override
   public void refreshAndNotifyCurrentSupervisionStatus(Long id) {
-
+    supervisedService.refreshAndNotifyCurrentSupervisionStatus(id);
   }
 
   @Override
   public void start(Long id, Timestamp timestamp) {
+    supervisedService.start(id, timestamp);
+  }
 
+  @Override
+  public void start(Process supervised, Timestamp timestamp) {
+    supervisedService.start(supervised, timestamp);
+  }
+
+  @Override
+  public void stop(Process supervised, Timestamp timestamp) {
+    processCache.lockOnKey(supervised.getId());
+    try {
+      ProcessCacheObject processCacheObject = (ProcessCacheObject) supervised;
+      processCacheObject.setCurrentHost(null);
+      processCacheObject.setStartupTime(null);
+      processCacheObject.setRequiresReboot(Boolean.FALSE);
+      processCacheObject.setProcessPIK(null);
+      processCacheObject.setLocalConfig(null);
+      supervisedService.stop(supervised, timestamp);
+    } finally {
+      processCache.unlockOnKey(supervised.getId());
+    }
   }
 
   @Override
   public void stop(Long id, Timestamp timestamp) {
-
+    supervisedService.stop(id, timestamp);
   }
 
   @Override
   public void resume(Long id, Timestamp timestamp, String message) {
-
+    supervisedService.resume(id, timestamp, message);
   }
 
   @Override
   public void suspend(Long id, Timestamp timestamp, String message) {
-
+    supervisedService.suspend(id, timestamp, message);
   }
 
   @Override
-  public boolean isRunning(Supervised supervised) {
-    return false;
+  public boolean isRunning(Process supervised) {
+    return supervisedService.isRunning(supervised);
   }
 
   @Override
   public boolean isRunning(Long id) {
-    return false;
+    return supervisedService.isRunning(id);
   }
 
   @Override
-  public boolean isUncertain(Supervised supervised) {
-    return false;
+  public boolean isUncertain(Process supervised) {
+    return isUncertain(supervised);
   }
 
   @Override
   public void removeAliveTimer(Long id) {
-
+    supervisedService.removeAliveTimer(id);
   }
 
   @Override
   public void loadAndStartAliveTag(Long supervisedId) {
-
+    supervisedService.loadAndStartAliveTag(supervisedId);
   }
 
   @Override
   public void removeAliveDirectly(Long aliveId) {
-
+    supervisedService.removeAliveDirectly(aliveId);
   }
 
   @Override
   public SupervisionConstants.SupervisionEntity getSupervisionEntity() {
     return SupervisionConstants.SupervisionEntity.PROCESS;
-  }
-
-  @Override
-  public void setSupervisionEntity(SupervisionConstants.SupervisionEntity entity) {
-
   }
 }
 

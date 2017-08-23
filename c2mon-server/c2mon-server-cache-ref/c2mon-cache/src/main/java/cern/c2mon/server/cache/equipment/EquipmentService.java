@@ -12,8 +12,8 @@ import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.CoreService;
 import cern.c2mon.cache.api.service.AbstractEquipmentService;
 import cern.c2mon.cache.api.service.SupervisedService;
-import cern.c2mon.server.cache.SupervisedServiceImpl;
 import cern.c2mon.server.cache.CoreAbstractEquipmentService;
+import cern.c2mon.server.cache.SupervisedServiceImpl;
 import cern.c2mon.server.cache.alivetimer.AliveTimerService;
 import cern.c2mon.server.cache.commfault.CommFaultService;
 import cern.c2mon.server.common.datatag.DataTag;
@@ -73,6 +73,16 @@ public class EquipmentService implements CoreService, SupervisedService<Equipmen
   @Override
   public void start(Long id, Timestamp timestamp) {
     supervisedService.start(id, timestamp);
+  }
+
+  @Override
+  public void start(Equipment supervised, Timestamp timestamp) {
+    supervisedService.start(supervised, timestamp);
+  }
+
+  @Override
+  public void stop(Equipment supervised, Timestamp timestamp) {
+    supervisedService.stop(supervised, timestamp);
   }
 
   @Override
