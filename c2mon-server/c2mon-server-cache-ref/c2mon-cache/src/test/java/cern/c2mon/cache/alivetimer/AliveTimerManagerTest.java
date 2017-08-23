@@ -1,7 +1,5 @@
 package cern.c2mon.cache.alivetimer;
 
-import org.apache.ignite.Ignition;
-import org.apache.ignite.configuration.CacheConfiguration;
 import org.easymock.EasyMock;
 import org.junit.*;
 import org.junit.runner.RunWith;

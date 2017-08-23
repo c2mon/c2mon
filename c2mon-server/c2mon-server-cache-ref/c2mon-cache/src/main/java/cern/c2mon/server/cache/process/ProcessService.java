@@ -27,17 +27,17 @@ public class ProcessService implements CoreService, ProcessOperationService, Sup
 
   private SupervisedService<Process> supervisedService;
 
-  private ProcessOperationService processOperationService;
+  private final ProcessOperationService processOperationService;
 
-  private EquipmentService equipmentService;
+  private final EquipmentService equipmentService;
 
 //  private SubEquipmentService subEquipmentService;
 
-  private C2monCache aliveTimerCache;
+  private final C2monCache aliveTimerCache;
 
-  private C2monCache<Long, Process> processCache;
+  private final C2monCache<Long, Process> processCache;
 
-  private ServerProperties properties;
+  private final ServerProperties properties;
 
   @Autowired
   public ProcessService(final EquipmentService equipmentService, final AliveTimerService aliveTimerService,
@@ -163,7 +163,7 @@ public class ProcessService implements CoreService, ProcessOperationService, Sup
 
   @Override
   public boolean isUncertain(Process supervised) {
-    return isUncertain(supervised);
+    return supervisedService.isUncertain(supervised);
   }
 
   @Override

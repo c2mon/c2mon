@@ -1,7 +1,6 @@
 package cern.c2mon.server.cache;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 /**
  * Enumeration of all caches used by the C2MON core.
