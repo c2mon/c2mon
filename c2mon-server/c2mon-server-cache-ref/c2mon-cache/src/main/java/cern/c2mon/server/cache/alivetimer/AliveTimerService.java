@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.CoreService;
 import cern.c2mon.server.common.alive.AliveTimer;
 import cern.c2mon.server.common.alive.AliveTimerCacheObject;
 import cern.c2mon.server.common.equipment.AbstractEquipment;
@@ -17,7 +18,7 @@ import cern.c2mon.server.common.process.Process;
 
 @Slf4j
 @Service
-public class AliveTimerService {
+public class AliveTimerService implements CoreService {
 
   C2monCache<Long, AliveTimer> aliveTimerCache;
 
@@ -26,6 +27,11 @@ public class AliveTimerService {
     this.aliveTimerCache = aliveTimerCache;
 
     log.info("ALIVE TIMER SERVICE WAS CREATED SUCCESSFULLY");
+  }
+
+  @Override
+  public C2monCache getCache() {
+    return aliveTimerCache;
   }
 
   /**

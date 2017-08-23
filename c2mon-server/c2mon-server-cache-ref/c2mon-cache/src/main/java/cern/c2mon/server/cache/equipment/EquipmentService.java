@@ -1,13 +1,20 @@
 package cern.c2mon.server.cache.equipment;
 
 import java.sql.Timestamp;
+import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.CoreService;
+import cern.c2mon.cache.api.service.CoreEquipmentManager;
 import cern.c2mon.cache.api.service.SupervisedManager;
+import cern.c2mon.server.cache.CoreEquipmentService;
+import cern.c2mon.server.cache.SupervisedService;
+import cern.c2mon.server.cache.alivetimer.AliveTimerService;
+import cern.c2mon.server.cache.commfault.CommFaultService;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.process.Process;
@@ -20,20 +27,31 @@ import cern.c2mon.shared.common.supervision.SupervisionConstants;
 
 @Slf4j
 @Service
-public class EquipmentService implements SupervisedManager<Equipment> {
+public class EquipmentService implements CoreService, SupervisedManager<Equipment>, CoreEquipmentManager {
 
-  private final C2monCache<Long, Process> processCache;
+  private C2monCache<Long, Equipment> equipmentCache;
 
-  private final C2monCache<Long, DataTag> dataTagCache;
+  private C2monCache<Long, Process> processCache;
 
-  private final SupervisedManager<Equipment> supervisedService;
+  private C2monCache<Long, DataTag> dataTagCache;
+
+  private SupervisedManager<Equipment> supervisedService;
+
+  private CoreEquipmentManager coreEquipmentService;
 
   @Autowired
-  public EquipmentService(final C2monCache<Long, Process> processCache, final C2monCache<Long, DataTag> dataTagCache,
-                          final SupervisedManager<Equipment> supervisedService) {
+  public EquipmentService(final C2monCache<Long, Equipment> equipmentCache, final C2monCache<Long, Process> processCache,
+                          final C2monCache<Long, DataTag> dataTagCache, final AliveTimerService aliveTimerService, final CommFaultService commFaultService) {
+    this.equipmentCache = equipmentCache;
     this.processCache = processCache;
     this.dataTagCache = dataTagCache;
-    this.supervisedService = supervisedService;
+    this.supervisedService = new SupervisedService<>(equipmentCache, aliveTimerService);
+    this.coreEquipmentService = new CoreEquipmentService<>(equipmentCache, commFaultService);
+  }
+
+  @Override
+  public C2monCache getCache() {
+    return this.equipmentCache;
   }
 
   @Override
@@ -104,5 +122,20 @@ public class EquipmentService implements SupervisedManager<Equipment> {
   @Override
   public void setSupervisionEntity(SupervisionConstants.SupervisionEntity entity) {
     supervisedService.setSupervisionEntity(entity);
+  }
+
+  @Override
+  public Long getProcessIdForAbstractEquipment(Long abstractEquipmentId) {
+    return coreEquipmentService.getProcessIdForAbstractEquipment(abstractEquipmentId);
+  }
+
+  @Override
+  public Map<Long, Long> getAbstractEquipmentControlTags() {
+    return coreEquipmentService.getAbstractEquipmentControlTags();
+  }
+
+  @Override
+  public void removeCommFault(Long abstractEquipmentId) {
+    coreEquipmentService.removeCommFault(abstractEquipmentId);
   }
 }
