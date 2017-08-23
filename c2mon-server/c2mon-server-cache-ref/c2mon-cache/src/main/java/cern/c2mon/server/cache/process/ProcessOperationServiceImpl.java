@@ -119,6 +119,7 @@ public class ProcessOperationServiceImpl implements ProcessOperationService {
     else {
       Long equipmentId = 0L; /*subEquipmentFacade.getEquipmentIdForSubEquipment(aliveTimer.getRelatedId()); */ //TODO: uncomment this code, when SubEquipmentService will be written
 //      return equipmentService.getProcessIdForAbstractEquipment(equipmentId);
+      return 0L;
     }
   }
 
@@ -133,6 +134,7 @@ public class ProcessOperationServiceImpl implements ProcessOperationService {
     else if (subEquipmentControlTags.containsKey(controlTagId)) {
       Long subEquipmentId = subEquipmentControlTags.get(controlTagId);
 //      return subEquipmentFacade.getEquipmentIdForSubEquipment(subEquipmentId); //TODO: uncomment this code, when SubEquipmentService will be written
+      return 0L;
     }
     else return null;
   }

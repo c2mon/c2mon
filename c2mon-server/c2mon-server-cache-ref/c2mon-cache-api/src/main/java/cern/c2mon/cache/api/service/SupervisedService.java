@@ -66,6 +66,19 @@ public interface SupervisedService<T extends Supervised> {
   void start(Long id, Timestamp timestamp);
 
   /**
+   * Sets the status of the Supervised object to STARTUP,
+   * with associated message.
+   * <p>
+   * <p>Starts the alive timer if not already running.
+   *
+   * @param supervised supervised object
+   * @param timestamp  time of the start
+   */
+  void start(final T supervised, final Timestamp timestamp);
+
+  void stop(final T supervised, final Timestamp timestamp);
+
+  /**
    * Sets the status of the Supervised object to DOWN,
    * with stop message.
    * <p>
@@ -155,7 +168,11 @@ public interface SupervisedService<T extends Supervised> {
    */
   void removeAliveDirectly(Long aliveId);
 
-  SupervisionConstants.SupervisionEntity getSupervisionEntity();
+  default SupervisionConstants.SupervisionEntity getSupervisionEntity() {
+    return null;
+  }
 
-  void setSupervisionEntity(SupervisionConstants.SupervisionEntity entity);
+  default void setSupervisionEntity(SupervisionConstants.SupervisionEntity entity) {
+
+  }
 }
