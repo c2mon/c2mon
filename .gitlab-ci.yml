@@ -6,7 +6,7 @@ stages:
 build_and_publish:
   type: build
   script:
-    - mvn -q -U -B clean deploy --settings settings.xml
+    - mvn -q -U -B clean deploy --settings settings.xml -Ddependencies.set.direct
   only:
     - master
 
@@ -14,7 +14,7 @@ build_and_publish:
 build:
   type: build
   script:
-    - mvn -q -U -B clean test -DskipDockerBuild -DskipDockerTag --settings settings.xml
+    - mvn -q -U -B clean test -DskipDockerBuild -DskipDockerTag --settings settings.xml -Ddependencies.set.direct
   except:
     - master
 
