@@ -2,14 +2,12 @@ package cern.c2mon.cache.api.service;
 
 import java.util.Map;
 
-import cern.c2mon.cache.api.C2monCache;
-
 /**
  * Common Service methods for Equipment and SubEquipment.
  *
  * @author Szymon Halastra
  */
-public interface CoreEquipmentManager {
+public interface AbstractEquipmentService {
 
   /**
    * Returns the Process id for a given Equipment or SubEquipment

@@ -9,10 +9,10 @@ import org.springframework.stereotype.Service;
 
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.CoreService;
-import cern.c2mon.cache.api.service.CoreEquipmentManager;
-import cern.c2mon.cache.api.service.SupervisedManager;
-import cern.c2mon.server.cache.CoreEquipmentService;
-import cern.c2mon.server.cache.SupervisedService;
+import cern.c2mon.cache.api.service.AbstractEquipmentService;
+import cern.c2mon.cache.api.service.SupervisedService;
+import cern.c2mon.server.cache.AbstractEquipmentSupervisedService;
+import cern.c2mon.server.cache.CoreAbstractEquipmentService;
 import cern.c2mon.server.cache.alivetimer.AliveTimerService;
 import cern.c2mon.server.cache.commfault.CommFaultService;
 import cern.c2mon.server.common.datatag.DataTag;
@@ -27,7 +27,7 @@ import cern.c2mon.shared.common.supervision.SupervisionConstants;
 
 @Slf4j
 @Service
-public class EquipmentService implements CoreService, SupervisedManager<Equipment>, CoreEquipmentManager {
+public class EquipmentService implements CoreService, SupervisedService<Equipment>, AbstractEquipmentService {
 
   private C2monCache<Long, Equipment> equipmentCache;
 
@@ -35,9 +35,9 @@ public class EquipmentService implements CoreService, SupervisedManager<Equipmen
 
   private C2monCache<Long, DataTag> dataTagCache;
 
-  private SupervisedManager<Equipment> supervisedService;
+  private SupervisedService<Equipment> supervisedService;
 
-  private CoreEquipmentManager coreEquipmentService;
+  private AbstractEquipmentService coreEquipmentService;
 
   @Autowired
   public EquipmentService(final C2monCache<Long, Equipment> equipmentCache, final C2monCache<Long, Process> processCache,
@@ -45,8 +45,8 @@ public class EquipmentService implements CoreService, SupervisedManager<Equipmen
     this.equipmentCache = equipmentCache;
     this.processCache = processCache;
     this.dataTagCache = dataTagCache;
-    this.supervisedService = new SupervisedService<>(equipmentCache, aliveTimerService);
-    this.coreEquipmentService = new CoreEquipmentService<>(equipmentCache, commFaultService);
+    this.supervisedService = new AbstractEquipmentSupervisedService(equipmentCache, aliveTimerService);
+    this.coreEquipmentService = new CoreAbstractEquipmentService<>(equipmentCache, commFaultService);
   }
 
   @Override

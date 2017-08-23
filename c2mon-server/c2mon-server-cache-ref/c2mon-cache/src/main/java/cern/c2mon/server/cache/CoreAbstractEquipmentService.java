@@ -5,24 +5,21 @@ import java.util.List;
 import java.util.Map;
 
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.cache.api.service.CoreEquipmentManager;
+import cern.c2mon.cache.api.service.AbstractEquipmentService;
 import cern.c2mon.server.cache.commfault.CommFaultService;
 import cern.c2mon.server.common.equipment.AbstractEquipment;
 
 /**
  * @author Szymon Halastra
  */
-public class CoreEquipmentService<T extends AbstractEquipment> implements CoreEquipmentManager {
+public class CoreAbstractEquipmentService<T extends AbstractEquipment> implements AbstractEquipmentService {
 
   private C2monCache<Long, T> cache;
 
   private C2monCache commFaultTagCache;
 
-  private CommFaultService commFaultService;
-
-  public CoreEquipmentService(C2monCache<Long, T> cache, CommFaultService commFaultService) {
+  public CoreAbstractEquipmentService(C2monCache<Long, T> cache, CommFaultService commFaultService) {
     this.cache = cache;
-    this.commFaultService = commFaultService;
     this.commFaultTagCache = commFaultService.getCache();
   }
 
