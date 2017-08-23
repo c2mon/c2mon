@@ -31,7 +31,7 @@ import cern.c2mon.shared.common.supervision.SupervisionConstants;
  *
  * @author Mark Brightwell
  */
-public interface SupervisedManager<T extends Supervised> {
+public interface SupervisedService<T extends Supervised> {
 
   /**
    * Returns the last supervision event that occured

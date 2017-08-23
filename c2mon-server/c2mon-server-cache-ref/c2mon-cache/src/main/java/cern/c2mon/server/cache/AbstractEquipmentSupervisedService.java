@@ -6,9 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.cache.api.service.SupervisedManager;
+import cern.c2mon.cache.api.service.SupervisedService;
 import cern.c2mon.server.cache.alivetimer.AliveTimerService;
-import cern.c2mon.server.common.alive.AliveTimer;
 import cern.c2mon.server.common.process.ProcessCacheObject;
 import cern.c2mon.server.common.supervision.Supervised;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
@@ -20,7 +19,7 @@ import cern.c2mon.shared.common.supervision.SupervisionConstants;
  */
 
 @Slf4j
-public class SupervisedService<T extends Supervised> implements SupervisedManager<T> {
+public class AbstractEquipmentSupervisedService<T extends Supervised> implements SupervisedService<T> {
 
   private C2monCache<Long, T> cache;
 
@@ -31,7 +30,7 @@ public class SupervisedService<T extends Supervised> implements SupervisedManage
   private SupervisionConstants.SupervisionEntity supervisionEntity;
 
   @Autowired
-  public SupervisedService(final C2monCache<Long, T> cache, final AliveTimerService aliveTimerService) {
+  public AbstractEquipmentSupervisedService(final C2monCache<Long, T> cache, final AliveTimerService aliveTimerService) {
     this.cache = cache;
     this.aliveTimerService = aliveTimerService;
     this.aliveTimerCache = aliveTimerService.getCache();
