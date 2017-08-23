@@ -179,30 +179,32 @@ public class AlarmUpdateHandler implements AlarmHandler {
   private String buildPrefix(Tag tag) {
     String additionalInfo;
 
-    switch (tag.getMode()) {
-      case DataTagConstants.MODE_MAINTENANCE:
-        if (tag.isValid()) {
-          additionalInfo = "[M]";
-        }
-        else {
-          additionalInfo = "[M][?]";
-        }
-        break;
-      case DataTagConstants.MODE_TEST:
-        if (tag.isValid()) {
-          additionalInfo = "[T]";
-        }
-        else {
-          additionalInfo = "[T][?]";
-        }
-        break;
-      default:
-        if (tag.isValid()) {
-          additionalInfo = "";
-        }
-        else {
-          additionalInfo = "[?]";
-        }
+    short mode = tag.getMode();
+    if (mode == DataTagConstants.MODE_MAINTENANCE) {
+      if (tag.isValid()) {
+        additionalInfo = "[M]";
+      }
+      else {
+        additionalInfo = "[M][?]";
+      }
+
+    }
+    else if (mode == DataTagConstants.MODE_TEST) {
+      if (tag.isValid()) {
+        additionalInfo = "[T]";
+      }
+      else {
+        additionalInfo = "[T][?]";
+      }
+
+    }
+    else {
+      if (tag.isValid()) {
+        additionalInfo = "";
+      }
+      else {
+        additionalInfo = "[?]";
+      }
     }
 
     // Add another flag to the info if the value is simulated

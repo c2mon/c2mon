@@ -13,7 +13,7 @@ import cern.c2mon.server.common.subequipment.SubEquipment;
  */
 
 @Configuration
-public class SubequipmentCacheConfig {
+public class SubEquipmentCacheConfig {
 
   @Bean(name = C2monCacheName.Names.SUBEQUIPMENT)
   public C2monCache createCache(AbstractFactory cachingFactory) {
