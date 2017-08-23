@@ -1,7 +1,6 @@
-package cern.c2mon.server.cache.equipment;
+package cern.c2mon.server.cache.subequipment;
 
 import java.sql.Timestamp;
-import java.util.Collection;
 import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
@@ -16,49 +15,40 @@ import cern.c2mon.server.cache.CoreAbstractEquipmentService;
 import cern.c2mon.server.cache.SupervisedServiceImpl;
 import cern.c2mon.server.cache.alivetimer.AliveTimerService;
 import cern.c2mon.server.cache.commfault.CommFaultService;
-import cern.c2mon.server.common.datatag.DataTag;
-import cern.c2mon.server.common.equipment.Equipment;
-import cern.c2mon.server.common.process.Process;
+import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.common.supervision.SupervisionConstants;
 
 /**
  * @author Szymon Halastra
  */
-
 @Slf4j
 @Service
-public class EquipmentService implements CoreService, SupervisedService<Equipment>, AbstractEquipmentService {
+public class SubEquipmentService implements CoreService, SupervisedService<SubEquipment>, AbstractEquipmentService {
 
-  private final C2monCache<Long, Equipment> equipmentCache;
+  private C2monCache<Long, SubEquipment> subEquipmentCache;
 
-  private final C2monCache<Long, Process> processCache;
+  private SupervisedService<SubEquipment> supervisedService;
 
-  private final C2monCache<Long, DataTag> dataTagCache;
+  private AbstractEquipmentService abstractEquipmentService;
 
-  private final SupervisedService<Equipment> supervisedService;
+  private CommFaultService commFaultService;
 
-  private final AbstractEquipmentService coreEquipmentService;
+  private AliveTimerService aliveTimerService;
 
   @Autowired
-  public EquipmentService(final C2monCache<Long, Equipment> equipmentCache, final C2monCache<Long, Process> processCache,
-                          final C2monCache<Long, DataTag> dataTagCache, final AliveTimerService aliveTimerService, final CommFaultService commFaultService) {
-    this.equipmentCache = equipmentCache;
-    this.processCache = processCache;
-    this.dataTagCache = dataTagCache;
+  public SubEquipmentService(C2monCache<Long, SubEquipment> subEquipmentCache, CommFaultService commFaultService, AliveTimerService aliveTimerService) {
+    this.subEquipmentCache = subEquipmentCache;
+    this.commFaultService = commFaultService;
+    this.aliveTimerService = aliveTimerService;
 
-    this.supervisedService = new SupervisedServiceImpl(equipmentCache, aliveTimerService);
-    this.coreEquipmentService = new CoreAbstractEquipmentService<>(equipmentCache, commFaultService);
-  }
-
-  //TODO: write this method
-  public Collection<? extends Long> getDataTagIds(long equipmentId) {
-    return null;
+    this.supervisedService = new SupervisedServiceImpl<>(subEquipmentCache, aliveTimerService);
+    this.abstractEquipmentService = new CoreAbstractEquipmentService<>(subEquipmentCache, commFaultService);
   }
 
   @Override
   public C2monCache getCache() {
-    return this.equipmentCache;
+    return subEquipmentCache;
   }
 
   @Override
@@ -77,12 +67,12 @@ public class EquipmentService implements CoreService, SupervisedService<Equipmen
   }
 
   @Override
-  public void start(Equipment supervised, Timestamp timestamp) {
+  public void start(SubEquipment supervised, Timestamp timestamp) {
     supervisedService.start(supervised, timestamp);
   }
 
   @Override
-  public void stop(Equipment supervised, Timestamp timestamp) {
+  public void stop(SubEquipment supervised, Timestamp timestamp) {
     supervisedService.stop(supervised, timestamp);
   }
 
@@ -102,7 +92,7 @@ public class EquipmentService implements CoreService, SupervisedService<Equipmen
   }
 
   @Override
-  public boolean isRunning(Equipment supervised) {
+  public boolean isRunning(SubEquipment supervised) {
     return supervisedService.isRunning(supervised);
   }
 
@@ -112,7 +102,7 @@ public class EquipmentService implements CoreService, SupervisedService<Equipmen
   }
 
   @Override
-  public boolean isUncertain(Equipment supervised) {
+  public boolean isUncertain(SubEquipment supervised) {
     return supervisedService.isUncertain(supervised);
   }
 
@@ -128,31 +118,26 @@ public class EquipmentService implements CoreService, SupervisedService<Equipmen
 
   @Override
   public void removeAliveDirectly(Long aliveId) {
-    supervisedService.removeAliveTimer(aliveId);
+    supervisedService.removeAliveDirectly(aliveId);
   }
 
   @Override
   public SupervisionConstants.SupervisionEntity getSupervisionEntity() {
-    return supervisedService.getSupervisionEntity();
-  }
-
-  @Override
-  public void setSupervisionEntity(SupervisionConstants.SupervisionEntity entity) {
-    supervisedService.setSupervisionEntity(entity);
+    return SupervisionConstants.SupervisionEntity.SUBEQUIPMENT;
   }
 
   @Override
   public Long getProcessIdForAbstractEquipment(Long abstractEquipmentId) {
-    return coreEquipmentService.getProcessIdForAbstractEquipment(abstractEquipmentId);
+    return abstractEquipmentService.getProcessIdForAbstractEquipment(abstractEquipmentId);
   }
 
   @Override
   public Map<Long, Long> getAbstractEquipmentControlTags() {
-    return coreEquipmentService.getAbstractEquipmentControlTags();
+    return abstractEquipmentService.getAbstractEquipmentControlTags();
   }
 
   @Override
   public void removeCommFault(Long abstractEquipmentId) {
-    coreEquipmentService.removeCommFault(abstractEquipmentId);
+    abstractEquipmentService.removeCommFault(abstractEquipmentId);
   }
 }
