@@ -3,7 +3,7 @@ package cern.c2mon.cache.api;
 /**
  * @author Szymon Halastra
  */
-public interface CoreService {
+public interface CoreService<K, V> {
 
-  C2monCache getCache();
+  C2monCache<K, V> getCache();
 }
