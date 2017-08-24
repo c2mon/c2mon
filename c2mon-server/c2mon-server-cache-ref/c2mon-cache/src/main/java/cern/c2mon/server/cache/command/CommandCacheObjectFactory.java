@@ -3,8 +3,6 @@ package cern.c2mon.server.cache.command;
 import java.lang.reflect.Field;
 import java.util.Properties;
 
-import javax.validation.constraints.Size;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -32,7 +30,7 @@ import cern.c2mon.shared.daq.config.HardwareAddressUpdate;
 @Component
 public class CommandCacheObjectFactory extends CacheObjectFactory<CommandTag> {
 
-  private C2monCache<Long, Equipment> equipmentCache;
+  private final C2monCache<Long, Equipment> equipmentCache;
 
   @Autowired
   public CommandCacheObjectFactory(C2monCache<Long, Equipment> equipmentCache) {
@@ -40,13 +38,8 @@ public class CommandCacheObjectFactory extends CacheObjectFactory<CommandTag> {
   }
 
   @Override
-  public Change updateConfig(CommandTag cacheable, Properties properties) throws IllegalAccessException {
-    return null;
-  }
-
-  @Override
   public Change configureCacheObject(CommandTag commandTag, Properties properties) {
-    String tmpStr = null;
+    String tmpStr;
     CommandTagCacheObject commandTagCacheObject = (CommandTagCacheObject) commandTag;
     CommandTagUpdate commandTagUpdate = new CommandTagUpdate();
     commandTagUpdate.setCommandTagId(commandTag.getId());
