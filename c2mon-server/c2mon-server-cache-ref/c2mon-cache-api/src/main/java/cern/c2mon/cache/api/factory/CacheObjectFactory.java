@@ -18,7 +18,11 @@ public abstract class CacheObjectFactory<T extends Cacheable> {
     return cacheable;
   }
 
-  public abstract Change updateConfig(T cacheable, Properties properties) throws IllegalAccessException;
+  public Change updateConfig(T cacheable, Properties properties) throws IllegalAccessException {
+    Change changeEvent = configureCacheObject(cacheable, properties);
+    validateConfig(cacheable);
+    return changeEvent;
+  }
 
   public abstract Change configureCacheObject(T cacheable, Properties properties);
 
