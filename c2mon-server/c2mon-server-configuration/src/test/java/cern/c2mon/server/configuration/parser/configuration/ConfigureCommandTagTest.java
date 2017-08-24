@@ -311,9 +311,6 @@ public class ConfigureCommandTagTest {
 
   @Test
   public void updateNonExistentCommandTag() {
-    // Setup Exception
-    //tagException.expect(ConfigurationParseException.class);
-
     // setup Configuration:
     CommandTag tag = CommandTag.update(20L).description("The description").build();
 
@@ -327,7 +324,13 @@ public class ConfigureCommandTagTest {
 
     // run test
     EasyMock.replay(commandTagCache);
-    parser.parse(config);
+
+    List<ConfigurationElement> result = parser.parse(config);
+
+    assertEquals(1, result.size());
+    assertEquals(ConfigConstants.Entity.MISSING, result.get(0).getEntity());
+    assertEquals(ConfigConstants.Status.WARNING, result.get(0).getStatus());
+
     EasyMock.verify(commandTagCache);
   }
 

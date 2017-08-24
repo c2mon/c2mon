@@ -454,9 +454,6 @@ public class ConfigureSubEquipmentTest {
 
   @Test
   public void updateNonExistentSubEquipment() {
-    // Setup Exception
-    //tagException.expect(ConfigurationParseException.class);
-
     // setup Configuration:
     SubEquipment subEquipment = SubEquipment.update(10L).description("The description").build();
 
@@ -470,7 +467,13 @@ public class ConfigureSubEquipmentTest {
 
     // run test
     EasyMock.replay(subEquipmentCache);
-    parser.parse(config);
+
+    List<ConfigurationElement> result = parser.parse(config);
+
+    assertEquals(1, result.size());
+    assertEquals(ConfigConstants.Entity.MISSING, result.get(0).getEntity());
+    assertEquals(ConfigConstants.Status.WARNING, result.get(0).getStatus());
+
     EasyMock.verify(subEquipmentCache);
   }
 

@@ -403,9 +403,6 @@ public class ConfigureProcessTest {
 
   @Test
   public void updateNonExistentProcess() {
-    // Setup Exception
-    //tagException.expect(ConfigurationParseException.class);
-
     // setup Configuration:
     Process process = Process.update(1L).description("The description").build();
 
@@ -419,7 +416,13 @@ public class ConfigureProcessTest {
 
     // run test
     EasyMock.replay(processCache);
-    parser.parse(config);
+
+    List<ConfigurationElement> result = parser.parse(config);
+
+    assertEquals(1, result.size());
+    assertEquals(ConfigConstants.Entity.MISSING, result.get(0).getEntity());
+    assertEquals(ConfigConstants.Status.WARNING, result.get(0).getStatus());
+
     EasyMock.verify(processCache);
   }
 

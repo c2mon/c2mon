@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cern.c2mon.server.configuration.parser.exception.EntityDoesNotExistException;
+import cern.c2mon.shared.client.configuration.ConfigConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -107,6 +108,13 @@ public class ConfigurationParserImpl implements ConfigurationParser {
         try {
           results.add(entityFactory.updateInstance(configurationEntity));
         } catch (EntityDoesNotExistException e) {
+          ConfigurationElement missingEntity = new ConfigurationElement();
+          missingEntity.setStatus(ConfigConstants.Status.WARNING);
+          missingEntity.setEntityId(configurationEntity.getId());
+          missingEntity.setAction(ConfigConstants.Action.UPDATE);
+          missingEntity.setConfigId(-1L);
+          missingEntity.setEntity(ConfigConstants.Entity.MISSING);
+          results.add(missingEntity);
           log.warn(e.getMessage());
         }
       } else if (configurationEntity.isCreated()) {

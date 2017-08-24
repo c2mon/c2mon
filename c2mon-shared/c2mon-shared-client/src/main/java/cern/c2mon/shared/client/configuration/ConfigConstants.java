@@ -37,7 +37,7 @@ public class ConfigConstants {
    * @author Mark Brightwell
    *
    */
-  public enum Entity { DATATAG, CONTROLTAG, RULETAG, COMMANDTAG, PROCESS, EQUIPMENT, ALARM, SUBEQUIPMENT, DEVICECLASS, DEVICE }
+  public enum Entity { DATATAG, CONTROLTAG, RULETAG, COMMANDTAG, PROCESS, EQUIPMENT, ALARM, SUBEQUIPMENT, DEVICECLASS, DEVICE, MISSING }
 
   /**
    * The result of a reconfiguration action.
