@@ -88,15 +88,10 @@ public class SupervisedServiceImpl<T extends Supervised> implements SupervisedSe
 
   @Override
   public boolean isRunning(final T supervised) {
-    cache.lockOnKey(supervised.getId());
-    try {
-      return supervised.getSupervisionStatus() != null
-              && (supervised.getSupervisionStatus().equals(SupervisionConstants.SupervisionStatus.STARTUP)
-              || supervised.getSupervisionStatus().equals(SupervisionConstants.SupervisionStatus.RUNNING)
-              || supervised.getSupervisionStatus().equals(SupervisionConstants.SupervisionStatus.RUNNING_LOCAL));
-    } finally {
-      cache.unlockOnKey(supervised.getId());
-    }
+    return supervised.getSupervisionStatus() != null
+            && (supervised.getSupervisionStatus().equals(SupervisionConstants.SupervisionStatus.STARTUP)
+            || supervised.getSupervisionStatus().equals(SupervisionConstants.SupervisionStatus.RUNNING)
+            || supervised.getSupervisionStatus().equals(SupervisionConstants.SupervisionStatus.RUNNING_LOCAL));
   }
 
   @Override
