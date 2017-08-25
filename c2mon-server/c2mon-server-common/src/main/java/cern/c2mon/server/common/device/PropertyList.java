@@ -29,7 +29,7 @@ import org.simpleframework.xml.Root;
  * @author Justin Lewis Salmon
  */
 @Root(name = "Properties")
-public class PropertyList {
+public class PropertyList implements AbstractList {
 
   @ElementList(entry = "Property", inline = true, required = false)
   private List<Property> properties = new ArrayList<>();
@@ -42,7 +42,13 @@ public class PropertyList {
     super();
   }
 
+  //TODO: remove this method and replace with getList
   public List<Property> getProperties() {
+    return properties;
+  }
+
+  @Override
+  public List getList() {
     return properties;
   }
 }

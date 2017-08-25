@@ -29,7 +29,7 @@ import org.simpleframework.xml.Root;
  * @author Justin Lewis Salmon
  */
 @Root(name = "Commands")
-public class CommandList {
+public class CommandList implements AbstractList {
 
   @ElementList(entry = "Command", inline = true, required = false)
   private List<Command> commands = new ArrayList<>();
@@ -42,7 +42,13 @@ public class CommandList {
     super();
   }
 
+  //TODO: remove this method and replace with getList
   public List<Command> getCommands() {
+    return commands;
+  }
+
+  @Override
+  public List<Command> getList() {
     return commands;
   }
 }

@@ -31,7 +31,7 @@ import cern.c2mon.shared.client.device.DeviceProperty;
  * @author Justin Lewis Salmon
  */
 @Root(name = "DeviceProperties")
-public class DevicePropertyList {
+public class DevicePropertyList implements AbstractList {
 
   @ElementList(entry = "DeviceProperty", inline = true, required = false)
   private List<DeviceProperty> deviceProperties = new ArrayList<>();
@@ -44,7 +44,13 @@ public class DevicePropertyList {
     super();
   }
 
+  //TODO: remove this method and replace with getList
   public List<DeviceProperty> getDeviceProperties() {
+    return deviceProperties;
+  }
+
+  @Override
+  public List getList() {
     return deviceProperties;
   }
 }

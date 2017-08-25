@@ -31,7 +31,7 @@ import cern.c2mon.shared.client.device.DeviceCommand;
  * @author Justin Lewis Salmon
  */
 @Root(name = "DeviceCommands")
-public class DeviceCommandList {
+public class DeviceCommandList implements AbstractList {
 
   @ElementList(entry = "DeviceCommand", inline = true, required = false)
   private List<DeviceCommand> deviceCommands = new ArrayList<>();
@@ -44,7 +44,14 @@ public class DeviceCommandList {
     super();
   }
 
+  //TODO: remove this method and replace with getList
   public List<DeviceCommand> getDeviceCommands() {
+    return deviceCommands;
+  }
+
+
+  @Override
+  public List<DeviceCommand> getList() {
     return deviceCommands;
   }
 }

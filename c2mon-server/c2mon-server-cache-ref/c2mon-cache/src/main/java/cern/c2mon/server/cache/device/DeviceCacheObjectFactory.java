@@ -1,16 +1,14 @@
 package cern.c2mon.server.cache.device;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import org.simpleframework.xml.Serializer;
-import org.simpleframework.xml.core.Persister;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.factory.CacheObjectFactory;
+import cern.c2mon.cache.api.parser.XmlParser;
 import cern.c2mon.server.common.device.*;
 import cern.c2mon.shared.client.device.DeviceCommand;
 import cern.c2mon.shared.client.device.DeviceProperty;
@@ -43,25 +41,13 @@ public class DeviceCacheObjectFactory extends CacheObjectFactory<Device> {
 
     // Parse properties and commands from XML representation
     if (properties.getProperty("deviceProperties") != null) {
-      try {
-        List<DeviceProperty> deviceProperties = parseDevicePropertiesXML(properties.getProperty("deviceProperties"));
-        deviceCacheObject.setDeviceProperties(deviceProperties);
-      }
-      catch (Exception e) {
-        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
-                "Exception: Unable to create device property list from parameter \"deviceProperties\": " + e + "\n" + properties.getProperty("deviceProperties"));
-      }
+      List<DeviceProperty> deviceProperties = XmlParser.parseXmlProperties(properties.getProperty("deviceProperties"), DevicePropertyList.class);
+      deviceCacheObject.setDeviceProperties(deviceProperties);
     }
 
     if (properties.getProperty("deviceCommands") != null) {
-      try {
-        List<DeviceCommand> deviceCommands = parseDeviceCommandsXML(properties.getProperty("deviceCommands"));
-        deviceCacheObject.setDeviceCommands(deviceCommands);
-      }
-      catch (Exception e) {
-        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
-                "Exception: Unable to create device command list from parameter \"deviceCommands\":" + e + "\n" + properties.getProperty("deviceCommands"));
-      }
+      List<DeviceCommand> deviceCommands = XmlParser.parseXmlCommands(properties.getProperty("deviceCommands"), DeviceCommandList.class);
+      deviceCacheObject.setDeviceCommands(deviceCommands);
     }
 
     return null;
@@ -149,56 +135,5 @@ public class DeviceCacheObjectFactory extends CacheObjectFactory<Device> {
                 + "\" specifies incorrect ID (does not match corresponding parent class command)");
       }
     }
-  }
-
-  /**
-   * Parse the XML representation of the properties of a device (which comes
-   * from configuration) and return it as a list of {@link DeviceProperty}
-   * objects.
-   *
-   * @param xmlString the XML representation string of the device properties
-   *
-   * @return the list of device properties
-   * @throws Exception if the XML could not be parsed
-   */
-  private List<DeviceProperty> parseDevicePropertiesXML(String xmlString) throws Exception {
-    List<DeviceProperty> deviceProperties = new ArrayList<>();
-
-    Serializer serializer = new Persister();
-    DevicePropertyList devicePropertyList = serializer.read(DevicePropertyList.class, xmlString);
-
-    for (DeviceProperty deviceProperty : devicePropertyList.getDeviceProperties()) {
-
-      // Remove all whitespace and control characters
-      if (deviceProperty.getValue() != null) {
-        deviceProperty.setValue(deviceProperty.getValue().replaceAll("[\u0000-\u001f]", "").trim());
-      }
-
-      deviceProperties.add(deviceProperty);
-    }
-
-    return deviceProperties;
-  }
-
-  /**
-   * Parse the XML representation of the commands of a device (which comes from
-   * configuration) and return it as a list of {@link DeviceCommand} objects.
-   *
-   * @param xmlString the XML representation string of the device commands
-   *
-   * @return the list of device commands
-   * @throws Exception if the XML could not be parsed
-   */
-  private List<DeviceCommand> parseDeviceCommandsXML(String xmlString) throws Exception {
-    List<DeviceCommand> deviceCommands = new ArrayList<>();
-
-    Serializer serializer = new Persister();
-    DeviceCommandList deviceCommandList = serializer.read(DeviceCommandList.class, xmlString);
-
-    for (DeviceCommand deviceCommand : deviceCommandList.getDeviceCommands()) {
-      deviceCommands.add(deviceCommand);
-    }
-
-    return deviceCommands;
   }
 }
