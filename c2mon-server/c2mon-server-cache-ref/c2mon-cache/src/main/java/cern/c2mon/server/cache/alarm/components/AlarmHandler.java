@@ -1,4 +1,4 @@
-package cern.c2mon.server.cache.alarm;
+package cern.c2mon.server.cache.alarm.components;
 
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.tag.Tag;

@@ -8,8 +8,8 @@ import org.junit.Test;
 
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.TagLocationService;
-import cern.c2mon.server.cache.alarm.AlarmHandler;
-import cern.c2mon.server.cache.alarm.AlarmUpdateHandler;
+import cern.c2mon.server.cache.alarm.components.AlarmHandler;
+import cern.c2mon.server.cache.alarm.components.AlarmUpdateHandler;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.AlarmCondition;
