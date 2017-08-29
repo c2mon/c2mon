@@ -455,6 +455,8 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
         ConfigurationElementReport elementReport = new ConfigurationElementReport(element.getAction(), element.getEntity(), element.getEntityId());
         elementReport.setWarning("Entity " + element.getEntityId() + " does not exist");
         report.addElementReport(elementReport);
+        report.setStatusDescription("Please check subreport description for details");
+        report.addStatus(Status.WARNING);
       } else {
           //initialize success report
           ConfigurationElementReport elementReport = new ConfigurationElementReport(element.getAction(),
