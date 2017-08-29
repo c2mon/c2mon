@@ -37,8 +37,7 @@ public class ConfigurationAlarmUtil {
       properties = new Properties();
     }
 
-    Alarm alarm = Alarm.create("faultFamily", "faultMember", 1337, new ValueCondition(Integer.class, 1)).build();
-    alarm.setDataTagId(100L);
+    Alarm alarm = Alarm.create("faultFamily", "faultMember", 1337, new ValueCondition(Integer.class, 1)).dataTagId(100L).build();
 
     properties.setProperty("faultFamily", "faultFamily");
     properties.setProperty("faultMember", "faultMember");
@@ -61,8 +60,8 @@ public class ConfigurationAlarmUtil {
     Alarm alarm = Alarm.create("faultFamily", "faultMember", 1337, new ValueCondition(Integer.class, 1))
         .id(id)
         .addMetadata("testMetadata", 11)
+        .dataTagId(100L)
         .build();
-    alarm.setDataTagId(100L);
 
     properties.setProperty("faultFamily", "faultFamily");
     properties.setProperty("faultMember", "faultMember");
