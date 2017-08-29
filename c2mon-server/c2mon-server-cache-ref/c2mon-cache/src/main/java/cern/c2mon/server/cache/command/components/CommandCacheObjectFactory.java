@@ -1,4 +1,4 @@
-package cern.c2mon.server.cache.command;
+package cern.c2mon.server.cache.command.components;
 
 import java.lang.reflect.Field;
 import java.util.Properties;

@@ -11,7 +11,7 @@ import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.impl.IgniteC2monCache;
 import cern.c2mon.server.cache.CacheModuleRef;
-import cern.c2mon.server.cache.alivetimer.AliveTimerOperation;
+import cern.c2mon.server.cache.alivetimer.components.AliveTimerOperation;
 import cern.c2mon.server.cache.alivetimer.AliveTimerService;
 import cern.c2mon.server.common.alive.AliveTimer;
 import cern.c2mon.server.common.alive.AliveTimerCacheObject;

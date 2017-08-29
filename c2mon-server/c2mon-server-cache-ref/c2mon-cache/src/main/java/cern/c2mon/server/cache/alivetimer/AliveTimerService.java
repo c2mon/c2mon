@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.CoreService;
+import cern.c2mon.server.cache.alivetimer.components.AliveTimerManager;
+import cern.c2mon.server.cache.alivetimer.components.AliveTimerOperation;
 import cern.c2mon.server.common.alive.AliveTimer;
 import cern.c2mon.server.common.alive.AliveTimerCacheObject;
 import cern.c2mon.server.common.equipment.AbstractEquipment;

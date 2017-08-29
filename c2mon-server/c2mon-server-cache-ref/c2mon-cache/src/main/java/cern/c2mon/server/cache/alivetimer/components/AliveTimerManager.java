@@ -1,4 +1,4 @@
-package cern.c2mon.server.cache.alivetimer;
+package cern.c2mon.server.cache.alivetimer.components;
 
 import java.io.Serializable;
 import java.util.EnumMap;
