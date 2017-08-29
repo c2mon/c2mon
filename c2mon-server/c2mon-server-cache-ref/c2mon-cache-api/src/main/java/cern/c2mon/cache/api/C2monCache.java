@@ -25,7 +25,7 @@ import cern.c2mon.shared.common.Cacheable;
  *
  * @author Szymon Halastra
  */
-public abstract class C2monCache<K, V> extends ApplicationObjectSupport implements C2monListener, C2monCacheLoader, C2monLock<K>, Serializable {
+public abstract class C2monCache<K, V> extends ApplicationObjectSupport implements C2monListener, C2monLock<K>, Serializable {
 
   C2monListener<Cacheable> listenerService;
 
@@ -88,5 +88,6 @@ public abstract class C2monCache<K, V> extends ApplicationObjectSupport implemen
     return this.listenerService.registerKeyBufferedListener(bufferedCacheListener, frequency);
   }
 
-  public abstract void loadFromDb(K aliveId);
+  //TODO: temoprary, should be removed and placed in loader
+  public abstract void loadFromDb(K id);
 }
