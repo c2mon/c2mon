@@ -95,4 +95,21 @@ public class MetadataUtilsTest {
     assertFalse(result.getMetadata().containsKey(currentKey1));
   }
 
+  @Test
+  public void testUpdateWithNullMetadataProperty(){
+    Metadata currentMetadata = new Metadata();
+    String currentKey = "currentKey";
+    currentMetadata.addMetadata(currentKey, null);
+    cern.c2mon.shared.client.metadata.Metadata clientMetadata = new cern.c2mon.shared.client.metadata.Metadata();
+    clientMetadata.setUpdate(true);
+    Properties properties = new Properties();
+    properties.put("metadata",  cern.c2mon.shared.client.metadata.Metadata.toJSON(clientMetadata));
+
+    Metadata result = MetadataUtils.parseMetadataConfiguration(properties, currentMetadata);
+
+    assertEquals(1, result.getMetadata().size());
+    assertTrue(result.getMetadata().containsKey(currentKey));
+    assertEquals(currentMetadata.getMetadata().get(currentKey), result.getMetadata().get(currentKey));
+  }
+
 }

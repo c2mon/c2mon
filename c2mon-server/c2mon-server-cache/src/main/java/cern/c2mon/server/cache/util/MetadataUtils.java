@@ -3,7 +3,6 @@ package cern.c2mon.server.cache.util;
 import cern.c2mon.shared.client.metadata.Metadata;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class MetadataUtils {
 
@@ -30,12 +29,12 @@ public class MetadataUtils {
         .entrySet()
         .stream()
         .filter(entry -> !removeList.contains(entry.getKey()))
-        .collect(Collectors.toMap(
-            Map.Entry::getKey,
-            Map.Entry::getValue
-        ));
+        .collect(HashMap::new,
+            (map, entry) -> map.put(entry.getKey(), entry.getValue()),
+            HashMap::putAll);
     clientMetadata.getMetadata()
         .forEach(newMetadata::put);
     return newMetadata;
   }
 }
+
