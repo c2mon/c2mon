@@ -192,7 +192,7 @@ public class SupervisedServiceImpl<T extends Supervised> implements SupervisedSe
   public void loadAndStartAliveTag(final Long supervisedId) {
     T supervised = cache.get(supervisedId);
     Long aliveId = supervised.getAliveTagId();
-    aliveTimerCache.loadFromDb(aliveId);
+    aliveTimerCache.loadFromDb(aliveId); //TODO: implement loadFromDB, before that think how it should be implemented and designed
     if (aliveId != null) {
       aliveTimerService.start(aliveId);
     }
