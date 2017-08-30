@@ -29,7 +29,7 @@ c2mon.client.history.jdbc.url=jdbc:hsqldb:hsql://localhost/c2mondb;sql.syntax_or
 c2mon.client.history.jdbc.username=sa
 c2mon.client.history.jdbc.password=
 ```
-See also [C2MON properties](user-guide/server/elasticsearch/database).
+See also [C2MON properties](/user-guide/server/database).
 
 !!! info "Note"
     C2MON currently only supports Oracle, HSQL and MySQL as backing stores.
