@@ -11,7 +11,15 @@ import cern.c2mon.shared.daq.config.Change;
  */
 public abstract class CacheObjectFactory<T extends Cacheable> {
 
-  public Cacheable createCacheObject(T cacheable, Properties properties) throws IllegalAccessException {
+  /**
+   * Creates CacheObject wrapped with properties, use this one
+   * @param id
+   * @param properties
+   * @return CacheObject
+   * @throws IllegalAccessException
+   */
+  public T createCacheObject(Long id, Properties properties) throws IllegalAccessException {
+    T cacheable = createCacheObject(id);
     configureCacheObject(cacheable, properties);
     validateConfig(cacheable);
 
@@ -23,6 +31,14 @@ public abstract class CacheObjectFactory<T extends Cacheable> {
     validateConfig(cacheable);
     return changeEvent;
   }
+
+  /**
+   * Creates basic object with only id set
+   *
+   * @param id
+   * @return CacheObject
+   */
+  public abstract T createCacheObject(Long id);
 
   public abstract Change configureCacheObject(T cacheable, Properties properties);
 

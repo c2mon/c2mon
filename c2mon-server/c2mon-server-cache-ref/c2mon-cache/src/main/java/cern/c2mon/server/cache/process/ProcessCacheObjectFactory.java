@@ -20,9 +20,11 @@ import cern.c2mon.shared.daq.config.ProcessConfigurationUpdate;
 public class ProcessCacheObjectFactory extends CacheObjectFactory<Process> {
 
   @Override
-  public Cacheable createCacheObject(Process process, Properties properties) throws IllegalAccessException {
-    process.setSupervisionStatus(SupervisionConstants.SupervisionStatus.DOWN);
-    return super.createCacheObject(process, properties);
+  public Process createCacheObject(Long id) {
+    ProcessCacheObject processCacheObject = new ProcessCacheObject(id);
+    processCacheObject.setSupervisionStatus(SupervisionConstants.SupervisionStatus.DOWN);
+
+    return processCacheObject;
   }
 
   @Override

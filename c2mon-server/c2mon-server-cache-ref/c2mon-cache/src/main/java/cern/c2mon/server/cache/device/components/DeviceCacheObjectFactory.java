@@ -29,6 +29,13 @@ public class DeviceCacheObjectFactory extends CacheObjectFactory<Device> {
   }
 
   @Override
+  public Device createCacheObject(Long id) {
+    DeviceCacheObject deviceCacheObject = new DeviceCacheObject(id);
+
+    return deviceCacheObject;
+  }
+
+  @Override
   public Change configureCacheObject(Device device, Properties properties) {
     DeviceCacheObject deviceCacheObject = (DeviceCacheObject) device;
 
