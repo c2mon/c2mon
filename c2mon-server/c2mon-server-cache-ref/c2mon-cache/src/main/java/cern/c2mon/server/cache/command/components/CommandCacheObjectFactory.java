@@ -38,6 +38,13 @@ public class CommandCacheObjectFactory extends CacheObjectFactory<CommandTag> {
   }
 
   @Override
+  public CommandTag createCacheObject(Long id) {
+    CommandTagCacheObject commandTagCacheObject = new CommandTagCacheObject(id);
+
+    return commandTagCacheObject;
+  }
+
+  @Override
   public Change configureCacheObject(CommandTag commandTag, Properties properties) {
     String tmpStr;
     CommandTagCacheObject commandTagCacheObject = (CommandTagCacheObject) commandTag;

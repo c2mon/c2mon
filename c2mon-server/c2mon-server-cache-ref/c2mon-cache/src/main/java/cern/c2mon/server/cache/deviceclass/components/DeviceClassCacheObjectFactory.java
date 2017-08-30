@@ -18,6 +18,13 @@ import cern.c2mon.shared.daq.config.Change;
 public class DeviceClassCacheObjectFactory extends CacheObjectFactory<DeviceClass> {
 
   @Override
+  public DeviceClass createCacheObject(Long id) {
+    DeviceClassCacheObject deviceClassCacheObject = new DeviceClassCacheObject(id);
+
+    return deviceClassCacheObject;
+  }
+
+  @Override
   public Change configureCacheObject(DeviceClass deviceClass, Properties properties) {
     DeviceClassCacheObject deviceClassCacheObject = (DeviceClassCacheObject) deviceClass;
 

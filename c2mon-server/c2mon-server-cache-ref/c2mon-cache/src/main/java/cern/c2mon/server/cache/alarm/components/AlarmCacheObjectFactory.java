@@ -37,18 +37,15 @@ public class AlarmCacheObjectFactory extends CacheObjectFactory<Alarm> {
   }
 
   @Override
-  public Alarm createCacheObject(Alarm alarm, Properties properties) throws IllegalAccessException {
-    AlarmCacheObject alarmCacheObject = (AlarmCacheObject) alarm;
-    configureCacheObject(alarm, properties);
+  public Alarm createCacheObject(Long id) {
+    AlarmCacheObject alarmCacheObject = new AlarmCacheObject(id);
 
     // Initialise run-time parameters with default values
     alarmCacheObject.setState(AlarmCondition.TERMINATE);
     alarmCacheObject.setTimestamp(new Timestamp(0));
     alarmCacheObject.setInfo("");
 
-    validateConfig(alarm);
-
-    return alarm;
+    return alarmCacheObject;
   }
 
   @Override
