@@ -1,5 +1,6 @@
 package cern.c2mon.cache.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -12,6 +13,7 @@ import javax.cache.processor.EntryProcessorResult;
 
 import org.apache.ignite.IgniteCache;
 import org.apache.ignite.IgniteSpringBean;
+import org.apache.ignite.cache.query.ScanQuery;
 import org.apache.ignite.configuration.CacheConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -64,8 +66,11 @@ public class IgniteC2monCache<K, V> extends C2monCache<K, V> {
   }
 
   @Override
-  public List getKeys() {
-    return null; //TODO: rethink if this method is required
+  public List<K> getKeys() {
+    List<K> keys = new ArrayList<>();
+    cache.query(new ScanQuery<>(null)).forEach(objectObjectEntry -> keys.add((K) objectObjectEntry.getKey()));
+
+    return keys;
   }
 
   @Override
