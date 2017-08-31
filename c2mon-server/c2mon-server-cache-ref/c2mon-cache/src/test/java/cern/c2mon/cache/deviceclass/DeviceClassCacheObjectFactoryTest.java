@@ -1,4 +1,4 @@
-package cern.c2mon.cache;
+package cern.c2mon.cache.deviceclass;
 
 import java.util.Properties;
 
@@ -8,6 +8,7 @@ import org.junit.Test;
 import cern.c2mon.server.cache.deviceclass.components.DeviceClassCacheObjectFactory;
 import cern.c2mon.server.common.device.Command;
 import cern.c2mon.server.common.device.DeviceClass;
+import cern.c2mon.server.common.device.DeviceClassCacheObject;
 import cern.c2mon.server.common.device.Property;
 import cern.c2mon.shared.common.ConfigurationException;
 
@@ -76,7 +77,10 @@ public class DeviceClassCacheObjectFactoryTest {
     DeviceClassCacheObjectFactory factory = new DeviceClassCacheObjectFactory();
 
     properties.put("properties", "<Properties />");
-    factory.createCacheObject(10L, properties);
+
+    DeviceClassCacheObject object = (DeviceClassCacheObject) factory.createCacheObject(10L, properties);
+
+    assertEquals("Properties should be empty", 0, object.getProperties().size());
   }
 
   @Test
@@ -84,10 +88,11 @@ public class DeviceClassCacheObjectFactoryTest {
     Properties properties = createProperties();
     DeviceClassCacheObjectFactory factory = new DeviceClassCacheObjectFactory();
 
-
     properties.put("commands", "<Commands />");
-    factory.createCacheObject(10L, properties);
-  }
+
+    DeviceClassCacheObject object = (DeviceClassCacheObject) factory.createCacheObject(10L, properties);
+
+    assertEquals("Commands should be empty", 0, object.getCommands().size());  }
 
   private Properties createProperties() {
     Properties properties = new Properties();
