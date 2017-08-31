@@ -1,6 +1,12 @@
 stages:
+  - clean
   - build
   - deploy
+
+clean_elasticsearch:
+  type: clean
+  script:
+    - rm -Rf /tmp/elasticsearch-node
 
 # Fully build and publish master branch
 build_and_publish:
