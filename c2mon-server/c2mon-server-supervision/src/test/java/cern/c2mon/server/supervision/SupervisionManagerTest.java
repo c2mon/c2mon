@@ -19,10 +19,6 @@ package cern.c2mon.server.supervision;
 import java.sql.Timestamp;
 import java.util.concurrent.CountDownLatch;
 
-import cern.c2mon.server.cache.config.CacheModule;
-import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
-import cern.c2mon.server.common.config.CommonModule;
-import cern.c2mon.server.supervision.config.SupervisionModule;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.Before;
@@ -32,15 +28,18 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.server.cache.*;
+import cern.c2mon.server.cache.config.CacheModule;
+import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.common.alive.AliveTimer;
+import cern.c2mon.server.common.config.CommonModule;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.common.tag.Tag;
+import cern.c2mon.server.supervision.config.SupervisionModule;
 import cern.c2mon.server.supervision.impl.SupervisionTagNotifier;
 import cern.c2mon.server.supervision.junit.SupervisionCachePopulationRule;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
@@ -260,6 +259,7 @@ public class SupervisionManagerTest {
    * @throws InterruptedException
    */
   @Test
+  @Ignore("This test is flaky")
   public void testCommFaultTag() throws InterruptedException {
     CountDownLatch latch1 = new CountDownLatch(6);
     //(1) Send CommFaultTag TRUE
