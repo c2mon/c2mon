@@ -5,7 +5,6 @@ import java.util.concurrent.LinkedBlockingDeque;
 import lombok.extern.slf4j.Slf4j;
 
 import cern.c2mon.cache.api.listener.impl.BufferedKeyCacheListener;
-import cern.c2mon.cache.api.listener.impl.CacheListener;
 import cern.c2mon.cache.api.listener.impl.DefaultBufferedCacheListener;
 import cern.c2mon.cache.api.listener.impl.MultiThreadedCacheListener;
 import cern.c2mon.server.common.component.Lifecycle;
@@ -73,7 +72,7 @@ public class C2monListenerService<K, V extends Cacheable> implements C2monListen
 
   @Override
   public Lifecycle registerListener(C2monCacheListener<? super V> cacheListener) {
-    CacheListener<? super V> wrappedCacheListener = new CacheListener<>(cacheListener);
+    MultiThreadedCacheListener<? super V> wrappedCacheListener = new MultiThreadedCacheListener<>(cacheListener,1000, 0);
     cacheListeners.add(wrappedCacheListener);
     return wrappedCacheListener;
   }
