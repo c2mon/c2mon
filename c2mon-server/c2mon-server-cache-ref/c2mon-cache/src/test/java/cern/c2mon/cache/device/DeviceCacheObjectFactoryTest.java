@@ -1,4 +1,4 @@
-package cern.c2mon.cache;
+package cern.c2mon.cache.device;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -103,6 +103,7 @@ public class DeviceCacheObjectFactoryTest {
       fail("createCacheObject() did not throw exception");
     }
     catch (ConfigurationException e) {
+      assertEquals("INVLAID_PARAMETER should be thrown", ConfigurationException.INVALID_PARAMETER_VALUE, e.getErrorCode());
     }
 
     verify(deviceClassCache);
@@ -125,6 +126,7 @@ public class DeviceCacheObjectFactoryTest {
       fail("createCacheObject() did not throw exception");
     }
     catch (ConfigurationException e) {
+      assertEquals("INVLAID_PARAMETER should be thrown", ConfigurationException.INVALID_PARAMETER_VALUE, e.getErrorCode());
     }
 
     verify(deviceClassCache);
@@ -144,6 +146,7 @@ public class DeviceCacheObjectFactoryTest {
       fail("createCacheObject() did not throw exception");
     }
     catch (ConfigurationException e) {
+      assertEquals("INVLAID_PARAMETER should be thrown", ConfigurationException.INVALID_PARAMETER_VALUE, e.getErrorCode());
     }
 
     verify(deviceClassCache);
@@ -164,6 +167,7 @@ public class DeviceCacheObjectFactoryTest {
       Assert.fail("createCacheObject() did not throw exception");
     }
     catch (ConfigurationException e) {
+      assertEquals("INVLAID_PARAMETER should be thrown", ConfigurationException.INVALID_PARAMETER_VALUE, e.getErrorCode());
     }
 
     verify(deviceClassCache);
@@ -181,9 +185,12 @@ public class DeviceCacheObjectFactoryTest {
     DeviceCacheObjectFactory factory = new DeviceCacheObjectFactory(deviceClassCache);
 
     deviceProperties.put("deviceProperties", "<DeviceProperties />");
-    factory.createCacheObject(10L, deviceProperties);
+
+    DeviceCacheObject object = (DeviceCacheObject) factory.createCacheObject(10L, deviceProperties);
 
     verify(deviceClassCache);
+
+    assertEquals("DeviceProperties should be empty", 0, object.getDeviceProperties().size());
   }
 
   @Test
@@ -198,9 +205,12 @@ public class DeviceCacheObjectFactoryTest {
     DeviceCacheObjectFactory factory = new DeviceCacheObjectFactory(deviceClassCache);
 
     deviceProperties.put("deviceCommands", "<DeviceCommands />");
-    factory.createCacheObject(10L, deviceProperties);
+
+    DeviceCacheObject object = (DeviceCacheObject) factory.createCacheObject(10L, deviceProperties);
 
     verify(deviceClassCache);
+
+    assertEquals("DeviceCommands should be empty", 0, object.getDeviceCommands().size());
   }
 
   private DeviceClass createDeviceClass() {
