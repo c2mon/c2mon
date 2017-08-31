@@ -33,6 +33,10 @@ public class AlarmCacheObjectFactoryTest {
 
   @Test
   public void createAlarmCacheObjectWithProperties() throws IllegalAccessException {
+    expect(handler.getTopicForAlarm(anyObject(AlarmCacheObject.class))).andReturn("tim.alarm");
+
+    replay(handler);
+
     Properties properties = new Properties();
     properties.setProperty("dataTagId", "100");
     properties.setProperty("faultFamily", "fault-family");
@@ -42,11 +46,7 @@ public class AlarmCacheObjectFactoryTest {
             "</AlarmCondition>\n");
 
     AlarmCacheObject alarm = (AlarmCacheObject) factory.createCacheObject(1L, properties);
-
-    expect(handler.getTopicForAlarm(anyObject(AlarmCacheObject.class))).andReturn("tim.alarm");
-
-    replay(handler);
-
+    
     assertEquals("alarm should have dataTagId set", Long.valueOf(100L), alarm.getDataTagId());
     assertEquals("alarm should have faultFamily set", "fault-family", alarm.getFaultFamily());
     assertEquals("alarm should have faultMember set", "fault-member", alarm.getFaultMember());
