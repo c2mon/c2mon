@@ -10,6 +10,7 @@ import cern.c2mon.server.cache.alarm.components.AlarmCacheObjectFactory;
 import cern.c2mon.server.cache.alarm.components.AlarmHandler;
 import cern.c2mon.server.cache.alarm.components.AlarmUpdateHandler;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
+import cern.c2mon.server.common.alarm.AlarmCondition;
 import cern.c2mon.shared.common.ConfigurationException;
 
 import static org.easymock.EasyMock.*;
@@ -46,11 +47,11 @@ public class AlarmCacheObjectFactoryTest {
             "</AlarmCondition>\n");
 
     AlarmCacheObject alarm = (AlarmCacheObject) factory.createCacheObject(1L, properties);
-    
+
     assertEquals("alarm should have dataTagId set", Long.valueOf(100L), alarm.getDataTagId());
     assertEquals("alarm should have faultFamily set", "fault-family", alarm.getFaultFamily());
     assertEquals("alarm should have faultMember set", "fault-member", alarm.getFaultMember());
-    assertTrue("alarm should have alarmCondition set", alarm.getCondition().toString().contains("TERMINATE"));
+    assertEquals("alarm should have alarmCondition set", alarm.getState(), AlarmCondition.TERMINATE);
     assertEquals("alarm should have alarm topic set", "tim.alarm", alarm.getTopic());
   }
 
