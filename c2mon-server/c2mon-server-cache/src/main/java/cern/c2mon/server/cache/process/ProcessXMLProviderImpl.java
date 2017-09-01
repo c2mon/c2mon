@@ -28,9 +28,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import cern.c2mon.server.cache.*;
+
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -48,16 +47,10 @@ import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
  * TODO Add to TC config.
  *
  * @author Mark Brightwell
- *
  */
 @Service
 @Slf4j
 public class ProcessXMLProviderImpl implements ProcessXMLProvider {
-
-  /**
-   * Class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(ProcessXMLProviderImpl.class);
 
   /**
    * Required facade, cache and DAO beans.
@@ -74,8 +67,8 @@ public class ProcessXMLProviderImpl implements ProcessXMLProvider {
 
   @Autowired
   public ProcessXMLProviderImpl(EquipmentCache equipmentCache, SubEquipmentDAO subEquipmentDAO,
-      SubEquipmentFacade subEquipmentFacade, DataTagFacade dataTagFacade, ControlTagCache controlTagCache,
-      ProcessCache processCache, CommandTagFacade commandTagFacade, SubEquipmentCache subEquipmentCache,
+                                SubEquipmentFacade subEquipmentFacade, DataTagFacade dataTagFacade, ControlTagCache controlTagCache,
+                                ProcessCache processCache, CommandTagFacade commandTagFacade, SubEquipmentCache subEquipmentCache,
                                 EquipmentFacade equipmentFacade) {
     super();
     this.equipmentCache = equipmentCache;
@@ -84,7 +77,7 @@ public class ProcessXMLProviderImpl implements ProcessXMLProvider {
     this.subEquipmentCache = subEquipmentCache;
     this.dataTagFacade = dataTagFacade;
     this.controlTagCache = controlTagCache;
-    this.processCache= processCache;
+    this.processCache = processCache;
     this.commandTagFacade = commandTagFacade;
     this.equipmentFacade = equipmentFacade;
   }
@@ -124,7 +117,7 @@ public class ProcessXMLProviderImpl implements ProcessXMLProvider {
       str.append(processCacheObject.getMaxMessageDelay());
       str.append("</max-message-delay>\n");
 
-        LOGGER.debug("getting equipment ids");
+      log.debug("getting equipment ids");
 
       str.append("  <EquipmentUnits>\n");
       Collection<Long> equipmentIds = processCacheObject.getEquipmentIds();
@@ -210,7 +203,7 @@ public class ProcessXMLProviderImpl implements ProcessXMLProvider {
 
   /**
    * Creates the configuration for the subequipments attached to the equipment provided as a parameter
-   *
+   * <p>
    * <p>Called within block synchronized on equipment.
    *
    * @param equipment Reference to the equipment for which we want to generate its subequipments configuration
@@ -238,11 +231,10 @@ public class ProcessXMLProviderImpl implements ProcessXMLProvider {
    * Generates a XML file describing the configuration for the SubEquipment's that are attached to the
    * indicated equipment
    *
-   * @param equipmentId
-   *          The id of the equipment for which we want to generate its
-   *          subEquipments configuration
+   * @param equipmentId The id of the equipment for which we want to generate its
+   *                    subEquipments configuration
    * @return A string representing an XML file containing the equipment's
-   *         information for its subEquipments
+   * information for its subEquipments
    */
   @Override
   public String getSubEquipmentConfigXML(final Long equipmentId) {
@@ -312,7 +304,7 @@ public class ProcessXMLProviderImpl implements ProcessXMLProvider {
    * Generate the content of the <DataTags> section of the DAQ config XML.
    * This method generates a <DataTag ...> XML entry for each DataTag
    * attached to the specified equipment unit or one of its subequipments.
-   *
+   * <p>
    * <p>Called within block synchronized on equipment.
    */
   private String getDataTagsConfigXML(final EquipmentCacheObject pEquipment) {
@@ -329,8 +321,8 @@ public class ProcessXMLProviderImpl implements ProcessXMLProvider {
     // Generate XML for this equipment unit and append it to the buffer.
     // generate datatag XML:
     ThreadPoolExecutor tagXmlExecutor =
-      new ThreadPoolExecutor(8, 10, 5, TimeUnit.SECONDS,
-          new LinkedBlockingQueue<>(10000), new ThreadPoolExecutor.CallerRunsPolicy());
+        new ThreadPoolExecutor(8, 10, 5, TimeUnit.SECONDS,
+            new LinkedBlockingQueue<>(10000), new ThreadPoolExecutor.CallerRunsPolicy());
     Collection<Long> dataTags = equipmentFacade.getDataTagIds(pEquipment.getId());
 
     // TIMS-851: Allow attachment of DataTags to SubEquipments
@@ -420,7 +412,7 @@ public class ProcessXMLProviderImpl implements ProcessXMLProvider {
    * Generate the content of the <CommandTags> section of the DAQ config XML.
    * This method generates a <CommandTag ...> XML entry for each CommandTag
    * attached to the specified equipment unit or one of its subequipments.
-   *
+   * <p>
    * <p>Call within equipment lock.
    */
   private String getCommandTagsConfigXML(final EquipmentCacheObject pEquipment) {
@@ -440,8 +432,8 @@ public class ProcessXMLProviderImpl implements ProcessXMLProvider {
 
   /**
    * Task used when loading the config XML from the DataTag cache.
-   * @author Mark Brightwell
    *
+   * @author Mark Brightwell
    */
   private class GetTagXmlTask implements Callable<String> {
 
@@ -470,5 +462,4 @@ public class ProcessXMLProviderImpl implements ProcessXMLProvider {
   public String getProcessConfigXML(String processName) {
     return getProcessConfigXML(processCache.getCopy(processName));
   }
-
 }

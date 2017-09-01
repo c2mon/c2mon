@@ -370,9 +370,9 @@ public class ConfigureDataTagTest {
     List<ConfigurationElement> parsed = parser.parse(config);
 
     assertEquals((long) parsed.get(0).getEntityId(), 20L);
-    assertEquals(parsed.get(0).getEntity(), ConfigConstants.Entity.DATATAG);
-    assertEquals(parsed.get(0).getAction(), ConfigConstants.Action.UPDATE);
-    assertEquals(parsed.get(0).getElementProperties(), expectedProps);
+    assertEquals(ConfigConstants.Entity.DATATAG, parsed.get(0).getEntity());
+    assertEquals(ConfigConstants.Action.UPDATE, parsed.get(0).getAction());
+    assertEquals(expectedProps, parsed.get(0).getElementProperties());
 
     EasyMock.verify(dataTagCache, tagFacadeGateway);
   }

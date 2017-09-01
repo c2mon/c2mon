@@ -19,12 +19,6 @@ package cern.c2mon.server.client.publish;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import cern.c2mon.server.cache.*;
-import cern.c2mon.server.cache.C2monCacheListener;
-import cern.c2mon.server.client.config.ClientProperties;
-import cern.c2mon.server.common.alarm.TagWithAlarms;
-import cern.c2mon.shared.client.serializer.TransferTagSerializer;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -35,12 +29,17 @@ import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.alarm.AlarmAggregator;
 import cern.c2mon.server.alarm.AlarmAggregatorListener;
+import cern.c2mon.server.cache.*;
+import cern.c2mon.server.client.config.ClientProperties;
 import cern.c2mon.server.client.util.TransferObjectFactory;
+import cern.c2mon.server.common.alarm.TagWithAlarms;
+import cern.c2mon.server.common.republisher.Publisher;
 import cern.c2mon.server.common.republisher.Republisher;
 import cern.c2mon.server.common.republisher.RepublisherFactory;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.configuration.ConfigurationUpdate;
 import cern.c2mon.server.configuration.ConfigurationUpdateListener;
+import cern.c2mon.shared.client.serializer.TransferTagSerializer;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
 import cern.c2mon.shared.client.tag.TransferTagImpl;
 import cern.c2mon.shared.client.tag.TransferTagValueImpl;
@@ -84,7 +83,7 @@ public class TagValuePublisher implements C2monCacheListener<Tag>, Configuration
   private final CacheRegistrationService cacheRegistrationService;
 
   /** Contains re-publication logic */
-  private Republisher<Tag> republisher;
+  private Republisher<TagWithAlarms> republisher;
 
   /** Time between republicaton attempts */
   private int republicationDelay;
@@ -170,6 +169,7 @@ public class TagValuePublisher implements C2monCacheListener<Tag>, Configuration
 //   *               is null if no alarms are associated to the tag
 //   */
 //  @Deprecated
+//  @Override
 //  public void notifyOnUpdate(final Tag tag, final List<Alarm> alarms) {
 //    TagWithAlarms tagWithAlarms = new TagWithAlarmsImpl(tag, alarms);
 //    try {
@@ -229,12 +229,12 @@ public class TagValuePublisher implements C2monCacheListener<Tag>, Configuration
   @Override
   // TODO change the TagWithAlarmsImpl in order to send the expressions information to the client
   public void notifyElementUpdated(Tag tag) {
+    TagWithAlarms tagWithAlarms = this.tagFacadeGateway.getTagWithAlarms(tag.getId());
     try {
-      TagWithAlarms tagWithAlarms = this.tagFacadeGateway.getTagWithAlarms(tag.getId();
       publish(tagWithAlarms);
     } catch (JmsException e) {
       log.error("Error publishing tag update to topic for tag " + tag.getId() + " - submitting for republication", e);
-      republisher.publicationFailed(tag);
+      republisher.publicationFailed(tagWithAlarms);
     }
   }
 

@@ -25,11 +25,9 @@ import java.io.Serializable;
 import javax.annotation.PostConstruct;
 
 import cern.c2mon.server.cache.config.CacheProperties;
+
 import lombok.extern.slf4j.Slf4j;
 import net.sf.ehcache.Ehcache;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import cern.c2mon.server.cache.C2monCache;
 import cern.c2mon.server.cache.ClusterCache;
@@ -44,10 +42,9 @@ import cern.c2mon.server.cache.ClusterCache;
  * It is recommended to make the instantiation through Spring to avoid having a direct
  * dependency to Ehcache in the code.
  *
- * @author Matthias Braeger
- *
  * @param <K> key class type
  * @param <V> value class type
+ * @author Matthias Braeger
  */
 @Slf4j
 public class DefaultCacheImpl<K, V extends Serializable> extends BasicCache<K, V> implements C2monCache<K, V> {
@@ -65,7 +62,7 @@ public class DefaultCacheImpl<K, V extends Serializable> extends BasicCache<K, V
     // if in single cache mode, clear the disk cache before starting up
     //(skipCacheLoading can be set to override this and use the disk store instead)
     if (!properties.isSkipPreloading() && properties.getMode().equalsIgnoreCase("single")) {
-        cache.removeAll();
+      cache.removeAll();
     }
   }
 
@@ -83,8 +80,7 @@ public class DefaultCacheImpl<K, V extends Serializable> extends BasicCache<K, V
       } finally {
         this.releaseReadLockOnKey(id);
       }
-    }
-    else {
+    } else {
       log.error("getCopy() - Trying to access cache with a NULL key - throwing an exception!");
       //TODO throw runtime exception here or not?
       throw new IllegalArgumentException("Accessing cache with null key!");
@@ -93,6 +89,7 @@ public class DefaultCacheImpl<K, V extends Serializable> extends BasicCache<K, V
 
   /**
    * Returns a deep copy through serialization
+   *
    * @param reference The reference object
    * @return Copy of the reference
    */

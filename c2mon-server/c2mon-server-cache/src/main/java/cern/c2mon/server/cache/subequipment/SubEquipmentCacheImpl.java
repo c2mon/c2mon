@@ -19,11 +19,10 @@ package cern.c2mon.server.cache.subequipment;
 import javax.annotation.PostConstruct;
 
 import cern.c2mon.server.cache.config.CacheProperties;
+
 import lombok.extern.slf4j.Slf4j;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.loader.CacheLoader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jmx.export.annotation.ManagedResource;
@@ -44,14 +43,15 @@ import cern.c2mon.shared.common.ConfigurationException;
  * Implementation of the SubEquipment cache.
  *
  * @author Mark Brightwell
- *
  */
 @Slf4j
 @Service("subEquipmentCache")
-@ManagedResource(objectName="cern.c2mon:type=cache,name=subEquipmentCache")
+@ManagedResource(objectName = "cern.c2mon:type=cache,name=subEquipmentCache")
 public class SubEquipmentCacheImpl extends AbstractCache<Long, SubEquipment> implements SubEquipmentCache {
 
-  /** Used to post configure the associated control tags */
+  /**
+   * Used to post configure the associated control tags
+   */
   private final ControlTagCache controlCache;
 
   private final EquipmentCache equipmentCache;
@@ -94,6 +94,7 @@ public class SubEquipmentCacheImpl extends AbstractCache<Long, SubEquipment> imp
 
   /**
    * Ensures that the Alive-, Status- and CommFault Tags have appropriately the sub-equipment id set.
+   *
    * @param subEquipment the cache object
    */
   @Override
@@ -126,8 +127,7 @@ public class SubEquipmentCacheImpl extends AbstractCache<Long, SubEquipment> imp
             String.format("No CommFault tag (%s) found for sub-equipment #%d (%s).", commFaultTagId, subEquipment.getId(), subEquipment.getName()));
       }
 
-    }
-    else {
+    } else {
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, String.format("No CommFault tag for Sub-Equipment %s (#%d) defined.",
           subEquipment.getName(), subEquipment.getId()));
     }
@@ -143,8 +143,7 @@ public class SubEquipmentCacheImpl extends AbstractCache<Long, SubEquipment> imp
             String.format("No Status tag (%s) found for Sub-Equipment %s (#%d).", statusTagId, subEquipment.getName(), subEquipment.getId()));
       }
 
-    }
-    else {
+    } else {
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, String.format("No Status tag for Sub-Equipment %s (#%d) defined.",
           subEquipment.getName(), subEquipment.getId()));
     }
@@ -167,5 +166,4 @@ public class SubEquipmentCacheImpl extends AbstractCache<Long, SubEquipment> imp
     copy.setProcessId(processId);
     controlCache.putQuiet(copy);
   }
-
 }

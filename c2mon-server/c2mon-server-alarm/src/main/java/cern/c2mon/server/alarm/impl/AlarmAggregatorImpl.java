@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -36,15 +36,14 @@ import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.tag.Tag;
 
 /**
- * Implementation of the {@link AlarmAggregator} (a singleton bean in 
+ * Implementation of the {@link AlarmAggregator} (a singleton bean in
  * the server context).
- * 
+ * <p>
  * <p>This implementation registers for synchronous notifications from the cache (i.e.
  * on original JMS update thread). These calls are passed through to the client module
  * on the same thread (may need adjusting).
- * 
- * @author Mark Brightwell
  *
+ * @author Mark Brightwell
  */
 @Slf4j
 @Service
@@ -54,34 +53,34 @@ public class AlarmAggregatorImpl implements AlarmAggregator, C2monCacheListener<
    * List of registered listeners.
    */
   private List<AlarmAggregatorListener> listeners;
-  
+
   /**
    * Used to register the aggregator as Tag update listener.
    */
   private CacheRegistrationService cacheRegistrationService;
-  
+
   /**
    * The gateway to all Tag facades.
    */
   private TagFacadeGateway tagFacadeGateway;
-  
+
   /**
    * The gateway to all Tag caches.
    */
   private TagLocationService tagLocationService;
-  
+
   /**
    * Autowired constructor.
-   * 
-   * @param cacheRegistrationService the cache registration service (for registration to cache update notifications)  
-   * @param tagFacadeGateway the Tag Facade gateway (for access to all Tag Facade beans) 
-   * @param tagLocationService the Tag location service
+   *
+   * @param cacheRegistrationService the cache registration service (for registration to cache update notifications)
+   * @param tagFacadeGateway         the Tag Facade gateway (for access to all Tag Facade beans)
+   * @param tagLocationService       the Tag location service
    */
   @Autowired
   public AlarmAggregatorImpl(final CacheRegistrationService cacheRegistrationService,
-      final TagFacadeGateway tagFacadeGateway, final TagLocationService tagLocationService) {
+                             final TagFacadeGateway tagFacadeGateway, final TagLocationService tagLocationService) {
     super();
-    this.cacheRegistrationService = cacheRegistrationService;    
+    this.cacheRegistrationService = cacheRegistrationService;
     this.tagFacadeGateway = tagFacadeGateway;
     this.tagLocationService = tagLocationService;
     listeners = new ArrayList<AlarmAggregatorListener>();
@@ -89,7 +88,7 @@ public class AlarmAggregatorImpl implements AlarmAggregator, C2monCacheListener<
 
   /**
    * Init method called on bean creation.
-   * Registers to cache updates 
+   * Registers to cache updates
    * (synchronous to guarantee evaluation of all alarms )
    */
   @PostConstruct
@@ -100,7 +99,7 @@ public class AlarmAggregatorImpl implements AlarmAggregator, C2monCacheListener<
     cacheRegistrationService.registerSynchronousToAllTags(this);
     cacheRegistrationService.registerForSupervisionChanges(this);
   }
-    
+
   @Override
   public void registerForTagUpdates(final AlarmAggregatorListener aggregatorListener) {
     listeners.add(aggregatorListener);
@@ -108,23 +107,24 @@ public class AlarmAggregatorImpl implements AlarmAggregator, C2monCacheListener<
 
   /**
    * When an update to a Tag is received from the cache, evaluates the associated Alarms
-   * and notifies the (alarm + tag) listeners. 
-   * 
+   * and notifies the (alarm + tag) listeners.
+   * <p>
    * <p>Notice that received Tag is a clone, but since the cache notification is synchronous
    * a lock is already held on this tag, which can therefore not be modified during this
    * call.
-   * 
+   *
    * @param tag a clone of the updated Tag received from the cache
    */
   @Override
-  public void notifyElementUpdated(final Tag tag) {      
-      List<Alarm> alarmList = evaluateAlarms(tag);            
-      notifyListeners(tag, alarmList);          
+  public void notifyElementUpdated(final Tag tag) {
+    List<Alarm> alarmList = evaluateAlarms(tag);
+    notifyListeners(tag, alarmList);
   }
 
   /**
    * Notify the listeners of a tag update with associated alarms.
-   * @param tag the Tag that has been updated
+   *
+   * @param tag       the Tag that has been updated
    * @param alarmList the associated list of evaluated alarms
    */
   private void notifyListeners(final Tag tag, final List<Alarm> alarmList) {
@@ -141,7 +141,6 @@ public class AlarmAggregatorImpl implements AlarmAggregator, C2monCacheListener<
   @Override
   public void onSupervisionChange(final Tag tag) {
     log.trace("Evaluating alarm for tag " + tag.getId() + " due to supervision status notification.");
-
     evaluateAlarms(tag);
   }
 
@@ -153,11 +152,11 @@ public class AlarmAggregatorImpl implements AlarmAggregator, C2monCacheListener<
         if (alarmList.isEmpty()) {
           log.warn("Empty alarm list returned when evaluating alarms for tag " + tag.getId()
               + " - this should not be happening (possible timestamp filtering problem)");
-        }        
+        }
       } catch (Exception e) {
         log.error("Exception caught when attempting to evaluate the alarms for tag " + tag.getId()
             + " - publishing to the client with no attached alarms.", e);
-      }       
+      }
     }
     return alarmList;
   }
@@ -169,5 +168,4 @@ public class AlarmAggregatorImpl implements AlarmAggregator, C2monCacheListener<
     //During a server recovery start, a callback will be provided on the onSupervisionChange method, which will
     // re-evaluate all alarms.
   }
-    
 }

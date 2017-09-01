@@ -18,13 +18,9 @@ package cern.c2mon.server.cache.commfault;
 
 import javax.annotation.PostConstruct;
 
-import cern.c2mon.server.cache.config.CacheProperties;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.loader.CacheLoader;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -32,6 +28,7 @@ import org.springframework.stereotype.Service;
 import cern.c2mon.server.cache.ClusterCache;
 import cern.c2mon.server.cache.CommFaultTagCache;
 import cern.c2mon.server.cache.common.AbstractCache;
+import cern.c2mon.server.cache.config.CacheProperties;
 import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
 import cern.c2mon.server.cache.loading.SimpleCacheLoaderDAO;
 import cern.c2mon.server.common.commfault.CommFaultTag;
@@ -41,7 +38,6 @@ import cern.c2mon.server.common.config.C2monCacheName;
  * Implementation of CommFaultTag cache.
  *
  * @author Mark Brightwell
- *
  */
 @Slf4j
 @Service("commFaultTagCache")

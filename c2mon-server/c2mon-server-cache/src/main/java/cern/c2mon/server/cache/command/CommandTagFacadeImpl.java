@@ -16,6 +16,13 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.command;
 
+import java.lang.reflect.Field;
+import java.util.Properties;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import cern.c2mon.server.cache.CommandTagCache;
 import cern.c2mon.server.cache.CommandTagFacade;
 import cern.c2mon.server.cache.EquipmentCache;
@@ -33,25 +40,13 @@ import cern.c2mon.shared.common.datatag.address.HardwareAddressFactory;
 import cern.c2mon.shared.common.type.TypeConverter;
 import cern.c2mon.shared.daq.config.CommandTagUpdate;
 import cern.c2mon.shared.daq.config.HardwareAddressUpdate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.lang.reflect.Field;
-import java.util.Properties;
-
 
 /**
  * Implementation of the CommandTagFacade.
  */
 @Service
+@Slf4j
 public class CommandTagFacadeImpl extends AbstractFacade<CommandTag> implements CommandTagFacade {
-
-  /**
-   * Private class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(CommandTagFacadeImpl.class);
 
   /**
    * Reference to the cache.
@@ -72,6 +67,7 @@ public class CommandTagFacadeImpl extends AbstractFacade<CommandTag> implements 
 
   /**
    * Generates the XML needed to send to the DAQ at start-up.
+   *
    * @param id
    * @return
    */
@@ -82,7 +78,7 @@ public class CommandTagFacadeImpl extends AbstractFacade<CommandTag> implements 
       CommandTag commandTag = commandTagCache.getCopy(id);
       returnValue = generateSourceXML(commandTag); //old version: SourceDataTag.toConfigXML(tag);
     } catch (CacheElementNotFoundException cacheEx) {
-      LOGGER.error("Failed to locate command tag with id " + id + " in the cache (returning empty String config).");
+      log.error("Failed to locate command tag with id {} in the cache (returning empty String config).", id);
     }
     return returnValue;
   }
@@ -102,10 +98,10 @@ public class CommandTagFacadeImpl extends AbstractFacade<CommandTag> implements 
   @Override
   public SourceCommandTag generateSourceCommandTag(CommandTag commandTag) {
     SourceCommandTag sourceCommandTag = new SourceCommandTag(commandTag.getId(),
-                                                             commandTag.getName(),
-                                                             commandTag.getSourceTimeout(),
-                                                             commandTag.getSourceRetries(),
-                                                             commandTag.getHardwareAddress());
+        commandTag.getName(),
+        commandTag.getSourceTimeout(),
+        commandTag.getSourceRetries(),
+        commandTag.getHardwareAddress());
     return sourceCommandTag;
   }
 
@@ -138,8 +134,7 @@ public class CommandTagFacadeImpl extends AbstractFacade<CommandTag> implements 
     if ((tmpStr = properties.getProperty("mode")) != null) {
       try {
         commandTagCacheObject.setMode(Short.parseShort(tmpStr));
-      }
-      catch (NumberFormatException e) {
+      } catch (NumberFormatException e) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "NumberFormatException: Unable to convert parameter \"mode\" to short: " + tmpStr);
       }
     }
@@ -153,8 +148,7 @@ public class CommandTagFacadeImpl extends AbstractFacade<CommandTag> implements 
       try {
         commandTagCacheObject.setSourceRetries(Integer.parseInt(tmpStr));
         commandTagUpdate.setSourceRetries(Integer.parseInt(tmpStr));
-      }
-      catch (NumberFormatException e) {
+      } catch (NumberFormatException e) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "NumberFormatException: Unable to convert parameter \"sourceRetries\" to int: " + tmpStr);
       }
     }
@@ -163,8 +157,7 @@ public class CommandTagFacadeImpl extends AbstractFacade<CommandTag> implements 
       try {
         commandTagCacheObject.setSourceTimeout(Integer.parseInt(tmpStr));
         commandTagUpdate.setSourceTimeout(Integer.parseInt(tmpStr));
-      }
-      catch (NumberFormatException e) {
+      } catch (NumberFormatException e) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "NumberFormatException: Unable to convert parameter \"sourceTimeout\" to int: " + tmpStr);
       }
     }
@@ -172,8 +165,7 @@ public class CommandTagFacadeImpl extends AbstractFacade<CommandTag> implements 
     if ((tmpStr = properties.getProperty("execTimeout")) != null) {
       try {
         commandTagCacheObject.setExecTimeout(Integer.parseInt(tmpStr));
-      }
-      catch (NumberFormatException e) {
+      } catch (NumberFormatException e) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "NumberFormatException: Unable to convert parameter \"execTimeout\" to int: " + tmpStr);
       }
     }
@@ -181,8 +173,7 @@ public class CommandTagFacadeImpl extends AbstractFacade<CommandTag> implements 
     if ((tmpStr = properties.getProperty("clientTimeout")) != null) {
       try {
         commandTagCacheObject.setClientTimeout(Integer.parseInt(tmpStr));
-      }
-      catch (NumberFormatException e) {
+      } catch (NumberFormatException e) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "NumberFormatException: Unable to convert parameter \"clientTimeout\" to int: " + tmpStr);
       }
     }
@@ -192,20 +183,19 @@ public class CommandTagFacadeImpl extends AbstractFacade<CommandTag> implements 
         HardwareAddress hardwareAddress = HardwareAddressFactory.getInstance().fromConfigXML(tmpStr);
         commandTagCacheObject.setHardwareAddress(hardwareAddress);
         setUpdateHardwareAddress(hardwareAddress, commandTagUpdate);
-      }
-      catch (Exception e) {
+      } catch (Exception e) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Exception: Unable to create HardwareAddress from parameter \"hardwareAddress\": " + tmpStr);
       }
     }
 
     // minValue (Comparable)
-    if ((tmpStr = properties.getProperty("minValue"))!= null) {
-        Comparable comparableMin = (Comparable) TypeConverter.cast(tmpStr, commandTagCacheObject.getDataType());
-        commandTagCacheObject.setMinimum(comparableMin);
+    if ((tmpStr = properties.getProperty("minValue")) != null) {
+      Comparable comparableMin = (Comparable) TypeConverter.cast(tmpStr, commandTagCacheObject.getDataType());
+      commandTagCacheObject.setMinimum(comparableMin);
     }
 
     // Try to extract maxValue of the appropriate data type
-    if ((tmpStr = properties.getProperty("maxValue"))!= null) {
+    if ((tmpStr = properties.getProperty("maxValue")) != null) {
       Comparable comparableMax = (Comparable) TypeConverter.cast(tmpStr, commandTagCacheObject.getDataType());
       commandTagCacheObject.setMaximum(comparableMax);
     }
@@ -239,8 +229,7 @@ public class CommandTagFacadeImpl extends AbstractFacade<CommandTag> implements 
       try {
         commandTagCacheObject.setEquipmentId(Long.valueOf(tmpStr));
         commandTagCacheObject.setProcessId(equipmentCache.get(commandTagCacheObject.getEquipmentId()).getProcessId());
-      }
-      catch (NumberFormatException e) {
+      } catch (NumberFormatException e) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "NumberFormatException: Unable to convert parameter \"equipmentId\" to Long: " + tmpStr);
       }
     }
@@ -249,7 +238,8 @@ public class CommandTagFacadeImpl extends AbstractFacade<CommandTag> implements 
 
   /**
    * Sets the {@link HardwareAddress} field in the {@link CommandTagUpdate}.
-   * @param hardwareAddress the new {@link HardwareAddress}
+   *
+   * @param hardwareAddress  the new {@link HardwareAddress}
    * @param commandTagUpdate the update object that will be sent to the DAQ
    * @throws IllegalAccessException
    * @throws
@@ -266,6 +256,7 @@ public class CommandTagFacadeImpl extends AbstractFacade<CommandTag> implements 
 
   /**
    * Checks all fields of a Command Tag satisfy requirements.
+   *
    * @param commandTag
    * @throws ConfigurationException
    */
@@ -286,10 +277,13 @@ public class CommandTagFacadeImpl extends AbstractFacade<CommandTag> implements 
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"description\" can be up to 100 characters long");
     }
     switch (commandTag.getMode()) {
-      case DataTagConstants.MODE_OPERATIONAL : break;
-      case DataTagConstants.MODE_TEST : break;
-      case DataTagConstants.MODE_MAINTENANCE : break;
-      default :
+      case DataTagConstants.MODE_OPERATIONAL:
+        break;
+      case DataTagConstants.MODE_TEST:
+        break;
+      case DataTagConstants.MODE_MAINTENANCE:
+        break;
+      default:
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Invalid value for parameter \"mode\" : " + commandTag.getMode());
     }
 
@@ -314,7 +308,7 @@ public class CommandTagFacadeImpl extends AbstractFacade<CommandTag> implements 
     }
 
     if (commandTag.getExecTimeout() < (commandTag.getSourceTimeout() * (commandTag.getSourceRetries() + 1))) {
-      LOGGER.debug("sourceTimeout: " + commandTag.getSourceTimeout() + " sourceRetries: " + commandTag.getSourceRetries() + " execTimeout: " + commandTag.getExecTimeout());
+      log.debug("sourceTimeout: " + commandTag.getSourceTimeout() + " sourceRetries: " + commandTag.getSourceRetries() + " execTimeout: " + commandTag.getExecTimeout());
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"execTimeout\" must be greater than (sourceRetries + 1) * sourceTimeout");
     }
 
@@ -324,21 +318,19 @@ public class CommandTagFacadeImpl extends AbstractFacade<CommandTag> implements 
         if (!minValueClass.isInstance(commandTag.getMinimum())) {
           throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"mininum\" must be of type " + commandTag.getDataType() + " or null");
         }
-      }
-      catch (Exception e) {
+      } catch (Exception e) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Error validating parameter \"minimum\": " + e.getMessage());
       }
 
     }
 
-    if (commandTag.getMaximum() != null ) {
+    if (commandTag.getMaximum() != null) {
       try {
         Class maxValueClass = TypeConverter.getType(commandTag.getDataType());
         if (!maxValueClass.isInstance(commandTag.getMaximum())) {
           throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"maximum\" must be of type " + commandTag.getDataType() + " or null");
         }
-      }
-      catch (Exception e) {
+      } catch (Exception e) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Error validating parameter \"maximum\": " + e.getMessage());
       }
 
@@ -354,6 +346,7 @@ public class CommandTagFacadeImpl extends AbstractFacade<CommandTag> implements 
 
   /**
    * Used to be implemented in SourceCommandTag object (TODO still be be removed there)
+   *
    * @param cmd
    * @return
    */

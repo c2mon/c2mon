@@ -21,20 +21,18 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
-import cern.c2mon.server.cache.config.CacheProperties;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.loader.CacheLoader;
 import net.sf.ehcache.search.Attribute;
 import net.sf.ehcache.search.Results;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.cache.ClusterCache;
+import cern.c2mon.server.cache.config.CacheProperties;
 import cern.c2mon.server.cache.DataTagCache;
 import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
@@ -47,11 +45,10 @@ import cern.c2mon.server.common.datatag.DataTag;
  * Implementation of the DataTag cache.
  *
  * @author Mark Brightwell
- *
  */
 @Slf4j
 @Service("dataTagCache")
-@ManagedResource(objectName="cern.c2mon:type=cache,name=dataTagCache")
+@ManagedResource(objectName = "cern.c2mon:type=cache,name=dataTagCache")
 public class DataTagCacheImpl extends AbstractTagCache<DataTag> implements DataTagCache {
 
   @Autowired
@@ -106,7 +103,8 @@ public class DataTagCacheImpl extends AbstractTagCache<DataTag> implements DataT
 
   /**
    * Receives a list of all DataTag ids which are attached to the given equipment or sub-equipment.
-   * @param id The id of the (sub-)equipment
+   *
+   * @param id              The id of the (sub-)equipment
    * @param searchAttribute The ehcache search attribute, which is specified in the wrapper method
    * @return A list of all DataTag ids belonging to the given (sub-)equipment
    */
@@ -138,7 +136,6 @@ public class DataTagCacheImpl extends AbstractTagCache<DataTag> implements DataT
     }
     return tagIds;
   }
-
 
   @Override
   protected void doPostDbLoading(DataTag cacheObject) {

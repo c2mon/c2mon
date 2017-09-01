@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -33,7 +33,6 @@ import cern.c2mon.server.common.process.Process;
  * Implementation of the AliverTimerFacade.
  *
  * @author Mark Brightwell
- *
  */
 @Slf4j
 @Service
@@ -67,6 +66,7 @@ public class AliveTimerFacadeImpl implements AliveTimerFacade {
       aliveTimerCache.releaseWriteLockOnKey(aliveId);
     }
   }
+
   /**
    * Update this alive timer. This method will reset the time of the last
    * update and thus relaunch the alive timer.
@@ -165,6 +165,7 @@ public class AliveTimerFacadeImpl implements AliveTimerFacade {
 
   /**
    * Check whether this alive timer has expired.
+   *
    * @return true if the alive timer is active and it has not been updated since
    * at least "aliveInterval" milliseconds.
    */
@@ -172,8 +173,8 @@ public class AliveTimerFacadeImpl implements AliveTimerFacade {
   public boolean hasExpired(final Long aliveTimerId) {
     aliveTimerCache.acquireReadLockOnKey(aliveTimerId);
     try {
-        AliveTimer aliveTimer = aliveTimerCache.get(aliveTimerId);
-        return (System.currentTimeMillis() - aliveTimer.getLastUpdate() > aliveTimer.getAliveInterval() + aliveTimer.getAliveInterval() / 3);
+      AliveTimer aliveTimer = aliveTimerCache.get(aliveTimerId);
+      return (System.currentTimeMillis() - aliveTimer.getLastUpdate() > aliveTimer.getAliveInterval() + aliveTimer.getAliveInterval() / 3);
     } finally {
       aliveTimerCache.releaseReadLockOnKey(aliveTimerId);
     }
@@ -212,7 +213,7 @@ public class AliveTimerFacadeImpl implements AliveTimerFacade {
       type = AliveTimer.ALIVE_TYPE_SUBEQUIPMENT;
     }
     AliveTimer aliveTimer = new AliveTimerCacheObject(abstractEquipment.getAliveTagId(), abstractEquipment.getId(), abstractEquipment.getName(),
-                                                      abstractEquipment.getStateTagId(), type, abstractEquipment.getAliveInterval());
+        abstractEquipment.getStateTagId(), type, abstractEquipment.getAliveInterval());
     aliveTimerCache.put(aliveTimer.getId(), aliveTimer);
   }
 

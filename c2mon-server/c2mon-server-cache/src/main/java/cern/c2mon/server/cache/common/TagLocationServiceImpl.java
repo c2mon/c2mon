@@ -20,9 +20,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,8 +33,8 @@ import cern.c2mon.server.common.tag.Tag;
 
 /**
  * Spring bean implementation of the {@link TagLocationService}.
- * @author mbrightw
  *
+ * @author mbrightw
  */
 @Service
 public class TagLocationServiceImpl implements TagLocationService {
@@ -58,7 +55,6 @@ public class TagLocationServiceImpl implements TagLocationService {
   private RuleTagCache ruleTagCache;
 
   /**
-   *
    * @param dataTagCache
    * @param controlTagCache
    * @param ruleTagCache

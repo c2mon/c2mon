@@ -104,7 +104,7 @@ public class ReflectionService {
               tempProp = String.valueOf(Metadata.toJSON((Metadata) pd.getReadMethod().invoke(obj)));
 
             } else if (pd.getName().equals("expressions")) {
-              tempProp = mapper.writeValueAsString(pd.getReadMethod().invoke(obj));
+              tempProp = mapper.writeValueAsString((pd.getReadMethod().invoke(obj)));
 
             } else {
               // default call of all properties. Returns the standard toStringValue of the given Type

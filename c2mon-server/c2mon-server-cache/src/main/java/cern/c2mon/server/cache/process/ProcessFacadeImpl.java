@@ -23,14 +23,11 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
 
-import cern.c2mon.server.common.config.ServerProperties;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
+import cern.c2mon.server.common.config.ServerProperties;
 import cern.c2mon.server.cache.AliveTimerCache;
 import cern.c2mon.server.cache.AliveTimerFacade;
 import cern.c2mon.server.cache.EquipmentFacade;
@@ -49,20 +46,20 @@ import cern.c2mon.shared.daq.config.ProcessConfigurationUpdate;
 
 /**
  * Facade object containing all the logic for modifying a ProcessCacheObject.
- * @author Mark Brightwell
  *
+ * @author Mark Brightwell
  */
 @Service
+@Slf4j
 public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> implements ProcessFacade {
 
   /**
-   * Class logger.
+   * PIK numbers limit (max)
    */
-  private static final Logger LOGGER = LoggerFactory.getLogger(ProcessFacadeImpl.class);
-
-  /** PIK numbers limit (max) */
   private static final int PIK_MAX = 999999;
-  /** PIK numbers limit (min) */
+  /**
+   * PIK numbers limit (min)
+   */
   private static final int PIK_MIN = 100000;
 
   private EquipmentFacade equipmentFacade;
@@ -113,32 +110,28 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
     if ((tmpStr = properties.getProperty("aliveInterval")) != null) {
       try {
         processCacheObject.setAliveInterval(Integer.valueOf(tmpStr));
-      }
-      catch (NumberFormatException e) {
+      } catch (NumberFormatException e) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "NumberFormatException: Unable to convert parameter \"aliveInterval\" to Integer: " + tmpStr);
       }
     }
     if ((tmpStr = properties.getProperty("aliveTagId")) != null) {
       try {
         processCacheObject.setAliveTagId(Long.valueOf(tmpStr));
-      }
-      catch (NumberFormatException e) {
+      } catch (NumberFormatException e) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "NumberFormatException: Unable to convert parameter \"aliveTagId\" to Long: " + tmpStr);
       }
     }
-    if ((tmpStr = properties.getProperty("stateTagId")) != null || (tmpStr = properties.getProperty("statusTagId")) != null ) {
+    if ((tmpStr = properties.getProperty("stateTagId")) != null || (tmpStr = properties.getProperty("statusTagId")) != null) {
       try {
         processCacheObject.setStateTagId(Long.valueOf(tmpStr));
-      }
-      catch (NumberFormatException e) {
+      } catch (NumberFormatException e) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "NumberFormatException: Unable to convert parameter \"stateTagId\" to Long: " + tmpStr);
       }
     }
     if ((tmpStr = properties.getProperty("maxMessageSize")) != null) {
       try {
         processCacheObject.setMaxMessageSize(Integer.parseInt(tmpStr));
-      }
-      catch (NumberFormatException e) {
+      } catch (NumberFormatException e) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "NumberFormatException: Unable to convert parameter \"maxMessageSize\" to int: " + tmpStr);
       }
     }
@@ -146,8 +139,7 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
     if ((tmpStr = properties.getProperty("maxMessageDelay")) != null) {
       try {
         processCacheObject.setMaxMessageDelay(Integer.parseInt(tmpStr));
-      }
-      catch (NumberFormatException e) {
+      } catch (NumberFormatException e) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "NumberFormatException: Unable to convert parameter \"maxMessageDelay\" to int: " + tmpStr);
       }
     }
@@ -157,8 +149,9 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
 
   /**
    * Adds an Equipment to the list of Equipments under this Process.
+   *
    * @param processCacheObject the Process
-   * @param pEquipmentId id of the Equipment to add
+   * @param pEquipmentId       id of the Equipment to add
    */
   public void addEquipmentId(final ProcessCacheObject processCacheObject, final Long pEquipmentId) {
     if (!processCacheObject.getEquipmentIds().contains(pEquipmentId)) {
@@ -168,8 +161,9 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
 
   /**
    * Removes an Equipment from the list of Equipments under this Process.
+   *
    * @param processCacheObject the process
-   * @param pEquipmentId the id of the Equipment
+   * @param pEquipmentId       the id of the Equipment
    */
   public void removeEquipmentId(final ProcessCacheObject processCacheObject, final Long pEquipmentId) {
     if (processCacheObject.getEquipmentIds().contains(pEquipmentId)) {
@@ -203,12 +197,12 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
       if (properties.isTestMode()) {
         // If the TEST Mode is on
         startLocal(process, pHostName, pStartupTime);
-        LOGGER.trace("start - TEST Mode - Process " + process.getName()
+        log.trace("start - TEST Mode - Process " + process.getName()
             + ", PIK " + process.getProcessPIK());
       } else {
         // If the TEST Mode is off
         start(process, pHostName, pStartupTime);
-        LOGGER.trace("start - Process " + process.getName()
+        log.trace("start - Process " + process.getName()
             + ", PIK " + process.getProcessPIK());
       }
       processCache.put(processId, process);
@@ -223,15 +217,15 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
    * Records the start up time of the process and the host it is running on,
    * (and sets it's status to STARTUP - may remove this in the future as duplicate
    * of state tag of the DAQ)
-   *
+   * <p>
    * <p>Also starts the alive timer.
-   *
+   * <p>
    * <p>Please note, that in case of a cache reference to the process it is up to the calling
    * method to acquire a write lock. In case of a copy it is the calling method that has
    * to take care of committing the changes made to the process object back to the cache.
    *
-   * @param process the Process that is starting
-   * @param pHostName the hostname of the Process
+   * @param process      the Process that is starting
+   * @param pHostName    the hostname of the Process
    * @param pStartupTime the start up time
    */
   private void start(final Process process, final String pHostName, final Timestamp pStartupTime) {
@@ -251,18 +245,18 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
    * Records the start up time of the process and the host it is running on,
    * (and sets it's status to STARTUP - may remove this in the future as duplicate
    * of state tag of the DAQ)
-   *
+   * <p>
    * <p>Also starts the alive timer.
-   *
+   * <p>
    * <p>Please note, that in case of a cache reference to the process it is up to the calling
    * method to acquire a write lock. In case of a copy it is the calling method that has
    * to take care of committing the changes made to the process object back to the cache.
-   *
+   * <p>
    * <p>This function does not check if the process is Running and use to be called by the TEST mode
    * since it will force the DAQ to start
    *
-   * @param process the Process that is starting
-   * @param pHostName the hostname of the Process
+   * @param process      the Process that is starting
+   * @param pHostName    the hostname of the Process
    * @param pStartupTime the start up time
    */
   private void startLocal(final Process process, final String pHostName, final Timestamp pStartupTime) {
@@ -289,8 +283,8 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
   }
 
   private void errorStatus(final Process process, final String errorMessage) {
-      ProcessCacheObject processCacheObject = (ProcessCacheObject) process;
-      processCacheObject.setSupervisionStatus(SupervisionStatus.DOWN);
+    ProcessCacheObject processCacheObject = (ProcessCacheObject) process;
+    processCacheObject.setSupervisionStatus(SupervisionStatus.DOWN);
   }
 
   /**
@@ -300,6 +294,7 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
    * constraints, a ConfigurationException will be thrown.
    * The ConfigurationException will contain more information
    * about the source of the problem.
+   *
    * @throws ConfigurationException
    */
   protected void validateConfig(final Process process) throws ConfigurationException {

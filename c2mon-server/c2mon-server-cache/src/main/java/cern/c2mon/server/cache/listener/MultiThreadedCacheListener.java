@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -32,58 +32,59 @@ import cern.c2mon.shared.common.Cacheable;
  * Cache listener implementation providing a pool of threads calling
  * the <code>notifyElementUpdated</code> on the {@link C2monCacheListener}
  * interface.
- * 
+ * <p>
  * <p>This class is used internally in the server core to wrap a module
  * listener. The module should preferably register by using the
  * {@link CacheRegistrationService} bean.
- * 
+ * <p>
  * <p>The number of threads used should be chosen according to the cache
  * the listener will be subscribed to and the expected operational load
  * of the system for that cache.
- * 
- * @author Mark Brightwell
- * @param <T> type of cache object expected by listener
  *
+ * @param <T> type of cache object expected by listener
+ * @author Mark Brightwell
  */
 @Slf4j
 public class MultiThreadedCacheListener<T extends Cacheable> implements C2monCacheListener<T>, Lifecycle {
-  
+
   /**
    * The number of milliseconds a thread waits between checking for shutdown requests.
    */
   private static final int THREAD_SHUTDOWN_CHECK_INTERVAL = 2000;
-  
+
   /**
    * The wrapped listener.
    */
   private C2monCacheListener<T> c2monCacheListener;
-  
+
   /**
    * Queue keeping the cache objects.
    */
-  private LinkedBlockingQueue<ObjectAndMethod> taskQueue;  
-  
+  private LinkedBlockingQueue<ObjectAndMethod> taskQueue;
+
   /**
    * Used for remembering which method to call (instead of reflection), in the map below.
    */
-  private enum SupportedMethods { ON_UPDATE, STATUS_CONFIRMATION }
-  
+  private enum SupportedMethods {
+    ON_UPDATE, STATUS_CONFIRMATION
+  }
+
   /**
    * The pool of threads calling the C2monCacheListener (the threads are submitted
    * a fixed set of tasks that run until server shutdown).
    */
   private ThreadPoolExecutor executor;
-    
+
   /**
    * Shutdown request made. On access lock using shutdownRequestLock.
    */
   private volatile boolean shutdownRequestMade = false;
-  
+
   /**
    * The listener can only be started and stopped once.
    */
   private volatile boolean running = false;
-  
+
   /**
    * Constructor.
    * @param timCacheListener the listener wrapped by this class
@@ -95,20 +96,20 @@ public class MultiThreadedCacheListener<T extends Cacheable> implements C2monCac
    */
   public MultiThreadedCacheListener(final C2monCacheListener<T> timCacheListener, final int queueCapacity, final int threadPoolSize) {
     super();
-    this.c2monCacheListener = timCacheListener;  
-    taskQueue = new LinkedBlockingQueue<ObjectAndMethod>(queueCapacity);    
+    this.c2monCacheListener = timCacheListener;
+    taskQueue = new LinkedBlockingQueue<ObjectAndMethod>(queueCapacity);
     executor = new ThreadPoolExecutor(threadPoolSize, threadPoolSize, Long.MAX_VALUE, TimeUnit.NANOSECONDS, new SynchronousQueue<Runnable>());
     for (int i = 0; i < threadPoolSize; i++) {
-      executor.submit(new NotifyTask());     
-    }    
+      executor.submit(new NotifyTask());
+    }
   }
-  
- 
+
+
   @Override
-  public void confirmStatus(T cacheable) {   
+  public void confirmStatus(T cacheable) {
     try {
-      if (!shutdownRequestMade) {              
-        taskQueue.put(new ObjectAndMethod(cacheable, SupportedMethods.STATUS_CONFIRMATION));        
+      if (!shutdownRequestMade) {
+        taskQueue.put(new ObjectAndMethod(cacheable, SupportedMethods.STATUS_CONFIRMATION));
       } else {
         log.warn("Attempt at notifying of element update after shutdown started "
             + "- should not happen and indicates incorrect shutdown sequence!");       
@@ -118,17 +119,15 @@ public class MultiThreadedCacheListener<T extends Cacheable> implements C2monCac
     }
   }
 
-
-
   @Override
   public void notifyElementUpdated(T cacheable) {
     try {
-      if (!shutdownRequestMade) {        
-        taskQueue.put(new ObjectAndMethod(cacheable, SupportedMethods.ON_UPDATE));        
+      if (!shutdownRequestMade) {
+        taskQueue.put(new ObjectAndMethod(cacheable, SupportedMethods.ON_UPDATE));
       } else {
         log.warn("Attempt at notifying of element update after shutdown started "
             + "- should not happen and indicates incorrect shutdown sequence!");
-      }            
+      }
     } catch (InterruptedException interEx) {
       log.error("InterruptedExcetion caught while waiting for MultiThreadedListener queue to free space: ", interEx);
     }
@@ -175,37 +174,39 @@ public class MultiThreadedCacheListener<T extends Cacheable> implements C2monCac
       } catch (InterruptedException ex) {
         log.error("Interrupted while waiting for shutdown to complete", ex);
       }
-    }    
+    }
   }
-  
+
   /**
    * For management purposes.
+   *
    * @return the size of the thread pool for this listener
-   */  
+   */
   public int getActiveThreadPoolNumber() {
     return executor.getActiveCount();
   }
-  
+
   /**
    * For management purposes.
+   *
    * @return the size of the task queue for this listener
-   */  
+   */
   public int getTaskQueueSize() {
     return taskQueue.size();
   }
 
   /**
    * For passing an object and the method that needs calling.
-   * @author Mark Brightwell
    *
+   * @author Mark Brightwell
    */
   private final class ObjectAndMethod {
-    
+
     /**
      * Object in notification.
      */
     private T cacheable;
-    
+
     /**
      * Method to call.
      */
@@ -213,55 +214,56 @@ public class MultiThreadedCacheListener<T extends Cacheable> implements C2monCac
 
     /**
      * Constructor.
+     *
      * @param cacheable the object
-     * @param method the method
+     * @param method    the method
      */
     private ObjectAndMethod(final T cacheable, final SupportedMethods method) {
       super();
       this.cacheable = cacheable;
       this.method = method;
     }
-        
   }
-  
+
   /**
    * The task submitted to the executor threads. One task is submitted per
    * thread and it runs until the server shutdown.
-   * 
+   * <p>
    * <p>The task simply listens to the {@link LinkedBlockingQueue} field
    * for updates.
-   * 
-   * <p>Once a shutdown request is received, it will stop processing updates within 
-   * @author Mark Brightwell
+   * <p>
+   * <p>Once a shutdown request is received, it will stop processing updates within
    *
+   * @author Mark Brightwell
    */
   private class NotifyTask implements Runnable {
-    
+
     /**
      * Runs from start up to shutdown and listens for updates.
      */
     @Override
-    public void run() {      
+    public void run() {
       while (!shutdownRequestMade) {
-        try {          
-          ObjectAndMethod objectAndMethod = taskQueue.poll(THREAD_SHUTDOWN_CHECK_INTERVAL, TimeUnit.MILLISECONDS);          
+        try {
+          ObjectAndMethod objectAndMethod = taskQueue.poll(THREAD_SHUTDOWN_CHECK_INTERVAL, TimeUnit.MILLISECONDS);
           if (objectAndMethod != null) {
             callCorrectMethod(objectAndMethod);
-          }          
+          }
         } catch (InterruptedException e) {
           log.warn("Cache Listener thread interrupted in MultiThreadedListener.", e);
         }                         
       }
-      
+
       //empty the queue before shutting down
-      ObjectAndMethod objectAndMethod;      
+      ObjectAndMethod objectAndMethod;
       while ((objectAndMethod = taskQueue.poll()) != null) {
         callCorrectMethod(objectAndMethod);
       }
     }
-    
+
     /**
      * Calls the correct method as recorded in the local map.
+     *
      * @param objectAndMethod cacheable with method info
      */
     private void callCorrectMethod(final ObjectAndMethod objectAndMethod) {

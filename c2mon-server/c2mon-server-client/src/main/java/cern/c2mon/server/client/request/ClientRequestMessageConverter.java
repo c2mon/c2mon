@@ -21,14 +21,13 @@ import javax.jms.Message;
 import javax.jms.ObjectMessage;
 import javax.jms.TextMessage;
 
+import com.google.gson.JsonSyntaxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jms.support.converter.MessageConversionException;
 
 import cern.c2mon.shared.client.request.ClientRequest;
 import cern.c2mon.shared.client.request.ClientRequestImpl;
-
-import com.google.gson.JsonSyntaxException;
 
 /**
  * This abstract class provides a static method for converting a JMS tag request

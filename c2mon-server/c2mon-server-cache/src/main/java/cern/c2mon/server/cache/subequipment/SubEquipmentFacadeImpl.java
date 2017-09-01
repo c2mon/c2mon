@@ -20,9 +20,8 @@ import java.util.Collection;
 import java.util.Properties;
 
 import cern.c2mon.server.cache.*;
+
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,7 +38,6 @@ import cern.c2mon.shared.daq.config.EquipmentConfigurationUpdate;
  * Implementation of the SubEquipmentFacade.
  *
  * @author Mark Brightwell
- *
  */
 @Slf4j
 @Service
@@ -69,7 +67,7 @@ public class SubEquipmentFacadeImpl extends AbstractEquipmentFacade<SubEquipment
   }
 
   @Override
-  public SubEquipment createCacheObject(Long id, Properties properties){
+  public SubEquipment createCacheObject(Long id, Properties properties) {
     SubEquipmentCacheObject subEquipment = new SubEquipmentCacheObject(id);
     configureCacheObject(subEquipment, properties);
     validateConfig(subEquipment);
@@ -78,8 +76,9 @@ public class SubEquipmentFacadeImpl extends AbstractEquipmentFacade<SubEquipment
 
   /**
    * Sets the fields particular for SubEquipment from the properties object.
+   *
    * @param subEquipment sets the fields in this object
-   * @param properties looks for relevant properties in this object
+   * @param properties   looks for relevant properties in this object
    */
   @Override
   protected Change configureCacheObject(SubEquipment subEquipment, Properties properties) {
@@ -117,10 +116,11 @@ public class SubEquipmentFacadeImpl extends AbstractEquipmentFacade<SubEquipment
   /**
    * Overridden as for SubEquipment rule out changing the parent equipment
    * associated it is associated to.
-   * @throws IllegalAccessException
+   *
    * @return empty EquipmentConfigurationUpdate because SubEquipments are not used
-   *          on the DAQ layer and no event is sent (return type necessary as in
-   *          common interface).
+   * on the DAQ layer and no event is sent (return type necessary as in
+   * common interface).
+   * @throws IllegalAccessException
    */
   @Override
   public EquipmentConfigurationUpdate updateConfig(final SubEquipment subEquipment, final Properties properties) throws IllegalAccessException {
@@ -188,7 +188,7 @@ public class SubEquipmentFacadeImpl extends AbstractEquipmentFacade<SubEquipment
 
   @Override
   public Collection<Long> getDataTagIds(Long subEquipmentId) {
-    return  dataTagCache.getDataTagIdsBySubEquipmentId(subEquipmentId);
+    return dataTagCache.getDataTagIdsBySubEquipmentId(subEquipmentId);
   }
 
   @Override

@@ -87,7 +87,7 @@ public class TransferTagSerializer {
       tag = mapper.readValue(tagUpdateJson, dataType);
       tag.setValue(convertTagValue(tag));
     } catch (IOException e) {
-      log.warn("Error occurred while converting the json string back to an object: "+e.getMessage());
+      log.warn("Error occurred while converting the json string back to an object: " + e.getMessage());
     }
 
     return tag;

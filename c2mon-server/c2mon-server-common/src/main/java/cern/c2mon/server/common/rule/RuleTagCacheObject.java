@@ -234,7 +234,7 @@ public class RuleTagCacheObject extends AbstractTagCacheObject implements RuleTa
     public Set<Long> getSubEquipmentIds() {
       return parentSubEquipments;
     }
-    
+
     @Override
     public String toString() {
       StringBuffer str = new StringBuffer();

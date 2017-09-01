@@ -22,8 +22,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
@@ -38,12 +37,10 @@ import cern.c2mon.server.common.rule.RuleTag;
  * parent ids at start up.
  *
  * @author Mark Brightwell
- *
  */
 @Service
+@Slf4j
 public class RuleTagPostLoaderProcessor {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(RuleTagPostLoaderProcessor.class);
 
   private RuleTagFacade ruleTagFacade;
 
@@ -62,7 +59,9 @@ public class RuleTagPostLoaderProcessor {
   private static final int THREAD_IDLE_LIMIT = 5; // in seconds
   private static final String THREAD_NAME_PREFIX = "RuleLoader-";
 
-  /** Cluster Cache key to avoid loading twice the parent rule ids at startup */
+  /**
+   * Cluster Cache key to avoid loading twice the parent rule ids at startup
+   */
   public static final String ruleCachePostProcessedKey = "c2mon.cache.rule.ruleCachePostProcessed";
 
   @Autowired
@@ -79,9 +78,9 @@ public class RuleTagPostLoaderProcessor {
    */
   @PostConstruct
   public void loadRuleParentIds() {
-    LOGGER.trace("Entering loadRuleParentIds()...");
+    log.trace("Entering loadRuleParentIds()...");
 
-    LOGGER.trace("Trying to get cache lock for " + RuleTagCache.cacheInitializedKey);
+    log.trace("Trying to get cache lock for " + RuleTagCache.cacheInitializedKey);
     clusterCache.acquireWriteLockOnKey(RuleTagCache.cacheInitializedKey);
     try {
       Boolean isRuleCachePostProcessed = Boolean.FALSE;
@@ -89,7 +88,7 @@ public class RuleTagPostLoaderProcessor {
         isRuleCachePostProcessed = (Boolean) clusterCache.getCopy(ruleCachePostProcessedKey);
       }
       if (!isRuleCachePostProcessed.booleanValue()) {
-        LOGGER.debug("Setting parent ids for rules...");
+        log.debug("Setting parent ids for rules...");
 
         initializeThreadPool();
 
@@ -109,19 +108,19 @@ public class RuleTagPostLoaderProcessor {
         try {
           executor.getThreadPoolExecutor().awaitTermination(1200, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
-          LOGGER.warn("Exception caught while waiting for rule parent id loading threads to complete (waited longer then timeout?): ", e);
+          log.warn("Exception caught while waiting for rule parent id loading threads to complete (waited longer then timeout?): ", e);
         }
-        LOGGER.debug("Rule parent ids set.");
+        log.debug("Rule parent ids set.");
         clusterCache.put(ruleCachePostProcessedKey, Boolean.TRUE);
       } else {
-        LOGGER.info("Cache " + RuleTagCache.cacheInitializedKey + " was already initialized");
+        log.info("Cache " + RuleTagCache.cacheInitializedKey + " was already initialized");
       }
     } finally {
       clusterCache.releaseWriteLockOnKey(RuleTagCache.cacheInitializedKey);
-      LOGGER.trace("Released cache lock .. for " + RuleTagCache.cacheInitializedKey);
+      log.trace("Released cache lock .. for {}", RuleTagCache.cacheInitializedKey);
     }
 
-    LOGGER.trace("Leaving loadRuleParentIds()");
+    log.trace("Leaving loadRuleParentIds()");
   }
 
   private void initializeThreadPool() {
@@ -152,11 +151,11 @@ public class RuleTagPostLoaderProcessor {
         }
       }
     }
-
   }
 
   /**
    * Setter method.
+   *
    * @param threadPoolMax the threadPoolMax to set
    */
   public void setThreadPoolMax(int threadPoolMax) {
@@ -165,6 +164,7 @@ public class RuleTagPostLoaderProcessor {
 
   /**
    * Setter method.
+   *
    * @param threadPoolMin the threadPoolMin to set
    */
   public void setThreadPoolMin(int threadPoolMin) {

@@ -1,18 +1,9 @@
 package cern.c2mon.server.common.expression;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import groovy.lang.GroovyObject;
+import lombok.extern.slf4j.Slf4j;
 
 import cern.c2mon.server.common.tag.Tag;
-
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
-import groovy.lang.GroovyObject;
-import groovy.lang.GroovyShell;
-import groovy.lang.Script;
-import lombok.extern.slf4j.Slf4j;
-import org.codehaus.groovy.control.CompilerConfiguration;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Franz Ritter

@@ -27,18 +27,17 @@ import cern.c2mon.shared.util.threadhandler.ThreadHandler;
 /**
  * Asynchronous cache listener that passes events received by the Ehcache listener
  * to the wrapped {@link C2monCacheListener} on a single thread.
- *
+ * <p>
  * <p>A new CacheListener is created each time a new (asynchronous) listener is registered, wrapping
  * the C2monCacheListener implemented by the module listener class.
- *
+ * <p>
  * <p>It instantiates threads for each cache notification method, and passes each
  * received object to the appropriate thread.
- *
+ * <p>
  * <p><b>This class is deprecated and the {@link MultiThreadedCacheListener} should
  * preferably be used instead (with #threads = 1 for a single-threaded listener)</b>
  *
  * @author Mark Brightwell
- *
  */
 @Slf4j
 public final class CacheListener<T extends Cacheable> extends ApplicationObjectSupport implements C2monCacheListener<T>, Lifecycle {
@@ -77,10 +76,9 @@ public final class CacheListener<T extends Cacheable> extends ApplicationObjectS
 
   }
 
-
   @Override
   public void confirmStatus(final T cacheable) {
-    statusConfirmationHandler.put(new Object[] {cacheable});
+    statusConfirmationHandler.put(new Object[]{cacheable});
   }
 
 
@@ -92,6 +90,7 @@ public final class CacheListener<T extends Cacheable> extends ApplicationObjectS
 
   /**
    * For management purposes.
+   *
    * @return the size of the task queue for onUpdate calls
    */
   public int getTaskQueueSize() {
@@ -100,6 +99,7 @@ public final class CacheListener<T extends Cacheable> extends ApplicationObjectS
 
   /**
    * For management purposes.
+   *
    * @return the size of the task queue for status confirmations
    */
   public int getConfirmStatusQueueSize() {
@@ -132,14 +132,9 @@ public final class CacheListener<T extends Cacheable> extends ApplicationObjectS
   public void stop() {
     if (running) {
       running = false;
-      if (log.isDebugEnabled()) {
-        log.debug("Shutting down CacheListener threads.");
-      }
+      log.debug("Shutting down CacheListener threads.");
       notifyUpdateThreadHandler.shutdown();
       statusConfirmationHandler.shutdown();
     }
   }
-
-
-
 }

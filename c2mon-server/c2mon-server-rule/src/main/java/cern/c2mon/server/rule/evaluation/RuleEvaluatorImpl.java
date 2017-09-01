@@ -144,7 +144,7 @@ public class RuleEvaluatorImpl implements C2monCacheListener<Tag>, SmartLifecycl
    * the id does not belong to a rule a warning message is logged to
    * log4j. Please note, that the rule will always use the time stamp
    * of the latest incoming data tag update.
-   * @param ruleId The id of a rule.
+   * @param pRuleId The id of a rule.
    */
   @Override
   public final void evaluateRule(final Long ruleId) {
@@ -159,10 +159,10 @@ public class RuleEvaluatorImpl implements C2monCacheListener<Tag>, SmartLifecycl
         log.info(ruleId + " Attention: I already have a write lock on rule " + ruleId);
     }
 
-    ruleTagCache.acquireWriteLockOnKey(ruleId);
+    ruleTagCache.acquireWriteLockOnKey(pRuleId);
 
     try {
-      RuleTag rule = ruleTagCache.get(ruleId);
+      RuleTag rule = ruleTagCache.get(pRuleId);
 
       if (rule.getRuleExpression() != null) {
         final Collection<Long> ruleInputTagIds = rule.getRuleExpression().getInputTagIds();
@@ -189,11 +189,11 @@ public class RuleEvaluatorImpl implements C2monCacheListener<Tag>, SmartLifecycl
           Class<?> ruleResultClass = getType(rule.getDataType());
 
           Object value = rule.getRuleExpression().evaluate(tags, ruleResultClass);
-          ruleUpdateBuffer.update(ruleId, value, "Rule result", ruleResultTimestamp);
+          ruleUpdateBuffer.update(pRuleId, value, "Rule result", ruleResultTimestamp);
         } catch (CacheElementNotFoundException cacheEx) {
-          log.warn(ruleId + " evaluateRule - Failed to locate tag with id " + actualTag + " in any tag cache (during rule evaluation) - unable to evaluate rule.",
+          log.warn(pRuleId + " evaluateRule - Failed to locate tag with id " + actualTag + " in any tag cache (during rule evaluation) - unable to evaluate rule.",
               cacheEx);
-          ruleUpdateBuffer.invalidate(ruleId, TagQualityStatus.UNKNOWN_REASON,
+          ruleUpdateBuffer.invalidate(pRuleId, TagQualityStatus.UNKNOWN_REASON,
               "Unable to evaluate rule as cannot find required Tag in cache: " + cacheEx.getMessage(), ruleResultTimestamp);
         } catch (RuleEvaluationException re) {
           // TODO change in rule engine: this should NOT be done using an
@@ -201,12 +201,12 @@ public class RuleEvaluatorImpl implements C2monCacheListener<Tag>, SmartLifecycl
           log.trace(ruleId + " evaluateRule - Problem evaluating expresion for rule with Id (" + ruleId + ") - invalidating rule with quality UNKNOWN_REASON ("
               + re.getMessage() + ").");
           // switched from INACCESSIBLE in old code
-          ruleUpdateBuffer.invalidate(ruleId, TagQualityStatus.UNKNOWN_REASON, re.getMessage(), ruleResultTimestamp);
+          ruleUpdateBuffer.invalidate(pRuleId, TagQualityStatus.UNKNOWN_REASON, re.getMessage(), ruleResultTimestamp);
         } catch (Exception e) {
           log.error(ruleId +
               " evaluateRule - Unexpected Error evaluating expresion of rule with Id (" + ruleId + ") - invalidating rule with quality UNKNOWN_REASON", e);
           // switched from INACCESSIBLE in old code
-          ruleUpdateBuffer.invalidate(ruleId, TagQualityStatus.UNKNOWN_REASON, e.getMessage(), ruleResultTimestamp);
+          ruleUpdateBuffer.invalidate(pRuleId, TagQualityStatus.UNKNOWN_REASON, e.getMessage(), ruleResultTimestamp);
         }
       } else {
         log.error(ruleId + " evaluateRule - Unable to evaluate rule with Id (" + ruleId + ") as RuleExpression is null.");
@@ -216,9 +216,9 @@ public class RuleEvaluatorImpl implements C2monCacheListener<Tag>, SmartLifecycl
     } catch (Exception e) {
       log.error("evaluateRule - Unexpected Error caught while retrieving " + ruleId + " from rule cache.", e);
       // switched from INACCESSIBLE in old code
-      ruleUpdateBuffer.invalidate(ruleId, TagQualityStatus.UNKNOWN_REASON, e.getMessage(), ruleResultTimestamp);
+      ruleUpdateBuffer.invalidate(pRuleId, TagQualityStatus.UNKNOWN_REASON, e.getMessage(), ruleResultTimestamp);
     } finally {
-      ruleTagCache.releaseWriteLockOnKey(ruleId);
+      ruleTagCache.releaseWriteLockOnKey(pRuleId);
     }
   }
 

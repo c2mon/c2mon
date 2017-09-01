@@ -18,16 +18,12 @@ package cern.c2mon.server.cache.command;
 
 import javax.annotation.PostConstruct;
 
-import cern.c2mon.server.cache.config.CacheProperties;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.loader.CacheLoader;
-
 import net.sf.ehcache.search.Attribute;
 import net.sf.ehcache.search.Query;
 import net.sf.ehcache.search.Results;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -35,6 +31,7 @@ import org.springframework.stereotype.Service;
 import cern.c2mon.server.cache.ClusterCache;
 import cern.c2mon.server.cache.CommandTagCache;
 import cern.c2mon.server.cache.common.AbstractCache;
+import cern.c2mon.server.cache.config.CacheProperties;
 import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
 import cern.c2mon.server.cache.loading.SimpleCacheLoaderDAO;
 import cern.c2mon.server.common.config.C2monCacheName;
@@ -44,7 +41,6 @@ import cern.c2mon.shared.common.command.CommandTag;
  * Implementation of the CommandTag cache.
  *
  * @author Mark Brightwell
- *
  */
 @Slf4j
 @Service
@@ -98,8 +94,7 @@ public class CommandTagCacheImpl extends AbstractCache<Long, CommandTag> impleme
       }
 
       commandTagKey = results.all().size() > 0 ? (Long) results.all().get(0).getKey() : null;
-    }
-    finally {
+    } finally {
       if (results != null) {
         // Discard the results when done to free up cache resources.
         results.discard();
@@ -113,6 +108,5 @@ public class CommandTagCacheImpl extends AbstractCache<Long, CommandTag> impleme
   protected String getCacheInitializedKey() {
     return cacheInitializedKey;
   }
-
 
 }

@@ -5,12 +5,13 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import cern.c2mon.server.cache.ControlTagCache;
 import cern.c2mon.server.cache.DataTagCache;
 import cern.c2mon.server.cache.RuleTagCache;
 import cern.c2mon.server.common.expression.LocalExpressionCache;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 /**
  * @author Franz Ritter
@@ -46,5 +47,4 @@ public class LocalExpressionCacheScheduler {
         .collect(Collectors.toList());
     LocalExpressionCache.removeTags(staleIds);
   }
-
 }

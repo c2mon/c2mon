@@ -20,11 +20,11 @@ import java.sql.Timestamp;
 import java.util.Properties;
 
 import cern.c2mon.server.common.expression.Evaluator;
+
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.cache.AlarmCache;
@@ -45,8 +45,8 @@ import cern.c2mon.shared.rule.RuleExpression;
  * Facade object for manipulating server rules.
  *
  * @author Mark Brightwell
- *
  */
+@Slf4j
 @Service
 public class RuleTagFacadeImpl extends AbstractTagFacade<RuleTag> implements RuleTagFacade {
 
@@ -61,11 +61,6 @@ public class RuleTagFacadeImpl extends AbstractTagFacade<RuleTag> implements Rul
   private static final Logger RULELOG = LoggerFactory.getLogger("RuleTagLogger");
 
   /**
-   * Class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(RuleTagFacadeImpl.class);
-
-  /**
    * Reference to the low level Rule Facade bean.
    */
   private RuleTagCacheObjectFacade ruleTagCacheObjectFacade;
@@ -78,11 +73,11 @@ public class RuleTagFacadeImpl extends AbstractTagFacade<RuleTag> implements Rul
   /**
    * Constructor.
    *
-   * @param ruleTagCache the RuleTag cache
+   * @param ruleTagCache             the RuleTag cache
    * @param ruleTagCacheObjectFacade the low level Rule Facade
-   * @param alarmFacade the Alarm Facade
-   * @param alarmCache the Alarm cache
-   * @param dataTagCache the DataTag cache
+   * @param alarmFacade              the Alarm Facade
+   * @param alarmCache               the Alarm cache
+   * @param dataTagCache             the DataTag cache
    */
   @Autowired
   public RuleTagFacadeImpl(final RuleTagCache ruleTagCache,
@@ -122,8 +117,9 @@ public class RuleTagFacadeImpl extends AbstractTagFacade<RuleTag> implements Rul
   /**
    * Logs the rule in the specific log4j log, using the log4j renderer in the configuration file
    * (done after every update).
+   *
    * @param ruleTagCacheObject the cache object to log
-   * TODO not used
+   *                           TODO not used
    */
   private void log(final RuleTagCacheObject ruleTagCacheObject) {
     if (RULELOG.isInfoEnabled()) {
@@ -165,12 +161,11 @@ public class RuleTagFacadeImpl extends AbstractTagFacade<RuleTag> implements Rul
         updateCount++;
         log((RuleTagCacheObject) ruleTag);
       } else {
-        if (LOGGER.isTraceEnabled()) {
-          LOGGER.trace("Filtering out repeated update for rule " + id);
-        }
+        log.trace("Filtering out repeated update for rule " + id);
+
       }
     } catch (CacheElementNotFoundException cacheEx) {
-      LOGGER.error("Unable to locate rule in cache (id " + id + ") - no update performed.", cacheEx);
+      log.error("Unable to locate rule in cache (id " + id + ") - no update performed.", cacheEx);
     } finally {
       tagCache.releaseWriteLockOnKey(id);
     }
@@ -181,7 +176,7 @@ public class RuleTagFacadeImpl extends AbstractTagFacade<RuleTag> implements Rul
    * set the corresponding field). Also sets the parent equipments and processes for this
    * rule.
    *
-   * @param ruleTag fields are modified in this RuleTag
+   * @param ruleTag    fields are modified in this RuleTag
    * @param properties the properties used to set the fields.
    * @return always returns null as no changes to rules need propagating to the DAQ
    * @throws ConfigurationException if an exception occurs during reconfiguration
@@ -239,7 +234,7 @@ public class RuleTagFacadeImpl extends AbstractTagFacade<RuleTag> implements Rul
 
   @Override
   protected void invalidateQuietly(final RuleTag tag, final TagQualityStatus statusToAdd, final String statusDescription,
-      final Timestamp timestamp) {
+                                   final Timestamp timestamp) {
     ruleTagCacheObjectFacade.invalidate((RuleTag) tag, statusToAdd, statusDescription, timestamp);
   }
 }

@@ -263,7 +263,6 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
           listener.onConfigurationEvent(tagCopy, Action.REMOVE);
         }
 
-        LocalExpressionCache.removeTagInformation(tagCopy.getId());
         LocalExpressionCache.removeTag(tagCopy.getId());
         configurableDAO.deleteItem(tagCopy.getId());
       } catch (Exception ex) {

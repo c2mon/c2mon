@@ -18,19 +18,16 @@ package cern.c2mon.server.cache.control;
 
 import javax.annotation.PostConstruct;
 
-import cern.c2mon.server.cache.config.CacheProperties;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.loader.CacheLoader;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.cache.ClusterCache;
+import cern.c2mon.server.cache.config.CacheProperties;
 import cern.c2mon.server.cache.ControlTagCache;
 import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
 import cern.c2mon.server.cache.loading.SimpleCacheLoaderDAO;
@@ -43,11 +40,10 @@ import cern.c2mon.server.common.control.ControlTag;
  * steps for this cache.
  *
  * @author Mark Brightwell
- *
  */
 @Slf4j
 @Service("controlTagCache")
-@ManagedResource(objectName="cern.c2mon:type=cache,name=controlTagCache")
+@ManagedResource(objectName = "cern.c2mon:type=cache,name=controlTagCache")
 public class ControlTagCacheImpl extends AbstractTagCache<ControlTag> implements ControlTagCache {
 
   @Autowired

@@ -1,5 +1,19 @@
 package cern.c2mon.client.core.elasticsearch;
 
+import java.io.File;
+import java.util.Collection;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
+import org.elasticsearch.action.admin.indices.flush.FlushRequest;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.powermock.reflect.Whitebox;
+import org.springframework.util.FileSystemUtils;
+
 import cern.c2mon.client.core.config.C2monClientProperties;
 import cern.c2mon.server.cache.EquipmentCache;
 import cern.c2mon.server.cache.ProcessCache;

@@ -21,12 +21,10 @@ import java.util.HashSet;
 import javax.annotation.PostConstruct;
 
 import cern.c2mon.server.cache.config.CacheProperties;
+
 import lombok.extern.slf4j.Slf4j;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.loader.CacheLoader;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jmx.export.annotation.ManagedResource;
@@ -47,11 +45,10 @@ import cern.c2mon.server.common.rule.RuleTag;
  * Implementation of the Rule cache.
  *
  * @author Mark Brightwell
- *
  */
 @Slf4j
 @Service("ruleTagCache")
-@ManagedResource(objectName="cern.c2mon:type=cache,name=ruleTagCache")
+@ManagedResource(objectName = "cern.c2mon:type=cache,name=ruleTagCache")
 public class RuleTagCacheImpl extends AbstractTagCache<RuleTag> implements RuleTagCache {
 
   /**
@@ -111,7 +108,7 @@ public class RuleTagCacheImpl extends AbstractTagCache<RuleTag> implements RuleT
     HashSet<Long> subEquipmentIds = new HashSet<Long>();
     int cnt = 0;
 
-    log.trace(ruleTag.getId() + " Has "+ ruleTag.getRuleInputTagIds().size() + " input rule tags");
+    log.trace(ruleTag.getId() + " Has " + ruleTag.getRuleInputTagIds().size() + " input rule tags");
     for (Long tagKey : ruleTag.getRuleInputTagIds()) {
 
       cnt++;
@@ -124,23 +121,23 @@ public class RuleTagCacheImpl extends AbstractTagCache<RuleTag> implements RuleT
           subEquipmentIds.add(dataTag.getSubEquipmentId());
         }
       } else {
-          this.acquireWriteLockOnKey(tagKey);
-          try {
-              RuleTag childRuleTag = (RuleTag) this.get(tagKey);
-              //if not empty, already processed; if empty, needs processing
-              if (childRuleTag.getProcessIds().isEmpty()) {
-                setParentSupervisionIds(childRuleTag);
-                this.putQuiet(childRuleTag);
-              }
-              processIds.addAll(childRuleTag.getProcessIds());
-              equipmentIds.addAll(childRuleTag.getEquipmentIds());
-              subEquipmentIds.addAll(childRuleTag.getSubEquipmentIds());
-          } catch(CacheElementNotFoundException cenfe) {
-              throw new RuntimeException("Unable to set rule parent process & equipment ids for rule " + ruleTag.getId()
-                      + ": unable to locate tag " + tagKey + " in either RuleTag or DataTag cache (Control tags not supported in rules)", cenfe);
-          } finally {
-            this.releaseWriteLockOnKey(tagKey);
+        this.acquireWriteLockOnKey(tagKey);
+        try {
+          RuleTag childRuleTag = (RuleTag) this.get(tagKey);
+          //if not empty, already processed; if empty, needs processing
+          if (childRuleTag.getProcessIds().isEmpty()) {
+            setParentSupervisionIds(childRuleTag);
+            this.putQuiet(childRuleTag);
           }
+          processIds.addAll(childRuleTag.getProcessIds());
+          equipmentIds.addAll(childRuleTag.getEquipmentIds());
+          subEquipmentIds.addAll(childRuleTag.getSubEquipmentIds());
+        } catch (CacheElementNotFoundException cenfe) {
+          throw new RuntimeException("Unable to set rule parent process & equipment ids for rule " + ruleTag.getId()
+              + ": unable to locate tag " + tagKey + " in either RuleTag or DataTag cache (Control tags not supported in rules)", cenfe);
+        } finally {
+          this.releaseWriteLockOnKey(tagKey);
+        }
       }
 
     }
@@ -150,6 +147,4 @@ public class RuleTagCacheImpl extends AbstractTagCache<RuleTag> implements RuleT
     ruleTag.setEquipmentIds(equipmentIds);
     ruleTag.setSubEquipmentIds(subEquipmentIds);
   }
-
-
 }

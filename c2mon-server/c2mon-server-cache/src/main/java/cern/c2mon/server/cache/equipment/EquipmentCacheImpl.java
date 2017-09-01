@@ -18,16 +18,16 @@ package cern.c2mon.server.cache.equipment;
 
 import javax.annotation.PostConstruct;
 
-import cern.c2mon.server.cache.*;
-import cern.c2mon.server.cache.config.CacheProperties;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Service;
+import net.sf.ehcache.Ehcache;
+import net.sf.ehcache.loader.CacheLoader;
 
+import cern.c2mon.server.cache.*;
+import cern.c2mon.server.cache.config.CacheProperties;
 import cern.c2mon.server.cache.common.AbstractCache;
 import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
 import cern.c2mon.server.cache.loading.SimpleCacheLoaderDAO;
@@ -36,24 +36,23 @@ import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.control.ControlTagCacheObject;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.shared.common.ConfigurationException;
-import net.sf.ehcache.Ehcache;
-import net.sf.ehcache.loader.CacheLoader;
 
 /**
  * Implementation of the Equipment cache.
- *
+ * <p>
  * <p>
  * Contains initialization logic.
  *
  * @author Mark Brightwell
- *
  */
 @Slf4j
 @Service("equipmentCache")
 @ManagedResource(objectName = "cern.c2mon:type=cache,name=equipmentCache")
-public class EquipmentCacheImpl extends AbstractCache<Long, Equipment>implements EquipmentCache {
+public class EquipmentCacheImpl extends AbstractCache<Long, Equipment> implements EquipmentCache {
 
-  /** Used to post configure the associated control tags */
+  /**
+   * Used to post configure the associated control tags
+   */
   private final ControlTagCache controlCache;
 
   @Autowired
@@ -105,8 +104,7 @@ public class EquipmentCacheImpl extends AbstractCache<Long, Equipment>implements
       ControlTag aliveTagCopy = controlCache.getCopy(aliveTagId);
       if (aliveTagCopy != null) {
         setEquipmentId((ControlTagCacheObject) aliveTagCopy, equipmentId, processId);
-      }
-      else {
+      } else {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
             String.format("No Alive tag (%s) found for Equipment %s (#%d).", aliveTagId, equipment.getName(), equipment.getId()));
       }
@@ -117,13 +115,11 @@ public class EquipmentCacheImpl extends AbstractCache<Long, Equipment>implements
       ControlTag commFaultTagCopy = controlCache.getCopy(commFaultTagId);
       if (commFaultTagCopy != null) {
         setEquipmentId((ControlTagCacheObject) commFaultTagCopy, equipmentId, processId);
-      }
-      else {
+      } else {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
             String.format("No CommFault tag (%s) found for Equipment %s (#%d).", commFaultTagId, equipment.getName(), equipment.getId()));
       }
-    }
-    else {
+    } else {
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
           String.format("No CommFault tag for Equipment %s (#%d) defined.", equipment.getName(), equipment.getId()));
     }
@@ -133,13 +129,11 @@ public class EquipmentCacheImpl extends AbstractCache<Long, Equipment>implements
       ControlTag statusTagCopy = controlCache.getCopy(statusTag);
       if (statusTagCopy != null) {
         setEquipmentId((ControlTagCacheObject) statusTagCopy, equipmentId, processId);
-      }
-      else {
+      } else {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
             String.format("No Status tag (%s) found for Equipment %s (#%d).", statusTag, equipment.getName(), equipment.getId()));
       }
-    }
-    else {
+    } else {
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
           String.format("No Status tag for Equipment %s (#%d) defined.", equipment.getName(), equipment.getId()));
     }
@@ -162,5 +156,4 @@ public class EquipmentCacheImpl extends AbstractCache<Long, Equipment>implements
     copy.setProcessId(processId);
     controlCache.putQuiet(copy);
   }
-
 }

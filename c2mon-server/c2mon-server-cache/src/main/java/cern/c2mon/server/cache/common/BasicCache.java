@@ -26,9 +26,6 @@ import net.sf.ehcache.CacheException;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.support.ApplicationObjectSupport;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 
@@ -38,11 +35,10 @@ import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
  * Provides all core functionalities that are required to manage a cache. This
  * class uses internally Ehcache.
  *
- * @author Mark Brightwell
- * @author Justin Lewis Salmon
- *
  * @param <K> The key class type
  * @param <T> The value class type
+ * @author Mark Brightwell
+ * @author Justin Lewis Salmon
  */
 @Slf4j
 public abstract class BasicCache<K, T extends Serializable> extends ApplicationObjectSupport {
@@ -65,7 +61,7 @@ public abstract class BasicCache<K, T extends Serializable> extends ApplicationO
 
   /**
    * An inexpensive check to see if the key exists in the cache.
-   *
+   * <p>
    * <p>
    * Note: this method will block if the key to be checked is locked by another
    * thread.
@@ -73,9 +69,9 @@ public abstract class BasicCache<K, T extends Serializable> extends ApplicationO
    *
    * @param id The key to check for
    * @return <code>true</code> if an Element matching the key is found in the
-   *         cache. No assertions are made about the state of the Element.
-   * @see Ehcache#isKeyInCache(Object)
+   * cache. No assertions are made about the state of the Element.
    * @throws NullPointerException In case a null pointer is passed as key
+   * @see Ehcache#isKeyInCache(Object)
    */
   public final boolean hasKey(final K id) {
     if (id == null) {
@@ -87,7 +83,7 @@ public abstract class BasicCache<K, T extends Serializable> extends ApplicationO
 
   /**
    * Get a Reference to the object of type T in the cache.
-   *
+   * <p>
    * <p>
    * Throws the following unchecked exceptions:
    * <li> {@link IllegalArgumentException} if called with a null key
@@ -98,7 +94,7 @@ public abstract class BasicCache<K, T extends Serializable> extends ApplicationO
    * <p>
    * If not sure whether an element is in the cache, first use the hasKey(Long)
    * method.
-   *
+   * <p>
    * <p>
    * Notice that since this method returns a reference, the object may need
    * locking to stay consistent (if several field are read for instance). For
@@ -108,7 +104,7 @@ public abstract class BasicCache<K, T extends Serializable> extends ApplicationO
    * effective across server nodes. For this reason, it is generally preferable
    * to use the provided getCopy method, which returns a clone of the cache
    * object.
-   *
+   * <p>
    * <p>
    * Notice this method does not go to the DB to find a cache element. To
    * explicitly load an element from the DB use the loadFromDb(Long id) method
@@ -216,6 +212,7 @@ public abstract class BasicCache<K, T extends Serializable> extends ApplicationO
 
   /**
    * Acquires the proper write lock for a given cache key
+   *
    * @param id The key that retrieves a value that you want to protect via locking
    */
   public void acquireWriteLockOnKey(K id) {
@@ -237,6 +234,7 @@ public abstract class BasicCache<K, T extends Serializable> extends ApplicationO
 
   /**
    * Release a held write lock for the passed in key
+   *
    * @param id The key that retrieves a value that you want to protect via locking
    */
   public void releaseWriteLockOnKey(K id) {
@@ -265,7 +263,7 @@ public abstract class BasicCache<K, T extends Serializable> extends ApplicationO
    * Try to get a read lock on a given key.
    * If can't get it in timeout millis then return a boolean telling that it didn't get the lock
    *
-   * @param id The key that retrieves a value that you want to protect via locking
+   * @param id      The key that retrieves a value that you want to protect via locking
    * @param timeout millis until giveup on getting the lock
    * @return whether the lock was awarded
    */
@@ -281,7 +279,8 @@ public abstract class BasicCache<K, T extends Serializable> extends ApplicationO
   /**
    * Try to get a write lock on a given key.
    * If can't get it in timeout millis then return a boolean telling that it didn't get the lock
-   * @param id The key that retrieves a value that you want to protect via locking
+   *
+   * @param id      The key that retrieves a value that you want to protect via locking
    * @param timeout millis until giveup on getting the lock
    * @return whether the lock was awarded
    */

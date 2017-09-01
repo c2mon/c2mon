@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -18,10 +18,9 @@ package cern.c2mon.server.cache.device;
 
 import java.util.*;
 
+import lombok.extern.slf4j.Slf4j;
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.core.Persister;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -44,12 +43,8 @@ import cern.c2mon.shared.daq.config.Change;
  * @author Justin Lewis Salmon
  */
 @Service
+@Slf4j
 public class DeviceFacadeImpl extends AbstractFacade<Device> implements DeviceFacade {
-
-  /**
-   * Static class logger.
-   */
-  private static final Logger LOG = LoggerFactory.getLogger(DeviceCacheImpl.class);
 
   /**
    * Reference to the <code>Device</code> cache
@@ -65,7 +60,7 @@ public class DeviceFacadeImpl extends AbstractFacade<Device> implements DeviceFa
    * Default constructor used by Spring to autowire the device and device class
    * cache beans.
    *
-   * @param pDeviceCache reference to the Device cache bean
+   * @param pDeviceCache      reference to the Device cache bean
    * @param pDeviceClassCache reference to the DeviceClass cache bean
    */
   @Autowired
@@ -86,7 +81,7 @@ public class DeviceFacadeImpl extends AbstractFacade<Device> implements DeviceFa
 
     } catch (CacheElementNotFoundException e) {
       // If we didn't find a class with the given name, return an empty list.
-      LOG.warn("Error getting device class by name", e);
+      log.warn("Error getting device class by name", e);
       return devices;
     }
 
@@ -124,7 +119,7 @@ public class DeviceFacadeImpl extends AbstractFacade<Device> implements DeviceFa
         }
 
       } catch (CacheElementNotFoundException e) {
-        LOG.warn("Didn't find any devices of class " + className, e);
+        log.warn("Didn't find any devices of class " + className, e);
       }
     }
 
@@ -269,7 +264,6 @@ public class DeviceFacadeImpl extends AbstractFacade<Device> implements DeviceFa
    * objects.
    *
    * @param xmlString the XML representation string of the device properties
-   *
    * @return the list of device properties
    * @throws Exception if the XML could not be parsed
    */
@@ -297,7 +291,6 @@ public class DeviceFacadeImpl extends AbstractFacade<Device> implements DeviceFa
    * configuration) and return it as a list of {@link DeviceCommand} objects.
    *
    * @param xmlString the XML representation string of the device commands
-   *
    * @return the list of device commands
    * @throws Exception if the XML could not be parsed
    */
@@ -313,5 +306,4 @@ public class DeviceFacadeImpl extends AbstractFacade<Device> implements DeviceFa
 
     return deviceCommands;
   }
-
 }
