@@ -273,7 +273,6 @@ public class RuleTagConfigTransactedImpl extends TagConfigTransactedImpl<RuleTag
           listener.onConfigurationEvent(ruleTag, Action.REMOVE);
         }
 
-        LocalExpressionCache.removeTagInformation(ruleTag.getId());
         LocalExpressionCache.removeTag(ruleTag.getId());
         configurableDAO.deleteItem(ruleTag.getId());
       }

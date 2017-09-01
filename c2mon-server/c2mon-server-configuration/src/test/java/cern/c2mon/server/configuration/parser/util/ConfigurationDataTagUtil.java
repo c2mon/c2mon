@@ -16,15 +16,12 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.parser.util;
 
+import java.util.Properties;
+
 import cern.c2mon.shared.client.configuration.api.tag.DataTag;
+import cern.c2mon.shared.client.metadata.Metadata;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
-import cern.c2mon.shared.common.datatag.address.impl.PLCHardwareAddressImpl;
-import cern.c2mon.shared.client.metadata.Metadata;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Properties;
 
 public class ConfigurationDataTagUtil {
 

@@ -16,26 +16,22 @@
  *****************************************************************************/
 package cern.c2mon.server.common.tag;
 
+import java.io.Serializable;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
-import java.io.Serializable;
-import java.sql.Timestamp;
 
-import groovy.lang.Script;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-
 import lombok.extern.slf4j.Slf4j;
 
-import cern.c2mon.shared.client.expression.Expression;
+import cern.c2mon.server.common.expression.Expression;
+import cern.c2mon.server.common.metadata.Metadata;
 import cern.c2mon.shared.common.datatag.DataTagConstants;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
-import cern.c2mon.server.common.metadata.Metadata;
 
 /**
  * Abstract tag used as basis for all tag objects in the server:
@@ -109,8 +105,6 @@ public abstract class AbstractTagCacheObject implements DataTagConstants, Clonea
    */
   private Metadata metadata;
 
-  @Getter
-  @Setter
   private Collection<Expression> expressions;
 
   /**
