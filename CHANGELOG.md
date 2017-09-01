@@ -14,7 +14,7 @@ For more details on a given release, please check also the [Milestone planning](
 ### Fixed
 
 
-## [1.8.19] - 2017-09-01
+## [1.8.20] - 2017-09-01
 ### Added
 - Client API: First version of tag subscription by metadata (#88)
 - Client API: Improved Alarm configuration builder by adding more methods (#151)
@@ -23,6 +23,10 @@ For more details on a given release, please check also the [Milestone planning](
 - Server: Resolved `NullPointerException` during configuration when adding metadata with `null` value (#163)
 - Server: Configuration requests containing updates for non-existing entities will report a warning but not fail anymore
 - Documentation: Fixed dead link in the database section of the server documentation (#162)
+
+
+## 1.8.19 - BROKEN!
+Broken release!
 
 
 ## [1.8.18] - 2017-08-16
@@ -155,7 +159,7 @@ This patch contains bug fixes for the DAQ layer.
 - Remove of EquipmentLogger concept from DAQ Core (#56)
 
 [Unreleased]: https://gitlab.cern.ch/c2mon/c2mon/milestones/18
-[1.8.19]: https://gitlab.cern.ch/c2mon/c2mon/milestones/17
+[1.8.20]: https://gitlab.cern.ch/c2mon/c2mon/milestones/17
 [1.8.18]: https://gitlab.cern.ch/c2mon/c2mon/milestones/16
 [1.8.17]: https://gitlab.cern.ch/c2mon/c2mon/milestones/15
 [1.8.16]: https://gitlab.cern.ch/c2mon/c2mon/milestones/14
