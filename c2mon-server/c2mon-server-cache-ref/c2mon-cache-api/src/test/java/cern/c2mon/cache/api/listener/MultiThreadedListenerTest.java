@@ -43,17 +43,17 @@ public class MultiThreadedListenerTest extends CacheListenerBaseTest {
   /**
    * Mock listener.
    */
-  private C2monCacheListener mockTimCacheListener;
+  private C2monCacheListener c2monCacheListener;
 
   @Before
   public void setUp() {
-    mockTimCacheListener = createMock(C2monCacheListener.class);
-    multiThreadedListener = new MultiThreadedCacheListener(mockTimCacheListener, 2, 2);
+    c2monCacheListener = createMock(C2monCacheListener.class);
+    multiThreadedListener = new MultiThreadedCacheListener(c2monCacheListener, 2, 2);
   }
 
   @Test
   public void testNotification() throws CloneNotSupportedException, InterruptedException {
-    testNotification(multiThreadedListener, mockTimCacheListener);
+    testNotification(multiThreadedListener, c2monCacheListener);
   }
 
   @Test
@@ -62,12 +62,12 @@ public class MultiThreadedListenerTest extends CacheListenerBaseTest {
     final Cacheable mockCacheable2 = createMock(Cacheable.class); //remember must not notify with the same object twice    
     CountDownLatch latch = new CountDownLatch(2);
 
-    mockTimCacheListener.notifyElementUpdated(mockCacheable);
+    c2monCacheListener.notifyElementUpdated(mockCacheable);
     expectLastCall().andAnswer(() -> {
       latch.countDown();
       return null;
     });
-    mockTimCacheListener.notifyElementUpdated(mockCacheable2);
+    c2monCacheListener.notifyElementUpdated(mockCacheable2);
     expectLastCall().andAnswer(() -> {
       latch.countDown();
       return null;
@@ -76,11 +76,11 @@ public class MultiThreadedListenerTest extends CacheListenerBaseTest {
     //replay the scenario, notifying of the update
     replay(mockCacheable);
     replay(mockCacheable2);
-    replay(mockTimCacheListener);
+    replay(c2monCacheListener);
     multiThreadedListener.notifyElementUpdated(mockCacheable);
     multiThreadedListener.notifyElementUpdated(mockCacheable2);
     latch.await();
-    verify(mockTimCacheListener);
+    verify(c2monCacheListener);
     verify(mockCacheable);
     verify(mockCacheable2);
   }
