@@ -155,7 +155,7 @@ public final class DataTagQualityImpl implements DataTagQuality {
      */
     @Override
     public boolean isInitialised() {
-      return invalidQualityStates.containsKey(TagQualityStatus.UNINITIALISED);
+      return !invalidQualityStates.containsKey(TagQualityStatus.UNINITIALISED);
     }
 
     @Override
