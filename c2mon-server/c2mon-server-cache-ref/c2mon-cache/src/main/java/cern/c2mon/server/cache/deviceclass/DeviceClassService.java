@@ -16,18 +16,18 @@ import cern.c2mon.server.common.device.DeviceClass;
 @Service
 public class DeviceClassService {
 
-  private C2monCache<Long, DeviceClass> deviceClassCache;
+  private C2monCache<Long, DeviceClass> deviceClassCacheRef;
 
   @Autowired
-  public DeviceClassService(C2monCache<Long, DeviceClass> deviceClassCache) {
-    this.deviceClassCache = deviceClassCache;
+  public DeviceClassService(C2monCache<Long, DeviceClass> deviceClassCacheRef) {
+    this.deviceClassCacheRef = deviceClassCacheRef;
   }
 
   public List<String> getDeviceClassNames() {
     List<String> classNames = new ArrayList<>();
 
-    for (Long deviceClassId : deviceClassCache.getKeys()) {
-      DeviceClass deviceClass = deviceClassCache.get(deviceClassId);
+    for (Long deviceClassId : deviceClassCacheRef.getKeys()) {
+      DeviceClass deviceClass = deviceClassCacheRef.get(deviceClassId);
       classNames.add(deviceClass.getName());
     }
 

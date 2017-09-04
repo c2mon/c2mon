@@ -30,11 +30,11 @@ import cern.c2mon.shared.daq.config.HardwareAddressUpdate;
 @Component
 public class CommandCacheObjectFactory extends CacheObjectFactory<CommandTag> {
 
-  private final C2monCache<Long, Equipment> equipmentCache;
+  private final C2monCache<Long, Equipment> equipmentCacheRef;
 
   @Autowired
-  public CommandCacheObjectFactory(C2monCache<Long, Equipment> equipmentCache) {
-    this.equipmentCache = equipmentCache;
+  public CommandCacheObjectFactory(C2monCache<Long, Equipment> equipmentCacheRef) {
+    this.equipmentCacheRef = equipmentCacheRef;
   }
 
   @Override
@@ -142,7 +142,7 @@ public class CommandCacheObjectFactory extends CacheObjectFactory<CommandTag> {
     // equipmentId (Long) - not currently used, as need to remove and add for this change
     if ((tmpStr = properties.getProperty("equipmentId")) != null) {
       commandTagCacheObject.setEquipmentId(parseLong(tmpStr, "equipmentId"));
-      commandTagCacheObject.setProcessId(equipmentCache.get(commandTagCacheObject.getEquipmentId()).getProcessId());
+      commandTagCacheObject.setProcessId(equipmentCacheRef.get(commandTagCacheObject.getEquipmentId()).getProcessId());
 
     }
     return commandTagUpdate;

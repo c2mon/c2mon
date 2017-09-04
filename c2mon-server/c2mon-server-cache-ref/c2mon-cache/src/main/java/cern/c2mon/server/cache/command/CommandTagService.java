@@ -16,17 +16,17 @@ import cern.c2mon.shared.common.command.SourceCommandTag;
 @Service
 public class CommandTagService {
 
-  private C2monCache<Long, CommandTag> commandTagCache;
+  private C2monCache<Long, CommandTag> commandTagCacheRef;
 
   @Autowired
-  public CommandTagService(C2monCache<Long, CommandTag> commandTagCache) {
-    this.commandTagCache = commandTagCache;
+  public CommandTagService(C2monCache<Long, CommandTag> commandTagCacheRef) {
+    this.commandTagCacheRef = commandTagCacheRef;
   }
 
   public String getConfigXML(Long id) {
     String returnValue = "";
     try {
-      CommandTag commandTag = commandTagCache.get(id);
+      CommandTag commandTag = commandTagCacheRef.get(id);
       returnValue = generateSourceXML(commandTag); //old version: SourceDataTag.toConfigXML(tag);
     } catch (CacheElementNotFoundException cacheEx) {
       log.error("Failed to locate command tag with id " + id + " in the cache (returning empty String config).");

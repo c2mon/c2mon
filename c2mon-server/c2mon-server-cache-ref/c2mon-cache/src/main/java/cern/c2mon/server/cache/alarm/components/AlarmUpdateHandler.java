@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 import cern.c2mon.cache.api.C2monCache;
@@ -21,38 +22,39 @@ import cern.c2mon.shared.common.datatag.DataTagConstants;
 
 @Slf4j
 @Component
+@Primary //TODO: to remove, only for current version, added becasue of multiple bean definitions with AlarmService(due to implemeting the same interface)
 public class AlarmUpdateHandler implements AlarmHandler {
 
-  private C2monCache<Long, Alarm> alarmCache;
+  private C2monCache<Long, Alarm> alarmCacheRef;
 
   private TagLocationService tagLocationService;
 
   @Autowired
-  public AlarmUpdateHandler(final C2monCache<Long, Alarm> alarmCache, final TagLocationService tagLocationService) {
-    this.alarmCache = alarmCache;
-    this.tagLocationService = tagLocationService;
+  public AlarmUpdateHandler(final C2monCache<Long, Alarm> alarmCacheRef/*final TagLocationService tagLocationService*/) {
+    this.alarmCacheRef = alarmCacheRef;
+//    this.tagLocationService = tagLocationService;
   }
 
   @Override
   public void evaluateAlarm(Long alarmId) {
-    alarmCache.lockOnKey(alarmId);
+    alarmCacheRef.lockOnKey(alarmId);
     try {
-      Alarm alarm = alarmCache.get(alarmId);
+      Alarm alarm = alarmCacheRef.get(alarmId);
       Tag tag = tagLocationService.get(alarm.getTagId());
     } finally {
-      alarmCache.unlockOnKey(alarmId);
+      alarmCacheRef.unlockOnKey(alarmId);
     }
   }
 
   @Override
   public Alarm update(Long alarmId, Tag tag) {
-    alarmCache.lockOnKey(alarmId);
+    alarmCacheRef.lockOnKey(alarmId);
     try {
-      Alarm alarm = alarmCache.get(alarmId);
+      Alarm alarm = alarmCacheRef.get(alarmId);
       // Notice, in this case the update() method is putting the changes back into the cache
       return update(alarm, tag);
     } finally {
-      alarmCache.unlockOnKey(alarmId);
+      alarmCacheRef.unlockOnKey(alarmId);
     }
   }
 
@@ -121,7 +123,7 @@ public class AlarmUpdateHandler implements AlarmHandler {
       alarmCacheObject.setInfo(additionalInfo);
       alarmCacheObject.setAlarmChangeState(AlarmCacheObject.AlarmChangeState.CHANGE_STATE);
       alarmCacheObject.notYetPublished();
-      alarmCache.put(alarmCacheObject.getId(), alarmCacheObject);
+      alarmCacheRef.put(alarmCacheObject.getId(), alarmCacheObject);
       return alarmCacheObject;
     }
 
@@ -145,7 +147,7 @@ public class AlarmUpdateHandler implements AlarmHandler {
         // We only send a notification about a property change
         // to the subscribed alarm listeners, if the alarm is active
         alarmCacheObject.notYetPublished();
-        alarmCache.put(alarmCacheObject.getId(), alarmCacheObject);
+        alarmCacheRef.put(alarmCacheObject.getId(), alarmCacheObject);
       }
       return alarmCacheObject;
     }

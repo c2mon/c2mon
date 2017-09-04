@@ -37,7 +37,7 @@ public class AlarmHandlerTest {
   public void setup() {
     alarmCache = EasyMock.createNiceMock(C2monCache.class);
     tagLocationService = EasyMock.createStrictMock(TagLocationService.class);
-    alarmHandler = new AlarmUpdateHandler(alarmCache, tagLocationService);
+    alarmHandler = new AlarmUpdateHandler(alarmCache/*, tagLocationService*/);
   }
 
   @Test

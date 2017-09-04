@@ -43,13 +43,13 @@ public class AlarmService implements AlarmHandler {
   @Setter
   private int maxFaultMemberLength = MAX_FAULT_MEMBER_LENGTH;
 
-  private final C2monCache<Long, Alarm> alarmCache;
+  private final C2monCache<Long, Alarm> alarmCacheRef;
 
   private AlarmHandler alarmHandler;
 
   @Autowired
-  public AlarmService(final C2monCache<Long, Alarm> alarmCache, final AlarmHandler alarmHandler) {
-    this.alarmCache = alarmCache;
+  public AlarmService(final C2monCache<Long, Alarm> alarmCacheRef, final AlarmHandler alarmHandler) {
+    this.alarmCacheRef = alarmCacheRef;
     this.alarmHandler = alarmHandler;
   }
 
