@@ -20,9 +20,6 @@ import cern.c2mon.server.cache.EquipmentCache;
 import cern.c2mon.server.cache.ProcessCache;
 import cern.c2mon.server.cache.SubEquipmentCache;
 import cern.c2mon.server.common.datatag.DataTag;
-import cern.c2mon.server.common.equipment.Equipment;
-import cern.c2mon.server.common.process.Process;
-import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
@@ -92,36 +89,6 @@ public class TagDocumentConverter extends BaseTagDocumentConverter<TagDocument> 
     @Override
     protected Map<String, Object> getC2monMetadata(Tag tag) {
         Map<String, Object> map = super.getC2monMetadata(tag);
-
-        map.put("dataType", tag.getDataType());
-
-        if (!tag.getProcessIds().isEmpty()) {
-            try {
-                Process process = processCache.get(tag.getProcessIds().iterator().next());
-                map.put("process", process.getName());
-            } catch (Exception e) {
-                log.warn("Could not get Process name for tag #{} ({}) from cache. Reason: {}", tag.getId(), tag.getName(), e.getMessage());
-            }
-        }
-
-        if (!tag.getEquipmentIds().isEmpty()) {
-            try {
-                Equipment equipment = equipmentCache.get(tag.getEquipmentIds().iterator().next());
-                map.put("equipment", equipment.getName());
-            } catch (Exception e) {
-                log.warn("Could not get Equipment name for tag #{} ({}) from cache. Reason: {}", tag.getId(), tag.getName(), e.getMessage());
-            }
-        }
-
-        if (!tag.getSubEquipmentIds().isEmpty()) {
-            try {
-                SubEquipment subEquipment = subEquipmentCache.get(tag.getSubEquipmentIds().iterator().next());
-                map.put("subEquipment", subEquipment.getName());
-            } catch (Exception e) {
-                log.warn("Could not get SubEquipment name for tag #{} ({}) from cache. Reason: {}", tag.getId(), tag.getName(), e.getMessage());
-            }
-        }
-
         map.put("serverTimestamp", tag.getCacheTimestamp().getTime());
 
         if (tag instanceof DataTag) {

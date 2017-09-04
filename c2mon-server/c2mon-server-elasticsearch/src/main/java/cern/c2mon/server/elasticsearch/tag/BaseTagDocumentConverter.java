@@ -8,15 +8,20 @@ import cern.c2mon.server.common.metadata.Metadata;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.common.tag.Tag;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.converter.Converter;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
  * @author Justin Lewis Salmon
  */
+@Slf4j
 public class BaseTagDocumentConverter<T extends Map<String, Object>> implements Converter<Tag, Optional<T>> {
 
     final ProcessCache processCache;
@@ -65,18 +70,30 @@ public class BaseTagDocumentConverter<T extends Map<String, Object>> implements 
         map.put("dataType", tag.getDataType());
 
         if (!tag.getProcessIds().isEmpty()) {
-            Process process = processCache.get(tag.getProcessIds().iterator().next());
-            map.put("process", process.getName());
+            try {
+                Process process = processCache.get(tag.getProcessIds().iterator().next());
+                map.put("process", process.getName());
+            } catch (Exception e) {
+                log.warn("Could not get Process name for tag #{} ({}) from cache. Reason: {}", tag.getId(), tag.getName(), e.getMessage());
+            }
         }
 
         if (!tag.getEquipmentIds().isEmpty()) {
-            Equipment equipment = equipmentCache.get(tag.getEquipmentIds().iterator().next());
-            map.put("equipment", equipment.getName());
+            try {
+                Equipment equipment = equipmentCache.get(tag.getEquipmentIds().iterator().next());
+                map.put("equipment", equipment.getName());
+            } catch (Exception e) {
+                log.warn("Could not get Equipment name for tag #{} ({}) from cache. Reason: {}", tag.getId(), tag.getName(), e.getMessage());
+            }
         }
 
         if (!tag.getSubEquipmentIds().isEmpty()) {
-            SubEquipment subEquipment = subEquipmentCache.get(tag.getSubEquipmentIds().iterator().next());
-            map.put("subEquipment", subEquipment.getName());
+            try {
+                SubEquipment subEquipment = subEquipmentCache.get(tag.getSubEquipmentIds().iterator().next());
+                map.put("subEquipment", subEquipment.getName());
+            } catch (Exception e) {
+                log.warn("Could not get SubEquipment name for tag #{} ({}) from cache. Reason: {}", tag.getId(), tag.getName(), e.getMessage());
+            }
         }
 
         return map;
