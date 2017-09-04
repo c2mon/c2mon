@@ -19,7 +19,7 @@ package cern.c2mon.shared.common.datatag;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementMap;
@@ -45,17 +45,13 @@ public final class DataTagQualityImpl implements DataTagQuality {
      * Contains the list of set invalidation states and the optional textual description.
      */
     @ElementMap(required = false)
-    private HashMap<TagQualityStatus, String> invalidQualityStates = new HashMap<TagQualityStatus, String>();
+    private ConcurrentHashMap<TagQualityStatus, String> invalidQualityStates = new ConcurrentHashMap<>();
 
     /**
      * Only used for XML serialization. The result of the isValid method is stored here.
      */
-    @SuppressWarnings("unused")
     @Element(required = false)
     private boolean isValid;
-
-    /** Read-/Write lock for the <code>invalidQualityStates</code> Map */
-    private transient ReentrantReadWriteLock concurrentMapLock = new ReentrantReadWriteLock();
 
     /**
      * Default constructor Creates a DataQuality object representing an UNINITIALISED tag
@@ -72,19 +68,6 @@ public final class DataTagQualityImpl implements DataTagQuality {
      */
     public DataTagQualityImpl(final TagQualityStatus status) {
         this(status, "");
-    }
-
-    
-    /**
-     * This getter shall be used, because lock object is transient, so it may not be
-     * instantiated after deserialization
-     * @return lock instance 
-     */
-    private ReentrantReadWriteLock getLock() {
-        if (concurrentMapLock == null) {
-            concurrentMapLock = new ReentrantReadWriteLock();
-        }
-        return concurrentMapLock;
     }
     
     /**
@@ -125,18 +108,14 @@ public final class DataTagQualityImpl implements DataTagQuality {
      * the object to prepare in some implementation specific way for the serialization process.
      */
     @Persist
-    @SuppressWarnings("unused")
     private void prepare() {
-
         isValid = isValid();
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public DataTagQuality clone() throws CloneNotSupportedException {
         DataTagQualityImpl clone = (DataTagQualityImpl) super.clone();
-        clone.invalidQualityStates = (HashMap<TagQualityStatus, String>) invalidQualityStates.clone();
-
+        clone.invalidQualityStates = new ConcurrentHashMap<>(invalidQualityStates);
         return clone;
     }
 
@@ -145,28 +124,12 @@ public final class DataTagQualityImpl implements DataTagQuality {
      */
     @Override
     public boolean isValid() {
-        boolean valid = false;
-        try {
-            getLock().readLock().lock();
-            valid = invalidQualityStates.isEmpty();
-        } finally {
-            getLock().readLock().unlock();
-        }
-
-        return valid;
+        return invalidQualityStates.isEmpty();
     }
 
     @Override
     public boolean isInvalidStatusSet(final TagQualityStatus status) {
-        boolean isSet = false;
-        try {
-            getLock().readLock().lock();
-            isSet = invalidQualityStates.containsKey(status);
-        } finally {
-            getLock().readLock().unlock();
-        }
-
-        return isSet;
+        return invalidQualityStates.containsKey(status);
     }
 
     @Override
@@ -177,27 +140,14 @@ public final class DataTagQualityImpl implements DataTagQuality {
         } else {
             nonNullQualityDescription = qualityDescription;
         }
-        boolean isSame = false;
-        try {
-            getLock().readLock().lock();
-            isSame = invalidQualityStates.containsKey(status)
+        
+        return invalidQualityStates.containsKey(status)
                     && nonNullQualityDescription.equalsIgnoreCase(invalidQualityStates.get(status));
-        } finally {
-            getLock().readLock().unlock();
-        }
-        return isSame;
     }
 
     @Override
     public boolean isExistingTag() {
-        boolean exists = false;
-        try {
-            getLock().readLock().lock();
-            exists = !invalidQualityStates.containsKey(TagQualityStatus.UNDEFINED_TAG);
-        } finally {
-            getLock().readLock().unlock();
-        }
-        return exists;
+      return !invalidQualityStates.containsKey(TagQualityStatus.UNDEFINED_TAG);
     }
 
     /**
@@ -205,34 +155,22 @@ public final class DataTagQualityImpl implements DataTagQuality {
      */
     @Override
     public boolean isInitialised() {
-        boolean uninitialised = false;
-        try {
-            getLock().readLock().lock();
-            uninitialised = invalidQualityStates.containsKey(TagQualityStatus.UNINITIALISED);
-        } finally {
-            getLock().readLock().unlock();
-        }
-        return !uninitialised;
+      return invalidQualityStates.containsKey(TagQualityStatus.UNINITIALISED);
     }
 
     @Override
     public boolean isAccessible() {
-        boolean accessible = true;
-        try {
-            getLock().readLock().lock();
-            if (invalidQualityStates.containsKey(TagQualityStatus.PROCESS_DOWN)
-                    || invalidQualityStates.containsKey(TagQualityStatus.EQUIPMENT_DOWN)
-                    || invalidQualityStates.containsKey(TagQualityStatus.SUBEQUIPMENT_DOWN)
-                    || invalidQualityStates.containsKey(TagQualityStatus.INACCESSIBLE)
-                    || invalidQualityStates.containsKey(TagQualityStatus.SERVER_HEARTBEAT_EXPIRED)
-                    || invalidQualityStates.containsKey(TagQualityStatus.JMS_CONNECTION_DOWN)) {
-                accessible = false;
-            }
-        } finally {
-            getLock().readLock().unlock();
-        }
+      boolean accessible = true;
+      if (invalidQualityStates.containsKey(TagQualityStatus.PROCESS_DOWN)
+          || invalidQualityStates.containsKey(TagQualityStatus.EQUIPMENT_DOWN)
+          || invalidQualityStates.containsKey(TagQualityStatus.SUBEQUIPMENT_DOWN)
+          || invalidQualityStates.containsKey(TagQualityStatus.INACCESSIBLE)
+          || invalidQualityStates.containsKey(TagQualityStatus.SERVER_HEARTBEAT_EXPIRED)
+          || invalidQualityStates.containsKey(TagQualityStatus.JMS_CONNECTION_DOWN)) {
+        accessible = false;
+      }
 
-        return accessible;
+      return accessible;
     }
 
     /**
@@ -240,26 +178,15 @@ public final class DataTagQualityImpl implements DataTagQuality {
      */
     @Override
     public void validate() {
-        try {
-            getLock().writeLock().lock();
-            invalidQualityStates.clear();
-        } finally {
-            getLock().writeLock().unlock();
-        }
+      invalidQualityStates.clear();
     }
 
     @Override
     public void setInvalidStates(final Map<TagQualityStatus, String> qualityStates) {
-        try {
-            getLock().writeLock().lock();
-            invalidQualityStates.clear();
-            if (qualityStates != null) {
-                invalidQualityStates.putAll(qualityStates);
-            }
-        } finally {
-            getLock().writeLock().unlock();
-        }
-
+      invalidQualityStates.clear();
+      if (qualityStates != null) {
+        invalidQualityStates.putAll(qualityStates);
+      }
     }
 
     @Override
@@ -279,29 +206,24 @@ public final class DataTagQualityImpl implements DataTagQuality {
 
     @Override
     public String getDescription() {
-        String description = "";
-        try {
-            getLock().readLock().lock();
-            if (invalidQualityStates.isEmpty()) {
-                description = VALID_DESCR;
-            } else {
-                int severity = 999; // initialized with lowest severity
+      String description = "";
+      if (invalidQualityStates.isEmpty()) {
+        description = VALID_DESCR;
+      } else {
+        int severity = 999; // initialized with lowest severity
 
-                for (TagQualityStatus status : invalidQualityStates.keySet()) {
+        for (TagQualityStatus status : invalidQualityStates.keySet()) {
 
-                    if (status.getSeverity() < severity) {
-                        description = invalidQualityStates.get(status).trim();
-                        severity = status.getSeverity();
-                    } else if (status.getSeverity() == severity) {
-                        description += "; " + invalidQualityStates.get(status).trim();
-                    }
-                }
-            }
-        } finally {
-            getLock().readLock().unlock();
+          if (status.getSeverity() < severity) {
+            description = invalidQualityStates.get(status).trim();
+            severity = status.getSeverity();
+          } else if (status.getSeverity() == severity) {
+            description += "; " + invalidQualityStates.get(status).trim();
+          }
         }
+      }
 
-        return description;
+      return description;
     }
 
     @Override
@@ -311,46 +233,28 @@ public final class DataTagQualityImpl implements DataTagQuality {
 
     @Override
     public boolean addInvalidStatus(final TagQualityStatus statusToAdd, final String description) {
-        if (statusToAdd != null) {
-            try {
-                getLock().writeLock().lock();
-                if (description != null) {
-                    invalidQualityStates.put(statusToAdd, description);
-                } else {
-                    invalidQualityStates.put(statusToAdd, "");
-                }
-            } finally {
-                getLock().writeLock().unlock();
-            }
-            return true;
+      if (statusToAdd != null) {
+        if (description != null) {
+          invalidQualityStates.put(statusToAdd, description);
+        } else {
+          invalidQualityStates.put(statusToAdd, "");
         }
+        return true;
+      }
 
-        return false;
+      return false;
     }
 
     @Override
     public Map<TagQualityStatus, String> getInvalidQualityStates() {
-        Map<TagQualityStatus, String> copy;
-        try {
-            getLock().readLock().lock();
-            copy = new HashMap<TagQualityStatus, String>(invalidQualityStates);
-        } finally {
-            getLock().readLock().unlock();
-        }
-
-        return copy;
+        return new HashMap<TagQualityStatus, String>(invalidQualityStates);
     }
 
     @Override
     public void removeInvalidStatus(final TagQualityStatus statusToRemove) {
-        if (statusToRemove != null) {
-            try {
-                getLock().writeLock().lock();
-                invalidQualityStates.remove(statusToRemove);
-            } finally {
-                getLock().writeLock().unlock();
-            }
-        }
+      if (statusToRemove != null) {
+        invalidQualityStates.remove(statusToRemove);
+      }
     }
 
     /**
@@ -365,22 +269,17 @@ public final class DataTagQualityImpl implements DataTagQuality {
         StringBuilder qualityStatusStr = new StringBuilder();
         final String separator = "+";
 
-        try {
-            getLock().readLock().lock();
-            if (invalidQualityStates.isEmpty()) {
-                qualityStatusStr.append(VALID_DESCR);
-            } else {
-                boolean firstInsert = true;
-                for (TagQualityStatus status : invalidQualityStates.keySet()) {
-                    if (!firstInsert) {
-                        qualityStatusStr.append(separator);
-                    }
-                    qualityStatusStr.append(status);
-                    firstInsert = false;
-                }
+        if (invalidQualityStates.isEmpty()) {
+          qualityStatusStr.append(VALID_DESCR);
+        } else {
+          boolean firstInsert = true;
+          for (TagQualityStatus status : invalidQualityStates.keySet()) {
+            if (!firstInsert) {
+              qualityStatusStr.append(separator);
             }
-        } finally {
-            getLock().readLock().unlock();
+            qualityStatusStr.append(status);
+            firstInsert = false;
+          }
         }
 
         return qualityStatusStr.toString();
