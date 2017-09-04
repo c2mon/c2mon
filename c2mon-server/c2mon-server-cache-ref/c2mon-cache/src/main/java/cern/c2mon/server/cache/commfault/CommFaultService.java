@@ -17,21 +17,21 @@ import cern.c2mon.server.common.equipment.AbstractEquipment;
 @Service
 public class CommFaultService implements CoreService {
 
-  private final C2monCache<Long, CommFaultTag> commFaultTagCache;
+  private final C2monCache<Long, CommFaultTag> commFaultTagCacheRef;
 
   @Autowired
-  public CommFaultService(final C2monCache<Long, CommFaultTag> commFaultTagCache) {
-    this.commFaultTagCache = commFaultTagCache;
+  public CommFaultService(final C2monCache<Long, CommFaultTag> commFaultTagCacheRef) {
+    this.commFaultTagCacheRef = commFaultTagCacheRef;
   }
 
   @Override
   public C2monCache getCache() {
-    return commFaultTagCache;
+    return commFaultTagCacheRef;
   }
 
   public void generateFromEquipment(AbstractEquipment abstractEquipment) {
     CommFaultTag commFaultTag = new CommFaultTagCacheObject(abstractEquipment.getCommFaultTagId(), abstractEquipment.getId(),
             abstractEquipment.getName(), abstractEquipment.getAliveTagId(), abstractEquipment.getStateTagId());
-    commFaultTagCache.put(commFaultTag.getId(), commFaultTag);
+    commFaultTagCacheRef.put(commFaultTag.getId(), commFaultTag);
   }
 }

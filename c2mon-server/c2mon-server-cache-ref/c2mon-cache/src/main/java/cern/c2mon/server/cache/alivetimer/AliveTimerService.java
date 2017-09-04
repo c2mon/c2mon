@@ -22,33 +22,33 @@ import cern.c2mon.server.common.process.Process;
 @Service
 public class AliveTimerService implements CoreService<Long, AliveTimer> {
 
-  private C2monCache<Long, AliveTimer> aliveTimerCache;
+  private C2monCache<Long, AliveTimer> aliveTimerCacheRef;
 
   @Autowired
-  public AliveTimerService(C2monCache<Long, AliveTimer> aliveTimerCache) {
-    this.aliveTimerCache = aliveTimerCache;
+  public AliveTimerService(C2monCache<Long, AliveTimer> aliveTimerCacheRef) {
+    this.aliveTimerCacheRef = aliveTimerCacheRef;
 
     log.info("ALIVE TIMER SERVICE WAS CREATED SUCCESSFULLY");
   }
 
   @Override
   public C2monCache<Long, AliveTimer> getCache() {
-    return aliveTimerCache;
+    return aliveTimerCacheRef;
   }
 
   /**
    * Activate this alive timer.
    */
   public void start(final Long id) {
-    aliveTimerCache.invoke(id, new AliveTimerManager(), AliveTimerOperation.START);
+    aliveTimerCacheRef.invoke(id, new AliveTimerManager(), AliveTimerOperation.START);
   }
 
   public void stop(final Long id) {
-    aliveTimerCache.invoke(id, new AliveTimerManager(), AliveTimerOperation.STOP);
+    aliveTimerCacheRef.invoke(id, new AliveTimerManager(), AliveTimerOperation.STOP);
   }
 
   public void update(final Long id) {
-    aliveTimerCache.invoke(id, new AliveTimerManager(), AliveTimerOperation.UPDATE);
+    aliveTimerCacheRef.invoke(id, new AliveTimerManager(), AliveTimerOperation.UPDATE);
   }
 
   /**
@@ -58,7 +58,7 @@ public class AliveTimerService implements CoreService<Long, AliveTimer> {
    * at least "aliveInterval" milliseconds.
    */
   public boolean hasExpired(final Long aliveTimerId) {
-    return (boolean) aliveTimerCache.invoke(aliveTimerId, new AliveTimerManager(), AliveTimerOperation.HAS_EXPIRED);
+    return (boolean) aliveTimerCacheRef.invoke(aliveTimerId, new AliveTimerManager(), AliveTimerOperation.HAS_EXPIRED);
   }
 
   public void startAllTimers() {

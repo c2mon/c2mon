@@ -81,17 +81,17 @@ public enum C2monCacheName {
   }
 
   public static class Names {
-    public static final String ALARM = "alarmCache";
-    public static final String ALIVETIMER = "aliveTimerCache";
-    public static final String COMMAND = "commandTagCache";
-    public static final String COMMFAULT = "commFaultTagCache";
-    public static final String CONTROL = "controlTagCache";
-    public static final String DATATAG = "dataTagCache";
-    public static final String DEVICE = "deviceCache";
-    public static final String DEVICECLASS = "deviceClassCache";
-    public static final String EQUIPMENT = "equipmentCache";
-    public static final String PROCESS = "processCache";
-    public static final String RULE = "ruleTagCache";
-    public static final String SUBEQUIPMENT = "subEquipmentCache";
+    public static final String ALARM = "alarmCacheRef";
+    public static final String ALIVETIMER = "aliveTimerCacheRef";
+    public static final String COMMAND = "commandTagCacheRef";
+    public static final String COMMFAULT = "commFaultTagCacheRef";
+    public static final String CONTROL = "controlTagCacheRef";
+    public static final String DATATAG = "dataTagCacheRef";
+    public static final String DEVICE = "deviceCacheRef";
+    public static final String DEVICECLASS = "deviceClassCacheRef";
+    public static final String EQUIPMENT = "equipmentCacheRef";
+    public static final String PROCESS = "processCacheRef";
+    public static final String RULE = "ruleTagCacheRef";
+    public static final String SUBEQUIPMENT = "subEquipmentCacheRef";
   }
 }

@@ -21,11 +21,11 @@ import cern.c2mon.shared.daq.config.Change;
 @Component
 public class DeviceCacheObjectFactory extends CacheObjectFactory<Device> {
 
-  private C2monCache<Long, DeviceClass> deviceClassCache;
+  private C2monCache<Long, DeviceClass> deviceClassCacheRef;
 
   @Autowired
-  public DeviceCacheObjectFactory(C2monCache<Long, DeviceClass> deviceClassCache) {
-    this.deviceClassCache = deviceClassCache;
+  public DeviceCacheObjectFactory(C2monCache<Long, DeviceClass> deviceClassCacheRef) {
+    this.deviceClassCacheRef = deviceClassCacheRef;
   }
 
   @Override
@@ -82,7 +82,7 @@ public class DeviceCacheObjectFactory extends CacheObjectFactory<Device> {
     }
 
     // Cross-check device class ID
-    DeviceClass deviceClass = deviceClassCache.get(device.getDeviceClassId());
+    DeviceClass deviceClass = deviceClassCacheRef.get(device.getDeviceClassId());
     if (deviceClass == null) {
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"deviceClassId\" must refer to an existing DeviceClass");
     }

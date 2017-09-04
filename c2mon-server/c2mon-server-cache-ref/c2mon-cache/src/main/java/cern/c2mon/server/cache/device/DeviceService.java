@@ -15,10 +15,10 @@ import cern.c2mon.server.common.device.Device;
 @Service
 public class DeviceService {
 
-  private final C2monCache<Long, Device> deviceCache;
+  private final C2monCache<Long, Device> deviceCacheRef;
 
   @Autowired
-  public DeviceService(final C2monCache<Long, Device> deviceCache) {
-    this.deviceCache = deviceCache;
+  public DeviceService(final C2monCache<Long, Device> deviceCacheRef) {
+    this.deviceCacheRef = deviceCacheRef;
   }
 }

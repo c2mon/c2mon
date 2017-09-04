@@ -26,7 +26,7 @@ import cern.c2mon.shared.common.supervision.SupervisionConstants;
 @Service
 public class SubEquipmentService implements CoreService, SupervisedService<SubEquipment>, AbstractEquipmentService {
 
-  private C2monCache<Long, SubEquipment> subEquipmentCache;
+  private C2monCache<Long, SubEquipment> subEquipmentCacheRef;
 
   private SupervisedService<SubEquipment> supervisedService;
 
@@ -37,18 +37,18 @@ public class SubEquipmentService implements CoreService, SupervisedService<SubEq
   private AliveTimerService aliveTimerService;
 
   @Autowired
-  public SubEquipmentService(C2monCache<Long, SubEquipment> subEquipmentCache, CommFaultService commFaultService, AliveTimerService aliveTimerService) {
-    this.subEquipmentCache = subEquipmentCache;
+  public SubEquipmentService(C2monCache<Long, SubEquipment> subEquipmentCacheRef, CommFaultService commFaultService, AliveTimerService aliveTimerService) {
+    this.subEquipmentCacheRef = subEquipmentCacheRef;
     this.commFaultService = commFaultService;
     this.aliveTimerService = aliveTimerService;
 
-    this.supervisedService = new SupervisedServiceImpl<>(subEquipmentCache, aliveTimerService);
-    this.abstractEquipmentService = new CoreAbstractEquipmentService<>(subEquipmentCache, commFaultService);
+    this.supervisedService = new SupervisedServiceImpl<>(subEquipmentCacheRef, aliveTimerService);
+    this.abstractEquipmentService = new CoreAbstractEquipmentService<>(subEquipmentCacheRef, commFaultService);
   }
 
   @Override
   public C2monCache getCache() {
-    return subEquipmentCache;
+    return subEquipmentCacheRef;
   }
 
   @Override

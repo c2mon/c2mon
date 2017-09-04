@@ -14,8 +14,8 @@ import org.springframework.context.annotation.Configuration;
 @ComponentScan("cern.c2mon.server.cache")
 public class CacheModuleRef {
 
-  @Bean(name = "cachingProvider")
-  public C2monCachingProvider getCachingProvider() {
-    return new C2monCachingProvider();
-  }
+//  @Bean(name = "cachingProvider")
+//  public C2monCachingProvider getCachingProvider() {
+//    return new C2monCachingProvider();
+//  }
 }

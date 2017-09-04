@@ -12,6 +12,7 @@ import cern.c2mon.cache.api.CoreService;
 import cern.c2mon.cache.api.service.SupervisedService;
 import cern.c2mon.server.cache.alivetimer.AliveTimerService;
 import cern.c2mon.server.cache.equipment.EquipmentService;
+import cern.c2mon.server.common.alive.AliveTimer;
 import cern.c2mon.server.common.config.ServerProperties;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.process.ProcessCacheObject;
@@ -33,26 +34,26 @@ public class ProcessService implements CoreService, ProcessOperationService, Sup
 
 //  private SubEquipmentService subEquipmentService;
 
-  private final C2monCache aliveTimerCache;
+  private final C2monCache<Long, AliveTimer> aliveTimerCacheRef;
 
-  private final C2monCache<Long, Process> processCache;
+  private final C2monCache<Long, Process> processCacheRef;
 
   private final ServerProperties properties;
 
   @Autowired
   public ProcessService(final EquipmentService equipmentService, final AliveTimerService aliveTimerService,
-                        final C2monCache<Long, Process> processCache, final ServerProperties properties) {
+                        final C2monCache<Long, Process> processCacheRef, final ServerProperties properties) {
     this.equipmentService = equipmentService;
-    this.processCache = processCache;
-    this.aliveTimerCache = aliveTimerService.getCache();
+    this.processCacheRef = processCacheRef;
+    this.aliveTimerCacheRef = aliveTimerService.getCache();
     this.properties = properties;
 
-    this.processOperationService = new ProcessOperationServiceImpl(processCache, equipmentService, aliveTimerService, properties);
+    this.processOperationService = new ProcessOperationServiceImpl(processCacheRef, equipmentService, aliveTimerService, properties);
   }
 
   @Override
   public C2monCache getCache() {
-    return processCache;
+    return processCacheRef;
   }
 
   @Override
@@ -122,7 +123,7 @@ public class ProcessService implements CoreService, ProcessOperationService, Sup
 
   @Override
   public void stop(Process supervised, Timestamp timestamp) {
-    processCache.lockOnKey(supervised.getId());
+    processCacheRef.lockOnKey(supervised.getId());
     try {
       ProcessCacheObject processCacheObject = (ProcessCacheObject) supervised;
       processCacheObject.setCurrentHost(null);
@@ -132,7 +133,7 @@ public class ProcessService implements CoreService, ProcessOperationService, Sup
       processCacheObject.setLocalConfig(null);
       supervisedService.stop(supervised, timestamp);
     } finally {
-      processCache.unlockOnKey(supervised.getId());
+      processCacheRef.unlockOnKey(supervised.getId());
     }
   }
 

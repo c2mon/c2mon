@@ -30,25 +30,25 @@ import cern.c2mon.shared.common.supervision.SupervisionConstants;
 @Service
 public class EquipmentService implements CoreService, SupervisedService<Equipment>, AbstractEquipmentService {
 
-  private final C2monCache<Long, Equipment> equipmentCache;
+  private final C2monCache<Long, Equipment> equipmentCacheRef;
 
-  private final C2monCache<Long, Process> processCache;
+  private final C2monCache<Long, Process> processCacheRef;
 
-  private final C2monCache<Long, DataTag> dataTagCache;
+  private final C2monCache<Long, DataTag> dataTagCacheRef;
 
   private final SupervisedService<Equipment> supervisedService;
 
   private final AbstractEquipmentService coreEquipmentService;
 
   @Autowired
-  public EquipmentService(final C2monCache<Long, Equipment> equipmentCache, final C2monCache<Long, Process> processCache,
-                          final C2monCache<Long, DataTag> dataTagCache, final AliveTimerService aliveTimerService, final CommFaultService commFaultService) {
-    this.equipmentCache = equipmentCache;
-    this.processCache = processCache;
-    this.dataTagCache = dataTagCache;
+  public EquipmentService(final C2monCache<Long, Equipment> equipmentCacheRef, final C2monCache<Long, Process> processCacheRef,
+                          final C2monCache<Long, DataTag> dataTagCacheRef, final AliveTimerService aliveTimerService, final CommFaultService commFaultService) {
+    this.equipmentCacheRef = equipmentCacheRef;
+    this.processCacheRef = processCacheRef;
+    this.dataTagCacheRef = dataTagCacheRef;
 
-    this.supervisedService = new SupervisedServiceImpl(equipmentCache, aliveTimerService);
-    this.coreEquipmentService = new CoreAbstractEquipmentService<>(equipmentCache, commFaultService);
+    this.supervisedService = new SupervisedServiceImpl(equipmentCacheRef, aliveTimerService);
+    this.coreEquipmentService = new CoreAbstractEquipmentService<>(equipmentCacheRef, commFaultService);
   }
 
   //TODO: write this method
@@ -58,7 +58,7 @@ public class EquipmentService implements CoreService, SupervisedService<Equipmen
 
   @Override
   public C2monCache getCache() {
-    return this.equipmentCache;
+    return this.equipmentCacheRef;
   }
 
   @Override

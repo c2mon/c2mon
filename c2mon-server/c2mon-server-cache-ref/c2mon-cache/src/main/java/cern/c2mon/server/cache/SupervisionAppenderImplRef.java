@@ -38,7 +38,7 @@ import cern.c2mon.shared.common.datatag.TagQualityStatus;
  */
 @Slf4j
 @Service
-public class SupervisionAppenderImpl implements SupervisionAppender {
+public class SupervisionAppenderImplRef implements SupervisionAppender {
 
   /**
    * Process and Equipment bean interfaces.
@@ -49,7 +49,7 @@ public class SupervisionAppenderImpl implements SupervisionAppender {
   private C2monCache<Long, Equipment> equipmentCache;
 
   @Autowired
-  public SupervisionAppenderImpl(ProcessService processService, EquipmentService equipmentService) {
+  public SupervisionAppenderImplRef(ProcessService processService, EquipmentService equipmentService) {
     this.processService = processService;
     this.equipmentService = equipmentService;
 
