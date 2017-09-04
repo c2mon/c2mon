@@ -108,7 +108,7 @@ public class AbstractTagFacadeTest {
     
     c2monCache.acquireReadLockOnKey(tag.getId());
     c2monCache.releaseReadLockOnKey(tag.getId());
-    EasyMock.expect(c2monCache.get(1L)).andReturn(tag);
+    EasyMock.expect(c2monCache.getCopy(1L)).andReturn(tag);
     EasyMock.expect(alarmCache.getCopy(10L)).andReturn(alarm);
     
     EasyMock.replay(c2monCache);
