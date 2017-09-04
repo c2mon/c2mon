@@ -381,7 +381,7 @@ public abstract class AbstractTagFacade<T extends Tag> extends AbstractFacade<T>
   public TagWithAlarms getTagWithAlarms(Long id) {
     tagCache.acquireReadLockOnKey(id);
     try {
-      T tag = tagCache.get(id);
+      T tag = tagCache.getCopy(id);
       Collection<Alarm> alarms = new LinkedList<Alarm>();
       for (Long alarmId : tag.getAlarmIds()) {
         alarms.add(alarmCache.getCopy(alarmId));
