@@ -1,6 +1,7 @@
 package cern.c2mon.cache.impl;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ignite.cache.CacheMode;
 import org.apache.ignite.configuration.CacheConfiguration;
 
 import cern.c2mon.cache.api.factory.AbstractC2monCacheFactory;
@@ -19,8 +20,7 @@ public class IgniteFactory extends AbstractC2monCacheFactory {
 
     cacheConfiguration.setName(name);
     cacheConfiguration.setIndexedTypes(keyType, valueType);
-
-    log.info("And here it is, working IgniteFactory");
+    cacheConfiguration.setCacheMode(CacheMode.REPLICATED);
 
     return new IgniteC2monCache(cacheConfiguration);
   }
