@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+  <!--<bean id="base-ignite.cfg" class="org.apache.ignite.configuration.IgniteConfiguration" abstract="true">-->
+  <bean id="base-ignite.cfg" class="org.apache.ignite.configuration.IgniteConfiguration">
+    <property name="metricsLogFrequency" value="5000"/>
+    <property name="cacheConfiguration">
+      <list>
+        <bean class="org.apache.ignite.configuration.CacheConfiguration">
+          <property name="name" value="alarmCacheRef"/>
+          <property name="cacheMode" value="REPLICATED"/>
+          <!--Possible to set atomicity mode-->
+        </bean>
+        <bean class="org.apache.ignite.configuration.CacheConfiguration">
+          <property name="name" value="aliveTimerCacheRef"/>
+          <property name="cacheMode" value="REPLICATED"/>
+        </bean>
+        <bean class="org.apache.ignite.configuration.CacheConfiguration">
+          <property name="name" value="commandTagCacheRef"/>
+          <property name="cacheMode" value="REPLICATED"/>
+        </bean>
+        <bean class="org.apache.ignite.configuration.CacheConfiguration">
+          <property name="name" value="commFaultTagCacheRef"/>
+          <property name="cacheMode" value="REPLICATED"/>
+        </bean>
+        <bean class="org.apache.ignite.configuration.CacheConfiguration">
+          <property name="name" value="controlTagCacheRef"/>
+          <property name="cacheMode" value="REPLICATED"/>
+        </bean>
+        <bean class="org.apache.ignite.configuration.CacheConfiguration">
+          <property name="name" value="dataTagCacheRef"/>
+          <property name="cacheMode" value="REPLICATED"/>
+        </bean>
+        <bean class="org.apache.ignite.configuration.CacheConfiguration">
+          <property name="name" value="deviceCacheRef"/>
+          <property name="cacheMode" value="REPLICATED"/>
+        </bean>
+        <bean class="org.apache.ignite.configuration.CacheConfiguration">
+          <property name="name" value="deviceClassCacheRef"/>
+          <property name="cacheMode" value="REPLICATED"/>
+        </bean>
+        <bean class="org.apache.ignite.configuration.CacheConfiguration">
+          <property name="name" value="equipmentCacheRef"/>
+          <property name="cacheMode" value="REPLICATED"/>
+        </bean>
+        <bean class="org.apache.ignite.configuration.CacheConfiguration">
+          <property name="name" value="processCacheRef"/>
+          <property name="cacheMode" value="REPLICATED"/>
+        </bean>
+        <bean class="org.apache.ignite.configuration.CacheConfiguration">
+          <property name="name" value="ruleTagCacheRef"/>
+          <property name="cacheMode" value="REPLICATED"/>
+        </bean>
+        <bean class="org.apache.ignite.configuration.CacheConfiguration">
+          <property name="name" value="subEquipmentCacheRef"/>
+          <property name="cacheMode" value="REPLICATED"/>
+        </bean>
+      </list>
+    </property>
+  </bean>
+</beans>
