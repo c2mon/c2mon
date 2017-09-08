@@ -7,6 +7,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import static cern.c2mon.cache.impl.C2monCacheProperties.METRICS_LOG_FREQUENCY;
+
 /**
  * @author Szymon Halastra
  */
@@ -19,7 +21,8 @@ public class C2monIgniteConfiguration {
 
     IgniteConfiguration config = (IgniteConfiguration) context.getBean("base-ignite.cfg");
 
-    config.setClientMode(true);
+//    config.setClientMode(CLIENT_MODE);
+    config.setMetricsLogFrequency(METRICS_LOG_FREQUENCY);
 
     return config;
   }

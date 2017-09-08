@@ -5,7 +5,6 @@
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
   <!--<bean id="base-ignite.cfg" class="org.apache.ignite.configuration.IgniteConfiguration" abstract="true">-->
   <bean id="base-ignite.cfg" class="org.apache.ignite.configuration.IgniteConfiguration">
-    <property name="metricsLogFrequency" value="5000"/>
     <property name="cacheConfiguration">
       <list>
         <bean class="org.apache.ignite.configuration.CacheConfiguration">
