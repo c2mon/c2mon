@@ -6,8 +6,7 @@ import org.springframework.stereotype.Service;
 
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.CoreService;
-import cern.c2mon.server.cache.alivetimer.components.AliveTimerManager;
-import cern.c2mon.server.cache.alivetimer.components.AliveTimerOperation;
+import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.alive.AliveTimer;
 import cern.c2mon.server.common.alive.AliveTimerCacheObject;
 import cern.c2mon.server.common.equipment.AbstractEquipment;
@@ -27,8 +26,6 @@ public class AliveTimerService implements CoreService<Long, AliveTimer> {
   @Autowired
   public AliveTimerService(C2monCache<Long, AliveTimer> aliveTimerCacheRef) {
     this.aliveTimerCacheRef = aliveTimerCacheRef;
-
-    log.info("ALIVE TIMER SERVICE WAS CREATED SUCCESSFULLY");
   }
 
   @Override
@@ -36,19 +33,25 @@ public class AliveTimerService implements CoreService<Long, AliveTimer> {
     return aliveTimerCacheRef;
   }
 
-  /**
-   * Activate this alive timer.
-   */
-  public void start(final Long id) {
-    aliveTimerCacheRef.invoke(id, new AliveTimerManager(), AliveTimerOperation.START);
+  public boolean isRegisteredAliveTimer(final Long id) {
+    return aliveTimerCacheRef.containsKey(id); //TODO check DB also but do not load
   }
 
-  public void stop(final Long id) {
-    aliveTimerCacheRef.invoke(id, new AliveTimerManager(), AliveTimerOperation.STOP);
-  }
-
-  public void update(final Long id) {
-    aliveTimerCacheRef.invoke(id, new AliveTimerManager(), AliveTimerOperation.UPDATE);
+  public void update(final Long aliveId) {
+    aliveTimerCacheRef.lockOnKey(aliveId);
+    try {
+      AliveTimer aliveTimer = aliveTimerCacheRef.get(aliveId);
+      update(aliveTimer);
+      aliveTimerCacheRef.put(aliveId, aliveTimer);
+    }
+    catch (CacheElementNotFoundException cacheEx) {
+      log.error("Cannot locate the AliveTimer in the cache (Id is " + aliveId + ") - unable to update it.", cacheEx);
+    }
+    catch (Exception e) {
+      log.error("updatedAliveTimer() failed for an unknown reason: ", e);
+    } finally {
+      aliveTimerCacheRef.unlockOnKey(aliveId);
+    }
   }
 
   /**
@@ -58,60 +61,129 @@ public class AliveTimerService implements CoreService<Long, AliveTimer> {
    * at least "aliveInterval" milliseconds.
    */
   public boolean hasExpired(final Long aliveTimerId) {
-    return (boolean) aliveTimerCacheRef.invoke(aliveTimerId, new AliveTimerManager(), AliveTimerOperation.HAS_EXPIRED);
+    aliveTimerCacheRef.lockOnKey(aliveTimerId);
+    try {
+      AliveTimer aliveTimer = aliveTimerCacheRef.get(aliveTimerId);
+      return (System.currentTimeMillis() - aliveTimer.getLastUpdate() > aliveTimer.getAliveInterval() + aliveTimer.getAliveInterval() / 3);
+    } finally {
+      aliveTimerCacheRef.unlockOnKey(aliveTimerId);
+    }
   }
 
   public void startAllTimers() {
-//    log.debug("Starting all alive timers in cache.");
-//    try {
-//      Iterator<Cache.Entry<Long, AliveTimer>> entries = aliveTimerCacheRef.iterator();
-//      while (entries.hasNext()) {
-//        start(entries.next().getValue().getId());
-//      }
-//    }
-//    catch (Exception e) {
-//      log.error("Unable to retrieve list of alive timers from cache when attempting to start the timers.", e);
-//    }
+    log.debug("Starting all alive timers in cache.");
+    try {
+      for (Long currentId : aliveTimerCacheRef.getKeys()) {
+        start(currentId);
+      }
+    }
+    catch (Exception e) {
+      log.error("Unable to retrieve list of alive timers from cache when attempting to start the timers.", e);
+    }
   }
 
-  /**
-   * Not tested
-   */
   public void stopAllTimers() {
     log.debug("Stopping all alive timers in the cache.");
-//    try {
-//      Iterator<Cache.Entry<Long, AliveTimer>> entries = aliveTimerCacheRef.iterator();
-//      while (entries.hasNext()) {
-//        stop(entries.next().getValue().getId());
-//      }
-//    }
-//    catch (Exception e) {
-//      log.error("Unable to retrieve list of alive timers from cache when attempting to stop all timers.", e);
-//    }
+    try {
+      for (Long currentId : aliveTimerCacheRef.getKeys()) {
+        stop(currentId);
+      }
+    }
+    catch (Exception e) {
+      log.error("Unable to retrieve list of alive timers from cache when attempting to stop all timers.", e);
+    }
+  }
+
+  public void start(Long id) {
+    aliveTimerCacheRef.lockOnKey(id);
+    try {
+      AliveTimer aliveTimer = aliveTimerCacheRef.get(id);
+      start(aliveTimer);
+      aliveTimerCacheRef.put(id, aliveTimer);
+    }
+    catch (CacheElementNotFoundException cacheEx) {
+      log.error("Cannot locate the AliveTimer in the cache (Id is " + id + ") - unable to start it.");
+    }
+    catch (Exception e) {
+      log.error("Unable to start the alive timer " + id, e);
+    } finally {
+      aliveTimerCacheRef.unlockOnKey(id);
+    }
+  }
+
+  public void stop(Long id) {
+    aliveTimerCacheRef.lockOnKey(id);
+    log.debug("Stopping alive timer " + id + " and dependent alive timers.");
+    try {
+      AliveTimer aliveTimer = aliveTimerCacheRef.get(id);
+      stop(aliveTimer);
+
+      aliveTimerCacheRef.put(id, aliveTimer);
+    }
+    catch (CacheElementNotFoundException cacheEx) {
+      log.error("Cannot locate the AliveTimer in the cache (Id is " + id + ") - unable to stop it.");
+    }
+    catch (Exception e) {
+      log.error("Unable to stop the alive timer " + id, e);
+    } finally {
+      aliveTimerCacheRef.unlockOnKey(id);
+    }
   }
 
   /**
-   * Not tested
+   * Update this alive timer. This method will reset the time of the last
+   * update and thus relaunch the alive timer.
    */
-  public void generateFromEquipment(AbstractEquipment abstractEquipment) {
-    String type;
-    if (abstractEquipment instanceof Equipment) {
-      type = AliveTimer.ALIVE_TYPE_EQUIPMENT;
+  private void update(final AliveTimer aliveTimer) {
+    // We only update the alive timer if the timestamp is >= the timestamp
+    // of the last update. Otherwise, we ignore the update request and return
+    // false
+    // This is to avoid that alive timers that have been delayed on the network
+    // start confusing the alive timer mechanism.
+
+
+    aliveTimer.setActive(true);
+    aliveTimer.setLastUpdate(System.currentTimeMillis());
+    if (log.isDebugEnabled()) {
+      StringBuffer str = new StringBuffer("Updated alive timer for ");
+      str.append(AliveTimer.ALIVE_TYPE_PROCESS + " ");
+      str.append(aliveTimer.getRelatedName());
+      str.append(".");
+      log.debug(str.toString());
     }
-    else {
-      type = AliveTimer.ALIVE_TYPE_SUBEQUIPMENT;
-    }
-    AliveTimer aliveTimer = new AliveTimerCacheObject(abstractEquipment.getAliveTagId(), abstractEquipment.getId(), abstractEquipment.getName(),
-            abstractEquipment.getStateTagId(), type, abstractEquipment.getAliveInterval());
-//    aliveTimerCacheRef.put(aliveTimer.getId(), aliveTimer);
   }
 
   /**
-   * Not tested
+   * Activate this alive timer.
    */
-  public void generateFromProcess(Process process) {
-    AliveTimer aliveTimer = new AliveTimerCacheObject(process.getAliveTagId(), process.getId(), process.getName(),
-            process.getStateTagId(), AliveTimer.ALIVE_TYPE_PROCESS, process.getAliveInterval());
-//    aliveTimerCacheRef.put(aliveTimer.getId(), aliveTimer);
+  private void start(final AliveTimer aliveTimer) {
+    if (!aliveTimer.isActive()) {
+      if (log.isDebugEnabled()) {
+        StringBuffer str = new StringBuffer("start() : starting alive for ");
+        str.append(AliveTimer.ALIVE_TYPE_PROCESS + " ");
+        str.append(aliveTimer.getRelatedName());
+        str.append(".");
+        log.debug(str.toString());
+      }
+      aliveTimer.setActive(true);
+      aliveTimer.setLastUpdate(System.currentTimeMillis());
+    }
+  }
+
+  /**
+   * Deactivate this alive timer if activated.
+   */
+  private void stop(final AliveTimer aliveTimer) {
+    if (aliveTimer.isActive()) {
+      if (log.isDebugEnabled()) {
+        StringBuffer str = new StringBuffer("stop() : stopping alive for ");
+        str.append(aliveTimer.getAliveTypeDescription() + " ");
+        str.append(aliveTimer.getRelatedName());
+        str.append(".");
+        log.debug(str.toString());
+      }
+      aliveTimer.setActive(false);
+      aliveTimer.setLastUpdate(System.currentTimeMillis());
+    }
   }
 }

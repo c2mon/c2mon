@@ -71,7 +71,9 @@ public enum C2monCacheName {
   /**
    * SubEquipment cache.
    */
-  SUBEQUIPMENT(Names.SUBEQUIPMENT);
+  SUBEQUIPMENT(Names.SUBEQUIPMENT),
+
+  TAG(Names.TAG);
 
   @Getter
   private final String label;
@@ -93,5 +95,6 @@ public enum C2monCacheName {
     public static final String PROCESS = "processCacheRef";
     public static final String RULE = "ruleTagCacheRef";
     public static final String SUBEQUIPMENT = "subEquipmentCacheRef";
+    public static final String TAG= "tagCacheRef";
   }
 }

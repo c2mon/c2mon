@@ -26,7 +26,7 @@ import static org.junit.Assert.assertTrue;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = CacheModuleRef.class,
         loader = AnnotationConfigContextLoader.class)
-public class AliveTimerManagerTest {
+public class AliveTimerServiceTest {
 
   @Autowired
   private C2monCache<Long, AliveTimer> aliveTimerCache;
@@ -46,7 +46,7 @@ public class AliveTimerManagerTest {
     startedAliveTimer.setActive(true);
     startedAliveTimer.setLastUpdate(System.currentTimeMillis());
 
-//    expect(aliveTimerCache.get(1L)).andReturn(startedAliveTimer);
+    expect(aliveTimerCache.get(1L)).andReturn(startedAliveTimer);
 
     expect(aliveTimerCache.invoke(EasyMock.eq(1L), anyObject(), EasyMock.eq(AliveTimerOperation.START))).andReturn(startedAliveTimer);
 
