@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import cern.c2mon.cache.api.factory.CacheObjectFactory;
+import cern.c2mon.server.cache.services.AlarmService;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.AlarmCondition;
@@ -14,28 +15,47 @@ import cern.c2mon.server.common.metadata.Metadata;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.daq.config.Change;
 
+import static cern.c2mon.server.cache.alarm.AlarmProperties.MAX_FAULT_FAMILY_LENGTH;
+import static cern.c2mon.server.cache.alarm.AlarmProperties.MAX_FAULT_MEMBER_LENGTH;
+
 /**
  * @author Szymon Halastra
  */
 @Component
 public class AlarmCacheObjectFactory extends CacheObjectFactory<Alarm> {
 
-  private AlarmHandler alarmHandler;
-  /**
-   * Default max length for fault family
-   */
-  public static final int MAX_FAULT_FAMILY_LENGTH = 64;
-
-  /**
-   * Default max length for fault member
-   */
-  public static final int MAX_FAULT_MEMBER_LENGTH = 64;
+  private AlarmService alarmService;
 
   @Autowired
-  public AlarmCacheObjectFactory(AlarmHandler alarmHandler) {
-    this.alarmHandler = alarmHandler;
+  public AlarmCacheObjectFactory(AlarmService alarmService) {
+    this.alarmService = alarmService;
   }
 
+  /**
+   * Create an AlarmCacheObject from a collection of named properties.
+   * The following properties are expected in the collection:
+   * <ul>
+   *   <li>id</li>
+   *   <li>dataTagId</li>
+   *   <li>faultMember</li>
+   *   <li>faultFamily</li>
+   *   <li>faultCode</li>
+   *   <li>alarmCondition</li>
+   * </ul>
+   *
+   * A ConfigurationException will be thrown if one of the parameters cannot be
+   * decoded to the right format. Even if no exception is thrown, it is
+   * advisable to call the validate() method on the newly created object, which
+   * will perform further consistency checks.
+   *
+   * Please note that neither this constructor nor the validate method can
+   * perform dependency checks. It is up to the user to ensure that the DataTag
+   * to which the alarm is attached exists.
+   *
+   * @param id the id of the alarm object
+   * @param properties the properties containing the values for the alarm fields
+   * @return the alarm object created
+   */
   @Override
   public Alarm createCacheObject(Long id) {
     AlarmCacheObject alarmCacheObject = new AlarmCacheObject(id);
@@ -85,7 +105,7 @@ public class AlarmCacheObjectFactory extends CacheObjectFactory<Alarm> {
     }
 
     // set the JMS topic
-    alarmCacheObject.setTopic(alarmHandler.getTopicForAlarm(alarmCacheObject));
+    alarmCacheObject.setTopic(alarmService.getTopicForAlarm(alarmCacheObject));
 
     return null;
   }
