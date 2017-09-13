@@ -44,17 +44,17 @@ public class SupervisionAppenderImplRef implements SupervisionAppender {
    * Process and Equipment bean interfaces.
    */
   private ProcessService processService;
-  private C2monCache<Long, Process> processCache;
+  private C2monCache<Long, Process> processCacheRef;
   private EquipmentService equipmentService;
-  private C2monCache<Long, Equipment> equipmentCache;
+  private C2monCache<Long, Equipment> equipmentCacheRef;
 
   @Autowired
   public SupervisionAppenderImplRef(ProcessService processService, EquipmentService equipmentService) {
     this.processService = processService;
     this.equipmentService = equipmentService;
 
-    this.processCache = processService.getCache();
-    this.equipmentCache = equipmentService.getCache();
+    this.processCacheRef = processService.getCache();
+    this.equipmentCacheRef = equipmentService.getCache();
   }
 
   @Override
@@ -125,7 +125,5 @@ public class SupervisionAppenderImplRef implements SupervisionAppender {
     if (tagSupervisionStatus != null) {
       tagCopy.getDataTagQuality().addInvalidStatus(tagSupervisionStatus, message);
     }
-
   }
-
 }

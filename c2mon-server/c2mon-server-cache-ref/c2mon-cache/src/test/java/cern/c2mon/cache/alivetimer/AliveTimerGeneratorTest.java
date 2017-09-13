@@ -5,7 +5,7 @@ import org.junit.Test;
 /**
  * @author Szymon Halastra
  */
-public class AliveTimerCacheServiceTest {
+public class AliveTimerGeneratorTest {
 
   @Test
   public void generateTimerFromProcess() {

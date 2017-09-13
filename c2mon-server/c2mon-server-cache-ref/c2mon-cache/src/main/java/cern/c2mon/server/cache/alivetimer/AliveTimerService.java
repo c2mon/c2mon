@@ -8,10 +8,6 @@ import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.CoreService;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.alive.AliveTimer;
-import cern.c2mon.server.common.alive.AliveTimerCacheObject;
-import cern.c2mon.server.common.equipment.AbstractEquipment;
-import cern.c2mon.server.common.equipment.Equipment;
-import cern.c2mon.server.common.process.Process;
 
 /**
  * @author Szymon Halastra
@@ -34,24 +30,23 @@ public class AliveTimerService implements CoreService<Long, AliveTimer> {
   }
 
   public boolean isRegisteredAliveTimer(final Long id) {
-    return aliveTimerCacheRef.containsKey(id); //TODO check DB also but do not load
+    return aliveTimerCacheRef.containsKey(id);
   }
 
   public void update(final Long aliveId) {
-    aliveTimerCacheRef.lockOnKey(aliveId);
-    try {
-      AliveTimer aliveTimer = aliveTimerCacheRef.get(aliveId);
-      update(aliveTimer);
-      aliveTimerCacheRef.put(aliveId, aliveTimer);
-    }
-    catch (CacheElementNotFoundException cacheEx) {
-      log.error("Cannot locate the AliveTimer in the cache (Id is " + aliveId + ") - unable to update it.", cacheEx);
-    }
-    catch (Exception e) {
-      log.error("updatedAliveTimer() failed for an unknown reason: ", e);
-    } finally {
-      aliveTimerCacheRef.unlockOnKey(aliveId);
-    }
+    aliveTimerCacheRef.executeTransaction(() -> {
+      try {
+        AliveTimer aliveTimer = aliveTimerCacheRef.get(aliveId);
+        update(aliveTimer);
+        aliveTimerCacheRef.put(aliveId, aliveTimer);
+      }
+      catch (CacheElementNotFoundException cacheEx) {
+        log.error("Cannot locate the AliveTimer in the cache (Id is " + aliveId + ") - unable to update it.", cacheEx);
+      }
+      catch (Exception e) {
+        log.error("updatedAliveTimer() failed for an unknown reason: ", e);
+      }
+    });
   }
 
   /**
@@ -61,13 +56,13 @@ public class AliveTimerService implements CoreService<Long, AliveTimer> {
    * at least "aliveInterval" milliseconds.
    */
   public boolean hasExpired(final Long aliveTimerId) {
-    aliveTimerCacheRef.lockOnKey(aliveTimerId);
-    try {
+    final Boolean[] isExpired = new Boolean[1];
+    aliveTimerCacheRef.executeTransaction(() -> {
       AliveTimer aliveTimer = aliveTimerCacheRef.get(aliveTimerId);
-      return (System.currentTimeMillis() - aliveTimer.getLastUpdate() > aliveTimer.getAliveInterval() + aliveTimer.getAliveInterval() / 3);
-    } finally {
-      aliveTimerCacheRef.unlockOnKey(aliveTimerId);
-    }
+      isExpired[0] = (System.currentTimeMillis() - aliveTimer.getLastUpdate() > aliveTimer.getAliveInterval() + aliveTimer.getAliveInterval() / 3);
+    });
+
+    return isExpired[0];
   }
 
   public void startAllTimers() {
@@ -95,39 +90,37 @@ public class AliveTimerService implements CoreService<Long, AliveTimer> {
   }
 
   public void start(Long id) {
-    aliveTimerCacheRef.lockOnKey(id);
-    try {
-      AliveTimer aliveTimer = aliveTimerCacheRef.get(id);
-      start(aliveTimer);
-      aliveTimerCacheRef.put(id, aliveTimer);
-    }
-    catch (CacheElementNotFoundException cacheEx) {
-      log.error("Cannot locate the AliveTimer in the cache (Id is " + id + ") - unable to start it.");
-    }
-    catch (Exception e) {
-      log.error("Unable to start the alive timer " + id, e);
-    } finally {
-      aliveTimerCacheRef.unlockOnKey(id);
-    }
+    aliveTimerCacheRef.executeTransaction(() -> {
+      try {
+        AliveTimer aliveTimer = aliveTimerCacheRef.get(id);
+        start(aliveTimer);
+        aliveTimerCacheRef.put(id, aliveTimer);
+      }
+      catch (CacheElementNotFoundException cacheEx) {
+        log.error("Cannot locate the AliveTimer in the cache (Id is " + id + ") - unable to start it.");
+      }
+      catch (Exception e) {
+        log.error("Unable to start the alive timer " + id, e);
+      }
+    });
   }
 
   public void stop(Long id) {
-    aliveTimerCacheRef.lockOnKey(id);
-    log.debug("Stopping alive timer " + id + " and dependent alive timers.");
-    try {
-      AliveTimer aliveTimer = aliveTimerCacheRef.get(id);
-      stop(aliveTimer);
+    aliveTimerCacheRef.executeTransaction(() -> {
+      log.debug("Stopping alive timer " + id + " and dependent alive timers.");
+      try {
+        AliveTimer aliveTimer = aliveTimerCacheRef.get(id);
+        stop(aliveTimer);
 
-      aliveTimerCacheRef.put(id, aliveTimer);
-    }
-    catch (CacheElementNotFoundException cacheEx) {
-      log.error("Cannot locate the AliveTimer in the cache (Id is " + id + ") - unable to stop it.");
-    }
-    catch (Exception e) {
-      log.error("Unable to stop the alive timer " + id, e);
-    } finally {
-      aliveTimerCacheRef.unlockOnKey(id);
-    }
+        aliveTimerCacheRef.put(id, aliveTimer);
+      }
+      catch (CacheElementNotFoundException cacheEx) {
+        log.error("Cannot locate the AliveTimer in the cache (Id is " + id + ") - unable to stop it.");
+      }
+      catch (Exception e) {
+        log.error("Unable to stop the alive timer " + id, e);
+      }
+    });
   }
 
   /**

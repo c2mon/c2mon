@@ -21,7 +21,6 @@ public class C2monIgniteConfiguration {
 
     IgniteConfiguration config = (IgniteConfiguration) context.getBean("base-ignite.cfg");
 
-//    config.setClientMode(CLIENT_MODE);
     config.setMetricsLogFrequency(METRICS_LOG_FREQUENCY);
 
     return config;

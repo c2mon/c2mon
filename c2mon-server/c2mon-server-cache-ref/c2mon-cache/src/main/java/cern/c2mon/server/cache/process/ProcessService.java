@@ -28,17 +28,17 @@ public class ProcessService implements CoreService, ProcessOperationService, Sup
 
   private SupervisedService<Process> supervisedService;
 
-  private final ProcessOperationService processOperationService;
+  private ProcessOperationService processOperationService;
 
-  private final EquipmentService equipmentService;
+  private EquipmentService equipmentService;
 
 //  private SubEquipmentService subEquipmentService;
 
-  private final C2monCache<Long, AliveTimer> aliveTimerCacheRef;
+  private C2monCache<Long, AliveTimer> aliveTimerCacheRef;
 
-  private final C2monCache<Long, Process> processCacheRef;
+  private C2monCache<Long, Process> processCacheRef;
 
-  private final ServerProperties properties;
+  private ServerProperties properties;
 
   @Autowired
   public ProcessService(final EquipmentService equipmentService, final AliveTimerService aliveTimerService,
