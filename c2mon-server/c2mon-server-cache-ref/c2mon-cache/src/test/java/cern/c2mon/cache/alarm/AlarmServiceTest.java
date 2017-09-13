@@ -26,7 +26,7 @@ import static org.junit.Assert.*;
 /**
  * @author Szymon Halastra
  */
-public class AlarmHandlerTest {
+public class AlarmServiceTest {
 
   private AlarmService alarmService;
 
