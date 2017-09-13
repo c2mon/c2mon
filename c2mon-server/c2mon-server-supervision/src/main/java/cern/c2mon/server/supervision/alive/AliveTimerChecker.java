@@ -199,6 +199,9 @@ public class AliveTimerChecker extends TimerTask implements SmartLifecycle {
   /**
    * Run method of the AliveTimerManager thread.
    */
+  //TODO: create additional cache with ExpirePolicy enabled, thanks to that we would be able to replace current logic inside run() and check if aliveTimerCacheObject has expired
+  //TODO: it should work like this:
+  //TODO: if aliveTimer expires insdie of AliveTimerExpireCache(doesnt exist yet), then aliveTimer inside AliveTimerCache should be updated
   @Override
   public void run() {
     clusterCache.acquireWriteLockOnKey(LAST_ALIVE_TIMER_CHECK_LONG);

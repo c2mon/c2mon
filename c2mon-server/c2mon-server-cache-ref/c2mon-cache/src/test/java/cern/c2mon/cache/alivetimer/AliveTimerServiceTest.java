@@ -157,6 +157,26 @@ public class AliveTimerServiceTest {
 
   @Test
   public void stopAllAliveTimers() {
-    
+    int size = 10;
+    Map<Long, AliveTimer> aliveTimers = new HashMap<>(size);
+    IntStream.range(0, size).forEach(i -> {
+      AliveTimer aliveTimer = new AliveTimerCacheObject((long) i);
+      aliveTimer.setActive(true);
+      aliveTimer.setLastUpdate(System.currentTimeMillis());
+      aliveTimers.put(aliveTimer.getId(), aliveTimer);
+    });
+
+    aliveTimerCacheRef.putAll(aliveTimers);
+    aliveTimerService.stopAllTimers();
+
+    Map<Long, AliveTimer> stoppedAliveTimers = aliveTimerCacheRef.getAll(aliveTimers.keySet());
+    List<Boolean> actualNotActive = stoppedAliveTimers.values().stream().map(AliveTimer::isActive).collect(Collectors.toList());
+    List<Boolean> expectedFalse = new ArrayList<>(Collections.nCopies(size, Boolean.FALSE));
+
+    List<Long> actualLastUpdates = stoppedAliveTimers.values().stream().map(AliveTimer::getLastUpdate).collect(Collectors.toList());
+    List<Long> expectedZeros = new ArrayList<>(Collections.nCopies(size, 0L));
+
+    assertTrue("All AliveTimers should have active status", expectedFalse.equals(actualNotActive));
+    assertFalse("All AliveTimers should have last updated different than 0", expectedZeros.equals(actualLastUpdates));
   }
 }
