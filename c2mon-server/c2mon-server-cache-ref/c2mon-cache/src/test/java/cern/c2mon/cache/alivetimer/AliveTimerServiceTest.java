@@ -1,7 +1,10 @@
 package cern.c2mon.cache.alivetimer;
 
-import org.easymock.EasyMock;
-import org.junit.*;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -9,14 +12,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.cache.impl.IgniteC2monCache;
 import cern.c2mon.server.cache.CacheModuleRef;
-import cern.c2mon.server.cache.alivetimer.components.AliveTimerOperation;
 import cern.c2mon.server.cache.alivetimer.AliveTimerService;
 import cern.c2mon.server.common.alive.AliveTimer;
 import cern.c2mon.server.common.alive.AliveTimerCacheObject;
+import cern.c2mon.server.common.config.CommonModule;
 
-import static org.easymock.EasyMock.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -24,21 +25,20 @@ import static org.junit.Assert.assertTrue;
  * @author Szymon Halastra
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = CacheModuleRef.class,
-        loader = AnnotationConfigContextLoader.class)
+@ContextConfiguration(classes = {
+        CacheModuleRef.class,
+        CommonModule.class
+}, loader = AnnotationConfigContextLoader.class)
 public class AliveTimerServiceTest {
 
   @Autowired
-  private C2monCache<Long, AliveTimer> aliveTimerCache;
+  private C2monCache<Long, AliveTimer> aliveTimerCacheRef;
 
+  @Autowired
   private AliveTimerService aliveTimerService;
 
   @Test
   public void startAliveTimer() {
-    aliveTimerCache = EasyMock.createNiceMock(IgniteC2monCache.class);
-
-    aliveTimerService = new AliveTimerService(aliveTimerCache);
-
     AliveTimer aliveTimer = new AliveTimerCacheObject(1L);
     aliveTimer.setActive(false);
 
@@ -46,34 +46,25 @@ public class AliveTimerServiceTest {
     startedAliveTimer.setActive(true);
     startedAliveTimer.setLastUpdate(System.currentTimeMillis());
 
-    expect(aliveTimerCache.get(1L)).andReturn(startedAliveTimer);
-
-    expect(aliveTimerCache.invoke(EasyMock.eq(1L), anyObject(), EasyMock.eq(AliveTimerOperation.START))).andReturn(startedAliveTimer);
-
-    replay(aliveTimerCache);
-
-    aliveTimerCache.put(1L, aliveTimer);
+    aliveTimerCacheRef.put(1L, aliveTimer);
 
     aliveTimerService.start(1L);
 
-    verify(aliveTimerCache);
-//    assertTrue("Test if AliveTimer is started, set as active", aliveTimerCache.get(1L).isActive());
-//    assertTrue("Test if last update is set up", aliveTimerCache.get(1L).getLastUpdate() != 0);
+    assertTrue("Test if AliveTimer is started, set as active", aliveTimerCacheRef.get(1L).isActive());
+    assertTrue("Test if last update is set up", aliveTimerCacheRef.get(1L).getLastUpdate() != 0);
   }
 
   @Test
   public void startTest() {
-    aliveTimerService = new AliveTimerService(aliveTimerCache);
-
     AliveTimer aliveTimer = new AliveTimerCacheObject(1L);
     aliveTimer.setActive(false);
 
-    aliveTimerCache.put(1L, aliveTimer);
+    aliveTimerCacheRef.put(1L, aliveTimer);
 
     aliveTimerService.start(1L);
 
-    assertTrue("Test if AliveTimer is started, set as active", aliveTimerCache.get(1L).isActive());
-    assertTrue("Test if last update is set up", aliveTimerCache.get(1L).getLastUpdate() != 0);
+    assertTrue("Test if AliveTimer is started, set as active", aliveTimerCacheRef.get(1L).isActive());
+    assertTrue("Test if last update is set up", aliveTimerCacheRef.get(1L).getLastUpdate() != 0);
   }
 
   @Test
@@ -81,18 +72,18 @@ public class AliveTimerServiceTest {
     AliveTimer aliveTimer = new AliveTimerCacheObject(1L);
     aliveTimer.setActive(true);
 
-    aliveTimerCache.put(aliveTimer.getId(), aliveTimer);
+    aliveTimerCacheRef.put(aliveTimer.getId(), aliveTimer);
 
     aliveTimerService.start(1L);
 
-    long firstUpdate = aliveTimerCache.get(1L).getLastUpdate();
+    long firstUpdate = aliveTimerCacheRef.get(1L).getLastUpdate();
 
     Thread.sleep(100);
 
     aliveTimerService.update(1L);
 
-    assertTrue("Test if AliveTimer is active", aliveTimerCache.get(1L).isActive());
-    assertTrue("Test if AliveTimer is updated", aliveTimerCache.get(1L).getLastUpdate() != firstUpdate);
+    assertTrue("Test if AliveTimer is active", aliveTimerCacheRef.get(1L).isActive());
+    assertTrue("Test if AliveTimer is updated", aliveTimerCacheRef.get(1L).getLastUpdate() != firstUpdate);
   }
 
   @Test
@@ -100,7 +91,7 @@ public class AliveTimerServiceTest {
     AliveTimer aliveTimer = new AliveTimerCacheObject(1L, 2L, "test", 0L, AliveTimer.ALIVE_TYPE_EQUIPMENT, 20);
     aliveTimer.setActive(true);
 
-    aliveTimerCache.put(aliveTimer.getId(), aliveTimer);
+    aliveTimerCacheRef.put(aliveTimer.getId(), aliveTimer);
 
     aliveTimerService.update(aliveTimer.getId());
 
@@ -116,7 +107,7 @@ public class AliveTimerServiceTest {
     AliveTimer aliveTimer = new AliveTimerCacheObject(1L, 2L, "test", 0L, AliveTimer.ALIVE_TYPE_EQUIPMENT, 0);
     aliveTimer.setActive(true);
 
-    aliveTimerCache.put(aliveTimer.getId(), aliveTimer);
+    aliveTimerCacheRef.put(aliveTimer.getId(), aliveTimer);
 
     aliveTimerService.update(aliveTimer.getId());
 
@@ -131,41 +122,41 @@ public class AliveTimerServiceTest {
     aliveTimer.setActive(true);
     aliveTimer.setLastUpdate(System.currentTimeMillis());
 
-    aliveTimerCache.put(aliveTimer.getId(), aliveTimer);
+    aliveTimerCacheRef.put(aliveTimer.getId(), aliveTimer);
 
     aliveTimerService.stop(1L);
 
-    assertFalse("Test if AliveTimer is active", aliveTimerCache.get(1L).isActive());
+    assertFalse("Test if AliveTimer is active", aliveTimerCacheRef.get(1L).isActive());
   }
 
-//  @Test
-//  public void startAllAliveTimers() {
-//    int size = 10;
-//    Map<Long, AliveTimer> aliveTimers = new HashMap<>(size);
-//    IntStream.range(0, size).forEach(i -> {
-//      AliveTimer aliveTimer = new AliveTimerCacheObject((long) i);
-//      aliveTimer.setActive(false);
-//      aliveTimers.put(aliveTimer.getId(), aliveTimer);
-//    });
-//
-//    aliveTimerCache.putAll(aliveTimers);
-//
-//    aliveTimerService.startAllTimers();
-//
-//    Map<Long, AliveTimer> startedAliveTimers = aliveTimerCache.getAll(aliveTimers.keySet());
-//
-//    List<Boolean> actualActive = startedAliveTimers.values().stream().map(AliveTimer::isActive).collect(Collectors.toList());
-//    List<Boolean> expectedTrue = new ArrayList<>(Collections.nCopies(size, Boolean.TRUE));
-//
-//    List<Long> actualLastUpdates = startedAliveTimers.values().stream().map(AliveTimer::getLastUpdate).collect(Collectors.toList());
-//    List<Long> expectedZeros = new ArrayList<>(Collections.nCopies(size, 0L));
-//
-//    assertTrue("All AliveTimers should have active status", expectedTrue.equals(actualActive));
-//    assertFalse("All AliveTimers should have last updated different than 0", expectedZeros.equals(actualLastUpdates));
-//  }
+  @Test
+  public void startAllAliveTimers() {
+    int size = 10;
+    Map<Long, AliveTimer> aliveTimers = new HashMap<>(size);
+    IntStream.range(0, size).forEach(i -> {
+      AliveTimer aliveTimer = new AliveTimerCacheObject((long) i);
+      aliveTimer.setActive(false);
+      aliveTimers.put(aliveTimer.getId(), aliveTimer);
+    });
+
+    aliveTimerCacheRef.putAll(aliveTimers);
+
+    aliveTimerService.startAllTimers();
+
+    Map<Long, AliveTimer> startedAliveTimers = aliveTimerCacheRef.getAll(aliveTimers.keySet());
+
+    List<Boolean> actualActive = startedAliveTimers.values().stream().map(AliveTimer::isActive).collect(Collectors.toList());
+    List<Boolean> expectedTrue = new ArrayList<>(Collections.nCopies(size, Boolean.TRUE));
+
+    List<Long> actualLastUpdates = startedAliveTimers.values().stream().map(AliveTimer::getLastUpdate).collect(Collectors.toList());
+    List<Long> expectedZeros = new ArrayList<>(Collections.nCopies(size, 0L));
+
+    assertTrue("All AliveTimers should have active status", expectedTrue.equals(actualActive));
+    assertFalse("All AliveTimers should have last updated different than 0", expectedZeros.equals(actualLastUpdates));
+  }
 
   @Test
   public void stopAllAliveTimers() {
-
+    
   }
 }

@@ -2,18 +2,19 @@ package cern.c2mon.cache.alarm;
 
 import java.sql.Timestamp;
 
+import org.apache.ignite.internal.util.typedef.C2;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.TagLocationService;
-import cern.c2mon.server.cache.alarm.components.AlarmHandler;
-import cern.c2mon.server.cache.alarm.components.AlarmUpdateHandler;
+import cern.c2mon.server.cache.services.AlarmService;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.AlarmCondition;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
+import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.test.CacheObjectCreation;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
@@ -27,17 +28,17 @@ import static org.junit.Assert.*;
  */
 public class AlarmHandlerTest {
 
-  private AlarmHandler alarmHandler;
+  private AlarmService alarmService;
+
+  private C2monCache<Long, Tag> tagCache;
 
   private C2monCache<Long, Alarm> alarmCache;
-
-  private TagLocationService tagLocationService;
 
   @Before
   public void setup() {
     alarmCache = EasyMock.createNiceMock(C2monCache.class);
-    tagLocationService = EasyMock.createStrictMock(TagLocationService.class);
-    alarmHandler = new AlarmUpdateHandler(alarmCache/*, tagLocationService*/);
+    tagCache = EasyMock.createStrictMock(C2monCache.class);
+    alarmService = new AlarmService(alarmCache, tagCache);
   }
 
   @Test
@@ -50,10 +51,10 @@ public class AlarmHandlerTest {
     tag.setValue(null);
 
     expect(alarmCache.get(1L)).andReturn(alarm);
-    expect(tagLocationService.get(alarm.getTagId())).andReturn(tag);
-    replay(alarmCache, tagLocationService);
+    expect(tagCache.get(alarm.getTagId())).andReturn(tag);
+    replay(alarmCache, tagCache);
 
-    alarmHandler.evaluateAlarm(alarm.getId());
+    alarmService.evaluateAlarm(alarm.getId());
 
     assertEquals("Alarm should have the same state as before evaluation", true, alarm.getState().equals(AlarmCondition.ACTIVE));
   }
@@ -71,11 +72,11 @@ public class AlarmHandlerTest {
     tagCacheObject.setValue("value");
 
     expect(alarmCache.get(1L)).andReturn(alarmCacheObject);
-    expect(tagLocationService.get(1L)).andReturn(tagCacheObject);
+    expect(tagCache.get(1L)).andReturn(tagCacheObject);
 
-    replay(alarmCache, tagLocationService);
+    replay(alarmCache, tagCache);
 
-    alarmHandler.evaluateAlarm(alarmCacheObject.getId());
+    alarmService.evaluateAlarm(alarmCacheObject.getId());
 
     assertEquals("Alarm should have the same status as before evaluation", true, alarmCacheObject.getState().equals(AlarmCondition.ACTIVE));
   }
@@ -105,10 +106,10 @@ public class AlarmHandlerTest {
     alarmCache.lockOnKey(currentAlarmState.getId());
     expect(alarmCache.get(currentAlarmState.getId())).andReturn(currentAlarmState);
     alarmCache.unlockOnKey(currentAlarmState.getId());
-    EasyMock.replay(alarmCache, tagLocationService);
+    EasyMock.replay(alarmCache, tagCache);
     //(1)test update works
-    AlarmCacheObject newAlarm = (AlarmCacheObject) alarmHandler.update(currentAlarmState.getId(), tag);
-    EasyMock.verify(alarmCache, tagLocationService);
+    AlarmCacheObject newAlarm = (AlarmCacheObject) alarmService.update(currentAlarmState.getId(), tag);
+    EasyMock.verify(alarmCache, tagCache);
 
     assertEquals(AlarmCondition.TERMINATE, newAlarm.getState());
     assertTrue(newAlarm.getTimestamp().equals(tag.getCacheTimestamp()));
@@ -143,11 +144,11 @@ public class AlarmHandlerTest {
     expect(alarmCache.get(currentAlarmState.getId())).andReturn(currentAlarmState);
     alarmCache.put(currentAlarmState.getId(), currentAlarmState);
     alarmCache.unlockOnKey(currentAlarmState.getId());
-    EasyMock.replay(alarmCache, tagLocationService);
+    EasyMock.replay(alarmCache, tagCache);
 
     //(1) test update works
-    AlarmCacheObject newAlarm = (AlarmCacheObject) alarmHandler.update(currentAlarmState.getId(), tag);
-    EasyMock.verify(alarmCache, tagLocationService);
+    AlarmCacheObject newAlarm = (AlarmCacheObject) alarmService.update(currentAlarmState.getId(), tag);
+    EasyMock.verify(alarmCache, tagCache);
 
     assertEquals(AlarmCondition.TERMINATE, newAlarm.getState());
     assertTrue(newAlarm.getTimestamp().equals(tag.getCacheTimestamp()));
@@ -181,12 +182,12 @@ public class AlarmHandlerTest {
     // record expected notification call with EasyMock
     alarmCache.put(alarm.getId(), alarm);
     alarmCache.unlockOnKey(alarm.getId());
-    EasyMock.replay(alarmCache, tagLocationService);
+    EasyMock.replay(alarmCache, tagCache);
 
     //(1)test update works
-    AlarmCacheObject newAlarm = (AlarmCacheObject) alarmHandler.update(alarm.getId(), tag);
+    AlarmCacheObject newAlarm = (AlarmCacheObject) alarmService.update(alarm.getId(), tag);
 
-    EasyMock.verify(alarmCache, tagLocationService);
+    EasyMock.verify(alarmCache, tagCache);
 
     assertEquals(AlarmCondition.ACTIVE, newAlarm.getState());
     assertTrue(newAlarm.getTimestamp().after(origTime));
@@ -201,15 +202,15 @@ public class AlarmHandlerTest {
     assertEquals(AlarmCondition.TERMINATE, alarm2.getState()); //check is in correct start state
     tag.setValue("UP"); //alarm should be terminate
 
-    EasyMock.reset(alarmCache, tagLocationService);
+    EasyMock.reset(alarmCache, tagCache);
     alarmCache.lockOnKey(alarm2.getId());
     expect(alarmCache.get(alarm2.getId())).andReturn(alarm2);
     alarmCache.unlockOnKey(alarm2.getId());
-    EasyMock.replay(alarmCache, tagLocationService);
+    EasyMock.replay(alarmCache, tagCache);
 
-    AlarmCacheObject newAlarm2 = (AlarmCacheObject) alarmHandler.update(alarm2.getId(), tag);
+    AlarmCacheObject newAlarm2 = (AlarmCacheObject) alarmService.update(alarm2.getId(), tag);
 
-    EasyMock.verify(alarmCache, tagLocationService);
+    EasyMock.verify(alarmCache, tagCache);
 
     assertEquals(AlarmCondition.TERMINATE, newAlarm2.getState()); //original TERMINATE!
     assertEquals(newAlarm2.getTimestamp(), origTime);

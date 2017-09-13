@@ -7,8 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import cern.c2mon.server.cache.alarm.components.AlarmCacheObjectFactory;
-import cern.c2mon.server.cache.alarm.components.AlarmHandler;
-import cern.c2mon.server.cache.alarm.components.AlarmUpdateHandler;
+import cern.c2mon.server.cache.services.AlarmService;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.AlarmCondition;
 import cern.c2mon.shared.common.ConfigurationException;
@@ -21,22 +20,22 @@ import static org.junit.Assert.*;
  */
 public class AlarmCacheObjectFactoryTest {
 
-  private AlarmHandler handler;
+  private AlarmService alarmService;
 
   private AlarmCacheObjectFactory factory;
 
   @Before
   public void init() {
-    handler = EasyMock.createNiceMock(AlarmUpdateHandler.class);
+    alarmService = EasyMock.createNiceMock(AlarmService.class);
 
-    factory = new AlarmCacheObjectFactory(handler);
+    factory = new AlarmCacheObjectFactory(alarmService);
   }
 
   @Test
   public void createAlarmCacheObjectWithProperties() throws IllegalAccessException {
-    expect(handler.getTopicForAlarm(anyObject(AlarmCacheObject.class))).andReturn("tim.alarm");
+    expect(alarmService.getTopicForAlarm(anyObject(AlarmCacheObject.class))).andReturn("tim.alarm");
 
-    replay(handler);
+    replay(alarmService);
 
     Properties properties = new Properties();
     properties.setProperty("dataTagId", "100");
