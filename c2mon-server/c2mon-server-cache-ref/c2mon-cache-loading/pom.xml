@@ -10,34 +10,40 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>cern.c2mon.server</groupId>
-  <artifactId>c2mon-cache</artifactId>
+  <artifactId>c2mon-cache-loading</artifactId>
 
   <dependencies>
     <dependency>
       <groupId>cern.c2mon.server</groupId>
-      <artifactId>c2mon-cache-impl</artifactId>
+      <artifactId>c2mon-cache-api</artifactId>
       <version>1.8.17-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>cern.c2mon.server</groupId>
-      <artifactId>c2mon-server-common</artifactId>
+      <artifactId>c2mon-server-cachedbaccess</artifactId>
     </dependency>
     <dependency>
-      <groupId>cern.c2mon.server</groupId>
-      <artifactId>c2mon-cache-loading</artifactId>
-      <version>1.8.17-SNAPSHOT</version>
+      <groupId>cern.c2mon.shared</groupId>
+      <artifactId>c2mon-shared-common</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-context-support</artifactId>
-      <version>4.3.9.RELEASE</version>
+      <groupId>org.mybatis</groupId>
+      <artifactId>mybatis</artifactId>
     </dependency>
-
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
     </dependency>
 
+    <!-- Test dependencies -->
+    <dependency>
+      <groupId>cern.c2mon.server</groupId>
+      <artifactId>c2mon-server-test</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-test</artifactId>
+    </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -46,17 +52,7 @@
       <groupId>org.easymock</groupId>
       <artifactId>easymock</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-test</artifactId>
-      <version>4.3.7.RELEASE</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>cern.c2mon.server</groupId>
-      <artifactId>c2mon-server-test</artifactId>
-    </dependency>
-  </dependencies>
 
+  </dependencies>
 
 </project>
