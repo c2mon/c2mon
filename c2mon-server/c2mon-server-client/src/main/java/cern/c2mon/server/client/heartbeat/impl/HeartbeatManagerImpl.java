@@ -22,8 +22,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import com.google.gson.Gson;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.SmartLifecycle;
@@ -42,19 +41,15 @@ import cern.c2mon.shared.util.json.GsonFactory;
  * The HeartbeatManager bean generates regular server heartbeats, which
  * can then be used by clients for monitoring the alive status of the
  * server.
- *
+ * <p>
  * <p>The heartbeat is published directly on a JMS topic. Server modules can
  * also register as listeners for internal heartbeat notifications.
  *
  * @author Mark Brightwell
  */
+@Slf4j
 @Component
 public class HeartbeatManagerImpl implements HeartbeatManager, SmartLifecycle {
-
-  /**
-   * Log4j Logger for this class.
-   */
-  private static final Logger LOG = LoggerFactory.getLogger(HeartbeatManagerImpl.class);
 
   /**
    * Gson that is reused.
@@ -93,8 +88,10 @@ public class HeartbeatManagerImpl implements HeartbeatManager, SmartLifecycle {
   private ClusterCache clusterCache;
 
   private static final String TIMER_NAME_PREFIX = "Heartbeat";
+
   /**
    * Constructor.
+   *
    * @param heartbeatSender the JmsSender for sending heartbeats to the clients
    */
   @Autowired
@@ -116,6 +113,7 @@ public class HeartbeatManagerImpl implements HeartbeatManager, SmartLifecycle {
 
   /**
    * Notifies all the registered listeners of the heartbeat.
+   *
    * @param heartbeat the new heartbeat
    */
   private void notifyListeners(Heartbeat heartbeat) {
@@ -167,7 +165,7 @@ public class HeartbeatManagerImpl implements HeartbeatManager, SmartLifecycle {
    */
   @Override
   public synchronized void start() {
-    LOG.info("Starting server heartbeat.");
+    log.info("Starting server heartbeat.");
     this.timer.scheduleAtFixedRate(new HeartbeatTask(), 0, heartbeatInterval);
     running = true;
   }
@@ -177,7 +175,7 @@ public class HeartbeatManagerImpl implements HeartbeatManager, SmartLifecycle {
    */
   @Override
   public synchronized void stop() {
-    LOG.debug("Stopping server heartbeat.");
+    log.debug("Stopping server heartbeat.");
     this.timer.cancel();
     running = false;
   }
@@ -193,8 +191,8 @@ public class HeartbeatManagerImpl implements HeartbeatManager, SmartLifecycle {
 
   /**
    * The task that is run at every heartbeat.
-   * @author Mark Brightwell
    *
+   * @author Mark Brightwell
    */
   private class HeartbeatTask extends TimerTask {
 
@@ -203,9 +201,7 @@ public class HeartbeatManagerImpl implements HeartbeatManager, SmartLifecycle {
      */
     @Override
     public void run() {
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("Sending server heartbeat.");
-      }
+      log.debug("Sending server heartbeat.");
       try {
         final Heartbeat heartbeat = new Heartbeat();
         //access cache to check cache process is responding when using distributed cache
@@ -214,10 +210,8 @@ public class HeartbeatManagerImpl implements HeartbeatManager, SmartLifecycle {
         heartbeatSender.send(gson.toJson(heartbeat));
         notifyListeners(heartbeat);
       } catch (Exception e) {
-        LOG.error("run() : Error sending heartbeat message.", e);
+        log.error("run() : Error sending heartbeat message.", e);
       }
     }
-
   }
-
 }

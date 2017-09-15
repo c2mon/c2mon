@@ -58,5 +58,4 @@ public class Expression implements Serializable {
     this.name = name;
     this.expression = expression;
   }
-
 }

@@ -17,16 +17,7 @@
 package cern.c2mon.shared.rule;
 
 import java.io.Serializable;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.apache.commons.lang.StringUtils;
+import java.util.*;
 
 /**
  * The conditioned rule expression class uses internally {@link DefaultRuleCondition} 
