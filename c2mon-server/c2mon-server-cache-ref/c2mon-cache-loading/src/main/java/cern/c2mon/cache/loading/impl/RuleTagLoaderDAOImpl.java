@@ -19,9 +19,9 @@ package cern.c2mon.cache.loading.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import cern.c2mon.cache.loading.RuleTagLoaderDAO;
+import cern.c2mon.cache.loading.common.AbstractBatchLoaderDAO;
 import cern.c2mon.server.cache.dbaccess.RuleTagMapper;
-import cern.c2mon.server.cache.loading.RuleTagLoaderDAO;
-import cern.c2mon.server.cache.loading.common.AbstractBatchLoaderDAO;
 import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.rule.RuleTagCacheObject;
 

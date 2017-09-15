@@ -23,9 +23,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import cern.c2mon.cache.loading.config.CacheLoadingModule;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
-import cern.c2mon.server.cache.loading.DataTagLoaderDAO;
-import cern.c2mon.server.cache.loading.config.CacheLoadingModule;
 import cern.c2mon.server.common.config.CommonModule;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.test.DatabasePopulationRule;
@@ -35,10 +34,10 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {
-    CommonModule.class,
-    CacheDbAccessModule.class,
-    CacheLoadingModule.class,
-    DatabasePopulationRule.class
+        CommonModule.class,
+        CacheDbAccessModule.class,
+        CacheLoadingModule.class,
+        DatabasePopulationRule.class
 })
 public class DataTagLoaderDAOTest {
 

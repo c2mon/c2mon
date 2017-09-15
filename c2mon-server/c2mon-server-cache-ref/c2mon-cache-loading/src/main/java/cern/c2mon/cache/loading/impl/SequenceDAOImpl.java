@@ -20,8 +20,8 @@ package cern.c2mon.cache.loading.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import cern.c2mon.cache.loading.SequenceDAO;
 import cern.c2mon.server.cache.dbaccess.SequenceMapper;
-import cern.c2mon.server.cache.loading.SequenceDAO;
 
 /**
  * @author Franz Ritter

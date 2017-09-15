@@ -24,9 +24,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import cern.c2mon.cache.loading.config.CacheLoadingModule;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
-import cern.c2mon.server.cache.loading.DeviceDAO;
-import cern.c2mon.server.cache.loading.config.CacheLoadingModule;
 import cern.c2mon.server.common.config.CommonModule;
 import cern.c2mon.server.test.DatabasePopulationRule;
 
@@ -35,10 +34,10 @@ import cern.c2mon.server.test.DatabasePopulationRule;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {
-    CommonModule.class,
-    CacheDbAccessModule.class,
-    CacheLoadingModule.class,
-    DatabasePopulationRule.class
+        CommonModule.class,
+        CacheDbAccessModule.class,
+        CacheLoadingModule.class,
+        DatabasePopulationRule.class
 })
 public class DeviceDAOTest {
 
@@ -46,7 +45,9 @@ public class DeviceDAOTest {
   @Autowired
   public DatabasePopulationRule databasePopulationRule;
 
-  /** Component to test */
+  /**
+   * Component to test
+   */
   @Autowired
   DeviceDAO deviceDAO;
 

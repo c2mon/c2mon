@@ -19,9 +19,9 @@ package cern.c2mon.cache.loading.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import cern.c2mon.cache.loading.DeviceClassDAO;
+import cern.c2mon.cache.loading.common.AbstractDefaultLoaderDAO;
 import cern.c2mon.server.cache.dbaccess.DeviceClassMapper;
-import cern.c2mon.server.cache.loading.DeviceClassDAO;
-import cern.c2mon.server.cache.loading.common.AbstractDefaultLoaderDAO;
 import cern.c2mon.server.common.device.Command;
 import cern.c2mon.server.common.device.DeviceClass;
 import cern.c2mon.server.common.device.DeviceClassCacheObject;
