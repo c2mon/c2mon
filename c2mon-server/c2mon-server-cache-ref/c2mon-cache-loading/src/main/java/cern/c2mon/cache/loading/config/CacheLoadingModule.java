@@ -12,7 +12,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
  */
 @Configuration
 @EnableConfigurationProperties(CacheLoadingProperties.class)
-@ComponentScan("cern.c2mon.server.cache.loading")
+@ComponentScan("cern.c2mon.cache.loading")
 public class CacheLoadingModule {
 
   @Autowired
