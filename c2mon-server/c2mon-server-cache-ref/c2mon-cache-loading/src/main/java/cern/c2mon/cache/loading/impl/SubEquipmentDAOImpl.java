@@ -18,31 +18,26 @@ package cern.c2mon.cache.loading.impl;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
+import cern.c2mon.cache.loading.SubEquipmentDAO;
+import cern.c2mon.cache.loading.common.AbstractDefaultLoaderDAO;
 import cern.c2mon.server.cache.dbaccess.SubEquipmentMapper;
-import cern.c2mon.server.cache.loading.SubEquipmentDAO;
-import cern.c2mon.server.cache.loading.common.AbstractDefaultLoaderDAO;
 import cern.c2mon.server.common.exception.SubEquipmentException;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
 
 /**
  * SubEquipment DAO implementation.
- * @author Mark Brightwell
  *
+ * @author Mark Brightwell
  */
+@Slf4j
 @Service("subEquipmentDAO")
 public class SubEquipmentDAOImpl extends AbstractDefaultLoaderDAO<SubEquipment> implements SubEquipmentDAO {
-
-  /**
-   * Private logger.
-   */
-  private Logger LOGGER = LoggerFactory.getLogger(SubEquipmentDAOImpl.class);
 
   /**
    * Reference to iBatis mapper.
@@ -58,20 +53,20 @@ public class SubEquipmentDAOImpl extends AbstractDefaultLoaderDAO<SubEquipment> 
   /**
    * Creates a new subEquipment entity in the database
    *
-   * @param subEquipment
-   *          The information representing the subEquipment to be stored
-   * @throws SubEquipmentException
-   *           A SubEquipmentException is thrown in case the entity could not be
-   *           stored
+   * @param subEquipment The information representing the subEquipment to be stored
+   *
+   * @throws SubEquipmentException A SubEquipmentException is thrown in case the entity could not be
+   *                               stored
    */
   @Override
   public void create(final SubEquipmentCacheObject subEquipment) throws SubEquipmentException {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("create() - Create a subEquipment with the id: " + subEquipment.getId());
+    if (log.isDebugEnabled()) {
+      log.debug("create() - Create a subEquipment with the id: " + subEquipment.getId());
     }
     try {
       subEquipmentMapper.insertSubEquipment(subEquipment);
-    } catch (DataAccessException e) {
+    }
+    catch (DataAccessException e) {
       //TODO add these catch clauses to all the DAO classes...
       throw new SubEquipmentException(e.getMessage());
     }
@@ -80,21 +75,21 @@ public class SubEquipmentDAOImpl extends AbstractDefaultLoaderDAO<SubEquipment> 
   /**
    * Retrieves the subEquipment entity specified by its id
    *
-   * @param subEquipmentId
-   *          The id of the subEquipment to be retrieved
+   * @param subEquipmentId The id of the subEquipment to be retrieved
+   *
    * @return A SubEquipmentCacheObject representing a row of the equipment table
-   * @throws SubEquipmentException
-   *           An exception is thrown if the execution of the query failed
+   * @throws SubEquipmentException An exception is thrown if the execution of the query failed
    */
   @Override
   public SubEquipment getSubEquipmentById(final Long subEquipmentId) throws SubEquipmentException {
     SubEquipment eq = null;
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("getSubEquipmentById() - Getting the subEquipment with id: " + subEquipmentId);
+    if (log.isDebugEnabled()) {
+      log.debug("getSubEquipmentById() - Getting the subEquipment with id: " + subEquipmentId);
     }
     try {
       eq = (SubEquipment) getItem(subEquipmentId);
-    } catch (DataAccessException e) {
+    }
+    catch (DataAccessException e) {
       throw new SubEquipmentException(e.getMessage());
     }
     return eq;
@@ -103,22 +98,22 @@ public class SubEquipmentDAOImpl extends AbstractDefaultLoaderDAO<SubEquipment> 
   /**
    * Retrieves all the subEquipments attached to the indicated equipment
    *
-   * @param equipmentId
-   *          The id of the equipment for which we want to retrieve its
-   *          subEquipments
+   * @param equipmentId The id of the equipment for which we want to retrieve its
+   *                    subEquipments
+   *
    * @return List of SubEquipmentCacheObject attached to the indicated equipment
-   * @throws SubEquipmentException
-   *           An exception is thrown if the execution of the query failed
+   * @throws SubEquipmentException An exception is thrown if the execution of the query failed
    */
   @Override
   public List<SubEquipment> getSubEquipmentsByEquipment(final Long equipmentId) throws SubEquipmentException {
     List<SubEquipment> subEquipments = null;
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("getSubEquipmentsByEquipment() - Retrieving the subEquipments attached to the equipment with id " + equipmentId);
+    if (log.isDebugEnabled()) {
+      log.debug("getSubEquipmentsByEquipment() - Retrieving the subEquipments attached to the equipment with id " + equipmentId);
     }
     try {
       subEquipments = subEquipmentMapper.selectSubEquipmentsByEquipment(equipmentId);
-    } catch (DataAccessException e) {
+    }
+    catch (DataAccessException e) {
       throw new SubEquipmentException(e.getMessage());
     }
     return subEquipments;
@@ -126,8 +121,8 @@ public class SubEquipmentDAOImpl extends AbstractDefaultLoaderDAO<SubEquipment> 
 
   @Override
   public void deleteItem(final Long id) {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("remove() - Removing the SubEquipment with id " + id);
+    if (log.isDebugEnabled()) {
+      log.debug("remove() - Removing the SubEquipment with id " + id);
     }
     subEquipmentMapper.deleteSubEquipment(id);
   }

@@ -19,9 +19,9 @@ package cern.c2mon.cache.loading.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import cern.c2mon.cache.loading.CommandTagDAO;
+import cern.c2mon.cache.loading.common.AbstractDefaultLoaderDAO;
 import cern.c2mon.server.cache.dbaccess.CommandTagMapper;
-import cern.c2mon.server.cache.loading.CommandTagDAO;
-import cern.c2mon.server.cache.loading.common.AbstractDefaultLoaderDAO;
 import cern.c2mon.server.common.command.CommandTagCacheObject;
 import cern.c2mon.shared.common.command.CommandTag;
 

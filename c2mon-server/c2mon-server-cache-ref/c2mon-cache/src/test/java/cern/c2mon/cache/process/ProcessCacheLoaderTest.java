@@ -18,10 +18,10 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.loading.config.CacheLoadingModule;
 import cern.c2mon.server.cache.CacheModuleRef;
 import cern.c2mon.server.cache.dbaccess.ProcessMapper;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
-import cern.c2mon.server.cache.loading.config.CacheLoadingModule;
 import cern.c2mon.server.common.config.CommonModule;
 import cern.c2mon.shared.common.Cacheable;
 

@@ -19,10 +19,10 @@ package cern.c2mon.cache.loading.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import cern.c2mon.cache.loading.ControlTagLoaderDAO;
+import cern.c2mon.cache.loading.common.AbstractDefaultLoaderDAO;
 import cern.c2mon.server.cache.dbaccess.ControlTagMapper;
 import cern.c2mon.server.cache.dbaccess.DataTagMapper;
-import cern.c2mon.server.cache.loading.ControlTagLoaderDAO;
-import cern.c2mon.server.cache.loading.common.AbstractDefaultLoaderDAO;
 import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.control.ControlTagCacheObject;
 
