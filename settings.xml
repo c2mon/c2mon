@@ -7,6 +7,10 @@
     This file is only required for GitLab CI of https://gitlab.cern.ch/c2mon/c2mon 
    -->
   
+  <pluginGroups>
+    <pluginGroup>org.sonarsource.scanner.maven</pluginGroup>
+  </pluginGroups>
+  
   <servers>
     <server>
       <id>c2mon-releases</id>
@@ -69,5 +73,15 @@
         </pluginRepository>
       </pluginRepositories>
     </profile>
+  
+	<profile>
+      <id>sonar</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <sonar.host.url>https://en-ice-sonar.cern.ch</sonar.host.url>
+      </properties>
+    </profile>	
   </profiles>
 </settings>
