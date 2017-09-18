@@ -12,12 +12,13 @@ import cern.c2mon.server.common.alarm.Alarm;
  * @author Szymon Halastra
  */
 @Configuration
-public class AlaramCacheConfig {
+public class AlarmCacheConfig {
 
   @Bean(name = C2monCacheName.Names.ALARM)
   public C2monCache createCache(AbstractC2monCacheFactory cachingFactory) {
     C2monCache cache = cachingFactory.createCache(C2monCacheName.ALARM.getLabel(), Long.class, Alarm.class);
-//    cache.setCacheLoader(null).preload();
+
+    cache.setCacheLoader(null).preload();
 
     return cache;
   }
