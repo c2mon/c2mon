@@ -2,7 +2,6 @@ package cern.c2mon.server.cache.alarm;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.factory.AbstractC2monCacheFactory;
@@ -17,6 +16,9 @@ public class AlaramCacheConfig {
 
   @Bean(name = C2monCacheName.Names.ALARM)
   public C2monCache createCache(AbstractC2monCacheFactory cachingFactory) {
-    return cachingFactory.createCache(C2monCacheName.ALARM.getLabel(), Long.class, Alarm.class);
+    C2monCache cache = cachingFactory.createCache(C2monCacheName.ALARM.getLabel(), Long.class, Alarm.class);
+//    cache.setCacheLoader(null).preload();
+
+    return cache;
   }
 }
