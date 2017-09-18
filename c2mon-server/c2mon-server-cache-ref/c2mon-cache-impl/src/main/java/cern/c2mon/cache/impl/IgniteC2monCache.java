@@ -97,11 +97,6 @@ public class IgniteC2monCache<K, V> extends C2monCache<K, V> {
   }
 
   @Override
-  public void loadFromDb(K id) {
-
-  }
-
-  @Override
   public void lockOnKey(K key) {
     Lock lock = cache.lock(key);
 
