@@ -1,4 +1,4 @@
-package cern.c2mon.cache.loading.common;
+package cern.c2mon.server.cache.loading.common;
 
 import java.util.List;
 import java.util.Map;
@@ -6,9 +6,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import lombok.extern.slf4j.Slf4j;
 
-import cern.c2mon.cache.loading.BatchCacheLoaderDAO;
 import cern.c2mon.server.cache.dbaccess.BatchLoaderMapper;
 import cern.c2mon.server.cache.dbaccess.structure.DBBatch;
+import cern.c2mon.server.cache.loading.BatchCacheLoaderDAO;
 import cern.c2mon.shared.common.Cacheable;
 
 /**

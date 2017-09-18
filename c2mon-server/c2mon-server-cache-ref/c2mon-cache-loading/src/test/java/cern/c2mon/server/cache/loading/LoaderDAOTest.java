@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.cache.loading;
+package cern.c2mon.server.cache.loading;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +23,7 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 
-import cern.c2mon.cache.loading.impl.CommandTagDAOImpl;
+import cern.c2mon.server.cache.loading.impl.CommandTagDAOImpl;
 import cern.c2mon.server.cache.dbaccess.CommandTagMapper;
 import cern.c2mon.server.common.command.CommandTagCacheObject;
 import cern.c2mon.shared.common.command.CommandTag;

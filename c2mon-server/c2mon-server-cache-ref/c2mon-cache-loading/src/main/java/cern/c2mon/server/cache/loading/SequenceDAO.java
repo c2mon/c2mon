@@ -15,7 +15,7 @@
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package cern.c2mon.cache.loading;
+package cern.c2mon.server.cache.loading;
 
 /**
  * @author Franz Ritter

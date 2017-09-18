@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.cache.loading;
+package cern.c2mon.server.cache.loading;
 
 import java.util.List;
 
@@ -26,7 +26,6 @@ import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
  * SubEquipment DAO interface.
  *
  * @author Mark Brightwell
- *
  */
 public interface SubEquipmentDAO extends CacheLoaderDAO<SubEquipment>, ConfigurableDAO<SubEquipment> {
 

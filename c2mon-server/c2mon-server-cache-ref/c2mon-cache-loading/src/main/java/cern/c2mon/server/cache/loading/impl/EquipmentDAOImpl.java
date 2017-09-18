@@ -14,14 +14,14 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.cache.loading.impl;
+package cern.c2mon.server.cache.loading.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.cache.loading.EquipmentDAO;
-import cern.c2mon.cache.loading.common.AbstractDefaultLoaderDAO;
 import cern.c2mon.server.cache.dbaccess.EquipmentMapper;
+import cern.c2mon.server.cache.loading.EquipmentDAO;
+import cern.c2mon.server.cache.loading.common.AbstractDefaultLoaderDAO;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.equipment.EquipmentCacheObject;
 
@@ -29,7 +29,6 @@ import cern.c2mon.server.common.equipment.EquipmentCacheObject;
  * Equipment DAO implementation.
  *
  * @author Mark Brightwell
- *
  */
 @Service("equipmentDAO")
 public class EquipmentDAOImpl extends AbstractDefaultLoaderDAO<Equipment> implements EquipmentDAO {

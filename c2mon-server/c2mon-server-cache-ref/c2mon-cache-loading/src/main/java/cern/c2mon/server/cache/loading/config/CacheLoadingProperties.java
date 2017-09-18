@@ -1,4 +1,4 @@
-package cern.c2mon.cache.loading.config;
+package cern.c2mon.server.cache.loading.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

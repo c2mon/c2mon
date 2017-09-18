@@ -1,4 +1,4 @@
-package cern.c2mon.cache.loading.config;
+package cern.c2mon.server.cache.loading.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -12,7 +12,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
  */
 @Configuration
 @EnableConfigurationProperties(CacheLoadingProperties.class)
-@ComponentScan("cern.c2mon.cache.loading")
+@ComponentScan("cern.c2mon.server.cache.loading")
 public class CacheLoadingModule {
 
   @Autowired

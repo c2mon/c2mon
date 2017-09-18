@@ -1,4 +1,4 @@
-package cern.c2mon.cache.loading.common;
+package cern.c2mon.server.cache.loading.common;
 
 
 import java.util.LinkedList;
@@ -10,7 +10,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.loader.C2monCacheLoader;
-import cern.c2mon.cache.loading.BatchCacheLoaderDAO;
+import cern.c2mon.server.cache.loading.BatchCacheLoaderDAO;
 import cern.c2mon.shared.common.Cacheable;
 
 /**

@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.cache.loading;
+package cern.c2mon.server.cache.loading;
 
 import cern.c2mon.server.common.process.Process;
 
@@ -22,7 +22,6 @@ import cern.c2mon.server.common.process.Process;
  * Process DAO specification.
  *
  * @author Mark Brightwell
- *
  */
 public interface ProcessDAO extends CacheLoaderDAO<Process>, ConfigurableDAO<Process> {
 
@@ -32,6 +31,7 @@ public interface ProcessDAO extends CacheLoaderDAO<Process>, ConfigurableDAO<Pro
    * Retrieve the number of tags currently configured for a given process.
    *
    * @param processId the ID of the process
+   *
    * @return the number of tags configured for the process
    */
   Integer getNumTags(Long processId);
@@ -41,6 +41,7 @@ public interface ProcessDAO extends CacheLoaderDAO<Process>, ConfigurableDAO<Pro
    * process.
    *
    * @param processId the ID of the process
+   *
    * @return the number of invalid tags configured for the process
    */
   Integer getNumInvalidTags(Long processId);

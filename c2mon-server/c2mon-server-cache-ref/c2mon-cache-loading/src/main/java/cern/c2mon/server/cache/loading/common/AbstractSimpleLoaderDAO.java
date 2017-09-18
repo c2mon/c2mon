@@ -14,10 +14,10 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.cache.loading.common;
+package cern.c2mon.server.cache.loading.common;
 
-import cern.c2mon.cache.loading.SimpleCacheLoaderDAO;
 import cern.c2mon.server.cache.dbaccess.SimpleLoaderMapper;
+import cern.c2mon.server.cache.loading.SimpleCacheLoaderDAO;
 import cern.c2mon.shared.common.Cacheable;
 
 /**
