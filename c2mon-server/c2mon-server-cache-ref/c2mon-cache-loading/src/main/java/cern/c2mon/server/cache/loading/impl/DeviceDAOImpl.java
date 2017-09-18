@@ -14,15 +14,15 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.cache.loading.impl;
+package cern.c2mon.server.cache.loading.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.cache.loading.DeviceDAO;
-import cern.c2mon.cache.loading.common.AbstractDefaultLoaderDAO;
 import cern.c2mon.server.cache.dbaccess.DeviceMapper;
+import cern.c2mon.server.cache.loading.DeviceDAO;
+import cern.c2mon.server.cache.loading.common.AbstractDefaultLoaderDAO;
 import cern.c2mon.server.common.device.Device;
 import cern.c2mon.shared.client.device.DeviceCommand;
 import cern.c2mon.shared.client.device.DeviceProperty;

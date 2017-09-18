@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.cache.loading.common;
+package cern.c2mon.server.cache.loading.common;
 
 import java.util.Iterator;
 import java.util.List;
@@ -23,8 +23,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import lombok.extern.slf4j.Slf4j;
 
-import cern.c2mon.cache.loading.CacheLoaderDAO;
 import cern.c2mon.server.cache.dbaccess.LoaderMapper;
+import cern.c2mon.server.cache.loading.CacheLoaderDAO;
 import cern.c2mon.shared.common.Cacheable;
 
 /**

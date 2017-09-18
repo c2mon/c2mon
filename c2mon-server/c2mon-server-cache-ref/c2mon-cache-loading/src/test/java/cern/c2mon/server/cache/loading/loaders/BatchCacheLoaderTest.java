@@ -1,4 +1,4 @@
-package cern.c2mon.cache.loading.loaders;
+package cern.c2mon.server.cache.loading.loaders;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -8,10 +8,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.cache.loading.AlarmLoaderDAO;
-import cern.c2mon.cache.loading.common.BatchCacheLoader;
-import cern.c2mon.cache.loading.config.CacheLoadingModule;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
+import cern.c2mon.server.cache.loading.AlarmLoaderDAO;
+import cern.c2mon.server.cache.loading.common.BatchCacheLoader;
+import cern.c2mon.server.cache.loading.config.CacheLoadingModule;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.config.CommonModule;
 
