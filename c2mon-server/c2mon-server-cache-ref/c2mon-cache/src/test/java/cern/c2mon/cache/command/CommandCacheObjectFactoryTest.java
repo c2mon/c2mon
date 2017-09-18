@@ -4,6 +4,7 @@ import java.util.Properties;
 
 import org.easymock.EasyMock;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import cern.c2mon.cache.api.C2monCache;
@@ -33,6 +34,7 @@ public class CommandCacheObjectFactoryTest {
   }
 
   @Test
+  @Ignore
   public void createCommandCacheObject() throws IllegalAccessException {
     replay(equipmentCache);
 
