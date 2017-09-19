@@ -11,7 +11,6 @@ import javax.cache.processor.EntryProcessor;
 import javax.cache.processor.EntryProcessorException;
 import javax.cache.processor.EntryProcessorResult;
 
-import org.apache.ignite.Ignite;
 import org.apache.ignite.IgniteCache;
 import org.apache.ignite.IgniteSpringBean;
 import org.apache.ignite.cache.query.ScanQuery;
@@ -33,7 +32,8 @@ public class IgniteC2monCache<K, V> extends C2monCache<K, V> {
   private IgniteCache<K, V> cache;
   private CacheConfiguration<K, V> cacheCfg;
 
-  public IgniteC2monCache(CacheConfiguration cacheCfg) {
+  public IgniteC2monCache(String cacheName, CacheConfiguration cacheCfg) {
+    super(cacheName);
     this.cacheCfg = cacheCfg;
   }
 
@@ -41,6 +41,10 @@ public class IgniteC2monCache<K, V> extends C2monCache<K, V> {
   public void init() {
     cache = C2monIgnite.getOrCreateCache(cacheCfg);
     C2monIgnite.addCacheConfiguration(cacheCfg);
+
+    if (getCacheLoader() != null) {
+      this.getCacheLoader().preload();
+    }
   }
 
   @Override
@@ -61,11 +65,6 @@ public class IgniteC2monCache<K, V> extends C2monCache<K, V> {
   @Override
   public boolean remove(K key) {
     return cache.remove(key);
-  }
-
-  @Override
-  public String getName() {
-    return ""; //TODO: rethink if this method should be here
   }
 
   @Override

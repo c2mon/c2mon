@@ -65,17 +65,21 @@ public class BatchCacheLoader<K, V extends Cacheable> implements C2monCacheLoade
                           final BatchCacheLoaderDAO<V> cacheLoaderDAO) {
     this.batchCacheLoaderDAO = cacheLoaderDAO;
     this.cache = cache;
+
+    log.info("BatchCacheLoader after ref initialized");
   }
 
   @Override
   public void preload() {
     log.debug("preload() - Start preloading data for cache " + cache.getName());
+
+    log.info("Preload is running for " + cache.getName());
     Integer lastRow = batchCacheLoaderDAO.getMaxRow(); // 0 if no cache objects!
 
-    cacheLoadingThreadPoolTaskExecutor.setThreadNamePrefix(this.threadNamePrefix);
-    cacheLoadingThreadPoolTaskExecutor.initialize();
-
-    Integer firstRow = 0;
-    LinkedList<Callable<Object>> tasks = new LinkedList<>();
+//    cacheLoadingThreadPoolTaskExecutor.setThreadNamePrefix(this.threadNamePrefix);
+//    cacheLoadingThreadPoolTaskExecutor.initialize();
+//
+//    Integer firstRow = 0;
+//    LinkedList<Callable<Object>> tasks = new LinkedList<>();
   }
 }
