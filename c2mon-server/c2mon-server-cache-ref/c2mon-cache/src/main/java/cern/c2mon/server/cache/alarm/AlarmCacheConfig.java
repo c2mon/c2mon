@@ -23,7 +23,7 @@ public class AlarmCacheConfig {
 
     C2monCacheLoader cacheLoader = new BatchCacheLoader<Long, Alarm>(cache, alarmLoaderDAORef);
 
-    cache.setCacheLoader(cacheLoader).preload();
+    cache.setCacheLoader(cacheLoader);
 
     return cache;
   }

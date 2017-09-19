@@ -22,7 +22,7 @@ public class IgniteFactory extends AbstractC2monCacheFactory {
     cacheConfiguration.setIndexedTypes(keyType, valueType);
     cacheConfiguration.setCacheMode(CacheMode.REPLICATED);
 
-    return new IgniteC2monCache(cacheConfiguration);
+    return new IgniteC2monCache(name, cacheConfiguration);
   }
 
   @Override

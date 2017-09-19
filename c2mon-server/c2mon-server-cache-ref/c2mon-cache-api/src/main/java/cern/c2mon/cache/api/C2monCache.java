@@ -30,11 +30,14 @@ import cern.c2mon.shared.common.Cacheable;
  */
 public abstract class C2monCache<K, V> extends ApplicationObjectSupport implements C2monListener, C2monLock<K>, Serializable {
 
+  protected String cacheName;
+
   protected C2monCacheLoader cacheLoader;
 
   C2monListener<Cacheable> listenerService;
 
-  public C2monCache() {
+  public C2monCache(String cacheName) {
+    this.cacheName = cacheName;
     this.listenerService = new C2monListenerService();
   }
 
@@ -46,8 +49,6 @@ public abstract class C2monCache<K, V> extends ApplicationObjectSupport implemen
 
   public abstract boolean remove(K key);
 
-  public abstract String getName();
-
   public abstract List<K> getKeys();
 
   public abstract void putAll(Map<? extends K, ? extends V> map);
@@ -58,10 +59,16 @@ public abstract class C2monCache<K, V> extends ApplicationObjectSupport implemen
 
   public abstract <T> Map<K, EntryProcessorResult<T>> invokeAll(Set<? extends K> var1, EntryProcessor<K, V, T> var2, Object... var3);
 
-  public C2monCacheLoader setCacheLoader(C2monCacheLoader cacheLoader) {
-    this.cacheLoader = cacheLoader;
+  public String getName() {
+    return cacheName;
+  }
 
-    return this.cacheLoader;
+  public void setCacheLoader(C2monCacheLoader cacheLoader) {
+    this.cacheLoader = cacheLoader;
+  }
+
+  public C2monCacheLoader getCacheLoader() {
+    return cacheLoader;
   }
 
   @Override
