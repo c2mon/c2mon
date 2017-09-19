@@ -30,7 +30,8 @@ import cern.c2mon.server.common.alarm.AlarmCacheObject;
  *
  * @author Mark Brightwell
  */
-@Service("alarmLoaderDAO")
+//TODO: refer a name
+@Service("alarmLoaderDAORef")
 public class AlarmLoaderDAOImpl extends AbstractBatchLoaderDAO<Alarm> implements AlarmLoaderDAO {
 
   /**

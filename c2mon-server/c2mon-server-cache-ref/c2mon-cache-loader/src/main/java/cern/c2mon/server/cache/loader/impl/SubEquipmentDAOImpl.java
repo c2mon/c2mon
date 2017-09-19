@@ -36,7 +36,8 @@ import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
  * @author Mark Brightwell
  */
 @Slf4j
-@Service("subEquipmentDAO")
+//TODO: refer a name
+@Service("subEquipmentDAORef")
 public class SubEquipmentDAOImpl extends AbstractDefaultLoaderDAO<SubEquipment> implements SubEquipmentDAO {
 
   /**

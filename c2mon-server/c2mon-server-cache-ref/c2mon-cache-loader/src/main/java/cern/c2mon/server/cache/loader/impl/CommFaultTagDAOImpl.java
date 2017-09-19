@@ -29,7 +29,8 @@ import cern.c2mon.server.common.commfault.CommFaultTag;
  *
  * @author Mark Brightwell
  */
-@Service("commFaultTagDAO")
+//TODO: refer a name
+@Service("commFaultTagDAORef")
 public class CommFaultTagDAOImpl extends AbstractDefaultLoaderDAO<CommFaultTag> implements CommFaultTagDAO {
 
   /**

@@ -31,7 +31,8 @@ import cern.c2mon.server.common.control.ControlTagCacheObject;
  *
  * @author Mark Brightwell
  */
-@Service("controlTagLoaderDAO")
+//TODO: refer a name
+@Service("controlTagLoaderDAORef")
 public class ControlTagLoaderDAOImpl extends AbstractDefaultLoaderDAO<ControlTag> implements ControlTagLoaderDAO {
 
   private ControlTagMapper controlTagMapper;

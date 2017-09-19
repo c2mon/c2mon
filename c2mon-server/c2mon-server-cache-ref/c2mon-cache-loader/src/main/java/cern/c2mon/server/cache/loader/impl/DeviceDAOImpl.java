@@ -33,7 +33,8 @@ import cern.c2mon.shared.client.device.DeviceProperty;
  * @author Justin Lewis Salmon
  */
 @Slf4j
-@Service("deviceDAO")
+//TODO: refer a name
+@Service("deviceDAORef")
 public class DeviceDAOImpl extends AbstractDefaultLoaderDAO<Device> implements DeviceDAO {
 
   /**

@@ -30,7 +30,8 @@ import cern.c2mon.shared.common.command.CommandTag;
  *
  * @author Mark Brightwell
  */
-@Service("commandTagDAO")
+//TODO: refer a name
+@Service("commandTagDAORef")
 public class CommandTagDAOImpl extends AbstractDefaultLoaderDAO<CommandTag> implements CommandTagDAO {
 
   /**

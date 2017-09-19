@@ -30,7 +30,8 @@ import cern.c2mon.server.common.datatag.DataTag;
  *
  * @author Mark Brightwell
  */
-@Service("dataTagLoaderDAO")
+//TODO: refer a name
+@Service("dataTagLoaderDAORef")
 public class DataTagLoaderDAOImpl extends AbstractBatchLoaderDAO<DataTag> implements DataTagLoaderDAO, ConfigurableDAO<DataTag> {
 
   private DataTagMapper dataTagMapper;

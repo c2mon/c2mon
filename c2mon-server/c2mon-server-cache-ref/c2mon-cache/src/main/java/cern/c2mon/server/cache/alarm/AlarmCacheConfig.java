@@ -18,10 +18,10 @@ import cern.c2mon.server.common.alarm.Alarm;
 public class AlarmCacheConfig {
 
   @Bean(name = C2monCacheName.Names.ALARM)
-  public C2monCache createCache(AbstractC2monCacheFactory cachingFactory, AlarmLoaderDAO alarmLoaderDAO) {
+  public C2monCache createCache(AbstractC2monCacheFactory cachingFactory, AlarmLoaderDAO alarmLoaderDAORef) {
     C2monCache cache = cachingFactory.createCache(C2monCacheName.ALARM.getLabel(), Long.class, Alarm.class);
 
-    C2monCacheLoader cacheLoader = new BatchCacheLoader<Long, Alarm>(cache, alarmLoaderDAO);
+    C2monCacheLoader cacheLoader = new BatchCacheLoader<Long, Alarm>(cache, alarmLoaderDAORef);
 
     cache.setCacheLoader(cacheLoader).preload();
 
