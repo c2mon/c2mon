@@ -10,53 +10,45 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>cern.c2mon.server</groupId>
-  <artifactId>c2mon-cache</artifactId>
+  <artifactId>c2mon-cache-loader</artifactId>
 
   <dependencies>
     <dependency>
       <groupId>cern.c2mon.server</groupId>
-      <artifactId>c2mon-cache-impl</artifactId>
+      <artifactId>c2mon-cache-api</artifactId>
       <version>1.8.17-SNAPSHOT</version>
     </dependency>
     <dependency>
-      <groupId>cern.c2mon.server</groupId>
-      <artifactId>c2mon-server-common</artifactId>
+      <groupId>org.mybatis</groupId>
+      <artifactId>mybatis</artifactId>
     </dependency>
-    <dependency>
-      <groupId>cern.c2mon.server</groupId>
-      <artifactId>c2mon-cache-loader</artifactId>
-      <version>1.8.17-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-context-support</artifactId>
-      <version>4.3.9.RELEASE</version>
-    </dependency>
-
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
     </dependency>
 
+    <!-- Test dependencies -->
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.easymock</groupId>
-      <artifactId>easymock</artifactId>
+      <groupId>cern.c2mon.server</groupId>
+      <artifactId>c2mon-server-test</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-test</artifactId>
-      <version>4.3.7.RELEASE</version>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>cern.c2mon.server</groupId>
-      <artifactId>c2mon-server-test</artifactId>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
     </dependency>
-  </dependencies>
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymock</artifactId>
+      <scope>test</scope>
+    </dependency>
 
+  </dependencies>
 
 </project>
