@@ -423,6 +423,12 @@
           </configuration>
         </plugin>
       </plugins>
+      
+      <plugin>
+        <groupId>org.sonarsource.scanner.maven</groupId>
+        <artifactId>sonar-maven-plugin</artifactId>
+        <version>3.3.0.603</version>
+      </plugin>
 
     </pluginManagement>
 
@@ -472,6 +478,16 @@
         <inherited>false</inherited>
         <configuration>
           <mavenVersion>3.3.1</mavenVersion>
+        </configuration>
+      </plugin>
+      
+      <!-- Analyze vulnerabilities in dependencies -->
+      <plugin>
+        <groupId>org.owasp</groupId>
+        <artifactId>dependency-check-maven</artifactId>
+        <version>2.1.1</version>
+        <configuration>
+          <format>XML</format>
         </configuration>
       </plugin>
     </plugins>
