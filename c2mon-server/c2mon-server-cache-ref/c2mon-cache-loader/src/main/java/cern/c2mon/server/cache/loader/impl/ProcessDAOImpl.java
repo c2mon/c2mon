@@ -29,7 +29,8 @@ import cern.c2mon.server.common.process.Process;
  *
  * @author Mark Brightwell
  */
-@Service("processDAO")
+//TODO: refer a name
+@Service("processDAORef")
 public class ProcessDAOImpl extends AbstractDefaultLoaderDAO<Process> implements ProcessDAO {
 
   private ProcessMapper processMapper;

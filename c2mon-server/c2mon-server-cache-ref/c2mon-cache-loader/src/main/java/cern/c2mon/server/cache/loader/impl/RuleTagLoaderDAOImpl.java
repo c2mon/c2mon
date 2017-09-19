@@ -30,7 +30,8 @@ import cern.c2mon.server.common.rule.RuleTagCacheObject;
  *
  * @author Mark Brightwell
  */
-@Service("ruleTagLoaderDAO")
+//TODO: refer a name
+@Service("ruleTagLoaderDAORef")
 public class RuleTagLoaderDAOImpl extends AbstractBatchLoaderDAO<RuleTag> implements RuleTagLoaderDAO {
 
   private RuleTagMapper ruleTagMapper;

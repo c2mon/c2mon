@@ -30,7 +30,8 @@ import cern.c2mon.server.common.equipment.EquipmentCacheObject;
  *
  * @author Mark Brightwell
  */
-@Service("equipmentDAO")
+//TODO: refer a name
+@Service("equipmentDAORef")
 public class EquipmentDAOImpl extends AbstractDefaultLoaderDAO<Equipment> implements EquipmentDAO {
 
   private EquipmentMapper equipmentMapper;

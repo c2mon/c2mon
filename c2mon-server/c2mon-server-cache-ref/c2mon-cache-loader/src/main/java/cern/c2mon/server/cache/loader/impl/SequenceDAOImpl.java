@@ -26,7 +26,8 @@ import cern.c2mon.server.cache.loader.SequenceDAO;
 /**
  * @author Franz Ritter
  */
-@Service
+//TODO: refer a name
+@Service("sequenceDAORef")
 public class SequenceDAOImpl implements SequenceDAO {
 
   private SequenceMapper sequenceMapper;

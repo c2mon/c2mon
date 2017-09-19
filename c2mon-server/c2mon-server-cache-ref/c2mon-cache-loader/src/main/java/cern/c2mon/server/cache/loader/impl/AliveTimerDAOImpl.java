@@ -29,7 +29,8 @@ import cern.c2mon.server.common.alive.AliveTimer;
  *
  * @author Mark Brightwell
  */
-@Service("aliveTimerDAO")
+//TODO: refer a name
+@Service("aliveTimerDAORef")
 public class AliveTimerDAOImpl extends AbstractDefaultLoaderDAO<AliveTimer> implements AliveTimerDAO {
 
   /**
