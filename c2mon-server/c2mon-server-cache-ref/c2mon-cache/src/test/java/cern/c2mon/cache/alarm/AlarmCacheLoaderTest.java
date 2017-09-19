@@ -1,6 +1,9 @@
 package cern.c2mon.cache.alarm;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -19,7 +22,6 @@ import cern.c2mon.server.cache.loader.config.CacheLoaderModuleRef;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.config.CommonModule;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -52,6 +54,10 @@ public class AlarmCacheLoaderTest {
 
     List<Alarm> alarmList = alarmMapper.getAll();
 
+    Set<Long> keySet = alarmList.stream().map(Alarm::getId).collect(Collectors.toSet());
     assertTrue("List of alarms should not be empty", alarmList.size() > 0);
+
+    Map<Long, Alarm> alarms =  alarmCacheRef.getAll(keySet);
+    assertTrue("Alarm cache should have 4 elements", alarms.size() == 4);
   }
 }
