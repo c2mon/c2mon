@@ -16,7 +16,7 @@
     <module>c2mon-cache-api</module>
     <module>c2mon-cache-impl</module>
     <module>c2mon-cache</module>
-    <module>c2mon-cache-loading</module>
+    <module>c2mon-cache-loader</module>
   </modules>
 
 
