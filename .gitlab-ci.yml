@@ -13,7 +13,7 @@ build_and_publish:
   type: build
   script:
     - mvn -q -U -B clean deploy --settings settings.xml -Ddependencies.set.direct
-    - mvn dependency-check:aggregate sonar:sonar -Dsonar.dependencyCheck.reportPath=target/dependency-check-report.xml
+    - mvn dependency-check:aggregate sonar:sonar -Dsonar.dependencyCheck.reportPath=target/dependency-check-report.xml --settings settings.xml
   only:
     - master
 
