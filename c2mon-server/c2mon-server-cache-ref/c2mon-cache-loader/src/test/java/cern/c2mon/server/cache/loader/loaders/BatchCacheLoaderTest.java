@@ -11,7 +11,7 @@ import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.cache.loader.AlarmLoaderDAO;
 import cern.c2mon.server.cache.loader.common.BatchCacheLoader;
-import cern.c2mon.server.cache.loader.config.CacheLoadingModuleRef;
+import cern.c2mon.server.cache.loader.config.CacheLoaderModuleRef;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.config.CommonModule;
 
@@ -23,7 +23,7 @@ import static org.junit.Assert.assertNotNull;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {
         CommonModule.class,
-        CacheLoadingModuleRef.class,
+        CacheLoaderModuleRef.class,
         CacheDbAccessModule.class
 }, loader = AnnotationConfigContextLoader.class)
 public class BatchCacheLoaderTest {

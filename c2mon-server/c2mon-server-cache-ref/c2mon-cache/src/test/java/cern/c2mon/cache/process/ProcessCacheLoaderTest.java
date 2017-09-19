@@ -22,7 +22,7 @@ import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.CacheModuleRef;
 import cern.c2mon.server.cache.dbaccess.ProcessMapper;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
-import cern.c2mon.server.cache.loader.config.CacheLoadingModuleRef;
+import cern.c2mon.server.cache.loader.config.CacheLoaderModuleRef;
 import cern.c2mon.server.common.config.CommonModule;
 import cern.c2mon.shared.common.Cacheable;
 
@@ -39,7 +39,7 @@ import static org.junit.Assert.assertNotNull;
         CommonModule.class,
         CacheModuleRef.class,
         CacheDbAccessModule.class,
-        CacheLoadingModuleRef.class,
+        CacheLoaderModuleRef.class,
 })
 public class ProcessCacheLoaderTest {
 

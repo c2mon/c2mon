@@ -25,7 +25,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.cache.loader.ProcessDAO;
-import cern.c2mon.server.cache.loader.config.CacheLoadingModuleRef;
+import cern.c2mon.server.cache.loader.config.CacheLoaderModuleRef;
 import cern.c2mon.server.common.config.CommonModule;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.test.DatabasePopulationRule;
@@ -36,7 +36,7 @@ import static org.junit.Assert.*;
 @ContextConfiguration(classes = {
         CommonModule.class,
         CacheDbAccessModule.class,
-        CacheLoadingModuleRef.class,
+        CacheLoaderModuleRef.class,
         DatabasePopulationRule.class
 })
 public class ProcessLoaderDAOTest {
