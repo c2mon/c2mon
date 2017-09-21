@@ -20,8 +20,8 @@ import cern.c2mon.shared.common.Cacheable;
  * @author Mark Brightwell
  */
 @Slf4j
-public abstract class AbstractBatchLoaderDAO<T extends Cacheable> extends AbstractSimpleLoaderDAO<T> implements
-        BatchCacheLoaderDAO<T> {
+public abstract class AbstractBatchLoaderDAO<K extends Number, T extends Cacheable> extends AbstractSimpleLoaderDAO<T> implements
+        BatchCacheLoaderDAO<K, T> {
 
   /**
    * Mapper required for batch loading.
@@ -50,10 +50,10 @@ public abstract class AbstractBatchLoaderDAO<T extends Cacheable> extends Abstra
   }
 
   @Override
-  public Map<Object, T> getBatchAsMap(Long firstRow, Long lastRow) {
+  public Map<Long, T> getBatchAsMap(Long firstRow, Long lastRow) {
     DBBatch dbBatch = new DBBatch(firstRow, lastRow);
     List<T> cacheableList = batchLoaderMapper.getRowBatch(dbBatch);
-    Map<Object, T> returnMap = new ConcurrentHashMap<>((int) (lastRow - firstRow));
+    Map<Long, T> returnMap = new ConcurrentHashMap<>((int) (lastRow - firstRow));
     for (T element : cacheableList) {
       if (element != null) {
         returnMap.put(element.getId(), doPostDbLoading(element));

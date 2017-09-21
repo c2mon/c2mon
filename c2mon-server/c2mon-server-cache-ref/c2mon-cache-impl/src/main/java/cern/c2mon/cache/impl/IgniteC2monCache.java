@@ -19,6 +19,7 @@ import org.apache.ignite.transactions.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.loader.C2monCacheLoader;
 import cern.c2mon.cache.api.lock.TransactionalCallable;
 
 /**
