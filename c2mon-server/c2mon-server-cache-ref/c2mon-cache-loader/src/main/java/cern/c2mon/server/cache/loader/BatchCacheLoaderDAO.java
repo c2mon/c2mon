@@ -27,7 +27,7 @@ import cern.c2mon.shared.common.Cacheable;
  *
  * @author Mark Brightwell
  */
-public interface BatchCacheLoaderDAO<T extends Cacheable> extends SimpleCacheLoaderDAO<T> {
+public interface BatchCacheLoaderDAO<K extends Number, V extends Cacheable> extends SimpleCacheLoaderDAO<V> {
 
   /**
    * Returns the highest row number of elements to be loaded. Returns 0 if no
@@ -49,6 +49,6 @@ public interface BatchCacheLoaderDAO<T extends Cacheable> extends SimpleCacheLoa
    *
    * @return a map of objects ready to load into the cache
    */
-  Map<Object, T> getBatchAsMap(Long firstRow, Long lastRow);
+  Map<Long, V> getBatchAsMap(Long firstRow, Long lastRow);
 
 }

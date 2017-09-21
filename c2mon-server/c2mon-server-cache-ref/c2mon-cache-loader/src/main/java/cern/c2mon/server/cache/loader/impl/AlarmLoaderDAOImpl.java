@@ -32,7 +32,7 @@ import cern.c2mon.server.common.alarm.AlarmCacheObject;
  */
 //TODO: refer a name
 @Service("alarmLoaderDAORef")
-public class AlarmLoaderDAOImpl extends AbstractBatchLoaderDAO<Alarm> implements AlarmLoaderDAO {
+public class AlarmLoaderDAOImpl extends AbstractBatchLoaderDAO<Long, Alarm> implements AlarmLoaderDAO {
 
   /**
    * Reference to the required mapper.

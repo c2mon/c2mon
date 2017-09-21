@@ -11,20 +11,22 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
  * @author Justin Lewis Salmon
  */
 @Configuration
-@EnableConfigurationProperties(CacheLoadingProperties.class)
+@EnableConfigurationProperties(CacheLoaderProperties.class)
 @ComponentScan("cern.c2mon.server.cache.loader")
 public class CacheLoaderModuleRef {
 
   @Autowired
-  private CacheLoadingProperties properties;
+  private CacheLoaderProperties properties;
 
-  @Bean
-  public ThreadPoolTaskExecutor cacheLoadingThreadPoolTaskExecutor() {
+  @Bean(name = "cacheLoaderTaskExecutor")
+  public ThreadPoolTaskExecutor cacheLoaderTaskExecutor() {
     ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+
     executor.setCorePoolSize(properties.getMaxThreads());
     executor.setMaxPoolSize(properties.getMaxThreads());
-    executor.setKeepAliveSeconds(5);
     executor.setQueueCapacity(properties.getQueueSize());
+    executor.setKeepAliveSeconds(5);
+
     return executor;
   }
 }

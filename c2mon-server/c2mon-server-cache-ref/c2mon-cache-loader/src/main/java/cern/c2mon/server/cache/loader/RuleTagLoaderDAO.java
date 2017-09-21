@@ -23,6 +23,6 @@ import cern.c2mon.server.common.rule.RuleTag;
  *
  * @author Mark Brightwell
  */
-public interface RuleTagLoaderDAO extends BatchCacheLoaderDAO<RuleTag>, ConfigurableDAO<RuleTag> {
+public interface RuleTagLoaderDAO extends BatchCacheLoaderDAO<Long, RuleTag>, ConfigurableDAO<RuleTag> {
 
 }

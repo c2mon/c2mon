@@ -8,7 +8,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @Data
 @ConfigurationProperties(prefix = "c2mon.server.cacheloading")
-public class CacheLoadingProperties {
+public class CacheLoaderProperties {
 
   /**
    * Max number of threads used to load caches from the database. For best

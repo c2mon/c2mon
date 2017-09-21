@@ -25,6 +25,6 @@ import cern.c2mon.server.common.datatag.DataTag;
  *
  * @author Mark Brightwell
  */
-public interface DataTagLoaderDAO extends BatchCacheLoaderDAO<DataTag>, ConfigurableDAO<DataTag> {
+public interface DataTagLoaderDAO extends BatchCacheLoaderDAO<Long, DataTag>, ConfigurableDAO<DataTag> {
 
 }
