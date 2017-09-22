@@ -16,15 +16,14 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch.alarm;
 
-import java.util.Map;
-
+import cern.c2mon.server.common.alarm.Alarm;
+import cern.c2mon.server.elasticsearch.util.EntityUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import cern.c2mon.server.common.alarm.Alarm;
-import cern.c2mon.server.elasticsearch.util.EntityUtils;
+import java.util.Map;
 
 import static junit.framework.TestCase.assertEquals;
 

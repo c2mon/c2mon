@@ -1,17 +1,16 @@
 package cern.c2mon.server.elasticsearch.tag;
 
-import java.util.Map;
-
+import cern.c2mon.server.cache.EquipmentCache;
+import cern.c2mon.server.cache.ProcessCache;
+import cern.c2mon.server.cache.SubEquipmentCache;
+import cern.c2mon.server.common.datatag.DataTag;
 import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import cern.c2mon.server.cache.EquipmentCache;
-import cern.c2mon.server.cache.ProcessCache;
-import cern.c2mon.server.cache.SubEquipmentCache;
-import cern.c2mon.server.common.datatag.DataTag;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 

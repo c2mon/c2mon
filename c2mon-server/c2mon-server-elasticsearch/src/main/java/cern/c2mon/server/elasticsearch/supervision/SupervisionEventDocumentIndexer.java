@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.rest.RestStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -73,7 +74,7 @@ public class SupervisionEventDocumentIndexer implements IDBPersistenceHandler<Su
         .setType("supervision")
         .setSource(supervisionEvent.toString())
         .setRouting(supervisionEvent.getId())
-        .get().isCreated();
+        .get().status().equals(RestStatus.CREATED);
   }
 
   private String getOrCreateIndex(SupervisionEventDocument supervisionEvent) {

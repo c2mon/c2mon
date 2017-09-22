@@ -21,7 +21,7 @@ build_and_publish:
 build:
   type: build
   script:
-    - mvn -q -U -B clean test -DskipDockerBuild -DskipDockerTag --settings settings.xml -Ddependencies.set.direct
+    - mvn -q -U -B clean test -DskipDockerBuild -DskipDockerTag --settings settings.xml -Ddependencies.set.direct --debug -X
   except:
     - master
 

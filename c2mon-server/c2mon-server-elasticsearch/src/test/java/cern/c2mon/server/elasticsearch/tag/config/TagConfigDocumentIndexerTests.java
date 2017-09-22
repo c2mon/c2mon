@@ -19,7 +19,6 @@ package cern.c2mon.server.elasticsearch.tag.config;
 
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.elasticsearch.Indices;
-import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
 import cern.c2mon.server.elasticsearch.config.BaseElasticsearchIntegrationTest;
 import cern.c2mon.server.elasticsearch.junit.CachePopulationRule;
 import cern.c2mon.server.elasticsearch.util.EntityUtils;
@@ -50,9 +49,6 @@ public class TagConfigDocumentIndexerTests extends BaseElasticsearchIntegrationT
   @Rule
   @Autowired
   public CachePopulationRule cachePopulationRule;
-
-  @Autowired
-  private ElasticsearchClient client;
 
   @Test
   public void addDataTag() throws Exception {

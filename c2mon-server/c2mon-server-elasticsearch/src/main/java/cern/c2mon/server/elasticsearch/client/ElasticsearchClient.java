@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2017 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -26,15 +26,20 @@ import org.elasticsearch.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.node.InternalSettingsPreparer;
 import org.elasticsearch.node.Node;
+import org.elasticsearch.node.NodeValidationException;
+import org.elasticsearch.plugins.Plugin;
+import org.elasticsearch.transport.Netty4Plugin;
+import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-
-import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
+import java.util.Arrays;
+import java.util.Collection;
 
 /**
  * Wrapper around {@link Client}. Connects asynchronously, but also provides
@@ -42,12 +47,13 @@ import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
  *
  * @author Alban Marguet
  * @author Justin Lewis Salmon
+ * @author James Hamilton
  */
 @Slf4j
 @Service
 public class ElasticsearchClient {
 
-  @Autowired
+  @Getter
   private ElasticsearchProperties properties;
 
   @Getter
@@ -56,17 +62,21 @@ public class ElasticsearchClient {
   @Getter
   private boolean isClusterYellow;
 
-  private Node embeddedNode = null;
+  //static because we should only ever start 1 embedded node
+  private static Node embeddedNode = null;
 
-  @PostConstruct
-  public void init() {
-    client = createClient();
+  @Autowired
+  public ElasticsearchClient(ElasticsearchProperties properties) throws NodeValidationException {
+    this.properties = properties;
+    if (client == null) {
+      client = createClient();
 
-    if (properties.isEmbedded()) {
-      startEmbeddedNode();
+      if (properties.isEmbedded()) {
+        startEmbeddedNode();
+      }
+
+      connectAsynchronously();
     }
-
-    connectAsynchronously();
   }
 
   /**
@@ -75,16 +85,13 @@ public class ElasticsearchClient {
    * @return the {@link Client} instance
    */
   private Client createClient() {
-    final Settings.Builder settingsBuilder = Settings.settingsBuilder();
+    final Settings.Builder settingsBuilder = Settings.builder();
 
     settingsBuilder.put("node.name", properties.getNodeName())
         .put("cluster.name", properties.getClusterName())
         .put("http.enabled", properties.isHttpEnabled());
 
-    log.debug("Creating client {} at {}:{} in cluster {}",
-        properties.getNodeName(), properties.getHost(), properties.getPort(), properties.getClusterName());
-    TransportClient client = TransportClient.builder().settings(settingsBuilder.build()).build();
-
+    TransportClient client = new PreBuiltTransportClient(settingsBuilder.build());
     try {
       client.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(properties.getHost()), properties.getPort()));
     } catch (UnknownHostException e) {
@@ -141,33 +148,54 @@ public class ElasticsearchClient {
         .get();
   }
 
-  private void startEmbeddedNode() {
+  //@TODO "using Node directly within an application is not officially supported"
+  //https://www.elastic.co/guide/en/elasticsearch/reference/5.5/breaking_50_java_api_changes.html
+  //@TODO Embedded ES is no longer supported
+  public void startEmbeddedNode() throws NodeValidationException {
+    if (this.embeddedNode != null) {
+      log.info("Embedded Elasticsearch cluster already running");
+      return;
+    }
     log.info("Launching an embedded Elasticsearch cluster: {}", properties.getClusterName());
 
-    embeddedNode = nodeBuilder().settings(Settings.settingsBuilder()
-        .put("path.home", properties.getEmbeddedStoragePath())
-        .put("cluster.name", properties.getClusterName())
-        .put("node.name", properties.getNodeName())
-        .put("node.local", false)
-        .put("node.data", true)
-        .put("node.master", true)
-        .put("network.host", "0.0.0.0")
-        .put("http.enabled", true)
-        .put("http.cors.enabled", true)
-        .put("http.cors.allow-origin", "/.*/")
-        .build()).node();
+    Collection<Class<? extends Plugin>> plugins = Arrays.asList(Netty4Plugin.class);
+    embeddedNode = new PluginConfigurableNode(Settings.builder()
+     .put("path.home", properties.getEmbeddedStoragePath())
+     .put("cluster.name", properties.getClusterName())
+     .put("node.name", properties.getNodeName())
+     .put("transport.type", "netty4")
+     .put("node.data", true)
+     .put("node.master", true)
+     .put("network.host", "0.0.0.0")
+     .put("http.type", "netty4")
+     .put("http.enabled", true)
+     .put("http.cors.enabled", true)
+     .put("http.cors.allow-origin", "/.*/")
+     .build(), plugins);
+
+      embeddedNode.start();
   }
 
-  public void close(Client client) {
-    if (client != null) {
-      client.close();
-      log.info("Closed client {}", client.settings().get("node.name"));
+  //solution from here: https://github.com/elastic/elasticsearch-hadoop/blob/fefcf8b191d287aca93a04144c67b803c6c81db5/mr/src/itest/java/org/elasticsearch/hadoop/EsEmbeddedServer.java
+  private static class PluginConfigurableNode extends Node {
+    public PluginConfigurableNode(Settings settings, Collection<Class<? extends Plugin>> classpathPlugins) {
+      super(InternalSettingsPreparer.prepareEnvironment(settings, null), classpathPlugins);
     }
   }
 
-  public void closeEmbeddedNode(){
+  public void close() {
+    if (client != null) {
+      client.close();
+      log.info("Closed client {}", client.settings().get("node.name"));
+      client = null;
+      this.isClusterYellow = false;
+    }
+  }
+
+  public void closeEmbeddedNode() throws IOException {
     if(embeddedNode != null) {
       embeddedNode.close();
+      this.close();
     }
   }
 }

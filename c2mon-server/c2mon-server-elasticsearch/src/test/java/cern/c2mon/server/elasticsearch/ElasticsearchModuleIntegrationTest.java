@@ -16,13 +16,11 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch;
 
-import lombok.extern.slf4j.Slf4j;
-import org.junit.Before;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
 import cern.c2mon.server.elasticsearch.config.BaseElasticsearchIntegrationTest;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.Test;
+
+import java.io.IOException;
 
 /**
  * @author Alban Marguet
@@ -30,21 +28,12 @@ import cern.c2mon.server.elasticsearch.config.BaseElasticsearchIntegrationTest;
 @Slf4j
 public class ElasticsearchModuleIntegrationTest extends BaseElasticsearchIntegrationTest {
 
-  @Autowired
-  private ElasticsearchClient client;
-
-  @Before
-  public void setup() {
-    client.waitForYellowStatus();
-  }
-
   @Test
-  public void testModuleStartup() {
+  public void testModuleStartup() throws IOException {
     String[] indices = client.getClient().admin().indices().prepareGetIndex().get().indices();
     log.info("indices in the cluster: ");
     for (String index : indices) {
       log.info(index);
     }
-    client.closeEmbeddedNode();
   }
 }

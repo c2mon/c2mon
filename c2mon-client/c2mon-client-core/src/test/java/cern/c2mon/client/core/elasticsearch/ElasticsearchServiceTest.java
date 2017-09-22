@@ -6,20 +6,24 @@ import cern.c2mon.server.cache.ProcessCache;
 import cern.c2mon.server.cache.SubEquipmentCache;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.elasticsearch.Indices;
+import cern.c2mon.server.elasticsearch.MappingFactory;
 import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
 import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 import cern.c2mon.server.elasticsearch.tag.config.TagConfigDocumentConverter;
 import cern.c2mon.server.elasticsearch.tag.config.TagConfigDocumentIndexer;
 import cern.c2mon.server.elasticsearch.tag.config.TagConfigDocumentListener;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
+import org.apache.http.annotation.NotThreadSafe;
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.admin.indices.flush.FlushRequest;
-import org.junit.After;
+import org.elasticsearch.node.NodeValidationException;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.powermock.reflect.Whitebox;
 import org.springframework.util.FileSystemUtils;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -29,37 +33,48 @@ import java.util.concurrent.TimeoutException;
 import static org.easymock.EasyMock.createNiceMock;
 import static org.junit.Assert.assertEquals;
 
+@NotThreadSafe
 public class ElasticsearchServiceTest {
 
-  private ElasticsearchClient client = new ElasticsearchClient();
+  private ElasticsearchClient client;
   private TagConfigDocumentListener tagDocumentListener;
   private C2monClientProperties properties = new C2monClientProperties();
+  private static ElasticsearchProperties elasticsearchProperties = new ElasticsearchProperties();
 
-  @Before
-  public void setupElasticsearch() throws InterruptedException {
-    ElasticsearchProperties elasticsearchProperties = new ElasticsearchProperties();
-    FileSystemUtils.deleteRecursively(new File(elasticsearchProperties.getEmbeddedStoragePath()));
-    Whitebox.setInternalState(client, "properties", elasticsearchProperties);
-    client.init();
+  public ElasticsearchServiceTest() throws NodeValidationException {
+    this.client = new ElasticsearchClient(elasticsearchProperties);
+    Indices mustBeCreatedButVariableNotUsed = new Indices(this.client, elasticsearchProperties);
     TagConfigDocumentIndexer indexer = new TagConfigDocumentIndexer(client, elasticsearchProperties);
     ProcessCache processCache = createNiceMock(ProcessCache.class);
     EquipmentCache equipmentCache = createNiceMock(EquipmentCache.class);
     SubEquipmentCache subequipmentCache = createNiceMock(SubEquipmentCache.class);
-    Indices indices = new Indices(elasticsearchProperties, client);
     TagConfigDocumentConverter converter = new TagConfigDocumentConverter(processCache, equipmentCache, subequipmentCache);
     tagDocumentListener = new TagConfigDocumentListener(indexer, converter);
+  }
+
+  @BeforeClass
+  @AfterClass
+  public static void cleanup() {
+    FileSystemUtils.deleteRecursively(new java.io.File(elasticsearchProperties.getEmbeddedStoragePath()));
+  }
+
+  @Before
+  public void setupElasticsearch() throws InterruptedException, NodeValidationException {
     try {
-      CompletableFuture<Void> nodeReady = CompletableFuture.runAsync(() -> client.waitForYellowStatus());
+      CompletableFuture<Void> nodeReady = CompletableFuture.runAsync(() -> {
+        client.waitForYellowStatus();
+        client.getClient().admin().indices().delete(new DeleteIndexRequest(elasticsearchProperties.getTagConfigIndex()));
+        Indices.create(elasticsearchProperties.getTagConfigIndex(), "tag_config", MappingFactory.createTagConfigMapping());
+        try {
+          Thread.sleep(1000); //it takes some time for the index to be recreated
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+      });
       nodeReady.get(120, TimeUnit.SECONDS);
     } catch (ExecutionException | TimeoutException e) {
       throw new RuntimeException("Timeout when waiting for embedded elasticsearch node to start!");
     }
-  }
-
-  @After
-  public void closeElasticsearch() {
-    client.close(client.getClient());
-    client.closeEmbeddedNode();
   }
 
   @Test

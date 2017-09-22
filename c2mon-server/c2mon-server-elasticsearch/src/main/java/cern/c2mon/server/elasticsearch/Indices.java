@@ -6,12 +6,16 @@ import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 import cern.c2mon.server.elasticsearch.supervision.SupervisionEventDocument;
 import cern.c2mon.server.elasticsearch.tag.TagDocument;
 import cern.c2mon.server.elasticsearch.tag.config.TagConfigDocument;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.ResourceAlreadyExistsException;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.indices.IndexAlreadyExistsException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
@@ -28,8 +32,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @Component
 public class Indices {
 
+  @Getter
   private ElasticsearchClient client;
 
+  @Getter
   private ElasticsearchProperties properties;
 
   private final List<String> indexCache = new CopyOnWriteArrayList<>();
@@ -37,9 +43,9 @@ public class Indices {
   private static Indices self;
 
   @Autowired
-  public Indices(ElasticsearchProperties properties, ElasticsearchClient client) {
-    this.properties = properties;
+  public Indices(ElasticsearchClient client, ElasticsearchProperties properties) {
     this.client = client;
+    this.properties = properties;
     self = this;
   }
 
@@ -69,7 +75,7 @@ public class Indices {
     }
 
     CreateIndexRequestBuilder builder = self.client.getClient().admin().indices().prepareCreate(indexName);
-    builder.setSettings(Settings.settingsBuilder()
+    builder.setSettings(Settings.builder()
         .put("number_of_shards", self.properties.getShardsPerIndex())
         .put("number_of_replicas", self.properties.getReplicasPerShard())
         .build());
@@ -84,7 +90,7 @@ public class Indices {
     try {
       CreateIndexResponse response = builder.get();
       created = response.isAcknowledged();
-    } catch (IndexAlreadyExistsException ex) {
+    } catch (ResourceAlreadyExistsException ex) {
       created = true;
     }
 

@@ -1,8 +1,5 @@
 package cern.c2mon.server.elasticsearch.util;
 
-import java.sql.Timestamp;
-import java.util.Collections;
-
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.AlarmCondition;
@@ -15,6 +12,9 @@ import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.DataTagConstants;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.common.supervision.SupervisionConstants;
+
+import java.sql.Timestamp;
+import java.util.Collections;
 
 /**
  * @author Justin Lewis Salmon

@@ -16,13 +16,10 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch.client;
 
+import cern.c2mon.server.elasticsearch.config.BaseElasticsearchIntegrationTest;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.common.settings.Settings;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import cern.c2mon.server.elasticsearch.config.BaseElasticsearchIntegrationTest;
-import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
@@ -35,21 +32,13 @@ import static org.junit.Assert.assertTrue;
 @Slf4j
 public class ElasticsearchClientTests extends BaseElasticsearchIntegrationTest {
 
-  @Autowired
-  private ElasticsearchClient client;
-
-  @Autowired
-  private ElasticsearchProperties properties;
-
   @Test
   public void init() {
-    client.waitForYellowStatus();
-
     assertTrue(client.isClusterYellow());
     assertNotNull(client.getClient());
 
     Settings settings = client.getClient().settings();
-    assertEquals(properties.getNodeName(), settings.get("node.name"));
-    assertEquals(properties.getClusterName(), settings.get("cluster.name"));
+    assertEquals(client.getProperties().getNodeName(), settings.get("node.name"));
+    assertEquals(client.getProperties().getClusterName(), settings.get("cluster.name"));
   }
 }

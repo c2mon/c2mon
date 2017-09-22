@@ -30,7 +30,6 @@ public class BulkProcessorProxy implements BulkProcessor.Listener {
   @Autowired
   public BulkProcessorProxy(final ElasticsearchClient client, final ElasticsearchProperties properties) {
     this.bulkProcessor = BulkProcessor.builder(client.getClient(), this)
-        .setName("BulkProcessor")
         .setBulkActions(properties.getBulkActions())
         .setBulkSize(new ByteSizeValue(properties.getBulkSize(), ByteSizeUnit.MB))
         .setFlushInterval(TimeValue.timeValueSeconds(properties.getBulkFlushInterval()))

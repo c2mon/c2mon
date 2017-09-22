@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.rest.RestStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -69,7 +70,7 @@ public class AlarmDocumentIndexer implements IDBPersistenceHandler<AlarmDocument
         .setType("alarm")
         .setSource(alarm.toString())
         .setRouting(alarm.getId())
-        .get().isCreated();
+        .get().status().equals(RestStatus.CREATED);
   }
 
   private String getOrCreateIndex(AlarmDocument alarm) {
