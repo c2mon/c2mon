@@ -80,14 +80,13 @@ public class BatchCacheLoader<K extends Number, V extends Cacheable> implements 
   public void preload() {
     log.debug("preload() - Start preloading data for cache " + cache.getName());
 
+    Integer lastRow = batchCacheLoaderDAO.getMaxRow(); // 0 if no cache objects!
     log.info("Preload is running for " + cache.getName());
 
     cacheLoaderTaskExecutor.setThreadNamePrefix(this.threadNamePrefix);
     cacheLoaderTaskExecutor.initialize();
 
     Integer firstRow = 0;
-    Integer lastRow = batchCacheLoaderDAO.getMaxRow(); // 0 if no cache objects!
-
     LinkedList<Callable<Object>> tasks = new LinkedList<>();
     while (firstRow <= lastRow) {
       MapLoaderTask mapTask = new MapLoaderTask(firstRow + 1, firstRow + batchSize);

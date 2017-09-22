@@ -41,6 +41,8 @@ public abstract class C2monCache<K, V> extends ApplicationObjectSupport implemen
     this.listenerService = new C2monListenerService();
   }
 
+  public abstract void init();
+
   public abstract V get(K key);
 
   public abstract boolean containsKey(K key);
