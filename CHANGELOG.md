@@ -10,6 +10,7 @@ For more details on a given release, please check also the [Milestone planning](
 ### Added
 
 ### Changed
+- Updated Elasticsearch version from 2.4.1 to 5.6.0 (#164)
 
 ### Fixed
 
