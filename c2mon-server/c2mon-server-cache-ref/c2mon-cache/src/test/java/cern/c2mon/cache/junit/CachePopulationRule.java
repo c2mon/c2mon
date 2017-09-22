@@ -22,16 +22,13 @@ public class CachePopulationRule extends ExternalResource {
   @Autowired
   private DataSource cacheDataSource;
 
-  @Autowired
-  private C2monCache<Long, Alarm> alarmCacheRef;
-
-
   @Override
   protected void before() {
     ResourceDatabasePopulator populator = new ResourceDatabasePopulator(
             new ClassPathResource("sql/cache-data-remove.sql"),
             new ClassPathResource("sql/cache-data-insert.sql")
     );
+
     DatabasePopulatorUtils.execute(populator, cacheDataSource);
   }
 }
