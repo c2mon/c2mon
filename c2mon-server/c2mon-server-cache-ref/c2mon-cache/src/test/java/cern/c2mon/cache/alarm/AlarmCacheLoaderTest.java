@@ -42,13 +42,13 @@ public class AlarmCacheLoaderTest extends AbstractCacheLoaderTest {
     Set<Long> keySet = alarmList.stream().map(Alarm::getId).collect(Collectors.toSet());
     assertTrue("List of alarms should not be empty", alarmList.size() > 0);
 
-    assertEquals(alarmList.size(), alarmCacheRef.getKeys().size());
+    assertEquals("Size of cache and DB mapping should be equal", alarmList.size(), alarmCacheRef.getKeys().size());
     //compare all the objects from the cache and buffer
     Iterator<Alarm> it = alarmList.iterator();
     while (it.hasNext()) {
       Alarm alarm = it.next();
       //compare ids of associated datatags
-      assertEquals(alarm.getTagId(), alarmCacheRef.get(alarm.getId()).getTagId());
+      assertEquals("Cached Alarm should have the same name as Alarm in DB", alarm.getTagId(), alarmCacheRef.get(alarm.getId()).getTagId());
     }
   }
 }
