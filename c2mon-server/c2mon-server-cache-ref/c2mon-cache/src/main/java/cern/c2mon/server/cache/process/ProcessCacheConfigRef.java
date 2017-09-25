@@ -5,7 +5,10 @@ import org.springframework.context.annotation.Configuration;
 
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.factory.AbstractC2monCacheFactory;
+import cern.c2mon.cache.api.loader.C2monCacheLoader;
 import cern.c2mon.server.cache.C2monCacheName;
+import cern.c2mon.server.cache.loader.ProcessDAO;
+import cern.c2mon.server.cache.loader.common.SimpleCacheLoader;
 import cern.c2mon.server.common.process.Process;
 
 /**
@@ -15,7 +18,12 @@ import cern.c2mon.server.common.process.Process;
 public class ProcessCacheConfigRef {
 
   @Bean(name = C2monCacheName.Names.PROCESS)
-  public C2monCache createCache(AbstractC2monCacheFactory cachingFactory) {
-    return cachingFactory.createCache(C2monCacheName.PROCESS.getLabel(), Long.class, Process.class);
+  public C2monCache createCache(AbstractC2monCacheFactory cachingFactory, ProcessDAO processDAO) {
+    C2monCache cache = cachingFactory.createCache(C2monCacheName.PROCESS.getLabel(), Long.class, Process.class);
+
+    C2monCacheLoader cacheLoader = new SimpleCacheLoader<>(cache, processDAO);
+    cache.setCacheLoader(cacheLoader);
+
+    return cache;
   }
 }

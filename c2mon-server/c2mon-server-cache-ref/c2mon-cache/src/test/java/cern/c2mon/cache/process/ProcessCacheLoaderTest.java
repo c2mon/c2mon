@@ -1,50 +1,26 @@
 package cern.c2mon.cache.process;
 
+import java.util.Iterator;
 import java.util.List;
 
-import javax.sql.DataSource;
-
-import lombok.extern.slf4j.Slf4j;
-import org.apache.ignite.IgniteCache;
-import org.apache.ignite.Ignition;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
-import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import cern.c2mon.cache.AbstractCacheLoaderTest;
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.server.cache.CacheModuleRef;
 import cern.c2mon.server.cache.dbaccess.ProcessMapper;
-import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
-import cern.c2mon.server.cache.loader.config.CacheLoaderModuleRef;
-import cern.c2mon.server.common.config.CommonModule;
-import cern.c2mon.shared.common.Cacheable;
+import cern.c2mon.server.common.datatag.DataTag;
+import cern.c2mon.server.common.process.Process;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 /**
  * This is an integration test for loading cache from DB using embedded cache
  *
  * @author Szymon Halastra
  */
-@Slf4j
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {
-        CommonModule.class,
-        CacheModuleRef.class,
-        CacheDbAccessModule.class,
-        CacheLoaderModuleRef.class,
-})
-public class ProcessCacheLoaderTest {
-
-  @Autowired
-  private DataSource cacheDataSource;
+public class ProcessCacheLoaderTest extends AbstractCacheLoaderTest {
 
   @Autowired
   private ProcessMapper processMapper;
@@ -54,28 +30,25 @@ public class ProcessCacheLoaderTest {
 
   @Before
   public void init() {
-    ResourceDatabasePopulator populator = new ResourceDatabasePopulator(
-            new ClassPathResource("sql/cache-data-remove.sql"),
-            new ClassPathResource("sql/cache-data-insert.sql")
-    );
-    DatabasePopulatorUtils.execute(populator, cacheDataSource);
+    processCacheRef.init();
   }
 
   @Test
-  @Ignore
-  public void loadCacheFromDb() {
-    //TODO: 1. get test data from sql
-    assertNotNull("Checks if processCache is not null", processCacheRef);
-    //TODO: 2. use mapper for mapping it to object
-    //TODO: 3. load cache from DAO
-    List<Cacheable> processList = processMapper.getAll();
-    //TODO: 4. check if cache is loaded properly
+  public void preloadCache() {
+    assertNotNull("Process Cache should not be null", processCacheRef);
 
-    IgniteCache<Long, Process> cache = Ignition.ignite().getOrCreateCache("cache");
+    List<DataTag> processList = processMapper.getAll();
 
+    assertTrue("List of process tags should not be empty", processList.size() > 0);
 
-//    assertEquals("Checks if all objects were loaded", processList.size(), processCacheRef.getKeys().size());
-
-    log.info("test");
+    assertEquals("Size of cache and DB mapping should be equal", processList.size(), processCacheRef.getKeys().size());
+    //compare all the objects from the cache and buffer
+    Iterator<DataTag> it = processList.iterator();
+    while (it.hasNext()) {
+      Process currentProcess = (Process) it.next();
+      //equality of DataTagCacheObjects => currently only compares names
+      assertEquals("Cached Process should have the same name as in DB",
+              currentProcess.getName(), ((processCacheRef.get(currentProcess.getId())).getName()));
+    }
   }
 }
