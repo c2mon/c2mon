@@ -10,6 +10,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.loader.C2monCacheLoader;
@@ -17,7 +18,25 @@ import cern.c2mon.server.cache.loader.CacheLoaderDAO;
 import cern.c2mon.shared.common.Cacheable;
 
 /**
+ * Cache loader that loads the Ehcache underlying any C2monCache. It contains
+ * the common logic for loading the cache from the database. It must be
+ * provided with a reference to the Ehcache that needs loading and the DAO
+ * that contains the required methods for fetching the objects from the DB.
+ * <p>
+ * <p>One of these classes is instantiated for every cache used by the
+ * server (done in Spring XML file).
+ * <p>
+ * <p>Uses the Ehcache CacheLoader interface.
+ * <p>
+ * <p>TODO loading threads are hardcoded here; may wish to move these
+ * to parameters, but better is to use BatchCacheLoader instead
+ *
+ * @param <T> the cache object type
+ *
+ * @author Mark Brightwell
  * @author Szymon Halastra
+ * @deprecated use {@link BatchCacheLoader} instead if starting from scratch
+ * as better performance for large caches
  */
 @Slf4j
 public class SimpleCacheLoader<T extends Cacheable> implements C2monCacheLoader {
@@ -37,8 +56,10 @@ public class SimpleCacheLoader<T extends Cacheable> implements C2monCacheLoader 
    * Constructor (used in Spring XML to instantiate the loaders
    * for the different caches).
    *
-   * @param cache the cache to load from the DB
-   * @param cacheLoaderDAO the DAO for accessing the DB
+   * @param cache            the cache to load from the DB
+   * @param cacheLoaderDAO   the DAO for accessing the DB
+   * @param executor
+   * @param threadNamePrefix
    */
   public SimpleCacheLoader(C2monCache cache, CacheLoaderDAO<T> cacheLoaderDAO) {
     this.cache = cache;
@@ -52,7 +73,7 @@ public class SimpleCacheLoader<T extends Cacheable> implements C2monCacheLoader 
    */
   @Override
   public void preload() {
-//fill buffer from DB (uses iBatis call)
+    // fill buffer from DB (uses iBatis call)
     preloadBuffer = fillBufferFromDB();
 
     //load the cache from the buffer
@@ -60,7 +81,8 @@ public class SimpleCacheLoader<T extends Cacheable> implements C2monCacheLoader 
       log.debug("Loading the cache from the buffer...");
       loadCacheFromBuffer(preloadBuffer);
       log.debug("\t...done");
-    } else {
+    }
+    else {
       log.error("Attempt to call loadCacheFromBuffer with null buffer: "
               + "this should not happen and needs investigating!");
     }
@@ -70,6 +92,7 @@ public class SimpleCacheLoader<T extends Cacheable> implements C2monCacheLoader 
 
   /**
    * Loads all the values in the provided Map into the cache, using multiple threads.
+   *
    * @param preloadBuffer the Map key -> object to load into the cache
    */
   protected void loadCacheFromBuffer(final Map<Long, T> preloadBuffer) {
@@ -80,7 +103,6 @@ public class SimpleCacheLoader<T extends Cacheable> implements C2monCacheLoader 
   }
 
   private void loadCache(Collection<Long> keySet) {
-
     ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(4, 16, 5, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(1000));
     Iterator<Long> it = keySet.iterator();
 
@@ -106,7 +128,8 @@ public class SimpleCacheLoader<T extends Cacheable> implements C2monCacheLoader 
     threadPoolExecutor.shutdown();
     try {
       threadPoolExecutor.awaitTermination(1200, TimeUnit.SECONDS); //TODO move to config?constant?
-    } catch (InterruptedException e) {
+    }
+    catch (InterruptedException e) {
       log.warn("Exception caught while waiting for cache loading threads to complete (waited longer then timeout?): ", e);
     }
 
@@ -121,17 +144,17 @@ public class SimpleCacheLoader<T extends Cacheable> implements C2monCacheLoader 
    * Task of loading a list of objects into the cache.
    *
    * @author Mark Brightwell
-   *
    */
   private class CacheLoaderTask implements Runnable {
 
     /**
      * List of keys of objects to load.
      */
-    private LinkedList<Object> keyList = new LinkedList<Object>();
+    private LinkedList<Object> keyList = new LinkedList<>();
 
     /**
      * Add a key to the list.
+     *
      * @param key the Id to add (Long)
      */
     public void addToList(final Object key) {
