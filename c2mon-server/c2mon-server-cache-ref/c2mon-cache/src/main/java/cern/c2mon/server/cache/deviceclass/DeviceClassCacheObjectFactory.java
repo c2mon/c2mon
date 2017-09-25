@@ -1,4 +1,4 @@
-package cern.c2mon.server.cache.deviceclass.components;
+package cern.c2mon.server.cache.deviceclass;
 
 import java.util.List;
 import java.util.Properties;

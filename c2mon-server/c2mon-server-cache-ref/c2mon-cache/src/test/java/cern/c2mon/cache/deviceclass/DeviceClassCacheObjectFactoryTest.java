@@ -5,7 +5,7 @@ import java.util.Properties;
 import org.junit.Assert;
 import org.junit.Test;
 
-import cern.c2mon.server.cache.deviceclass.components.DeviceClassCacheObjectFactory;
+import cern.c2mon.server.cache.deviceclass.DeviceClassCacheObjectFactory;
 import cern.c2mon.server.common.device.Command;
 import cern.c2mon.server.common.device.DeviceClass;
 import cern.c2mon.server.common.device.DeviceClassCacheObject;

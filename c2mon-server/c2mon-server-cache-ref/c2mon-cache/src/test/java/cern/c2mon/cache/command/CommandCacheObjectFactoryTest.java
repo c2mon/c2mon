@@ -8,7 +8,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.server.cache.command.components.CommandCacheObjectFactory;
+import cern.c2mon.server.cache.command.CommandCacheObjectFactory;
 import cern.c2mon.server.common.command.CommandTagCacheObject;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.shared.common.ConfigurationException;

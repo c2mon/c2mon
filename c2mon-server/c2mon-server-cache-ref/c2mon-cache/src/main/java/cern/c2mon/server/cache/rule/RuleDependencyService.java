@@ -1,4 +1,4 @@
-package cern.c2mon.server.cache.services;
+package cern.c2mon.server.cache.rule;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

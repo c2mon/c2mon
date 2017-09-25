@@ -11,7 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.server.cache.device.components.DeviceCacheObjectFactory;
+import cern.c2mon.server.cache.device.DeviceCacheObjectFactory;
 import cern.c2mon.server.common.device.*;
 import cern.c2mon.shared.client.device.DeviceCommand;
 import cern.c2mon.shared.client.device.DeviceProperty;

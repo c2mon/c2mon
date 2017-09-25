@@ -1,4 +1,4 @@
-package cern.c2mon.server.cache.services;
+package cern.c2mon.server.cache.alarm;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;

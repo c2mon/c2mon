@@ -1,4 +1,4 @@
-package cern.c2mon.server.cache.alarm.components;
+package cern.c2mon.server.cache.alarm;
 
 import java.sql.Timestamp;
 import java.util.Properties;
@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import cern.c2mon.cache.api.factory.CacheObjectFactory;
-import cern.c2mon.server.cache.services.AlarmService;
+import cern.c2mon.server.cache.alarm.AlarmService;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.AlarmCondition;

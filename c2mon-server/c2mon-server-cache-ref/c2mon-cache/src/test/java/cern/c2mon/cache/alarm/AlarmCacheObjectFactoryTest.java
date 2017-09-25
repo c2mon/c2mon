@@ -6,8 +6,8 @@ import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
-import cern.c2mon.server.cache.alarm.components.AlarmCacheObjectFactory;
-import cern.c2mon.server.cache.services.AlarmService;
+import cern.c2mon.server.cache.alarm.AlarmCacheObjectFactory;
+import cern.c2mon.server.cache.alarm.AlarmService;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.AlarmCondition;
 import cern.c2mon.shared.common.ConfigurationException;
