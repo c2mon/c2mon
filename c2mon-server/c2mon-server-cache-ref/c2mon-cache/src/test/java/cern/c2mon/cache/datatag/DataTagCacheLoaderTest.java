@@ -41,7 +41,6 @@ public class DataTagCacheLoaderTest extends AbstractCacheLoaderTest {
 
     List<DataTag> dataTagList = dataTagMapper.getAll();
 
-    Set<Long> keySet = dataTagList.stream().map(DataTag::getId).collect(Collectors.toSet());
     assertTrue("List of data tags should not be empty", dataTagList.size() > 0);
 
     assertEquals("Size of cache and DB mapping should be equal", dataTagList.size(), dataTagCacheRef.getKeys().size());

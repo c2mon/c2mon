@@ -40,7 +40,6 @@ public class DeviceCacheLoaderTest extends AbstractCacheLoaderTest {
 
     List<Device> deviceList = deviceMapper.getAll();
 
-    Set<Long> keySet = deviceList.stream().map(Device::getId).collect(Collectors.toSet());
     assertTrue("List of devices should not be empty", deviceList.size() > 0);
 
     assertEquals("Size of cache and DB mapping should be equal", deviceList.size(), deviceCacheRef.getKeys().size());
