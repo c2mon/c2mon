@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import cern.c2mon.cache.AbstractCacheLoaderTest;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.dbaccess.CommandTagMapper;
-import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.command.CommandTagCacheObject;
 import cern.c2mon.server.test.CacheObjectComparison;
 import cern.c2mon.shared.common.command.CommandTag;
