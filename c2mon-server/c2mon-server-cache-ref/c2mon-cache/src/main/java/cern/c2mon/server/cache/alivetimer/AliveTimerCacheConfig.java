@@ -10,9 +10,8 @@ import cern.c2mon.cache.api.factory.AbstractC2monCacheFactory;
 import cern.c2mon.cache.api.loader.C2monCacheLoader;
 import cern.c2mon.server.cache.C2monCacheName;
 import cern.c2mon.server.cache.loader.AliveTimerDAO;
-import cern.c2mon.server.cache.loader.common.BatchCacheLoader;
+import cern.c2mon.server.cache.loader.common.SimpleCacheLoader;
 import cern.c2mon.server.cache.loader.config.CacheLoaderProperties;
-import cern.c2mon.server.common.alive.AliveTimer;
 import cern.c2mon.shared.client.configuration.api.tag.CommFaultTag;
 
 /**
@@ -32,8 +31,7 @@ public class AliveTimerCacheConfig {
   public C2monCache createCache(AbstractC2monCacheFactory cachingFactory, AliveTimerDAO aliveTimerDAORef) {
     C2monCache cache = cachingFactory.createCache(C2monCacheName.ALIVETIMER.getLabel(), Long.class, CommFaultTag.class);
 
-    C2monCacheLoader cacheLoader = new BatchCacheLoader<Long, AliveTimer>(cacheLoaderTaskExecutor, cache, aliveTimerDAORef,
-            properties.getBatchSize(), "AliveTimerLoader-");
+    C2monCacheLoader cacheLoader = new SimpleCacheLoader<>(cache, aliveTimerDAORef);
 
     cache.setCacheLoader(cacheLoader);
 
