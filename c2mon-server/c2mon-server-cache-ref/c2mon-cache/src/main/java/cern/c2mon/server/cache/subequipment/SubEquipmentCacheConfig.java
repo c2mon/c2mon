@@ -5,7 +5,10 @@ import org.springframework.context.annotation.Configuration;
 
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.factory.AbstractC2monCacheFactory;
+import cern.c2mon.cache.api.loader.C2monCacheLoader;
 import cern.c2mon.server.cache.C2monCacheName;
+import cern.c2mon.server.cache.loader.SubEquipmentDAO;
+import cern.c2mon.server.cache.loader.common.SimpleCacheLoader;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 
 /**
@@ -16,7 +19,12 @@ import cern.c2mon.server.common.subequipment.SubEquipment;
 public class SubEquipmentCacheConfig {
 
   @Bean(name = C2monCacheName.Names.SUBEQUIPMENT)
-  public C2monCache createCache(AbstractC2monCacheFactory cachingFactory) {
-    return cachingFactory.createCache(C2monCacheName.SUBEQUIPMENT.getLabel(), Long.class, SubEquipment.class);
+  public C2monCache createCache(AbstractC2monCacheFactory cachingFactory, SubEquipmentDAO subEquipmentDAO) {
+    C2monCache cache = cachingFactory.createCache(C2monCacheName.SUBEQUIPMENT.getLabel(), Long.class, SubEquipment.class);
+
+    C2monCacheLoader cacheLoader = new SimpleCacheLoader<>(cache, subEquipmentDAO);
+    cache.setCacheLoader(cacheLoader);
+
+    return cache;
   }
 }
