@@ -54,11 +54,11 @@ public class ElasticsearchService {
     searchSourceBuilder
         .size(0)
         .aggregation(AggregationBuilders
-            .filter("filter").filter(query)
+            .filter("filter", query)
             .subAggregation(AggregationBuilders.terms("group-by-name").field("name")
                 .subAggregation(AggregationBuilders.topHits("top-tag-hits")
-                    .setSize(1000)
-                    .setFetchSource(new String[] {"value", "timestamp"}, null))));
+                    .size(1000)
+                    .fetchSource(new String[] {"value", "timestamp"}, null))));
 
     SearchResult result;
     Search search = new Search.Builder(searchSourceBuilder.toString()).addIndex("c2mon-tag*").build();
