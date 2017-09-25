@@ -49,8 +49,13 @@ public class IgniteC2monCache<K, V> extends C2monCache<K, V> {
   }
 
   @Override
-  public V get(K key) {
-    return cache.get(key);
+  public V get(K key) throws IllegalArgumentException {
+    if (key instanceof Number) {
+      return cache.get(key);
+    }
+    else {
+      throw new IllegalArgumentException();
+    }
   }
 
   @Override
