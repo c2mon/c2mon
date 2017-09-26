@@ -60,7 +60,10 @@ public class ElasticsearchProperties {
   /**
    * Name of the tag configuration index
    */
-  private String tagConfigIndex = indexPrefix + "-tag-config";
+
+  public String getTagConfigIndex() {
+    return this.indexPrefix + "-tag-config";
+  }
 
   /**
    * Timeseries index bucketing strategy. Possible values:
