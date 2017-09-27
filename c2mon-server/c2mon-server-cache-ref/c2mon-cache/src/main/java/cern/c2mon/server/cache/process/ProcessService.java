@@ -12,6 +12,7 @@ import cern.c2mon.cache.api.CoreService;
 import cern.c2mon.cache.api.service.SupervisedService;
 import cern.c2mon.server.cache.alivetimer.AliveTimerService;
 import cern.c2mon.server.cache.equipment.EquipmentService;
+import cern.c2mon.server.cache.subequipment.SubEquipmentService;
 import cern.c2mon.server.common.alive.AliveTimer;
 import cern.c2mon.server.common.config.ServerProperties;
 import cern.c2mon.server.common.process.Process;
@@ -32,7 +33,7 @@ public class ProcessService implements CoreService, ProcessOperationService, Sup
 
   private EquipmentService equipmentService;
 
-//  private SubEquipmentService subEquipmentService;
+  private SubEquipmentService subEquipmentService;
 
   private C2monCache<Long, AliveTimer> aliveTimerCacheRef;
 
@@ -123,8 +124,7 @@ public class ProcessService implements CoreService, ProcessOperationService, Sup
 
   @Override
   public void stop(Process supervised, Timestamp timestamp) {
-    processCacheRef.lockOnKey(supervised.getId());
-    try {
+    processCacheRef.executeTransaction(() -> {
       ProcessCacheObject processCacheObject = (ProcessCacheObject) supervised;
       processCacheObject.setCurrentHost(null);
       processCacheObject.setStartupTime(null);
@@ -132,9 +132,9 @@ public class ProcessService implements CoreService, ProcessOperationService, Sup
       processCacheObject.setProcessPIK(null);
       processCacheObject.setLocalConfig(null);
       supervisedService.stop(supervised, timestamp);
-    } finally {
-      processCacheRef.unlockOnKey(supervised.getId());
-    }
+
+      return null;
+    });
   }
 
   @Override

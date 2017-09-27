@@ -23,7 +23,7 @@ import cern.c2mon.server.common.config.CommonModule;
         CacheLoaderModuleRef.class,
         CachePopulationRule.class
 })
-public class AbstractCacheLoaderTest {
+public abstract class AbstractCacheLoaderTest {
 
   @Rule
   @Autowired

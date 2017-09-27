@@ -1,14 +1,13 @@
 package cern.c2mon.server.cache.process;
 
 import java.sql.Timestamp;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import lombok.extern.slf4j.Slf4j;
 
 import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.cache.api.service.SupervisedService;
 import cern.c2mon.server.cache.SupervisedServiceImpl;
 import cern.c2mon.server.cache.alivetimer.AliveTimerService;
@@ -55,10 +54,8 @@ public class ProcessOperationServiceImpl implements ProcessOperationService {
 
   @Override
   public Process start(Long processId, String hostName, Timestamp startupTime) {
-    Process process;
-    processCache.lockOnKey(processId);
-    try {
-      process = processCache.get(processId);
+    Optional<Process> returnProcess = processCache.executeTransaction(() -> {
+      Process process = processCache.get(processId);
 
       if (properties.isTestMode()) {
         // If the TEST Mode is on
@@ -73,38 +70,36 @@ public class ProcessOperationServiceImpl implements ProcessOperationService {
                 + ", PIK " + process.getProcessPIK());
       }
       processCache.put(processId, process);
-    } finally {
-      processCache.unlockOnKey(processId);
-    }
 
-    return process;
+      return process;
+    });
+
+    return returnProcess.orElseThrow(CacheElementNotFoundException::new); //TODO: make better return in case of null
   }
 
   @Override
   public Collection<Long> getDataTagIds(Long processId) {
-    processCache.lockOnKey(processId);
-    try {
+    LinkedList<Long> dataTagIds = new LinkedList<>();
+    processCache.executeTransaction(() -> {
       ProcessCacheObject process = (ProcessCacheObject) processCache.get(processId);
-      LinkedList<Long> dataTagIds = new LinkedList<>();
       for (long equipmentId : process.getEquipmentIds()) {
         dataTagIds.addAll(equipmentService.getDataTagIds(equipmentId));
       }
-      return dataTagIds;
-    } finally {
-      processCache.unlockOnKey(processId);
-    }
+
+      return null;
+    });
+    return dataTagIds;
   }
 
   @Override
   public void errorStatus(Long processId, String errorMessage) {
-    processCache.lockOnKey(processId);
-    try {
+    processCache.executeTransaction(() -> {
       Process process = processCache.get(processId);
       errorStatus(process, errorMessage);
       processCache.put(processId, process);
-    } finally {
-      processCache.unlockOnKey(processId);
-    }
+
+      return null;
+    });
   }
 
   @Override
@@ -141,50 +136,47 @@ public class ProcessOperationServiceImpl implements ProcessOperationService {
 
   @Override
   public Boolean isRebootRequired(Long processId) {
-    processCache.lockOnKey(processId);
-    try {
+      Optional<Boolean> isRequiredReboot = processCache.executeTransaction(() -> {
       ProcessCacheObject process = (ProcessCacheObject) processCache.get(processId);
+
       return process.getRequiresReboot();
-    } finally {
-      processCache.unlockOnKey(processId);
-    }
+    });
+
+    return isRequiredReboot.orElseThrow(CacheElementNotFoundException::new);
   }
 
   @Override
   public void requiresReboot(Long processId, Boolean reboot) {
-    processCache.lockOnKey(processId);
-    try {
+    processCache.executeTransaction(() -> {
       ProcessCacheObject process = (ProcessCacheObject) processCache.get(processId);
       process.setRequiresReboot(reboot);
       processCache.put(processId, process);
-    } finally {
-      processCache.unlockOnKey(processId);
-    }
+
+      return null;
+    });
   }
 
   @Override
   public void setProcessPIK(Long processId, Long processPIK) {
-    processCache.lockOnKey(processId);
-    try {
+    processCache.executeTransaction(() -> {
       final ProcessCacheObject processCacheObject = (ProcessCacheObject) processCache.get(processId);
       // Set the PIK
       processCacheObject.setProcessPIK(processPIK);
       processCache.put(processId, processCacheObject);
-    } finally {
-      processCache.unlockOnKey(processId);
-    }
+
+      return null;
+    });
   }
 
   @Override
   public void setLocalConfig(Long processId, ProcessCacheObject.LocalConfig localType) {
-    processCache.lockOnKey(processId);
-    try {
+    processCache.executeTransaction(() -> {
       final ProcessCacheObject processCacheObject = (ProcessCacheObject) processCache.get(processId);
       processCacheObject.setLocalConfig(localType);
       processCache.put(processId, processCacheObject);
-    } finally {
-      processCache.unlockOnKey(processId);
-    }
+
+      return null;
+    });
   }
 
   /**

@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
 import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.impl.SimpleC2monCache;
 import cern.c2mon.server.cache.CacheModuleRef;
 import cern.c2mon.server.cache.alivetimer.AliveTimerService;
 import cern.c2mon.server.common.alive.AliveTimer;
@@ -24,18 +26,22 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Szymon Halastra
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {
-        CacheModuleRef.class,
-        CommonModule.class
-}, loader = AnnotationConfigContextLoader.class)
+//@RunWith(SpringJUnit4ClassRunner.class)
+//@ContextConfiguration(classes = {
+//        CacheModuleRef.class,
+//        CommonModule.class
+//}, loader = AnnotationConfigContextLoader.class)
 public class AliveTimerServiceTest {
 
-  @Autowired
   private C2monCache<Long, AliveTimer> aliveTimerCacheRef;
 
-  @Autowired
   private AliveTimerService aliveTimerService;
+
+  @Before
+  public void init() {
+    aliveTimerCacheRef = new SimpleC2monCache<>("alive-timer-cache");
+    aliveTimerService = new AliveTimerService(aliveTimerCacheRef);
+  }
 
   @Test
   public void startAliveTimer() {

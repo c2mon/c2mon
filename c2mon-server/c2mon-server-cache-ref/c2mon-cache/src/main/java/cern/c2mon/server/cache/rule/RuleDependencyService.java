@@ -52,8 +52,7 @@ public class RuleDependencyService {
    * @param ruleTagId the id of the rule
    */
   public void removeDependentRuleFromTag(final Tag tag, final Long ruleTagId) {
-    tagCacheRef.lockOnKey(tag.getId());
-    try {
+    tagCacheRef.executeTransaction(() -> {
       AbstractTagCacheObject cacheObject = (AbstractTagCacheObject) tag;
       cacheObject.getRuleIds().remove(ruleTagId);
       StringBuilder bld = new StringBuilder();
@@ -66,8 +65,8 @@ public class RuleDependencyService {
       if (bld.length() > 0) {
         cacheObject.setRuleIdsString(bld.toString().substring(0, bld.length() - 1)); //remove ", "
       }
-    } finally {
-      tagCacheRef.unlockOnKey(tag.getId());
-    }
+
+      return null;
+    });
   }
 }

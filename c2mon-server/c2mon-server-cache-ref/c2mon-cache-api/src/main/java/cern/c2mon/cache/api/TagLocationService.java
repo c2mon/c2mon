@@ -2,7 +2,6 @@ package cern.c2mon.cache.api;
 
 import java.util.Collection;
 
-import cern.c2mon.cache.api.lock.C2monLock;
 import cern.c2mon.server.common.tag.Tag;
 
 /**
@@ -18,7 +17,7 @@ import cern.c2mon.server.common.tag.Tag;
  * @author Mark Brightwell
  * @author Szymon Halastra
  */
-public interface TagLocationService extends C2monLock<Long> {
+public interface TagLocationService {
 
   /**
    * Returns the tag located if it can be located in any of the rule, control

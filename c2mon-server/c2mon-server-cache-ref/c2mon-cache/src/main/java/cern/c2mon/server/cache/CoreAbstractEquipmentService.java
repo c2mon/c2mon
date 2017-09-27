@@ -3,6 +3,7 @@ package cern.c2mon.server.cache;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.service.AbstractEquipmentService;
@@ -42,7 +43,7 @@ public class CoreAbstractEquipmentService<T extends AbstractEquipment> implement
   @Override
   public Map<Long, Long> getAbstractEquipmentControlTags() {
     HashMap<Long, Long> returnMap = new HashMap<>();
-    List<Long> equipmentKeys = commFaultTagCache.getKeys();
+    Set<Long> equipmentKeys = commFaultTagCache.getKeys();
     for (Long equipmentId : equipmentKeys) {
       AbstractEquipment equipment = cache.get(equipmentId);
       Long aliveId = equipment.getAliveTagId();

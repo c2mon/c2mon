@@ -1,5 +1,7 @@
 package cern.c2mon.server.cache.alivetimer;
 
+import java.util.Optional;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -46,6 +48,8 @@ public class AliveTimerService implements CoreService<Long, AliveTimer> {
       catch (Exception e) {
         log.error("updatedAliveTimer() failed for an unknown reason: ", e);
       }
+
+      return null;
     });
   }
 
@@ -56,13 +60,12 @@ public class AliveTimerService implements CoreService<Long, AliveTimer> {
    * at least "aliveInterval" milliseconds.
    */
   public boolean hasExpired(final Long aliveTimerId) {
-    final Boolean[] isExpired = new Boolean[1];
-    aliveTimerCacheRef.executeTransaction(() -> {
+    Optional<Boolean> isExpired = aliveTimerCacheRef.executeTransaction(() -> {
       AliveTimer aliveTimer = aliveTimerCacheRef.get(aliveTimerId);
-      isExpired[0] = (System.currentTimeMillis() - aliveTimer.getLastUpdate() > aliveTimer.getAliveInterval() + aliveTimer.getAliveInterval() / 3);
+      return (System.currentTimeMillis() - aliveTimer.getLastUpdate() > aliveTimer.getAliveInterval() + aliveTimer.getAliveInterval() / 3);
     });
 
-    return isExpired[0];
+    return isExpired.get();
   }
 
   public void startAllTimers() {
@@ -102,6 +105,8 @@ public class AliveTimerService implements CoreService<Long, AliveTimer> {
       catch (Exception e) {
         log.error("Unable to start the alive timer " + id, e);
       }
+
+      return null;
     });
   }
 
@@ -120,6 +125,8 @@ public class AliveTimerService implements CoreService<Long, AliveTimer> {
       catch (Exception e) {
         log.error("Unable to stop the alive timer " + id, e);
       }
+
+      return null;
     });
   }
 
