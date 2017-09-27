@@ -8,6 +8,7 @@ import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.elasticsearch.Indices;
 import cern.c2mon.server.elasticsearch.MappingFactory;
 import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
+import cern.c2mon.server.elasticsearch.client.ElasticsearchClientImpl;
 import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 import cern.c2mon.server.elasticsearch.tag.config.TagConfigDocumentConverter;
 import cern.c2mon.server.elasticsearch.tag.config.TagConfigDocumentIndexer;
@@ -21,7 +22,6 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.powermock.reflect.Whitebox;
 import org.springframework.util.FileSystemUtils;
 
 import java.util.Collection;
@@ -36,13 +36,14 @@ import static org.junit.Assert.assertEquals;
 @NotThreadSafe
 public class ElasticsearchServiceTest {
 
-  private ElasticsearchClient client;
+  private ElasticsearchClientImpl client;
   private TagConfigDocumentListener tagDocumentListener;
   private C2monClientProperties properties = new C2monClientProperties();
   private static ElasticsearchProperties elasticsearchProperties = new ElasticsearchProperties();
 
   public ElasticsearchServiceTest() throws NodeValidationException {
-    this.client = new ElasticsearchClient(elasticsearchProperties);
+    this.client = new ElasticsearchClientImpl(elasticsearchProperties);
+    this.client.init();
     Indices mustBeCreatedButVariableNotUsed = new Indices(this.client, elasticsearchProperties);
     TagConfigDocumentIndexer indexer = new TagConfigDocumentIndexer(client, elasticsearchProperties);
     ProcessCache processCache = createNiceMock(ProcessCache.class);

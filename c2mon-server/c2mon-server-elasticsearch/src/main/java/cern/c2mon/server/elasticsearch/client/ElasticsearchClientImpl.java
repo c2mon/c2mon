@@ -70,7 +70,7 @@ public class ElasticsearchClientImpl implements ElasticsearchClient {
   }
 
   @PostConstruct
-  void init() throws NodeValidationException {
+  public void init() throws NodeValidationException {
       if (client == null) {
         client = createClient();
 
