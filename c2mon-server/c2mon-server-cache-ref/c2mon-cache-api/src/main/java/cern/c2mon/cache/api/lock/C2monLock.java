@@ -1,5 +1,7 @@
 package cern.c2mon.cache.api.lock;
 
+import java.util.concurrent.locks.Lock;
+
 /**
  * @author Szymon Halastra
  */

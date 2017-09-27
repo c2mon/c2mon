@@ -1,30 +1,31 @@
 package cern.c2mon.cache.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.locks.Lock;
 
 import javax.annotation.PostConstruct;
+import javax.cache.CacheException;
 import javax.cache.processor.EntryProcessor;
 import javax.cache.processor.EntryProcessorException;
 import javax.cache.processor.EntryProcessorResult;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.ignite.IgniteCache;
 import org.apache.ignite.IgniteSpringBean;
 import org.apache.ignite.cache.query.ScanQuery;
 import org.apache.ignite.configuration.CacheConfiguration;
 import org.apache.ignite.transactions.Transaction;
+import org.apache.ignite.transactions.TransactionDeadlockException;
+import org.apache.ignite.transactions.TransactionTimeoutException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.cache.api.loader.C2monCacheLoader;
-import cern.c2mon.cache.api.lock.TransactionalCallable;
+import cern.c2mon.cache.api.transactions.TransactionalCallable;
 
 /**
  * @author Szymon Halastra
  */
+@Slf4j
 public class IgniteC2monCache<K, V> extends C2monCache<K, V> {
 
   @Autowired
@@ -74,8 +75,8 @@ public class IgniteC2monCache<K, V> extends C2monCache<K, V> {
   }
 
   @Override
-  public List<K> getKeys() {
-    List<K> keys = new ArrayList<>();
+  public Set<K> getKeys() {
+    Set<K> keys = new TreeSet<>();
     cache.query(new ScanQuery<>(null)).forEach(objectObjectEntry -> keys.add((K) objectObjectEntry.getKey()));
 
     return keys;
@@ -116,12 +117,22 @@ public class IgniteC2monCache<K, V> extends C2monCache<K, V> {
   }
 
   @Override
-  public void executeTransaction(TransactionalCallable callable) {
+  public <S> Optional<S> executeTransaction(TransactionalCallable<S> callable) {
     try (Transaction tx = C2monIgnite.transactions().txStart()) {
 
-      callable.call();
+      S returnValue = callable.call();
 
       tx.commit();
+
+      return Optional.of(returnValue);
     }
+    catch (CacheException e) {
+      if (e.getCause() instanceof TransactionTimeoutException &&
+              e.getCause().getCause() instanceof TransactionDeadlockException) {
+        log.error("DeadLock occurred", e.getCause().getCause().getMessage());
+      }
+    }
+
+    return Optional.empty();
   }
 }

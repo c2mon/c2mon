@@ -3,9 +3,9 @@ package cern.c2mon.cache.api;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
-import javax.cache.integration.CacheLoader;
 import javax.cache.processor.EntryProcessor;
 import javax.cache.processor.EntryProcessorException;
 import javax.cache.processor.EntryProcessorResult;
@@ -18,9 +18,10 @@ import cern.c2mon.cache.api.listener.C2monListener;
 import cern.c2mon.cache.api.listener.C2monListenerService;
 import cern.c2mon.cache.api.loader.C2monCacheLoader;
 import cern.c2mon.cache.api.lock.C2monLock;
-import cern.c2mon.cache.api.lock.TransactionalCallable;
+import cern.c2mon.cache.api.transactions.TransactionalCallable;
 import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.shared.common.Cacheable;
+
 
 /**
  * @param <K> cache key type
@@ -28,7 +29,7 @@ import cern.c2mon.shared.common.Cacheable;
  *
  * @author Szymon Halastra
  */
-public abstract class C2monCache<K, V> extends ApplicationObjectSupport implements C2monListener, C2monLock<K>, Serializable {
+public abstract class C2monCache<K, V> extends ApplicationObjectSupport implements C2monListener, Serializable, C2monLock<K> {
 
   protected String cacheName;
 
@@ -51,7 +52,7 @@ public abstract class C2monCache<K, V> extends ApplicationObjectSupport implemen
 
   public abstract boolean remove(K key);
 
-  public abstract List<K> getKeys();
+  public abstract Set<K> getKeys();
 
   public abstract void putAll(Map<? extends K, ? extends V> map);
 
@@ -60,6 +61,8 @@ public abstract class C2monCache<K, V> extends ApplicationObjectSupport implemen
   public abstract <T> T invoke(K var1, EntryProcessor<K, V, T> var2, Object... var3) throws EntryProcessorException;
 
   public abstract <T> Map<K, EntryProcessorResult<T>> invokeAll(Set<? extends K> var1, EntryProcessor<K, V, T> var2, Object... var3);
+
+  public abstract <S> Optional<S> executeTransaction(TransactionalCallable<S> callable);
 
   public String getName() {
     return cacheName;
@@ -107,6 +110,4 @@ public abstract class C2monCache<K, V> extends ApplicationObjectSupport implemen
   public Lifecycle registerKeyBufferedListener(C2monBufferedCacheListener bufferedCacheListener, int frequency) {
     return this.listenerService.registerKeyBufferedListener(bufferedCacheListener, frequency);
   }
-
-  public abstract void executeTransaction(TransactionalCallable callable);
 }
