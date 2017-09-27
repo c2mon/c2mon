@@ -16,6 +16,7 @@ For more details on a given release, please check also the [Milestone planning](
 ## [1.8.25] - 2017-09-27
 ### Added
 - Server: Added property to disable Elasticsearch module, if not required (#167)
+- Added logic for SonarQube code analysis to Maven configuration. For now the SonarQube server is only accesible from inside of CERN. We will change this at a later stage.
 
 ### Changed
 - Elasticsearch: Updated Elasticsearch version from 2.4.1 to 5.6.0 (#164)
