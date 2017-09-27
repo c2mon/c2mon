@@ -67,19 +67,13 @@ public class ElasticsearchClientImpl implements ElasticsearchClient {
   @Autowired
   public ElasticsearchClientImpl(ElasticsearchProperties properties) throws NodeValidationException {
     this.properties = properties;
-  }
+    this.client = createClient();
 
-  @PostConstruct
-  public void init() throws NodeValidationException {
-      if (client == null) {
-        client = createClient();
+    if (properties.isEmbedded()) {
+      startEmbeddedNode();
+    }
 
-        if (properties.isEmbedded()) {
-          startEmbeddedNode();
-        }
-
-        connectAsynchronously();
-      }
+    connectAsynchronously();
   }
 
   /**

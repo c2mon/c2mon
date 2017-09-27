@@ -43,7 +43,6 @@ public class ElasticsearchServiceTest {
 
   public ElasticsearchServiceTest() throws NodeValidationException {
     this.client = new ElasticsearchClientImpl(elasticsearchProperties);
-    this.client.init();
     Indices mustBeCreatedButVariableNotUsed = new Indices(this.client, elasticsearchProperties);
     TagConfigDocumentIndexer indexer = new TagConfigDocumentIndexer(client, elasticsearchProperties);
     ProcessCache processCache = createNiceMock(ProcessCache.class);
