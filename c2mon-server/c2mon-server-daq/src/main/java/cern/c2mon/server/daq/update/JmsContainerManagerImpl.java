@@ -25,9 +25,9 @@ import javax.jms.Message;
 
 import cern.c2mon.server.daq.JmsContainerManager;
 import cern.c2mon.server.daq.config.DaqProperties;
+
+import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.command.ActiveMQQueue;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.SmartLifecycle;
@@ -41,6 +41,7 @@ import cern.c2mon.server.cache.ClusterCache;
 import cern.c2mon.server.cache.ProcessCache;
 import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.common.process.Process;
+
 import org.springframework.stereotype.Component;
 
 /**
@@ -51,18 +52,9 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component
+@Slf4j
 @ManagedResource(objectName="cern.c2mon:name=processJmsContainerManager")
 public class JmsContainerManagerImpl implements JmsContainerManager, SmartLifecycle {
-
-  /**
-   * Class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(JmsContainerManagerImpl.class);
-
-  /**
-   * Milliseconds before an idle consumer thread is closed (not used by any Process container).
-   */
-  private static final long THREAD_IDLE_LIMIT = 60000;
 
   /**
    * Flag for lifecycle management.
@@ -143,12 +135,12 @@ public class JmsContainerManagerImpl implements JmsContainerManager, SmartLifecy
 
   @Override
   public void subscribe(final Process process) {
-    LOGGER.trace("Subscribing to updates from Process " + process.getId());
+    log.trace("Subscribing to updates from Process " + process.getId());
     if (!jmsContainers.containsKey(process.getId())) {
       DefaultMessageListenerContainer container = subscribe(process, properties.getJms().getUpdate().getMaxConsumers());
       container.start();
     } else {
-      LOGGER.warn("Attempt at creating a JMS listener container for a Process that already has one.");
+      log.warn("Attempt at creating a JMS listener container for a Process that already has one.");
     }
   }
 
@@ -192,7 +184,7 @@ public class JmsContainerManagerImpl implements JmsContainerManager, SmartLifecy
    * @param processId if of the process
    */
   private void unsubscribe(final Long processId) {
-    LOGGER.trace("Unsubscribing from updates for Process " + processId);
+    log.trace("Unsubscribing from updates for Process " + processId);
     if (jmsContainers.containsKey(processId)) {
       DefaultMessageListenerContainer container = jmsContainers.get(processId);
 
@@ -201,7 +193,7 @@ public class JmsContainerManagerImpl implements JmsContainerManager, SmartLifecy
 
       jmsContainers.remove(processId);
     } else {
-      LOGGER.warn("Attempt to remove an unrecognized JMS listener container.");
+      log.warn("Attempt to remove an unrecognized JMS listener container.");
     }
   }
 
@@ -211,7 +203,7 @@ public class JmsContainerManagerImpl implements JmsContainerManager, SmartLifecy
    */
   @ManagedOperation(description="Stop this JMS container")
   public void stopContainer(String processName) {
-    LOGGER.info("Stopping JMS container for Process " + processName);
+    log.info("Stopping JMS container for Process " + processName);
     jmsContainers.get(processCache.getProcessId(processName)).stop();
   }
 
@@ -221,7 +213,7 @@ public class JmsContainerManagerImpl implements JmsContainerManager, SmartLifecy
    */
   @ManagedOperation(description="Start this JMS container.")
   public void startContainer(String processName) {
-    LOGGER.info("Starting JMS container for Process " + processName);
+    log.info("Starting JMS container for Process " + processName);
     jmsContainers.get(processCache.getProcessId(processName)).start();
   }
 
@@ -264,11 +256,11 @@ public class JmsContainerManagerImpl implements JmsContainerManager, SmartLifecy
     if (!running) {
       running = true;
       //start JMS containers (not in Spring context!)
-      LOGGER.info("Starting Process JMS listeners...");
+      log.info("Starting Process JMS listeners...");
       for (Map.Entry<Long, DefaultMessageListenerContainer> entry : jmsContainers.entrySet()) {
         entry.getValue().start();
       }
-      LOGGER.info("Finished starting Process JMS listeners.");
+      log.info("Finished starting Process JMS listeners.");
 
       //start thread that will increase the listener thread number after warm up time
       //(this thread expires if stop is called)
@@ -283,10 +275,10 @@ public class JmsContainerManagerImpl implements JmsContainerManager, SmartLifecy
               counter++;
             }
           } catch (InterruptedException e) {
-            LOGGER.error("Interrupted during warm-up phase; starting all listener threads.", e);
+            log.error("Interrupted during warm-up phase; starting all listener threads.", e);
           }
           if (running) {
-            LOGGER.info("Increasing max concurrent update consumers to operational value.");
+            log.info("Increasing max concurrent update consumers to operational value.");
             for (Map.Entry<Long, DefaultMessageListenerContainer> entry : jmsContainers.entrySet()) {
               entry.getValue().setMaxConcurrentConsumers(properties.getJms().getUpdate().getMaxConsumers());
             }
@@ -308,7 +300,7 @@ public class JmsContainerManagerImpl implements JmsContainerManager, SmartLifecy
   @Override
   public synchronized void stop() {
     try {
-      LOGGER.info("Stopping JMS update containers listening for tag updates from the DAQ layer.");
+      log.info("Stopping JMS update containers listening for tag updates from the DAQ layer.");
       subscriptionChecker.cancel();
       ThreadPoolExecutor shutdownExecutor = new ThreadPoolExecutor(10, 10, 1, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), r -> {
         String threadName = "StopDaqUpdate";
@@ -323,10 +315,10 @@ public class JmsContainerManagerImpl implements JmsContainerManager, SmartLifecy
       shutdownExecutor.shutdown();
       jmsContainers.clear();
       daqThreadPoolTaskExecutor.shutdown();
-//      LOGGER.info("Stopping JMS connections to DAQs");
+//      log.info("Stopping JMS connections to DAQs");
 //      updateConnectionFactory.stop(); //closes all JMS connections in the pool
     } catch (Exception e) {
-      LOGGER.error("Exception caught while closing down the Spring listener/JMS thread pool", e);
+      log.error("Exception caught while closing down the Spring listener/JMS thread pool", e);
     }
   }
 
@@ -364,7 +356,7 @@ public class JmsContainerManagerImpl implements JmsContainerManager, SmartLifecy
     public void run() {
       clusterCache.acquireWriteLockOnKey(CONFIG_LOCK_KEY);
       try {
-        LOGGER.debug("Checking JMS subscriptions are up to date.");
+        log.debug("Checking JMS subscriptions are up to date.");
         try {
           //check no new
           for (Long id : processCache.getKeys()) {
@@ -379,7 +371,7 @@ public class JmsContainerManagerImpl implements JmsContainerManager, SmartLifecy
             }
           }
         } catch (Exception e) {
-          LOGGER.error("Unexpected exception caught while updating Process JMS containers", e);
+          log.error("Unexpected exception caught while updating Process JMS containers", e);
         }
       } finally {
         clusterCache.releaseWriteLockOnKey(CONFIG_LOCK_KEY);
@@ -408,6 +400,5 @@ public class JmsContainerManagerImpl implements JmsContainerManager, SmartLifecy
       container.shutdown();
       return container;
     }
-
   }
 }

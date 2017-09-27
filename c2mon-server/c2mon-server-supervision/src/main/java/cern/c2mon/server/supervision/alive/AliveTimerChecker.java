@@ -22,6 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.PostConstruct;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,13 +49,9 @@ import cern.c2mon.server.supervision.SupervisionManager;
  * @author Mark Brightwell
  *
  */
+@Slf4j
 @Service
 public class AliveTimerChecker extends TimerTask implements SmartLifecycle {
-
-  /**
-   * Log4j Logger for this class.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(AliveTimerChecker.class);
 
   /**
    * SMS logger for warnings.
@@ -159,7 +156,7 @@ public class AliveTimerChecker extends TimerTask implements SmartLifecycle {
    */
   @PostConstruct
   public void init() {
-    LOGGER.trace("Initialising AliveTimerChecker...");
+    log.trace("Initialising AliveTimerChecker...");
     clusterCache.acquireWriteLockOnKey(LAST_ALIVE_TIMER_CHECK_INITIALISATION_KEY);
     try {
       if (!clusterCache.hasKey(LAST_ALIVE_TIMER_CHECK_INITIALISATION_KEY)) {
@@ -169,7 +166,7 @@ public class AliveTimerChecker extends TimerTask implements SmartLifecycle {
     } finally {
       clusterCache.releaseWriteLockOnKey(LAST_ALIVE_TIMER_CHECK_INITIALISATION_KEY);
     }
-    LOGGER.trace("Initialisation complete.");
+    log.trace("Initialisation complete.");
   }
 
   /**
@@ -177,7 +174,7 @@ public class AliveTimerChecker extends TimerTask implements SmartLifecycle {
    */
   @Override
   public synchronized void start() {
-    LOGGER.info("Starting the C2MON alive timer mechanism.");
+    log.info("Starting the C2MON alive timer mechanism.");
     timer = new Timer("AliveChecker");
     timer.schedule(this, INITIAL_SCAN_DELAY, SCAN_INTERVAL);
     running = true;
@@ -191,7 +188,7 @@ public class AliveTimerChecker extends TimerTask implements SmartLifecycle {
    */
   @Override
   public synchronized void stop() {
-    LOGGER.info("Stopping the C2MON alive timer mechanism.");
+    log.info("Stopping the C2MON alive timer mechanism.");
     timer.cancel();
     running = false;
   }
@@ -205,11 +202,9 @@ public class AliveTimerChecker extends TimerTask implements SmartLifecycle {
     try {
       Long lastCheck = (Long) clusterCache.getCopy(LAST_ALIVE_TIMER_CHECK_LONG);
       if (System.currentTimeMillis() - lastCheck.longValue() < 9000) { //results in check on a single server
-        LOGGER.debug("Skipping alive check as already performed.");
+        log.debug("Skipping alive check as already performed.");
       } else {
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug("run() : checking alive timers ... ");
-        }
+        log.debug("run() : checking alive timers ... ");
         short aliveDownCount = 0;
         try {
           for (Long currentId : aliveTimerCache.getKeys()) {
@@ -241,15 +236,13 @@ public class AliveTimerChecker extends TimerTask implements SmartLifecycle {
             warningSwitchOffCountDown = new AtomicInteger(SWITCH_OFF_COUNTDOWN);
           }
         } catch (CacheElementNotFoundException cacheEx) {
-          LOGGER.warn("Failed to locate alive timer in cache on expiration check (may happen exceptionally if just removed).", cacheEx);
+          log.warn("Failed to locate alive timer in cache on expiration check (may happen exceptionally if just removed).", cacheEx);
         } catch (Exception e) {
-          LOGGER.error("Unexpected exception when checking the alive timers", e);
+          log.error("Unexpected exception when checking the alive timers", e);
         }
         lastCheck = Long.valueOf(System.currentTimeMillis());
         clusterCache.put(LAST_ALIVE_TIMER_CHECK_LONG, lastCheck);
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug("run() : finished checking alive timers ... ");
-        }
+        log.debug("run() : finished checking alive timers ... ");
       } // end of else block
     } finally {
       clusterCache.releaseWriteLockOnKey(LAST_ALIVE_TIMER_CHECK_LONG);
