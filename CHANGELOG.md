@@ -10,9 +10,18 @@ For more details on a given release, please check also the [Milestone planning](
 ### Added
 
 ### Changed
-- Updated Elasticsearch version from 2.4.1 to 5.6.0 (#164)
 
 ### Fixed
+
+## [1.8.25] - 2017-09-27
+### Added
+- Server: Added property to disable Elasticsearch module, if not required (#167)
+
+### Changed
+- Elasticsearch: Updated Elasticsearch version from 2.4.1 to 5.6.0 (#164)
+
+### Fixed
+- Server: Index prefix property is now correctly taken into acount for creating the tag-config index
 
 
 ## [1.8.24] - 2017-09-05
@@ -178,7 +187,8 @@ This patch contains bug fixes for the DAQ layer.
 - Remove of EquipmentLogger concept from DAQ Core (#56)
 
 
-[Unreleased]: https://gitlab.cern.ch/c2mon/c2mon/milestones/19
+[Unreleased]: https://gitlab.cern.ch/c2mon/c2mon/milestones/20
+[1.8.25]: https://gitlab.cern.ch/c2mon/c2mon/milestones/19
 [1.8.24]: https://gitlab.cern.ch/c2mon/c2mon/milestones/18
 [1.8.23]: https://gitlab.cern.ch/c2mon/c2mon/milestones/17
 [1.8.18]: https://gitlab.cern.ch/c2mon/c2mon/milestones/16
