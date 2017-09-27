@@ -11,6 +11,11 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class ElasticsearchProperties {
 
   /**
+   * Is Elasticsearch enabled?
+   */
+  private boolean enabled = true;
+
+  /**
    * Host name or IP address pointing to the Elasticsearch cluster
    */
   private String host = "localhost";

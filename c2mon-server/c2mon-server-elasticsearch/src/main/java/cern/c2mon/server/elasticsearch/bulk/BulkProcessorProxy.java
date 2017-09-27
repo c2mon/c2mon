@@ -15,6 +15,8 @@ import org.springframework.util.Assert;
 import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
 import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 
+import javax.annotation.PostConstruct;
+
 /**
  * Wrapper around {@link BulkProcessor}. If a bulk operation fails, this class
  * will throw a {@link RuntimeException}.
@@ -25,16 +27,28 @@ import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 @Component
 public class BulkProcessorProxy implements BulkProcessor.Listener {
 
-  private final BulkProcessor bulkProcessor;
+  private ElasticsearchClient client;
+
+  private ElasticsearchProperties properties;
+
+  private BulkProcessor bulkProcessor;
 
   @Autowired
   public BulkProcessorProxy(final ElasticsearchClient client, final ElasticsearchProperties properties) {
-    this.bulkProcessor = BulkProcessor.builder(client.getClient(), this)
-        .setBulkActions(properties.getBulkActions())
-        .setBulkSize(new ByteSizeValue(properties.getBulkSize(), ByteSizeUnit.MB))
-        .setFlushInterval(TimeValue.timeValueSeconds(properties.getBulkFlushInterval()))
-        .setConcurrentRequests(properties.getConcurrentRequests())
-        .build();
+    this.client = client;
+    this.properties = properties;
+  }
+
+  @PostConstruct
+  private void init() {
+    if (this.properties.isEnabled()) {
+      this.bulkProcessor = BulkProcessor.builder(client.getClient(), this)
+          .setBulkActions(properties.getBulkActions())
+          .setBulkSize(new ByteSizeValue(properties.getBulkSize(), ByteSizeUnit.MB))
+          .setFlushInterval(TimeValue.timeValueSeconds(properties.getBulkFlushInterval()))
+          .setConcurrentRequests(properties.getConcurrentRequests())
+          .build();
+    }
   }
 
   public void add(IndexRequest request) {
