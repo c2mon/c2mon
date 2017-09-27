@@ -110,6 +110,8 @@ public class ObjectTypeHandler implements TypeHandler {
         result = rs.getString("TAGDATATYPE");
       } else if (columnName.startsWith("CMD")) {
         result = rs.getString("CMDDATATYPE");
+      } else if (columnName.startsWith("EX")) {
+        result = "java.lang.Object";
       } else {
         log.warn("Column {} is not supported: using default data type (String)", columnName);
       }

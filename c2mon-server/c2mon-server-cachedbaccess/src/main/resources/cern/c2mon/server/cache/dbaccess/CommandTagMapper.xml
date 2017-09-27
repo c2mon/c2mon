@@ -53,8 +53,8 @@
          AND CMD_EQID = EQID
     </select>
 
-    <!-- the command table only contains configuration information, so this method would only be used for reconfigurations -->
-    <update id="updateCommandTag" parameterType="cern.c2mon.server.common.command.CommandTagCacheObject">
+  <!-- the command table only contains configuration information, so this method would only be used for reconfigurations -->
+  <update id="updateCommandTag" parameterType="cern.c2mon.server.common.command.CommandTagCacheObject">
       UPDATE COMMANDTAG
          SET CMDNAME = #{name,jdbcType=VARCHAR},
              CMDDESC = #{description,jdbcType=VARCHAR},
