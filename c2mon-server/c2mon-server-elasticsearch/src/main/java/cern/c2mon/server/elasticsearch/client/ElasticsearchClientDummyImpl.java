@@ -4,10 +4,15 @@ import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.node.NodeValidationException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 
 public class ElasticsearchClientDummyImpl implements ElasticsearchClient {
+
+  @Autowired
+  private ElasticsearchProperties properties;
+
   @Override
   public void waitForYellowStatus() {
     throw new ElasticsearchClientNotAvailable();
@@ -35,7 +40,7 @@ public class ElasticsearchClientDummyImpl implements ElasticsearchClient {
 
   @Override
   public ElasticsearchProperties getProperties() {
-    throw new ElasticsearchClientNotAvailable();
+    return this.properties;
   }
 
   @Override
