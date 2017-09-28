@@ -36,15 +36,15 @@ import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
 @Component
 public class TagConfigDocumentListener implements ConfigurationEventListener {
 
-  @Autowired
-  private ElasticsearchClient elasticsearchClient;
+  private final ElasticsearchClient elasticsearchClient;
 
   private final TagConfigDocumentIndexer indexer;
 
   private final TagConfigDocumentConverter converter;
 
   @Autowired
-  public TagConfigDocumentListener(final TagConfigDocumentIndexer indexer, final TagConfigDocumentConverter converter) {
+  public TagConfigDocumentListener(final ElasticsearchClient elasticsearchClient, final TagConfigDocumentIndexer indexer, final TagConfigDocumentConverter converter) {
+    this.elasticsearchClient = elasticsearchClient;
     this.indexer = indexer;
     this.converter = converter;
   }

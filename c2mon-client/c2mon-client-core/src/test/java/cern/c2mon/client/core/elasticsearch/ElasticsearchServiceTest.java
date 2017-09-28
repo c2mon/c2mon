@@ -51,8 +51,7 @@ public class ElasticsearchServiceTest {
     EquipmentCache equipmentCache = createNiceMock(EquipmentCache.class);
     SubEquipmentCache subequipmentCache = createNiceMock(SubEquipmentCache.class);
     TagConfigDocumentConverter converter = new TagConfigDocumentConverter(processCache, equipmentCache, subequipmentCache);
-    tagDocumentListener = new TagConfigDocumentListener(indexer, converter);
-    Whitebox.setInternalState(tagDocumentListener, "elasticsearchClient", this.client);
+    tagDocumentListener = new TagConfigDocumentListener(this.client, indexer, converter);
   }
 
   @BeforeClass
