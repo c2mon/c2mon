@@ -38,6 +38,14 @@ public class SupervisionEventDocument extends HashMap<String, Object> implements
   private static final ObjectMapper mapper = new ObjectMapper();
 
   @Override
+  public Object put(String key, Object value) {
+    if (key.equals("timestamp")) {
+      value = Long.valueOf(value.toString());
+    }
+    return super.put(key, value);
+  }
+
+  @Override
   public String getId() {
     return String.valueOf(this.get("id"));
   }

@@ -22,7 +22,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.mockito.internal.util.reflection.Whitebox;
 
+import java.sql.Timestamp;
 import java.util.Map;
 
 import static junit.framework.TestCase.assertEquals;
@@ -61,5 +63,24 @@ public class AlarmDocumentConverterTests {
     assertEquals(alarm.getMetadata().getMetadata().get("building"), metadata.get("building"));
     assertEquals(alarm.getMetadata().getMetadata().get("array"), metadata.get("array"));
     assertEquals(alarm.getMetadata().getMetadata().get("responsiblePerson"), metadata.get("responsiblePerson"));
+  }
+
+  /**
+   * Timestamp should not be 0 but in case it is
+   * it should still be a Long not an Integer.
+   */
+  @Test
+  public void convertZeroTimestamp() {
+    Alarm alarm = EntityUtils.createAlarm();
+    Whitebox.setInternalState(alarm, "timestamp", new Timestamp(0));
+    AlarmDocument document = converter.convert(alarm);
+
+    // Serialize
+    String json = document.toString();
+
+    // Deserialize
+    document = (AlarmDocument) document.getObject(json);
+    assertEquals(Long.class, document.get("timestamp").getClass());
+    assertEquals(0L, document.get("timestamp"));
   }
 }

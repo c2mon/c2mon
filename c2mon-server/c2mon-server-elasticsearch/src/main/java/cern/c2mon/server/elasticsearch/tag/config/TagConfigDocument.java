@@ -29,6 +29,14 @@ public class TagConfigDocument extends HashMap<String, Object> {
 
   private static final ObjectMapper mapper = new ObjectMapper();
 
+  @Override
+  public Object put(String key, Object value) {
+    if (key.equals("timestamp")) {
+      value = Long.valueOf(value.toString());
+    }
+    return super.put(key, value);
+  }
+
   public <T> T getProperty(String key, Class<T> klass) {
     return mapper.convertValue(get(key), klass);
   }
