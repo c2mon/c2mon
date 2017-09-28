@@ -40,6 +40,10 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Wrapper around {@link Client}. Connects asynchronously, but also provides
@@ -57,9 +61,6 @@ public class ElasticsearchClientImpl implements ElasticsearchClient {
 
   @Getter
   private Client client;
-
-  @Getter
-  private boolean isClusterYellow;
 
   //static because we should only ever start 1 embedded node
   private static Node embeddedNode = null;
@@ -118,25 +119,32 @@ public class ElasticsearchClientImpl implements ElasticsearchClient {
    */
   @Override
   public void waitForYellowStatus() {
-    while (!isClusterYellow) {
-      log.debug("Waiting for yellow status of Elasticsearch cluster...");
+    try {
+      CompletableFuture<Void> nodeReady = CompletableFuture.runAsync(() -> {
+        //client.admin().cluster().prepareHealth().setWaitForYellowStatus().execute().actionGet();
+          while (true) {
+            log.info("Waiting for yellow status of Elasticsearch cluster...");
 
-      try {
-        ClusterHealthStatus status = getClusterHealth().getStatus();
-        if (status.equals(ClusterHealthStatus.YELLOW) || status.equals(ClusterHealthStatus.GREEN)) {
-          isClusterYellow = true;
-          break;
+            try {
+              if (isClusterYellow()) {
+                break;
+              }
+            } catch (Exception e) {
+              log.info("Elasticsearch cluster not yet ready: {}", e.getMessage());
+            }
+
+            try {
+              Thread.sleep(100L);
+            } catch (InterruptedException ignored) {
+            }
+          }
+          log.info("Elasticsearch cluster is yellow");
         }
-      } catch (Exception e) {
-        log.trace("Elasticsearch cluster not yet ready: {}", e.getMessage());
-      }
-
-      try {
-        Thread.sleep(100L);
-      } catch (InterruptedException ignored) {}
+      );
+      nodeReady.get(120, TimeUnit.SECONDS);
+    } catch (InterruptedException | ExecutionException | TimeoutException e) {
+      throw new RuntimeException("Timeout when waiting for Elasticsearch yellow status!");
     }
-
-    log.debug("Elasticsearch cluster is yellow");
   }
 
   @Override
@@ -145,6 +153,11 @@ public class ElasticsearchClientImpl implements ElasticsearchClient {
         .setWaitForYellowStatus()
         .setTimeout(TimeValue.timeValueMillis(100))
         .get();
+  }
+
+  public boolean isClusterYellow() {
+    ClusterHealthStatus status = getClusterHealth().getStatus();
+    return status.equals(ClusterHealthStatus.YELLOW) || status.equals(ClusterHealthStatus.GREEN);
   }
 
   //@TODO "using Node directly within an application is not officially supported"
@@ -189,7 +202,6 @@ public class ElasticsearchClientImpl implements ElasticsearchClient {
       client.close();
       log.info("Closed client {}", client.settings().get("node.name"));
       client = null;
-      this.isClusterYellow = false;
     }
   }
 

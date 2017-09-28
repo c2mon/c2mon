@@ -83,6 +83,10 @@ public class TagConfigDocumentIndexer {
   }
 
   public void removeTagConfig(TagConfigDocument tag) {
+    if (!Indices.exists(this.configIndex)) {
+      return;
+    }
+
     DeleteRequest deleteRequest = new DeleteRequest(configIndex, TYPE,
             String.valueOf(tag.getId())).routing(tag.getId());
 

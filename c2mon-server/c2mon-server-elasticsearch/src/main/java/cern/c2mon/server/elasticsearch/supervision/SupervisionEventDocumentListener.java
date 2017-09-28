@@ -18,6 +18,7 @@ package cern.c2mon.server.elasticsearch.supervision;
 
 import javax.annotation.PostConstruct;
 
+import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -46,6 +47,9 @@ import cern.c2mon.shared.client.supervision.SupervisionEvent;
 public class SupervisionEventDocumentListener implements SupervisionListener, SmartLifecycle {
 
   @Autowired
+  private ElasticsearchClient elasticsearchClient;
+
+  @Autowired
   private SupervisionNotifier supervisionNotifier;
 
   @Autowired
@@ -61,7 +65,9 @@ public class SupervisionEventDocumentListener implements SupervisionListener, Sm
 
   @PostConstruct
   public void init() {
-    listenerContainer = supervisionNotifier.registerAsListener(this);
+    if (this.elasticsearchClient.getProperties().isEnabled()) {
+      listenerContainer = supervisionNotifier.registerAsListener(this);
+    }
   }
 
   @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)

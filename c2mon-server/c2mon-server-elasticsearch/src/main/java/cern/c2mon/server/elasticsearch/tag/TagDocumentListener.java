@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
+import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -49,6 +50,9 @@ import cern.c2mon.server.common.tag.Tag;
 public class TagDocumentListener implements C2monBufferedCacheListener<Tag>, SmartLifecycle {
 
   @Autowired
+  private ElasticsearchClient elasticsearchClient;
+
+  @Autowired
   private CacheRegistrationService cacheRegistrationService;
 
   @Autowired
@@ -65,7 +69,9 @@ public class TagDocumentListener implements C2monBufferedCacheListener<Tag>, Sma
   @PostConstruct
   public void init() {
     // Register to be notified of all tag updates (data, rule and control tags)
-    listenerContainer = cacheRegistrationService.registerBufferedListenerToTags(this);
+    if (this.elasticsearchClient.getProperties().isEnabled()) {
+      listenerContainer = cacheRegistrationService.registerBufferedListenerToTags(this);
+    }
   }
 
   @Override

@@ -10,10 +10,13 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.ResourceAlreadyExistsException;
+import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequestBuilder;
+import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.common.xcontent.XContentType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.stereotype.Component;
@@ -69,7 +72,7 @@ public class Indices {
    *
    * @return true if the index was successfully created, false otherwise
    */
-  public static boolean create(String indexName, String type, String mapping) {
+  public synchronized static boolean create(String indexName, String type, String mapping) {
     if (exists(indexName)) {
       return true;
     }
@@ -81,7 +84,7 @@ public class Indices {
         .build());
 
     if (mapping != null) {
-      builder.addMapping(type, mapping);
+      builder.addMapping(type, mapping, XContentType.JSON);
     }
 
     log.debug("Creating new index with name {}", indexName);
@@ -93,6 +96,8 @@ public class Indices {
     } catch (ResourceAlreadyExistsException ex) {
       created = true;
     }
+
+    self.client.waitForYellowStatus();
 
     if (created) {
       self.indexCache.add(indexName);
@@ -113,11 +118,6 @@ public class Indices {
    */
   public static boolean exists(String indexName) {
     if (self.indexCache.contains(indexName)) {
-      return true;
-    }
-
-    if (self.client.getClient().admin().indices().prepareExists(indexName).get().isExists()) {
-      self.indexCache.add(indexName);
       return true;
     }
 
