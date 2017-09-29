@@ -46,25 +46,22 @@ import cern.c2mon.shared.client.supervision.SupervisionEvent;
 @Service
 public class SupervisionEventDocumentListener implements SupervisionListener, SmartLifecycle {
 
-  @Autowired
-  private ElasticsearchClient elasticsearchClient;
+  private final ElasticsearchClient elasticsearchClient;
 
-  @Autowired
-  private SupervisionNotifier supervisionNotifier;
-
-  @Autowired
   @Qualifier("supervisionEventDocumentPersistenceManager")
-  private IPersistenceManager<SupervisionEventDocument> persistenceManager;
+  private final IPersistenceManager<SupervisionEventDocument> persistenceManager;
 
-  @Autowired
-  private SupervisionEventDocumentConverter converter;
+  private final SupervisionEventDocumentConverter converter;
 
   private Lifecycle listenerContainer;
 
   private volatile boolean running = false;
 
-  @PostConstruct
-  public void init() {
+  @Autowired
+  public SupervisionEventDocumentListener(final ElasticsearchClient elasticsearchClient, final SupervisionNotifier supervisionNotifier, final IPersistenceManager<SupervisionEventDocument> persistenceManager, final SupervisionEventDocumentConverter converter) {
+    this.elasticsearchClient = elasticsearchClient;
+    this.persistenceManager = persistenceManager;
+    this.converter = converter;
     if (this.elasticsearchClient.getProperties().isEnabled()) {
       listenerContainer = supervisionNotifier.registerAsListener(this);
     }
