@@ -43,25 +43,25 @@ import cern.c2mon.server.common.config.ServerConstants;
 @Component
 public class AlarmDocumentListener implements C2monCacheListener<Alarm>, SmartLifecycle {
 
-  @Autowired
-  private ElasticsearchClient elasticsearchClient;
+  private final ElasticsearchClient elasticsearchClient;
 
-  @Autowired
-  private CacheRegistrationService cacheRegistrationService;
+  private final CacheRegistrationService cacheRegistrationService;
 
-  @Autowired
   @Qualifier("alarmDocumentPersistenceManager")
-  private IPersistenceManager<AlarmDocument> persistenceManager;
+  private final IPersistenceManager<AlarmDocument> persistenceManager;
 
-  @Autowired
-  private AlarmDocumentConverter converter;
+  private final AlarmDocumentConverter converter;
 
   private Lifecycle listenerContainer;
 
   private volatile boolean running = false;
 
-  @PostConstruct
-  public void init() {
+  @Autowired
+  public AlarmDocumentListener(final ElasticsearchClient elasticsearchClient, final CacheRegistrationService cacheRegistrationService, final IPersistenceManager<AlarmDocument> persistenceManager, final AlarmDocumentConverter converter) {
+    this.elasticsearchClient = elasticsearchClient;
+    this.cacheRegistrationService = cacheRegistrationService;
+    this.persistenceManager = persistenceManager;
+    this.converter = converter;
     if (this.elasticsearchClient.getProperties().isEnabled()) {
       listenerContainer = cacheRegistrationService.registerToAlarms(this);
     }
