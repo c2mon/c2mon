@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch.alarm;
 
+import cern.c2mon.pmanager.fallback.exception.DataFallbackException;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.elasticsearch.util.EntityUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +41,7 @@ public class AlarmDocumentConverterTests {
   private AlarmDocumentConverter converter = new AlarmDocumentConverter();
 
   @Test
-  public void toAndFromJson() {
+  public void toAndFromJson() throws DataFallbackException {
     Alarm alarm = EntityUtils.createAlarm();
     AlarmDocument document = converter.convert(alarm);
 
@@ -70,7 +71,7 @@ public class AlarmDocumentConverterTests {
    * it should still be a Long not an Integer.
    */
   @Test
-  public void convertZeroTimestamp() {
+  public void convertZeroTimestamp() throws DataFallbackException {
     Alarm alarm = EntityUtils.createAlarm();
     Whitebox.setInternalState(alarm, "timestamp", new Timestamp(0));
     AlarmDocument document = converter.convert(alarm);

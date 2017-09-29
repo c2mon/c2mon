@@ -202,12 +202,12 @@ public class FallbackFileManager {
      *             An exception is thrown if something wrongs happens while
      *             reading the file
      */
-    public final List readDataBack(final int numberOfLines) throws DataFallbackException {
+    public final FallbackObjectContainer readDataBack(final int numberOfLines) throws DataFallbackException {
         // close the outputstream if it was still opened
         fFileController.closeFallbackOutputStream();
         fFileController.openFallbackInputStream();
         // read from the fallback log mechanism the indicated number of lines
-        final List data = fFileController.readLines(numberOfLines, fallbackObj);
+        final FallbackObjectContainer data = fFileController.readLines(numberOfLines, fallbackObj);
         // dtFallback.closeFallbackInputStream();
         return data;
     }

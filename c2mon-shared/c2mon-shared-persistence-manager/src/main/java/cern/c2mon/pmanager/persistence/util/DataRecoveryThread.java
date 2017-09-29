@@ -16,8 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.pmanager.persistence.util;
 
-import java.util.List;
-
+import cern.c2mon.pmanager.fallback.manager.FallbackObjectContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -171,24 +170,24 @@ public class DataRecoveryThread implements Runnable, FallbackAlarmsInterface {
      */
     private int commitFallbackData() {
 
-        List data = null;
+        FallbackObjectContainer data = null;
         int committed = 0;
 
         if (FALLBACK_LOG.isDebugEnabled())
             FALLBACK_LOG
-                    .debug("commitFallbackData() : Commiting the tags stored in the logfile back into the database");
+                    .debug("commitFallbackData() : Committing the tags stored in the logfile back into the database");
         try {
             // Get all the datatags stored in the log file
             data = persistenceManager.getFallbackManager().readDataBack(
                     FallbackProperties.getInstance().getNumberLinesToReadFromFile());
             // Insert the datatags into the database
             if (LOG.isDebugEnabled()) {
-                LOG.debug("commitFallBackData() - Inserting " + data.size()
+                LOG.debug("commitFallBackData() - Inserting " + data.getReadLines()
                         + " tags from the fallback file into the database");
             }
 
-            persistenceManager.getDbHandler().storeData(data);
-            committed = data.size();
+            persistenceManager.getDbHandler().storeData(data.getObjects());
+            committed = data.getReadLines();
         } catch (IDBPersistenceException e) {
             FALLBACK_LOG.error(
                     "CommitFallBackData : Error executing/committing prepared statement.", e);

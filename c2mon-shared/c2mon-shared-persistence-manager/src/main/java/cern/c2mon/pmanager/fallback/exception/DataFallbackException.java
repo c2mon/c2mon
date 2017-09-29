@@ -17,7 +17,7 @@
 
 package cern.c2mon.pmanager.fallback.exception;
 
-/**
+import java.io.IOException; /**
  * Represents any failure occurred during any operation with the fallback log files  
  * @author mruizgar
  *
@@ -31,14 +31,14 @@ public class DataFallbackException extends Exception {
      
     private static final long serialVersionUID = -5186815965613228882L;
 
-    /**
-     * Constructor to create an Exception with an explanatory message inside
-     * @param message The message that explains what have occurred
-     */
-    public DataFallbackException(final String message) {     
-    
-        super(message);
-    }
+  /**
+   * Constructor to create an Exception with an explanatory message inside
+   *
+   * @param message The message that explains what have occurred
+   */
+  public DataFallbackException(final String message) {
+    super(message);
+  }
     
     /**
      * Default constructor
@@ -46,5 +46,8 @@ public class DataFallbackException extends Exception {
     public DataFallbackException() {
         super();
     }
-    
+
+  public DataFallbackException(final String message, final Exception e) {
+      super(message, e);
+  }
 }

@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import cern.c2mon.pmanager.fallback.manager.FallbackObjectContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -544,11 +545,11 @@ public class FallbackFileController {
      *             An exception is thrown if tags cannot be read from the
      *             fallback file
      */
-    public final List readLines(final int numOfLines, final IFallback fallbackObj)
+    public final FallbackObjectContainer readLines(final int numOfLines, final IFallback fallbackObj)
             throws DataFallbackException {
         // line counter
         int readlines = 0;
-        List objects = new ArrayList();
+        List<IFallback> objects = new ArrayList<>();
         String line = null;
         IFallback obj;
 
@@ -567,10 +568,6 @@ public class FallbackFileController {
                         objects.add(obj);
                     } catch (DataFallbackException e) {
                          LOG.error("readLines() - " + e.getMessage() + "" + line);
-                        // If the read line was not correct we add a NULL
-                        // dataTag so the line is taken in account
-                        // but not treated
-                        objects.add(null);
                     }
                     readlines++;
                 }
@@ -582,7 +579,7 @@ public class FallbackFileController {
             LOG.debug("readLines() - " + objects.size()
                     + " lines has been read from the log file");
         }
-        return objects;
+        return new FallbackObjectContainer(objects, readlines);
     }
 
     /**

@@ -17,6 +17,7 @@
 package cern.c2mon.server.elasticsearch.alarm;
 
 import cern.c2mon.pmanager.IFallback;
+import cern.c2mon.pmanager.fallback.exception.DataFallbackException;
 import cern.c2mon.server.common.alarm.Alarm;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -50,11 +51,11 @@ public class AlarmDocument extends HashMap<String, Object> implements IFallback 
   }
 
   @Override
-  public IFallback getObject(String line) {
+  public IFallback getObject(String line) throws DataFallbackException {
     try {
       return mapper.readValue(line, AlarmDocument.class);
     } catch (IOException e) {
-      throw new RuntimeException("Error reading line from fallback", e);
+      throw new DataFallbackException("Error reading line from fallback", e);
     }
   }
 
