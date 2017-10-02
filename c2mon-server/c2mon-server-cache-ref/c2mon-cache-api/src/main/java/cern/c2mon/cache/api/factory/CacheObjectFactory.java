@@ -40,7 +40,7 @@ public abstract class CacheObjectFactory<T extends Cacheable> {
    */
   public abstract T createCacheObject(Long id);
 
-  public abstract Change configureCacheObject(T cacheable, Properties properties);
+  public abstract Change configureCacheObject(T cacheable, Properties properties)throws IllegalAccessException;
 
   /**
    * Checks all fields of a Command Tag satisfy requirements.
@@ -79,5 +79,19 @@ public abstract class CacheObjectFactory<T extends Cacheable> {
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
               "NumberFormatException: Unable to convert parameter \"" + paramName + "\" to short: " + longInString);
     }
+  }
+
+  /**
+   * If the String is "null", then set the return value
+   * to null, else return the original value.
+   *
+   * <p>Should be used on fields that accept configurations
+   * resetting them to null.
+   *
+   * @param fieldValue the field value, may be "null"
+   * @return the fieldValue, or null if the fieldValue was "null"
+   */
+  protected String checkAndSetNull(String fieldValue) {
+    return fieldValue.equals("null") ? null : fieldValue;
   }
 }
