@@ -38,4 +38,6 @@ public class EquipmentCacheObjectFactoryTest {
 
     assertNotNull("Object should be not created, missing required parameters in properties", equipment);
   }
+
+  //TODO: add more tests with properties
 }
