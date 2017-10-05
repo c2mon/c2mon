@@ -24,7 +24,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import cern.c2mon.server.configuration.parser.exception.EntityDoesNotExistException;
 import lombok.extern.slf4j.Slf4j;
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.convert.AnnotationStrategy;
@@ -405,13 +404,15 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
       }
     }
 
-    //LOGGER.info(configId + " Saving configuration ")
-    //save Configuration element status information in the DB tables
-    for (ConfigurationElement element : configElements) {
-      configurationDAO.saveStatusInfo(element);
+    if (isDBConfig) {
+      //save Configuration element status information in the DB tables
+      for (ConfigurationElement element : configElements) {
+        configurationDAO.saveStatusInfo(element);
+      }
+      //mark the Configuration as applied in the DB table, with timestamp set
+      configurationDAO.markAsApplied(configId);
     }
-    //mark the Configuration as applied in the DB table, with timestamp set
-    configurationDAO.markAsApplied(configId);
+
     log.info("Finished applying configuraton " + configId);
 
     report.normalize();
