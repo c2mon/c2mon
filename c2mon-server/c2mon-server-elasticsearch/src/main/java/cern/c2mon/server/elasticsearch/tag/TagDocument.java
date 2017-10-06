@@ -40,6 +40,9 @@ public class TagDocument extends HashMap<String, Object> implements IFallback {
   @Override
   public Object put(String key, Object value) {
     if (key.equals("timestamp")) {
+      if(value instanceof Double) {
+        value = ((Double) value).longValue();
+      }
       value = Long.valueOf(value.toString());
     }
     return super.put(key, value);
