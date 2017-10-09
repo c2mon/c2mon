@@ -20,7 +20,8 @@ public class DeviceClassCacheConfig {
 
   @Bean(name = C2monCacheName.Names.DEVICECLASS)
   public C2monCache createCache(AbstractC2monCacheFactory cachingFactory, DeviceClassDAO deviceClassDAO) {
-    C2monCache cache = cachingFactory.createCache(C2monCacheName.DEVICECLASS.getLabel(), Long.class, DeviceClass.class);
+    C2monCache cache = cachingFactory.createCache(C2monCacheName.DEVICECLASS.getLabel(), Long.class,
+            DeviceClass.class);
 
     C2monCacheLoader cacheLoader = new SimpleCacheLoader<>(cache, deviceClassDAO);
     cache.setCacheLoader(cacheLoader);

@@ -1,6 +1,9 @@
 package cern.c2mon.cache.impl;
 
-import java.util.*;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.locks.Lock;
 
 import javax.annotation.PostConstruct;
@@ -21,12 +24,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.transactions.TransactionalCallable;
+import cern.c2mon.shared.common.Cacheable;
 
 /**
  * @author Szymon Halastra
  */
 @Slf4j
-public class IgniteC2monCache<K, V> extends C2monCache<K, V> {
+public class IgniteC2monCache<K, V extends Cacheable> extends C2monCache<K, V> {
 
   @Autowired
   private IgniteSpringBean C2monIgnite;

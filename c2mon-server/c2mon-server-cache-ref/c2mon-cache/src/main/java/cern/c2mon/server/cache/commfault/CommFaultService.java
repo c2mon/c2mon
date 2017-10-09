@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.cache.api.CoreService;
 import cern.c2mon.server.common.commfault.CommFaultTag;
 import cern.c2mon.server.common.commfault.CommFaultTagCacheObject;
 import cern.c2mon.server.common.equipment.AbstractEquipment;
@@ -15,7 +14,7 @@ import cern.c2mon.server.common.equipment.AbstractEquipment;
  */
 @Slf4j
 @Service
-public class CommFaultService implements CoreService {
+public class CommFaultService {
 
   private final C2monCache<Long, CommFaultTag> commFaultTagCacheRef;
 
@@ -24,7 +23,6 @@ public class CommFaultService implements CoreService {
     this.commFaultTagCacheRef = commFaultTagCacheRef;
   }
 
-  @Override
   public C2monCache getCache() {
     return commFaultTagCacheRef;
   }

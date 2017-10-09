@@ -36,5 +36,4 @@ public interface CacheLoaderDAO<T extends Cacheable> extends SimpleCacheLoaderDA
    * @return all cache objects
    */
   Map<Long, T> getAllAsMap();
-
 }

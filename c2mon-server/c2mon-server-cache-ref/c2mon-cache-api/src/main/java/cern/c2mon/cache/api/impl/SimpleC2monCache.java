@@ -22,13 +22,11 @@ import cern.c2mon.shared.common.Cacheable;
  */
 public class SimpleC2monCache<V extends Cacheable> extends C2monCache<Long, V> {
 
-  private final String cacheName;
   private final ConcurrentMap<Long, V> cache;
 
   public SimpleC2monCache(String cacheName) {
     super(cacheName);
     this.cache = new ConcurrentHashMap<>(100);
-    this.cacheName = cacheName;
   }
 
 

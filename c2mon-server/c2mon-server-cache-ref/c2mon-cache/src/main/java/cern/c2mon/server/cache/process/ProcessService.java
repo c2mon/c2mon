@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.cache.api.CoreService;
 import cern.c2mon.cache.api.service.SupervisedService;
 import cern.c2mon.server.cache.alivetimer.AliveTimerService;
 import cern.c2mon.server.cache.equipment.EquipmentService;
@@ -25,7 +24,7 @@ import cern.c2mon.shared.common.supervision.SupervisionConstants;
  */
 @Slf4j
 @Service
-public class ProcessService implements CoreService, ProcessOperationService, SupervisedService<Process> {
+public class ProcessService implements ProcessOperationService, SupervisedService<Process> {
 
   private SupervisedService<Process> supervisedService;
 
@@ -52,7 +51,6 @@ public class ProcessService implements CoreService, ProcessOperationService, Sup
     this.processOperationService = new ProcessOperationServiceImpl(processCacheRef, equipmentService, aliveTimerService, properties);
   }
 
-  @Override
   public C2monCache getCache() {
     return processCacheRef;
   }

@@ -10,16 +10,6 @@ import cern.c2mon.shared.common.Cacheable;
  */
 public interface C2monListener<V extends Cacheable> {
 
-  /**
-   * Creates a new cache element and calls the Ehcache notifyElementUpdated
-   * method.
-   * <p>
-   * Notifies the listeners that an update occurred for this DataTag. Should
-   * be called *within a lock on the cache object* so the object is not modified
-   * before being passed to the listeners (using a clone).
-   *
-   * @param cacheable the cache object that has been updated
-   */
   void notifyListenersOfUpdate(V cacheable);
 
   void notifyListenerStatusConfirmation(V cacheable, long timestamp);

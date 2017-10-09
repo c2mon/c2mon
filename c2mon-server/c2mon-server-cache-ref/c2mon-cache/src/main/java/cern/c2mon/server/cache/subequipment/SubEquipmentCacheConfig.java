@@ -20,7 +20,8 @@ public class SubEquipmentCacheConfig {
 
   @Bean(name = C2monCacheName.Names.SUBEQUIPMENT)
   public C2monCache createCache(AbstractC2monCacheFactory cachingFactory, SubEquipmentDAO subEquipmentDAO) {
-    C2monCache cache = cachingFactory.createCache(C2monCacheName.SUBEQUIPMENT.getLabel(), Long.class, SubEquipment.class);
+    C2monCache cache = cachingFactory.createCache(C2monCacheName.SUBEQUIPMENT.getLabel(), Long.class,
+            SubEquipment.class);
 
     C2monCacheLoader cacheLoader = new SimpleCacheLoader<>(cache, subEquipmentDAO);
     cache.setCacheLoader(cacheLoader);

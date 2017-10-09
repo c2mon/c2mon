@@ -1,7 +1,6 @@
 package cern.c2mon.cache.api;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -10,8 +9,10 @@ import javax.cache.processor.EntryProcessor;
 import javax.cache.processor.EntryProcessorException;
 import javax.cache.processor.EntryProcessorResult;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.ApplicationObjectSupport;
 
+import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.cache.api.listener.C2monBufferedCacheListener;
 import cern.c2mon.cache.api.listener.C2monCacheListener;
 import cern.c2mon.cache.api.listener.C2monListener;
@@ -29,17 +30,22 @@ import cern.c2mon.shared.common.Cacheable;
  *
  * @author Szymon Halastra
  */
-public abstract class C2monCache<K, V> extends ApplicationObjectSupport implements C2monListener, Serializable, C2monLock<K> {
+@Slf4j
+public abstract class C2monCache<K, V extends Cacheable> extends ApplicationObjectSupport implements C2monListener<V>, Serializable, C2monLock<K> {
 
-  protected String cacheName;
+  private final String cacheName;
 
-  protected C2monCacheLoader cacheLoader;
+  private C2monCacheLoader cacheLoader;
 
-  C2monListener<Cacheable> listenerService;
+  private final C2monListener<V> listenerService;
+
+  /**
+   * Reference to cache loader.
+   */
 
   public C2monCache(String cacheName) {
     this.cacheName = cacheName;
-    this.listenerService = new C2monListenerService();
+    this.listenerService = new C2monListenerService<>();
   }
 
   public abstract void init();
@@ -76,13 +82,49 @@ public abstract class C2monCache<K, V> extends ApplicationObjectSupport implemen
     return cacheLoader;
   }
 
+  public V loadFromDb(K key) {
+    V result;
+
+    if (!containsKey(key)) {
+
+      //try to load from DB; is put in cache if successful; returns null o.w.
+      try {
+        result = getFromDb(key);
+      }
+      catch (Exception e) {
+        log.error("Exception caught while loading cache element from DB", e);
+        result = null;
+      }
+      //if unable to find in DB
+      if (result == null) {
+        throw new CacheElementNotFoundException("Failed to locate cache element with id " + key + " (Cache is " + this.cacheName + ")");
+      }
+      else {
+        doPostDbLoading(result);
+        put(key, result);
+        return result;
+      }
+    }
+    else { //try and retrieve; note this could still fail if the element is removed in the meantime! (error logged below in this case)
+      return get(key);
+    }
+  }
+
+  private V getFromDb(final K key) {
+    throw new UnsupportedOperationException("Not yet implemented"); //TODO: used for lazy loading, not required by C2mon, can be added in a future
+  }
+
+  private void doPostDbLoading(V value) {
+
+  }
+
   @Override
-  public void notifyListenersOfUpdate(Cacheable cacheable) {
+  public void notifyListenersOfUpdate(V cacheable) {
     this.listenerService.notifyListenersOfUpdate(cacheable);
   }
 
   @Override
-  public void notifyListenerStatusConfirmation(Cacheable cacheable, long timestamp) {
+  public void notifyListenerStatusConfirmation(V cacheable, long timestamp) {
     this.listenerService.notifyListenerStatusConfirmation(cacheable, timestamp);
   }
 

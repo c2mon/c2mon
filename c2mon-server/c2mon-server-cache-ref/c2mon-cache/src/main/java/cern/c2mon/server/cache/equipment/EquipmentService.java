@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.cache.api.CoreService;
 import cern.c2mon.cache.api.service.AbstractEquipmentService;
 import cern.c2mon.cache.api.service.SupervisedService;
 import cern.c2mon.server.cache.CoreAbstractEquipmentService;
@@ -28,7 +27,7 @@ import cern.c2mon.shared.common.supervision.SupervisionConstants;
 
 @Slf4j
 @Service
-public class EquipmentService implements CoreService, SupervisedService<Equipment>, AbstractEquipmentService {
+public class EquipmentService implements SupervisedService<Equipment>, AbstractEquipmentService {
 
   private final C2monCache<Long, Equipment> equipmentCacheRef;
 
@@ -56,7 +55,6 @@ public class EquipmentService implements CoreService, SupervisedService<Equipmen
     return null;
   }
 
-  @Override
   public C2monCache getCache() {
     return this.equipmentCacheRef;
   }

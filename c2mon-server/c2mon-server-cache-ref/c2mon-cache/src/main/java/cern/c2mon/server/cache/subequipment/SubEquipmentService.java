@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.cache.api.CoreService;
 import cern.c2mon.cache.api.service.AbstractEquipmentService;
 import cern.c2mon.cache.api.service.SupervisedService;
 import cern.c2mon.server.cache.CoreAbstractEquipmentService;
@@ -24,7 +23,7 @@ import cern.c2mon.shared.common.supervision.SupervisionConstants;
  */
 @Slf4j
 @Service
-public class SubEquipmentService implements CoreService, SupervisedService<SubEquipment>, AbstractEquipmentService {
+public class SubEquipmentService implements SupervisedService<SubEquipment>, AbstractEquipmentService {
 
   private C2monCache<Long, SubEquipment> subEquipmentCacheRef;
 
@@ -46,7 +45,6 @@ public class SubEquipmentService implements CoreService, SupervisedService<SubEq
     this.abstractEquipmentService = new CoreAbstractEquipmentService<>(subEquipmentCacheRef, commFaultService);
   }
 
-  @Override
   public C2monCache getCache() {
     return subEquipmentCacheRef;
   }

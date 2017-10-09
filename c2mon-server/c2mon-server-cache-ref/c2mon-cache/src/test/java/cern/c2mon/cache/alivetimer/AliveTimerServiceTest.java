@@ -19,11 +19,6 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Szymon Halastra
  */
-//@RunWith(SpringJUnit4ClassRunner.class)
-//@ContextConfiguration(classes = {
-//        CacheModuleRef.class,
-//        CommonModule.class
-//}, loader = AnnotationConfigContextLoader.class)
 public class AliveTimerServiceTest {
 
   private C2monCache<Long, AliveTimer> aliveTimerCacheRef;

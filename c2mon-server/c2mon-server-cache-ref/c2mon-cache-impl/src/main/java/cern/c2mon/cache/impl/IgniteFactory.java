@@ -4,8 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.ignite.cache.CacheMode;
 import org.apache.ignite.configuration.CacheConfiguration;
 
-import cern.c2mon.cache.api.factory.AbstractC2monCacheFactory;
 import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.factory.AbstractC2monCacheFactory;
 
 /**
  * @author Szymon Halastra

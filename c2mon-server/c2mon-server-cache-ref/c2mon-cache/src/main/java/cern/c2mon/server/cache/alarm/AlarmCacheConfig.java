@@ -18,7 +18,7 @@ import cern.c2mon.server.common.alarm.Alarm;
  * @author Szymon Halastra
  */
 @Configuration
-public class AlarmCacheConfig{
+public class AlarmCacheConfig {
 
   @Autowired
   private ThreadPoolTaskExecutor cacheLoaderTaskExecutor;

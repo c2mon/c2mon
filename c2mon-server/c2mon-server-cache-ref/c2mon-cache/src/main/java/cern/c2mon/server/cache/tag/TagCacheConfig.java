@@ -16,6 +16,7 @@ public class TagCacheConfig {
 
   @Bean(name = C2monCacheName.Names.TAG)
   public C2monCache createCache(AbstractC2monCacheFactory cachingFactory) {
+    //TODO: temporary it has null in place of SingleEntryLoader
     return cachingFactory.createCache(C2monCacheName.TAG.getLabel(), Long.class, Tag.class);
   }
 }
