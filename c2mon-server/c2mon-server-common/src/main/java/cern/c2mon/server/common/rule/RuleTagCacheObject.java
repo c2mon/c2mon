@@ -17,15 +17,9 @@
 package cern.c2mon.server.common.rule;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import cern.c2mon.server.common.tag.AbstractTagCacheObject;
 import cern.c2mon.shared.rule.RuleExpression;
@@ -36,14 +30,10 @@ import cern.c2mon.shared.rule.RuleFormatException;
  *
  * @author Mark Brightwell
  */
+@Slf4j
 public class RuleTagCacheObject extends AbstractTagCacheObject implements RuleTag, Cloneable {
 
     private static final long serialVersionUID = -3382383610136394447L;
-
-    /**
-     * Private class logger.
-     */
-    private static final Logger LOGGER = LoggerFactory.getLogger(RuleTagCacheObject.class);
 
     /**
      * The rule as a String. Should never be null for a RuleTag (set as empty String if necessary).
@@ -58,17 +48,17 @@ public class RuleTagCacheObject extends AbstractTagCacheObject implements RuleTa
     /**
      * Reference to all the Equipments providing tags for this rule.
      */
-    private Set<Long> parentEquipments = new HashSet<Long>();
+    private Set<Long> parentEquipments = new HashSet<>();
 
     /**
      * Reference to all the SubEquipments providing tags for this rule.
      */
-    private Set<Long> parentSubEquipments = new HashSet<Long>();
+    private Set<Long> parentSubEquipments = new HashSet<>();
 
     /**
      * Reference to all the Processes providing tags for this rule.
      */
-    private Set<Long> parentProcesses = new HashSet<Long>();
+    private Set<Long> parentProcesses = new HashSet<>();
 
     /**
      * Constructor used to return a cache object when the object cannot be found in the cache.
@@ -139,12 +129,21 @@ public class RuleTagCacheObject extends AbstractTagCacheObject implements RuleTa
         return ruleTagCacheObject;
     }
 
-    @Override
+  /**
+   * Returns the RuleExpression that encodes the logic behind the rule.
+   * May be null if rule parsing failed when loading the rule.
+   *
+   * @return the expression containing the rule logic
+   */
     public final RuleExpression getRuleExpression() {
         return ruleExpression;
     }
 
-    @Override
+  /**
+   * Returns the datatags USED by this rule. If the rule expression
+   * is null returns an empty collection.
+   * @return the ids of Tag used in this rule
+   */
     public final Collection<Long> getRuleInputTagIds() {
         Collection<Long> ruleCollection;
         if (ruleExpression != null) {
@@ -155,7 +154,10 @@ public class RuleTagCacheObject extends AbstractTagCacheObject implements RuleTa
         return ruleCollection;
     }
 
-    @Override
+  /**
+   * Returns an own copy of the tags used by this rule.
+   * @return ids of tags used in this rule
+   */
     public final Collection<Long> getCopyRuleInputTagIds() {
         Collection<Long> ruleCollection;
         if (ruleExpression != null) {
@@ -183,22 +185,31 @@ public class RuleTagCacheObject extends AbstractTagCacheObject implements RuleTa
             try {
                 this.ruleExpression = RuleExpression.createExpression(this.ruleText);
             } catch (RuleFormatException formatEx) {
-                LOGGER.error("Exception caught in setting rule expression: unable to parse rule text: ", formatEx);
+                log.error("Exception caught in setting rule expression: unable to parse rule text: ", formatEx);
             }
         } else {
             throw new NullPointerException("Attempting to set RuleTag ruleText field to null!");
         }
-
     }
 
+  /**
+   * Returns the cache timestamp of the current value held by the rule.
+   *
+   * @return the cache timestamp of the rule value
+   */
     @Override
     public Timestamp getTimestamp() {
         return getCacheTimestamp();
     }
 
-    @Override
-    public void setEquipmentIds(Set<Long> parentEquipments) {
-        this.parentEquipments = parentEquipments;
+  /**
+   * Sets the collection of Equipments whose tags
+   * are used in this rule.
+   *
+   * @param equipmentIds the new collection that will replace the old
+   */
+    public void setEquipmentIds(Set<Long> equipmentIds) {
+        this.parentEquipments = equipmentIds;
     }
 
     @Override
@@ -206,9 +217,14 @@ public class RuleTagCacheObject extends AbstractTagCacheObject implements RuleTa
         return parentEquipments;
     }
 
-    @Override
-    public void setProcessIds(Set<Long> parentProcesses) {
-        this.parentProcesses = parentProcesses;
+  /**
+   * Sets the collection of Processes whose tags
+   * are used in this rule.
+   *
+   * @param processIds the new collection that will replace the old
+   */
+    public void setProcessIds(Set<Long> processIds) {
+        this.parentProcesses = processIds;
     }
 
     @Override
@@ -216,7 +232,13 @@ public class RuleTagCacheObject extends AbstractTagCacheObject implements RuleTa
         return parentProcesses;
     }
 
-    @Override
+  /**
+   * Returns the process with the lowest id from the process id
+   * list (sort each time). Used for creating cache object.
+   * Returns 0 if list is empty.
+   *
+   * @return the id of the process
+   */
     public Long getLowestProcessId() {
         if (!parentProcesses.isEmpty()) {
             List<Long> sortedList = new ArrayList<Long>(parentProcesses);
@@ -226,9 +248,14 @@ public class RuleTagCacheObject extends AbstractTagCacheObject implements RuleTa
             return 0L;
     }
 
-    @Override
-    public void setSubEquipmentIds(Set<Long> parentSubEquipments) {
-        this.parentSubEquipments = parentSubEquipments;
+  /**
+   * Sets the collection of SubEquipments whose tags
+   * are used in this rule.
+   *
+   * @param subEquipmentIds the new collection that will replace the old
+   */
+    public void setSubEquipmentIds(Set<Long> subEquipmentIds) {
+        this.parentSubEquipments = subEquipmentIds;
     }
 
     public Set<Long> getSubEquipmentIds() {
