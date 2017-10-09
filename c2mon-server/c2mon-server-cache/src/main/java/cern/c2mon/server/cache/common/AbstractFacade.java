@@ -31,7 +31,7 @@ public abstract class AbstractFacade<T extends Cacheable> implements Configurabl
    * @param cacheable
    * @return
    */ 
-//  @Override
+//  @Override(RuleTag)
 //  public boolean isFakeCacheObject(Cacheable cacheable) {
 //    synchronized (cacheable) {
 //      return cacheable.getId() == 0;

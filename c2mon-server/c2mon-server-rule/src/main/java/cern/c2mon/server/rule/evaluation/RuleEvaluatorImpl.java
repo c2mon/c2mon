@@ -37,6 +37,7 @@ import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.common.rule.RuleTag;
+import cern.c2mon.server.common.rule.RuleTagCacheObject;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.rule.RuleEvaluator;
 import cern.c2mon.server.rule.config.RuleProperties;
@@ -160,7 +161,7 @@ public class RuleEvaluatorImpl implements C2monCacheListener<Tag>, SmartLifecycl
     ruleTagCache.acquireWriteLockOnKey(ruleId);
 
     try {
-      RuleTag rule = ruleTagCache.get(ruleId);
+      RuleTagCacheObject rule = (RuleTagCacheObject) ruleTagCache.get(ruleId);
 
       if (rule.getRuleExpression() != null) {
         final Collection<Long> ruleInputTagIds = rule.getRuleExpression().getInputTagIds();

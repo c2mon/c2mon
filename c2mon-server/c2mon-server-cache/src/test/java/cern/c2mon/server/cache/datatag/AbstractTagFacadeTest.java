@@ -43,7 +43,7 @@ public class AbstractTagFacadeTest {
 
   @Before
   public void init() {
-    ruleTagFacade = new RuleTagFacadeImpl(null, null, null, null, null);
+    ruleTagFacade = new RuleTagFacadeImpl(null, null, null, null);
   }
 
   /**

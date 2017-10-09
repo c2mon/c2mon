@@ -31,6 +31,7 @@ import cern.c2mon.server.cache.ClusterCache;
 import cern.c2mon.server.cache.RuleTagCache;
 import cern.c2mon.server.cache.RuleTagFacade;
 import cern.c2mon.server.common.rule.RuleTag;
+import cern.c2mon.server.common.rule.RuleTagCacheObject;
 
 /**
  * Manages the multi threaded loading of the rule
@@ -146,7 +147,9 @@ public class RuleTagPostLoaderProcessor {
         RuleTag ruleTag = ruleTagCache.get(ruleKey);
         //if not empty, already processed
         if (ruleTag.getProcessIds().isEmpty()) {
-          ruleTagFacade.setParentSupervisionIds(ruleTag);
+          if (ruleTagCache.get(ruleKey) instanceof RuleTagCacheObject) {
+            ruleTagFacade.setParentSupervisionIds((RuleTagCacheObject) ruleTag);
+          }
           ruleTagCache.putQuiet(ruleTag);
         }
       }

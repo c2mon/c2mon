@@ -21,6 +21,8 @@ public class Evaluator {
    * @return reference to the given (potentially modified) tag
    */
   public static <T extends Tag> T evaluate(T tag) {
+    //log.info("Evaluating Expression TagId #{} with name {}", tag.getId(), tag.getName());
+
     if (tag.getExpressions().isEmpty()) {
       return tag;
     }

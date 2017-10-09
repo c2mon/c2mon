@@ -19,8 +19,6 @@ package cern.c2mon.server.cache.rule;
 import java.sql.Timestamp;
 import java.util.Properties;
 
-import cern.c2mon.server.common.expression.Evaluator;
-
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,35 +64,27 @@ public class RuleTagFacadeImpl extends AbstractTagFacade<RuleTag> implements Rul
   private RuleTagCacheObjectFacade ruleTagCacheObjectFacade;
 
   /**
-   * Reference to the DataTag cache.
-   */
-  private DataTagCache dataTagCache;
-
-  /**
    * Constructor.
    *
    * @param ruleTagCache             the RuleTag cache
    * @param ruleTagCacheObjectFacade the low level Rule Facade
    * @param alarmFacade              the Alarm Facade
    * @param alarmCache               the Alarm cache
-   * @param dataTagCache             the DataTag cache
    */
   @Autowired
   public RuleTagFacadeImpl(final RuleTagCache ruleTagCache,
                            final RuleTagCacheObjectFacade ruleTagCacheObjectFacade,
                            final AlarmFacade alarmFacade,
-                           final AlarmCache alarmCache,
-                           final DataTagCache dataTagCache) {
+                           final AlarmCache alarmCache) {
     super(ruleTagCache, alarmFacade, alarmCache);
-    this.ruleTagCacheObjectFacade = ruleTagCacheObjectFacade;
-    this.dataTagCache = dataTagCache;
+    this.ruleTagCacheObjectFacade = ruleTagCacheObjectFacade;;
   }
 
   @Override
   public void setParentSupervisionIds(final Long ruleTagId) {
     tagCache.acquireWriteLockOnKey(ruleTagId);
     try {
-      RuleTag ruleTag = tagCache.get(ruleTagId);
+      RuleTagCacheObject ruleTag = (RuleTagCacheObject) tagCache.get(ruleTagId);
       setParentSupervisionIds(ruleTag);
       tagCache.putQuiet(ruleTag);
     } finally {
@@ -110,7 +100,7 @@ public class RuleTagFacadeImpl extends AbstractTagFacade<RuleTag> implements Rul
    * @param ruleTag the RuleTag for which the fields should be set
    */
   @Override
-  public void setParentSupervisionIds(final RuleTag ruleTag) {
+  public void setParentSupervisionIds(final RuleTagCacheObject ruleTag) {
     ((RuleTagCache) tagCache).setParentSupervisionIds(ruleTag);
   }
 
@@ -129,25 +119,6 @@ public class RuleTagFacadeImpl extends AbstractTagFacade<RuleTag> implements Rul
     }
   }
 
-  // TODO: remove?
-//  @Override
-//  public void invalidate(Long id, DataTagQuality dataTagQuality, Timestamp timestamp) {
-//    try {
-//      RuleTag ruleTag = (RuleTag) tagCache.get(id);
-//      ruleTag.getWriteLock().lock();
-//      try {
-//        ruleTagCacheObjectFacade.invalidate(ruleTag, dataTagQuality, timestamp);
-//        tagCache.put(ruleTag.getId, ruleTag);
-//        updateCount++;
-//        log((RuleTagCacheObject) ruleTag);
-//      } finally {
-//        ruleTag.getWriteLock().unlock();
-//      }
-//    } catch (CacheElementNotFoundException cacheEx) {
-//      LOGGER.error("Unable to locate rule in cache (id " + id + ") - no invalidation performed.", cacheEx);
-//    }
-//  }
-
   @Override
   public void updateAndValidate(final Long id, final Object value, final String valueDescription, final Timestamp timestamp) {
     tagCache.acquireWriteLockOnKey(id);
@@ -156,7 +127,7 @@ public class RuleTagFacadeImpl extends AbstractTagFacade<RuleTag> implements Rul
       if (!filterout(ruleTag, value, valueDescription, null, null, timestamp)) {
         ruleTagCacheObjectFacade.validate(ruleTag);
         ruleTagCacheObjectFacade.update(ruleTag, value, valueDescription, timestamp);
-        ruleTag = Evaluator.evaluate(ruleTag);
+        //ruleTag = Evaluator.evaluate(ruleTag);
         tagCache.put(id, ruleTag);
         updateCount++;
         log((RuleTagCacheObject) ruleTag);
@@ -188,7 +159,7 @@ public class RuleTagFacadeImpl extends AbstractTagFacade<RuleTag> implements Rul
     String tmpStr = properties.getProperty("ruleText");
     if (tmpStr != null) {
       ((RuleTagCacheObject) ruleTag).setRuleText(tmpStr); //also sets rule expression
-      setParentSupervisionIds(ruleTag);
+      setParentSupervisionIds((RuleTagCacheObject) ruleTag);
     }
 
     return null;
@@ -220,7 +191,7 @@ public class RuleTagFacadeImpl extends AbstractTagFacade<RuleTag> implements Rul
       }
       RuleExpression exp;
       try {
-        exp = ruleTag.getRuleExpression();
+        exp = ((RuleTagCacheObject) ruleTag).getRuleExpression();
       } catch (Exception e) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"ruleText\" is not a gramatically correct rule expression");
       }
@@ -235,6 +206,6 @@ public class RuleTagFacadeImpl extends AbstractTagFacade<RuleTag> implements Rul
   @Override
   protected void invalidateQuietly(final RuleTag tag, final TagQualityStatus statusToAdd, final String statusDescription,
                                    final Timestamp timestamp) {
-    ruleTagCacheObjectFacade.invalidate((RuleTag) tag, statusToAdd, statusDescription, timestamp);
+    ruleTagCacheObjectFacade.invalidate(tag, statusToAdd, statusDescription, timestamp);
   }
 }
