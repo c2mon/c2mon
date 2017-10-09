@@ -1,16 +1,15 @@
 package cern.c2mon.server.cache.dbaccess;
 
-import cern.c2mon.server.common.expression.DslExpression;
+import cern.c2mon.server.common.expression.ExpressionCacheObject;
 
 /**
  * Mapper for accessing and updating the rule expression
  *
  * @author Martin Flamm
  */
-public interface ExpressionMapper extends PersistenceMapper<DslExpression>, LoaderMapper<DslExpression>,
-    BatchLoaderMapper<DslExpression>, ConfigurableMapper<DslExpression> {
+public interface ExpressionMapper extends PersistenceMapper<ExpressionCacheObject>, LoaderMapper<ExpressionCacheObject>, ConfigurableMapper<ExpressionCacheObject> {
 
-  void insertExpression(DslExpression expression);
+  void insertExpression(ExpressionCacheObject expression);
 
   void deleteExpression(long expressionId);
 }

@@ -4,15 +4,15 @@
 
 <mapper namespace="cern.c2mon.server.cache.dbaccess.ExpressionMapper">
 
-  <!-- result map below corresponds to the abstract DslExpression -->
-  <resultMap id="expressionResultMap" type="cern.c2mon.server.common.expression.DslExpression">
+  <!-- result map below corresponds to the abstract ExpressionCacheObject -->
+  <resultMap id="expressionResultMap" type="cern.c2mon.server.common.expression.ExpressionCacheObject">
     <id property="id" column="EX_ID" jdbcType="NUMERIC" javaType="java.lang.Long"/>
     <result property="description" column="EX_DESCRIPTION" jdbcType="VARCHAR"/>
     <result property="dataType" column="EX_DATATYPE"/>
     <result property="metadata" column="EX_METADATA" javaType="cern.c2mon.server.common.metadata.Metadata"
             jdbcType="VARCHAR"/>
     <result property="expression" column="EX_EXPRESSION" jdbcType="VARCHAR"/>
-    <result property="result" column="EX_RESULT" javaType="java.lang.Object" jdbcType="VARCHAR"/>
+    <result property="value" column="EX_VALUE" javaType="java.lang.Object" jdbcType="VARCHAR"/>
     <result property="version" column="EX_VERSION" jdbcType="NUMERIC" javaType="java.lang.Long"/>
     <collection property="alarmIds" ofType="cern.c2mon.server.common.alarm.Alarm" javaType="java.util.ArrayList"
                 column="EX_ID" select="selectAlarms"/>
@@ -40,9 +40,9 @@
   </resultMap>
 
   <!-- must specify jdbcType for parameters that can be null in DB  -->
-  <insert id="insertExpression" parameterType="cern.c2mon.server.common.expression.DslExpression">
-    INSERT INTO DSLEXPRESSION (EX_ID, EX_DESCRIPTION, EX_DATATYPE, EX_RESULT, EX_EXPRESSION, EX_METADATA, EX_VERSION)
-    VALUES (#{id}, #{description}, #{dataType}, #{result},#{expression}, #{metadata, jdbcType=VARCHAR}, #{version})
+  <insert id="insertExpression" parameterType="cern.c2mon.server.common.expression.ExpressionCacheObject">
+    INSERT INTO DSLEXPRESSION (EX_ID, EX_DESCRIPTION, EX_DATATYPE, EX_VALUE, EX_EXPRESSION, EX_METADATA, EX_VERSION)
+    VALUES (#{id}, #{description}, #{dataType}, #{value},#{expression}, #{metadata, jdbcType=VARCHAR}, #{version})
   </insert>
 
   <delete id="deleteExpression" parameterType="Long">
@@ -57,4 +57,7 @@
     Select * from DSLEXPRESSION
   </select>
 
+  <select id="getItem" resultMap="expressionResultMap" parameterType="Long">
+    SELECT * FROM DSLEXPRESSION where EX_ID = #{id}
+  </select>
 </mapper>
