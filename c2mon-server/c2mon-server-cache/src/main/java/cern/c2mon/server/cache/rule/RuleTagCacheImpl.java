@@ -108,7 +108,7 @@ public class RuleTagCacheImpl extends AbstractTagCache<RuleTag> implements RuleT
     HashSet<Long> subEquipmentIds = new HashSet<Long>();
     int cnt = 0;
 
-    log.trace(ruleTag.getId() + " Has " + ruleTag.getRuleInputTagIds().size() + " input rule tags");
+    log.trace("{} Has {} input rule tags", ruleTag.getId(), ruleTag.getRuleInputTagIds().size());
     for (Long tagKey : ruleTag.getRuleInputTagIds()) {
 
       cnt++;
@@ -141,8 +141,7 @@ public class RuleTagCacheImpl extends AbstractTagCache<RuleTag> implements RuleT
       }
 
     }
-    log.debug("setParentSupervisionIds() - Setting parent ids for rule " + ruleTag.getId() + "; process ids: " + processIds + "; equipment ids: " + equipmentIds
-        + "; subequipmnet ids: " + subEquipmentIds);
+    log.debug("setParentSupervisionIds() - Setting parent ids for rule {}; process ids: {}; equipment ids: {}; subEquipment ids: {}", ruleTag.getId(), processIds, equipmentIds, subEquipmentIds);
     ruleTag.setProcessIds(processIds);
     ruleTag.setEquipmentIds(equipmentIds);
     ruleTag.setSubEquipmentIds(subEquipmentIds);

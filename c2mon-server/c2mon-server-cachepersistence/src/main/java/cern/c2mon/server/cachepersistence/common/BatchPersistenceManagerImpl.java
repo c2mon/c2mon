@@ -20,6 +20,7 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.exceptions.PersistenceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,13 +49,9 @@ import cern.c2mon.shared.common.Cacheable;
  *
  * @param <T> the type held by the given cache
  */
+@Slf4j
 @ManagedResource
 public class BatchPersistenceManagerImpl<T extends Cacheable> implements BatchPersistenceManager, SmartLifecycle {
-
-  /**
-   * Private class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(BatchPersistenceManagerImpl.class);
 
   /**
    * Size of the batches between database commits. Also corresponds
@@ -128,7 +125,7 @@ public class BatchPersistenceManagerImpl<T extends Cacheable> implements BatchPe
   public void persistList(final Collection<Long> keyCollection) {
     clusterCache.acquireWriteLockOnKey(cachePersistenceLock);
     try {
-      LOGGER.debug("Submitting new persistence task (currently " + cachePersistenceThreadPoolTaskExecutor.getThreadPoolExecutor().getQueue().size() + " tasks in queue)");
+      log.debug("Submitting new persistence task (currently " + cachePersistenceThreadPoolTaskExecutor.getThreadPoolExecutor().getQueue().size() + " tasks in queue)");
 
       //local set, no synch needed; removes duplicates from collection (though unnecessary with current SynchroBuffer)
       Set<Long> localToBePersisted = new HashSet<>(keyCollection);
@@ -143,7 +140,7 @@ public class BatchPersistenceManagerImpl<T extends Cacheable> implements BatchPe
 
       int size = localToBePersisted.size();
 
-      LOGGER.debug("Persisting " + size + " cache object(s) to the database (" + cache.getClass() + ")");
+      log.debug("Persisting " + size + " cache object(s) to the database (" + cache.getClass() + ")");
 
       LinkedList<Future< ? >> taskResults = new LinkedList<>();
       Map<Future< ? >, Collection<Long>> submittedSets = new HashMap<>();
@@ -175,15 +172,15 @@ public class BatchPersistenceManagerImpl<T extends Cacheable> implements BatchPe
         count++;
         try {
           result.get(timeoutPerBatch, TimeUnit.MILLISECONDS);
-          LOGGER.debug("Persistence batch number " + count + " completed.");
+          log.debug("Persistence batch number " + count + " completed.");
         } catch (InterruptedException e) {
-          LOGGER.error("Interrupted exception caught when waiting for persistence task " + count + " to complete", e);
+          log.error("Interrupted exception caught when waiting for persistence task " + count + " to complete", e);
           exceptionCaught = true;
         } catch (ExecutionException e) {
-          LOGGER.error("ExecutionException thrown when executing cache persistence task " + count + "; original cause is ", e.getCause());
+          log.error("ExecutionException thrown when executing cache persistence task " + count + "; original cause is ", e.getCause());
           exceptionCaught = true;
         } catch (TimeoutException e) {
-          LOGGER.warn("Timeout while waiting for persistence task " + count + " to "
+          log.warn("Timeout while waiting for persistence task " + count + " to "
               + "complete (timeout per batch of " + RECORDS_PER_BATCH + " is set at " + timeoutPerBatch + " milliseconds; cancelling batch)"
               + "Cache elements will be persisted during next persistence task.", e);
           result.cancel(true);
@@ -201,9 +198,9 @@ public class BatchPersistenceManagerImpl<T extends Cacheable> implements BatchPe
         }
       }
       if (exceptionCount == 0) {
-        LOGGER.debug("Completed persistence of all " + count + " batches");
+        log.debug("Completed persistence of all " + count + " batches");
       } else {
-        LOGGER.debug(exceptionCount + " out of " + count + " persistence batches failed and will be resubmitted.");
+        log.debug(exceptionCount + " out of " + count + " persistence batches failed and will be resubmitted.");
       }
     } finally {
       clusterCache.releaseWriteLockOnKey(cachePersistenceLock);
@@ -301,22 +298,22 @@ public class BatchPersistenceManagerImpl<T extends Cacheable> implements BatchPe
    */
   @Override
   public synchronized void stop() {
-    LOGGER.info("Shutting down cache persistence manager (" + cache.getClass().getSimpleName() + ")");
+    log.info("Shutting down cache persistence manager ({})", cache.getClass().getSimpleName());
     started = false;
     cachePersistenceThreadPoolTaskExecutor.shutdown();
     //may be none-empty if added using addElementToPersist
     while (!toBePersisted.isEmpty()) {
-      LOGGER.debug("Detected cache objects that need persisting... trying to persist them.");
+      log.debug("Detected cache objects that need persisting... trying to persist them.");
       toBePersistedLock.writeLock().lock();
       try {
         cachePersistenceDAO.persistBatch(new ArrayList<>(toBePersisted));
         toBePersisted.clear();
       } catch (PersistenceException e) {
-        LOGGER.error("Exception caught while persisting final batch of cache objects - will try again in 1s", e);
+        log.error("Exception caught while persisting final batch of cache objects - will try again in 1s", e);
         try {
           Thread.sleep(1000);
         } catch (InterruptedException e1) {
-          LOGGER.error("Interrupted during sleep", e1);
+          log.error("Interrupted during sleep", e1);
         }
       } finally {
         toBePersistedLock.writeLock().unlock();

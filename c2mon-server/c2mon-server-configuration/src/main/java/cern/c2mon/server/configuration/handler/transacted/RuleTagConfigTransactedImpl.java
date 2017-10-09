@@ -20,11 +20,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Properties;
 
-import cern.c2mon.server.common.expression.Evaluator;
-import cern.c2mon.server.common.expression.LocalExpressionCache;
-import cern.c2mon.server.common.listener.ConfigurationEventListener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.stereotype.Service;
@@ -33,32 +29,31 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import cern.c2mon.server.configuration.handler.AlarmConfigHandler;
-import cern.c2mon.server.configuration.handler.RuleTagConfigHandler;
-import cern.c2mon.server.configuration.handler.impl.TagConfigGateway;
 import cern.c2mon.server.cache.RuleTagCache;
 import cern.c2mon.server.cache.RuleTagFacade;
 import cern.c2mon.server.cache.TagLocationService;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.cache.loading.RuleTagLoaderDAO;
+import cern.c2mon.server.common.expression.Evaluator;
+import cern.c2mon.server.common.expression.LocalExpressionCache;
+import cern.c2mon.server.common.listener.ConfigurationEventListener;
 import cern.c2mon.server.common.rule.RuleTag;
-import cern.c2mon.shared.client.configuration.ConfigurationElement;
-import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
+import cern.c2mon.server.configuration.handler.AlarmConfigHandler;
+import cern.c2mon.server.configuration.handler.RuleTagConfigHandler;
+import cern.c2mon.server.configuration.handler.impl.TagConfigGateway;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
+import cern.c2mon.shared.client.configuration.ConfigurationElement;
+import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 
 /**
  * Implementation of transacted configuration methods.
  * @author Mark Brightwell
  *
  */
+@Slf4j
 @Service
 public class RuleTagConfigTransactedImpl extends TagConfigTransactedImpl<RuleTag> implements RuleTagConfigTransacted {
-
-  /**
-   * Class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(RuleTagConfigTransactedImpl.class);
 
   /**
    * Circular dependency between RuleTagConfigHandler
@@ -105,14 +100,14 @@ public class RuleTagConfigTransactedImpl extends TagConfigTransactedImpl<RuleTag
 
     tagCache.acquireWriteLockOnKey(element.getEntityId());
     try {
-      LOGGER.trace("Creating RuleTag with id " + element.getEntityId());
+      log.trace("Creating RuleTag with id {}", element.getEntityId());
       RuleTag ruleTag = commonTagFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
       Collection<Long> tagIds = ruleTag.getRuleInputTagIds();
       try {
         ruleTag = Evaluator.evaluate(ruleTag);
         configurableDAO.insert(ruleTag);
       } catch (Exception e) {
-        LOGGER.error("Exception caught while inserting a new Rule into the DB - rolling back changes", e);
+        log.error("Exception caught while inserting a new Rule into the DB - rolling back changes", e);
         throw new UnexpectedRollbackException("Unexpected exception while creating a Rule: rolling back the change", e);
       }
       try {
@@ -127,13 +122,13 @@ public class RuleTagConfigTransactedImpl extends TagConfigTransactedImpl<RuleTag
         tagCache.putQuiet(ruleTag);
       } catch (RuntimeException e) {
         String errMessage = "Exception caught while adding a RuleTag - rolling back DB transaction.";
-        LOGGER.error(errMessage, e);
+        log.error(errMessage, e);
         tagCache.remove(ruleTag.getId());
         for (Long tagId : tagIds) {
           try {
             tagConfigGateway.removeRuleFromTag(tagId, ruleTag.getId());
           } catch (RuntimeException ex) {
-            LOGGER.warn("Exception caught while attempting to role back rule creation in cache (removing references from input tags)", ex);
+            log.warn("Exception caught while attempting to role back rule creation in cache (removing references from input tags)", ex);
           }
         }
         throw new UnexpectedRollbackException(errMessage, e);
@@ -156,7 +151,7 @@ public class RuleTagConfigTransactedImpl extends TagConfigTransactedImpl<RuleTag
   @Override
   @Transactional(value = "cacheTransactionManager", propagation = Propagation.REQUIRES_NEW)
   public void doUpdateRuleTag(Long id, Properties properties) throws IllegalAccessException {
-    LOGGER.trace("Updating RuleTag " + id);
+    log.trace("Updating RuleTag {}", id);
 
     tagCache.acquireWriteLockOnKey(id);
     try {
@@ -180,7 +175,7 @@ public class RuleTagConfigTransactedImpl extends TagConfigTransactedImpl<RuleTag
         tagCache.putQuiet(ruleTagCopy);
       } catch (RuntimeException e) {
         String msg = "Exception caught while updating Rule";
-        LOGGER.error(msg, e);
+        log.error(msg, e);
         throw new UnexpectedRollbackException(msg, e);
       }
 
@@ -196,21 +191,21 @@ public class RuleTagConfigTransactedImpl extends TagConfigTransactedImpl<RuleTag
         }
       } catch (RuntimeException e) {
         String errMessage = "Exception caught while updating a RuleTag in cache - rolling back DB transaction and removing from cache.";
-        LOGGER.error(errMessage, e);
+        log.error(errMessage, e);
         //try to re-assign all references as they were
         if (oldTagIds != null) {
           for (Long oldTagId : oldTagIds) {
             try {
               tagConfigGateway.addRuleToTag(oldTagId, ruleTagCopy.getId());
             } catch (Exception ex) {
-              LOGGER.warn("Exception caught while rolling back rule update", ex);
+              log.warn("Exception caught while rolling back rule update", ex);
             }
           }
           for (Long newTagId : ruleTagCopy.getRuleInputTagIds()) {
             try {
               tagConfigGateway.removeRuleFromTag(newTagId, ruleTagCopy.getId());
             } catch (Exception ex) {
-              LOGGER.warn("Exception caught while rolling back rule update", ex);
+              log.warn("Exception caught while rolling back rule update", ex);
             }
           }
         }
@@ -219,13 +214,13 @@ public class RuleTagConfigTransactedImpl extends TagConfigTransactedImpl<RuleTag
       tagCache.releaseWriteLockOnKey(id);
       //reset all parent DAQ/Equipment ids of rules higher up the pile - if fails, no rolling back possible, so rule cache may be left inconsistent
       try {
-        LOGGER.trace("Resetting all relevant Rule parent Process/Equipment ids");
+        log.trace("Resetting all relevant Rule parent Process/Equipment ids");
         for (Long parentRuleId : ruleTagCopy.getRuleIds()) {
           ruleTagFacade.setParentSupervisionIds(parentRuleId);
         }
       } catch (Exception e) {
         String msg = "Exception while reloading rule parent ids: cache may be left in inconsistent state! - need to remove this rule to try and recover consistency";
-        LOGGER.error(msg, e);
+        log.error(msg, e);
         throw new UnexpectedRollbackException(msg, e);
       }
     } finally {
@@ -238,12 +233,12 @@ public class RuleTagConfigTransactedImpl extends TagConfigTransactedImpl<RuleTag
   @Override
   @Transactional(value = "cacheTransactionManager", propagation=Propagation.REQUIRES_NEW, isolation = Isolation.READ_COMMITTED)
   public void doRemoveRuleTag(final Long id, final ConfigurationElementReport elementReport) {
-    LOGGER.trace("Removing RuleTag " + id);
+    log.trace("Removing RuleTag {}", id);
     try {
       RuleTag ruleTag = tagCache.get(id);
       Collection<Long> ruleIds = ruleTag.getCopyRuleIds();
       if (!ruleIds.isEmpty()) {
-        LOGGER.debug("Removing rules dependent on RuleTag " + id);
+        log.debug("Removing rules dependent on RuleTag {}", id);
         for (Long ruleId : ruleIds) { //concurrent modifcation as a rule is removed from the list during the remove call!
           if (tagLocationService.isInTagCache(ruleId)) { //may already have been removed if a previous rule in the list was used in this rule!
             ConfigurationElementReport newReport = new ConfigurationElementReport(Action.REMOVE, Entity.RULETAG, ruleId);
@@ -258,7 +253,7 @@ public class RuleTagConfigTransactedImpl extends TagConfigTransactedImpl<RuleTag
         ruleInputTagIds = ruleTag.getCopyRuleInputTagIds();
         Collection<Long> alarmIds = ruleTag.getCopyAlarmIds();
         if (!alarmIds.isEmpty()) {
-          LOGGER.debug("Removing Alarms dependent on RuleTag " + id);
+          log.debug("Removing Alarms dependent on RuleTag " + id);
           for (Long alarmId : alarmIds) { //need copy as modified concurrently by remove alarm
             ConfigurationElementReport alarmReport = new ConfigurationElementReport(Action.REMOVE, Entity.ALARM, alarmId);
             elementReport.addSubReport(alarmReport);
@@ -278,7 +273,7 @@ public class RuleTagConfigTransactedImpl extends TagConfigTransactedImpl<RuleTag
       }
       catch (RuntimeException rEx) {
         String errMessage = "Exception caught when removing rule tag with id " + id;
-        LOGGER.error(errMessage, rEx);
+        log.error(errMessage, rEx);
         throw new UnexpectedRollbackException(errMessage, rEx);
       } finally {
         if (tagCache.isWriteLockedByCurrentThread(id)) {
@@ -286,7 +281,7 @@ public class RuleTagConfigTransactedImpl extends TagConfigTransactedImpl<RuleTag
         }
       }
     } catch (CacheElementNotFoundException e) {
-      LOGGER.debug("Attempting to remove a non-existent RuleTag - no action taken.");
+      log.debug("Attempting to remove a non-existent RuleTag - no action taken.");
       elementReport.setWarning("Attempting to removed a non-existent RuleTag");
     }
   }

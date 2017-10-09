@@ -21,6 +21,7 @@ import java.util.HashMap;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 
 import cern.c2mon.pmanager.IFallback;
 import cern.c2mon.server.common.tag.Tag;
@@ -33,6 +34,7 @@ import cern.c2mon.server.common.tag.Tag;
  * @author Alban Marguet
  * @author Justin Lewis Salmon
  */
+@Slf4j
 public class TagDocument extends HashMap<String, Object> implements IFallback {
 
   private static final ObjectMapper mapper = new ObjectMapper();
