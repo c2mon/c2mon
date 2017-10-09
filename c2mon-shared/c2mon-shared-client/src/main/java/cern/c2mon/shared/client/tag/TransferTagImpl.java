@@ -148,14 +148,11 @@ public final class TransferTagImpl extends TransferTagValueImpl implements TagUp
   /**
    * Adds the equipment id as dependency to this tag
    * @param equipmentId The equipment id
-   * @return <code>true</code>, if the equipment id was added, else <code>false</code>
    */
-  public boolean addEquipmentId(final Long equipmentId) {
+  public void addEquipmentId(final Long equipmentId) {
     if (equipmentId != null && equipmentId > 0) {
-      return equipmentIds.add(equipmentId);
+       equipmentIds.add(equipmentId);
     }
-
-    return false;
   }
 
   /**
