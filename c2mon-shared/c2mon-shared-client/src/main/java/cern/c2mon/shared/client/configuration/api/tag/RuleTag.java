@@ -84,7 +84,7 @@ public class RuleTag extends Tag {
   public static CreateBuilder create(String name, Class<?> dataType, String ruleText) {
 
     Assert.hasText(name, "Rule tag name is required!");
-    Assert.notNull(name, "Data type is required!");
+    Assert.notNull(dataType, "Data type is required!");
     Assert.hasText(ruleText, "Rule expression is required!");
 
     return new CreateBuilder(name, dataType, ruleText);
