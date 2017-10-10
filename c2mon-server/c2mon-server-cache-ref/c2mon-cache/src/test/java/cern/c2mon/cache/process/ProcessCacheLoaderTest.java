@@ -36,14 +36,14 @@ public class ProcessCacheLoaderTest extends AbstractCacheLoaderTest {
   public void preloadCache() {
     assertNotNull("Process Cache should not be null", processCacheRef);
 
-    List<DataTag> processList = processMapper.getAll();
+    List<Process> processList = processMapper.getAll();
 
     assertTrue("List of process tags should not be empty", processList.size() > 0);
 
     assertEquals("Size of cache and DB mapping should be equal", processList.size(), processCacheRef.getKeys().size());
     //compare all the objects from the cache and buffer
-    for (DataTag aProcessList : processList) {
-      Process currentProcess = (Process) aProcessList;
+    for (Process process : processList) {
+      Process currentProcess = (Process) process;
       //equality of DataTagCacheObjects => currently only compares names
       assertEquals("Cached Process should have the same name as in DB",
               currentProcess.getName(), ((processCacheRef.get(currentProcess.getId())).getName()));
