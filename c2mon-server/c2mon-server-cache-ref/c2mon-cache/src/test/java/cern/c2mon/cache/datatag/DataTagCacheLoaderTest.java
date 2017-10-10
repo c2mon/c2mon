@@ -1,6 +1,5 @@
 package cern.c2mon.cache.datatag;
 
-import java.util.Iterator;
 import java.util.List;
 
 import org.junit.Before;
@@ -40,9 +39,7 @@ public class DataTagCacheLoaderTest extends AbstractCacheLoaderTest {
 
     assertEquals("Size of cache and DB mapping should be equal", dataTagList.size(), dataTagCacheRef.getKeys().size());
     //compare all the objects from the cache and buffer
-    Iterator<DataTag> it = dataTagList.iterator();
-    while (it.hasNext()) {
-      DataTag currentTag = it.next();
+    for (DataTag currentTag : dataTagList) {
       //equality of DataTagCacheObjects => currently only compares names
       assertEquals("Cached DataTag should have the same name as in DB",
               currentTag.getName(), (dataTagCacheRef.get(currentTag.getId())).getName());

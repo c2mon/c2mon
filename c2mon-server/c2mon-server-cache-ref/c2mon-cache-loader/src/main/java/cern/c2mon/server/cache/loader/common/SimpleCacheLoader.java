@@ -102,7 +102,7 @@ public class SimpleCacheLoader<T extends Cacheable> implements CacheLoader {
   }
 
   private void loadCache(Collection<Long> keySet) {
-    ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(4, 16, 5, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(1000));
+    ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(4, 16, 5, TimeUnit.SECONDS, new ArrayBlockingQueue<>(1000));
     Iterator<Long> it = keySet.iterator();
 
     CacheLoaderTask loaderTask = null;

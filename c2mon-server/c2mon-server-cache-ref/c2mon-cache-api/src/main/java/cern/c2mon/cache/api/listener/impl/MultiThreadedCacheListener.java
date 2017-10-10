@@ -98,8 +98,8 @@ public class MultiThreadedCacheListener<T extends Cacheable> implements CacheLis
   public MultiThreadedCacheListener(final CacheListener<T> cacheListener, final int queueCapacity, final int threadPoolSize) {
     super();
     this.cacheListener = cacheListener;
-    taskQueue = new LinkedBlockingQueue<ObjectAndMethod>(queueCapacity);
-    executor = new ThreadPoolExecutor(threadPoolSize, threadPoolSize, Long.MAX_VALUE, TimeUnit.NANOSECONDS, new SynchronousQueue<Runnable>());
+    taskQueue = new LinkedBlockingQueue<>(queueCapacity);
+    executor = new ThreadPoolExecutor(threadPoolSize, threadPoolSize, Long.MAX_VALUE, TimeUnit.NANOSECONDS, new SynchronousQueue<>());
     for (int i = 0; i < threadPoolSize; i++) {
       executor.submit(new NotifyTask());
     }

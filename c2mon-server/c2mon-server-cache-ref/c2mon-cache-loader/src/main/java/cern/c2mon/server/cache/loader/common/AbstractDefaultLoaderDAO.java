@@ -68,7 +68,7 @@ public abstract class AbstractDefaultLoaderDAO<T extends Cacheable> extends Abst
   @Override
   public Map<Long, T> getAllAsMap() {
     List<T> cacheableList = loaderMapper.getAll();
-    ConcurrentHashMap<Long, T> returnMap = new ConcurrentHashMap<Long, T>(initialBufferSize);
+    ConcurrentHashMap<Long, T> returnMap = new ConcurrentHashMap<>(initialBufferSize);
     Iterator<T> it = cacheableList.iterator();
     T current;
     while (it.hasNext()) {

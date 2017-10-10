@@ -1,6 +1,5 @@
 package cern.c2mon.cache.equipment;
 
-import java.util.Iterator;
 import java.util.List;
 
 import org.junit.Before;
@@ -41,9 +40,8 @@ public class EquipmentCacheLoaderTest extends AbstractCacheLoaderTest {
 
     assertEquals("Size of cache and DB mapping should be equal", equipmentList.size(), equipmentCacheRef.getKeys().size());
     //compare all the objects from the cache and buffer
-    Iterator<Equipment> it = equipmentList.iterator();
-    while (it.hasNext()) {
-      EquipmentCacheObject currentEquipment = (EquipmentCacheObject) it.next();
+    for (Equipment anEquipmentList : equipmentList) {
+      EquipmentCacheObject currentEquipment = (EquipmentCacheObject) anEquipmentList;
       //only compares one field so far
       assertEquals("Cached Equipment should have the same name as in DB",
               currentEquipment.getName(), ((equipmentCacheRef.get(currentEquipment.getId())).getName()));

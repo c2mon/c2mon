@@ -1,6 +1,5 @@
 package cern.c2mon.cache.alarm;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -44,9 +43,7 @@ public class AlarmCacheLoaderTest extends AbstractCacheLoaderTest {
 
     assertEquals("Size of cache and DB mapping should be equal", alarmList.size(), alarmCacheRef.getKeys().size());
     //compare all the objects from the cache and buffer
-    Iterator<Alarm> it = alarmList.iterator();
-    while (it.hasNext()) {
-      Alarm alarm = it.next();
+    for (Alarm alarm : alarmList) {
       //compare ids of associated datatags
       assertEquals("Cached Alarm should have the same name as Alarm in DB", alarm.getTagId(), alarmCacheRef.get(alarm.getId()).getTagId());
     }

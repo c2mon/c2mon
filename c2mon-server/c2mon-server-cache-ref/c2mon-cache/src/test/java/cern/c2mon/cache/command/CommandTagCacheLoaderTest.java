@@ -1,6 +1,5 @@
 package cern.c2mon.cache.command;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -46,9 +45,7 @@ public class CommandTagCacheLoaderTest extends AbstractCacheLoaderTest {
     assertEquals("Size of cache and DB mapping should be equal", commandList.size(), commandTagCacheRef.getKeys().size());
 
     //compare all the objects from the cache and buffer
-    Iterator<CommandTag> it = commandList.iterator();
-    while (it.hasNext()) {
-      CommandTag currentCommandTag = it.next();
+    for (CommandTag currentCommandTag : commandList) {
       CacheObjectComparison.equals((CommandTagCacheObject) currentCommandTag,
               (CommandTagCacheObject) commandTagCacheRef.get(currentCommandTag.getId()));
     }

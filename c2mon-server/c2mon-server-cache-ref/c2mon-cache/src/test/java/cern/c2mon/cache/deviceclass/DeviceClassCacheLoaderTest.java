@@ -1,6 +1,5 @@
 package cern.c2mon.cache.deviceclass;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -43,9 +42,7 @@ public class DeviceClassCacheLoaderTest extends AbstractCacheLoaderTest {
 
     assertEquals("Size of cache and DB mapping should be equal", deviceClassList.size(), deviceClassCacheRef.getKeys().size());
     // Compare all the objects from the cache and buffer
-    Iterator<DeviceClass> it = deviceClassList.iterator();
-    while (it.hasNext()) {
-      DeviceClass currentDeviceClass = it.next();
+    for (DeviceClass currentDeviceClass : deviceClassList) {
       // Equality of DataTagCacheObjects => currently only compares names
       assertEquals("Cached DataTag should have the same name as in DB",
               currentDeviceClass.getName(), (deviceClassCacheRef.get(currentDeviceClass.getId()).getName()));

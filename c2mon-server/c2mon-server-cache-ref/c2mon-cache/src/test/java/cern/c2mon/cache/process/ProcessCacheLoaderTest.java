@@ -1,6 +1,5 @@
 package cern.c2mon.cache.process;
 
-import java.util.Iterator;
 import java.util.List;
 
 import org.junit.Before;
@@ -43,9 +42,8 @@ public class ProcessCacheLoaderTest extends AbstractCacheLoaderTest {
 
     assertEquals("Size of cache and DB mapping should be equal", processList.size(), processCacheRef.getKeys().size());
     //compare all the objects from the cache and buffer
-    Iterator<DataTag> it = processList.iterator();
-    while (it.hasNext()) {
-      Process currentProcess = (Process) it.next();
+    for (DataTag aProcessList : processList) {
+      Process currentProcess = (Process) aProcessList;
       //equality of DataTagCacheObjects => currently only compares names
       assertEquals("Cached Process should have the same name as in DB",
               currentProcess.getName(), ((processCacheRef.get(currentProcess.getId())).getName()));

@@ -1,6 +1,5 @@
 package cern.c2mon.cache.alivetimer;
 
-import java.util.Iterator;
 import java.util.List;
 
 import org.junit.Before;
@@ -41,9 +40,8 @@ public class AliveTimerCacheLoaderTest extends AbstractCacheLoaderTest {
     //test the cache is the same size as in DB
     assertEquals("Size of cache and DB mapping should be equal", aliveList.size(), aliveTimerCacheRef.getKeys().size());
     //compare all the objects from the cache and buffer
-    Iterator<AliveTimer> it = aliveList.iterator();
-    while (it.hasNext()) {
-      AliveTimerCacheObject currentTimer = (AliveTimerCacheObject) it.next();
+    for (AliveTimer anAliveList : aliveList) {
+      AliveTimerCacheObject currentTimer = (AliveTimerCacheObject) anAliveList;
       //only compares one field so far
       assertEquals("Cached AliveTimer should have the same name as AliveTimer in DB", currentTimer.getRelatedName(), ((aliveTimerCacheRef.get(currentTimer.getId())).getRelatedName()));
     }

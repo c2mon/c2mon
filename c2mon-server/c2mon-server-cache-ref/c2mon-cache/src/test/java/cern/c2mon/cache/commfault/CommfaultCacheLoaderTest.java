@@ -1,6 +1,5 @@
 package cern.c2mon.cache.commfault;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -44,9 +43,8 @@ public class CommfaultCacheLoaderTest extends AbstractCacheLoaderTest {
 
     assertEquals("Size of cache and DB mapping should be equal", commFaultList.size(), commFaultTagCacheRef.getKeys().size());
     //compare all the objects from the cache and buffer
-    Iterator<CommFaultTag> it = commFaultList.iterator();
-    while (it.hasNext()) {
-      CommFaultTagCacheObject currentTag = (CommFaultTagCacheObject) it.next();
+    for (CommFaultTag aCommFaultList : commFaultList) {
+      CommFaultTagCacheObject currentTag = (CommFaultTagCacheObject) aCommFaultList;
       //equality of DataTagCacheObjects => currently only compares names
       assertEquals("Cached CommfaultTag should have the same name as in DB",
               currentTag.getEquipmentId(), ((commFaultTagCacheRef.get(currentTag.getId())).getEquipmentId()));

@@ -23,8 +23,8 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 
-import cern.c2mon.server.cache.loader.impl.CommandTagDAOImpl;
 import cern.c2mon.server.cache.dbaccess.CommandTagMapper;
+import cern.c2mon.server.cache.loader.impl.CommandTagDAOImpl;
 import cern.c2mon.server.common.command.CommandTagCacheObject;
 import cern.c2mon.shared.common.command.CommandTag;
 
@@ -58,15 +58,15 @@ public class LoaderDAOTest {
 
   @Test
   public void testGetAllDataTagsAsMap() {
-    List<CommandTag> returnList = new ArrayList<CommandTag>();
+    List<CommandTag> returnList = new ArrayList<>();
     returnList.add(new CommandTagCacheObject(23L));
     returnList.add(new CommandTagCacheObject(24L));
     expect(mockMapper.getAll()).andReturn(returnList);
     replay(mockMapper);
     Map<Long, CommandTag> returnMap = commandTagDAO.getAllAsMap();
     assertEquals(returnList.size(), returnMap.size()); //2 objects put in setUp
-    assertTrue(returnMap.keySet().contains(new Long(23)));
-    assertTrue(returnMap.keySet().contains(new Long(24)));
+    assertTrue(returnMap.keySet().contains(23L));
+    assertTrue(returnMap.keySet().contains(24L));
     verify(mockMapper);
   }
 

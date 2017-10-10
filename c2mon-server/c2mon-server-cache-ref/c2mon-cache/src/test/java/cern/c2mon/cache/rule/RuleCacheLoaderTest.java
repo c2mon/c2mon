@@ -1,6 +1,5 @@
 package cern.c2mon.cache.rule;
 
-import java.util.Iterator;
 import java.util.List;
 
 import org.junit.Before;
@@ -41,9 +40,8 @@ public class RuleCacheLoaderTest extends AbstractCacheLoaderTest {
 
     assertEquals("Size of cache and DB mapping should be equal", ruleList.size(), ruleTagCacheRef.getKeys().size());
     //compare all the objects from the cache and buffer
-    Iterator<RuleTag> it = ruleList.iterator();
-    while (it.hasNext()) {
-      RuleTagCacheObject currentRule = (RuleTagCacheObject) it.next();
+    for (RuleTag aRuleList : ruleList) {
+      RuleTagCacheObject currentRule = (RuleTagCacheObject) aRuleList;
       //only compares one field so far (name, which does not change when server is running!)
       assertEquals("Cached RuleTag should have the same name as in DB",
               currentRule.getName(), ((ruleTagCacheRef.get(currentRule.getId())).getName()));

@@ -93,7 +93,7 @@ public class ListenerService<K, V extends Cacheable> implements Listener<V> {
 
   @Override
   public Lifecycle registerKeyBufferedListener(final BufferedCacheListener<Long> bufferedCacheListener, int frequency) {
-    BufferedKeyCacheListener<V> bufferedKeyCacheListener = new BufferedKeyCacheListener<V>(bufferedCacheListener, frequency);
+    BufferedKeyCacheListener<V> bufferedKeyCacheListener = new BufferedKeyCacheListener<>(bufferedCacheListener, frequency);
     cacheListeners.add(bufferedKeyCacheListener);
     return bufferedKeyCacheListener;
   }

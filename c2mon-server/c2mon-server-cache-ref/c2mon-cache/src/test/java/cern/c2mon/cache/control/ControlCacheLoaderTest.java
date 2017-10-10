@@ -1,6 +1,5 @@
 package cern.c2mon.cache.control;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -13,7 +12,6 @@ import cern.c2mon.cache.AbstractCacheLoaderTest;
 import cern.c2mon.cache.api.Cache;
 import cern.c2mon.server.cache.dbaccess.ControlTagMapper;
 import cern.c2mon.server.common.control.ControlTag;
-import cern.c2mon.server.common.datatag.DataTag;
 
 import static org.junit.Assert.*;
 
@@ -44,9 +42,7 @@ public class ControlCacheLoaderTest extends AbstractCacheLoaderTest {
 
     assertEquals("Size of cache and DB mapping should be equal", dataTagList.size(), controlTagCacheRef.getKeys().size());
     //compare all the objects from the cache and buffer
-    Iterator<ControlTag> it = dataTagList.iterator();
-    while (it.hasNext()) {
-      DataTag currentTag = it.next();
+    for (ControlTag currentTag : dataTagList) {
       //equality of DataTagCacheObjects => currently only compares names
       assertEquals("Cached ControlTag should have the same name as in DB",
               currentTag.getName(), (controlTagCacheRef.get(currentTag.getId())).getName());
