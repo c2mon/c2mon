@@ -4,7 +4,6 @@ import java.util.Properties;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import sun.misc.Contended;
 
 import cern.c2mon.cache.api.Cache;
 import cern.c2mon.server.cache.CoreAbstractEquipmentService;
@@ -21,18 +20,12 @@ import static cern.c2mon.shared.common.type.TypeConverter.getType;
  * @author Szymon Halastra
  */
 @Slf4j
-@Contended
 public class DataTagCacheObjectFactory extends TagCacheObjectFactory<DataTag> {
 
-  private final Cache<Long, DataTag> dataTagCacheRef;
-
-  private final CoreAbstractEquipmentService coreAbstractEquipmentService;
-
   @Autowired
-  public DataTagCacheObjectFactory(Cache<Long, DataTag> dataTagCacheRef, CoreAbstractEquipmentService coreAbstractEquipmentService) {
+  public DataTagCacheObjectFactory(Cache<Long, DataTag> dataTagCacheRef,
+                                   CoreAbstractEquipmentService coreAbstractEquipmentService) {
     super(dataTagCacheRef, coreAbstractEquipmentService);
-    this.dataTagCacheRef = dataTagCacheRef;
-    this.coreAbstractEquipmentService = coreAbstractEquipmentService;
   }
 
   @Override
@@ -90,7 +83,6 @@ public class DataTagCacheObjectFactory extends TagCacheObjectFactory<DataTag> {
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "No address provided for DataTag - unable to configure it.");
     }
   }
-
 
 
   @Override
