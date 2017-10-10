@@ -27,7 +27,7 @@ import cern.c2mon.shared.common.Cacheable;
  * @author Mark Brightwell
  * @param <T> the type the listener expects
  */
-public interface C2monCacheListener<T extends Cacheable> {
+public interface CacheListener<T extends Cacheable> {
   
   /**
    * Callback when a cache object is modified. The passed object

@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Configuration;
 
 import cern.c2mon.cache.api.Cache;
 import cern.c2mon.cache.api.factory.AbstractCacheFactory;
-import cern.c2mon.cache.api.loader.C2monCacheLoader;
+import cern.c2mon.cache.api.loader.CacheLoader;
 import cern.c2mon.server.cache.CacheName;
 import cern.c2mon.server.cache.loader.DeviceDAO;
 import cern.c2mon.server.cache.loader.common.SimpleCacheLoader;
@@ -21,7 +21,7 @@ public class DeviceCacheConfig {
   public Cache createCache(AbstractCacheFactory cachingFactory, DeviceDAO deviceDAO) {
     Cache cache = cachingFactory.createCache(CacheName.DEVICE.getLabel(), Long.class, Device.class);
 
-    C2monCacheLoader cacheLoader = new SimpleCacheLoader<>(cache, deviceDAO);
+    CacheLoader cacheLoader = new SimpleCacheLoader<>(cache, deviceDAO);
     cache.setCacheLoader(cacheLoader);
 
     return cache;

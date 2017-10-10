@@ -11,7 +11,7 @@ import static org.easymock.EasyMock.*;
  */
 public class CacheListenerBaseTest {
 
-  protected void testNotification(C2monCacheListener c2monCacheListener, C2monCacheListener mockTimCacheListener) throws InterruptedException {
+  protected void testNotification(CacheListener c2monCacheListener, CacheListener mockTimCacheListener) throws InterruptedException {
     final Cacheable mockCacheable = createMock(Cacheable.class);
 
     // expect the C2monCacheListener to be notified of the update by the ThreadHandler in the

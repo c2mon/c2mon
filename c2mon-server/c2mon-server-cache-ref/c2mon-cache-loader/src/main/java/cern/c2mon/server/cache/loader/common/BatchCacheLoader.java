@@ -11,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import cern.c2mon.cache.api.Cache;
-import cern.c2mon.cache.api.loader.C2monCacheLoader;
+import cern.c2mon.cache.api.loader.CacheLoader;
 import cern.c2mon.server.cache.loader.BatchCacheLoaderDAO;
 import cern.c2mon.shared.common.Cacheable;
 
@@ -19,7 +19,7 @@ import cern.c2mon.shared.common.Cacheable;
  * @author Szymon Halastra
  */
 @Slf4j
-public class BatchCacheLoader<K extends Number, V extends Cacheable> implements C2monCacheLoader {
+public class BatchCacheLoader<K extends Number, V extends Cacheable> implements CacheLoader {
 
   /**
    * Executor for loading the cache using multiple threads.

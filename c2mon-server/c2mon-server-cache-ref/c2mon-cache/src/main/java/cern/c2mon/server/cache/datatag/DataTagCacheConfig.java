@@ -7,7 +7,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import cern.c2mon.cache.api.Cache;
 import cern.c2mon.cache.api.factory.AbstractCacheFactory;
-import cern.c2mon.cache.api.loader.C2monCacheLoader;
+import cern.c2mon.cache.api.loader.CacheLoader;
 import cern.c2mon.server.cache.CacheName;
 import cern.c2mon.server.cache.loader.DataTagLoaderDAO;
 import cern.c2mon.server.cache.loader.common.BatchCacheLoader;
@@ -31,7 +31,7 @@ public class DataTagCacheConfig {
   public Cache createCache(AbstractCacheFactory cachingFactory, DataTagLoaderDAO dataTagLoaderDAO) {
     Cache cache = cachingFactory.createCache(CacheName.DATATAG.getLabel(), Long.class, DataTag.class);
 
-    C2monCacheLoader cacheLoader = new BatchCacheLoader<Long, DataTag>(cacheLoaderTaskExecutor, cache, dataTagLoaderDAO,
+    CacheLoader cacheLoader = new BatchCacheLoader<Long, DataTag>(cacheLoaderTaskExecutor, cache, dataTagLoaderDAO,
             properties.getBatchSize(), "DataTagLoader-");
     cache.setCacheLoader(cacheLoader);
 

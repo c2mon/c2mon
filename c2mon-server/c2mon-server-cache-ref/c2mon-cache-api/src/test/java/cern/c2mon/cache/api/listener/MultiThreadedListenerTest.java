@@ -43,17 +43,17 @@ public class MultiThreadedListenerTest extends CacheListenerBaseTest {
   /**
    * Mock listener.
    */
-  private C2monCacheListener c2monCacheListener;
+  private CacheListener cacheListener;
 
   @Before
   public void setUp() {
-    c2monCacheListener = createMock(C2monCacheListener.class);
-    multiThreadedListener = new MultiThreadedCacheListener(c2monCacheListener, 2, 2);
+    cacheListener = createMock(CacheListener.class);
+    multiThreadedListener = new MultiThreadedCacheListener(cacheListener, 2, 2);
   }
 
   @Test
   public void testNotification() throws CloneNotSupportedException, InterruptedException {
-    testNotification(multiThreadedListener, c2monCacheListener);
+    testNotification(multiThreadedListener, cacheListener);
   }
 
   @Test
@@ -62,12 +62,12 @@ public class MultiThreadedListenerTest extends CacheListenerBaseTest {
     final Cacheable mockCacheable2 = createMock(Cacheable.class); //remember must not notify with the same object twice    
     CountDownLatch latch = new CountDownLatch(2);
 
-    c2monCacheListener.notifyElementUpdated(mockCacheable);
+    cacheListener.notifyElementUpdated(mockCacheable);
     expectLastCall().andAnswer(() -> {
       latch.countDown();
       return null;
     });
-    c2monCacheListener.notifyElementUpdated(mockCacheable2);
+    cacheListener.notifyElementUpdated(mockCacheable2);
     expectLastCall().andAnswer(() -> {
       latch.countDown();
       return null;
@@ -76,11 +76,11 @@ public class MultiThreadedListenerTest extends CacheListenerBaseTest {
     //replay the scenario, notifying of the update
     replay(mockCacheable);
     replay(mockCacheable2);
-    replay(c2monCacheListener);
+    replay(cacheListener);
     multiThreadedListener.notifyElementUpdated(mockCacheable);
     multiThreadedListener.notifyElementUpdated(mockCacheable2);
     latch.await();
-    verify(c2monCacheListener);
+    verify(cacheListener);
     verify(mockCacheable);
     verify(mockCacheable2);
   }

@@ -6,7 +6,7 @@ package cern.c2mon.cache.api.loader;
  *
  * @author Szymon Halastra
  */
-public interface C2monCacheLoader<K, V> {
+public interface CacheLoader<K, V> {
 
   /**
    * At server start-up, loads the cache from the DB into memory.

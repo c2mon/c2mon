@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 
 import cern.c2mon.cache.api.Cache;
-import cern.c2mon.cache.api.loader.C2monCacheLoader;
+import cern.c2mon.cache.api.loader.CacheLoader;
 import cern.c2mon.server.cache.loader.CacheLoaderDAO;
 import cern.c2mon.shared.common.Cacheable;
 
@@ -38,7 +38,7 @@ import cern.c2mon.shared.common.Cacheable;
  * as better performance for large caches
  */
 @Slf4j
-public class SimpleCacheLoader<T extends Cacheable> implements C2monCacheLoader {
+public class SimpleCacheLoader<T extends Cacheable> implements CacheLoader {
 
   /**
    * The map used to load objects into the cache from the DB at startup.

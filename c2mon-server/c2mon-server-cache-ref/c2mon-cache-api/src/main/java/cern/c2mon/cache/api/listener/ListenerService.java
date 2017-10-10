@@ -14,14 +14,14 @@ import cern.c2mon.shared.common.Cacheable;
  * @author Szymon Halastra
  */
 @Slf4j
-public class C2monListenerService<K, V extends Cacheable> implements C2monListener<V> {
+public class ListenerService<K, V extends Cacheable> implements Listener<V> {
 
   /**
    * Reference to the Cache event listeners
    */
-  private LinkedBlockingDeque<C2monCacheListener<? super V>> cacheListeners = new LinkedBlockingDeque<>();
+  private LinkedBlockingDeque<CacheListener<? super V>> cacheListeners = new LinkedBlockingDeque<>();
 
-  public C2monListenerService() {
+  public ListenerService() {
   }
 
 
@@ -40,7 +40,7 @@ public class C2monListenerService<K, V extends Cacheable> implements C2monListen
     try {
       @SuppressWarnings("unchecked")
       V cloned = (V) cacheable.clone();
-      for (C2monCacheListener<? super V> listener : cacheListeners) {
+      for (CacheListener<? super V> listener : cacheListeners) {
         listener.notifyElementUpdated(cloned);
       }
     }
@@ -55,7 +55,7 @@ public class C2monListenerService<K, V extends Cacheable> implements C2monListen
     try {
       @SuppressWarnings("unchecked")
       V cloned = (V) cacheable.clone();
-      for (C2monCacheListener<? super V> listener : cacheListeners) {
+      for (CacheListener<? super V> listener : cacheListeners) {
         listener.confirmStatus(cloned);
       }
     }
@@ -66,33 +66,33 @@ public class C2monListenerService<K, V extends Cacheable> implements C2monListen
   }
 
   @Override
-  public void registerSynchronousListener(C2monCacheListener<? super V> cacheListener) {
+  public void registerSynchronousListener(CacheListener<? super V> cacheListener) {
     cacheListeners.add(cacheListener);
   }
 
   @Override
-  public Lifecycle registerListener(C2monCacheListener<? super V> cacheListener) {
-    MultiThreadedCacheListener<? super V> wrappedCacheListener = new MultiThreadedCacheListener<>(cacheListener,1000, 0);
+  public Lifecycle registerListener(CacheListener<? super V> cacheListener) {
+    MultiThreadedCacheListener<? super V> wrappedCacheListener = new MultiThreadedCacheListener<>(cacheListener, 1000, 0);
     cacheListeners.add(wrappedCacheListener);
     return wrappedCacheListener;
   }
 
   @Override
-  public Lifecycle registerThreadedListener(C2monCacheListener<? super V> cacheListener, int queueCapacity, int threadPoolSize) {
+  public Lifecycle registerThreadedListener(CacheListener<? super V> cacheListener, int queueCapacity, int threadPoolSize) {
     MultiThreadedCacheListener<? super V> threadedCacheListener = new MultiThreadedCacheListener<>(cacheListener, queueCapacity, threadPoolSize);
     cacheListeners.add(threadedCacheListener);
     return threadedCacheListener;
   }
 
   @Override
-  public Lifecycle registerBufferedListener(final C2monBufferedCacheListener<Cacheable> c2monBufferedCacheListener, int frequency) {
+  public Lifecycle registerBufferedListener(final BufferedCacheListener<Cacheable> c2monBufferedCacheListener, int frequency) {
     DefaultBufferedCacheListener<Cacheable> bufferedCacheListener = new DefaultBufferedCacheListener<>(c2monBufferedCacheListener, frequency);
     cacheListeners.add(bufferedCacheListener);
     return bufferedCacheListener;
   }
 
   @Override
-  public Lifecycle registerKeyBufferedListener(final C2monBufferedCacheListener<Long> bufferedCacheListener, int frequency) {
+  public Lifecycle registerKeyBufferedListener(final BufferedCacheListener<Long> bufferedCacheListener, int frequency) {
     BufferedKeyCacheListener<V> bufferedKeyCacheListener = new BufferedKeyCacheListener<V>(bufferedCacheListener, frequency);
     cacheListeners.add(bufferedKeyCacheListener);
     return bufferedKeyCacheListener;

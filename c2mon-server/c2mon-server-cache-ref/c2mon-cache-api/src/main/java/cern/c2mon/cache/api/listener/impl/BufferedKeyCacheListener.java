@@ -16,8 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.cache.api.listener.impl;
 
-import cern.c2mon.cache.api.listener.C2monBufferedCacheListener;
-import cern.c2mon.cache.api.listener.impl.AbstractBufferedCacheListener;
+import cern.c2mon.cache.api.listener.BufferedCacheListener;
 import cern.c2mon.shared.common.Cacheable;
 
 /**
@@ -36,7 +35,7 @@ public class BufferedKeyCacheListener<T extends Cacheable> extends AbstractBuffe
    * @param bufferedKeyTimCacheListener the listener to register.
    * @param frequency                   the frequency (in ms) at which the buffer should be emptied
    */
-  public BufferedKeyCacheListener(final C2monBufferedCacheListener<Long> bufferedKeyTimCacheListener, int frequency) {
+  public BufferedKeyCacheListener(final BufferedCacheListener<Long> bufferedKeyTimCacheListener, int frequency) {
     super(bufferedKeyTimCacheListener, frequency);
   }
 

@@ -26,7 +26,7 @@ import java.util.Collection;
  * @param <S> the type of collection the listener is expecting
  *
  */
-public interface C2monBufferedCacheListener<S> {
+public interface BufferedCacheListener<S> {
 
   /**
    * Callback when a cache object is modified. Only the key is passed (the listener

@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Configuration;
 
 import cern.c2mon.cache.api.Cache;
 import cern.c2mon.cache.api.factory.AbstractCacheFactory;
-import cern.c2mon.cache.api.loader.C2monCacheLoader;
+import cern.c2mon.cache.api.loader.CacheLoader;
 import cern.c2mon.server.cache.CacheName;
 import cern.c2mon.server.cache.loader.AliveTimerDAO;
 import cern.c2mon.server.cache.loader.common.SimpleCacheLoader;
@@ -22,7 +22,7 @@ public class AliveTimerCacheConfig {
   public Cache createCache(AbstractCacheFactory cachingFactory, AliveTimerDAO aliveTimerDAORef) {
     Cache cache = cachingFactory.createCache(CacheName.ALIVETIMER.getLabel(), Long.class, CommFaultTag.class);
 
-    C2monCacheLoader cacheLoader = new SimpleCacheLoader<>(cache, aliveTimerDAORef);
+    CacheLoader cacheLoader = new SimpleCacheLoader<>(cache, aliveTimerDAORef);
 
     cache.setCacheLoader(cacheLoader);
 

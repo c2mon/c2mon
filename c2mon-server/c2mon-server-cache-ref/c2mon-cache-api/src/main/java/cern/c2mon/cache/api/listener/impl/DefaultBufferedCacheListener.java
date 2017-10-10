@@ -16,7 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.cache.api.listener.impl;
 
-import cern.c2mon.cache.api.listener.C2monBufferedCacheListener;
+import cern.c2mon.cache.api.listener.BufferedCacheListener;
 import cern.c2mon.shared.common.Cacheable;
 
 /**
@@ -35,7 +35,7 @@ public class DefaultBufferedCacheListener<T extends Cacheable> extends AbstractB
    * @param bufferedCacheListener listener expecting collections of cache objects
    * @param frequency             the frequency (in seconds) at which the buffer should be emptied
    */
-  public DefaultBufferedCacheListener(final C2monBufferedCacheListener<T> bufferedCacheListener, int frequency) {
+  public DefaultBufferedCacheListener(final BufferedCacheListener<T> bufferedCacheListener, int frequency) {
     super(bufferedCacheListener, frequency);
   }
 

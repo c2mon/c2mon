@@ -13,11 +13,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.ApplicationObjectSupport;
 
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
-import cern.c2mon.cache.api.listener.C2monBufferedCacheListener;
-import cern.c2mon.cache.api.listener.C2monCacheListener;
-import cern.c2mon.cache.api.listener.C2monListener;
-import cern.c2mon.cache.api.listener.C2monListenerService;
-import cern.c2mon.cache.api.loader.C2monCacheLoader;
+import cern.c2mon.cache.api.listener.BufferedCacheListener;
+import cern.c2mon.cache.api.listener.CacheListener;
+import cern.c2mon.cache.api.listener.Listener;
+import cern.c2mon.cache.api.listener.ListenerService;
+import cern.c2mon.cache.api.loader.CacheLoader;
 import cern.c2mon.cache.api.lock.C2monLock;
 import cern.c2mon.cache.api.transactions.TransactionalCallable;
 import cern.c2mon.server.common.component.Lifecycle;
@@ -31,13 +31,13 @@ import cern.c2mon.shared.common.Cacheable;
  * @author Szymon Halastra
  */
 @Slf4j
-public abstract class Cache<K, V extends Cacheable> extends ApplicationObjectSupport implements C2monListener<V>, Serializable, C2monLock<K> {
+public abstract class Cache<K, V extends Cacheable> extends ApplicationObjectSupport implements Listener<V>, Serializable, C2monLock<K> {
 
   private final String cacheName;
 
-  private C2monCacheLoader cacheLoader;
+  private CacheLoader cacheLoader;
 
-  private final C2monListener<V> listenerService;
+  private final Listener<V> listenerService;
 
   /**
    * Reference to cache loader.
@@ -45,7 +45,7 @@ public abstract class Cache<K, V extends Cacheable> extends ApplicationObjectSup
 
   public Cache(String cacheName) {
     this.cacheName = cacheName;
-    this.listenerService = new C2monListenerService<>();
+    this.listenerService = new ListenerService<>();
   }
 
   public abstract void init();
@@ -74,11 +74,11 @@ public abstract class Cache<K, V extends Cacheable> extends ApplicationObjectSup
     return cacheName;
   }
 
-  public void setCacheLoader(C2monCacheLoader cacheLoader) {
+  public void setCacheLoader(CacheLoader cacheLoader) {
     this.cacheLoader = cacheLoader;
   }
 
-  public C2monCacheLoader getCacheLoader() {
+  public CacheLoader getCacheLoader() {
     return cacheLoader;
   }
 
@@ -129,27 +129,27 @@ public abstract class Cache<K, V extends Cacheable> extends ApplicationObjectSup
   }
 
   @Override
-  public void registerSynchronousListener(C2monCacheListener cacheListener) {
+  public void registerSynchronousListener(CacheListener cacheListener) {
     this.listenerService.registerSynchronousListener(cacheListener);
   }
 
   @Override
-  public Lifecycle registerListener(C2monCacheListener cacheListener) {
+  public Lifecycle registerListener(CacheListener cacheListener) {
     return this.listenerService.registerListener(cacheListener);
   }
 
   @Override
-  public Lifecycle registerThreadedListener(C2monCacheListener cacheListener, int queueCapacity, int threadPoolSize) {
+  public Lifecycle registerThreadedListener(CacheListener cacheListener, int queueCapacity, int threadPoolSize) {
     return this.listenerService.registerThreadedListener(cacheListener, queueCapacity, threadPoolSize);
   }
 
   @Override
-  public Lifecycle registerBufferedListener(C2monBufferedCacheListener c2monBufferedCacheListener, int frequency) {
-    return this.listenerService.registerBufferedListener(c2monBufferedCacheListener, frequency);
+  public Lifecycle registerBufferedListener(BufferedCacheListener bufferedCacheListener, int frequency) {
+    return this.listenerService.registerBufferedListener(bufferedCacheListener, frequency);
   }
 
   @Override
-  public Lifecycle registerKeyBufferedListener(C2monBufferedCacheListener bufferedCacheListener, int frequency) {
+  public Lifecycle registerKeyBufferedListener(BufferedCacheListener bufferedCacheListener, int frequency) {
     return this.listenerService.registerKeyBufferedListener(bufferedCacheListener, frequency);
   }
 }
