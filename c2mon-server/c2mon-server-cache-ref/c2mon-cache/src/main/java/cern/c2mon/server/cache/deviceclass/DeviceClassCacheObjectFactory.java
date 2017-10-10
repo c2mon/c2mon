@@ -5,7 +5,7 @@ import java.util.Properties;
 
 import org.springframework.stereotype.Component;
 
-import cern.c2mon.cache.api.factory.CacheObjectFactory;
+import cern.c2mon.cache.api.factory.AbstractCacheObjectFactory;
 import cern.c2mon.cache.api.parser.XmlParser;
 import cern.c2mon.server.common.device.*;
 import cern.c2mon.shared.common.ConfigurationException;
@@ -15,7 +15,7 @@ import cern.c2mon.shared.daq.config.Change;
  * @author Szymon Halastra
  */
 @Component
-public class DeviceClassCacheObjectFactory extends CacheObjectFactory<DeviceClass> {
+public class DeviceClassCacheObjectFactory extends AbstractCacheObjectFactory<DeviceClass> {
 
   @Override
   public DeviceClass createCacheObject(Long id) {

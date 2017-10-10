@@ -6,8 +6,7 @@ import java.util.Properties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import cern.c2mon.cache.api.factory.CacheObjectFactory;
-import cern.c2mon.server.cache.alarm.AlarmService;
+import cern.c2mon.cache.api.factory.AbstractCacheObjectFactory;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.AlarmCondition;
@@ -22,7 +21,7 @@ import static cern.c2mon.server.cache.alarm.AlarmProperties.MAX_FAULT_MEMBER_LEN
  * @author Szymon Halastra
  */
 @Component
-public class AlarmCacheObjectFactory extends CacheObjectFactory<Alarm> {
+public class AlarmCacheObjectFactory extends AbstractCacheObjectFactory<Alarm> {
 
   private AlarmService alarmService;
 
@@ -35,25 +34,26 @@ public class AlarmCacheObjectFactory extends CacheObjectFactory<Alarm> {
    * Create an AlarmCacheObject from a collection of named properties.
    * The following properties are expected in the collection:
    * <ul>
-   *   <li>id</li>
-   *   <li>dataTagId</li>
-   *   <li>faultMember</li>
-   *   <li>faultFamily</li>
-   *   <li>faultCode</li>
-   *   <li>alarmCondition</li>
+   * <li>id</li>
+   * <li>dataTagId</li>
+   * <li>faultMember</li>
+   * <li>faultFamily</li>
+   * <li>faultCode</li>
+   * <li>alarmCondition</li>
    * </ul>
-   *
+   * <p>
    * A ConfigurationException will be thrown if one of the parameters cannot be
    * decoded to the right format. Even if no exception is thrown, it is
    * advisable to call the validate() method on the newly created object, which
    * will perform further consistency checks.
-   *
+   * <p>
    * Please note that neither this constructor nor the validate method can
    * perform dependency checks. It is up to the user to ensure that the DataTag
    * to which the alarm is attached exists.
    *
-   * @param id the id of the alarm object
+   * @param id         the id of the alarm object
    * @param properties the properties containing the values for the alarm fields
+   *
    * @return the alarm object created
    */
   @Override

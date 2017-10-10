@@ -6,9 +6,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import cern.c2mon.cache.api.Cache;
-import cern.c2mon.cache.api.factory.AbstractC2monCacheFactory;
+import cern.c2mon.cache.api.factory.AbstractCacheFactory;
 import cern.c2mon.cache.api.loader.C2monCacheLoader;
-import cern.c2mon.server.cache.C2monCacheName;
+import cern.c2mon.server.cache.CacheName;
 import cern.c2mon.server.cache.loader.RuleTagLoaderDAO;
 import cern.c2mon.server.cache.loader.common.BatchCacheLoader;
 import cern.c2mon.server.cache.loader.config.CacheLoaderProperties;
@@ -26,9 +26,9 @@ public class RuleTagCacheConfig {
   @Autowired
   private CacheLoaderProperties properties;
 
-  @Bean(name = C2monCacheName.Names.RULE)
-  public Cache createCache(AbstractC2monCacheFactory cachingFactory, RuleTagLoaderDAO ruleTagLoaderDAO) {
-    Cache cache = cachingFactory.createCache(C2monCacheName.RULETAG.getLabel(), Long.class, RuleTag.class);
+  @Bean(name = CacheName.Names.RULE)
+  public Cache createCache(AbstractCacheFactory cachingFactory, RuleTagLoaderDAO ruleTagLoaderDAO) {
+    Cache cache = cachingFactory.createCache(CacheName.RULETAG.getLabel(), Long.class, RuleTag.class);
 
     C2monCacheLoader cacheLoader = new BatchCacheLoader<Long, RuleTag>(cacheLoaderTaskExecutor, cache, ruleTagLoaderDAO,
             properties.getBatchSize(), "RuleTagLoader-");

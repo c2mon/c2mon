@@ -6,9 +6,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import cern.c2mon.cache.api.Cache;
-import cern.c2mon.cache.api.factory.AbstractC2monCacheFactory;
+import cern.c2mon.cache.api.factory.AbstractCacheFactory;
 import cern.c2mon.cache.api.loader.C2monCacheLoader;
-import cern.c2mon.server.cache.C2monCacheName;
+import cern.c2mon.server.cache.CacheName;
 import cern.c2mon.server.cache.loader.AlarmLoaderDAO;
 import cern.c2mon.server.cache.loader.common.BatchCacheLoader;
 import cern.c2mon.server.cache.loader.config.CacheLoaderProperties;
@@ -26,9 +26,9 @@ public class AlarmCacheConfig {
   @Autowired
   private CacheLoaderProperties properties;
 
-  @Bean(name = C2monCacheName.Names.ALARM)
-  public Cache createCache(AbstractC2monCacheFactory cachingFactory, AlarmLoaderDAO alarmLoaderDAORef) {
-    Cache cache = cachingFactory.createCache(C2monCacheName.ALARM.getLabel(), Long.class, Alarm.class);
+  @Bean(name = CacheName.Names.ALARM)
+  public Cache createCache(AbstractCacheFactory cachingFactory, AlarmLoaderDAO alarmLoaderDAORef) {
+    Cache cache = cachingFactory.createCache(CacheName.ALARM.getLabel(), Long.class, Alarm.class);
 
     C2monCacheLoader cacheLoader = new BatchCacheLoader<Long, Alarm>(cacheLoaderTaskExecutor, cache, alarmLoaderDAORef,
             properties.getBatchSize(), "AlarmCacheLoader-");

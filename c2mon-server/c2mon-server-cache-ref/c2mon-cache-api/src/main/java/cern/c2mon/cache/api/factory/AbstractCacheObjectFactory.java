@@ -9,7 +9,7 @@ import cern.c2mon.shared.daq.config.Change;
 /**
  * @author Szymon Halastra
  */
-public abstract class CacheObjectFactory<T extends Cacheable> {
+public abstract class AbstractCacheObjectFactory<T extends Cacheable> {
 
   /**
    * Creates CacheObject wrapped with properties, use this one

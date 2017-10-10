@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import cern.c2mon.cache.api.Cache;
-import cern.c2mon.cache.api.factory.CacheObjectFactory;
+import cern.c2mon.cache.api.factory.AbstractCacheObjectFactory;
 import cern.c2mon.server.common.command.CommandTagCacheObject;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
@@ -28,7 +28,7 @@ import cern.c2mon.shared.daq.config.HardwareAddressUpdate;
  */
 @Slf4j
 @Component
-public class CommandCacheObjectFactory extends CacheObjectFactory<CommandTag> {
+public class CommandCacheObjectFactory extends AbstractCacheObjectFactory<CommandTag> {
 
   private final Cache<Long, Equipment> equipmentCacheRef;
 

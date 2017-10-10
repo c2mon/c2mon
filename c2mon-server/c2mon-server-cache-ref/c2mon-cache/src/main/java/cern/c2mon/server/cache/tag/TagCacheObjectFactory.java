@@ -6,7 +6,7 @@ import java.util.Optional;
 import java.util.Properties;
 
 import cern.c2mon.cache.api.Cache;
-import cern.c2mon.cache.api.factory.CacheObjectFactory;
+import cern.c2mon.cache.api.factory.AbstractCacheObjectFactory;
 import cern.c2mon.server.cache.CoreAbstractEquipmentService;
 import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.datatag.DataTag;
@@ -32,7 +32,7 @@ import cern.c2mon.shared.daq.config.HardwareAddressUpdate;
  *
  * @author Szymon Halastra
  */
-public abstract class TagCacheObjectFactory<T extends Tag> extends CacheObjectFactory<T> {
+public abstract class TagCacheObjectFactory<T extends Tag> extends AbstractCacheObjectFactory<T> {
 
   private final Cache<Long, T> tagCacheRef;
 

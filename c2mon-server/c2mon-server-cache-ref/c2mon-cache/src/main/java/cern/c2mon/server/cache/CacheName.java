@@ -11,7 +11,7 @@ import lombok.Getter;
  * @author Szymon Halastra
  */
 
-public enum C2monCacheName {
+public enum CacheName {
 
   /**
    * Alarm cache.
@@ -73,12 +73,15 @@ public enum C2monCacheName {
    */
   SUBEQUIPMENT(Names.SUBEQUIPMENT),
 
+  /**
+   * Tag cache - stores DataTag, RuleTag and ControlTag
+   */
   TAG(Names.TAG);
 
   @Getter
   private final String label;
 
-  C2monCacheName(final String label) {
+  CacheName(final String label) {
     this.label = label;
   }
 

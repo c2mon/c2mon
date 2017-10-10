@@ -4,7 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
-import cern.c2mon.cache.api.factory.AbstractC2monCacheFactory;
+import cern.c2mon.cache.api.factory.AbstractCacheFactory;
 import cern.c2mon.cache.impl.IgniteFactory;
 
 /**
@@ -16,7 +16,7 @@ import cern.c2mon.cache.impl.IgniteFactory;
 public class CacheProperties {
 
   @Bean(name = "cachingFactory")
-  public AbstractC2monCacheFactory getCacheFactory() {
+  public AbstractCacheFactory getCacheFactory() {
     return new IgniteFactory();
   }
 }

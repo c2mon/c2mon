@@ -2,7 +2,7 @@ package cern.c2mon.server.cache;
 
 import java.util.Properties;
 
-import cern.c2mon.cache.api.factory.CacheObjectFactory;
+import cern.c2mon.cache.api.factory.AbstractCacheObjectFactory;
 import cern.c2mon.server.common.equipment.AbstractEquipment;
 import cern.c2mon.server.common.equipment.AbstractEquipmentCacheObject;
 import cern.c2mon.shared.common.ConfigurationException;
@@ -11,7 +11,7 @@ import cern.c2mon.shared.daq.config.EquipmentConfigurationUpdate;
 /**
  * @author Szymon Halastra
  */
-public abstract class AbstractEquipmentCacheObjectFactory<T extends AbstractEquipment> extends CacheObjectFactory<T> {
+public abstract class AbstractEquipmentCacheObjectFactory<T extends AbstractEquipment> extends AbstractCacheObjectFactory<T> {
 
   @Override
   public void validateConfig(T abstractEquipment) throws ConfigurationException {

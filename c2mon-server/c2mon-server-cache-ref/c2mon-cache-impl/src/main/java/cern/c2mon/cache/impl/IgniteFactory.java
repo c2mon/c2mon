@@ -5,14 +5,14 @@ import org.apache.ignite.cache.CacheMode;
 import org.apache.ignite.configuration.CacheConfiguration;
 
 import cern.c2mon.cache.api.Cache;
-import cern.c2mon.cache.api.factory.AbstractC2monCacheFactory;
+import cern.c2mon.cache.api.factory.AbstractCacheFactory;
 
 /**
  * @author Szymon Halastra
  */
 
 @Slf4j
-public class IgniteFactory extends AbstractC2monCacheFactory {
+public class IgniteFactory extends AbstractCacheFactory {
 
   @Override
   public Cache createCache(String name, Class<?> keyType, Class<?> valueType) {
@@ -26,7 +26,7 @@ public class IgniteFactory extends AbstractC2monCacheFactory {
   }
 
   @Override
-  public AbstractC2monCacheFactory getCachingFactory() {
+  public AbstractCacheFactory getCachingFactory() {
     return this;
   }
 }
