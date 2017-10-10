@@ -13,7 +13,6 @@ import javax.cache.processor.EntryProcessorException;
 import javax.cache.processor.EntryProcessorResult;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.ignite.IgniteCache;
 import org.apache.ignite.IgniteSpringBean;
 import org.apache.ignite.cache.query.ScanQuery;
 import org.apache.ignite.configuration.CacheConfiguration;
@@ -22,7 +21,7 @@ import org.apache.ignite.transactions.TransactionDeadlockException;
 import org.apache.ignite.transactions.TransactionTimeoutException;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.Cache;
 import cern.c2mon.cache.api.transactions.TransactionalCallable;
 import cern.c2mon.shared.common.Cacheable;
 
@@ -30,15 +29,15 @@ import cern.c2mon.shared.common.Cacheable;
  * @author Szymon Halastra
  */
 @Slf4j
-public class IgniteC2monCache<K, V extends Cacheable> extends C2monCache<K, V> {
+public class IgniteCache<K, V extends Cacheable> extends Cache<K, V> {
 
   @Autowired
   private IgniteSpringBean C2monIgnite;
 
-  private IgniteCache<K, V> cache;
+  private org.apache.ignite.IgniteCache<K, V> cache;
   private CacheConfiguration<K, V> cacheCfg;
 
-  public IgniteC2monCache(String cacheName, CacheConfiguration cacheCfg) {
+  public IgniteCache(String cacheName, CacheConfiguration cacheCfg) {
     super(cacheName);
     this.cacheCfg = cacheCfg;
   }

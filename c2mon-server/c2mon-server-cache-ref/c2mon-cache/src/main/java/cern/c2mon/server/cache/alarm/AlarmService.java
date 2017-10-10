@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.Cache;
 import cern.c2mon.server.common.alarm.*;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.common.datatag.DataTagConstants;
@@ -25,12 +25,12 @@ import cern.c2mon.shared.common.datatag.DataTagConstants;
 @Service
 public class AlarmService {
 
-  private C2monCache<Long, Alarm> alarmCacheRef;
+  private Cache<Long, Alarm> alarmCacheRef;
 
-  private C2monCache<Long, Tag> tagCacheRef;
+  private Cache<Long, Tag> tagCacheRef;
 
   @Autowired
-  public AlarmService(final C2monCache<Long, Alarm> alarmCacheRef, final C2monCache<Long, Tag> tagCacheRef) {
+  public AlarmService(final Cache<Long, Alarm> alarmCacheRef, final Cache<Long, Tag> tagCacheRef) {
     this.alarmCacheRef = alarmCacheRef;
     this.tagCacheRef = tagCacheRef;
   }

@@ -8,7 +8,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
-import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.Cache;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.cache.loader.AlarmLoaderDAO;
 import cern.c2mon.server.cache.loader.common.BatchCacheLoader;
@@ -30,7 +30,7 @@ import static org.junit.Assert.assertNotNull;
 }, loader = AnnotationConfigContextLoader.class)
 public class BatchCacheLoaderTest {
 
-  private C2monCache<Long, Alarm> alarmCacheRef;
+  private Cache<Long, Alarm> alarmCacheRef;
 
   @Autowired
   private ThreadPoolTaskExecutor cacheLoaderTaskExecutor;
@@ -45,7 +45,8 @@ public class BatchCacheLoaderTest {
 
   @Test
   public void preloadCacheFromDb() {
-    batchCacheLoader = new BatchCacheLoader<>(cacheLoaderTaskExecutor, alarmCacheRef, alarmLoaderDAO, properties.getBatchSize(), "AlarmLoader-");
+    batchCacheLoader = new BatchCacheLoader<>(cacheLoaderTaskExecutor, alarmCacheRef, alarmLoaderDAO,
+            properties.getBatchSize(), "AlarmLoader-");
     assertNotNull("Cache loader should not be null", batchCacheLoader);
   }
 }

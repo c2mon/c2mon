@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.Cache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.alive.AliveTimer;
 
@@ -18,14 +18,14 @@ import cern.c2mon.server.common.alive.AliveTimer;
 @Service
 public class AliveTimerService {
 
-  private C2monCache<Long, AliveTimer> aliveTimerCacheRef;
+  private Cache<Long, AliveTimer> aliveTimerCacheRef;
 
   @Autowired
-  public AliveTimerService(C2monCache<Long, AliveTimer> aliveTimerCacheRef) {
+  public AliveTimerService(Cache<Long, AliveTimer> aliveTimerCacheRef) {
     this.aliveTimerCacheRef = aliveTimerCacheRef;
   }
 
-  public C2monCache<Long, AliveTimer> getCache() {
+  public Cache<Long, AliveTimer> getCache() {
     return aliveTimerCacheRef;
   }
 

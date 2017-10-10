@@ -31,7 +31,7 @@ import cern.c2mon.shared.common.Cacheable;
  * @author Szymon Halastra
  */
 @Slf4j
-public abstract class C2monCache<K, V extends Cacheable> extends ApplicationObjectSupport implements C2monListener<V>, Serializable, C2monLock<K> {
+public abstract class Cache<K, V extends Cacheable> extends ApplicationObjectSupport implements C2monListener<V>, Serializable, C2monLock<K> {
 
   private final String cacheName;
 
@@ -43,7 +43,7 @@ public abstract class C2monCache<K, V extends Cacheable> extends ApplicationObje
    * Reference to cache loader.
    */
 
-  public C2monCache(String cacheName) {
+  public Cache(String cacheName) {
     this.cacheName = cacheName;
     this.listenerService = new C2monListenerService<>();
   }

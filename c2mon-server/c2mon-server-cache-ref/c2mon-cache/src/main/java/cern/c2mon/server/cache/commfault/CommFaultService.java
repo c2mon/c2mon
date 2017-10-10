@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.Cache;
 import cern.c2mon.server.common.commfault.CommFaultTag;
 import cern.c2mon.server.common.commfault.CommFaultTagCacheObject;
 import cern.c2mon.server.common.equipment.AbstractEquipment;
@@ -16,14 +16,14 @@ import cern.c2mon.server.common.equipment.AbstractEquipment;
 @Service
 public class CommFaultService {
 
-  private final C2monCache<Long, CommFaultTag> commFaultTagCacheRef;
+  private final Cache<Long, CommFaultTag> commFaultTagCacheRef;
 
   @Autowired
-  public CommFaultService(final C2monCache<Long, CommFaultTag> commFaultTagCacheRef) {
+  public CommFaultService(final Cache<Long, CommFaultTag> commFaultTagCacheRef) {
     this.commFaultTagCacheRef = commFaultTagCacheRef;
   }
 
-  public C2monCache getCache() {
+  public Cache getCache() {
     return commFaultTagCacheRef;
   }
 

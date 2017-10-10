@@ -8,7 +8,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import cern.c2mon.cache.AbstractCacheLoaderTest;
-import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.Cache;
 import cern.c2mon.server.cache.dbaccess.RuleTagMapper;
 import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.rule.RuleTagCacheObject;
@@ -21,7 +21,7 @@ import static org.junit.Assert.*;
 public class RuleCacheLoaderTest extends AbstractCacheLoaderTest {
 
   @Autowired
-  private C2monCache<Long, RuleTag> ruleTagCacheRef;
+  private Cache<Long, RuleTag> ruleTagCacheRef;
 
   @Autowired
   private RuleTagMapper ruleTagMapper;

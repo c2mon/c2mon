@@ -4,7 +4,7 @@ import java.sql.Timestamp;
 
 import lombok.extern.slf4j.Slf4j;
 
-import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.Cache;
 import cern.c2mon.cache.api.service.SupervisedService;
 import cern.c2mon.server.cache.alivetimer.AliveTimerService;
 import cern.c2mon.server.common.process.ProcessCacheObject;
@@ -20,15 +20,15 @@ import cern.c2mon.shared.common.supervision.SupervisionConstants;
 @Slf4j
 public class SupervisedServiceImpl<T extends Supervised> implements SupervisedService<T> {
 
-  private final C2monCache<Long, T> cache;
+  private final Cache<Long, T> cache;
 
   private final AliveTimerService aliveTimerService;
 
-  private final C2monCache aliveTimerCache;
+  private final Cache aliveTimerCache;
 
   private SupervisionConstants.SupervisionEntity supervisionEntity;
 
-  public SupervisedServiceImpl(final C2monCache<Long, T> cache, final AliveTimerService aliveTimerService) {
+  public SupervisedServiceImpl(final Cache<Long, T> cache, final AliveTimerService aliveTimerService) {
     this.cache = cache;
     this.aliveTimerService = aliveTimerService;
     this.aliveTimerCache = aliveTimerService.getCache();

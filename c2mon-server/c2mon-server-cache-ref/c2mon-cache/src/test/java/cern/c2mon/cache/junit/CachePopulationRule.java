@@ -8,9 +8,6 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 
-import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.server.common.alarm.Alarm;
-
 /**
  * Using this rule in a JUnit test will ensure that all caches are preloaded
  * cleanly with test data at the start of each test.

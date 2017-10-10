@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.Cache;
 import cern.c2mon.cache.api.factory.CacheObjectFactory;
 import cern.c2mon.server.common.command.CommandTagCacheObject;
 import cern.c2mon.server.common.equipment.Equipment;
@@ -30,10 +30,10 @@ import cern.c2mon.shared.daq.config.HardwareAddressUpdate;
 @Component
 public class CommandCacheObjectFactory extends CacheObjectFactory<CommandTag> {
 
-  private final C2monCache<Long, Equipment> equipmentCacheRef;
+  private final Cache<Long, Equipment> equipmentCacheRef;
 
   @Autowired
-  public CommandCacheObjectFactory(C2monCache<Long, Equipment> equipmentCacheRef) {
+  public CommandCacheObjectFactory(Cache<Long, Equipment> equipmentCacheRef) {
     this.equipmentCacheRef = equipmentCacheRef;
   }
 

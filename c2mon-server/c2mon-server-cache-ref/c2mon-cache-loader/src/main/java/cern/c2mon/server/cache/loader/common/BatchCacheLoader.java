@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.Cache;
 import cern.c2mon.cache.api.loader.C2monCacheLoader;
 import cern.c2mon.server.cache.loader.BatchCacheLoaderDAO;
 import cern.c2mon.shared.common.Cacheable;
@@ -46,7 +46,7 @@ public class BatchCacheLoader<K extends Number, V extends Cacheable> implements 
   /**
    * Reference to C2monCache
    */
-  private final C2monCache<Long, V> cache;
+  private final Cache<Long, V> cache;
 
   /**
    * Reference to batch loader DAO
@@ -63,7 +63,7 @@ public class BatchCacheLoader<K extends Number, V extends Cacheable> implements 
    * @param batchSize        the number of object loaded in a single task
    * @param threadNamePrefix the name of thread pool
    */
-  public BatchCacheLoader(ThreadPoolTaskExecutor cacheLoaderTaskExecutor, final C2monCache<Long, V> cache,
+  public BatchCacheLoader(ThreadPoolTaskExecutor cacheLoaderTaskExecutor, final Cache<Long, V> cache,
                           final BatchCacheLoaderDAO<K, V> cacheLoaderDAO,
                           final int batchSize,
                           final String threadNamePrefix) {

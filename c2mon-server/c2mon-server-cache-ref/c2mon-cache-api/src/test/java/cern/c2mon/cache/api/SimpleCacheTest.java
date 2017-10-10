@@ -6,7 +6,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import org.junit.Test;
 
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
-import cern.c2mon.cache.api.impl.SimpleC2monCache;
+import cern.c2mon.cache.api.impl.SimpleCache;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 
@@ -19,14 +19,14 @@ import static org.junit.Assert.*;
  *
  * @author Szymon Halastra
  */
-public class SimpleC2monCacheTest {
+public class SimpleCacheTest {
 
   private static final long MAP_SIZE = 100;
   private static final int GENERATOR_SIZE = 10;
 
   @Test
   public void getAllEntriesByProvidedKeySet() {
-    C2monCache<Long, DataTag> cache = new SimpleC2monCache<>("simple-cache");
+    Cache<Long, DataTag> cache = new SimpleCache<>("simple-cache");
     assertNotNull("Cache should be not null", cache);
 
     Map<Long, DataTag> map = new HashMap<>();

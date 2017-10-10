@@ -8,7 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.Cache;
 import cern.c2mon.cache.api.service.AbstractEquipmentService;
 import cern.c2mon.cache.api.service.SupervisedService;
 import cern.c2mon.server.cache.CoreAbstractEquipmentService;
@@ -29,19 +29,19 @@ import cern.c2mon.shared.common.supervision.SupervisionConstants;
 @Service
 public class EquipmentService implements SupervisedService<Equipment>, AbstractEquipmentService {
 
-  private final C2monCache<Long, Equipment> equipmentCacheRef;
+  private final Cache<Long, Equipment> equipmentCacheRef;
 
-  private final C2monCache<Long, Process> processCacheRef;
+  private final Cache<Long, Process> processCacheRef;
 
-  private final C2monCache<Long, DataTag> dataTagCacheRef;
+  private final Cache<Long, DataTag> dataTagCacheRef;
 
   private final SupervisedService<Equipment> supervisedService;
 
   private final AbstractEquipmentService coreEquipmentService;
 
   @Autowired
-  public EquipmentService(final C2monCache<Long, Equipment> equipmentCacheRef, final C2monCache<Long, Process> processCacheRef,
-                          final C2monCache<Long, DataTag> dataTagCacheRef, final AliveTimerService aliveTimerService, final CommFaultService commFaultService) {
+  public EquipmentService(final Cache<Long, Equipment> equipmentCacheRef, final Cache<Long, Process> processCacheRef,
+                          final Cache<Long, DataTag> dataTagCacheRef, final AliveTimerService aliveTimerService, final CommFaultService commFaultService) {
     this.equipmentCacheRef = equipmentCacheRef;
     this.processCacheRef = processCacheRef;
     this.dataTagCacheRef = dataTagCacheRef;
@@ -55,7 +55,7 @@ public class EquipmentService implements SupervisedService<Equipment>, AbstractE
     return null;
   }
 
-  public C2monCache getCache() {
+  public Cache getCache() {
     return this.equipmentCacheRef;
   }
 

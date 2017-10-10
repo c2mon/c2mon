@@ -8,15 +8,12 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import cern.c2mon.cache.AbstractCacheLoaderTest;
-import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.Cache;
 import cern.c2mon.server.cache.dbaccess.EquipmentMapper;
-import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.equipment.EquipmentCacheObject;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Szymon Halastra
@@ -24,7 +21,7 @@ import static org.junit.Assert.assertTrue;
 public class EquipmentCacheLoaderTest extends AbstractCacheLoaderTest {
 
   @Autowired
-  private C2monCache<Long, Equipment> equipmentCacheRef;
+  private Cache<Long, Equipment> equipmentCacheRef;
 
   @Autowired
   private EquipmentMapper equipmentMapper;

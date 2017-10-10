@@ -8,7 +8,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import cern.c2mon.cache.AbstractCacheLoaderTest;
-import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.Cache;
 import cern.c2mon.server.cache.dbaccess.ProcessMapper;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.process.Process;
@@ -26,7 +26,7 @@ public class ProcessCacheLoaderTest extends AbstractCacheLoaderTest {
   private ProcessMapper processMapper;
 
   @Autowired
-  private C2monCache<Long, Process> processCacheRef;
+  private Cache<Long, Process> processCacheRef;
 
   @Before
   public void init() {

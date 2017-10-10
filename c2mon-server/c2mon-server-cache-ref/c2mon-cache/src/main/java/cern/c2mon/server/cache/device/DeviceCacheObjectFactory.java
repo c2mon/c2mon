@@ -6,7 +6,7 @@ import java.util.Properties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.Cache;
 import cern.c2mon.cache.api.factory.CacheObjectFactory;
 import cern.c2mon.cache.api.parser.XmlParser;
 import cern.c2mon.server.common.device.*;
@@ -21,10 +21,10 @@ import cern.c2mon.shared.daq.config.Change;
 @Component
 public class DeviceCacheObjectFactory extends CacheObjectFactory<Device> {
 
-  private C2monCache<Long, DeviceClass> deviceClassCacheRef;
+  private Cache<Long, DeviceClass> deviceClassCacheRef;
 
   @Autowired
-  public DeviceCacheObjectFactory(C2monCache<Long, DeviceClass> deviceClassCacheRef) {
+  public DeviceCacheObjectFactory(Cache<Long, DeviceClass> deviceClassCacheRef) {
     this.deviceClassCacheRef = deviceClassCacheRef;
   }
 

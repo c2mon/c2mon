@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.Cache;
 import cern.c2mon.server.common.device.Device;
 
 /**
@@ -15,10 +15,10 @@ import cern.c2mon.server.common.device.Device;
 @Service
 public class DeviceService {
 
-  private final C2monCache<Long, Device> deviceCacheRef;
+  private final Cache<Long, Device> deviceCacheRef;
 
   @Autowired
-  public DeviceService(final C2monCache<Long, Device> deviceCacheRef) {
+  public DeviceService(final Cache<Long, Device> deviceCacheRef) {
     this.deviceCacheRef = deviceCacheRef;
   }
 }

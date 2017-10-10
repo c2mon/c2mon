@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.Cache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.shared.common.command.CommandTag;
 import cern.c2mon.shared.common.command.SourceCommandTag;
@@ -16,10 +16,10 @@ import cern.c2mon.shared.common.command.SourceCommandTag;
 @Service
 public class CommandTagService {
 
-  private C2monCache<Long, CommandTag> commandTagCacheRef;
+  private Cache<Long, CommandTag> commandTagCacheRef;
 
   @Autowired
-  public CommandTagService(C2monCache<Long, CommandTag> commandTagCacheRef) {
+  public CommandTagService(Cache<Long, CommandTag> commandTagCacheRef) {
     this.commandTagCacheRef = commandTagCacheRef;
   }
 

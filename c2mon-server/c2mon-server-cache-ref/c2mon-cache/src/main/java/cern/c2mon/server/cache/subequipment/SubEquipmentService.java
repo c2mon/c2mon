@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.Cache;
 import cern.c2mon.cache.api.service.AbstractEquipmentService;
 import cern.c2mon.cache.api.service.SupervisedService;
 import cern.c2mon.server.cache.CoreAbstractEquipmentService;
@@ -25,7 +25,7 @@ import cern.c2mon.shared.common.supervision.SupervisionConstants;
 @Service
 public class SubEquipmentService implements SupervisedService<SubEquipment>, AbstractEquipmentService {
 
-  private C2monCache<Long, SubEquipment> subEquipmentCacheRef;
+  private Cache<Long, SubEquipment> subEquipmentCacheRef;
 
   private SupervisedService<SubEquipment> supervisedService;
 
@@ -36,7 +36,7 @@ public class SubEquipmentService implements SupervisedService<SubEquipment>, Abs
   private AliveTimerService aliveTimerService;
 
   @Autowired
-  public SubEquipmentService(C2monCache<Long, SubEquipment> subEquipmentCacheRef, CommFaultService commFaultService, AliveTimerService aliveTimerService) {
+  public SubEquipmentService(Cache<Long, SubEquipment> subEquipmentCacheRef, CommFaultService commFaultService, AliveTimerService aliveTimerService) {
     this.subEquipmentCacheRef = subEquipmentCacheRef;
     this.commFaultService = commFaultService;
     this.aliveTimerService = aliveTimerService;
@@ -45,7 +45,7 @@ public class SubEquipmentService implements SupervisedService<SubEquipment>, Abs
     this.abstractEquipmentService = new CoreAbstractEquipmentService<>(subEquipmentCacheRef, commFaultService);
   }
 
-  public C2monCache getCache() {
+  public Cache getCache() {
     return subEquipmentCacheRef;
   }
 

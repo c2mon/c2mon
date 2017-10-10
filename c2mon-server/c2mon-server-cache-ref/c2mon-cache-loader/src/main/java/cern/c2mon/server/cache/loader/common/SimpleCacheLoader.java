@@ -10,9 +10,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.Cache;
 import cern.c2mon.cache.api.loader.C2monCacheLoader;
 import cern.c2mon.server.cache.loader.CacheLoaderDAO;
 import cern.c2mon.shared.common.Cacheable;
@@ -48,7 +47,7 @@ public class SimpleCacheLoader<T extends Cacheable> implements C2monCacheLoader 
    */
   private Map<Long, T> preloadBuffer = new ConcurrentHashMap<>();
 
-  private final C2monCache cache;
+  private final Cache cache;
 
   private final CacheLoaderDAO<T> cacheLoaderDAO;
 
@@ -61,7 +60,7 @@ public class SimpleCacheLoader<T extends Cacheable> implements C2monCacheLoader 
    * @param executor
    * @param threadNamePrefix
    */
-  public SimpleCacheLoader(C2monCache cache, CacheLoaderDAO<T> cacheLoaderDAO) {
+  public SimpleCacheLoader(Cache cache, CacheLoaderDAO<T> cacheLoaderDAO) {
     this.cache = cache;
     this.cacheLoaderDAO = cacheLoaderDAO;
   }

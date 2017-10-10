@@ -7,8 +7,8 @@ import java.util.stream.IntStream;
 import org.junit.Before;
 import org.junit.Test;
 
-import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.cache.api.impl.SimpleC2monCache;
+import cern.c2mon.cache.api.Cache;
+import cern.c2mon.cache.api.impl.SimpleCache;
 import cern.c2mon.server.cache.alivetimer.AliveTimerService;
 import cern.c2mon.server.common.alive.AliveTimer;
 import cern.c2mon.server.common.alive.AliveTimerCacheObject;
@@ -21,13 +21,13 @@ import static org.junit.Assert.assertTrue;
  */
 public class AliveTimerServiceTest {
 
-  private C2monCache<Long, AliveTimer> aliveTimerCacheRef;
+  private Cache<Long, AliveTimer> aliveTimerCacheRef;
 
   private AliveTimerService aliveTimerService;
 
   @Before
   public void init() {
-    aliveTimerCacheRef = new SimpleC2monCache<>("alive-timer-cache");
+    aliveTimerCacheRef = new SimpleCache<>("alive-timer-cache");
     aliveTimerService = new AliveTimerService(aliveTimerCacheRef);
   }
 
