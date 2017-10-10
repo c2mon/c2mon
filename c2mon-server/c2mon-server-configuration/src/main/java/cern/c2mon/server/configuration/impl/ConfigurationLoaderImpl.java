@@ -125,6 +125,8 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
 
   private final DeviceConfigHandler deviceConfigHandler;
 
+  private final ExpressionConfigHandler expressionConfigHandler;
+
   private Environment environment;
 
   /**
@@ -165,6 +167,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
                                  ProcessCache processCache,
                                  DeviceClassConfigHandler deviceClassConfigHandler,
                                  DeviceConfigHandler deviceConfigHandler,
+                                 ExpressionConfigHandler expressionConfigHandler,
                                  ConfigurationParser configParser,
                                  SequenceDAO sequenceDAO,
                                  ConfigurationProperties properties,
@@ -185,6 +188,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
     this.clusterCache = clusterCache;
     this.deviceClassConfigHandler = deviceClassConfigHandler;
     this.deviceConfigHandler = deviceConfigHandler;
+    this.expressionConfigHandler = expressionConfigHandler;
     this.configParser = configParser;
     this.sequenceDAO = sequenceDAO;
     this.daqConfigEnabled = properties.isDaqConfigEnabled();
@@ -592,6 +596,9 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
             break;
           case DEVICE:
             daqConfigEvents.add(deviceConfigHandler.createDevice(element));
+            break;
+          case EXPRESSION:
+            expressionConfigHandler.createExpression(element);
             break;
           default:
             elementReport.setFailure("Unrecognized reconfiguration entity: " + element.getEntity());

@@ -36,6 +36,7 @@ import cern.c2mon.shared.client.configuration.api.equipment.SubEquipment;
 import cern.c2mon.shared.client.configuration.api.process.Process;
 import cern.c2mon.shared.client.configuration.api.tag.*;
 import cern.c2mon.shared.client.configuration.api.util.ConfigurationEntity;
+import cern.c2mon.shared.client.expression.DslExpression;
 
 
 /**
@@ -56,12 +57,13 @@ public class ConfigurationParserImpl implements ConfigurationParser {
   private ProcessFactory processFactory;
   private RuleTagFactory ruleTagFactory;
   private SubEquipmentFactory subEquipmentFactory;
+  private ExpressionFactory expressionFactory;
 
   @Autowired
   public ConfigurationParserImpl(
       AlarmFactory alarmFactory, CommandTagFactory commandTagFactory, ControlTagFactory controlTagFactory,
       DataTagFactory dataTagFactory, EquipmentFactory equipmentFactory, ProcessFactory processFactory, RuleTagFactory ruleTagFactory,
-      SubEquipmentFactory subEquipmentFactory) {
+      SubEquipmentFactory subEquipmentFactory, ExpressionFactory expressionFactory) {
     this.alarmFactory = alarmFactory;
     this.commandTagFactory = commandTagFactory;
     this.controlTagFactory = controlTagFactory;
@@ -70,6 +72,7 @@ public class ConfigurationParserImpl implements ConfigurationParser {
     this.processFactory = processFactory;
     this.ruleTagFactory = ruleTagFactory;
     this.subEquipmentFactory = subEquipmentFactory;
+    this.expressionFactory = expressionFactory;
   }
 
   @Override
@@ -157,6 +160,9 @@ public class ConfigurationParserImpl implements ConfigurationParser {
     }
     if (entity instanceof CommandTag) {
       return commandTagFactory;
+    }
+    if (entity instanceof DslExpression) {
+      return expressionFactory;
     }
     throw new IllegalArgumentException("No EntityFactory for class " + entity.getClass() + " could be determined!");
   }

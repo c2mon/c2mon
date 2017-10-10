@@ -38,6 +38,7 @@ import cern.c2mon.server.common.expression.Evaluator;
 import cern.c2mon.server.common.expression.LocalExpressionCache;
 import cern.c2mon.server.common.listener.ConfigurationEventListener;
 import cern.c2mon.server.common.rule.RuleTag;
+import cern.c2mon.server.common.rule.RuleTagCacheObject;
 import cern.c2mon.server.configuration.handler.AlarmConfigHandler;
 import cern.c2mon.server.configuration.handler.RuleTagConfigHandler;
 import cern.c2mon.server.configuration.handler.impl.TagConfigGateway;
@@ -102,7 +103,7 @@ public class RuleTagConfigTransactedImpl extends TagConfigTransactedImpl<RuleTag
     try {
       log.trace("Creating RuleTag with id {}", element.getEntityId());
       RuleTag ruleTag = commonTagFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
-      Collection<Long> tagIds = ruleTag.getRuleInputTagIds();
+      Collection<Long> tagIds = ((RuleTagCacheObject) ruleTag).getRuleInputTagIds();
       try {
         ruleTag = Evaluator.evaluate(ruleTag);
         configurableDAO.insert(ruleTag);
@@ -160,7 +161,7 @@ public class RuleTagConfigTransactedImpl extends TagConfigTransactedImpl<RuleTag
 
       //first record the old tag Ids before reconfiguring
       if (properties.containsKey("ruleText")) {
-         oldTagIds = ruleTagCopy.getRuleInputTagIds();
+         oldTagIds = ((RuleTagCacheObject)ruleTagCopy).getRuleInputTagIds();
       }
 
       try {
@@ -185,7 +186,7 @@ public class RuleTagConfigTransactedImpl extends TagConfigTransactedImpl<RuleTag
           for (Long oldTagId : oldTagIds) {
             tagConfigGateway.removeRuleFromTag(oldTagId, ruleTagCopy.getId());
           }
-          for (Long newTagId : ruleTagCopy.getRuleInputTagIds()) {
+          for (Long newTagId : ((RuleTagCacheObject)ruleTagCopy).getRuleInputTagIds()) {
             tagConfigGateway.addRuleToTag(newTagId, ruleTagCopy.getId());
           }
         }
@@ -201,7 +202,7 @@ public class RuleTagConfigTransactedImpl extends TagConfigTransactedImpl<RuleTag
               log.warn("Exception caught while rolling back rule update", ex);
             }
           }
-          for (Long newTagId : ruleTagCopy.getRuleInputTagIds()) {
+          for (Long newTagId : ((RuleTagCacheObject)ruleTagCopy).getRuleInputTagIds()) {
             try {
               tagConfigGateway.removeRuleFromTag(newTagId, ruleTagCopy.getId());
             } catch (Exception ex) {
@@ -231,58 +232,62 @@ public class RuleTagConfigTransactedImpl extends TagConfigTransactedImpl<RuleTag
   }
 
   @Override
-  @Transactional(value = "cacheTransactionManager", propagation=Propagation.REQUIRES_NEW, isolation = Isolation.READ_COMMITTED)
+  @Transactional(value = "cacheTransactionManager", propagation = Propagation.REQUIRES_NEW, isolation = Isolation.READ_COMMITTED)
   public void doRemoveRuleTag(final Long id, final ConfigurationElementReport elementReport) {
     log.trace("Removing RuleTag {}", id);
-    try {
-      RuleTag ruleTag = tagCache.get(id);
-      Collection<Long> ruleIds = ruleTag.getCopyRuleIds();
-      if (!ruleIds.isEmpty()) {
-        log.debug("Removing rules dependent on RuleTag {}", id);
-        for (Long ruleId : ruleIds) { //concurrent modifcation as a rule is removed from the list during the remove call!
-          if (tagLocationService.isInTagCache(ruleId)) { //may already have been removed if a previous rule in the list was used in this rule!
-            ConfigurationElementReport newReport = new ConfigurationElementReport(Action.REMOVE, Entity.RULETAG, ruleId);
-            elementReport.addSubReport(newReport);
-            ruleTagConfigHandler.removeRuleTag(ruleId, newReport); //call config handler bean so transaction annotation is noticed
-          }
-        }
-      }
-      tagCache.acquireWriteLockOnKey(id);
-      Collection<Long> ruleInputTagIds = Collections.EMPTY_LIST;
+    RuleTagCacheObject ruleTag;
+    if (tagCache.get(id) instanceof RuleTagCacheObject) {
+      ruleTag = (RuleTagCacheObject) tagCache.get(id);
       try {
-        ruleInputTagIds = ruleTag.getCopyRuleInputTagIds();
-        Collection<Long> alarmIds = ruleTag.getCopyAlarmIds();
-        if (!alarmIds.isEmpty()) {
-          log.debug("Removing Alarms dependent on RuleTag " + id);
-          for (Long alarmId : alarmIds) { //need copy as modified concurrently by remove alarm
-            ConfigurationElementReport alarmReport = new ConfigurationElementReport(Action.REMOVE, Entity.ALARM, alarmId);
-            elementReport.addSubReport(alarmReport);
-            alarmConfigHandler.removeAlarm(alarmId, alarmReport);
+        Collection<Long> ruleIds = ruleTag.getCopyRuleIds();
+        if (!ruleIds.isEmpty()) {
+          log.debug("Removing rules dependent on RuleTag {}", id);
+          for (Long ruleId : ruleIds) {
+            //concurrent modifcation as a rule is removed from the list during the remove call!
+            if (tagLocationService.isInTagCache(ruleId)) { //may already have been removed if a previous rule in the list was used in this rule!
+              ConfigurationElementReport newReport = new ConfigurationElementReport(Action.REMOVE, Entity.RULETAG, ruleId);
+              elementReport.addSubReport(newReport);
+              ruleTagConfigHandler.removeRuleTag(ruleId, newReport); //call config handler bean so transaction annotation is noticed
+            }
           }
         }
-        for (Long inputTagId : ruleInputTagIds) {
-          tagConfigGateway.removeRuleFromTag(inputTagId, id); //allowed to lock tag below the rule...
-        }
+        tagCache.acquireWriteLockOnKey(id);
+        try {
+          Collection<Long> ruleInputTagIds = ruleTag.getCopyRuleInputTagIds();
+          Collection<Long> alarmIds = ruleTag.getCopyAlarmIds();
+          if (!alarmIds.isEmpty()) {
+            log.debug("Removing Alarms dependent on RuleTag " + id);
+            for (Long alarmId : alarmIds) { //need copy as modified concurrently by remove alarm
+              ConfigurationElementReport alarmReport = new ConfigurationElementReport(Action.REMOVE, Entity.ALARM, alarmId);
+              elementReport.addSubReport(alarmReport);
+              alarmConfigHandler.removeAlarm(alarmId, alarmReport);
+            }
+          }
+          for (Long inputTagId : ruleInputTagIds) {
+            tagConfigGateway.removeRuleFromTag(inputTagId, id); //allowed to lock tag below the rule...
+          }
 
-        for (ConfigurationEventListener listener : configurationEventListeners) {
-          listener.onConfigurationEvent(ruleTag, Action.REMOVE);
-        }
+          for (ConfigurationEventListener listener : configurationEventListeners) {
+            listener.onConfigurationEvent(ruleTag, Action.REMOVE);
+          }
 
-        LocalExpressionCache.removeTag(ruleTag.getId());
-        configurableDAO.deleteItem(ruleTag.getId());
-      }
-      catch (RuntimeException rEx) {
-        String errMessage = "Exception caught when removing rule tag with id " + id;
-        log.error(errMessage, rEx);
-        throw new UnexpectedRollbackException(errMessage, rEx);
-      } finally {
-        if (tagCache.isWriteLockedByCurrentThread(id)) {
-          tagCache.releaseWriteLockOnKey(id);
+          LocalExpressionCache.removeTag(ruleTag.getId());
+          configurableDAO.deleteItem(ruleTag.getId());
+        } catch (RuntimeException rEx) {
+          String errMessage = "Exception caught when removing rule tag with id " + id;
+          log.error(errMessage, rEx);
+          throw new UnexpectedRollbackException(errMessage, rEx);
+        } finally {
+          if (tagCache.isWriteLockedByCurrentThread(id)) {
+            tagCache.releaseWriteLockOnKey(id);
+          }
         }
+      } catch (CacheElementNotFoundException e) {
+        log.debug("Attempting to remove a non-existent RuleTag - no action taken.");
+        elementReport.setWarning("Attempting to removed a non-existent RuleTag");
       }
-    } catch (CacheElementNotFoundException e) {
-      log.debug("Attempting to remove a non-existent RuleTag - no action taken.");
-      elementReport.setWarning("Attempting to removed a non-existent RuleTag");
+    } else {
+      log.debug("RuleTag is not an instance of RuleTagCacheObject - no action taken.");
     }
   }
 }

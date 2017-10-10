@@ -18,8 +18,7 @@ package cern.c2mon.server.configuration.handler.impl;
 
 import java.util.Properties;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.UnexpectedRollbackException;
@@ -38,21 +37,16 @@ import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 
 /**
  * See interface documentation also.
- *
+ * <p>
  * <p>Currently all alarms and rules must be manually removed from any tag before it can be removed.
  * This also applied when removing an Equipment or Process: this will only succeed if all alarms
  * and rules have first been removed.
  *
  * @author Mark Brightwell
- *
  */
+@Slf4j
 @Service
 public class DataTagConfigHandlerImpl implements DataTagConfigHandler {
-
-  /**
-   * Class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(DataTagConfigHandlerImpl.class);
 
   /**
    * Bean with DB transactions on methods.
@@ -76,6 +70,7 @@ public class DataTagConfigHandlerImpl implements DataTagConfigHandler {
 
   /**
    * Constructor.
+   *
    * @param dataTagCache cache
    * @param equipmentFacade
    * @param subEquipmentFacade
@@ -83,7 +78,7 @@ public class DataTagConfigHandlerImpl implements DataTagConfigHandler {
    */
   @Autowired
   public DataTagConfigHandlerImpl(DataTagCache dataTagCache, EquipmentFacade equipmentFacade, SubEquipmentFacade subEquipmentFacade,
-      ConfigurationUpdateImpl configurationUpdateImpl) {
+                                  ConfigurationUpdateImpl configurationUpdateImpl) {
     this.dataTagCache = dataTagCache;
     this.equipmentFacade = equipmentFacade;
     this.subEquipmentFacade = subEquipmentFacade;
@@ -94,16 +89,14 @@ public class DataTagConfigHandlerImpl implements DataTagConfigHandler {
   public ProcessChange createDataTag(ConfigurationElement element) throws IllegalAccessException {
     ProcessChange change = dataTagConfigTransacted.doCreateDataTag(element);
     dataTagCache.notifyListenersOfUpdate(element.getEntityId());
-    if (LOGGER.isTraceEnabled()) {
-    	LOGGER.trace("createDataTag - Notifying Configuration update listeners");
-    }
+    log.trace("createDataTag - Notifying Configuration update listeners");
     this.configurationUpdateImpl.notifyListeners(element.getEntityId());
     return change;
   }
 
   @Override
   public ProcessChange removeDataTag(Long id, ConfigurationElementReport tagReport) {
-    LOGGER.trace("Removing DataTag " + id);
+    log.trace("Removing DataTag " + id);
     try {
       DataTag tagCopy = dataTagCache.getCopy(id);
       ProcessChange change = dataTagConfigTransacted.doRemoveDataTag(id, tagReport);
@@ -118,19 +111,17 @@ public class DataTagConfigHandlerImpl implements DataTagConfigHandler {
 
   @Override
   public ProcessChange updateDataTag(Long id, Properties elementProperties) {
-	  try {
-		  ProcessChange processChange = dataTagConfigTransacted.doUpdateDataTag(id, elementProperties);
-		  if (LOGGER.isTraceEnabled()) {
-		    	LOGGER.trace("createDataTag - Notifying Configuration update listeners");
-		    }
-		  this.configurationUpdateImpl.notifyListeners(id);
-		  return processChange;
-	  } catch (UnexpectedRollbackException e) {
-		  LOGGER.error("Rolling back update in cache");
-		  dataTagCache.remove(id); //DB transaction is rolled back here: reload the tag
-		  dataTagCache.loadFromDb(id);
-		  throw e;
-	  }
+    try {
+      ProcessChange processChange = dataTagConfigTransacted.doUpdateDataTag(id, elementProperties);
+      log.trace("createDataTag - Notifying Configuration update listeners");
+      this.configurationUpdateImpl.notifyListeners(id);
+      return processChange;
+    } catch (UnexpectedRollbackException e) {
+      log.error("Rolling back update in cache");
+      dataTagCache.remove(id); //DB transaction is rolled back here: reload the tag
+      dataTagCache.loadFromDb(id);
+      throw e;
+    }
   }
 
   @Override

@@ -29,6 +29,7 @@ import cern.c2mon.shared.client.configuration.api.equipment.Equipment;
 import cern.c2mon.shared.client.configuration.api.equipment.SubEquipment;
 import cern.c2mon.shared.client.configuration.api.process.Process;
 import cern.c2mon.shared.client.configuration.api.tag.*;
+import cern.c2mon.shared.client.expression.DslExpression;
 import cern.c2mon.shared.client.process.ProcessNameResponse;
 import cern.c2mon.shared.client.tag.TagConfig;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
@@ -65,6 +66,8 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
   private CommandTagConfigurationManager commandTagConfigurationManager;
 
+  private ExpressionConfigurationManager expressionConfigurationManager;
+
   @Autowired
   protected ConfigurationServiceImpl(final @Qualifier("coreRequestHandler") RequestHandler requestHandler,
                                      final ConfigurationRequestSender configurationRequestSender,
@@ -75,7 +78,9 @@ public class ConfigurationServiceImpl implements ConfigurationService {
                                      RuleTagConfigurationManager ruleTagConfigurationManager,
                                      AlarmConfigurationManager alarmConfigurationManager,
                                      ControlTagConfigurationManager controlTagConfigurationManager,
-                                     CommandTagConfigurationManager commandTagConfigurationManager) {
+                                     CommandTagConfigurationManager commandTagConfigurationManager,
+                                     ExpressionConfigurationManager expressionConfigurationManager
+                                     ) {
     this.clientRequestHandler = requestHandler;
     this.configurationRequestSender = configurationRequestSender;
     this.processConfigurationManager = processConfigurationManager;
@@ -86,6 +91,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     this.alarmConfigurationManager = alarmConfigurationManager;
     this.controlTagConfigurationManager = controlTagConfigurationManager;
     this.commandTagConfigurationManager = commandTagConfigurationManager;
+    this.expressionConfigurationManager = expressionConfigurationManager;
   }
 
   @Override
@@ -483,5 +489,20 @@ public class ConfigurationServiceImpl implements ConfigurationService {
   @Override
   public ConfigurationReport removeAlarms(Set<Long> ids) {
     return alarmConfigurationManager.removeAlarms(ids);
+  }
+
+  @Override
+  public ConfigurationReport createExpression(String name, String desciption, Class<?> datatype, String expression) {
+    return expressionConfigurationManager.createExpression(name, desciption, datatype, expression);
+  }
+
+  @Override
+  public ConfigurationReport createExpression(DslExpression expression) {
+    return expressionConfigurationManager.createExpression(expression);
+  }
+
+  @Override
+  public ConfigurationReport createExpressions(List<DslExpression> ruleTags) {
+    return expressionConfigurationManager.createExpressions(ruleTags);
   }
 }
