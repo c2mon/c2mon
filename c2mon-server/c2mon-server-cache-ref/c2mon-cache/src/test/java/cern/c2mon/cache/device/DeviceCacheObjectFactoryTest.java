@@ -1,9 +1,6 @@
 package cern.c2mon.cache.device;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 import org.easymock.EasyMock;
 import org.junit.Assert;
@@ -70,7 +67,7 @@ public class DeviceCacheObjectFactoryTest {
 
     assertNotNull(device);
     assertTrue(device.getId() == 10L);
-    assertTrue(device.getName() == deviceProperties.getProperty("name"));
+    assertTrue(Objects.equals(device.getName(), deviceProperties.getProperty("name")));
     assertTrue(device.getDeviceClassId() == 400L);
 
     assertTrue(device.getDeviceProperties().size() == 3);

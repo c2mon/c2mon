@@ -1,5 +1,6 @@
 package cern.c2mon.cache.deviceclass;
 
+import java.util.Objects;
 import java.util.Properties;
 
 import org.junit.Assert;
@@ -29,7 +30,7 @@ public class DeviceClassCacheObjectFactoryTest {
     DeviceClass deviceClass = factory.createCacheObject(10L, properties);
     Assert.assertNotNull(deviceClass);
     assertTrue(deviceClass.getId() == 10L);
-    assertTrue(deviceClass.getName() == properties.getProperty("name"));
+    assertTrue(Objects.equals(deviceClass.getName(), properties.getProperty("name")));
 
     assertTrue(deviceClass.getProperties().size() == 2);
 

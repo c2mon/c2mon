@@ -31,10 +31,6 @@
       <groupId>cern.c2mon.server</groupId>
       <artifactId>c2mon-server-cachedbaccess</artifactId>
     </dependency>
-    <dependency>
-      <groupId>cern.c2mon.shared</groupId>
-      <artifactId>c2mon-shared-common</artifactId>
-    </dependency>
 
     <dependency>
       <groupId>javax.cache</groupId>

@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.cache.loading;
+package cern.c2mon.server.cache.loader;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -24,7 +24,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
-import cern.c2mon.server.cache.loader.ProcessDAO;
 import cern.c2mon.server.cache.loader.config.CacheLoaderModuleRef;
 import cern.c2mon.server.common.config.CommonModule;
 import cern.c2mon.server.common.process.Process;
