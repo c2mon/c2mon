@@ -28,10 +28,10 @@ public class DataTagCacheConfig {
   CacheLoaderProperties properties;
 
   @Bean(name = CacheName.Names.DATATAG)
-  public Cache createCache(AbstractCacheFactory cachingFactory, DataTagLoaderDAO dataTagLoaderDAO) {
+  public Cache createCache(AbstractCacheFactory cachingFactory, DataTagLoaderDAO dataTagLoaderDAORef) {
     Cache cache = cachingFactory.createCache(CacheName.DATATAG.getLabel(), Long.class, DataTag.class);
 
-    CacheLoader cacheLoader = new BatchCacheLoader<Long, DataTag>(cacheLoaderTaskExecutor, cache, dataTagLoaderDAO,
+    CacheLoader cacheLoader = new BatchCacheLoader<Long, DataTag>(cacheLoaderTaskExecutor, cache, dataTagLoaderDAORef,
             properties.getBatchSize(), "DataTagLoader-");
     cache.setCacheLoader(cacheLoader);
 
