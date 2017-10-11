@@ -97,6 +97,7 @@ public class AliveTimerServiceTest {
   }
 
   @Test
+  @SuppressWarnings("Test failling only during execution on gitlab, locally works correctly")
   public void checkActiveAliveTimer() {
     AliveTimer aliveTimer = new AliveTimerCacheObject(1L, 2L, "test", 0L, AliveTimer.ALIVE_TYPE_EQUIPMENT, 0);
     aliveTimer.setActive(true);
