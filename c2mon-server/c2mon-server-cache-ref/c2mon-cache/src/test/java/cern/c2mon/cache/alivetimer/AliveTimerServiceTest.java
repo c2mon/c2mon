@@ -96,6 +96,8 @@ public class AliveTimerServiceTest {
     assertTrue("Test if AliveTimer is expired", hasExpired);
   }
 
+  //TODO: Even if this test works fine locally, it should be fixed to pass a remote testing on gitlab,
+  //TODO: then SuppressWarning can be removed
   @Test
   @SuppressWarnings("Test failling only during execution on gitlab, locally works correctly")
   public void checkActiveAliveTimer() {
