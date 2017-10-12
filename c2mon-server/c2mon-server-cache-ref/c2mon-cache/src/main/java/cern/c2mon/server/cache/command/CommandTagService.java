@@ -23,12 +23,20 @@ public class CommandTagService {
     this.commandTagCacheRef = commandTagCacheRef;
   }
 
+  /**
+   * Generates the XML needed to send to the DAQ at start-up.
+   *
+   * @param id
+   *
+   * @return
+   */
   public String getConfigXML(Long id) {
     String returnValue = "";
     try {
       CommandTag commandTag = commandTagCacheRef.get(id);
       returnValue = generateSourceXML(commandTag); //old version: SourceDataTag.toConfigXML(tag);
-    } catch (CacheElementNotFoundException cacheEx) {
+    }
+    catch (CacheElementNotFoundException cacheEx) {
       log.error("Failed to locate command tag with id " + id + " in the cache (returning empty String config).");
     }
     return returnValue;
@@ -44,8 +52,9 @@ public class CommandTagService {
   }
 
   /**
-   * Used to be implemented in SourceCommandTag object (TODO still be be removed there)
+   *
    * @param cmd
+   *
    * @return
    */
   private String generateSourceXML(CommandTag cmd) {
