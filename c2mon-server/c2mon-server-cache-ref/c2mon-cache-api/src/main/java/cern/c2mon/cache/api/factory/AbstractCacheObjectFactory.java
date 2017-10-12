@@ -13,8 +13,10 @@ public abstract class AbstractCacheObjectFactory<T extends Cacheable> {
 
   /**
    * Creates CacheObject wrapped with properties, use this one
+   *
    * @param id
    * @param properties
+   *
    * @return CacheObject
    * @throws IllegalAccessException
    */
@@ -36,18 +38,30 @@ public abstract class AbstractCacheObjectFactory<T extends Cacheable> {
    * Creates basic object with only id set
    *
    * @param id
+   *
    * @return CacheObject
    */
   public abstract T createCacheObject(Long id);
 
-  public abstract Change configureCacheObject(T cacheable, Properties properties)throws IllegalAccessException;
+  /**
+   * Given an alarm object, reset some of its fields according to the passed properties.
+   *
+   * @param properties the properties object containing the fields
+   * @param cacheable  the object to modify (is modified by this method)
+   *
+   * @return always returns null, as no CacheObject change needs propagating to the DAQ layer
+   * @throws ConfigurationException if cannot configure the CacheObject from the properties
+   */
+  public abstract Change configureCacheObject(T cacheable, Properties properties) throws IllegalAccessException;
 
   /**
-   * Checks all fields of a Command Tag satisfy requirements.
+   * Perform a series of consistency checks on the CacheObject. This method
+   * should be invoked if an CacheObject was created from a list of named
+   * properties.
    *
-   * @param commandTag
+   * @param cacheable the cache object to validate
    *
-   * @throws ConfigurationException
+   * @throws ConfigurationException if one of the consistency checks fails
    */
   public abstract void validateConfig(T cacheable) throws ConfigurationException;
 
@@ -84,11 +98,12 @@ public abstract class AbstractCacheObjectFactory<T extends Cacheable> {
   /**
    * If the String is "null", then set the return value
    * to null, else return the original value.
-   *
+   * <p>
    * <p>Should be used on fields that accept configurations
    * resetting them to null.
    *
    * @param fieldValue the field value, may be "null"
+   *
    * @return the fieldValue, or null if the fieldValue was "null"
    */
   protected String checkAndSetNull(String fieldValue) {
