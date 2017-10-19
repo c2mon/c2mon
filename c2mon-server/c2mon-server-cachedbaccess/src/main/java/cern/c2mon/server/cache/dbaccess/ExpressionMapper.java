@@ -7,7 +7,7 @@ import cern.c2mon.server.common.expression.ExpressionCacheObject;
  *
  * @author Martin Flamm
  */
-public interface ExpressionMapper extends PersistenceMapper<ExpressionCacheObject>, LoaderMapper<ExpressionCacheObject>, ConfigurableMapper<ExpressionCacheObject> {
+public interface ExpressionMapper extends BatchLoaderMapper<ExpressionCacheObject>, PersistenceMapper<ExpressionCacheObject>, LoaderMapper<ExpressionCacheObject>, ConfigurableMapper<ExpressionCacheObject> {
 
   void insertExpression(ExpressionCacheObject expression);
 

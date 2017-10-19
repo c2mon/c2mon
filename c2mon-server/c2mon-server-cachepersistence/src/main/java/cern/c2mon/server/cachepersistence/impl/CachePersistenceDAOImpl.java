@@ -99,6 +99,4 @@ public class CachePersistenceDAOImpl<T extends Cacheable> implements CachePersis
       }
     }
   }
-
-
 }

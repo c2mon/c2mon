@@ -3,18 +3,19 @@ package cern.c2mon.server.common.expression;
 import java.sql.Timestamp;
 import java.util.Set;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import cern.c2mon.server.common.metadata.Metadata;
 import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.tag.AbstractTagCacheObject;
+import cern.c2mon.shared.common.Cacheable;
 
 /**
  * @author Martin Flamm
  */
-
 @Data
-public class ExpressionCacheObject extends AbstractTagCacheObject implements RuleTag, Cloneable {
+public class ExpressionCacheObject extends AbstractTagCacheObject implements RuleTag {
 
   /**
    * Version number of the class used during serialization/deserialization. This
@@ -50,14 +51,19 @@ public class ExpressionCacheObject extends AbstractTagCacheObject implements Rul
     super(id);
   }
 
+  public ExpressionCacheObject() {
+    super();
+  }
+
   @Override
   public Object clone() throws CloneNotSupportedException {
-    return new CloneNotSupportedException();
+    ExpressionCacheObject cacheObject = (ExpressionCacheObject) super.clone();
+    return cacheObject;
   }
 
   @Override
   public Timestamp getTimestamp() {
-    return null;
+    return getCacheTimestamp();
   }
 
   @Override
@@ -77,6 +83,6 @@ public class ExpressionCacheObject extends AbstractTagCacheObject implements Rul
 
   @Override
   public String getRuleText() {
-    return null;
+    return this.expression;
   }
 }

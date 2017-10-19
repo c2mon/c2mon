@@ -56,23 +56,28 @@ public class RuleTagCacheImpl extends AbstractTagCache<RuleTag> implements RuleT
    * DataTagCache for rule parent id loading.
    */
   private final DataTagCache dataTagCache;
+  private final C2monCacheLoader expressionCacheLoader;
 
   @Autowired
   public RuleTagCacheImpl(@Qualifier("clusterCache") final ClusterCache clusterCache,
                           @Qualifier("ruleTagEhcache") final Ehcache ehcache,
                           @Qualifier("ruleTagEhcacheLoader") final CacheLoader cacheLoader,
                           @Qualifier("ruleTagCacheLoader") final C2monCacheLoader c2monCacheLoader,
+                          @Qualifier("expressionCacheLoader") final C2monCacheLoader expressionCacheLoader,
                           @Qualifier("ruleTagLoaderDAO") final SimpleCacheLoaderDAO<RuleTag> cacheLoaderDAO,
                           @Qualifier("dataTagCache") final DataTagCache dataTagCache,
                           final CacheProperties properties) {
     super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO, properties);
     this.dataTagCache = dataTagCache;
+    this.expressionCacheLoader = expressionCacheLoader;
   }
 
   @PostConstruct
   public void init() {
     log.debug("Initializing RuleTag cache...");
+    expressionCacheLoader.preload();
     commonInit();
+
     log.info("RuleTag cache initialization complete");
   }
 

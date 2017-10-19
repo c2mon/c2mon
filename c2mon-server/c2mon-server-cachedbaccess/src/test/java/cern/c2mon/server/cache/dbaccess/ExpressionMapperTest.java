@@ -2,27 +2,25 @@ package cern.c2mon.server.cache.dbaccess;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 
-import org.junit.Ignore;
+import javax.annotation.Resource;
+
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import cern.c2mon.server.common.expression.ExpressionCacheObject;
 import cern.c2mon.server.common.metadata.Metadata;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Martin Flamm
  */
 public class ExpressionMapperTest extends AbstractMapperTest {
 
-  @Autowired
+  @Resource
   private ExpressionMapper expressionMapper;
 
-  // ToDo: fix ExpressionMapper and enable test again
-  @Ignore
   @Test
   public void testInsertCompletes() {
     ExpressionCacheObject expression = createExpression(1L, "avg(q(name:'*/cpu.loadavg', '1m'))");
@@ -40,6 +38,7 @@ public class ExpressionMapperTest extends AbstractMapperTest {
     assertEquals("Java.lang.Float", cachedObject.getDataType());
     assertEquals(1252516526L, cachedObject.getVersion());
     assertEquals(22.25452D, cachedObject.getValue());
+    assertEquals("name_" + 1L, cachedObject.getName());
 
     expressionMapper.deleteExpression(expression.getId());
   }
@@ -49,13 +48,32 @@ public class ExpressionMapperTest extends AbstractMapperTest {
     ExpressionCacheObject expression = createExpression(1L, "avg(q(name:'*/cpu.loadavg', '1m'))");
     expressionMapper.insertExpression(expression);
 
-    expressionMapper.deleteExpression(expression.getId());
+    expressionMapper.deleteExpression(1L);
     assertTrue(expressionMapper.getAll().isEmpty());
+  }
+
+  @Test
+  public void testGetNumberItems() {
+    ExpressionCacheObject expression;
+
+    expression = createExpression(1L, "avg(q(name:'*/cpu.loadavg', '1m'))");
+    expressionMapper.insertExpression(expression);
+    expression = createExpression(2L, "avg(q(name:'*/cpu.loadavg', '1m'))");
+    expressionMapper.insertExpression(expression);
+    expression = createExpression(3L, "avg(q(name:'*/cpu.loadavg', '1m'))");
+    expressionMapper.insertExpression(expression);
+
+    Integer numberItems = expressionMapper.getNumberItems();
+    assertTrue(numberItems == 3);
+    expressionMapper.deleteExpression(1L);
+    expressionMapper.deleteExpression(2L);
+    expressionMapper.deleteExpression(3L);
   }
 
   private ExpressionCacheObject createExpression(long id, String expressionString) {
     ExpressionCacheObject expression = new ExpressionCacheObject(id);
     expression.setExpression(expressionString);
+    expression.setName("name_" + id);
 
     Metadata metadata = new Metadata();
     metadata.addMetadata("responsible", "Joe Bloggs");

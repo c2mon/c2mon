@@ -30,6 +30,7 @@ import org.springframework.stereotype.Service;
 import cern.c2mon.server.cache.ClusterCache;
 import cern.c2mon.server.cache.RuleTagCache;
 import cern.c2mon.server.cache.RuleTagFacade;
+import cern.c2mon.server.common.expression.ExpressionCacheObject;
 import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.rule.RuleTagCacheObject;
 
@@ -146,7 +147,7 @@ public class RuleTagPostLoaderProcessor {
       for (Long ruleKey : keyList) {
         RuleTag ruleTag = ruleTagCache.get(ruleKey);
         //if not empty, already processed
-        if (ruleTag.getProcessIds().isEmpty()) {
+        if ((ruleTag instanceof RuleTagCacheObject) && ruleTag.getProcessIds().isEmpty()) {
           if (ruleTagCache.get(ruleKey) instanceof RuleTagCacheObject) {
             ruleTagFacade.setParentSupervisionIds((RuleTagCacheObject) ruleTag);
           }

@@ -1,9 +1,9 @@
 package cern.c2mon.server.dsl;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.naming.event.ObjectChangeListener;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinTask;
+import java.util.concurrent.TimeUnit;
 
 import groovy.lang.GroovyShell;
 import groovy.lang.Script;
@@ -14,17 +14,16 @@ import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.cache.RuleTagCache;
-import cern.c2mon.server.cache.RuleTagFacade;
 import cern.c2mon.server.cache.TagLocationService;
 import cern.c2mon.server.cache.dbaccess.ExpressionMapper;
 import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.common.expression.ExpressionCacheObject;
-import cern.c2mon.server.common.metadata.Metadata;
 import cern.c2mon.server.common.rule.RuleTag;
-import cern.c2mon.server.common.rule.RuleTagCacheObject;
 import cern.c2mon.server.dsl.config.DslProperties;
 import cern.c2mon.server.elasticsearch.BaseScript;
 import cern.c2mon.server.elasticsearch.ElasticsearchService;
+import cern.c2mon.shared.common.datatag.DataTagQuality;
+import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 
 /**
  * @author Martin Flamm
@@ -53,15 +52,16 @@ public class ExpressionEvaluatorTask extends TimerTask implements SmartLifecycle
   private final ElasticsearchService elasticsearchService;
 
   private ExpressionMapper expressionMapper;
-  private ExpressionLoader expressionLoader;
+  private ExpressionLoaderTask expressionLoader;
 
   private final GroovyShell shell;
   //  String e3 = "(avg(q(name:'*/cpu.loadavg', '1m'))> 3) && (avg(q(name:'*/cpu.temp', '1m'))> 40)";
 //  Script s3;
   private long counter;
+  private final ForkJoinPool threadPool;
 
   @Autowired
-  public ExpressionEvaluatorTask(RuleTagCache ruleTagCache, TagLocationService tagLocationService, DslProperties properties, ElasticsearchService elasticsearchService, ExpressionMapper expressionMapper, ExpressionLoader expressionLoader) {
+  public ExpressionEvaluatorTask(RuleTagCache ruleTagCache, TagLocationService tagLocationService, DslProperties properties, ElasticsearchService elasticsearchService, ExpressionMapper expressionMapper, ExpressionLoaderTask expressionLoader) {
     super();
     this.ruleTagCache = ruleTagCache;
     this.properties = properties;
@@ -73,29 +73,80 @@ public class ExpressionEvaluatorTask extends TimerTask implements SmartLifecycle
     this.expressionMapper = expressionMapper;
     this.expressionLoader = expressionLoader;
     //this.s3 =  shell.parse(e3);
+    this.threadPool = new ForkJoinPool(10);
   }
 
   @Override
   public void run() {
     if (!expressionLoader.isRunning() && !ExpressionCache.isEmpty()) {
       try {
+
+        Map<Long, Script> compiledExpressions = ExpressionCache.getCompiledExpressions();
+
         counter = System.currentTimeMillis();
-        ExpressionCache.getCompiledExpressions().forEach((k, v) -> {
-          ExpressionCacheObject tempExpression = ExpressionCache.getExpression(k);
-          Object temp = v.run();
-          tempExpression.setValue(temp);
-          ExpressionCache.cacheExpression(k, tempExpression);
-          ruleTagCache.putQuiet(tempExpression);
-          //expressionMapper.updateCacheable(tempExpression);
-          RuleTag ruletag = ruleTagCache.get(tempExpression.getId());
-          log.info("Evaluating expression #{} with a value of {}", k, tempExpression.getValue());
-        });
+        threadPool.awaitTermination(10, TimeUnit.SECONDS);
+        threadPool.submit(() -> compiledExpressions.entrySet().parallelStream()
+            .forEach(entry -> updateCacheValue(entry.getKey(), runScript(entry.getValue())))
+        ).get(5, TimeUnit.MINUTES);
+
         counter = System.currentTimeMillis() - counter;
-        log.info("Evaluating all expressions took {}s.", counter / 1000);
+//        compiledExpressions.entrySet().parallelStream()
+//            .forEach(entry -> updateCacheValue(entry.getKey(), runScript(entry.getValue())));
+
+//        compiledExpressions.forEach((k, v) -> {
+//          if (ruleTagCache.get(k) instanceof ExpressionCacheObject) {
+//            ExpressionCacheObject cachedExpression = (ExpressionCacheObject) ruleTagCache.get(k);
+//            Object temp = v.run();
+//            cachedExpression.setValue(temp);
+//            //ExpressionCache.cacheExpressionId(k, tempExpression);
+//            ruleTagCache.put(cachedExpression.getId(), cachedExpression);
+//            RuleTag ruletag = ruleTagCache.get(cachedExpression.getId());
+//            if(cachedExpression.getId() % 150 == 0) log.info("{} left out of {}", idx.decrementAndGet(), compiledExpressions.size());
+//          }
+//        });
+
+
+        //log.info("The following {} expression IDs are stored in the ruleTagCache {}", ExpressionCache.getExpressionIds().size(), ExpressionCache.getExpressionIds());
+//        for(Long id : ExpressionCache.getExpressionIds()) {
+//          log.info("#{}, value {}", id, ruleTagCache.get(id).getValue());
+//        }
+        log.info("Evaluating {} expressions took {}ms.", compiledExpressions.size(), counter);
       } catch (Exception e) {
         e.printStackTrace();
       }
     }
+  }
+
+  private void updateCacheValue(Long itemId, Object newValue) {
+    ruleTagCache.acquireWriteLockOnKey(itemId);
+    getExpressionFromCache(itemId).ifPresent(cachedExpression -> updateExpressionCacheValue(newValue, cachedExpression));
+    ruleTagCache.releaseWriteLockOnKey(itemId);
+  }
+
+  private void updateExpressionCacheValue(Object newValue, ExpressionCacheObject cachedExpression) {
+    cachedExpression.setValue(newValue);
+    DataTagQuality dataTagQuality = new DataTagQualityImpl();
+    dataTagQuality.validate();
+    cachedExpression.setDataTagQuality(dataTagQuality);
+    expressionMapper.updateConfig(cachedExpression);
+    ruleTagCache.put(cachedExpression.getId(), cachedExpression);
+  }
+
+
+  private Optional<ExpressionCacheObject> getExpressionFromCache(Long id) {
+    RuleTag tag = ruleTagCache.get(id);
+    if (tag instanceof ExpressionCacheObject) {
+      return Optional.of((ExpressionCacheObject) tag);
+    }
+    return Optional.empty();
+  }
+
+  private Object runScript(Script value) {
+    return value.run();
+  }
+
+  private void cacheExpression(ExpressionCacheObject expression) {
+    ruleTagCache.put(expression.getId(), expression);
   }
 
   @Override
@@ -112,6 +163,7 @@ public class ExpressionEvaluatorTask extends TimerTask implements SmartLifecycle
   @Override
   public void stop() {
     log.info("Stopping the C2MON script evaluation.");
+    threadPool.shutdown();
     timer.cancel();
     running = false;
   }

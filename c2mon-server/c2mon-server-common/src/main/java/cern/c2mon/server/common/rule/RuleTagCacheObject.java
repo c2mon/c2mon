@@ -31,7 +31,7 @@ import cern.c2mon.shared.rule.RuleFormatException;
  * @author Mark Brightwell
  */
 @Slf4j
-public class RuleTagCacheObject extends AbstractTagCacheObject implements RuleTag, Cloneable {
+public class RuleTagCacheObject extends AbstractTagCacheObject implements RuleTag {
 
     private static final long serialVersionUID = -3382383610136394447L;
 
@@ -168,7 +168,6 @@ public class RuleTagCacheObject extends AbstractTagCacheObject implements RuleTa
         return ruleCollection;
     }
 
-    @Override
     public final String getRuleText() {
         return this.ruleText;
     }

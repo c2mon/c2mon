@@ -26,8 +26,10 @@ import cern.c2mon.server.common.alarm.TagWithAlarms;
 import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.device.Device;
+import cern.c2mon.server.common.expression.ExpressionCacheObject;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.rule.RuleTag;
+import cern.c2mon.server.common.rule.RuleTagCacheObject;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.client.alarm.AlarmValueImpl;
 import cern.c2mon.shared.client.device.DeviceClassNameResponse;
@@ -87,21 +89,27 @@ public abstract class TransferObjectFactory {
       String dataType = isKnownClass(tag.getDataType()) ? getType(tag.getDataType()).getName() : tag.getDataType();
       transferTag.setValueClassName(dataType);
 
+
       addAlarmValues(transferTag, tagWithAlarms.getAlarms());
-      transferTag.setSimulated(tag.isSimulated());
-      transferTag.setUnit(tag.getUnit());
-      transferTag.addEquipmentIds(tag.getEquipmentIds());
-      transferTag.addSubEquipmentIds(tag.getSubEquipmentIds());
-      transferTag.addProcessIds(tag.getProcessIds());
+      if (!(tag instanceof ExpressionCacheObject)) {
+        transferTag.setSimulated(tag.isSimulated());
+        transferTag.setUnit(tag.getUnit());
+        transferTag.addEquipmentIds(tag.getEquipmentIds());
+        transferTag.addSubEquipmentIds(tag.getSubEquipmentIds());
+        transferTag.addProcessIds(tag.getProcessIds());
+      }
+
       if (tag.getMetadata() != null) {
         transferTag.setMetadata(tag.getMetadata().getMetadata());
       }
 
-      if (tag instanceof RuleTag) {
-        transferTag.defineRuleExpression(((RuleTag) tag).getRuleExpression());
+      if (tag instanceof RuleTagCacheObject) {
+        transferTag.defineExpression(((RuleTagCacheObject) tag).getRuleExpression());
       } else if (tag instanceof ControlTag) {
         transferTag.setControlTagFlag(true);
         transferTag.setAliveTagFlag(aliveTag);
+      } else if (tag instanceof ExpressionCacheObject) {
+        transferTag.defineExpression(((ExpressionCacheObject) tag).getExpression());
       }
     }
 
@@ -146,8 +154,8 @@ public abstract class TransferObjectFactory {
         transferTag.setMetadata(tag.getMetadata().getMetadata());
       }
 
-      if (tag instanceof RuleTag) {
-        transferTag.defineRuleExpression(((RuleTag) tag).getRuleExpression());
+      if (tag instanceof RuleTagCacheObject) {
+        transferTag.defineExpression(((RuleTagCacheObject) tag).getRuleExpression());
       } else if (tag instanceof ControlTag) {
         transferTag.setControlTagFlag(true);
         transferTag.setAliveTagFlag(aliveTag);

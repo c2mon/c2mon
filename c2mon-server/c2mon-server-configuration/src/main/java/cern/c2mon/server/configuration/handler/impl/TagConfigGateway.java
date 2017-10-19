@@ -19,8 +19,10 @@ package cern.c2mon.server.configuration.handler.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import cern.c2mon.server.common.expression.ExpressionCacheObject;
 import cern.c2mon.server.configuration.handler.ControlTagConfigHandler;
 import cern.c2mon.server.configuration.handler.DataTagConfigHandler;
+import cern.c2mon.server.configuration.handler.ExpressionConfigHandler;
 import cern.c2mon.server.configuration.handler.RuleTagConfigHandler;
 import cern.c2mon.server.cache.TagLocationService;
 import cern.c2mon.server.common.control.ControlTag;
@@ -48,6 +50,9 @@ public class TagConfigGateway implements TagConfigHandler<Tag> {
   
   @Autowired
   private RuleTagConfigHandler ruleTagConfigHandler;
+
+  @Autowired
+  private ExpressionConfigHandler expressionConfigHandler;
   
   private TagLocationService tagLocationService;
   
@@ -72,6 +77,8 @@ public class TagConfigGateway implements TagConfigHandler<Tag> {
       return (TagConfigHandler<T>) ruleTagConfigHandler;
     } else if (tag instanceof ControlTag) {
       return (TagConfigHandler<T>) controlTagConfigHandler;
+    } else if (tag instanceof ExpressionCacheObject) {
+      return (TagConfigHandler<T>) expressionConfigHandler;
     } else {       
       return (TagConfigHandler<T>) dataTagConfigHandler;
     }

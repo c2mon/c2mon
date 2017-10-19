@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,10 +38,9 @@ import cern.c2mon.shared.common.Cacheable;
  * @param <T> type of cache object
  *
  */
+@Slf4j
 public abstract class AbstractDefaultLoaderDAO<T extends Cacheable> extends AbstractSimpleLoaderDAO<T> implements CacheLoaderDAO<T> {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(AbstractDefaultLoaderDAO.class);
-  
   /**
    * The initial size of the Map used to store the cache object loaded from the DB.
    */
@@ -77,7 +77,7 @@ public abstract class AbstractDefaultLoaderDAO<T extends Cacheable> extends Abst
       if (current != null) {
         returnMap.put(current.getId(), doPostDbLoading(current));
       } else {
-        LOGGER.warn("Null value retrieved from DB by Mapper " + loaderMapper.getClass().getSimpleName());
+        log.warn("Null value retrieved from DB by Mapper " + loaderMapper.getClass().getSimpleName());
       }
     }
     return returnMap;

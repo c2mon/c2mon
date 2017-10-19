@@ -1,38 +1,21 @@
 package cern.c2mon.shared.client.expression;
 
-import java.io.Serializable;
-import java.util.Collection;
-
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.springframework.util.Assert;
 
 import cern.c2mon.shared.client.configuration.api.tag.Tag;
-import cern.c2mon.shared.client.configuration.api.util.ConfigurationEntity;
-import cern.c2mon.shared.client.configuration.api.util.IgnoreProperty;
+import cern.c2mon.shared.client.configuration.api.util.DefaultValue;
 import cern.c2mon.shared.client.metadata.Metadata;
-import cern.c2mon.shared.common.rule.RuleInputValue;
 
 /**
  * @author Martin Flamm
  */
 @Data
-public class DslExpression extends Tag implements Serializable {
-
-  /**
-   * Unique expression identifier.
-   */
-  @IgnoreProperty
-  private Long id;
-
-  /**
-   * The name of the expression.
-   */
-  private String name;
-
-  /**
-   * The description of the expression.
-   */
-  private String description;
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+public class DslExpression extends Tag {
 
   /**
    * The data type of the expression result.
@@ -40,36 +23,16 @@ public class DslExpression extends Tag implements Serializable {
   private String dataType;
 
   /**
-   * Collection which indicates if this expression has also an alarm configured alarms.
-   * If this list is not empty, the evaluation of the expression will also evaluate this alarms.
-   */
-  private Collection<Long> alarmIds;
-
-  /**
-   * The metadata of this expression.
-   */
-  private Metadata metadata;
-
-  /**
    * The expression which needs to be resolved.
    */
   private String expression;
 
   /**
-   * The last result of the expression.
+   * Indicates whether this tag's value changes shall be logged to the
+   * history.
    */
-  private Object result;
-
-  /**
-   * The current version of the expression.
-   */
-  private long version;
-
-  /**
-   * Corresponding rule id in the ruleTagCache. Every Expression has a corresponding rule in the ruleTagCache in order
-   * to enable the ruleEngine to treat expression in the same way like rules.
-   */
-  private long cacheRuleId;
+  @DefaultValue("true")
+  private Boolean isLogged;
 
   public static DslExpression.CreateBuilder create(String name, String desciption, Class<?> datatype, String expression) {
     Assert.hasText(name, "Expression name is required!");
@@ -80,16 +43,11 @@ public class DslExpression extends Tag implements Serializable {
     return new CreateBuilder(name, desciption, datatype, expression);
   }
 
-  @Override
-  public Object clone() throws CloneNotSupportedException {
-    return new CloneNotSupportedException();
-  }
-
   public static class CreateBuilder {
     private DslExpression expressionToBuild = new DslExpression();
 
-    private CreateBuilder(String name, String desciption, Class<?> datatype, String expression) {
-      this.expressionToBuild.setDescription(desciption);
+    private CreateBuilder(String name, String description, Class<?> datatype, String expression) {
+      this.expressionToBuild.setDescription(description);
       this.expressionToBuild.setName(name);
       this.expressionToBuild.setDataType(datatype.getName());
       this.expressionToBuild.setExpression(expression);

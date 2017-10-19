@@ -231,8 +231,12 @@ public final class TransferTagImpl extends TransferTagValueImpl implements TagUp
    * In case of a rule tag this value shall be set.
    * @param ruleExpression The rule which was used to compute the tag value
    */
-  public void defineRuleExpression(final RuleExpression ruleExpression) {
-    this.ruleExpressionStr = ruleExpression.getExpression();
+  public void defineExpression(final Object ruleExpression) {
+    if(ruleExpression instanceof RuleExpression){
+      this.ruleExpressionStr = ((RuleExpression) ruleExpression).getExpression();
+    } else {
+      this.ruleExpressionStr = (String) ruleExpression;
+    }
   }
 
   /**

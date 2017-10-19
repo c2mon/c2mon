@@ -56,6 +56,8 @@ public class CacheConsistencyChecker implements SmartLifecycle {
    */
   private Map<C2monCache<?, ?>, SimpleLoaderMapper<?>> map = new HashMap<>();
 
+  private ExpressionMapper expressionMapper;
+
   /**
    * Constructor.
    */
@@ -83,7 +85,8 @@ public class CacheConsistencyChecker implements SmartLifecycle {
                                  final RuleTagCache ruleTagCache,
                                  final RuleTagMapper ruleTagMapper,
                                  final SubEquipmentCache subEquipmentCache,
-                                 final SubEquipmentMapper subEquipmentMapper) {
+                                 final SubEquipmentMapper subEquipmentMapper,
+                                 final ExpressionMapper expressionMapper) {
     super();
     map.put(alarmCache, alarmMapper);
     map.put(aliveTimerCache, aliveTimerMapper);
@@ -97,6 +100,7 @@ public class CacheConsistencyChecker implements SmartLifecycle {
     map.put(processCache, processMapper);
     map.put(ruleTagCache, ruleTagMapper);
     map.put(subEquipmentCache, subEquipmentMapper);
+    this.expressionMapper = expressionMapper;
   }
 
   @Override
@@ -115,6 +119,9 @@ public class CacheConsistencyChecker implements SmartLifecycle {
         int cacheSize = cache.getKeys().size();
         int dbSize = mapper.getNumberItems();
 
+        if(cache.getClass().getSimpleName().equals("RuleTagCacheImpl")) {
+          dbSize = dbSize + expressionMapper.getNumberItems();
+        }
         if (cacheSize != dbSize) {
           messages.add(cache.getClass().getSimpleName() + " consistency check failed (cache size: " + cacheSize + ", DB size: " + dbSize + ")");
         }

@@ -105,7 +105,7 @@ public class RuleTagConfigTransactedImpl extends TagConfigTransactedImpl<RuleTag
       RuleTag ruleTag = commonTagFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
       Collection<Long> tagIds = ((RuleTagCacheObject) ruleTag).getRuleInputTagIds();
       try {
-        ruleTag = Evaluator.evaluate(ruleTag);
+        //ruleTag = Evaluator.evaluate(ruleTag);
         configurableDAO.insert(ruleTag);
       } catch (Exception e) {
         log.error("Exception caught while inserting a new Rule into the DB - rolling back changes", e);

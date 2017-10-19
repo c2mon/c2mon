@@ -7,52 +7,72 @@
   <!-- result map below corresponds to the abstract ExpressionCacheObject -->
   <resultMap id="expressionResultMap" type="cern.c2mon.server.common.expression.ExpressionCacheObject">
     <id property="id" column="EX_ID" jdbcType="NUMERIC" javaType="java.lang.Long"/>
+    <result property="name" column="EX_NAME" jdbcType="VARCHAR"/>
     <result property="description" column="EX_DESCRIPTION" jdbcType="VARCHAR"/>
     <result property="dataType" column="EX_DATATYPE"/>
     <result property="metadata" column="EX_METADATA" javaType="cern.c2mon.server.common.metadata.Metadata"
             jdbcType="VARCHAR"/>
+    <result property="logged" column="EX_LOGGED" jdbcType="NUMERIC"/>
     <result property="expression" column="EX_EXPRESSION" jdbcType="VARCHAR"/>
     <result property="value" column="EX_VALUE" javaType="java.lang.Object" jdbcType="VARCHAR"/>
     <result property="version" column="EX_VERSION" jdbcType="NUMERIC" javaType="java.lang.Long"/>
-    <collection property="alarmIds" ofType="cern.c2mon.server.common.alarm.Alarm" javaType="java.util.ArrayList"
-                column="EX_ID" select="selectAlarms"/>
+    <result property="ruleIdsString" column="EX_RULEIDS" jdbcType="VARCHAR"/>
   </resultMap>
 
-  <resultMap id="alarmResultMap" type="cern.c2mon.server.common.alarm.Alarm">
-    <id property="id" column="ALARMID" jdbcType="NUMERIC" javaType="java.lang.Long"/>
-    <result property="faultFamily" column="ALARMFFAMILY" jdbcType="VARCHAR"/>
-    <result property="faultMember" column="ALARMFMEMBER" jdbcType="VARCHAR"/>
-    <result property="faultCode" column="ALARMFCODE" jdbcType="NUMERIC"/>
-    <result property="state" column="ALARMSTATE" jdbcType="VARCHAR"/>
-    <result property="timestamp" column="ALARMTIME" jdbcType="TIMESTAMP"/>
-    <result property="published" column="ALA_PUBLISHED" jdbcType="NUMERIC"/>
-    <result property="info" column="ALARMINFO" jdbcType="VARCHAR"/>
-    <result property="condition" column="ALARMCONDITION" javaType="cern.c2mon.server.common.alarm.AlarmCondition"
-            jdbcType="VARCHAR"/>
-    <result property="dataTagId" column="ALARM_TAGID" jdbcType="NUMERIC" javaType="java.lang.Long"/>
-    <result property="metadata" column="ALARMMETADATA" javaType="cern.c2mon.server.common.metadata.Metadata"
-            jdbcType="VARCHAR"/>
-    <association property="lastPublication" javaType="cern.c2mon.server.common.alarm.AlarmPublication">
-      <result property="state" column="ALA_PUB_STATE" jdbcType="VARCHAR"/>
-      <result property="publicationTime" column="ALA_PUB_TIME" jdbcType="TIMESTAMP"/>
-      <result property="info" column="ALA_PUB_INFO" jdbcType="VARCHAR"/>
-    </association>
-  </resultMap>
+  <!--<resultMap id="alarmResultMap" type="Long">-->
+    <!--<id column="alarmId" jdbcType="NUMERIC" javaType="java.lang.Long"/>-->
+  <!--</resultMap>-->
+
+  <!--<resultMap id="alarmResultMap" type="cern.c2mon.server.common.alarm.Alarm">-->
+    <!--<id property="id" column="ALARMID" jdbcType="NUMERIC" javaType="java.lang.Long"/>-->
+    <!--<result property="faultFamily" column="ALARMFFAMILY" jdbcType="VARCHAR"/>-->
+    <!--<result property="faultMember" column="ALARMFMEMBER" jdbcType="VARCHAR"/>-->
+    <!--<result property="faultCode" column="ALARMFCODE" jdbcType="NUMERIC"/>-->
+    <!--<result property="state" column="ALARMSTATE" jdbcType="VARCHAR"/>-->
+    <!--<result property="timestamp" column="ALARMTIME" jdbcType="TIMESTAMP"/>-->
+    <!--<result property="published" column="ALA_PUBLISHED" jdbcType="NUMERIC"/>-->
+    <!--<result property="info" column="ALARMINFO" jdbcType="VARCHAR"/>-->
+    <!--<result property="condition" column="ALARMCONDITION" javaType="cern.c2mon.server.common.alarm.AlarmCondition"-->
+            <!--jdbcType="VARCHAR"/>-->
+    <!--<result property="dataTagId" column="ALARM_TAGID" jdbcType="NUMERIC" javaType="java.lang.Long"/>-->
+    <!--<result property="metadata" column="ALARMMETADATA" javaType="cern.c2mon.server.common.metadata.Metadata"-->
+            <!--jdbcType="VARCHAR"/>-->
+    <!--<association property="lastPublication" javaType="cern.c2mon.server.common.alarm.AlarmPublication">-->
+      <!--<result property="state" column="ALA_PUB_STATE" jdbcType="VARCHAR"/>-->
+      <!--<result property="publicationTime" column="ALA_PUB_TIME" jdbcType="TIMESTAMP"/>-->
+      <!--<result property="info" column="ALA_PUB_INFO" jdbcType="VARCHAR"/>-->
+    <!--</association>-->
+  <!--</resultMap>-->
 
   <!-- must specify jdbcType for parameters that can be null in DB  -->
   <insert id="insertExpression" parameterType="cern.c2mon.server.common.expression.ExpressionCacheObject">
-    INSERT INTO DSLEXPRESSION (EX_ID, EX_DESCRIPTION, EX_DATATYPE, EX_VALUE, EX_EXPRESSION, EX_METADATA, EX_VERSION)
-    VALUES (#{id}, #{description}, #{dataType}, #{value},#{expression}, #{metadata, jdbcType=VARCHAR}, #{version})
+    INSERT INTO DSLEXPRESSION (EX_ID, EX_NAME, EX_DESCRIPTION, EX_DATATYPE, EX_VALUE, EX_EXPRESSION, EX_METADATA, EX_VERSION, EX_LOGGED, EX_RULEIDS)
+    VALUES (#{id},#{name}, #{description}, #{dataType}, #{value},#{expression}, #{metadata, jdbcType=VARCHAR}, #{version}, #{logged,jdbcType=NUMERIC}, #{ruleIdsString, jdbcType=VARCHAR})
   </insert>
+
+  <update id="updateConfig" parameterType="cern.c2mon.server.common.expression.ExpressionCacheObject">
+    UPDATE DSLEXPRESSION
+    SET EX_NAME = #{name},
+    EX_EXPRESSION = #{expression},
+    EX_DESCRIPTION = SUBSTR(#{description,jdbcType=VARCHAR}, 1, 100),
+    EX_DATATYPE = #{dataType},
+    EX_VALUE = #{value},
+    EX_LOGGED = #{logged,jdbcType=NUMERIC},
+    EX_RULEIDS = #{ruleIdsString, jdbcType=VARCHAR},
+    EX_METADATA = #{metadata,jdbcType=VARCHAR},
+    EX_VERSION = #{version}
+    WHERE EX_ID=#{id}
+  </update>
 
   <delete id="deleteExpression" parameterType="Long">
     delete from DSLEXPRESSION where EX_ID = #{id}
   </delete>
 
-  <select id="selectAlarms" resultMap="alarmResultMap">
-    SELECT * FROM ALARM WHERE ALARM_TAGID = #{id}
-  </select>
+  <!--<select id="selectAlarms" resultMap="alarmResultMap">-->
+    <!--SELECT * FROM ALARM WHERE ALARM_TAGID = #{id}-->
+  <!--</select>-->
 
+  <!-- getAll needed for persistent caches -->
   <select id="getAll" resultMap="expressionResultMap">
     Select * from DSLEXPRESSION
   </select>
@@ -60,4 +80,15 @@
   <select id="getItem" resultMap="expressionResultMap" parameterType="Long">
     SELECT * FROM DSLEXPRESSION where EX_ID = #{id}
   </select>
+
+  <select id="getNumberItems" resultType="Integer">
+    SELECT COUNT(DISTINCT EX_ID)
+    FROM DSLEXPRESSION
+  </select>
+
+  <select id="getRowBatch" resultMap="expressionResultMap" parameterType="cern.c2mon.server.cache.dbaccess.structure.DBBatch">
+    SELECT *
+    FROM DSLEXPRESSION
+  </select>
+
 </mapper>

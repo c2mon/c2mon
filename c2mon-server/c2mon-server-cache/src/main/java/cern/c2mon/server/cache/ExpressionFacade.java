@@ -1,5 +1,6 @@
 package cern.c2mon.server.cache;
 
+import cern.c2mon.server.common.expression.ExpressionCacheObject;
 import cern.c2mon.server.common.rule.RuleTag;
 
 /**

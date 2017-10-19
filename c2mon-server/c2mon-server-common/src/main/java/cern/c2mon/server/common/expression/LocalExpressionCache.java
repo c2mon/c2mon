@@ -5,7 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import cern.c2mon.server.common.tag.Tag;
-import cern.c2mon.server.common.expression.Expression;
+
 import groovy.lang.GroovyObject;
 import lombok.extern.slf4j.Slf4j;
 
@@ -77,7 +77,7 @@ public class LocalExpressionCache {
     version = version == null ? -1L : version;
 
     if (version < expression.getVersion()) {
-      GroovyObject script = ExpressionFactory.createScript(expression.getExpression());
+      GroovyObject script = ExpressionFactory_old.createScript(expression.getExpression());
 
       tagIdToLocalScripts.get(tag.getId()).put(expression.getName(), script);
       tagIdToVersion.get(tag.getId()).put(expression.getName(), expression.getVersion());

@@ -19,8 +19,7 @@ package cern.c2mon.server.configuration.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.configuration.ConfigurationUpdate;
@@ -38,12 +37,9 @@ import cern.c2mon.server.configuration.ConfigurationUpdateListener;
  * @author vilches
  * 
  */
+@Slf4j
 @Service
 public class ConfigurationUpdateImpl implements ConfigurationUpdate {
-  /**
-   * Class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationUpdateImpl.class);
 
   /**
    * List of registered listeners.
@@ -52,22 +48,17 @@ public class ConfigurationUpdateImpl implements ConfigurationUpdate {
 
   @Override
   public void registerForConfigurationUpdates(ConfigurationUpdateListener configurationUpdateListener) {
-    if (LOGGER.isTraceEnabled()) {
-      LOGGER.trace("registerForConfigurationUpdates - new Listener added to the list");
-    }
+    log.trace("registerForConfigurationUpdates - new Listener added to the list");
     this.listeners.add(configurationUpdateListener);
   }
 
   /**
    * Notify the listeners of a configuration update.
    * 
-   * @param tag
-   *          the Tag id that has updated his configuration
+   * @param tagId the Tag id that has updated his configuration
    */
   public void notifyListeners(final Long tagId) {
-    if (LOGGER.isTraceEnabled()) {
-      LOGGER.trace("notifyListeners - notify the Tag with id " + tagId + " has changed. Number of listeners: " + this.listeners.size());
-    }
+    log.trace("notifyListeners - notify the Tag with id " + tagId + " has changed. Number of listeners: " + this.listeners.size());
     for (ConfigurationUpdateListener listener : this.listeners) {
       listener.notifyOnConfigurationUpdate(tagId);
     }

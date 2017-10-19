@@ -1,12 +1,12 @@
 package cern.c2mon.server.dsl;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import groovy.lang.Script;
 import lombok.extern.slf4j.Slf4j;
-
-import cern.c2mon.server.common.expression.ExpressionCacheObject;
 
 /**
  * Node-local cache of compiled expressions. This cache is kept to avoid
@@ -22,7 +22,7 @@ public class ExpressionCache {
    * Holds the compiled expressions.
    */
   private static Map<Long, Script> compiledExpressions = new ConcurrentHashMap<>();
-  private static Map<Long, Object> idToExpressionMap = new ConcurrentHashMap<>();
+  private static List<Long> cachedExpressions = new ArrayList<>();
 
   private ExpressionCache() {
   }
@@ -34,7 +34,7 @@ public class ExpressionCache {
    */
   public static void removeTag(Long id) {
     compiledExpressions.remove(id);
-    idToExpressionMap.remove(id);
+    cachedExpressions.remove(id);
   }
 
   /**
@@ -46,11 +46,15 @@ public class ExpressionCache {
     tagIds.stream().forEach(ExpressionCache::removeTag);
   }
 
-  static void cacheExpression(Long key, ExpressionCacheObject expression) {
-    idToExpressionMap.put(key, expression);
+  public static void cacheExpressionId(Long key) {
+    cachedExpressions.add(key);
   }
 
-  static void cacheCompiledExpression(Long key, Script expression) {
+  public static List<Long> getExpressionIds() {
+    return cachedExpressions;
+  }
+
+  public static void cacheCompiledExpression(Long key, Script expression) {
     compiledExpressions.put(key, expression);
   }
 
@@ -62,7 +66,4 @@ public class ExpressionCache {
     return compiledExpressions.isEmpty();
   }
 
-  static ExpressionCacheObject getExpression(long key) {
-    return (ExpressionCacheObject) idToExpressionMap.get(key);
-  }
 }

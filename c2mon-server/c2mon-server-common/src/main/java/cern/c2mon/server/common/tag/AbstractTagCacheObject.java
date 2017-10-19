@@ -43,7 +43,6 @@ import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 @Data
 public abstract class AbstractTagCacheObject implements DataTagConstants, Cloneable, Serializable {
 
-  // TODO remove UID if not needed
   /**
    * UID since serializable
    */

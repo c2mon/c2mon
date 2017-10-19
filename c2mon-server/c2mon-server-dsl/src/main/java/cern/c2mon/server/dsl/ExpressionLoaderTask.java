@@ -1,43 +1,51 @@
 package cern.c2mon.server.dsl;
 
 import java.util.List;
+import java.util.concurrent.ForkJoinPool;
 
 import groovy.lang.GroovyShell;
 import lombok.extern.slf4j.Slf4j;
 import org.codehaus.groovy.control.CompilerConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.SmartLifecycle;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
+import cern.c2mon.server.cache.RuleTagCache;
 import cern.c2mon.server.cache.dbaccess.ExpressionMapper;
 import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.common.expression.ExpressionCacheObject;
-import cern.c2mon.server.elasticsearch.BaseScript;
 
 /**
  * @author Martin Flamm
  */
 @Slf4j
-@Service
-public class ExpressionLoader implements SmartLifecycle {
+@Component
+public class ExpressionLoaderTask implements SmartLifecycle {
 
   /**
    * Lifecycle flag.
    */
   private volatile boolean running = false;
 
+  private final RuleTagCache ruleTagCache;
+
   private ExpressionMapper expressionMapper;
+  private ExpressionParser compiler;
 
   private final GroovyShell shell;
 
   private long counter;
+  private final ForkJoinPool threadPool;
 
   @Autowired
-  public ExpressionLoader(ExpressionMapper expressionMapper) {
+  public ExpressionLoaderTask(ExpressionMapper expressionMapper, RuleTagCache ruleTagCache, ExpressionParser compiler) {
     this.expressionMapper = expressionMapper;
+    this.compiler = compiler;
+    this.ruleTagCache = ruleTagCache;
     CompilerConfiguration config = new CompilerConfiguration();
     config.setScriptBaseClass(ExpressionBase.class.getName());
     this.shell = new GroovyShell(config);
+    this.threadPool = new ForkJoinPool(10);
   }
 
   @Override
@@ -56,31 +64,35 @@ public class ExpressionLoader implements SmartLifecycle {
     if (!running) {
       running = true;
 
-      log.info("Start populating local expression cache from database.");
+      log.info("Start populating local expression cache from database");
       counter = System.currentTimeMillis();
       List<ExpressionCacheObject> expressions = expressionMapper.getAll();
       counter = System.currentTimeMillis() - counter;
-      log.info("It took {}ms to retrieve all expressions from the database.", counter);
-      log.info("Fetched {} expressions from database.", expressions.size());
-      expressions.forEach(item -> {
-        ExpressionCache.cacheExpression(item.getId(), item);
-      });
+      log.info("It took {}ms to retrieve {} expressions from the database", counter, expressions.size());
 
       counter = System.currentTimeMillis();
-      expressions.parallelStream().forEach(item -> {
-        ExpressionCache.cacheCompiledExpression(item.getId(), shell.parse(item.getExpression()));
-        log.info("Compiling {}", item.getId());
-      });
+      threadPool.submit(() -> expressions.parallelStream()
+          .forEach(item -> {
+        ruleTagCache.acquireWriteLockOnKey(item.getId());
+        ExpressionCache.cacheCompiledExpression(item.getId(), compiler.compileExpression(item));
+        ruleTagCache.putQuiet(item);
+        ruleTagCache.releaseWriteLockOnKey(item.getId());
+        ExpressionCache.cacheExpressionId(item.getId());
+        log.info("Compiling expression #{}", item.getId());
+      }));
+
       counter = System.currentTimeMillis() - counter;
-      log.info("It took {}ms to compile all expressions and safe them into cache.", counter);
-      log.info("Finished populating local expression cache from database.");
+      if (!expressions.isEmpty()) {
+        log.info("It took {}ms to compile all expressions and safe them into rule cache", counter);
+      }
+      log.info("Finished populating local expression cache from database");
       stop();
     }
   }
 
   @Override
   public void stop() {
-    log.debug("Stopping local expression cache loader.");
+    log.debug("Stopping local expression cache loader");
     running = false;
   }
 

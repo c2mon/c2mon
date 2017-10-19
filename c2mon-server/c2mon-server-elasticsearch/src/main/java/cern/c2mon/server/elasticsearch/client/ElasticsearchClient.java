@@ -5,6 +5,8 @@ import org.elasticsearch.node.NodeValidationException;
 
 import java.io.IOException;
 
+import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
+
 public interface ElasticsearchClient {
   void waitForYellowStatus();
 
@@ -19,7 +21,7 @@ public interface ElasticsearchClient {
 
   void closeEmbeddedNode() throws IOException;
 
-  cern.c2mon.server.elasticsearch.config.ElasticsearchProperties getProperties();
+  ElasticsearchProperties getProperties();
 
   org.elasticsearch.client.Client getClient();
 

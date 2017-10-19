@@ -91,5 +91,4 @@ public abstract class Tag implements ConfigurationEntity {
     this.expressions = expressions == null ? new ArrayList<>() : this.expressions;
     this.expressions.add(expression);
   }
-
 }

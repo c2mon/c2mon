@@ -5,6 +5,7 @@ import java.util.Properties;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.cache.AlarmCache;
 import cern.c2mon.server.cache.AlarmFacade;
@@ -20,6 +21,7 @@ import cern.c2mon.shared.daq.config.Change;
  * @author Martin Flamm
  */
 @Slf4j
+@Service
 public class ExpressionFacadeImpl extends AbstractTagFacade<RuleTag> implements ExpressionFacade {
 
   @Autowired
@@ -37,7 +39,6 @@ public class ExpressionFacadeImpl extends AbstractTagFacade<RuleTag> implements 
 
     try {
       String tmpStr;
-
 
       // Version of the expression
       if ((tmpStr = properties.getProperty("version")) != null) {

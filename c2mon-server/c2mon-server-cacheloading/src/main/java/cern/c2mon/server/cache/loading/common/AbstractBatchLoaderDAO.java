@@ -16,14 +16,11 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.loading.common;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import cern.c2mon.server.cache.dbaccess.BatchLoaderMapper;
 import cern.c2mon.server.cache.dbaccess.structure.DBBatch;

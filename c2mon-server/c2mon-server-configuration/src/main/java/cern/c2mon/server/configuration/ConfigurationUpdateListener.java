@@ -28,8 +28,7 @@ public interface ConfigurationUpdateListener {
   /**
    * Is called when a Configuration update has been received
    * 
-   * @param tag
-   *          the updated Tag id
+   * @param tagId the updated Tag id
    */
   void notifyOnConfigurationUpdate(Long tagId);
 

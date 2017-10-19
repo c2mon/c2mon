@@ -37,7 +37,7 @@ public class HsqlDatabaseBuilder {
       dataSource = new EmbeddedDatabaseBuilder().setType(HSQL).setName("c2mondb").build();
     } else if (url.contains("hsql://")) {
       // Start an externally visible, file-based HSQL server
-      HsqlServer.start("file:///tmp/c2mondb", "c2mondb");
+      HsqlServer.start("file:///home/mflamm/dev/c2mondb/c2mondb", "c2mondb");
       url += ";sql.syntax_ora=true;hsqldb.default_table_type=cached;hsqldb.cache_rows=1000;hsqldb.result_max_memory_rows=2000;hsqldb.cache_size=100";
       dataSource = DataSourceBuilder.create().url(url).username("sa").password("").build();
 

@@ -2,6 +2,8 @@ package cern.c2mon.server.configuration.handler;
 
 import java.util.Properties;
 
+import cern.c2mon.server.common.expression.ExpressionCacheObject;
+import cern.c2mon.server.configuration.handler.impl.TagConfigHandler;
 import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
@@ -9,7 +11,7 @@ import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 /**
  * @author Martin Flamm
  */
-public interface ExpressionConfigHandler {
+public interface ExpressionConfigHandler extends TagConfigHandler<ExpressionCacheObject> {
 
   /**
    * Creates a expression in the C2MON server.

@@ -1,5 +1,6 @@
 package cern.c2mon.server.cache.config;
 
+import cern.c2mon.server.cache.loading.ExpressionLoaderDAO;
 import cern.c2mon.server.cache.loading.common.BatchCacheLoader;
 import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
 import cern.c2mon.server.cache.loading.common.EhcacheLoaderImpl;
@@ -37,5 +38,11 @@ public class RuleTagCacheConfig {
   public C2monCacheLoader ruleTagCacheLoader(Ehcache ruleTagEhcache, RuleTagLoaderDAO ruleTagLoaderDAO) {
     Integer batchSize = properties.getBatchSize();
     return new BatchCacheLoader<>(ruleTagEhcache, ruleTagLoaderDAO, batchSize, "RuleTagCacheLoader-");
+  }
+
+  @Bean
+  public C2monCacheLoader expressionCacheLoader(Ehcache ruleTagEhcache, ExpressionLoaderDAO expressionLoaderDAO) {
+    Integer batchSize = properties.getBatchSize();
+    return new BatchCacheLoader<>(ruleTagEhcache, expressionLoaderDAO, batchSize, "ExpressionCacheLoader-");
   }
 }
