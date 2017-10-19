@@ -71,13 +71,9 @@ public class DipConfigStrategy implements IConfigurationStrategy {
 				DataTagAddress address = new DataTagAddress(new DIPHardwareAddressImpl(uri.getHost() + uri.getPath()));
 				
 				DataTag tagToCreate = DataTag.create(uri.toString(), Object.class, address).description(uri.toString()).build();
-//				dataTags.add(DataTag.builder().id((dynConfigService.getNewDataTagId())).name(uri.toString())
-//						.description(uri.toString()).address(address).dataType(DataType.STRING).build());
 				dataTags.add(EQUIPMENT_NAME, tagToCreate);
 			}
 		}
-
-//		configurationService.createDataTags(EQUIPMENT_NAME, dataTags);
 
 		return dataTags;
 	}

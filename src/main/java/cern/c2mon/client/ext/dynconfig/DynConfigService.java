@@ -77,32 +77,6 @@ public class DynConfigService implements InitializingBean{
 				// Test the result
 			}
 			
-			/*
-			Collection<Configuration> configurations = strategy.getConfigurations(Arrays.asList(new URI[]{uri}));
-			
-			for(Configuration configuration: configurations){
-				ConfigurationReport configReport = configurationService.applyConfiguration(configuration, new ClientRequestReportListener() {
-					
-					@Override
-					public void onProgressReportReceived(ClientRequestProgressReport progressReport) {
-						System.out.println("C2MON config status : "+progressReport.getCurrentOperation());
-						
-					}
-					
-					@Override
-					public void onErrorReportReceived(ClientRequestErrorReport errorReport) {
-						if(! errorReport.executedSuccessfully()){
-						  System.out.println("C2MON config error : "+errorReport.getErrorMessage());
-						}else{
-							System.out.println("C2MON config complete !");
-						}
-						
-					}
-				});
-			}*/
-//			if(!configReport.executedSuccessfully()){
-//			  throw new RuntimeException("Could not instantiate new data tag for "+uri.toString()+" : "+ configReport.getErrorMessage());
-//			}
 			// Lookup the tag name again, this time it should exist
 			tags = tagService.findByName(SupportedProtocolsEnum.convertToTagName(uri));
 		}	

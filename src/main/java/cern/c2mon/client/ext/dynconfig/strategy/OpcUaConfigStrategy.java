@@ -109,38 +109,6 @@ public class OpcUaConfigStrategy implements IConfigurationStrategy {
 		}
 			
 		return dataTags;
-				
-//		List<DataTag> dataTags = new ArrayList<>();
-//				
-//				
-//		List<Configuration> configs = new ArrayList<>();
-//		
-//		// Find each different host
-//		Map<String, List<URI>> hosts = uris.stream().collect(Collectors.groupingBy(URI::getHost));
-//		
-//		for(String host: hosts.keySet()){
-//			List<URI> hostUris = hosts.get(host);
-//			for (URI uri : hostUris) {
-//				if (uri.getScheme().equals(SupportedProtocolsEnum.PROTOCOL_OPCUA.getUrlScheme())) {
-//					// TODO : Parse the URI path to capture : 
-//					//     - Namespace index
-//					//     - Address type (GUID, String or Numeric)
-//					OPCHardwareAddressImpl hwAddr = new OPCHardwareAddressImpl(uri.getPath().substring(1) );
-//					hwAddr.setAddressType(ADDRESS_TYPE.STRING);
-//					hwAddr.setNamespace(1);
-//					DataTagAddress address = new DataTagAddress(hwAddr);
-//					dataTags.add(DataTag.builder().id((dynConfigService.getNewDataTagId())).name(uri.toString())
-//							.description(uri.toString()).address(address).dataType(DataType.INTEGER).build());
-//				}
-//			}
-//			Long[] eqProcPair = opcUaNameToEqProcID.get(host);
-//			
-//			Equipment equipment = Equipment.builder().id(eqProcPair[2]).dataTags(dataTags).build();
-//			Process process = Process.builder().id(eqProcPair[1]).equipment(equipment).build();
-//			configs.add(Configuration.builder().confId(eqProcPair[0]).process(process).build());
-//		}
-//
-//		return configs;
 	}
 
 
