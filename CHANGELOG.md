@@ -12,7 +12,12 @@ For more details on a given release, please check also the [Milestone planning](
 ### Changed
 
 ### Fixed
+
+## [1.8.26] - 2017-10-20
+### Fixed
 - Fix thread lock in parallel configuration (#171)
+- Fixed problem in creation of the Elasticsearch config index where the mapping was not always taken into account (#170)
+
 
 ## [1.8.25] - 2017-09-27
 ### Added
@@ -189,7 +194,8 @@ This patch contains bug fixes for the DAQ layer.
 - Remove of EquipmentLogger concept from DAQ Core (#56)
 
 
-[Unreleased]: https://gitlab.cern.ch/c2mon/c2mon/milestones/20
+[Unreleased]: https://gitlab.cern.ch/c2mon/c2mon/milestones/21
+[1.8.26]: https://gitlab.cern.ch/c2mon/c2mon/milestones/20
 [1.8.25]: https://gitlab.cern.ch/c2mon/c2mon/milestones/19
 [1.8.24]: https://gitlab.cern.ch/c2mon/c2mon/milestones/18
 [1.8.23]: https://gitlab.cern.ch/c2mon/c2mon/milestones/17
