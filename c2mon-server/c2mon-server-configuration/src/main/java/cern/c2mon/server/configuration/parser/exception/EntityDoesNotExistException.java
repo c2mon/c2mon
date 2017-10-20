@@ -5,13 +5,13 @@ import lombok.Getter;
 public class EntityDoesNotExistException extends ConfigurationParseException {
 
     @Getter
-    private long id;
+    private final Long id;
     @Getter
-    private String type;
+    private final String type;
     @Getter
-    private String name;
+    private final String name;
 
-    public EntityDoesNotExistException(long id, String type, String name) {
+    public EntityDoesNotExistException(final Long id, final String type, final String name) {
         super("Error updating entity: " + type + " (name = " + name + ", id = " + id + ") does not exist!");
         this.id = id;
         this.type = type;
