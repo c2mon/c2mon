@@ -12,6 +12,7 @@ For more details on a given release, please check also the [Milestone planning](
 ### Changed
 
 ### Fixed
+- Fix thread lock in parallel configuration (#171)
 
 ## [1.8.25] - 2017-09-27
 ### Added
