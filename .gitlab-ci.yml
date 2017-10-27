@@ -2,6 +2,7 @@ stages:
   - clean
   - build
   - deploy
+  - sonar
 
 clean_elasticsearch:
   type: clean
@@ -13,7 +14,6 @@ build_and_publish:
   type: build
   script:
     - mvn -q -U -B clean deploy --settings settings.xml -Ddependencies.set.direct
-    - mvn dependency-check:aggregate sonar:sonar -Dsonar.dependencyCheck.reportPath=target/dependency-check-report.xml --settings settings.xml
   only:
     - master
 
@@ -40,5 +40,19 @@ trigger:
   script:
     # Trigger build of tim-server
     - "curl -X POST -F token=$TIM_SERVER_TOKEN -F ref=master https://gitlab.cern.ch/api/v3/projects/9859/trigger/builds"
+  only:
+    - master
+    
+sonar_preview:
+  type: sonar
+  script:
+    - mvn -q -U -B clean compile sonar:sonar -Dsonar.host.url=https://en-ice-sonar.cern.ch -Dsonar.analysis.mode=preview -Dsonar.gitlab.commit_sha=$CI_BUILD_REF -Dsonar.gitlab.ref_name=$CI_BUILD_REF_NAME -Dsonar.gitlab.project_id=$CI_PROJECT_ID -Dsonar.gitlab.max_major_issues_gate=0 --settings settings.xml --debug -X
+  except:
+    - master
+
+quality_assurance:
+  stage: sonar
+  script:
+    - mvn package dependency-check:aggregate sonar:sonar -Dsonar.dependencyCheck.reportPath=target/dependency-check-report.xml --settings settings.xml
   only:
     - master
