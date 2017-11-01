@@ -194,9 +194,9 @@ This patch contains bug fixes for the DAQ layer.
 - Remove of EquipmentLogger concept from DAQ Core (#56)
 
 
-[Unreleased]: https://gitlab.cern.ch/c2mon/c2mon/milestones/21
-[1.8.26]: https://gitlab.cern.ch/c2mon/c2mon/milestones/20
-[1.8.25]: https://gitlab.cern.ch/c2mon/c2mon/milestones/19
+[Unreleased]: https://gitlab.cern.ch/c2mon/c2mon/milestones/19
+[1.8.26]: https://gitlab.cern.ch/c2mon/c2mon/milestones/21
+[1.8.25]: https://gitlab.cern.ch/c2mon/c2mon/milestones/20
 [1.8.24]: https://gitlab.cern.ch/c2mon/c2mon/milestones/18
 [1.8.23]: https://gitlab.cern.ch/c2mon/c2mon/milestones/17
 [1.8.18]: https://gitlab.cern.ch/c2mon/c2mon/milestones/16
