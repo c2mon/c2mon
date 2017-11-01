@@ -58,13 +58,13 @@ public class ElasticsearchService {
     searchSourceBuilder
         .aggregation(AggregationBuilders
             .filter("filter", query)
-            .subAggregation(AggregationBuilders.terms("group-by-name").field("name")
+            .subAggregation(AggregationBuilders.terms("group-by-name").size(1000).field("name")
                 .subAggregation(AggregationBuilders.topHits("top-tag-hits")
                     .size(1000)
-                    .fetchSource(new String[] {"value", "timestamp"}, null))));
+                    .fetchSource(new String[]{"id", "name", "value", "timestamp"}, null))));
 
     SearchResult result;
-    Search search = new Search.Builder(searchSourceBuilder.toString()).addIndex("c2mon-tag*").build();
+    Search search = new Search.Builder(searchSourceBuilder.toString()).addIndex("c2mon-tag_*").build();
 
     try {
       result = client.execute(search);
@@ -93,34 +93,29 @@ public class ElasticsearchService {
     return results;
   }
 
-  public Map<String, List<TagDocument>> q2(Map<String, Object> metadata) {
-    //log.info("using metadata " + metadata.toString());
-
+  public Map<String, List<TagDocument>> q2(Map<String, Object> metadata, String interval) {
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-
     BoolQueryBuilder query = boolQuery();
-    query
-        .must(rangeQuery("timestamp").gte("now-1d"));
-    metadata.forEach((k, v) -> query.must(wildcardQuery("metadata." + k, v.toString())));
+    SearchResult result;
+
+    metadata.forEach((k, v) -> query.must(matchQuery("metadata." + k, v.toString())));
 
     searchSourceBuilder
-        .size(0)
         .aggregation(AggregationBuilders
             .filter("filter", query)
             .subAggregation(AggregationBuilders.terms("group-by-id").field("id")
                 .subAggregation(AggregationBuilders.topHits("top-tag-hits")
                     .size(1000)
-                    .fetchSource(new String[]{"id", "timestamp", "value", "name", "c2mon.dataType"}, null))));
+                    .fetchSource(new String[]{"id", "timestamp"}, null))));
 
-    SearchResult result;
-    Search search = new Search.Builder(searchSourceBuilder.toString()).addIndex("c2mon-tag*").build();
+    Search search = new Search.Builder(searchSourceBuilder.toString()).addIndex("c2mon-tag-*").build();
 
     try {
       result = client.execute(search);
     } catch (IOException e) {
-      throw new RuntimeException("Error querying history by metadata " + metadata.toString(), e);
+      throw new RuntimeException("Error querying history for tags with metadata - " + metadata.values(), e);
     }
-
+//
     List<TermsAggregation.Entry> buckets = result.getAggregations()
         .getFilterAggregation("filter")
         .getTermsAggregation("group-by-id").getBuckets();
@@ -130,7 +125,6 @@ public class ElasticsearchService {
     for (TermsAggregation.Entry bucket : buckets) {
       results.put(bucket.getKey(), bucket.getTopHitsAggregation("top-tag-hits")
           .getHits(TagDocument.class).stream()
-          .filter(hit -> hit.source.get("value") != null)
           .map(hit -> {
             TagDocument doc = hit.source;
             doc.remove("es_metadata_id");

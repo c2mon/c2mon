@@ -57,18 +57,10 @@ public abstract class ExpressionBase extends Script {
     return results.values().stream().mapToDouble(e -> e).max().orElse(0);
   }
 
-//  Map<String, List<TagDocument>> meta(Map<String, Object> paramsl) {
-//return new
-//  }
-
   Map<String, List<TagDocument>> q(Map<String, Object> params, String interval) {
     String name = (String) params.remove("name");
     Map<String, List<TagDocument>> result = service.q(name, params, interval);
     return result;
-  }
-
-  Map<String, List<TagDocument>> q2(Map<String, Object> params) {
-    return service.q2(params);
   }
 
   private static void log(Object object) throws IOException {

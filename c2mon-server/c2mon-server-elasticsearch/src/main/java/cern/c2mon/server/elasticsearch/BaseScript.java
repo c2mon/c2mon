@@ -107,35 +107,35 @@ public abstract class BaseScript extends Script {
     String e1 = "q(name:'*/cpu.loadavg', '1m')";
     Script s1 = shell.parse(e1);
 
-    String e2 = "avg(q(name:'*/cpu.loadavg', '1m'))";
+    String e2 = "avg(q(name:'*', location:'104/1', '6h'))";
     Script s2 = shell.parse(e2);
 
-    String e3 = "(avg(q(name:'*/cpu.loadavg', '1m')) > 1.0) && (avg(q(name:'*/cpu.temp', '1m')) > 28.5)";
+    String e3 = "(avg(q(name:'*/cpu.loadavg', '6h')) > 1.0) && (avg(q(name:'*/cpu.temp', '6h')) > 28.5)";
     final long timeStart = System.currentTimeMillis();
     Script s3 = shell.parse(e3);
     final long timeEnd = System.currentTimeMillis();
     System.out.println("Compilation took " + (timeEnd - timeStart) + " ms");
-    String e4 = "q2(meta(responsible:'John Doe', location:'864'))";
-    Script s4 = shell.parse(e4);
+    //String e4 = "meta(responsible:'Tiffany Pieters', location:'864', '1m')";
+    //Script s4 = shell.parse(e4);
 
     Executors.newScheduledThreadPool(1).scheduleAtFixedRate(() -> {
       try {
 
         Object result;
-            //= s1.run();
-//        System.out.println(e1 + ": ");
-//        log(result);
+        result = s2.run();
+        System.out.println(e2 + ": ");
+        log(result);
 //
 //        result = s2.run();
 //        System.out.println(e2 + ": ");
 //        log(result);
 
-        long timerunStart = System.currentTimeMillis();
-        result = s3.run();
-        long timerunEnd = System.currentTimeMillis();
-        System.out.println(e3 + ": ");
-        log(result);
-        System.out.println("Execution took " + (timerunEnd-timerunStart) + " ms");
+        //long timerunStart = System.currentTimeMillis();
+//        result = s4.run();
+//        //long timerunEnd = System.currentTimeMillis();
+//        System.out.println(e4 + ": ");
+//        log(result);
+        //System.out.println("Execution took " + (timerunEnd-timerunStart) + " ms");
 
 //        result = s4.run();
 //        System.out.println(e4 + ": ");
@@ -196,9 +196,9 @@ public abstract class BaseScript extends Script {
     return service.q(name, params, interval);
   }
 
-  Map<String, List<TagDocument>> q2(Map<String, Object> params) {
-    return service.q2(params);
-  }
+//  Map<String, List<TagDocument>> meta(Map<String, Object> params, String interval) {
+//    return service.q2(params, interval);
+//  }
 
   private static void log(Object object) throws IOException {
     String json = new ObjectMapper().writer().withDefaultPrettyPrinter().writeValueAsString(object);

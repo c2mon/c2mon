@@ -47,5 +47,4 @@ public class RuleTagCacheObjectFacade extends AbstractTagObjectFacade<RuleTag> {
     RuleTagCacheObject ruleTagCacheObject = (RuleTagCacheObject) ruleTag;    
     ruleTagCacheObject.setCacheTimestamp(timestamp);
   }
-  
 }
