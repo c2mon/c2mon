@@ -1,8 +1,8 @@
 package cern.c2mon.server.dsl;
 
+import java.sql.Timestamp;
 import java.util.*;
 import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.TimeUnit;
 
 import groovy.lang.GroovyShell;
@@ -57,7 +57,7 @@ public class ExpressionEvaluatorTask extends TimerTask implements SmartLifecycle
   private final GroovyShell shell;
   //  String e3 = "(avg(q(name:'*/cpu.loadavg', '1m'))> 3) && (avg(q(name:'*/cpu.temp', '1m'))> 40)";
 //  Script s3;
-  private long counter;
+  //private long counter;
   private final ForkJoinPool threadPool;
 
   @Autowired
@@ -73,7 +73,7 @@ public class ExpressionEvaluatorTask extends TimerTask implements SmartLifecycle
     this.expressionMapper = expressionMapper;
     this.expressionLoader = expressionLoader;
     //this.s3 =  shell.parse(e3);
-    this.threadPool = new ForkJoinPool(10);
+    this.threadPool = new ForkJoinPool(2);
   }
 
   @Override
@@ -83,13 +83,14 @@ public class ExpressionEvaluatorTask extends TimerTask implements SmartLifecycle
 
         Map<Long, Script> compiledExpressions = ExpressionCache.getCompiledExpressions();
 
-        counter = System.currentTimeMillis();
-        threadPool.awaitTermination(10, TimeUnit.SECONDS);
+        Long counter = System.currentTimeMillis();
+        //threadPool.awaitTermination(10, TimeUnit.SECONDS);
         threadPool.submit(() -> compiledExpressions.entrySet().parallelStream()
             .forEach(entry -> updateCacheValue(entry.getKey(), runScript(entry.getValue())))
         ).get(5, TimeUnit.MINUTES);
 
         counter = System.currentTimeMillis() - counter;
+        log.info("Evaluating {} expressions took {}ms.", compiledExpressions.size(), counter);
 //        compiledExpressions.entrySet().parallelStream()
 //            .forEach(entry -> updateCacheValue(entry.getKey(), runScript(entry.getValue())));
 
@@ -110,8 +111,8 @@ public class ExpressionEvaluatorTask extends TimerTask implements SmartLifecycle
 //        for(Long id : ExpressionCache.getExpressionIds()) {
 //          log.info("#{}, value {}", id, ruleTagCache.get(id).getValue());
 //        }
-        log.info("Evaluating {} expressions took {}ms.", compiledExpressions.size(), counter);
       } catch (Exception e) {
+        log.error("Something went wrong while evaluating the expressions");
         e.printStackTrace();
       }
     }
@@ -119,15 +120,16 @@ public class ExpressionEvaluatorTask extends TimerTask implements SmartLifecycle
 
   private void updateCacheValue(Long itemId, Object newValue) {
     ruleTagCache.acquireWriteLockOnKey(itemId);
-    getExpressionFromCache(itemId).ifPresent(cachedExpression -> updateExpressionCacheValue(newValue, cachedExpression));
+    getExpressionFromCache(itemId).ifPresent(cachedExpression -> updateCachedExpression(newValue, cachedExpression));
     ruleTagCache.releaseWriteLockOnKey(itemId);
   }
 
-  private void updateExpressionCacheValue(Object newValue, ExpressionCacheObject cachedExpression) {
+  private void updateCachedExpression(Object newValue, ExpressionCacheObject cachedExpression) {
     cachedExpression.setValue(newValue);
     DataTagQuality dataTagQuality = new DataTagQualityImpl();
     dataTagQuality.validate();
     cachedExpression.setDataTagQuality(dataTagQuality);
+    cachedExpression.setCacheTimestamp(new Timestamp(System.currentTimeMillis()));
     expressionMapper.updateConfig(cachedExpression);
     ruleTagCache.put(cachedExpression.getId(), cachedExpression);
   }

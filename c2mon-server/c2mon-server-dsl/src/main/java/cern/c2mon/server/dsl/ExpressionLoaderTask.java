@@ -1,6 +1,7 @@
 package cern.c2mon.server.dsl;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 
 import groovy.lang.GroovyShell;
@@ -45,7 +46,7 @@ public class ExpressionLoaderTask implements SmartLifecycle {
     CompilerConfiguration config = new CompilerConfiguration();
     config.setScriptBaseClass(ExpressionBase.class.getName());
     this.shell = new GroovyShell(config);
-    this.threadPool = new ForkJoinPool(10);
+    this.threadPool = new ForkJoinPool(3);
   }
 
   @Override
@@ -71,15 +72,19 @@ public class ExpressionLoaderTask implements SmartLifecycle {
       log.info("It took {}ms to retrieve {} expressions from the database", counter, expressions.size());
 
       counter = System.currentTimeMillis();
-      threadPool.submit(() -> expressions.parallelStream()
-          .forEach(item -> {
-        ruleTagCache.acquireWriteLockOnKey(item.getId());
-        ExpressionCache.cacheCompiledExpression(item.getId(), compiler.compileExpression(item));
-        ruleTagCache.putQuiet(item);
-        ruleTagCache.releaseWriteLockOnKey(item.getId());
-        ExpressionCache.cacheExpressionId(item.getId());
-        log.info("Compiling expression #{}", item.getId());
-      }));
+      try {
+        threadPool.submit(() -> expressions.parallelStream()
+            .forEach(item -> {
+          ruleTagCache.acquireWriteLockOnKey(item.getId());
+          ExpressionCache.cacheCompiledExpression(item.getId(), compiler.compileExpression(item));
+          ruleTagCache.putQuiet(item);
+          ruleTagCache.releaseWriteLockOnKey(item.getId());
+          ExpressionCache.cacheExpressionId(item.getId());
+          log.info("Compiling expression #{}", item.getId());
+        })).get();
+      } catch (InterruptedException | ExecutionException e) {
+        e.printStackTrace();
+      }
 
       counter = System.currentTimeMillis() - counter;
       if (!expressions.isEmpty()) {
