@@ -44,7 +44,7 @@ The connection between the SubEquipment and its parent Equipment is also monitor
 ## Configuration structure
 
 The data structure of a DAQ configuration is strictly hierarchical.
-The smallest configurable unit are tags, which are either attached an Equipment or Sub-Equipment.
+The smallest configurable unit is a tag, which is either attached to an Equipment or Sub-Equipment.
 
 ![Screenshot](/images/overview/process-data-relation.png =500x)
 

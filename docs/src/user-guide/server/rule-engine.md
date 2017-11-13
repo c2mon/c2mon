@@ -55,7 +55,7 @@ The conditional operators allow you to link several BOOLEAN results to one joine
 
 ## The Rule Syntax
 
-We distinguish two types of rules expressions that is "Simple Rule Expression" and "Complex Rule Expression".
+We distinguish two types of rules expressions that is "Simple Rule Expression" and "Conditioned Rule Expression".
 
 
 ### Simple Rule Expression
