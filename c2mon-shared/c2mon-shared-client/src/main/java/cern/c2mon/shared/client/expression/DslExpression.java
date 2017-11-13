@@ -34,13 +34,13 @@ public class DslExpression extends Tag {
   @DefaultValue("true")
   private Boolean isLogged;
 
-  public static DslExpression.CreateBuilder create(String name, String desciption, Class<?> datatype, String expression) {
+  public static DslExpression.CreateBuilder create(String name, String description, Class<?> datatype, String expression) {
     Assert.hasText(name, "Expression name is required!");
-    Assert.hasText(desciption, "Expression description is required!");
+    Assert.hasText(description, "Expression description is required!");
     Assert.notNull(datatype, "Data type is required!");
     Assert.hasText(expression, "Expression is required!");
 
-    return new CreateBuilder(name, desciption, datatype, expression);
+    return new CreateBuilder(name, description, datatype, expression);
   }
 
   public static class CreateBuilder {
