@@ -13,6 +13,15 @@ For more details on a given release, please check also the [Milestone planning](
 
 ### Fixed
 
+
+## [1.8.27] - 2017-11-17
+### Changed
+- Server: Increased the size of field ALARMFAMILY in ALARM database table (#176)
+
+### Fixed
+- CERN specific: Converting alarm triplet to upper case string, which is the requested standard (c2mon-daq-alarmsource#5)
+
+
 ## [1.8.26] - 2017-10-20
 ### Fixed
 - Fix thread lock in parallel configuration (#171)
