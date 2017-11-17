@@ -16,11 +16,12 @@
  *****************************************************************************/
 package cern.c2mon.shared.common.datatag.address.impl;
 
+import lombok.Getter;
+import org.apache.commons.lang.StringUtils;
 import org.simpleframework.xml.Element;
 
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.datatag.address.AlarmSourceHardwareAddress;
-import lombok.Getter;
 
 
 
@@ -64,7 +65,7 @@ public final class AlarmSourceHardwareAddressImpl extends HardwareAddressImpl im
     /* Nothing to do */
   }
 
-  protected final void setFaultFamily(final String faultFamily) throws ConfigurationException {
+  protected final void setFaultFamily(final String faultFamily) {
     validateFaultFamily(faultFamily);
     this.faultFamily = faultFamily;
   }
@@ -72,13 +73,13 @@ public final class AlarmSourceHardwareAddressImpl extends HardwareAddressImpl im
 
 
   private void validateFaultFamily(final String faultFamily) {
-    if (faultFamily == null || faultFamily.isEmpty()) {
+    if (StringUtils.isEmpty(faultFamily)) {
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"fault family\" cannot be null or empty.");
     }
   }
 
 
-  protected final void setFaultMember(final String faultMember) throws ConfigurationException {
+  protected final void setFaultMember(final String faultMember) {
     validateFaultMember(faultMember);
     this.faultMember = faultMember;
   }
@@ -86,7 +87,7 @@ public final class AlarmSourceHardwareAddressImpl extends HardwareAddressImpl im
 
 
   private void validateFaultMember(final String faultMember) {
-    if (faultMember == null || faultMember.isEmpty()) {
+    if (StringUtils.isEmpty(faultMember)) {
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"fault member\" cannot be null or empty.");
     }
   }
@@ -103,7 +104,7 @@ public final class AlarmSourceHardwareAddressImpl extends HardwareAddressImpl im
   }
 
   @Override
-  public void validate() throws ConfigurationException {
+  public void validate() {
     validateFaultFamily(faultFamily);
     validateFaultMember(faultMember);
     validateFaultCode(faultCode);
@@ -111,7 +112,8 @@ public final class AlarmSourceHardwareAddressImpl extends HardwareAddressImpl im
 
   @Override
   public final String getAlarmId() {
-    return faultFamily + ":" + faultMember + ":" + faultCode;
+    validate();
+    return faultFamily.toUpperCase() + ":" + faultMember.toUpperCase() + ":" + faultCode;
   }
 
 }
