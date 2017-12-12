@@ -14,6 +14,10 @@ For more details on a given release, please check also the [Milestone planning](
 ### Fixed
 
 
+## 1.8.28 - 2017-12-12
+### Changed
+- Client API: Removed all unrequired dependencies from c2mon-client-core pom.xml, in particular Elasticsearch (#164)
+
 ## [1.8.27] - 2017-11-17
 ### Changed
 - Server: Increased the size of field ALARMFAMILY in ALARM database table (#176)
