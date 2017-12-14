@@ -36,14 +36,6 @@
 
     <!-- 3rd party dependencies -->
     <dependency>
-      <groupId>com.oracle</groupId>
-      <artifactId>ojdbc</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.oracle</groupId>
-      <artifactId>orai18n</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.hsqldb</groupId>
       <artifactId>hsqldb</artifactId>
     </dependency>

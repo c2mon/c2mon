@@ -30,14 +30,6 @@
       <artifactId>spring-tx</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.oracle</groupId>
-      <artifactId>ojdbc</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.oracle</groupId>
-      <artifactId>orai18n</artifactId>
-    </dependency>
-    <dependency>
       <groupId>commons-dbcp</groupId>
       <artifactId>commons-dbcp</artifactId>
     </dependency>

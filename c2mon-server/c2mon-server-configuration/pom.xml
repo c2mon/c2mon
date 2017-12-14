@@ -31,14 +31,6 @@
 
     <!-- 3rd party dependencies -->
     <dependency>
-      <groupId>com.oracle</groupId>
-      <artifactId>ojdbc</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.oracle</groupId>
-      <artifactId>orai18n</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.mybatis</groupId>
       <artifactId>mybatis-spring</artifactId>
     </dependency>
