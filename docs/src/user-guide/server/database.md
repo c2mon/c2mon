@@ -24,7 +24,7 @@ See also [Configuring the module](/user-guide/client-api/history/#configuring-th
 ## Setup C2MON with Oracle
 
 !!! IMPORTANT : Oracle drivers cannot be distributed under an open-source license.
-To connect C2MON to an Oracle database, you must download the Oracle JDBC driver libraries (typically ojdbc.jar and orai18n.jar) and copy them under ```/c2mon-server/lib```.
+To connect C2MON to an Oracle database, you must download the Oracle JDBC driver libraries (typically ojdbc.jar and orai18n.jar) and copy them under ```/c2mon-server/lib```.  
 Oracle drivers are typically available on the [Oracle Tech Network website](http://www.oracle.com/technetwork/database/features/jdbc/index.html).
 
 To persist data in an Oracle instance (v11 or later) the following properties have to be set:
