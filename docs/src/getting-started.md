@@ -22,6 +22,17 @@ docker run --rm --name c2mon -it -p 0.0.0.0:1099:1099 -p 0.0.0.0:9001:9001 -p 0.
   gitlab-registry.cern.ch/c2mon/c2mon
 ```
 
+### Persisting C2MON data in an Oracle database
+
+Note that Oracle database drivers (unlike MySQL and HSQL) are not distributed with C2MON. In order to persist data in an Oracle database, you must [download the Oracle JDBC drivers](http://www.oracle.com/technetwork/database/features/jdbc/index.html) and mount them as volumes in your Docker container.
+For example, if the JDBC driver libraries ```ojdbc.jar``` and ```orai18n.jar``` are available in the current folder, you can run :
+
+```bash
+docker run --rm --name c2mon -it -p 0.0.0.0:1099:1099 -p 0.0.0.0:9001:9001 -p 0.0.0.0:61616:61616 -p 0.0.0.0:9200:9200 \
+  -v `pwd`/ojdbc.jar:/c2mon-server/lib/ojdbc.jar:z -v `pwd`/orai18n.jar:/c2mon-server/lib/orai18n.jar:z gitlab-registry.cern.ch/c2mon/c2mon
+```
+
+
 # Publishing data
 
 Once you have your server running, you can use one of several pre-provided acquisition processes (DAQs) that will grab data from some service and send it to
