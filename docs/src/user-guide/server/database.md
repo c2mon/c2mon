@@ -22,6 +22,11 @@ See also [Configuring the module](/user-guide/client-api/history/#configuring-th
     The open [Issue 158](https://gitlab.cern.ch/c2mon/c2mon/issues/158) addresses this problem.
 
 ## Setup C2MON with Oracle
+
+!!! IMPORTANT : Oracle drivers cannot be distributed under an open-source license.
+To connect C2MON to an Oracle database, you must download the Oracle JDBC driver libraries (typically ojdbc.jar and orai18n.jar) and copy them under ```/c2mon-server/lib```.
+Oracle drivers are typically available on the [Oracle Tech Network website](http://www.oracle.com/technetwork/database/features/jdbc/index.html).
+
 To persist data in an Oracle instance (v11 or later) the following properties have to be set:
 
 ```shell
@@ -61,8 +66,6 @@ c2mon.server.history.jdbc.validation-query=${c2mon.server.cachedbaccess.jdbc.val
 ```
 These settings can also be set as Java VM options with the ```-D``` parameter or as [Spring Boot environment variables](https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-external-config.html).
 
-!!! warning "Be careful!"
-   You must also install the Oracle JDBC driver libraries (typically ojdbc.jar and orai18n.jar) under ```/c2mon-server/lib```
 
 
 ## Setup C2MON with MySQL
