@@ -29,7 +29,8 @@ For example, if the JDBC driver libraries ```ojdbc.jar``` and ```orai18n.jar``` 
 
 ```bash
 docker run --rm --name c2mon -it -p 0.0.0.0:1099:1099 -p 0.0.0.0:9001:9001 -p 0.0.0.0:61616:61616 -p 0.0.0.0:9200:9200 \
-  -v `pwd`/ojdbc.jar:/c2mon-server/lib/ojdbc.jar:z -v `pwd`/orai18n.jar:/c2mon-server/lib/orai18n.jar:z gitlab-registry.cern.ch/c2mon/c2mon
+  -v `pwd`/ojdbc.jar:/c2mon-server/lib/ojdbc.jar:z -v `pwd`/orai18n.jar:/c2mon-server/lib/orai18n.jar:z \
+  gitlab-registry.cern.ch/c2mon/c2mon
 ```
 
 
