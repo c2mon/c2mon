@@ -6,14 +6,15 @@ import java.util.Map;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import cern.c2mon.daq.common.IEquipmentMessageSender;
 import cern.c2mon.daq.config.DaqProperties;
 import cern.c2mon.shared.common.datatag.SourceDataTag;
 import cern.c2mon.shared.common.datatag.SourceDataTagQuality;
 import cern.c2mon.shared.common.datatag.SourceDataTagQualityCode;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 /**
  * @author Franz Ritter
@@ -22,15 +23,14 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class FreshnessMonitor {
 
-  @Autowired
-  private DaqProperties properties;
-  private Map<Long, Runnable> freshnessTasks;
+  private final DaqProperties properties;
+  private final Map<Long, Runnable> freshnessTasks = new HashMap<>();
   private IEquipmentMessageSender equipmentMessageSender;
-  private ScheduledThreadPoolExecutor timer;
+  private final ScheduledThreadPoolExecutor timer = new ScheduledThreadPoolExecutor(2);
 
-  public FreshnessMonitor() {
-    this.timer = new ScheduledThreadPoolExecutor(2);
-    this.freshnessTasks = new HashMap<>();
+  @Autowired
+  public FreshnessMonitor(DaqProperties properties) {
+    this.properties = properties;
   }
 
   public void setIEquipmentMessageSender(IEquipmentMessageSender equipmentMessageSender) {

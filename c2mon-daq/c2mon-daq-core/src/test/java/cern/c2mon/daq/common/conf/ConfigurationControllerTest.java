@@ -16,12 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.daq.common.conf;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.junit.Before;
@@ -31,11 +25,11 @@ import cern.c2mon.daq.common.conf.core.ConfigurationController;
 import cern.c2mon.daq.common.conf.core.DefaultCommandTagChanger;
 import cern.c2mon.daq.common.conf.core.DefaultEquipmentConfigurationChanger;
 import cern.c2mon.daq.common.conf.core.EquipmentConfigurationFactory;
-import cern.c2mon.daq.common.conf.core.ProcessConfigurationLoader;
 import cern.c2mon.daq.common.conf.equipment.ICommandTagChanger;
 import cern.c2mon.daq.common.conf.equipment.IDataTagChanger;
 import cern.c2mon.daq.common.conf.equipment.IEquipmentConfigurationChanger;
 import cern.c2mon.daq.common.timer.FreshnessMonitor;
+import cern.c2mon.daq.config.DaqProperties;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.command.ISourceCommandTag;
 import cern.c2mon.shared.common.command.SourceCommandTag;
@@ -47,17 +41,10 @@ import cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl;
 import cern.c2mon.shared.common.process.EquipmentConfiguration;
 import cern.c2mon.shared.common.process.IEquipmentConfiguration;
 import cern.c2mon.shared.common.process.ProcessConfiguration;
-import cern.c2mon.shared.daq.config.ChangeReport;
+import cern.c2mon.shared.daq.config.*;
 import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
-import cern.c2mon.shared.daq.config.CommandTagAdd;
-import cern.c2mon.shared.daq.config.CommandTagRemove;
-import cern.c2mon.shared.daq.config.DataTagAdd;
-import cern.c2mon.shared.daq.config.DataTagAddressUpdate;
-import cern.c2mon.shared.daq.config.DataTagRemove;
-import cern.c2mon.shared.daq.config.DataTagUpdate;
-import cern.c2mon.shared.daq.config.EquipmentConfigurationUpdate;
-import cern.c2mon.shared.daq.config.ProcessConfigurationUpdate;
-import cern.c2mon.shared.daq.config.SubEquipmentUnitAdd;
+
+import static org.junit.Assert.*;
 
 
 public class ConfigurationControllerTest {
@@ -69,7 +56,7 @@ public class ConfigurationControllerTest {
     private static final long TEST_NOT_EXIST_ID = 1337L;
 
     private static final long TEST_EQUIPMENT_ID = 1L;
-    
+
     private static final long TEST_SUB_EQUIPMENT_ID = 2L;
 
     private static final String DEFAULT_NAME = "default";
@@ -80,17 +67,11 @@ public class ConfigurationControllerTest {
 
     private ProcessConfiguration processConfiguration;
 
-    private ProcessConfigurationLoader processConfigurationLoader = new ProcessConfigurationLoader();
-
-    private static final String PROCESS_CONFIGURATION_UNKNOWN_TYPE_XML = "UnknownTypeProcessConfiguration.xml";
-
-    private static final String PROCESS_CONFIGURATION_REJECTED_XML = "RejectedProcessConfiguration.xml";
-
     @Before
     public void setUp() throws ParserConfigurationException {
         configurationController = new ConfigurationController();
         configurationController.setEquipmentConfigurationFactory(new EquipmentConfigurationFactory());
-        configurationController.setFreshnessMonitor(new FreshnessMonitor());
+        configurationController.setFreshnessMonitor(new FreshnessMonitor(new DaqProperties()));
         processConfiguration = new ProcessConfiguration();
         processConfiguration.setProcessID(TEST_PROCESS_ID);
         configurationController.setProcessConfiguration(processConfiguration);
@@ -382,7 +363,7 @@ public class ConfigurationControllerTest {
         ISourceCommandTag commandTag = configurationController.findCommandTag(TEST_NOT_EXIST_ID);
         assertNull(commandTag);
     }
-    
+
 	@Test
 	public void testAddSubEquipmentUnitSuccess() throws ConfigurationException {
 		String xml = "<SubEquipmentUnit  id=\"" + TEST_SUB_EQUIPMENT_ID + "\" name=\"E_TEST\">"
