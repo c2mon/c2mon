@@ -120,9 +120,24 @@ public class ElasticsearchClientImpl implements ElasticsearchClient {
   public void waitForYellowStatus() {
     try {
       CompletableFuture<Void> nodeReady = CompletableFuture.runAsync(() -> {
-        log.info("Waiting for yellow status of Elasticsearch cluster...");
-        client.admin().cluster().prepareHealth().setWaitForYellowStatus().execute().actionGet();
-        log.info("Elasticsearch cluster is yellow");
+        //client.admin().cluster().prepareHealth().setWaitForYellowStatus().execute().actionGet();
+          while (true) {
+            log.info("Waiting for yellow status of Elasticsearch cluster...");
+
+            try {
+              if (isClusterYellow()) {
+                break;
+              }
+            } catch (Exception e) {
+              log.info("Elasticsearch cluster not yet ready: {}", e.getMessage());
+            }
+
+            try {
+              Thread.sleep(100L);
+            } catch (InterruptedException ignored) {
+            }
+          }
+          log.info("Elasticsearch cluster is yellow");
         }
       );
       nodeReady.get(120, TimeUnit.SECONDS);
