@@ -20,28 +20,21 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Properties;
 
-import javax.naming.ConfigurationException;
-
-import cern.c2mon.server.common.listener.ConfigurationEventListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.GenericApplicationContext;
-import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import cern.c2mon.server.cache.DataTagCache;
-import cern.c2mon.server.cache.DataTagFacade;
-import cern.c2mon.server.cache.EquipmentFacade;
-import cern.c2mon.server.cache.SubEquipmentFacade;
-import cern.c2mon.server.cache.TagLocationService;
+import cern.c2mon.server.cache.*;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.cache.loading.DataTagLoaderDAO;
 import cern.c2mon.server.common.datatag.DataTag;
+import cern.c2mon.server.common.listener.ConfigurationEventListener;
 import cern.c2mon.server.configuration.handler.AlarmConfigHandler;
 import cern.c2mon.server.configuration.handler.RuleTagConfigHandler;
 import cern.c2mon.server.configuration.impl.ProcessChange;
@@ -52,7 +45,6 @@ import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import cern.c2mon.shared.daq.config.Change;
 import cern.c2mon.shared.daq.config.DataTagAdd;
 import cern.c2mon.shared.daq.config.DataTagRemove;
-import cern.c2mon.shared.daq.config.DataTagUpdate;
 
 /**
  * Implementation of transacted methods.
@@ -120,7 +112,7 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
     tagCache.acquireWriteLockOnKey(element.getEntityId());
     try {
       LOGGER.trace("Creating DataTag " + element.getEntityId());
-      DataTag dataTag = (DataTag) commonTagFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
+      DataTag dataTag = commonTagFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
       try {
         configurableDAO.insert(dataTag);
       } catch (Exception e) {
@@ -199,7 +191,7 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
       }
 
       tagCache.putQuiet(dataTagCopy);
-      if (((DataTagUpdate) dataTagUpdate).isEmpty()) {
+      if (!dataTagUpdate.hasChanged()) {
         return new ProcessChange();
       } else {
         if (dataTagCopy.getEquipmentId() != null) {
@@ -228,7 +220,7 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
       Collection<Long> ruleIds = tagCopy.getCopyRuleIds();
       if (!ruleIds.isEmpty()) {
         LOGGER.trace("Removing Rules dependent on DataTag " + id);
-        for (Long ruleId : new ArrayList<Long>(ruleIds)) {
+        for (Long ruleId : new ArrayList<>(ruleIds)) {
           if (tagLocationService.isInTagCache(ruleId)) { //may already have been removed if a previous rule in the list was used in this rule! {
             ConfigurationElementReport newReport = new ConfigurationElementReport(Action.REMOVE, Entity.RULETAG, ruleId);
             elementReport.addSubReport(newReport);
@@ -241,7 +233,7 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
         Collection<Long> alarmIds = tagCopy.getCopyAlarmIds();
         if (!alarmIds.isEmpty()) {
           LOGGER.trace("Removing Alarms dependent on DataTag " + id);
-          for (Long alarmId : new ArrayList<Long>(alarmIds)) {
+          for (Long alarmId : new ArrayList<>(alarmIds)) {
             ConfigurationElementReport alarmReport = new ConfigurationElementReport(Action.REMOVE, Entity.ALARM, alarmId);
             elementReport.addSubReport(alarmReport);
             alarmConfigHandler.removeAlarm(alarmId, alarmReport);
