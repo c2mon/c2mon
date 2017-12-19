@@ -32,7 +32,7 @@ import lombok.Data;
 @JsonSubTypes({
     @JsonSubTypes.Type(value = CommandTagAdd.class, name = "commandTagAdd"),
     @JsonSubTypes.Type(value = CommandTagRemove.class, name = "commandTagRemove"),
-    @JsonSubTypes.Type(value = CommandTagRemove.class, name = "commandTagRemove"),
+    @JsonSubTypes.Type(value = CommandTagUpdate.class, name = "commandTagUpdate"),
     @JsonSubTypes.Type(value = DataTagAdd.class, name = "dataTagAdd"),
     @JsonSubTypes.Type(value = DataTagRemove.class, name = "dataTagRemove"),
     @JsonSubTypes.Type(value = DataTagUpdate.class, name = "dataTagUpdate"),
@@ -49,19 +49,8 @@ public abstract class Change extends ChangePart implements IChange {
    */
   private long changeId;
 
-  /**
-   * @return the changeId
-   */
   @Override
-  public long getChangeId() {
-    return changeId;
-  }
-
-  /**
-   * @param changeId the changeId to set
-   */
-  @Override
-  public void setChangeId(final long changeId) {
-    this.changeId = changeId;
+  public boolean hasChanged() {
+    throw new UnsupportedOperationException("This method is not supported by this IChange class");
   }
 }
