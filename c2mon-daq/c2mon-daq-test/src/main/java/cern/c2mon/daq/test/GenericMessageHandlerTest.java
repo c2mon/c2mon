@@ -19,14 +19,14 @@ package cern.c2mon.daq.test;
 
 import java.lang.reflect.Method;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.apache.xerces.parsers.DOMParser;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
 import cern.c2mon.daq.common.EquipmentMessageHandler;
@@ -38,6 +38,7 @@ import cern.c2mon.daq.common.impl.EquipmentMessageSender;
 import cern.c2mon.daq.common.messaging.IProcessMessageSender;
 import cern.c2mon.daq.common.messaging.impl.RequestController;
 import cern.c2mon.daq.common.timer.FreshnessMonitor;
+import cern.c2mon.daq.config.DaqProperties;
 import cern.c2mon.daq.filter.IFilterMessageSender;
 import cern.c2mon.daq.filter.dynamic.IDynamicTimeDeadbandFilterActivator;
 import cern.c2mon.daq.filter.dynamic.TimeDifferenceMovingAverageTimeDeadbandActivator;
@@ -79,7 +80,7 @@ public abstract class GenericMessageHandlerTest {
 
   protected ConfigurationController configurationController;
 
-  private FreshnessMonitor freshnessMonitorMock;
+  protected FreshnessMonitor freshnessMonitorMock;
 
   static Logger log = LoggerFactory.getLogger(GenericMessageHandlerTest.class);
 
@@ -140,7 +141,7 @@ public abstract class GenericMessageHandlerTest {
 
       messageSender = createMock(IProcessMessageSender.class);
       filterMessageSender = createMock(IFilterMessageSender.class);
-      freshnessMonitorMock = createMock(FreshnessMonitor.class);
+      freshnessMonitorMock = new FreshnessMonitor(new DaqProperties());
 
       lowDynamicTimeDeadbandFilterActivator = new TimeDifferenceMovingAverageTimeDeadbandActivator(10, 110, 150, 30000);
 
@@ -151,6 +152,7 @@ public abstract class GenericMessageHandlerTest {
 
       configurationController = new ConfigurationController();
       configurationController.setProcessConfiguration(pconf);
+      configurationController.setFreshnessMonitor(freshnessMonitorMock);
       pconf.setProcessID(TEST_PROCESS_ID);
       pconf.setProcessName(TEST_PROCESS_NAME);
 
