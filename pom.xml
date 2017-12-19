@@ -17,12 +17,12 @@
    
    <distributionManagement>
      <repository>
-       <id>c2mon-releases</id>
-       <url>${repository.releases.url}</url>
+       <id>c2mon-nexus-releases</id>
+       <url>${nexus.releases.url}</url>
      </repository>
      <snapshotRepository>
-       <id>c2mon-releases</id>
-       <url>${repository.snapshots.url}</url>
+       <id>c2mon-nexus-releases</id>
+       <url>${nexus.snapshots.url}</url>
      </snapshotRepository>
   </distributionManagement>
 
