@@ -123,7 +123,7 @@ DataTag tagToCreate = DataTag.create("TAG_EXAMPLE", Integer.class, new DataTagAd
         .metadata(Metadata.builder().addMetadata("myCustomKey", "someValue"))
         .build();
         
-configurationService.createDatatag("E_EXAMPLE", tagToCreate);
+configurationService.createDataTag("E_EXAMPLE", tagToCreate);
 ```
 
 
