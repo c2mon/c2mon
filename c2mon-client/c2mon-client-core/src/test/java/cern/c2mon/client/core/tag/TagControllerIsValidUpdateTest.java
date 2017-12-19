@@ -19,18 +19,12 @@ package cern.c2mon.client.core.tag;
 import static org.junit.Assert.assertTrue;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
 
 import org.junit.Test;
 
-import cern.c2mon.shared.client.alarm.AlarmValue;
-import cern.c2mon.shared.client.tag.TagMode;
-import cern.c2mon.shared.client.tag.TagUpdate;
+import cern.c2mon.client.core.tag.utils.TestTagUpdate;
+import cern.c2mon.client.core.tag.utils.TestTagValueUpdate;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
-import cern.c2mon.shared.common.datatag.DataTagQuality;
-import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 
 /**
  * Tests for  {@link TagController#isValidUpdate(TagValueUpdate)}
@@ -61,10 +55,10 @@ public class TagControllerIsValidUpdateTest {
 
     TagController tagController = new TagController(TAG_ID);
 
-    TestTagValueUpdate tagValueUpdate_PAST = createTagVUpdate();
+    TestTagValueUpdate tagValueUpdate_PAST = TestTagValueUpdate.create();
     tagValueUpdate_PAST.setServerTimestamp(TIME_JUST_A_BIT_AGO);
 
-    TestTagValueUpdate tagValueUpdate_2 = createTagVUpdate();
+    TestTagValueUpdate tagValueUpdate_2 = TestTagValueUpdate.create();
     tagValueUpdate_2.setServerTimestamp(TIME_JUST_A_BIT_IN_THE_FUTURE);
 
     tagController.onUpdate(tagValueUpdate_PAST);
@@ -103,7 +97,7 @@ public class TagControllerIsValidUpdateTest {
 
     // case g: let's make sure instance of TagUpdate
     // does not make a difference..
-    TestTagUpdate tagUpdate_2 = createTagUpdate();
+    TestTagUpdate tagUpdate_2 = TestTagUpdate.create();
     tagUpdate_2.setServerTimestamp(TIME_JUST_A_BIT_IN_THE_FUTURE);
     tagUpdate_2.setDaqTimestamp(null);
     tagUpdate_2.setSourceTimestamp(null);
@@ -120,10 +114,10 @@ public class TagControllerIsValidUpdateTest {
 
     TagController tagController = new TagController(TAG_ID);
 
-    TestTagValueUpdate tagValueUpdate_CURRENT = createTagVUpdate();
+    TestTagValueUpdate tagValueUpdate_CURRENT = TestTagValueUpdate.create();
     tagValueUpdate_CURRENT.setServerTimestamp(CURRENT_TIME);
 
-    TestTagValueUpdate tagValueUpdate_2 = createTagVUpdate();
+    TestTagValueUpdate tagValueUpdate_2 = TestTagValueUpdate.create();
     tagValueUpdate_2.setServerTimestamp(TIME_JUST_A_BIT_AGO);
 
     tagController.onUpdate(tagValueUpdate_CURRENT);
@@ -176,11 +170,11 @@ public class TagControllerIsValidUpdateTest {
 
     TagController tagController = new TagController(TAG_ID);
 
-    TestTagValueUpdate tagValueUpdate_1 = createTagVUpdate();
+    TestTagValueUpdate tagValueUpdate_1 = TestTagValueUpdate.create();
     tagValueUpdate_1.setServerTimestamp(CURRENT_TIME);
     tagValueUpdate_1.setDaqTimestamp(null);
 
-    TestTagValueUpdate tagValueUpdate_2 = createTagVUpdate();
+    TestTagValueUpdate tagValueUpdate_2 = TestTagValueUpdate.create();
     tagValueUpdate_2.setServerTimestamp(CURRENT_TIME);
     tagValueUpdate_2.setDaqTimestamp(CURRENT_TIME);
 
@@ -211,12 +205,12 @@ public class TagControllerIsValidUpdateTest {
 
     TagController tagController = new TagController(TAG_ID);
 
-    TestTagValueUpdate tagValueUpdate_1 = createTagVUpdate();
+    TestTagValueUpdate tagValueUpdate_1 = TestTagValueUpdate.create();
     tagValueUpdate_1.setServerTimestamp(CURRENT_TIME);
     tagValueUpdate_1.setDaqTimestamp(CURRENT_TIME);
     tagController.onUpdate(tagValueUpdate_1);
 
-    TestTagValueUpdate tagValueUpdate_2 = createTagVUpdate();
+    TestTagValueUpdate tagValueUpdate_2 = TestTagValueUpdate.create();
     tagValueUpdate_2.setServerTimestamp(CURRENT_TIME);
     tagValueUpdate_2.setDaqTimestamp(null);
     final boolean status = tagController.isValidUpdate(tagValueUpdate_2);
@@ -244,12 +238,12 @@ public class TagControllerIsValidUpdateTest {
 
     TagController tagController = new TagController(TAG_ID);
 
-    TestTagValueUpdate tagValueUpdate_1 = createTagVUpdate();
+    TestTagValueUpdate tagValueUpdate_1 = TestTagValueUpdate.create();
     tagValueUpdate_1.setServerTimestamp(CURRENT_TIME);
     tagValueUpdate_1.setDaqTimestamp(CURRENT_TIME);
     tagController.onUpdate(tagValueUpdate_1);
 
-    TestTagValueUpdate tagValueUpdate_2 = createTagVUpdate();
+    TestTagValueUpdate tagValueUpdate_2 = TestTagValueUpdate.create();
     tagValueUpdate_2.setServerTimestamp(CURRENT_TIME);
     tagValueUpdate_2.setDaqTimestamp(TIME_JUST_A_BIT_IN_THE_FUTURE);
     final boolean status = tagController.isValidUpdate(tagValueUpdate_2);
@@ -278,13 +272,13 @@ public class TagControllerIsValidUpdateTest {
 
     TagController tagController = new TagController(TAG_ID);
 
-    TestTagValueUpdate tagValueUpdate_1 = createTagVUpdate();
+    TestTagValueUpdate tagValueUpdate_1 = TestTagValueUpdate.create();
     tagValueUpdate_1.setServerTimestamp(CURRENT_TIME);
     tagValueUpdate_1.setDaqTimestamp(CURRENT_TIME);
     tagController.onUpdate(tagValueUpdate_1);
 
     // case a:
-    TestTagValueUpdate tagValueUpdate_2 = createTagVUpdate();
+    TestTagValueUpdate tagValueUpdate_2 = TestTagValueUpdate.create();
     tagValueUpdate_2.setServerTimestamp(CURRENT_TIME);
     tagValueUpdate_2.setDaqTimestamp(TIME_JUST_A_BIT_AGO);
     final boolean statusA = tagController.isValidUpdate(tagValueUpdate_2);
@@ -312,12 +306,12 @@ public class TagControllerIsValidUpdateTest {
 
     TagController tagController = new TagController(TAG_ID);
 
-    TestTagUpdate tagValueUpdate_1 = createTagUpdate();
+    TestTagUpdate tagValueUpdate_1 = TestTagUpdate.create();
     tagValueUpdate_1.setServerTimestamp(CURRENT_TIME);
     tagValueUpdate_1.setDaqTimestamp(CURRENT_TIME);
     tagValueUpdate_1.setSourceTimestamp(null);
 
-    TestTagUpdate tagValueUpdate_2 = createTagUpdate();
+    TestTagUpdate tagValueUpdate_2 = TestTagUpdate.create();
     tagValueUpdate_2.setServerTimestamp(CURRENT_TIME);
     tagValueUpdate_2.setDaqTimestamp(CURRENT_TIME);
     tagValueUpdate_2.setSourceTimestamp(null);
@@ -336,12 +330,12 @@ public class TagControllerIsValidUpdateTest {
 
     TagController tagController = new TagController(TAG_ID);
 
-    TestTagUpdate tagValueUpdate_1 = createTagUpdate();
+    TestTagUpdate tagValueUpdate_1 = TestTagUpdate.create();
     tagValueUpdate_1.setServerTimestamp(CURRENT_TIME);
     tagValueUpdate_1.setDaqTimestamp(CURRENT_TIME);
     tagValueUpdate_1.setSourceTimestamp(null);
 
-    TestTagUpdate tagValueUpdate_2 = createTagUpdate();
+    TestTagUpdate tagValueUpdate_2 = TestTagUpdate.create();
     tagValueUpdate_2.setServerTimestamp(CURRENT_TIME);
     tagValueUpdate_2.setDaqTimestamp(CURRENT_TIME);
     tagValueUpdate_2.setSourceTimestamp(null);
@@ -361,7 +355,7 @@ public class TagControllerIsValidUpdateTest {
 
     TagController tagController = new TagController(TAG_ID);
 
-    TestTagValueUpdate tagValueUpdate_1 = createTagVUpdate();
+    TestTagValueUpdate tagValueUpdate_1 = TestTagValueUpdate.create();
     tagValueUpdate_1.setServerTimestamp(CURRENT_TIME);
     tagValueUpdate_1.setDaqTimestamp(CURRENT_TIME);
     tagValueUpdate_1.setSourceTimestamp(null);
@@ -371,7 +365,7 @@ public class TagControllerIsValidUpdateTest {
      * Result should be the same for both cases a, b that follow.
      */
     // case a: Update is instance of TagValueUpdate
-    TestTagValueUpdate tagValueUpdate_2A = createTagVUpdate();
+    TestTagValueUpdate tagValueUpdate_2A = TestTagValueUpdate.create();
     tagValueUpdate_2A.setServerTimestamp(CURRENT_TIME);
     tagValueUpdate_2A.setDaqTimestamp(CURRENT_TIME);
     tagValueUpdate_2A.setSourceTimestamp(CURRENT_TIME);
@@ -380,7 +374,7 @@ public class TagControllerIsValidUpdateTest {
     assertTrue(statusA == true);
 
     // case b: Update is instance of TagUpdate
-    TestTagUpdate tagValueUpdate_2B = createTagUpdate();
+    TestTagUpdate tagValueUpdate_2B = TestTagUpdate.create();
     tagValueUpdate_2B.setServerTimestamp(CURRENT_TIME);
     tagValueUpdate_2B.setDaqTimestamp(CURRENT_TIME);
     tagValueUpdate_2B.setSourceTimestamp(CURRENT_TIME);
@@ -398,7 +392,7 @@ public class TagControllerIsValidUpdateTest {
 
     TagController tagController = new TagController(TAG_ID);
 
-    TestTagValueUpdate tagValueUpdate_1 = createTagVUpdate();
+    TestTagValueUpdate tagValueUpdate_1 = TestTagValueUpdate.create();
     tagValueUpdate_1.setServerTimestamp(CURRENT_TIME);
     tagValueUpdate_1.setDaqTimestamp(CURRENT_TIME);
     tagValueUpdate_1.setSourceTimestamp(CURRENT_TIME);
@@ -409,7 +403,7 @@ public class TagControllerIsValidUpdateTest {
      * Result should be the same for both cases a, b that follow.
      */
     // case a: Update is instance of TagValueUpdate
-    TestTagValueUpdate tagValueUpdate_2A = createTagVUpdate();
+    TestTagValueUpdate tagValueUpdate_2A = TestTagValueUpdate.create();
     tagValueUpdate_2A.setServerTimestamp(CURRENT_TIME);
     tagValueUpdate_2A.setDaqTimestamp(CURRENT_TIME);
     tagValueUpdate_2A.setSourceTimestamp(null);
@@ -418,7 +412,7 @@ public class TagControllerIsValidUpdateTest {
     assertTrue(statusA == false);
 
     // case b: Update is instance of TagUpdate
-    TestTagUpdate tagValueUpdate_2B = createTagUpdate();
+    TestTagUpdate tagValueUpdate_2B = TestTagUpdate.create();
     tagValueUpdate_2B.setServerTimestamp(CURRENT_TIME);
     tagValueUpdate_2B.setDaqTimestamp(CURRENT_TIME);
     tagValueUpdate_2B.setSourceTimestamp(null);
@@ -435,12 +429,12 @@ public class TagControllerIsValidUpdateTest {
 
     TagController tagController = new TagController(TAG_ID);
 
-    TestTagUpdate tagValueUpdate_1 = createTagUpdate();
+    TestTagUpdate tagValueUpdate_1 = TestTagUpdate.create();
     tagValueUpdate_1.setServerTimestamp(CURRENT_TIME);
     tagValueUpdate_1.setDaqTimestamp(CURRENT_TIME);
     tagValueUpdate_1.setSourceTimestamp(CURRENT_TIME);
 
-    TestTagUpdate tagValueUpdate_2 = createTagUpdate();
+    TestTagUpdate tagValueUpdate_2 = TestTagUpdate.create();
     tagValueUpdate_2.setServerTimestamp(CURRENT_TIME);
     tagValueUpdate_2.setDaqTimestamp(CURRENT_TIME);
     tagValueUpdate_2.setSourceTimestamp(CURRENT_TIME);
@@ -459,12 +453,12 @@ public class TagControllerIsValidUpdateTest {
 
     TagController tagController = new TagController(TAG_ID);
 
-    TestTagValueUpdate tagValueUpdate_1 = createTagVUpdate();
+    TestTagValueUpdate tagValueUpdate_1 = TestTagValueUpdate.create();
     tagValueUpdate_1.setServerTimestamp(CURRENT_TIME);
     tagValueUpdate_1.setDaqTimestamp(CURRENT_TIME);
     tagValueUpdate_1.setSourceTimestamp(CURRENT_TIME);
 
-    TestTagValueUpdate tagValueUpdate_2 = createTagVUpdate();
+    TestTagValueUpdate tagValueUpdate_2 = TestTagValueUpdate.create();
     tagValueUpdate_2.setServerTimestamp(CURRENT_TIME);
     tagValueUpdate_2.setDaqTimestamp(CURRENT_TIME);
     tagValueUpdate_2.setSourceTimestamp(CURRENT_TIME);
@@ -483,7 +477,7 @@ public class TagControllerIsValidUpdateTest {
 
     TagController tagController = new TagController(TAG_ID);
 
-    TestTagValueUpdate tagValueUpdate_1 = createTagVUpdate();
+    TestTagValueUpdate tagValueUpdate_1 = TestTagValueUpdate.create();
     tagValueUpdate_1.setServerTimestamp(CURRENT_TIME);
     tagValueUpdate_1.setDaqTimestamp(CURRENT_TIME);
     tagValueUpdate_1.setSourceTimestamp(CURRENT_TIME);
@@ -493,7 +487,7 @@ public class TagControllerIsValidUpdateTest {
      */
     tagController.onUpdate(tagValueUpdate_1);
 
-    TestTagValueUpdate tagValueUpdate_2 = createTagVUpdate();
+    TestTagValueUpdate tagValueUpdate_2 = TestTagValueUpdate.create();
     tagValueUpdate_2.setServerTimestamp(CURRENT_TIME);
     tagValueUpdate_2.setDaqTimestamp(CURRENT_TIME);
 
@@ -508,270 +502,5 @@ public class TagControllerIsValidUpdateTest {
     final boolean statusB = tagController.isValidUpdate(tagValueUpdate_2);
     assertTrue(statusB == true);
   }
-
-  private TestTagValueUpdate createTagVUpdate() {
-
-    TestTagValueUpdate tagUpdate = new TestTagValueUpdate(new Timestamp(System.currentTimeMillis() - 10000L), null, null, "java.lang.String");
-    return tagUpdate;
-  }
-
-  private TestTagUpdate createTagUpdate() {
-
-    TestTagUpdate tagUpdate = new TestTagUpdate(new Timestamp(System.currentTimeMillis() - 10000L), null, null, "java.lang.String");
-
-    return tagUpdate;
-  }
-
-  /**
-   * Helper class for the tests above.
-   */
-  private class TestTagValueUpdate implements TagValueUpdate {
-
-    private Timestamp sourceTimestamp;
-
-    private Timestamp daqTimestamp;
-
-    private Timestamp serverTimestamp;
-
-    private String valueClassName;
-
-    private final Long id = 1234L;
-
-    public TestTagValueUpdate(final Timestamp sourceTimestamp, final Timestamp daqTimestamp, final Timestamp serverTimestamp, final String valueClassName) {
-
-      this.sourceTimestamp = sourceTimestamp;
-      this.daqTimestamp = daqTimestamp;
-      this.serverTimestamp = serverTimestamp;
-      this.valueClassName = valueClassName;
-    }
-
-    public void setServerTimestamp(Timestamp serverTimestamp) {
-      this.serverTimestamp = serverTimestamp;
-    }
-
-    public void setSourceTimestamp(Timestamp sourceTimestamp) {
-      this.sourceTimestamp = sourceTimestamp;
-    }
-
-    public void setDaqTimestamp(Timestamp daqTimestamp) {
-      this.daqTimestamp = daqTimestamp;
-    }
-
-    @Override
-    public Long getId() {
-      return id;
-    }
-
-    @Override
-    public DataTagQuality getDataTagQuality() {
-      return new DataTagQualityImpl();
-    }
-
-    @Override
-    public Object getValue() {
-      return null;
-    }
-
-    @Override
-    public Timestamp getSourceTimestamp() {
-      return sourceTimestamp;
-    }
-
-    @Override
-    public Timestamp getDaqTimestamp() {
-      return daqTimestamp;
-    }
-
-    @Override
-    public Timestamp getServerTimestamp() {
-      return serverTimestamp;
-    }
-
-    @Override
-    public String getDescription() {
-      return null;
-    }
-
-    @Override
-    public Collection<AlarmValue> getAlarms() {
-      return new ArrayList<AlarmValue>();
-    }
-
-    @Override
-    public TagMode getMode() {
-      return null;
-    }
-
-    @Override
-    public boolean isSimulated() {
-      return false;
-    }
-
-    @Override
-    public String getValueDescription() {
-      return null;
-    }
-
-    @Override
-    public String getValueClassName() {
-      return this.valueClassName;
-    }
-
-    @Override
-    public void setValue(Object arg) {
-    }
-  }
-
-  /**
-   * Helper class for the tests above.
-   */
-  private class TestTagUpdate implements TagUpdate {
-
-    private Timestamp sourceTimestamp;
-
-    private Timestamp daqTimestamp;
-
-    private Timestamp serverTimestamp;
-
-    private String valueClassName;
-
-    private final Long id = 1234L;
-
-    public TestTagUpdate(final Timestamp sourceTimestamp, final Timestamp daqTimestamp, final Timestamp serverTimestamp, final String valueClassName) {
-
-      this.sourceTimestamp = sourceTimestamp;
-      this.daqTimestamp = daqTimestamp;
-      this.serverTimestamp = serverTimestamp;
-      this.valueClassName = valueClassName;
-    }
-
-    public void setServerTimestamp(Timestamp serverTimestamp) {
-      this.serverTimestamp = serverTimestamp;
-    }
-
-    public void setSourceTimestamp(Timestamp sourceTimestamp) {
-      this.sourceTimestamp = sourceTimestamp;
-    }
-
-    public void setDaqTimestamp(Timestamp daqTimestamp) {
-      this.daqTimestamp = daqTimestamp;
-    }
-
-    @Override
-    public Long getId() {
-      return id;
-    }
-
-    @Override
-    public DataTagQuality getDataTagQuality() {
-      return new DataTagQualityImpl();
-    }
-
-    @Override
-    public Object getValue() {
-      return null;
-    }
-
-    @Override
-    public Timestamp getSourceTimestamp() {
-      return sourceTimestamp;
-    }
-
-    @Override
-    public Timestamp getDaqTimestamp() {
-      return daqTimestamp;
-    }
-
-    @Override
-    public Timestamp getServerTimestamp() {
-      return serverTimestamp;
-    }
-
-    @Override
-    public String getDescription() {
-      return null;
-    }
-
-    @Override
-    public Collection<AlarmValue> getAlarms() {
-      return new ArrayList<AlarmValue>();
-    }
-
-    @Override
-    public TagMode getMode() {
-      return null;
-    }
-
-    @Override
-    public boolean isSimulated() {
-      return false;
-    }
-
-    @Override
-    public String getValueDescription() {
-      return null;
-    }
-
-    @Override
-    public String getValueClassName() {
-      return this.valueClassName;
-    }
-
-    @Override
-    public void setValue(Object arg) {
-
-    }
-
-    @Override
-    public Collection<Long> getProcessIds() {
-      return null;
-    }
-
-    @Override
-    public Collection<Long> getEquipmentIds() {
-      return null;
-    }
-
-    @Override
-    public Collection<Long> getSubEquipmentIds() {
-      return null;
-    }
-
-    @Override
-    public String getUnit() {
-      return null;
-    }
-
-    @Override
-    public String getRuleExpression() {
-      return null;
-    }
-
-    @Override
-    public String getName() {
-      return null;
-    }
-
-    @Override
-    public String getTopicName() {
-      return null;
-    }
-
-    @Override
-    public boolean isControlTag() {
-      // TODO Auto-generated method stub
-      return false;
-    }
-
-    @Override
-    public boolean isAliveTag() {
-      // TODO Auto-generated method stub
-      return false;
-    }
-
-    @Override
-    public Map<String, Object> getMetadata(){
-      return null;
-    }
-  }
+  
 }
