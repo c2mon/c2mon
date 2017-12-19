@@ -13,6 +13,11 @@
   
   <servers>
     <server>
+      <id>c2mon-nexus-releases</id>
+      <username>${env.NEXUS_USERNAME}</username>
+      <password>${env.NEXUS_PASSWORD}</password>
+    </server>
+    <server>
       <id>c2mon-releases</id>
       <username>${env.ARTIFACTORY_USERNAME}</username>
       <password>${env.ARTIFACTORY_PASSWORD}</password>
@@ -36,6 +41,8 @@
       
       <!-- Variables used for distributionManagement section in pom.xml  -->
       <properties>
+        <nexus.releases.url>http://artifactory/beco-release-local</nexus.releases.url>
+        <nexus.snapshots.url>http://artifactory/beco-development-local</nexus.snapshots.url>
         <repository.releases.url>http://artifactory/beco-release-local</repository.releases.url>
         <repository.snapshots.url>http://artifactory/beco-development-local</repository.snapshots.url>
       </properties>
