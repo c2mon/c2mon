@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -20,11 +20,11 @@ import java.util.List;
 
 /**
  * Interface implemented by all Change events sent
- * from the server to the DAQ layer. 
- * 
+ * from the server to the DAQ layer.
+ *
  * <p>Change events must at least have a unique id
  * and may also have fields that need removing.
- * 
+ *
  * @author Mark Brightwell
  *
  */
@@ -41,7 +41,7 @@ public interface IChange {
    * @param changeId the id
    */
   void setChangeId(long changeId);
-  
+
   /**
    * Adds a name of a field which should be removed.
    * @param javaFieldName The (java) name of the field to remove.
@@ -54,4 +54,10 @@ public interface IChange {
    */
   List<String> getFieldsToRemove();
 
+  /**
+   * Indicate whether or not any of the fields have changed.
+   * This is only used on the server side, before deciding to inform the DAQ layer.
+   * @return <code>true</code>, if the DAQ process shall be informed about configuration changes.
+   */
+  boolean hasChanged();
 }
