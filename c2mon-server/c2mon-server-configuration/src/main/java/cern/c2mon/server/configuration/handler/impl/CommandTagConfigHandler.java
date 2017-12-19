@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -20,8 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -44,13 +43,9 @@ import cern.c2mon.shared.daq.config.CommandTagRemove;
  * @author Mark Brightwell
  *
  */
+@Slf4j
 @Service
 public class CommandTagConfigHandler {
-
-  /**
-   * Class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(CommandTagConfigHandler.class);
 
   @Autowired
   private CommandTagFacade commandTagFacade;
@@ -67,8 +62,8 @@ public class CommandTagConfigHandler {
   public List<ProcessChange> createCommandTag(ConfigurationElement element) throws IllegalAccessException {
     commandTagCache.acquireWriteLockOnKey(element.getEntityId());
     try {
-      LOGGER.trace("Creating CommandTag " + element.getEntityId());
-      CommandTag commandTag = commandTagFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
+      log.trace("Creating CommandTag " + element.getEntityId());
+      CommandTag<?> commandTag = commandTagFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
       commandTagDAO.insertCommandTag(commandTag);
       commandTagCache.putQuiet(commandTag);
       equipmentFacade.addCommandToEquipment(commandTag.getEquipmentId(), commandTag.getId());
@@ -78,7 +73,7 @@ public class CommandTagConfigHandler {
       CommandTagAdd commandTagAdd = new CommandTagAdd(element.getSequenceId(),
                                                       commandTag.getEquipmentId(),
                                                       commandTagFacade.generateSourceCommandTag(commandTag));
-      ArrayList<ProcessChange> processChanges = new ArrayList<ProcessChange>();
+      ArrayList<ProcessChange> processChanges = new ArrayList<>();
       processChanges.add(new ProcessChange(equipmentFacade.getProcessIdForAbstractEquipment(commandTag.getEquipmentId()), commandTagAdd));
       return processChanges;
     } finally {
@@ -87,24 +82,30 @@ public class CommandTagConfigHandler {
   }
 
   public List<ProcessChange> updateCommandTag(Long id, Properties properties) throws IllegalAccessException {
-    LOGGER.trace("Updating CommandTag " + id);
+    log.trace("Updating CommandTag {}", id);
     //reject if trying to change equipment it is attached to - not currently allowed
     if (properties.containsKey("equipmentId")) {
-      LOGGER.warn("Attempting to change the equipment to which a command is attached - this is not currently supported!");
+      log.warn("Attempting to change the equipment to which a command is attached - this is not currently supported!");
       properties.remove("equipmentId");
     }
     Change commandTagUpdate = null;
     Long equipmentId = commandTagCache.get(id).getEquipmentId();
     commandTagCache.acquireWriteLockOnKey(id);
+
     try {
-      CommandTag commandTag = commandTagCache.get(id);
+      CommandTag<?> commandTag = commandTagCache.get(id);
       commandTagUpdate = commandTagFacade.updateConfig(commandTag, properties);
       commandTagDAO.updateCommandTag(commandTag);
     } finally {
       commandTagCache.releaseWriteLockOnKey(id);
     }
-    ArrayList<ProcessChange> processChanges = new ArrayList<ProcessChange>();
-    processChanges.add(new ProcessChange(equipmentFacade.getProcessIdForAbstractEquipment(equipmentId), commandTagUpdate));
+
+    List<ProcessChange> processChanges = new ArrayList<>();
+
+    if (commandTagUpdate.hasChanged()) {
+      processChanges.add(new ProcessChange(equipmentFacade.getProcessIdForAbstractEquipment(equipmentId), commandTagUpdate));
+    }
+
     return processChanges;
   }
 
@@ -115,12 +116,12 @@ public class CommandTagConfigHandler {
    * @return a ProcessChange event to send to the DAQ if no error occurred
    */
   public List<ProcessChange> removeCommandTag(final Long id, final ConfigurationElementReport elementReport) {
-    LOGGER.trace("Removing CommandTag " + id);
-    ArrayList<ProcessChange> processChanges = new ArrayList<ProcessChange>();
+    log.trace("Removing CommandTag " + id);
+    ArrayList<ProcessChange> processChanges = new ArrayList<>();
     Long equipmentId;
     commandTagCache.acquireWriteLockOnKey(id);
     try {
-      CommandTag commandTag = commandTagCache.get(id);
+      CommandTag<?> commandTag = commandTagCache.get(id);
       equipmentId = commandTag.getEquipmentId();
       commandTagDAO.deleteCommandTag(commandTag.getId());
       commandTagCache.remove(commandTag.getId());
@@ -132,11 +133,11 @@ public class CommandTagConfigHandler {
       removeEvent.setEquipmentId(equipmentId);
       processChanges.add(new ProcessChange(equipmentFacade.getProcessIdForAbstractEquipment(commandTag.getEquipmentId()), removeEvent));
     } catch (CacheElementNotFoundException e) {
-      LOGGER.warn("Attempting to remove a non-existent Command - no action taken.");
+      log.warn("Attempting to remove a non-existent Command - no action taken.");
       elementReport.setWarning("Attempting to remove a non-existent CommandTag");
     } catch (Exception ex) {
       elementReport.setFailure("Exception caught while removing a commandtag.", ex);
-      LOGGER.error("Exception caught while removing a commandtag (id: " + id + ")", ex);
+      log.error("Exception caught while removing a commandtag (id: " + id + ")", ex);
       throw new RuntimeException(ex);
     } finally {
       if (commandTagCache.isWriteLockedByCurrentThread(id)) {
