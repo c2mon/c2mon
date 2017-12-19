@@ -69,38 +69,40 @@ public class Indices {
    *
    * @return true if the index was successfully created, false otherwise
    */
-  public synchronized static boolean create(String indexName, String type, String mapping) {
-    if (exists(indexName)) {
-      return true;
+  public static boolean create(String indexName, String type, String mapping) {
+    synchronized (Indices.class) {
+      if (exists(indexName)) {
+        return true;
+      }
+
+      CreateIndexRequestBuilder builder = self.client.getClient().admin().indices().prepareCreate(indexName);
+      builder.setSettings(Settings.builder()
+          .put("number_of_shards", self.properties.getShardsPerIndex())
+          .put("number_of_replicas", self.properties.getReplicasPerShard())
+          .build());
+
+      if (mapping != null) {
+        builder.addMapping(type, mapping, XContentType.JSON);
+      }
+
+      log.debug("Creating new index with name {}", indexName);
+      boolean created;
+
+      try {
+        CreateIndexResponse response = builder.get();
+        created = response.isAcknowledged();
+      } catch (ResourceAlreadyExistsException ex) {
+        created = true;
+      }
+
+      self.client.waitForYellowStatus();
+
+      if (created) {
+        self.indexCache.add(indexName);
+      }
+
+      return created;
     }
-
-    CreateIndexRequestBuilder builder = self.client.getClient().admin().indices().prepareCreate(indexName);
-    builder.setSettings(Settings.builder()
-        .put("number_of_shards", self.properties.getShardsPerIndex())
-        .put("number_of_replicas", self.properties.getReplicasPerShard())
-        .build());
-
-    if (mapping != null) {
-      builder.addMapping(type, mapping, XContentType.JSON);
-    }
-
-    log.debug("Creating new index with name {}", indexName);
-    boolean created;
-
-    try {
-      CreateIndexResponse response = builder.get();
-      created = response.isAcknowledged();
-    } catch (ResourceAlreadyExistsException ex) {
-      created = true;
-    }
-
-    self.client.waitForYellowStatus();
-
-    if (created) {
-      self.indexCache.add(indexName);
-    }
-
-    return created;
   }
 
   /**
@@ -113,23 +115,25 @@ public class Indices {
    *
    * @return true if the index exists, false otherwise
    */
-  public static synchronized boolean exists(String indexName) {
-    boolean exists = self.indexCache.contains(indexName);
-    if (!exists) {
-      self.client.waitForYellowStatus();
-      IndexMetaData indexMetaData = self.client.getClient().admin().cluster()
-          .state(Requests.clusterStateRequest())
-          .actionGet()
-          .getState()
-          .getMetaData()
-          .index(indexName);
+  public static boolean exists(String indexName) {
+    synchronized (Indices.class) {
+      boolean exists = self.indexCache.contains(indexName);
+      if (!exists) {
+        self.client.waitForYellowStatus();
+        IndexMetaData indexMetaData = self.client.getClient().admin().cluster()
+            .state(Requests.clusterStateRequest())
+            .actionGet()
+            .getState()
+            .getMetaData()
+            .index(indexName);
 
-      if (indexMetaData != null) {
-        self.indexCache.add(indexName);
-        exists = true;
+        if (indexMetaData != null) {
+          self.indexCache.add(indexName);
+          exists = true;
+        }
       }
+      return exists;
     }
-    return exists;
   }
 
   /**
