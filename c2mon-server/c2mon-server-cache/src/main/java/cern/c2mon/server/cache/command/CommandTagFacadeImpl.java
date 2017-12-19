@@ -16,6 +16,14 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.command;
 
+import java.lang.reflect.Field;
+import java.util.Properties;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import cern.c2mon.server.cache.CommandTagCache;
 import cern.c2mon.server.cache.CommandTagFacade;
 import cern.c2mon.server.cache.EquipmentCache;
@@ -33,13 +41,6 @@ import cern.c2mon.shared.common.datatag.address.HardwareAddressFactory;
 import cern.c2mon.shared.common.type.TypeConverter;
 import cern.c2mon.shared.daq.config.CommandTagUpdate;
 import cern.c2mon.shared.daq.config.HardwareAddressUpdate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.lang.reflect.Field;
-import java.util.Properties;
 
 
 /**
@@ -115,15 +116,7 @@ public class CommandTagFacadeImpl extends AbstractFacade<CommandTag> implements 
     CommandTagCacheObject commandTagCacheObject = (CommandTagCacheObject) commandTag;
     CommandTagUpdate commandTagUpdate = new CommandTagUpdate();
     commandTagUpdate.setCommandTagId(commandTag.getId());
-    // id (Long) TODO should be able to remove this as id is always set beforehand and never changed in update
-//    if ((tmpStr = properties.getProperty("id")) != null) {
-//      try {
-//        commandTagCacheObject.setId(valueOf(tmpStr));
-//      }
-//      catch (NumberFormatException e) {
-//        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "NumberFormatException: Unable to convert parameter \"id\" to Long: " + tmpStr);
-//      }
-//    }
+
     // name (String)
     if ((tmpStr = properties.getProperty("name")) != null) {
       commandTagCacheObject.setName(tmpStr);
@@ -269,6 +262,7 @@ public class CommandTagFacadeImpl extends AbstractFacade<CommandTag> implements 
    * @param commandTag
    * @throws ConfigurationException
    */
+  @Override
   public void validateConfig(CommandTag commandTag) throws ConfigurationException {
     if (commandTag.getId() == null) {
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"id\" cannot be null");
