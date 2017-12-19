@@ -76,10 +76,11 @@ public class ConfigurationController {
    */
   @Autowired
   private ProcessConfigurationLoader processConfigurationLoader;
+
   /**
    * The updater which applies changes to source data tags.
    */
-  private ConfigurationUpdater configurationUpdater = new ConfigurationUpdater();
+  private final ConfigurationUpdater configurationUpdater = new ConfigurationUpdater();
 
   /**
    * Reference to the ProcessRequestSender (for requesting the XML config
@@ -96,36 +97,36 @@ public class ConfigurationController {
   @Autowired(required = false)
   @Qualifier("secondaryRequestSender")
   private ProcessRequestSender secondaryRequestSender;
-  
+
   @Autowired
   private EquipmentConfigurationFactory equipmentConfigurationFactory;
 
   /**
    * Map of data tag changers. It maps equipment id - > changer.
    */
-  private Map<Long, IDataTagChanger> dataTagChangers = new ConcurrentHashMap<>();
+  private final Map<Long, IDataTagChanger> dataTagChangers = new ConcurrentHashMap<>();
   /**
    * Map of command tag changers. It maps equipment id - > changer.
    */
-  private Map<Long, ICommandTagChanger> commandTagChangers = new ConcurrentHashMap<>();
+  private final  Map<Long, ICommandTagChanger> commandTagChangers = new ConcurrentHashMap<>();
   /**
    * Map of equipment changers. It maps equipment id - > changer.
    */
-  private Map<Long, IEquipmentConfigurationChanger> equipmentChangers = new ConcurrentHashMap<>();
+  private final Map<Long, IEquipmentConfigurationChanger> equipmentChangers = new ConcurrentHashMap<>();
   /**
    * These are additional changers of the core. Which can be used to inform
    * other parts of the core about changes.
    */
-  private Map<Long, List<ICoreDataTagChanger>> coreDataTagChangers = new ConcurrentHashMap<>();
+  private final Map<Long, List<ICoreDataTagChanger>> coreDataTagChangers = new ConcurrentHashMap<>();
   /**
    * These are additional changers of the core. Which can be used to inform
    * other parts of the core about changes.
    */
-  private Map<Long, List<ICoreCommandTagChanger>> coreCommandTagChangers = new ConcurrentHashMap<>();
+  private final Map<Long, List<ICoreCommandTagChanger>> coreCommandTagChangers = new ConcurrentHashMap<>();
   /**
    * The core equipment configuration changers.
    */
-  private Map<Long, List<ICoreEquipmentConfigurationChanger>> coreEquipmentConfigurationChangers = new HashMap<>();
+  private final Map<Long, List<ICoreEquipmentConfigurationChanger>> coreEquipmentConfigurationChangers = new HashMap<>();
 
   /**
    * Loads configurations: Process PIK and Process Configuration. Catches
@@ -825,7 +826,7 @@ public class ConfigurationController {
     }
 
     SubEquipmentConfiguration subEquipmentConfiguration = null;
-   
+
     // Create the configuration
     try {
       subEquipmentConfiguration = equipmentConfigurationFactory.createSubEquipmentConfiguration(subEquipmentUnitAdd.getSubEquipmentUnitXml());
@@ -1065,10 +1066,10 @@ public class ConfigurationController {
   public long getStartUp() {
     return startUp;
   }
-  
+
 	/**
 	 * Set the equipmentConfigurationFactory.
-	 * 
+	 *
 	 * @param equipmentConfigurationFactory
 	 */
 	public void setEquipmentConfigurationFactory(EquipmentConfigurationFactory equipmentConfigurationFactory) {
