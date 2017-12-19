@@ -6,7 +6,8 @@
     {
       "nested_metadata_template": {
         "mapping": {
-          "index": "not_analyzed"
+          "type": "keyword",
+          "index": true
         },
         "match_mapping_type": "string",
         "path_match": "metadata.*"
@@ -18,46 +19,60 @@
       "type": "long"
     },
     "name": {
-      "type": "string",
-      "index": "not_analyzed"
+      "type": "keyword",
+      "index": true
     },
     "description": {
-      "type": "string",
-      "index": "analyzed"
+      "type": "text",
+      "index": true
     },
     "metadata": {
       "type": "object",
       "dynamic": "true"
     },
     "unit": {
-      "type": "string",
-      "index": "not_analyzed"
+      "type": "keyword",
+      "index": true
     },
     "mode":{
-      "type": "string",
-      "index": "not_analyzed"
+      "type": "keyword",
+      "index": true
     },
     "c2mon": {
       "dynamic": "true",
       "properties": {
         "dataType": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword",
+          "index": true
         },
         "process": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword",
+          "index": true
         },
         "equipment": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword",
+          "index": true
         },
         "subEquipment": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword",
+          "index": true
         },
         "logged": {
           "type": "boolean"
+        },
+        "value": {
+          "type": "double"
+        },
+        "valueBoolean": {
+          "type": "boolean"
+        },
+        "valueString": {
+          "type": "keyword",
+          "index": "true"
+        },
+        "valueObject": {
+          "type": "object",
+          "dynamic": "true"
         }
       }
     },

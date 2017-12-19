@@ -1,27 +1,41 @@
 {
   "properties": {
     "entity": {
-      "type": "string",
-      "index": "not_analyzed"
+      "type": "keyword",
+      "index": true
     },
     "id": {
       "type": "long"
     },
     "message": {
-      "type": "string",
-      "index": "not_analyzed"
+      "type": "keyword",
+      "index": true
     },
     "name": {
-      "type": "string",
-      "index": "not_analyzed"
+      "type": "keyword",
+      "index": true
     },
     "status": {
-      "type": "string",
-      "index": "not_analyzed"
+      "type": "keyword",
+      "index": true
     },
     "timestamp": {
       "type": "date",
       "format": "epoch_millis"
+    },
+    "value": {
+      "type": "double"
+    },
+    "valueBoolean": {
+      "type": "boolean"
+    },
+    "valueString": {
+      "type": "keyword",
+      "index": "true"
+    },
+    "valueObject": {
+      "type": "object",
+      "dynamic": "true"
     }
   }
 }

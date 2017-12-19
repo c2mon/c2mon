@@ -3,7 +3,8 @@
     {
       "nested_metadata_template": {
         "mapping": {
-          "index": "not_analyzed"
+          "type": "keyword",
+          "index": true
         },
         "match_mapping_type": "string",
         "path_match": "metadata.*"
@@ -21,19 +22,19 @@
       "type": "integer"
     },
     "faultFamily": {
-      "type": "string",
-      "index": "not_analyzed"
+      "type": "keyword",
+      "index": true
     },
     "faultMember": {
-      "type": "string",
-      "index": "not_analyzed"
+      "type": "keyword",
+      "index": true
     },
     "id": {
       "type": "long"
     },
     "info": {
-      "type": "string",
-      "index": "not_analyzed"
+      "type": "keyword",
+      "index": true
     },
     "metadata": {
       "type": "object",
@@ -45,6 +46,20 @@
     "timestamp": {
       "type": "date",
       "format": "epoch_millis"
+    },
+    "value": {
+      "type": "double"
+    },
+    "valueBoolean": {
+      "type": "boolean"
+    },
+    "valueString": {
+      "type": "keyword",
+      "index": "true"
+    },
+    "valueObject": {
+      "type": "object",
+      "dynamic": "true"
     }
   }
 }

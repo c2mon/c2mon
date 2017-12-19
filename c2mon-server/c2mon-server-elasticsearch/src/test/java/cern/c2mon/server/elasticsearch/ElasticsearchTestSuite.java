@@ -20,7 +20,6 @@ import org.springframework.util.FileSystemUtils;
 @Suite.SuiteClasses({
     ElasticsearchModuleIntegrationTest.class,
     IndicesTests.class,
-    MappingFactoryTests.class,
     AlarmDocumentConverterTests.class,
     AlarmDocumentIndexerTests.class,
     ElasticsearchClientTests.class,

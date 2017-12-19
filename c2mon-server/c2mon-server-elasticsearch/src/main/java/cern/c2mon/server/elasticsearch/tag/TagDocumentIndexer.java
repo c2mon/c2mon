@@ -16,21 +16,18 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch.tag;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
+import cern.c2mon.pmanager.IDBPersistenceHandler;
+import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
+import cern.c2mon.server.elasticsearch.Indices;
+import cern.c2mon.server.elasticsearch.MappingFactory;
+import cern.c2mon.server.elasticsearch.bulk.BulkProcessorProxy;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.index.IndexRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import cern.c2mon.pmanager.IDBPersistenceHandler;
-import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
-import cern.c2mon.server.elasticsearch.Indices;
-import cern.c2mon.server.elasticsearch.Mappings;
-import cern.c2mon.server.elasticsearch.Types;
-import cern.c2mon.server.elasticsearch.bulk.BulkProcessorProxy;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * This class manages the fallback-aware indexing of {@link TagDocument}
@@ -70,11 +67,10 @@ public class TagDocumentIndexer implements IDBPersistenceHandler<TagDocument> {
 
   private void indexTag(TagDocument tag) {
     String index = getOrCreateIndex(tag);
-    String type = Types.of(tag.getProperty("c2mon", Map.class).get("dataType").toString());
 
-    log.trace("Indexing tag (#{}, index={}, type={})", tag.getId(), index, type);
+    log.trace("Indexing tag (#{}, index={}, type={})", tag.getId(), index, "tag");
 
-    IndexRequest indexNewTag = new IndexRequest(index, type)
+    IndexRequest indexNewTag = new IndexRequest(index, "tag")
         .source(tag.toString())
         .routing(tag.getId());
 
@@ -85,17 +81,7 @@ public class TagDocumentIndexer implements IDBPersistenceHandler<TagDocument> {
     String index = Indices.indexFor(tag);
 
     if (!Indices.exists(index)) {
-      Indices.create(index);
-
-      // Create mappings for this index
-      Mappings.create(index, Boolean.class);
-      Mappings.create(index, Short.class);
-      Mappings.create(index, Integer.class);
-      Mappings.create(index, Float.class);
-      Mappings.create(index, Double.class);
-      Mappings.create(index, Long.class);
-      Mappings.create(index, String.class);
-      Mappings.create(index, Object.class);
+      Indices.create(index, "tag", MappingFactory.createTagMapping());
     }
 
     return index;

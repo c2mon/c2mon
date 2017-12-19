@@ -7,18 +7,15 @@ import cern.c2mon.server.elasticsearch.supervision.SupervisionEventDocument;
 import cern.c2mon.server.elasticsearch.tag.TagDocument;
 import cern.c2mon.server.elasticsearch.tag.config.TagConfigDocument;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.ResourceAlreadyExistsException;
-import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequestBuilder;
-import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
-import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
+import org.elasticsearch.client.Requests;
+import org.elasticsearch.cluster.metadata.IndexMetaData;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
@@ -116,12 +113,23 @@ public class Indices {
    *
    * @return true if the index exists, false otherwise
    */
-  public static boolean exists(String indexName) {
-    if (self.indexCache.contains(indexName)) {
-      return true;
-    }
+  public static synchronized boolean exists(String indexName) {
+    boolean exists = self.indexCache.contains(indexName);
+    if (!exists) {
+      self.client.waitForYellowStatus();
+      IndexMetaData indexMetaData = self.client.getClient().admin().cluster()
+          .state(Requests.clusterStateRequest())
+          .actionGet()
+          .getState()
+          .getMetaData()
+          .index(indexName);
 
-    return false;
+      if (indexMetaData != null) {
+        self.indexCache.add(indexName);
+        exists = true;
+      }
+    }
+    return exists;
   }
 
   /**
