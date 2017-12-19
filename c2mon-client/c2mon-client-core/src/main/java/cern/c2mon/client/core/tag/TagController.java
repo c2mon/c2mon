@@ -36,6 +36,7 @@ import cern.c2mon.shared.client.tag.TagValueUpdate;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
 import cern.c2mon.shared.common.supervision.SupervisionConstants;
+import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
 import cern.c2mon.shared.common.type.TypeConverter;
 import cern.c2mon.shared.rule.RuleExpression;
 import cern.c2mon.shared.rule.RuleFormatException;
@@ -130,15 +131,15 @@ public class TagController implements TagUpdateListener, SupervisionListener {
         switch (supervisionEvent.getEntity()) {
           case PROCESS:
             oldEvent = tagImpl.getProcessSupervisionStatus().put(supervisionEvent.getEntityId(), supervisionEvent);
-            updateProcessStatus();
+            updateProcessStatus(supervisionEvent);
             break;
           case EQUIPMENT:
             oldEvent = tagImpl.getEquipmentSupervisionStatus().put(supervisionEvent.getEntityId(), supervisionEvent);
-            updateEquipmentStatus();
+            updateEquipmentStatus(supervisionEvent);
             break;
           case SUBEQUIPMENT:
             oldEvent = tagImpl.getSubEquipmentSupervisionStatus().put(supervisionEvent.getEntityId(), supervisionEvent);
-            updateSubEquipmentStatus();
+            updateSubEquipmentStatus(supervisionEvent);
             break;
           default:
             String errorMsg = "The supervision event type " + supervisionEvent.getEntity() + " is not supported.";
@@ -164,13 +165,13 @@ public class TagController implements TagUpdateListener, SupervisionListener {
    * Inner method for updating the process status of this tag and
    * computing the error message, if one of the linked processes is down.
    */
-  private void updateProcessStatus() {
-    boolean down = false;
+  private void updateProcessStatus(SupervisionEvent supervisionEvent) {
     StringBuilder invalidationMessage = new StringBuilder();
     for (SupervisionEvent event : tagImpl.getProcessSupervisionStatus().values()) {
       this.invalidateMessage(invalidationMessage, event);
     }
 
+    boolean down = SupervisionStatus.DOWN == supervisionEvent.getStatus();
     if (down) {
       tagImpl.getDataTagQuality().addInvalidStatus(TagQualityStatus.PROCESS_DOWN, invalidationMessage.toString());
     }
@@ -183,13 +184,13 @@ public class TagController implements TagUpdateListener, SupervisionListener {
    * Inner method for updating the equipment status of this tag and
    * computing the error message, if one of the linked equipments is down.
    */
-  private void updateEquipmentStatus() {
-    boolean down = false;
+  private void updateEquipmentStatus(SupervisionEvent supervisionEvent) {
     StringBuilder invalidationMessage = new StringBuilder();
     for (SupervisionEvent event : tagImpl.getEquipmentSupervisionStatus().values()) {
       this.invalidateMessage(invalidationMessage, event);
     }
 
+    boolean down = SupervisionStatus.DOWN == supervisionEvent.getStatus();
     if (down) {
       tagImpl.getDataTagQuality().addInvalidStatus(TagQualityStatus.EQUIPMENT_DOWN, invalidationMessage.toString());
     }
@@ -202,13 +203,14 @@ public class TagController implements TagUpdateListener, SupervisionListener {
    * Inner method for updating the sub equipment status of this tag and
    * computing the error message, if one of the linked sub equipments is down.
    */
-  private void updateSubEquipmentStatus() {
+  private void updateSubEquipmentStatus(SupervisionEvent supervisionEvent) {
     StringBuilder invalidationMessage = new StringBuilder();
     for (SupervisionEvent event : tagImpl.getSubEquipmentSupervisionStatus().values()) {
       this.invalidateMessage(invalidationMessage, event);
     }
 
-    if (invalidationMessage.length() == 0) {
+    boolean down = SupervisionStatus.DOWN == supervisionEvent.getStatus();
+    if (down) {
       tagImpl.getDataTagQuality().addInvalidStatus(TagQualityStatus.SUBEQUIPMENT_DOWN, invalidationMessage.toString());
     }
     else {
