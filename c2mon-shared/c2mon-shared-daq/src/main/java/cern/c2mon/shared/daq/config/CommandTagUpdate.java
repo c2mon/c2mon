@@ -94,4 +94,12 @@ public class CommandTagUpdate extends Change implements ITagChange {
         this.commandTagId = commandTagId;
         this.equipmentId = equipmentId;
     }
+
+    @Override
+    public boolean hasChanged() {
+      return name != null
+          || sourceTimeout != null
+          || sourceRetries != null
+          || hardwareAddressUpdate != null;
+    }
 }

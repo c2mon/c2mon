@@ -138,4 +138,9 @@ public class DataTagUpdate extends Change implements ITagChange {
         this.maxValue = maxValue;
         setEmpty(false);
     }
+
+    @Override
+    public final boolean hasChanged() {
+      return !isEmpty();
+    }
 }
