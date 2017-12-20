@@ -13,7 +13,8 @@ For more details on a given release, please check also the [Milestone planning](
 - Server: Avoids now sending CommandTag configuration updates to DAQ, if not required (#183)
 
 ### Fixed
-- Client API: Tags were not invalidated after a process or equipment went down (#181). This bug got introduced by #53
+- Client API: Tags were not invalidated after a process or equipment went down (#181). This bug got introduced by Client API refactoring (#53)
+- DAQ: Fixed problem with initialitation of `FreshnessMonitor` for `GenericMessageHandlerTest` unit test class
 
 ### Removed
 - Server: Removed Oracle dependency (#179)
