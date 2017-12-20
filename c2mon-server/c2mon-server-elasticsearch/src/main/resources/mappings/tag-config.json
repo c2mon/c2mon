@@ -63,6 +63,9 @@
         "value": {
           "type": "double"
         },
+        "valueLong": {
+          "type": "long"
+        },
         "valueBoolean": {
           "type": "boolean"
         },
