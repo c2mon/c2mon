@@ -8,7 +8,7 @@ For more details on a given release, please check also the [Milestone planning](
 
 ## [Unreleased]
 ### Changed
-- Updated MYSQL schema scripts for version 5.7 (#177)
+- Server: Updated MYSQL schema scripts for version 5.7 (#177)
 - Deployment is now done against Nexus to make all artifacts available from outside of CERN (#182)
 - Server: Avoids now sending CommandTag configuration updates to DAQ, if not required (#183)
 
@@ -16,7 +16,7 @@ For more details on a given release, please check also the [Milestone planning](
 - Client API: Tags were not invalidated after a process or equipment went down (#181). This bug got introduced by #53
 
 ### Removed
-- Removed Oracle dependency from server (#179)
+- Server: Removed Oracle dependency (#179)
 
 
 ## 1.8.28 - 2017-12-12
