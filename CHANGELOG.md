@@ -7,6 +7,14 @@ All issues referenced in parentheses can be consulted under [CERN GitLab](https:
 For more details on a given release, please check also the [Milestone planning](https://gitlab.cern.ch/c2mon/c2mon/milestones?state=all).
 
 ## [Unreleased]
+### Added
+
+### Changed
+
+### Fixed
+
+
+## [1.8.29] - 2017-12-20
 ### Changed
 - Server: Updated MYSQL schema scripts for version 5.7 (#177)
 - Deployment is now done against Nexus to make all artifacts available from outside of CERN (#182)
@@ -213,8 +221,8 @@ This patch contains bug fixes for the DAQ layer.
 ### Removed
 - Remove of EquipmentLogger concept from DAQ Core (#56)
 
-
-[Unreleased]: https://gitlab.cern.ch/c2mon/c2mon/milestones/22
+[Unreleased]: https://gitlab.cern.ch/c2mon/c2mon/milestones/23
+[1.8.29]: https://gitlab.cern.ch/c2mon/c2mon/milestones/22
 [1.8.27]: https://gitlab.cern.ch/c2mon/c2mon/milestones/19
 [1.8.26]: https://gitlab.cern.ch/c2mon/c2mon/milestones/21
 [1.8.25]: https://gitlab.cern.ch/c2mon/c2mon/milestones/20
