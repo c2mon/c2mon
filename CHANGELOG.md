@@ -15,6 +15,7 @@ For more details on a given release, please check also the [Milestone planning](
 ### Fixed
 - Client API: Tags were not invalidated after a process or equipment went down (#181). This bug got introduced by Client API refactoring (#53)
 - DAQ: Fixed problem with initialitation of `FreshnessMonitor` for `GenericMessageHandlerTest` unit test class
+- Server: Fixed issue that at creation of the Elasticsearch config index the mapping was not always taken into account (#170)
 
 ### Removed
 - Server: Removed Oracle dependency (#179)
