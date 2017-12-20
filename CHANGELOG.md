@@ -7,11 +7,16 @@ All issues referenced in parentheses can be consulted under [CERN GitLab](https:
 For more details on a given release, please check also the [Milestone planning](https://gitlab.cern.ch/c2mon/c2mon/milestones?state=all).
 
 ## [Unreleased]
-### Added
-
 ### Changed
+- Updated MYSQL schema scripts for version 5.7 (#177)
+- Deployment is now done against Nexus to make all artifacts available from outside of CERN (#182)
+- Server: Avoids now sending CommandTag configuration updates to DAQ, if not required (#183)
 
 ### Fixed
+- Client API: Tags were not invalidated after a process or equipment went down (#181). This bug got introduced by #53
+
+### Removed
+- Removed Oracle dependency from server (#179)
 
 
 ## 1.8.28 - 2017-12-12
