@@ -17,19 +17,16 @@
 
 package cern.c2mon.server.elasticsearch.tag.config;
 
-import javax.annotation.PostConstruct;
-
+import cern.c2mon.server.elasticsearch.Indices;
+import cern.c2mon.server.elasticsearch.MappingFactory;
+import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
+import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import cern.c2mon.server.elasticsearch.Indices;
-import cern.c2mon.server.elasticsearch.MappingFactory;
-import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
-import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 
 /**
  * This class manages the indexing of {@link TagConfigDocument} instances to
@@ -54,35 +51,44 @@ public class TagConfigDocumentIndexer {
     this.configIndex = properties.getTagConfigIndex();
   }
 
-  public void indexTagConfig(TagConfigDocument tag) {
+  public void indexTagConfig(final TagConfigDocument tag) {
     if (!Indices.exists(configIndex)) {
       Indices.create(configIndex, TYPE, MappingFactory.createTagConfigMapping());
     }
 
-    IndexRequest indexNewTag = new IndexRequest(configIndex, TYPE,
-            String.valueOf(tag.getId())).source(tag.toString()).routing(tag.getId());
+    IndexRequest indexRequest = this.getIndexRequest(tag);
 
     try {
-      client.getClient().index(indexNewTag).get();
+      client.getClient().index(indexRequest).get();
       client.waitForYellowStatus();
     } catch (Exception e) {
       log.error("Error occurred while indexing the config for tag #{}", tag.getId(), e);
     }
   }
 
-  public void updateTagConfig(TagConfigDocument tag) {
-    UpdateRequest updateRequest = new UpdateRequest(configIndex, TYPE,
-            String.valueOf(tag.getId())).doc(tag.toString()).routing(tag.getId());
+  private IndexRequest getIndexRequest(final TagConfigDocument tag) {
+      return new IndexRequest(configIndex, TYPE,
+        String.valueOf(tag.getId())).source(tag.toString()).routing(tag.getId());
+  }
 
-    try {
-      client.getClient().update(updateRequest).get();
-      client.waitForYellowStatus();
-    } catch (Exception e) {
-      log.error("Error occurred while updating the config for tag #{}", tag.getId(), e);
+  /**
+   * Update a given tag config document, or create it if it doesn't exist.
+   *
+   * @param tag
+   */
+  public void updateTagConfig(final TagConfigDocument tag) {
+      UpdateRequest updateRequest = new UpdateRequest(configIndex, TYPE,
+          String.valueOf(tag.getId())).doc(tag.toString()).routing(tag.getId());
+      updateRequest.upsert(this.getIndexRequest(tag));
+      try {
+        client.getClient().update(updateRequest).get();
+        client.waitForYellowStatus();
+      } catch (Exception e) {
+        log.error("Error occurred while updating the config for tag #{}", tag.getId(), e);
     }
   }
 
-  public void removeTagConfig(TagConfigDocument tag) {
+  public void removeTagConfig(final TagConfigDocument tag) {
     if (!Indices.exists(this.configIndex)) {
       return;
     }

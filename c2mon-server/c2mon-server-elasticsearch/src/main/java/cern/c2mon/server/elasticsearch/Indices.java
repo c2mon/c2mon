@@ -11,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.ResourceAlreadyExistsException;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
 import org.elasticsearch.client.Requests;
 import org.elasticsearch.cluster.metadata.IndexMetaData;
 import org.elasticsearch.common.settings.Settings;
@@ -22,6 +24,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Static utility singleton for working with Elasticsearch indices.
@@ -136,6 +139,29 @@ public class Indices {
     }
   }
 
+  /**
+   * Delete an index in Elasticsearch.
+   *
+   * @param indexName
+   *
+   * @return true if the request was acknowledged.
+   */
+  public static boolean delete(String indexName) {
+    synchronized (Indices.class) {
+      try {
+        DeleteIndexResponse response = self.client.getClient().admin().indices().delete(new DeleteIndexRequest(indexName)).get();
+        if (response.isAcknowledged()) {
+          self.indexCache.remove(indexName);
+          return true;
+        } else {
+          return false;
+        }
+      } catch (InterruptedException|ExecutionException e) {
+        log.error("Error while deleting index", e);
+        return false;
+      }
+    }
+  }
   /**
    * Generate an index for the given {@link TagDocument} based on its
    * timestamp.

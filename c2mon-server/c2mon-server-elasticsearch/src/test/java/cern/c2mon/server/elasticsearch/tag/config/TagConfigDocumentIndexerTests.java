@@ -76,23 +76,38 @@ public class TagConfigDocumentIndexerTests extends BaseElasticsearchIntegrationT
 
   @Test
   public void updateDataTag() throws Exception {
+    testUpdate(true);
+  }
+
+  @Test
+  public void updateMissingDataTag() throws Exception {
+    testUpdate(false);
+  }
+
+  private void testUpdate(boolean doIndexDocument) throws Exception {
     DataTagCacheObject tag = (DataTagCacheObject) EntityUtils.createDataTag();
 
     TagConfigDocument document = converter.convert(tag)
             .orElseThrow(()->new Exception("Tag conversion failed"));
+
     String index = Indices.indexFor(document);
 
+    Indices.create(index);
+    client.waitForYellowStatus();
+
+    if (doIndexDocument) {
       // Insert the document
       indexer.indexTagConfig(document);
       assertTrue(Indices.exists(index));
 
-    // Refresh the index to make sure the document is searchable
-    client.getClient().admin().indices().prepareRefresh(index).get();
-    client.getClient().admin().cluster().prepareHealth().setIndices(index).setWaitForYellowStatus().get();
+      // Refresh the index to make sure the document is searchable
+      client.getClient().admin().indices().prepareRefresh(index).get();
+      client.getClient().admin().cluster().prepareHealth().setIndices(index).setWaitForYellowStatus().get();
+    }
 
     // Make sure the tag exists in the index
     SearchResponse response = client.getClient().prepareSearch(index).setRouting(tag.getId().toString()).get();
-    assertEquals(1, response.getHits().totalHits());
+    assertEquals(doIndexDocument ? 1 : 0, response.getHits().totalHits());
 
     // Update the document
     document.put("description", "A better description");
