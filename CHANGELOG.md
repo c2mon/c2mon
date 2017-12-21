@@ -12,6 +12,7 @@ For more details on a given release, please check also the [Milestone planning](
 ### Changed
 
 ### Fixed
+- Server: When a tag update is received and C2MON detects that this tag is not registered in the Elasticsearch config index it will now add the docuement instead of throwing an error (#178)
 
 
 ## [1.8.29] - 2017-12-20
