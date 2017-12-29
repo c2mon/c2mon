@@ -15,10 +15,12 @@ A C2MON DAQ module is a Java program responsible for connecting to and reading d
 C2MON server. It is also optionally responsible for executing commands on sources.
 
 A DAQ knows how to:
-- Connect to the source(s) (the `Equipment`);
+
+- Connect to the source(s) (the `Equipment`)
 - Bind to and read individual metrics from the source and publish them as `Tag`s
 - Execute commands on the source
 - Send heartbeats and status flags about the connection status and quality of groups of metrics
+- Filter the incoming raw data
 
 Historically, the types of physical sources that C2MON was designed for were dynamic in nature, meaning that they did not have a well-defined set of output
 metrics - rather, the set of metrics changed frequently. For example, CERN uses many types of [PLC](https://en.wikipedia.org/wiki/Programmable_logic_controller).
