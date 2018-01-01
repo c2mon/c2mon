@@ -1,6 +1,6 @@
 # Client API
 
-The C2MON client API is written in Java and provides various service classes to interact with the server:
+The C2MON Client API is written in Java and provides various service classes to interact with the server:
 
 * `TagService`: The most important service class and most probably the only one you will need in the beginning. Provides methods to
 search for and subscribe to tags.
@@ -10,25 +10,50 @@ search for and subscribe to tags.
 * `SupervisionService`: Provides methods for registering heartbeat listeners, to monitor server connection state.
 * `SessionService`: Optional service to secure the command execution (requires implementing an `AuthenticationManager`).
 
-## Including the API dependency
+## Including the API
 
-To use the API, you need to add a dependency on `c2mon-daq-core`. Include it in your project using Maven:
+To use the API, you need to add a dependency on `c2mon-client-core`. 
+
+Remember to replace "__insert_version_here__" with a real version number, such as "1.8.30"
+
+### Maven configuration
+If you make use of Maven include the following dependency in you C2MON client project:
 
 ```xml
 <dependency>
-    <groupId>cern.c2mon.daq</groupId>
-    <artifactId>c2mon-daq-core</artifactId>
+    <groupId>cern.c2mon.client</groupId>
+    <artifactId>c2mon-client-core</artifactId>
     <version>__insert_version_here__</version>
 </dependency>
 ```
 
-Or using Gradle:
+The C2MON artifacts are hosted on the CERN Nexus repository:
+
+```xml
+<repositories>
+  <repository>
+    <id>cern-nexus</id>
+    <name>CERN Central Nexus</name>
+    <url>https://nexus.web.cern.ch/nexus/content/groups/public</url>
+  </repository>
+</repositories>
+```
+
+### Gradle configuration
+
+```json
+compile "cern.c2mon.client:c2mon-client-core:__insert_version_here__"
+```
+
+Declaration of the CERN Nexus repository:
+
+```json
+repositories {
+  mavenCentral()
+  maven { url "https://nexus.web.cern.ch/nexus/content/groups/public" }
+}
 
 ```
-compile "cern.c2mon.daq:c2mon-daq-core:__insert_version_here__"
-```
-
-Remember to replace "__insert_version_here__" with a real version number, such as "1.8.0".
 
 ## Connecting to a C2MON server
 
