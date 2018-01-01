@@ -9,9 +9,52 @@ and pushes it to client applications.
 
 You can run a server by downloading and executing a tarball distribution, or by running a Docker image.
 
+!!! info "Note"
+    To run the C2MON tarball distribution you need at least Java 1.8 installed on your machine.
+
 ### Running the tarball distribution
 
-** Coming soon!**
+The [C2MON server distribution tarball](https://nexus.web.cern.ch/nexus/content/groups/public/cern/c2mon/server/c2mon-server/) can be downloaded from [here](https://nexus.web.cern.ch/nexus/content/groups/public/cern/c2mon/server/c2mon-server/).
+
+We recommend to always use the latest stable version and to read the [CHANGELOG.md](https://github.com/c2mon/c2mon/blob/master/CHANGELOG.md) file.
+
+Extraxt the tarball on your local file system and change into the `c2mon-server-1.8.xx/bin/` directory.
+
+!!! info "Note"
+    The scripts provided with the tarball are Linux bash scripts. We recommend this environment also for production usage. Windows users should use [Docker](#using-the-docker-image) instead.
+
+To start the server execute the following script:
+
+```shell
+$ ./c2mon.sh start
+
+Starting a C2MON server:     [  OK  ]
+```
+
+For the help page just run the script without any options:
+
+```
+$ ./c2mon.sh
+
+Usage: ./c2mon.sh {start|stop|restart|status|run} [-d|--debug] [-r|--recover]
+
+start   - Starts the C2MON server on this host, if it is not running.
+stop    - Stops the C2MON server on this host, if it is running. If a gentle shutdown fails, the process is killed after 20 seconds.
+restart - Restarts the C2MON server.
+status  - Checks the status (running/stopped) of the C2MON server.
+run     - Starts the C2MON server in the foreground without logging to a file.
+
+-d, --debug
+         Allows attaching a remote debugger to the C2MON Java process.
+-r, --recover
+         Recover after a server crash.
+```
+
+It is also advisable to take a look into the `log/c2mon.log` file. When C2MON starts successfully you should see the following INFO message:
+
+```
+... [main] cern.c2mon.server.ServerStartup : C2MON server is now initialised
+```
 
 ### Using the Docker image
 
@@ -80,4 +123,4 @@ docker run --rm --name web-ui -ti --link c2mon:c2mon -p 0.0.0.0:8080:8080 gitlab
 What you achieved with this tutorial is a Hello World demonstration of C2MON to understand the [core concepts](/core-concepts) of the framework.
 
 However, in order to use C2MON for your own use case you have now work on connecting to your data sources. This will require to get more familiar with the C2MON Data Acquisition (DAQ) layer.
-Maybe you can use some of the existing [Open Source DAQs](https://github.com/c2mon?utf8=%E2%9C%93&q=c2mon-daq), but most propably you want to write your own DAQ process. Therefore, you should read as next about the [DAQ API](/user-guide/daq-api). 
+Maybe you can use some of the existing [Open Source DAQs](https://github.com/c2mon?utf8=%E2%9C%93&q=c2mon-daq), but most propably you want to write your own DAQ process. Therefore, you should read as next about the [DAQ API](/user-guide/daq-api).
