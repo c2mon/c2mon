@@ -3,36 +3,14 @@
 This guide assumes that you are familiar with the [core concepts](/core-concepts) of C2MON. At the end of this guide you should be able to write your
 own data acquisition module using the C2MON DAQ APIs.
 
-## Introduction
-
-C2MON was initially developed at CERN to acquire data from physical infrastructural equipment, such as PLCs or OPC servers. As such, the word
-"equipment" occurs frequently within the API. However, this does not mean that you cannot write a DAQ for retrieving data from other sources, such as
-host monitoring processes, middleware protocols, or any other type of software services or physical hardware.
-
-## Anatomy of a C2MON DAQ module
-
-A C2MON DAQ module is a Java program responsible for connecting to and reading data from specific sources (software, hardware) and publishing the data to a
-C2MON server. It is also optionally responsible for executing commands on sources.
-
-A DAQ knows how to:
-
-- Connect to the source(s) (the `Equipment`)
-- Bind to and read individual metrics from the source and publish them as `Tag`s
-- Execute commands on the source
-- Send heartbeats and status flags about the connection status and quality of groups of metrics
-- Filter the incoming raw data
-
-Historically, the types of physical sources that C2MON was designed for were dynamic in nature, meaning that they did not have a well-defined set of output
-metrics - rather, the set of metrics changed frequently. For example, CERN uses many types of [PLC](https://en.wikipedia.org/wiki/Programmable_logic_controller).
-These PLCs have many generic input/output channels, which are in turn connected to industrial equipment, and are frequently re-wired.
-
-For this reason, the design choice was made to pre-define the set of metrics that a particular DAQ would be responsible for acquiring, and to store this
-configuration in the C2MON server itself. The DAQ API was designed to be dynamic in the fact that it would retrieve its pre-defined configuration at
-startup and use it to read from the source. It would also be optionally capable of re-configuring its set of metrics at runtime.
-
 ## Including the API
 
-To use the API, you need to add a dependency on `c2mon-daq-core`. Include it in your project using Maven:
+To use the API, you need to add a dependency on `c2mon-daq-core`. 
+
+Remember to replace "__insert_version_here__" with a real version number, such as "1.8.30"
+
+### Maven configuration
+If you make use of Maven include the following dependency in you DAQ project:
 
 ```xml
 <dependency>
@@ -42,10 +20,32 @@ To use the API, you need to add a dependency on `c2mon-daq-core`. Include it in 
 </dependency>
 ```
 
-Or using Gradle:
+The C2MON artifacts are hosted on the CERN Nexus repository:
 
+```xml
+<repositories>
+  <repository>
+    <id>cern-nexus</id>
+    <name>CERN Central Nexus</name>
+    <url>https://nexus.web.cern.ch/nexus/content/groups/public</url>
+  </repository>
+</repositories>
 ```
+
+### Gradle configuration
+
+```json
 compile "cern.c2mon.daq:c2mon-daq-core:__insert_version_here__"
+```
+
+Declaration of the CERN Nexus repository:
+
+```json
+repositories {
+  mavenCentral()
+  maven { url "https://nexus.web.cern.ch/nexus/content/groups/public" }
+}
+
 ```
 
 ## Writing an `EquipmentMessageHandler`
