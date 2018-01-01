@@ -24,8 +24,8 @@ echo "  \"release\":  \"$LATEST_RELEASE\","  >> ${VERSIONS_FILE}
 echo "  \"snapshot\": \"$LATEST_SNAPSHOT\","  >> ${VERSIONS_FILE}
 echo "  \"versions\": [" >> ${VERSIONS_FILE}
 
-# Include all released versions
-for v in `git tag -l | sort -n -t. -k1 -k3`;
+# Include last 5 released versions
+for v in `git tag -l | sort -n -t. -k1 -k3 | tail -n 5`;
   do echo "    \"${v}\"," >> ${VERSIONS_FILE}
 done
 
@@ -45,4 +45,3 @@ if [[ ${VERSION} =~ "SNAPSHOT" ]]; then
 else
   cp -r target/${VERSION} target/latest
 fi
-
