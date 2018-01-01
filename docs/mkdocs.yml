@@ -7,6 +7,10 @@ site_favicon: favicon.ico
 theme_dir: ./theme
 #theme: readthedocs
 
+repo_url: https://gitlab.cern.ch/c2mon/c2mon
+repo_name: CERN GitLab
+edit_uri: blob/master/docs/src/
+
 pages:
   - Home: 'index.md'
   - Getting Started: 'getting-started.md'
@@ -27,6 +31,7 @@ pages:
       - 'user-guide/client-api/configuration.md'
       - 'user-guide/client-api/history.md'
     - DAQ API:
+      - 'user-guide/daq-api/index.md'
       - 'user-guide/daq-api/DAQ_module_developer_guide.md'
       - 'user-guide/daq-api/DAQ_module_testing_guide.md'
     - Server:
