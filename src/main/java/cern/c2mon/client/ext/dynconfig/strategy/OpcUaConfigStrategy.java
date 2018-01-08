@@ -13,7 +13,10 @@ import org.springframework.util.MultiValueMap;
 import cern.c2mon.client.core.service.ConfigurationService;
 import cern.c2mon.client.ext.dynconfig.DynConfigService;
 import cern.c2mon.client.ext.dynconfig.SupportedProtocolsEnum;
+import cern.c2mon.shared.client.configuration.api.equipment.Equipment;
+import cern.c2mon.shared.client.configuration.api.process.Process;
 import cern.c2mon.shared.client.configuration.api.tag.DataTag;
+import cern.c2mon.shared.client.process.ProcessNameResponse;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.address.OPCHardwareAddress.ADDRESS_TYPE;
 import cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl;
@@ -21,15 +24,7 @@ import cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl;
 public class OpcUaConfigStrategy implements IConfigurationStrategy {
 	DynConfigService dynConfigService;
 
-	public static final Long OPCUA_EQUIPMENT_ID = 20101L;
-	public static final Long OPCUA_EQUIPMENT_ALIVE_TAG_ID = 20111L;
-	public static final Long OPCUA_EQUIPMENT_STATUS_TAG_ID = 20112L;
-	public static final Long OPCUA_EQUIPMENT_COMMFAULT_TAG_ID = 20113L;
-
 	public static final Long OPCUA_PROCESS_ID = 40101L;
-	public static final Long OPCUA_PROCESS_ALIVE_TAG_ID = 40111L;
-	public static final Long OPCUA_PROCESS_STATUS_TAG_ID = 40112L;
-	private static final Long OPCUA_CONFIG_ID = 20L;
 	
 	public static final String PROCESS_NAME = "P_DYNOPCUA";
 	public static final String EQUIPMENT_NAME = "dynopcua.equipment";
@@ -47,47 +42,16 @@ public class OpcUaConfigStrategy implements IConfigurationStrategy {
 	
 	@Override
 	public boolean init() {
-//		Tag opcuaProcessAliveTag = configurationService.getTagService().get(OPCUA_PROCESS_ALIVE_TAG_ID);
-//		if (!opcuaProcessAliveTag.isValid()) {
-//			StatusTag eqStatusTag = StatusTag.builder().id(OPCUA_EQUIPMENT_STATUS_TAG_ID).name("dynopcua.equipment.status")
-//					.description("DYN OPCUA Equipment status tag").build();
-//			CommFaultTag eqCommFaultTag = CommFaultTag.builder().id(OPCUA_EQUIPMENT_COMMFAULT_TAG_ID)
-//					.name("dynopcua.equipment.commfault").description("DYN DIP Equipment Comm Fault Tag").build();
-//
-//			Equipment equipment = Equipment.builder().id(OPCUA_EQUIPMENT_ID).name("dynopcua.equipment")
-//					.description("DYNOPCUA Equipment").handlerClass("cern.c2mon.daq.opcua.OPCUAMessageHandler")
-//			//		.address("URI=opc.tcp://pitrafficlight.dyndns.cern.ch:4841/open62541;serverTimeout=5000;serverRetryTimeout=10000;aliveWriter=false")
-//					.address("URI=opc.tcp://pitrafficlighteth.cern.ch:4841/open62541;serverTimeout=5000;serverRetryTimeout=10000;aliveWriter=false")
-//					.statusTag(eqStatusTag).commFaultTag(eqCommFaultTag).build();
-//
-//			StatusTag pStatusTag = StatusTag.builder().id(OPCUA_PROCESS_STATUS_TAG_ID).name("dynopcua.process.status")
-//					.description("DYNOPCUA status tag").build();
-//			AliveTag pAliveTag = AliveTag.builder().id(OPCUA_PROCESS_ALIVE_TAG_ID).name("dynopcua.process.alive")
-//					.description("DYNOPCUA alive tag").build();
-//
-//			Process process = Process.builder().id(OPCUA_PROCESS_ID).name("P_DYNOPCUA").description("DYNOPCUA Process")
-//					.equipment(equipment).statusTag(pStatusTag).aliveTag(pAliveTag).build();
-//			Configuration config = Configuration.builder().confId(OPCUA_CONFIG_ID).name("DYNOPCUA Configuration")
-//					.application("DYNOPCUA").process(process).build();
-//			ConfigurationReport report = C2monServiceGateway.getConfigurationService().applyConfiguration(config,
-//					new ClientRequestReportListener() {
-//
-//						@Override
-//						public void onProgressReportReceived(ClientRequestProgressReport progressReport) {
-//							logger.info(progressReport.getProgressDescription());
-//						}
-//
-//						@Override
-//						public void onErrorReportReceived(ClientRequestErrorReport errorReport) {
-//							logger.error("Error while configuration DYNOPCUA config " + errorReport.getErrorMessage());
-//						}
-//					});
-//
-////			if (!report.executedSuccessfully()) {
-////				return false;
-////			}
-//		}
-//		opcUaNameToEqProcID.put("pitrafficlight", new Long[]{OPCUA_CONFIG_ID, OPCUA_PROCESS_ID, OPCUA_EQUIPMENT_ID});
+		Collection<ProcessNameResponse> processes = configurationService.getProcessNames();
+		if (! processes.contains(PROCESS_NAME)) {
+			Process process = Process.create(PROCESS_NAME).id(OPCUA_PROCESS_ID).description("DYNOPCUA Process").build();
+			
+			configurationService.createProcess(process);
+			
+			Equipment equipment = Equipment.create(EQUIPMENT_NAME, "cern.c2mon.daq.opcua.OPCUAMessageHandler").description("DYNOPCUA Process").build();
+			configurationService.createEquipment(PROCESS_NAME,  equipment);
+			
+		}
 		return true;
 	}
 	
