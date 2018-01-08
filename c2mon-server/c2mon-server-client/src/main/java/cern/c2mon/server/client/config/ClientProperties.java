@@ -26,8 +26,10 @@ public class ClientProperties {
      */
     private String tagTopicPrefix = "c2mon.client.tag";
 
+    /** Specify the initial number of concurrent consumers to receive client requests */
     private int initialConsumers = 5;
 
+    /** Specify the maximum number of concurrent consumers to receive client requests */
     private int maxConsumers = 10;
   }
 }
