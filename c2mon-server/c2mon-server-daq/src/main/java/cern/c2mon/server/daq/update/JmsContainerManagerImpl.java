@@ -137,7 +137,7 @@ public class JmsContainerManagerImpl implements JmsContainerManager, SmartLifecy
   public void init() {
     daqThreadPoolTaskExecutor.initialize();
     for (Long id : processCache.getKeys()) {
-      subscribe(processCache.get(id), properties.getJms().getUpdate().getInitialConsumers());
+      subscribe(processCache.get(id), properties.getJms().getUpdate().getMaxConsumers());
     }
   }
 
