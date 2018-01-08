@@ -35,12 +35,18 @@ public class CacheDataSourceConfig {
   @ConfigurationProperties(prefix = "c2mon.server.cachedbaccess.jdbc")
   public DataSource cacheDataSource() {
     String url = properties.getJdbc().getUrl();
+    String username = properties.getJdbc().getUsername();
+    String password = properties.getJdbc().getPassword();
 
     // A simple inspection is done on the JDBC URL to deduce whether to create an in-memory
     // in-process database, start a file-based externally visible database or connect to
     // an external database.
     if (url.contains("hsql")) {
-      return new HsqlDatabaseBuilder().setUrl(url).addScript(new ClassPathResource("sql/cache-schema-hsqldb.sql")).build();
+      return new HsqlDatabaseBuilder()
+                 .url(url)
+                 .username(username)
+                 .password(password)
+                 .addScript(new ClassPathResource("sql/cache-schema-hsqldb.sql")).build();
     } else {
       return DataSourceBuilder.create().build();
     }

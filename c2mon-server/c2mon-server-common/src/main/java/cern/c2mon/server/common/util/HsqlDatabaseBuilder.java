@@ -17,10 +17,22 @@ import static org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType.
  */
 public class HsqlDatabaseBuilder {
   private String url;
+  private String username;
+  private String password;
   private List<Resource> scripts = new ArrayList<>();
 
-  public HsqlDatabaseBuilder setUrl(String url) {
+  public HsqlDatabaseBuilder url(String url) {
     this.url = url;
+    return this;
+  }
+  
+  public HsqlDatabaseBuilder username(String username) {
+    this.username = username;
+    return this;
+  }
+  
+  public HsqlDatabaseBuilder password(String password) {
+    this.password = password;
     return this;
   }
 
@@ -39,7 +51,7 @@ public class HsqlDatabaseBuilder {
       // Start an externally visible, file-based HSQL server
       HsqlServer.start("file:///tmp/c2mondb", "c2mondb");
       url += ";sql.syntax_ora=true;hsqldb.default_table_type=cached;hsqldb.cache_rows=1000;hsqldb.result_max_memory_rows=2000;hsqldb.cache_size=100";
-      dataSource = DataSourceBuilder.create().url(url).username("sa").password("").build();
+      dataSource = DataSourceBuilder.create().url(url).username(username).password(password).build();
 
     } else {
       throw new RuntimeException("The given URL was not a valid HSQL JDBC URL!");

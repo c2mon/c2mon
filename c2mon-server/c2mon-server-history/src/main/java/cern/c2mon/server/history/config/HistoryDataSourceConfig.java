@@ -41,9 +41,15 @@ public class HistoryDataSourceConfig {
   @ConfigurationProperties("c2mon.server.history.jdbc")
   public DataSource historyDataSource() {
     String url = properties.getJdbc().getUrl();
+    String username = properties.getJdbc().getUsername();
+    String password = properties.getJdbc().getPassword();
 
     if (url.contains("hsql")) {
-      return new HsqlDatabaseBuilder().setUrl(url).addScript(new ClassPathResource("sql/history-schema-hsqldb.sql")).build();
+      return new HsqlDatabaseBuilder()
+                 .url(url)
+                 .username(username)
+                 .password(password)
+                 .addScript(new ClassPathResource("sql/history-schema-hsqldb.sql")).build();
     } else {
       return DataSourceBuilder.create().build();
     }
