@@ -83,7 +83,7 @@ docker run --rm --name c2mon -it -p 0.0.0.0:1099:1099 -p 0.0.0.0:9001:9001 -p 0.
 C2MON comes with reasonable defaults for most settings.
 Before you get out to tweak and tune the configuration, make sure you understand what are you trying to accomplish and the consequences.
 
-The primary way of configuring a server is via the [`conf/c2mon.properties`](https://gitlab.cern.ch/c2mon/c2mon/blob/master/c2mon-server/distribution/tar/conf/c2mon-server.properties) configuration file, which is delivered with the tarball.
+The primary way of configuring a server is via the [`conf/c2mon.properties`](https://github.com/c2mon/c2mon/blob/master/c2mon-server/distribution/tar/conf/c2mon-server.properties) configuration file, which is delivered with the tarball.
 It contains the most important settings and their default values you may want to change for your environment.
 
 The properties listed in the file can just as well be set as Java system properties with the `-D` option.
