@@ -19,6 +19,10 @@ public class DaqProperties {
   @Data
   public class Jms extends DaqJmsProperties {
 
+    /**
+     * The timeout in milliseconds, which the server shall wait for a reply after
+     * sending a DAQ (re-)configuration
+     */
     private int configurationTimeout = 60000;
 
     private Update update = new Update();
@@ -44,10 +48,32 @@ public class DaqProperties {
        * call (i.e. put in cache and notify listeners)
        */
       boolean transacted = true;
+      
+      /**
+       * Specify the limit for idle executions of a consumer task, not having received
+       * any message within its execution. If this limit is reached, the task will shut
+       * down and leave receiving to other executing tasks.
+       * Raise this limit if you encounter too frequent scaling up and down. With this
+       * limit being higher, an idle consumer will be kept around longer, avoiding the
+       * restart of a consumer once a new load of messages comes in.
+       */
       int idleTaskExecutionLimit = 5;
+      
+      /**
+       * Specify the maximum number of messages to process in one task. More
+       * concretely, this limits the number of message reception attempts per task,
+       * which includes receive iterations that did not actually pick up a message
+       * until they hit their timeout (see the "receiveTimeout" property).
+       */
       int maxMessagesPerTask = 1;
+      
+      /** Set the timeout to use for receive calls, in milliseconds */
       int receiveTimeout = 1000;
-      int numExecutorThreads = 250;
+      
+      /** Set the global TagUpdater's pool size shared by all DAQ update queues */
+      int numExecutorThreads = 100;
+      
+      /** Set the TagUpdater's ThreadPoolTaskExecutor keep-alive seconds */
       int keepAliveSeconds = 60;
     }
 
