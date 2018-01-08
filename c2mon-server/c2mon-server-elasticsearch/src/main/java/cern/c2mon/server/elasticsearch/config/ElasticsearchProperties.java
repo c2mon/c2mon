@@ -11,7 +11,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class ElasticsearchProperties {
 
   /**
-   * Is Elasticsearch enabled?
+   * Enable/Disable writing to Elasticsearch
    */
   private boolean enabled = true;
 
@@ -65,7 +65,6 @@ public class ElasticsearchProperties {
   /**
    * Name of the tag configuration index
    */
-
   public String getTagConfigIndex() {
     return this.indexPrefix + "-tag-config";
   }
@@ -75,14 +74,14 @@ public class ElasticsearchProperties {
    *
    * - M (or m): monthly indices (YYYY-MM)
    * - D (or d): daily indices (YYYY-MM-DD)
-   # - W (or w): weekly indices (YYYY-ww)
+   * - W (or w): weekly indices (YYYY-ww)
    */
   private String indexType = "M";
 
   /**
    * Number of shards per index
    */
-  private int shardsPerIndex = 10;
+  private int shardsPerIndex = 5;
 
   /**
    * Number of replicas for each primary shard
@@ -102,7 +101,7 @@ public class ElasticsearchProperties {
   /**
    * Flush interval in seconds for a batch of tags
    */
-  private int bulkFlushInterval = 10;
+  private int bulkFlushInterval = 5;
 
   /**
    * Maximum number of concurrent requests allowed to be executed at the
@@ -111,7 +110,7 @@ public class ElasticsearchProperties {
   private int concurrentRequests = 1;
 
   /**
-   * Absolute path the the file to which tag updates will be written in the
+   * Absolute path the file to which tag updates will be written in the
    * event of Elasticsearch communication failure
    */
   private String tagFallbackFile = "/tmp/es-tag-fallback.txt";
