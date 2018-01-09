@@ -55,17 +55,24 @@ repositories {
 
 ```
 
-## Connecting to a C2MON server
+## Changing Client default configuration
+
+C2MON comes with reasonable defaults for most settings.
+Before you get out to tweak and tune the configuration, make sure you understand what are you trying to accomplish and the consequences.
+
+The primary way of configuring a C2MON client application is via the [c2mon-client.properties] configuration file, which is delivered as example with the [c2mon-web-ui](https://github.com/c2mon/c2mon-web-ui) tarball.
+It contains the most important settings and their default values you may want to change for your environment.
+
+The properties listed in the file can just as well be set as Java system properties with the `-D` option.
+
+
+### Connecting to a remote C2MON server
 
 By default, the client tries to connect to a server running at `localhost:61616`.
 
-To override this, the client looks for the `c2mon.client.conf.url` property at startup. You can set it using a JVM
-argument (`-Dc2mon.client.conf.url=...`) or as a system property (`System.setProperty("c2mon.client.conf.url", "...")`). It takes both `file://`
-and `http://` protocol formats.
+The [c2mon-client.properties] file must contain at least the `c2mon.client.jms.url` property, which is the [URL of the JMS broker](http://activemq.apache.org/uri-protocols.html) to which the C2MON server is listening for client connections.
 
-
-The file must contain at least the `c2mon.client.jms.url` property, which is the [URL of the JMS broker](http://activemq.apache.org/uri-protocols.html)
-to which the C2MON server is listening for client connections. For example:
+For example:
 
 ```bash
 c2mon.client.jms.url=tcp://jms-broker-host:61616
@@ -98,3 +105,12 @@ C2monServiceGateway.startC2monClient();
 ```
 
 Then the service classes can be acquired via the gateway, e.g. `TagService tagService = C2monServiceGateway.getTagService();`.
+
+
+
+
+
+
+
+
+[c2mon-client.properties]: https://github.com/c2mon/c2mon-web-ui/blob/master/src/dist/tar/conf/c2mon-client.properties
