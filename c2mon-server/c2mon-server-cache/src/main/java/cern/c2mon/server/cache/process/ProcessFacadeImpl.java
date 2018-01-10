@@ -17,28 +17,16 @@
 package cern.c2mon.server.cache.process;
 
 import java.sql.Timestamp;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Random;
+import java.util.*;
 
-import cern.c2mon.server.common.config.ServerProperties;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.server.cache.AliveTimerCache;
-import cern.c2mon.server.cache.AliveTimerFacade;
-import cern.c2mon.server.cache.EquipmentFacade;
-import cern.c2mon.server.cache.ProcessCache;
-import cern.c2mon.server.cache.ProcessFacade;
-import cern.c2mon.server.cache.SubEquipmentFacade;
+import cern.c2mon.server.cache.*;
 import cern.c2mon.server.cache.common.AbstractSupervisedFacade;
 import cern.c2mon.server.common.alive.AliveTimer;
+import cern.c2mon.server.common.config.ServerProperties;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.process.ProcessCacheObject;
 import cern.c2mon.server.common.process.ProcessCacheObject.LocalConfig;
@@ -53,12 +41,8 @@ import cern.c2mon.shared.daq.config.ProcessConfigurationUpdate;
  *
  */
 @Service
+@Slf4j
 public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> implements ProcessFacade {
-
-  /**
-   * Class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(ProcessFacadeImpl.class);
 
   /** PIK numbers limit (max) */
   private static final int PIK_MAX = 999999;
@@ -99,6 +83,7 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
     return process;
   }
 
+  @Override
   protected ProcessConfigurationUpdate configureCacheObject(final Process process, final Properties properties) {
     ProcessCacheObject processCacheObject = (ProcessCacheObject) process;
     ProcessConfigurationUpdate configurationUpdate = new ProcessConfigurationUpdate();
@@ -203,13 +188,11 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
       if (properties.isTestMode()) {
         // If the TEST Mode is on
         startLocal(process, pHostName, pStartupTime);
-        LOGGER.trace("start - TEST Mode - Process " + process.getName()
-            + ", PIK " + process.getProcessPIK());
+        log.trace("start - TEST Mode - Process {}, PIK {}", process.getName(), process.getProcessPIK());
       } else {
         // If the TEST Mode is off
         start(process, pHostName, pStartupTime);
-        LOGGER.trace("start - Process " + process.getName()
-            + ", PIK " + process.getProcessPIK());
+        log.trace("start Process {}, PIK {}", process.getName(), process.getProcessPIK());
       }
       processCache.put(processId, process);
     } finally {
@@ -302,6 +285,7 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
    * about the source of the problem.
    * @throws ConfigurationException
    */
+  @Override
   protected void validateConfig(final Process process) throws ConfigurationException {
     processCache.acquireReadLockOnKey(process.getId());
     try {
@@ -314,9 +298,6 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
       }
       if (processCacheObject.getName().length() == 0 || processCacheObject.getName().length() > 60) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"name\" must be 1 to 60 characters long");
-      }
-      if (!ProcessCacheObject.PROCESS_NAME_PATTERN.matcher(processCacheObject.getName()).matches()) {
-        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"name\" must match the following pattern: " + ProcessCacheObject.PROCESS_NAME_PATTERN.toString());
       }
       if (processCacheObject.getDescription() == null) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"description\" cannot be null");
@@ -352,7 +333,7 @@ public class ProcessFacadeImpl extends AbstractSupervisedFacade<Process> impleme
     processCache.acquireReadLockOnKey(processId);
     try {
       ProcessCacheObject process = (ProcessCacheObject) processCache.get(processId);
-      LinkedList<Long> dataTagIds = new LinkedList<Long>();
+      LinkedList<Long> dataTagIds = new LinkedList<>();
       for (long equipmentId : process.getEquipmentIds()) {
         dataTagIds.addAll(equipmentFacade.getDataTagIds(equipmentId));
       }
