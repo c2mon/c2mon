@@ -8,11 +8,21 @@ For more details on a given release, please check also the [Milestone planning](
 
 ## [Unreleased]
 ### Added
+- Server: Documented all properties and default variables in the c2mon-server.properties file of the distribution tarball (#132)
+- Server: Introduced a common property for setting database url for all connections (backup db, history db): `c2mon.server.jdbc.url`
+- Documentation: Added introduction to 'DAQ API' section
 
 ### Changed
+- Documentation: Updated getting-started chapter (#133)
+- Server: Reduced DAQ value updater executor thread pool size to 100 instead of 250
+
 
 ### Fixed
+- Fixed dependency resolution problems when building against Maven Central
 - Server: When a tag update is received and C2MON detects that this tag is not registered in the Elasticsearch config index it will now add the docuement instead of throwing an error (#178)
+
+### Removed
+- Server: Removed Process name pattern matcher check constraint to allow any process name format (#186)
 
 
 ## [1.8.29] - 2017-12-20
