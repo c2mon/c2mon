@@ -63,26 +63,34 @@
           </snapshots>
         </repository>
         <repository>
-          <id>nexus-internal</id>
+          <id>nexus-internal-group</id>
           <name>CERN BE-ICS Public Repositories</name>
           <url>http://repository.cern.ch/nexus/content/groups/public/</url>
           <releases><enabled>true</enabled></releases>
           <snapshots><enabled>false</enabled></snapshots>
         </repository>
         <repository>
-          <id>nexus-c2mon-internal</id>
+          <id>nexus-c2mon</id>
           <name>C2MON Releases</name>
           <url>https://repository.cern.ch/nexus/content/repositories/c2mon-releases/</url>
           <releases><enabled>true</enabled></releases>
           <snapshots><enabled>false</enabled></snapshots>
-        </repository> 
+        </repository>
+        <repository>
+          <id>nexus-c2mon-internal</id>
+          <name>C2MON Releases</name>
+          <url>https://repository.cern.ch/nexus/content/repositories/c2mon-internal-releases/</url>
+          <releases><enabled>true</enabled></releases>
+          <snapshots><enabled>false</enabled></snapshots>
+        </repository>
         <repository>
           <id>nexus-c2mon-snapshots</id>
           <name>C2MON Snapshots</name>
           <url>https://repository.cern.ch/nexus/content/repositories/c2mon-snapshots/</url>
-          <releases><enabled>true</enabled></releases>
-          <snapshots><enabled>false</enabled></snapshots>
+          <releases><enabled>false</enabled></releases>
+          <snapshots><enabled>true</enabled></snapshots>
         </repository> 
+
       </repositories>
       <pluginRepositories>
         <pluginRepository>
