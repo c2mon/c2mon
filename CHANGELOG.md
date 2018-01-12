@@ -11,6 +11,7 @@ For more details on a given release, please check also the [Milestone planning](
 - Server: Documented all properties and default variables in the c2mon-server.properties file of the distribution tarball (#132)
 - Server: Introduced a common property for setting database url for all connections (backup db, history db): `c2mon.server.jdbc.url`
 - Documentation: Added introduction to 'DAQ API' section
+- Added JMX call to persist all Tags to tag-config index (#185)
 
 ### Changed
 - Documentation: Updated getting-started chapter (#133)
@@ -20,6 +21,7 @@ For more details on a given release, please check also the [Milestone planning](
 ### Fixed
 - Fixed dependency resolution problems when building against Maven Central
 - Server: When a tag update is received and C2MON detects that this tag is not registered in the Elasticsearch config index it will now add the docuement instead of throwing an error (#178)
+- Fix bug for Equipment deletion from Process, related to clustered cache
 
 ### Removed
 - Server: Removed Process name pattern matcher check constraint to allow any process name format (#186)
