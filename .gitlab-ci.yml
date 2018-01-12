@@ -53,6 +53,6 @@ sonar_preview:
 quality_assurance:
   stage: sonar
   script:
-    - mvn package dependency-check:aggregate sonar:sonar -Dmaven.test.skip=true -Dsonar.dependencyCheck.reportPath=target/dependency-check-report.xml --settings settings.xml
+    - mvn package dependency-check:aggregate sonar:sonar -Dmaven.test.skip=true -Dsonar.host.url=https://en-ice-sonar.cern.ch -Dsonar.dependencyCheck.reportPath=target/dependency-check-report.xml --settings settings.xml
   only:
     - master
