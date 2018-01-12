@@ -62,7 +62,7 @@ public class DaqProperties {
      * URL of the secondary JMS broker to which to publish (only relevant when
      * running in double publication mode)
      */
-    private String secondaryUrl = "tcp://localhost:61617";
+    private String secondaryUrl = "tcp://0.0.0.0:61617";
   }
 
   /**
@@ -141,7 +141,7 @@ public class DaqProperties {
        * URL of the broker to which to publish filtered values. Only relevant
        * if c2mon.daq.filter.publishFilteredValues=true
        */
-      private String url = "tcp://localhost:61616";
+      private String url = "tcp://0.0.0.0:61616";
     }
   }
 }
