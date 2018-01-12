@@ -513,4 +513,13 @@ public abstract class AbstractTagFacade<T extends Tag> extends AbstractFacade<T>
     return this.tagCache.hasKey(id);
   }
 
+  @Override
+  public List<Long> getKeys() {
+    return this.tagCache.getKeys();
+  }
+
+  @Override
+  public T getTag(Long id) {
+    return this.tagCache.get(id);
+  }
 }

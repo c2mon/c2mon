@@ -75,6 +75,22 @@ public class TagConfigDocumentIndexerTests extends BaseElasticsearchIntegrationT
   }
 
   @Test
+  public void reindexTagConfigDocuments() throws Exception {
+    final String index = Indices.indexFor(new TagConfigDocument());
+    //Delete the index first
+    DeleteIndexResponse deleteResponse = client.getClient().admin().indices().prepareDelete(index).get();
+    assertTrue("The index could not be deleted", deleteResponse.isAcknowledged());
+    //reindex everything from the cache
+    this.indexer.reindexAllTagConfigDocuments();
+    // Refresh the index to make sure the document is searchable
+    client.getClient().admin().indices().prepareRefresh(index).get();
+    client.getClient().admin().cluster().prepareHealth().setIndices(index).setWaitForYellowStatus().get();
+    SearchResponse response = client.getClient().prepareSearch(index).get();
+    //53 IDs from c2mon-server-test/src/resources/sql/cache-data-insert.sql
+    assertEquals("There should be 53 tag config documents", 53, response.getHits().totalHits);
+  }
+
+  @Test
   public void updateDataTag() throws Exception {
     testUpdate(true);
   }

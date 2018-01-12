@@ -129,5 +129,19 @@ public interface CommonTagFacade<T extends Tag> extends ConfigurableCacheFacade<
    * @return Tag and Alarms, with corresponding values (no longer residing in cache)
    */
   TagWithAlarms getTagWithAlarms(Long id);
-  
+
+  /**
+   * Get a list of all tag IDs in the cache.
+   *
+   * @return list of Tag IDs
+   */
+  List<Long> getKeys();
+
+  /**
+   * Get a tag by ID.
+   *
+   * @param id the ID
+   * @return the Tag
+   */
+  T getTag(Long id);
 }

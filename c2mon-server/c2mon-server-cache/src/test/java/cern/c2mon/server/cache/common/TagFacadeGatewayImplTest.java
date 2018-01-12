@@ -20,7 +20,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import cern.c2mon.server.cache.AbstractCacheIntegrationTest;
 import org.junit.Test;
@@ -55,5 +57,11 @@ public class TagFacadeGatewayImplTest extends AbstractCacheIntegrationTest {
     }
   }
   
-  
+ @Test
+ public void testGetKeys() {
+    //IDs from c2mon-server-test/src/resources/sql/cache-data-insert.sql
+    List<Long> expectedResult = Arrays.asList(1205L, 1260L, 1224L, 1263L, 210007L, 1221L, 1252L, 1262L, 210004L, 210005L, 1200L, 1250L, 1231L, 210006L, 1230L, 1220L, 1222L, 1223L, 1261L, 1240L, 1251L, 1241L, 1232L, 200002L, 200010L, 210002L, 210001L, 200011L, 210003L, 210008L, 200001L, 200000L, 210009L, 210010L, 200005L, 200012L, 210000L, 200004L, 200003L, 60007L, 60005L, 60010L, 59999L, 60011L, 60004L, 60003L, 60001L, 60012L, 60002L, 60000L, 60008L, 60009L, 60006L);
+    assertEquals("There should be " + expectedResult.size() + " keys", expectedResult.size(), this.tagFacadeGateway.getKeys().size());
+    assertTrue("Some keys are missing", this.tagFacadeGateway.getKeys().containsAll(expectedResult));
+ }
 }

@@ -16,22 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.common;
 
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import cern.c2mon.server.cache.CommonTagFacade;
-import cern.c2mon.server.cache.ControlTagFacade;
-import cern.c2mon.server.cache.DataTagFacade;
-import cern.c2mon.server.cache.RuleTagFacade;
-import cern.c2mon.server.cache.TagFacadeGateway;
-import cern.c2mon.server.cache.TagLocationService;
+import cern.c2mon.server.cache.*;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.TagWithAlarms;
 import cern.c2mon.server.common.control.ControlTag;
@@ -39,6 +24,11 @@ import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
 import cern.c2mon.shared.daq.config.Change;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.sql.Timestamp;
+import java.util.*;
 
 /**
  * Implementation of the TagFacadeGateway.
@@ -86,8 +76,6 @@ public class TagFacadeGatewayImpl implements TagFacadeGateway {
     this.tagLocationService = tagLocationService;
   }
 
-//  private <T extends Tag> CommonTagFacade<>
-  
   @SuppressWarnings("unchecked")
   private <T extends Tag> CommonTagFacade<T> getFacade(final T tag) {
     if (tag instanceof RuleTag) {
@@ -139,15 +127,27 @@ public class TagFacadeGatewayImpl implements TagFacadeGateway {
   public TagWithAlarms getTagWithAlarms(Long id) {
     return getFacade(id).getTagWithAlarms(id);    
   }
-  
+
+  @Override
+  public List<Long> getKeys() {
+    Set<Long> keys = new HashSet<>(this.controlTagFacade.getKeys());
+    keys.addAll(this.dataTagFacade.getKeys());
+    keys.addAll(this.ruleTagFacade.getKeys());
+    return new ArrayList<>(keys);
+  }
+
+  @Override
+  public Tag getTag(Long id) {
+    return this.getFacade(id).getTag(id);
+  }
+
   @Override
   public Collection<TagWithAlarms> getTagsWithAlarms(String regex) {
-    boolean isRegex = true;
     Collection<TagWithAlarms> tagWithAlarms = new ArrayList<>();
     
     // Remove escaped wildcards and then check if there are any left
     String test = regex.replace("\\*", "").replace("\\?", "");
-    isRegex = test.contains("*") || test.contains("?");
+    boolean isRegex = test.contains("*") || test.contains("?");
     
     if (isRegex) {
       Collection<Tag> tags = tagLocationService.findByNameWildcard(regex);
@@ -174,6 +174,4 @@ public class TagFacadeGatewayImpl implements TagFacadeGateway {
   public boolean isInTagCache(Long id) {
     return ruleTagFacade.isInTagCache(id) || controlTagFacade.isInTagCache(id) || dataTagFacade.isInTagCache(id);
   }
-
-  
 }

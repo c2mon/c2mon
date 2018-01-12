@@ -50,5 +50,5 @@ public interface TagFacadeGateway extends CommonTagFacade<Tag> {
    * @see TagLocationService#isInTagCache(Long)
    */
   @Override
-  public boolean isInTagCache(Long id);
+  boolean isInTagCache(Long id);
 }

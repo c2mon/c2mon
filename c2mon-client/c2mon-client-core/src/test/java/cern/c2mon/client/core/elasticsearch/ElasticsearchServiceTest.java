@@ -4,6 +4,7 @@ import cern.c2mon.client.core.config.C2monClientProperties;
 import cern.c2mon.server.cache.EquipmentCache;
 import cern.c2mon.server.cache.ProcessCache;
 import cern.c2mon.server.cache.SubEquipmentCache;
+import cern.c2mon.server.cache.common.TagFacadeGatewayImpl;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.elasticsearch.Indices;
 import cern.c2mon.server.elasticsearch.MappingFactory;
