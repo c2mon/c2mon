@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2018 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -20,8 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.UnexpectedRollbackException;
@@ -49,13 +48,9 @@ import cern.c2mon.shared.common.ConfigurationException;
  * @author Mark Brightwell
  *
  */
+@Slf4j
 @Service
 public class ProcessConfigTransactedImpl implements ProcessConfigTransacted {
-
-  /**
-   * Class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(ProcessConfigTransactedImpl.class);
 
   /**
    * Reference to facade.
@@ -110,7 +105,7 @@ public class ProcessConfigTransactedImpl implements ProcessConfigTransacted {
   public ProcessChange doCreateProcess(final ConfigurationElement element) throws IllegalAccessException {
     processCache.acquireWriteLockOnKey(element.getEntityId());
     try {
-      Process process = (Process) processFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
+      Process process = processFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
       processDAO.insert(process);
       processCache.putQuiet(process);
 
@@ -161,12 +156,13 @@ public class ProcessConfigTransactedImpl implements ProcessConfigTransacted {
 
   @Override
   public void removeEquipmentFromProcess(Long equipmentId, Long processId) {
-    LOGGER.debug("Removing Process Equipments for process " + processId);
     try {
       processCache.acquireWriteLockOnKey(processId);
       try {
-        Process process = processCache.get(processId);
-        process.getEquipmentIds().remove(equipmentId);
+        Process processCopy = processCache.getCopy(processId);
+        log.debug("Removing Process Equipment {} for process {}", equipmentId, processCopy.getName());
+        processCopy.getEquipmentIds().remove(equipmentId);
+        processCache.putQuiet(processCopy);
       } finally {
         processCache.releaseWriteLockOnKey(processId);
       }
@@ -181,7 +177,7 @@ public class ProcessConfigTransactedImpl implements ProcessConfigTransacted {
    */
   private List<ProcessChange> updateControlTagInformation(final ConfigurationElement element, final Process process) {
 
-      List<ProcessChange> changes = new ArrayList<ProcessChange>(3);
+      List<ProcessChange> changes = new ArrayList<>(3);
       Long processId = process.getId();
 
       ControlTag aliveTagCopy = controlCache.getCopy(process.getAliveTagId());
@@ -204,8 +200,7 @@ public class ProcessConfigTransactedImpl implements ProcessConfigTransacted {
   }
 
   private void setProcessId(ControlTagCacheObject copy, Long processId) {
-    String logMsg = String.format("Adding process id #%s to control tag #%s", processId, copy.getId());
-    LOGGER.trace(logMsg);
+    log.trace("Adding process id #{} to control tag {} (#{})", processId, copy.getName(), copy.getId());
     copy.setProcessId(processId);
     controlCache.putQuiet(copy);
   }
