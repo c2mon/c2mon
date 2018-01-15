@@ -21,8 +21,6 @@ public class DynConfigServiceIT {
 		dcs.setConfigurationService(C2monServiceGateway.getConfigurationService());
 		dcs.setTagService(C2monServiceGateway.getTagService());
 
-		dcs.init();
-
 //		Tag tag = dcs.getTagForURI(new URI("dip://dip/acc/LHC/RunControl/Page1"));
 //		Tag tag = dcs.getTagForURI(new URI(SupportedProtocolsEnum.PROTOCOL_OPCUA+"://pitrafficlight/GreenLED.on"));
 		Tag tag = dcs.getTagForURI(new URI("dip://dip/acc/LHC/RunControl/Page1"));

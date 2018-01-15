@@ -77,4 +77,11 @@ public class DipConfigStrategy implements IConfigurationStrategy {
 
 		return dataTags;
 	}
+
+	@Override
+	public boolean test(URI uri) {
+		return uri.getScheme().equals(SupportedProtocolsEnum.PROTOCOL_DIP.getUrlScheme());
+	}
+	
+	
 }

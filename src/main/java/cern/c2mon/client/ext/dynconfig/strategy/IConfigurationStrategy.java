@@ -2,12 +2,13 @@ package cern.c2mon.client.ext.dynconfig.strategy;
 
 import java.net.URI;
 import java.util.Collection;
+import java.util.function.Predicate;
 
 import org.springframework.util.MultiValueMap;
 
 import cern.c2mon.shared.client.configuration.api.tag.DataTag;
 
-public interface IConfigurationStrategy {
+public interface IConfigurationStrategy extends Predicate<URI> {
 
 	MultiValueMap<String, DataTag> getConfigurations(Collection<URI> uris);
 	
@@ -15,5 +16,7 @@ public interface IConfigurationStrategy {
 	 * Initialize the configuration strategy, for instance by registering the required C2MON Equipments and Processes. 
 	 */
 	boolean init();
+	
+	
 
 }

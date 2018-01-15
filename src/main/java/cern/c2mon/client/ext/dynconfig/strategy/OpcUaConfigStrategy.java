@@ -76,5 +76,9 @@ public class OpcUaConfigStrategy implements IConfigurationStrategy {
 	}
 
 
+	@Override
+	public boolean test(URI uri) {
+		return uri.getScheme().equals(SupportedProtocolsEnum.PROTOCOL_OPCUA.getUrlScheme());
+	}
 
 }
