@@ -4,9 +4,9 @@
                       http://maven.apache.org/xsd/settings-1.0.0.xsd">
   <servers>
     <server>
-      <id>c2mon-releases</id>
-      <username>${env.ARTIFACTORY_USERNAME}</username>
-      <password>${env.ARTIFACTORY_PASSWORD}</password>
+      <id>c2mon-nexus-releases</id>
+      <username>${env.NEXUS_USERNAME}</username>
+      <password>${env.NEXUS_PASSWORD}</password>
     </server>
     <server>
       <id>gitlab-registry.cern.ch</id>
@@ -25,8 +25,8 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <properties>
-        <repository.releases.url>http://artifactory/beco-release-local</repository.releases.url>
-        <repository.snapshots.url>http://artifactory/beco-development-local</repository.snapshots.url>
+        <nexus.releases.url>https://repository.cern.ch/nexus/content/repositories/c2mon-internal-releases/</nexus.releases.url>
+        <nexus.snapshots.url>https://repository.cern.ch/nexus/content/repositories/c2mon-snapshots/</nexus.snapshots.url>
       </properties>
       
       <repositories>
@@ -44,6 +44,35 @@
             <enabled>true</enabled>
           </snapshots>
         </repository>
+        <repository>
+          <id>nexus-internal-group</id>
+          <name>CERN BE-ICS Public Repositories</name>
+          <url>http://repository.cern.ch/nexus/content/groups/public/</url>
+          <releases><enabled>true</enabled></releases>
+          <snapshots><enabled>false</enabled></snapshots>
+        </repository>
+        <repository>
+          <id>nexus-c2mon</id>
+          <name>C2MON Releases</name>
+          <url>https://repository.cern.ch/nexus/content/repositories/c2mon-releases/</url>
+          <releases><enabled>true</enabled></releases>
+          <snapshots><enabled>false</enabled></snapshots>
+        </repository>
+        <repository>
+          <id>nexus-c2mon-internal</id>
+          <name>C2MON Releases</name>
+          <url>https://repository.cern.ch/nexus/content/repositories/c2mon-internal-releases/</url>
+          <releases><enabled>true</enabled></releases>
+          <snapshots><enabled>false</enabled></snapshots>
+        </repository>
+        <repository>
+          <id>nexus-c2mon-snapshots</id>
+          <name>C2MON Snapshots</name>
+          <url>https://repository.cern.ch/nexus/content/repositories/c2mon-snapshots/</url>
+          <releases><enabled>false</enabled></releases>
+          <snapshots><enabled>true</enabled></snapshots>
+        </repository> 
+
       </repositories>
       <pluginRepositories>
         <pluginRepository>
