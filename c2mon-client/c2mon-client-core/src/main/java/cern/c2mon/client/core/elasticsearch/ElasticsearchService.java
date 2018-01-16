@@ -285,11 +285,17 @@ public class ElasticsearchService {
    * @return list of tag ids returned from elasticsearch
    */
   public Collection<Long> findTagsByQuery(String query, String errorMessage) {
-    Function<SearchResult, Collection<Long>> converter =
-        result -> new ArrayList<>(result.getHits(Map.class)
-            .stream()
-            .map(hit -> (long) (double) hit.source.get("id"))
-            .collect(Collectors.toList()));
+    Function<SearchResult, Collection<Long>> converter = 
+        result -> {
+          if (!result.isSucceeded()) {
+            return new ArrayList<>();
+          } else {
+            return new ArrayList<>(result.getHits(Map.class)
+                .stream()
+                .map(hit -> (long) (double) hit.source.get("id"))
+                .collect(Collectors.toList()));
+          }
+        };
     return findByQuery(query, converter, configIndex, errorMessage);
   }
 
