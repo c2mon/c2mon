@@ -18,7 +18,10 @@ package cern.c2mon.server.cache.common;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
+import cern.c2mon.server.common.rule.RuleTag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -113,7 +116,12 @@ public class TagLocationServiceImpl implements TagLocationService {
     
     return resultList;
   }
-  
+
+  @Override
+  public Collection<RuleTag> findByRuleInputTagId(Long id) {
+    return this.ruleTagCache.findByRuleInputTagId(id);
+  }
+
   @Override
   public void put(Tag tag) {
     getCache(tag.getId()).put(tag.getId(), tag);
