@@ -8,14 +8,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+import com.oracle.webservices.internal.api.databinding.DatabindingMode;
+
 import cern.c2mon.client.core.C2monServiceGateway;
 import cern.c2mon.client.core.service.ConfigurationService;
 import cern.c2mon.client.ext.dynconfig.DynConfigService;
 import cern.c2mon.client.ext.dynconfig.SupportedProtocolsEnum;
-import cern.c2mon.shared.client.configuration.api.equipment.Equipment;
-import cern.c2mon.shared.client.configuration.api.process.Process;
+import cern.c2mon.client.ext.dynconfig.configuration.ProcessEquipmentURIMapping;
 import cern.c2mon.shared.client.configuration.api.tag.DataTag;
-import cern.c2mon.shared.client.process.ProcessNameResponse;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.address.impl.DIPHardwareAddressImpl;
 
@@ -25,54 +25,30 @@ import cern.c2mon.shared.common.datatag.address.impl.DIPHardwareAddressImpl;
  * @author CERN
  *
  */
-public class DipConfigStrategy implements IConfigurationStrategy {
-
-	public static final Long DIP_PROCESS_ID = 20101L;
-	
-	public static final String PROCESS_NAME = "P_DYNDIP";
-	public static final String EQUIPMENT_NAME = "dyndip.equipment";
-	
-
-	DynConfigService dynConfigService;
+public class DipConfigStrategy extends AConfigStrategy  implements ITagConfigurationMapping {
 
 	Logger logger = LoggerFactory.getLogger(this.getClass());
-	private ConfigurationService configurationService;
-
-	@Override
-	public boolean init() {
-		Collection<ProcessNameResponse> processes = configurationService.getProcessNames();
-		if (! processes.contains(PROCESS_NAME)) {
-			Process process = Process.create(PROCESS_NAME).id(DIP_PROCESS_ID).description("DYNDIP Process").build();
-			
-			configurationService.createProcess(process);
-			
-			Equipment equipment = Equipment.create(EQUIPMENT_NAME, "cern.c2mon.daq.dip.DIPMessageHandler").description("DYNDIP Process").build();
-			configurationService.createEquipment(PROCESS_NAME,  equipment);
-			
-		}
-		return true;
-	}
-
-	public DipConfigStrategy(DynConfigService dynConfServ, ConfigurationService configurationService) {
-		dynConfigService = dynConfServ;
+	public DipConfigStrategy(ConfigurationService configurationService) {
 		this.configurationService = configurationService;
 	}
 
 	/**
 	 * Create DIP Data Tags out of the given URIs
 	 * 
-	 * @see cern.c2mon.client.ext.dynconfig.strategy.IConfigurationStrategy#getConfiguration(java.util.Collection)
+	 * @see cern.c2mon.client.ext.dynconfig.strategy.ITagConfigurationMapping#getConfiguration(java.util.Collection)
 	 */
 	@Override
-	public MultiValueMap<String, DataTag> getConfigurations(Collection<URI> uris) {
+	public MultiValueMap<String, DataTag> getConfigurations(ProcessEquipmentURIMapping mapping, Collection<URI> uris) {
+		String msgHandler = "cern.c2mon.daq.dip.DIPMessageHandler";
+		
+		createProcessIfRequired(mapping, msgHandler);
+
 		MultiValueMap<String, DataTag> dataTags = new LinkedMultiValueMap<String, DataTag>();
 		for (URI uri : uris) {
-			if (uri.getScheme().equals(SupportedProtocolsEnum.PROTOCOL_DIP.getUrlScheme())) {
 				DataTagAddress address = new DataTagAddress(new DIPHardwareAddressImpl(uri.getHost() + uri.getPath()));
 				
 				DataTag tagToCreate = DataTag.create(uri.toString(), Object.class, address).description(uri.toString()).build();
-				dataTags.add(EQUIPMENT_NAME, tagToCreate);
-			}
+				dataTags.add(mapping.getEquipmentName(), tagToCreate);
 		}
 
 		return dataTags;
@@ -82,6 +58,7 @@ public class DipConfigStrategy implements IConfigurationStrategy {
 	public boolean test(URI uri) {
 		return uri.getScheme().equals(SupportedProtocolsEnum.PROTOCOL_DIP.getUrlScheme());
 	}
-	
+
+
 	
 }
