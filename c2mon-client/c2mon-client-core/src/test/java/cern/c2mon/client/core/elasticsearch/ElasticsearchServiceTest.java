@@ -35,6 +35,7 @@ import java.util.concurrent.TimeoutException;
 
 import static org.easymock.EasyMock.createNiceMock;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 @NotThreadSafe
 public class ElasticsearchServiceTest {
@@ -147,6 +148,19 @@ public class ElasticsearchServiceTest {
       Collection<Long> tagsForResponsibleUser = service.findTagsByNameAndMetadata(tagname, metadataKey, testUser);
       assertEquals("There should be one tag with given name and metadata", 1, tagsForResponsibleUser.size());
       assertEquals(testUserTagId, tagsForResponsibleUser.stream().findFirst().get());
+    } catch (Exception e) {
+      e.printStackTrace();
+      throw e;
+    }
+  }
+  
+  @Test
+  public void testSearchByName() throws InterruptedException {
+    try {
+      ElasticsearchService service = new ElasticsearchService(properties);
+      Collection<Long> tagsForResponsibleUser = service.findByName("TEST");
+      assertNotNull("The tags collection should not be null", tagsForResponsibleUser);
+      assertEquals("There tags collection should be empty", 0, tagsForResponsibleUser.size());
     } catch (Exception e) {
       e.printStackTrace();
       throw e;
