@@ -416,7 +416,13 @@ public class TagServiceImpl implements AdvancedTagService {
 
   @Override
   public Collection<Tag> findByName(String regex) {
-    return get(elasticsearchService.findByName(regex));
+    if (hasWildcard(regex)) {
+      Set<String> regexList = new HashSet<>();
+      regexList.add(regex);
+      return findByName(regexList);
+    } else {
+      return getByName(Arrays.asList(new String[]{regex}));
+    }
   }
 
   @Override
