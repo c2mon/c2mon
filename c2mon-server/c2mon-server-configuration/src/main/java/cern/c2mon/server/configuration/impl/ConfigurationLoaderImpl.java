@@ -183,7 +183,8 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
                                  SequenceDAO sequenceDAO,
                                  ConfigurationProperties properties,
                                  ServerProperties serverProperties,
-                                 RuleTagCache ruleTagCache) {
+                                 RuleTagCache ruleTagCache,
+                                 TagLocationService tagLocationService) {
     super();
     this.processCommunicationManager = processCommunicationManager;
     this.configurationDAO = configurationDAO;
@@ -205,6 +206,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
     this.daqConfigEnabled = properties.isDaqConfigEnabled();
     this.reportDirectory = serverProperties.getHome() + "/reports";
     this.ruleTagCache = ruleTagCache;
+    this.tagLocationService = tagLocationService;
   }
 
   @Override
@@ -356,7 +358,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
                         elementsToCheckRules.add(element);
                       }
                     }
-                ).get(300, TimeUnit.SECONDS);
+                )).get(300, TimeUnit.SECONDS);
             } catch (TimeoutException e) {
               String errorMessage = "Error applying configuration elements in parallel, timeout after 5 minutes";
               log.error(errorMessage, e);
@@ -612,7 +614,6 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
    *
    * @param element the details of the configuration action
    * @param elementReport report that should be set to failed if there is a problem
-   * @param changeId first free id to use in the sequence of changeIds, used for sending to DAQs *is increased by method*
    * @return list of DAQ configuration events; is never null but may be empty
    * @throws IllegalAccessException
    **/
