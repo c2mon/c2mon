@@ -6,7 +6,7 @@
   <parent>
     <groupId>cern.c2mon.client</groupId>
     <artifactId>c2mon-client</artifactId>
-    <version>1.8.29</version>
+    <version>1.8.30-SNAPSHOT</version>
   </parent>
 
   <artifactId>c2mon-client-ext-dynconfig</artifactId>
@@ -51,7 +51,11 @@
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient</artifactId>
     </dependency>
-    
+    <dependency>
+	      <groupId>org.projectlombok</groupId>
+	      <artifactId>lombok</artifactId>
+	</dependency>
+	
     <!--  Test dependencies -->
     <dependency>
       <groupId>junit</groupId>

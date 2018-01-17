@@ -12,6 +12,14 @@ public class AConfigStrategy {
 
 	protected ConfigurationService configurationService;
 
+	public ConfigurationService getConfigurationService() {
+		return configurationService;
+	}
+
+	public void setConfigurationService(ConfigurationService configurationService) {
+		this.configurationService = configurationService;
+	}
+
 	public AConfigStrategy() {
 		super();
 	}

@@ -16,7 +16,8 @@ import cern.c2mon.client.core.service.ConfigurationService;
 import cern.c2mon.client.core.service.TagService;
 import cern.c2mon.client.ext.dynconfig.configuration.DynConfigConfiguration;
 import cern.c2mon.client.ext.dynconfig.configuration.ProcessEquipmentURIMapping;
-import cern.c2mon.client.ext.dynconfig.strategy.ITagConfigurationMapping;
+import cern.c2mon.client.ext.dynconfig.strategy.AConfigStrategy;
+import cern.c2mon.client.ext.dynconfig.strategy.ITagConfigurationStrategy;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.api.tag.DataTag;
 
@@ -30,13 +31,20 @@ public class DynConfigService {
 	@Autowired
 	TagService tagService;
 
-	Collection<ITagConfigurationMapping> configurationStrategies = new ArrayList<>();
+	private Collection<ITagConfigurationStrategy> configurationStrategies = null;
 
-	@Autowired
+//	@Autowired
 	DynConfigConfiguration config;
 
-	public void setConfigurationStrategies(Collection<ITagConfigurationMapping> configurationStrategies) {
+	public void setConfigurationStrategies(Collection<ITagConfigurationStrategy> configurationStrategies) {
 		this.configurationStrategies = configurationStrategies;
+		
+		for(ITagConfigurationStrategy strategy : this.configurationStrategies){
+			// Lazily inject a configuration service reference
+			if(((AConfigStrategy)strategy).getConfigurationService()== null){
+				((AConfigStrategy)strategy).setConfigurationService(configurationService);
+			}
+		}
 	}
 
 	public void setConfigurationService(ConfigurationService configurationService) {
@@ -72,9 +80,10 @@ public class DynConfigService {
 
 		if (tags.isEmpty()) {
 			// Lookup an applicable configuration strategy
-			for (ITagConfigurationMapping strategy : configurationStrategies) {
+			for (ITagConfigurationStrategy strategy : configurationStrategies) {
 				MultiValueMap<String, DataTag> equipmentToTags = strategy.getConfigurations(mapping,
 						Arrays.asList(new URI[] { uri }));
+				
 				if (equipmentToTags.size() != 0) {
 					for (String eq : equipmentToTags.keySet()) {
 						ConfigurationReport rep = configurationService.createDataTags(eq,

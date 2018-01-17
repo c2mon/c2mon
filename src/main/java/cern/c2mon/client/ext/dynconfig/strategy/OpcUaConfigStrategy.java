@@ -22,7 +22,7 @@ import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.address.OPCHardwareAddress.ADDRESS_TYPE;
 import cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl;
 
-public class OpcUaConfigStrategy extends AConfigStrategy implements ITagConfigurationMapping {
+public class OpcUaConfigStrategy extends AConfigStrategy implements ITagConfigurationStrategy {
 
 	private ConfigurationService configurationService;
 	

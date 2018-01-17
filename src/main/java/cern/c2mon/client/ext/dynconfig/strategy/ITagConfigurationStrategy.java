@@ -9,7 +9,7 @@ import org.springframework.util.MultiValueMap;
 import cern.c2mon.client.ext.dynconfig.configuration.ProcessEquipmentURIMapping;
 import cern.c2mon.shared.client.configuration.api.tag.DataTag;
 
-public interface ITagConfigurationMapping extends Predicate<URI> {
+public interface ITagConfigurationStrategy extends Predicate<URI> {
 
 	MultiValueMap<String, DataTag> getConfigurations(ProcessEquipmentURIMapping mapping, Collection<URI> uris);
 	

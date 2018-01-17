@@ -25,17 +25,17 @@ import cern.c2mon.shared.common.datatag.address.impl.DIPHardwareAddressImpl;
  * @author CERN
  *
  */
-public class DipConfigStrategy extends AConfigStrategy  implements ITagConfigurationMapping {
+public class DipConfigStrategy extends AConfigStrategy  implements ITagConfigurationStrategy {
 
 	Logger logger = LoggerFactory.getLogger(this.getClass());
-	public DipConfigStrategy(ConfigurationService configurationService) {
-		this.configurationService = configurationService;
+	
+	public DipConfigStrategy() {
 	}
 
 	/**
 	 * Create DIP Data Tags out of the given URIs
 	 * 
-	 * @see cern.c2mon.client.ext.dynconfig.strategy.ITagConfigurationMapping#getConfiguration(java.util.Collection)
+	 * @see cern.c2mon.client.ext.dynconfig.strategy.ITagConfigurationStrategy#getConfiguration(java.util.Collection)
 	 */
 	@Override
 	public MultiValueMap<String, DataTag> getConfigurations(ProcessEquipmentURIMapping mapping, Collection<URI> uris) {
