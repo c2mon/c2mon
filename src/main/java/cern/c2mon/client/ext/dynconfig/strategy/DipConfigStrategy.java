@@ -8,11 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import com.oracle.webservices.internal.api.databinding.DatabindingMode;
-
-import cern.c2mon.client.core.C2monServiceGateway;
-import cern.c2mon.client.core.service.ConfigurationService;
-import cern.c2mon.client.ext.dynconfig.DynConfigService;
 import cern.c2mon.client.ext.dynconfig.SupportedProtocolsEnum;
 import cern.c2mon.client.ext.dynconfig.configuration.ProcessEquipmentURIMapping;
 import cern.c2mon.shared.client.configuration.api.tag.DataTag;
