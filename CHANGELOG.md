@@ -10,6 +10,7 @@ For more details on a given release, please check also the [Milestone planning](
 ### Added
 
 ### Changed
+- Tidy temporary file handling in tests (#189)
 
 ### Fixed
 
