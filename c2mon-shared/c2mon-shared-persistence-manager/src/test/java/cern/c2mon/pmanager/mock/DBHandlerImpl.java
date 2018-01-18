@@ -16,13 +16,12 @@
  *****************************************************************************/
 package cern.c2mon.pmanager.mock;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
 import cern.c2mon.pmanager.IDBPersistenceHandler;
 import cern.c2mon.pmanager.IFallback;
 import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Implements the IDBPersistenceHandler interface for testing purposes.
@@ -30,17 +29,17 @@ import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
  *
  * @author mruizgar
  */
-public class DBHandlerImpl implements IDBPersistenceHandler {
+public class DBHandlerImpl implements IDBPersistenceHandler<IFallback> {
 
   /**
    * Container for the objects that have to be stored
    */
-  private ArrayList storage = new ArrayList();
+  private List<IFallback> storage = new ArrayList<>();
 
   /**
    * Gets a string identifying the DB user account
    *
-   * @return String The strind identifying the user account
+   * @return String The string identifying the user account
    */
   @Override
   public final String getDBInfo() {
@@ -51,35 +50,16 @@ public class DBHandlerImpl implements IDBPersistenceHandler {
    * Stores an IFallback object into a DB table
    *
    * @param object IFallback object containing the data to be committed to the DB
-   * @throws SQLException An exception is thrown in case the object cannot be committed to the DB
+   * @throws IDBPersistenceException An exception is thrown in case the object cannot be committed to the DB
    */
 
   @Override
   public final void storeData(final IFallback object) throws IDBPersistenceException {
     if (object instanceof FallbackImpl) {
-      if (!((FallbackImpl) object).toString().equals(FallbackImpl.ERROR)) {
+      if (!object.toString().equals(FallbackImpl.ERROR)) {
         storage.add(object);
       } else {
         throw new IDBPersistenceException("Connection to the DB has been lost");
-      }
-    }
-  }
-
-  /**
-   * Stores a list of objects read back from the fallback mechanism into a db table
-   *
-   * @param data List of IFallback objects read back from a fallback file and containing the
-   *             data to be committed to the DB
-   * @throws SQLException An exception is thrown in case the objects cannot be committed to the DB
-   */
-  public final void storeDataBack(final List data) throws SQLException {
-    for (int i = 0; i < data.size(); i++) {
-      if (data.get(i) instanceof FallbackImpl) {
-        if (!((FallbackImpl) data.get(i)).toString().equals(FallbackImpl.ERROR)) {
-          storage.add(storage);
-        } else {
-          throw new SQLException("Connection to the DB has been lost");
-        }
       }
     }
   }
@@ -91,11 +71,11 @@ public class DBHandlerImpl implements IDBPersistenceHandler {
    * @throws IDBPersistenceException An exception is thrown in case the objects cannot be committed to the DB
    */
   @Override
-  public final void storeData(final List data) throws IDBPersistenceException {
-    for (int i = 0; i < data.size(); i++) {
-      if (data.get(i) instanceof FallbackImpl) {
-        if (!((FallbackImpl) data.get(i)).toString().equals(FallbackImpl.ERROR)) {
-          storage.add(data.get(i));
+  public final void storeData(final List<IFallback> data) throws IDBPersistenceException {
+    for (IFallback aData : data) {
+      if (aData instanceof FallbackImpl) {
+        if (!aData.toString().equals(FallbackImpl.ERROR)) {
+          storage.add(aData);
         } else {
           throw new IDBPersistenceException("Connection to the DB has been lost", 0);
         }

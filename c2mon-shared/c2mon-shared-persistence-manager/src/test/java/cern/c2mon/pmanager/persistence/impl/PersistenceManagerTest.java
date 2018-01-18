@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2018 CERN. All rights not expressly granted are reserved.
  * <p/>
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -16,22 +16,17 @@
  *****************************************************************************/
 package cern.c2mon.pmanager.persistence.impl;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-
 import cern.c2mon.pmanager.IFallback;
 import cern.c2mon.pmanager.mock.AlarmListenerImpl;
 import cern.c2mon.pmanager.mock.DBHandlerImpl;
 import cern.c2mon.pmanager.mock.FallbackImpl;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
@@ -39,21 +34,21 @@ import static org.junit.Assert.assertEquals;
  * JUnit test for the PersistenceManager class
  *
  * @author mruizgar
- *
  */
-@RunWith(JUnit4.class)
 public class PersistenceManagerTest {
 
-  @Rule
-  public TemporaryFolder folder = new TemporaryFolder(new File("/tmp"));
+  /**
+   * Instance of the class we want to test
+   */
+  private static PersistenceManager<IFallback> persistenceManager;
 
-  /** Instance of the class we want to test */
-  private PersistenceManager<IFallback> persistenceManager;
-
-  /** It sets all the objects needed for running the test */
-  @Before
-  public final void setUp() throws IOException {
-    File fallbackFile = folder.newFile();
+  /**
+   * It sets all the objects needed for running the test
+   */
+  @BeforeClass
+  public static void before() throws IOException {
+    final File fallbackFile = File.createTempFile("DataTagFallback", ".log");
+    fallbackFile.deleteOnExit();
     persistenceManager = new PersistenceManager<>(new DBHandlerImpl(), fallbackFile.getAbsolutePath(), new AlarmListenerImpl(), new FallbackImpl());
   }
 
@@ -112,6 +107,4 @@ public class PersistenceManagerTest {
     persistenceManager.storeData(data);
     assertEquals(5, persistenceManager.getFallbackManager().getFallbackFileController().getNumberOfLines() - lines);
   }
-
-
 }
