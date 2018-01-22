@@ -118,7 +118,7 @@ Again, you can download and execute a tarball or run a Docker image to get it up
 ### Using the hostmetrics DAQ Docker image
 
 ```bash
-docker run --rm --name daq-hostmetrics -it --net=host -e "C2MON_DAQ_JMS_URL=tcp://localhost:61616" \
+docker run --rm --name daq-hostmetrics -it --net=host -e "C2MON_DAQ_JMS_URL=failover:tcp://localhost:61616" \
   gitlab-registry.cern.ch/c2mon/c2mon-daq-hostmetrics bin/C2MON-DAQ-STARTUP.jvm -f P_HOST01
 ```
 
