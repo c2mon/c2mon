@@ -11,7 +11,7 @@ public class DaqJmsProperties {
   /**
    * URL of the primary JMS broker to which to publish
    */
-  private String url = "failover:tcp://localhost:61616";
+  private String url = "failover:tcp://0.0.0.0:61616";
 
   /**
    * The queue prefix used to publish data tags to the server. The process ID
