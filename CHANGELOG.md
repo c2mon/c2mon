@@ -13,6 +13,7 @@ For more details on a given release, please check also the [Milestone planning](
 - Tidy temporary file handling in tests (#189)
 
 ### Fixed
+- Fixed problem for local protyping that DAQ process could not recover from C2MON a server restart with embedded ActiveMQ broker (#191)
 
 
 ## [1.8.30] - 2018-01-17
