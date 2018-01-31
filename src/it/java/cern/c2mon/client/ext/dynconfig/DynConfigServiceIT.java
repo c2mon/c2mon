@@ -1,5 +1,7 @@
 package cern.c2mon.client.ext.dynconfig;
 
+import static org.junit.Assert.assertTrue;
+
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -7,7 +9,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.junit.Test;
-import org.springframework.util.MultiValueMap;
 
 import cern.c2mon.client.common.listener.TagListener;
 import cern.c2mon.client.common.tag.Tag;
@@ -17,7 +18,6 @@ import cern.c2mon.client.ext.dynconfig.configuration.DynConfigConfiguration;
 import cern.c2mon.client.ext.dynconfig.configuration.ProcessEquipmentURIMapping;
 import cern.c2mon.client.ext.dynconfig.strategy.DipConfigStrategy;
 import cern.c2mon.client.ext.dynconfig.strategy.ITagConfigurationStrategy;
-import cern.c2mon.shared.client.configuration.api.tag.DataTag;
 
 public class DynConfigServiceIT {
 	@Test
@@ -25,10 +25,8 @@ public class DynConfigServiceIT {
 		//System.setProperty("c2mon.client.conf.url", "classpath:c2mon-dynconfig-client.properties");
 		//System.setProperty("c2mon.client.jms.url", "http://dash.web.cern.ch");
 		System.setProperty("c2mon.client.jms.url", "tcp://localhost:61616");
+		System.setProperty("c2mon.dynconfig.component.active", "false");
 		C2monServiceGateway.startC2monClientSynchronous();
-		
-		
-		C2monServiceGateway.getTagService().findByName("just-a-quick-sanity-test");
 		
 		DynConfigService dcs = new DynConfigService();
 		dcs.setConfigurationService(C2monServiceGateway.getConfigurationService());
@@ -38,8 +36,8 @@ public class DynConfigServiceIT {
 		List<ProcessEquipmentURIMapping> mappings = new ArrayList<>();
 		
 		mappings.add(ProcessEquipmentURIMapping.builder().uriPattern("^dip.*")
-				.processId(10001L).processName("DYNDIP")
-				.equipmentName("DYNDIP.equipment").build());
+				.processId(10001L).processName("P_DYNDIP")
+				.equipmentName("E_DYNDIP").build());
 		
 		dcs.config.setMappings(mappings);
 		
@@ -49,7 +47,8 @@ public class DynConfigServiceIT {
 		
 //		Tag tag = dcs.getTagForURI(new URI("dip://dip/acc/LHC/RunControl/Page1"));
 //		Tag tag = dcs.getTagForURI(new URI(SupportedProtocolsEnum.PROTOCOL_OPCUA+"://pitrafficlight/GreenLED.on"));
-		Tag tag = dcs.getTagForURI(new URI("dip://dip/acc/LHC/RunControl/Page1"));
+		URI uri = new URI("dip://dip/acc/LHC/RunControl/Page1");
+		Tag tag = dcs.getTagForURI(uri);
 		
 		TagService ts = C2monServiceGateway.getTagService();
         //ts.subscribe(100000L, new TagListener() {
@@ -74,6 +73,13 @@ public class DynConfigServiceIT {
 
 		System.out.println("Waiting for updates...");
 		Thread.sleep(3000l);
+		
+		
+		System.out.println("Deleting the tag now ...");
+		dcs.deleteTagForURI(uri);
+		
+		assertTrue(ts.findByName(SupportedProtocolsEnum.convertToTagName(uri)).isEmpty());
+		
 		System.out.println("Done.");
 	}
 
