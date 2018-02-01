@@ -37,7 +37,7 @@ public class DynConfigService {
 	private Collection<ITagConfigurationStrategy> configurationStrategies = null;
 
 	@Autowired
-	DynConfigConfiguration config;
+	public DynConfigConfiguration config;
 
 	public DynConfigService() {
 		// Setup default configuration strategies
