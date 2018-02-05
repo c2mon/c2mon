@@ -65,6 +65,10 @@
     </dependency>
     <dependency>
       <groupId>cern.c2mon.server</groupId>
+      <artifactId>c2mon-server-drools</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.server</groupId>
       <artifactId>c2mon-server-history</artifactId>
     </dependency>
 
@@ -116,6 +120,11 @@
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.server</groupId>
+      <artifactId>c2mon-server-drools</artifactId>
+      <version>1.8.31-SNAPSHOT</version>
     </dependency>
   </dependencies>
 
