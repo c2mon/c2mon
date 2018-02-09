@@ -29,7 +29,7 @@
             alarmfmember, alarmfcode, alarmcondition,
             alarmstate, alarmtime, ala_published, alarminfo,
             ala_pub_state, ala_pub_time, ala_pub_info, alarmmetadata
-       FROM alarm
+       FROM ALARM
     </select>
 
     <select id="getRowBatch" resultMap="alarmResultMap" parameterType="cern.c2mon.server.cache.dbaccess.structure.DBBatch">
@@ -37,8 +37,8 @@
       alarmcondition, alarmstate, alarmtime, ala_published, alarminfo,
       ala_pub_state, ala_pub_time, ala_pub_info, alarmmetadata
       FROM(
-        SELECT ROWNUM as RN, alarm.*
-        FROM alarm
+        SELECT ROWNUM as RN, ALARM.*
+        FROM ALARM
         ORDER BY alarmid
       )
       WHERE RN <![CDATA[ >= ]]> #{startRow}
@@ -51,13 +51,13 @@
               alarmfmember, alarmfcode, alarmcondition,
               alarmstate, alarmtime, ala_published, alarminfo,
               ala_pub_state, ala_pub_time, ala_pub_info, alarmmetadata
-         FROM alarm
+         FROM ALARM
         WHERE alarmid = #{id}
     </select>
 
     <select id="isInDb" resultType="boolean" parameterType="Long">
       SELECT count(*)
-        FROM alarm
+        FROM ALARM
        WHERE alarmid = #{id}
     </select>
 

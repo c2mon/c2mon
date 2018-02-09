@@ -43,6 +43,15 @@
           AND RN <![CDATA[ <= ]]> #{endRow})
     </select>
 
+    <select id="getRowBatch" resultMap="ruleTagResultMap" parameterType="cern.c2mon.server.cache.dbaccess.structure.DBBatch" databaseId="mysql">
+      SELECT TAGID, TAGNAME, TAGDESC, TAGMODE, TAGDATATYPE, TAGVALUE, TAGVALUEDESC,
+        TAGSRVTIMESTAMP, TAGQUALITYDESC, TAGUNIT, TAGSIMULATED, TAGLOGGED,
+        TAGDIPADDRESS, TAGJAPCADDRESS, TAGRULE, TAGRULEIDS, ALARMID, TAGMETADATA
+      FROM DATATAG LEFT OUTER JOIN ALARM ON ALARM_TAGID = TAGID
+      WHERE TAGCONTROLTAG = 0 AND TAGRULE IS NOT NULL
+      ORDER BY TAGID
+      LIMIT #{rowCount} OFFSET #{startRow}
+    </select>
     <!-- getItem needed for persistence caches -->
     <select id="getItem" resultMap="ruleTagResultMap" parameterType="Long">
      SELECT TAGID, TAGNAME, TAGDESC, TAGMODE, TAGDATATYPE,

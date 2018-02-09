@@ -104,7 +104,7 @@
 
     <select id="isInDb" resultType="boolean" parameterType="Long">
       SELECT count(*)
-        FROM commandtag
+        FROM COMMANDTAG
        WHERE cmdid = #{id}
     </select>
 

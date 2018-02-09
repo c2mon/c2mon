@@ -12,6 +12,7 @@ import cern.c2mon.server.cache.equipment.EquipmentCacheImpl;
 import cern.c2mon.server.cache.process.ProcessCacheImpl;
 import cern.c2mon.server.cache.rule.RuleTagCacheImpl;
 import cern.c2mon.server.cache.subequipment.SubEquipmentCacheImpl;
+import cern.c2mon.server.test.DatabasePopulationRule;
 import net.sf.ehcache.CacheManager;
 import org.junit.rules.ExternalResource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.stereotype.Service;
 
 import javax.sql.DataSource;
+import java.sql.SQLException;
 
 /**
  * Using this rule in a JUnit test will ensure that all caches are preloaded
@@ -29,10 +31,7 @@ import javax.sql.DataSource;
  * @author Justin Lewis Salmon
  */
 @Service
-public class ConfigurationCachePopulationRule extends ExternalResource {
-
-  @Autowired
-  private DataSource cacheDataSource;
+public class ConfigurationCachePopulationRule extends DatabasePopulationRule {
 
   @Autowired
   private ProcessCacheImpl processCache;
@@ -71,13 +70,8 @@ public class ConfigurationCachePopulationRule extends ExternalResource {
   private DeviceCacheImpl deviceCache;
 
   @Override
-  protected void before() {
-    ResourceDatabasePopulator populator = new ResourceDatabasePopulator(
-        new ClassPathResource("sql/cache-data-remove.sql"),
-        new ClassPathResource("sql/cache-data-insert.sql")
-    );
-    DatabasePopulatorUtils.execute(populator, cacheDataSource);
-
+  protected void before() throws SQLException {
+    super.before();
     CacheManager.getInstance().clearAll();
     controlTagCache.init();
     processCache.init();

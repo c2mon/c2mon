@@ -41,7 +41,7 @@
 
     <select id="isInDb" resultType="boolean" parameterType="Long">
       SELECT count(*)
-        FROM alivetimer
+        FROM ALIVETIMER
        WHERE aliveid = #{id}
     </select>
 

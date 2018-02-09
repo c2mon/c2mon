@@ -33,13 +33,22 @@ public class DBBatch {
 
   /**
    * First record to load (in an assumed ordered list of records
-   * that need loading from the DB).
+   * that need loading from the DB) (inclusive).
    */
   private Long startRow;
 
   /**
-   * Last cache object to load.
+   * Last cache object to load (inclusive).
    */
   private Long endRow;
+
+  /**
+   * Get the number of rows between startRow and endRow (inclusive).
+   *
+   * @return number of rows
+   */
+  public long getRowCount() {
+    return endRow - startRow + 1;
+  }
 
 }

@@ -124,19 +124,19 @@
 
     <select id="getNumTags" resultType="Integer" parameterType="Long">
         select count(*)
-          from datatag
-    inner join equipment on equipment.eqid = datatag.tag_eqid
-    inner join process on process.procid = equipment.eq_procid
-         where process.procid = #{id}
+          from DATATAG
+    inner join EQUIPMENT on EQUIPMENT.eqid = DATATAG.tag_eqid
+    inner join PROCESS on PROCESS.procid = EQUIPMENT.eq_procid
+         where PROCESS.procid = #{id}
     </select>
 
     <select id="getNumInvalidTags" resultType="Integer" parameterType="Long">
         select count(*)
-          from datatag
-    inner join equipment on equipment.eqid = datatag.tag_eqid
-    inner join process on process.procid = equipment.eq_procid
-         where process.procid = #{id}
-           and datatag.tagqualitydesc != '{}'
+          from DATATAG
+    inner join EQUIPMENT on EQUIPMENT.eqid = DATATAG.tag_eqid
+    inner join PROCESS on PROCESS.procid = EQUIPMENT.eq_procid
+         where PROCESS.procid = #{id}
+           and DATATAG.tagqualitydesc != '{}'
     </select>
 
   </mapper>

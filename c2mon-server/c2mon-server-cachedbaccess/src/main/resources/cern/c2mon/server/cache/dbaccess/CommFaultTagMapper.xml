@@ -28,7 +28,7 @@
 
     <select id="isInDb" resultType="boolean" parameterType="Long">
       SELECT count(*)
-        FROM commfaulttag
+        FROM COMMFAULTTAG
        WHERE commfaultid = #{id}
     </select>
 
