@@ -129,6 +129,11 @@ public class TagFacadeGatewayImpl implements TagFacadeGateway {
   }
 
   @Override
+  public List<Alarm> getAlarms(Tag tag) {
+    return getFacade(tag).getAlarms(tag);
+  }
+
+  @Override
   public List<Long> getKeys() {
     Set<Long> keys = new HashSet<>(this.controlTagFacade.getKeys());
     keys.addAll(this.dataTagFacade.getKeys());

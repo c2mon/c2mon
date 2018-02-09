@@ -165,7 +165,7 @@ public class TagConfigDocumentIndexerTests extends BaseElasticsearchIntegrationT
     assertEquals(1, response.getHits().totalHits());
 
     // Delete the document
-    indexer.removeTagConfig(document);
+    indexer.removeTagConfigById(Long.valueOf(document.getId()));
 
     // Refresh again
     client.getClient().admin().indices().prepareRefresh(index).get();

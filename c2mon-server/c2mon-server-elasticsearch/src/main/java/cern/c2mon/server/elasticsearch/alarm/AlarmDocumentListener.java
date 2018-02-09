@@ -16,8 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch.alarm;
 
-import javax.annotation.PostConstruct;
-
 import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,14 +48,14 @@ public class AlarmDocumentListener implements C2monCacheListener<Alarm>, SmartLi
   @Qualifier("alarmDocumentPersistenceManager")
   private final IPersistenceManager<AlarmDocument> persistenceManager;
 
-  private final AlarmDocumentConverter converter;
+  private final AlarmValueDocumentConverter converter;
 
   private Lifecycle listenerContainer;
 
   private volatile boolean running = false;
 
   @Autowired
-  public AlarmDocumentListener(final ElasticsearchClient elasticsearchClient, final CacheRegistrationService cacheRegistrationService, final IPersistenceManager<AlarmDocument> persistenceManager, final AlarmDocumentConverter converter) {
+  public AlarmDocumentListener(final ElasticsearchClient elasticsearchClient, final CacheRegistrationService cacheRegistrationService, final IPersistenceManager<AlarmDocument> persistenceManager, final AlarmValueDocumentConverter converter) {
     this.elasticsearchClient = elasticsearchClient;
     this.cacheRegistrationService = cacheRegistrationService;
     this.persistenceManager = persistenceManager;

@@ -98,6 +98,11 @@ public interface Alarm extends Cacheable {
    */
   boolean isActive();
 
+  /**
+   * Get the alarm's metadata.
+   *
+   * @return The metadata
+   */
   Metadata getMetadata();
 
   /**

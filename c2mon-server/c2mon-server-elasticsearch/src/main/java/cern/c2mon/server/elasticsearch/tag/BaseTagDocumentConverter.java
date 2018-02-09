@@ -24,9 +24,9 @@ import java.util.stream.Collectors;
 @Slf4j
 public class BaseTagDocumentConverter<T extends Map<String, Object>> implements Converter<Tag, Optional<T>> {
 
-    final ProcessCache processCache;
-    final EquipmentCache equipmentCache;
-    final SubEquipmentCache subEquipmentCache;
+    private final ProcessCache processCache;
+    private final EquipmentCache equipmentCache;
+    private final SubEquipmentCache subEquipmentCache;
     private final Supplier<T> containerSupplier;
 
     public BaseTagDocumentConverter(final ProcessCache processCache, final EquipmentCache equipmentCache, final SubEquipmentCache subEquipmentCache, final Supplier<T> containerSupplier) {
@@ -37,7 +37,7 @@ public class BaseTagDocumentConverter<T extends Map<String, Object>> implements 
     }
 
     @Override
-    public Optional<T> convert(Tag tag) {
+    public Optional<T> convert(final Tag tag) {
         T map = containerSupplier.get();
         map.put("id", tag.getId());
         map.put("name", tag.getName());
@@ -49,7 +49,7 @@ public class BaseTagDocumentConverter<T extends Map<String, Object>> implements 
         return Optional.of(map);
     }
 
-    private T getMetadata(Tag tag) {
+    private T getMetadata(final Tag tag) {
         Metadata metadata = tag.getMetadata();
         if (metadata != null) {
             return metadata.getMetadata().entrySet().stream()
@@ -64,7 +64,7 @@ public class BaseTagDocumentConverter<T extends Map<String, Object>> implements 
         return containerSupplier.get();
     }
 
-    protected Map<String, Object> getC2monMetadata(Tag tag) {
+    protected Map<String, Object> getC2monMetadata(final Tag tag) {
         Map<String, Object> map = new HashMap<>();
 
         map.put("dataType", tag.getDataType());

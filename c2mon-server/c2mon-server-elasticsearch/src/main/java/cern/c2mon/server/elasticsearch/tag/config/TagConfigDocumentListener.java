@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2018 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -17,14 +17,18 @@
 
 package cern.c2mon.server.elasticsearch.tag.config;
 
+import cern.c2mon.server.cache.TagFacadeGateway;
+import cern.c2mon.server.common.alarm.Alarm;
+import cern.c2mon.server.common.listener.ConfigurationEventListener;
+import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
+import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import cern.c2mon.server.common.listener.ConfigurationEventListener;
-import cern.c2mon.server.common.tag.Tag;
-import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Listens for tag configuration events, converts them to
@@ -42,33 +46,51 @@ public class TagConfigDocumentListener implements ConfigurationEventListener {
 
   private final TagConfigDocumentConverter converter;
 
+  private final TagFacadeGateway tagFacadeGateway;
+
   @Autowired
-  public TagConfigDocumentListener(final ElasticsearchClient elasticsearchClient, final TagConfigDocumentIndexer indexer, final TagConfigDocumentConverter converter) {
+  public TagConfigDocumentListener(final ElasticsearchClient elasticsearchClient, final TagConfigDocumentIndexer indexer, final TagConfigDocumentConverter converter, final TagFacadeGateway tagFacadeGateway) {
     this.elasticsearchClient = elasticsearchClient;
     this.indexer = indexer;
     this.converter = converter;
+    this.tagFacadeGateway = tagFacadeGateway;
   }
 
   @Override
   public void onConfigurationEvent(Tag tag, Action action) {
     if (this.elasticsearchClient.getProperties().isEnabled()) {
-      try {
-        switch (action) {
-          case CREATE:
-            converter.convert(tag).ifPresent(indexer::indexTagConfig);
-            break;
-          case UPDATE:
-            converter.convert(tag).ifPresent(indexer::updateTagConfig);
-            break;
-          case REMOVE:
-            converter.convert(tag).ifPresent(indexer::removeTagConfig);
-            break;
-          default:
-            break;
-        }
-      } catch (Exception e) {
-        throw new RuntimeException("Error indexing tag configuration", e);
+      if (action == Action.REMOVE) {
+        this.updateConfiguration(tag, Collections.emptyList(), action);
+      } else {
+        this.updateConfiguration(tag, this.tagFacadeGateway.getAlarms(tag), action);
       }
+    }
+  }
+
+  @Override
+  public void onConfigurationEvent(Alarm alarm, Action action) {
+    if (this.elasticsearchClient.getProperties().isEnabled()) {
+      this.updateConfiguration(this.tagFacadeGateway.getTag(alarm.getTagId()), Collections.singletonList(alarm), action);
+    }
+  }
+
+  private void updateConfiguration(Tag tag, List<Alarm> alarms, Action action) {
+    try {
+      switch (action) {
+        case CREATE:
+          converter.convert(tag, alarms).ifPresent(indexer::indexTagConfig);
+          break;
+        case UPDATE:
+          converter.convert(tag, alarms).ifPresent(indexer::updateTagConfig);
+          break;
+        case REMOVE:
+          indexer.removeTagConfigById(tag.getId());
+          break;
+        default:
+          //do nothing
+      }
+    } catch (Exception e) {
+      throw new RuntimeException("Error indexing tag configuration", e);
     }
   }
 }

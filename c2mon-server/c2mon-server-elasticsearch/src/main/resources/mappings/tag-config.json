@@ -34,7 +34,7 @@
       "type": "keyword",
       "index": true
     },
-    "mode":{
+    "mode": {
       "type": "keyword",
       "index": true
     },
@@ -82,6 +82,29 @@
     "timestamp": {
       "type": "date",
       "format": "epoch_millis"
+    },
+    "alarms": {
+      "dynamic": true,
+      "properties": {
+        "faultCode": {
+          "type": "integer"
+        },
+        "faultFamily": {
+          "type": "keyword",
+          "index": true
+        },
+        "faultMember": {
+          "type": "keyword",
+          "index": true
+        },
+        "id": {
+          "type": "long"
+        },
+        "metadata": {
+          "type": "object",
+          "dynamic": "true"
+        }
+      }
     }
   }
 }

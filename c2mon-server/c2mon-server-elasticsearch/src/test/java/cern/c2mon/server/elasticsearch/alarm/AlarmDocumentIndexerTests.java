@@ -45,7 +45,7 @@ public class AlarmDocumentIndexerTests extends BaseElasticsearchIntegrationTest 
     AlarmCacheObject alarm = (AlarmCacheObject) EntityUtils.createAlarm();
     alarm.setTimestamp(new Timestamp(0));
 
-    AlarmDocument document = new AlarmDocumentConverter().convert(alarm);
+    AlarmDocument document = new AlarmValueDocumentConverter().convert(alarm);
     indexer.storeData(document);
 
     // Refresh the index to make sure the document is searchable

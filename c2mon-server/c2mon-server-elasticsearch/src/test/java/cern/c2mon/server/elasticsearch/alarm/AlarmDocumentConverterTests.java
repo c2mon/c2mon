@@ -38,7 +38,7 @@ import static junit.framework.TestCase.assertEquals;
 @RunWith(JUnit4.class)
 public class AlarmDocumentConverterTests {
 
-  private AlarmDocumentConverter converter = new AlarmDocumentConverter();
+  private AlarmValueDocumentConverter converter = new AlarmValueDocumentConverter();
 
   @Test
   public void toAndFromJson() throws DataFallbackException {

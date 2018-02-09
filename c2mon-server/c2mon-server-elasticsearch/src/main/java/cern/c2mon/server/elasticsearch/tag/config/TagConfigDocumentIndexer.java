@@ -101,19 +101,18 @@ public class TagConfigDocumentIndexer {
     }
   }
 
-  void removeTagConfig(final TagConfigDocument tag) {
+  void removeTagConfigById(final Long tagId) {
     if (!Indices.exists(this.configIndex)) {
       return;
     }
 
-    DeleteRequest deleteRequest = new DeleteRequest(configIndex, TYPE,
-            String.valueOf(tag.getId())).routing(tag.getId());
+    DeleteRequest deleteRequest = new DeleteRequest(configIndex, TYPE, String.valueOf(tagId)).routing(String.valueOf(tagId));
 
     try {
       client.getClient().delete(deleteRequest).get();
       client.waitForYellowStatus();
     } catch (Exception e) {
-      log.error("Error occurred while deleting the config for tag #{}", tag.getId(), e);
+      log.error("Error occurred while deleting the config for tag #{}", tagId, e);
     }
   }
 

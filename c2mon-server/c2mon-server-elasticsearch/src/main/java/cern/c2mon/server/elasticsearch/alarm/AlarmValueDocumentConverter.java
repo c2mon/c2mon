@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2018 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -16,53 +16,27 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch.alarm;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
 import cern.c2mon.server.common.alarm.Alarm;
-import cern.c2mon.server.common.metadata.Metadata;
 
 /**
- * Converts {@link Alarm} instances to {@link AlarmDocument} instances.
+ * Converts {@link Alarm} instances to {@link AlarmDocument} instances with values included.
  *
  * @author Alban Marguet
  * @author Justin Lewis Salmon
  */
 @Component
-public class AlarmDocumentConverter implements Converter<Alarm, AlarmDocument> {
+public class AlarmValueDocumentConverter extends BaseAlarmDocumentConverter {
 
   @Override
-  public AlarmDocument convert(final Alarm alarm) {
-    AlarmDocument document = new AlarmDocument();
-
-    document.put("id", alarm.getId());
+  public AlarmDocument convert(Alarm alarm) {
+    AlarmDocument document = super.convert(alarm);
     document.put("tagId", alarm.getTagId());
     document.put("active", alarm.isActive());
     document.put("activeNumeric", alarm.isActive() ? 1 : 0);
-    document.put("faultFamily", alarm.getFaultFamily());
-    document.put("faultMember", alarm.getFaultMember());
-    document.put("faultCode", alarm.getFaultCode());
-    document.put("timestamp", alarm.getTimestamp().getTime());
     document.put("info", alarm.getInfo());
-    document.put("metadata", getMetadata(alarm));
-
+    document.put("timestamp", alarm.getTimestamp().getTime());
     return document;
-  }
-
-  private Map<String, Object> getMetadata(Alarm alarm) {
-    Metadata metadata = alarm.getMetadata();
-
-    if (metadata != null) {
-      return metadata.getMetadata().entrySet().stream().collect(Collectors.toMap(
-          Map.Entry::getKey,
-          e -> e.getValue() == null ? null : e.getValue()
-      ));
-    }
-
-    return Collections.emptyMap();
   }
 }

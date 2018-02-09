@@ -63,6 +63,7 @@ import cern.c2mon.shared.daq.config.HardwareAddressUpdate;
 @Slf4j
 public abstract class AbstractTagFacade<T extends Tag> extends AbstractFacade<T> implements CommonTagFacade<T> {
 
+
   /**
    * The cache for objects of type T.
    */
@@ -269,8 +270,8 @@ public abstract class AbstractTagFacade<T extends Tag> extends AbstractFacade<T>
    *
    * <p>Note also adjust text field of cache object.
    *
-   * @param tagId
-   * @param ruleTagId
+   * @param tag the tag
+   * @param ruleTagId the rule ID
    */
   @Override
   public void addDependentRuleToTag(final T tag, final Long ruleTagId) {
@@ -381,14 +382,19 @@ public abstract class AbstractTagFacade<T extends Tag> extends AbstractFacade<T>
     tagCache.acquireReadLockOnKey(id);
     try {
       T tag = tagCache.getCopy(id);
-      Collection<Alarm> alarms = new LinkedList<>();
-      for (Long alarmId : tag.getAlarmIds()) {
-        alarms.add(alarmCache.getCopy(alarmId));
-      }
-      return new TagWithAlarmsImpl(tag, alarms);
+      return new TagWithAlarmsImpl(tag, this.getAlarms(tag));
     } finally {
       tagCache.releaseReadLockOnKey(id);
     }
+  }
+
+  @Override
+  public List<Alarm> getAlarms(Tag tag) {
+    List<Alarm> alarms = new ArrayList<>();
+    for (Long alarmId : tag.getAlarmIds()) {
+      alarms.add(alarmCache.getCopy(alarmId));
+    }
+    return alarms;
   }
 
   /**

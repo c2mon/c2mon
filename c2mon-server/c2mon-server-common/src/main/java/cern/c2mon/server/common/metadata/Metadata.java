@@ -23,22 +23,28 @@ public class Metadata implements Serializable, Cloneable {
   public static String toJSON(Metadata metadata) {
     try {
       return mapper.writeValueAsString(metadata.getMetadata());
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       log.error("Exception caught while serializing metatata to JSON", e);
     }
 
     return null;
   }
 
+  /**
+   * Returns a map representation of the metadata.
+   *
+   * @return a map representation of the metadata
+   */
+  public Map<String, Object> toMap() {
+    return new HashMap<>(this.metadata);
+  }
+
   public static Map<String, Object> fromJSON(String json) {
     try {
-      TypeReference<HashMap<String, Object>> typeRef = new TypeReference<HashMap<String, Object>>() {
-      };
+      TypeReference<HashMap<String, Object>> typeRef = new TypeReference<HashMap<String, Object>>() {};
       return mapper.readValue(json, typeRef);
-    }
-    catch (IOException e) {
-      log.error("Exception caught while deserializing metatata from JSON", e);
+    } catch (IOException e) {
+      log.error("Exception caught while deserializing metadata from JSON", e);
     }
 
     return null;

@@ -16,23 +16,26 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.handler.transacted;
 
-import java.util.Properties;
-
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.UnexpectedRollbackException;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
 import cern.c2mon.server.cache.AlarmCache;
 import cern.c2mon.server.cache.AlarmFacade;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.cache.loading.AlarmLoaderDAO;
 import cern.c2mon.server.common.alarm.Alarm;
+import cern.c2mon.server.common.listener.ConfigurationEventListener;
 import cern.c2mon.server.configuration.handler.impl.TagConfigGateway;
+import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.UnexpectedRollbackException;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Collection;
+import java.util.Properties;
 
 /**
  * Implementation of transacted methods.
@@ -44,6 +47,7 @@ import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 @Service
 public class AlarmConfigTransactedImpl implements AlarmConfigTransacted {
 
+  private final Collection<ConfigurationEventListener> configurationEventListeners;
   /**
    * Reference to the alarm facade.
    */
@@ -70,14 +74,16 @@ public class AlarmConfigTransactedImpl implements AlarmConfigTransacted {
    * @param alarmFacade the alarm facade bean
    * @param alarmDAO the alarm DAO bean
    * @param alarmCache the alarm cache bean
+   * @param context the application context
    */
   @Autowired
   public AlarmConfigTransactedImpl(final AlarmFacade alarmFacade, final AlarmLoaderDAO alarmDAO,
-                            final AlarmCache alarmCache) {
+                            final AlarmCache alarmCache, final GenericApplicationContext context) {
     super();
     this.alarmFacade = alarmFacade;
     this.alarmDAO = alarmDAO;
     this.alarmCache = alarmCache;
+    this.configurationEventListeners = context.getBeansOfType(ConfigurationEventListener.class).values();
   }
 
   /**
@@ -91,15 +97,18 @@ public class AlarmConfigTransactedImpl implements AlarmConfigTransacted {
   @Override
   @Transactional(value = "cacheTransactionManager", propagation = Propagation.REQUIRED)
   public void doCreateAlarm(final ConfigurationElement element) throws IllegalAccessException {
-    
-    Alarm alarm = null;
+    Alarm alarm;
     
     alarmCache.acquireWriteLockOnKey(element.getEntityId());
     try {
       log.trace("Creating alarm " + element.getEntityId());
       alarm = alarmFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
-      
+
+      //trigger onConfiguration
       try {
+        for (ConfigurationEventListener listener : this.configurationEventListeners) {
+          listener.onConfigurationEvent(alarm, ConfigConstants.Action.CREATE);
+        }
         alarmDAO.insert(alarm);
         alarmCache.putQuiet(alarm);
       } catch (Exception e) {
@@ -142,6 +151,9 @@ public class AlarmConfigTransactedImpl implements AlarmConfigTransacted {
     alarmCache.acquireWriteLockOnKey(alarmId);
     try {
       Alarm alarm = alarmCache.getCopy(alarmId);
+      for (ConfigurationEventListener listener : this.configurationEventListeners) {
+          listener.onConfigurationEvent(alarm, ConfigConstants.Action.UPDATE);
+      }
       alarmFacade.updateConfig(alarm, properties);
       alarmDAO.updateConfig(alarm);
       alarmCache.putQuiet(alarm);
@@ -161,6 +173,9 @@ public class AlarmConfigTransactedImpl implements AlarmConfigTransacted {
     alarmCache.acquireWriteLockOnKey(alarmId);
     try {
       Alarm alarm = alarmCache.get(alarmId);
+      for (ConfigurationEventListener listener : this.configurationEventListeners) {
+          listener.onConfigurationEvent(alarm, ConfigConstants.Action.REMOVE);
+      }
       alarmDAO.deleteItem(alarmId);
       try {
         removeDataTagReference(alarm);
