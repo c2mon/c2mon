@@ -1,35 +1,37 @@
-package cern.c2mon.server.listener;
+package cern.c2mon.server.drools.listener;
 
 import cern.c2mon.server.cache.C2monBufferedCacheListener;
 import cern.c2mon.server.cache.CacheRegistrationService;
 import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.common.tag.Tag;
-import cern.c2mon.server.drools.DroolsEngine;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.kie.api.runtime.KieSession;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 @Component
 @Slf4j
-public class TagListener implements C2monBufferedCacheListener<Tag>, SmartLifecycle {
+public class DroolsTagListener implements C2monBufferedCacheListener<Tag>, SmartLifecycle {
 
-  private DroolsEngine droolsEngine;
+  private final KieSession kieSession;
 
   private final Lifecycle lifecycle;
 
   private volatile boolean running = false;
 
-  public TagListener(@Autowired final CacheRegistrationService cacheRegistrationService, final DroolsEngine droolsEngine) {
+  public DroolsTagListener(final CacheRegistrationService cacheRegistrationService, final KieSession kieSession) {
+    this.kieSession = kieSession;
     this.lifecycle = cacheRegistrationService.registerBufferedListenerToTags(this);
-    this.droolsEngine = droolsEngine;
   }
 
   @Override
   public void notifyElementUpdated(Collection<Tag> collection) {
-    System.out.println(collection);
+    for (Tag t : collection) {
+      this.kieSession.insert(t);
+    }
+    this.kieSession.fireAllRules();
   }
 
   @Override

@@ -48,6 +48,10 @@ public class Metadata implements Serializable, Cloneable {
     return null;
   }
 
+  public Object get(String key) {
+    return this.metadata.get(key);
+  }
+
   public static Metadata fromJSON(String json) {
     try {
       TypeReference<Metadata> typeRef = new TypeReference<Metadata>() {};

@@ -1,0 +1,141 @@
+import cern.c2mon.server.common.tag.AbstractTagCacheObject;
+import cern.c2mon.server.common.tag.Tag;
+import cern.c2mon.server.common.alarm.Alarm
+import cern.c2mon.server.common.alarm.AlarmCacheObject;
+
+declare AbstractTagCacheObject
+    @role(event)
+    @timestamp(cacheTimestamp)
+end
+
+declare AlarmCacheObject
+    @role(event)
+    @timestamp(timestamp)
+end
+
+declare AlarmActive
+    message: String
+end
+
+rule "temperature is updated"
+    when
+        tag: AbstractTagCacheObject(name == ".*/cpu.temp")
+    then
+        System.out.println(tag.getName() + " updated value " + tag.getValue() + tag.getUnit());
+end
+
+rule "temperature is above 40"
+when
+    tag: AbstractTagCacheObject(name matches ".*/cpu.temp", value > 40.0)
+then
+    System.out.println(tag.getName() + " temperature above 40" + tag.getUnit() + " (" + tag.getValue() + tag.getUnit() + ")");
+end
+
+rule "temperature outside range"
+when
+    tag: AbstractTagCacheObject(name matches ".*/cpu.temp", value < 10 || value > 40)
+then
+    System.out.println(tag.getName() + " outside of good range");
+end
+
+rule "temperature in building 864"
+    when
+        tag: AbstractTagCacheObject(name matches ".*/cpu.temp", metadata.get("location") == "864")
+    then
+        System.out.println("Temperature updated in location 864");
+end
+
+rule "average CPU temp over 40"
+when
+       $avg: Number( doubleValue > 40.0) from accumulate (
+         AbstractTagCacheObject($value: value, name matches ".*/cpu.temp") over window:time( 10m ),
+         average($value)
+       )
+then
+    System.out.println("HIGH TEMPERATURE: " + $avg + "C");
+    AlarmActive $alarm = new AlarmActive();
+    $alarm.setMessage("OH NO!");
+    insertLogical($alarm); //retracted when rule is no longer active
+end
+
+
+rule "std dev of temp"
+    when
+        $std: Number (doubleValue > 10.0) from accumulate (
+            AbstractTagCacheObject($value: value, name matches ".*/cpu.temp", metadata.get("location") == "864") over window:time(5m),
+            standardDeviation($value)
+        )
+    then
+        System.out.println("stddev over 5 minutes is over 10%: " + $std);
+end
+
+
+rule "more than 1 alarm"
+    when
+        $n: Number (intValue >= 1) from accumulate (
+            AlarmCacheObject(faultFamily == "cpu.temp"),
+            count(1)
+        )
+    then
+        System.out.println("Number of alarms is " + $n);
+end
+
+rule "alarm active"
+    when
+        $alarm: AlarmCacheObject()
+    then
+        System.out.println("OMG there's an alarm: " + $alarm);
+end
+
+rule "print message when alarm is active"
+when
+    $alarm: AlarmActive()
+then
+    System.out.println($alarm.getMessage());
+end
+
+
+rule "timed test"
+    timer (int: 30s 30s)
+then
+    System.out.println("TIMER every 30 seconds");
+end
+
+
+
+/* maybe better way to do this */
+declare DeadbandActive
+    @role(event)
+    tagId: long
+    @expires(3m)
+end
+
+rule "activate deadband"
+    when
+        $tag: AbstractTagCacheObject(value > 65.0, $id: id, name matches ".*/cpu.temp")
+//        not (DeadbandActive(tagId == $tag.getId()))
+    then
+        DeadbandActive deadbandActive = new DeadbandActive();
+        deadbandActive.setTagId($tag.getId());
+        System.out.println("inserting deadband active: " + $tag.getName());
+        insert(deadbandActive);
+end
+
+rule "activate deadband 2"
+    when
+        $tag: AbstractTagCacheObject($id: id, name matches ".*/cpu.temp")
+        $db: DeadbandActive(tagId == $id)
+        not (DeadbandActive(tagId == $id, this after[0,3m] $tag))
+    then
+        System.out.println("TESTingTEST");
+        retract($db);
+end
+
+
+rule "print when deadband is actived"
+    when
+        $db: DeadbandActive()
+    then
+        System.out.println("Deadband active for tag " + $db.getTagId());
+end
+

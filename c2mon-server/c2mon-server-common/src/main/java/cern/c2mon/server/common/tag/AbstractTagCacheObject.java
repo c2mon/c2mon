@@ -39,7 +39,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
  */
 @Slf4j
 @Data
-public abstract class AbstractTagCacheObject implements DataTagConstants, Cloneable, Serializable {
+public abstract class AbstractTagCacheObject implements Tag, DataTagConstants, Cloneable, Serializable {
 
   // TODO remove UID if not needed
   /**
