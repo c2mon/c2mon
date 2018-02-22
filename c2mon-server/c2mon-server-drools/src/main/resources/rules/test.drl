@@ -103,7 +103,7 @@ end
 
 
 
-/* maybe better way to do this */
+/* not working, how to do this?? */
 declare DeadbandActive
     @role(event)
     tagId: long
@@ -113,7 +113,7 @@ end
 rule "activate deadband"
     when
         $tag: AbstractTagCacheObject(value > 65.0, $id: id, name matches ".*/cpu.temp")
-//        not (DeadbandActive(tagId == $tag.getId()))
+      //  not (DeadbandActive(tagId == $tag.getId()))
     then
         DeadbandActive deadbandActive = new DeadbandActive();
         deadbandActive.setTagId($tag.getId());
