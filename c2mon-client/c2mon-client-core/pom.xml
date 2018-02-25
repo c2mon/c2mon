@@ -33,11 +33,6 @@
       <groupId>org.apache.activemq</groupId>
       <artifactId>activemq-client</artifactId>
     </dependency>
-    <!-- Required stay backward compatible to older ActiveMQ broker -->
-    <dependency>
-      <groupId>org.apache.activemq</groupId>
-      <artifactId>activemq-openwire-legacy</artifactId>
-    </dependency>
     
     <!-- Runtime dependencies required to support HTTP via ActiveMQ -->
     <!-- Note that these dependencies are optional, they must be redeclared... -->
