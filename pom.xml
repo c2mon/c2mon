@@ -176,13 +176,6 @@
         <artifactId>activemq-broker</artifactId>
         <version>${org.apache.activemq.version}</version>
       </dependency>
-      <dependency>
-        <groupId>org.apache.activemq</groupId>
-        <artifactId>activemq-openwire-legacy</artifactId>
-        <version>${org.apache.activemq.version}</version>
-        <scope>runtime</scope>
-      </dependency>
-
       <!-- Required dependencies for HTTP via ActiveMQ -->
       <dependency>
         <groupId>org.apache.activemq</groupId>
