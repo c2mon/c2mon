@@ -8,12 +8,15 @@ For more details on a given release, please check also the [Milestone planning](
 
 ## [Unreleased]
 ### Added
+- Elasticsearch: Storing alarm configuration to Tag config document in c2mon-config index (#194)
 
 ### Changed
 - Tidy temporary file handling in tests (#189)
+- Upgraded ActiveMQ to version 5.15.2, which was tested by CERN and passed all stress tests
 
 ### Fixed
-- Fixed problem for local protyping that DAQ process could not recover from C2MON a server restart with embedded ActiveMQ broker (#191)
+- Fixed problem for local protyping that DAQ process could not recover from a C2MON server restart with embedded ActiveMQ broker (#191)
+- Server: Fixing MySQL support (#193)
 
 
 ## [1.8.30] - 2018-01-17
