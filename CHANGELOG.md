@@ -8,6 +8,14 @@ For more details on a given release, please check also the [Milestone planning](
 
 ## [Unreleased]
 ### Added
+
+### Changed
+
+### Fixed
+
+
+## [1.8.31] - 2018-02-26
+### Added
 - Elasticsearch: Storing alarm configuration to Tag config document in c2mon-config index (#194)
 
 ### Changed
@@ -17,6 +25,9 @@ For more details on a given release, please check also the [Milestone planning](
 ### Fixed
 - Fixed problem for local protyping that DAQ process could not recover from a C2MON server restart with embedded ActiveMQ broker (#191)
 - Server: Fixing MySQL support (#193)
+
+### Removed
+-  Removed activemq-openwire-legacy runtime dependency
 
 
 ## [1.8.30] - 2018-01-17
@@ -247,7 +258,8 @@ This patch contains bug fixes for the DAQ layer.
 ### Removed
 - Remove of EquipmentLogger concept from DAQ Core (#56)
 
-[Unreleased]: https://gitlab.cern.ch/c2mon/c2mon/milestones/24
+[Unreleased]: https://gitlab.cern.ch/c2mon/c2mon/milestones/25
+[1.8.31]: https://gitlab.cern.ch/c2mon/c2mon/milestones/24
 [1.8.30]: https://gitlab.cern.ch/c2mon/c2mon/milestones/23
 [1.8.29]: https://gitlab.cern.ch/c2mon/c2mon/milestones/22
 [1.8.27]: https://gitlab.cern.ch/c2mon/c2mon/milestones/19
