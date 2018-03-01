@@ -467,7 +467,7 @@ public class DataTagValueFilter {
         // valueDeadband divided by 100 to go from % to a factor
         double maxDiff = curDoubleValue * valueDeadband * PERCENTAGE_FACTOR;
         double realDiff = Math.abs(curDoubleValue - newValue.doubleValue());
-        isRelativeValueDeadband = (realDiff <= maxDiff);
+        isRelativeValueDeadband = realDiff <= maxDiff;
       }
     }
     log.trace("leaving isRelativeValueDeadband().. Result: " + isRelativeValueDeadband);
