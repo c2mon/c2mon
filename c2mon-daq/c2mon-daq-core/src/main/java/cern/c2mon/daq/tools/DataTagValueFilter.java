@@ -438,7 +438,7 @@ public class DataTagValueFilter {
    */
   public boolean isAbsoluteValueDeadband(final Number currentValue, final Number newValue, final float valueDeadband) {
     log.trace("entering isAbsoluteValueDeadband()..");
-    boolean isAbsoluteValueDeadband = currentValue != null && newValue != null && Math.abs(currentValue.doubleValue() - newValue.doubleValue()) < valueDeadband;
+    boolean isAbsoluteValueDeadband = currentValue != null && newValue != null && Math.abs(currentValue.doubleValue() - newValue.doubleValue()) <= valueDeadband;
     log.trace("leaving isAbsoluteValueDeadband().. Result: " + isAbsoluteValueDeadband);
     return isAbsoluteValueDeadband;
   }
@@ -467,7 +467,7 @@ public class DataTagValueFilter {
         // valueDeadband divided by 100 to go from % to a factor
         double maxDiff = curDoubleValue * valueDeadband * PERCENTAGE_FACTOR;
         double realDiff = Math.abs(curDoubleValue - newValue.doubleValue());
-        isRelativeValueDeadband = realDiff < maxDiff;
+        isRelativeValueDeadband = (realDiff <= maxDiff);
       }
     }
     log.trace("leaving isRelativeValueDeadband().. Result: " + isRelativeValueDeadband);
