@@ -35,7 +35,7 @@ public class DataTagValueFilterTest {
 
 	@Test
 	public void testIsRelativeValueDeadband() {
-		assertTrue(DataTagValueFilter.willCausePrecisionLoss(167772119));
+		assertTrue("Integer value 167772119 should be flagged as causing a loss of precision", DataTagValueFilter.willCausePrecisionLoss(167772119));
 		
 		// Most basic sanity test
 		assertFalse("Incoming zero value should never get evaluated", dvf.isRelativeValueDeadband(0f, 1f, 110));
