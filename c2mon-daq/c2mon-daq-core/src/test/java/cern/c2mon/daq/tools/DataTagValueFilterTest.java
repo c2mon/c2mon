@@ -10,14 +10,12 @@ public class DataTagValueFilterTest {
 	
 	@Test
 	public void testIsAbsoluteValueDeadband() {
-		// Issue 195
 		assertTrue("Integer values should not be filtered if equal", dvf.isAbsoluteValueDeadband(1, 2, 1f));
 		
 	}
 
 	@Test
 	public void testIsRelativeValueDeadband() {
-		// Issue 195
 		assertTrue("Integer values should not be filtered if equal",dvf.isRelativeValueDeadband(1, 2, 100));
 	}
 	
