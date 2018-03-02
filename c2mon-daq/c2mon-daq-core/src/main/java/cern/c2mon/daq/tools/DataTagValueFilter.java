@@ -540,12 +540,13 @@ public class DataTagValueFilter {
      * @return <code>true</code> if the given integer could cause a loss of
      *         precision when converted to float.
      */
-    static boolean willCausePrecisionLoss(int val) {
+    static boolean willCausePrecisionLoss(final int val) {
+        int eval = val;
         if (val < 0) {
-            val = -val;
+            eval *= -1;
         }
         // 8 is the bit-width of the exponent for single-precision
-        return Integer.numberOfLeadingZeros(val) + Integer.numberOfTrailingZeros(val) < 8;
+        return Integer.numberOfLeadingZeros(eval) + Integer.numberOfTrailingZeros(eval) < 8;
     }
 
     /**
@@ -558,11 +559,12 @@ public class DataTagValueFilter {
      *         precision when converted to double.
      */
     static boolean willCausePrecisionLoss(long val) {
+        long eval = val;
         if (val < 0) {
-            val = -val;
+            eval *= -1;
         }
         // 11 is the bit-width for the exponent in double-precision
-        return Long.numberOfLeadingZeros(val) + Long.numberOfTrailingZeros(val) < 11;
+        return Long.numberOfLeadingZeros(eval) + Long.numberOfTrailingZeros(eval) < 11;
     }
 
     /**
