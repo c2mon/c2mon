@@ -512,20 +512,15 @@ public class DataTagValueFilter {
         }
 
         if (currentValue instanceof Integer) {
-            int n = currentValue.intValue() - newValue.intValue();
-            return Math.abs(new Double(n));
+            return Math.abs(new Double(currentValue.intValue() - newValue.intValue()));
         } else if (currentValue instanceof Byte) {
-            byte n = (byte) (currentValue.byteValue() - newValue.byteValue());
-            return Math.abs(new Double(n));
+            return Math.abs(new Double((byte) (currentValue.byteValue() - newValue.byteValue())));
         } else if (currentValue instanceof Long) {
-            long n = currentValue.longValue() - newValue.longValue();
-            return Math.abs(new Double(n));
+            return Math.abs(new Double(currentValue.longValue() - newValue.longValue()));
         } else if (currentValue instanceof Float) {
-            float n = currentValue.floatValue() - newValue.floatValue();
-            return Math.abs(new Double(n));
+            return Math.abs(new Double(currentValue.floatValue() - newValue.floatValue()));
         } else if (currentValue instanceof Double) {
-            double n = currentValue.doubleValue() - newValue.doubleValue();
-            return Math.abs(n);
+            return Math.abs(currentValue.doubleValue() - newValue.doubleValue());
         } else {
           return null;
         }
