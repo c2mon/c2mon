@@ -525,7 +525,7 @@ public class DataTagValueFilter {
             return Math.abs(new Double(n));
         } else if (currentValue instanceof Double) {
             double n = currentValue.doubleValue() - newValue.doubleValue();
-            return Math.abs(new Double(n));
+            return Math.abs(n);
         } else {
           return null;
         }
