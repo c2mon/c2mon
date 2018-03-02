@@ -558,7 +558,7 @@ public class DataTagValueFilter {
      * @return <code>true</code> if the given long could cause a loss of
      *         precision when converted to double.
      */
-    static boolean willCausePrecisionLoss(long val) {
+    static boolean willCausePrecisionLoss(final long val) {
         long eval = val;
         if (val < 0) {
             eval *= -1;
