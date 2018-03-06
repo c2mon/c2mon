@@ -495,72 +495,72 @@ public class DataTagValueFilter {
      *         loss of precision conversion), a Double with the delta otherwise.
      */
     private Double calculateDelta(final Number currentValue, final Number newValue) {
+        Double result = null;
         // Note that Integer to Float, and Long to Double require particular
         // attention, as they can incur a loss of precision
-        if (currentValue instanceof Integer
-                && (willCausePrecisionLoss(currentValue.intValue()) || willCausePrecisionLoss(newValue.intValue()))) {
+        if (willCausePrecisionLoss(currentValue, newValue)) {
             log.trace(
                     "Possible loss of precision detected on incoming integer values when evaluating against a float deadband");
             return null;
 
         }
-        if (currentValue instanceof Long
-                && (willCausePrecisionLoss(currentValue.longValue()) || willCausePrecisionLoss(newValue.longValue()))) {
-            log.trace(
-                    "Possible loss of precision detected on incoming long values when evaluating against a float deadband");
-            return null;
+        
 
+        switch (currentValue.getClass().getName()) {
+        case "java.lang.Integer":
+            result = Math.abs((double) (currentValue.intValue() - newValue.intValue()));
+            break;
+        case "java.lang.Long":
+            result = Math.abs((double) (currentValue.longValue() - newValue.longValue()));
+            break;
+        case "java.lang.Byte":
+            result = Math.abs((double) ((byte) (currentValue.byteValue() - newValue.byteValue())));
+            break;
+        case "java.lang.Float":
+            result = Math.abs((double) (currentValue.floatValue() - newValue.floatValue()));
+            break;
+        case "java.lang.Double":
+            result = Math.abs(currentValue.doubleValue() - newValue.doubleValue());
+            break;
+        default:
+            log.trace("Incoming numeric value of unknown type " + currentValue.getClass().getName());
         }
 
-        if (currentValue instanceof Integer) {
-            return Math.abs(new Double(currentValue.intValue() - newValue.intValue()));
-        } else if (currentValue instanceof Byte) {
-            return Math.abs(new Double((byte) (currentValue.byteValue() - newValue.byteValue())));
-        } else if (currentValue instanceof Long) {
-            return Math.abs(new Double(currentValue.longValue() - newValue.longValue()));
-        } else if (currentValue instanceof Float) {
-            return Math.abs(new Double(currentValue.floatValue() - newValue.floatValue()));
-        } else if (currentValue instanceof Double) {
-            return Math.abs(currentValue.doubleValue() - newValue.doubleValue());
-        } else {
-            return null;
-        }
+        return result;
     }
 
+
     /**
-     * Check if the given integer could cause a loss of precision when converted
-     * to float.
+     * Check if the given numbers could cause a loss of precision when converted
+     * to float or double.
      * 
-     * @param val
-     *            The given integer.
-     * @return <code>true</code> if the given integer could cause a loss of
+     * @param values
+     *            The given numbers.
+     * @return <code>true</code> if any of the given integers could cause a loss of
      *         precision when converted to float.
      */
-    static boolean willCausePrecisionLoss(final int val) {
-        int eval = val;
-        if (val < 0) {
-            eval *= -1;
+    static boolean willCausePrecisionLoss(final Number... values) {
+        for (int i = 0; i < values.length; i++) {
+            if(values[i] instanceof Integer){
+                Integer eval = (Integer)values[i];
+                if (eval < 0) {
+                    eval *= -1;
+                }
+                if (Integer.numberOfLeadingZeros(eval) + Integer.numberOfTrailingZeros(eval) < 8) {
+                    return true;
+                }
+            }
+            if(values[i] instanceof Long){
+                Long eval = (Long)values[i];
+                if (eval < 0) {
+                    eval *= -1;
+                }
+                if (Long.numberOfLeadingZeros(eval) + Long.numberOfTrailingZeros(eval) < 11) {
+                    return true;
+                }
+            }
         }
-        // 8 is the bit-width of the exponent for single-precision
-        return Integer.numberOfLeadingZeros(eval) + Integer.numberOfTrailingZeros(eval) < 8;
-    }
-
-    /**
-     * Check if the given long could cause a loss of precision when converted to
-     * double.
-     * 
-     * @param val
-     *            The given long.
-     * @return <code>true</code> if the given long could cause a loss of
-     *         precision when converted to double.
-     */
-    static boolean willCausePrecisionLoss(final long val) {
-        long eval = val;
-        if (val < 0) {
-            eval *= -1;
-        }
-        // 11 is the bit-width for the exponent in double-precision
-        return Long.numberOfLeadingZeros(eval) + Long.numberOfTrailingZeros(eval) < 11;
+        return false;
     }
 
     /**
@@ -580,7 +580,7 @@ public class DataTagValueFilter {
         log.trace("entering isRelativeValueDeadband()..");
         boolean isRelativeValueDeadband = false;
         if (currentValue == null || newValue == null) {
-            isRelativeValueDeadband = false;
+            // do nothing
         } else if (currentValue.equals(newValue)) {
             isRelativeValueDeadband = true;
         } else {
