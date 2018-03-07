@@ -495,16 +495,15 @@ public class DataTagValueFilter {
      *         loss of precision conversion), a Double with the delta otherwise.
      */
     private Double calculateDelta(final Number currentValue, final Number newValue) {
-        Double result = null;
         // Note that Integer to Float, and Long to Double require particular
         // attention, as they can incur a loss of precision
         if (willCausePrecisionLoss(currentValue, newValue)) {
             log.trace(
-                    "Possible loss of precision detected on incoming integer values when evaluating against a float deadband");
+                    "Possible loss of precision detected on incoming values when evaluating against a float deadband");
             return null;
 
         }
-        
+        Double result = null;
 
         switch (currentValue.getClass().getName()) {
         case "java.lang.Integer":
@@ -529,20 +528,19 @@ public class DataTagValueFilter {
         return result;
     }
 
-
     /**
      * Check if the given numbers could cause a loss of precision when converted
      * to float or double.
      * 
      * @param values
      *            The given numbers.
-     * @return <code>true</code> if any of the given integers could cause a loss of
-     *         precision when converted to float.
+     * @return <code>true</code> if any of the given integers could cause a loss
+     *         of precision when converted to float.
      */
     static boolean willCausePrecisionLoss(final Number... values) {
         for (int i = 0; i < values.length; i++) {
-            if(values[i] instanceof Integer){
-                Integer eval = (Integer)values[i];
+            if (values[i] instanceof Integer) {
+                Integer eval = (Integer) values[i];
                 if (eval < 0) {
                     eval *= -1;
                 }
@@ -550,8 +548,8 @@ public class DataTagValueFilter {
                     return true;
                 }
             }
-            if(values[i] instanceof Long){
-                Long eval = (Long)values[i];
+            if (values[i] instanceof Long) {
+                Long eval = (Long) values[i];
                 if (eval < 0) {
                     eval *= -1;
                 }
