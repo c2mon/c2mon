@@ -32,6 +32,9 @@ public class DroolsTagListener implements C2monBufferedCacheListener<Tag>, Smart
       this.kieSession.insert(t);
     }
     this.kieSession.fireAllRules();
+    for (Object o : this.kieSession.getObjects()) {
+      System.out.println(o);
+    }
   }
 
   @Override

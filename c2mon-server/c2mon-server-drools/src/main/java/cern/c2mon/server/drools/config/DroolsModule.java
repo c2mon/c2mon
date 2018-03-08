@@ -1,5 +1,7 @@
 package cern.c2mon.server.drools.config;
 
+import cern.c2mon.server.common.datatag.DataTagCacheObject;
+import cern.c2mon.server.common.tag.Tag;
 import org.kie.api.KieBase;
 import org.kie.api.KieBaseConfiguration;
 import org.kie.api.KieServices;
@@ -12,6 +14,9 @@ import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.KieSessionConfiguration;
 import org.kie.api.runtime.conf.TimedRuleExecutionOption;
+import org.kie.api.runtime.rule.DataSource;
+import org.kie.api.runtime.rule.RuleUnit;
+import org.kie.api.runtime.rule.RuleUnitExecutor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -52,7 +57,12 @@ public class DroolsModule {
 
     KieSession kSession = kieBase.newKieSession(ksconf, null);
     kSession.fireAllRules();
-    //new Thread(() -> kSession.fireUntilHalt()).start();
+    /*new Thread() {
+      @Override
+      public void run() {
+        kSession.fireUntilHalt();
+      }
+    }.start();*
     return kSession;
   }
 }

@@ -107,13 +107,13 @@ end
 declare DeadbandActive
     @role(event)
     tagId: long
-    @expires(3m)
+    @expires(1m)
 end
 
 rule "activate deadband"
     when
         $tag: AbstractTagCacheObject(value > 65.0, $id: id, name matches ".*/cpu.temp")
-      //  not (DeadbandActive(tagId == $tag.getId()))
+        not DeadbandActive(tagId == $id)
     then
         DeadbandActive deadbandActive = new DeadbandActive();
         deadbandActive.setTagId($tag.getId());
@@ -121,15 +121,25 @@ rule "activate deadband"
         insert(deadbandActive);
 end
 
+
+rule "ad2"
+    when
+        $t: DeadbandActive($tagId: tagId)
+        not DeadbandActive(tagId == $tagId, this after[0s,1m] $t)
+    then
+        System.out.println("TEST XXXXXXXXXXXXXXXX:n " + $t.getTagId());
+end
+/*
 rule "activate deadband 2"
     when
-        $tag: AbstractTagCacheObject($id: id, name matches ".*/cpu.temp")
-        $db: DeadbandActive(tagId == $id)
-        not (DeadbandActive(tagId == $id, this after[0,3m] $tag))
+        $tag: AbstractTagCacheObject($id: id, name matches ".*//*
+cpu.temp")
+        $db: DeadbandActive(tagId == $id, this after[0,3m] $tag)
     then
         System.out.println("TESTingTEST");
         retract($db);
 end
+*/
 
 
 rule "print when deadband is actived"
