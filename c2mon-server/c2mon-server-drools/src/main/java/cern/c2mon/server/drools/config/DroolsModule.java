@@ -62,7 +62,7 @@ public class DroolsModule {
       public void run() {
         kSession.fireUntilHalt();
       }
-    }.start();*
+    }.start();*/
     return kSession;
   }
 }
