@@ -17,6 +17,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class Metadata implements Serializable, Cloneable {
 
+  /** Serial version UID */
+  private static final long serialVersionUID = -4640805019166816224L;
+
+
   private Map<String, Object> metadata = new HashMap<>();
   private static transient ObjectMapper mapper = new ObjectMapper();
 
@@ -31,8 +35,6 @@ public class Metadata implements Serializable, Cloneable {
   }
 
   /**
-   * Returns a map representation of the metadata.
-   *
    * @return a map representation of the metadata
    */
   public Map<String, Object> toMap() {
