@@ -26,23 +26,19 @@ property.
 
 ## Mappings and types
 
-Since C2MON tags can have arbitrary types, each type has its own Elasticsearch 
-type mapping that extends from the 
-[base mapping](https://gitlab.cern.ch/c2mon/c2mon/tree/master/c2mon-server/c2mon-server-elasticsearch/src/main/resources/mappings/tag.json).
+Since C2MON tags can have arbitrary types multiple fields are used 
+to store the value depending on its type.
 
-The following table describes the corresponding Elasticsearch type mapping name 
-and the extra fields that are added to the base mapping for that type:
-
-| Java type | Elasticsearch type | Field(s) |
-|-----------|--------------------|----------|
-| `Boolean` | `type_boolean` | `valueBoolean` (`true` or `false`), `value` (`0` or `1`)
-| `Short`   | `type_short`   | `value` (as double)
-| `Integer` | `type_integer` | `value` (as double)
-| `Float`   | `type_float`   | `value` (as double)
-| `Double`  | `type_double`  | `value` (as double)
-| `Long`    | `type_long`    | `value` (as double), `valueLong` (as long)
-| `String`  | `type_string`  | `valueString`
-| `Object`  | `type_object`  | `valueObject` (as object, dynamic mapping)
+| Java type | Field(s) |
+|-----------|----------|
+| `Boolean` | `valueBoolean` (`true` or `false`), `value` (`0` or `1`)
+| `Short`   | `value` (as double)
+| `Integer` | `value` (as double)
+| `Float`   | `value` (as double)
+| `Double`  | `value` (as double)
+| `Long`    | `value` (as double), `valueLong` (as long)
+| `String`  | `valueString`
+| `Object`  | `valueObject` (as object, dynamic mapping)
 
 
 [Alarms](https://gitlab.cern.ch/c2mon/c2mon/tree/master/c2mon-server/c2mon-server-elasticsearch/src/main/resources/mappings/alarm.json) 
