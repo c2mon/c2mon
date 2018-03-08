@@ -45,6 +45,8 @@
         <nexus.snapshots.url>https://repository.cern.ch/nexus/content/repositories/c2mon-snapshots/</nexus.snapshots.url>
         <repository.releases.url>http://artifactory/beco-release-local</repository.releases.url>
         <repository.snapshots.url>http://artifactory/beco-development-local</repository.snapshots.url>
+        <!-- This BE-CO property ensures all dependencies are resolved strictly -->
+        <dependencies.set.all>true</dependencies.set.all>
       </properties>
       
       <repositories>
