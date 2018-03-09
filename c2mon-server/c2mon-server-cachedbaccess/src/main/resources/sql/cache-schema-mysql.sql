@@ -13,27 +13,14 @@ INSERT INTO SEQUENCE VALUES('ALARM_ID', 1000000);
 
 DELIMITER $$
 CREATE FUNCTION `NEXTVAL` (`seq_name` varchar(100))
-RETURNS bigint(20) NOT DETERMINISTIC
+RETURNS bigint(20) 
+MODIFIES SQL DATA 
+DETERMINISTIC 
 BEGIN
     DECLARE cur_val bigint(20);
  
-    SELECT
-        VAL INTO cur_val
-    FROM
-        SEQUENCE
-    WHERE
-        NAME = seq_name
-    ;
- 
-    IF cur_val IS NOT NULL THEN
-        UPDATE
-            SEQUENCE
-        SET
-            VAL = VAL + 1
-        WHERE
-            NAME = seq_name
-        ;
-    END IF;
+    UPDATE SEQUENCE SET VAL=VAL+1 WHERE NAME=seq_name; 
+    SELECT VAL INTO cur_val FROM SEQUENCE WHERE NAME=seq_name limit 1; 
  
     RETURN cur_val;
 END$$
