@@ -14,6 +14,17 @@ For more details on a given release, please check also the [Milestone planning](
 ### Fixed
 
 
+## [1.8.32] - 2018-03-09
+### Added
+- Server: Added serial version UID to Metadata cache object in order to stay compliant with C2MON version 1.8.30
+
+### Changed
+- Documentation: Updated Elasticsearch documentation (#198)
+
+### Fixed
+- DAQ: Fixed precision error in value deadband filtering (#195)
+
+
 ## [1.8.31] - 2018-02-26
 ### Added
 - Elasticsearch: Storing alarm configuration to Tag config document in c2mon-config index (#194)
@@ -258,7 +269,8 @@ This patch contains bug fixes for the DAQ layer.
 ### Removed
 - Remove of EquipmentLogger concept from DAQ Core (#56)
 
-[Unreleased]: https://gitlab.cern.ch/c2mon/c2mon/milestones/25
+[Unreleased]: https://gitlab.cern.ch/c2mon/c2mon/milestones/26
+[1.8.32]: https://gitlab.cern.ch/c2mon/c2mon/milestones/25
 [1.8.31]: https://gitlab.cern.ch/c2mon/c2mon/milestones/24
 [1.8.30]: https://gitlab.cern.ch/c2mon/c2mon/milestones/23
 [1.8.29]: https://gitlab.cern.ch/c2mon/c2mon/milestones/22
