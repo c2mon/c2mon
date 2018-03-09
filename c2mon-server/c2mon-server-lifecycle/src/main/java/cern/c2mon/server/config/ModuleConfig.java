@@ -37,7 +37,7 @@ import org.springframework.context.support.DefaultLifecycleProcessor;
     RuleModule.class,
     ConfigurationModule.class,
     ElasticsearchModule.class,
-    DroolsModule.class,
+//    DroolsModule.class,
     HistoryModule.class,
     ClientModule.class,
     AlarmModule.class,
