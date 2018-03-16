@@ -37,11 +37,10 @@ import cern.c2mon.client.core.jms.ConnectionListener;
 import cern.c2mon.client.core.jms.JmsProxy;
 import cern.c2mon.client.core.jms.RequestHandler;
 import cern.c2mon.client.core.listener.HeartbeatListener;
-import cern.c2mon.client.core.service.CoreSupervisionService;
 import cern.c2mon.client.core.manager.SupervisionServiceImpl;
+import cern.c2mon.client.core.service.CoreSupervisionService;
 import cern.c2mon.client.core.tag.TagController;
 import cern.c2mon.client.core.tag.TagImpl;
-
 import cern.c2mon.shared.client.supervision.Heartbeat;
 import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
@@ -530,7 +529,6 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
         // Adds the clone (without listeners) to the history cache.
         historyCache.put(tagId, historyTag);
       }
-      historyCacheUpdateList.clear();
     }
   }
 
