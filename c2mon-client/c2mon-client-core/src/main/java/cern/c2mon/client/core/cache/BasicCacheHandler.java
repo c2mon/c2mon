@@ -128,6 +128,11 @@ public interface BasicCacheHandler {
    */
   Collection<TagController> getTagControllers(Set<Long> tagIds);
 
+  /**
+   * @return The <code>TagController</code> objects for the given id
+   */
+  TagController getTagController(Long tagId);
+
 
   /**
    * Enables or disables the History mode of the cache. In history mode all

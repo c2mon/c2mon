@@ -348,4 +348,9 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
 
     return resultList;
   }
+
+  @Override
+  public TagController getTagController(Long tagId) {
+    return controller.getActiveCache().get(tagId);
+  }
 }
