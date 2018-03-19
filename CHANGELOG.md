@@ -10,6 +10,12 @@ For more details on a given release, please check also the [Milestone planning](
 ### Added
 
 ### Changed
+
+### Fixed
+
+
+## [1.8.33] - 2018-03-19
+### Changed
 - DAQ: Small improvements in logback.xml 
 
 ### Fixed
@@ -273,7 +279,8 @@ This patch contains bug fixes for the DAQ layer.
 ### Removed
 - Remove of EquipmentLogger concept from DAQ Core (#56)
 
-[Unreleased]: https://gitlab.cern.ch/c2mon/c2mon/milestones/26
+[Unreleased]: https://gitlab.cern.ch/c2mon/c2mon/milestones/27
+[1.8.33]: https://gitlab.cern.ch/c2mon/c2mon/milestones/26
 [1.8.32]: https://gitlab.cern.ch/c2mon/c2mon/milestones/25
 [1.8.31]: https://gitlab.cern.ch/c2mon/c2mon/milestones/24
 [1.8.30]: https://gitlab.cern.ch/c2mon/c2mon/milestones/23
