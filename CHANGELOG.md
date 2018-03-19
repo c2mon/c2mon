@@ -10,8 +10,12 @@ For more details on a given release, please check also the [Milestone planning](
 ### Added
 
 ### Changed
+- DAQ: Small improvements in logback.xml 
 
 ### Fixed
+- Server: Fixed minor issue in MySQL schema (#193)
+- Client: Small code changes to fix problems with history player (c2mon-client-ext-history) package (#200)
+- Client: Fix NPE in isAuthorized() method of CommandServiceImpl
 
 
 ## [1.8.32] - 2018-03-09
