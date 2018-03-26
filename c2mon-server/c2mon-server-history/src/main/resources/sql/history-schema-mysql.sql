@@ -14,7 +14,10 @@ CREATE TABLE IF NOT EXISTS SHORTTERMLOG (
   tagdir            VARCHAR(1)
 );
 
-ALTER TABLE SHORTTERMLOG ADD INDEX tagservertime_tagid_idx (tagservertime, tagid);
+ALTER TABLE SHORTTERMLOG ADD INDEX stl_tagservertime_tagid_idx (tagservertime, tagid);
+ALTER TABLE SHORTTERMLOG ADD INDEX stl_tagid_tagtime_idx (tagid, tagtime);
+ALTER TABLE SHORTTERMLOG ADD INDEX stl_tagtime_tagid_idx (tagtime, tagid);
+ALTER TABLE SHORTTERMLOG ADD INDEX stl_tagtime_idx (tagtime) USING BTREE;
 
 CREATE TABLE IF NOT EXISTS SUPERVISION_LOG (
   SUL_ENTITY  VARCHAR(30)  NOT NULL,
@@ -39,6 +42,11 @@ CREATE TABLE IF NOT EXISTS STL_DAY_SNAPSHOT (
   tagmode       INTEGER,
   tagvaluedesc  VARCHAR(1000)
 );
+
+ALTER TABLE STL_DAY_SNAPSHOT ADD INDEX stlds_tagservertime_tagid_idx (tagservertime, tagid);
+ALTER TABLE STL_DAY_SNAPSHOT ADD INDEX stlds_tagid_tagtime_idx (tagid, tagtime);
+ALTER TABLE STL_DAY_SNAPSHOT ADD INDEX stlds_tagtime_tagid_idx (tagtime, tagid);
+ALTER TABLE STL_DAY_SNAPSHOT ADD INDEX stlds_tagtime_idx (tagtime) USING BTREE;
 
 CREATE TABLE IF NOT EXISTS COMMANDTAGLOG (
   cmdid           INTEGER       NOT NULL,
@@ -72,4 +80,7 @@ CREATE TABLE IF NOT EXISTS ALARMLOG (
   info            VARCHAR(100)  DEFAULT NULL
 );
 
+ALTER TABLE ALARMLOG ADD INDEX alarmlog_logdate_tagid_idx (logdate, tagid);
+ALTER TABLE ALARMLOG ADD INDEX alarmlog_tagid_logdate_idx (tagid, logdate);
+ALTER TABLE ALARMLOG ADD INDEX alarmlog_logdate_idx (logdate) USING BTREE;
 
