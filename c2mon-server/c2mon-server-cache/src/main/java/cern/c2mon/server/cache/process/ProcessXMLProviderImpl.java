@@ -204,8 +204,9 @@ public class ProcessXMLProviderImpl implements ProcessXMLProvider {
       return str.toString();
     } catch (CacheElementNotFoundException cacheEx) {
       log.warn("Cannot locate Equipment in cache (Id=" + id + ")");
-      return "";
     }
+
+    return "";
   }
 
   /**
