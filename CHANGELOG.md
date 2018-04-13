@@ -14,7 +14,7 @@ For more details on a given release, please check also the [Milestone planning](
 ### Fixed
 
 
-## [1.8.33] - 2018-04-13
+## [1.8.34] - 2018-04-13
 ### Fixed
 -  Server: Fixed bug in DAQ process XML document generation related to deleted Equipments (#207)
 
@@ -285,7 +285,7 @@ This patch contains bug fixes for the DAQ layer.
 - Remove of EquipmentLogger concept from DAQ Core (#56)
 
 [Unreleased]: https://gitlab.cern.ch/c2mon/c2mon/milestones/28
-[1.8.33]: https://gitlab.cern.ch/c2mon/c2mon/milestones/27
+[1.8.34]: https://gitlab.cern.ch/c2mon/c2mon/milestones/27
 [1.8.33]: https://gitlab.cern.ch/c2mon/c2mon/milestones/26
 [1.8.32]: https://gitlab.cern.ch/c2mon/c2mon/milestones/25
 [1.8.31]: https://gitlab.cern.ch/c2mon/c2mon/milestones/24
