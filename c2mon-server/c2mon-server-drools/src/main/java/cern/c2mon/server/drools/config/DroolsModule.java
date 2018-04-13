@@ -56,7 +56,7 @@ public class DroolsModule {
     ksconf.setOption(TimedRuleExecutionOption.YES);
 
     KieSession kSession = kieBase.newKieSession(ksconf, null);
-    kSession.fireAllRules();
+    //kSession.fireAllRules();
     /*new Thread() {
       @Override
       public void run() {

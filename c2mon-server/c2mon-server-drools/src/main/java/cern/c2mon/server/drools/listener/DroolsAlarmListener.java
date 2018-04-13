@@ -43,13 +43,13 @@ public class DroolsAlarmListener implements C2monCacheListener<Alarm>, SmartLife
 
   @Override
   public void notifyElementUpdated(final Alarm alarm) {
-    System.out.println(alarm);
+/*    System.out.println(alarm);
     if (alarm == null) {
       log.warn("Received a null alarm");
       return;
     }
     this.kieSession.insert(alarm);
-    this.kieSession.fireAllRules();
+    this.kieSession.fireAllRules();*/
   }
 
   @Override

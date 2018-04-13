@@ -28,13 +28,13 @@ public class DroolsTagListener implements C2monBufferedCacheListener<Tag>, Smart
 
   @Override
   public void notifyElementUpdated(Collection<Tag> collection) {
-    for (Tag t : collection) {
+    /*for (Tag t : collection) {
       this.kieSession.insert(t);
     }
     this.kieSession.fireAllRules();
     for (Object o : this.kieSession.getObjects()) {
       System.out.println(o);
-    }
+    }*/
   }
 
   @Override
