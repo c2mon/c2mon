@@ -131,7 +131,7 @@ public class ProcessXMLProviderImpl implements ProcessXMLProvider {
 
       if (equipmentIds != null && equipmentIds.size() > 0) {
         for (Long equipmentId : equipmentIds) {
-          str.append(getEquipmentConfigXML((Long) equipmentId));
+          str.append(getEquipmentConfigXML(equipmentId));
         }
       }
       str.append("  </EquipmentUnits>\n");
@@ -203,8 +203,8 @@ public class ProcessXMLProviderImpl implements ProcessXMLProvider {
       str.append("</EquipmentUnit>");
       return str.toString();
     } catch (CacheElementNotFoundException cacheEx) {
-      log.error("Cannot locate Equipment in cache (Id=" + id + ") - throwing the exception.");
-      throw cacheEx;
+      log.warn("Cannot locate Equipment in cache (Id=" + id + ")");
+      return "";
     }
   }
 
