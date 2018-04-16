@@ -3,6 +3,7 @@ package cern.c2mon.server.elasticsearch.tag;
 import cern.c2mon.server.cache.EquipmentCache;
 import cern.c2mon.server.cache.ProcessCache;
 import cern.c2mon.server.cache.SubEquipmentCache;
+import cern.c2mon.server.common.commfault.CommFaultTag;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.metadata.Metadata;
 import cern.c2mon.server.common.process.Process;
@@ -69,12 +70,16 @@ public class BaseTagDocumentConverter<T extends Map<String, Object>> implements 
 
         map.put("dataType", tag.getDataType());
 
-        if (!tag.getProcessIds().isEmpty()) {
-            try {
-                Process process = processCache.get(tag.getProcessIds().iterator().next());
-                map.put("process", process.getName());
-            } catch (Exception e) {
-                log.warn("Could not get Process name for tag #{} ({}) from cache. Reason: {}", tag.getId(), tag.getName(), e.getMessage());
+
+        //TODO: Commfault shouldn't show information about equipment, since it is not connected with one
+        if(!(tag instanceof CommFaultTag)) {
+            if (!tag.getProcessIds().isEmpty()) {
+                try {
+                    Process process = processCache.get(tag.getProcessIds().iterator().next());
+                    map.put("process", process.getName());
+                } catch (Exception e) {
+                    log.warn("Could not get Process name for tag #{} ({}) from cache. Reason: {}", tag.getId(), tag.getName(), e.getMessage());
+                }
             }
         }
 
