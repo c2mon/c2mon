@@ -58,7 +58,9 @@ public class BaseTagDocumentConverter<T extends Map<String, Object>> implements 
                     .collect(Collectors.toMap(
                             Map.Entry::getKey,
                             Map.Entry::getValue,
-                            (u,v) -> { throw new IllegalStateException(String.format("Duplicate key %s", u)); },
+                            (u, v) -> {
+                                throw new IllegalStateException(String.format("Duplicate key %s", u));
+                            },
                             containerSupplier
                     ));
         }
@@ -71,14 +73,12 @@ public class BaseTagDocumentConverter<T extends Map<String, Object>> implements 
         map.put("dataType", tag.getDataType());
 
 
-        if(!(tag instanceof CommFaultTag)) {
-            if (!tag.getProcessIds().isEmpty()) {
-                try {
-                    Process process = processCache.get(tag.getProcessIds().iterator().next());
-                    map.put("process", process.getName());
-                } catch (Exception e) {
-                    log.warn("Could not get Process name for tag #{} ({}) from cache. Reason: {}", tag.getId(), tag.getName(), e.getMessage());
-                }
+        if (!(tag instanceof CommFaultTag) || !tag.getProcessIds().isEmpty()) {
+            try {
+                Process process = processCache.get(tag.getProcessIds().iterator().next());
+                map.put("process", process.getName());
+            } catch (Exception e) {
+                log.warn("Could not get Process name for tag #{} ({}) from cache. Reason: {}", tag.getId(), tag.getName(), e.getMessage());
             }
         }
 
