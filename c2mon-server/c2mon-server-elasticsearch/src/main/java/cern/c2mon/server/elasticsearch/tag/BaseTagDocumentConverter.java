@@ -71,7 +71,6 @@ public class BaseTagDocumentConverter<T extends Map<String, Object>> implements 
         map.put("dataType", tag.getDataType());
 
 
-        //TODO: Commfault shouldn't show information about equipment, since it is not connected with one
         if(!(tag instanceof CommFaultTag)) {
             if (!tag.getProcessIds().isEmpty()) {
                 try {
