@@ -26,10 +26,11 @@
           </execution>
         </executions>
         <configuration>
-          <executable>./build.sh</executable>
+          <executable>mkdocs</executable>
           <workingDirectory>${project.basedir}</workingDirectory>
           <arguments>
-            <argument>${project.version}</argument>
+            <argument>build</argument>
+            <argument>--clean</argument>
           </arguments>
         </configuration>
       </plugin>
@@ -52,4 +53,3 @@
   </build>
 
 </project>
-
