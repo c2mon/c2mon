@@ -1,9 +1,10 @@
 # Getting Started
 
-Just want to get C2MON up and running to see what it does? Read this page.
+A Hello World guide to get C2MON up and running with some sample data.
 
+---
 
-# Running the server
+## Running the server
 
 The first thing to do is to get a C2MON server up and running. The server is a standalone application that receives data from acquisition processes (DAQs) and pushes it to client applications.
 
@@ -11,7 +12,7 @@ You can run a server by downloading and executing a tarball distribution, or by 
 
 For convenience and fast development the server is by default starting with:
 
-- embedded [ActiveMQ v5.14.0](http://activemq.apache.org/) JMS broker,
+- embedded [ActiveMQ v5.15.2](http://activemq.apache.org/) JMS broker,
 - embedded [Elasticsearch v5.6.0](https://www.elastic.co/products/elasticsearch) node,
 - embedded [HSQLDB v2.3.2](http://hsqldb.org/) database.
 
@@ -19,20 +20,20 @@ For convenience and fast development the server is by default starting with:
 
 Alternatively to HSQLDB you can also use [MySQL v5.1.38](https://www.mysql.com/) or [Oracle v11.2.0.3](http://www.oracle.com/technetwork/database/database-technologies/express-edition/downloads/index.html).
 
-!!! info "Note"
-    To run the C2MON tarball distribution you need at least Java 1.8 installed on your machine.
-
 
 ### Running the tarball distribution
+
+To run the C2MON tarball distribution you need at least Java 1.8 installed on your machine.
 
 The [C2MON server distribution tarball](https://nexus.web.cern.ch/nexus/content/groups/public/cern/c2mon/server/c2mon-server/) can be downloaded from [here](https://nexus.web.cern.ch/nexus/content/groups/public/cern/c2mon/server/c2mon-server/).
 
 We recommend to always use the latest stable version and to read the [CHANGELOG.md](https://github.com/c2mon/c2mon/blob/master/CHANGELOG.md) file.
 
-Extraxt the tarball on your local file system and change into the `c2mon-server-1.8.xx/bin/` directory.
+Extract the tarball on your local file system and change into the `c2mon-server-1.8.xx/bin/` directory.
 
-!!! info "Note"
-    The scripts provided with the tarball are Linux bash scripts. We recommend this environment also for production usage. Windows users should use [Docker](#using-the-docker-image) instead.
+> **Please note!**
+
+>The scripts provided with the tarball are Linux bash scripts. We recommend this environment also for production usage. Windows users should use [Docker](#using-the-docker-image) instead.
 
 To start the server execute the following script:
 
@@ -71,7 +72,8 @@ It is also advisable to take a look into the `log/c2mon.log` file. When C2MON st
 
 ### Using the Docker image
 
-We push a Docker image of the server to the [CERN Docker registry](https://gitlab-registry.cern.ch). To run the image:
+We push a Docker container of the server to the [CERN Docker registry](https://gitlab.cern.ch/c2mon/c2mon/container_registry).
+To run the image:
 
 ```bash
 docker run --rm --name c2mon -it -p 0.0.0.0:1099:1099 -p 0.0.0.0:9001:9001 -p 0.0.0.0:61616:61616 -p 0.0.0.0:9200:9200 \
@@ -83,7 +85,7 @@ docker run --rm --name c2mon -it -p 0.0.0.0:1099:1099 -p 0.0.0.0:9001:9001 -p 0.
 C2MON comes with reasonable defaults for most settings.
 Before you get out to tweak and tune the configuration, make sure you understand what are you trying to accomplish and the consequences.
 
-The primary way of configuring a server is via the [`conf/c2mon.properties`](https://github.com/c2mon/c2mon/blob/master/c2mon-server/distribution/tar/conf/c2mon-server.properties) configuration file, which is delivered with the tarball.
+The primary way of configuring a server is via the [`conf/c2mon-server.properties`](https://github.com/c2mon/c2mon/blob/master/c2mon-server/distribution/tar/conf/c2mon-server.properties) configuration file, which is delivered with the tarball.
 It contains the most important settings and their default values you may want to change for your environment.
 
 The properties listed in the file can just as well be set as Java system properties with the `-D` option.
@@ -101,7 +103,7 @@ docker run --rm --name c2mon -it -p 0.0.0.0:1099:1099 -p 0.0.0.0:9001:9001 -p 0.
 ```
 
 
-# Publishing data
+## Publishing sample data
 
 Once the server is running it's time to send some metrics to it!
 
@@ -123,33 +125,43 @@ docker run --rm --name daq-hostmetrics -it --net=host -e "C2MON_DAQ_JMS_URL=fail
 ```
 
 
-# Reading data
+## Start C2MON Web User Interface
 
-Once you have a server running and a DAQ process publishing data to the server, it's time to actually look at how we're going to get the data back out again
-in order to do something useful with it.
+Once you have a server running and a DAQ process publishing data to the server, it's time to actually look at how we're going to get the data back out again in order to do something useful with it.
 
-C2MON comes with a web-based application that you can use to do various things such as view metric history, monitor alarms, inspect configurations and
-view statistics about C2MON clusters.
+C2MON comes with a web-based application called [c2mon-web-ui](http://github.com/c2mon/c2mon-web-ui), that you can use to do various things such as view metric history, monitor alarms, inspect configurations and view statistics about C2MON clusters.
 
 
-## Running the web interface tarball distribution
+### Running the tarball distribution (Linux only)
 
-**Coming soon!**
+The C2MON Web UI distribution tarball can be downloaded from [CERN Nexus repository](https://nexus.web.cern.ch/nexus/content/groups/public/cern/c2mon/web/c2mon-web-ui/).
 
+Extract the tarball on your local file system and change into the `c2mon-web-ui-0.0.xx/bin/` directory.
 
-## Using the Docker image
+To start c2mon-web-ui server execute the following script:
+
+```shell
+$ ./c2mon-web-ui.sh start
+
+Starting C2MON web UI:     [  OK  ]
+```
+
+### Using the Docker image
+
+We push the c2mon-web-ui Docker images to the [CERN Docker registry](https://gitlab.cern.ch/c2mon/c2mon-web-ui/container_registry).
+To run the image:
 
 ```bash
 docker run --rm --name web-ui -ti --link c2mon:c2mon -p 0.0.0.0:8080:8080 gitlab-registry.cern.ch/c2mon/c2mon-web-ui
 ```
 
-## Inspecting the data
+<!-- ### Inspecting the data
 
 **TODO**: write a brief section on how to find and interpret metrics using the web interface
+ -->
 
-
-# What's next?
+## What's next?
 What you achieved with this tutorial is a Hello World demonstration of C2MON to understand the [core concepts](/core-concepts) of the framework.
 
 However, in order to use C2MON for your own use case you have now work on connecting to your data sources. This will require to get more familiar with the C2MON Data Acquisition (DAQ) layer.
-Maybe you can use some of the existing [Open Source DAQs](https://github.com/c2mon?utf8=%E2%9C%93&q=c2mon-daq), but most propably you want to write your own DAQ process. Therefore, you should read as next about the [DAQ API](/user-guide/daq-api).
+Maybe you can use some of the existing [Open Source DAQs](https://github.com/c2mon?utf8=%E2%9C%93&q=c2mon-daq), but most probably you want to write your own DAQ process. Therefore, you should read as next about the [DAQ API](/user-guide/daq-api).

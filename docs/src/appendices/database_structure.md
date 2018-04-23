@@ -1,25 +1,27 @@
-<a id="_database_structure"></a>
-## Database structure
+# Database structure
 
-This section gives an detailed overview about the different C2MON database tables.
+A detailed overview about the different C2MON database tables.
 
-Usually, the server makes only use of this table at startup to initialize the In-Memory cache.
+---
+
+Usually, the server makes only use of this table at startup to initialise the In-Memory cache.
 Furthermore, it is used to backup every 10 seconds the latest tag updates for eventual cache recovery.
 
 The tables are completely controlled by the server layer and administrators should not try to do manual changes at runtime.
 In general, configuration changes should always be done through the server Configuration module.
-However, for testing purposes it might be interesting to directly manipulate the tables (see also Process <<guides.md#_data_configuration_, Data Configuration>>).
+
+However, for testing purposes it might be interesting to directly manipulate the tables.
 
 > **Please note!**
 
->The listed tables are only read at startup in case the In-Memory cache has not yet been initialized.
+>The listed tables are only read at startup in case the In-Memory cache has not yet been initialised.
 >Apart from that, the server does only depend on the database access for making data backups.
 
 
 
-### The DATATAG table
+## The DATATAG table
 
-The DATATAG table is a non-normalized table in order to facilitate the write of search queries.
+The DATATAG table is a non-normalised table in order to facilitate the write of search queries.
 The table contains all configured DataTags, ControlTags and RuleTags.
 Only CommandTags are stored in a separate table.
 
@@ -55,7 +57,7 @@ Only CommandTags are stored in a separate table.
 
 
 
-### The PROCESS table
+## The PROCESS table
 
 | Columns Name | Description | Type | Not NULL? |
 | ------------ | ----------- | ---- | --------- |
@@ -80,7 +82,7 @@ Only CommandTags are stored in a separate table.
 
 
 
-### The EQUIPMENT table
+## The EQUIPMENT table
 
 | Columns Name | Description | Type | Not NULL? |
 | ------------ | ----------- | ---- | --------- |
@@ -103,9 +105,9 @@ Only CommandTags are stored in a separate table.
 
 
 
-### The ALARM table
+## The ALARM table
 
-Please read also <<overview.md#_alarms, Core Concepts: Alarms>> for more information about for instance the triplet concept of Fault Family / Fault Member / Fault Code
+Please read also [Alarms Overview](/overview/alarms) for more information about for instance the triplet concept of Fault Family / Fault Member / Fault Code
 
 | Columns Name | Description |Type | Not NULL? |
 | ------------ | ----------- |---- | --------- |

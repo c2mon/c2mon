@@ -1,5 +1,9 @@
 # Configuration API
 
+Learn how to configure the different entities in C2MON
+
+---
+
 C2MON centrally manages the configuration of data acquisition (DAQ) processes.
 A DAQ receives its configuration from the server at startup, which has two main advantages:
 
@@ -26,7 +30,7 @@ Here is the simplest way of creating a new `Process`:
 ConfigurationReport report = configurationService.createProcess("P_EXAMPLE");
 ```
 
-The method returns a `ConfigurationReport` which gives detailed information about the outcome of the configuration (as do all of the methods in the 
+The method returns a `ConfigurationReport` which gives detailed information about the outcome of the configuration (as do all of the methods in the
 `ConfigurationService`).
 
 Note that an ID for the process will be generated automatically on the server, and an `AliveTag` and a `StatusTag` will be generated automatically.
@@ -39,7 +43,7 @@ Process processToCreate = Process.create("P_EXAMPLE")
         .id(123L)
         .description("A short description")
         .build();
-        
+
 configurationService.createProcess(processToCreate);
 ```
 
@@ -51,14 +55,14 @@ Existing `Process` instances can be updated via the `Process#update(String)` or 
 Process processToUpdate = Process.update("P_EXAMPLE")
         .description("An updated description")
         .build();
-        
+
 configurationService.updateProcess(processToUpdate);
 ```
 
 Note that not all properties of a `Process` are updateable, for example the ID. The builder method exposes methods only for those
 properties which are updateable.
 
-Also note that if you accidentally pass a `Process` instance created with `Process#create` to the `ConfigurationService#updateProcess` method, 
+Also note that if you accidentally pass a `Process` instance created with `Process#create` to the `ConfigurationService#updateProcess` method,
 an exception will be thrown. You must use the `update` builders when updating entities.
 
 ## Configuring Equipment
@@ -66,7 +70,7 @@ an exception will be thrown. You must use the `update` builders when updating en
 The following code shows the simplest way to create an `Equipment`:
 
 ```java
-configurationService.createEquipment("P_EXAMPLE", "E_EXAMPLE", 
+configurationService.createEquipment("P_EXAMPLE", "E_EXAMPLE",
         "org.example.MyEquipmentMessageHandler");
 ```
 
@@ -81,7 +85,7 @@ Equipment equipmentToCreate = Equipment.create("E_EXAMPLE", "org.example.MyEquip
         .description("A short description")
         .aliveTag(AliveTag.create("E_EXAMPLE:ALIVE").build(), 70000)
         .build();
-        
+
 configurationService.createEquipment("P_EXAMPLE", equipmentToCreate);
 ```
 
@@ -94,7 +98,7 @@ Equipment equipmentToUpdate = Equipment.update("E_EXAMPLE")
         .description("An updated description")
         .aliveInterval(80000)
         .build();
-        
+
 configurationService.updateEquipment(equipmentToUpdate);
 ```
 
@@ -108,7 +112,7 @@ configurationService.createDataTag("E_EXAMPLE", "TAG_EXAMPLE", Integer.class, ne
 ```
 
 !!! info "Note"
-    A well-chosen naming convention will enable you to make searching for tags easier in the future. 
+    A well-chosen naming convention will enable you to make searching for tags easier in the future.
     We suggest using a _folder-like_ structure with `/` as separator.
     Example: `serviceA/computer/mypc1/memory`
 
@@ -122,7 +126,7 @@ DataTag tagToCreate = DataTag.create("TAG_EXAMPLE", Integer.class, new DataTagAd
         .description("An example datatag")
         .metadata(Metadata.builder().addMetadata("myCustomKey", "someValue"))
         .build();
-        
+
 configurationService.createDataTag("E_EXAMPLE", tagToCreate);
 ```
 

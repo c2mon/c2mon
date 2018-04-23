@@ -1,11 +1,15 @@
 # Creating a new DAQ module from scratch
 
+A step-by-step guide to integrate a new communication protocol.
+
+---
+
 This guide assumes that you are familiar with the [core concepts](/core-concepts) of C2MON. At the end of this guide you should be able to write your
 own data acquisition module using the C2MON DAQ APIs.
 
 ## Including the API
 
-To use the API, you need to add a dependency on `c2mon-daq-core`. 
+To use the API, you need to add a dependency on `c2mon-daq-core`.
 
 Remember to replace "__insert_version_here__" with a real version number, such as "1.8.30"
 
@@ -48,7 +52,7 @@ repositories {
 
 ```
 
-## Writing an `EquipmentMessageHandler`
+## Writing a new equipment message handler
 
 The `EquipmentMessageHandler` is an abstract class that specifies the methods you must implement to provide basic DAQ
 functionality, and provides support methods for handing you your pre-defined configuration.
@@ -216,4 +220,3 @@ To support dynamic reconfiguration of tags, you can implement an `ICommandTagCha
 ### Equipment
 
 Implement and register an `IEquipmentConfigurationChanger` via `IEquipmentConfigurationHandler#setEquipmentConfigurationChanger`.
-

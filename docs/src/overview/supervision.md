@@ -1,6 +1,9 @@
 # Supervision
 
-This section describes the mechanism by which C2MON is able to monitor (or supervise) parts of the system.
+Describes the mechanism by which C2MON is able to monitor (or supervise) parts of the system.
+
+---
+
 To supervise a part of the system is to maintain information about its health, and to react when problems are detected with it.
 
 As mentioned in Core Concept: Tags, C2MON provides three types of ControlTag (the StatusTag, the AliveTag and the CommFaultTag).
@@ -33,26 +36,26 @@ The StatusTag represents the overall health of the supervised entity, and is der
 
 The following diagram shows how the AliveTag and CommFaultTag influence the StatusTag:
 
-![Screenshot](/images/overview/supervision-tags.png =500x)
+![supervision-tags](/img/overview/supervision-tags.png)
 
 ## Supervisable Entities
 
 The entities that are supervisable within C2MON are the Process, the Equipment and the SubEquipment (which were introduced in Core Concept: Process/Equipment).
 This means that Processes, Equipments and SubEquipments can all be independently supervised with their own ControlTags.
 
-**Supervision Flow: AliveTags**
+### Supervision Flow: AliveTags
 
 The following diagram shows how the supervision flow for an AliveTag works.
 As you can see, the AliveTag is checked periodically for expiration.
 If it has expired, it triggers a change in the StatusTag and the CommFaultTag.
 If it is received normally, it also triggers a reset of the StatusTag and CommFaultTag back to normal.
 
-![Screenshot](/images/overview/alivetag-flow.png)
+![Screenshot](/img/overview/alivetag-flow.png)
 
 
-**Supervision Flow: CommFaultTags**
+### Supervision Flow: CommFaultTags
 
 The following diagram shows how the supervision flow for a CommFaultTag works.
 When a CommFaultTag is received, its value is checked. If the value is false (which indicates a problem) then the StatusTag is changed to DOWN and the AliveTag is invalidated. If the value is true (which indicates no problem) then the StatusTag is changed to RUNNING and the AliveTag becomes valid.
 
-![Screenshot](/images/overview/commfaulttag-flow.png)
+![Screenshot](/img/overview/commfaulttag-flow.png)

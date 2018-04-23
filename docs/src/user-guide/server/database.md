@@ -1,4 +1,9 @@
 # Database
+
+How to configure an external database for C2MON.
+
+---
+
 By default C2MON start with an embedded HSQL database for prototyping and development purposes.
 
 !!! warning "Be careful!"
@@ -39,7 +44,7 @@ c2mon.server.cachedbaccess.jdbc.default-auto-commit=false
 c2mon.server.cachedbaccess.jdbc.test-while-idle=true
 c2mon.server.cachedbaccess.jdbc.test-on-borrow=true
 c2mon.server.cachedbaccess.jdbc.validation-query=SELECT 1 FROM DUAL
- 
+
 ###############################################################################
 # c2mon-server-configuration
 ###############################################################################
@@ -51,7 +56,7 @@ c2mon.server.configuration.jdbc.password=${c2mon.server.cachedbaccess.jdbc.passw
 c2mon.server.configuration.jdbc.test-while-idle=true
 c2mon.server.configuration.jdbc.test-on-borrow=true
 c2mon.server.configuration.jdbc.validation-query=${c2mon.server.cachedbaccess.jdbc.validation-query}
- 
+
 ################################################################################
 # c2mon-server-history
 ################################################################################
@@ -82,7 +87,7 @@ c2mon.server.cachedbaccess.jdbc.default-auto-commit=false
 c2mon.server.cachedbaccess.jdbc.test-while-idle=true
 c2mon.server.cachedbaccess.jdbc.test-on-borrow=true
 c2mon.server.cachedbaccess.jdbc.validation-query=SELECT 1
- 
+
 ###############################################################################
 # c2mon-server-configuration
 ###############################################################################
@@ -94,7 +99,7 @@ c2mon.server.configuration.jdbc.password=${c2mon.server.cachedbaccess.jdbc.passw
 c2mon.server.configuration.jdbc.test-while-idle=true
 c2mon.server.configuration.jdbc.test-on-borrow=true
 c2mon.server.configuration.jdbc.validation-query=${c2mon.server.cachedbaccess.jdbc.validation-query}
- 
+
 ################################################################################
 # c2mon-server-history
 ################################################################################

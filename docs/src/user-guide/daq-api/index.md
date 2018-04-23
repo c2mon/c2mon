@@ -1,10 +1,12 @@
-# DAQ API
+# DAQ API - General Overview
 
-The C2MON DAQ API is used by all existing DAQ modules for the server communication.
+Introduction to C2MON Data Acquisition (DAQ) API, used by all existing DAQ modules for the server communication.
 
-C2MON was initially developed at CERN to acquire data from physical infrastructural equipment, such as PLCs or OPC servers. As such, the word
-"Equipment" occurs frequently within the API. However, this does not mean that you cannot write a DAQ for retrieving data from other sources, such as
-host monitoring processes, middleware protocols, or any other type of software services or physical hardware.
+---
+
+C2MON was initially developed at CERN to acquire data from physical infrastructural equipment, such as PLCs or OPC servers.
+As such, the word "Equipment" occurs frequently within the API.
+However, this does not mean that you cannot write a DAQ for retrieving data from other sources, such as host monitoring processes, middleware protocols, or any other type of software services or physical hardware.
 
 ## Anatomy of a C2MON DAQ module
 
@@ -19,7 +21,7 @@ A DAQ knows how to:
 - Execute commands on the source
 - Send heartbeats and status flags about the connection status and quality of groups of metrics
 - Filter the incoming raw data
-- Add/Update/Delete Tags at runtime 
+- Add/Update/Delete Tags at runtime
 
 Historically, the types of physical sources that C2MON was designed for were dynamic in nature, meaning that they did not have a well-defined set of output
 metrics - rather, the set of metrics changed frequently. For example, CERN uses many types of [PLC](https://en.wikipedia.org/wiki/Programmable_logic_controller).
@@ -71,4 +73,3 @@ A few DAQ modules are provided on [GitHub](https://github.com/c2mon?utf8=%E2%9C%
 To configure a new a DAQ Processes or just Tags on a given DAQ module make use of the [C2MON Configuration API](/user-guide/client-api/configuration).
 
 Every tarball contains a [c2mon-daq.properties](https://github.com/c2mon/c2mon/blob/master/c2mon-daq/distribution/src/main/resources/tar/conf/c2mon-daq.properties) file in the `/conf` directory for changing the default setup to your needs. The properties listed in the file can just as well be set as Java system properties with the `-D` option.
-
