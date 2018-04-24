@@ -12,8 +12,6 @@ edit_uri: blob/master/docs/src/
 extra_css:
     - css/extra.css
 
-google_analytics: ['UA-36723568-3', 'mkdocs.org']
-
 pages:
   - Home: 'index.md'
   - Getting Started: 'getting-started.md'
