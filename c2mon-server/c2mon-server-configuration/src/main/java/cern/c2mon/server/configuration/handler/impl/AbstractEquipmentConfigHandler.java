@@ -172,7 +172,8 @@ public abstract class AbstractEquipmentConfigHandler<T extends AbstractEquipment
         Long oldCommFaultId = abstractEquipmentCopy.getCommFaultTagId();
         List<ProcessChange> processChanges = abstractEquipmentConfigTransacted.doUpdateAbstractEquipment(abstractEquipmentCopy, elementProperties);
 
-        abstractEquipmentCache.putQuiet(abstractEquipmentCopy); // commit changes in cache
+        // commit local changes back to the cache
+        abstractEquipmentCache.putQuiet(abstractEquipmentCopy);
         abstractEquipmentCache.releaseWriteLockOnKey(abstractEquipmentId);
 
         if (aliveConfigure) {
