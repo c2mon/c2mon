@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2018 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -21,11 +21,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 
-import cern.c2mon.server.cache.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import cern.c2mon.server.cache.*;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.equipment.EquipmentCacheObject;
 import cern.c2mon.server.common.process.Process;
@@ -75,6 +75,7 @@ public class EquipmentFacadeImpl extends AbstractEquipmentFacade<Equipment> impl
    * Creates the equipment object from the properties and validates them.
    * The returned object has not been inserted in the cache.
    */
+  @Override
   public Equipment createCacheObject(final Long equipmentId, final Properties properties) {
     EquipmentCacheObject equipment = new EquipmentCacheObject(equipmentId);
     configureCacheObject(equipment, properties);
@@ -103,10 +104,11 @@ public class EquipmentFacadeImpl extends AbstractEquipmentFacade<Equipment> impl
    * @param equipment
    * @throws ConfigurationException if a field is not formatted correctly
    */
+  @Override
   protected void validateConfig(Equipment equipment) {
     EquipmentCacheObject equipmentCacheObject = (EquipmentCacheObject) equipment;
     super.validateConfig(equipmentCacheObject);
-    //only validated for Equipment, although also set in SubEquipment (but not used there - only DB related and inherited from TIM1! -> TODO remove handler class name form subequipment cache object and adapt loading SQL)
+    //only validated for Equipment, although also set in SubEquipment (but not used there - only DB related and inherited from TIM1! -> TODO remove handler class name from subequipment cache object and adapt loading SQL)
     if (equipmentCacheObject.getHandlerClassName() == null) {
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"handlerClassName\" cannot be null");
     }
@@ -122,11 +124,13 @@ public class EquipmentFacadeImpl extends AbstractEquipmentFacade<Equipment> impl
    * @param properties
    * @return a change event to be sent to the DAQ layer
    */
+  @Override
   protected EquipmentConfigurationUpdate configureCacheObject(Equipment equipment, Properties properties) {
     EquipmentCacheObject equipmentCacheObject = (EquipmentCacheObject) equipment;
     EquipmentConfigurationUpdate configurationUpdate = setCommonProperties(equipmentCacheObject, properties);
     String tmpStr = properties.getProperty("address");
     if (tmpStr != null) {
+      log.info("Changing address of equipment {} to: {}", equipment.getName(), tmpStr);
       equipmentCacheObject.setAddress(tmpStr);
       configurationUpdate.setEquipmentAddress(tmpStr);
     }
@@ -134,6 +138,7 @@ public class EquipmentFacadeImpl extends AbstractEquipmentFacade<Equipment> impl
     //never set when called from config update method
     if ((tmpStr = properties.getProperty("processId")) != null) {
       try {
+        log.info("Changing process id of equipment {} from {} to {}", equipment.getName(), equipment.getId(), tmpStr);
         equipmentCacheObject.setProcessId(Long.valueOf(tmpStr));
       }
       catch (NumberFormatException e) {
@@ -143,6 +148,7 @@ public class EquipmentFacadeImpl extends AbstractEquipmentFacade<Equipment> impl
     return configurationUpdate;
   }
 
+  @Override
   public Long getProcessIdForAbstractEquipment(final Long equipmentId) {
     Equipment equipment = cache.get(equipmentId);
     Long processId = equipment.getProcessId();
