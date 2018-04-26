@@ -14,6 +14,15 @@ For more details on a given release, please check also the [Milestone planning](
 ### Fixed
 
 
+## [1.8.35] - 2018-04-26
+### Changed
+- Documentation: Upgrade to MkDocs 0.17.3 and major refactoring of C2MON documentation structure (!182)
+
+### Fixed
+- Server, Elasticsearch: Added missing argument for re-index tag config operation (#194)
+- Fixed equipment configuration bug by adding 'cache put' command (!184)
+
+
 ## [1.8.34] - 2018-04-13
 ### Fixed
 -  Server: Fixed bug in DAQ process XML document generation related to deleted Equipments (#207)
@@ -284,7 +293,9 @@ This patch contains bug fixes for the DAQ layer.
 ### Removed
 - Remove of EquipmentLogger concept from DAQ Core (#56)
 
-[Unreleased]: https://gitlab.cern.ch/c2mon/c2mon/milestones/28
+
+[Unreleased]: https://gitlab.cern.ch/c2mon/c2mon/milestones/29
+[1.8.35]: https://gitlab.cern.ch/c2mon/c2mon/milestones/28
 [1.8.34]: https://gitlab.cern.ch/c2mon/c2mon/milestones/27
 [1.8.33]: https://gitlab.cern.ch/c2mon/c2mon/milestones/26
 [1.8.32]: https://gitlab.cern.ch/c2mon/c2mon/milestones/25
