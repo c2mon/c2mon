@@ -1,4 +1,4 @@
-# Change Log
+# Changelog
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/).
@@ -30,7 +30,7 @@ For more details on a given release, please check also the [Milestone planning](
 
 ## [1.8.33] - 2018-03-19
 ### Changed
-- DAQ: Small improvements in logback.xml 
+- DAQ: Small improvements in logback.xml
 
 ### Fixed
 - Server: Fixed minor issue in MySQL schema (#193)
@@ -317,4 +317,3 @@ This patch contains bug fixes for the DAQ layer.
 [1.8.8]: https://gitlab.cern.ch/c2mon/c2mon/milestones/9
 [1.8.7]: https://gitlab.cern.ch/c2mon/c2mon/milestones/8
 [1.8.6]: https://gitlab.cern.ch/c2mon/c2mon/milestones/7
-
