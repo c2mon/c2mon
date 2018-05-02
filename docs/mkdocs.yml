@@ -38,8 +38,11 @@ pages:
       - General Overview: 'user-guide/daq-api/index.md'
       - 'user-guide/daq-api/DAQ_module_developer_guide.md'
       - 'user-guide/daq-api/DAQ_module_testing_guide.md'
-  - Appendices:
-    - 'appendices/database_structure.md'
+  - About:
+    - 'about/CHANGELOG.md'
+    - Contributing: 'about/CONTRIBUTING.md'
+    - 'about/license.md'
+
 
 markdown_extensions:
   - toc:
