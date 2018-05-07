@@ -6,12 +6,22 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 All issues referenced in parentheses can be consulted under [CERN GitLab](https://gitlab.cern.ch/c2mon/c2mon/issues).
 For more details on a given release, please check also the [Milestone planning](https://gitlab.cern.ch/c2mon/c2mon/milestones?state=all).
 
+
 ## [Unreleased]
 ### Added
 
 ### Changed
 
 ### Fixed
+
+
+## [1.8.36] - 2018-05-07
+### Changed
+- Documentation: Updated [Database](https://c2mon.web.cern.ch/c2mon/docs/user-guide/server/database/) section and added [About](https://c2mon.web.cern.ch/c2mon/docs/about/CHANGELOG/) chapter
+
+### Fixed
+- Client API: Fixed NPE in `ControlTagConfigurationManagerImpl`, which occured when sending a configuration update on a control tag
+- Server: Removed write lock in `RuleTagCacheImpl`, which could cause in rare cases a deadlock during a rule configuration in cluster mode (only!)
 
 
 ## [1.8.35] - 2018-04-26
@@ -294,7 +304,8 @@ This patch contains bug fixes for the DAQ layer.
 - Remove of EquipmentLogger concept from DAQ Core (#56)
 
 
-[Unreleased]: https://gitlab.cern.ch/c2mon/c2mon/milestones/29
+[Unreleased]: https://gitlab.cern.ch/c2mon/c2mon/milestones/30
+[1.8.36]: https://gitlab.cern.ch/c2mon/c2mon/milestones/29
 [1.8.35]: https://gitlab.cern.ch/c2mon/c2mon/milestones/28
 [1.8.34]: https://gitlab.cern.ch/c2mon/c2mon/milestones/27
 [1.8.33]: https://gitlab.cern.ch/c2mon/c2mon/milestones/26
