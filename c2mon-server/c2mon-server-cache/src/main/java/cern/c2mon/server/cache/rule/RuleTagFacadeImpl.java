@@ -17,24 +17,17 @@
 package cern.c2mon.server.cache.rule;
 
 import java.sql.Timestamp;
-import java.util.HashSet;
 import java.util.Properties;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.server.cache.AlarmCache;
-import cern.c2mon.server.cache.AlarmFacade;
-import cern.c2mon.server.cache.DataTagCache;
-import cern.c2mon.server.cache.RuleTagCache;
-import cern.c2mon.server.cache.RuleTagFacade;
+import cern.c2mon.server.cache.*;
 import cern.c2mon.server.cache.common.AbstractTagFacade;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
-import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.rule.RuleTagCacheObject;
 import cern.c2mon.shared.common.ConfigurationException;
@@ -49,6 +42,7 @@ import cern.c2mon.shared.rule.RuleExpression;
  *
  */
 @Service
+@Slf4j
 public class RuleTagFacadeImpl extends AbstractTagFacade<RuleTag> implements RuleTagFacade {
 
   /**
@@ -60,11 +54,6 @@ public class RuleTagFacadeImpl extends AbstractTagFacade<RuleTag> implements Rul
    * Logger for logging updates made to rules.
    */
   private static final Logger RULELOG = LoggerFactory.getLogger("RuleTagLogger");
-
-  /**
-   * Class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(RuleTagFacadeImpl.class);
 
   /**
    * Reference to the low level Rule Facade bean.
@@ -154,24 +143,25 @@ public class RuleTagFacadeImpl extends AbstractTagFacade<RuleTag> implements Rul
 
   @Override
   public void updateAndValidate(final Long id, final Object value, final String valueDescription, final Timestamp timestamp) {
+    RuleTag ruleTagCopy;
     tagCache.acquireWriteLockOnKey(id);
     try {
-      RuleTag ruleTag = tagCache.get(id);
-      if (!filterout(ruleTag, value, valueDescription, null, null, timestamp)) {
-        ruleTagCacheObjectFacade.validate(ruleTag);
-        ruleTagCacheObjectFacade.update(ruleTag, value, valueDescription, timestamp);
-        tagCache.put(id, ruleTag);
-        updateCount++;
-        log((RuleTagCacheObject) ruleTag);
-      } else {
-        if (LOGGER.isTraceEnabled()) {
-          LOGGER.trace("Filtering out repeated update for rule " + id);
-        }
-      }
+      ruleTagCopy = tagCache.getCopy(id);
     } catch (CacheElementNotFoundException cacheEx) {
-      LOGGER.error("Unable to locate rule in cache (id " + id + ") - no update performed.", cacheEx);
+      log.error("Unable to locate rule #{} in cache - no update performed.", id, cacheEx);
+      return;
     } finally {
       tagCache.releaseWriteLockOnKey(id);
+    }
+
+    if (!filterout(ruleTagCopy, value, valueDescription, null, null, timestamp)) {
+      ruleTagCacheObjectFacade.validate(ruleTagCopy);
+      ruleTagCacheObjectFacade.update(ruleTagCopy, value, valueDescription, timestamp);
+      tagCache.put(id, ruleTagCopy);
+      updateCount++;
+      log((RuleTagCacheObject) ruleTagCopy);
+    } else {
+      log.trace("Filtering out repeated update for rule {}", id);
     }
   }
 
@@ -239,6 +229,6 @@ public class RuleTagFacadeImpl extends AbstractTagFacade<RuleTag> implements Rul
   @Override
   protected void invalidateQuietly(final RuleTag tag, final TagQualityStatus statusToAdd, final String statusDescription,
       final Timestamp timestamp) {
-    ruleTagCacheObjectFacade.invalidate((RuleTag) tag, statusToAdd, statusDescription, timestamp);
+    ruleTagCacheObjectFacade.invalidate(tag, statusToAdd, statusDescription, timestamp);
   }
 }
