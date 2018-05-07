@@ -16,14 +16,21 @@
  *****************************************************************************/
 package cern.c2mon.client.core.configuration.impl;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import cern.c2mon.client.core.configuration.ConfigurationRequestSender;
 import cern.c2mon.client.core.configuration.ControlTagConfigurationManager;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.api.Configuration;
-import cern.c2mon.shared.client.configuration.api.tag.*;
-import org.springframework.stereotype.Service;
-
-import java.util.*;
+import cern.c2mon.shared.client.configuration.api.tag.AliveTag;
+import cern.c2mon.shared.client.configuration.api.tag.CommFaultTag;
+import cern.c2mon.shared.client.configuration.api.tag.DataTag;
+import cern.c2mon.shared.client.configuration.api.tag.StatusTag;
 
 import static cern.c2mon.client.core.configuration.util.ConfigurationUtil.validateIsUpdate;
 
@@ -34,6 +41,11 @@ import static cern.c2mon.client.core.configuration.util.ConfigurationUtil.valida
 public class ControlTagConfigurationManagerImpl implements ControlTagConfigurationManager {
 
   private ConfigurationRequestSender configurationRequestSender;
+
+  @Autowired
+  ControlTagConfigurationManagerImpl(ConfigurationRequestSender configurationRequestSender) {
+    this.configurationRequestSender = configurationRequestSender;
+  }
 
   @Override
   public ConfigurationReport updateAliveTag(AliveTag tag) {
