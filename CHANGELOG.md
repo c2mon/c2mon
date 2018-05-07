@@ -22,6 +22,7 @@ For more details on a given release, please check also the [Milestone planning](
 ### Fixed
 - Client API: Fixed NPE in `ControlTagConfigurationManagerImpl`, which occured when sending a configuration update on a control tag
 - Server: Removed write lock in `RuleTagCacheImpl`, which could cause in rare cases a deadlock during a rule configuration in cluster mode (only!)
+- Server: Supressing invalid warning message during Process Commfault value persistence to Elasticsearch (#209)
 
 
 ## [1.8.35] - 2018-04-26
