@@ -25,7 +25,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.server.cache.*;
+import cern.c2mon.server.cache.AlarmCache;
+import cern.c2mon.server.cache.AlarmFacade;
+import cern.c2mon.server.cache.RuleTagCache;
+import cern.c2mon.server.cache.RuleTagFacade;
 import cern.c2mon.server.cache.common.AbstractTagFacade;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.rule.RuleTag;
@@ -61,11 +64,6 @@ public class RuleTagFacadeImpl extends AbstractTagFacade<RuleTag> implements Rul
   private RuleTagCacheObjectFacade ruleTagCacheObjectFacade;
 
   /**
-   * Reference to the DataTag cache.
-   */
-  private DataTagCache dataTagCache;
-
-  /**
    * Constructor.
    *
    * @param ruleTagCache the RuleTag cache
@@ -78,11 +76,9 @@ public class RuleTagFacadeImpl extends AbstractTagFacade<RuleTag> implements Rul
   public RuleTagFacadeImpl(final RuleTagCache ruleTagCache,
                            final RuleTagCacheObjectFacade ruleTagCacheObjectFacade,
                            final AlarmFacade alarmFacade,
-                           final AlarmCache alarmCache,
-                           final DataTagCache dataTagCache) {
+                           final AlarmCache alarmCache) {
     super(ruleTagCache, alarmFacade, alarmCache);
     this.ruleTagCacheObjectFacade = ruleTagCacheObjectFacade;
-    this.dataTagCache = dataTagCache;
   }
 
   @Override
