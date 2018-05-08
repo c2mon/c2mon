@@ -16,6 +16,17 @@
  *****************************************************************************/
 package cern.c2mon.server.rule.listener;
 
+import java.sql.Timestamp;
+import java.util.concurrent.CountDownLatch;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import cern.c2mon.server.cache.C2monCacheListener;
 import cern.c2mon.server.cache.DataTagCache;
 import cern.c2mon.server.cache.DataTagFacade;
 import cern.c2mon.server.cache.RuleTagCache;
@@ -28,21 +39,6 @@ import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.rule.config.RuleModule;
 import cern.c2mon.server.rule.junit.RuleCachePopulationRule;
 import cern.c2mon.server.test.CacheObjectCreation;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.support.AbstractApplicationContext;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.io.IOException;
-import java.sql.Timestamp;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -102,6 +98,18 @@ public class RuleListenerTest {
     dataTagCache.put(dataTag2.getId(), dataTag2);
     ruleTagCache.put(ruleTag.getId(), ruleTag);
 
+    final CountDownLatch latch = new CountDownLatch(1);
+    final CountDownLatch latch2 = new CountDownLatch(2);
+    ruleTagCache.registerSynchronousListener(new C2monCacheListener<RuleTag>() {
+      @Override
+      public void notifyElementUpdated(RuleTag cacheable) {
+        latch.countDown();
+        latch2.countDown();
+      }
+      @Override
+      public void confirmStatus(RuleTag cacheable) {}
+    });
+
     //check still set as expected in test class
     assertEquals(dataTag1.getValue(), Boolean.TRUE);
     assertEquals(dataTag2.getValue(), Boolean.TRUE);
@@ -125,24 +133,16 @@ public class RuleListenerTest {
     //dataTagCache.notifyListenersOfUpdate(dataTag1);
 
     //check update was made
-    assertEquals(dataTagCache.get(dataTag1.getId()).getValue(), Boolean.FALSE);
-    try {
-      Thread.sleep(SLEEP_TIME);
-    } catch (InterruptedException e) {
-      throw e;
-    }
-    assertEquals(Integer.valueOf(3), ruleTag.getValue());
+    assertEquals(Boolean.FALSE, dataTagCache.get(dataTag1.getId()).getValue());
+    latch.await();
+    assertEquals(Integer.valueOf(3), ruleTagCache.get(ruleTag.getId()).getValue());
 
     //(2) second test of rule update
     //update dataTag to TRUE, notify listeners and check rule was again updated
     dataTagFacade.updateAndValidate(dataTag1.getId(), Boolean.TRUE, "now true", new Timestamp(System.currentTimeMillis()));
     //dataTagCache.notifyListenersOfUpdate(dataTag1);
-    assertEquals(dataTagCache.get(dataTag1.getId()).getValue(), Boolean.TRUE);
-    try {
-      Thread.sleep(SLEEP_TIME);
-    } catch (InterruptedException e) {
-      throw e;
-    }
-    assertEquals(Integer.valueOf(2), ruleTag.getValue());
+    assertEquals(Boolean.TRUE, dataTagCache.get(dataTag1.getId()).getValue());
+    latch2.await();
+    assertEquals(Integer.valueOf(2), ruleTagCache.get(ruleTag.getId()).getValue());
   }
 }
