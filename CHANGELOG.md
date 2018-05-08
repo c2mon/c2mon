@@ -14,6 +14,9 @@ For more details on a given release, please check also the [Milestone planning](
 
 ### Fixed
 
+## 1.8.37 - 2018-05-08
+### Fixed
+- Server: Fixed additional write lock problem related to rule configuration in cluster environment, which appeared during integration testing of [1.8.36]
 
 ## [1.8.36] - 2018-05-07
 ### Changed
