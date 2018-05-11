@@ -27,7 +27,7 @@ To run the C2MON tarball distribution you need at least Java 1.8 installed on yo
 
 The [C2MON server distribution tarball](https://nexus.web.cern.ch/nexus/content/groups/public/cern/c2mon/server/c2mon-server/) can be downloaded from [here](https://nexus.web.cern.ch/nexus/content/groups/public/cern/c2mon/server/c2mon-server/).
 
-We recommend to always use the latest stable version and to read the [CHANGELOG.md](https://github.com/c2mon/c2mon/blob/master/CHANGELOG.md) file.
+We recommend to always use the latest stable version listed in the [CHANGELOG](/about/CHANGELOG/) file.
 
 Extract the tarball on your local file system and change into the `c2mon-server-1.8.xx/bin/` directory.
 
