@@ -17,6 +17,12 @@ Please have a look into the [CHANGELOG.md][] file.
 ## Milestone planning
 [Find here][] the complete list of all existing version milestones.
 
+## Downloading latest stable server tarball 
+
+The C2MON server tarball can be downloaded from [CERN Nexus Repository](https://nexus.web.cern.ch/nexus/#nexus-search;gav~cern.c2mon.server~c2mon-server~~tar.gz~)
+
+Please check also the [CHANGELOG.md] to find out the latest stable release version.
+
 ## Building from Source
 C2MON uses a [Maven][]-based build system. In the instructions
 below, `./mvnw` is invoked from the root of the source tree and serves as
