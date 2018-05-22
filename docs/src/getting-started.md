@@ -146,6 +146,8 @@ $ ./c2mon-web-ui.sh start
 Starting C2MON web UI:     [  OK  ]
 ```
 
+You can now consult the C2MON Web User Interface on http://localhost:8080/c2mon-web-ui/
+
 ### Using the Docker image
 
 We push the c2mon-web-ui Docker images to the [CERN Docker registry](https://gitlab.cern.ch/c2mon/c2mon-web-ui/container_registry).
@@ -154,6 +156,8 @@ To run the image:
 ```bash
 docker run --rm --name web-ui -ti --link c2mon:c2mon -p 0.0.0.0:8080:8080 gitlab-registry.cern.ch/c2mon/c2mon-web-ui
 ```
+
+You can now consult the C2MON Web User Interface on http://localhost:8080/c2mon-web-ui/
 
 <!-- ### Inspecting the data
 
