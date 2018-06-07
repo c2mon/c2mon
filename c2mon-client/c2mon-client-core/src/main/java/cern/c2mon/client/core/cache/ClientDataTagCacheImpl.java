@@ -162,7 +162,7 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
 
   @Override
   public Collection<Tag> getAllTagsForListener(final BaseTagListener listener) {
-    Collection<Tag> list = new ArrayList<Tag>();
+    Collection<Tag> list = new ArrayList<>();
 
     cacheReadLock.lock();
     try {
@@ -180,7 +180,7 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
 
   @Override
   public Set<Long> getAllTagIdsForListener(final BaseTagListener listener) {
-    Set<Long> list = new HashSet<Long>();
+    Set<Long> list = new HashSet<>();
 
     cacheReadLock.lock();
     try {
@@ -198,7 +198,7 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
 
   @Override
   public Collection<Tag> getAllTagsForProcess(final Long processId) {
-    Collection<Tag> list = new ArrayList<Tag>();
+    Collection<Tag> list = new ArrayList<>();
 
     cacheReadLock.lock();
     try {
@@ -324,5 +324,33 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
   @Override
   public <T extends BaseTagListener> void subscribeByRegex(Set<String> regexList, T listener) throws CacheSynchronizationException {
     tagSubscriptionHandler.subscribeByRegex(regexList, listener, (listener instanceof TagListener));
+  }
+
+  @Override
+  public Collection<TagController> getAllTagControllers() {
+    return controller.getActiveCache().values();
+  }
+
+  @Override
+  public Collection<TagController> getTagControllers(Set<Long> tagIds) {
+    Collection<TagController> resultList = new ArrayList<>(tagIds.size());
+    cacheReadLock.lock();
+    try {
+      for (Long tagId : tagIds) {
+        TagController tagBean = controller.getActiveCache().get(tagId);
+        if (tagBean != null) {
+          resultList.add(tagBean);
+        }
+      }
+    } finally {
+      cacheReadLock.unlock();
+    }
+
+    return resultList;
+  }
+
+  @Override
+  public TagController getTagController(Long tagId) {
+    return controller.getActiveCache().get(tagId);
   }
 }

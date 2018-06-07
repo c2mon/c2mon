@@ -24,24 +24,18 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import cern.c2mon.client.common.service.SessionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import cern.c2mon.client.common.service.SessionService;
 import cern.c2mon.client.common.tag.CommandTag;
+import cern.c2mon.client.core.jms.RequestHandler;
 import cern.c2mon.client.core.service.CommandService;
 import cern.c2mon.client.core.tag.CommandTagImpl;
-import cern.c2mon.client.core.jms.RequestHandler;
-import cern.c2mon.shared.client.command.CommandExecuteRequest;
-import cern.c2mon.shared.client.command.CommandExecuteRequestImpl;
-import cern.c2mon.shared.client.command.CommandExecutionStatus;
-import cern.c2mon.shared.client.command.CommandReport;
-import cern.c2mon.shared.client.command.CommandReportImpl;
-import cern.c2mon.shared.client.command.CommandTagHandle;
-import cern.c2mon.shared.client.command.CommandTagValueException;
+import cern.c2mon.shared.client.command.*;
 
 @Service
 public class CommandServiceImpl implements CommandService {
@@ -57,7 +51,7 @@ public class CommandServiceImpl implements CommandService {
    * server.
    */
   private final Map<Long, CommandTagImpl<Object>> commandCache =
-    new ConcurrentHashMap<Long, CommandTagImpl<Object>>();
+    new ConcurrentHashMap<>();
 
   /**
    * The C2MON session manager
@@ -258,13 +252,13 @@ public class CommandServiceImpl implements CommandService {
       hostname = "unknown-host";
     }
 
-    return new CommandExecuteRequestImpl<T>(commandTag.getId(), value,
+    return new CommandExecuteRequestImpl<>(commandTag.getId(), value,
                                   commandTag.getClientTimeout(), System.getProperty("user.home"), hostname);
   }
 
   @Override
   public <T> CommandTag<T> getCommandTag(final Long commandId) {
-    Set<Long> commandTagIds = new HashSet<Long>();
+    Set<Long> commandTagIds = new HashSet<>();
     commandTagIds.add(commandId);
     Set<CommandTag<T>> commandTags = getCommandTags(commandTagIds);
 
@@ -277,6 +271,10 @@ public class CommandServiceImpl implements CommandService {
   public boolean isAuthorized(final String userName, final Long commandId) {
     if (!commandCache.containsKey(commandId)) {
       getCommandTag(commandId);
+    }
+
+    if (sessionService == null) {
+      return false;
     }
 
     if (sessionService.isUserLogged(userName)) {

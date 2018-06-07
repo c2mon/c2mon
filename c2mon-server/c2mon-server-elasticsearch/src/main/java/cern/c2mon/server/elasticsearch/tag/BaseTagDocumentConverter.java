@@ -3,6 +3,7 @@ package cern.c2mon.server.elasticsearch.tag;
 import cern.c2mon.server.cache.EquipmentCache;
 import cern.c2mon.server.cache.ProcessCache;
 import cern.c2mon.server.cache.SubEquipmentCache;
+import cern.c2mon.server.common.commfault.CommFaultTag;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.metadata.Metadata;
 import cern.c2mon.server.common.process.Process;
@@ -57,7 +58,9 @@ public class BaseTagDocumentConverter<T extends Map<String, Object>> implements 
                     .collect(Collectors.toMap(
                             Map.Entry::getKey,
                             Map.Entry::getValue,
-                            (u,v) -> { throw new IllegalStateException(String.format("Duplicate key %s", u)); },
+                            (u, v) -> {
+                                throw new IllegalStateException(String.format("Duplicate key %s", u));
+                            },
                             containerSupplier
                     ));
         }
@@ -69,7 +72,8 @@ public class BaseTagDocumentConverter<T extends Map<String, Object>> implements 
 
         map.put("dataType", tag.getDataType());
 
-        if (!tag.getProcessIds().isEmpty()) {
+
+        if (!(tag instanceof CommFaultTag) || !tag.getProcessIds().isEmpty()) {
             try {
                 Process process = processCache.get(tag.getProcessIds().iterator().next());
                 map.put("process", process.getName());

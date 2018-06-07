@@ -24,6 +24,13 @@ build:
     - mvn -q -U -B clean test -DskipDockerBuild -DskipDockerTag --settings settings.xml -Ddependencies.set.direct --debug -X
   except:
     - master
+    
+trigger_build:
+  stage: deploy
+  script:
+    - "curl -X POST -F token=$TIM_SERVER_TOKEN -F ref=master https://gitlab.cern.ch/api/v4/projects/9859/trigger/pipeline"
+  only:
+  - master
 
 deploy_docs:
   type: deploy

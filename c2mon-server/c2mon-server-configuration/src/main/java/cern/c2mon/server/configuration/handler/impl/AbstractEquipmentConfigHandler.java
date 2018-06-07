@@ -1,16 +1,16 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ * Copyright (C) 2010-2018 CERN. All rights not expressly granted are reserved.
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -91,13 +91,13 @@ public abstract class AbstractEquipmentConfigHandler<T extends AbstractEquipment
    */
   protected List<ProcessChange> removeEquipmentControlTags(final T abstractEquipment, final ConfigurationElementReport equipmentReport) {
     List<ProcessChange> changes = new ArrayList<>();
-    
+
     LOGGER.debug("Removing (Sub-)Equipment control tags.");
     Long aliveTagId = abstractEquipment.getAliveTagId();
-    
+
     if (aliveTagId != null) {
       ConfigurationElementReport tagReport = new ConfigurationElementReport(Action.REMOVE, Entity.CONTROLTAG, aliveTagId);
-      
+
       ProcessChange change = controlTagConfigHandler.removeControlTag(aliveTagId, tagReport);
       if (change.processActionRequired()) {
         change.setNestedSubReport(tagReport);
@@ -107,11 +107,11 @@ public abstract class AbstractEquipmentConfigHandler<T extends AbstractEquipment
         equipmentReport.addSubReport(tagReport);
       }
     }
-    
+
     Long commTagId = abstractEquipment.getCommFaultTagId();
     if (commTagId != null) {
       ConfigurationElementReport tagReport = new ConfigurationElementReport(Action.REMOVE, Entity.CONTROLTAG, commTagId);
-    
+
       ProcessChange change = controlTagConfigHandler.removeControlTag(commTagId, tagReport);
       if (change.processActionRequired()) {
         change.setNestedSubReport(tagReport);
@@ -121,10 +121,10 @@ public abstract class AbstractEquipmentConfigHandler<T extends AbstractEquipment
         equipmentReport.addSubReport(tagReport);
       }
     }
-    
+
     Long stateTagId = abstractEquipment.getStateTagId();
     ConfigurationElementReport tagReport = new ConfigurationElementReport(Action.REMOVE, Entity.CONTROLTAG, stateTagId);
-    
+
     ProcessChange change = controlTagConfigHandler.removeControlTag(stateTagId, tagReport);
     if (change.processActionRequired()) {
       change.setNestedSubReport(tagReport);
@@ -146,7 +146,7 @@ public abstract class AbstractEquipmentConfigHandler<T extends AbstractEquipment
    * @throws IllegalAccessException if thrown when updating fields
    */
   protected List<ProcessChange> commonUpdate(Long abstractEquipmentId, Properties elementProperties) throws IllegalAccessException {
-    LOGGER.debug("Updating (Sub)Equipment " + abstractEquipmentId);
+    LOGGER.debug("Updating (sub-)equipment {}", abstractEquipmentId);
     // TODO or not todo: warning: can still update commfault, alive and state
     // tag id to non-existent tags (id is NOT checked and exceptions will be
     // thrown!)
@@ -166,32 +166,38 @@ public abstract class AbstractEquipmentConfigHandler<T extends AbstractEquipment
     }
     abstractEquipmentCache.acquireWriteLockOnKey(abstractEquipmentId);
     try {
-      T abstractEquipment = abstractEquipmentCache.get(abstractEquipmentId);
+      T abstractEquipmentCopy = abstractEquipmentCache.getCopy(abstractEquipmentId);
       try {
-        Long oldAliveId = abstractEquipment.getAliveTagId();
-        Long oldCommFaultId = abstractEquipment.getCommFaultTagId();
-        List<ProcessChange> processChanges = abstractEquipmentConfigTransacted.doUpdateAbstractEquipment(abstractEquipment, elementProperties);
+        Long oldAliveId = abstractEquipmentCopy.getAliveTagId();
+        Long oldCommFaultId = abstractEquipmentCopy.getCommFaultTagId();
+        List<ProcessChange> processChanges = abstractEquipmentConfigTransacted.doUpdateAbstractEquipment(abstractEquipmentCopy, elementProperties);
+
+        // commit local changes back to the cache
+        abstractEquipmentCache.putQuiet(abstractEquipmentCopy);
         abstractEquipmentCache.releaseWriteLockOnKey(abstractEquipmentId);
+
         if (aliveConfigure) {
           if (oldAliveId != null)
             commonEquipmentFacade.removeAliveDirectly(oldAliveId);
-          if (abstractEquipment.getAliveTagId() != null)
-            commonEquipmentFacade.loadAndStartAliveTag(abstractEquipment.getId());
+          if (abstractEquipmentCopy.getAliveTagId() != null)
+            commonEquipmentFacade.loadAndStartAliveTag(abstractEquipmentCopy.getId());
         }
-        if (commFaultConfigure && abstractEquipment.getCommFaultTagId() != null) {
+        if (commFaultConfigure && abstractEquipmentCopy.getCommFaultTagId() != null) {
           if (oldCommFaultId != null)
             commFaultTagCache.remove(oldCommFaultId);
-          if (abstractEquipment.getCommFaultTagId() != null)
-            commFaultTagCache.loadFromDb(abstractEquipment.getCommFaultTagId());
+          if (abstractEquipmentCopy.getCommFaultTagId() != null)
+            commFaultTagCache.loadFromDb(abstractEquipmentCopy.getCommFaultTagId());
         }
+
         return processChanges;
       } catch (RuntimeException ex) {
-        LOGGER.error("Exception caught while updating Sub-equipment - rolling back changes to the Sub-equipment", ex);
+        LOGGER.error("Exception caught while updating (sub-)equipment - rolling back changes", ex);
         //reload all potentially updated cache elements now DB changes are rolled back
-        if (abstractEquipmentCache.isWriteLockedByCurrentThread(abstractEquipmentId))
+        if (abstractEquipmentCache.isWriteLockedByCurrentThread(abstractEquipmentId)) {
           abstractEquipmentCache.releaseWriteLockOnKey(abstractEquipmentId);
-        commFaultTagCache.remove(abstractEquipment.getCommFaultTagId());
-        aliveTimerCache.remove(abstractEquipment.getAliveTagId());
+        }
+        commFaultTagCache.remove(abstractEquipmentCopy.getCommFaultTagId());
+        aliveTimerCache.remove(abstractEquipmentCopy.getAliveTagId());
         abstractEquipmentCache.remove(abstractEquipmentId);
         T oldAbstractEquipment = abstractEquipmentCache.get(abstractEquipmentId);
         commFaultTagCache.loadFromDb(oldAbstractEquipment.getCommFaultTagId());

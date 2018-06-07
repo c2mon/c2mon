@@ -18,6 +18,7 @@
 package cern.c2mon.server.elasticsearch.tag.config;
 
 import cern.c2mon.server.cache.TagFacadeGateway;
+import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.elasticsearch.Indices;
 import cern.c2mon.server.elasticsearch.MappingFactory;
 import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
@@ -126,7 +127,8 @@ public class TagConfigDocumentIndexer {
     }
 
     for (Long id : tagFacadeGateway.getKeys()) {
-      converter.convert(tagFacadeGateway.getTag(id)).ifPresent(this::updateTagConfig);
+      Tag tag = tagFacadeGateway.getTag(id);
+      converter.convert(tag, tagFacadeGateway.getAlarms(tag)).ifPresent(this::updateTagConfig);
     }
   }
 }

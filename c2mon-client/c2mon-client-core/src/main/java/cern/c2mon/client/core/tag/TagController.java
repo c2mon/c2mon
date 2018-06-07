@@ -445,10 +445,6 @@ public class TagController implements TagUpdateListener, SupervisionListener {
         return false;
       }
 
-      if (tagValueUpdate.getValueClassName() == null) {
-        return false;
-      }
-
       // Check server cache timestamp
       final long newServerTime = tagValueUpdate.getServerTimestamp().getTime();
       final long oldServerTime = tagImpl.getServerTimestamp().getTime();

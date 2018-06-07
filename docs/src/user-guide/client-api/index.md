@@ -1,4 +1,8 @@
-# Client API
+# Data subscription
+
+Learn how to subscribe to your data with the C2MON Client API.
+
+---
 
 The C2MON Client API is written in Java and provides various service classes to interact with the server:
 
@@ -12,7 +16,7 @@ search for and subscribe to tags.
 
 ## Including the API
 
-To use the API, you need to add a dependency on `c2mon-client-core`. 
+To use the API, you need to add a dependency on `c2mon-client-core`.
 
 Remember to replace "__insert_version_here__" with a real version number, such as "1.8.30"
 
@@ -55,13 +59,15 @@ repositories {
 
 ```
 
-## Changing Client default configuration
+## Changing the default configuration
 
 C2MON comes with reasonable defaults for most settings.
 Before you get out to tweak and tune the configuration, make sure you understand what are you trying to accomplish and the consequences.
 
 The primary way of configuring a C2MON client application is via the [c2mon-client.properties] configuration file, which is delivered as example with the [c2mon-web-ui](https://github.com/c2mon/c2mon-web-ui) tarball.
 It contains the most important settings and their default values you may want to change for your environment.
+
+To inject a customised properties file to your C2MON client application use this Java system property: `-Dc2mon.client.conf.url`
 
 The properties listed in the file can just as well be set as Java system properties with the `-D` option.
 
@@ -104,9 +110,110 @@ The startup can take several seconds, so to initialise the client asynchronously
 C2monServiceGateway.startC2monClient();
 ```
 
-Then the service classes can be acquired via the gateway, e.g. `TagService tagService = C2monServiceGateway.getTagService();`.
+Then the service classes can be acquired via the gateway.
+
+For example:
+```java
+TagService tagService = C2monServiceGateway.getTagService();
+```
 
 
+## Getting data
+
+Once you have access to the `TagService`, you can start to retrieve data from C2MON. To find and subscribe your data you can either use the unique tag ID,
+or the unique tag name.
+
+> **Please note!**
+
+> A well-chosen naming convention will enable you to make searching for tags easier in the future.
+> We suggest using a _folder-like_ structure with `/` as separator.
+
+> Example: `serviceA/computer/mypc1/memory`
+
+
+
+
+### Searching for tags by name
+
+The `TagService` offers multiple possibilities to get data by name from the server. You can:
+
+- Give the explicit tag name (or a list of names);
+- Give a wildcard expression (or multiple expressions)
+
+**Tag names are *always case insensitive*.**
+
+The following special characters are supported in wildcard expressions:
+
+- ? - match any one single character
+- \* - match any multiple character(s) (including zero)
+
+The supported wildcard characters can be escaped with a backslash `\`, and a literal backslash can be included with '\\'
+
+!!! warning "Be careful!"
+    Expressions starting with a leading wildcard character are potentially very expensive (ie. full scan) for indexed caches.
+
+**Example:** Get the latest value of a tag by explicit name
+```java
+Tag tag = tagService.findByName("host1:cpu.avg");
+```
+
+**Example:** Get the latest value of the `cpu.avg` metric for all hosts:
+```java
+Collection<Tag> tags = tagService.findByName("host*:cpu.avg");
+```
+
+
+
+
+### Subscribing to tag updates
+
+A near real-time stream of tag updates can be acquired through the use of a `TagListener`.
+
+**Example:** Subscribe to a set of tags
+```java
+...
+TagService tagService = C2monServiceGateway.getTagService();
+tagService.subscribeByName("host*:cpu.avg", new TagUpdateListener());
+...
+
+public class TagUpdateListener implements TagListener {
+
+  /**
+   * Called every time a new value update is received
+   */
+  @Override
+  public void onUpdate(final Tag tagUpdate) {
+    System.out.println(String.format("Update for tag %s (%d): %s",
+                        tagUpdate.getName(), tagUpdate.getId(), tagUpdate.getValue()));
+  }
+
+  /**
+   * Called once during subscription to pass the initial values
+   */
+  @Override
+  public void onInitialUpdate(final Collection<Tag> initialValues) {
+    System.out.println(String.format("\nFound %d matching tags", initialValues.size()));
+
+    for (Tag tag : initialValues) {
+      System.out.println(String.format("Initial value for tag %s (%d): %s",
+                          tag.getName(), tag.getId(), tag.getValue()));
+    }
+  }
+}
+```
+
+### Subscription by tag ID
+
+In addition to its name, each tag has a unique ID. In certain cases you may prefer to use the ID directly instead of the name, in particular if
+you have already a listener subscribed to a given tag. In that case, the client does not have to contact the server as for a wildcard search and can
+directly use the local cache, which is of course significantly faster.
+
+**Example:** Get the latest value of a tag by ID:
+```java
+Tag tag = tagService.get(1234L);
+```
+
+Every other aspect of subscribing to tags by ID is identical to that of subscribing by name.
 
 
 

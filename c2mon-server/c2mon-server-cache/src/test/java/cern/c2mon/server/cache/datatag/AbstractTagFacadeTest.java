@@ -16,9 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.datatag;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.sql.Timestamp;
 
 import org.junit.Before;
@@ -27,7 +24,9 @@ import org.junit.Test;
 import cern.c2mon.server.cache.rule.RuleTagFacadeImpl;
 import cern.c2mon.server.common.rule.RuleTagCacheObject;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
-import org.springframework.mock.env.MockEnvironment;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * JUnit test of AbstractTagFacade class.
@@ -43,7 +42,7 @@ public class AbstractTagFacadeTest {
 
   @Before
   public void init() {
-    ruleTagFacade = new RuleTagFacadeImpl(null, null, null, null, null);
+    ruleTagFacade = new RuleTagFacadeImpl(null, null, null, null);
   }
 
   /**

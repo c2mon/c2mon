@@ -16,6 +16,29 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.api;
 
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.Collections;
+import java.util.List;
+import java.util.Properties;
+import java.util.concurrent.CountDownLatch;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+
+import junit.framework.Assert;
+import lombok.extern.slf4j.Slf4j;
+import org.easymock.EasyMock;
+import org.easymock.IAnswer;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
 import cern.c2mon.server.cache.*;
 import cern.c2mon.server.cache.config.CacheModule;
 import cern.c2mon.server.cache.dbaccess.*;
@@ -62,26 +85,6 @@ import cern.c2mon.shared.common.datatag.address.impl.SimpleHardwareAddressImpl;
 import cern.c2mon.shared.daq.config.Change;
 import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
-import junit.framework.Assert;
-import lombok.extern.slf4j.Slf4j;
-import org.easymock.EasyMock;
-import org.easymock.IAnswer;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-import java.io.IOException;
-import java.sql.Timestamp;
-import java.util.Collections;
-import java.util.List;
-import java.util.Properties;
 
 import static cern.c2mon.server.configuration.parser.util.ConfigurationProcessUtil.buildCreateAllFieldsProcess;
 import static org.easymock.EasyMock.*;
@@ -1349,6 +1352,16 @@ public class ConfigurationLoaderTest {
     configurationLoader.applyConfiguration(createRuleTag);
     processFacade.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
 
+    final CountDownLatch latch = new CountDownLatch(1);
+    ruleTagCache.registerSynchronousListener(new C2monCacheListener<cern.c2mon.server.common.rule.RuleTag>() {
+      @Override
+      public void notifyElementUpdated(cern.c2mon.server.common.rule.RuleTag cacheable) {
+        latch.countDown();
+      }
+      @Override
+      public void confirmStatus(cern.c2mon.server.common.rule.RuleTag cacheable) {}
+    });
+
     // TEST:
     // Build configuration to add the test RuleTagUpdate
     RuleTag ruleTagUpdate = RuleTag.update(1500L).ruleText("(2 > 1)[1],true[0]").description("new description").build();
@@ -1369,9 +1382,9 @@ public class ConfigurationLoaderTest {
     expectedCacheObjectRule.setProcessIds(Collections.EMPTY_SET);
     expectedCacheObjectRule.setEquipmentIds(Collections.EMPTY_SET);
     expectedCacheObjectRule.getDataTagQuality().validate();
-    Thread.sleep(1000); // sleep 1s to allow for rule evaluation on separate thread
+    latch.await();
 
-    ObjectEqualityComparison.assertRuleTagConfigEquals(expectedCacheObjectRule, cacheObjectData);
+    ObjectEqualityComparison.assertRuleTagConfigEquals(expectedCacheObjectRule, (RuleTagCacheObject) ruleTagCache.get(1500L));
 
     verify(communicationManager);
 

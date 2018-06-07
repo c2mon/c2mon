@@ -16,12 +16,15 @@
  *****************************************************************************/
 package cern.c2mon.server.test;
 
+import java.sql.Timestamp;
+
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.AlarmCondition;
 import cern.c2mon.server.common.command.CommandTagCacheObject;
 import cern.c2mon.server.common.control.ControlTagCacheObject;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.common.equipment.EquipmentCacheObject;
+import cern.c2mon.server.common.metadata.Metadata;
 import cern.c2mon.server.common.process.ProcessCacheObject;
 import cern.c2mon.server.common.process.ProcessCacheObject.LocalConfig;
 import cern.c2mon.server.common.rule.RuleTagCacheObject;
@@ -29,12 +32,12 @@ import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
 import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.command.CommandExecutionDetails;
-import cern.c2mon.shared.common.datatag.*;
+import cern.c2mon.shared.common.datatag.DataTagAddress;
+import cern.c2mon.shared.common.datatag.DataTagConstants;
+import cern.c2mon.shared.common.datatag.DataTagQuality;
+import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl;
-import cern.c2mon.server.common.metadata.Metadata;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
-
-import java.sql.Timestamp;
 
 /**
  * Contains static methods for creating test cache objects.
@@ -118,11 +121,11 @@ public final class CacheObjectCreation {
    * @return the ControlTag
    */
   public static ControlTagCacheObject createTestControlTag() {
-    ControlTagCacheObject cacheObject = new ControlTagCacheObject(new Long(1001),
+    ControlTagCacheObject cacheObject = new ControlTagCacheObject(Long.valueOf(1001),
                                                                   "Junit_test_tag",
                                                                   "Float",
                                                                   DataTagConstants.MODE_TEST);
-    cacheObject.setId(new Long(1001));  //must be non null in DB
+    cacheObject.setId(Long.valueOf(1001));  //must be non null in DB
     cacheObject.setName("Junit_test_tag"); //non null
     cacheObject.setDescription("test description");
     cacheObject.setMode(DataTagConstants.MODE_TEST); //non null
@@ -134,7 +137,7 @@ public final class CacheObjectCreation {
     cacheObject.setValue(new Float(1000));
     cacheObject.setValueDescription("test value description");
     cacheObject.setSimulated(false); //null allowed
-    cacheObject.setEquipmentId(new Long(150)); //need test equipment inserted
+    cacheObject.setEquipmentId(Long.valueOf(150)); //need test equipment inserted
     cacheObject.setMinValue(new Float(100));
     cacheObject.setMaxValue(new Float(2000));
     cacheObject.setAddress(new DataTagAddress());
@@ -153,7 +156,7 @@ public final class CacheObjectCreation {
   public static DataTagCacheObject createTestDataTag() {
     //construct fake DataTagCacheObject, setting all fields
     DataTagCacheObject cacheObject = new DataTagCacheObject();
-    cacheObject.setId(new Long(100000));  //must be non null in DB
+    cacheObject.setId(Long.valueOf(100000));  //must be non null in DB
     cacheObject.setName("Junit_test_datatag1"); //non null
     cacheObject.setDescription("test description");
     cacheObject.setMode(DataTagConstants.MODE_TEST); //non null
@@ -166,7 +169,7 @@ public final class CacheObjectCreation {
     cacheObject.setValue(Boolean.TRUE);
     cacheObject.setValueDescription("test value description");
     cacheObject.setSimulated(false); //null allowed
-    cacheObject.setEquipmentId(new Long(100)); //need test equipment inserted
+    cacheObject.setEquipmentId(Long.valueOf(100)); //need test equipment inserted
     cacheObject.setMinValue(new Float(23.3));
     cacheObject.setMaxValue(new Float(12.2));
     cacheObject.setAddress(new DataTagAddress());
@@ -184,12 +187,11 @@ public final class CacheObjectCreation {
    */
   public static DataTagCacheObject createTestDataTag2() {
     DataTagCacheObject cacheObject = new DataTagCacheObject();
-    cacheObject.setId(new Long(100001));  //must be non null in DB
+    cacheObject.setId(Long.valueOf(100001));  //must be non null in DB
     cacheObject.setName("Junit_test_datatag2"); //non null
     cacheObject.setDescription("test description");
     cacheObject.setMode(DataTagConstants.MODE_TEST); //non null
     cacheObject.setDataType("Boolean"); // non null
-    //cacheObject.setTopic("tim.testdatatag.XADDRESS");
     cacheObject.setLogged(false); //null allowed
     cacheObject.setUnit("test unit m/sec");
     cacheObject.setDipAddress("testDIPaddress");
@@ -197,7 +199,7 @@ public final class CacheObjectCreation {
     cacheObject.setValue(Boolean.TRUE);
     cacheObject.setValueDescription("test value description");
     cacheObject.setSimulated(false); //null allowed
-    cacheObject.setEquipmentId(new Long(100)); //need test equipment inserted - using JAPC currently
+    cacheObject.setEquipmentId(Long.valueOf(100)); //need test equipment inserted - using JAPC currently
     cacheObject.setMinValue(new Float(23.3));
     cacheObject.setMaxValue(new Float(12.2));
     cacheObject.setAddress(new DataTagAddress());
@@ -216,7 +218,7 @@ public final class CacheObjectCreation {
   public static DataTagCacheObject createTestDataTag3() {
     //construct fake DataTagCacheObject, setting all fields
     DataTagCacheObject cacheObject = new DataTagCacheObject();
-    cacheObject.setId(new Long(100003));  //must be non null in DB
+    cacheObject.setId(Long.valueOf(100003));  //must be non null in DB
     cacheObject.setName("Junit_test_datatag3"); //non null
     cacheObject.setDescription("test description");
     cacheObject.setMode(DataTagConstants.MODE_TEST); //non null
@@ -229,7 +231,7 @@ public final class CacheObjectCreation {
     cacheObject.setValue("DOWN");
     cacheObject.setValueDescription("test value description");
     cacheObject.setSimulated(false); //null allowed
-    cacheObject.setEquipmentId(new Long(100)); //need test equipment inserted
+    cacheObject.setEquipmentId(Long.valueOf(100)); //need test equipment inserted
     cacheObject.setMinValue(new Float(23.3));
     cacheObject.setMaxValue(new Float(12.2));
     cacheObject.setAddress(new DataTagAddress());
@@ -249,16 +251,16 @@ public final class CacheObjectCreation {
    */
   public static EquipmentCacheObject createTestEquipment() {
     EquipmentCacheObject equipmentCacheObject = new EquipmentCacheObject(
-                                                                          new Long(100),
+                                                                          Long.valueOf(100),
                                                                           "Test Equipment",
                                                                           "Test desc",
                                                                           "Test class name",
                                                                           "Test address",
-                                                                          new Long(1222),
-                                                                          new Long(5000200),
+                                                                          Long.valueOf(1222),
+                                                                          Long.valueOf(5000200),
                                                                           10, //alive interval
-                                                                          new Long(1223),
-                                                                          new Long(90)
+                                                                          Long.valueOf(1223),
+                                                                          Long.valueOf(90)
                                                                           );
     equipmentCacheObject.setStatusDescription("Status description");
     equipmentCacheObject.setStatusTime(new Timestamp(System.currentTimeMillis()));
@@ -273,15 +275,15 @@ public final class CacheObjectCreation {
    */
   public static SubEquipmentCacheObject createTestSubEquipment() {
     SubEquipmentCacheObject subEquipmentCacheObject = new SubEquipmentCacheObject(
-                                                                        new Long(101),
+                                                                        Long.valueOf(101),
                                                                         "Test SubEquipment",
                                                                         "Test desc",
                                                                         "Test class name",
-                                                                        new Long(1222), //keep same as parent eq (not correct configuration, only for testing)
-                                                                        new Long(5000300), //keep same as parent eq
+                                                                        Long.valueOf(1222), //keep same as parent eq (not correct configuration, only for testing)
+                                                                        Long.valueOf(5000300), //keep same as parent eq
                                                                         10,
-                                                                        new Long(1223),
-                                                                        new Long(100)
+                                                                        Long.valueOf(1223),
+                                                                        Long.valueOf(100)
                                                                         );
     subEquipmentCacheObject.setStatusDescription("Status description");
     subEquipmentCacheObject.setStatusTime(new Timestamp(System.currentTimeMillis()));
@@ -296,15 +298,15 @@ public final class CacheObjectCreation {
    */
   public static SubEquipmentCacheObject createTestSubEquipment2() {
     SubEquipmentCacheObject subEquipmentCacheObject = new SubEquipmentCacheObject(
-                                                                        new Long(102),
+                                                                        Long.valueOf(102),
                                                                         "Test SubEquipment 2",
                                                                         "Test desc 2",
                                                                         "Test class name 2",
-                                                                        new Long(1222), //keep same as parent eq (not correct configuration, only for testing)
-                                                                        new Long(5000300), //keep same as parent eq
+                                                                        Long.valueOf(1222), //keep same as parent eq (not correct configuration, only for testing)
+                                                                        Long.valueOf(5000300), //keep same as parent eq
                                                                         10,
-                                                                        new Long(1223),
-                                                                        new Long(100)
+                                                                        Long.valueOf(1223),
+                                                                        Long.valueOf(100)
                                                                         );
     subEquipmentCacheObject.setStatusDescription("Status description");
     subEquipmentCacheObject.setStatusTime(new Timestamp(System.currentTimeMillis()));
@@ -317,14 +319,10 @@ public final class CacheObjectCreation {
    * @return the Process
    */
   public static ProcessCacheObject createTestProcess1() {
-    ProcessCacheObject processCacheObject = new ProcessCacheObject(new Long(90), "Test Process", new Long(1200), 100, 100);
-    //processCacheObject.setId(new Long(90));
-    //processCacheObject.setName("Test Process");
+    ProcessCacheObject processCacheObject = new ProcessCacheObject(Long.valueOf(90), "Test Process", Long.valueOf(1200), 100, 100);
     processCacheObject.setDescription("Test process description");
-    //processCacheObject.setMaxMessageDelay(100);
-    //processCacheObject.setMaxMessageSize(100);
     processCacheObject.setAliveInterval(60);
-    processCacheObject.setAliveTagId(new Long(510)); //FK ref
+    processCacheObject.setAliveTagId(Long.valueOf(510)); //FK ref
     processCacheObject.setStateTagId(510L);
     processCacheObject.setSupervisionStatus(SupervisionStatus.DOWN);
     processCacheObject.setStatusTime(new Timestamp(System.currentTimeMillis()));
@@ -343,12 +341,13 @@ public final class CacheObjectCreation {
    * @return the RuleTag
    */
   public static RuleTagCacheObject createTestRuleTag() {
-    RuleTagCacheObject cacheObject = new RuleTagCacheObject(new Long(130),
-                                                                  "Junit_test_tag",
-                                                                  "Integer",
-                                                                  DataTagConstants.MODE_TEST,
-                                                                  "(#100000 = true)&(#100001 = true)[2],true[3]"); //rule text set here - only extra field on top of abstract class
-    cacheObject.setId(new Long(130));  //must be non null in DB
+    RuleTagCacheObject cacheObject =
+        new RuleTagCacheObject(Long.valueOf(130L),
+          "Junit_test_tag",
+          "Integer",
+          DataTagConstants.MODE_TEST,
+          "(#100000 = true)&(#100001 = true)[2],true[3]"); //rule text set here - only extra field on top of abstract class
+    cacheObject.setId(Long.valueOf(130L));  //must be non null in DB
     cacheObject.setName("Junit_test_rule_tag"); //non null
     cacheObject.setDescription("test rule description");
     cacheObject.setMode(DataTagConstants.MODE_TEST); //non null
@@ -358,7 +357,7 @@ public final class CacheObjectCreation {
     cacheObject.setUnit("test unit m/sec");
     cacheObject.setDipAddress("testDIPaddress");
     cacheObject.setJapcAddress("testJAPCaddress");
-    cacheObject.setValue(new Integer(1000));
+    cacheObject.setValue(Integer.valueOf(1000));
     cacheObject.setValueDescription("test value description");
     cacheObject.setSimulated(false); //null allowed
     cacheObject.setDataTagQuality(createValidQuality());
@@ -372,11 +371,11 @@ public final class CacheObjectCreation {
    * @return the ControlTag
    */
   public static ControlTagCacheObject createTestProcessAlive() {
-    ControlTagCacheObject cacheObject = new ControlTagCacheObject(new Long(510),
+    ControlTagCacheObject cacheObject = new ControlTagCacheObject(Long.valueOf(510),
                                                                   "Test process alive tag",
                                                                   "Long",
                                                                   DataTagConstants.MODE_TEST);
-    //cacheObject.setId(new Long(5000100));  //must be non null in DB
+    //cacheObject.setId(Long.valueOf(5000100));  //must be non null in DB
     //cacheObject.setName("Test process alive tag"); //non null
     cacheObject.setDescription("test alive description");
     //cacheObject.setMode(DataTagConstants.MODE_TEST); //non null
@@ -386,10 +385,10 @@ public final class CacheObjectCreation {
     cacheObject.setUnit("seconds since 1970");
     cacheObject.setDipAddress("testDIPaddress");
     cacheObject.setJapcAddress("testJAPCaddress");
-    cacheObject.setValue(new Long(System.currentTimeMillis()));
+    cacheObject.setValue(Long.valueOf(System.currentTimeMillis()));
     cacheObject.setValueDescription("test value description");
     cacheObject.setSimulated(false); //null allowed
-    //cacheObject.setEquipmentId(new Long(300000)); //null for alive tags!
+    //cacheObject.setEquipmentId(Long.valueOf(300000)); //null for alive tags!
     cacheObject.setMinValue(Long.MIN_VALUE);
     cacheObject.setMaxValue(Long.MAX_VALUE);
     cacheObject.setAddress(new DataTagAddress());
@@ -405,11 +404,11 @@ public final class CacheObjectCreation {
    * @return the ControlTag
    */
   public static ControlTagCacheObject createTestEquipmentAlive() {
-    ControlTagCacheObject cacheObject = new ControlTagCacheObject(new Long(5000200),
+    ControlTagCacheObject cacheObject = new ControlTagCacheObject(Long.valueOf(5000200),
                                                                   "Test equipment alive tag",
                                                                   "Long",
                                                                   DataTagConstants.MODE_TEST);
-    //cacheObject.setId(new Long(5000200));  //must be non null in DB
+    //cacheObject.setId(Long.valueOf(5000200));  //must be non null in DB
     //cacheObject.setName("Test equipment alive tag"); //non null
     cacheObject.setDescription("test alive description");
     //cacheObject.setMode(DataTagConstants.MODE_TEST); //non null
@@ -419,10 +418,10 @@ public final class CacheObjectCreation {
     cacheObject.setUnit("seconds since 1970");
     cacheObject.setDipAddress("testDIPaddress");
     cacheObject.setJapcAddress("testJAPCaddress");
-    cacheObject.setValue(new Long(System.currentTimeMillis()));
+    cacheObject.setValue(Long.valueOf(System.currentTimeMillis()));
     cacheObject.setValueDescription("test value description");
     cacheObject.setSimulated(false); //null allowed
-    //cacheObject.setEquipmentId(new Long(300000)); //null for alive tags!
+    //cacheObject.setEquipmentId(Long.valueOf(300000)); //null for alive tags!
     cacheObject.setMinValue(Long.MIN_VALUE);
     cacheObject.setMaxValue(Long.MAX_VALUE);
     cacheObject.setAddress(new DataTagAddress());
@@ -438,11 +437,11 @@ public final class CacheObjectCreation {
    * @return the ControlTag
    */
   public static ControlTagCacheObject createTestSubEquipmentAlive() {
-    ControlTagCacheObject cacheObject = new ControlTagCacheObject(new Long(5000300),
+    ControlTagCacheObject cacheObject = new ControlTagCacheObject(Long.valueOf(5000300),
                                                                   "Test subequipment alive tag",
                                                                   "Long",
                                                                   DataTagConstants.MODE_TEST);
-    //cacheObject.setId(new Long(5000300));  //must be non null in DB
+    //cacheObject.setId(Long.valueOf(5000300));  //must be non null in DB
     //cacheObject.setName("Test subequipment alive tag"); //non null
     cacheObject.setDescription("test alive description");
     //cacheObject.setMode(DataTagConstants.MODE_TEST); //non null
@@ -452,10 +451,10 @@ public final class CacheObjectCreation {
     cacheObject.setUnit("seconds since 1970");
     cacheObject.setDipAddress("testDIPaddress");
     cacheObject.setJapcAddress("testJAPCaddress");
-    cacheObject.setValue(new Long(System.currentTimeMillis()));
+    cacheObject.setValue(Long.valueOf(System.currentTimeMillis()));
     cacheObject.setValueDescription("test value description");
     cacheObject.setSimulated(false); //null allowed
-    //cacheObject.setEquipmentId(new Long(300000)); //null for alive tags!
+    //cacheObject.setEquipmentId(Long.valueOf(300000)); //null for alive tags!
     cacheObject.setMinValue(Long.MIN_VALUE);
     cacheObject.setMaxValue(Long.MAX_VALUE);
     cacheObject.setAddress(new DataTagAddress());
@@ -495,7 +494,7 @@ public final class CacheObjectCreation {
       //set process field - usually loaded using join from DB -  here must set to parent of Eq 300000
       commandTag.setProcessId(Long.valueOf(90));
 
-      CommandExecutionDetails<Long> commandExecutionDetails = new CommandExecutionDetails<Long>();
+      CommandExecutionDetails<Long> commandExecutionDetails = new CommandExecutionDetails<>();
       commandExecutionDetails.setExecutionStartTime(new Timestamp(System.currentTimeMillis() - 1000));
       commandExecutionDetails.setExecutionEndTime(new Timestamp(System.currentTimeMillis()));
       commandExecutionDetails.setValue(10L);

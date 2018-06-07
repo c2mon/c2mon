@@ -33,6 +33,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public final class TypeConverter  {
 
+  private static final String JAVA_LANG_PREFIX = "java.lang.";
+
   /**
    * Hidden default constructor
    */
@@ -592,7 +594,11 @@ public final class TypeConverter  {
    * @return the class for the given name if known, {@literal null} otherwise
    */
   public static Class<?> getType(String typeName) {
-    String fullPath = !typeName.contains(".") ? "java.lang." + typeName : typeName;
+    if (typeName == null) {
+      return null;
+    }
+
+    String fullPath = typeName.contains(".") ? typeName : JAVA_LANG_PREFIX + typeName;
 
     try {
       return Class.forName(fullPath);
@@ -603,14 +609,14 @@ public final class TypeConverter  {
 
   /**
    * Is the given type name a primitive type?
-   * 
+   *
    * @param typeName a simple class name within the java.lang.* package or the
    *                 fully qualified class name
-   * 
+   *
    * @return true if primitive
    */
   public static boolean isPrimitive(String typeName) {
-	  String fullPath = !typeName.contains(".") ? "java.lang." + typeName : typeName;
-	  return fullPath.startsWith("java.lang.") && !fullPath.equals("java.lang.Object");
+	  String fullPath = !typeName.contains(".") ? JAVA_LANG_PREFIX + typeName : typeName;
+	  return fullPath.startsWith(JAVA_LANG_PREFIX) && !fullPath.equals("java.lang.Object");
   }
 }

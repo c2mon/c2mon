@@ -43,7 +43,7 @@
   <appender name="TagAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <file>${TAG_LOG_FILE}</file>
     <encoder>
-      <pattern>%msg%n</pattern>
+      <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %msg%n</pattern>
     </encoder>
     <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
       <fileNamePattern>${TAG_LOG_FILE}.%i</fileNamePattern>
@@ -56,7 +56,7 @@
   <appender name="TagFilterAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <file>${TAG_FILTER_LOG_FILE}</file>
     <encoder>
-      <pattern>%msg%n</pattern>
+      <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %msg%n</pattern>
     </encoder>
     <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
       <fileNamePattern>${TAG_FILTER_LOG_FILE}.%i</fileNamePattern>
@@ -82,7 +82,7 @@
   <appender name="CommandAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <file>${COMMAND_LOG_FILE}</file>
     <encoder>
-      <pattern>%msg%n</pattern>
+      <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %msg%n</pattern>
     </encoder>
     <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
       <fileNamePattern>${COMMAND_LOG_FILE}.%i</fileNamePattern>

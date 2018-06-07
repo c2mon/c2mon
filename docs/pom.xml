@@ -5,7 +5,7 @@
   <parent>
     <groupId>cern.c2mon</groupId>
     <artifactId>c2mon</artifactId>
-    <version>1.8.32-SNAPSHOT</version>
+    <version>1.8.39-SNAPSHOT</version>
   </parent>
 
   <artifactId>docs</artifactId>
@@ -26,10 +26,11 @@
           </execution>
         </executions>
         <configuration>
-          <executable>./build.sh</executable>
+          <executable>mkdocs</executable>
           <workingDirectory>${project.basedir}</workingDirectory>
           <arguments>
-            <argument>${project.version}</argument>
+            <argument>build</argument>
+            <argument>--clean</argument>
           </arguments>
         </configuration>
       </plugin>
@@ -52,4 +53,3 @@
   </build>
 
 </project>
-

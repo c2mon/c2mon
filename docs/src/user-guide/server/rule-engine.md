@@ -1,7 +1,11 @@
 # Rule Engine
 
+An introduction to the C2MON RuleTag grammar.
+
+---
+
 C2MON provides a simple Domain Specific Language (DSL) that allows expressing complex rules on top of the acquired data.
-The rules are stored as simple Strings and loaded as [RuleTags](/core-concepts/tags), which are then interpreted at runtime.
+The rules are stored as simple Strings and loaded as [RuleTags](/overview/tags), which are then interpreted at runtime.
 
 The rule evaluation on the C2MON server layer is fully supported within a clustered setup.
 Thanks to its rich rule grammar the C2MON Rule Engine can play a central role for real time analytics.
@@ -141,7 +145,7 @@ In case that #44178 is invalid:
 #### Checking for Invalid Tags
 
 The rule engine does always a best effort evaluation.
-In case of an invalid input tags you have to keep in mind the following behavior of the Rule Engine:
+In case of an invalid input tags you have to keep in mind the following behaviour of the Rule Engine:
 
 - Conditions that are concatenated by the AND (&) operator cannot be evaluated, if one of the input tags has an invalid quality.
 - OR (|) concatenated conditions can be evaluated, if at least one input tag is valid.
@@ -164,4 +168,9 @@ Common problems are:
 
 - Comparison Operators are applied to non Boolean type values
 - Arithmetic Operators are applied to Boolean or String types
-- One of the tags addressed by the rule is not initialized
+- One of the tags addressed by the rule is not initialised
+
+
+## Configuration of a RuleTags
+
+Configuring a `RuleTag` is very similar to the configuration of a `DataTag`, which is described in the [Configuration API](/user-guide/client-api/configuration/#configuring-ruletags) section.
