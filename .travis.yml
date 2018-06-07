@@ -1,0 +1,20 @@
+language: java
+jdk: openjdk8
+branches:
+- master
+- 1.x
+- 2.x
+cache:
+  directories:
+  - $HOME/.m2
+install:
+- mvn install -DskipTests=true -Dmaven.javadoc.skip=true -pl \!docs -DskipDockerBuild -DskipDockerTag -B -V
+script:
+- mvn -pl \!docs -DskipDockerBuild -DskipDockerTag test -B
+after_success:
+- openssl aes-256-cbc -pass pass:$ENCRYPTION_PASSWORD -in $GPG_DIR/pubring.gpg.enc -out $GPG_DIR/pubring.gpg -d
+- openssl aes-256-cbc -pass pass:$ENCRYPTION_PASSWORD -in $GPG_DIR/secring.gpg.enc -out $GPG_DIR/secring.gpg -d
+- $GPG_DIR/publish.sh
+env:
+  global:
+  - GPG_DIR="`pwd`/.travis/deploy"
