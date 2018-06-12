@@ -1,0 +1,284 @@
+apiVersion: v1
+kind: Template
+metadata:
+  creationTimestamp: null
+  name: c2mon-server-template
+objects:
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+      openshift.io/image.dockerRepositoryCheck: 2016-07-05T09:47:26Z
+    creationTimestamp: null
+    generation: 2
+    labels:
+      app: c2mon
+    name: c2mon
+  spec:
+    tags:
+    - annotations:
+        openshift.io/imported-from: docker.cern.ch/c2mon-project/server
+      from:
+        kind: DockerImage
+        name: 172.30.78.46:5000/test-c2mon-server/c2mon:latest
+      generation: 2
+      importPolicy: {}
+      name: latest
+  status:
+    dockerImageRepository: ""
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+    creationTimestamp: null
+    labels:
+      app: c2mon
+    name: c2mon
+  spec:
+    replicas: 1
+    selector:
+      app: c2mon
+      deploymentconfig: c2mon
+    strategy:
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        annotations:
+          openshift.io/container.c2mon.image.entrypoint: '["bin/c2mon.sh","run"]'
+          openshift.io/generated-by: OpenShiftNewApp
+        creationTimestamp: null
+        labels:
+          app: c2mon
+          deploymentconfig: c2mon
+      spec:
+        containers:
+        - image: docker.cern.ch/c2mon-project/server@sha256:28306fd4d8c04266af44be95590ebf139f4a54a09cc11845a4489c8712081803
+          imagePullPolicy: Always
+          name: c2mon
+          ports:
+          - containerPort: 9001
+            protocol: TCP
+          - containerPort: 1099
+            protocol: TCP
+          - containerPort: 61616
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          volumeMounts:
+          - mountPath: /opt/c2mon/server/conf
+            name: c2mon-volume-1
+          - mountPath: /opt/c2mon/server/log
+            name: c2mon-volume-2
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - emptyDir: {}
+          name: c2mon-volume-1
+        - emptyDir: {}
+          name: c2mon-volume-2
+    test: false
+    triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - c2mon
+        from:
+          kind: ImageStreamTag
+          name: c2mon:latest
+          namespace: test-c2mon-server
+      type: ImageChange
+  status: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+    creationTimestamp: null
+    labels:
+      app: c2mon
+    name: c2mon
+  spec:
+    ports:
+    - name: 1099-tcp
+      port: 1099
+      protocol: TCP
+      targetPort: 1099
+    - name: 9001-tcp
+      port: 9001
+      protocol: TCP
+      targetPort: 9001
+    - name: 61616-tcp
+      port: 61616
+      protocol: TCP
+      targetPort: 61616
+    selector:
+      app: c2mon
+      deploymentconfig: c2mon
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+      openshift.io/image.dockerRepositoryCheck: 2016-07-05T09:58:14Z
+    creationTimestamp: null
+    generation: 2
+    labels:
+      app: cfgviewer
+    name: cfgviewer
+  spec:
+    tags:
+    - annotations:
+        openshift.io/imported-from: docker.cern.ch/c2mon-project/web-configviewer
+      from:
+        kind: DockerImage
+        name: 172.30.78.46:5000/test-c2mon-server/cfgviewer:latest
+      generation: 2
+      importPolicy: {}
+      name: latest
+  status:
+    dockerImageRepository: ""
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+    creationTimestamp: null
+    labels:
+      app: cfgviewer
+    name: cfgviewer
+  spec:
+    replicas: 1
+    selector:
+      app: cfgviewer
+      deploymentconfig: cfgviewer
+    strategy:
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        annotations:
+          openshift.io/container.cfgviewer.image.entrypoint: '["bin/webapp.sh","run"]'
+          openshift.io/generated-by: OpenShiftNewApp
+        creationTimestamp: null
+        labels:
+          app: cfgviewer
+          deploymentconfig: cfgviewer
+      spec:
+        containers:
+        - image: docker.cern.ch/c2mon-project/web-configviewer@sha256:b4405eaed26e94b5becac3424b0e2adf41641f7efa750b9d07403ac5da7b23da
+          imagePullPolicy: Always
+          name: cfgviewer
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          resources:
+            limits:
+              cpu: "1"
+              memory: 2Gi
+            requests:
+              cpu: 200m
+              memory: 512Mi
+          terminationMessagePath: /dev/termination-log
+          volumeMounts:
+          - mountPath: /opt/c2mon/web-configviewer/log
+            name: cfgviewer-volume-2
+          - mountPath: /opt/c2mon/web-configviewer/tmp
+            name: cfgviewer-volume-3
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - emptyDir: {}
+          name: cfgviewer-volume-2
+        - emptyDir: {}
+          name: cfgviewer-volume-3
+    test: false
+    triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - cfgviewer
+        from:
+          kind: ImageStreamTag
+          name: cfgviewer:latest
+          namespace: test-c2mon-server
+      type: ImageChange
+  status: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+    creationTimestamp: null
+    labels:
+      app: c2mon
+    name: c2mon
+  spec:
+    ports:
+    - name: 1099-tcp
+      port: 1099
+      protocol: TCP
+      targetPort: 1099
+    - name: 9001-tcp
+      port: 9001
+      protocol: TCP
+      targetPort: 9001
+    - name: 61616-tcp
+      port: 61616
+      protocol: TCP
+      targetPort: 61616
+    selector:
+      app: c2mon
+      deploymentconfig: c2mon
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Route
+  metadata:
+    annotations:
+      cern.ch/generated.host.replaced: "true"
+    creationTimestamp: null
+    labels:
+      app: cfgviewer
+    name: cfgviewer
+  spec:
+    host: test-c2mon-server.web.cern.ch
+    port:
+      targetPort: 8080-tcp
+    to:
+      kind: Service
+      name: cfgviewer
+  status:
+    ingress:
+    - conditions:
+      - lastTransitionTime: 2016-07-05T10:00:21Z
+        status: "True"
+        type: Admitted
+      host: test-c2mon-server.web.cern.ch
+      routerName: router
