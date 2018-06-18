@@ -44,13 +44,13 @@ deploy_docs:
 sonar_preview:
   type: sonar
   script:
-    - mvn -q -U -B clean compile sonar:sonar -Dmaven.test.skip=true -Dsonar.host.url=https://en-ice-sonar.cern.ch -Dsonar.analysis.mode=preview -Dsonar.gitlab.commit_sha=$CI_BUILD_REF -Dsonar.gitlab.ref_name=$CI_BUILD_REF_NAME -Dsonar.gitlab.project_id=$CI_PROJECT_ID -Dsonar.gitlab.max_major_issues_gate=0 --settings settings.xml
+    - mvn -q -U -B clean compile sonar:sonar -Dmaven.test.skip=true -Dsonar.host.url=${SONAR_URL} -Dsonar.analysis.mode=preview -Dsonar.gitlab.commit_sha=$CI_BUILD_REF -Dsonar.gitlab.ref_name=$CI_BUILD_REF_NAME -Dsonar.gitlab.project_id=$CI_PROJECT_ID -Dsonar.gitlab.max_major_issues_gate=0 --settings settings.xml
   except:
     - master
 
 quality_assurance:
   stage: sonar
   script:
-    - mvn package dependency-check:aggregate sonar:sonar -Dmaven.test.skip=true -Dsonar.host.url=https://en-ice-sonar.cern.ch -Dsonar.dependencyCheck.reportPath=target/dependency-check-report.xml --settings settings.xml
+    - mvn package dependency-check:aggregate sonar:sonar -Dmaven.test.skip=true -Dsonar.host.url=${SONAR_URL} -Dsonar.dependencyCheck.reportPath=target/dependency-check-report.xml --settings settings.xml
   only:
     - master
