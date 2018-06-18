@@ -124,7 +124,7 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <properties>
-        <sonar.host.url>https://en-ice-sonar.cern.ch</sonar.host.url>
+        <sonar.host.url>https://cvl-sonarqube.cern.ch</sonar.host.url>
       </properties>
     </profile>	
   </profiles>
