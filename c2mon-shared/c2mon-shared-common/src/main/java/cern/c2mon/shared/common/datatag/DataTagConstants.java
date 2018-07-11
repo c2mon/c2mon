@@ -111,7 +111,8 @@ public interface DataTagConstants {
    */
   public static final short TTL_FOREVER = 0;
   
-  public static final int TTL_ONE_WEEK = 604800000;
+  public static final int TTL_ONE_DAY = 86400000;
+  public static final int TTL_TEN_MINUTES = 600000;
 
 
 }

@@ -157,12 +157,12 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
   /**
    * Default constructor creating an uninitialised DataTagAddress object. The
    * HardwareAddress field of the created object will be null. The timeToLive
-   * is set to 1 week, the deadband is set to DEADBAND_NONE, the priority
+   * is set to 1 day, the deadband is set to DEADBAND_NONE, the priority
    * is PRIORITY_LOW.
    */
   public DataTagAddress() {
     this(null, // no hardware address
-            TTL_ONE_WEEK, // maximum time-to-live - 1 week
+            TTL_ONE_DAY, // maximum time-to-live
         DataTagDeadband.DEADBAND_NONE, // no deadband filtering
         0f, // no value deadband
         0, // no time deadband
@@ -172,14 +172,14 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
   }
 
   /**
-   * Constructor Default values: The timeToLive is set to 1 week, the
+   * Constructor Default values: The timeToLive is set to 1 day, the
    * deadband is set to DEADBAND_NONE, the transformation factor is set to
    * TRANSFORMATION_NONE, the priority is PRIORITY_LOW.
    *
    * @param hardwareAddress the hardware address for the DataTagAddress object
    */
   public DataTagAddress(HardwareAddress hardwareAddress) {
-    this(hardwareAddress, TTL_ONE_WEEK, // maximum time-to-live - 1 week
+    this(hardwareAddress, TTL_ONE_DAY, // maximum time-to-live
         DataTagDeadband.DEADBAND_NONE, // no value deadband filtering
         0f, // no value deadband
         0, // no time deadband filtering
@@ -225,14 +225,14 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
   }
 
   /**
-   * Constructor Default values: The timeToLive is set to TTL_ONE_WEEK, the
+   * Constructor Default values: The timeToLive is set to TTL_ONE_DAY, the
    * deadband is set to DEADBAND_NONE, the transformation factor is set to
    * TRANSFORMATION_NONE, the priority is PRIORITY_LOW.
    *
    * @param addressParameters the address parameters the DataTagAddress object
    */
   public DataTagAddress(HashMap<String, String> addressParameters) {
-    this(TTL_ONE_WEEK, // maximum time-to-live
+    this(TTL_ONE_DAY, // maximum time-to-live
         DataTagDeadband.DEADBAND_NONE, // no value deadband filtering
         0f, // no value deadband
         0, // no time deadband filtering
@@ -413,11 +413,11 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
    * Set the time-to-live (TTL) for values sent by a data source.
    *
    * @param ttl the time-to-live in milliseconds. If the specified ttl is less
-   *            than 0, ttl defaults to TTL_ONE_WEEK.
+   *            than 0, ttl defaults to TTL_ONE_DAY.
    */
   public void setTimeToLive(int ttl) {
     if (ttl < 0) {
-      this.timeToLive = TTL_ONE_WEEK;
+      this.timeToLive = TTL_ONE_DAY;
     } else {
       this.timeToLive = ttl;
     }
