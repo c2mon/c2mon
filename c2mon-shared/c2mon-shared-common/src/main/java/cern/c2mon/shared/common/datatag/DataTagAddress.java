@@ -441,9 +441,9 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
       str.append(SimpleXMLParser.mapToXMLString(addressParameters));
     }
 
-    str.append("        <time-to-live>");
-    str.append(timeToLive);
-    str.append("</time-to-live>\n");
+    str.append("        <time-to-live>") 
+       .append(timeToLive)
+       .append("</time-to-live>\n");
 
     if (valueDeadbandType != DataTagDeadband.DEADBAND_NONE) {
       str.append("        <value-deadband-type>");
