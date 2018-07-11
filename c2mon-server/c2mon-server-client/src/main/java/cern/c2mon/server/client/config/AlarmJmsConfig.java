@@ -29,7 +29,7 @@ public class AlarmJmsConfig {
     jmsTemplate.setDefaultDestination(new ActiveMQTopic(alarmTopic));
 
     jmsTemplate.setExplicitQosEnabled(true);
-    jmsTemplate.setTimeToLive(5400000);
+    jmsTemplate.setTimeToLive(properties.getJms().getTimeToLive());
     jmsTemplate.setDeliveryPersistent(false);
     jmsTemplate.setSessionTransacted(false);
     return jmsTemplate;

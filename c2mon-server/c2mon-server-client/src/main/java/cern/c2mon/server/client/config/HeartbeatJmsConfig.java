@@ -36,7 +36,7 @@ public class HeartbeatJmsConfig {
     jmsTemplate.setDefaultDestination(new ActiveMQTopic(properties.getJms().getHeartbeatTopic()));
     jmsTemplate.setExplicitQosEnabled(true);
     jmsTemplate.setPriority(7);
-    jmsTemplate.setTimeToLive(5400000);
+    jmsTemplate.setTimeToLive(properties.getJms().getTimeToLive());
     jmsTemplate.setDeliveryPersistent(false);
     jmsTemplate.setSessionTransacted(false);
     return jmsTemplate;

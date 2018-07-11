@@ -85,7 +85,7 @@ public class ClientRequestDelegator implements SessionAwareMessageListener<Messa
   /**
    * Default TTL of replies to client requests
    */
-  private static final long DEFAULT_REPLY_TTL = 5400000;
+  private static final long DEFAULT_REPLY_TTL = 3600000;
 
   /**
    * Default Constructor

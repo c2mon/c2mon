@@ -47,7 +47,7 @@ public class ClientJmsConfig {
   public JmsTemplate clientTopicPublisherJmsTemplate() {
     JmsTemplate jmsTemplate = new JmsTemplate(clientSingleConnectionFactory());
     jmsTemplate.setExplicitQosEnabled(true);
-    jmsTemplate.setTimeToLive(5400000);
+    jmsTemplate.setTimeToLive(properties.getJms().getTimeToLive());
     jmsTemplate.setDeliveryPersistent(false);
     jmsTemplate.setSessionTransacted(false);
     return jmsTemplate;
