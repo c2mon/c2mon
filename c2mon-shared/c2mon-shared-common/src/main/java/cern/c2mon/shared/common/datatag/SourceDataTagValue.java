@@ -131,7 +131,7 @@ public final class SourceDataTagValue implements Cloneable {
         null, // timestamp
         DataTagAddress.PRIORITY_LOW, false, // no guaranteed delivery
         null, // no value description
-        DataTagAddress.TTL_FOREVER);
+        DataTagAddress.TTL_ONE_WEEK);
   }
 
   /**

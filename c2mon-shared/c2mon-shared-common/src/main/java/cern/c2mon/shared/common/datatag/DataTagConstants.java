@@ -110,6 +110,8 @@ public interface DataTagConstants {
    * <PRE>setTimeToLive(TTL_FOREVER);</PRE>
    */
   public static final short TTL_FOREVER = 0;
+  
+  public static final int TTL_ONE_WEEK = 604800000;
 
 
 }
