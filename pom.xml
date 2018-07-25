@@ -5,11 +5,11 @@
   <parent>
     <groupId>cern.c2mon.client</groupId>
     <artifactId>c2mon-client</artifactId>
-    <version>1.8.30</version>
+    <version>1.8.30-SNAPSHOT</version>
   </parent>
 
   <artifactId>c2mon-client-ext-dynconfig</artifactId>
-  <version>0.2.0</version>
+  <version>0.2.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>C2MON dynamic configuration service</name>
@@ -19,7 +19,7 @@
     <url>https://gitlab.cern.ch/c2mon/c2mon-client-ext-dynconfig</url>
     <connection>scm:git:ssh://git@gitlab.cern.ch:7999/c2mon/c2mon-client-ext-dynconfig.git</connection>
     <developerConnection>scm:git:ssh://git@gitlab.cern.ch:7999/c2mon/c2mon-client-ext-dynconfig.git</developerConnection>
-    <tag>0.2.0</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <dependencies>
