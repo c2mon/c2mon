@@ -109,21 +109,18 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
 	 * Timestamp of the last state change
 	 **/
 
-
 	private boolean lastActiveState;
-	private int counterFault=0;
-	private int timeRange=60;
-	private int oscNumbers=6;
+	private int counterFault;
 	private long firstOscTS;
-	private boolean oscillating=false;
-	
-	
-	public void setState(String newState)
-	{
-		this.state= newState;
+	private boolean oscillating;
+	final int timeRange = 60;
+	final int oscNumbers = 6;
+
+	public void setState(String newState) {
+		this.state = newState;
 		checkOscillation();
 	}
-	
+
 	private void checkOscillation() {
 		final boolean isCurrentlyActive = isActive();
 		if (isCurrentlyActive != lastActiveState) {
@@ -132,7 +129,6 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
 			resetCounter();
 		}
 		lastActiveState = isCurrentlyActive;
-		//System.out.println("last data:" + newData + " ==== counter:" + counterFault + " ==== OSCILLATING: " + oscillating);
 	}
 
 	private void increaseCounter() {
@@ -149,12 +145,8 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
 	}
 
 	private boolean checkConditions() {
-		return ((counterFault >= oscNumbers) && ((System.currentTimeMillis() - firstOscTS) <= timeRange * 1000));
+		return (counterFault >= oscNumbers && (System.currentTimeMillis() - firstOscTS) <= timeRange * 1000);
 	}
-
-	/**
-	 * EP
-	 **/
 
 	private Timestamp timestamp;
 
@@ -181,8 +173,6 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
 	 */
 	private String topic = "c2mon.client.alarm";
 
-	
-	
 	/**
 	 * Default constructor.
 	 */
