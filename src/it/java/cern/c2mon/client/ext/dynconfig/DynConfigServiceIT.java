@@ -32,14 +32,14 @@ public class DynConfigServiceIT {
 		dcs.setConfigurationService(C2monServiceGateway.getConfigurationService());
 		dcs.setTagService(C2monServiceGateway.getTagService());
 		
-		dcs.config = new DynConfigConfiguration();
+		dcs.setConfig(new DynConfigConfiguration());
 		List<ProcessEquipmentURIMapping> mappings = new ArrayList<>();
 		
 		mappings.add(ProcessEquipmentURIMapping.builder().uriPattern("^dip.*")
 				.processId(10001L).processName("P_DYNDIP")
 				.equipmentName("E_DYNDIP").build());
 		
-		dcs.config.setMappings(mappings);
+		dcs.getConfig().setMappings(mappings);
 		
 		DipConfigStrategy dipCS = new DipConfigStrategy();
 		

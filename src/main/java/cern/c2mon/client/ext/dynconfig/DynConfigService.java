@@ -37,9 +37,13 @@ public class DynConfigService {
 	private Collection<ITagConfigurationStrategy> configurationStrategies = null;
 
 	@Autowired
-	DynConfigConfiguration config;
+    private DynConfigConfiguration config;
 
-	public DynConfigService() {
+	public DynConfigConfiguration getConfig() {
+        return config;
+    }
+
+    public DynConfigService() {
 		// Setup default configuration strategies
 
 	}
@@ -120,7 +124,7 @@ public class DynConfigService {
 							// TODO: Inspect the report and propagate any errors
 							// as exceptions (or a bulk report)
 							if (rep.isErrorReport()) {
-								logger.error("Could not create data tag " + uri + " : " + rep.getErrorMessage());
+							    logger.error("Could not create data tag " + uri + " : " + rep.getErrorMessage());
 							}
 						}
 
@@ -140,5 +144,9 @@ public class DynConfigService {
 		}
 		return (tags.size() > 0 ? tags.iterator().next() : null);
 	}
+
+    public void setConfig(DynConfigConfiguration config) {
+        this.config = config;
+    }
 
 }
