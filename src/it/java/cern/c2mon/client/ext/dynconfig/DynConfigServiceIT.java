@@ -45,8 +45,6 @@ public class DynConfigServiceIT {
 		
 		dcs.setConfigurationStrategies(Arrays.asList(new ITagConfigurationStrategy[]{dipCS}));
 		
-//		Tag tag = dcs.getTagForURI(new URI("dip://dip/acc/LHC/RunControl/Page1"));
-//		Tag tag = dcs.getTagForURI(new URI(SupportedProtocolsEnum.PROTOCOL_OPCUA+"://pitrafficlight/GreenLED.on"));
 		URI uri = new URI("dip://dip/acc/LHC/RunControl/Page1");
 		Tag tag = dcs.getTagForURI(uri);
 		
