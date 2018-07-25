@@ -21,9 +21,9 @@ public class AlarmCacheObjectTest {
 		}
 		assertTrue(aco.isOscillating());
 
-		aco = new AlarmCacheObject();
-
 		// Second case : no oscillation if less than 5 state changes
+		// keeping always the timestamp within the range
+		aco = new AlarmCacheObject();
 		for (int i = 0; i < 5; i++) {
 			if (i % 2 == 0) {
 				aco.setState(AlarmCondition.ACTIVE);
@@ -34,10 +34,8 @@ public class AlarmCacheObjectTest {
 		assertFalse(aco.isOscillating());
 
 		// Third case : reset after some time
-
+		// time stamp not in the range
 		aco = new AlarmCacheObject();
-
-		// Second case : no oscillation if less than 5 state changes
 		for (int i = 0; i < 5; i++) {
 			try {
 				Thread.sleep(14000);
@@ -52,7 +50,6 @@ public class AlarmCacheObjectTest {
 			}
 		}
 		assertFalse(aco.isOscillating());
-
 	}
 
 }
