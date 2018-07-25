@@ -24,3 +24,5 @@ hs_err_pid*
 activemq-data/
 *~
 
+pom.xml.releaseBackup
+release.properties
