@@ -411,7 +411,7 @@ public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractT
   }
 
   /**
-   * To be called internally only within a dataTag synchronized block. Should not be made public.
+   * To be called internally only within a dataTag synchronized block. Shou ould not be made public.
    */
   private void updateAndValidate(final T dataTag, final Object value, final String valueDescription, final Timestamp timestamp) {
     if (!filteroutValid(dataTag, value, valueDescription, timestamp)) {

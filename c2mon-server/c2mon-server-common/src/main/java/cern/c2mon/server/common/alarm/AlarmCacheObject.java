@@ -40,22 +40,6 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
 	private static final long serialVersionUID = 794087757524662419L;
 
 	/**
-	 * This enum contains all the possible change state values which an alarm
-	 * object can have.
-	 */
-	public enum AlarmChangeState {
-		/** Alarm state hasn't changed since. */
-		CHANGE_NONE,
-		/** The alarm's state has changed. */
-		CHANGE_STATE,
-		/**
-		 * The additional information about the alarm has changed since the last
-		 * update call.
-		 */
-		CHANGE_PROPERTIES
-	};
-
-	/**
 	 * Internal identifier of the AlarmCacheObject.
 	 */
 	private Long id;
@@ -100,12 +84,6 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
 	private String state;
 
 	/**
-	 * Member indicating whether the alarm's state or properties have changed
-	 * since the last update.
-	 */
-	private AlarmChangeState alarmChangeState;
-
-	/**
 	 * Timestamp of the last state change
 	 **/
 
@@ -118,35 +96,35 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
 
 	public void setState(String newState) {
 		this.state = newState;
-		checkOscillation();
+		
 	}
 
-	private void checkOscillation() {
-		final boolean isCurrentlyActive = isActive();
-		if (isCurrentlyActive != lastActiveState) {
-			increaseCounter();
-		} else {
-			resetCounter();
-		}
-		lastActiveState = isCurrentlyActive;
-	}
-
-	private void increaseCounter() {
-		counterFault++;
-		if (counterFault == 1) {
-			firstOscTS = System.currentTimeMillis();
-		}
-		oscillating = checkConditions();
-	}
-
-	private void resetCounter() {
-		counterFault = 0;
-		oscillating = false;
-	}
-
-	private boolean checkConditions() {
-		return (counterFault >= oscNumbers && (System.currentTimeMillis() - firstOscTS) <= timeRange * 1000);
-	}
+//	private void checkOscillation() {
+//		final boolean isCurrentlyActive = isActive();
+//		if (isCurrentlyActive != lastActiveState) {
+//			increaseCounter();
+//		} else {
+//			resetCounter();
+//		}
+//		lastActiveState = isCurrentlyActive;
+//	}
+//
+//	private void increaseCounter() {
+//		counterFault++;
+//		if (counterFault == 1) {
+//			firstOscTS = System.currentTimeMillis();
+//		}
+//		oscillating = checkConditions();
+//	}
+//
+//	private void resetCounter() {
+//		counterFault = 0;
+//		oscillating = false;
+//	}
+//
+//	private boolean checkConditions() {
+//		return (counterFault >= oscNumbers && (System.currentTimeMillis() - firstOscTS) <= timeRange * 1000);
+//	}
 
 	private Timestamp timestamp;
 
@@ -180,7 +158,6 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
 		// Initialise run-time parameters with default values
 		// (overwritten on loading if DB has none null values)
 		this.state = AlarmCondition.TERMINATE;
-		this.alarmChangeState = AlarmChangeState.CHANGE_NONE;
 		this.timestamp = new Timestamp(0);
 		this.info = "";
 	}

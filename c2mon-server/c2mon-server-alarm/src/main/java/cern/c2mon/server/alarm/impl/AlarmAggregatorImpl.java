@@ -21,19 +21,18 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.alarm.AlarmAggregator;
 import cern.c2mon.server.alarm.AlarmAggregatorListener;
+import cern.c2mon.server.cache.C2monCacheListener;
 import cern.c2mon.server.cache.CacheRegistrationService;
 import cern.c2mon.server.cache.CacheSupervisionListener;
 import cern.c2mon.server.cache.TagFacadeGateway;
-import cern.c2mon.server.cache.TagLocationService;
-import cern.c2mon.server.cache.C2monCacheListener;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.tag.Tag;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Implementation of the {@link AlarmAggregator} (a singleton bean in 
@@ -66,11 +65,6 @@ public class AlarmAggregatorImpl implements AlarmAggregator, C2monCacheListener<
   private TagFacadeGateway tagFacadeGateway;
   
   /**
-   * The gateway to all Tag caches.
-   */
-  private TagLocationService tagLocationService;
-  
-  /**
    * Autowired constructor.
    * 
    * @param cacheRegistrationService the cache registration service (for registration to cache update notifications)  
@@ -79,11 +73,10 @@ public class AlarmAggregatorImpl implements AlarmAggregator, C2monCacheListener<
    */
   @Autowired
   public AlarmAggregatorImpl(final CacheRegistrationService cacheRegistrationService,
-      final TagFacadeGateway tagFacadeGateway, final TagLocationService tagLocationService) {
+      final TagFacadeGateway tagFacadeGateway) {
     super();
     this.cacheRegistrationService = cacheRegistrationService;    
     this.tagFacadeGateway = tagFacadeGateway;
-    this.tagLocationService = tagLocationService;
     listeners = new ArrayList<AlarmAggregatorListener>();
   }
 

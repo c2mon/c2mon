@@ -55,7 +55,10 @@ import cern.c2mon.shared.client.alarm.AlarmQuery;
 @Service("alarmCache")
 @ManagedResource(objectName="cern.c2mon:type=cache,name=alarmCache")
 public class AlarmCacheImpl extends AbstractCache<Long, Alarm> implements AlarmCache {
-
+  
+  final int timeRange = 60;
+  final int oscNumbers = 6;
+  
   @Autowired
   public AlarmCacheImpl(@Qualifier("clusterCache") final ClusterCache clusterCache,
                         @Qualifier("alarmEhcache") final Ehcache ehcache,
