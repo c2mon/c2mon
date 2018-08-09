@@ -54,7 +54,7 @@ public class AlarmFacadeImplTest {
   public void setup() {
     alarmCache = EasyMock.createStrictMock(AlarmCache.class);
     tagLocationService = EasyMock.createStrictMock(TagLocationService.class);
-    alarmFacadeImpl = new AlarmFacadeImpl(alarmCache, tagLocationService);
+    alarmFacadeImpl = new AlarmFacadeImpl(alarmCache, tagLocationService, null);
   }
   
   /**

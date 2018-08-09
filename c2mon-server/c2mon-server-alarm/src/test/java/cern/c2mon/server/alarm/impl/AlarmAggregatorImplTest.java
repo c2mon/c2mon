@@ -77,7 +77,7 @@ public class AlarmAggregatorImplTest {
    tagFacadeGateway = createMock(TagFacadeGateway.class);
    tagLocationService = createMock(TagLocationService.class);
    cacheRegistrationService = createMock(CacheRegistrationService.class);   
-   alarmAggregator = new AlarmAggregatorImpl(cacheRegistrationService, tagFacadeGateway, tagLocationService);
+   alarmAggregator = new AlarmAggregatorImpl(cacheRegistrationService, tagFacadeGateway);
    
    //register 2 listeners
    listener1 = createMock(AlarmAggregatorListener.class);

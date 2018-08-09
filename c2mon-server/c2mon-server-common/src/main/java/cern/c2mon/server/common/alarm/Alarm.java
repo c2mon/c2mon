@@ -19,9 +19,8 @@ package cern.c2mon.server.common.alarm;
 
 import java.sql.Timestamp;
 
-import cern.c2mon.server.common.alarm.AlarmCacheObject.AlarmChangeState;
-import cern.c2mon.shared.common.Cacheable;
 import cern.c2mon.server.common.metadata.Metadata;
+import cern.c2mon.shared.common.Cacheable;
 
 /**
  * Interface giving access to the most important attributes of an Alarm
@@ -36,13 +35,6 @@ public interface Alarm extends Cacheable {
    * @see AlarmCondition for the ACTIVE and TERMINATED constants
    */
   String getState();
-  
-  /**
-   * Get the change state of the alarm cache object
-   * @return The cache state enum constant which describes the change state.
-   * @see AlarmChangeState
-   */
-  AlarmChangeState getAlarmChangeState();
   
   /**
    * Get the UTC timestamp of the alarm's last state change
