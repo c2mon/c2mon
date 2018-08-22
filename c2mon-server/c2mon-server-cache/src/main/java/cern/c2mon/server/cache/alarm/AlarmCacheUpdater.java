@@ -57,14 +57,6 @@ final class AlarmCacheUpdater {
     // Compute the alarm state corresponding to the new tag value
     String newState = alarmCacheObject.getCondition().evaluateState(tag.getValue());
 
-    //Evaluate oscillation
-    final boolean isCurrentlyActive = alarm.isActive();
-    if (isCurrentlyActive != alarmCacheObject.isLastActiveState()) {
-      increaseOscillCounter(alarmCacheObject);
-    } else {
-      resetOscillCounter(alarmCacheObject);
-    }
-    alarmCacheObject.setLastActiveState(isCurrentlyActive);
     
    
   
@@ -158,22 +150,5 @@ final class AlarmCacheUpdater {
     // this.alarmChange = CHANGE_NONE;
     return alarmCacheObject;
   }
-
-private void increaseOscillCounter(AlarmCacheObject alarm) {
-  alarm.setCounterFault(alarm.getCounterFault()+1);
-  if (alarm.getCounterFault() == 1) {
-    alarm.setFirstOscTS(System.currentTimeMillis());
-  }
-  alarm.setOscillating(checkOscillConditions(alarm));
-}
-
-private void resetOscillCounter(AlarmCacheObject alarm) {
-  alarm.setCounterFault(0);
-  alarm.setOscillating(false);
-}
-
-private boolean checkOscillConditions(AlarmCacheObject alarm) {
-  return (alarm.getCounterFault() >= alarm.getOscNumbers() && (System.currentTimeMillis()-alarm.getFirstOscTS()) <= alarm.getTimeRange() * 1000);
-}
 
 }

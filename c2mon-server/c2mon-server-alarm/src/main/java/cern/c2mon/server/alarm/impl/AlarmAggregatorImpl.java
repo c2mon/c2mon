@@ -17,6 +17,7 @@
 package cern.c2mon.server.alarm.impl;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -26,6 +27,7 @@ import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.alarm.AlarmAggregator;
 import cern.c2mon.server.alarm.AlarmAggregatorListener;
+import cern.c2mon.server.alarm.oscillation.OscillationUpdater;
 import cern.c2mon.server.cache.C2monCacheListener;
 import cern.c2mon.server.cache.CacheRegistrationService;
 import cern.c2mon.server.cache.CacheSupervisionListener;
@@ -63,6 +65,9 @@ public class AlarmAggregatorImpl implements AlarmAggregator, C2monCacheListener<
    * The gateway to all Tag facades.
    */
   private TagFacadeGateway tagFacadeGateway;
+  
+  @Autowired
+  private OscillationUpdater oscillationUpdater;
   
   /**
    * Autowired constructor.
@@ -146,7 +151,12 @@ public class AlarmAggregatorImpl implements AlarmAggregator, C2monCacheListener<
         if (alarmList.isEmpty()) {
           log.warn("Empty alarm list returned when evaluating alarms for tag " + tag.getId()
               + " - this should not be happening (possible timestamp filtering problem)");
-        }        
+        }
+        for (Iterator alarmIterator = alarmList.iterator(); alarmIterator.hasNext();) {
+          Alarm alarm = (Alarm) alarmIterator.next();
+          oscillationUpdater.update(alarm, tag);
+        }
+        
       } catch (Exception e) {
         log.error("Exception caught when attempting to evaluate the alarms for tag " + tag.getId()
             + " - publishing to the client with no attached alarms.", e);
