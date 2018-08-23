@@ -22,7 +22,7 @@ public class EmbeddedBrokerAutoConfiguration {
     BrokerService brokerService = new BrokerService();
     brokerService.setPersistent(false);
     brokerService.setUseShutdownHook(false);
-    brokerService.setUseJmx(false);
+    brokerService.setUseJmx(true);
     brokerService.addConnector(properties.getJms().getUrl());
     return brokerService;
   }
