@@ -20,34 +20,20 @@ public class OscillationUpdaterTest {
   private OscillationUpdater acu;
   private DataTagCacheObject ee;
 
-  @Test
-  public void testOscillation() {
-    OscillationProperties myOsc = new OscillationProperties();
-    myOsc.setOscNumbers(6);
-    myOsc.setTimeRange(60);
-    acu.setOscillationProperties(myOsc);
-
-    // First case : simulation active state changes within period of time
-    // - assert that the oscillation is detected
-    oscillDetected();
-
-    // Second case : no oscillation if less than 5 state changes
-    // keeping always the timestamp within the range
-    lowOscillChanges();
-
-    // Third case : time stamp not in the range
-    tsNotInRange();
-  }
-
   @Before
   public void setup() {
     aco = new AlarmCacheObject();
     acu = new OscillationUpdater();
     ee = new DataTagCacheObject();
-    acu.update(aco, ee);
+    
+    OscillationProperties myOsc = new OscillationProperties();
+    myOsc.setOscNumbers(6);
+    myOsc.setTimeRange(60);
+    acu.setOscillationProperties(myOsc);
   }
 
-  public void oscillDetected() {
+  @Test
+  public void testOscillDetected() {
     for (int i = 0; i < 7; i++) {
       if (i % 2 == 0) {
         aco.setState(AlarmCondition.ACTIVE);
@@ -59,7 +45,8 @@ public class OscillationUpdaterTest {
     assertTrue(aco.isOscillating());
   }
 
-  public void lowOscillChanges() {
+  @Test
+  public void testLowOscillChanges() {
     for (int i = 0; i < 5; i++) {
       if (i % 2 == 0) {
         aco.setState(AlarmCondition.ACTIVE);
@@ -71,10 +58,11 @@ public class OscillationUpdaterTest {
     assertFalse(aco.isOscillating());
   }
 
-  public void tsNotInRange() {
+  @Test
+  public void testTimestampNotInRange() {
     for (int i = 0; i < 7; i++) {
       try {
-        Thread.sleep(5000);
+        Thread.sleep(1000);
       } catch (InterruptedException e) {
         // TODO Auto-generated catch block
         e.printStackTrace();
