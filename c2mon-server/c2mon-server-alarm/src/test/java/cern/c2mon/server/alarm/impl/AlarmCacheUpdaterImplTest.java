@@ -1,15 +1,16 @@
-package cern.c2mon.server.cache.alarm;
-
-import static org.junit.Assert.*;
+package cern.c2mon.server.alarm.impl;
 
 import org.junit.Test;
 
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
+import cern.c2mon.server.common.alarm.AlarmCacheUpdater;
 import cern.c2mon.server.common.alarm.AlarmCondition;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
-import cern.c2mon.server.common.tag.Tag;
 
-public class AlarmCacheUpdaterTest {
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class AlarmCacheUpdaterImplTest {
 
   @Test
   public void testUpdate() {
@@ -21,7 +22,7 @@ public class AlarmCacheUpdaterTest {
     // First case : simulation active state changes within period of time
     // - assert that the oscillation is detected
     AlarmCacheObject aco = new AlarmCacheObject();
-    AlarmCacheUpdater acu = new AlarmCacheUpdater();
+    AlarmCacheUpdater acu = new AlarmCacheUpdaterImpl();
     DataTagCacheObject ee = new DataTagCacheObject();
     acu.update(aco, ee);
 

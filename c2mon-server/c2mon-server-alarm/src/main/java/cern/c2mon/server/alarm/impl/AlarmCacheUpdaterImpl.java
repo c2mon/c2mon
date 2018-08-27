@@ -1,7 +1,24 @@
-package cern.c2mon.server.cache.alarm;
+/******************************************************************************
+ * Copyright (C) 2010-2018 CERN. All rights not expressly granted are reserved.
+ *
+ * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
+ * C2MON is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation, either version 3 of the license.
+ *
+ * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
+ *****************************************************************************/
+package cern.c2mon.server.alarm.impl;
 
 import java.sql.Timestamp;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -9,24 +26,25 @@ import cern.c2mon.server.cache.AlarmCache;
 import cern.c2mon.server.cache.AlarmFacade;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
+import cern.c2mon.server.common.alarm.AlarmCacheUpdater;
 import cern.c2mon.server.common.alarm.AlarmCondition;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.common.datatag.DataTagConstants;
-import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
-final class AlarmCacheUpdater {
-  
+public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
+
   @Autowired
   AlarmCache alarmCache;
-  
+
   /**
    * Logic kept the same as in TIM1 (see {@link AlarmFacade}). The locking of
    * the objets is done in the public class. Notice, in this case the update()
    * method is putting the changes back into the cache.
    */
-  Alarm update(final Alarm alarm, final Tag tag) {
+  @Override
+  public Alarm update(final Alarm alarm, final Tag tag) {
     AlarmCacheObject alarmCacheObject = (AlarmCacheObject) alarm;
     // this time is then used in LASER publication as user timestamp
     Timestamp alarmTime = tag.getCacheTimestamp();
@@ -36,7 +54,7 @@ final class AlarmCacheUpdater {
     if (tag.getValue() == null) {
       log.debug("Alarm update called with null Tag value - leaving Alarm status unchanged at " + alarm.getState());
 
-      // change the alarm timestamp ifl the alarm has never been initialised
+      // change the alarm timestamp, if the alarm has never been initialised
       if (alarmCacheObject.getTimestamp().equals(new Timestamp(0))) {
         alarmCacheObject.setTimestamp(alarmTime);
       }
@@ -57,9 +75,9 @@ final class AlarmCacheUpdater {
     // Compute the alarm state corresponding to the new tag value
     String newState = alarmCacheObject.getCondition().evaluateState(tag.getValue());
 
-    
-   
-  
+
+
+
     // Return immediately if the alarm new state is null
     if (newState == null) {
       log.error("update() : new state would be NULL -> no update.");
@@ -98,6 +116,10 @@ final class AlarmCacheUpdater {
       }
     }
 
+    if (alarm.isOscillating()) {
+      additionalInfo = additionalInfo + "[OSC]";
+    }
+
     // Add another flag to the info if the value is simulated
     if (tag.isSimulated()) {
       additionalInfo = additionalInfo + "[SIM]";
@@ -114,7 +136,6 @@ final class AlarmCacheUpdater {
       alarmCacheObject.setState(newState);
       alarmCacheObject.setTimestamp(alarmTime);
       alarmCacheObject.setInfo(additionalInfo);
-      alarmCacheObject.notYetPublished();
       alarmCache.put(alarmCacheObject.getId(), alarmCacheObject);
       return alarmCacheObject;
     }
@@ -133,9 +154,6 @@ final class AlarmCacheUpdater {
       alarmCacheObject.setInfo(additionalInfo);
       alarmCacheObject.setTimestamp(alarmTime);
       if (!alarmCacheObject.getState().equals(AlarmCondition.TERMINATE)) {
-        // We only send a notification about a property change
-        // to the subscribed alarm listeners, if the alarm is active
-        alarmCacheObject.notYetPublished();
         alarmCache.put(alarmCacheObject.getId(), alarmCacheObject);
       }
       return alarmCacheObject;

@@ -29,6 +29,7 @@ import cern.c2mon.server.cache.common.AbstractFacade;
 import cern.c2mon.server.cache.util.MetadataUtils;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
+import cern.c2mon.server.common.alarm.AlarmCacheUpdater;
 import cern.c2mon.server.common.alarm.AlarmCondition;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.common.ConfigurationException;
@@ -72,10 +73,10 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
 
   private final AlarmCacheUpdater alarmCacheUpdater;
 
-  
+
   /**
    * Autowired constructor.
-   * 
+   *
    * @param alarmCache
    *          the alarm cache
    */
@@ -266,9 +267,9 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
   }
 
 //  private void checkOscillation(Alarm alarm) {
-//    
+//
 
-  
+
   //
 
   /**

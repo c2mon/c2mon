@@ -92,7 +92,6 @@ public final class CacheObjectCreation {
     Metadata metadata = new Metadata();
     metadata.addMetadata("testMetadata",11);
     alarm3.setMetadata(metadata);
-    alarm3.hasBeenPublished(new Timestamp(System.currentTimeMillis()));
     return alarm3;
   }
 

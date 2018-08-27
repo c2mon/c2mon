@@ -21,16 +21,12 @@ import java.util.Collection;
 
 import javax.annotation.PostConstruct;
 
-import cern.c2mon.server.cache.config.CacheProperties;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.loader.CacheLoader;
 import net.sf.ehcache.search.Attribute;
 import net.sf.ehcache.search.Query;
 import net.sf.ehcache.search.Result;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jmx.export.annotation.ManagedResource;
@@ -39,8 +35,9 @@ import org.springframework.stereotype.Service;
 import cern.c2mon.server.cache.AlarmCache;
 import cern.c2mon.server.cache.ClusterCache;
 import cern.c2mon.server.cache.common.AbstractCache;
-import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
+import cern.c2mon.server.cache.config.CacheProperties;
 import cern.c2mon.server.cache.loading.AlarmLoaderDAO;
+import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.config.C2monCacheName;
 import cern.c2mon.shared.client.alarm.AlarmQuery;
@@ -55,10 +52,10 @@ import cern.c2mon.shared.client.alarm.AlarmQuery;
 @Service("alarmCache")
 @ManagedResource(objectName="cern.c2mon:type=cache,name=alarmCache")
 public class AlarmCacheImpl extends AbstractCache<Long, Alarm> implements AlarmCache {
-  
+
   final int timeRange = 60;
   final int oscNumbers = 6;
-  
+
   @Autowired
   public AlarmCacheImpl(@Qualifier("clusterCache") final ClusterCache clusterCache,
                         @Qualifier("alarmEhcache") final Ehcache ehcache,
@@ -101,7 +98,7 @@ public class AlarmCacheImpl extends AbstractCache<Long, Alarm> implements AlarmC
   public Collection<Long> findAlarm(AlarmQuery query) {
 
     Ehcache ehcache = getCache();
-    ArrayList<Long> result = new ArrayList<Long>();
+    ArrayList<Long> result = new ArrayList<>();
 
     Query cacheQuery = ehcache.createQuery();
 
@@ -123,6 +120,10 @@ public class AlarmCacheImpl extends AbstractCache<Long, Alarm> implements AlarmC
     }
     if (query.getActive() != null) {
       Attribute<Boolean> active = ehcache.getSearchAttribute("isActive");
+      cacheQuery.addCriteria(active.eq(query.getActive()));
+    }
+    if (query.getOscillating() != null) {
+      Attribute<Boolean> active = ehcache.getSearchAttribute("isOscillating");
       cacheQuery.addCriteria(active.eq(query.getActive()));
     }
 

@@ -1,16 +1,16 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ * Copyright (C) 2010-2018 CERN. All rights not expressly granted are reserved.
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -18,20 +18,21 @@ package cern.c2mon.server.common.alarm;
 
 import java.sql.Timestamp;
 
+import lombok.Data;
+
 import cern.c2mon.server.common.metadata.Metadata;
 import cern.c2mon.shared.common.Cacheable;
-import lombok.Data;
 
 /**
  * Alarm object held in the cache.
- * 
+ *
  * Imported more or less as-is into C2MON.
- * 
+ *
  * Note: in TIM1 care was taken to make sure this is "" and not null - be
  * careful when sending to LASER as this may be the reason (?)
- * 
+ *
  * @author Mark Brightwell
- * 
+ *
  */
 @Data
 public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
@@ -90,6 +91,8 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
   private boolean lastActiveState;
   private int counterFault;
   private long firstOscTS;
+
+  /** Set to <code>true</code>, if alarm starts oscillating */
   private boolean oscillating;
 
   public void setState(String newState) {
@@ -100,24 +103,12 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
   private Timestamp timestamp;
 
   /**
-   * Was the current alarm value published?
-   */
-  private boolean published = false;
-
-  /**
-   * Optional info property. TODO in TIM1 care was taken to make sure this is ""
-   * and not null - be careful when sending to LASER as this may be the reason
+   * Optional info property
    **/
   private String info;
 
   /**
-   * Latest state to be published.
-   */
-  private AlarmPublication lastPublication;
-
-  /**
    * Name of the JMS topic on which the alarm will be distributed to clients.
-   * TODO remove because single topic now for alarm publication?
    */
   private String topic = "c2mon.client.alarm";
 
@@ -134,7 +125,7 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
 
   /**
    * Constructor setting Alarm id.
-   * 
+   *
    * @param id
    *          the id of the Alarm
    */
@@ -145,11 +136,12 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
 
   /**
    * Create a deep clone of this AlarmCacheObject.
-   * 
+   *
    * @return a deep clone of this AlarmCacheObject
    * @throws CloneNotSupportedException
    *           should never be thrown
    */
+  @Override
   public Object clone() throws CloneNotSupportedException {
     AlarmCacheObject alarmCacheObject = (AlarmCacheObject) super.clone();
     if (this.condition != null) {
@@ -158,12 +150,10 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
     if (this.timestamp != null) {
       alarmCacheObject.timestamp = (Timestamp) this.timestamp.clone();
     }
-    if (this.lastPublication != null) {
-      alarmCacheObject.lastPublication = (AlarmPublication) lastPublication.clone();
-    }
     return alarmCacheObject;
   }
 
+  @Override
   public final Metadata getMetadata() {
     if (this.metadata == null) {
       this.metadata = new Metadata();
@@ -183,32 +173,12 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
 
   /**
    * Checks if the Alarm state is ACTIVE.
-   * 
+   *
    * @return true if the alarm is currently active.
    */
+  @Override
   public boolean isActive() {
     return this.state != null && this.state.equals(AlarmCondition.ACTIVE);
-  }
-
-  @Override
-  public void hasBeenPublished(Timestamp publicationTime) {
-    if (publicationTime == null) {
-      throw new NullPointerException("Cannot set publication time to null");
-    }
-    published = true;
-    if (state != null) {
-      lastPublication = new AlarmPublication(this.state, this.info, publicationTime);
-    }
-  }
-
-  @Override
-  public void notYetPublished() {
-    published = false;
-  }
-
-  @Override
-  public boolean isPublishedToLaser() {
-    return isPublished();
   }
 
   @Override
