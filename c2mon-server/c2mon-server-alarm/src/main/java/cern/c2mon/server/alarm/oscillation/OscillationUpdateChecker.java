@@ -189,6 +189,8 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
           for (Long alarmId : result) {
             Alarm alarmCopy = alarmCache.getCopy(alarmId);
             // TODO: Check if oscillation can be removed
+
+//            Use: alarmCache.putQuiet(alarmCopy);
           }
 
 
