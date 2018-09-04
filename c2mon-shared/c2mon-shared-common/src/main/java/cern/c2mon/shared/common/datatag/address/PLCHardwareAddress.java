@@ -17,6 +17,8 @@
 package cern.c2mon.shared.common.datatag.address;
 
 
+import cern.c2mon.shared.common.datatag.address.impl.PLCHardwareAddressType;
+
 /**
  * The PLCHardwareAddress interface is used by the JECMessageHandler.
  * 
@@ -26,47 +28,16 @@ package cern.c2mon.shared.common.datatag.address;
  */
 
 public interface PLCHardwareAddress  extends HardwareAddress {
-  // ---------------------------------------------------------------------------
-  // Public constant definitions
-  // ---------------------------------------------------------------------------
-
-  /** Structure type for boolean data tags (inputs) */
-  int STRUCT_BOOLEAN = 1;
-
-  /** Structure type for analog (numeric) data tags (inputs)*/
-  int STRUCT_ANALOG = 2;
-
-  /** Structure type for boolean command tags (outputs) */
-  int STRUCT_BOOLEAN_COMMAND = 3;
-
-  /** Structure type for analog command tags (outputs) */
-  int STRUCT_ANALOG_COMMAND = 4;
-
-  /** Structure type for internal boolean states for diagnostic purposes  */
-  int STRUCT_DIAG_BOOLEAN = 5;
-
-  /** Structure type for internal analogue states for diagnostic purposes  */
-  int STRUCT_DIAG_ANALOG = 6;
-
-  /** Structure type for internal boolean commands for diagnostic purposes
-   * (e.g. PING) 
-   */
-  int STRUCT_DIAG_BOOLEAN_COMMAND = 7;
-
-  // ---------------------------------------------------------------------------
-  // Public member accessors
-  // ---------------------------------------------------------------------------
-
   /**
    * Get the type of data block within the PLC.
    * The block type can only be one of the constant values defined in 
    * STRUCT_BOOLEAN, STRUCT_ANALOG, STRUCT_BOOLEAN_COMMAND and 
    * STRUCT_ANALOG_COMMAND.
    * @return the type of data block within the PLC
-   * @see PLCHardwareAddress#STRUCT_BOOLEAN
-   * @see PLCHardwareAddress#STRUCT_ANALOG
-   * @see PLCHardwareAddress#STRUCT_BOOLEAN_COMMAND
-   * @see PLCHardwareAddress#STRUCT_ANALOG_COMMAND
+   * @see PLCHardwareAddressType#STRUCT_BOOLEAN
+   * @see PLCHardwareAddressType#STRUCT_ANALOG
+   * @see PLCHardwareAddressType#STRUCT_BOOLEAN_COMMAND
+   * @see PLCHardwareAddressType#STRUCT_ANALOG_COMMAND
    */
   int getBlockType();
 
@@ -121,4 +92,5 @@ public interface PLCHardwareAddress  extends HardwareAddress {
    */
   int getCommandPulseLength();
 
+  int getStringLength();
 }
