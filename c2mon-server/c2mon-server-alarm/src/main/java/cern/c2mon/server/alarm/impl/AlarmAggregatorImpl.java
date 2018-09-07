@@ -37,12 +37,13 @@ import cern.c2mon.server.common.tag.Tag;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Implementation of the {@link AlarmAggregator} (a singleton bean in 
- * the server context).
+ * Implementation of the {@link AlarmAggregator} (a singleton bean in the server
+ * context).
  * 
- * <p>This implementation registers for synchronous notifications from the cache (i.e.
- * on original JMS update thread). These calls are passed through to the client module
- * on the same thread (may need adjusting).
+ * <p>
+ * This implementation registers for synchronous notifications from the cache
+ * (i.e. on original JMS update thread). These calls are passed through to the
+ * client module on the same thread (may need adjusting).
  * 
  * @author Mark Brightwell
  *
@@ -55,83 +56,90 @@ public class AlarmAggregatorImpl implements AlarmAggregator, C2monCacheListener<
    * List of registered listeners.
    */
   private List<AlarmAggregatorListener> listeners;
-  
+
   /**
    * Used to register the aggregator as Tag update listener.
    */
   private CacheRegistrationService cacheRegistrationService;
-  
+
   /**
    * The gateway to all Tag facades.
    */
   private TagFacadeGateway tagFacadeGateway;
-  
+
   @Autowired
   private OscillationUpdater oscillationUpdater;
-  
+
   /**
    * Autowired constructor.
    * 
-   * @param cacheRegistrationService the cache registration service (for registration to cache update notifications)  
-   * @param tagFacadeGateway the Tag Facade gateway (for access to all Tag Facade beans) 
-   * @param tagLocationService the Tag location service
+   * @param cacheRegistrationService
+   *          the cache registration service (for registration to cache update
+   *          notifications)
+   * @param tagFacadeGateway
+   *          the Tag Facade gateway (for access to all Tag Facade beans)
+   * @param tagLocationService
+   *          the Tag location service
    */
   @Autowired
-  public AlarmAggregatorImpl(final CacheRegistrationService cacheRegistrationService,
-      final TagFacadeGateway tagFacadeGateway) {
+  public AlarmAggregatorImpl(final CacheRegistrationService cacheRegistrationService, final TagFacadeGateway tagFacadeGateway) {
     super();
-    this.cacheRegistrationService = cacheRegistrationService;    
+    this.cacheRegistrationService = cacheRegistrationService;
     this.tagFacadeGateway = tagFacadeGateway;
     listeners = new ArrayList<AlarmAggregatorListener>();
   }
 
   /**
-   * Init method called on bean creation.
-   * Registers to cache updates 
+   * Init method called on bean creation. Registers to cache updates
    * (synchronous to guarantee evaluation of all alarms )
    */
   @PostConstruct
   public void init() {
-    //notice: if change to non-synchronous, need to revisit evaluation method,
-    //  which assumes a lock is held on the tag; else one update could overtake another
-    //  one at this stage
+    // notice: if change to non-synchronous, need to revisit evaluation method,
+    // which assumes a lock is held on the tag; else one update could overtake
+    // another
+    // one at this stage
     cacheRegistrationService.registerSynchronousToAllTags(this);
     cacheRegistrationService.registerForSupervisionChanges(this);
   }
-    
+
   @Override
   public void registerForTagUpdates(final AlarmAggregatorListener aggregatorListener) {
     listeners.add(aggregatorListener);
   }
 
   /**
-   * When an update to a Tag is received from the cache, evaluates the associated Alarms
-   * and notifies the (alarm + tag) listeners. 
+   * When an update to a Tag is received from the cache, evaluates the
+   * associated Alarms and notifies the (alarm + tag) listeners.
    * 
-   * <p>Notice that received Tag is a clone, but since the cache notification is synchronous
-   * a lock is already held on this tag, which can therefore not be modified during this
-   * call.
+   * <p>
+   * Notice that received Tag is a clone, but since the cache notification is
+   * synchronous a lock is already held on this tag, which can therefore not be
+   * modified during this call.
    * 
-   * @param tag a clone of the updated Tag received from the cache
+   * @param tag
+   *          a clone of the updated Tag received from the cache
    */
   @Override
-  public void notifyElementUpdated(final Tag tag) {      
-      List<Alarm> alarmList = evaluateAlarms(tag);            
-      notifyListeners(tag, alarmList);          
+  public void notifyElementUpdated(final Tag tag) {
+    List<Alarm> alarmList = evaluateAlarms(tag);
+    notifyListeners(tag, alarmList);
   }
 
   /**
    * Notify the listeners of a tag update with associated alarms.
-   * @param tag the Tag that has been updated
-   * @param alarmList the associated list of evaluated alarms
+   * 
+   * @param tag
+   *          the Tag that has been updated
+   * @param alarmList
+   *          the associated list of evaluated alarms
    */
   private void notifyListeners(final Tag tag, final List<Alarm> alarmList) {
     for (AlarmAggregatorListener listener : listeners) {
       try {
         listener.notifyOnUpdate((Tag) tag.clone(), alarmList);
       } catch (CloneNotSupportedException e) {
-        log.error("Unexpected exception caught: clone should be implemented for this class! "
-            + "Alarm & tag listener was not notified: " + listener.getClass().getSimpleName());
+        log.error("Unexpected exception caught: clone should be implemented for this class! " + "Alarm & tag listener was not notified: " + listener.getClass().getSimpleName());
       }
     }
   }
@@ -149,28 +157,25 @@ public class AlarmAggregatorImpl implements AlarmAggregator, C2monCacheListener<
       try {
         alarmList = tagFacadeGateway.evaluateAlarms(tag);
         if (alarmList.isEmpty()) {
-          log.warn("Empty alarm list returned when evaluating alarms for tag " + tag.getId()
-              + " - this should not be happening (possible timestamp filtering problem)");
+          log.warn("Empty alarm list returned when evaluating alarms for tag " + tag.getId() + " - this should not be happening (possible timestamp filtering problem)");
         }
-        for (Iterator alarmIterator = alarmList.iterator(); alarmIterator.hasNext();) {
-          Alarm alarm = (Alarm) alarmIterator.next();
-          oscillationUpdater.update(alarm, tag);
-        }
-        
+
       } catch (Exception e) {
-        log.error("Exception caught when attempting to evaluate the alarms for tag " + tag.getId()
-            + " - publishing to the client with no attached alarms.", e);
-      }       
+        log.error("Exception caught when attempting to evaluate the alarms for tag " + tag.getId() + " - publishing to the client with no attached alarms.", e);
+      }
     }
     return alarmList;
   }
 
   @Override
   public void confirmStatus(Tag tag) {
-    //do not take any action here: a new evaluation here does not use the current supervision status of the tag,
-    // so will override any current TERMINATED alarms due to supervision status down
-    //During a server recovery start, a callback will be provided on the onSupervisionChange method, which will
+    // do not take any action here: a new evaluation here does not use the
+    // current supervision status of the tag,
+    // so will override any current TERMINATED alarms due to supervision status
+    // down
+    // During a server recovery start, a callback will be provided on the
+    // onSupervisionChange method, which will
     // re-evaluate all alarms.
   }
-    
+
 }

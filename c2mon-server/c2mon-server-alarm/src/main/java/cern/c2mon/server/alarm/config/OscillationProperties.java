@@ -13,6 +13,9 @@ public class OscillationProperties {
   
   private int timeRange = 60;
   private int oscNumbers = 6;
+      
+      //time to check if the oscillation is still alive [sec] ;
+  private int timeOscillationAlive = 2000;
   
   
 }

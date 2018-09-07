@@ -85,10 +85,11 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
   private String state;
 
   /**
-   * Timestamp of the last state change
+   * Timestamp of the last oscillation state change
    **/
-
   private boolean lastActiveState;
+  
+
   private int counterFault;
   private long firstOscTS;
 
@@ -97,11 +98,13 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
 
   public void setState(String newState) {
     this.state = newState;
-
   }
 
   private Timestamp timestamp;
 
+//  public void setTimeStamp(TimeStamp ) {
+//    this.state = newState;
+//  }
   /**
    * Optional info property
    **/

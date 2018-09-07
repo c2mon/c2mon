@@ -28,22 +28,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Service;
 
+import cern.c2mon.server.alarm.config.OscillationProperties;
 import cern.c2mon.server.cache.AlarmCache;
 import cern.c2mon.server.cache.AliveTimerFacade;
 import cern.c2mon.server.cache.ClusterCache;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.alarm.Alarm;
+import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.shared.client.alarm.AlarmQuery;
 
 /**
- * Timer that regularly checks all the active alive timers monitoring
- * the connections to the DAQs, Equipment and SubEquipment.
+ * Timer that regularly checks all the active alive timers monitoring the
+ * connections to the DAQs, Equipment and SubEquipment.
  *
- * <p>Notice that an alive timer is considered expired when alive-interval
- *  + alive-interval/3 milliseconds have expired since the last alive
- *  message arrived, where alive-interval is specific to the AliveTimer
- *  object (see <code>hasExpired</code> in {@link AliveTimerFacade}).
+ * <p>
+ * Notice that an alive timer is considered expired when alive-interval +
+ * alive-interval/3 milliseconds have expired since the last alive message
+ * arrived, where alive-interval is specific to the AliveTimer object (see
+ * <code>hasExpired</code> in {@link AliveTimerFacade}).
  *
  * @author Mark Brightwell
  *
@@ -62,22 +65,20 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
   private static final String LAST_CHECK_INITIALISATION_KEY = OscillationUpdateChecker.class.getName() + ".lastCheckInitialisationKey";
 
   /**
-   * Cluster cache key for retrieving the time of last check
-   * of the alives. Across server cluster it assures that
-   * the alive check only takes place on a single server.
+   * Cluster cache key for retrieving the time of last check of the alives.
+   * Across server cluster it assures that the alive check only takes place on a
+   * single server.
    */
   private static final String LAST_CHECK_LONG = OscillationUpdateChecker.class.getName() + ".lastAliveTimerCheck";
 
   /**
-   * How often the timer checks whether the alive
-   * timer have expired.
+   * How often the timer checks whether the alive timer have expired.
    */
   private static final int SCAN_INTERVAL = 10000;
 
   /**
-   * The time the server waits before doing first
-   * checks at start up (this gives time for incoming
-   * alives to be processed).
+   * The time the server waits before doing first checks at start up (this gives
+   * time for incoming alives to be processed).
    */
   private static final int INITIAL_SCAN_DELAY = 120000;
 
@@ -100,29 +101,41 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
    * Reference to alive timer cache.
    */
   private AlarmCache alarmCache;
+  
+  /**
+   * Reference to alive oscillationUpdater.
+   */
+  private OscillationUpdater oscillationUpdater;
 
   /**
    * Count down to alarm switch off.
    */
   private AtomicInteger warningSwitchOffCountDown = new AtomicInteger(SWITCH_OFF_COUNTDOWN);
 
-  /** Reference to the clusterCache to share values accross the cluster nodes */
+  /** Reference to the clusterCache to share values across the cluster nodes */
   private final ClusterCache clusterCache;
 
-  private static final int SWITCH_OFF_COUNTDOWN = 60; //10mins
+  private static final int SWITCH_OFF_COUNTDOWN = 60; // 10mins
 
   /**
    * Constructor.
-   * @param alarmCache the alarm cache
-   * @param clusterCache Reference to the clusterCache to share values accross teh cluster nodes
+   * 
+   * @param alarmCache
+   *          the alarm cache
+   * @param clusterCache
+   *          Reference to the clusterCache to share values accross teh cluster
+   *          nodes
    */
   @Autowired
-  public OscillationUpdateChecker(final AlarmCache alarmCache,
-                                  final ClusterCache clusterCache) {
+  public OscillationUpdateChecker(final AlarmCache alarmCache, final ClusterCache clusterCache, final OscillationUpdater oscillationUpdater) {
     super();
     this.alarmCache = alarmCache;
     this.clusterCache = clusterCache;
+    this.oscillationUpdater = oscillationUpdater;
   }
+
+  @Autowired
+  OscillationProperties oscillationProperties;
 
   /**
    * Initialises the clustered values
@@ -154,10 +167,10 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
   }
 
   /**
-   * Stops the timer mechanism. No more checks are made on the
-   * alive timers.
+   * Stops the timer mechanism. No more checks are made on the alive timers.
    *
-   * <p>Can be restarted using the start method.
+   * <p>
+   * Can be restarted using the start method.
    */
   @Override
   public synchronized void stop() {
@@ -174,25 +187,29 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
     clusterCache.acquireWriteLockOnKey(LAST_CHECK_LONG);
     try {
       Long lastCheck = (Long) clusterCache.getCopy(LAST_CHECK_LONG);
-      if (System.currentTimeMillis() - lastCheck.longValue() < 9000) { //results in check on a single server
+      if (System.currentTimeMillis() - lastCheck.longValue() < 9000) { // results
+                                                                       // in
+                                                                       // check
+                                                                       // on a
+                                                                       // single
+                                                                       // server
         log.debug("Skipping alarm oscillation check as already performed.");
       } else {
         if (log.isDebugEnabled()) {
           log.debug("run() : checking alarm oscillation timers ... ");
         }
-        short aliveDownCount = 0;
         try {
 
           AlarmQuery query = AlarmQuery.builder().oscillating(true).build();
           Collection<Long> result = alarmCache.findAlarm(query);
 
           for (Long alarmId : result) {
-            Alarm alarmCopy = alarmCache.getCopy(alarmId);
-            // TODO: Check if oscillation can be removed
-
-//            Use: alarmCache.putQuiet(alarmCopy);
+            AlarmCacheObject alarmCopy = (AlarmCacheObject) alarmCache.getCopy(alarmId);
+            if (oscillationUpdater.checkOscillAlive(alarmCopy)) {
+              alarmCopy.setOscillating(false);
+              alarmCache.putQuiet(alarmCopy);
+            }
           }
-
 
         } catch (CacheElementNotFoundException cacheEx) {
           log.warn("Failed to locate alive timer in cache on expiration check (may happen exceptionally if just removed).", cacheEx);
@@ -224,7 +241,7 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
 
   @Override
   public synchronized boolean isRunning() {
-   return running;
+    return running;
   }
 
   @Override

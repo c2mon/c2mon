@@ -7,6 +7,7 @@ import org.junit.Before;
 import static org.junit.Assert.assertFalse;
 
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import cern.c2mon.server.alarm.config.OscillationProperties;
 import cern.c2mon.server.alarm.oscillation.OscillationUpdater;
@@ -20,12 +21,14 @@ public class OscillationUpdaterTest {
   private OscillationUpdater acu;
   private DataTagCacheObject ee;
 
+  @Autowired
+  OscillationProperties oscillationProperties;
+  
   @Before
   public void setup() {
     aco = new AlarmCacheObject();
     acu = new OscillationUpdater();
     ee = new DataTagCacheObject();
-    
     OscillationProperties myOsc = new OscillationProperties();
     myOsc.setOscNumbers(6);
     myOsc.setTimeRange(60);
@@ -75,5 +78,22 @@ public class OscillationUpdaterTest {
       acu.update(aco, ee);
     }
     assertTrue(aco.isOscillating());
+  }
+  
+  @Test
+  public void testTimeOscillationAlive() throws Exception {
+    for (int i = 0; i < 7; i++) {
+      if (i % 2 == 0) {
+        aco.setState(AlarmCondition.ACTIVE);
+      } else {
+        aco.setState(AlarmCondition.TERMINATE);
+      }
+      acu.update(aco, ee);
+    }
+//    System.out.println(oscillationProperties.getTimeOscillationAlive());
+    Thread.sleep(1000);
+//    aco.setState(AlarmCondition.TERMINATE);
+//    acu.update(aco, ee);
+    assertTrue(acu.checkOscillAlive(aco));
   }
 }

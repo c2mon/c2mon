@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import cern.c2mon.server.alarm.oscillation.OscillationUpdater;
 import cern.c2mon.server.cache.AlarmCache;
 import cern.c2mon.server.cache.AlarmFacade;
 import cern.c2mon.server.common.alarm.Alarm;
@@ -37,6 +38,9 @@ public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
 
   @Autowired
   AlarmCache alarmCache;
+  
+  @Autowired
+  OscillationUpdater oscillationUpdater;
 
   /**
    * Logic kept the same as in TIM1 (see {@link AlarmFacade}). The locking of
@@ -75,9 +79,8 @@ public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
     // Compute the alarm state corresponding to the new tag value
     String newState = alarmCacheObject.getCondition().evaluateState(tag.getValue());
 
-
-
-
+    oscillationUpdater.update(alarm, tag);
+    
     // Return immediately if the alarm new state is null
     if (newState == null) {
       log.error("update() : new state would be NULL -> no update.");
@@ -124,7 +127,8 @@ public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
     if (tag.isSimulated()) {
       additionalInfo = additionalInfo + "[SIM]";
     }
-
+    
+    
     // Default case: change the alarm's state
     // (1) if the alarm has never been initialised
     // (2) if tag is VALID and the alarm changes from ACTIVE->TERMINATE or
