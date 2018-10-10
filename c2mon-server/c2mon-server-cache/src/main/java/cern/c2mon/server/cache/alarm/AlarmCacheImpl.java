@@ -124,7 +124,7 @@ public class AlarmCacheImpl extends AbstractCache<Long, Alarm> implements AlarmC
     }
     if (query.getOscillating() != null) {
       Attribute<Boolean> active = ehcache.getSearchAttribute("isOscillating");
-      cacheQuery.addCriteria(active.eq(query.getActive()));
+      cacheQuery.addCriteria(active.eq(query.getOscillating()));
     }
 
     for (Result res: cacheQuery.maxResults(query.getMaxResultSize()).includeKeys().execute().all()) {

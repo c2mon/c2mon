@@ -79,7 +79,7 @@ public abstract class AlarmCondition implements Serializable {
    * in LASER) for the given tag value.
    * The only allowed return values are FaultState.TERMINATE or FaultState.ACTIVE.
    */
-  public abstract String evaluateState(Object value);
+  public abstract boolean evaluateState(Object value);
 
   /**
    * Clone method

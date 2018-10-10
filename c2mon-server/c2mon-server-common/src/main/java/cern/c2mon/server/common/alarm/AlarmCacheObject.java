@@ -18,10 +18,9 @@ package cern.c2mon.server.common.alarm;
 
 import java.sql.Timestamp;
 
-import lombok.Data;
-
 import cern.c2mon.server.common.metadata.Metadata;
 import cern.c2mon.shared.common.Cacheable;
+import lombok.Data;
 
 /**
  * Alarm object held in the cache.
@@ -79,16 +78,16 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
    */
   private Metadata metadata;
 
-  /**
-   * The alarm's current state
-   **/
-  private String state;
+  /** <code>true</code>, if the alarm state is active as published to listeners (may be forced to <code>true</code> in case of oscillation) */
+  private boolean active = false;
 
+  /** <code>true</code>, if the alarm state is active */
+  private boolean active2publish = false;
+  
   /**
-   * Timestamp of the last oscillation state change
+   * Whether the alarm was previously active
    **/
   private boolean lastActiveState;
-  
 
   private int counterFault;
   private long firstOscTS;
@@ -96,15 +95,8 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
   /** Set to <code>true</code>, if alarm starts oscillating */
   private boolean oscillating;
 
-  public void setState(String newState) {
-    this.state = newState;
-  }
-
   private Timestamp timestamp;
 
-//  public void setTimeStamp(TimeStamp ) {
-//    this.state = newState;
-//  }
   /**
    * Optional info property
    **/
@@ -119,9 +111,6 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
    * Default constructor.
    */
   public AlarmCacheObject() {
-    // Initialise run-time parameters with default values
-    // (overwritten on loading if DB has none null values)
-    this.state = AlarmCondition.TERMINATE;
     this.timestamp = new Timestamp(0);
     this.info = "";
   }
@@ -175,14 +164,16 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
   }
 
   /**
-   * Checks if the Alarm state is ACTIVE.
+   * Checks if the Oscillation is ACTIVE.
    *
-   * @return true if the alarm is currently active.
+   * @return true if the oscillation is true.
    */
   @Override
-  public boolean isActive() {
-    return this.state != null && this.state.equals(AlarmCondition.ACTIVE);
+  public boolean isOscillating() {
+    return oscillating;
   }
+
+ 
 
   @Override
   public String toString() {
@@ -200,7 +191,9 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
     str.append('\t');
     str.append(getFaultCode());
     str.append('\t');
-    str.append(getState());
+    str.append(isActive());
+    str.append('\t');
+    str.append(isOscillating());
     if (getInfo() != null) {
       str.append('\t');
       str.append(getInfo());
@@ -208,5 +201,4 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
 
     return str.toString();
   }
-
 }

@@ -29,12 +29,8 @@ import cern.c2mon.shared.common.Cacheable;
  */
 public interface Alarm extends Cacheable {
 
-  /**
-   * Get the alarm's current state.
-   * @return the alarm's current state
-   * @see AlarmCondition for the ACTIVE and TERMINATED constants
-   */
-  String getState();
+  String ALARM_INFO_OSC = "[OSC]";
+
 
   /**
    * Get the UTC timestamp of the alarm's last state change
@@ -98,5 +94,9 @@ public interface Alarm extends Cacheable {
    */
   Metadata getMetadata();
 
+  
+  /**
+   * @return true if the alarm is oscillating.
+   */
   boolean isOscillating();
 }

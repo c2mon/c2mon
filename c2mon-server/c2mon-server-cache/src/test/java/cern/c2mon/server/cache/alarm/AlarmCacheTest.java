@@ -108,7 +108,7 @@ public class AlarmCacheTest extends AbstractCacheIntegrationTest {
   public void testGetActiveAlarms() {
     AlarmQuery query = AlarmQuery.builder().active(true).build();
     AlarmCacheObject toChange = (AlarmCacheObject) alarmCache.get(350000L);
-    toChange.setState("ACTIVE");
+    toChange.setActive(true);
 
     alarmCache.putQuiet(toChange);
     Collection<Long> result = alarmCache.findAlarm(query);

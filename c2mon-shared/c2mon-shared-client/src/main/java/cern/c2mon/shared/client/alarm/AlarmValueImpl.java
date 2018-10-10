@@ -38,10 +38,10 @@ import org.simpleframework.xml.core.Persister;
 import cern.c2mon.shared.client.request.ClientRequestReport;
 
 /**
- * This bean class implements the <code>AlarmValue</code> interface
- * and is used to transport an alarm value update information
- * from the server to the client. The <code>AlarmValue</code> is embedded
- * into the <code>TransferTagValue</code> object.
+ * This bean class implements the <code>AlarmValue</code> interface and is used
+ * to transport an alarm value update information from the server to the client.
+ * The <code>AlarmValue</code> is embedded into the
+ * <code>TransferTagValue</code> object.
  *
  * @author Matthias Braeger
  *
@@ -54,7 +54,8 @@ import cern.c2mon.shared.client.request.ClientRequestReport;
 public final class AlarmValueImpl extends ClientRequestReport implements AlarmValue, Cloneable {
 
   /** Alarm id */
-  @NotNull @Min(1)
+  @NotNull
+  @Min(1)
   @Attribute
   private Long id;
 
@@ -68,7 +69,8 @@ public final class AlarmValueImpl extends ClientRequestReport implements AlarmVa
   @Element
   private String faultFamily;
 
-  //ToDo: correct typo in next major release -> https://gitlab.cern.ch/c2mon/c2mon/issues/149
+  // ToDo: correct typo in next major release ->
+  // https://gitlab.cern.ch/c2mon/c2mon/issues/149
   /** LASER alarm fault member */
   @NotNull
   @Element
@@ -79,7 +81,8 @@ public final class AlarmValueImpl extends ClientRequestReport implements AlarmVa
   private String info;
 
   /** Unique identifier of the Tag to which the alarm is attached */
-  @NotNull @Min(1)
+  @NotNull
+  @Min(1)
   @Element
   private Long tagId;
 
@@ -88,13 +91,18 @@ public final class AlarmValueImpl extends ClientRequestReport implements AlarmVa
   private String tagDescription;
 
   /** UTC timestamp of the alarm's last state change */
-  @NotNull @Past
+  @NotNull
+  @Past
   @Element
   private Timestamp timestamp;
 
   /** <code>true</code>, if the alarm is active */
   @Element
   private boolean active;
+
+  /** <code>true</code>, if the oscillation is active */
+  @Element
+  private boolean oscillating;
 
   /**
    * Metadata according to the tag in this class.
@@ -111,23 +119,26 @@ public final class AlarmValueImpl extends ClientRequestReport implements AlarmVa
 
   /**
    * Default Constructor
-   * @param pId Alarm id
-   * @param pFaultCode LASER alarm fault code
-   * @param pFaultMember LASER alarm fault memeber
-   * @param pFaultFamily LASER alarm fault family
-   * @param pInfo Free text for additional information about the alarm
-   * @param pTagId Unique identifier of the Tag to which the alarm is attached
-   * @param pTimestamp UTC timestamp of the alarm's last state change
-   * @param isActive <code>true</code>, if the alarm is active
+   * 
+   * @param pId
+   *          Alarm id
+   * @param pFaultCode
+   *          LASER alarm fault code
+   * @param pFaultMember
+   *          LASER alarm fault memeber
+   * @param pFaultFamily
+   *          LASER alarm fault family
+   * @param pInfo
+   *          Free text for additional information about the alarm
+   * @param pTagId
+   *          Unique identifier of the Tag to which the alarm is attached
+   * @param pTimestamp
+   *          UTC timestamp of the alarm's last state change
+   * @param isActive
+   *          <code>true</code>, if the alarm is active
    */
-  public AlarmValueImpl(final Long pId,
-                        final int pFaultCode,
-                        final String pFaultMember,
-                        final String pFaultFamily,
-                        final String pInfo,
-                        final Long pTagId,
-                        final Timestamp pTimestamp,
-                        final boolean isActive) {
+  public AlarmValueImpl(final Long pId, final int pFaultCode, final String pFaultMember, final String pFaultFamily, final String pInfo, final Long pTagId,
+      final Timestamp pTimestamp, final boolean isActive) {
     id = pId;
     faultCode = pFaultCode;
     faultMemeber = pFaultMember;
@@ -140,36 +151,61 @@ public final class AlarmValueImpl extends ClientRequestReport implements AlarmVa
 
   /**
    * Default Constructor
-   * @param pId Alarm id
-   * @param pFaultCode LASER alarm fault code
-   * @param pFaultMember LASER alarm fault memeber
-   * @param pFaultFamily LASER alarm fault family
-   * @param pInfo Free text for additional information about the alarm
-   * @param pTagId Unique identifier of the Tag to which the alarm is attached
-   * @param pTagDescription Description for the Tag to which the alarm is attached
-   * @param pTimestamp UTC timestamp of the alarm's last state change
-   * @param isActive <code>true</code>, if the alarm is active
+   * 
+   * @param pId
+   *          Alarm id
+   * @param pFaultCode
+   *          LASER alarm fault code
+   * @param pFaultMember
+   *          LASER alarm fault memeber
+   * @param pFaultFamily
+   *          LASER alarm fault family
+   * @param pInfo
+   *          Free text for additional information about the alarm
+   * @param pTagId
+   *          Unique identifier of the Tag to which the alarm is attached
+   * @param pTagDescription
+   *          Description for the Tag to which the alarm is attached
+   * @param pTimestamp
+   *          UTC timestamp of the alarm's last state change
+   * @param isActive
+   *          <code>true</code>, if the alarm is active
    */
-  public AlarmValueImpl(final Long pId,
-                        final int pFaultCode,
-                        final String pFaultMember,
-                        final String pFaultFamily,
-                        final String pInfo,
-                        final Long pTagId,
-                        final String pTagDescription,
-                        final Timestamp pTimestamp,
-                        final boolean isActive) {
-    id = pId;
-    faultCode = pFaultCode;
-    faultMemeber = pFaultMember;
-    faultFamily = pFaultFamily;
-    info = pInfo;
-    tagId = pTagId;
+  public AlarmValueImpl(final Long pId, final int pFaultCode, final String pFaultMember, final String pFaultFamily, final String pInfo, final Long pTagId,
+      final String pTagDescription, final Timestamp pTimestamp, final boolean isActive) {
+    this(pId, pFaultCode, pFaultMember, pFaultFamily, pInfo, pTagId, pTimestamp, isActive);
     tagDescription = pTagDescription;
-    timestamp = pTimestamp;
-    active = isActive;
   }
-
+  
+  /**
+   * Default Constructor
+   * 
+   * @param pId
+   *          Alarm id
+   * @param pFaultCode
+   *          LASER alarm fault code
+   * @param pFaultMember
+   *          LASER alarm fault memeber
+   * @param pFaultFamily
+   *          LASER alarm fault family
+   * @param pInfo
+   *          Free text for additional information about the alarm
+   * @param pTagId
+   *          Unique identifier of the Tag to which the alarm is attached
+   * @param pTagDescription
+   *          Description for the Tag to which the alarm is attached
+   * @param pTimestamp
+   *          UTC timestamp of the alarm's last state change
+   * @param isActive
+   *          <code>true</code>, if the alarm is active
+   */
+  public AlarmValueImpl(final Long pId, final int pFaultCode, final String pFaultMember, final String pFaultFamily, final String pInfo, final Long pTagId,
+      final Timestamp pTimestamp, final boolean isActive, final boolean isOscillating) {
+    this(pId, pFaultCode, pFaultMember, pFaultFamily, pInfo, pTagId, pTimestamp, isActive);
+    this.oscillating = isOscillating;
+  }
+  
+ 
 
   @Override
   @JsonIgnore
@@ -182,7 +218,7 @@ public final class AlarmValueImpl extends ClientRequestReport implements AlarmVa
     AlarmValueImpl clone = (AlarmValueImpl) super.clone();
     clone.timestamp = (Timestamp) timestamp.clone();
     clone.metadata = new HashMap<>();
-    for(Map.Entry<String, Object> entry : metadata.entrySet()) {
+    for (Map.Entry<String, Object> entry : metadata.entrySet()) {
       clone.metadata.put(deepClone(entry.getKey()), deepClone(entry.getValue()));
     }
 
@@ -208,52 +244,50 @@ public final class AlarmValueImpl extends ClientRequestReport implements AlarmVa
   }
 
   public String getXml() {
-      Serializer serializer = new Persister(new AnnotationStrategy());
-      StringWriter fw = null;
-      String result = null;
+    Serializer serializer = new Persister(new AnnotationStrategy());
+    StringWriter fw = null;
+    String result = null;
 
-      try {
-          fw = new StringWriter();
-          serializer.write(this, fw);
-          result = fw.toString();
-      } catch (Exception e) {
+    try {
+      fw = new StringWriter();
+      serializer.write(this, fw);
+      result = fw.toString();
+    } catch (Exception e) {
+      e.printStackTrace();
+    } finally {
+      if (fw != null) {
+        try {
+          fw.close();
+        } catch (IOException e) {
           e.printStackTrace();
-      } finally {
-          if (fw != null) {
-              try {
-                  fw.close();
-              } catch (IOException e) {
-                  e.printStackTrace();
-              }
-          }
+        }
       }
-      return result;
+    }
+    return result;
   }
-
 
   public static AlarmValueImpl fromXml(final String xml) throws Exception {
 
-      AlarmValueImpl alarmVal = null;
-      StringReader sr = null;
-      Serializer serializer = new Persister(new AnnotationStrategy());
+    AlarmValueImpl alarmVal = null;
+    StringReader sr = null;
+    Serializer serializer = new Persister(new AnnotationStrategy());
 
-      try {
-          sr = new StringReader(xml);
-          alarmVal = serializer.read(AlarmValueImpl.class, new StringReader(xml), false);
-      } finally {
+    try {
+      sr = new StringReader(xml);
+      alarmVal = serializer.read(AlarmValueImpl.class, new StringReader(xml), false);
+    } finally {
 
-          if (sr != null) {
-              sr.close();
-          }
+      if (sr != null) {
+        sr.close();
       }
+    }
 
-      return alarmVal;
+    return alarmVal;
   }
-
 
   @Override
   public String toString() {
-      return this.getXml();
+    return this.getXml();
   }
 
   @Override

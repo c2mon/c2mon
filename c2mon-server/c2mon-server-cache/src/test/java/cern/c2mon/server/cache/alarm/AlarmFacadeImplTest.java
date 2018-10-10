@@ -72,8 +72,8 @@ public class AlarmFacadeImplTest {
     currentAlarmState.setTimestamp(origTime);
     tag.setSourceTimestamp(tagTime);
     //check set as expected
-    assertEquals(AlarmCondition.TERMINATE, currentAlarmState.getState());
-    assertEquals(AlarmCondition.ACTIVE, currentAlarmState.getCondition().evaluateState(tag.getValue()));
+    assertEquals(false, currentAlarmState.isActive());
+    assertEquals(true, currentAlarmState.getCondition().evaluateState(tag.getValue()));
     assertFalse(tag.isValid());
 
     alarmCache.acquireWriteLockOnKey(currentAlarmState.getId());
@@ -84,9 +84,9 @@ public class AlarmFacadeImplTest {
     AlarmCacheObject newAlarm = (AlarmCacheObject) alarmFacadeImpl.update(currentAlarmState.getId(), tag);
     EasyMock.verify(alarmCache, tagLocationService);
 
-    assertEquals(AlarmCondition.TERMINATE, newAlarm.getState());
+    assertEquals(false, currentAlarmState.isActive());
     assertTrue(newAlarm.getTimestamp().equals(tag.getCacheTimestamp()));
-    assertEquals(AlarmCondition.TERMINATE, currentAlarmState.getState()); //also update alarm parameter object (usually in cache)
+    assertEquals(false, currentAlarmState.isActive()); //also update alarm parameter object (usually in cache)
     assertTrue(currentAlarmState.getTimestamp().equals(tag.getCacheTimestamp()));
   }
 
@@ -103,10 +103,10 @@ public class AlarmFacadeImplTest {
     AlarmCacheObject currentAlarmState = CacheObjectCreation.createTestAlarm2();
     Timestamp origTime = new Timestamp(System.currentTimeMillis() - 50000);
     currentAlarmState.setTimestamp(origTime);
-    tag.setSourceTimestamp(tagTime);
+    tag.setSourceTimestamp(tagTime); 
     //check set as expected
-    assertEquals(AlarmCondition.ACTIVE, currentAlarmState.getState());
-    assertEquals(AlarmCondition.TERMINATE, currentAlarmState.getCondition().evaluateState(tag.getValue()));
+    assertEquals(true, currentAlarmState.isActive());
+    assertEquals(true, currentAlarmState.getCondition().evaluateState(tag.getValue()));
     assertTrue(tag.isValid());
 
     // Recording Mock calls
@@ -120,9 +120,9 @@ public class AlarmFacadeImplTest {
     AlarmCacheObject newAlarm = (AlarmCacheObject) alarmFacadeImpl.update(currentAlarmState.getId(), tag);
     EasyMock.verify(alarmCache, tagLocationService);
 
-    assertEquals(AlarmCondition.TERMINATE, newAlarm.getState());
+    assertEquals(false, newAlarm.isActive());
     assertTrue(newAlarm.getTimestamp().equals(tag.getCacheTimestamp()));
-    assertEquals(AlarmCondition.TERMINATE, currentAlarmState.getState()); //also update alarm parameter object (usually in cache)
+    assertEquals(false, currentAlarmState.isActive()); //also update alarm parameter object (usually in cache)
     assertTrue(currentAlarmState.getTimestamp().equals(tag.getCacheTimestamp()));
   }
 
@@ -140,8 +140,8 @@ public class AlarmFacadeImplTest {
     alarm.setTimestamp(origTime);
     tag.setSourceTimestamp(tagTime);
     //check set as expected
-    assertEquals(AlarmCondition.TERMINATE, alarm.getState());
-    assertEquals(AlarmCondition.ACTIVE, alarm.getCondition().evaluateState(tag.getValue()));
+    assertEquals(false, alarm.isActive());
+    assertEquals(true, alarm.getCondition().evaluateState(tag.getValue()));
 
     alarmCache.acquireWriteLockOnKey(alarm.getId());
     EasyMock.expect(alarmCache.get(alarm.getId())).andReturn(alarm);
@@ -155,16 +155,16 @@ public class AlarmFacadeImplTest {
 
     EasyMock.verify(alarmCache, tagLocationService);
 
-    assertEquals(AlarmCondition.ACTIVE, newAlarm.getState());
+    assertEquals(true, newAlarm.isActive());
     assertTrue(newAlarm.getTimestamp().after(origTime));
-    assertEquals(AlarmCondition.ACTIVE, alarm.getState()); //also update alarm parameter object (usually in cache)
+    assertEquals(true, alarm.isActive()); //also update alarm parameter object (usually in cache)
     assertTrue(alarm.getTimestamp().after(origTime));
 
     //(2)test terminate->terminate fails
     AlarmCacheObject alarm2 = CacheObjectCreation.createTestAlarm1(); //reset data
     origTime = alarm2.getTimestamp();
     Thread.sleep(10);
-    assertEquals(AlarmCondition.TERMINATE, alarm2.getState()); //check is in correct start state
+    assertEquals(false, alarm2.isActive()); //check is in correct start state
     tag.setValue("UP"); //alarm should be terminate
 
     EasyMock.reset(alarmCache, tagLocationService);
@@ -177,9 +177,9 @@ public class AlarmFacadeImplTest {
 
     EasyMock.verify(alarmCache, tagLocationService);
 
-    assertEquals(AlarmCondition.TERMINATE, newAlarm2.getState()); //original TERMINATE!
+    assertEquals(false, newAlarm2.isActive()); //original TERMINATE!
     assertEquals(newAlarm2.getTimestamp(), origTime);
-    assertEquals(AlarmCondition.TERMINATE, alarm2.getState()); //original TERMINATE!
+    assertEquals(false, alarm2.isActive()); //original TERMINATE!
     assertEquals(alarm2.getTimestamp(), origTime);
   }
 

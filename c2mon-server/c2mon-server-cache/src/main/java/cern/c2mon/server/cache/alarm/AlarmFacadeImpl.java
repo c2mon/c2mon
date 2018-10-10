@@ -176,7 +176,7 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
     configureCacheObject(alarm, properties);
 
     // Initialise run-time parameters with default values
-    alarm.setState(AlarmCondition.TERMINATE);
+    alarm.setActive(false);
     alarm.setTimestamp(new Timestamp(0));
     alarm.setInfo("");
 

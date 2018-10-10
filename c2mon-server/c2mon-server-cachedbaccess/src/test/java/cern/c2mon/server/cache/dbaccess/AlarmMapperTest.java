@@ -88,9 +88,9 @@ public class AlarmMapperTest extends AbstractMapperTest {
   public void testUpdateAlarm() {
     AlarmCacheObject alarmOriginal = (AlarmCacheObject) alarmMapper.getItem(350000L);
     //check is terminated
-    assertEquals(alarmOriginal.getState(), AlarmCondition.TERMINATE);
+    assertEquals(alarmOriginal.isActive(), false);
     //update fields
-    alarmOriginal.setState(AlarmCondition.ACTIVE);
+    alarmOriginal.setActive(true);
     alarmOriginal.setTimestamp(new Timestamp(System.currentTimeMillis()));
     alarmOriginal.setInfo("updated info");
     //update in DB

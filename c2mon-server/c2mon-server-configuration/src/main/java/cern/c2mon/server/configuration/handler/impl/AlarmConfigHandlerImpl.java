@@ -82,7 +82,7 @@ public class AlarmConfigHandlerImpl implements AlarmConfigHandler {
       alarmConfigTransacted.doRemoveAlarm(alarmId, alarmReport);
       alarmCache.remove(alarmId); //will be skipped if rollback exception thrown in do method
         
-      alarm.setState(AlarmCondition.TERMINATE);
+      alarm.setActive(false);
       alarm.setInfo("Alarm was removed");
       alarm.setTimestamp(new Timestamp(System.currentTimeMillis()));
         

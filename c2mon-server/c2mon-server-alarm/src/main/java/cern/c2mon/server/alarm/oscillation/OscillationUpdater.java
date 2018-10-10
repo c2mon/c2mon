@@ -16,9 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.server.alarm.oscillation;
 
-import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
-
 import java.sql.Timestamp;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +27,8 @@ import cern.c2mon.server.cache.AlarmFacade;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.tag.Tag;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
@@ -52,13 +51,15 @@ public final class OscillationUpdater {
     AlarmCacheObject alarmCacheObject = (AlarmCacheObject) alarm;
     alarmCacheObject.setTimestamp(new Timestamp(System.currentTimeMillis()));
     // Evaluate oscillation
-    final boolean isCurrentlyActive = alarm.isActive();
-    if (isCurrentlyActive != alarmCacheObject.isLastActiveState()) {
+    //final boolean isCurrentlyActive = alarm.isActive();
+    final boolean isAlarmConditionActive = alarm.getCondition().evaluateState(tag.getValue());
+    if (isAlarmConditionActive != alarmCacheObject.isLastActiveState()) {
       increaseOscillCounter(alarmCacheObject);
-    } else {
-      resetOscillCounter(alarmCacheObject);
     }
-    alarmCacheObject.setLastActiveState(isCurrentlyActive);
+//    else {
+//      resetOscillCounter(alarmCacheObject);
+//    }
+    alarmCacheObject.setLastActiveState(isAlarmConditionActive);
   }
 
   public boolean checkOscillAlive(AlarmCacheObject alarmCacheObject) {
@@ -67,20 +68,26 @@ public final class OscillationUpdater {
 
   private void increaseOscillCounter(AlarmCacheObject alarmCacheObject) {
     alarmCacheObject.setCounterFault(alarmCacheObject.getCounterFault() + 1);
-    if (alarmCacheObject.getCounterFault() == 1) {
+    if (alarmCacheObject.getCounterFault() == 1 || ((alarmCacheObject.getCounterFault() % oscillationProperties.getOscNumbers()) == 0)) {
       alarmCacheObject.setFirstOscTS(System.currentTimeMillis());
     }
     alarmCacheObject.setOscillating(checkOscillConditions(alarmCacheObject));
   }
 
-  private void resetOscillCounter(AlarmCacheObject alarmCacheObject) {
+  public void resetOscillCounter(AlarmCacheObject alarmCacheObject) {
+
     alarmCacheObject.setCounterFault(0);
     alarmCacheObject.setOscillating(false);
   }
 
   private boolean checkOscillConditions(AlarmCacheObject alarmCacheObject) {
-    return (alarmCacheObject.getCounterFault() >= oscillationProperties.getOscNumbers()
-        && (System.currentTimeMillis() - alarmCacheObject.getFirstOscTS()) <= oscillationProperties.getTimeRange() * 1000);
-  }
+    if ((alarmCacheObject.getCounterFault() >= oscillationProperties.getOscNumbers())
+        && ((System.currentTimeMillis() - alarmCacheObject.getFirstOscTS()) <= oscillationProperties.getTimeRange() * 1000)) {
+      return true;
+    } else {
+      return false;
+    }
 
+   
+  }
 }

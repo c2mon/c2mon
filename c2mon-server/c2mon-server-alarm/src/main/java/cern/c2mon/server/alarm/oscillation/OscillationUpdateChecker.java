@@ -23,7 +23,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.PostConstruct;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Service;
@@ -32,11 +31,13 @@ import cern.c2mon.server.alarm.config.OscillationProperties;
 import cern.c2mon.server.cache.AlarmCache;
 import cern.c2mon.server.cache.AliveTimerFacade;
 import cern.c2mon.server.cache.ClusterCache;
+import cern.c2mon.server.cache.DataTagCache;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
-import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
+import cern.c2mon.server.common.alarm.AlarmCacheUpdater;
 import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.shared.client.alarm.AlarmQuery;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Timer that regularly checks all the active alive timers monitoring the
@@ -93,29 +94,19 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
   private Timer timer;
 
   /**
-   * Reference to alive timer facade.
-   */
-  private AliveTimerFacade aliveTimerFacade;
-
-  /**
    * Reference to alive timer cache.
    */
   private AlarmCache alarmCache;
+  
+  private DataTagCache dataTagCache;
   
   /**
    * Reference to alive oscillationUpdater.
    */
   private OscillationUpdater oscillationUpdater;
 
-  /**
-   * Count down to alarm switch off.
-   */
-  private AtomicInteger warningSwitchOffCountDown = new AtomicInteger(SWITCH_OFF_COUNTDOWN);
-
   /** Reference to the clusterCache to share values across the cluster nodes */
   private final ClusterCache clusterCache;
-
-  private static final int SWITCH_OFF_COUNTDOWN = 60; // 10mins
 
   /**
    * Constructor.
@@ -127,9 +118,10 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
    *          nodes
    */
   @Autowired
-  public OscillationUpdateChecker(final AlarmCache alarmCache, final ClusterCache clusterCache, final OscillationUpdater oscillationUpdater) {
+  public OscillationUpdateChecker(final AlarmCache alarmCache, final DataTagCache dataTagCache, final ClusterCache clusterCache, final OscillationUpdater oscillationUpdater) {
     super();
     this.alarmCache = alarmCache;
+    this.dataTagCache = dataTagCache;
     this.clusterCache = clusterCache;
     this.oscillationUpdater = oscillationUpdater;
   }
@@ -161,7 +153,7 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
   @Override
   public synchronized void start() {
     log.info("Starting the C2MON alive timer mechanism.");
-    timer = new Timer("AliveChecker");
+    timer = new Timer("AlarmOscillationChecker");
     timer.schedule(this, INITIAL_SCAN_DELAY, SCAN_INTERVAL);
     running = true;
   }
@@ -205,9 +197,11 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
 
           for (Long alarmId : result) {
             AlarmCacheObject alarmCopy = (AlarmCacheObject) alarmCache.getCopy(alarmId);
-            if (oscillationUpdater.checkOscillAlive(alarmCopy)) {
+            if (!oscillationUpdater.checkOscillAlive(alarmCopy)) {
+              oscillationUpdater.resetOscillCounter(alarmCopy);
               alarmCopy.setOscillating(false);
-              alarmCache.putQuiet(alarmCopy);
+              alarmCopy.setInfo(AlarmCacheUpdater.evaluateAdditionalInfo(alarmCopy, dataTagCache.get(alarmCopy.getDataTagId())));
+              alarmCache.put(alarmCopy.getId(), alarmCopy);
             }
           }
 
@@ -220,7 +214,7 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
         clusterCache.put(LAST_CHECK_LONG, lastCheck);
 
         if (log.isDebugEnabled()) {
-          log.debug("run() : finished checking alarm oscilation timers ... ");
+          log.debug("run() : finished checking alarm oscillation timers ... ");
         }
       } // end of else block
     } finally {
