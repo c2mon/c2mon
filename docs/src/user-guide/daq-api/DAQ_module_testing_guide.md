@@ -35,7 +35,7 @@ In order to use DAQ testing framework for your JUnit tests, you need to include 
 ## Example test template
 
 The code sample below presents an example skeleton test class of `DemoMessageHandler`.
-Please not the class needs to be annotated with the `@UseHandler` annotation, pointing to the class of the handler you want to test.
+Please note the class needs to be annotated with the `@UseHandler` annotation, pointing to the class of the handler you want to test.
 The presented template can be used as a start point for building more advanced tests, testing various DAQ use-cases.
 
 **Example for test class:**
@@ -154,7 +154,7 @@ import static org.easymock.EasyMock.verify;
 
 import static org.junit.Assert.assertEquals;
 
-import cern.c2mon.daq.test.GenericMessageHandlerTst;
+import cern.c2mon.daq.test.GenericMessageHandlerTest;
 import cern.c2mon.daq.test.SourceDataTagValueCapture;
 import cern.c2mon.daq.test.UseConf;
 import cern.c2mon.daq.test.UseHandler;
@@ -162,9 +162,13 @@ import cern.c2mon.daq.test.UseHandler;
 import org.junit.Test;
 import org.easymock.Capture;
 
-@Test
-@UseConf("e_demohandler_test1.xml")   // e_myhandler_test1.xml configuration will be used for this test.
-public void test1() throws Exception {
+// Specify the Handler class that is to be tested using @UseHandler annotation
+@UseHandler(DemoMessageHandler.class)
+public class DemoMessageHandlerTest extends GenericMessageHandlerTest {
+
+  @Test
+  @UseConf("e_demohandler_test1.xml")   // e_myhandler_test1.xml configuration will be used for this test.
+  public void test1() throws Exception {
 
      // create junit captures for the tag id, value and message (for the commmfault tag)
      Capture<Long> id = new Capture<Long>();
@@ -199,6 +203,7 @@ public void test1() throws Exception {
      assertEquals(107211L, id.getValue().longValue());
      // ..and the value
      assertEquals(false, val.getValue());
+  }
 }
 ```
 
