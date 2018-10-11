@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.alarm.impl;
+package cern.c2mon.server.cache.alarm.impl;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -25,13 +25,13 @@ import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.server.alarm.AlarmAggregator;
-import cern.c2mon.server.alarm.AlarmAggregatorListener;
-import cern.c2mon.server.alarm.oscillation.OscillationUpdater;
 import cern.c2mon.server.cache.C2monCacheListener;
 import cern.c2mon.server.cache.CacheRegistrationService;
 import cern.c2mon.server.cache.CacheSupervisionListener;
 import cern.c2mon.server.cache.TagFacadeGateway;
+import cern.c2mon.server.cache.alarm.AlarmAggregator;
+import cern.c2mon.server.cache.alarm.AlarmAggregatorListener;
+import cern.c2mon.server.cache.alarm.oscillation.OscillationUpdater;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.tag.Tag;
 import lombok.extern.slf4j.Slf4j;

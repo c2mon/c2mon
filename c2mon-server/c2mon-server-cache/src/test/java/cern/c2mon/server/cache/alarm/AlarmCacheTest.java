@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import cern.c2mon.server.cache.AbstractCacheIntegrationTest;
 import cern.c2mon.server.cache.AlarmCache;
+import cern.c2mon.server.cache.alarm.impl.AlarmCacheImpl;
 import cern.c2mon.server.cache.dbaccess.AlarmMapper;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;

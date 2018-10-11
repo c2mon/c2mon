@@ -1,6 +1,6 @@
 package cern.c2mon.server.config;
 
-import cern.c2mon.server.alarm.config.AlarmModule;
+import cern.c2mon.server.cache.alarm.config.AlarmModule;
 import cern.c2mon.server.cache.config.CacheModule;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.cache.loading.config.CacheLoadingModule;

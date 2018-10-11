@@ -1,4 +1,4 @@
-package cern.c2mon.server.alarm.config;
+package cern.c2mon.server.cache.alarm.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

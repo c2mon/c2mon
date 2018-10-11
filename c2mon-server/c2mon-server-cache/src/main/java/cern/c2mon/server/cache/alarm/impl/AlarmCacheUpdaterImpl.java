@@ -14,16 +14,17 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.alarm.impl;
+package cern.c2mon.server.cache.alarm.impl;
 
 import java.sql.Timestamp;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-import cern.c2mon.server.alarm.oscillation.OscillationUpdater;
 import cern.c2mon.server.cache.AlarmCache;
 import cern.c2mon.server.cache.AlarmFacade;
+import cern.c2mon.server.cache.alarm.oscillation.OscillationUpdater;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.AlarmCacheUpdater;
@@ -32,7 +33,7 @@ import lombok.AccessLevel;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
-@Component
+@Service
 @Slf4j
 public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
 

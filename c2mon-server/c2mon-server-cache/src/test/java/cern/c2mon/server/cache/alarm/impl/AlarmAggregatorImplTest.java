@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.alarm.impl;
+package cern.c2mon.server.cache.alarm.impl;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
@@ -28,10 +28,11 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import cern.c2mon.server.alarm.AlarmAggregatorListener;
 import cern.c2mon.server.cache.CacheRegistrationService;
 import cern.c2mon.server.cache.TagFacadeGateway;
 import cern.c2mon.server.cache.TagLocationService;
+import cern.c2mon.server.cache.alarm.AlarmAggregatorListener;
+import cern.c2mon.server.cache.alarm.impl.AlarmAggregatorImpl;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.datatag.DataTag;

@@ -24,6 +24,7 @@ import org.junit.Test;
 
 import cern.c2mon.server.cache.AlarmCache;
 import cern.c2mon.server.cache.TagLocationService;
+import cern.c2mon.server.cache.alarm.impl.AlarmFacadeImpl;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.AlarmCondition;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;

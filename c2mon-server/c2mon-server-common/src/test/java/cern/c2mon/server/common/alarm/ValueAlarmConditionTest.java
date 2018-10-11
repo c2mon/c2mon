@@ -40,7 +40,6 @@ public class ValueAlarmConditionTest {
    * @throws ParserConfigurationException 
    */
   @Test
-  @Ignore
   public void testEnumHandling() throws ParserConfigurationException {
     String xmlString = "<AlarmCondition class=\"cern.c2mon.server.common.alarm.ValueAlarmCondition\">"
       + "<alarm-value type=\"String\">DOWN</alarm-value>"
@@ -50,10 +49,10 @@ public class ValueAlarmConditionTest {
     AlarmCondition condition = AlarmCondition.fromConfigXML(document.getDocumentElement());
     
     SupervisionStatus value = SupervisionStatus.DOWN;
-    Assert.assertEquals(AlarmCondition.ACTIVE, condition.evaluateState(value));
+    Assert.assertEquals(true, condition.evaluateState(value));
     
     SupervisionStatus value2 = SupervisionStatus.RUNNING;
-    Assert.assertEquals(AlarmCondition.TERMINATE, condition.evaluateState(value2));    
+    Assert.assertEquals(false, condition.evaluateState(value2));    
   }
   
 }

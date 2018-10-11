@@ -1,4 +1,4 @@
-package cern.c2mon.server.alarm.config;
+package cern.c2mon.server.cache.alarm.config;
 
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
@@ -9,5 +9,5 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @EnableConfigurationProperties(OscillationProperties.class)
-@ComponentScan("cern.c2mon.server.alarm")
+@ComponentScan("cern.c2mon.server.cache.alarm")
 public class AlarmModule {}

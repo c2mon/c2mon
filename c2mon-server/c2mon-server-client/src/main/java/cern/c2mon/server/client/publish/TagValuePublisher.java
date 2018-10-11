@@ -32,11 +32,11 @@ import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.server.alarm.AlarmAggregator;
-import cern.c2mon.server.alarm.AlarmAggregatorListener;
 import cern.c2mon.server.cache.AliveTimerFacade;
 import cern.c2mon.server.cache.TagFacadeGateway;
 import cern.c2mon.server.cache.TagLocationService;
+import cern.c2mon.server.cache.alarm.AlarmAggregator;
+import cern.c2mon.server.cache.alarm.AlarmAggregatorListener;
 import cern.c2mon.server.client.util.TransferObjectFactory;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.TagWithAlarms;

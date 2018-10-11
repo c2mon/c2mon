@@ -1,4 +1,4 @@
-package cern.c2mon.server.alarm.impl;
+package cern.c2mon.server.cache.alarm.impl;
 
 import static org.easymock.EasyMock.createMock;
 import static org.junit.Assert.assertEquals;
@@ -11,9 +11,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import cern.c2mon.server.alarm.config.OscillationProperties;
-import cern.c2mon.server.alarm.oscillation.OscillationUpdater;
 import cern.c2mon.server.cache.AlarmCache;
+import cern.c2mon.server.cache.alarm.config.OscillationProperties;
+import cern.c2mon.server.cache.alarm.impl.AlarmCacheUpdaterImpl;
+import cern.c2mon.server.cache.alarm.oscillation.OscillationUpdater;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.AlarmCondition;

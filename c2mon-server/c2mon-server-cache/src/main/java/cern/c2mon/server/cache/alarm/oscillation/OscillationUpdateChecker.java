@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.alarm.oscillation;
+package cern.c2mon.server.cache.alarm.oscillation;
 
 import java.util.Collection;
 import java.util.Timer;
@@ -27,11 +27,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.server.alarm.config.OscillationProperties;
 import cern.c2mon.server.cache.AlarmCache;
 import cern.c2mon.server.cache.AliveTimerFacade;
 import cern.c2mon.server.cache.ClusterCache;
 import cern.c2mon.server.cache.DataTagCache;
+import cern.c2mon.server.cache.alarm.config.OscillationProperties;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.AlarmCacheUpdater;
