@@ -38,6 +38,34 @@
       "type": "keyword",
       "index": true
     },
+    "value": {
+      "type": "double"
+    },
+    "valueBoolean": {
+      "type": "boolean"
+    },
+    "valueFloat": {
+      "type": "float"
+    },
+    "valueLong": {
+      "type": "long"
+    },
+    "valueObject": {
+      "type": "object",
+      "dynamic": true
+    },
+    "valueString": {
+      "type": "keyword",
+      "index": true
+    },
+    "valueDescription": {
+      "type": "keyword",
+      "index": true
+    },
+    "timestamp": {
+      "type": "date",
+      "format": "epoch_millis"
+    },
     "c2mon": {
       "dynamic": "true",
       "properties": {
@@ -68,29 +96,8 @@
         "sourceTimestamp": {
           "type": "date",
           "format": "epoch_millis"
-        },
-        "value": {
-          "type": "double"
-        },
-        "valueLong": {
-          "type": "long"
-        },
-        "valueBoolean": {
-          "type": "boolean"
-        },
-        "valueString": {
-          "type": "keyword",
-          "index": true
-        },
-        "valueObject": {
-          "type": "object",
-          "dynamic": true
         }
       }
-    },
-    "timestamp": {
-      "type": "date",
-      "format": "epoch_millis"
     },
     "quality": {
       "dynamic": "false",
@@ -106,10 +113,6 @@
           "type": "boolean"
         }
       }
-    },
-    "valueDescription": {
-      "type": "keyword",
-      "index": true
     }
   }
 }
