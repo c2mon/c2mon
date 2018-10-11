@@ -38,47 +38,6 @@
       "type": "keyword",
       "index": true
     },
-    "c2mon": {
-      "dynamic": "true",
-      "properties": {
-        "dataType": {
-          "type": "keyword",
-          "index": true
-        },
-        "process": {
-          "type": "keyword",
-          "index": true
-        },
-        "equipment": {
-          "type": "keyword",
-          "index": true
-        },
-        "subEquipment": {
-          "type": "keyword",
-          "index": true
-        },
-        "logged": {
-          "type": "boolean"
-        },
-        "value": {
-          "type": "double"
-        },
-        "valueLong": {
-          "type": "long"
-        },
-        "valueBoolean": {
-          "type": "boolean"
-        },
-        "valueString": {
-          "type": "keyword",
-          "index": "true"
-        },
-        "valueObject": {
-          "type": "object",
-          "dynamic": "true"
-        }
-      }
-    },
     "timestamp": {
       "type": "date",
       "format": "epoch_millis"
@@ -103,6 +62,30 @@
         "metadata": {
           "type": "object",
           "dynamic": "true"
+        }
+      }
+    },
+    "c2mon": {
+      "dynamic": "true",
+      "properties": {
+        "dataType": {
+          "type": "keyword",
+          "index": true
+        },
+        "process": {
+          "type": "keyword",
+          "index": true
+        },
+        "equipment": {
+          "type": "keyword",
+          "index": true
+        },
+        "subEquipment": {
+          "type": "keyword",
+          "index": true
+        },
+        "logged": {
+          "type": "boolean"
         }
       }
     }
