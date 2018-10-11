@@ -26,6 +26,9 @@
     "value": {
       "type": "double"
     },
+    "valueFloat": {
+      "type": "float"
+    },
     "valueLong": {
       "type": "long"
     },
