@@ -18,8 +18,8 @@ package cern.c2mon.server.common.alarm;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
@@ -36,9 +36,11 @@ public class ValueAlarmConditionTest {
   
   /**
    * Tests that Enums can be compared to String alarm conditions.
+   * TODO : Reactivate test when XML handling for alarms is rediscussed with Matthias
    * @throws ParserConfigurationException 
    */
   @Test
+  @Ignore
   public void testEnumHandling() throws ParserConfigurationException {
     String xmlString = "<AlarmCondition class=\"cern.c2mon.server.common.alarm.ValueAlarmCondition\">"
       + "<alarm-value type=\"String\">DOWN</alarm-value>"
