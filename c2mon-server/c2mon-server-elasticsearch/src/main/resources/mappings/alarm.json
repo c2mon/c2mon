@@ -16,7 +16,7 @@
       "type": "boolean"
     },
     "activeNumeric": {
-      "type": "double"
+      "type": "integer"
     },
     "faultCode": {
       "type": "integer"
@@ -46,23 +46,6 @@
     "timestamp": {
       "type": "date",
       "format": "epoch_millis"
-    },
-    "value": {
-      "type": "double"
-    },
-    "valueLong": {
-      "type": "long"
-    },
-    "valueBoolean": {
-      "type": "boolean"
-    },
-    "valueString": {
-      "type": "keyword",
-      "index": "true"
-    },
-    "valueObject": {
-      "type": "object",
-      "dynamic": "true"
     }
   }
 }
