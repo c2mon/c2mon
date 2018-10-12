@@ -9,10 +9,17 @@ For more details on a given release, please check also the [Milestone planning](
 
 ## [Unreleased]
 ### Added
+- Added string data type support to JEC protocol address class (#214)
+- Enabled JMX support for embedded JMS broker
+- Added openshift template draft for Docker deployment
 
 ### Changed
+- Client: Search by tag name in DAQ is now case insensitive
+- Time-to-live of JMS messages is reduced to one day (and 10 minutes for alive messages) (#220)
 
 ### Fixed
+- Server: Fixed value mapping problem in Elasticsearch plugin (#222)
+- Documentation: Typo correction and fixes in example test code of DAQ module testing guide
 
 ## 1.8.38 - 2018-05-08
 ### Fixed
