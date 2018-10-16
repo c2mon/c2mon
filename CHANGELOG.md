@@ -9,6 +9,14 @@ For more details on a given release, please check also the [Milestone planning](
 
 ## [Unreleased]
 ### Added
+
+### Changed
+
+### Fixed
+
+
+## [1.8.39] - 2018-10-16
+### Added
 - Added string data type support to JEC protocol address class (#214)
 - Enabled JMX support for embedded JMS broker
 - Added openshift template draft for Docker deployment
@@ -318,7 +326,8 @@ This patch contains bug fixes for the DAQ layer.
 - Remove of EquipmentLogger concept from DAQ Core (#56)
 
 
-[Unreleased]: https://gitlab.cern.ch/c2mon/c2mon/milestones/30
+[Unreleased]: https://gitlab.cern.ch/c2mon/c2mon/milestones/31
+[1.8.39]: https://gitlab.cern.ch/c2mon/c2mon/milestones/30
 [1.8.36]: https://gitlab.cern.ch/c2mon/c2mon/milestones/29
 [1.8.35]: https://gitlab.cern.ch/c2mon/c2mon/milestones/28
 [1.8.34]: https://gitlab.cern.ch/c2mon/c2mon/milestones/27
