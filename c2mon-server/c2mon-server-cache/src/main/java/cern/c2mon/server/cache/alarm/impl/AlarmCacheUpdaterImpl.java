@@ -19,7 +19,6 @@ package cern.c2mon.server.cache.alarm.impl;
 import java.sql.Timestamp;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.cache.AlarmCache;
@@ -55,11 +54,12 @@ public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
     AlarmCacheObject alarmCacheObject = (AlarmCacheObject) alarm;
     // this time is then used in LASER publication as user timestamp
     Timestamp alarmTime = tag.getCacheTimestamp();
+    
     // not possible to evaluate alarms with associated null tag; occurs during
     // normal operation
     // (may change in future is alarm state depends on quality f.eg.)
     if (tag.getValue() == null) {
-      log.debug("Alarm update called with null Tag value - leaving Alarm status unchanged at " + alarm.isActive());
+      log.debug("Alarm update called with null Tag value - leaving Alarm status unchanged at {}", alarm.isActive());
 
       // change the alarm timestamp, if the alarm has never been initialised
       if (alarmCacheObject.getTimestamp().equals(new Timestamp(0))) {
@@ -75,45 +75,49 @@ public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
 
     // timestamp should never be null
     if (tag.getTimestamp() == null) {
-      log.warn("update() : tag value or timestamp null -> no update");
+      log.warn("Tag value or timestamp null -> no update");
       throw new IllegalArgumentException("update method called on Alarm facade with either null tag value or null tag timestamp.");
     }
 
-    // Check the oscillating status
-    boolean wasAlreadyOscillating = alarmCacheObject.isOscillating();
-    oscillationUpdater.update(alarm, tag);
-
+    return updateAlarmCacheObject(alarmCacheObject, tag);
+  }
+  
+  
+  private AlarmCacheObject updateAlarmCacheObject(final AlarmCacheObject alarmCacheObject, final Tag tag) {
     // Compute the alarm state corresponding to the new tag value
     boolean newState = alarmCacheObject.getCondition().evaluateState(tag.getValue());
 
     // Return if new state is TERMINATE and old state was also TERMINATE, return
     // original alarm (no need to save in cache)
     if (newState == false && alarmCacheObject.isActive() == false) {
-      return alarm;
+      return alarmCacheObject;
     }
+    
+    boolean hasChanged = alarmCacheObject.isActive() != newState;
+    
+    alarmCacheObject.setActive(newState);
+    
+    // Check the oscillating status
+    boolean wasAlreadyOscillating = alarmCacheObject.isOscillating();
+    oscillationUpdater.update(alarmCacheObject, tag);
 
     // Build up a prefix according to the tag value's validity and mode
-    String additionalInfo = AlarmCacheUpdater.evaluateAdditionalInfo(alarm, tag);
+    String additionalInfo = AlarmCacheUpdater.evaluateAdditionalInfo(alarmCacheObject, tag);
 
     // Default case: change the alarm's state
     // (1) if the alarm has never been initialised
     // (2) if tag is VALID and the alarm changes from ACTIVE->TERMINATE or
     // TERMINATE->ACTIVE
-    if (alarmCacheObject.getTimestamp().equals(new Timestamp(0)) || (tag.isValid() && ((alarmCacheObject.isActive() != newState) || (alarm.isOscillating())))) {
+    if (alarmCacheObject.getTimestamp().equals(new Timestamp(0)) || (tag.isValid() && hasChanged) ) {
 
-      log.trace(new StringBuffer("update(): alarm ").append(alarmCacheObject.getId()).append(" changed STATE to ").append(newState).toString());
-      alarmCacheObject.setTimestamp(alarmTime);
+      log.trace("Alarm {} changed STATE to {}",alarmCacheObject.getId(), newState);
+      
+      alarmCacheObject.setTimestamp(tag.getCacheTimestamp());
       alarmCacheObject.setInfo(additionalInfo);
 
-      if (alarm.isOscillating()) {
-        alarmCacheObject.setActive(true);
-        if (wasAlreadyOscillating) {
-          alarmCache.putQuiet(alarmCacheObject);
-        } else {
-          alarmCache.put(alarmCacheObject.getId(), alarmCacheObject);
-        }
+      if (alarmCacheObject.isOscillating() && wasAlreadyOscillating) {
+        alarmCache.putQuiet(alarmCacheObject);
       } else {
-        alarmCacheObject.setActive(newState);
         alarmCache.put(alarmCacheObject.getId(), alarmCacheObject);
       }
       return alarmCacheObject;
@@ -126,12 +130,13 @@ public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
     if (alarmCacheObject.getInfo() == null) {
       alarmCacheObject.setInfo("");
     }
+    
     if (!alarmCacheObject.getInfo().equals(additionalInfo)) {
-      log.trace(new StringBuffer("update(): alarm ").append(alarmCacheObject.getId()).append(" changed INFO to ").append(additionalInfo).toString());
+      log.trace("update(): alarm #{} changed INFO to {}", alarmCacheObject.getId(), additionalInfo);
 
       alarmCacheObject.setInfo(additionalInfo);
-      alarmCacheObject.setTimestamp(alarmTime);
-      if (alarmCacheObject.isActive() != false) {
+      alarmCacheObject.setTimestamp(tag.getCacheTimestamp());
+      if (alarmCacheObject.isActive()) {
         alarmCache.put(alarmCacheObject.getId(), alarmCacheObject);
       }
       return alarmCacheObject;
@@ -139,7 +144,7 @@ public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
 
     // In all other cases, the value of the alarm related to the DataTag has
     // not changed. No need to publish an alarm change.
-    log.trace(new StringBuffer("update(): alarm ").append(alarmCacheObject.getId()).append(" has not changed.").toString());
+    log.trace("Alarm #{} has not changed.", alarmCacheObject.getId());
 
     return alarmCacheObject;
   }

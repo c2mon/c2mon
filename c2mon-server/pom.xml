@@ -13,7 +13,6 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>c2mon-server-alarm</module>
     <module>c2mon-server-benchmark</module>
     <module>c2mon-server-cache</module>
     <module>c2mon-server-cachedbaccess</module>
@@ -43,11 +42,6 @@
   <dependencyManagement>
     <dependencies>
       <!-- Internal C2MON dependencies -->
-      <dependency>
-        <groupId>cern.c2mon.server</groupId>
-        <artifactId>c2mon-server-alarm</artifactId>
-        <version>${project.parent.version}</version>
-      </dependency>
       <dependency>
         <groupId>cern.c2mon.server</groupId>
         <artifactId>c2mon-server-cache</artifactId>

@@ -19,7 +19,6 @@ package cern.c2mon.server.cache.alarm.oscillation;
 import java.util.Collection;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.PostConstruct;
 

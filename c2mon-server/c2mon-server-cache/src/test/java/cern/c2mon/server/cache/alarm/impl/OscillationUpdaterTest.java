@@ -42,7 +42,7 @@ public class OscillationUpdaterTest {
     dataTagCacheObject = new DataTagCacheObject();
     oscillationProperties = new OscillationProperties();
     oscillationProperties.setOscNumbers(3);
-    oscillationProperties.setTimeRange(2);
+    oscillationProperties.setTimeRange(600);
     oscUpdater.setOscillationProperties(oscillationProperties);
 
     dataTagCacheObject.setSourceTimestamp(new Timestamp(System.currentTimeMillis() - 60000));
@@ -72,9 +72,11 @@ public class OscillationUpdaterTest {
   // than the for oscillations counter..
   @Test
   public void testOscillDetected() {
+    log.info("------ testOscillDetected -------"); 
     for (int i = 0; i < 20; i++) {
       dataTagCacheObject.setValue(i % 2);
       oscUpdater.update(alarmCacheObject, dataTagCacheObject);
+      log.info("ALARM ACTIVE: {} - OSCILLATION: {}", alarmCacheObject.isActive(), alarmCacheObject.isOscillating()); 
     }
     assertTrue(alarmCacheObject.isOscillating());
   }
@@ -84,9 +86,11 @@ public class OscillationUpdaterTest {
   // the oscillation is detected
   @Test
   public void testLowOscillChanges() {
-    for (int i = 0; i < 5; i++) {
+    log.info("------ testLowOscillChanges -------"); 
+    for (int i = 0; i < 7; i++) {
       dataTagCacheObject.setValue(i % 2);
       oscUpdater.update(alarmCacheObject, dataTagCacheObject);
+      log.info("ALARM ACTIVE: {} - OSCILLATION: {}", alarmCacheObject.isActive(), alarmCacheObject.isOscillating()); 
     }
     assertTrue(alarmCacheObject.isOscillating());
   }
@@ -123,8 +127,10 @@ public class OscillationUpdaterTest {
     AlarmCacheUpdaterImpl myAlarmCacheUpdater = new AlarmCacheUpdaterImpl();
     myAlarmCacheUpdater.setAlarmCache(myAlarmCache);
     myAlarmCacheUpdater.setOscillationUpdater(this.oscUpdater);
-
-    for (int i = 1; i < 5; i++) {
+    
+    oscUpdater.resetOscillCounter(alarmCacheObject);
+    
+    for (int i = 1; i < 6; i++) {
       dataTagCacheObject.setValue(i % 2);
 
       // Notify the mock object that we expect put() to be called
@@ -133,19 +139,11 @@ public class OscillationUpdaterTest {
       } else {
         myAlarmCache.putQuiet(alarmCacheObject);
       }
-      EasyMock.expectLastCall(); // to call just once previous instruction
-
+      EasyMock.expectLastCall();
       EasyMock.replay(myAlarmCache);
 
-      //
       myAlarmCacheUpdater.update(alarmCacheObject, dataTagCacheObject);
-      log.info("ALARM ACTIVE: {} - OSCILLATION: {}", alarmCacheObject.isActive(), alarmCacheObject.isOscillating()); // it
-                                                                                                                     // is
-                                                                                                                     // printed
-                                                                                                                     // just
-                                                                                                                     // 1
-                                                                                                                     // time
-
+      log.info("ALARM ACTIVE: {} - OSCILLATION: {} INFO: {} firstOscTS {} counter {} ", alarmCacheObject.isActive(), alarmCacheObject.isOscillating(), alarmCacheObject.getInfo(), alarmCacheObject.getFirstOscTS(), alarmCacheObject.getCounterFault());
       assertEquals(alarmCacheObject.isOscillating(), alarmCacheObject.getInfo().contains(Alarm.ALARM_INFO_OSC));
       EasyMock.verify(myAlarmCache);
       EasyMock.reset(myAlarmCache);
@@ -164,39 +162,14 @@ public class OscillationUpdaterTest {
       } else {
         myAlarmCache.putQuiet(alarmCacheObject);
       }
-      // to call just once previous instruction
       EasyMock.expectLastCall();
       EasyMock.replay(myAlarmCache);
 
       myAlarmCacheUpdater.update(alarmCacheObject, dataTagCacheObject);
-      log.info("ALARM ACTIVE: {} - OSCILLATION: {} INFO: {}", alarmCacheObject.isActive(), alarmCacheObject.isOscillating(), alarmCacheObject.getInfo());
+      log.info("ALARM ACTIVE: {} - OSCILLATION: {} INFO: {} firstOscTS {} counter {} ", alarmCacheObject.isActive(), alarmCacheObject.isOscillating(), alarmCacheObject.getInfo(), alarmCacheObject.getFirstOscTS(), alarmCacheObject.getCounterFault());
 
       EasyMock.verify(myAlarmCache);
       EasyMock.reset(myAlarmCache);
     }
-
-    log.info("===========================");
-
-    // for (int i = 1; i < 6; i++) {
-    //
-    // dataTagCacheObject.setValue(0);
-    //
-    // if (i == 1) {
-    // myAlarmCache.put(alarmCacheObject.getId(), alarmCacheObject);
-    // EasyMock.expectLastCall(); // to call just once previous instruction
-    // EasyMock.replay(myAlarmCache);
-    //
-    // }
-    // myAlarmCacheUpdater.update(alarmCacheObject, dataTagCacheObject);
-    // log.info("ALARM ACTIVE: {} - OSCILLATION: {}",
-    // alarmCacheObject.isActive(), alarmCacheObject.isOscillating());
-    // if (i == 1) {
-    // EasyMock.verify(myAlarmCache);
-    // EasyMock.reset(myAlarmCache);
-    // }
-    //
-    // }
-    // log.info("===========================");
-
   }
 }

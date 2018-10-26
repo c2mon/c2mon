@@ -81,9 +81,6 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
   /** <code>true</code>, if the alarm state is active as published to listeners (may be forced to <code>true</code> in case of oscillation) */
   private boolean active = false;
 
-  /** <code>true</code>, if the alarm state is active */
-  private boolean active2publish = false;
-  
   /**
    * Whether the alarm was previously active
    **/
