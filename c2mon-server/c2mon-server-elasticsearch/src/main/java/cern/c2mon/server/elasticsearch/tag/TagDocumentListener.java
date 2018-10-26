@@ -121,14 +121,19 @@ public class TagDocumentListener implements C2monBufferedCacheListener<Tag>, Sma
 
   @Override
   public void start() {
-    running = true;
-    listenerContainer.start();
+    if (this.elasticsearchClient.getProperties().isEnabled()) {
+        running = true;
+        listenerContainer.start();
+    }
   }
 
   @Override
   public void stop() {
-    listenerContainer.stop();
-    running = false;
+    if (this.elasticsearchClient.getProperties().isEnabled()) {
+        listenerContainer.stop();
+        running = false;
+    }
+    
   }
 
   @Override
