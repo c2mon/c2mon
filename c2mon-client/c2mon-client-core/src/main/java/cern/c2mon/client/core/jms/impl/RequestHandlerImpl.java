@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2018 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -19,24 +19,18 @@ package cern.c2mon.client.core.jms.impl;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 import javax.jms.JMSException;
 
-import cern.c2mon.client.core.config.C2monClientProperties;
-import cern.c2mon.client.core.jms.JmsProxy;
 import lombok.Setter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.common.listener.ClientRequestReportListener;
+import cern.c2mon.client.core.config.C2monClientProperties;
+import cern.c2mon.client.core.jms.JmsProxy;
 import cern.c2mon.client.core.jms.RequestHandler;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.command.CommandExecuteRequest;
@@ -64,13 +58,9 @@ import cern.c2mon.shared.client.tag.TagValueUpdate;
  * @author Mark Brightwell
  *
  */
+@Slf4j
 @Service("coreRequestHandler")
 public class RequestHandlerImpl implements RequestHandler {
-
-  /**
-   * Class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(RequestHandlerImpl.class);
 
   /**
    * The maximum number of tags in a single request. Each request runs in its
@@ -127,7 +117,7 @@ public class RequestHandlerImpl implements RequestHandler {
 
   @Override
   public Collection<SupervisionEvent> getCurrentSupervisionStatus() throws JMSException {
-    ClientRequestImpl<SupervisionEvent> clientRequest = new ClientRequestImpl<SupervisionEvent>(SupervisionEvent.class);
+    ClientRequestImpl<SupervisionEvent> clientRequest = new ClientRequestImpl<>(SupervisionEvent.class);
     return jmsProxy.sendRequest(clientRequest, defaultRequestQueue, clientRequest.getTimeout());
   }
 
@@ -158,7 +148,7 @@ public class RequestHandlerImpl implements RequestHandler {
   @Override
   public Collection<AlarmValue> requestAllActiveAlarms() throws JMSException {
 
-    ClientRequestImpl<AlarmValue> activeAlarmsRequest = new ClientRequestImpl<AlarmValue>(
+    ClientRequestImpl<AlarmValue> activeAlarmsRequest = new ClientRequestImpl<>(
         ClientRequest.ResultType.TRANSFER_ACTIVE_ALARM_LIST,
           ClientRequest.RequestType.ACTIVE_ALARMS_REQUEST,
           60000); // == timeout
@@ -185,25 +175,24 @@ public class RequestHandlerImpl implements RequestHandler {
 
   @Override
   public ConfigurationReport applyConfiguration(final Long configurationId, final ClientRequestReportListener reportListener) {
-    ArrayList<Long> ids = new ArrayList<Long>();
+    ArrayList<Long> ids = new ArrayList<>();
     ids.add(configurationId);
 
     Collection<ConfigurationReport> report = executeRequest(ids, ConfigurationReport.class, reportListener, adminRequestQueue);
 
     if (report.isEmpty()) {
       final String errorMsg = "applyConfiguration returned an empty Collection";
-      LOGGER.error(errorMsg);
+      log.error(errorMsg);
       throw new RuntimeException(errorMsg);
     }
     if (report.size() > 1) {
       final String errorMsg = "applyConfiguration returned a Collection with more than 1 result";
-      LOGGER.error(errorMsg);
+      log.error(errorMsg);
       throw new RuntimeException(errorMsg);
     }
     final ConfigurationReport receivedReport = report.iterator().next();
     if (receivedReport != null)
-      LOGGER.trace("applyConfiguration(): Received Configuration report Report="
-          + receivedReport.toXML());
+      log.trace("Received configuration report: {}", receivedReport.toXML());
 
     return receivedReport;
   }
@@ -239,34 +228,34 @@ public class RequestHandlerImpl implements RequestHandler {
   private <T extends ClientRequestResult> Collection<T> executeRequest(
       final Collection<Long> ids, final Class<T> clazz, final ClientRequestReportListener reportListener, final String requestQueue) {
 
-    LOGGER.debug("Initiating client request.");
-    ClientRequestImpl<T> clientRequest = new ClientRequestImpl<T>(clazz);
+    log.debug("Initiating client request");
+    ClientRequestImpl<T> clientRequest = new ClientRequestImpl<>(clazz);
     Iterator<Long> it = ids.iterator();
-    Collection<Future<Collection<T>>> results = new ArrayList<Future<Collection<T>>>();
+    Collection<Future<Collection<T>>> results = new ArrayList<>();
     int counter = 0;
     while (it.hasNext()) {
       while (it.hasNext() && counter < maxRequestSize) {
         clientRequest.addTagId(it.next());
         counter++;
       }
-      RequestValuesTask<T> task = new RequestValuesTask<T>(clientRequest, reportListener, requestQueue);
+      RequestValuesTask<T> task = new RequestValuesTask<>(clientRequest, reportListener, requestQueue);
       results.add(executor.submit(task));
-      clientRequest = new ClientRequestImpl<T>(clazz);
+      clientRequest = new ClientRequestImpl<>(clazz);
       counter = 0;
     }
-    Collection<T> finalCollection = new ArrayList<T>();
+    Collection<T> finalCollection = new ArrayList<>();
     for (Future<Collection<T>> result : results) {
       try {
         finalCollection.addAll(result.get());
       } catch (InterruptedException e) {
-        LOGGER.error("InterruptedException caught while executing RequestValuesTask.", e);
+        log.error("InterruptedException caught while executing RequestValuesTask", e);
         throw new RuntimeException(e);
       } catch (ExecutionException e) {
-        LOGGER.error("ExecutionException caught while executing RequestValuesTask.", e);
+        log.error("ExecutionException caught while executing RequestValuesTask", e);
         throw new RuntimeException(e);
       }
     }
-    LOGGER.debug("Client request completed.");
+    log.debug("Client request completed");
     return finalCollection;
   }
 
@@ -285,34 +274,34 @@ public class RequestHandlerImpl implements RequestHandler {
   private <T extends ClientRequestResult> Collection<T> executeNameRequest(
       final Collection<String> regexList, final Class<T> clazz, final ClientRequestReportListener reportListener, final String requestQueue) {
 
-    LOGGER.debug("Initiating client request.");
-    ClientRequestImpl<T> clientRequest = new ClientRequestImpl<T>(clazz);
+    log.debug("Initiating client request");
+    ClientRequestImpl<T> clientRequest = new ClientRequestImpl<>(clazz);
     Iterator<String> it = regexList.iterator();
-    Collection<Future<Collection<T>>> results = new ArrayList<Future<Collection<T>>>();
+    Collection<Future<Collection<T>>> results = new ArrayList<>();
     int counter = 0;
     while (it.hasNext()) {
       while (it.hasNext() && counter < maxRequestSize) {
         clientRequest.addRegex(it.next());
         counter++;
       }
-      RequestValuesTask<T> task = new RequestValuesTask<T>(clientRequest, reportListener, requestQueue);
+      RequestValuesTask<T> task = new RequestValuesTask<>(clientRequest, reportListener, requestQueue);
       results.add(executor.submit(task));
-      clientRequest = new ClientRequestImpl<T>(clazz);
+      clientRequest = new ClientRequestImpl<>(clazz);
       counter = 0;
     }
-    Collection<T> finalCollection = new ArrayList<T>();
+    Collection<T> finalCollection = new ArrayList<>();
     for (Future<Collection<T>> result : results) {
       try {
         finalCollection.addAll(result.get());
       } catch (InterruptedException e) {
-        LOGGER.error("InterruptedException caught while executing RequestValuesTask.", e);
+        log.error("InterruptedException caught while executing RequestValuesTask", e);
         throw new RuntimeException(e);
       } catch (ExecutionException e) {
-        LOGGER.error("ExecutionException caught while executing RequestValuesTask.", e);
+        log.error("ExecutionException caught while executing RequestValuesTask", e);
         throw new RuntimeException(e);
       }
     }
-    LOGGER.debug("Client request completed.");
+    log.debug("Client request completed.");
     return finalCollection;
   }
 
@@ -328,7 +317,7 @@ public class RequestHandlerImpl implements RequestHandler {
 
   @Override
   public String getProcessXml(final String processName) throws JMSException {
-    ClientRequestImpl<ProcessXmlResponse> xmlRequest = new ClientRequestImpl<ProcessXmlResponse>(ProcessXmlResponse.class);
+    ClientRequestImpl<ProcessXmlResponse> xmlRequest = new ClientRequestImpl<>(ProcessXmlResponse.class);
     xmlRequest.setRequestParameter(processName);
     // response should have a unique element in
     ProcessXmlResponse response = jmsProxy.sendRequest(xmlRequest, defaultRequestQueue, xmlRequest.getTimeout()).iterator().next();
@@ -342,7 +331,7 @@ public class RequestHandlerImpl implements RequestHandler {
   @Override
   public Collection<ProcessNameResponse> getProcessNames() throws JMSException {
 
-    ClientRequestImpl<ProcessNameResponse> namesRequest = new ClientRequestImpl<ProcessNameResponse>(ProcessNameResponse.class);
+    ClientRequestImpl<ProcessNameResponse> namesRequest = new ClientRequestImpl<>(ProcessNameResponse.class);
 
     return jmsProxy.sendRequest(namesRequest, defaultRequestQueue, namesRequest.getTimeout());
   }
@@ -351,7 +340,7 @@ public class RequestHandlerImpl implements RequestHandler {
   @Override
   public <T> CommandReport executeCommand(final CommandExecuteRequest<T> commandExecuteRequest) throws JMSException {
 
-    ClientRequestImpl clientRequest = new ClientRequestImpl<CommandReport>(CommandReport.class);
+    ClientRequestImpl clientRequest = new ClientRequestImpl<>(CommandReport.class);
     clientRequest.setObjectParameter(commandExecuteRequest);
 
     Collection<CommandReport> c = jmsProxy.sendRequest(clientRequest, defaultRequestQueue, commandExecuteRequest.getTimeout());
@@ -368,10 +357,10 @@ public class RequestHandlerImpl implements RequestHandler {
     Collection<ConfigurationReportHeader> reports = jmsProxy.sendRequest(clientRequest, defaultRequestQueue, clientRequest.getTimeout());
 
     if (reports.isEmpty()) {
-      LOGGER.warn("getConfigurationReports() returned an empty collection");
+      log.warn("getConfigurationReports() returned an empty collection");
     }
 
-    LOGGER.trace("getConfigurationReports(): Received " + reports.size() + " configuration report headers");
+    log.trace("getConfigurationReports(): Received {} configuration report headers", reports.size());
     return reports;
   }
 
@@ -384,10 +373,10 @@ public class RequestHandlerImpl implements RequestHandler {
     Collection<ConfigurationReport> reports = jmsProxy.sendRequest(clientRequest, defaultRequestQueue, clientRequest.getTimeout());
 
     if (reports.isEmpty()) {
-      LOGGER.warn("getConfigurationReports() returned an empty collection");
+      log.warn("getConfigurationReports() returned an empty collection");
     }
 
-    LOGGER.trace("getConfigurationReports(): Received " + reports.size() + " reports for configuration " + id);
+    log.trace("getConfigurationReports(): Received {} reports for configuration {}", reports.size(), id);
     return reports;
   }
 
