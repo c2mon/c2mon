@@ -13,6 +13,7 @@ For more details on a given release, please check also the [Milestone planning](
 ### Changed
 
 ### Fixed
+- Server: Fixed ElasticSearch mapping for Boolean tags on numeric value field, which was always set to 1 (#223)
 
 
 ## [1.8.39] - 2018-10-16
