@@ -20,7 +20,8 @@
     #{faultMember,jdbcType=VARCHAR},
     #{faultCode,jdbcType=NUMERIC},
     SYS_EXTRACT_UTC(#{serverTimestamp,jdbcType=TIMESTAMP}),
-    #{info,jdbcType=VARCHAR})
+    #{info,jdbcType=VARCHAR},
+    #{oscillating,jdbcType=NUMERIC})
   </insert>
 
   <insert id="insertLog" databaseId="mysql" parameterType="cern.c2mon.server.history.structure.AlarmRecord">
@@ -38,7 +39,8 @@
     #{faultMember,jdbcType=VARCHAR},
     #{faultCode,jdbcType=NUMERIC},
     CONVERT_TZ( #{serverTimestamp,jdbcType=TIMESTAMP}, @@session.time_zone, '+00:00' ),
-    #{info,jdbcType=VARCHAR})
+    #{info,jdbcType=VARCHAR},
+    #{oscillating,jdbcType=NUMERIC})
   </insert>
 
   <!-- only used to remove inserts done during testing -->
