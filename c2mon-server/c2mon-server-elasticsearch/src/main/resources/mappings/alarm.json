@@ -40,6 +40,9 @@
       "type": "object",
       "dynamic": "true"
     },
+    "oscillating": {
+      "type": "boolean"
+    },
     "tagId": {
       "type": "long"
     },
