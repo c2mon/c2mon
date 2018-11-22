@@ -73,7 +73,7 @@ CREATE TABLE IF NOT EXISTS ALARMLOG (
   active          VARCHAR(1)    NOT NULL,
   servertime      TIMESTAMP(6)  NOT NULL,
   info            VARCHAR(100)  DEFAULT NULL,
-  oscillating     INTEGER       NOT NULL
+  oscillating     VARCHAR(1)
 );
 
 

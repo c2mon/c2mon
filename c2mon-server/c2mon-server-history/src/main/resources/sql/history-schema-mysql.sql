@@ -68,9 +68,9 @@ CREATE TABLE IF NOT EXISTS ALARMLOG (
   faultmember     VARCHAR(60)   NOT NULL,
   faultcode       INTEGER       NOT NULL,
   active          VARCHAR(1)    NOT NULL,
-  servertime      TIMESTAMP  NOT NULL DEFAULT '1970-01-02 00:00:01',
+  servertime      TIMESTAMP     NOT NULL DEFAULT '1970-01-02 00:00:01',
   info            VARCHAR(100)  DEFAULT NULL,
-  oscillating     INTEGER       NOT NULL
+  oscillating     VARCHAR(1)
 );
 
 
