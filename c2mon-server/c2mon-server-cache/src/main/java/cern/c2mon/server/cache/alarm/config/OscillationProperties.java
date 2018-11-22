@@ -9,13 +9,18 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Data
 @ConfigurationProperties(prefix = "c2mon.server.alarm.oscillation")
 public class OscillationProperties {
-
   
+  
+  /** The time range in seconds for the {@link #oscNumbers} threshold */
   private int timeRange = 60;
-  private int oscNumbers = 10;
-      
-      //time to check if the oscillation is still alive [msec] ;
-  private int timeOscillationAlive = 2000;
+  
+  
+  /** The maximum numbers of alarm state changes during the given time range */
+  private int oscNumbers = 6;
+  
+  
+  /** time to check if the oscillation is still alive [sec] ; */
+  private int timeOscillationAlive = 10;
   
   
 }

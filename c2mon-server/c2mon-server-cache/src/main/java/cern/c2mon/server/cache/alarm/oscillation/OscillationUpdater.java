@@ -64,7 +64,7 @@ public final class OscillationUpdater {
   }
 
   public boolean checkOscillAlive(AlarmCacheObject alarmCacheObject) {
-    return ((System.currentTimeMillis() - alarmCacheObject.getTimestamp().getTime()) < oscillationProperties.getTimeOscillationAlive());
+    return ((System.currentTimeMillis() - alarmCacheObject.getTimestamp().getTime()) < (oscillationProperties.getTimeOscillationAlive()*1000));
   }
 
   private void increaseOscillCounter(AlarmCacheObject alarmCacheObject) {
