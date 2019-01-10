@@ -28,7 +28,6 @@ import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.tag.Tag;
 import lombok.Data;
 
-
 /**
  * 
  * @author Emiliano Piselli
@@ -38,65 +37,75 @@ import lombok.Data;
 @Data
 public final class OscillationUpdater {
 
-  @Autowired
-  AlarmCache alarmCache;
+    @Autowired
+    AlarmCache alarmCache;
 
-  @Autowired
-  OscillationProperties oscillationProperties;
+    @Autowired
+    OscillationProperties oscillationProperties;
 
-  /**
-   * Logic kept the same as in TIM1 (see {@link AlarmFacade}). The locking of
-   * the objets is done in the public class. Notice, in this case the update()
-   * method is putting the changes back into the cache.
-   */
-  public void update(final AlarmCacheObject alarmCacheObject, final Tag tag) {
-    alarmCacheObject.setTimestamp(new Timestamp(System.currentTimeMillis()));
+    /**
+     * Logic kept the same as in TIM1 (see {@link AlarmFacade}). The locking of
+     * the objets is done in the public class. Notice, in this case the update()
+     * method is putting the changes back into the cache.
+     */
+    public void update(final AlarmCacheObject alarmCacheObject, final Tag tag) {
+        alarmCacheObject.setTimestamp(new Timestamp(System.currentTimeMillis()));
 
-    // Evaluate oscillation
-    boolean isAlarmConditionActive = alarmCacheObject.getCondition().evaluateState(tag.getValue());
-    alarmCacheObject.setActive(isAlarmConditionActive);
-    
-    if (isAlarmConditionActive != alarmCacheObject.isLastActiveState()) {
-      increaseOscillCounter(alarmCacheObject);
+        // Evaluate oscillation
+        boolean isAlarmConditionActive = alarmCacheObject.getCondition().evaluateState(tag.getValue());
+        if (tag.isValid()) {
+            alarmCacheObject.setActive(isAlarmConditionActive);
+        }
+
+        if (isAlarmConditionActive != alarmCacheObject.isLastActiveState()) {
+            increaseOscillCounter(alarmCacheObject);
+        }
+
+        alarmCacheObject.setLastActiveState(isAlarmConditionActive);
     }
 
-    alarmCacheObject.setLastActiveState(isAlarmConditionActive);
-  }
-
-  public boolean checkOscillAlive(AlarmCacheObject alarmCacheObject) {
-    return ((System.currentTimeMillis() - alarmCacheObject.getTimestamp().getTime()) < (oscillationProperties.getTimeOscillationAlive()*1000));
-  }
-
-  private void increaseOscillCounter(AlarmCacheObject alarmCacheObject) {
-    alarmCacheObject.setCounterFault(alarmCacheObject.getCounterFault() + 1);
-    if (alarmCacheObject.getCounterFault() == 1 || ((alarmCacheObject.getCounterFault() % oscillationProperties.getOscNumbers()) == 0)) {
-      alarmCacheObject.setFirstOscTS(System.currentTimeMillis());
+    public boolean checkOscillAlive(AlarmCacheObject alarmCacheObject) {
+        return ((System.currentTimeMillis()
+                - alarmCacheObject.getTimestamp().getTime()) < (oscillationProperties.getTimeOscillationAlive()
+                        * 1000));
     }
-    alarmCacheObject.setOscillating(checkOscillConditions(alarmCacheObject));
-  }
 
-  public void resetOscillCounter(AlarmCacheObject alarmCacheObject) {
-
-    alarmCacheObject.setCounterFault(0);
-    alarmCacheObject.setOscillating(false);
-    alarmCacheObject.setFirstOscTS(0);
-    alarmCacheObject.setLastActiveState(false);
-  }
-
-  /**
-   * If the oscillation condition is met we still have to check, if the alarm is currently set to ACTIVE because we only want active
-   * alarms being flagged as oscillating. Like that the user will only deal with ACTIVE oscillating alarms.
-   * 
-   * @param alarmCacheObject the alarm cache object containing already the new alarm state
-   * @return true, if alarm shall be marked as oscillating
-   */
-  private boolean checkOscillConditions(AlarmCacheObject alarmCacheObject) {
-    if ((alarmCacheObject.getCounterFault() >= oscillationProperties.getOscNumbers())
-        && ((System.currentTimeMillis() - alarmCacheObject.getFirstOscTS()) <= oscillationProperties.getTimeRange() * 1000)) {
-      
-      return (alarmCacheObject.isOscillating() || (alarmCacheObject.isActive() && !alarmCacheObject.isOscillating()));
+    private void increaseOscillCounter(AlarmCacheObject alarmCacheObject) {
+        alarmCacheObject.setCounterFault(alarmCacheObject.getCounterFault() + 1);
+        if (alarmCacheObject.getCounterFault() == 1
+                || ((alarmCacheObject.getCounterFault() % oscillationProperties.getOscNumbers()) == 0)) {
+            alarmCacheObject.setFirstOscTS(System.currentTimeMillis());
+        }
+        alarmCacheObject.setOscillating(checkOscillConditions(alarmCacheObject));
     }
-    
-    return false;
-  }
+
+    public void resetOscillCounter(AlarmCacheObject alarmCacheObject) {
+
+        alarmCacheObject.setCounterFault(0);
+        alarmCacheObject.setOscillating(false);
+        alarmCacheObject.setFirstOscTS(0);
+        alarmCacheObject.setLastActiveState(false);
+    }
+
+    /**
+     * If the oscillation condition is met we still have to check, if the alarm
+     * is currently set to ACTIVE because we only want active alarms being
+     * flagged as oscillating. Like that the user will only deal with ACTIVE
+     * oscillating alarms.
+     * 
+     * @param alarmCacheObject
+     *            the alarm cache object containing already the new alarm state
+     * @return true, if alarm shall be marked as oscillating
+     */
+    private boolean checkOscillConditions(AlarmCacheObject alarmCacheObject) {
+        if ((alarmCacheObject.getCounterFault() >= oscillationProperties.getOscNumbers())
+                && ((System.currentTimeMillis() - alarmCacheObject.getFirstOscTS()) <= oscillationProperties
+                        .getTimeRange() * 1000)) {
+
+            return (alarmCacheObject.isOscillating()
+                    || (alarmCacheObject.isActive() && !alarmCacheObject.isOscillating()));
+        }
+
+        return false;
+    }
 }

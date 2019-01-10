@@ -37,11 +37,11 @@ import lombok.extern.slf4j.Slf4j;
 public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
 
   @Autowired
-  @Setter(AccessLevel.PROTECTED)
+  @Setter(AccessLevel.PUBLIC)
   private AlarmCache alarmCache;
 
   @Autowired
-  @Setter(AccessLevel.PROTECTED)
+  @Setter(AccessLevel.PUBLIC)
   OscillationUpdater oscillationUpdater;
 
   /**
@@ -95,7 +95,10 @@ public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
     
     boolean hasChanged = alarmCacheObject.isActive() != newState;
     
-    alarmCacheObject.setActive(newState);
+    // We only allow activating the alarm if the tag is valid.
+    if(tag.isValid()){
+        alarmCacheObject.setActive(newState);
+    }
     
     // Check the oscillating status
     boolean wasAlreadyOscillating = alarmCacheObject.isOscillating();
