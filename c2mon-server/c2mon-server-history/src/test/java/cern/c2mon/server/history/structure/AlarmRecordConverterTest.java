@@ -47,6 +47,7 @@ public class AlarmRecordConverterTest {
     EasyMock.expect(alarm.getInfo()).andReturn("");
     EasyMock.expect(alarm.getTimestamp()).andReturn(new Timestamp(System.currentTimeMillis()));
     EasyMock.expect(alarm.isActive()).andReturn(true);
+    EasyMock.expect(alarm.isOscillating()).andReturn(false);
     EasyMock.replay(alarm);
 
     AlarmRecord l = (AlarmRecord) converter.convertToLogged(alarm);
