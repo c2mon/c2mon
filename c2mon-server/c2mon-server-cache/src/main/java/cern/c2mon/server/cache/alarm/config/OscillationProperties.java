@@ -1,12 +1,19 @@
 package cern.c2mon.server.cache.alarm.config;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * @author Justin Lewis Salmon
+ * @author Emiliano Piselli
  */
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @ConfigurationProperties(prefix = "c2mon.server.alarm.oscillation")
 public class OscillationProperties {
   
