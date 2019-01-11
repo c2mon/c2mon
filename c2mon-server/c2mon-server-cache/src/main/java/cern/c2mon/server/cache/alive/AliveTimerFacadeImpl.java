@@ -39,7 +39,8 @@ import cern.c2mon.server.common.process.Process;
 @Service
 public class AliveTimerFacadeImpl implements AliveTimerFacade {
 
-  private AliveTimerCache aliveTimerCache;
+  private static final String CANNOT_LOCATE_THE_ALIVE_TIMER_IN_THE_CACHE_ID_IS = "Cannot locate the AliveTimer in the cache (Id is ";
+private AliveTimerCache aliveTimerCache;
 
   @Autowired
   public AliveTimerFacadeImpl(AliveTimerCache aliveTimerCache) {
@@ -60,7 +61,7 @@ public class AliveTimerFacadeImpl implements AliveTimerFacade {
       update(aliveTimer);
       aliveTimerCache.put(aliveId, aliveTimer);
     } catch (CacheElementNotFoundException cacheEx) {
-      log.error("Cannot locate the AliveTimer in the cache (Id is " + aliveId + ") - unable to update it.", cacheEx);
+      log.error(CANNOT_LOCATE_THE_ALIVE_TIMER_IN_THE_CACHE_ID_IS + aliveId + ") - unable to update it.", cacheEx);
     } catch (Exception e) {
       log.error("updatedAliveTimer() failed for an unknown reason: ", e);
     } finally {
@@ -82,7 +83,7 @@ public class AliveTimerFacadeImpl implements AliveTimerFacade {
     aliveTimer.setActive(true);
     aliveTimer.setLastUpdate(System.currentTimeMillis());
     if (log.isDebugEnabled()) {
-      StringBuffer str = new StringBuffer("Updated alive timer for ");
+      StringBuilder str = new StringBuilder("Updated alive timer for ");
       str.append(AliveTimer.ALIVE_TYPE_PROCESS + " ");
       str.append(aliveTimer.getRelatedName());
       str.append(".");
@@ -98,7 +99,7 @@ public class AliveTimerFacadeImpl implements AliveTimerFacade {
       start(aliveTimer);
       aliveTimerCache.put(id, aliveTimer);
     } catch (CacheElementNotFoundException cacheEx) {
-      log.error("Cannot locate the AliveTimer in the cache (Id is " + id + ") - unable to start it.");
+      log.error(CANNOT_LOCATE_THE_ALIVE_TIMER_IN_THE_CACHE_ID_IS + id + ") - unable to start it.");
     } catch (Exception e) {
       log.error("Unable to start the alive timer " + id, e);
     } finally {
@@ -112,7 +113,7 @@ public class AliveTimerFacadeImpl implements AliveTimerFacade {
   private void start(final AliveTimer aliveTimer) {
     if (!aliveTimer.isActive()) {
       if (log.isDebugEnabled()) {
-        StringBuffer str = new StringBuffer("start() : starting alive for ");
+        StringBuilder str = new StringBuilder("start() : starting alive for ");
         str.append(AliveTimer.ALIVE_TYPE_PROCESS + " ");
         str.append(aliveTimer.getRelatedName());
         str.append(".");
@@ -130,15 +131,9 @@ public class AliveTimerFacadeImpl implements AliveTimerFacade {
     try {
       AliveTimer aliveTimer = aliveTimerCache.get(id);
       stop(aliveTimer);
-//      if (aliveTimer.getDependentAliveTimerIds() != null) {
-//        Iterator<Long> it  = aliveTimer.getDependentAliveTimerIds().iterator();
-//        while (it.hasNext()) {
-//          stop(it.next());
-//        }
-//      }
       aliveTimerCache.put(id, aliveTimer);
     } catch (CacheElementNotFoundException cacheEx) {
-      log.error("Cannot locate the AliveTimer in the cache (Id is " + id + ") - unable to stop it.");
+      log.error(CANNOT_LOCATE_THE_ALIVE_TIMER_IN_THE_CACHE_ID_IS + id + ") - unable to stop it.");
     } catch (Exception e) {
       log.error("Unable to stop the alive timer " + id, e);
     } finally {
@@ -152,7 +147,7 @@ public class AliveTimerFacadeImpl implements AliveTimerFacade {
   private void stop(final AliveTimer aliveTimer) {
     if (aliveTimer.isActive()) {
       if (log.isDebugEnabled()) {
-        StringBuffer str = new StringBuffer("stop() : stopping alive for ");
+        StringBuilder str = new StringBuilder("stop() : stopping alive for ");
         str.append(aliveTimer.getAliveTypeDescription() + " ");
         str.append(aliveTimer.getRelatedName());
         str.append(".");
