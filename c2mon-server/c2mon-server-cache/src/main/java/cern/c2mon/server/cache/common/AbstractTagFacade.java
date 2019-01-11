@@ -153,12 +153,8 @@ public abstract class AbstractTagFacade<T extends Tag> extends AbstractFacade<T>
 
       // TAG mode
       if ((tmpStr = properties.getProperty("mode")) != null) {
-        try {
-          tag.setMode(Short.parseShort(tmpStr));
-          dataTagUpdate.setMode(Short.parseShort(tmpStr));
-        } catch (NumberFormatException e) {
-          throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "NumberFormatException: Unable to convert parameter \"mode\" to short: " + tmpStr);
-        }
+        tag.setMode(Short.parseShort(tmpStr));
+        dataTagUpdate.setMode(Short.parseShort(tmpStr));
       }
 
       // TAG log flag
@@ -187,7 +183,7 @@ public abstract class AbstractTagFacade<T extends Tag> extends AbstractFacade<T>
       tag.setMetadata(newMetadata);
     }
     catch (Exception e) {
-      throw new RuntimeException("Something went wrong while setting the common properties", e);
+      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,"Something went wrong while setting the common properties", e);
     } finally {
       tagCache.releaseWriteLockOnKey(tag.getId());
     }
@@ -217,29 +213,16 @@ public abstract class AbstractTagFacade<T extends Tag> extends AbstractFacade<T>
       if (tag.getName().length() == 0 ) { //|| tag.getName().length() > 60
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"name\" cannot be empty");
       }
-//      if (tag.getDescription() == null) {
-//        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"description\" cannot be null");
-//      }
-//      if (tag.getDescription().length() == 0 || tag.getDescription().length() > 100) {
-//        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"description\" must be 1 to 100 characters long");
-//      }
+
       if (tag.getDataType() == null) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"dataType\" cannot be null");
       }
-//      if (tag.getValueDictionary() == null) {
-//        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"valueDictionary\" cannot be null");
-//      }
       if (tag.getMode() != DataTagConstants.MODE_OPERATIONAL && tag.getMode() != DataTagConstants.MODE_TEST && tag.getMode() != DataTagConstants.MODE_MAINTENANCE) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Invalid value for parameter \"mode\".");
       }
-      //TODO setting client topic still needs doing...
-//      if (tag.getTopic() == null) {
-//        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"topic\" cannot be null");
-//      }
-      if (tag.getUnit() != null) {
-        if (tag.getUnit().length() > 20) {
-          throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"unit\" must be 0 to 20 characters long");
-        }
+
+      if (tag.getUnit() != null && tag.getUnit().length() > 20) {
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"unit\" must be 0 to 20 characters long");
       }
     } finally {
       tagCache.releaseReadLockOnKey(tag.getId());
