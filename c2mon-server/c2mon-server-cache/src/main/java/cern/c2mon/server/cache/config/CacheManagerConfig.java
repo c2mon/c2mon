@@ -30,12 +30,14 @@ public class CacheManagerConfig {
         return getEhCacheManagerFactoryBean("ehcache/ehcache-single.xml");
       case "multi":
         return getEhCacheManagerFactoryBean("ehcache/ehcache-multi.xml");
+      default:
+        throw new IOException(format("Unsupported cache mode specified: '%s'", cacheMode));
     }
 
-    throw new RuntimeException(format("Unsupported cache mode specified: '%s'", cacheMode));
+    
   }
 
-  private EhCacheManagerFactoryBean getEhCacheManagerFactoryBean(String configLocation) throws IOException {
+  private EhCacheManagerFactoryBean getEhCacheManagerFactoryBean(String configLocation) {
     EhCacheManagerFactoryBean bean = new EhCacheManagerFactoryBean();
     bean.setConfigLocation(new ClassPathResource(configLocation));
     bean.setShared(true);
