@@ -268,7 +268,7 @@ public abstract class AbstractCache<K, T extends Cacheable> extends BasicCache<K
       }
     } catch (CloneNotSupportedException e) {
       log.error("CloneNotSupportedException caught while cloning a cache element - this should never happen!", e);
-      throw new RuntimeException("CloneNotSupportedException caught while cloning a cache element - this should never happen!", e);
+      throw new FailedCacheElementCloningException("CloneNotSupportedException caught while cloning a cache element - this should never happen!", e);
     }
   }
 
@@ -281,7 +281,7 @@ public abstract class AbstractCache<K, T extends Cacheable> extends BasicCache<K
       }
     } catch (CloneNotSupportedException e) {
       log.error("CloneNotSupportedException caught while cloning a cache element - this should never happen!", e);
-      throw new RuntimeException("CloneNotSupportedException caught while cloning a cache element - this should never happen!", e);
+      throw new FailedCacheElementCloningException("CloneNotSupportedException caught while cloning a cache element - this should never happen!", e);
     }
   }
 
