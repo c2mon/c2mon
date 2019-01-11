@@ -155,14 +155,14 @@ public class CacheRegistrationServiceTest extends AbstractCacheIntegrationTest {
     
     //sleep to allow separate thread to process
    
-    Thread.sleep(200);
+    wait(200);
    
     DataTag cacheCopy = dataTagCache.getCopy(dataTag.getId());
     //check listener received the value
     assertNotNull(testListener.receivedValue);
     assertNotNull(testListener.receivedId);
     assertEquals(cacheCopy.getValue(), testListener.receivedValue);
-    assertEquals(cacheCopy.getValue(), Boolean.FALSE); //check is indeed false
+    assertEquals(Boolean.FALSE, cacheCopy.getValue()); //check is indeed false
     assertEquals(cacheCopy.getId(), testListener.receivedId);
     
     //do the same for control tags
@@ -170,7 +170,7 @@ public class CacheRegistrationServiceTest extends AbstractCacheIntegrationTest {
     ControlTag controlTagFromCache = controlTagCache.getCopy(controlTag.getId());   
     //sleep to allow separate thread to process
     
-    Thread.sleep(100);    
+    wait(100);    
     
     //check listener notified
     assertEquals(controlTagFromCache.getValue(), testListener.receivedValue);
