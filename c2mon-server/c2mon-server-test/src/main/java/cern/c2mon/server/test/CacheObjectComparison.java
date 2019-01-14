@@ -16,11 +16,12 @@
  *****************************************************************************/
 package cern.c2mon.server.test;
 
-import static org.junit.Assert.assertEquals;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.command.CommandTagCacheObject;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.common.tag.Tag;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Contains static methods for comparing cache objects in tests.
@@ -110,16 +111,11 @@ public final class CacheObjectComparison {
     assertEquals(alarm1.getFaultCode(), alarm2.getFaultCode());
     assertEquals(alarm1.getFaultFamily(), alarm2.getFaultFamily());
     assertEquals(alarm1.getFaultMember(), alarm2.getFaultMember());
-    assertEquals(alarm1.getState(), alarm2.getState());
+    assertEquals(alarm1.isActive(), alarm2.isActive());
     assertEquals(alarm1.getInfo(), alarm2.getInfo());
     assertEquals(alarm1.getCondition(), alarm2.getCondition());
     assertEquals(alarm1.getTimestamp(), alarm2.getTimestamp());
-    assertEquals(alarm1.isPublished(), alarm2.isPublished());
-    if (alarm1.getLastPublication() != null) {
-      assertEquals(alarm1.getLastPublication().getState(), alarm2.getLastPublication().getState());
-      assertEquals(alarm1.getLastPublication().getInfo(), alarm2.getLastPublication().getInfo());
-      assertEquals(alarm1.getLastPublication().getPublicationTime(), alarm2.getLastPublication().getPublicationTime());
-    }
+    assertEquals(alarm1.isOscillating(), alarm2.isOscillating());
   }
 
 

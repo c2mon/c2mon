@@ -66,7 +66,7 @@ public final class CacheObjectCreation {
         + "<alarm-value type=\"String\">DOWN</alarm-value></AlarmCondition>");
     alarm1.setCondition(condition);
     alarm1.setInfo("alarm info");
-    alarm1.setState(AlarmCondition.TERMINATE);
+    alarm1.setActive(false);
     alarm1.setTimestamp(new Timestamp(System.currentTimeMillis() - 2000));
     alarm1.setDataTagId(100003L);
     return alarm1;
@@ -86,13 +86,12 @@ public final class CacheObjectCreation {
         + "<alarm-value type=\"String\">DOWN</alarm-value></AlarmCondition>");
     alarm3.setCondition(condition);
     alarm3.setInfo("alarm info");
-    alarm3.setState(AlarmCondition.TERMINATE);
+    alarm3.setActive(false);
     alarm3.setTimestamp(new Timestamp(System.currentTimeMillis() - 2000));
     alarm3.setDataTagId(100003L);
     Metadata metadata = new Metadata();
     metadata.addMetadata("testMetadata",11);
     alarm3.setMetadata(metadata);
-    alarm3.hasBeenPublished(new Timestamp(System.currentTimeMillis()));
     return alarm3;
   }
 
@@ -111,7 +110,7 @@ public final class CacheObjectCreation {
         + "<alarm-value type=\"Boolean\">false</alarm-value></AlarmCondition>");
     alarm1.setCondition(condition);
     alarm1.setInfo("alarm info");
-    alarm1.setState(AlarmCondition.ACTIVE);
+    alarm1.setActive(true);
     alarm1.setTimestamp(new Timestamp(System.currentTimeMillis() - 2000));
     return alarm1;
   }

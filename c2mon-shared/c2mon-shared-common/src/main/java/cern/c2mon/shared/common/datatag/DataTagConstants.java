@@ -110,20 +110,6 @@ public interface DataTagConstants {
    * <PRE>setTimeToLive(TTL_FOREVER);</PRE>
    */
   public static final short TTL_FOREVER = 0;
-  
-  /**
-   * Constant to be used to set a time-to-live of one day for a
-   * DataTagValueUpdate message to be sent to the application server.
-   * <PRE>setTimeToLive(TTL_ONE_DAY);</PRE>
-   */
-  public static final int TTL_ONE_DAY = 86400000;
-  
-  /**
-   * Constant to be used to set a time-to-live of ten minutes for a
-   * DataTagValueUpdate message to be sent to the application server.
-   * <PRE>setTimeToLive(TTL_TEN_MINUTES);</PRE>
-   */
-  public static final int TTL_TEN_MINUTES = 600000;
 
 
 }

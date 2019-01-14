@@ -22,6 +22,8 @@ import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.test.CacheObjectCreation;
+
+import org.awaitility.Duration;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.BeansException;
@@ -33,9 +35,11 @@ import org.springframework.test.annotation.DirtiesContext;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.concurrent.TimeUnit;
 
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
+import static org.awaitility.Awaitility.await;
 
 /**
  * Integration test that checks that registered listeners
@@ -155,14 +159,15 @@ public class CacheRegistrationServiceTest extends AbstractCacheIntegrationTest {
     
     //sleep to allow separate thread to process
    
-    Thread.sleep(200);
+    await().dontCatchUncaughtExceptions().atMost(1, TimeUnit.SECONDS).until( () -> testListener.receivedId != null);
+   
    
     DataTag cacheCopy = dataTagCache.getCopy(dataTag.getId());
     //check listener received the value
     assertNotNull(testListener.receivedValue);
     assertNotNull(testListener.receivedId);
     assertEquals(cacheCopy.getValue(), testListener.receivedValue);
-    assertEquals(cacheCopy.getValue(), Boolean.FALSE); //check is indeed false
+    assertEquals(Boolean.FALSE, cacheCopy.getValue()); //check is indeed false
     assertEquals(cacheCopy.getId(), testListener.receivedId);
     
     //do the same for control tags
@@ -170,7 +175,7 @@ public class CacheRegistrationServiceTest extends AbstractCacheIntegrationTest {
     ControlTag controlTagFromCache = controlTagCache.getCopy(controlTag.getId());   
     //sleep to allow separate thread to process
     
-    Thread.sleep(100);    
+    await().dontCatchUncaughtExceptions().atMost(1, TimeUnit.SECONDS).until( () -> controlTagFromCache.getValue() != null);
     
     //check listener notified
     assertEquals(controlTagFromCache.getValue(), testListener.receivedValue);

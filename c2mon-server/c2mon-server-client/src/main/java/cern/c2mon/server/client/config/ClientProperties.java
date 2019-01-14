@@ -31,7 +31,5 @@ public class ClientProperties {
 
     /** Specify the maximum number of concurrent consumers to receive client requests */
     private int maxConsumers = 10;
-    
-    private int timeToLive = 3600000;
   }
 }

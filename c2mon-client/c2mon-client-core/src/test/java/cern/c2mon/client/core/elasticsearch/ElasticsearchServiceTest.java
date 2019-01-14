@@ -17,6 +17,7 @@ import cern.c2mon.server.elasticsearch.tag.config.TagConfigDocumentIndexer;
 import cern.c2mon.server.elasticsearch.tag.config.TagConfigDocumentListener;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import org.apache.http.annotation.NotThreadSafe;
+import org.awaitility.Awaitility;
 import org.easymock.EasyMock;
 import org.easymock.Mock;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
@@ -77,12 +78,7 @@ public class ElasticsearchServiceTest {
       CompletableFuture<Void> nodeReady = CompletableFuture.runAsync(() -> {
         client.waitForYellowStatus();
         client.getClient().admin().indices().delete(new DeleteIndexRequest(elasticsearchProperties.getTagConfigIndex()));
-        Indices.create(elasticsearchProperties.getTagConfigIndex(), "tag_config", MappingFactory.createTagConfigMapping());
-        try {
-          Thread.sleep(1000); //it takes some time for the index to be recreated
-        } catch (InterruptedException e) {
-          e.printStackTrace();
-        }
+        Awaitility.await().until(() -> Indices.create(elasticsearchProperties.getTagConfigIndex(), "tag_config", MappingFactory.createTagConfigMapping()));
       });
       nodeReady.get(120, TimeUnit.SECONDS);
     } catch (ExecutionException | TimeoutException e) {
@@ -114,9 +110,10 @@ public class ElasticsearchServiceTest {
       tagDocumentListener.onConfigurationEvent(tag, ConfigConstants.Action.CREATE);
 
       client.getClient().admin().indices().flush(new FlushRequest()).actionGet();
-      Thread.sleep(10000);
-
+      
       ElasticsearchService service = new ElasticsearchService(properties);
+      
+      Awaitility.await().until(() -> service.getDistinctMetadataKeys().size() > 0);
 
       assertEquals("There should be 2 tags, one for responsible and one for 1234", 2, service.getDistinctMetadataKeys().size());
 
@@ -158,10 +155,11 @@ public class ElasticsearchServiceTest {
       tagDocumentListener.onConfigurationEvent(tag, ConfigConstants.Action.CREATE);
 
       client.getClient().admin().indices().flush(new FlushRequest()).actionGet();
-      Thread.sleep(10000);
-
+      
       ElasticsearchService service = new ElasticsearchService(properties);
-
+      
+      Awaitility.await().until(() -> service.findTagsByNameAndMetadata(tagname, metadataKey, testUser).size() > 0);
+      
       Collection<Long> tagsForResponsibleUser = service.findTagsByNameAndMetadata(tagname, metadataKey, testUser);
       assertEquals("There should be one tag with given name and metadata", 1, tagsForResponsibleUser.size());
       assertEquals(testUserTagId, tagsForResponsibleUser.stream().findFirst().get());

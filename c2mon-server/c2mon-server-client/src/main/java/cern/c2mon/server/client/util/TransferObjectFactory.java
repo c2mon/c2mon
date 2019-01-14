@@ -153,7 +153,8 @@ public abstract class TransferObjectFactory {
           alarm.getInfo(),
           alarm.getTagId(),
           alarm.getTimestamp(),
-          alarm.isActive());
+          alarm.isActive(),
+          alarm.isOscillating());
 
       if (alarm.getMetadata() != null) {
         alarmValueImpl.setMetadata(alarm.getMetadata().getMetadata());
@@ -292,7 +293,8 @@ public abstract class TransferObjectFactory {
                 alarm.getInfo(),
                 alarm.getTagId(),
                 alarm.getTimestamp(),
-                alarm.isActive());
+                alarm.isActive(),
+                alarm.isOscillating());
         if (alarm.getMetadata()!= null){
           alarmValue.setMetadata(alarm.getMetadata().getMetadata());
         }

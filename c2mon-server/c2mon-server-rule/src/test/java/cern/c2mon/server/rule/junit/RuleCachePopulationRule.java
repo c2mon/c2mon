@@ -1,6 +1,6 @@
 package cern.c2mon.server.rule.junit;
 
-import cern.c2mon.server.cache.alarm.AlarmCacheImpl;
+import cern.c2mon.server.cache.alarm.impl.AlarmCacheImpl;
 import cern.c2mon.server.cache.alive.AliveTimerCacheImpl;
 import cern.c2mon.server.cache.command.CommandTagCacheImpl;
 import cern.c2mon.server.cache.commfault.CommFaultTagCacheImpl;

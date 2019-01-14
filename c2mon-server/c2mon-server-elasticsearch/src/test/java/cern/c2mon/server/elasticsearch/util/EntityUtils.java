@@ -35,7 +35,7 @@ public class EntityUtils {
     metadata.addMetadata("responsiblePerson", "Fred");
     alarm.setMetadata(metadata);
     alarm.setInfo("alarm info");
-    alarm.setState(AlarmCondition.TERMINATE);
+    alarm.setActive(false);
     return alarm;
   }
 

@@ -129,5 +129,11 @@
       <version>1.6.3</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.awaitility</groupId>
+      <artifactId>awaitility</artifactId>
+      <version>3.1.5</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 </project>

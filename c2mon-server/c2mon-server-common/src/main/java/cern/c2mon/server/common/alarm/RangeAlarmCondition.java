@@ -92,7 +92,7 @@ package cern.c2mon.server.common.alarm;
    * @return ACTIVE if the value means that the alarm should be activated,
    * TERMINATE if the value means that the alarm should be terminated.
    */
-  public String evaluateState(final Object pValue) {
+  public boolean evaluateState(final Object pValue) {
     // If the value is null, the alarm will always be terminated
     boolean result = (pValue != null);
     
@@ -111,7 +111,7 @@ package cern.c2mon.server.common.alarm;
         maxValue.compareTo(pValue) >= 0;
     }
     
-    return result ? AlarmCondition.ACTIVE : AlarmCondition.TERMINATE;
+    return result;
   }
   
   /**

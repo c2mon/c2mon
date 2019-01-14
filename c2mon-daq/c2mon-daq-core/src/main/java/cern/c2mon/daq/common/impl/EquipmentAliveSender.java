@@ -124,7 +124,7 @@ class EquipmentAliveSender {
       aliveTagValue = aliveTag.update(update);
     } else {
 
-      int ttl = DataTagConstants.TTL_TEN_MINUTES;
+      int ttl = DataTagConstants.TTL_FOREVER;
       if (aliveTagInterval <= Integer.MAX_VALUE) {
         ttl = aliveTagInterval.intValue();
       }

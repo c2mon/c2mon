@@ -14,7 +14,13 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.cache.alarm;
+package cern.c2mon.server.cache.alarm.impl;
+
+import java.sql.Timestamp;
+import java.util.Properties;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.cache.AlarmCache;
 import cern.c2mon.server.cache.AlarmFacade;
@@ -23,26 +29,18 @@ import cern.c2mon.server.cache.common.AbstractFacade;
 import cern.c2mon.server.cache.util.MetadataUtils;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
-import cern.c2mon.server.common.alarm.AlarmCacheObject.AlarmChangeState;
+import cern.c2mon.server.common.alarm.AlarmCacheUpdater;
 import cern.c2mon.server.common.alarm.AlarmCondition;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.common.ConfigurationException;
-import cern.c2mon.shared.common.datatag.DataTagConstants;
 import cern.c2mon.shared.daq.config.Change;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.sql.Timestamp;
-import java.util.Properties;
 
 /**
- * Implementation of the AlarmFacade.
+ * Implementation of the AlarmFacade.l
  *
  * @author Mark Brightwell
  *
  */
-@Slf4j
 @Service
 public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacade {
 
@@ -59,7 +57,7 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
   /**
    * Reference to the Alarm cache.
    */
-  private AlarmCache alarmCache;
+  private final AlarmCache alarmCache;
 
   /**
    * Used to validate the alarm object at runtime configuration.
@@ -71,25 +69,31 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
    */
   private int maxFaultMemberLength = MAX_FAULT_MEMBER_LENGTH;
 
-  private TagLocationService tagLocationService;
+  private final TagLocationService tagLocationService;
+
+  private final AlarmCacheUpdater alarmCacheUpdater;
 
 
   /**
    * Autowired constructor.
-   * @param alarmCache the alarm cache
+   *
+   * @param alarmCache
+   *          the alarm cache
    */
   @Autowired
-  public AlarmFacadeImpl(final AlarmCache alarmCache, final TagLocationService tagLocationService) {
+  public AlarmFacadeImpl(final AlarmCache alarmCache, final TagLocationService tagLocationService, AlarmCacheUpdater alarmCacheUpdater) {
     super();
     this.alarmCache = alarmCache;
     this.tagLocationService = tagLocationService;
+    this.alarmCacheUpdater = alarmCacheUpdater;
   }
 
   /**
    * Derives a valid JMS topic name for distributing the alarm's values to
    * clients (currently the same for all alarms, so returns a constant).
    *
-   * @param alarm the alarm for which the topic should be provided
+   * @param alarm
+   *          the alarm for which the topic should be provided
    * @return a valid JMS topic name for the alarm
    */
   @Override
@@ -117,7 +121,8 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
   }
 
   /**
-   * @param maxFaultMemberLength the maximum allowed length for the fault member
+   * @param maxFaultMemberLength
+   *          the maximum allowed length for the fault member
    */
   public void setMaxFaultMemberLength(int maxFaultMemberLength) {
     this.maxFaultMemberLength = maxFaultMemberLength;
@@ -131,22 +136,23 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
   }
 
   /**
-   * @param maxFaultFamily the maximum allowed length for the fault family
+   * @param maxFaultFamily
+   *          the maximum allowed length for the fault family
    */
   public void setMaxFaultFamily(int maxFaultFamily) {
     this.maxFaultFamily = maxFaultFamily;
   }
 
-/**
-   * Create an AlarmCacheObject from a collection of named properties.
-   * The following properties are expected in the collection:
+  /**
+   * Create an AlarmCacheObject from a collection of named properties. The
+   * following properties are expected in the collection:
    * <ul>
-   *   <li>id</li>
-   *   <li>dataTagId</li>
-   *   <li>faultMember</li>
-   *   <li>faultFamily</li>
-   *   <li>faultCode</li>
-   *   <li>alarmCondition</li>
+   * <li>id</li>
+   * <li>dataTagId</li>
+   * <li>faultMember</li>
+   * <li>faultFamily</li>
+   * <li>faultCode</li>
+   * <li>alarmCondition</li>
    * </ul>
    *
    * A ConfigurationException will be thrown if one of the parameters cannot be
@@ -158,8 +164,10 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
    * perform dependency checks. It is up to the user to ensure that the DataTag
    * to which the alarm is attached exists.
    *
-   * @param id the id of the alarm object
-   * @param properties the properties containing the values for the alarm fields
+   * @param id
+   *          the id of the alarm object
+   * @param properties
+   *          the properties containing the values for the alarm fields
    * @return the alarm object created
    */
   @Override
@@ -168,7 +176,7 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
     configureCacheObject(alarm, properties);
 
     // Initialise run-time parameters with default values
-    alarm.setState(AlarmCondition.TERMINATE);
+    alarm.setActive(false);
     alarm.setTimestamp(new Timestamp(0));
     alarm.setInfo("");
 
@@ -176,14 +184,18 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
     return alarm;
   }
 
-
   /**
-   * Given an alarm object, reset some of its fields according to the passed properties.
+   * Given an alarm object, reset some of its fields according to the passed
+   * properties.
    *
-   * @param alarmProperties the properties object containing the fields
-   * @param alarm the alarm object to modify (is modified by this method)
-   * @return always returns null, as no alarm change needs propagating to the DAQ layer
-   * @throws ConfigurationException if cannot configure the Alarm from the properties
+   * @param alarmProperties
+   *          the properties object containing the fields
+   * @param alarm
+   *          the alarm object to modify (is modified by this method)
+   * @return always returns null, as no alarm change needs propagating to the
+   *         DAQ layer
+   * @throws ConfigurationException
+   *           if cannot configure the Alarm from the properties
    */
   @Override
   protected Change configureCacheObject(final Alarm alarm, final Properties alarmProperties) throws ConfigurationException {
@@ -192,8 +204,7 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
     if ((tmpStr = alarmProperties.getProperty("dataTagId")) != null) {
       try {
         alarmCacheObject.setDataTagId(Long.valueOf(tmpStr));
-      }
-      catch (NumberFormatException e) {
+      } catch (NumberFormatException e) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "NumberFormatException: Unable to convert parameter \"dataTagId\" to Long: " + tmpStr);
       }
     }
@@ -207,8 +218,7 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
     if ((tmpStr = alarmProperties.getProperty("faultCode")) != null) {
       try {
         alarmCacheObject.setFaultCode(Integer.parseInt(tmpStr));
-      }
-      catch (NumberFormatException e) {
+      } catch (NumberFormatException e) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "NumberFormatException: Unable to convert parameter \"faultCode\" to int: " + tmpStr);
       }
     }
@@ -216,9 +226,9 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
     if ((tmpStr = alarmProperties.getProperty("alarmCondition")) != null) {
       try {
         alarmCacheObject.setCondition(AlarmCondition.fromConfigXML(tmpStr));
-      }
-      catch (Exception e) {
-        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Exception: Unable to create AlarmCondition object from parameter \"alarmCondition\": \n" + tmpStr);
+      } catch (Exception e) {
+        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
+            "Exception: Unable to create AlarmCondition object from parameter \"alarmCondition\": \n" + tmpStr);
       }
     }
 
@@ -236,8 +246,9 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
     alarmCache.acquireWriteLockOnKey(alarmId);
     try {
       Alarm alarm = alarmCache.get(alarmId);
-      // Notice, in this case the update() method is putting the changes back into the cache
-      return update(alarm, tag);
+      // Notice, in this case the update() method is putting the changes back
+      // into the cache
+      return alarmCacheUpdater.update(alarm, tag);
     } finally {
       alarmCache.releaseWriteLockOnKey(alarmId);
     }
@@ -249,151 +260,27 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
     try {
       Alarm alarm = alarmCache.get(alarmId);
       Tag tag = tagLocationService.getCopy(alarm.getTagId());
-      update(alarm, tag);
+      alarmCacheUpdater.update(alarm, tag);
     } finally {
       alarmCache.releaseWriteLockOnKey(alarmId);
     }
   }
 
-  /**
-   * Logic kept the same as in TIM1 (see {@link AlarmFacade}).
-   * The locking of the objets is done in the public class.
-   * Notice, in this case the update() method is putting the changes back into the cache.
-   */
-  private Alarm update(final Alarm alarm, final Tag tag) {
-    AlarmCacheObject alarmCacheObject = (AlarmCacheObject) alarm;
-    // Reset previous change state
-    alarmCacheObject.setAlarmChangeState(AlarmChangeState.CHANGE_NONE);
-    // this time is then used in LASER publication as user timestamp
-    Timestamp alarmTime = tag.getCacheTimestamp();
-    // not possible to evaluate alarms with associated null tag; occurs during normal operation
-    // (may change in future is alarm state depends on quality f.eg.)
-    if (tag.getValue() == null) {
-      log.debug("Alarm update called with null Tag value - leaving Alarm status unchanged at " + alarm.getState());
+//  private void checkOscillation(Alarm alarm) {
+//
 
-      // change the alarm timestamp if the alarm has never been initialised
-      if (alarmCacheObject.getTimestamp().equals(new Timestamp(0)) ){
-        alarmCacheObject.setTimestamp(alarmTime);
-      }
-      return alarmCacheObject;
-    }
 
-    if (!tag.getDataTagQuality().isInitialised()) {
-      log.debug("Alarm update called with uninitialised Tag - leaving Alarm status unchanged.");
-      return alarm;
-    }
-
-    // timestamp should never be null
-    if (tag.getTimestamp() == null) {
-      log.warn("update() : tag value or timestamp null -> no update");
-      throw new IllegalArgumentException("update method called on Alarm facade with either null tag value or null tag timestamp.");
-    }
-
-    // Compute the alarm state corresponding to the new tag value
-    String newState = alarmCacheObject.getCondition().evaluateState(tag.getValue());
-
-    // Return immediately if the alarm new state is null
-    if (newState == null) {
-      log.error("update() : new state would be NULL -> no update.");
-      throw new IllegalStateException("Alarm evaluated to null state!");
-    }
-
-    // Return if new state is TERMINATE and old state was also TERMINATE, return original alarm (no need to save in cache)
-    if (newState.equals(AlarmCondition.TERMINATE) && alarmCacheObject.getState().equals(AlarmCondition.TERMINATE)) {
-      return alarm;
-    }
-
-    // Build up a prefix according to the tag value's validity and mode
-    String additionalInfo = null;
-
-    switch (tag.getMode()) {
-    case DataTagConstants.MODE_MAINTENANCE:
-      if (tag.isValid()) {
-        additionalInfo = "[M]";
-      } else {
-        additionalInfo = "[M][?]";
-      }
-      break;
-    case DataTagConstants.MODE_TEST:
-      if (tag.isValid()) {
-        additionalInfo = "[T]";
-      } else {
-        additionalInfo = "[T][?]";
-      }
-      break;
-    default:
-      if (tag.isValid()) {
-        additionalInfo = "";
-      } else {
-        additionalInfo = "[?]";
-      }
-    }
-
-    // Add another flag to the info if the value is simulated
-    if (tag.isSimulated()) {
-      additionalInfo = additionalInfo + "[SIM]";
-    }
-
-    // Default case: change the alarm's state
-    // (1) if the alarm has never been initialised
-    // (2) if tag is VALID and the alarm changes from ACTIVE->TERMINATE or TERMIATE->ACTIVE
-    if (alarmCacheObject.getTimestamp().equals(new Timestamp(0))
-        || (tag.isValid() && !alarmCacheObject.getState().equals(newState))) {
-
-      log.trace(new StringBuffer("update(): alarm ").append(alarmCacheObject.getId())
-          .append(" changed STATE to ").append(newState).toString());
-
-      alarmCacheObject.setState(newState);
-      alarmCacheObject.setTimestamp(alarmTime);
-      alarmCacheObject.setInfo(additionalInfo);
-      alarmCacheObject.setAlarmChangeState(AlarmChangeState.CHANGE_STATE);
-      alarmCacheObject.notYetPublished();
-      alarmCache.put(alarmCacheObject.getId(), alarmCacheObject);
-      return alarmCacheObject;
-    }
-
-    // Even if the alarm state itself hasn't change, the additional
-    // information
-    // related to the alarm (e.g. whether the alarm is valid or invalid)
-    // might
-    // have changed
-    if (alarmCacheObject.getInfo() == null) {
-      alarmCacheObject.setInfo("");
-    }
-    if (!alarmCacheObject.getInfo().equals(additionalInfo)) {
-      log.trace(new StringBuffer("update(): alarm ").append(alarmCacheObject.getId())
-          .append(" changed INFO to ").append(additionalInfo).toString());
-
-      alarmCacheObject.setInfo(additionalInfo);
-      alarmCacheObject.setAlarmChangeState(AlarmChangeState.CHANGE_PROPERTIES);
-      alarmCacheObject.setTimestamp(alarmTime);
-      if (!alarmCacheObject.getState().equals(AlarmCondition.TERMINATE)) {
-        // We only send a notification about a property change
-        // to the subscribed alarm listeners, if the alarm is active
-        alarmCacheObject.notYetPublished();
-        alarmCache.put(alarmCacheObject.getId(), alarmCacheObject);
-      }
-      return alarmCacheObject;
-    }
-
-    // In all other cases, the value of the alarm related to the DataTag has
-    // not changed. No need to publish an alarm change.
-    log.trace(new StringBuffer("update(): alarm ").append(alarmCacheObject.getId())
-        .append(" has not changed.").toString());
-
-    //no change so no listener notification in this case
-
-    //this.alarmChange = CHANGE_NONE;
-    return alarmCacheObject;
-  }
+  //
 
   /**
    * Perform a series of consistency checks on the AlarmCacheObject. This method
    * should be invoked if an AlarmCacheObject was created from a list of named
    * properties.
    *
-   * @param alarm the alarm object to validate
-   * @throws ConfigurationException if one of the consistency checks fails
+   * @param alarm
+   *          the alarm object to validate
+   * @throws ConfigurationException
+   *           if one of the consistency checks fails
    */
   @Override
   protected void validateConfig(final Alarm alarm) throws ConfigurationException {

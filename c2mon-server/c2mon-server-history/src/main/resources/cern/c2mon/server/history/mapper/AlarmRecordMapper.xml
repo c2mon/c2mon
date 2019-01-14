@@ -6,39 +6,45 @@
 <mapper namespace="cern.c2mon.server.history.mapper.AlarmRecordMapper">
 
   <insert id="insertLog" databaseId="oracle" parameterType="cern.c2mon.server.history.structure.AlarmRecord">
-    INSERT INTO ALARMLOG (LOGDATE, TAGID, ALARMID, ACTIVE, FAULTFAMILY, FAULTMEMBER, FAULTCODE, SERVERTIME, INFO)
+    INSERT INTO ALARMLOG (LOGDATE, TAGID, ALARMID, ACTIVE, FAULTFAMILY, FAULTMEMBER, FAULTCODE, SERVERTIME, INFO, OSCILLATING)
     VALUES (
-    <!-- The logDate is not null, because is a dataTag read from the fallback file -->
-    <if test="logDate != null">SYS_EXTRACT_UTC(#{logDate,jdbcType=TIMESTAMP})</if>
-    <!-- The logDate is null, what means that comes from a DAQ -->
-    <if test="logDate == null">SYS_EXTRACT_UTC(SYSTIMESTAMP)</if>,
-    #{tagId,jdbcType=NUMERIC},
-    #{id,jdbcType=NUMERIC},
-    <if test="active == true">'Y'</if>
-    <if test="active == false">'N'</if>,
-    #{faultFamily,jdbcType=VARCHAR},
-    #{faultMember,jdbcType=VARCHAR},
-    #{faultCode,jdbcType=NUMERIC},
-    SYS_EXTRACT_UTC(#{serverTimestamp,jdbcType=TIMESTAMP}),
-    #{info,jdbcType=VARCHAR})
+      <!-- The logDate is not null, because is a dataTag read from the fallback file -->
+      <if test="logDate != null">SYS_EXTRACT_UTC(#{logDate,jdbcType=TIMESTAMP})</if>
+      <!-- The logDate is null, what means that comes from a DAQ -->
+      <if test="logDate == null">SYS_EXTRACT_UTC(SYSTIMESTAMP)</if>,
+      #{tagId,jdbcType=NUMERIC},
+      #{id,jdbcType=NUMERIC},
+      <if test="active == true">'Y'</if>
+      <if test="active == false">'N'</if>,
+      #{faultFamily,jdbcType=VARCHAR},
+      #{faultMember,jdbcType=VARCHAR},
+      #{faultCode,jdbcType=NUMERIC},
+      SYS_EXTRACT_UTC(#{serverTimestamp,jdbcType=TIMESTAMP}),
+      #{info,jdbcType=VARCHAR},
+      <if test="oscillating == true">'Y'</if>
+      <if test="oscillating == false">'N'</if>
+    )
   </insert>
 
   <insert id="insertLog" databaseId="mysql" parameterType="cern.c2mon.server.history.structure.AlarmRecord">
-    INSERT INTO ALARMLOG (LOGDATE, TAGID, ALARMID, ACTIVE, FAULTFAMILY, FAULTMEMBER, FAULTCODE, SERVERTIME, INFO)
+    INSERT INTO ALARMLOG (LOGDATE, TAGID, ALARMID, ACTIVE, FAULTFAMILY, FAULTMEMBER, FAULTCODE, SERVERTIME, INFO, OSCILLATING)
     VALUES (
-    <!-- The logDate is not null, because is a dataTag read from the fallback file -->
-    <if test="logDate != null">CONVERT_TZ( #{logDate,jdbcType=TIMESTAMP}, @@session.time_zone, '+00:00' )</if>
-    <!-- The logDate is null, what means that comes from a DAQ -->
-    <if test="logDate == null">CONVERT_TZ( CURRENT_TIMESTAMP, @@session.time_zone, '+00:00' )</if>,
-    #{tagId,jdbcType=NUMERIC},
-    #{id,jdbcType=NUMERIC},
-    <if test="active == true">'Y'</if>
-    <if test="active == false">'N'</if>,
-    #{faultFamily,jdbcType=VARCHAR},
-    #{faultMember,jdbcType=VARCHAR},
-    #{faultCode,jdbcType=NUMERIC},
-    CONVERT_TZ( #{serverTimestamp,jdbcType=TIMESTAMP}, @@session.time_zone, '+00:00' ),
-    #{info,jdbcType=VARCHAR})
+      <!-- The logDate is not null, because is a dataTag read from the fallback file -->
+      <if test="logDate != null">CONVERT_TZ( #{logDate,jdbcType=TIMESTAMP}, @@session.time_zone, '+00:00' )</if>
+      <!-- The logDate is null, what means that comes from a DAQ -->
+      <if test="logDate == null">CONVERT_TZ( CURRENT_TIMESTAMP, @@session.time_zone, '+00:00' )</if>,
+      #{tagId,jdbcType=NUMERIC},
+      #{id,jdbcType=NUMERIC},
+      <if test="active == true">'Y'</if>
+      <if test="active == false">'N'</if>,
+      #{faultFamily,jdbcType=VARCHAR},
+      #{faultMember,jdbcType=VARCHAR},
+      #{faultCode,jdbcType=NUMERIC},
+      CONVERT_TZ( #{serverTimestamp,jdbcType=TIMESTAMP}, @@session.time_zone, '+00:00' ),
+      #{info,jdbcType=VARCHAR},
+      <if test="oscillating == true">'Y'</if>
+      <if test="oscillating == false">'N'</if>
+    )
   </insert>
 
   <!-- only used to remove inserts done during testing -->

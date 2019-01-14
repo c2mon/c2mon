@@ -16,23 +16,24 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.alarm;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import cern.c2mon.server.cache.AbstractCacheIntegrationTest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import cern.c2mon.server.cache.AbstractCacheIntegrationTest;
 import cern.c2mon.server.cache.AlarmCache;
+import cern.c2mon.server.cache.alarm.impl.AlarmCacheImpl;
 import cern.c2mon.server.cache.dbaccess.AlarmMapper;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.test.CacheObjectComparison;
 import cern.c2mon.shared.client.alarm.AlarmQuery;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Alarm cache integration tests: starts the module (alarm cache part)
@@ -60,9 +61,9 @@ public class AlarmCacheTest extends AbstractCacheIntegrationTest {
     //compare all the objects from the cache and buffer
     Iterator<Alarm> it = alarmList.iterator();
     while (it.hasNext()) {
-      Alarm alarm = (Alarm) it.next();
+      Alarm alarm = it.next();
       //compare ids of associated datatags
-      assertEquals(alarm.getTagId(), ((Alarm) alarmCache.getCopy(alarm.getId())).getTagId());
+      assertEquals(alarm.getTagId(), alarmCache.getCopy(alarm.getId()).getTagId());
     }
   }
 
@@ -95,10 +96,20 @@ public class AlarmCacheTest extends AbstractCacheIntegrationTest {
   }
 
   @Test
+  // TODO FIX ME!
+  public void testFindOscillatingAlarms() {
+    AlarmQuery query = AlarmQuery.builder().oscillating(true).build();
+
+    Collection<Long> result = alarmCache.findAlarm(query);
+    assertNotNull(result);
+    assertEquals("Search result != 4", 4, result.size());
+  }
+
+  @Test
   public void testGetActiveAlarms() {
     AlarmQuery query = AlarmQuery.builder().active(true).build();
     AlarmCacheObject toChange = (AlarmCacheObject) alarmCache.get(350000L);
-    toChange.setState("ACTIVE");
+    toChange.setActive(true);
 
     alarmCache.putQuiet(toChange);
     Collection<Long> result = alarmCache.findAlarm(query);

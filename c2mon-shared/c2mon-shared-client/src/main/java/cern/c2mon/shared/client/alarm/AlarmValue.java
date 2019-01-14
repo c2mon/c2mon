@@ -73,16 +73,16 @@ public interface AlarmValue extends ClientRequestResult {
 
   Map<String, Object> getMetadata();
   
-  /** 
-   * @return The description of the Tag 
-   */
-  @Deprecated
-  String getTagDescription();
-  
   /**
    * @return true if the alarm is currently active.
    */
   boolean isActive();
+  
+  
+  /**
+   * @return <code>true</code>, if oscillation control got activated for that alarm on the server side
+   */
+  boolean isOscillating();
   
   /**
    * @return true if this.alarm is more recent.

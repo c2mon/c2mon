@@ -208,7 +208,7 @@ Please read also [Alarms Overview](/overview/alarms) for more information about 
 | ALARMFFAMILY | The alarm Fault family | VARCHAR(64) | x |
 | ALARMFMEMBER | The alarm Fault member | VARCHAR(64) | x |
 | ALARMFCODE | The alarm Fault code | INTEGER | x |
-| ALARMSTATE | Either \'ACTIVE' or \'TERMINATE' | VARCHAR(10) |
+| ALARMSTATE | Either 1 (=Active) or 0 (=Terminate) | VARCHAR(10) |
 | ALARMTIME | The time when the alarm was activated or terminated | VARCHAR(6) |
 | ALARMINFO | A free text field that is used by C2MON to store additional alarm information, that is:<br> '[T]' : Indicates that the associated Tag is in TEST mode<br> '[?]' : Indicates that the associated Tag has bad quality (invalid) e.g. due to an Equipment communication failure| VARCHAR(100) |
 | ALARMCONDITION | Configuration for the AlarmCondition class that is specified as XML.<br>Below you see examples for `ValueAlarmCondition` and  `RangeAlarmCondition`, which specify when an alarm shall be set to ACTIVE.<br>Please note, that only one definition will can be set per alarm:<br>`<AlarmCondition class="cern.c2mon.server.common.alarm.ValueAlarmCondition">`<br>&nbsp;&nbsp;&nbsp;&nbsp;`<alarm-value type="Boolean">true</alarm-value>`<br>`</AlarmCondition>`<br><br>`<AlarmCondition class="cern.c2mon.server.common.alarm.ValueAlarmCondition">`<br>&nbsp;&nbsp;&nbsp;&nbsp;`<alarm-value type="String">DOWN</alarm-value>`<br>`</AlarmCondition>`<br><br>`<AlarmCondition class="cern.c2mon.server.common.alarm.ValueAlarmCondition">`<br>&nbsp;&nbsp;&nbsp;&nbsp;`<alarm-value type="Integer">1</alarm-value>`<br><br>`</AlarmCondition>`<br>`<AlarmCondition class="cern.c2mon.server.common.alarm.RangeAlarmCondition">`<br>&nbsp;&nbsp;&nbsp;&nbsp;`<max-value type="Float">5.0</max-value>`<br>`</AlarmCondition>`<br><br>`<AlarmCondition class="cern.c2mon.server.common.alarm.RangeAlarmCondition">`<br>&nbsp;&nbsp;&nbsp;&nbsp;`<min-value type="Integer">10</max-value>`<br>`</AlarmCondition>`<br>| VARCHAR(500) |
@@ -217,6 +217,7 @@ Please read also [Alarms Overview](/overview/alarms) for more information about 
 | ALA_PUB_TIME | _Please note, that this field is only relevant, if the C2MON system has an alarm publication module implemented._<br> The time of the last alarm publication | TIMESTAMP(6) |
 | ALA_PUB_INFO | _Please note, that this field is only relevant, if the C2MON system has an alarm publication module implemented._<br>The last alarm information being published. See also ALARMINFO |VARCHAR(100) |
 | ALARMMETADATA | The metadata of the alarm, stored as JSON string | VARCHAR(4000) |
+| ALARMOSCILLATION | Either 1 (=Oscillating) or 0 (=Not oscillating) | INTEGER |
 
 
 

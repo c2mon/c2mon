@@ -18,8 +18,8 @@ package cern.c2mon.server.common.alarm;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
@@ -36,6 +36,7 @@ public class ValueAlarmConditionTest {
   
   /**
    * Tests that Enums can be compared to String alarm conditions.
+   * TODO : Reactivate test when XML handling for alarms is rediscussed with Matthias
    * @throws ParserConfigurationException 
    */
   @Test
@@ -48,10 +49,10 @@ public class ValueAlarmConditionTest {
     AlarmCondition condition = AlarmCondition.fromConfigXML(document.getDocumentElement());
     
     SupervisionStatus value = SupervisionStatus.DOWN;
-    Assert.assertEquals(AlarmCondition.ACTIVE, condition.evaluateState(value));
+    Assert.assertEquals(true, condition.evaluateState(value));
     
     SupervisionStatus value2 = SupervisionStatus.RUNNING;
-    Assert.assertEquals(AlarmCondition.TERMINATE, condition.evaluateState(value2));    
+    Assert.assertEquals(false, condition.evaluateState(value2));    
   }
   
 }

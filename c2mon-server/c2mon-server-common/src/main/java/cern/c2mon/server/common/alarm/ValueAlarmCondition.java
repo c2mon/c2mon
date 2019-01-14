@@ -73,7 +73,7 @@ public class ValueAlarmCondition extends AlarmCondition {
    * @throws IllegalStateException if type of alarm condition and tag value do not match
    */
   @Override
-  public String evaluateState(final Object pValue) {
+  public boolean evaluateState(final Object pValue) {
     if (pValue == null) {
       throw new NullPointerException("Trying to evaluate alarm condition for null value.");
     }
@@ -90,11 +90,7 @@ public class ValueAlarmCondition extends AlarmCondition {
 
     // Compare the tag value to the alarm value and determine the alarm
     // state.
-    if (pValue.equals(enumAdaptedAlarmValue)) {
-      return AlarmCondition.ACTIVE;
-    } else {
-      return AlarmCondition.TERMINATE;
-    }
+    return (pValue.equals(enumAdaptedAlarmValue));
   }
 
   /**

@@ -96,6 +96,7 @@
       <searchAttribute name="faultFamily" expression="value.getFaultFamily()" />
       <searchAttribute name="faultMember" expression="value.getFaultMember()" />
       <searchAttribute name="faultCode" expression="value.getFaultCode()" />
+      <searchAttribute name="isOscillating" expression="value.isOscillating()"/>
     </searchable>
   </cache>
 

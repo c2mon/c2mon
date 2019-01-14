@@ -42,6 +42,7 @@ public final class AlarmRecordConverter implements LoggerConverter<Alarm> {
     alarmRecord.setServerTimestamp(alarm.getTimestamp());
 
     alarmRecord.setInfo(alarm.getInfo());
+    alarmRecord.setOscillating(alarm.isOscillating());
     return alarmRecord;
   }
 }

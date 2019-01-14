@@ -39,4 +39,7 @@ public class CacheProperties {
    * How long (in ms) the buffered cache listener should sleep between pulls
    */
   private int bufferedListenerPullFrequency = 5000;
+
+  private int timeRange = 60;
+  private int oscNumbers = 6;
 }

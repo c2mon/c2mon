@@ -91,19 +91,19 @@ public class AlarmCachePersistenceTest {
     alarmCache.put(originalObject.getId(), originalObject);
 
     //check state is as expected
-    assertEquals(AlarmCondition.TERMINATE, originalObject.getState());
+    assertEquals(false, originalObject.isActive());
 
     //check it is in cache (only compares states so far)
     AlarmCacheObject cacheObject = (AlarmCacheObject) alarmCache.get(originalObject.getId());
-    assertEquals(alarmCache.get(originalObject.getId()).getState(), originalObject.getState());
+    assertEquals(alarmCache.get(originalObject.getId()).isActive(), originalObject.isActive());
     //check it is in database (only values so far...)
     AlarmCacheObject objectInDB = (AlarmCacheObject) alarmMapper.getItem(originalObject.getId());
     assertNotNull(objectInDB);
-    assertEquals(objectInDB.getState(), originalObject.getState());
-    assertEquals(AlarmCondition.TERMINATE, objectInDB.getState()); //state is TERMINATE in test alarm 1
+    assertEquals(objectInDB.isActive(), originalObject.isActive());
+    assertEquals(false, objectInDB.isActive()); //state is TERMINATE in test alarm 1
 
     //now update the cache object to new value
-    cacheObject.setState(AlarmCondition.ACTIVE);
+    cacheObject.setActive(true);
     //notify the listeners
     alarmCache.notifyListenersOfUpdate(cacheObject);
 
@@ -112,7 +112,7 @@ public class AlarmCachePersistenceTest {
 
     objectInDB = (AlarmCacheObject) alarmMapper.getItem(originalObject.getId());
     assertNotNull(objectInDB);
-    assertEquals(AlarmCondition.ACTIVE, objectInDB.getState());
+    assertEquals(true, objectInDB.isActive());
 
     //clean up...
     //remove from cache

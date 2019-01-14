@@ -29,7 +29,7 @@ public class SupervisionJmsConfig {
     jmsTemplate.setDefaultDestination(new ActiveMQTopic(supervisionTopic));
 
     jmsTemplate.setExplicitQosEnabled(true);
-    jmsTemplate.setTimeToLive(properties.getJms().getTimeToLive());
+    jmsTemplate.setTimeToLive(5400000);
     jmsTemplate.setDeliveryPersistent(false);
     jmsTemplate.setSessionTransacted(false);
     return jmsTemplate;

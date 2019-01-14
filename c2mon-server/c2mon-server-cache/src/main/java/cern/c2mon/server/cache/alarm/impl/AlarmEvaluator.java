@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.alarm.impl;
+package cern.c2mon.server.cache.alarm.impl;
 
 import cern.c2mon.server.cache.C2monCacheListener;
 import cern.c2mon.server.common.tag.Tag;

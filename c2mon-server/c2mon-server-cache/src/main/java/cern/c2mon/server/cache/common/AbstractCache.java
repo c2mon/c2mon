@@ -68,7 +68,9 @@ import cern.c2mon.shared.common.Cacheable;
 @Slf4j
 public abstract class AbstractCache<K, T extends Cacheable> extends BasicCache<K, T> {
 
-  private final CacheProperties properties;
+  private static final String CLONE_NOT_SUPPORTED_EXCEPTION_CAUGHT_WHILE_CLONING_A_CACHE_ELEMENT = "CloneNotSupportedException caught while cloning a cache element - this should never happen!";
+
+private final CacheProperties properties;
 
   /**
    * Contains properties distributed across the server cluster.
@@ -196,26 +198,28 @@ public abstract class AbstractCache<K, T extends Cacheable> extends BasicCache<K
   @SuppressWarnings("unchecked")
   public final T getCopy(final K id) {
     if (id != null) {
-      cache.acquireReadLockOnKey(id);
-
-      try {
-        T reference = get(id);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(baos);
-        oos.writeObject(reference);
-
-        ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-        ObjectInputStream ois = new ObjectInputStream(bais);
-        return (T) ois.readObject();
-      } catch (CacheElementNotFoundException cenfe) {
-        throw cenfe;
-      }
-      catch (Exception ex) {
-        log.error("Unable to get a serialized copy of the cache element as serialization is not supported for this object.", ex);
-        throw new UnsupportedOperationException("The getCopy() method is not supported for this cache element since the cache object is not entirely serializable. Please revisit your object.", ex);
-      } finally {
-        cache.releaseReadLockOnKey(id);
-      }
+        cache.acquireReadLockOnKey(id);
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                ObjectOutputStream oos = new ObjectOutputStream(baos);) {
+            T reference = get(id);
+    
+            oos.writeObject(reference);
+    
+            ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+            ObjectInputStream ois = new ObjectInputStream(bais);
+            return (T) ois.readObject();
+        } catch (CacheElementNotFoundException cenfe) {
+            throw cenfe;
+        } catch (Exception ex) {
+            log.error(
+                    "Unable to get a serialized copy of the cache element as serialization is not supported for this object.",
+                    ex);
+            throw new UnsupportedOperationException(
+                    "The getCopy() method is not supported for this cache element since the cache object is not entirely serializable. Please revisit your object.",
+                    ex);
+        } finally {
+            cache.releaseReadLockOnKey(id);
+        }
     }
     else {
       log.error("getCopy() - Trying to access cache with a NULL key - throwing an exception!");
@@ -267,8 +271,8 @@ public abstract class AbstractCache<K, T extends Cacheable> extends BasicCache<K
         listener.notifyElementUpdated(cloned);
       }
     } catch (CloneNotSupportedException e) {
-      log.error("CloneNotSupportedException caught while cloning a cache element - this should never happen!", e);
-      throw new RuntimeException("CloneNotSupportedException caught while cloning a cache element - this should never happen!", e);
+      log.error(CLONE_NOT_SUPPORTED_EXCEPTION_CAUGHT_WHILE_CLONING_A_CACHE_ELEMENT, e);
+      throw new FailedCacheElementCloningException(CLONE_NOT_SUPPORTED_EXCEPTION_CAUGHT_WHILE_CLONING_A_CACHE_ELEMENT, e);
     }
   }
 
@@ -280,8 +284,8 @@ public abstract class AbstractCache<K, T extends Cacheable> extends BasicCache<K
         listener.confirmStatus(cloned);
       }
     } catch (CloneNotSupportedException e) {
-      log.error("CloneNotSupportedException caught while cloning a cache element - this should never happen!", e);
-      throw new RuntimeException("CloneNotSupportedException caught while cloning a cache element - this should never happen!", e);
+      log.error(CLONE_NOT_SUPPORTED_EXCEPTION_CAUGHT_WHILE_CLONING_A_CACHE_ELEMENT, e);
+      throw new FailedCacheElementCloningException(CLONE_NOT_SUPPORTED_EXCEPTION_CAUGHT_WHILE_CLONING_A_CACHE_ELEMENT, e);
     }
   }
 
