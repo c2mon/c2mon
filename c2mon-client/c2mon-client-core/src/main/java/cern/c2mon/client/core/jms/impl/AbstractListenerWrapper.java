@@ -55,11 +55,6 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractListenerWrapper<T, U> extends AbstractQueuedWrapper<U> {
 
   /**
-   * Class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(AbstractListenerWrapper.class);
-  
-  /**
    * Listeners registered for receiving events.  
    */
   private Collection<T> listeners = new ArrayList<T>();
