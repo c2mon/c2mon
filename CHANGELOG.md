@@ -8,9 +8,13 @@ For more details on a given release, please check also the [Milestone planning](
 
 
 ## [Unreleased]
+**Please note**,  upgrading to this version requires changes in the database schema. This was necessary in order to implement the alarm oscillation control feature (see #145).
+
 ### Added
+- Server: Added generic oscillation control for alarms (#145)
 
 ### Changed
+- DAQ: Improved logging for multi-equipment DAQs by giving threads the name of the corresponding equipment (#224)
 
 ### Fixed
 - Server: Fixed ElasticSearch mapping for Boolean tags on numeric value field, which was always set to 1 (#223)
