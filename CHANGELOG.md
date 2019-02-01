@@ -6,8 +6,16 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 All issues referenced in parentheses can be consulted under [CERN GitLab](https://gitlab.cern.ch/c2mon/c2mon/issues).
 For more details on a given release, please check also the [Milestone planning](https://gitlab.cern.ch/c2mon/c2mon/milestones?state=all).
 
-
 ## [Unreleased]
+
+### Added
+
+### Changed
+
+### Fixed
+
+
+## [1.8.40] - 2019-02-01
 **Please note**,  upgrading to this version requires changes in the database schema. This was necessary in order to implement the alarm oscillation control feature (see #145).
 
 ### Added
@@ -18,6 +26,7 @@ For more details on a given release, please check also the [Milestone planning](
 
 ### Fixed
 - Server: Fixed ElasticSearch mapping for Boolean tags on numeric value field, which was always set to 1 (#223)
+- Server: Resolved bug preventing C2MON server to start without Elasticsearch logging (#218)
 
 
 ## [1.8.39] - 2018-10-16
@@ -331,7 +340,8 @@ This patch contains bug fixes for the DAQ layer.
 - Remove of EquipmentLogger concept from DAQ Core (#56)
 
 
-[Unreleased]: https://gitlab.cern.ch/c2mon/c2mon/milestones/31
+[Unreleased]: https://gitlab.cern.ch/c2mon/c2mon/milestones/32
+[1.8.40]: https://gitlab.cern.ch/c2mon/c2mon/milestones/31
 [1.8.39]: https://gitlab.cern.ch/c2mon/c2mon/milestones/30
 [1.8.36]: https://gitlab.cern.ch/c2mon/c2mon/milestones/29
 [1.8.35]: https://gitlab.cern.ch/c2mon/c2mon/milestones/28
