@@ -65,6 +65,13 @@ public class EquipmentConfigurationHandler implements IEquipmentConfigurationHan
     public long getEquipmentId() {
         return equipmentId;
     }
+
+  /**
+   * @return the Equipment Unit name
+   */
+  public String getEquipmentName() {
+      return this.getEquipmentConfiguration().getName();
+    }
     
     /**
      * Gets the equipment configuration.

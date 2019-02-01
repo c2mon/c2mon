@@ -20,6 +20,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -204,7 +205,8 @@ public class DriverKernel implements ApplicationContextAware {
       try {
         emhandler.shutdown();
       } catch (EqIOException ex) {
-        log.warn("a problem occured while calling disconnectFromDataSourc() of EquipmentMessageHandler id :" + emhandler.getEquipmentConfiguration()
+        log.warn("a problem occured while calling disconnectFromDataSourc() of EquipmentMessageHandler id: {}",
+                emhandler.getEquipmentConfiguration()
             .getId() + ", name :" + emhandler.getEquipmentConfiguration().getName());
       }
     }
@@ -294,45 +296,21 @@ public class DriverKernel implements ApplicationContextAware {
     log.debug("configure - Starting DAQ alive timer.");
     processMessageSender.startAliveTimer();
 
-    EquipmentMessageHandler equnit = null;
     ProcessConfiguration processConfiguration = configurationController.getProcessConfiguration();
-    boolean dynamicTimeDeadbandEnabled = properties.getFilter().getDynamicDeadband().isEnabled();
 
-    int eqUnitsConnectedProperly = 0;
+    AtomicInteger eqUnitsConnectedProperly = new AtomicInteger(0);
     // for each equipment unit defined in the ProcessConfiguration XML
     for (EquipmentConfiguration conf : processConfiguration.getEquipmentConfigurations().values()) {
       long equipmentId = conf.getId();
-      log.info("configure - Dynamic timedeadband enabled for equipment id: " + equipmentId + " enabled: " + dynamicTimeDeadbandEnabled);
-      conf.setDynamicTimeDeadbandEnabled(dynamicTimeDeadbandEnabled);
+      String equipmentUnitName = conf.getName();
 
-      EquipmentMessageSender equipmentMessageSender = (EquipmentMessageSender) applicationContext.getBean(EQUIPMENT_MESSAGE_SENDER);
-      // equipmentMessageSender.setEquipmentConfiguration(conf);
-      // equipmentMessageSender.setEquipmentlogFactory(equipmentlogFactory);
-      equipmentMessageSender.init(conf);
+      Thread equipmentThread = new Thread(() -> configureEquipment(equipmentId, conf, eqUnitsConnectedProperly), equipmentUnitName);
+      equipmentThread.start();
 
-      configurationController.addCoreDataTagChanger(equipmentId, equipmentMessageSender);
       try {
-        validateDataTags(conf, equipmentMessageSender);
-        validateCommandTags(conf, equipmentMessageSender);
-        equnit = EquipmentMessageHandler.createEquipmentMessageHandler(conf.getHandlerClassName(), new EquipmentCommandHandler(equipmentId,
-            requestController), new EquipmentConfigurationHandler(equipmentId, configurationController), equipmentMessageSender, applicationContext);
-      } catch (InstantiationException e) {
-        String msg = "Error while instantiating " + conf.getHandlerClassName();
-        equipmentMessageSender.confirmEquipmentStateIncorrect(msg + ": " + e.getMessage());
-        log.error(msg, e);
-      } catch (IllegalAccessException e) {
-        String msg = "Access error while calling constructor of " + conf.getHandlerClassName();
-        equipmentMessageSender.confirmEquipmentStateIncorrect("Error in code: " + msg);
-        log.error(msg, e);
-      } catch (ClassNotFoundException e) {
-        String msg = "Handler class not found: " + conf.getHandlerClassName();
-        equipmentMessageSender.confirmEquipmentStateIncorrect("Error during configuration: " + msg);
-        log.error(msg, e);
-      }
-      if (equnit != null) {
-        if (registerNewEquipmentUnit(equnit)) {
-          eqUnitsConnectedProperly++;
-        }
+        equipmentThread.join();
+      } catch (InterruptedException e) {
+        log.error("There was a problem while running a thread", e);
       }
     } // for
 
@@ -340,15 +318,60 @@ public class DriverKernel implements ApplicationContextAware {
     processMessageReceiver.init();
     processMessageReceiver.connect();
 
-    // log.info("Number of supervised equipment units : " +
-    // eqLookupTable.size());
-    log.info("configure - Number of equipment units configured properly : " + eqUnitsConnectedProperly);
+    log.info("configure - Number of equipment units configured properly : {} out of {}", eqUnitsConnectedProperly, processConfiguration.getEquipmentConfigurations().size());
     log.info("configure - DAQ initialized and running.");
+  }
+
+  /**
+   * Configures and creates new {@link EquipmentMessageHandler} for an equipment unit
+   *
+   * @param equipmentId id of equipment unit
+   * @param conf equipment configuration
+   * @param eqUnitsConnectedProperly keeps in log information how many equipment units have been configured properly
+   */
+  private void configureEquipment(long equipmentId, EquipmentConfiguration conf, AtomicInteger eqUnitsConnectedProperly) {
+    EquipmentMessageHandler equnit = null;
+
+    boolean dynamicTimeDeadbandEnabled = properties.getFilter().getDynamicDeadband().isEnabled();
+
+    log.info("configure - Dynamic timedeadband enabled for equipment id: {} enabled {}", equipmentId, dynamicTimeDeadbandEnabled);
+    conf.setDynamicTimeDeadbandEnabled(dynamicTimeDeadbandEnabled);
+
+    EquipmentMessageSender equipmentMessageSender = (EquipmentMessageSender) applicationContext.getBean(EQUIPMENT_MESSAGE_SENDER);
+    equipmentMessageSender.init(conf);
+
+    configurationController.addCoreDataTagChanger(equipmentId, equipmentMessageSender);
+    try {
+      validateDataTags(conf, equipmentMessageSender);
+      validateCommandTags(conf, equipmentMessageSender);
+      equnit = EquipmentMessageHandler.createEquipmentMessageHandler(conf.getHandlerClassName(),
+              new EquipmentCommandHandler(equipmentId,
+              requestController), new EquipmentConfigurationHandler(equipmentId, configurationController),
+              equipmentMessageSender, applicationContext);
+
+    } catch (InstantiationException e) {
+      String msg = "Error while instantiating " + conf.getHandlerClassName();
+      equipmentMessageSender.confirmEquipmentStateIncorrect(msg + ": " + e.getMessage());
+      log.error(msg, e);
+    } catch (IllegalAccessException e) {
+      String msg = "Access error while calling constructor of " + conf.getHandlerClassName();
+      equipmentMessageSender.confirmEquipmentStateIncorrect("Error in code: " + msg);
+      log.error(msg, e);
+    } catch (ClassNotFoundException e) {
+      String msg = "Handler class not found: " + conf.getHandlerClassName();
+      equipmentMessageSender.confirmEquipmentStateIncorrect("Error during configuration: " + msg);
+      log.error(msg, e);
+    }
+    if (equnit != null) {
+      if (registerNewEquipmentUnit(equnit)) {
+        eqUnitsConnectedProperly.incrementAndGet();
+      }
+    }
   }
 
   private boolean registerNewEquipmentUnit(final EquipmentMessageHandler eqHandler) {
     this.eqLookupTable.put(eqHandler.getEquipmentConfiguration().getId(), eqHandler);
-    log.info("registerNewEquipmentUnit - Number of supervised equipment units : " + eqLookupTable.size());
+    log.info("registerNewEquipmentUnit - Number of supervised equipment units : {}", eqLookupTable.size());
     return startEquipmentMessageHandler(eqHandler);
   }
 
@@ -359,7 +382,7 @@ public class DriverKernel implements ApplicationContextAware {
     // remove equipment configuratio from the process configuration object
     configurationController.getProcessConfiguration().removeEquipmentConfiguration(eqId);
 
-    log.info("unregisterEquipmentUnit - Number of supervised equipment units : " + eqLookupTable.size());
+    log.info("unregisterEquipmentUnit - Number of supervised equipment units : {}", eqLookupTable.size());
     return stopStatus;
   }
 
@@ -376,7 +399,7 @@ public class DriverKernel implements ApplicationContextAware {
         log.debug("Validating data tag #{}", sourceDataTag.getId());
         sourceDataTag.validate();
       } catch (ConfigurationException e) {
-        log.error("Error validating configuration for DataTag " + sourceDataTag.getId(), e);
+        log.error("Error validating configuration for DataTag {}", sourceDataTag.getId(), e);
         SourceDataTagQuality quality = new SourceDataTagQuality(SourceDataTagQualityCode.INCORRECT_NATIVE_ADDRESS, e.getMessage());
         equipmentMessageSender.update(sourceDataTag.getId(), quality);
       }
@@ -399,7 +422,7 @@ public class DriverKernel implements ApplicationContextAware {
         log.debug("Validating command tag #{}", sourceCommandTag.getId());
         sourceCommandTag.validate();
       } catch (ConfigurationException e) {
-        log.error("Error validating configuration for CommandTag " + sourceCommandTag.getId(), e);
+        log.error("Error validating configuration for CommandTag {}", sourceCommandTag.getId(), e);
         commandTagIterator.remove();
       }
     }
@@ -419,15 +442,15 @@ public class DriverKernel implements ApplicationContextAware {
       equipmentMessageHandler.connectToDataSource();
       equipmentMessageHandler.refreshAllDataTags();
     } catch (EqIOException ex) {
-      log.error("startEquipmentMessageHandler - Could not connect EquipmentUnit to its data source. EquipmentMessageHandler name :" +
-          equipmentConfiguration.getName() + " id :" + equipmentConfiguration.getId());
+      log.error("startEquipmentMessageHandler - Could not connect EquipmentUnit to its data source. EquipmentMessageHandler name: {} id: {}",
+              equipmentConfiguration.getName(), equipmentConfiguration.getId());
       String errMsg = "EqIOException : code = " + ex.getErrorCode() + " message = " + ex.getErrorDescription();
       log.error(errMsg);
       equipmentMessageHandler.getEquipmentMessageSender().confirmEquipmentStateIncorrect(errMsg);
       success = false;
     } catch (Exception ex) {
-      log.error("startEquipmentMessageHandler - Could not connect EquipmentUnit to its data source. EquipmentMessageHandler name :" +
-          equipmentMessageHandler.getEquipmentConfiguration().getName() + " id :" + equipmentMessageHandler.getEquipmentConfiguration().getId());
+      log.error("startEquipmentMessageHandler - Could not connect EquipmentUnit to its data source. EquipmentMessageHandler name: {} id: {}",
+              equipmentMessageHandler.getEquipmentConfiguration().getName(), equipmentMessageHandler.getEquipmentConfiguration().getId());
       String errMsg = "Unexpected exception caught whilst connecting to equipment: ";
       log.error(errMsg, ex);
       equipmentMessageHandler.getEquipmentMessageSender().confirmEquipmentStateIncorrect(errMsg + ex.getMessage());
@@ -449,8 +472,8 @@ public class DriverKernel implements ApplicationContextAware {
         // send commfault tag
         handler.getEquipmentMessageSender().confirmEquipmentStateIncorrect("Equipment has been been stopped");
       } catch (Exception ex) {
-        log.warn("stopEquipmentMessageHandler - Could not discconnect EquipmentUnit from its data source. EquipmentMessageHandler name :" + conf.getName()
-            + " id :" + eqId);
+        log.warn("stopEquipmentMessageHandler - Could not discconnect EquipmentUnit from its data source. EquipmentMessageHandler name : {} id : {}",
+                conf.getName(), eqId);
       }
     }
 
@@ -531,7 +554,7 @@ public class DriverKernel implements ApplicationContextAware {
     boolean dynamicTimeDeadbandEnabled = properties.getFilter().getDynamicDeadband().isEnabled();
     conf.setDynamicTimeDeadbandEnabled(dynamicTimeDeadbandEnabled);
 
-    log.info("onEquipmentUnitAdd - Dynamic timedeadband enabled for equipment id: " + conf.getId() + " enabled: " + dynamicTimeDeadbandEnabled);
+    log.info("onEquipmentUnitAdd - Dynamic timedeadband enabled for equipment id: {} enabled: {}", conf.getId(), dynamicTimeDeadbandEnabled);
 
     EquipmentMessageSender equipmentMessageSender = (EquipmentMessageSender) applicationContext.getBean(EQUIPMENT_MESSAGE_SENDER);
 
