@@ -24,8 +24,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -37,11 +36,9 @@ import cern.c2mon.client.core.service.CommandService;
 import cern.c2mon.client.core.tag.CommandTagImpl;
 import cern.c2mon.shared.client.command.*;
 
+@Slf4j
 @Service
 public class CommandServiceImpl implements CommandService {
-
-  /** Log4j Logger for this class */
-  private static final Logger LOG = LoggerFactory.getLogger(CommandServiceImpl.class);
 
   /** Default for an uninitialized unknown tag id  */
   private static final Long UNKNOWN_TAG_ID = -1L;
@@ -82,14 +79,14 @@ public class CommandServiceImpl implements CommandService {
   @Override
   public CommandReport executeCommand(final String userName, final Long commandId, final Object value) throws CommandTagValueException {
     if(sessionService != null){
-      LOG.info("Executing command with SessionService authentication");
+      log.info("Executing command with SessionService authentication");
 
       if (!sessionService.isUserLogged(userName)) {
         return new CommandReportImpl(commandId,
             CommandExecutionStatus.STATUS_AUTHORISATION_FAILED, "No user is logged-in.");
       }
     } else {
-      LOG.info("Executing command without SessionService authentication");
+      log.info("Executing command without SessionService authentication");
     }
 
     if (!commandCache.containsKey(commandId)) {
@@ -111,12 +108,11 @@ public class CommandServiceImpl implements CommandService {
     }
 
     try {
-      LOG.info("executeCommand() - Executing command " + commandId + " for authorized user " + userName);
+      log.info("Executing command #{} for authorized user {}", commandId, userName);
       return clientRequestHandler.executeCommand(executeRequest);
     }
     catch (Exception e) {
-      LOG.error("executeCommand() - Catched JMS execption while trying to execute command "
-                + commandId + ". ", e);
+      log.error("Caught JMS execption while trying to execute command #{}", commandId, e);
       return new CommandReportImpl(commandId,
           CommandExecutionStatus.STATUS_SERVER_ERROR,
           "Could not execute the command due to a communication error with the server. Error: " + e.getMessage());
@@ -131,12 +127,7 @@ public class CommandServiceImpl implements CommandService {
     Set<CommandTag<T>> resultSet = new HashSet<>();
     Set<Long> newCommandTagIds = new HashSet<>();
 
-    if (LOG.isDebugEnabled()) {
-      StringBuilder str = new StringBuilder("getCommandTags() - creating ");
-      str.append(pIds.size());
-      str.append(" command tags.");
-      LOG.debug(str.toString());
-    }
+    log.debug("Creating {} command tags", pIds.size());
 
     // Create ClientDataTags for all IDs and keep in hash table
     CommandTagImpl commandTag;
@@ -155,10 +146,29 @@ public class CommandServiceImpl implements CommandService {
       }
     }
 
-    if (newCommandTagIds.size() > 0) {
-      if (LOG.isDebugEnabled()) {
-        LOG.debug(new StringBuilder("getCommandTags() - ").append(newCommandTagIds.size()).append(" commands to be requested.").toString());
+    getNewCommandsFromServer(newCommandTagIds);
+
+    // Clone command tags for result set
+    for (Long commandId : pIds) {
+      // skip all fake tags
+      if (!commandId.equals(UNKNOWN_TAG_ID)) {
+        try {
+          resultSet.add((CommandTag<T>) commandCache.get(commandId).clone());
+        }
+        catch (CloneNotSupportedException e) {
+          log.error("Error while cloning command tag with id {}", commandId);
+          throw new RuntimeException("Cloning not supported by CommandTagImpl with id " + commandId, e);
+        }
       }
+    }
+
+    return resultSet;
+  }
+
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  private void getNewCommandsFromServer(Set<Long> newCommandTagIds) {
+    if (!newCommandTagIds.isEmpty()) {
+      log.debug("{} commands to be requested from the server", newCommandTagIds.size());
 
       Collection<CommandTagHandle> commandTagHandles = clientRequestHandler.requestCommandTagHandles(newCommandTagIds);
       if (commandTagHandles != null) {
@@ -170,30 +180,14 @@ public class CommandServiceImpl implements CommandService {
             cct.update(tagHandle);
           }
           else {
-            LOG.error("getCommandTags() - Received unknown command tag: " + tagHandle.getId());
+            log.error("Received unknown command tag: {}", tagHandle.getId());
           }
         }
       }
     }
     else {
-      LOG.debug("getCommandTags() - No commands to be requested from the server.");
+      log.debug("No commands to be requested from the server");
     }
-
-    // Clone command tags for result set
-    for (Long commandId : pIds) {
-      // skip all fake tags
-      if (!commandId.equals(UNKNOWN_TAG_ID)) {
-        try {
-          resultSet.add((CommandTag<T>) commandCache.get(commandId).clone());
-        }
-        catch (CloneNotSupportedException e) {
-          LOG.error("getCommandTags() - Error while cloning command tag with id " + commandId);
-          throw new RuntimeException("Cloning not supported by CommandTagImpl with id " + commandId, e);
-        }
-      }
-    }
-
-    return resultSet;
   }
 
 
@@ -248,7 +242,7 @@ public class CommandServiceImpl implements CommandService {
     try {
       hostname = InetAddress.getLocalHost().getHostName();
     } catch (UnknownHostException e) {
-      LOG.warn("UnknownHostException caught while creating command request - set to unknown", e);
+      log.warn("UnknownHostException caught while creating command request - set to unknown", e);
       hostname = "unknown-host";
     }
 
@@ -284,8 +278,8 @@ public class CommandServiceImpl implements CommandService {
           return sessionService.isAuthorized(userName, cct.getAuthorizationDetails());
         }
         else {
-          LOG.warn("isAuthorized() - No authorization details received for command "
-              + commandId + ". Please contact the support team to solve this problem!");
+          log.warn("No authorization details received for command #{}. "
+              + "Please contact the support team to solve this problem!", commandId);
         }
       }
     }
@@ -296,11 +290,11 @@ public class CommandServiceImpl implements CommandService {
   @Override
   public void registerSessionService(SessionService sessionService) {
     if(sessionService == null){
-      LOG.warn("No SessionService to to the CommandManager set. Service is null.");
+      log.warn("No SessionService to to the CommandManager set. Service is null.");
     }
 
     if(this.sessionService != null){
-      LOG.warn("SessionService were already set. Overriding of the service!");
+      log.warn("SessionService were already set. Overriding of the service!");
     }
 
     this.sessionService = sessionService;
@@ -311,5 +305,10 @@ public class CommandServiceImpl implements CommandService {
     Set<Long> commandIds = commandCache.keySet();
     commandCache.clear();
     getCommandTags(commandIds);
+  }
+
+  @Override
+  public void clearCommandCache() {
+    commandCache.clear();
   }
 }
