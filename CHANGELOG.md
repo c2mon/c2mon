@@ -9,6 +9,7 @@ For more details on a given release, please check also the [Milestone planning](
 ## [Unreleased]
 
 ### Added
+- Client API: Added method to clear local command cache 
 
 ### Changed
 
