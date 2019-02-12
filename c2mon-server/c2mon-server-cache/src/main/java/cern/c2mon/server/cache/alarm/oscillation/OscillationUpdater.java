@@ -55,6 +55,7 @@ public final class OscillationUpdater {
         boolean isAlarmConditionActive = alarmCacheObject.getCondition().evaluateState(tag.getValue());
         if (tag.isValid()) {
             alarmCacheObject.setActive(isAlarmConditionActive);
+            alarmCacheObject.setInternalActive(isAlarmConditionActive);
         }
 
         if (isAlarmConditionActive != alarmCacheObject.isLastActiveState()) {
@@ -79,8 +80,7 @@ public final class OscillationUpdater {
         alarmCacheObject.setOscillating(checkOscillConditions(alarmCacheObject));
     }
 
-    public void resetOscillCounter(AlarmCacheObject alarmCacheObject) {
-
+    public void resetOscillationCounter(AlarmCacheObject alarmCacheObject) {
         alarmCacheObject.setCounterFault(0);
         alarmCacheObject.setOscillating(false);
         alarmCacheObject.setFirstOscTS(0);
@@ -88,24 +88,16 @@ public final class OscillationUpdater {
     }
 
     /**
-     * If the oscillation condition is met we still have to check, if the alarm
-     * is currently set to ACTIVE because we only want active alarms being
-     * flagged as oscillating. Like that the user will only deal with ACTIVE
-     * oscillating alarms.
+     * Check whether we have accumulated enough oscillations over the prescribed
+     * period of time to declare we are actually oscillating.
      * 
      * @param alarmCacheObject
-     *            the alarm cache object containing already the new alarm state
-     * @return true, if alarm shall be marked as oscillating
+     *            the alarm cache object containing already the new alarm state.
+     * @return true, if alarm shall be marked as oscillating.
      */
     private boolean checkOscillConditions(AlarmCacheObject alarmCacheObject) {
-        if ((alarmCacheObject.getCounterFault() >= oscillationProperties.getOscNumbers())
+        return ((alarmCacheObject.getCounterFault() >= oscillationProperties.getOscNumbers())
                 && ((System.currentTimeMillis() - alarmCacheObject.getFirstOscTS()) <= oscillationProperties
-                        .getTimeRange() * 1000)) {
-
-            return (alarmCacheObject.isOscillating()
-                    || (alarmCacheObject.isActive() && !alarmCacheObject.isOscillating()));
-        }
-
-        return false;
+                        .getTimeRange() * 1000));
     }
 }

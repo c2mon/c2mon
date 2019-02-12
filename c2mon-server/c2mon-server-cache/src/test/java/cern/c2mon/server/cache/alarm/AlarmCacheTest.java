@@ -96,7 +96,6 @@ public class AlarmCacheTest extends AbstractCacheIntegrationTest {
   }
 
   @Test
-  // TODO FIX ME!
   public void testFindOscillatingAlarms() {
     AlarmQuery query = AlarmQuery.builder().oscillating(true).build();
 

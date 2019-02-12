@@ -35,6 +35,7 @@ public class OscillationUpdaterTest {
   @Autowired
   OscillationProperties oscillationProperties;
 
+  @SuppressWarnings("serial")
   @Before
   public void setup() {
     alarmCacheObject = new AlarmCacheObject();
@@ -46,7 +47,7 @@ public class OscillationUpdaterTest {
     oscUpdater.setOscillationProperties(oscillationProperties);
 
     dataTagCacheObject.setSourceTimestamp(new Timestamp(System.currentTimeMillis() - 60000));
-    dataTagCacheObject.setValue(new Integer(0));
+    dataTagCacheObject.setValue((int)0);
     DataTagQuality qual = new DataTagQualityImpl();
     qual.validate();
     dataTagCacheObject.setDataTagQuality(qual);
@@ -72,11 +73,10 @@ public class OscillationUpdaterTest {
   // than the for oscillations counter..
   @Test
   public void testOscillDetected() {
-    log.info("------ testOscillDetected -------"); 
     for (int i = 0; i < 20; i++) {
       dataTagCacheObject.setValue(i % 2);
       oscUpdater.update(alarmCacheObject, dataTagCacheObject);
-      log.info("ALARM ACTIVE: {} - OSCILLATION: {}", alarmCacheObject.isActive(), alarmCacheObject.isOscillating()); 
+      log.info("ALARM ACTIVE: {} - INTERNAL ACTIVE: {} - OSCILLATION: {}", alarmCacheObject.isActive(), alarmCacheObject.isInternalActive(), alarmCacheObject.isOscillating()); 
     }
     assertTrue(alarmCacheObject.isOscillating());
   }
@@ -86,11 +86,10 @@ public class OscillationUpdaterTest {
   // the oscillation is detected
   @Test
   public void testLowOscillChanges() {
-    log.info("------ testLowOscillChanges -------"); 
     for (int i = 0; i < 7; i++) {
       dataTagCacheObject.setValue(i % 2);
       oscUpdater.update(alarmCacheObject, dataTagCacheObject);
-      log.info("ALARM ACTIVE: {} - OSCILLATION: {}", alarmCacheObject.isActive(), alarmCacheObject.isOscillating()); 
+      log.info("ALARM ACTIVE: {} - INTERNAL ACTIVE: {} - OSCILLATION: {}", alarmCacheObject.isActive(), alarmCacheObject.isInternalActive(), alarmCacheObject.isOscillating());
     }
     assertTrue(alarmCacheObject.isOscillating());
   }
@@ -128,7 +127,7 @@ public class OscillationUpdaterTest {
     myAlarmCacheUpdater.setAlarmCache(myAlarmCache);
     myAlarmCacheUpdater.setOscillationUpdater(this.oscUpdater);
     
-    oscUpdater.resetOscillCounter(alarmCacheObject);
+    oscUpdater.resetOscillationCounter(alarmCacheObject);
     
     for (int i = 1; i < 6; i++) {
       dataTagCacheObject.setValue(i % 2);
@@ -143,15 +142,19 @@ public class OscillationUpdaterTest {
       EasyMock.replay(myAlarmCache);
 
       myAlarmCacheUpdater.update(alarmCacheObject, dataTagCacheObject);
-      log.info("ALARM ACTIVE: {} - OSCILLATION: {} INFO: {} firstOscTS {} counter {} ", alarmCacheObject.isActive(), alarmCacheObject.isOscillating(), alarmCacheObject.getInfo(), alarmCacheObject.getFirstOscTS(), alarmCacheObject.getCounterFault());
+      log.info("ALARM ACTIVE: {} - INTERNAL ACTIVE: {} OSCILLATION: {} INFO: {} firstOscTS {} counter {} ", alarmCacheObject.isActive(), alarmCacheObject.isInternalActive(), alarmCacheObject.isOscillating(), alarmCacheObject.getInfo(), alarmCacheObject.getFirstOscTS(), alarmCacheObject.getCounterFault());
       assertEquals(alarmCacheObject.isOscillating(), alarmCacheObject.getInfo().contains(Alarm.ALARM_INFO_OSC));
+      if(alarmCacheObject.isOscillating()) {
+        assertTrue("If an alarm is oscillating, it must be active", alarmCacheObject.isActive());
+      }
       EasyMock.verify(myAlarmCache);
       EasyMock.reset(myAlarmCache);
     }
     log.info("===========================");
-    oscUpdater.resetOscillCounter(alarmCacheObject);
+    oscUpdater.resetOscillationCounter(alarmCacheObject);
     alarmCacheObject.setOscillating(false);
     alarmCacheObject.setActive(false);
+    alarmCacheObject.setInternalActive(false);
 
     for (int i = 1; i < 9; i++) {
 
@@ -166,7 +169,7 @@ public class OscillationUpdaterTest {
       EasyMock.replay(myAlarmCache);
 
       myAlarmCacheUpdater.update(alarmCacheObject, dataTagCacheObject);
-      log.info("ALARM ACTIVE: {} - OSCILLATION: {} INFO: {} firstOscTS {} counter {} ", alarmCacheObject.isActive(), alarmCacheObject.isOscillating(), alarmCacheObject.getInfo(), alarmCacheObject.getFirstOscTS(), alarmCacheObject.getCounterFault());
+      log.info("ALARM ACTIVE: {} - INTERNAL ACTIVE: {} OSCILLATION: {} INFO: {} firstOscTS {} counter {} ", alarmCacheObject.isActive(), alarmCacheObject.isInternalActive(), alarmCacheObject.isOscillating(), alarmCacheObject.getInfo(), alarmCacheObject.getFirstOscTS(), alarmCacheObject.getCounterFault());
 
       EasyMock.verify(myAlarmCache);
       EasyMock.reset(myAlarmCache);

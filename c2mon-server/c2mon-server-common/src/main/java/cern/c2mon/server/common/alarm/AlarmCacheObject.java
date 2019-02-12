@@ -72,19 +72,30 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
   private AlarmCondition condition;
 
   /**
-   * The meta data of the Alatm. The meta data can be arbitrary and of of the
+   * The meta data of the Alarm. The meta data can be arbitrary and of of the
    * type String, Numeric and Boolean. Not every Alarm needs to have a meta
    * data. Also the meta data don't have to be every time the same.
    */
   private Metadata metadata;
 
-  /** <code>true</code>, if the alarm state is active as published to listeners (may be forced to <code>true</code> in case of oscillation) */
+  /** <code>true</code>, if the alarm state is active as published to listeners 
+   * (may be forced to <code>true</code> and silenced in case of oscillation) 
+   *
+   */
   private boolean active = false;
 
   /**
    * Whether the alarm was previously active
    **/
   private boolean lastActiveState;
+  
+  /**
+   * <code>true</code> if the alarm state is active as maintained internally. This state is not exposed to listeners 
+   * and only used for the purpose of detecting and maintaining oscillation. 
+   * It always reflect the true state of an alarm, regardless of oscillation status 
+   * (in contrast with the attribute <b>active</b> which may be forced to <code>true</code> if an oscillation is ongoing).
+   */
+  private boolean internalActive = false;
 
   private int counterFault;
   private long firstOscTS;
@@ -191,6 +202,8 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
     str.append(isActive());
     str.append('\t');
     str.append(isOscillating());
+    str.append('\t');
+    str.append(isInternalActive());
     if (getInfo() != null) {
       str.append('\t');
       str.append(getInfo());

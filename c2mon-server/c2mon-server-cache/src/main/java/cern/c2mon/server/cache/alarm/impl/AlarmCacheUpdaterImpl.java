@@ -93,11 +93,12 @@ public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
       return alarmCacheObject;
     }
     
-    boolean hasChanged = alarmCacheObject.isActive() != newState;
+    boolean hasChanged = alarmCacheObject.isInternalActive() != newState;
     
     // We only allow activating the alarm if the tag is valid.
     if(tag.isValid()){
         alarmCacheObject.setActive(newState);
+        alarmCacheObject.setInternalActive(newState);
     }
     
     // Check the oscillating status
@@ -119,7 +120,11 @@ public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
       alarmCacheObject.setInfo(additionalInfo);
 
       if (alarmCacheObject.isOscillating() && wasAlreadyOscillating) {
-        alarmCache.putQuiet(alarmCacheObject);
+          // #233 - When oscillating we force the alarm to *active*
+          // (only the *internalActive* property reflects the true status)
+          alarmCacheObject.setActive(true);
+          alarmCache.putQuiet(alarmCacheObject);
+        
       } else {
         alarmCache.put(alarmCacheObject.getId(), alarmCacheObject);
       }

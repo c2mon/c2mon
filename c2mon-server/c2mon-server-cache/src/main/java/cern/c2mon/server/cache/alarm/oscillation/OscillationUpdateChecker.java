@@ -197,7 +197,7 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
           for (Long alarmId : result) {
             AlarmCacheObject alarmCopy = (AlarmCacheObject) alarmCache.getCopy(alarmId);
             if (!oscillationUpdater.checkOscillAlive(alarmCopy)) {
-              oscillationUpdater.resetOscillCounter(alarmCopy);
+              oscillationUpdater.resetOscillationCounter(alarmCopy);
               alarmCopy.setOscillating(false);
               alarmCopy.setInfo(AlarmCacheUpdater.evaluateAdditionalInfo(alarmCopy, dataTagCache.get(alarmCopy.getDataTagId())));
               alarmCache.put(alarmCopy.getId(), alarmCopy);
