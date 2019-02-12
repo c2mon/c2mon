@@ -95,7 +95,7 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
    * It always reflect the true state of an alarm, regardless of oscillation status 
    * (in contrast with the attribute <b>active</b> which may be forced to <code>true</code> if an oscillation is ongoing).
    */
-  private boolean internalActive = false;
+  private boolean internalActive;
 
   private int counterFault;
   private long firstOscTS;
@@ -185,25 +185,25 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
 
   @Override
   public String toString() {
-    StringBuffer str = new StringBuffer();
+    StringBuilder str = new StringBuilder();
 
-    str.append(getId());
-    str.append('\t');
-    str.append(getTagId());
-    str.append('\t');
-    str.append(getTimestamp());
-    str.append('\t');
-    str.append(getFaultFamily());
-    str.append('\t');
-    str.append(getFaultMember());
-    str.append('\t');
-    str.append(getFaultCode());
-    str.append('\t');
-    str.append(isActive());
-    str.append('\t');
-    str.append(isOscillating());
-    str.append('\t');
-    str.append(isInternalActive());
+    str.append(getId())
+       .append('\t')
+       .append(getTagId())
+       .append('\t')
+       .append(getTimestamp())
+       .append('\t')
+       .append(getFaultFamily())
+       .append('\t')
+       .append(getFaultMember())
+       .append('\t')
+       .append(getFaultCode())
+       .append('\t')
+       .append(isActive())
+       .append('\t')
+       .append(isOscillating())
+       .append('\t')
+       .append(isInternalActive());
     if (getInfo() != null) {
       str.append('\t');
       str.append(getInfo());
