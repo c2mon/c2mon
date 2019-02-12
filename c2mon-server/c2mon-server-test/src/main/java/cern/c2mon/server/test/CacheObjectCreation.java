@@ -67,6 +67,7 @@ public final class CacheObjectCreation {
     alarm1.setCondition(condition);
     alarm1.setInfo("alarm info");
     alarm1.setActive(false);
+    alarm1.setInternalActive(false);
     alarm1.setTimestamp(new Timestamp(System.currentTimeMillis() - 2000));
     alarm1.setDataTagId(100003L);
     return alarm1;
@@ -87,6 +88,7 @@ public final class CacheObjectCreation {
     alarm3.setCondition(condition);
     alarm3.setInfo("alarm info");
     alarm3.setActive(false);
+    alarm3.setInternalActive(false);
     alarm3.setTimestamp(new Timestamp(System.currentTimeMillis() - 2000));
     alarm3.setDataTagId(100003L);
     Metadata metadata = new Metadata();
@@ -111,6 +113,7 @@ public final class CacheObjectCreation {
     alarm1.setCondition(condition);
     alarm1.setInfo("alarm info");
     alarm1.setActive(true);
+    alarm1.setInternalActive(true);
     alarm1.setTimestamp(new Timestamp(System.currentTimeMillis() - 2000));
     return alarm1;
   }

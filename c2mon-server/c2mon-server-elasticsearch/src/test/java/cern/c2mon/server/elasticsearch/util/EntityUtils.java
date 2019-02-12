@@ -36,6 +36,7 @@ public class EntityUtils {
     alarm.setMetadata(metadata);
     alarm.setInfo("alarm info");
     alarm.setActive(false);
+    alarm.setInternalActive(false);
     return alarm;
   }
 

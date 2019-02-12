@@ -112,6 +112,7 @@ public final class CacheObjectComparison {
     assertEquals(alarm1.getFaultFamily(), alarm2.getFaultFamily());
     assertEquals(alarm1.getFaultMember(), alarm2.getFaultMember());
     assertEquals(alarm1.isActive(), alarm2.isActive());
+    assertEquals(alarm1.isInternalActive(), alarm2.isInternalActive());
     assertEquals(alarm1.getInfo(), alarm2.getInfo());
     assertEquals(alarm1.getCondition(), alarm2.getCondition());
     assertEquals(alarm1.getTimestamp(), alarm2.getTimestamp());
