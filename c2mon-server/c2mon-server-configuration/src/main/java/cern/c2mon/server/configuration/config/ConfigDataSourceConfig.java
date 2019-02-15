@@ -36,11 +36,12 @@ public class ConfigDataSourceConfig {
     // in-process database, start a file-based externally visible database or connect to
     // an external database.
     if (url.contains("hsql")) {
-      return new HsqlDatabaseBuilder()
+      return HsqlDatabaseBuilder.builder()
                  .url(url)
                  .username(username)
                  .password(password)
-                 .addScript(new ClassPathResource("sql/config-schema-hsqldb.sql")).build();
+                 .script(new ClassPathResource("sql/config-schema-hsqldb.sql"))
+                 .build().toDataSource();
     } else {
       return DataSourceBuilder.create().build();
     }

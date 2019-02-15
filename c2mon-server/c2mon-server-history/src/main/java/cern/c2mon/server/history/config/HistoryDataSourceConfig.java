@@ -45,11 +45,12 @@ public class HistoryDataSourceConfig {
     String password = properties.getJdbc().getPassword();
 
     if (url.contains("hsql")) {
-      return new HsqlDatabaseBuilder()
+      return HsqlDatabaseBuilder.builder()
                  .url(url)
                  .username(username)
                  .password(password)
-                 .addScript(new ClassPathResource("sql/history-schema-hsqldb.sql")).build();
+                 .script(new ClassPathResource("sql/history-schema-hsqldb.sql")).build()
+                 .toDataSource();
     } else {
       return DataSourceBuilder.create().build();
     }

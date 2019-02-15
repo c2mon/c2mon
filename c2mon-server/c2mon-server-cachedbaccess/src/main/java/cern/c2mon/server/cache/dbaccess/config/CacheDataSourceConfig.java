@@ -19,6 +19,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.annotation.Resource;
 import javax.sql.DataSource;
+
+import java.util.Arrays;
 import java.util.Properties;
 
 /**
@@ -42,11 +44,12 @@ public class CacheDataSourceConfig {
     // in-process database, start a file-based externally visible database or connect to
     // an external database.
     if (url.contains("hsql")) {
-      return new HsqlDatabaseBuilder()
+      return HsqlDatabaseBuilder.builder()
                  .url(url)
                  .username(username)
                  .password(password)
-                 .addScript(new ClassPathResource("sql/cache-schema-hsqldb.sql")).build();
+                 .script(new ClassPathResource("sql/cache-schema-hsqldb.sql"))
+                 .build().toDataSource();
     } else {
       return DataSourceBuilder.create().build();
     }
