@@ -1,13 +1,16 @@
 package cern.c2mon.server.common.config;
 
-import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Primary;
+
+import lombok.Data;
 
 /**
  * @author Justin Lewis Salmon
  */
 @Data
 @ConfigurationProperties(prefix = "c2mon.server")
+@Primary
 public class ServerProperties {
 
   /**
@@ -40,6 +43,13 @@ public class ServerProperties {
      * c2mon.server.daqcommunication.jms.url and c2mon.server.client.jms.url
      */
     private String url = "tcp://localhost:61616";
+    
+    private String httpurl = "http://localhost:8086";
+    
+    private String mqtturl = "mqtt://localhost:1883";
+    
+    private String wsurl = "ws://localhost:61614";
+    
 
     /**
      * Enable/disable the embedded broker

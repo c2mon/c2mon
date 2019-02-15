@@ -24,6 +24,9 @@ public class EmbeddedBrokerAutoConfiguration {
     brokerService.setUseShutdownHook(false);
     brokerService.setUseJmx(true);
     brokerService.addConnector(properties.getJms().getUrl());
+    brokerService.addConnector(properties.getJms().getHttpurl());
+    brokerService.addConnector(properties.getJms().getMqtturl());
+    brokerService.addConnector(properties.getJms().getWsurl());
     return brokerService;
   }
 }
