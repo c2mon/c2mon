@@ -45,7 +45,7 @@ public final class OscillationUpdater {
 
     /**
      * Logic kept the same as in TIM1 (see {@link AlarmFacade}). The locking of
-     * the objets is done in the public class. Notice, in this case the update()
+     * the objects is done in the public class. Notice, in this case the update()
      * method is putting the changes back into the cache.
      */
     public void update(final AlarmCacheObject alarmCacheObject, final Tag tag) {

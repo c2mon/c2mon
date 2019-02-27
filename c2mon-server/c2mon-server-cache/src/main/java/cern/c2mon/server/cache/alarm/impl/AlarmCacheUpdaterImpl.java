@@ -54,6 +54,7 @@ public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
     AlarmCacheObject alarmCacheObject = (AlarmCacheObject) alarm;
     // this time is then used in LASER publication as user timestamp
     Timestamp alarmTime = tag.getCacheTimestamp();
+    Timestamp alarmSourceTimestamp = tag.getTimestamp();
     
     // not possible to evaluate alarms with associated null tag; occurs during
     // normal operation
@@ -64,6 +65,7 @@ public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
       // change the alarm timestamp, if the alarm has never been initialised
       if (alarmCacheObject.getTimestamp().equals(new Timestamp(0))) {
         alarmCacheObject.setTimestamp(alarmTime);
+        alarmCacheObject.setSourceTimestamp(alarmSourceTimestamp);
       }
       return alarmCacheObject;
     }
@@ -117,6 +119,7 @@ public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
       log.trace("Alarm {} changed STATE to {}",alarmCacheObject.getId(), newState);
       
       alarmCacheObject.setTimestamp(tag.getCacheTimestamp());
+      alarmCacheObject.setSourceTimestamp(tag.getTimestamp());
       alarmCacheObject.setInfo(additionalInfo);
 
       if (alarmCacheObject.isOscillating() && wasAlreadyOscillating) {
