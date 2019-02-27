@@ -41,6 +41,7 @@
         <groupId>cern.c2mon.daq</groupId>
         <artifactId>c2mon-daq-test</artifactId>
         <version>${project.parent.version}</version>
+        <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.shared</groupId>
