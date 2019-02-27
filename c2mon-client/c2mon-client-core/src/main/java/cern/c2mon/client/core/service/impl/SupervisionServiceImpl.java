@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.client.core.manager;
+package cern.c2mon.client.core.service.impl;
 
 import java.util.*;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 
 import cern.c2mon.client.core.jms.*;
 import cern.c2mon.client.core.listener.HeartbeatListener;
+import cern.c2mon.client.core.manager.HeartbeatListenerManager;
 import cern.c2mon.client.core.service.CoreSupervisionService;
 import cern.c2mon.shared.client.supervision.Heartbeat;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;

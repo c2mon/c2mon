@@ -16,25 +16,18 @@
  *****************************************************************************/
 package cern.c2mon.client.core;
 
-import cern.c2mon.client.core.config.C2monAutoConfiguration;
-
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.boot.Banner;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ConfigurableApplicationContext;
-
-import cern.c2mon.client.core.service.impl.CommandServiceImpl;
-import cern.c2mon.client.core.manager.SupervisionServiceImpl;
-import cern.c2mon.client.core.service.*;
-
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.stereotype.Component;
+
+import cern.c2mon.client.core.config.C2monAutoConfiguration;
+import cern.c2mon.client.core.service.*;
 
 /**
  * This class is the main facade for all applications using the
@@ -63,7 +56,7 @@ public class C2monServiceGateway implements ApplicationContextAware {
   private static final Long MAX_INITIALIZATION_TIME = 60000L;
 
   /** Static reference to the <code>C2monCommandManager</code> singleton instance */
-  private static CommandServiceImpl commandServiceImpl = null;
+  private static CommandService commandService = null;
 
   /** Static reference to the <code>TagService</code> singleton instance */
   private static TagService tagService = null;
@@ -77,8 +70,8 @@ public class C2monServiceGateway implements ApplicationContextAware {
   /** Static reference to the <code>StatisticsService</code> singleton instance */
   private static StatisticsService statisticsService = null;
 
-  /** Static reference to the <code>C2monSupervisionManager</code> singleton instance */
-  private static SupervisionServiceImpl supervisionServiceImpl = null;
+  /** Static reference to the <code>SupervisionService</code> singleton instance */
+  private static SupervisionService supervisionService = null;
 
   /**
    * Protected default constructor
@@ -102,8 +95,8 @@ public class C2monServiceGateway implements ApplicationContextAware {
    */
   public static CommandService getCommandService() {
     startC2monClientSynchronous();
-    
-    return commandServiceImpl;
+
+    return commandService;
   }
 
   /**
@@ -155,8 +148,8 @@ public class C2monServiceGateway implements ApplicationContextAware {
    */
   public static SupervisionService getSupervisionService() {
     startC2monClientSynchronous();
-    
-    return supervisionServiceImpl;
+
+    return supervisionService;
   }
 
   /**
@@ -217,7 +210,7 @@ public class C2monServiceGateway implements ApplicationContextAware {
       log.info("Waiting for C2MON server connection (max " + MAX_INITIALIZATION_TIME / 1000  + " sec)...");
 
       Long startTime = System.currentTimeMillis();
-      while (!supervisionServiceImpl.isServerConnectionWorking()) {
+      while (!supervisionService.isServerConnectionWorking()) {
         try { Thread.sleep(200); } catch (InterruptedException ie) { /* Do nothing */ }
         if (System.currentTimeMillis() - startTime >= MAX_INITIALIZATION_TIME) {
           throw new RuntimeException(
@@ -236,8 +229,8 @@ public class C2monServiceGateway implements ApplicationContextAware {
    * @param context the application context
    */
   private static void initiateGatewayFields(final ApplicationContext context) {
-    supervisionServiceImpl = context.getBean(SupervisionServiceImpl.class);
-    commandServiceImpl = context.getBean(CommandServiceImpl.class);
+    supervisionService = context.getBean(SupervisionService.class);
+    commandService = context.getBean(CommandService.class);
 
     alarmService = context.getBean(AlarmService.class);
     configurationService = context.getBean(ConfigurationService.class);
