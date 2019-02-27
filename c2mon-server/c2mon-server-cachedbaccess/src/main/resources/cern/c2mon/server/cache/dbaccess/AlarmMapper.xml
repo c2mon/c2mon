@@ -11,6 +11,7 @@
       <result property="faultCode" column="ALARMFCODE" jdbcType="NUMERIC"/>
       <result property="active" column="ALARMSTATE" jdbcType="VARCHAR"/>
       <result property="timestamp" column="ALARMTIME" jdbcType="TIMESTAMP"/>
+      <result property="sourceTimestamp" column="ALARMSOURCETIME" jdbcType="TIMESTAMP"/>
       <result property="info" column="ALARMINFO" jdbcType="VARCHAR"/>
       <result property="condition" column="ALARMCONDITION" javaType="cern.c2mon.server.common.alarm.AlarmCondition" jdbcType="VARCHAR"/>
       <result property="dataTagId" column="ALARM_TAGID" jdbcType="NUMERIC" javaType="java.lang.Long"/>
@@ -22,13 +23,13 @@
     <select id="getAll" resultMap="alarmResultMap">
      SELECT alarmid, alarm_tagid, alarmffamily,
             alarmfmember, alarmfcode, alarmcondition,
-            alarmstate, alarmtime, alarminfo, alarmmetadata, alarmoscillation
+            alarmstate, alarmtime, alarmsourcetime, alarminfo, alarmmetadata, alarmoscillation
        FROM ALARM
     </select>
 
     <select id="getRowBatch" resultMap="alarmResultMap" parameterType="cern.c2mon.server.cache.dbaccess.structure.DBBatch">
       SELECT alarmid, alarm_tagid, alarmffamily, alarmfmember, alarmfcode,
-      alarmcondition, alarmstate, alarmtime, alarminfo, alarmmetadata, alarmoscillation
+      alarmcondition, alarmstate, alarmtime, alarmsourcetime, alarminfo, alarmmetadata, alarmoscillation
       FROM(
         SELECT ROWNUM as RN, ALARM.*
         FROM ALARM
@@ -42,7 +43,7 @@
     <select id="getItem" resultMap="alarmResultMap" parameterType="Long">
        SELECT alarmid, alarm_tagid, alarmffamily,
               alarmfmember, alarmfcode, alarmcondition,
-              alarmstate, alarmtime, alarminfo, alarmmetadata, alarmoscillation
+              alarmstate, alarmtime, alarmsourcetime, alarminfo, alarmmetadata, alarmoscillation
          FROM ALARM
         WHERE alarmid = #{id}
     </select>
@@ -57,6 +58,7 @@
       UPDATE ALARM
          SET ALARMSTATE = #{active,jdbcType=VARCHAR},
              ALARMTIME = #{timestamp,jdbcType=TIMESTAMP},
+             ALARMSOURCETIME = #{sourceTimestamp,jdbcType=TIMESTAMP},
              ALARMINFO = #{info,jdbcType=VARCHAR},
              ALARMOSCILLATION = #{oscillating,jdbcType=NUMERIC}
        WHERE ALARMID = #{id}
@@ -75,11 +77,12 @@
     <!-- must specify jdbcType for parameters that can be null in DB  -->
     <insert id="insertAlarm" parameterType="cern.c2mon.server.common.alarm.AlarmCacheObject">
       INSERT INTO ALARM (ALARMID, ALARMFFAMILY, ALARMFMEMBER, ALARMFCODE,
-                         ALARMSTATE, ALARMTIME, ALARMINFO,
+                         ALARMSTATE, ALARMTIME, ALARMSOURCETIME, ALARMINFO,
                          ALARMCONDITION, ALARM_TAGID, ALARMMETADATA, ALARMOSCILLATION
                 )
       VALUES (#{id},#{faultFamily},#{faultMember},#{faultCode},
-              #{active,jdbcType=VARCHAR}, #{timestamp,jdbcType=TIMESTAMP}, #{info,jdbcType=VARCHAR},
+              #{active,jdbcType=VARCHAR}, #{timestamp,jdbcType=TIMESTAMP},
+              #{sourceTimestamp,jdbcType=TIMESTAMP}, #{info,jdbcType=VARCHAR},
               #{condition,javaType=cern.c2mon.server.common.alarm.AlarmCondition,jdbcType=VARCHAR},
               #{dataTagId,jdbcType=NUMERIC},
               #{metadata, jdbcType=VARCHAR},

@@ -6,7 +6,7 @@
 <mapper namespace="cern.c2mon.server.history.mapper.AlarmRecordMapper">
 
   <insert id="insertLog" databaseId="oracle" parameterType="cern.c2mon.server.history.structure.AlarmRecord">
-    INSERT INTO ALARMLOG (LOGDATE, TAGID, ALARMID, ACTIVE, FAULTFAMILY, FAULTMEMBER, FAULTCODE, SERVERTIME, INFO, OSCILLATING)
+    INSERT INTO ALARMLOG (LOGDATE, TAGID, ALARMID, ACTIVE, FAULTFAMILY, FAULTMEMBER, FAULTCODE, SERVERTIME, SOURCETIME, INFO, OSCILLATING)
     VALUES (
       <!-- The logDate is not null, because is a dataTag read from the fallback file -->
       <if test="logDate != null">SYS_EXTRACT_UTC(#{logDate,jdbcType=TIMESTAMP})</if>
@@ -20,6 +20,7 @@
       #{faultMember,jdbcType=VARCHAR},
       #{faultCode,jdbcType=NUMERIC},
       SYS_EXTRACT_UTC(#{serverTimestamp,jdbcType=TIMESTAMP}),
+      SYS_EXTRACT_UTC(#{sourceTimestamp,jdbcType=TIMESTAMP}),
       #{info,jdbcType=VARCHAR},
       <if test="oscillating == true">'Y'</if>
       <if test="oscillating == false">'N'</if>
@@ -27,7 +28,7 @@
   </insert>
 
   <insert id="insertLog" databaseId="mysql" parameterType="cern.c2mon.server.history.structure.AlarmRecord">
-    INSERT INTO ALARMLOG (LOGDATE, TAGID, ALARMID, ACTIVE, FAULTFAMILY, FAULTMEMBER, FAULTCODE, SERVERTIME, INFO, OSCILLATING)
+    INSERT INTO ALARMLOG (LOGDATE, TAGID, ALARMID, ACTIVE, FAULTFAMILY, FAULTMEMBER, FAULTCODE, SERVERTIME, SOURCETIME, INFO, OSCILLATING)
     VALUES (
       <!-- The logDate is not null, because is a dataTag read from the fallback file -->
       <if test="logDate != null">CONVERT_TZ( #{logDate,jdbcType=TIMESTAMP}, @@session.time_zone, '+00:00' )</if>
@@ -41,6 +42,7 @@
       #{faultMember,jdbcType=VARCHAR},
       #{faultCode,jdbcType=NUMERIC},
       CONVERT_TZ( #{serverTimestamp,jdbcType=TIMESTAMP}, @@session.time_zone, '+00:00' ),
+      CONVERT_TZ( #{sourceTimestamp,jdbcType=TIMESTAMP}, @@session.time_zone, '+00:00' ),
       #{info,jdbcType=VARCHAR},
       <if test="oscillating == true">'Y'</if>
       <if test="oscillating == false">'N'</if>

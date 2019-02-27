@@ -179,6 +179,7 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
     alarm.setActive(false);
     alarm.setInternalActive(false);
     alarm.setTimestamp(new Timestamp(0));
+    alarm.setSourceTimestamp(new Timestamp(0));
     alarm.setInfo("");
 
     validateConfig(alarm);

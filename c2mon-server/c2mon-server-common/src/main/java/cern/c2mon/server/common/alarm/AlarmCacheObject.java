@@ -104,6 +104,8 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
   private boolean oscillating;
 
   private Timestamp timestamp;
+  
+  private Timestamp sourceTimestamp;
 
   /**
    * Optional info property
@@ -210,5 +212,9 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
     }
 
     return str.toString();
+  }
+  
+  public void setTimestamp(Timestamp ts) {
+      this.timestamp = ts;
   }
 }

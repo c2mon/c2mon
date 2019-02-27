@@ -37,6 +37,11 @@ public interface Alarm extends Cacheable {
    * @return the UTC timestamp of the alarm's last state change
    */
   Timestamp getTimestamp();
+  
+  /**
+   * Get the UTC timestamp of the data tag's source
+   */
+  Timestamp getSourceTimestamp();
 
   /**
    * Get the optional additional info on the alarm that is to be sent to

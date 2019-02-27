@@ -56,6 +56,8 @@ public class AlarmRecord implements IFallback, Loggable {
     private String info;
 
     private Timestamp serverTimestamp;
+    
+    private Timestamp sourceTimestamp;
 
     private Timestamp logDate = null;
 
