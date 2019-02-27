@@ -18,8 +18,9 @@ package cern.c2mon.client.core.manager;
 
 import java.util.*;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,10 +40,12 @@ import cern.c2mon.shared.client.supervision.SupervisionEvent;
  *
  * @author Matthias Braeger
  */
+@Slf4j
 @Service
 public class SupervisionServiceImpl implements CoreSupervisionService, SupervisionListener, ConnectionListener, HeartbeatListener {
 
-  private static final Logger log = org.slf4j.LoggerFactory.getLogger(SupervisionServiceImpl.class);
+  private static final String UNKNOWN = "UNKNOWN";
+
   /**
    * Set to <code>true</code>, if the supervision cache is correctly initialized
    */
@@ -396,5 +399,62 @@ public class SupervisionServiceImpl implements CoreSupervisionService, Supervisi
   @Override
   public void addClientHealthListener(ClientHealthListener clientHealthListener) {
     jmsHealthMonitor.addHealthListener(clientHealthListener);
+  }
+
+  @Override
+  public String getProcessName(Long processId) {
+    SupervisionEvent process = this.processEventCache.get(processId);
+    if (process != null) {
+      return process.getName();
+    }
+    return UNKNOWN;
+  }
+
+  @Override
+  public String getEquipmentName(Long equipmentId) {
+    SupervisionEvent equipment = this.equipmentEventCache.get(equipmentId);
+    if (equipment != null) {
+      return equipment.getName();
+    }
+    return UNKNOWN;
+  }
+
+  @Override
+  public String getSubEquipmentName(Long subEquipmentId) {
+    SupervisionEvent subEquipment = this.subEquipmentEventCache.get(subEquipmentId);
+    if (subEquipment != null) {
+      return subEquipment.getName();
+    }
+    return UNKNOWN;
+  }
+
+  @Override
+  public Collection<String> getAllProcessNames() {
+    return processEventCache.values().stream().map(SupervisionEvent::getName).collect(Collectors.toList());
+  }
+
+  @Override
+  public Collection<String> getAllEquipmentNames() {
+    return equipmentEventCache.values().stream().map(SupervisionEvent::getName).collect(Collectors.toList());
+  }
+
+  @Override
+  public Collection<String> getAllSubEquipmentNames() {
+    return subEquipmentEventCache.values().stream().map(SupervisionEvent::getName).collect(Collectors.toList());
+  }
+
+  @Override
+  public SupervisionEvent getProcessSupervisionEvent(Long processId) {
+    return this.getProcessSupervisionEvent(processId);
+  }
+
+  @Override
+  public SupervisionEvent getEquipmentSupervisionEvent(Long equipmentId) {
+    return this.getEquipmentSupervisionEvent(equipmentId);
+  }
+
+  @Override
+  public SupervisionEvent getSubEquipmentSupervisionEvent(Long subEquipmentId) {
+    return this.subEquipmentEventCache.get(subEquipmentId);
   }
 }
