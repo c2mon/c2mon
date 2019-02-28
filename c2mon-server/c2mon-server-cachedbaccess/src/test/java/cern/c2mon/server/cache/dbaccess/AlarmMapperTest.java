@@ -92,6 +92,7 @@ public class AlarmMapperTest extends AbstractMapperTest {
     //update fields
     alarmOriginal.setActive(true);
     alarmOriginal.setTimestamp(new Timestamp(System.currentTimeMillis()));
+    alarmOriginal.setSourceTimestamp(new Timestamp(System.currentTimeMillis()));
     alarmOriginal.setInfo("updated info");
     //update in DB
     alarmMapper.updateCacheable(alarmOriginal);
