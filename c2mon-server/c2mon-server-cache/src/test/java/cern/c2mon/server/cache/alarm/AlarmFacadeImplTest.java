@@ -101,7 +101,7 @@ public class AlarmFacadeImplTest {
 
     assertEquals(false, currentAlarmState.isActive());
     assertTrue(newAlarm.getTimestamp().equals(tag.getCacheTimestamp()));
-    assertTrue(newAlarm.getSourceTimestamp().equals(tag.getTimestamp()));
+    assertTrue("Source timestamp was not properly set",newAlarm.getSourceTimestamp().equals(tag.getTimestamp()));
     assertEquals(false, currentAlarmState.isActive()); //also update alarm parameter object (usually in cache)
     assertTrue(currentAlarmState.getTimestamp().equals(tag.getCacheTimestamp()));
   }

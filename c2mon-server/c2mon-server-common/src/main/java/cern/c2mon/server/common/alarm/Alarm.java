@@ -39,7 +39,8 @@ public interface Alarm extends Cacheable {
   Timestamp getTimestamp();
   
   /**
-   * Get the UTC timestamp of the data tag's source
+   * Get the UTC timestamp of the data tag's source (as opposed to the cache timestamp).
+   * @return the UTC timestamp of the alarm's source data tag timestamp
    */
   Timestamp getSourceTimestamp();
 
