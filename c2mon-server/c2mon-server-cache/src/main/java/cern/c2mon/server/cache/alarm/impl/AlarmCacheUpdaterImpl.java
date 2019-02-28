@@ -147,6 +147,7 @@ public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
 
       alarmCacheObject.setInfo(additionalInfo);
       alarmCacheObject.setTimestamp(tag.getCacheTimestamp());
+      alarmCacheObject.setSourceTimestamp(tag.getTimestamp());
       if (alarmCacheObject.isActive()) {
         alarmCache.put(alarmCacheObject.getId(), alarmCacheObject);
       }

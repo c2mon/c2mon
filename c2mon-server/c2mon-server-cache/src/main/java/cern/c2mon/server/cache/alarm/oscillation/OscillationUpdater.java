@@ -50,7 +50,8 @@ public final class OscillationUpdater {
      */
     public void update(final AlarmCacheObject alarmCacheObject, final Tag tag) {
         alarmCacheObject.setTimestamp(new Timestamp(System.currentTimeMillis()));
-
+        alarmCacheObject.setSourceTimestamp(tag.getTimestamp());
+        
         // Evaluate oscillation
         boolean isAlarmConditionActive = alarmCacheObject.getCondition().evaluateState(tag.getValue());
         if (tag.isValid()) {
