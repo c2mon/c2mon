@@ -46,6 +46,7 @@ public class AlarmRecordConverterTest {
     EasyMock.expect(alarm.getTagId()).andReturn(1L);
     EasyMock.expect(alarm.getInfo()).andReturn("");
     EasyMock.expect(alarm.getTimestamp()).andReturn(new Timestamp(System.currentTimeMillis()));
+    EasyMock.expect(alarm.getSourceTimestamp()).andReturn(new Timestamp(System.currentTimeMillis()));
     EasyMock.expect(alarm.isActive()).andReturn(true);
     EasyMock.expect(alarm.isOscillating()).andReturn(false);
     EasyMock.replay(alarm);
@@ -63,6 +64,7 @@ public class AlarmRecordConverterTest {
     al.setActive(true);
     al.setAlarmId(1234L);
     al.setServerTimestamp(new Timestamp(System.currentTimeMillis()));
+    al.setSourceTimestamp(new Timestamp(System.currentTimeMillis()));
     al.setInfo("!@#$%^&*(}{[]\\  \"  |");
     al.setTagId(10L);
     al.setFaultFamily("FF");
