@@ -39,7 +39,7 @@ public class AlarmDocument extends HashMap<String, Object> implements IFallback 
 
   @Override
   public Object put(String key, Object value) {
-    if (key.equals("timestamp")) {
+    if (key.equals("timestamp") || key.equals("sourceTimestamp")) {
       value = Long.valueOf(value.toString());
     }
     return super.put(key, value);
