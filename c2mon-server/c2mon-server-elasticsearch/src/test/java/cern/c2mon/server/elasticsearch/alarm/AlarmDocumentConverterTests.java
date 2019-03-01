@@ -59,6 +59,7 @@ public class AlarmDocumentConverterTests {
     assertEquals(alarm.isActive(), document.get("active"));
     assertEquals(alarm.getInfo(), document.get("info"));
     assertEquals(alarm.getTimestamp().getTime(), document.get("timestamp"));
+    assertEquals(alarm.getSourceTimestamp().getTime(), document.get("sourceTimestamp"));
 
     Map<String, Object> metadata = (Map<String, Object>) document.get("metadata");
     assertEquals(alarm.getMetadata().getMetadata().get("building"), metadata.get("building"));
@@ -74,6 +75,7 @@ public class AlarmDocumentConverterTests {
   public void convertZeroTimestamp() throws DataFallbackException {
     Alarm alarm = EntityUtils.createAlarm();
     Whitebox.setInternalState(alarm, "timestamp", new Timestamp(0));
+    Whitebox.setInternalState(alarm, "sourceTimestamp", new Timestamp(0));
     AlarmDocument document = converter.convert(alarm);
 
     // Serialize
@@ -83,5 +85,7 @@ public class AlarmDocumentConverterTests {
     document = (AlarmDocument) document.getObject(json);
     assertEquals(Long.class, document.get("timestamp").getClass());
     assertEquals(0L, document.get("timestamp"));
+    assertEquals(Long.class, document.get("sourceTimestamp").getClass());
+    assertEquals(0L, document.get("sourceTimestamp"));
   }
 }

@@ -29,6 +29,7 @@ public class EntityUtils {
     alarm.setFaultMember("fault member");
     alarm.setFaultCode(0);
     alarm.setTimestamp(new Timestamp(System.currentTimeMillis()));
+    alarm.setSourceTimestamp(new Timestamp(alarm.getTimestamp().getTime()));
     Metadata metadata = new Metadata();
     metadata.addMetadata("building", "1");
     metadata.addMetadata("array", Collections.singletonList("test"));
