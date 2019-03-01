@@ -214,7 +214,4 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
     return str.toString();
   }
   
-  public void setTimestamp(Timestamp ts) {
-      this.timestamp = ts;
-  }
 }
