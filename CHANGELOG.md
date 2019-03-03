@@ -11,8 +11,10 @@ For more details on a given release, please check also the [Milestone planning](
 ### Added
 - Client API: Added method to clear local command cache 
 - Client API: Added methods to `SupervisionService` for retrieving process and (sub-)equipment information from local cache (#238)
+- Server, Client API: Added source timestamp to alarm object (#237)
 
 ### Changed
+- Cient API: Set ActiveMQ prefetch limit to 100 to avoid slow consumer problem (#240)
 
 ### Fixed
 
