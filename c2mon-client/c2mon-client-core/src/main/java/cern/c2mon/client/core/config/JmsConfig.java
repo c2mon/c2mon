@@ -17,8 +17,8 @@
 package cern.c2mon.client.core.config;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.ActiveMQPrefetchPolicy;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jms.connection.CachingConnectionFactory;
@@ -40,6 +40,11 @@ public class JmsConfig {
   public ActiveMQConnectionFactory clientJmsConnectionFactory() {
     ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory(properties.getJms().getUrl());
     factory.setTrustAllPackages(true);
+    
+    ActiveMQPrefetchPolicy prefetchPolicy = new ActiveMQPrefetchPolicy();
+    prefetchPolicy.setAll(100);
+    factory.setPrefetchPolicy(prefetchPolicy);
+    
     return factory;
   }
 
