@@ -25,7 +25,7 @@ repository: c2mon/c2mon
 
 # Build settings
 markdown: kramdown
-theme: jekyll-theme-minimal
+theme: minimal
 plugins:
   - jekyll-feed
   - github-pages
