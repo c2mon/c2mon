@@ -1,3 +1,6 @@
+---
+layout: default
+---
 # C2MON documentation
 
 Welcome to the official CERN Control and Monitoring Platform (C2MON) documentation.

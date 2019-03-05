@@ -1,0 +1,65 @@
+- text: Home
+  url: /
+- text: Getting Started
+  url: /getting-started/
+  subitems:
+    - text: First menu (sub)
+      url: /first-menu/first-menu-sub/
+      subitems:
+        - text: First menu (sub-sub)
+          url: /first-menu/first-menu-sub/first-menu-sub-sub/
+- text: Overview
+  url: /overview/
+  subitems:
+    - text: Introduction to C2MON
+    - text: Process/Equipment
+      url: /overview/process-equipment/
+    - text: Tags
+      url: /overview/tags/
+    - text: Supervision
+      url: /overview/supervision/
+    - text: Alarms
+      url: /overview/alarms/
+    - text: Class/Device/Property
+      url: /overview/class-device-property/
+- text: User Guide
+  url: /user-guide/
+  subitems:
+    - text: Client API
+      url: /user-guide/client-api/
+      subitems:
+        - text: Data Subscription
+          url: /user-guide/client-api/
+        - text: Configuration API
+          url: /user-guide/client-api/configuration/
+        - text: Accessing Historical Data
+          url: /user-guide/client-api/history/
+    - text: Server
+      url: /user-guide/server/
+      subitems:
+        - text: Running the server
+          url: /user-guide/server/index/
+        - text: Elasticsearch
+          url: /user-guide/server/elasticsearch/
+        - text: Rule Engine
+          url: /user-guide/server/rule-engine/
+        - text: Database
+          url: /user-guide/server/database/
+    - text: DAQ API
+      url: /user-guide/daq-api/
+      subitems:
+        - text: General Overview
+          url: /user-guide/daq-api/index.md/
+        - text: DAQ module developer guide
+          url: /user-guide/daq-api/DAQ_module_developer_guide/
+        - text: DAQ module testing guide
+          url: /user-guide/daq-api/DAQ_module_testing_guide/
+- text: About
+  url: /about/
+  subitems:
+    - text: CHANGELOG
+      url: /about/CHANGELOG/
+    - text: Contributing
+      url: /about/CONTRIBUTING/
+    - text: License
+      url: /about/license/
