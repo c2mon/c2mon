@@ -28,6 +28,7 @@ markdown: kramdown
 theme: minimal
 plugins:
   - jekyll-feed
+  - jekyll-seo-tag
   - github-pages
 
 # Exclude from processing.
