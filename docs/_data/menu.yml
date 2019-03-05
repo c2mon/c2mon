@@ -1,65 +1,59 @@
 - text: Home
-  url: /
+  url: {{ site.baseurl }}
 - text: Getting Started
-  url: /getting-started/
-  subitems:
-    - text: First menu (sub)
-      url: /first-menu/first-menu-sub/
-      subitems:
-        - text: First menu (sub-sub)
-          url: /first-menu/first-menu-sub/first-menu-sub-sub/
+  url: {{ site.baseurl }}/getting-started/
 - text: Overview
-  url: /overview/
+  url: {{ site.baseurl }}/overview/
   subitems:
     - text: Introduction to C2MON
     - text: Process/Equipment
-      url: /overview/process-equipment/
+      url: {{ site.baseurl }}/overview/process-equipment/
     - text: Tags
-      url: /overview/tags/
+      url: {{ site.baseurl }}/overview/tags/
     - text: Supervision
-      url: /overview/supervision/
+      url: {{ site.baseurl }}/overview/supervision/
     - text: Alarms
-      url: /overview/alarms/
+      url: {{ site.baseurl }}/overview/alarms/
     - text: Class/Device/Property
-      url: /overview/class-device-property/
+      url: {{ site.baseurl }}/overview/class-device-property/
 - text: User Guide
-  url: /user-guide/
+  url: {{ site.baseurl }}/user-guide/
   subitems:
     - text: Client API
-      url: /user-guide/client-api/
+      url: {{ site.baseurl }}/user-guide/client-api/
       subitems:
         - text: Data Subscription
-          url: /user-guide/client-api/
+          url: {{ site.baseurl }}/user-guide/client-api/
         - text: Configuration API
-          url: /user-guide/client-api/configuration/
+          url: {{ site.baseurl }}/user-guide/client-api/configuration/
         - text: Accessing Historical Data
-          url: /user-guide/client-api/history/
+          url: {{ site.baseurl }}/user-guide/client-api/history/
     - text: Server
-      url: /user-guide/server/
+      url: {{ site.baseurl }}/user-guide/server/
       subitems:
         - text: Running the server
-          url: /user-guide/server/index/
+          url: {{ site.baseurl }}/user-guide/server/index/
         - text: Elasticsearch
-          url: /user-guide/server/elasticsearch/
+          url: {{ site.baseurl }}/user-guide/server/elasticsearch/
         - text: Rule Engine
-          url: /user-guide/server/rule-engine/
+          url: {{ site.baseurl }}/user-guide/server/rule-engine/
         - text: Database
-          url: /user-guide/server/database/
+          url: {{ site.baseurl }}/user-guide/server/database/
     - text: DAQ API
-      url: /user-guide/daq-api/
+      url: {{ site.baseurl }}/user-guide/daq-api/
       subitems:
         - text: General Overview
-          url: /user-guide/daq-api/index.md/
+          url: {{ site.baseurl }}/user-guide/daq-api/index.md/
         - text: DAQ module developer guide
-          url: /user-guide/daq-api/DAQ_module_developer_guide/
+          url: {{ site.baseurl }}/user-guide/daq-api/DAQ_module_developer_guide/
         - text: DAQ module testing guide
-          url: /user-guide/daq-api/DAQ_module_testing_guide/
+          url: {{ site.baseurl }}/user-guide/daq-api/DAQ_module_testing_guide/
 - text: About
-  url: /about/
+  url: {{ site.baseurl }}/about/
   subitems:
     - text: CHANGELOG
-      url: /about/CHANGELOG/
+      url: {{ site.baseurl }}/about/CHANGELOG/
     - text: Contributing
-      url: /about/CONTRIBUTING/
+      url: {{ site.baseurl }}/about/CONTRIBUTING/
     - text: License
-      url: /about/license/
+      url: {{ site.baseurl }}/about/license/
