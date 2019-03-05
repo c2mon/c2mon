@@ -28,6 +28,7 @@ markdown: kramdown
 theme: jekyll-theme-minimal
 plugins:
   - jekyll-feed
+  - jekyll-relative-links
   - jekyll-seo-tag
   - github-pages
 
