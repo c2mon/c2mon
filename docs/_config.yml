@@ -17,7 +17,7 @@ title: C2MON
 email: c2mon-support@cern.ch
 description: >- # this means to ignore newlines until "baseurl:"
   The CERN Control and Monitoring Platform (C2MON) is an open-source heterogeneous time-series data acquisition/subscription framework with alerting and control functionalities that can be used for building many different types of system
-baseurl: "" # the subpath of your site, e.g. /blog
+baseurl: "/c2mon" # the subpath of your site, e.g. /blog
 url: https://c2mon.web.cern.ch/c2mon/
 twitter_username: jekyllrb
 github_username:  c2mon
