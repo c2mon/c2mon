@@ -40,13 +40,14 @@
       </header>
 
       <section>
-
-
-      <p>{% include nav.html nav=site.data.menu base=site.baseurl %}</p>
-
-      {{ content }}
-
+      {% include nav.html nav=site.data.menu base=site.baseurl %}
       </section>
+
+      <section>
+      {% include editPage.html %}
+      {{ content }}
+      </section>
+
       <footer>
         {% if site.github.is_project_page %}
         <p>This project is maintained by <a href="{{ site.github.owner_url }}">{{ site.github.owner_name }}</a></p>

@@ -22,6 +22,8 @@ url: https://c2mon.web.cern.ch/c2mon/
 twitter_username: jekyllrb
 github_username:  c2mon
 repository: c2mon/c2mon
+repoHost: "https://gitlab.cern.ch/"
+docFolder: "/tree/master/docs/src"
 
 # Build settings
 markdown: kramdown
@@ -31,12 +33,6 @@ plugins:
   - jekyll-relative-links
   - jekyll-seo-tag
   - github-pages
-
-defaults:
-  - scope:
-      path: "assets/assets/imgoverview"
-    values:
-      image: true
 
 # Exclude from processing.
 # The following items will not be processed, by default. Create a custom list
