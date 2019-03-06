@@ -2,39 +2,48 @@
 # If url is skipped, the text will be lowercased and
 # used in the link. " " and "/" are replaced with " "
 # To maintain the base (parent) URL, just use url: ""
-- text: Home
+- text: About
   url: ""
-- text: Getting Started
-- text: Overview
+- text: Features
+  url: "#features"
+- text: Examples
+  url: ""
+- text: Docs
   subitems:
-    - text: Introduction to C2MON
-      url: ""
-    - text: Process/Equipment
-    - text: Tags
-    - text: Supervision
-    - text: Alarms
-    - text: Class/Device/Property
-- text: User Guide
-  subitems:
-    - text: Client API
-      subitems:
-        - text: Data Subscription
-          url: ""
-        - text: Configuration API
-        - text: Accessing Historical Data
-    - text: Server
-      subitems:
-        - text: Running the server
-          url: ""
-        - text: Elasticsearch
-        - text: Rule Engine
-        - text: Database
-    - text: DAQ API
-      subitems:
-        - text: General Overview
-          url: ""
-        - text: DAQ module developer guide
-        - text: DAQ module testing guide
-- text: License
-# Jekyll seems to have the /license page occupied by default
-  url: "c2mon-license"
+  - text: Home
+    url: ""
+  - text: Getting Started
+  - text: Overview
+    subitems:
+      - text: Introduction to C2MON
+        url: ""
+      - text: Process/Equipment
+      - text: Tags
+      - text: Supervision
+      - text: Alarms
+      - text: Class/Device/Property
+  - text: User Guide
+    subitems:
+      - text: Client API
+        subitems:
+          - text: Data Subscription
+            url: ""
+          - text: Configuration API
+          - text: Accessing Historical Data
+      - text: Server
+        subitems:
+          - text: Running the server
+            url: ""
+          - text: Elasticsearch
+          - text: Rule Engine
+          - text: Database
+      - text: DAQ API
+        subitems:
+          - text: General Overview
+            url: ""
+          - text: DAQ module developer guide
+          - text: DAQ module testing guide
+  - text: License
+  # Jekyll seems to have the /license page occupied by default
+    url: "c2mon-license"
+- text: Contact
