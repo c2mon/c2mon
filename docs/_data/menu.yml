@@ -1,3 +1,4 @@
+# You can specify custom URLs for files using url: "filename"
 # If url is skipped, the text will be lowercased and
 # used in the link. " " and "/" are replaced with " "
 # To maintain the base (parent) URL, just use url: ""
@@ -20,9 +21,7 @@
         - text: Data Subscription
           url: ""
         - text: Configuration API
-          url: configuration
         - text: Accessing Historical Data
-          url: history
     - text: Server
       subitems:
         - text: Running the server
@@ -35,13 +34,7 @@
         - text: General Overview
           url: ""
         - text: DAQ module developer guide
-          url: DAQ_module_developer_guide/
         - text: DAQ module testing guide
-          url: DAQ_module_testing_guide/
-- text: About
-  subitems:
-    - text: CHANGELOG
-      url: CHANGELOG/
-    - text: Contributing
-      url: CONTRIBUTING/
-    - text: License
+- text: License
+# Jekyll seems to have the /license page occupied by default
+  url: "c2mon-license"
