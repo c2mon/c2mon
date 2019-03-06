@@ -32,6 +32,12 @@ plugins:
   - jekyll-seo-tag
   - github-pages
 
+defaults:
+  - scope:
+      path: "assets/assets/imgoverview"
+    values:
+      image: true
+
 # Exclude from processing.
 # The following items will not be processed, by default. Create a custom list
 # to override the default setting.

@@ -28,4 +28,4 @@ It is possible to define custom Alarm condition types through the configuration,
 
 The diagram below shows an example how Alarm condition can be assigned to results of rules or tags.
 
-![alarm-evaluation-example](/img/overview/alarm-evaluation-example.png)
+![alarm-evaluation-example](/assets/img/overview/alarm-evaluation-example.png)

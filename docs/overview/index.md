@@ -50,7 +50,7 @@ C2MON can be used:
 
 The C2MON platform uses a 3-tier architecture, as displayed in the diagram below.
 
-![c2mon-layer-overview](/img/overview/c2mon-layer-overview.png)
+![c2mon-layer-overview](/assets/img/overview/c2mon-layer-overview.png)
 
 **Data Acquisition (DAQ) Layer**
 

@@ -23,7 +23,7 @@ The Class/Device/Property is conceptually simple to understand:
 
 The following diagram shows a Device Class with three concrete Devices. Note that the Device does not have to provide instances for all properties.
 
-![Screenshot](/img/overview/class-device-property.png)
+![Screenshot](/assets/img/overview/class-device-property.png)
 
 
 ## Constraints
