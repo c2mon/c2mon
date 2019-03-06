@@ -1,31 +1,29 @@
+# If url is skipped, the text will be lowercased and
+# used in the link. " " and "/" are replaced with " "
+# To maintain the base (parent) URL, just use url: ""
 - text: Home
-  url: /index
+  url: ""
 - text: Getting Started
-  url: /getting-started
 - text: Overview
-  url: /overview/
   subitems:
     - text: Introduction to C2MON
+      url: ""
     - text: Process/Equipment
-      url: process-equipment
     - text: Tags
     - text: Supervision
     - text: Alarms
     - text: Class/Device/Property
 - text: User Guide
-  url: /user-guide/
   subitems:
     - text: Client API
-      url: client-api
       subitems:
         - text: Data Subscription
           url: ""
         - text: Configuration API
-          url: configuration/
+          url: configuration
         - text: Accessing Historical Data
-          url: history/
+          url: history
     - text: Server
-      url: server/
       subitems:
         - text: Running the server
           url: ""
@@ -33,7 +31,6 @@
         - text: Rule Engine
         - text: Database
     - text: DAQ API
-      url: daq-api/
       subitems:
         - text: General Overview
           url: ""
@@ -42,7 +39,6 @@
         - text: DAQ module testing guide
           url: DAQ_module_testing_guide/
 - text: About
-  url: /about/
   subitems:
     - text: CHANGELOG
       url: CHANGELOG/
