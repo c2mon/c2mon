@@ -2,12 +2,6 @@
   url: /
 - text: Getting Started
   url: /getting-started/
-  subitems:
-    - text: First menu (sub)
-      url: /first-menu/first-menu-sub/
-      subitems:
-        - text: First menu (sub-sub)
-          url: /first-menu/first-menu-sub/first-menu-sub-sub/
 - text: Overview
   url: /overview/
   subitems:
