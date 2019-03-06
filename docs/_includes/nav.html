@@ -1,9 +1,14 @@
 {% assign navurl = page.url | remove: 'index.html' %}
 <ul>
 {% for item in include.nav %}
+    {% if item.url %}
+      {% assign fullUrl = item.url | prepend:include.base %}
+    {% else %}
+      {% assign fullUrl = item.text | replace: "/" " ", "-" | downcase | prepend:include.base %}
+    {% endif %}
     <li>
-        <a href="{{ item.url }}">
-            {% if item.url == navurl %}
+        <a href="{{ fullUrl }}">
+            {% if navurl contains fullUrl%}
                 <b>{{ item.text }}</b>
             {% else %}
                 {{ item.text }}
@@ -11,7 +16,8 @@
         </a>
     </li>
     {% if item.subitems and navurl contains item.url %}
-        {% include nav.html nav=item.subitems %}
+    <!-- Allows for correct subitem urls -->
+        {% include nav.html nav=item.subitems base=fullUrl %}
     {% endif %}
 {% endfor %}
 </ul>

@@ -1,59 +1,51 @@
 - text: Home
-  url: /
+  url: /index
 - text: Getting Started
-  url: /getting-started/
+  url: /getting-started
 - text: Overview
   url: /overview/
   subitems:
     - text: Introduction to C2MON
     - text: Process/Equipment
-      url: /overview/process-equipment/
+      url: process-equipment
     - text: Tags
-      url: /overview/tags/
     - text: Supervision
-      url: /overview/supervision/
     - text: Alarms
-      url: /overview/alarms/
     - text: Class/Device/Property
-      url: /overview/class-device-property/
 - text: User Guide
   url: /user-guide/
   subitems:
     - text: Client API
-      url: /user-guide/client-api/
+      url: client-api
       subitems:
         - text: Data Subscription
-          url: /user-guide/client-api/
+          url: ""
         - text: Configuration API
-          url: /user-guide/client-api/configuration/
+          url: configuration/
         - text: Accessing Historical Data
-          url: /user-guide/client-api/history/
+          url: history/
     - text: Server
-      url: /user-guide/server/
+      url: server/
       subitems:
         - text: Running the server
-          url: /user-guide/server/index/
+          url: ""
         - text: Elasticsearch
-          url: /user-guide/server/elasticsearch/
         - text: Rule Engine
-          url: /user-guide/server/rule-engine/
         - text: Database
-          url: /user-guide/server/database/
     - text: DAQ API
-      url: /user-guide/daq-api/
+      url: daq-api/
       subitems:
         - text: General Overview
-          url: /user-guide/daq-api/index.md/
+          url: ""
         - text: DAQ module developer guide
-          url: /user-guide/daq-api/DAQ_module_developer_guide/
+          url: DAQ_module_developer_guide/
         - text: DAQ module testing guide
-          url: /user-guide/daq-api/DAQ_module_testing_guide/
+          url: DAQ_module_testing_guide/
 - text: About
   url: /about/
   subitems:
     - text: CHANGELOG
-      url: /about/CHANGELOG/
+      url: CHANGELOG/
     - text: Contributing
-      url: /about/CONTRIBUTING/
+      url: CONTRIBUTING/
     - text: License
-      url: /about/license/
