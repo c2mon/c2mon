@@ -20,32 +20,6 @@ The modular architecture builds on a core system that aims to be reusable for mu
 C2MON comes with a modern looking web interface that provides many core functionalities for data browsing, administration and analysis.
 
 
-
-## Use Cases
-
-Since C2MON is essentially a heterogeneous data acquisition framework with configuration, persistence, historical browsing, control and alarm functionalities, it can be suitable for building many different types of system.
-
-For example, it is used internally at CERN as an industrial SCADA system; as a network monitoring system; as a central alarm aggregation service; and as a general-purpose data proxy.
-
-Reuse for instance C2MON within your project as open SCADA middleware whilst focusing on client application development.
-Some more examples are listed below.
-
-C2MON can be used:
-
-* To acquire and store data from different type of systems,
-* To build up a simple or highly distributed or cloud based monitoring and control solution,
-* To realise high-availability solutions with on-line reconfiguration,
-* To share data from hundred of thousands or even millions of data sensors with multiple types of applications,
-* To cluster data acquisition with event notifications and to execute background tasks (e.g. rule or alarm evaluations),
-* To centrally manage the subscription configuration from different type of systems,
-* To define structured objects (Devices) on top of your data acquisition that can be re-used on the client tier,
-* As data analysis framework,
-* As simple data proxy,
-* As filtering system to reduce for instance the noise of analogue sensors,
-* As data recorder,
-* As data history player for client applications to replay for instance highly complex synoptic dashboards.
-
-
 ## Architectural Overview
 
 The C2MON platform uses a 3-tier architecture, as displayed in the diagram below.
@@ -65,7 +39,7 @@ The technology stack is based on Java Spring container and is designed to run in
 
 **Client Layer**
 
-Communication with the client layer is done via a provided C2MON Client API, which is documented here: [Client API](user-guide/client-api).
+Communication with the client layer is done via a provided C2MON Client API,  documented here: [Client API](doc/user-guide/client-api).
 
 ## Core Concepts
 

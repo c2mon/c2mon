@@ -3,18 +3,14 @@
 # used in the link. " " and "/" are replaced with " "
 # To maintain the base (parent) URL, just use url: ""
 - text: Home
-  url: "index"
+  url: "index/"
 - text: Features
 - text: Use Cases
 - text: Docs
   subitems:
-  - text: Home
-    url: ""
   - text: Getting Started
   - text: Overview
     subitems:
-      - text: Introduction to C2MON
-        url: ""
       - text: Process/Equipment
       - text: Tags
       - text: Supervision
@@ -25,20 +21,15 @@
       - text: Client API
         subitems:
           - text: Data Subscription
-            url: ""
           - text: Configuration API
           - text: Accessing Historical Data
       - text: Server
         subitems:
-          - text: Running the server
-            url: ""
           - text: Elasticsearch
           - text: Rule Engine
           - text: Database
       - text: DAQ API
         subitems:
-          - text: General Overview
-            url: ""
           - text: DAQ module developer guide
           - text: DAQ module testing guide
   - text: License
