@@ -6,6 +6,9 @@ The CERN Control and Monitoring Platform (C2MON) is essentially a heterogeneous 
 
 It comes with a simple and intuitive data subscription API with integrated history browsing capabilities that can be used to form the basis for industrial dashboards and other graphical monitoring applications. Powerful data filtering and configuration mechanisms help fine tune data flow and prevent data burst situations.
 
+{% include video.html url="hxo8K0lbqos" %}
+
+---
 
 ## Features
 
@@ -21,12 +24,12 @@ It comes with a simple and intuitive data subscription API with integrated histo
 * History browsing capabilities
 * Built-in support for Elasticsearch
 
+---
+
 ## Examples
 
 One platform for multiple monitoring scenarios
 
 Two major systems at CERN are based on C2MON and contributing features to the platform. Come and join our community and see how C2MON will meet also your monitoring requirements.
 
-<figure class="video_container">
-  <iframe src="https://www.youtube.com/embed/OKisSUCCWLQ" alt="Technical Infrastructure Monitoring" frameborder="0" allowfullscreen="true"> </iframe>
-</figure>
+{% include video.html url="OKisSUCCWLQ" %}
