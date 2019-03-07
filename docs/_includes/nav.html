@@ -1,5 +1,4 @@
 {% assign navurl = site.url | append: site.baseurl | append: page.url | remove: '.html' %}
-Nav {{ navurl }}
 <ul>
 {% for item in include.nav %}
     {% if item.url %}
@@ -20,7 +19,6 @@ Nav {{ navurl }}
             {% endif %}
         </a>
     </li>
-    Full {{ fullUrl }}
     {% if item.subitems and navurl contains fullUrl %}
       <!-- Allows for skipping the "/" in menu.yml entries -->
         {% include nav.html nav=item.subitems base=fullUrl %}
