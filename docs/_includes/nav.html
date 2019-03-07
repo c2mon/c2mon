@@ -4,13 +4,10 @@
     {% if item.url %}
       {% assign fullUrl = item.url %}
     {% else %}
-      {% assign fullUrl = item.text | replace:"/","-" | replace:" ","-"
-        | downcase | append:"/" %}
+      {% assign fullUrl = item.text %}
     {% endif %}
-    {% assign fullUrl = fullUrl | prepend:include.base %}
+    {% assign fullUrl = fullUrl | slugify | prepend:include.base | absolute_url %}
     <li>
-      <!-- Leading slash so our links are not relative to
-      currently navigated page (baaaad!) -->
         <a href="{{ fullUrl }}">
             {% if navurl contains fullUrl %}
                 <b>{{ item.text }}</b>
@@ -20,7 +17,8 @@
         </a>
     </li>
     {% if item.subitems and navurl contains fullUrl %}
-      <!-- Allows for skipping the "/" in menu.yml entries -->
+        <!-- Allows for skipping the "/" in menu.yml entries -->
+        {% assign fullUrl = fullUrl | append:"/" %}
         {% include nav.html nav=item.subitems base=fullUrl %}
     {% endif %}
 {% endfor %}
