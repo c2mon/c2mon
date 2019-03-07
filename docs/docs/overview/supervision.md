@@ -36,7 +36,7 @@ The StatusTag represents the overall health of the supervised entity, and is der
 
 The following diagram shows how the AliveTag and CommFaultTag influence the StatusTag:
 
-![supervision-tags](/assets/img/overview/supervision-tags.png)
+![supervision-tags]({{site.baseurl }}/assets/img/overview/supervision-tags.png)
 
 ## Supervisable Entities
 
@@ -50,7 +50,7 @@ As you can see, the AliveTag is checked periodically for expiration.
 If it has expired, it triggers a change in the StatusTag and the CommFaultTag.
 If it is received normally, it also triggers a reset of the StatusTag and CommFaultTag back to normal.
 
-![Screenshot](/assets/img/overview/alivetag-flow.png)
+![Screenshot]({{site.baseurl }}/assets/img/overview/alivetag-flow.png)
 
 
 ### Supervision Flow: CommFaultTags
@@ -58,4 +58,4 @@ If it is received normally, it also triggers a reset of the StatusTag and CommFa
 The following diagram shows how the supervision flow for a CommFaultTag works.
 When a CommFaultTag is received, its value is checked. If the value is false (which indicates a problem) then the StatusTag is changed to DOWN and the AliveTag is invalidated. If the value is true (which indicates no problem) then the StatusTag is changed to RUNNING and the AliveTag becomes valid.
 
-![Screenshot](/assets/img/overview/commfaulttag-flow.png)
+![Screenshot]({{site.baseurl }}/assets/img/overview/commfaulttag-flow.png)

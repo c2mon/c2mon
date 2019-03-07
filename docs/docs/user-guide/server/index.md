@@ -16,7 +16,7 @@ All you need is at least **Java 1.8** installed on your machine.
 
 Here, an example how the _run configuration_ looks in Eclipse:
 
-![eclipse-server-config](/assets/img/user-guide/server/eclipse-server-config.png)
+![eclipse-server-config]({{site.baseurl }}/assets/img/user-guide/server/eclipse-server-config.png)
 
 ### Changing default configuration
 

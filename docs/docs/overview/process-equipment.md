@@ -17,7 +17,7 @@ The Process/Equipment structure is conceptually simple:
 
 The following diagram shows an abstract view of the concept:
 
-![process-equipment](/assets/img/overview/process-equipment.png)
+![process-equipment]({{site.baseurl }}/assets/img/overview/process-equipment.png)
 
 These three structures provide the flexibility within C2MON to model and monitor a diverse range of data acquisition needs. The following sections describe them in more detail.
 
@@ -49,6 +49,6 @@ The connection between the Sub-Equipment and its parent Equipment is also monito
 The data structure of a DAQ configuration is strictly hierarchical.
 The smallest configurable unit is a tag, which is either attached to an Equipment or Sub-Equipment.
 
-![process-data-relation](/assets/img/overview/process-data-relation.png)
+![process-data-relation]({{site.baseurl }}/assets/img/overview/process-data-relation.png)
 
 The tags in dark blue are mandatory tags for the Supervision and have to be generated together with every new Process, Equipment or Sub-Equipment (see also Core Concept: Supervision).
