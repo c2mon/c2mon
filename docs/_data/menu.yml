@@ -5,7 +5,6 @@
 - text: Home
   url: "index"
 - text: Features
-  url: "#features"
 - text: Use Cases
 - text: Docs
   subitems:
