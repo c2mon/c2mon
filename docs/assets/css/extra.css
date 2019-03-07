@@ -22,6 +22,10 @@ a.button {
     text-decoration: none;
 }
 
+ul {
+  margin-bottom: 0;
+}
+
 /* Reduce image size */
 img[alt=c2mon-layer-overview] { width: 400px; }
 img[alt=process-equipment] { width: 350px; }
