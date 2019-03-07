@@ -6,8 +6,7 @@
   url: ""
 - text: Features
   url: "#features"
-- text: Examples
-  url: ""
+- text: Use Cases
 - text: Docs
   subitems:
   - text: Home
