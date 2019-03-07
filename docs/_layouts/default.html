@@ -40,7 +40,8 @@
       </header>
 
       <section>
-      {% include nav.html nav=site.data.menu base=site.baseurl %}
+      {% assign baseurl = site.url | append: site.baseurl | append: "/" %}
+      {% include nav.html nav=site.data.menu base=baseurl %}
       </section>
 
       <section>

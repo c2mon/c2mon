@@ -1,26 +1,28 @@
-{% assign navurl = page.url | remove: 'index.html' %}
+{% assign navurl = site.url | append: site.baseurl | append: page.url | remove: '.html' %}
+Nav {{ navurl }}
 <ul>
 {% for item in include.nav %}
     {% if item.url %}
-      {% assign fullUrl = item.url | prepend:include.base %}
+      {% assign fullUrl = item.url %}
     {% else %}
       {% assign fullUrl = item.text | replace:"/","-" | replace:" ","-"
-        | downcase | prepend:include.base %}
+        | downcase | append:"/" %}
     {% endif %}
+    {% assign fullUrl = fullUrl | prepend:include.base %}
     <li>
       <!-- Leading slash so our links are not relative to
       currently navigated page (baaaad!) -->
-        <a href="/{{ fullUrl }}">
-            {% if navurl contains fullUrl%}
+        <a href="{{ fullUrl }}">
+            {% if navurl contains fullUrl %}
                 <b>{{ item.text }}</b>
             {% else %}
                 {{ item.text }}
             {% endif %}
         </a>
     </li>
+    Full {{ fullUrl }}
     {% if item.subitems and navurl contains fullUrl %}
       <!-- Allows for skipping the "/" in menu.yml entries -->
-        {% assign fullUrl = fullUrl | append:"/" %}
         {% include nav.html nav=item.subitems base=fullUrl %}
     {% endif %}
 {% endfor %}
