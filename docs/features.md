@@ -1,4 +1,8 @@
-# Features
+---
+layout:   page
+title:    Features
+summary:  Some of C2MON's highlights
+---
 
 * Horizontally scalable at all layers
 * Load-balanced server clustering capability
@@ -10,4 +14,4 @@
 * Powerful filtering resulting to meaningful alerts
 * Rule based alerts
 * History browsing capabilities
-* Built-in support for Elasticsearch
+* Built-in support for [Elasticsearch](https://www.elastic.co/)

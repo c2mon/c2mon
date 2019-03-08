@@ -1,9 +1,15 @@
-# One platform for multiple monitoring scenarios
+---
+layout:   page
+title:    One platform for multiple monitoring scenarios
+summary:  Examples of C2MON in action
+---
 
 Two major systems at CERN are based on C2MON and contributing features to the platform. Come and join our community and see how C2MON will meet also your monitoring requirements.
 
 {% include video.html url="OKisSUCCWLQ" %}
 > Video demonstrating TIM in action!
+
+---
 
 ## TIM - Technical Infrastructure Monitoring
 
@@ -14,14 +20,17 @@ TIM provides different types of Java and Web applications allowing operators for
 The main application is called "TIM Viewer", a generic Dashboard viewer for animating data coming from C2MON. Currently, the TIM Viewer hosts +200 Dashboards used by different user groups at CERN.
 
 ![Tim Viewer: a client application build on top of C2MON](assets/img/about/tim_viewer_1.png)
+
 ![Water monitoring station screen as shown on the Tim Viewer](assets/img/about/tim_viewer_2.png)
 > Views showing the access status to the LHC tunnel and a CERN water Monitoring station ( SPS Accelerator ).
 
-TIM in numbers:
+__TIM in numbers:__
 
 * ~93'000 data tags, ~40'000 alarms, ~ 1'000 rules
 * Up to 400 million raw data values per day
 * After filtering ~ 2.2 million values are treated and stored by the C2MON server
+
+---
 
 ## DIAMON - DIAgnostic and MONitoring
 
@@ -32,6 +41,8 @@ Main Objectives:
 
 * Provide the [CERN Control Centre (CCC)](https://www.facebook.com/pages/CERN-Control-Centre-CCC/172354182781843) operators with precise and easy to use tools to monitor the behaviour of the BE Controls Infrastructure.
 * Allow for an easy access to diagnostic tools providing more details and help to solve an eventual problem.
+
+---
 
 ## Your use case?
 
