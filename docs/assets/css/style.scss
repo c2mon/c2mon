@@ -1,13 +1,8 @@
 ---
 ---
-
 @import 'jekyll-theme-geneva-noir';
 .navbar {
   background: #4D94CE;
-}
-
-h1, h2 {
-  color: #317eac;
 }
 
 .navbar-brand {
@@ -22,11 +17,9 @@ a.button {
     text-decoration: none;
 }
 
-ul {
-  margin-bottom: 0;
-}
-
 /* Reduce image size */
+img[alt="Tim Viewer: a client application build on top of C2MON"] { max-width: 50%; }
+img[alt="Water monitoring station screen as shown on the Tim Viewer"] { max-width: 50%; }
 img[alt=c2mon-layer-overview] { width: 400px; }
 img[alt=process-equipment] { width: 350px; }
 img[alt=process-data-relation] { width: 700px; }
