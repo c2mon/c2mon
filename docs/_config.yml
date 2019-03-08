@@ -27,7 +27,7 @@ docFolder: "/tree/master/docs/src"
 
 # Build settings
 markdown: kramdown
-theme: jekyll-theme-minimal
+remote_theme: alkoclick/carte-noire
 plugins:
   - jekyll-feed
   - jekyll-relative-links
