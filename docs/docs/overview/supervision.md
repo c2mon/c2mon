@@ -20,9 +20,8 @@ If the AliveTag is not received regularly (within a configurable time interval) 
 The CommFaultTag can be sent at any time, and indicates that there is some kind of communication problem with the entity.
 The CommFaultTag has a Boolean value; true indicates that there is no problem, false indicates a problem.
 
-> **Please note!**
-
->The false alarm behavior concept comes from controlling logic, were an alarm is raised if the current (1) gets interrupted (0).
+> **Please note!** <br>
+The false alarm behavior concept comes from controlling logic, were an alarm is raised if the current (1) gets interrupted (0).
 
 # The StatusTag
 

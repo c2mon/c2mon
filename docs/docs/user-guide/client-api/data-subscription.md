@@ -4,12 +4,10 @@ title:    Data subscription
 Summary:  Learn how to subscribe to your data with the C2MON Client API.
 ---
 
-> **Please note!**
-
-> A well-chosen naming convention will enable you to make searching for tags easier in the future.
-> We suggest using a _folder-like_ structure with `/` as separator.
-
-> Example: `serviceA/computer/mypc1/memory`
+> **Please note!** <br>
+A well-chosen naming convention will enable you to make searching for tags easier in the future.
+We suggest using a _folder-like_ structure with `/` as separator.
+Example: `serviceA/computer/mypc1/memory`
 
 
 # Searching for tags by name

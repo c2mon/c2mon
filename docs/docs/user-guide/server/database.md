@@ -6,11 +6,10 @@ Summary:  How to configure an external relational database for C2MON.
 
 By default C2MON start with an embedded HSQL database for prototyping and development purposes.
 
-> **Please note!**
-
->    The HSQL in-memory database is by default not persisted on disk.
->    Therefore, all configuration- and history data are lost when C2MON is stopped.
->    How-to persist the HSQL storage is explained here [below](#setup-c2mon-with-persistent-hsql).
+> **Please note!** <br>
+The HSQL in-memory database is by default not persisted on disk.
+Therefore, all configuration- and history data are lost when C2MON is stopped.
+How-to persist the HSQL storage is explained here [below](#setup-c2mon-with-persistent-hsql).
 
 # Setup the Database schema
 
@@ -104,10 +103,9 @@ In general, configuration changes should always be done through the server Confi
 
 However, for testing purposes it might be interesting to directly manipulate the tables.
 
-> **Please note!**
-
->The listed tables are only read at startup in case the In-Memory cache has not yet been initialised.
->Apart from that, the server does only depend on the database access for making data backups.
+> **Please note!** <br>
+The listed tables are only read at startup in case the In-Memory cache has not yet been initialised.
+Apart from that, the server does only depend on the database access for making data backups.
 
 
 

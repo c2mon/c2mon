@@ -49,7 +49,6 @@ To get started, take a look at the concept of [process/equipment](process-equipm
 
 More advanced topics include [alarms](alarms) and [class/device/property](class-device-property).
 
-> **Please note!**
-
->These sections describe C2MON data configuration only from a conceptual point of view.
->To learn how to actually configure monitoring data, please please have a look at the User Guide section.
+> **Please note!** <br>
+These sections describe C2MON data configuration only from a conceptual point of view.
+To learn how to actually configure monitoring data, please please have a look at the User Guide section.

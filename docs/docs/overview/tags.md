@@ -35,10 +35,9 @@ C2MON leaves it completely free how that hardware address is formatted.
 More information about that topic is provided in [Creating a new DAQ module from scratch](/user-guide/daq-api/DAQ_module_developer_guide).
 
 
-> **Please note!**
-
->    Many functionalities in the C2MON server are only available for data points with primitive type values, such as Floats or Strings.
-    However, the core C2MON could handle more complex data type without too many changes. DataTag values are stored as simple Java Objects.
+> **Please note!** <br>
+Many functionalities in the C2MON server are only available for data points with primitive type values, such as Floats or Strings.
+However, the core C2MON could handle more complex data type without too many changes. DataTag values are stored as simple Java Objects.
 
 
 # The RuleTag
@@ -48,9 +47,8 @@ Its value is specified by a Rule expression given in a specific C2MON rule gramm
 This expression specifies how the Rule value is derived from the value of the Tags that feed into it.
 Changes to these Tags will result in an update of the Rule, based on the Rule expression.
 
-> **Please note!**
-
->For more information about how to create rule expressions for RuleTags, please read the chapter about the [Rule Engine](/user-guide/server/rule-engine).
+> **Please note!** <br>
+For more information about how to create rule expressions for RuleTags, please read the chapter about the [Rule Engine](/user-guide/server/rule-engine).
 
 
 # The ControlTag
@@ -91,10 +89,9 @@ C2MON replaces this by the Equipment and Sub-Equipment heartbeat (see also [Supe
 A Tag update notification can hence be triggered by a change of the quality state.
 It is therefore absolutely necessary to always check the validity of the received Tag update.
 
-> **Please note!**
-
->A tag can accumulate multiple invalidation state.
->A subscribed client will be notified at every change, independent if an invalidation quality state is added or removed.
+> **Please note!** <br>
+A tag can accumulate multiple invalidation state.
+A subscribed client will be notified at every change, independent if an invalidation quality state is added or removed.
 
 The following table lists all quality flags that a Tag can receive.
 

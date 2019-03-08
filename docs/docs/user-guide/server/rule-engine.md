@@ -53,9 +53,8 @@ The conditional operators allow you to link several BOOLEAN results to one joine
 |OR _or_ &#124; | OR Condition |
 
 
-> **Please note!**
-
-> It is also allowed to use parenthesis to clearly separate conditions or calculations
+> **Please note!** <br>
+It is also allowed to use parenthesis to clearly separate conditions or calculations
 
 # The Rule Syntax
 

@@ -31,9 +31,8 @@ We recommend to always use the latest stable version listed in the [CHANGELOG](/
 
 Extract the tarball on your local file system and change into the `c2mon-server-1.8.xx/bin/` directory.
 
-> **Please note!**
-
->The scripts provided with the tarball are Linux bash scripts. We recommend this environment also for production usage. Windows users should use [Docker](#using-the-docker-image) instead.
+> **Please note!** <br>
+The scripts provided with the tarball are Linux bash scripts. We recommend this environment also for production usage. Windows users should use [Docker](#using-the-docker-image) instead.
 
 To start the server execute the following script:
 
