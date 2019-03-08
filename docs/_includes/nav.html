@@ -1,5 +1,5 @@
 {% assign navurl = site.url | append: site.baseurl | append: page.url | remove: '.html' %}
-<ul>
+<ul class="pages">
 {% for item in include.nav %}
     {% if item.url %}
       {% assign fullUrl = item.url %}
