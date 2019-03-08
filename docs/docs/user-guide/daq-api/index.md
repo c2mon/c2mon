@@ -1,14 +1,14 @@
-# DAQ API - General Overview
-
-Introduction to C2MON Data Acquisition (DAQ) API, used by all existing DAQ modules for the server communication.
-
+---
+layout:   post
+title:    DAQ API - General Overview
+Summary:  Introduction to C2MON Data Acquisition (DAQ) API, used by all existing DAQ modules for the server communication.
 ---
 
 C2MON was initially developed at CERN to acquire data from physical infrastructural equipment, such as PLCs or OPC servers.
 As such, the word "Equipment" occurs frequently within the API.
 However, this does not mean that you cannot write a DAQ for retrieving data from other sources, such as host monitoring processes, middleware protocols, or any other type of software services or physical hardware.
 
-## Anatomy of a C2MON DAQ module
+# Anatomy of a C2MON DAQ module
 
 A C2MON DAQ module is a Java program responsible for connecting to and reading data from specific sources (software, hardware) and publishing data to the
 C2MON server tier. It is also optionally in charge of data filtering and executing commands on sources.
@@ -31,7 +31,7 @@ For this reason, the design choice was made to pre-define the set of metrics tha
 configuration in the C2MON server itself. The DAQ API was designed to be dynamic in the fact that it would retrieve its pre-defined configuration at
 startup and use it to read from the source. It would also be optionally capable of re-configuring its set of metrics at runtime.
 
-## Data validation
+# Data validation
 
 Before the data is send to the server the DAQ core is applying several data validation checks, which can affect the Tag quality. The following checks are applied:
 
@@ -43,7 +43,7 @@ Before the data is send to the server the DAQ core is applying several data vali
 | Data freshness (optional)        | The time in which a new value is expected. If this time expire the the quality of the tag changes to STALE. This is configurable on the `DataTagAddress` |
 
 
-## Data filtering
+# Data filtering
 
 Guaranteeing the availability of a monitoring system and its applications involves protecting it from overload during data avalanches. C2MON archives this through data filtering on the DAQ level without loosing any important events.
 
@@ -59,16 +59,16 @@ Moreover, the following static filters can be configured on individual tags. Thi
 However, when setting the filter parameters, a balance must be achieved between noise rejection vs. speed of response.
 
 
-### What happens to the filtered data?
+## What happens to the filtered data?
 
 The filtered data are kept in a rotating log file for debugging purposes. In addition, it is also possible to define a filter message queue to which the filtered values are sent. This can be useful for instance to generate statistics on the incoming raw data stream or to keep track of the full data history.
 
 
-## Existing DAQ modules
+# Existing DAQ modules
 A few DAQ modules are provided on [GitHub](https://github.com/c2mon?utf8=%E2%9C%93&q=c2mon-daq), which are actively maintained by the CERN C2MON team. We plan to add some more in the near future and hope the community will do the same!
 
 
-### DAQ module configuration
+## DAQ module configuration
 
 To configure a new a DAQ Processes or just Tags on a given DAQ module make use of the [C2MON Configuration API](/user-guide/client-api/configuration).
 

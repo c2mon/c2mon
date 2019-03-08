@@ -1,5 +1,5 @@
 ---
-layout:   page
+layout:   post
 title:    One platform for multiple monitoring scenarios
 summary:  Examples of C2MON in action
 ---
@@ -21,8 +21,9 @@ The main application is called "TIM Viewer", a generic Dashboard viewer for anim
 
 ![Tim Viewer: a client application build on top of C2MON](assets/img/about/tim_viewer_1.png)
 
-![Water monitoring station screen as shown on the Tim Viewer](assets/img/about/tim_viewer_2.png)
 > Views showing the access status to the LHC tunnel and a CERN water Monitoring station ( SPS Accelerator ).
+
+![Water monitoring station screen as shown on the Tim Viewer](assets/img/about/tim_viewer_2.png)
 
 __TIM in numbers:__
 

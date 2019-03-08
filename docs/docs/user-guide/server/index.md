@@ -1,7 +1,7 @@
-# Running C2MON server
-
-How to start and configure the C2MON server.
-
+---
+layout:   post
+title:    Running the C2MON server
+Summary:  How to configure and start the C2MON server.
 ---
 
 How to deploy and start C2MON server with Docker or the distribution tarball is described in the [Getting Started](/getting-started) Guide
@@ -18,7 +18,7 @@ Here, an example how the _run configuration_ looks in Eclipse:
 
 ![eclipse-server-config]({{site.baseurl }}/assets/img/user-guide/server/eclipse-server-config.png)
 
-### Changing default configuration
+## Changing default configuration
 
 C2MON comes with reasonable defaults for most settings.
 Before you get out to tweak and tune the configuration, make sure you understand what are you trying to accomplish and the consequences.

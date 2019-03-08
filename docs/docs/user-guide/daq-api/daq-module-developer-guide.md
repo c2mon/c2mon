@@ -1,19 +1,19 @@
-# Creating a new DAQ module from scratch
-
-A step-by-step guide to integrate a new communication protocol.
-
+---
+layout:   post
+title:    Creating a new DAQ module from scratch
+Summary:  A step-by-step guide to integrate a new communication protocol.
 ---
 
 This guide assumes that you are familiar with the [core concepts](/overview) of C2MON. At the end of this guide you should be able to write your
 own data acquisition module using the C2MON DAQ APIs.
 
-## Including the API
+# Including the API
 
 To use the API, you need to add a dependency on `c2mon-daq-core`.
 
 Remember to replace "__insert_version_here__" with a real version number, such as "1.8.30"
 
-### Maven configuration
+## Maven configuration
 If you make use of Maven include the following dependency in you DAQ project:
 
 ```xml
@@ -36,7 +36,7 @@ The C2MON artifacts are hosted on the CERN Nexus repository:
 </repositories>
 ```
 
-### Gradle configuration
+## Gradle configuration
 
 ```json
 compile "cern.c2mon.daq:c2mon-daq-core:__insert_version_here__"
@@ -52,7 +52,7 @@ repositories {
 
 ```
 
-## Writing a new equipment message handler
+# Writing a new equipment message handler
 
 The `EquipmentMessageHandler` is an abstract class that specifies the methods you must implement to provide basic DAQ
 functionality, and provides support methods for handing you your pre-defined configuration.
@@ -111,7 +111,7 @@ public class DemoMessageHandler extends EquipmentMessageHandler {
 
 
 
-### Implementing `connectToDataSource()`
+## Implementing `connectToDataSource()`
 
 The `connectToDataSource()` method is called for you when the DAQ process wants your equipment to connect to the underlying data source and get ready to start
 publishing data.
@@ -132,17 +132,17 @@ This is of course a lot for a single method. Best practice is therefore to deleg
     `connectToDataSource()`` is only called once per equipment lifecycle. This means at process startup, or after an equipment reconfiguration.
 
 
-### Inspecting the pre-defined configuration
+## Inspecting the pre-defined configuration
 
 The first thing your handler should do is acquire and inspect the pre-defined configuration and use it to connect to the underlying data source and bind
 individual items within the data source as tags.
 
-#### Using the equipment address
+## Using the equipment address
 
 You will have pre-defined the address of the equipment at configuration time. The address is an arbitrary string that contains some data that your handler is
 capable of understanding and using to connect to the source. For example, it could contain the address of a remote OPC server.
 
-#### Using the tag address parameters
+## Using the tag address parameters
 
 You will have already pre-defined the address parameters for each tag at configuration time. The tag address is simply a map of strings. Again, it is up to
 your handler to know what to do with these parameters in order to bind them to a specific input. For example, it could contain the name of an individual
@@ -174,18 +174,18 @@ public class DemoMessageHandler extends EquipmentMessageHandler {
 ```
 
 
-### Supervising equipment health
+## Supervising equipment health
 
 In order for C2MON to be able to monitor the quality of publications, handlers should provide regular updates about their health. This is done by using
 heartbeats and "communication fault" tags.
 
-#### Heartbeats
+## Heartbeats
 
 Heartbeats are usually sent at pre-defined intervals, defined in `IEquipmentConfiguration#getAliveTagInterval()`.
 
 To send a heartbeat, simply call `getEquipmentMessageSender().sendSupervisionAlive()`. Note that equipment heartbeats are optional.
 
-#### Communication faults
+## Communication faults
 
 Communication faults are sent whenever a handler detects a problem with the connection to the underlying data source, or when a connection problem resolves
 itself.
@@ -194,29 +194,29 @@ To indicate that the connection state is healthy, use `IEquipmentMessageSender#c
 `IEquipmentMessageSender#confirmEquipmentStateIncorrect(String)` where the parameter containts a description of the problem.
 
 
-## Running your DAQ module
+# Running your DAQ module
 
 Currently, `c2mon-daq-core` provides the `cern.c2mon.daq.DaqStartup` class which contains the `main` method that is responsible for connecting to the C2MON
 server and instantiating your `EquipmentMessageHandler` instances.
 
 
-## Executing commands (optional)
+# Executing commands (optional)
 
 If your source supports executing commands, you can implement an `ICommandRunner` and register it via `IEquipmentCommandHandler#setCommandRunner`.
 
-## Dynamic reconfiguration (optional)
+# Dynamic reconfiguration (optional)
 
-### Tags
+## Tags
 
 To support dynamic reconfiguration of tags, you can implement an `IDataTagChanger` and register it via `IEquipmentConfigurationHandler#setDataTagChanger`. When
 the configuration of the set of tags for this handler changes, the methods of your `IDataTagChanger` will be called and you will have to deal with it.
 
-### Commands
+## Commands
 
 To support dynamic reconfiguration of tags, you can implement an `ICommandTagChanger` and register it via
 `IEquipmentConfigurationHandler#setCommandTagChanger`.  When the configuration of the set of commands for this handler changes, the methods of your
 `ICommandTagChanger` will be called and you will have to deal with it.
 
-### Equipment
+## Equipment
 
 Implement and register an `IEquipmentConfigurationChanger` via `IEquipmentConfigurationHandler#setEquipmentConfigurationChanger`.

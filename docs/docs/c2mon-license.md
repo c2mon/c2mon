@@ -1,3 +1,10 @@
+---
+layout:   post
+title:    License
+Summary:  The license of the C2MON platform.
+---
+
+
 GNU Lesser General Public License
 =================================
 

@@ -1,7 +1,7 @@
-# Accessing historical data
-
-Lean how to access historical data through the Java API.
-
+---
+layout:   post
+title:    Accessing historical data
+Summary:  Lean how to access historical data through the Java API.
 ---
 
 Client-based access to historical data is made available through the `c2mon-client-ext-history` module. In addition to providing raw history, you can also
@@ -24,7 +24,7 @@ Or using Gradle:
 compile "cern.c2mon.client:c2mon-client-ext-history:__insert_version_here__"
 ```
 
-## Configuring the module
+# Configuring the module
 
 The history module requires a few extra properties in order to work. If you are running a local C2MON server, simply point the module to its database:
 

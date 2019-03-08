@@ -1,5 +1,5 @@
 ---
-layout:   page
+layout:   post
 title:    Contact
 summary:  How and where to reach the developers
 ---

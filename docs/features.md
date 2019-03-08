@@ -1,5 +1,5 @@
 ---
-layout:   page
+layout:   post
 title:    Features
 summary:  Some of C2MON's highlights
 ---

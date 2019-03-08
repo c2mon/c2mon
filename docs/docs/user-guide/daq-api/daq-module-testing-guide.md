@@ -1,7 +1,7 @@
-# Writing JUnit tests for DAQ modules
-
-Explains how to make use of the DAQ testing framework.
-
+---
+layout:   post
+title:    Writing JUnit tests for DAQ modules
+Summary:  Explains how to make use of the DAQ testing framework.
 ---
 
 Before starting reading this guide please make sure that you are at least familiar with the following guide:
@@ -10,7 +10,7 @@ Before starting reading this guide please make sure that you are at least famili
 
 At the end of this guide you should be able to write JUnit tests for your DAQs.
 
-## Introduction
+# Introduction
 
 When implementing a DAQ module it is a good practice to write JUnit tests in parallel to assure the code correctness of your new DAQ.
 This will also significantly speed up your development, since problems can be detected much earlier.
@@ -18,7 +18,7 @@ This will also significantly speed up your development, since problems can be de
 Most of the functionality of your DAQ can be well tested in total isolation from the C2MOM system, by using the _C2MON DAQ testing framework_.
 
 
-## DAQ testing framework dependency
+# DAQ testing framework dependency
 
 In order to use DAQ testing framework for your JUnit tests, you need to include this dependency in your project's `pom.xml` :
 
@@ -32,7 +32,7 @@ In order to use DAQ testing framework for your JUnit tests, you need to include 
 ```
 
 
-## Example test template
+# Example test template
 
 The code sample below presents an example skeleton test class of `DemoMessageHandler`.
 Please note the class needs to be annotated with the `@UseHandler` annotation, pointing to the class of the handler you want to test.
@@ -82,7 +82,7 @@ public class DemoMessageHandlerTest extends GenericMessageHandlerTest {
 
 
 
-## How does the annotation work?
+# How does the annotation work?
 
 Once you annotate your test class with `@UseHandler` annotation, pointing to the handler class you wish to test, an instance of a handler will be created for
 you automatically for every test declared in your test class.
@@ -131,13 +131,13 @@ src/test/cern/c2mon/daq/demo/conf/e_demohandler_test2.xml
 
 
 
-## Testing Use-Cases
+# Testing Use-Cases
 
 Below we present the most frequently used testing scenarios, which should give you an overall idea on how the testing framework can be used, and how you can
 build you own tests.
 
 
-### Assuring the handler sends CommfaultTag at start-up as expected
+## Assuring the handler sends CommfaultTag at start-up as expected
 
 Unless there are configuration problems, at start-up, your DAQ is expected to deliver a `CommfaultTag` value to the server, indicating if you are correctly
 connected to the monitored device.
@@ -208,7 +208,7 @@ public class DemoMessageHandlerTest extends GenericMessageHandlerTest {
 ```
 
 
-### Example Configuration:
+## Example Configuration:
 
 Below we listed the e_demohandler_test1.xml file as example:
 

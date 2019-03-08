@@ -1,7 +1,7 @@
-# Elasticsearch archiving
-
-Explains how the C2MON server is storing historical data into Elasticsearch.
-
+---
+layout:   post
+title:    Elasticsearch archiving
+Summary:  Explains how the C2MON server is storing historical data into Elasticsearch.
 ---
 
 C2MON comes integrated with [Elasticsearch](https://www.elastic.co/guide/index.html)
@@ -9,14 +9,14 @@ out-of-the-box for time series data storage. It uses a combination of the fast
 [TransportConnector](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-transport.html)
 and the bulk API to achieve highly performant indexing speeds.
 
-## Connecting to Elasticsearch
+# Connecting to Elasticsearch
 
 By default, an embedded Elasticsearch node is started within the JVM. To
 connect to an external cluster, set `c2mon.server.elasticsearch.embedded` to `false`
 and point `c2mon.server.elasticsearch.host` and `c2mon.server.elasticsearch.port`
 to the required values.
 
-## Indexing strategies
+# Indexing strategies
 
 Depending on the use case, C2MON can be tweaked to use different time series
 indexing strategies. The strategy can be set using the `c2mon.server.elasticsearch.indexType`
@@ -28,7 +28,7 @@ property.
 | Weekly  | `W` or `w`  | `yyyy-'W'ww` | `alarm_2016-'2'27`    |
 | Monthly | `M` or `m`  | `yyyy-MM`    | `supervision_2016-02` |
 
-## Mappings and types
+# Mappings and types
 
 Since C2MON tags can have arbitrary types multiple fields are used
 to store the value depending on its type.
@@ -50,13 +50,13 @@ and [SupervisionEvents](https://github.com/c2mon/c2mon/tree/master/c2mon-server/
 have simple mappings; see their sources for reference.
 
 
-## Metadata
+# Metadata
 
 The mappings allow arbitrary metadata fields to be added dynamically.
 
 All `String` metadata values are explicitly set to be `non_analyzed`. Other types
 are determined using the default Elasticsearch type analysis strategy.
 
-## Advanced customisation
+# Advanced customisation
 
 Other aspects of the Elasticsearch integration can be customised. See Elasticsearch section in the [c2mon-server.properties](https://github.com/c2mon/c2mon/blob/master/c2mon-server/distribution/tar/conf/c2mon-server.properties#L340) file for details.

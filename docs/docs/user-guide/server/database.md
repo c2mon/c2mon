@@ -1,7 +1,7 @@
-# Database
-
-How to configure an external relational database for C2MON.
-
+---
+layout:   post
+title:    Database
+Summary:  How to configure an external relational database for C2MON.
 ---
 
 By default C2MON start with an embedded HSQL database for prototyping and development purposes.
@@ -12,7 +12,7 @@ By default C2MON start with an embedded HSQL database for prototyping and develo
 >    Therefore, all configuration- and history data are lost when C2MON is stopped.
 >    How-to persist the HSQL storage is explained here [below](#setup-c2mon-with-persistent-hsql).
 
-## Setup the Database schema
+# Setup the Database schema
 
 Except for HSQL, C2MON **is not** automatically generating the database schema for the given account.
 This step is manual!
@@ -29,14 +29,14 @@ Currently, C2MON supports Oracle, MySQL and HSQL as relational database next to 
 It is possible to separate the cache backup tables from the history tables by using two database accounts.
 However, here we will focus on the simple approach with one account.
 
-### Running C2MON with other databases
+## Running C2MON with other databases
 
 C2MON is using [MyBATIS](http://www.mybatis.org/mybatis-3/) as persistence framework,
 which makes it relatively easy to support other databases.
 Due to our limited resources we focus for now on these three, but would be happy to
 add in a collaborative attempt more databases.
 
-## Setup C2MON with persistent HSQL
+# Setup C2MON with persistent HSQL
 To persist the HSQL data on hard disk the following property has to be set:
 
 **C2MON properties**
@@ -53,7 +53,7 @@ See also [Configuring the module](/user-guide/client-api/history/#configuring-th
     The open [Issue 158](https://gitlab.cern.ch/c2mon/c2mon/issues/158) addresses this problem.
 
 
-## Setup C2MON with Oracle
+# Setup C2MON with Oracle
 
 > **Oracle drivers cannot be distributed under an open-source license.**
 
@@ -62,7 +62,7 @@ Oracle drivers are typically available on the [Oracle Tech Network website](http
 
 
 
-### Configuring
+## Configuring
 
 To persist data in an Oracle instance (v11 or later) at least the following properties have to be set:
 
@@ -76,7 +76,7 @@ These settings can also be set as Java VM options with the ```-D``` parameter or
 
 
 
-## Setup C2MON with MySQL
+# Setup C2MON with MySQL
 
 To persist data in a MySQL instance (v 5.7 minimum) at least the following properties have to be set:
 
@@ -111,7 +111,7 @@ However, for testing purposes it might be interesting to directly manipulate the
 
 
 
-## The DATATAG table
+# The DATATAG table
 
 The DATATAG table is a non-normalised table in order to facilitate the write of search queries.
 The table contains all configured DataTags, ControlTags and RuleTags.
@@ -149,7 +149,7 @@ Only CommandTags are stored in a separate table.
 
 
 
-## The PROCESS table
+# The PROCESS table
 
 | Columns Name | Description | Type | Not NULL? |
 | ------------ | ----------- | ---- | --------- |
@@ -174,7 +174,7 @@ Only CommandTags are stored in a separate table.
 
 
 
-## The EQUIPMENT table
+# The EQUIPMENT table
 
 | Columns Name | Description | Type | Not NULL? |
 | ------------ | ----------- | ---- | --------- |
@@ -197,7 +197,7 @@ Only CommandTags are stored in a separate table.
 
 
 
-## The ALARM table
+# The ALARM table
 
 Please read also [Alarms Overview](/overview/alarms) for more information about for instance the triplet concept of Fault Family / Fault Member / Fault Code
 

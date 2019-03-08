@@ -1,7 +1,7 @@
-# Class/Device/Property
-
-This concept provides a different, more object-oriented way of structuring monitoring data coming from C2MON DAQs.
-
+---
+layout:   post
+title:    Class/Device/Property
+Summary:  This concept provides a different, more object-oriented way of structuring monitoring data coming from C2MON DAQs.
 ---
 
 The Process/Equipment structure is the original concept within C2MON, and has existed from the very beginning.
@@ -13,7 +13,7 @@ It is simply an abstraction layer provided by the server to client applications.
 Please contact for now [c2mon-support@cern.ch](mailto:c2mon-support@cern.ch) to learn how to configure it in C2MON, as the actual configuration is not yet described.
 
 
-## Class/Device/Property Structure
+# Class/Device/Property Structure
 
 The Class/Device/Property is conceptually simple to understand:
 
@@ -26,7 +26,7 @@ The following diagram shows a Device Class with three concrete Devices. Note tha
 ![Screenshot]({{site.baseurl }}/assets/img/overview/class-device-property.png)
 
 
-## Constraints
+# Constraints
 
 * A Device can only belong to a single Device Class (multiple inheritance not supported).
 * A Property belongs to only one Device.

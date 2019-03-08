@@ -1,7 +1,7 @@
-# Data subscription
-
-Learn how to subscribe to your data with the C2MON Client API.
-
+---
+layout:   post
+title:    Data subscription
+Summary:  Learn how to subscribe to your data with the C2MON Client API.
 ---
 
 > **Please note!**
@@ -12,7 +12,7 @@ Learn how to subscribe to your data with the C2MON Client API.
 > Example: `serviceA/computer/mypc1/memory`
 
 
-## Searching for tags by name
+# Searching for tags by name
 
 The `TagService` offers multiple possibilities to get data by name from the server. You can:
 
@@ -44,7 +44,7 @@ Collection<Tag> tags = tagService.findByName("host*:cpu.avg");
 
 
 
-## Subscribing to tag updates
+# Subscribing to tag updates
 
 A near real-time stream of tag updates can be acquired through the use of a `TagListener`.
 
@@ -81,7 +81,7 @@ public class TagUpdateListener implements TagListener {
 }
 ```
 
-## Subscription by tag ID
+# Subscription by tag ID
 
 In addition to its name, each tag has a unique ID. In certain cases you may prefer to use the ID directly instead of the name, in particular if
 you have already a listener subscribed to a given tag. In that case, the client does not have to contact the server as for a wildcard search and can

@@ -1,10 +1,10 @@
-# Tags
-
-An overview of the C2MON Tag concept.
-
+---
+layout:   post
+title:    Tags
+Summary:  An overview of the C2MON Tag concept.
 ---
 
-## Introduction
+# Introduction
 
 Almost all information in C2MON is stored and flows through the system in the form of Tags.
 In this section, we describe what Tags are and what their role is in the C2MON architecture.
@@ -24,7 +24,7 @@ On the other hand, Tags always belong to one and only one Equipment/SubEquipment
 Tags can also have Alarms attached. to understand Alarms, please read the section about [Alarms](alarms).
 
 
-## The DataTag
+# The DataTag
 
 The DataTag is a Tag coming from an external data source.
 It corresponds to a single external data point, represented by a Java primitive type (String, Float, Integer, etc.).
@@ -41,7 +41,7 @@ More information about that topic is provided in [Creating a new DAQ module from
     However, the core C2MON could handle more complex data type without too many changes. DataTag values are stored as simple Java Objects.
 
 
-## The RuleTag
+# The RuleTag
 
 The RuleTag is a Tag internal to C2MON built on top of other Tags.
 Its value is specified by a Rule expression given in a specific C2MON rule grammar.
@@ -53,7 +53,7 @@ Changes to these Tags will result in an update of the Rule, based on the Rule ex
 >For more information about how to create rule expressions for RuleTags, please read the chapter about the [Rule Engine](/user-guide/server/rule-engine).
 
 
-## The ControlTag
+# The ControlTag
 
 The ControlTag is any Tag used by the C2MON system for monitoring/publishing internal states of the system itself (we include here Equipment as part of the system, even if it may be shared with others). In other words, ControlTags are used by C2MON for self-monitoring of some component of the system. Making use of the functionalities available to all Tags, these values can then be logged and sent to C2MON clients for self-monitoring purposes.
 Alarms may also be attached to detect critical problems.
@@ -71,7 +71,7 @@ Equipment AliveTags are a good example of a ControlTag, since they are used to m
 In a similar way, an Equipment StatusTag is used to publish the current status (running or down) of an Equipment.
 
 
-## The CommandTag
+# The CommandTag
 
 The CommandTag is a special type of Tag that is used to send commands from the client layer to the DAQ layer.
 It is the only Tag that travels in this direction; all other Tags travel from the DAQ layer to the client layer.
@@ -79,7 +79,7 @@ It is the only Tag that travels in this direction; all other Tags travel from th
 CommandTags are usually used to send start/stop/restart commands to a DAQ process.
 
 
-## Tag Quality
+# Tag Quality
 
 The Tag quality is a fundamental concept of C2MON, used to indicate the health state of the sensor communication.
 In case of communication problems between the source and C2MON the Tag quality is giving very precise information about what went wrong (see table below).

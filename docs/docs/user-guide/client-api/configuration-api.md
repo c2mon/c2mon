@@ -1,7 +1,7 @@
-# Configuration API
-
-Learn how to configure the different entities in C2MON
-
+---
+layout:   post
+title:    Configuration API
+Summary:  Learn how to configure the different entities in C2MON
 ---
 
 C2MON centrally manages the configuration of data acquisition (DAQ) processes.
@@ -22,7 +22,7 @@ To acquire a reference to the `ConfigurationService`:
 ConfigurationService configurationService = C2monServiceGateway.getConfigurationService();
 ```
 
-## Configuring Processes
+# Configuring Processes
 
 Here is the simplest way of creating a new `Process`:
 
@@ -47,7 +47,7 @@ Process processToCreate = Process.create("P_EXAMPLE")
 configurationService.createProcess(processToCreate);
 ```
 
-#### Updating a Process
+## Updating a Process
 
 Existing `Process` instances can be updated via the `Process#update(String)` or `Process#update(Long)` builder methods:
 
@@ -65,7 +65,7 @@ properties which are updateable.
 Also note that if you accidentally pass a `Process` instance created with `Process#create` to the `ConfigurationService#updateProcess` method,
 an exception will be thrown. You must use the `update` builders when updating entities.
 
-## Configuring Equipment
+# Configuring Equipment
 
 The following code shows the simplest way to create an `Equipment`:
 
@@ -89,7 +89,7 @@ Equipment equipmentToCreate = Equipment.create("E_EXAMPLE", "org.example.MyEquip
 configurationService.createEquipment("P_EXAMPLE", equipmentToCreate);
 ```
 
-#### Updating an Equipment
+## Updating an Equipment
 
 Existing `Equipment` instances can be updated via the `Equipment#update(String)` or `Equipment#update(Long)` builder methods:
 
@@ -103,7 +103,7 @@ configurationService.updateEquipment(equipmentToUpdate);
 ```
 
 
-## Configuring DataTags
+# Configuring DataTags
 
 The following code shows the simplest way to create a `DataTag`:
 
@@ -131,7 +131,7 @@ configurationService.createDataTag("E_EXAMPLE", tagToCreate);
 ```
 
 
-## Configuring Alarms
+# Configuring Alarms
 
 The following code shows the simplest way to create an `Alarm`:
 
@@ -143,7 +143,7 @@ The first parameter expects the name of an already created `Tag`. An alarm ID wi
 
 `Alarm#create` and `Alarm#update` methods also exist in a similar manner as for the `DataTag`.
 
-## Configuring RuleTags
+# Configuring RuleTags
 
 The following code shows the simplest way to create a `RuleTag`:
 

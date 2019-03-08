@@ -1,11 +1,10 @@
 ---
-layout: default
+layout:   post
+title:    C2MON documentation
+Summary:  The official CERN Control and Monitoring Platform (C2MON) documentation
 ---
-# C2MON documentation
 
-Welcome to the official CERN Control and Monitoring Platform (C2MON) documentation.
-
----
+Welcome to the official CERN Control and Monitoring Platform (C2MON) documentation!
 
 The CERN Control and Monitoring Platform (C2MON) is an open-source heterogeneous time-series data acquisition/subscription framework with alerting and
 control functionalities that can be used for building many different types of system. Check out the potential [use cases](overview/#use-cases).
@@ -38,7 +37,7 @@ We recommend to always use the latest stable version listed in the [CHANGELOG] f
 [CHANGELOG]: about/CHANGELOG
 
 
-### Data Acquisition (DAQ) modules
+## Data Acquisition (DAQ) modules
 
 CERN provides at best effort several ready-to-use DAQ modules. All DAQs can as well be installed from a tarball or Docker container.
 

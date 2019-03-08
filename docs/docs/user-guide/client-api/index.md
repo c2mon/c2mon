@@ -1,7 +1,7 @@
-# The C2MON Client API
-
-Learn how to set up and use the C2MON Client API.
-
+---
+layout:   post
+title:    The C2MON Client API
+Summary:  Learn how to set up and use the C2MON Client API.
 ---
 
 The C2MON Client API is written in Java and provides various service classes to interact with the server:
@@ -14,13 +14,13 @@ search for and subscribe to tags.
 * `SupervisionService`: Provides methods for registering heartbeat listeners, to monitor server connection state.
 * `SessionService`: Optional service to secure the command execution (requires implementing an `AuthenticationManager`).
 
-## Including the API
+# Including the API
 
 To use the API, you need to add a dependency on `c2mon-client-core`.
 
 Remember to replace "__insert_version_here__" with a real version number, such as "1.8.30"
 
-### Maven configuration
+## Maven configuration
 If you make use of Maven include the following dependency in you C2MON client project:
 
 ```xml
@@ -43,7 +43,7 @@ The C2MON artifacts are hosted on the CERN Nexus repository:
 </repositories>
 ```
 
-### Gradle configuration
+## Gradle configuration
 
 ```json
 compile "cern.c2mon.client:c2mon-client-core:__insert_version_here__"
@@ -59,7 +59,7 @@ repositories {
 
 ```
 
-## Changing the default configuration
+# Changing the default configuration
 
 C2MON comes with reasonable defaults for most settings.
 Before you get out to tweak and tune the configuration, make sure you understand what are you trying to accomplish and the consequences.
@@ -72,7 +72,7 @@ To inject a customised properties file to your C2MON client application use this
 The properties listed in the file can just as well be set as Java system properties with the `-D` option.
 
 
-### Connecting to a remote C2MON server
+## Connecting to a remote C2MON server
 
 By default, the client tries to connect to a server running at `localhost:61616`.
 
@@ -84,9 +84,9 @@ For example:
 c2mon.client.jms.url=tcp://jms-broker-host:61616
 ```
 
-## Using the API
+# Using the API
 
-### Spring Boot applications
+## Spring Boot applications
 
 Applications that use Spring Boot can benefit from integration with the C2MON client. Access to the client service classes can simply be acquired by
 `@Autowiring` them, e.g.:
@@ -96,7 +96,7 @@ Applications that use Spring Boot can benefit from integration with the C2MON cl
 private TagService tagService;
 ```
 
-### Non-Spring applications
+## Non-Spring applications
 
 Regular Java applications must use the `C2monServiceGateway` to acquire access to the service classes. At application startup, initialise the client:
 
@@ -118,7 +118,7 @@ TagService tagService = C2monServiceGateway.getTagService();
 ```
 
 
-## Getting data
+# Getting data
 
 Once you have access to the `TagService`, you can start to retrieve data from C2MON. To find and subscribe your data you can either use the unique tag ID,
 or the unique tag name. Read more on the [Data Subscription documentation page](data-subscription)

@@ -1,5 +1,5 @@
 ---
-layout:   page
+layout:   post
 title:    C2MON
 summary:  What is C2MON?
 ---
