@@ -1,0 +1,69 @@
+{% if site.github_username %}
+<div class="content-panel feedback">
+  We <i class="fa fa-heart"></i> feedback!<br />
+  Help us <a href="{{ site.repoHost }}{{ site.repository }}{{ site.docFolder }}{{ page.url | replace: "html","md"}}">improve this page</a>
+</div>
+{% endif %}
+
+{% if site.twitter_username and site.disqus_account %}
+<div class="content-panel feedback">
+  I <i class="fa fa-heart"></i> feedback.<br />
+  Let me know what you think of this article on twitter <a href="http://www.twitter.com/{{ site.twitter_username }}">@{{ site.twitter_username }}</a> or leave a comment below!
+</div>
+{% elsif site.twitter_username %}
+<div class="content-panel feedback">
+  I <i class="fa fa-heart"></i> feedback.<br />
+  Let me know what you think of this article on twitter <a href="http://www.twitter.com/{{ site.twitter_username }}">@{{ site.twitter_username }}</a>!
+</div>
+{% elsif site.disqus_account %}
+<div class="content-panel feedback">
+  I <i class="fa fa-heart"></i> feedback.<br />
+  Let me know what you think of this article in the comment section below!
+</div>
+{% endif %}
+{% if site.disqus_account %}
+<div class="content-panel comments">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+  </div>
+</div>
+{% endif %}
+
+{% if site.related_posts.length > 0 %}
+<div class="content-panel related clearfix">
+  {% for post in site.related_posts limit:1 %}
+  <div class="related-header">
+    <a href="{{ site.baseurl }}{{ post.url }}">Read More</a>
+  </div>
+    <div class="title">
+      <a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a>
+    </div>
+    <div class="excerpt">
+       {% if post.summary %}
+        {{ post.summary | strip_html | truncatewords:30 }}
+       {% else %}
+        {{ post.excerpt | strip_html | truncatewords:30 }}
+       {% endif %}
+      <a href="{{ site.baseurl }}{{ post.url }}">Continue Reading</a>
+    </div>
+  {% endfor %}
+  <hr />
+  <div class="previous previous-next">
+    {% if page.previous %}
+    <p>
+      <a href="{{ site.baseurl }}{{ page.previous.url }}">{{ page.previous.title }}</a>
+    </p>
+    <p class="date">Published {{ page.previous.date | date: "%B %-d, %Y" }}</p>
+    {% endif %}
+  </div>
+  <div class="next previous-next">
+    {% if page.next %}
+    <p>
+      <a href="{{ site.baseurl }}{{ page.next.url }}">{{ page.next.title }}</a>
+    </p>
+    <p class="date">Published {{ page.next.date | date: "%B %-d, %Y" }}</p>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
