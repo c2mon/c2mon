@@ -2,6 +2,7 @@
 # If url is skipped, the text will be lowercased and
 # used in the link. " " and "/" are replaced with " "
 # To maintain the base (parent) URL, just use url: ""
+# See also: https://jekyllrb.com/docs/liquid/filters/#slugify
 - text: Home
   url: "index/"
 - text: Features
