@@ -7,6 +7,10 @@ $menu-size: 300px;
   background: #4D94CE;
 }
 
+.navbar-brand {
+  font-weight: bold;
+}
+
 .single .article {
   width: 60%;
   margin-left: 20%;
@@ -14,10 +18,6 @@ $menu-size: 300px;
 
 .single .article .content {
 font-size: 18px;
-}
-
-.index {
-  width: inherit;
 }
 
 .all-posts #search-container {
@@ -36,6 +36,10 @@ html.mm-opening .mm-page {
   left: $menu-size;
 }
 
+.index {
+  width: inherit;
+}
+
 .index .articles h2 {
   margin-bottom: 15px;
   margin-top: 35px;
@@ -46,20 +50,8 @@ html.mm-opening .mm-page {
   margin-bottom: 20px;
 }
 
-.navbar-brand {
-  font-weight: bold;
-}
-
 td, th {
   padding: 5px;
-}
-
-a.button {
-    -webkit-appearance: button;
-    -moz-appearance: button;
-    appearance: button;
-
-    text-decoration: none;
 }
 
 /* Reduce image size */
