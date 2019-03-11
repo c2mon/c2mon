@@ -1,8 +1,35 @@
 ---
 ---
 @import 'jekyll-theme-geneva-noir';
+$menu-size: 300px;
+
 .navbar {
   background: #4D94CE;
+}
+
+.single .article {
+  width: 60%;
+  margin-left: 20%;
+}
+
+.index {
+  width: inherit;
+}
+
+.all-posts #search-container {
+  padding-top: 0px;
+}
+
+.all-posts #search-input {
+  margin-top: 0px;
+}
+
+.mm-menu {
+  width: $menu-size;
+}
+
+html.mm-opening .mm-page {
+  left: $menu-size;
 }
 
 .index .articles h2 {
