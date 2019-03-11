@@ -1,8 +1,27 @@
+# This file is used to build the navBar menu
+
+# It is essentially a map of the folder structure
+
+# The entries in this file tell Jekyll which pages to link
+# in the navbar and where those pages exist
+
+# Caution!
+# Pages not linked below are still accessible in the final
+# site unless you specifically exclude them in _config.yml
+# They will however, not be present in the navBar
+
 # You can specify custom URLs for files using url: "filename"
-# If url is skipped, the text will be lowercased and
-# used in the link. " " and "/" are replaced with " "
-# To maintain the base (parent) URL, just use url: ""
+# However, if you follow a good naming convention, the
+# automagic url linking below will work out!
+
+# If url is skipped, the text will be slugified.
+# It's lowercased, " " and "/" are replaced with " "
 # See also: https://jekyllrb.com/docs/liquid/filters/#slugify
+
+# If you are linking to a folder, the folder/index.md
+# file will be opened by default
+
+# To maintain the base (parent) URL, just use url: ""
 - text: Home
   url: "index/"
 - text: Features
@@ -37,4 +56,3 @@
   # Jekyll seems to have the /license page occupied by default
     url: "c2mon-license"
 - text: Contact
-- text: Search
