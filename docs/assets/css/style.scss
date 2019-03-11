@@ -17,7 +17,13 @@ $menu-size: 300px;
 }
 
 .single .article .content {
-font-size: 18px;
+  font-size: 18px;
+}
+
+.single .article .content blockquote p {
+  font-size: 21px;
+  font-weight: 400;
+  padding: 5px;
 }
 
 .all-posts #search-container {
