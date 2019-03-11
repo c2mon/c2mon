@@ -1,7 +1,7 @@
 ---
 layout:   post
 title:    Configuration API
-Summary:  Learn how to configure the different entities in C2MON
+summary:  Learn how to configure the different entities in C2MON
 ---
 
 C2MON centrally manages the configuration of data acquisition (DAQ) processes.

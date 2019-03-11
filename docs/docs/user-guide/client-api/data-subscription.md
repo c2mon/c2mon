@@ -1,7 +1,7 @@
 ---
 layout:   post
 title:    Data subscription
-Summary:  Learn how to subscribe to your data with the C2MON Client API.
+summary:  Learn how to subscribe to your data with the C2MON Client API.
 ---
 
 > **Please note!** <br>

@@ -1,7 +1,7 @@
 ---
 layout:   post
 title:    Process/Equipment
-Summary:  A general introduction to the Process/Equipment data configuration concept within C2MON.
+summary:  A general introduction to the Process/Equipment data configuration concept within C2MON.
 ---
 
 # Hierarchical structure

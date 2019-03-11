@@ -1,7 +1,7 @@
 ---
 layout:   post
 title:    Tags
-Summary:  An overview of the C2MON Tag concept.
+summary:  An overview of the C2MON Tag concept.
 ---
 
 # Introduction

@@ -1,7 +1,7 @@
 ---
 layout:   post
 title:    Introduction to C2MON
-Summary:  A high-level introduction to the concepts of the C2MON platform.
+summary:  A high-level introduction to the concepts of the C2MON platform.
 ---
 
 After reading this chapter, you should have a good idea about how data flows through C2MON; from the raw data coming from sensory data sources, all the way up to user applications that make use of that data.

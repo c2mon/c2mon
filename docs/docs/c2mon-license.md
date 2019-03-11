@@ -1,7 +1,7 @@
 ---
 layout:   post
 title:    License
-Summary:  The license of the C2MON platform.
+summary:  The license of the C2MON platform.
 ---
 
 

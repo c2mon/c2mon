@@ -1,7 +1,7 @@
 ---
 layout:   post
 title:    Elasticsearch archiving
-Summary:  Explains how the C2MON server is storing historical data into Elasticsearch.
+summary:  Explains how the C2MON server is storing historical data into Elasticsearch.
 ---
 
 C2MON comes integrated with [Elasticsearch](https://www.elastic.co/guide/index.html)

@@ -1,7 +1,7 @@
 ---
 layout:   post
 title:    Database
-Summary:  How to configure an external relational database for C2MON.
+summary:  How to configure an external relational database for C2MON.
 ---
 
 By default C2MON start with an embedded HSQL database for prototyping and development purposes.

@@ -1,7 +1,7 @@
 ---
 layout:   post
 title:    Accessing historical data
-Summary:  Lean how to access historical data through the Java API.
+summary:  Lean how to access historical data through the Java API.
 ---
 
 Client-based access to historical data is made available through the `c2mon-client-ext-history` module. In addition to providing raw history, you can also

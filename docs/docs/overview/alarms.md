@@ -1,7 +1,7 @@
 ---
 layout:   post
 title:    Alarms
-Summary:  A brief description the alarm concept in C2MON.
+summary:  A brief description the alarm concept in C2MON.
 ---
 
 Tags change frequently within C2MON as data from DAQ processes are received and evaluated by the system.

@@ -1,7 +1,7 @@
 ---
 layout:   post
 title:    C2MON documentation
-Summary:  The official CERN Control and Monitoring Platform (C2MON) documentation
+summary:  The official CERN Control and Monitoring Platform (C2MON) documentation
 ---
 
 Welcome to the official CERN Control and Monitoring Platform (C2MON) documentation!

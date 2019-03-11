@@ -1,7 +1,7 @@
 ---
 layout:   post
 title:    Creating a new DAQ module from scratch
-Summary:  A step-by-step guide to integrate a new communication protocol.
+summary:  A step-by-step guide to integrate a new communication protocol.
 ---
 
 This guide assumes that you are familiar with the [core concepts](/overview) of C2MON. At the end of this guide you should be able to write your

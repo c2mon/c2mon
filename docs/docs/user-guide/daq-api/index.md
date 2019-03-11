@@ -1,7 +1,7 @@
 ---
 layout:   post
 title:    DAQ API - General Overview
-Summary:  Introduction to C2MON Data Acquisition (DAQ) API, used by all existing DAQ modules for the server communication.
+summary:  Introduction to C2MON Data Acquisition (DAQ) API, used by all existing DAQ modules for the server communication.
 ---
 
 C2MON was initially developed at CERN to acquire data from physical infrastructural equipment, such as PLCs or OPC servers.

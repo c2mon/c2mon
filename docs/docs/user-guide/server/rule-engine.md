@@ -1,7 +1,7 @@
 ---
 layout:   post
 title:    Rule Engine
-Summary:  An introduction to the C2MON RuleTag grammar.
+summary:  An introduction to the C2MON RuleTag grammar.
 ---
 
 C2MON provides a simple Domain Specific Language (DSL) that allows expressing complex rules on top of the acquired data.

@@ -1,7 +1,7 @@
 ---
 layout:   post
 title:    Getting Started
-Summary:  A Hello World guide to get C2MON up and running with some sample data.
+summary:  A Hello World guide to get C2MON up and running with some sample data.
 ---
 
 # Running the server
