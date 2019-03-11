@@ -34,6 +34,10 @@ plugins:
   - jekyll-seo-tag
   - github-pages
 
+exclude:
+  - Gemfile.lock
+  - README.md
+
 # Exclude from processing.
 # The following items will not be processed, by default. Create a custom list
 # to override the default setting.
