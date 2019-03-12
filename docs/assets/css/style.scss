@@ -1,7 +1,13 @@
 ---
 ---
 @import 'jekyll-theme-geneva-noir';
-$menu-size: 300px;
+@import 'toc';
+$menu-size: 16%;
+$article-size: 60%;
+
+.pages {
+  padding-left: 20px;
+}
 
 .navbar {
   background: #4D94CE;
@@ -12,8 +18,8 @@ $menu-size: 300px;
 }
 
 .single .article {
-  width: 60%;
-  margin-left: 20%;
+  width: $article-size;
+  margin-left: (100% - $menu-size - $article-size)/2%;
 }
 
 .single .article .content {

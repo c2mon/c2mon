@@ -1,12 +1,11 @@
-<nav id="my-menu">
+<nav id="my-menu" class="mm-menu mm-horizontal mm-ismenu mm-offcanvas mm-current mm-opened">
   <div>
-    <p>{{ site.title }}</p>
+    <h1>{{ site.title }}</h1>
 
     {% include nav.html nav=site.data.menu %}
 
     {% include search.html %}
-    
+
     {% include social_links.html %}
   </div>
 </nav>
-<div class="menu-button" href="#menu"><i class="fa fa-bars"></i></div>
