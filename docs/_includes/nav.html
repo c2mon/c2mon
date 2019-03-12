@@ -10,7 +10,7 @@
     {% assign fullUrl = fullUrl | slugify | prepend:include.base | absolute_url %}
 
     <li>
-      <a href="{{ fullUrl }}">
+      <a href="{{ fullUrl }}" class="pages-li">
         {%- if navurl contains fullUrl -%}
           <b>
             {{ item.text }}
