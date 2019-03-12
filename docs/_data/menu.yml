@@ -55,4 +55,5 @@
   - text: License
   # Jekyll seems to have the /license page occupied by default
     url: "c2mon-license"
+- text: Single page HTML
 - text: Contact

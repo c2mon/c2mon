@@ -3,6 +3,7 @@ layout:   post
 title:    Elasticsearch archiving
 summary:  Explains how the C2MON server is storing historical data into Elasticsearch.
 ---
+{{""}}
 
 C2MON comes integrated with [Elasticsearch](https://www.elastic.co/guide/index.html)
 out-of-the-box for time series data storage. It uses a combination of the fast

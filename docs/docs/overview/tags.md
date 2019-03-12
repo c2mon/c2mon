@@ -3,6 +3,7 @@ layout:   post
 title:    Tags
 summary:  An overview of the C2MON Tag concept.
 ---
+{{""}}
 
 # Introduction
 

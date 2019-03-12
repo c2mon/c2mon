@@ -3,6 +3,7 @@ layout:   post
 title:    Class/Device/Property
 summary:  This concept provides a different, more object-oriented way of structuring monitoring data coming from C2MON DAQs.
 ---
+{{""}}
 
 The Process/Equipment structure is the original concept within C2MON, and has existed from the very beginning.
 The Class/Device/Property structure is much newer, and was added as an alternative to the Process/Equipment structure.
