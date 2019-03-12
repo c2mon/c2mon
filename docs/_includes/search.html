@@ -18,7 +18,7 @@
     searchInput: document.getElementById('search-input'),
     resultsContainer: document.getElementById('results-container'),
     dataSource: '{{ site.baseurl }}/assets/json/search.json',
-    searchResultTemplate: '<li><a href="{url}" title="{summary}">{title}<\/a><\/li>',
+    searchResultTemplate: '<li><a href="{url}" class="li-searchResult" title="{summary}">{title}<\/a><\/li>',
     noResultsText: 'No results found',
     limit: 10,
     fuzzy: true,
