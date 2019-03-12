@@ -3,6 +3,7 @@ layout:   post
 title:    Data subscription
 summary:  Learn how to subscribe to your data with the C2MON Client API.
 ---
+{{""}}
 
 > **Please note!** <br>
 A well-chosen naming convention will enable you to make searching for tags easier in the future.

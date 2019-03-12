@@ -3,6 +3,7 @@ layout:   post
 title:    Process/Equipment
 summary:  A general introduction to the Process/Equipment data configuration concept within C2MON.
 ---
+{{""}}
 
 # Hierarchical structure
 

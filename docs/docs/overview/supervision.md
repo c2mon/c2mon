@@ -3,6 +3,7 @@ layout:   post
 title:    Supervision
 summary:  Describes the mechanism by which C2MON is able to monitor (or supervise) parts of the system.
 ---
+{{""}}
 
 To supervise a part of the system is to maintain information about its health, and to react when problems are detected with it.
 

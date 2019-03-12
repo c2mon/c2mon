@@ -3,6 +3,7 @@ layout:   post
 title:    The C2MON Client API
 summary:  Learn how to set up and use the C2MON Client API.
 ---
+{{""}}
 
 The C2MON Client API is written in Java and provides various service classes to interact with the server:
 

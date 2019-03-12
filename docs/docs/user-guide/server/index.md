@@ -3,6 +3,7 @@ layout:   post
 title:    Running the C2MON server
 summary:  How to configure and start the C2MON server.
 ---
+{{""}}
 
 How to deploy and start C2MON server with Docker or the distribution tarball is described in the [Getting Started](/getting-started) Guide
 

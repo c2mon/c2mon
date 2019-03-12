@@ -1,0 +1,30 @@
+{% assign tree = include.tree %}
+{%- unless include.tree.size > 0 -%}
+  {% assign tree = site.data.menu %}
+{%- endunless -%}
+
+{% for post in tree %}
+
+  {% assign fullUrl = post.text %}
+  {% if post.url %}
+    {% assign fullUrl = post.url %}
+  {% endif %}
+  {% assign fullUrl = fullUrl | slugify | prepend:include.base %}
+
+{% capture hit %}
+  {% if post.subitems %}
+    {% assign fullUrl = fullUrl | append:"/" %}
+    {{ include.content | where_exp:"post","post.url == fullUrl" | map: "content" }}
+    {%- include dfs.html tree=post.subitems base=fullUrl content=include.content -%}
+  {% else %}
+    {% assign fullUrl = fullUrl | append:".html" %}
+    {{ include.content | where_exp:"post","post.url == fullUrl" | map: "content" }}
+  {% endif %}
+{% endcapture %}
+
+{% if hit.size > 0 %}
+  {{ hit }}
+{% endif %}
+
+
+{% endfor %}

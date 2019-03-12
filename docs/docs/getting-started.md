@@ -3,7 +3,7 @@ layout:   post
 title:    Getting Started
 summary:  A Hello World guide to get C2MON up and running with some sample data.
 ---
-
+{{""}}
 # Running the server
 
 The first thing to do is to get a C2MON server up and running. The server is a standalone application that receives data from acquisition processes (DAQs) and pushes it to client applications.
