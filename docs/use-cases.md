@@ -11,7 +11,7 @@ Two major systems at CERN are based on C2MON and contributing features to the pl
 
 ---
 
-## TIM - Technical Infrastructure Monitoring
+# TIM - Technical Infrastructure Monitoring
 
 TIM is a 24/7 service at CERN to supervise and control a variety of infrastructure spread across the CERN sites.
 
@@ -33,7 +33,7 @@ __TIM in numbers:__
 
 ---
 
-## DIAMON - DIAgnostic and MONitoring
+# DIAMON - DIAgnostic and MONitoring
 
 The purpose of the DIAMON project is to propose to the CERN operators and equipment groups tools to monitor the BE Controls infrastructure with easy to use, first line diagnostics and tools to solve problems, or help to decide about responsibilities for first line of intervention.
 
@@ -45,7 +45,7 @@ Main Objectives:
 
 ---
 
-## Your use case?
+# Your use case?
 
 Since C2MON is essentially a heterogeneous data acquisition framework with configuration, persistence, historical browsing, control and alarm functionalities, it can be suitable for building many different types of system.
 
