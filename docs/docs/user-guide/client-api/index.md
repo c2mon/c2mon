@@ -6,6 +6,8 @@ series:   client-api
 ---
 {{""}}
 
+{%- include toc.html -%}
+
 The C2MON Client API is written in Java and provides various service classes to interact with the server:
 
 * `TagService`: The most important service class and most probably the only one you will need in the beginning. Provides methods to

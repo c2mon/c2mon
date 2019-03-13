@@ -6,6 +6,8 @@ series:   DAQ API
 ---
 {{""}}
 
+{%- include toc.html -%}
+
 Before starting reading this guide please make sure that you are at least familiar with the following guide:
 
 * [Creating a new DAQ module from scratch](DAQ_module_developer_guide.md)

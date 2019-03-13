@@ -6,6 +6,8 @@ series:   Overview
 ---
 {{""}}
 
+{%- include toc.html -%}
+
 The Process/Equipment structure is the original concept within C2MON, and has existed from the very beginning.
 The Class/Device/Property structure is much newer, and was added as an alternative to the Process/Equipment structure.
 

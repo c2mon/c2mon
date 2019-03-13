@@ -4,6 +4,8 @@ title:    C2MON documentation
 summary:  The official CERN Control and Monitoring Platform (C2MON) documentation
 ---
 {{""}}
+
+{%- include toc.html -%}
 Welcome to the official CERN Control and Monitoring Platform (C2MON) documentation!
 
 The CERN Control and Monitoring Platform (C2MON) is an open-source heterogeneous time-series data acquisition/subscription framework with alerting and

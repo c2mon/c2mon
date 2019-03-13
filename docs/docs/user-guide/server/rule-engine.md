@@ -6,6 +6,8 @@ series:   Server
 ---
 {{""}}
 
+{%- include toc.html -%}
+
 C2MON provides a simple Domain Specific Language (DSL) that allows expressing complex rules on top of the acquired data.
 The rules are stored as simple Strings and loaded as [RuleTags](/overview/tags), which are then interpreted at runtime.
 

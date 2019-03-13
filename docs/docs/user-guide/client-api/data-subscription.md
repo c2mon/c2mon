@@ -6,6 +6,8 @@ series:   client-api
 ---
 {{""}}
 
+{%- include toc.html -%}
+
 > **Please note!** <br>
 A well-chosen naming convention will enable you to make searching for tags easier in the future.
 We suggest using a _folder-like_ structure with `/` as separator.

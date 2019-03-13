@@ -6,6 +6,8 @@ series:   Overview
 ---
 {{""}}
 
+{%- include toc.html -%}
+
 Tags change frequently within C2MON as data from DAQ processes are received and evaluated by the system.
 Sometimes, your sensory equipment may produce values that are worrying, dangerous or incorrect (for whatever reason). C2MON provides a mechanism to alert you when this happens. This page describes the Alarm mechanism.
 

@@ -6,6 +6,8 @@ series:   DAQ API
 ---
 {{""}}
 
+{%- include toc.html -%}
+
 This guide assumes that you are familiar with the [core concepts](/overview) of C2MON. At the end of this guide you should be able to write your
 own data acquisition module using the C2MON DAQ APIs.
 

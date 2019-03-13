@@ -6,6 +6,8 @@ series:   client-api
 ---
 {{""}}
 
+{%- include toc.html -%}
+
 C2MON centrally manages the configuration of data acquisition (DAQ) processes.
 A DAQ receives its configuration from the server at startup, which has two main advantages:
 

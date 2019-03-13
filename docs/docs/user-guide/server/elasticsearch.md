@@ -6,6 +6,8 @@ series:   Server
 ---
 {{""}}
 
+{%- include toc.html -%}
+
 C2MON comes integrated with [Elasticsearch](https://www.elastic.co/guide/index.html)
 out-of-the-box for time series data storage. It uses a combination of the fast
 [TransportConnector](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-transport.html)

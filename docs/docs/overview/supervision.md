@@ -6,6 +6,8 @@ series:   Overview
 ---
 {{""}}
 
+{%- include toc.html -%}
+
 To supervise a part of the system is to maintain information about its health, and to react when problems are detected with it.
 
 As mentioned in Core Concept: Tags, C2MON provides three types of ControlTag (the StatusTag, the AliveTag and the CommFaultTag).

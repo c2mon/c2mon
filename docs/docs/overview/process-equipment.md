@@ -6,6 +6,8 @@ series:   Overview
 ---
 {{""}}
 
+{%- include toc.html -%}
+
 # Hierarchical structure
 
 Processes & Equipments are used to structure the configuration of data points.

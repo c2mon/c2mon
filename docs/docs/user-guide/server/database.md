@@ -6,6 +6,8 @@ series:   Server
 ---
 {{""}}
 
+{%- include toc.html -%}
+
 By default C2MON start with an embedded HSQL database for prototyping and development purposes.
 
 > **Please note!** <br>
