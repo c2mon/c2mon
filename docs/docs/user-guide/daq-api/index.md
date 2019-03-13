@@ -50,7 +50,7 @@ Before the data is send to the server the DAQ core is applying several data vali
 
 # Data filtering
 
-Guaranteeing the availability of a monitoring system and its applications involves protecting it from overload during data avalanches. C2MON archives this through data filtering on the DAQ level without loosing any important events.
+Guaranteeing the availability of a monitoring system and its applications involves protecting it from overload during data avalanches. C2MON archives this through data filtering on the DAQ level without losing any important events.
 
 Beside filtering out redundant values (default behaviour) the DAQ layer provides a dynamic-filtering option for noise rejection. This is configurable per DAQ process and imposes time deadbands on individual Tags detected as feeding too much data to the C2MON server cluster. Various strategies on measuring the data throughput are provided.
 
