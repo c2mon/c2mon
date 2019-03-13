@@ -1,0 +1,41 @@
+{::options parse_block_html="true" /}
+
+{% capture toc %}
+This document contains the following sections:
+1. TOC
+{:toc}
+{% endcapture %}
+
+<div class="container-fluid single series-header">
+
+{::options parse_block_html="false" /}
+<div>
+  {% if page.series %}
+    <p>This document is part of the series '{{ page.series }}':</p>
+    <ol class="series">
+    {% for apost in site.pages reversed %}
+      {% if page.series == apost.series %}
+        <li>
+          {% if page.title == apost.title %}
+            {% assign nextpost = true %}
+            {{ apost.title }}
+          {% else %}
+            {% if nextpost == true %}
+              {% assign seriesnext = apost %}
+            {% endif %}
+            {% assign nextpost = false %}
+            <a href="{{ apost.url | relative_url }}">{{ apost.title }}</a>
+          {% endif %}
+        </li>
+      {% endif %}
+    {% endfor %}
+    </ol>
+  {% endif %}
+</div>
+
+{::options parse_block_html="true" /}
+  <div>
+    {{ toc }}
+  </div>
+
+</div>
