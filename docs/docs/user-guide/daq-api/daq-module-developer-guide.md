@@ -3,6 +3,7 @@ layout:   post
 title:    Creating a new DAQ module from scratch
 summary:  A step-by-step guide to integrate a new communication protocol.
 series:   DAQ API
+order:    2
 ---
 {{""}}
 

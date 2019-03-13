@@ -3,6 +3,7 @@ layout:   post
 title:    Data subscription
 summary:  Learn how to subscribe to your data with the C2MON Client API.
 series:   client-api
+order:    2
 ---
 {{""}}
 

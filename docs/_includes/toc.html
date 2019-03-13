@@ -13,21 +13,15 @@ This document contains the following sections:
   {% if page.series %}
     <p>This document is part of the series '{{ page.series }}':</p>
     <ol class="series">
-    {% for apost in site.pages reversed %}
-      {% if page.series == apost.series %}
-        <li>
-          {% if page.title == apost.title %}
-            {% assign nextpost = true %}
-            {{ apost.title }}
-          {% else %}
-            {% if nextpost == true %}
-              {% assign seriesnext = apost %}
-            {% endif %}
-            {% assign nextpost = false %}
-            <a href="{{ apost.url | relative_url }}">{{ apost.title }}</a>
-          {% endif %}
-        </li>
-      {% endif %}
+    {% assign sorted_pages = site.pages | where_exp: "post","post.series == page.series" | sort: "order" %}
+    {% for apost in sorted_pages %}
+      <li>
+        {% if page.title == apost.title %}
+          {{ apost.title }}
+        {% else %}
+          <a href="{{ apost.url | relative_url }}">{{ apost.title }}</a>
+        {% endif %}
+      </li>
     {% endfor %}
     </ol>
   {% endif %}
