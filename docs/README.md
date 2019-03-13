@@ -50,3 +50,6 @@ Github-pages plugin is only compatible with [a few selected plugins](https://hel
 
 _None of the above :(_
 The \_site folder contains the generated files, you can troubleshoot most issues by checking those
+
+_Why do some files start with {{""}} ?_
+Because the Liquid code used to generate the single-page-html has a bug that causes it to parse the first line as if it was a code block. The way to avoid it is using another Liquid block that will not be rendered
