@@ -115,7 +115,7 @@ public class DemoMessageHandler extends EquipmentMessageHandler {
 
 
 
-## Implementing `connectToDataSource()`
+## Implementing __connectToDataSource()__
 
 The `connectToDataSource()` method is called for you when the DAQ process wants your equipment to connect to the underlying data source and get ready to start
 publishing data.
