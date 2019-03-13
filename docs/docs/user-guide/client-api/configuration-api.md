@@ -2,6 +2,7 @@
 layout:   post
 title:    Configuration API
 summary:  Learn how to configure the different entities in C2MON
+series:   client-api
 ---
 {{""}}
 

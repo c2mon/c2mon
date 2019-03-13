@@ -2,6 +2,7 @@
 layout:   post
 title:    Elasticsearch archiving
 summary:  Explains how the C2MON server is storing historical data into Elasticsearch.
+series:   Server
 ---
 {{""}}
 

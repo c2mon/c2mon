@@ -2,6 +2,7 @@
 layout:   post
 title:    Running the C2MON server
 summary:  How to configure and start the C2MON server.
+series:   Server
 ---
 {{""}}
 

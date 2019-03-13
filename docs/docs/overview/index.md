@@ -2,6 +2,7 @@
 layout:   post
 title:    Introduction to C2MON
 summary:  A high-level introduction to the concepts of the C2MON platform.
+series:   Overview
 ---
 {{""}}
 

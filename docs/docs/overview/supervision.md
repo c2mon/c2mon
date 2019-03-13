@@ -2,6 +2,7 @@
 layout:   post
 title:    Supervision
 summary:  Describes the mechanism by which C2MON is able to monitor (or supervise) parts of the system.
+series:   Overview
 ---
 {{""}}
 

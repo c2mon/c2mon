@@ -2,6 +2,7 @@
 layout:   post
 title:    Class/Device/Property
 summary:  This concept provides a different, more object-oriented way of structuring monitoring data coming from C2MON DAQs.
+series:   Overview
 ---
 {{""}}
 

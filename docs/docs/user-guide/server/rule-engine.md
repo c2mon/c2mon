@@ -2,6 +2,7 @@
 layout:   post
 title:    Rule Engine
 summary:  An introduction to the C2MON RuleTag grammar.
+series:   Server
 ---
 {{""}}
 

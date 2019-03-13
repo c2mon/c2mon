@@ -2,6 +2,7 @@
 layout:   post
 title:    Writing JUnit tests for DAQ modules
 summary:  Explains how to make use of the DAQ testing framework.
+series:   DAQ API
 ---
 {{""}}
 

@@ -2,6 +2,7 @@
 layout:   post
 title:    Accessing historical data
 summary:  Lean how to access historical data through the Java API.
+series:   client-api
 ---
 {{""}}
 

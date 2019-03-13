@@ -2,6 +2,7 @@
 layout:   post
 title:    DAQ API - General Overview
 summary:  Introduction to C2MON Data Acquisition (DAQ) API, used by all existing DAQ modules for the server communication.
+series:   DAQ API
 ---
 {{""}}
 

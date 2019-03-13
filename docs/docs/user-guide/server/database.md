@@ -2,6 +2,7 @@
 layout:   post
 title:    Database
 summary:  How to configure an external relational database for C2MON.
+series:   Server
 ---
 {{""}}
 

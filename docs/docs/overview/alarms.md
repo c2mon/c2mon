@@ -2,6 +2,7 @@
 layout:   post
 title:    Alarms
 summary:  A brief description the alarm concept in C2MON.
+series:   Overview
 ---
 {{""}}
 
