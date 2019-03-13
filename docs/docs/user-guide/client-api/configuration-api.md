@@ -116,8 +116,7 @@ The following code shows the simplest way to create a `DataTag`:
 configurationService.createDataTag("E_EXAMPLE", "TAG_EXAMPLE", Integer.class, new DataTagAddress());
 ```
 
-!!! info "Note"
-    A well-chosen naming convention will enable you to make searching for tags easier in the future.
+> A well-chosen naming convention will enable you to make searching for tags easier in the future.
     We suggest using a _folder-like_ structure with `/` as separator.
     Example: `serviceA/computer/mypc1/memory`
 

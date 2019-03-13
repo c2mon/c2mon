@@ -109,8 +109,7 @@ public class DemoMessageHandler extends EquipmentMessageHandler {
 }
 ```
 
-!!! info "Note"
-    It is necessary to pre-define the specific `EquipmentMessageHandler` implementation that will be used at configuration time (inside an `Equipment`).
+> It is necessary to pre-define the specific `EquipmentMessageHandler` implementation that will be used at configuration time (inside an `Equipment`).
     So, the DAQ process will only know at runtime which handler to use for that equipment. This allows a single process to deal with multiple types of
     equipment at the same time.
 
@@ -133,8 +132,7 @@ In general, you should perform all initialisation in this method, such as:
 
 This is of course a lot for a single method. Best practice is therefore to delegate the work to sub classes in order to simplify the main logic.
 
-!!! info "Note"
-    `connectToDataSource()`` is only called once per equipment lifecycle. This means at process startup, or after an equipment reconfiguration.
+> `connectToDataSource()`` is only called once per equipment lifecycle. This means at process startup, or after an equipment reconfiguration.
 
 
 ## Inspecting the pre-defined configuration
