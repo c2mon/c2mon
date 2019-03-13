@@ -7,7 +7,7 @@
     {% if item.url %}
       {% assign fullUrl = item.url %}
     {% endif %}
-    {% assign fullUrl = fullUrl | slugify | prepend:include.base | absolute_url %}
+    {% assign fullUrl = fullUrl | slugify: "raw" | replace: "/","-" | prepend:include.base | absolute_url %}
 
     <li>
       <a href="{{ fullUrl }}" class="pages-li">

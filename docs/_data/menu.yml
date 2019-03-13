@@ -23,9 +23,11 @@
 
 # To maintain the base (parent) URL, just use url: ""
 - text: Home
-  url: "index/"
+  url: "index"
 - text: Features
+  url: "index#features"
 - text: Use Cases
+  url: "index#use-cases"
 - text: Docs
   subitems:
   - text: Getting Started
