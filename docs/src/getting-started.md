@@ -93,7 +93,7 @@ The properties listed in the file can just as well be set as Java system propert
 
 #### Persisting C2MON data in an Oracle database
 
-Note that Oracle database drivers (unlike MySQL and HSQLDB) are not distributed with C2MON. In order to persist data in an Oracle database, you must [download the Oracle JDBC drivers](http://www.oracle.com/technetwork/database/features/jdbc/index.html) and mount them as volumes in your Docker container.
+Note that Oracle database drivers (unlike MySQL and HSQLDB) are not distributed with C2MON. In order to persist data in an Oracle database, you must [download the Oracle JDBC drivers](https://www.oracle.com/technetwork/database/application-development/jdbc/downloads/index.html) and mount them as volumes in your Docker container.
 For example, if the JDBC driver libraries ```ojdbc.jar``` and ```orai18n.jar``` are available in the current folder, you can run :
 
 ```bash
@@ -165,7 +165,7 @@ You can now consult the C2MON Web User Interface on http://localhost:8080/c2mon-
  -->
 
 ## What's next?
-What you achieved with this tutorial is a Hello World demonstration of C2MON to understand the [core concepts](/core-concepts) of the framework.
+What you achieved with this tutorial is a Hello World demonstration of C2MON to understand the [core concepts](/overview/#core-concepts) of the framework.
 
 However, in order to use C2MON for your own use case you have now work on connecting to your data sources. This will require to get more familiar with the C2MON Data Acquisition (DAQ) layer.
 Maybe you can use some of the existing [Open Source DAQs](https://github.com/c2mon?utf8=%E2%9C%93&q=c2mon-daq), but most probably you want to write your own DAQ process. Therefore, you should read as next about the [DAQ API](/user-guide/daq-api).

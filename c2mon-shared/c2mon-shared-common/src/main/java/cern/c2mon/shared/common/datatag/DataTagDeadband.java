@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2019 CERN. All rights not expressly granted are reserved.
  * 
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -40,7 +40,7 @@ public final class DataTagDeadband {
     public static final short DEADBAND_PROCESS_ABSOLUTE = 1;
 
     /**
-     * Constant to be used to enable relative value deadband filtering on the DAQ process level. When absolute value
+     * Constant to be used to enable relative value deadband filtering on the DAQ process level. When relative value
      * deadband filtering is enabled, the DAQ process will only accept a new tag value if it is at least "deadbandValue"
      * per cent (!) greater or less than the last known value. Otherwise, the new value will be discarded.
      * 
