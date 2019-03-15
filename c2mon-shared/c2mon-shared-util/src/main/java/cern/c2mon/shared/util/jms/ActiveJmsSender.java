@@ -16,23 +16,12 @@
  *****************************************************************************/
 package cern.c2mon.shared.util.jms;
 
-import javax.jms.Destination;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageProducer;
-import javax.jms.Session;
-import javax.jms.TemporaryTopic;
-import javax.jms.TextMessage;
+import javax.jms.*;
 
-import org.apache.activemq.command.ActiveMQQueue;
-import org.apache.activemq.command.ActiveMQTopic;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.qpid.jms.JmsQueue;
+import org.apache.qpid.jms.JmsTopic;
 import org.springframework.jms.core.JmsTemplate;
-import org.springframework.jms.core.MessageCreator;
-import org.springframework.jms.core.SessionCallback;
-
 
 /**
  * Implementation of the JmsSender for ActiveMQ.
@@ -43,13 +32,9 @@ import org.springframework.jms.core.SessionCallback;
  * @author Mark Brightwell
  *
  */
+@Slf4j
 public class ActiveJmsSender implements JmsSender {
-  
-  /**
-   * Private class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(ActiveJmsSender.class);
-  
+
   /**
    * Reference to the JmsTemplate. Could be instantiated in a Spring XML.
    * Needs setting explicitly (no autowire annotation in source).
@@ -76,7 +61,7 @@ public class ActiveJmsSender implements JmsSender {
 
       MessageConsumer consumer = session.createConsumer(replyTopic);
 
-      Destination requestDestination = new ActiveMQQueue(jmsListenerQueue);
+      Destination requestDestination = new JmsQueue(jmsListenerQueue);
       MessageProducer messageProducer = session.createProducer(requestDestination);
       messageProducer.send(textMessage);
 
@@ -86,7 +71,7 @@ public class ActiveJmsSender implements JmsSender {
         if (replyMessage instanceof TextMessage) {
           returnString = ((TextMessage) replyMessage).getText();
         } else {
-          LOGGER.warn("Non-text message received as JMS reply from ActiveMQ - unable to process");
+          log.warn("Non-text message received as JMS reply from ActiveMQ - unable to process");
         }
       }
       return returnString;
@@ -106,15 +91,8 @@ public class ActiveJmsSender implements JmsSender {
     if (text == null) {
       throw new NullPointerException("Attempting to send a null text message.");
     }
-    Destination topic = new ActiveMQTopic(jmsTopicName);
-    jmsTemplate.send(topic, new MessageCreator() {
-      
-      @Override
-      public Message createMessage(Session session) throws JMSException {
-        return session.createTextMessage(text);        
-      }
-      
-    });
+    Destination topic = new JmsTopic(jmsTopicName);
+    jmsTemplate.send(topic, session -> session.createTextMessage(text));
   }
   
   @Override
@@ -122,15 +100,8 @@ public class ActiveJmsSender implements JmsSender {
     if (text == null) {
       throw new NullPointerException("Attempting to send a null text message.");
     }
-    Destination queue = new ActiveMQQueue(jmsQueueName);
-    jmsTemplate.send(queue, new MessageCreator() {
-      
-      @Override
-      public Message createMessage(Session session) throws JMSException {
-        return session.createTextMessage(text);        
-      }
-      
-    });
+    Destination queue = new JmsQueue(jmsQueueName);
+    jmsTemplate.send(queue, session -> session.createTextMessage(text));
   }
 
   /**
@@ -142,14 +113,7 @@ public class ActiveJmsSender implements JmsSender {
     if (text == null) {
       throw new NullPointerException("Attempting to send a null text message.");
     }
-    jmsTemplate.send(new MessageCreator() {      
-      
-      @Override
-      public Message createMessage(Session session) throws JMSException {
-        return session.createTextMessage(text);
-      }
-      
-    });
+    jmsTemplate.send(session -> session.createTextMessage(text));
   }
 
 }
