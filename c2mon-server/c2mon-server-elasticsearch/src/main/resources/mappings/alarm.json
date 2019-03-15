@@ -49,6 +49,10 @@
     "timestamp": {
       "type": "date",
       "format": "epoch_millis"
+    },
+    "sourceTimestamp": {
+      "type": "date",
+      "format": "epoch_millis"
     }
   }
 }

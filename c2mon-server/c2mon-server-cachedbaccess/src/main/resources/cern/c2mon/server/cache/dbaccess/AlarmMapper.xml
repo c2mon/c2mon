@@ -3,13 +3,12 @@
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
   <mapper namespace="cern.c2mon.server.cache.dbaccess.AlarmMapper">
-
     <resultMap id="alarmResultMap" type="cern.c2mon.server.common.alarm.AlarmCacheObject">
       <id property="id" column="ALARMID" jdbcType="NUMERIC" javaType="java.lang.Long"/>
       <result property="faultFamily" column="ALARMFFAMILY" jdbcType="VARCHAR"/>
       <result property="faultMember" column="ALARMFMEMBER" jdbcType="VARCHAR"/>
       <result property="faultCode" column="ALARMFCODE" jdbcType="NUMERIC"/>
-      <result property="active" column="ALARMSTATE" jdbcType="VARCHAR"/>
+      <result property="active" column="ALARMSTATE" jdbcType="VARCHAR" javaType="java.lang.Boolean"/>
       <result property="timestamp" column="ALARMTIME" jdbcType="TIMESTAMP"/>
       <result property="sourceTimestamp" column="ALARMSOURCETIME" jdbcType="TIMESTAMP"/>
       <result property="info" column="ALARMINFO" jdbcType="VARCHAR"/>
@@ -56,7 +55,7 @@
 
     <update id="updateCacheable" parameterType="cern.c2mon.server.common.alarm.AlarmCacheObject">
       UPDATE ALARM
-         SET ALARMSTATE = #{active,jdbcType=VARCHAR},
+         SET ALARMSTATE = #{active,jdbcType=VARCHAR,javaType=Boolean},
              ALARMTIME = #{timestamp,jdbcType=TIMESTAMP},
              ALARMSOURCETIME = #{sourceTimestamp,jdbcType=TIMESTAMP},
              ALARMINFO = #{info,jdbcType=VARCHAR},
@@ -81,7 +80,8 @@
                          ALARMCONDITION, ALARM_TAGID, ALARMMETADATA, ALARMOSCILLATION
                 )
       VALUES (#{id},#{faultFamily},#{faultMember},#{faultCode},
-              #{active,jdbcType=VARCHAR}, #{timestamp,jdbcType=TIMESTAMP},
+              #{active,jdbcType=VARCHAR,javaType=Boolean},
+              #{timestamp,jdbcType=TIMESTAMP},
               #{sourceTimestamp,jdbcType=TIMESTAMP}, #{info,jdbcType=VARCHAR},
               #{condition,javaType=cern.c2mon.server.common.alarm.AlarmCondition,jdbcType=VARCHAR},
               #{dataTagId,jdbcType=NUMERIC},
