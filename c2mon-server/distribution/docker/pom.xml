@@ -10,10 +10,11 @@
 
   <artifactId>docker</artifactId>
   <name>c2mon-server :: docker image</name>
-  <packaging>pom</packaging>
+  <packaging>ear</packaging>
 
   <properties>
-    <docker.image.base>java:8-jdk</docker.image.base>
+    <registry>gitlab-registry.cern.ch</registry>
+    <docker.image.base>openjdk:8-jdk</docker.image.base>
   </properties>
 
   <build>
@@ -45,63 +46,59 @@
       </plugin>
 
       <plugin>
-        <groupId>com.spotify</groupId>
-        <artifactId>docker-maven-plugin</artifactId>
-        <version>0.4.10</version>
+        <groupId>com.google.cloud.tools</groupId>
+        <artifactId>jib-maven-plugin</artifactId>
+        <version>1.0.2</version>
         <executions>
           <execution>
-            <id>build-image</id>
-            <phase>compile</phase>
+            <phase>package</phase>
+            <id>dockerBuild</id>
             <goals>
-              <goal>build</goal>
+              <goal>dockerBuild</goal>
             </goals>
-          </execution>
-          <execution>
-            <id>push-image</id>
-            <phase>deploy</phase>
-            <goals>
-              <goal>push</goal>
-            </goals>
-            <configuration>
-              <imageName>gitlab-registry.cern.ch/c2mon/c2mon</imageName>
-            </configuration>
           </execution>
         </executions>
         <configuration>
-          <imageName>gitlab-registry.cern.ch/c2mon/c2mon</imageName>
-          <baseImage>${docker.image.base}</baseImage>
-          <serverId>gitlab-registry.cern.ch</serverId>
-          <registryUrl>https://gitlab-registry.cern.ch</registryUrl>
-          <forceTags>true</forceTags>
-          <imageTags>
-            <imageTag>${project.version}</imageTag>
-            <imageTag>latest</imageTag>
-          </imageTags>
-          <workdir>/c2mon-server</workdir>
-          <cmd>["bin/c2mon.sh","run"]</cmd>
-          <env>
-            <_JAVA_OPTIONS>-Dc2mon.server.elasticsearch.home=/c2mon-server/elasticsearch</_JAVA_OPTIONS>
-          </env>
-          <exposes>
-            <expose>61616</expose>
-            <expose>9200</expose>
-            <expose>9001</expose>
-            <expose>1099</expose>
-          </exposes>
-          <runs>
-            <run>chmod 755 /c2mon-server/bin/*</run>
-          </runs>
-          <volumes>
-            <volume>/c2mon-server/log</volume>
-            <volume>/c2mon-server/conf</volume>
-            <volume>/c2mon-server/elasticsearch</volume>
-          </volumes>
-          <resources>
-            <resource>
-              <directory>${project.build.directory}/dependency/c2mon-server-${project.version}</directory>
-              <targetPath>/c2mon-server</targetPath>
-            </resource>
-          </resources>
+          <from>
+            <image>${docker.image.base}</image>
+          </from>
+          <to>
+            <image>${registry}/c2mon/c2mon</image>
+            <tags>
+              <tag>${project.version}</tag>
+              <tag>latest</tag>
+            </tags>
+          </to>
+          <container>
+            <ports>
+              <port>61616</port>
+              <port>9200</port>
+              <port>9001</port>
+              <port>1099</port>
+            </ports>
+            <environment>
+              <_JAVA_OPTIONS>-Dc2mon.server.elasticsearch.home=/c2mon-server/elasticsearch</_JAVA_OPTIONS>
+            </environment>
+            <volumes>
+              <volume>/log</volume>
+              <volume>/conf</volume>
+              <volume>/elasticsearch</volume>
+            </volumes>
+            <entrypoint>["bin/c2mon.sh","run"]</entrypoint>
+          </container>
+          <extraDirectory>
+            <path>${project.build.directory}/dependency/c2mon-server-${project.version}</path>
+            <permissions>
+              <permission>
+                <file>/bin/c2mon.sh</file>
+                <mode>755</mode>
+              </permission>
+              <permission>
+                <file>/bin/C2MON-SRV.jvm</file>
+                <mode>755</mode>
+              </permission>
+            </permissions>
+          </extraDirectory>
         </configuration>
       </plugin>
 
