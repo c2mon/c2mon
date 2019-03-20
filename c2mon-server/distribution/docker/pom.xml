@@ -13,7 +13,7 @@
   <packaging>ear</packaging>
 
   <properties>
-    <registry>gitlab-registry.cern.ch</registry>
+    <registry>registry.hub.docker.com</registry>
     <docker.image.base>openjdk:8-jdk</docker.image.base>
   </properties>
 
@@ -63,7 +63,7 @@
             <image>${docker.image.base}</image>
           </from>
           <to>
-            <image>alkoclick/c2mon</image>
+            <image>${registry}/cernoss/c2mon</image>
             <tags>
               <tag>${project.version}</tag>
               <tag>latest</tag>
