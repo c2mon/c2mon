@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2019 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -27,6 +27,8 @@ import net.sf.ehcache.loader.CacheLoader;
 import net.sf.ehcache.search.Attribute;
 import net.sf.ehcache.search.Query;
 import net.sf.ehcache.search.Result;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jmx.export.annotation.ManagedResource;
@@ -53,8 +55,8 @@ import cern.c2mon.shared.client.alarm.AlarmQuery;
 @ManagedResource(objectName="cern.c2mon:type=cache,name=alarmCache")
 public class AlarmCacheImpl extends AbstractCache<Long, Alarm> implements AlarmCache {
 
-  final int timeRange = 60;
-  final int oscNumbers = 6;
+  /** A special logger that can be used later to store alarm updates in a separate log file */
+  private static final Logger ALARM_LOGGER = LoggerFactory.getLogger("AlarmLogger");
 
   @Autowired
   public AlarmCacheImpl(@Qualifier("clusterCache") final ClusterCache clusterCache,
@@ -132,6 +134,14 @@ public class AlarmCacheImpl extends AbstractCache<Long, Alarm> implements AlarmC
     }
 
     return result;
+  }
+
+  @Override
+  public void put(Long key, Alarm value) {
+    super.put(key, value);
+    if (ALARM_LOGGER.isInfoEnabled()) {
+      ALARM_LOGGER.info(value.toString());
+    }
   }
 
 }
