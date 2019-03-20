@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2019 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -16,6 +16,25 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch.config;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
+import lombok.extern.slf4j.Slf4j;
+import org.awaitility.Awaitility;
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
+import org.elasticsearch.node.NodeValidationException;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.util.FileSystemUtils;
+
 import cern.c2mon.server.cache.config.CacheModule;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.cache.loading.config.CacheLoadingModule;
@@ -25,18 +44,6 @@ import cern.c2mon.server.elasticsearch.MappingFactory;
 import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
 import cern.c2mon.server.elasticsearch.junit.CachePopulationRule;
 import cern.c2mon.server.supervision.config.SupervisionModule;
-import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
-import org.junit.Before;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {
@@ -51,6 +58,8 @@ import java.util.concurrent.TimeoutException;
 @Slf4j
 public abstract class BaseElasticsearchIntegrationTest {
 
+  private static final ElasticsearchProperties elasticsearchProperties = new ElasticsearchProperties();
+
   //the embedded ES node will start
   //when the client is instantiatied (magically by Spring)
   //we don't shutdown the embedded server at the end of each
@@ -58,25 +67,32 @@ public abstract class BaseElasticsearchIntegrationTest {
   @Autowired
   protected ElasticsearchClient client;
 
+  @BeforeClass
+  public static void cleanup() {
+    log.debug("Clean ES properties");
+    FileSystemUtils.deleteRecursively(new java.io.File(elasticsearchProperties.getEmbeddedStoragePath()));
+  }
+
   @Before
-  public void waitForElasticSearch() throws InterruptedException, ExecutionException {
+  public void setupElasticsearch() throws InterruptedException, NodeValidationException {
     try {
+      log.debug("Setup Elasticsearch cluster for testing...");
       CompletableFuture<Void> nodeReady = CompletableFuture.runAsync(() -> {
         client.waitForYellowStatus();
-        ElasticsearchProperties elasticsearchProperties = this.client.getProperties();
-        Indices.delete(elasticsearchProperties.getTagConfigIndex());
-        Indices.create(elasticsearchProperties.getTagConfigIndex(), "tag_config", MappingFactory.createTagConfigMapping());
-        try {
-          //it takes some time for the index to be recreated, should do this properly
-          //by waiting for yellow status but it doesn't work?
-          Thread.sleep(500);
-        } catch (InterruptedException e) {
-          e.printStackTrace();
-        }
+        client.getClient().admin().indices().delete(new DeleteIndexRequest(elasticsearchProperties.getTagConfigIndex()));
+        Awaitility.await().until(() -> Indices.create(elasticsearchProperties.getTagConfigIndex(), "tag_config", MappingFactory.createTagConfigMapping()));
       });
       nodeReady.get(120, TimeUnit.SECONDS);
-    } catch (TimeoutException e) {
-      throw new RuntimeException("Timeout when waiting for embedded elasticsearch!");
+      log.debug("Elasticseach cluster ready for testing!");
+    } catch (ExecutionException | TimeoutException e) {
+      Assert.fail("Timeout when waiting for embedded elasticsearch node to start!");
+      throw new RuntimeException("Timeout when waiting for embedded elasticsearch node to start!");
     }
+  }
+
+  @After
+  public void tearDown() {
+    log.debug("Closing ES client...");
+    client.close();
   }
 }
