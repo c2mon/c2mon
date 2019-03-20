@@ -63,13 +63,14 @@
             <image>${docker.image.base}</image>
           </from>
           <to>
-            <image>${registry}/c2mon/c2mon</image>
+            <image>alkoclick/c2mon</image>
             <tags>
               <tag>${project.version}</tag>
               <tag>latest</tag>
             </tags>
           </to>
           <container>
+            <useCurrentTimestamp>true</useCurrentTimestamp>
             <ports>
               <port>61616</port>
               <port>9200</port>
