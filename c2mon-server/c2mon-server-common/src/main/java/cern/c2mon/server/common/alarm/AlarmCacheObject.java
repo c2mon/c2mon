@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2018 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2019 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -18,15 +18,14 @@ package cern.c2mon.server.common.alarm;
 
 import java.sql.Timestamp;
 
+import lombok.Data;
+
 import cern.c2mon.server.common.metadata.Metadata;
 import cern.c2mon.shared.common.Cacheable;
-import lombok.Data;
 
 /**
  * Alarm object held in the cache.
- *
- * Imported more or less as-is into C2MON.
- *
+ * <p/>
  * Note: in TIM1 care was taken to make sure this is "" and not null - be
  * careful when sending to LASER as this may be the reason (?)
  *
@@ -52,17 +51,17 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
   private Long dataTagId;
 
   /**
-   * LASER fault family of the alarm.
+   * Fault family of the alarm.
    **/
   private String faultFamily;
 
   /**
-   * LASER fault member of the alarm.
+   * Fault member of the alarm.
    **/
   private String faultMember;
 
   /**
-   * LASER fault code of the alarm.
+   * Fault code of the alarm.
    **/
   private int faultCode;
 
@@ -78,9 +77,9 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
    */
   private Metadata metadata;
 
-  /** <code>true</code>, if the alarm state is active as published to listeners 
-   * (may be forced to <code>true</code> and silenced in case of oscillation) 
-   *
+  /**
+   * <code>true</code>, if the alarm state is active as published to listeners
+   * (may be forced to <code>true</code> and silenced in case of oscillation)
    */
   private boolean active = false;
 
@@ -88,23 +87,27 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
    * Whether the alarm was previously active
    **/
   private boolean lastActiveState;
-  
+
   /**
-   * <code>true</code> if the alarm state is active as maintained internally. This state is not exposed to listeners 
-   * and only used for the purpose of detecting and maintaining oscillation. 
-   * It always reflect the true state of an alarm, regardless of oscillation status 
+   * <code>true</code> if the alarm state is active as maintained internally. This state is not exposed to listeners
+   * and only used for the purpose of detecting and maintaining oscillation.
+   * It always reflect the true state of an alarm, regardless of oscillation status
    * (in contrast with the attribute <b>active</b> which may be forced to <code>true</code> if an oscillation is ongoing).
    */
   private boolean internalActive;
 
   private int counterFault;
+
+  /** Timestamp in milliseconds, when oscillation flag was set has started */
   private long firstOscTS;
 
   /** Set to <code>true</code>, if alarm starts oscillating */
   private boolean oscillating;
 
+  /** Same as the server timestamp of the tag, that triggered the alarm state change */
   private Timestamp timestamp;
-  
+
+  /** This timestamp is taken from the incoming datatag value update */
   private Timestamp sourceTimestamp;
 
   /**
@@ -122,6 +125,7 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
    */
   public AlarmCacheObject() {
     this.timestamp = new Timestamp(0);
+    this.sourceTimestamp = timestamp;
     this.info = "";
   }
 
@@ -144,13 +148,19 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
    *           should never be thrown
    */
   @Override
-  public Object clone() throws CloneNotSupportedException {
+  public AlarmCacheObject clone() throws CloneNotSupportedException {
     AlarmCacheObject alarmCacheObject = (AlarmCacheObject) super.clone();
     if (this.condition != null) {
       alarmCacheObject.condition = (AlarmCondition) this.condition.clone();
     }
+    if (this.metadata != null) {
+      alarmCacheObject.metadata = this.metadata.clone();
+    }
     if (this.timestamp != null) {
       alarmCacheObject.timestamp = (Timestamp) this.timestamp.clone();
+    }
+    if (this.sourceTimestamp != null) {
+      alarmCacheObject.sourceTimestamp = (Timestamp) this.sourceTimestamp.clone();
     }
     return alarmCacheObject;
   }
@@ -183,8 +193,6 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
     return oscillating;
   }
 
- 
-
   @Override
   public String toString() {
     StringBuilder str = new StringBuilder();
@@ -201,11 +209,7 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
        .append('\t')
        .append(getFaultCode())
        .append('\t')
-       .append(isActive())
-       .append('\t')
-       .append(isOscillating())
-       .append('\t')
-       .append(isInternalActive());
+       .append(isActive());
     if (getInfo() != null) {
       str.append('\t');
       str.append(getInfo());
@@ -213,5 +217,5 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
 
     return str.toString();
   }
-  
+
 }
