@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2018 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2019 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -18,6 +18,9 @@ package cern.c2mon.server.cache.alarm.impl;
 
 import java.sql.Timestamp;
 
+import lombok.AccessLevel;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,25 +31,28 @@ import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.AlarmCacheUpdater;
 import cern.c2mon.server.common.tag.Tag;
-import lombok.AccessLevel;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Contains the routing logic for the alarm cache update. The alarm cache listeners will get informed depending, if it
+ * is an oscillating alarm or not.
+ *
+ * @author Mark Brightwell, Emiliano Piselli, Brice Copy, Matthias Braeger
+ */
 @Service
 @Slf4j
 public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
 
   @Autowired
-  @Setter(AccessLevel.PUBLIC)
+  @Setter(AccessLevel.PROTECTED)
   private AlarmCache alarmCache;
 
   @Autowired
-  @Setter(AccessLevel.PUBLIC)
+  @Setter(AccessLevel.PROTECTED)
   OscillationUpdater oscillationUpdater;
 
   /**
    * Logic kept the same as in TIM1 (see {@link AlarmFacade}). The locking of
-   * the objets is done in the public class. Notice, in this case the update()
+   * the cache object is done in the public class. Notice, in this case the update()
    * method is putting the changes back into the cache.
    */
   @Override
@@ -55,12 +61,12 @@ public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
     // this time is then used in LASER publication as user timestamp
     Timestamp alarmTime = tag.getCacheTimestamp();
     Timestamp alarmSourceTimestamp = tag.getTimestamp();
-    
+
     // not possible to evaluate alarms with associated null tag; occurs during
     // normal operation
     // (may change in future is alarm state depends on quality f.eg.)
     if (tag.getValue() == null) {
-      log.debug("Alarm update called with null Tag value - leaving Alarm status unchanged at {}", alarm.isActive());
+      log.debug("Alarm update called with null Tag value - leaving alarm status unchanged at {} for #{}", alarm.isActive(), alarm.getId());
 
       // change the alarm timestamp, if the alarm has never been initialised
       if (alarmCacheObject.getTimestamp().equals(new Timestamp(0))) {
@@ -71,20 +77,19 @@ public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
     }
 
     if (!tag.getDataTagQuality().isInitialised()) {
-      log.debug("Alarm update called with uninitialised Tag - leaving Alarm status unchanged.");
+      log.debug("Alarm update called with uninitialised Tag - leaving slarm status unchanged for alarm #{}", alarm.getId());
       return alarm;
     }
 
     // timestamp should never be null
     if (tag.getTimestamp() == null) {
-      log.warn("Tag value or timestamp null -> no update");
-      throw new IllegalArgumentException("update method called on Alarm facade with either null tag value or null tag timestamp.");
+      log.warn("Tag value or timestamp null -> no update on alarm #{}", alarm.getId());
+      throw new IllegalArgumentException("update method called on Alarm facade with either null tag value or null tag timestamp");
     }
 
     return updateAlarmCacheObject(alarmCacheObject, tag);
   }
-  
-  
+
   private AlarmCacheObject updateAlarmCacheObject(final AlarmCacheObject alarmCacheObject, final Tag tag) {
     // Compute the alarm state corresponding to the new tag value
     boolean newState = alarmCacheObject.getCondition().evaluateState(tag.getValue());
@@ -94,15 +99,15 @@ public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
     if (newState == false && alarmCacheObject.isActive() == false) {
       return alarmCacheObject;
     }
-    
+
     boolean hasChanged = alarmCacheObject.isInternalActive() != newState;
-    
+
     // We only allow activating the alarm if the tag is valid.
     if(tag.isValid()){
-        alarmCacheObject.setActive(newState);
-        alarmCacheObject.setInternalActive(newState);
+      alarmCacheObject.setActive(newState);
+      alarmCacheObject.setInternalActive(newState);
     }
-    
+
     // Check the oscillating status
     boolean wasAlreadyOscillating = alarmCacheObject.isOscillating();
     oscillationUpdater.update(alarmCacheObject, tag);
@@ -116,8 +121,8 @@ public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
     // TERMINATE->ACTIVE
     if (alarmCacheObject.getTimestamp().equals(new Timestamp(0)) || (tag.isValid() && hasChanged) ) {
 
-      log.trace("Alarm {} changed STATE to {}",alarmCacheObject.getId(), newState);
-      
+      log.trace("Alarm #{} changed STATE to {}", alarmCacheObject.getId(), newState);
+
       alarmCacheObject.setTimestamp(tag.getCacheTimestamp());
       alarmCacheObject.setSourceTimestamp(tag.getTimestamp());
       alarmCacheObject.setInfo(additionalInfo);
@@ -127,7 +132,7 @@ public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
           // (only the *internalActive* property reflects the true status)
           alarmCacheObject.setActive(true);
           alarmCache.putQuiet(alarmCacheObject);
-        
+
       } else {
         alarmCache.put(alarmCacheObject.getId(), alarmCacheObject);
       }
@@ -141,9 +146,9 @@ public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
     if (alarmCacheObject.getInfo() == null) {
       alarmCacheObject.setInfo("");
     }
-    
+
     if (!alarmCacheObject.getInfo().equals(additionalInfo)) {
-      log.trace("update(): alarm #{} changed INFO to {}", alarmCacheObject.getId(), additionalInfo);
+      log.trace("Alarm #{} changed INFO to {}", alarmCacheObject.getId(), additionalInfo);
 
       alarmCacheObject.setInfo(additionalInfo);
       alarmCacheObject.setTimestamp(tag.getCacheTimestamp());
@@ -156,7 +161,7 @@ public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
 
     // In all other cases, the value of the alarm related to the DataTag has
     // not changed. No need to publish an alarm change.
-    log.trace("Alarm #{} has not changed.", alarmCacheObject.getId());
+    log.trace("Alarm #{} has not changed", alarmCacheObject.getId());
 
     return alarmCacheObject;
   }
