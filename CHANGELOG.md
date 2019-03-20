@@ -9,14 +9,17 @@ For more details on a given release, please check also the [Milestone planning](
 ## [Unreleased]
 
 ### Added
-- Client API: Added method to clear local command cache 
+- Client API: Added method to clear local command cache (22abcb48)
 - Client API: Added methods to `SupervisionService` for retrieving process and (sub-)equipment information from local cache (#238)
 - Server, Client API: Added source timestamp to alarm object (#237)
+- Server: Added dedicated alarm logger to keep track of alarm updates in a separate log file (#229)
 
 ### Changed
 - Cient API: Set ActiveMQ prefetch limit to 100 to avoid slow consumer problem (#240)
 
 ### Fixed
+- Server: Fixed `clone()` method of `AlarmCacheObject` (5bf7a831)
+- Server: Fixed alarm state mapping to `Boolean` for database and source timestamp indexing for ElasticSearch (1627915c)
 
 
 ## [1.8.40] - 2019-02-01
