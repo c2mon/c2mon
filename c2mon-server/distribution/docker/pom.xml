@@ -46,62 +46,12 @@
 
       <plugin>
         <groupId>com.spotify</groupId>
-        <artifactId>docker-maven-plugin</artifactId>
-        <version>0.4.10</version>
-        <executions>
-          <execution>
-            <id>build-image</id>
-            <phase>compile</phase>
-            <goals>
-              <goal>build</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>push-image</id>
-            <phase>deploy</phase>
-            <goals>
-              <goal>push</goal>
-            </goals>
-            <configuration>
-              <imageName>gitlab-registry.cern.ch/c2mon/c2mon</imageName>
-            </configuration>
-          </execution>
-        </executions>
+        <artifactId>dockerfile-maven-plugin</artifactId>
+        <version>1.4.10</version>
         <configuration>
-          <imageName>gitlab-registry.cern.ch/c2mon/c2mon</imageName>
-          <baseImage>${docker.image.base}</baseImage>
-          <serverId>gitlab-registry.cern.ch</serverId>
-          <registryUrl>https://gitlab-registry.cern.ch</registryUrl>
-          <forceTags>true</forceTags>
-          <imageTags>
-            <imageTag>${project.version}</imageTag>
-            <imageTag>latest</imageTag>
-          </imageTags>
-          <workdir>/c2mon-server</workdir>
-          <cmd>["bin/c2mon.sh","run"]</cmd>
-          <env>
-            <_JAVA_OPTIONS>-Dc2mon.server.elasticsearch.home=/c2mon-server/elasticsearch</_JAVA_OPTIONS>
-          </env>
-          <exposes>
-            <expose>61616</expose>
-            <expose>9200</expose>
-            <expose>9001</expose>
-            <expose>1099</expose>
-          </exposes>
-          <runs>
-            <run>chmod 755 /c2mon-server/bin/*</run>
-          </runs>
-          <volumes>
-            <volume>/c2mon-server/log</volume>
-            <volume>/c2mon-server/conf</volume>
-            <volume>/c2mon-server/elasticsearch</volume>
-          </volumes>
-          <resources>
-            <resource>
-              <directory>${project.build.directory}/dependency/c2mon-server-${project.version}</directory>
-              <targetPath>/c2mon-server</targetPath>
-            </resource>
-          </resources>
+          <retryCount>0</retryCount>
+          <repository>gitlab-registry.cern.ch/alpapage/c2mon</repository>
+          <tag>${project.version}</tag>
         </configuration>
       </plugin>
 
