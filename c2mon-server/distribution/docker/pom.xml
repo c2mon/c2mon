@@ -51,10 +51,10 @@
         <version>1.0.2</version>
         <executions>
           <execution>
-            <phase>package</phase>
-            <id>dockerBuild</id>
+            <phase>deploy</phase>
+            <id>build</id>
             <goals>
-              <goal>dockerBuild</goal>
+              <goal>build</goal>
             </goals>
           </execution>
         </executions>
