@@ -15,9 +15,13 @@
   <properties>
     <registry>registry.hub.docker.com</registry>
     <docker.image.base>openjdk:8-jdk</docker.image.base>
+    <c2mon.home>/c2mon-server-${project.version}</c2mon.home>
   </properties>
 
   <build>
+    <!-- Overriding this so jib doesn't crash for missing folder -->
+    <outputDirectory>${project.build.directory}/dependency-maven-plugin-markers</outputDirectory>
+
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -79,23 +83,28 @@
             </ports>
             <environment>
               <_JAVA_OPTIONS>-Dc2mon.server.elasticsearch.home=/c2mon-server/elasticsearch</_JAVA_OPTIONS>
+              <C2MON_HOME>${c2mon.home}</C2MON_HOME>
             </environment>
+            <workingDirectory>${c2mon.home}</workingDirectory>
             <volumes>
               <volume>/log</volume>
               <volume>/conf</volume>
               <volume>/elasticsearch</volume>
             </volumes>
-            <entrypoint>["bin/c2mon.sh","run"]</entrypoint>
+            <entrypoint>
+              <entrypoint>bin/c2mon.sh</entrypoint>
+              <entrypoint>run</entrypoint>
+            </entrypoint>
           </container>
           <extraDirectory>
-            <path>${project.build.directory}/dependency/c2mon-server-${project.version}</path>
+            <path>${project.build.directory}/dependency</path>
             <permissions>
               <permission>
-                <file>/bin/c2mon.sh</file>
+                <file>${c2mon.home}/bin/c2mon.sh</file>
                 <mode>755</mode>
               </permission>
               <permission>
-                <file>/bin/C2MON-SRV.jvm</file>
+                <file>${c2mon.home}/bin/C2MON-SRV.jvm</file>
                 <mode>755</mode>
               </permission>
             </permissions>
