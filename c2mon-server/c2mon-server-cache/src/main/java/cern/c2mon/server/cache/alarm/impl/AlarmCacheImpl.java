@@ -139,9 +139,21 @@ public class AlarmCacheImpl extends AbstractCache<Long, Alarm> implements AlarmC
   @Override
   public void put(Long key, Alarm value) {
     super.put(key, value);
-    if (ALARM_LOGGER.isInfoEnabled()) {
+    if (ALARM_LOGGER.isTraceEnabled()) {
+      ALARM_LOGGER.trace(value.toString(true));
+    } else if (ALARM_LOGGER.isInfoEnabled()) {
       ALARM_LOGGER.info(value.toString());
     }
   }
+
+  @Override
+  public void putQuiet(Alarm value) {
+    super.putQuiet(value);
+    if (ALARM_LOGGER.isTraceEnabled()) {
+      ALARM_LOGGER.trace(value.toString(true));
+    }
+  }
+
+
 
 }

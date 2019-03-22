@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2019 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -37,7 +37,7 @@ public interface Alarm extends Cacheable {
    * @return the UTC timestamp of the alarm's last state change
    */
   Timestamp getTimestamp();
-  
+
   /**
    * Get the UTC timestamp of the data tag's source (as opposed to the cache timestamp).
    * @return the UTC timestamp of the alarm's source data tag timestamp
@@ -100,9 +100,21 @@ public interface Alarm extends Cacheable {
    */
   Metadata getMetadata();
 
-  
+
   /**
    * @return true if the alarm is oscillating.
    */
   boolean isOscillating();
+
+  /**
+   * A string representation of the alarm object.
+   * This is mainly used for debugging purposes. When calling {@link #toString()} it will call this method
+   * with <code>extended=false</code>.
+   *
+   * @param extended if set to <code>true</code>, the string will contain more information
+   *
+   * @return The alarm object as string.
+   * @see #toString()
+   */
+  String toString(boolean extended);
 }

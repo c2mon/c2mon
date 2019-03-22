@@ -195,6 +195,10 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
 
   @Override
   public String toString() {
+    return toString(false);
+  }
+
+  public String toString(boolean extended) {
     StringBuilder str = new StringBuilder();
 
     str.append(getId())
@@ -213,6 +217,10 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
     if (getInfo() != null) {
       str.append('\t');
       str.append(getInfo());
+    }
+    if (extended) {
+      str.append("\tinternalActive: ");
+      str.append(this.internalActive);
     }
 
     return str.toString();
