@@ -13,14 +13,9 @@
   <name>c2mon-server :: activemq image</name>
   <packaging>jar</packaging>
 
-  <plugins>
-    <plugin>
-      <groupId>com.google.cloud.tools</groupId>
-      <artifactId>jib-maven-plugin</artifactId>
-      <executions>
-
-      </executions>
-    </plugin>
-  </plugins>
+  <properties>
+    <image.base>webcenter/activemq:5.14.3</image.base>
+    <image.name>c2mon-mq</image.name>
+  </properties>
 
 </project>
