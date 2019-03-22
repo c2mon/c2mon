@@ -23,7 +23,7 @@
     <image.base></image.base>
     <image.name></image.name>
     <registry>registry.hub.docker.com</registry>
-    <repository>cernoss/${image.name}</repository>
+    <repository>cern/${image.name}</repository>
   </properties>
 
   <build>
