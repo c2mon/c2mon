@@ -200,6 +200,8 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
 
   /**
    * Convert the object to string, with optional extended debug information.
+   * 
+   * @param extended <code>true</code> to obtain debug information.
    * @return A string representation of the object.
    */
   public String toString(boolean extended) {

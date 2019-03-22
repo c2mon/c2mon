@@ -108,7 +108,7 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
   /** Reference to the clusterCache to share values across the cluster nodes */
   private final ClusterCache clusterCache;
 
-  private AlarmCacheUpdater alarmCacheUpdater;
+  private final AlarmCacheUpdater alarmCacheUpdater;
 
   /**
    * Constructor.
