@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -27,14 +28,15 @@
             <phase>generate-sources</phase>
             <configuration>
               <target>
-                <mkdir dir="${project.build.directory}/classes"/>
                 <!-- we send the file here so that it's copied over to the docker entrypoint
                 and then picked up by the mysql init process
                 See: https://hub.docker.com/_/mysql?tab=description -->
                 <concat destfile="${project.build.directory}/${docker.entrypoint}/c2mon-mysql-schema.sql">
                   <!-- also need a prelude to setup the DB, add a user, change user etc... -->
-                  <fileset file="${project.basedir}/../../../c2mon-server-history/src/main/resources/sql/history-schema-mysql.sql"/>
-                  <fileset file="${project.basedir}/../../../c2mon-server-configuration/src/main/resources/sql/config-schema-mysql.sql"/>
+                  <fileset
+                      file="${project.basedir}/../../../c2mon-server-history/src/main/resources/sql/history-schema-mysql.sql"/>
+                  <fileset
+                      file="${project.basedir}/../../../c2mon-server-configuration/src/main/resources/sql/config-schema-mysql.sql"/>
                 </concat>
               </target>
             </configuration>
@@ -48,38 +50,29 @@
       <plugin>
         <groupId>com.google.cloud.tools</groupId>
         <artifactId>jib-maven-plugin</artifactId>
-        <configuration>
-          <container>
-            <ports>
-              <port>3306</port>
-            </ports>
-            <entrypoint>
-              <entrypoint>INHERIT</entrypoint>
-            </entrypoint>
-            <environment>
-              <MYSQL_DATABASE>tim</MYSQL_DATABASE>
-              <MYSQL_ALLOW_EMPTY_PASSWORD>yes</MYSQL_ALLOW_EMPTY_PASSWORD>
-            </environment>
-          </container>
-          <extraDirectory>
-            <path>${project.build.directory}/</path>
-          </extraDirectory>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-deploy-plugin</artifactId>
-        <configuration>
-          <skip>true</skip>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-install-plugin</artifactId>
-        <configuration>
-          <skip>true</skip>
-        </configuration>
+        <executions>
+          <execution>
+            <phase>deploy</phase>
+            <id>build</id>
+            <configuration>
+              <container>
+                <ports>
+                  <port>3306</port>
+                </ports>
+                <entrypoint>
+                  <entrypoint>INHERIT</entrypoint>
+                </entrypoint>
+                <environment>
+                  <MYSQL_DATABASE>tim</MYSQL_DATABASE>
+                  <MYSQL_ALLOW_EMPTY_PASSWORD>yes</MYSQL_ALLOW_EMPTY_PASSWORD>
+                </environment>
+              </container>
+              <extraDirectory>
+                <path>${project.build.directory}/</path>
+              </extraDirectory>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

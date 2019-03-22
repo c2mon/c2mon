@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -19,9 +20,6 @@
   </properties>
 
   <build>
-    <!-- Overriding this so jib doesn't crash for missing folder -->
-    <outputDirectory>target/dependency-maven-plugin-markers</outputDirectory>
-
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -52,58 +50,49 @@
       <plugin>
         <groupId>com.google.cloud.tools</groupId>
         <artifactId>jib-maven-plugin</artifactId>
-        <configuration>
-          <container>
-            <ports>
-              <port>61616</port>
-              <port>9200</port>
-              <port>9001</port>
-              <port>1099</port>
-            </ports>
-            <environment>
-              <_JAVA_OPTIONS>-Dc2mon.server.elasticsearch.home=/c2mon-server/elasticsearch</_JAVA_OPTIONS>
-              <C2MON_HOME>${c2mon.home}</C2MON_HOME>
-            </environment>
-            <workingDirectory>${c2mon.home}</workingDirectory>
-            <volumes>
-              <volume>/log</volume>
-              <volume>/conf</volume>
-              <volume>/elasticsearch</volume>
-            </volumes>
-            <entrypoint>
-              <entrypoint>bin/c2mon.sh</entrypoint>
-              <entrypoint>run</entrypoint>
-            </entrypoint>
-          </container>
-          <extraDirectory>
-            <path>${project.build.directory}/dependency</path>
-            <permissions>
-              <permission>
-                <file>${c2mon.home}/bin/c2mon.sh</file>
-                <mode>755</mode>
-              </permission>
-              <permission>
-                <file>${c2mon.home}/bin/C2MON-SRV.jvm</file>
-                <mode>755</mode>
-              </permission>
-            </permissions>
-          </extraDirectory>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-deploy-plugin</artifactId>
-        <configuration>
-          <skip>true</skip>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-install-plugin</artifactId>
-        <configuration>
-          <skip>true</skip>
-        </configuration>
+        <executions>
+          <execution>
+            <phase>deploy</phase>
+            <id>build</id>
+            <configuration>
+              <container>
+                <ports>
+                  <port>61616</port>
+                  <port>9200</port>
+                  <port>9001</port>
+                  <port>1099</port>
+                </ports>
+                <environment>
+                  <_JAVA_OPTIONS>-Dc2mon.server.elasticsearch.home=/c2mon-server/elasticsearch</_JAVA_OPTIONS>
+                  <C2MON_HOME>${c2mon.home}</C2MON_HOME>
+                </environment>
+                <workingDirectory>${c2mon.home}</workingDirectory>
+                <volumes>
+                  <volume>/log</volume>
+                  <volume>/conf</volume>
+                  <volume>/elasticsearch</volume>
+                </volumes>
+                <entrypoint>
+                  <entrypoint>bin/c2mon.sh</entrypoint>
+                  <entrypoint>run</entrypoint>
+                </entrypoint>
+              </container>
+              <extraDirectory>
+                <path>${project.build.directory}/dependency</path>
+                <permissions>
+                  <permission>
+                    <file>${c2mon.home}/bin/c2mon.sh</file>
+                    <mode>755</mode>
+                  </permission>
+                  <permission>
+                    <file>${c2mon.home}/bin/C2MON-SRV.jvm</file>
+                    <mode>755</mode>
+                  </permission>
+                </permissions>
+              </extraDirectory>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
