@@ -127,15 +127,17 @@ public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
       alarmCacheObject.setSourceTimestamp(tag.getTimestamp());
       alarmCacheObject.setInfo(additionalInfo);
 
-      if (alarmCacheObject.isOscillating() && wasAlreadyOscillating) {
-          // #233 - When oscillating we force the alarm to *active*
+      if (alarmCacheObject.isOscillating()) {
+          // When oscillating we force the alarm to *active*
           // (only the *internalActive* property reflects the true status)
           alarmCacheObject.setActive(true);
-          alarmCache.putQuiet(alarmCacheObject);
-
-      } else {
-        alarmCache.put(alarmCacheObject.getId(), alarmCacheObject);
       }
+      if (wasAlreadyOscillating) {
+          alarmCache.putQuiet(alarmCacheObject);
+      } else {
+          alarmCache.put(alarmCacheObject.getId(), alarmCacheObject);
+      }
+
       return alarmCacheObject;
     }
 
