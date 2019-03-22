@@ -4,23 +4,23 @@
 
   <parent>
     <groupId>cern.c2mon.server</groupId>
-    <artifactId>distribution</artifactId>
+    <artifactId>c2mon-docker-parent</artifactId>
     <version>1.8.41-SNAPSHOT</version>
   </parent>
 
-  <artifactId>docker</artifactId>
-  <name>c2mon-server :: docker image</name>
-  <packaging>ear</packaging>
+  <artifactId>img-server</artifactId>
+  <name>c2mon-server :: server image</name>
+  <packaging>jar</packaging>
 
   <properties>
-    <registry>registry.hub.docker.com</registry>
-    <docker.image.base>openjdk:8-jdk</docker.image.base>
+    <image.base>openjdk:8-jdk</image.base>
+    <image.name>c2mon</image.name>
     <c2mon.home>/c2mon-server-${project.version}</c2mon.home>
   </properties>
 
   <build>
     <!-- Overriding this so jib doesn't crash for missing folder -->
-    <outputDirectory>${project.build.directory}/dependency-maven-plugin-markers</outputDirectory>
+    <outputDirectory>target/dependency-maven-plugin-markers</outputDirectory>
 
     <plugins>
       <plugin>
@@ -52,29 +52,8 @@
       <plugin>
         <groupId>com.google.cloud.tools</groupId>
         <artifactId>jib-maven-plugin</artifactId>
-        <version>1.0.2</version>
-        <executions>
-          <execution>
-            <phase>deploy</phase>
-            <id>build</id>
-            <goals>
-              <goal>build</goal>
-            </goals>
-          </execution>
-        </executions>
         <configuration>
-          <from>
-            <image>${docker.image.base}</image>
-          </from>
-          <to>
-            <image>${registry}/cernoss/c2mon</image>
-            <tags>
-              <tag>${project.version}</tag>
-              <tag>latest</tag>
-            </tags>
-          </to>
           <container>
-            <useCurrentTimestamp>true</useCurrentTimestamp>
             <ports>
               <port>61616</port>
               <port>9200</port>
