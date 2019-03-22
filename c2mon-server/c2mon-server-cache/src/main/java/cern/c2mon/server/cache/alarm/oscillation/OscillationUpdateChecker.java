@@ -35,6 +35,7 @@ import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.AlarmCacheUpdater;
 import cern.c2mon.server.common.config.ServerConstants;
+import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.shared.client.alarm.AlarmQuery;
 import lombok.extern.slf4j.Slf4j;
 
@@ -107,6 +108,8 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
   /** Reference to the clusterCache to share values across the cluster nodes */
   private final ClusterCache clusterCache;
 
+  private final AlarmCacheUpdater alarmCacheUpdater;
+
   /**
    * Constructor.
    * 
@@ -117,12 +120,13 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
    *          nodes
    */
   @Autowired
-  public OscillationUpdateChecker(final AlarmCache alarmCache, final DataTagCache dataTagCache, final ClusterCache clusterCache, final OscillationUpdater oscillationUpdater) {
+  public OscillationUpdateChecker(final AlarmCache alarmCache, final DataTagCache dataTagCache, final ClusterCache clusterCache, final OscillationUpdater oscillationUpdater, final AlarmCacheUpdater alarmCacheUpdater) {
     super();
     this.alarmCache = alarmCache;
     this.dataTagCache = dataTagCache;
     this.clusterCache = clusterCache;
     this.oscillationUpdater = oscillationUpdater;
+    this.alarmCacheUpdater = alarmCacheUpdater;
   }
 
   @Autowired
@@ -196,10 +200,12 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
 
           for (Long alarmId : result) {
             AlarmCacheObject alarmCopy = (AlarmCacheObject) alarmCache.getCopy(alarmId);
+            DataTag dataTag = dataTagCache.get(alarmCopy.getDataTagId());
             if (!oscillationUpdater.checkOscillAlive(alarmCopy)) {
               oscillationUpdater.resetOscillationCounter(alarmCopy);
               alarmCopy.setOscillating(false);
-              alarmCopy.setInfo(AlarmCacheUpdater.evaluateAdditionalInfo(alarmCopy, dataTagCache.get(alarmCopy.getDataTagId())));
+              alarmCacheUpdater.update(alarmCopy, dataTag);
+              alarmCopy.setInfo(AlarmCacheUpdater.evaluateAdditionalInfo(alarmCopy, dataTag));
               alarmCache.put(alarmCopy.getId(), alarmCopy);
             }
           }
