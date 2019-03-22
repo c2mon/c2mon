@@ -198,6 +198,10 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
     return toString(false);
   }
 
+  /**
+   * Convert the object to string, with optional extended debug information.
+   * @return A string representation of the object.
+   */
   public String toString(boolean extended) {
     StringBuilder str = new StringBuilder();
 
@@ -225,5 +229,4 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
 
     return str.toString();
   }
-
 }
