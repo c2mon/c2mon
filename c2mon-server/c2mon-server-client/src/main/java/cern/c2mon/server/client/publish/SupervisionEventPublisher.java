@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2019 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -17,9 +17,7 @@
 package cern.c2mon.server.client.publish;
 
 import javax.annotation.PostConstruct;
-import javax.validation.Valid;
 
-import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +27,8 @@ import org.springframework.jms.JmsException;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Service;
+
+import com.google.gson.Gson;
 
 import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.server.common.config.ServerConstants;
@@ -96,7 +96,7 @@ public class SupervisionEventPublisher implements SupervisionListener, SmartLife
   }
 
   @Override
-  public void notifySupervisionEvent(@Valid final SupervisionEvent supervisionEvent) {
+  public void notifySupervisionEvent(final SupervisionEvent supervisionEvent) {
     try {
       publish(supervisionEvent);
     } catch (JmsException e) {

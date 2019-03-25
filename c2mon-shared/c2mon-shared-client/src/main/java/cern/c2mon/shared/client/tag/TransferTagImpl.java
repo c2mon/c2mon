@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2019 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -19,13 +19,12 @@ package cern.c2mon.shared.client.tag;
 import java.sql.Timestamp;
 import java.util.*;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import lombok.Data;
 
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.rule.RuleExpression;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
 
 /**
  * This class implements the <code>TransferTag</code> interface which defines
@@ -43,7 +42,6 @@ public final class TransferTagImpl extends TransferTagValueImpl implements TagUp
    * is just one id defined. Only rules might have dependencies
    * to multiple processes (DAQs).
    */
-  @Size(min = 1)
   private final Collection<Long> processIds = new HashSet<Long>();
 
   /**
@@ -52,7 +50,6 @@ public final class TransferTagImpl extends TransferTagValueImpl implements TagUp
    * is just one id defined. Only rules might have dependencies
    * to multiple equipments.
    */
-  @Size(min = 1)
   private final Collection<Long> equipmentIds = new HashSet<Long>();
 
   /**
@@ -61,18 +58,15 @@ public final class TransferTagImpl extends TransferTagValueImpl implements TagUp
    * is just one id defined. Only rules might have dependencies
    * to multiple equipments.
    */
-  @Size(min = 0)
   private final Collection<Long> subEquipmentIds = new HashSet<Long>();
 
   /**
    * String representation of the JMS destination where
    * <code>TransferTagValue</code> is published on change.
    */
-  @NotNull
   private String topicName;
 
   /** The unique name of the tag */
-  @NotNull
   private String tagName;
 
   /** Unit of the tag */
@@ -90,7 +84,6 @@ public final class TransferTagImpl extends TransferTagValueImpl implements TagUp
   /**
    * Metadata according to the tag in this class.
    */
-  @NotNull
   private Map<String, Object> metadata = new HashMap<>();
 
   /**

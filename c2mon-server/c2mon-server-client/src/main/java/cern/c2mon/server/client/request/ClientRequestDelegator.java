@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2019 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -20,15 +20,8 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 
-import javax.jms.DeliveryMode;
-import javax.jms.Destination;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageProducer;
-import javax.jms.Session;
-import javax.validation.Valid;
+import javax.jms.*;
 
-import cern.c2mon.shared.client.serializer.TransferTagSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +34,7 @@ import com.google.gson.Gson;
 import cern.c2mon.server.supervision.SupervisionFacade;
 import cern.c2mon.shared.client.request.ClientRequest;
 import cern.c2mon.shared.client.request.ClientRequestResult;
+import cern.c2mon.shared.client.serializer.TransferTagSerializer;
 import cern.c2mon.shared.util.json.GsonFactory;
 
 /**
@@ -193,7 +187,7 @@ public class ClientRequestDelegator implements SessionAwareMessageListener<Messa
    * @return The response that shall be transfered back to the C2MON client
    *         layer
    */
-  private Collection<? extends ClientRequestResult> handleClientRequest(@Valid final ClientRequest clientRequest,
+  private Collection<? extends ClientRequestResult> handleClientRequest(final ClientRequest clientRequest,
                                                                         final Session session,
                                                                         final Destination replyDestination) {
 

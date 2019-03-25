@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2019 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -18,11 +18,8 @@ package cern.c2mon.shared.client.supervision;
 
 import java.sql.Timestamp;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Past;
-
 import com.google.gson.Gson;
+
 import lombok.Data;
 
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEntity;
@@ -53,14 +50,11 @@ public class SupervisionEventImpl implements SupervisionEvent {
   /**
    * The entity concerned (Process, Equipment, SubEquipment)
    */
-  @NotNull
   private SupervisionEntity entity;
 
   /**
    * The id of the entity (unique for the entity).
    */
-  @NotNull
-  @Min(1)
   private Long entityId;
 
   /** The name of the entity */
@@ -69,14 +63,11 @@ public class SupervisionEventImpl implements SupervisionEvent {
   /**
    * The new status of the entity.
    */
-  @NotNull
   private SupervisionStatus status;
 
   /**
    * The time of this change/confirmation of status.
    */
-  @NotNull
-  @Past
   private Timestamp eventTime;
 
   /**

@@ -1,5 +1,5 @@
-/*
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+/**
+ * Copyright (C) 2010-2019 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -14,24 +14,21 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package cern.c2mon.shared.client.serialize;
 
-import cern.c2mon.shared.client.alarm.AlarmValueImpl;
-import cern.c2mon.shared.client.request.ClientRequestResult;
-import cern.c2mon.shared.client.tag.TagMode;
-import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collection;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Past;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collection;
+import cern.c2mon.shared.client.alarm.AlarmValueImpl;
+import cern.c2mon.shared.client.request.ClientRequestResult;
+import cern.c2mon.shared.client.tag.TagMode;
+import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 
 /**
  * Created by fritter on 23/03/16.
@@ -41,15 +38,12 @@ import java.util.Collection;
 @AllArgsConstructor
 public class TestUpdateTag implements ClientRequestResult{
 
-  @NotNull
-  @Min(1)
   private Long tagId = null;
 
   private String valueClassName;
 
   private Object tagValue;
 
-  @NotNull
   private TagMode mode = null;
 
   private boolean simulated = false;
@@ -57,7 +51,6 @@ public class TestUpdateTag implements ClientRequestResult{
   @Singular
   private Collection<AlarmValueImpl> alarmValues = new ArrayList<AlarmValueImpl>();
 
-  @NotNull
   private DataTagQualityImpl tagQuality;
 
   private String description;
@@ -65,13 +58,10 @@ public class TestUpdateTag implements ClientRequestResult{
   /** The current tag value description */
   private String valueDescription;
 
-  @Past
   private Timestamp sourceTimestamp;
 
-  @Past
   private Timestamp daqTimestamp;
 
-  @NotNull @Past
   private Timestamp serverTimestamp;
 
   public TestUpdateTag(){};

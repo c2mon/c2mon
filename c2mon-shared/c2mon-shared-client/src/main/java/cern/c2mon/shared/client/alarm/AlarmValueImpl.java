@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2019 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -21,19 +21,17 @@ import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Past;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.Root;
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.convert.AnnotationStrategy;
 import org.simpleframework.xml.core.Persister;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
 import cern.c2mon.shared.client.request.ClientRequestReport;
 
@@ -54,25 +52,20 @@ import cern.c2mon.shared.client.request.ClientRequestReport;
 public final class AlarmValueImpl extends ClientRequestReport implements AlarmValue, Cloneable {
 
   /** Alarm id */
-  @NotNull
-  @Min(1)
   @Attribute
   private Long id;
 
   /** LASER alarm fault code */
-  @NotNull
   @Element
   private int faultCode;
 
   /** LASER alarm fault family */
-  @NotNull
   @Element
   private String faultFamily;
 
   // ToDo: correct typo in next major release ->
   // https://gitlab.cern.ch/c2mon/c2mon/issues/149
   /** LASER alarm fault member */
-  @NotNull
   @Element
   private String faultMemeber;
 
@@ -81,8 +74,6 @@ public final class AlarmValueImpl extends ClientRequestReport implements AlarmVa
   private String info;
 
   /** Unique identifier of the Tag to which the alarm is attached */
-  @NotNull
-  @Min(1)
   @Element
   private Long tagId;
 
@@ -91,8 +82,6 @@ public final class AlarmValueImpl extends ClientRequestReport implements AlarmVa
   private String tagDescription;
 
   /** UTC timestamp of the alarm's last state change */
-  @NotNull
-  @Past
   @Element
   private Timestamp timestamp;
 
@@ -107,7 +96,6 @@ public final class AlarmValueImpl extends ClientRequestReport implements AlarmVa
   /**
    * Metadata according to the tag in this class.
    */
-  @NotNull
   private Map<String, Object> metadata = new HashMap<>();
 
   /**
