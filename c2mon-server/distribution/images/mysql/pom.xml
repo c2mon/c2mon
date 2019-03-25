@@ -54,25 +54,25 @@
           <execution>
             <phase>deploy</phase>
             <id>build</id>
-            <configuration>
-              <container>
-                <ports>
-                  <port>3306</port>
-                </ports>
-                <entrypoint>
-                  <entrypoint>INHERIT</entrypoint>
-                </entrypoint>
-                <environment>
-                  <MYSQL_DATABASE>tim</MYSQL_DATABASE>
-                  <MYSQL_ALLOW_EMPTY_PASSWORD>yes</MYSQL_ALLOW_EMPTY_PASSWORD>
-                </environment>
-              </container>
-              <extraDirectory>
-                <path>${project.build.directory}/</path>
-              </extraDirectory>
-            </configuration>
           </execution>
         </executions>
+        <configuration>
+          <container>
+            <ports>
+              <port>3306</port>
+            </ports>
+            <entrypoint>
+              <entrypoint>INHERIT</entrypoint>
+            </entrypoint>
+            <environment>
+              <MYSQL_DATABASE>tim</MYSQL_DATABASE>
+              <MYSQL_ALLOW_EMPTY_PASSWORD>yes</MYSQL_ALLOW_EMPTY_PASSWORD>
+            </environment>
+          </container>
+          <extraDirectory>
+            <path>${project.build.directory}/</path>
+          </extraDirectory>
+        </configuration>
       </plugin>
     </plugins>
   </build>

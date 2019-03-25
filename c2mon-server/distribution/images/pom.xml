@@ -54,27 +54,27 @@
           <execution>
             <phase>deploy</phase>
             <id>build</id>
-            <configuration>
-              <from>
-                <image>${image.base}</image>
-              </from>
-              <to>
-                <image>${registry}/${repository}</image>
-                <tags>
-                  <tag>${project.version}</tag>
-                  <tag>latest</tag>
-                </tags>
-              </to>
-              <container>
-                <useCurrentTimestamp>true</useCurrentTimestamp>
-                <entrypoint>INHERIT</entrypoint>
-              </container>
-            </configuration>
             <goals>
               <goal>build</goal>
             </goals>
           </execution>
         </executions>
+        <configuration>
+          <from>
+            <image>${image.base}</image>
+          </from>
+          <to>
+            <image>${registry}/${repository}</image>
+            <tags>
+              <tag>${project.version}</tag>
+              <tag>latest</tag>
+            </tags>
+          </to>
+          <container>
+            <useCurrentTimestamp>true</useCurrentTimestamp>
+            <entrypoint>INHERIT</entrypoint>
+          </container>
+        </configuration>
       </plugin>
 
       <plugin>
