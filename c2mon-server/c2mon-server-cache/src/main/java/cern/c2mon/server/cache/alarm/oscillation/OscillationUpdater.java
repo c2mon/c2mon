@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2018 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2019 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -18,6 +18,7 @@ package cern.c2mon.server.cache.alarm.oscillation;
 
 import java.sql.Timestamp;
 
+import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -26,10 +27,9 @@ import cern.c2mon.server.cache.AlarmFacade;
 import cern.c2mon.server.cache.alarm.config.OscillationProperties;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.tag.Tag;
-import lombok.Data;
 
 /**
- * 
+ *
  * @author Emiliano Piselli
  *
  */
@@ -51,7 +51,7 @@ public final class OscillationUpdater {
     public void update(final AlarmCacheObject alarmCacheObject, final Tag tag) {
         alarmCacheObject.setTimestamp(new Timestamp(System.currentTimeMillis()));
         alarmCacheObject.setSourceTimestamp(tag.getTimestamp());
-        
+
         // Evaluate oscillation
         boolean isAlarmConditionActive = alarmCacheObject.getCondition().evaluateState(tag.getValue());
         if (tag.isValid()) {
@@ -67,9 +67,8 @@ public final class OscillationUpdater {
     }
 
     public boolean checkOscillAlive(AlarmCacheObject alarmCacheObject) {
-        return ((System.currentTimeMillis()
-                - alarmCacheObject.getTimestamp().getTime()) < (oscillationProperties.getTimeOscillationAlive()
-                        * 1000));
+        return ((System.currentTimeMillis()- alarmCacheObject.getTimestamp().getTime())
+                < (oscillationProperties.getTimeOscillationAlive() * 1000));
     }
 
     private void increaseOscillCounter(AlarmCacheObject alarmCacheObject) {
@@ -91,14 +90,14 @@ public final class OscillationUpdater {
     /**
      * Check whether we have accumulated enough oscillations over the prescribed
      * period of time to declare we are actually oscillating.
-     * 
+     *
      * @param alarmCacheObject
      *            the alarm cache object containing already the new alarm state.
      * @return true, if alarm shall be marked as oscillating.
      */
     private boolean checkOscillConditions(AlarmCacheObject alarmCacheObject) {
         return ((alarmCacheObject.getCounterFault() >= oscillationProperties.getOscNumbers())
-                && ((System.currentTimeMillis() - alarmCacheObject.getFirstOscTS()) <= oscillationProperties
-                        .getTimeRange() * 1000));
+                && ((System.currentTimeMillis() - alarmCacheObject.getFirstOscTS())
+                    <= oscillationProperties.getTimeRange() * 1000));
     }
 }

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2019 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -22,6 +22,7 @@ import java.util.TimerTask;
 
 import javax.annotation.PostConstruct;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Service;
@@ -29,15 +30,14 @@ import org.springframework.stereotype.Service;
 import cern.c2mon.server.cache.AlarmCache;
 import cern.c2mon.server.cache.AliveTimerFacade;
 import cern.c2mon.server.cache.ClusterCache;
-import cern.c2mon.server.cache.DataTagCache;
+import cern.c2mon.server.cache.TagFacadeGateway;
 import cern.c2mon.server.cache.alarm.config.OscillationProperties;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.AlarmCacheUpdater;
 import cern.c2mon.server.common.config.ServerConstants;
-import cern.c2mon.server.common.datatag.DataTag;
+import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.client.alarm.AlarmQuery;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * Timer that regularly checks all the active alive timers monitoring the
@@ -73,7 +73,7 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
   private static final String LAST_CHECK_LONG = OscillationUpdateChecker.class.getName() + ".lastAliveTimerCheck";
 
   /**
-   * How often the timer checks whether the alive timer have expired.
+   * How often the timer checks whether the alive timer have expired: 10 seconds (in millis)
    */
   private static final int SCAN_INTERVAL = 10000;
 
@@ -97,9 +97,9 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
    * Reference to alive timer cache.
    */
   private AlarmCache alarmCache;
-  
-  private DataTagCache dataTagCache;
-  
+
+  private final TagFacadeGateway tagFacade;
+
   /**
    * Reference to alive oscillationUpdater.
    */
@@ -112,7 +112,7 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
 
   /**
    * Constructor.
-   * 
+   *
    * @param alarmCache
    *          the alarm cache
    * @param clusterCache
@@ -120,10 +120,10 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
    *          nodes
    */
   @Autowired
-  public OscillationUpdateChecker(final AlarmCache alarmCache, final DataTagCache dataTagCache, final ClusterCache clusterCache, final OscillationUpdater oscillationUpdater, final AlarmCacheUpdater alarmCacheUpdater) {
+  public OscillationUpdateChecker(final AlarmCache alarmCache, final TagFacadeGateway tagFacade, final ClusterCache clusterCache, final OscillationUpdater oscillationUpdater, final AlarmCacheUpdater alarmCacheUpdater) {
     super();
     this.alarmCache = alarmCache;
-    this.dataTagCache = dataTagCache;
+    this.tagFacade = tagFacade;
     this.clusterCache = clusterCache;
     this.oscillationUpdater = oscillationUpdater;
     this.alarmCacheUpdater = alarmCacheUpdater;
@@ -182,39 +182,18 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
     clusterCache.acquireWriteLockOnKey(LAST_CHECK_LONG);
     try {
       Long lastCheck = (Long) clusterCache.getCopy(LAST_CHECK_LONG);
-      if (System.currentTimeMillis() - lastCheck.longValue() < 9000) { // results
-                                                                       // in
-                                                                       // check
-                                                                       // on a
-                                                                       // single
-                                                                       // server
+      if (System.currentTimeMillis() - lastCheck.longValue() < 9000) {
         log.debug("Skipping alarm oscillation check as already performed.");
       } else {
-        if (log.isDebugEnabled()) {
-          log.debug("run() : checking alarm oscillation timers ... ");
-        }
+        log.debug("checking alarm oscillation timers ... ");
         try {
-
           AlarmQuery query = AlarmQuery.builder().oscillating(true).build();
-          Collection<Long> result = alarmCache.findAlarm(query);
-
-          for (Long alarmId : result) {
-            AlarmCacheObject alarmCopy = (AlarmCacheObject) alarmCache.getCopy(alarmId);
-            DataTag dataTag = dataTagCache.get(alarmCopy.getDataTagId());
-            if (!oscillationUpdater.checkOscillAlive(alarmCopy)) {
-              oscillationUpdater.resetOscillationCounter(alarmCopy);
-              alarmCopy.setOscillating(false);
-              alarmCacheUpdater.update(alarmCopy, dataTag);
-              alarmCopy.setInfo(AlarmCacheUpdater.evaluateAdditionalInfo(alarmCopy, dataTag));
-              alarmCache.put(alarmCopy.getId(), alarmCopy);
-            }
-          }
-
-        } catch (CacheElementNotFoundException cacheEx) {
-          log.warn("Failed to locate alive timer in cache on expiration check (may happen exceptionally if just removed).", cacheEx);
+          Collection<Long> oscillatingAlarmIds = alarmCache.findAlarm(query);
+          oscillatingAlarmIds.stream().forEach(this::checkOscillation);
         } catch (Exception e) {
-          log.error("Unexpected exception when checking the alive timers", e);
+          log.error("Unexpected exception when checking the active oscillating alarms", e);
         }
+
         lastCheck = Long.valueOf(System.currentTimeMillis());
         clusterCache.put(LAST_CHECK_LONG, lastCheck);
 
@@ -224,6 +203,22 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
       } // end of else block
     } finally {
       clusterCache.releaseWriteLockOnKey(LAST_CHECK_LONG);
+    }
+  }
+
+  private void checkOscillation(Long alarmId) {
+    try {
+      AlarmCacheObject alarmCopy = (AlarmCacheObject) alarmCache.getCopy(alarmId);
+      Tag tag = tagFacade.getTag(alarmCopy.getDataTagId());
+      if (!oscillationUpdater.checkOscillAlive(alarmCopy)) {
+        oscillationUpdater.resetOscillationCounter(alarmCopy);
+        alarmCopy.setOscillating(false);
+        alarmCacheUpdater.update(alarmCopy, tag);
+        alarmCopy.setInfo(AlarmCacheUpdater.evaluateAdditionalInfo(alarmCopy, tag));
+        alarmCache.put(alarmCopy.getId(), alarmCopy);
+      }
+    } catch (CacheElementNotFoundException e) {
+      log.error("Failed to locate corresponding tag in cache for alarm #{}. This should never happen!", alarmId);
     }
   }
 
