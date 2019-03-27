@@ -84,7 +84,7 @@ public final class OscillationUpdater {
         alarmCacheObject.setCounterFault(0);
         alarmCacheObject.setOscillating(false);
         alarmCacheObject.setFirstOscTS(0);
-        alarmCacheObject.setLastActiveState(false);
+//        alarmCacheObject.setLastActiveState(false);
     }
 
     /**

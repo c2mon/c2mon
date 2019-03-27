@@ -152,6 +152,7 @@ public class OscillationUpdaterTest {
     }
     log.info("===========================");
     oscUpdater.resetOscillationCounter(alarmCacheObject);
+    alarmCacheObject.setLastActiveState(false);
     alarmCacheObject.setOscillating(false);
     alarmCacheObject.setActive(false);
     alarmCacheObject.setInternalActive(false);
