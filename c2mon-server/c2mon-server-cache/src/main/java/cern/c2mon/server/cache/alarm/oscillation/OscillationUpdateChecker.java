@@ -17,6 +17,7 @@
 package cern.c2mon.server.cache.alarm.oscillation;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -208,14 +209,24 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
 
   private void checkOscillation(Long alarmId) {
     try {
+      log.trace("Checking oscillation expiry for alarm #{}", alarmId);
       AlarmCacheObject alarmCopy = (AlarmCacheObject) alarmCache.getCopy(alarmId);
       Tag tag = tagFacade.getTag(alarmCopy.getDataTagId());
+      if(log.isTraceEnabled()) {
+                log.trace(" -> Alarm oscillation details osc {} first osc {} count {} al ts {}", alarmCopy.isOscillating(),
+                        new Date(alarmCopy.getFirstOscTS()).toString(), alarmCopy.getCounterFault(),
+                        alarmCopy.getTimestamp().toString());
+            }
       if (!oscillationUpdater.checkOscillAlive(alarmCopy)) {
-        oscillationUpdater.resetOscillationCounter(alarmCopy);
-        alarmCopy.setOscillating(false);
-        alarmCacheUpdater.update(alarmCopy, tag);
-        alarmCopy.setInfo(AlarmCacheUpdater.evaluateAdditionalInfo(alarmCopy, tag));
-        alarmCache.put(alarmCopy.getId(), alarmCopy);
+          log.trace(" -> ! Alarm #{} is not oscillating anymore, resetting oscillation counter", alarmId);
+          oscillationUpdater.resetOscillationCounter(alarmCopy);
+          alarmCopy.setOscillating(false);
+          alarmCacheUpdater.update(alarmCopy, tag);
+          alarmCopy.setInfo(AlarmCacheUpdater.evaluateAdditionalInfo(alarmCopy, tag));
+          log.trace(" -> Refreshing alarm cache for #{}", alarmId);
+          alarmCache.put(alarmCopy.getId(), alarmCopy);
+      } else {
+          log.trace(" -> ! Alarm #{} is still oscillating - no change", alarmId);
       }
     } catch (CacheElementNotFoundException e) {
       log.error("Failed to locate corresponding tag in cache for alarm #{}. This should never happen!", alarmId);
