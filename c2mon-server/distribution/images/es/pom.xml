@@ -26,11 +26,6 @@
         <configuration>
           <container>
             <environment>
-              <cluster.name>c2mon</cluster.name>
-              <discovery.type>single-node</discovery.type>
-              <xpack.security.enabled>false</xpack.security.enabled>
-              <!-- Disable swapping -->
-              <bootstrap.memory_lock>true</bootstrap.memory_lock>
               <!-- Ensure correct permission settings for user for volume -->
               <TAKE_FILE_OWNERSHIP>1</TAKE_FILE_OWNERSHIP>
               <ES_JAVA_OPTS>-Xms512m -Xmx512m</ES_JAVA_OPTS>
