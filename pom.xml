@@ -39,7 +39,7 @@
     <org.springframework.boot.version>2.1.0.RELEASE</org.springframework.boot.version>
     <org.slf4j.version>1.7.25</org.slf4j.version>
     <org.apache.activemq.version>5.15.2</org.apache.activemq.version>
-    <elasticsearch.version>5.6.0</elasticsearch.version>
+    <elasticsearch.version>5.6.15</elasticsearch.version>
     <mockito-all.version>1.10.19</mockito-all.version>
 
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -112,9 +112,9 @@
         <version>${org.springframework.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-jdbc</artifactId>
-        <version>${org.springframework.version}</version>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-jpa</artifactId>
+        <version>${org.springframework.boot.version}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework.boot</groupId>
@@ -125,6 +125,12 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-logging</artifactId>
         <version>${org.springframework.boot.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-to-slf4j</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.springframework.boot</groupId>
