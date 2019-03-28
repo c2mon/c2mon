@@ -1,0 +1,46 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: c2mon-server
+  name: c2mon-server
+spec:
+  replicas: 1
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: c2mon-server
+    spec:
+      containers:
+      - env:
+        - name: C2MON_SERVER_ELASTICSEARCH_EMBEDDED
+          value: "false"
+        - name: C2MON_SERVER_ELASTICSEARCH_HOST
+          value: es
+        - name: C2MON_SERVER_JMS_EMBEDDED
+          value: "false"
+        - name: C2MON_SERVER_JMS_URL
+          value: tcp://mq:61616
+        image: cern/c2mon
+        name: c2mon-server
+        resources: {}
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: c2mon-server
+  name: c2mon-server
+spec:
+  ports:
+    - name: server
+      port: 9001
+      targetPort: 9001
+  selector:
+    io.kompose.service: c2mon-server
+status:
+  loadBalancer: {}
