@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>cern.c2mon.server</groupId>
+    <artifactId>distribution</artifactId>
+    <version>1.8.41-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>kubernetes</artifactId>
+  <name>c2mon-server :: kubernetes</name>
+  <packaging>pom</packaging>
+
+  <properties>
+    <kubernetes.file>c2mon-kubernetes-single.yaml</kubernetes.file>
+  </properties>
+
+  <build>
+
+  <plugins>
+    <plugin>
+      <artifactId>maven-antrun-plugin</artifactId>
+      <executions>
+        <execution>
+          <phase>generate-sources</phase>
+          <configuration>
+            <target>
+              <concat destfile="test.file" append="yes" force="yes">
+                <fileset dir="." includes="*.yaml" excludes="${kubernetes.file}"/>
+                <filterchain>
+                  <tailfilter lines="3"/>
+                </filterchain>
+              </concat>
+              <concat destfile="${kubernetes.file}" force="yes">
+                <fileset dir="." includes="*.yaml" excludes="${kubernetes.file}"/>
+              </concat>
+            </target>
+          </configuration>
+          <goals>
+            <goal>run</goal>
+          </goals>
+        </execution>
+      </executions>
+    </plugin>
+  </plugins>
+
+  </build>
+
+</project>
