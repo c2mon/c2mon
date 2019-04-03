@@ -84,9 +84,14 @@ public final class OscillationUpdater {
         alarmCacheObject.setCounterFault(alarmCacheObject.getCounterFault() + 1);
         if (alarmCacheObject.getCounterFault() == 1
                 || ((alarmCacheObject.getCounterFault() % oscillationProperties.getOscNumbers()) == 0)) {
-            alarmCacheObject.setFirstOscTS(System.currentTimeMillis());
+            alarmCacheObject.setFirstOscTS(System.currentTimeMillis()-1);
         }
-        alarmCacheObject.setOscillating(checkOscillConditions(alarmCacheObject));
+        
+        if(checkOscillConditions(alarmCacheObject)) {
+            // We only change the oscillation status if the alarm is currently oscillating.
+            // Expiring the oscillation is the work of the OscillationUpdateChecker class.
+            alarmCacheObject.setOscillating(true);
+        }
     }
 
     public void resetOscillationCounter(AlarmCacheObject alarmCacheObject) {
