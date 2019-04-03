@@ -13,7 +13,7 @@
 
   <modules>
     <module>tar</module>
-    <module>docker</module>
+    <module>images</module>
   </modules>
 
   <dependencyManagement>

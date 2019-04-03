@@ -2,8 +2,6 @@
 
 set -e
 
-cd /${basedir}
-
 # Add daq process as command if at least one argument was provided to the C2MON DAQ entrypoint
 # with a "-" flag (otherwise we assume another command like /bin/bash etc...
 if [ "${1:0:1}" = '-' ]; then
