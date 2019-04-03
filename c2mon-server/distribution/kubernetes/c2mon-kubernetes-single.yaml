@@ -1,0 +1,262 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    io.kompose.service: mq
+  name: mq
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: mq
+    spec:
+      containers:
+      - image: cern/c2mon-mq
+        name: mq
+        ports:
+        - containerPort: 61616
+        - containerPort: 61614
+        resources: {}
+      restartPolicy: Always
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    io.kompose.service: mq
+  name: mq
+spec:
+  ports:
+    - name: "61616"
+      port: 61616
+      targetPort: 61616
+    - name: "61614"
+      port: 61614
+      targetPort: 61614
+  selector:
+    io.kompose.service: mq
+status:
+  loadBalancer: {}
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: c2mon-server
+  name: c2mon-server
+spec:
+  replicas: 1
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: c2mon-server
+    spec:
+      containers:
+      - env:
+        - name: C2MON_SERVER_ELASTICSEARCH_EMBEDDED
+          value: "false"
+        - name: C2MON_SERVER_ELASTICSEARCH_HOST
+          value: es
+        - name: C2MON_SERVER_JMS_EMBEDDED
+          value: "false"
+        - name: C2MON_SERVER_JMS_URL
+          value: tcp://mq:61616
+        image: cern/c2mon
+        name: c2mon-server
+        resources: {}
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: c2mon-server
+  name: c2mon-server
+spec:
+  ports:
+    - name: server
+      port: 9001
+      targetPort: 9001
+  selector:
+    io.kompose.service: c2mon-server
+status:
+  loadBalancer: {}
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: c2mon-web
+  name: c2mon-web
+spec:
+  replicas: 1
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: c2mon-web
+    spec:
+      containers:
+      - env:
+        - name: C2MON_SERVER_ELASTICSEARCH_HOST
+          value: http://es:9200
+        - name: C2MON_PORT_61616_TCP
+          value: tcp://mq:61616
+        - name: C2MON_PORT_9001_TCP_ADDR
+          value: c2mon-server
+        - name: C2MON_SERVER_JDBC_URL
+          value: jdbc:hsqldb:file:///tmp/c2mondb;sql.syntax_ora=true;hsqldb.default_table_type=cached;hsqldb.cache_rows=1000;hsqldb.result_max_memory_rows=2000;hsqldb.cache_size=100
+        name: c2mon-web
+        image: cern/c2mon-web-ui
+        ports:
+          - containerPort: 3306
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: c2mon-web
+  name: c2mon-web
+spec:
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+  selector:
+    io.kompose.service: c2mon-web
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: daq
+  name: daq
+spec:
+  replicas: 1
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: daq
+    spec:
+      containers:
+      - image: cern/c2mon-daq:c2mon-daq-hostmetrics-0.0.4-SNAPSHOT
+        name: daq
+        env:
+        - name: C2MON_DAQ_JMS_URL
+          value: failover:tcp://mq:61616
+        - name: C2MON_CLIENT_JMS_URL
+          value: failover:tcp://mq:61616
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: db
+  name: db
+spec:
+  replicas: 1
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: db
+    spec:
+      containers:
+      - env:
+        - name: MYSQL_ALLOW_EMPTY_PASSWORD
+          value: "yes"
+        image: cern/c2mon-mysql
+        name: db
+        ports:
+        - containerPort: 3306
+        resources: {}
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: db
+  name: db
+spec:
+  ports:
+    - name: "3306"
+      port: 3306
+      targetPort: 3306
+  selector:
+    io.kompose.service: db
+status:
+  loadBalancer: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: es
+  labels:
+    service: es
+spec:
+  clusterIP: None
+  ports:
+    - port: 9200
+      name: serving
+    - port: 9300
+      name: node-to-node
+  selector:
+    io.kompose.service: es
+---
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: es
+  name: es-node
+spec:
+  replicas: 1
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: es
+      name: c2mon-es-node
+    spec:
+      containers:
+      - image: cern/c2mon-es
+        name: c2mon-es-node
+        env:
+        - name: namespace
+          valueFrom:
+           fieldRef:
+            fieldPath: metadata.namespace
+        - name: node.name
+          valueFrom:
+           fieldRef:
+            fieldPath: metadata.name
+        - name: cluster.name
+          value: c2mon
+        - name: network.host
+          value: "0.0.0.0"
+        # Required in ES 5.6 images, as they don't pick up ENV config properly
+        args: ["-Enode.name=$(node.name)",
+               "-Ecluster.name=$(cluster.name)",
+               "-Enetwork.host=$(network.host)",
+               "-Ediscovery.type=single-node"]
+        ports:
+        - containerPort: 9200
+        - containerPort: 9300
+      restartPolicy: Always
+status: {}
+---
