@@ -3,6 +3,7 @@ package cern.c2mon.server.client.config;
 import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.configuration.impl.ConfigurationRequestHandler;
 import org.apache.activemq.command.ActiveMQQueue;
+import org.apache.qpid.jms.JmsQueue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
@@ -30,7 +31,7 @@ public class ConfigRequestJmsConfig {
     DefaultMessageListenerContainer container = new DefaultMessageListenerContainer();
 
     String configRequestQueue = properties.getJms().getConfigRequestQueue();
-    container.setDestination(new ActiveMQQueue(configRequestQueue));
+    container.setDestination(new JmsQueue(configRequestQueue));
 
     container.setConnectionFactory(clientSingleConnectionFactory);
     container.setMessageListener(requestHandler);

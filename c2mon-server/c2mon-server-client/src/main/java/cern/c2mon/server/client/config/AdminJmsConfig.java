@@ -3,9 +3,12 @@ package cern.c2mon.server.client.config;
 import cern.c2mon.server.client.request.ClientRequestDelegator;
 import cern.c2mon.server.client.request.ClientRequestErrorHandler;
 import cern.c2mon.server.common.config.ServerConstants;
-import org.apache.activemq.ActiveMQConnectionFactory;
+
 import org.apache.activemq.ActiveMQPrefetchPolicy;
 import org.apache.activemq.command.ActiveMQQueue;
+import org.apache.qpid.jms.JmsConnectionFactory;
+import org.apache.qpid.jms.JmsPrefetchPolicy;
+import org.apache.qpid.jms.JmsQueue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,14 +30,14 @@ public class AdminJmsConfig {
   private ThreadPoolExecutor clientExecutor;
 
   @Bean
-  public ActiveMQConnectionFactory adminActiveMQConnectionFactory() {
-    String url = properties.getJms().getUrl();
+  public JmsConnectionFactory adminAmqpConnectionFactory() {
+    String url = properties.getAmqp().getUrl();
 
-    ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(url);
+    JmsConnectionFactory connectionFactory = new JmsConnectionFactory(url);
     connectionFactory.setClientIDPrefix("C2MON-SERVER-CLIENT");
-    connectionFactory.setWatchTopicAdvisories(false);
+//    connectionFactory.setWatchTopicAdvisories(false);
 
-    ActiveMQPrefetchPolicy prefetchPolicy = new ActiveMQPrefetchPolicy();
+    JmsPrefetchPolicy prefetchPolicy = new JmsPrefetchPolicy();
     prefetchPolicy.setQueuePrefetch(0);
     connectionFactory.setPrefetchPolicy(prefetchPolicy);
     return connectionFactory;
@@ -42,7 +45,7 @@ public class AdminJmsConfig {
 
   @Bean
   public SingleConnectionFactory adminSingleConnectionFactory() {
-    return new SingleConnectionFactory(adminActiveMQConnectionFactory());
+    return new SingleConnectionFactory(adminAmqpConnectionFactory());
   }
 
   @Bean
@@ -50,7 +53,7 @@ public class AdminJmsConfig {
     DefaultMessageListenerContainer container = new DefaultMessageListenerContainer();
 
     String adminRequestQueue = properties.getJms().getAdminRequestQueue();
-    container.setDestination(new ActiveMQQueue(adminRequestQueue));
+    container.setDestination(new JmsQueue(adminRequestQueue));
 
     container.setConnectionFactory(adminSingleConnectionFactory());
     container.setMessageListener(delegator);

@@ -1,23 +1,22 @@
 package cern.c2mon.server.client.config;
 
-import cern.c2mon.server.client.request.ClientRequestDelegator;
-import cern.c2mon.server.client.request.ClientRequestErrorHandler;
-import cern.c2mon.server.common.config.ServerConstants;
-import cern.c2mon.shared.util.jms.ActiveJmsSender;
-import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.activemq.command.ActiveMQQueue;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
+import org.apache.qpid.jms.JmsConnectionFactory;
+import org.apache.qpid.jms.JmsQueue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
 import org.springframework.jms.connection.SingleConnectionFactory;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
 
-import java.util.Collections;
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import cern.c2mon.server.client.request.ClientRequestDelegator;
+import cern.c2mon.server.client.request.ClientRequestErrorHandler;
+import cern.c2mon.server.common.config.ServerConstants;
+import cern.c2mon.shared.util.jms.ActiveJmsSender;
 
 /**
  * @author Justin Lewis Salmon
@@ -29,18 +28,18 @@ public class ClientJmsConfig {
   private ClientProperties properties;
 
   @Bean
-  public ActiveMQConnectionFactory clientActiveMQConnectionFactory() {
-    String url = properties.getJms().getUrl();
-    ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(url);
+  public JmsConnectionFactory clientAmqpConnectionFactory() {
+    String url = properties.getAmqp().getUrl();
+    JmsConnectionFactory connectionFactory = new JmsConnectionFactory(url);
     connectionFactory.setClientIDPrefix("C2MON-SERVER-CLIENT");
-    connectionFactory.setTrustAllPackages(true);
-    connectionFactory.setWatchTopicAdvisories(false);
+//    connectionFactory.setTrustAllPackages(true);
+//    connectionFactory.setWatchTopicAdvisories(false);
     return connectionFactory;
   }
 
   @Bean
   public SingleConnectionFactory clientSingleConnectionFactory() {
-    return new SingleConnectionFactory(clientActiveMQConnectionFactory());
+    return new SingleConnectionFactory(clientAmqpConnectionFactory());
   }
 
   @Bean
@@ -65,7 +64,7 @@ public class ClientJmsConfig {
     DefaultMessageListenerContainer container = new DefaultMessageListenerContainer();
 
     String clientRequestQueue = properties.getJms().getRequestQueue();
-    container.setDestination(new ActiveMQQueue(clientRequestQueue));
+    container.setDestination(new JmsQueue(clientRequestQueue));
 
     container.setConnectionFactory(clientSingleConnectionFactory());
     container.setMessageListener(delegator);

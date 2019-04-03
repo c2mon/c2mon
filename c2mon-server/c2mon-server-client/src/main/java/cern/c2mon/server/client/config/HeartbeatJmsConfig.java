@@ -1,13 +1,14 @@
 package cern.c2mon.server.client.config;
 
-import cern.c2mon.shared.util.jms.ActiveJmsSender;
-import cern.c2mon.shared.util.jms.JmsSender;
-import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.activemq.command.ActiveMQTopic;
+import org.apache.qpid.jms.JmsConnectionFactory;
+import org.apache.qpid.jms.JmsTopic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.jms.connection.SingleConnectionFactory;
 import org.springframework.jms.core.JmsTemplate;
+
+import cern.c2mon.shared.util.jms.ActiveJmsSender;
+import cern.c2mon.shared.util.jms.JmsSender;
 
 /**
  * @author Justin Lewis Salmon
@@ -18,10 +19,10 @@ public class HeartbeatJmsConfig {
   private ClientProperties properties;
 
   @Bean
-  public ActiveMQConnectionFactory heartbeatConnectionFactory() {
-    ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory(properties.getJms().getUrl());
+  public JmsConnectionFactory heartbeatConnectionFactory() {
+    JmsConnectionFactory factory = new JmsConnectionFactory(properties.getAmqp().getUrl());
     factory.setClientIDPrefix("C2MON-SERVER-HEARTBEAT");
-    factory.setWatchTopicAdvisories(false);
+//    factory.setWatchTopicAdvisories(false);
     return factory;
   }
 
@@ -33,7 +34,7 @@ public class HeartbeatJmsConfig {
   @Bean
   public JmsTemplate heartbeatJmsTemplate() {
     JmsTemplate jmsTemplate = new JmsTemplate(heartbeatSingleConnectionFactory());
-    jmsTemplate.setDefaultDestination(new ActiveMQTopic(properties.getJms().getHeartbeatTopic()));
+    jmsTemplate.setDefaultDestination(new JmsTopic(properties.getJms().getHeartbeatTopic()));
     jmsTemplate.setExplicitQosEnabled(true);
     jmsTemplate.setPriority(7);
     jmsTemplate.setTimeToLive(5400000);

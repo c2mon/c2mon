@@ -106,7 +106,7 @@ public class TagValuePublisherTest {
   private TagFacadeGateway tagFacadeGateway;
 
   @Autowired
-  @Qualifier("clientActiveMQConnectionFactory")
+  @Qualifier("clientAmqpConnectionFactory")
   private ConnectionFactory connectionFactory;
 
   @Autowired

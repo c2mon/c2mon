@@ -2,6 +2,7 @@ package cern.c2mon.server.client.config;
 
 import cern.c2mon.shared.util.jms.ActiveJmsSender;
 import org.apache.activemq.command.ActiveMQTopic;
+import org.apache.qpid.jms.JmsTopic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,7 +27,7 @@ public class AlarmJmsConfig {
     JmsTemplate jmsTemplate = new JmsTemplate(clientSingleConnectionFactory);
 
     String alarmTopic = properties.getJms().getAlarmTopic();
-    jmsTemplate.setDefaultDestination(new ActiveMQTopic(alarmTopic));
+    jmsTemplate.setDefaultDestination(new JmsTopic(alarmTopic));
 
     jmsTemplate.setExplicitQosEnabled(true);
     jmsTemplate.setTimeToLive(5400000);

@@ -3,6 +3,7 @@ package cern.c2mon.server.client.config;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import cern.c2mon.shared.client.config.ClientAmqpProperties;
 import cern.c2mon.shared.client.config.ClientJmsProperties;
 
 /**
@@ -16,6 +17,8 @@ public class ClientProperties {
    * JMS properties
    */
   private Jms jms = new Jms();
+
+  private Amqp amqp = new Amqp();
 
   @Data
   public class Jms extends ClientJmsProperties {
@@ -31,5 +34,10 @@ public class ClientProperties {
 
     /** Specify the maximum number of concurrent consumers to receive client requests */
     private int maxConsumers = 10;
+  }
+
+  @Data
+  public class Amqp extends ClientAmqpProperties {
+
   }
 }

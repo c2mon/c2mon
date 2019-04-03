@@ -31,6 +31,11 @@ public class ServerProperties {
    */
   private final Jms jms = new Jms();
 
+  /**
+   * AMQP properties
+   */
+  private final AMQP amqp = new AMQP();
+
   @Data
   public static class Jms {
 
@@ -40,6 +45,20 @@ public class ServerProperties {
      * c2mon.server.daqcommunication.jms.url and c2mon.server.client.jms.url
      */
     private String url = "tcp://localhost:61616";
+
+    /**
+     * Enable/disable the embedded broker
+     */
+    private boolean embedded = true;
+  }
+
+  @Data
+  public static class AMQP {
+
+    /**
+     * URL of AMQP broker to connect to.
+     */
+    private String url = "amqp://localhost:5672";
 
     /**
      * Enable/disable the embedded broker
