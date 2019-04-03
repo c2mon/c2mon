@@ -77,7 +77,7 @@ public final class OscillationUpdater {
                     alarmCacheObject.getId(), (systemTime - alarmTs), new Timestamp(systemTime),
                     alarmCacheObject.getTimestamp().toString());
         }
-        return ((systemTime - alarmTs) < (oscillationProperties.getTimeOscillationAlive() * 1000));
+        return (systemTime - alarmTs) < (oscillationProperties.getTimeOscillationAlive() * 1000);
     }
 
     private void increaseOscillCounter(AlarmCacheObject alarmCacheObject) {
