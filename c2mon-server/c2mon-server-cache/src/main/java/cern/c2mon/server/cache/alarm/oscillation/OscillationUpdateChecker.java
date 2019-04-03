@@ -121,7 +121,7 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
    *          nodes
    */
   @Autowired
-  public OscillationUpdateChecker(final AlarmCache alarmCache, final TagFacadeGateway tagFacade, final ClusterCache clusterCache, final OscillationUpdater oscillationUpdater, final AlarmCacheUpdater alarmCacheUpdater) {
+  public OscillationUpdateChecker(final AlarmCache alarmCache, final DataTagCache dataTagCache, final ClusterCache clusterCache, final OscillationUpdater oscillationUpdater, final AlarmCacheUpdater alarmCacheUpdater) {
     super();
     this.alarmCache = alarmCache;
     this.tagFacade = tagFacade;
@@ -191,6 +191,8 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
           AlarmQuery query = AlarmQuery.builder().oscillating(true).build();
           Collection<Long> oscillatingAlarmIds = alarmCache.findAlarm(query);
           oscillatingAlarmIds.stream().forEach(this::checkOscillation);
+            DataTag dataTag = dataTagCache.get(alarmCopy.getDataTagId());
+              alarmCopy.setInfo(AlarmCacheUpdater.evaluateAdditionalInfo(alarmCopy, dataTag));
             DataTag dataTag = dataTagCache.get(alarmCopy.getDataTagId());
               alarmCopy.setInfo(AlarmCacheUpdater.evaluateAdditionalInfo(alarmCopy, dataTag));
         } catch (Exception e) {
