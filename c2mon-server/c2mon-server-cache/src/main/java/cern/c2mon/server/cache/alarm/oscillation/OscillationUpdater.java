@@ -19,6 +19,8 @@ package cern.c2mon.server.cache.alarm.oscillation;
 import java.sql.Timestamp;
 
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -35,6 +37,7 @@ import cern.c2mon.server.common.tag.Tag;
  */
 @Component
 @Data
+@Slf4j
 public final class OscillationUpdater {
 
     @Autowired
@@ -67,8 +70,14 @@ public final class OscillationUpdater {
     }
 
     public boolean checkOscillAlive(AlarmCacheObject alarmCacheObject) {
-        return ((System.currentTimeMillis()- alarmCacheObject.getTimestamp().getTime())
-                < (oscillationProperties.getTimeOscillationAlive() * 1000));
+        long systemTime = System.currentTimeMillis();
+        long alarmTs = alarmCacheObject.getTimestamp().getTime();
+        if (log.isTraceEnabled()) {
+            log.trace(" -> OscillationUpdater.checkOscillAlive()  Alarm #{} diff: {} systime : {} alarmts : {}",
+                    alarmCacheObject.getId(), (systemTime - alarmTs), new Timestamp(systemTime),
+                    alarmCacheObject.getTimestamp().toString());
+        }
+        return ((systemTime - alarmTs) < (oscillationProperties.getTimeOscillationAlive() * 1000));
     }
 
     private void increaseOscillCounter(AlarmCacheObject alarmCacheObject) {
