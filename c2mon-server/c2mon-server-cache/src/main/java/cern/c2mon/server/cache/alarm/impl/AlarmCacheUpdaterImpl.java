@@ -96,7 +96,7 @@ public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
 
     // Return if new state is TERMINATE and old state was also TERMINATE, return
     // original alarm (no need to save in cache)
-    if (newState == false && alarmCacheObject.isActive() == false) {
+    if ( (!newState) && (!alarmCacheObject.isActive()) ) {
       return alarmCacheObject;
     }
 
