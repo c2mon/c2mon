@@ -23,22 +23,21 @@ import java.util.concurrent.CountDownLatch;
 
 import javax.jms.*;
 
-import cern.c2mon.client.core.config.C2monAutoConfiguration;
-import org.apache.activemq.command.ActiveMQQueue;
+import org.apache.qpid.jms.JmsConnectionFactory;
+import org.apache.qpid.jms.JmsQueue;
 import org.easymock.EasyMock;
-import org.junit.*;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.springframework.jms.connection.CachingConnectionFactory;
 import org.springframework.jms.core.JmsTemplate;
-import org.springframework.jms.core.SessionCallback;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.client.common.listener.ClientRequestReportListener;
-import cern.c2mon.client.core.listener.TagUpdateListener;
 import cern.c2mon.client.core.config.C2monClientProperties;
-import cern.c2mon.client.core.config.mock.MockServerConfig;
+import cern.c2mon.client.core.jms.impl.ClientHealthMonitorImpl;
+import cern.c2mon.client.core.jms.impl.JmsProxyImpl;
+import cern.c2mon.client.core.jms.impl.SlowConsumerListener;
+import cern.c2mon.client.core.listener.TagUpdateListener;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.request.*;
 import cern.c2mon.shared.client.serializer.TransferTagSerializer;
@@ -61,34 +60,20 @@ import static org.junit.Assert.assertTrue;
  * @author Mark Brightwell
  *
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {
-    C2monAutoConfiguration.class,
-    MockServerConfig.class
-})
-@TestPropertySource(
-    properties = {
-        "c2mon.client.jms.url=vm://localhost:61616?broker.persistent=false&broker.useShutdownHook=false&broker.useJmx=false"
-    }
-)
-public class JmsProxyTest {
+public class JmsProxyTest extends EmbeddedBrokerTestSuite {
 
   /**
    * Component to test.
    */
-  @Autowired
   private JmsProxy jmsProxy;
 
-  @Autowired
   private C2monClientProperties properties;
 
   /**
    * For sending message to the broker, to be picked up by the tested proxy.
    */
-  @Autowired
   private ActiveJmsSender jmsSender;
 
-  @Autowired
   private JmsTemplate serverTemplate;
 
   TopicRegistrationDetails details = new TopicRegistrationDetails() {
@@ -102,6 +87,17 @@ public class JmsProxyTest {
       return 1L;
     }
   };
+
+  @Before
+  public void init() throws Exception {
+    properties = new C2monClientProperties();
+    jmsSender = new ActiveJmsSender();
+    serverTemplate = new JmsTemplate(new CachingConnectionFactory(new JmsConnectionFactory(properties.getAmqp().getUrl())));
+
+    JmsConnectionFactory connectionFactory = new JmsConnectionFactory(properties.getAmqp().getUrl());
+    SlowConsumerListener listener = new ClientHealthMonitorImpl();
+    jmsProxy = new JmsProxyImpl(connectionFactory, listener, properties);
+  }
 
   /**
    * Tests the sendRequest method throw the correct exception when the server does
@@ -121,37 +117,27 @@ public class JmsProxyTest {
    * Tests the sending of a request to the server and receiving a response
    * (decodes response and checks non null).
    *
-   * Start a new thread to mimick the server response to a client request.
+   * Start a new thread to mimic the server response to a client request.
    * @throws JMSException
    * @throws InterruptedException
    */
   @Test
-  public void testSendRequest() throws JMSException, InterruptedException {
+  public void testSendRequest() throws JMSException {
     JsonRequest<SupervisionEvent> jsonRequest = new ClientRequestImpl<>(SupervisionEvent.class);
-    final String queueName = properties.getJms().getRequestQueue() + "-" + System.currentTimeMillis();
-    new Thread(new Runnable() {
-      @Override
-      public void run() {
-        serverTemplate.execute(new SessionCallback<Object>() {
-
-          @Override
-          public Object doInJms(Session session) throws JMSException {
-            MessageConsumer consumer = session.createConsumer(new ActiveMQQueue(queueName));
-            Message message = consumer.receive(10000);
-            Assert.assertNotNull(message);
-            Assert.assertTrue(message instanceof TextMessage);
-            //send some response (empty collection)
-            Collection<SupervisionEvent> supervisionEvents = new ArrayList<>();
-            supervisionEvents.add(new SupervisionEventImpl(SupervisionEntity.PROCESS, 1L, "P_TEST", SupervisionStatus.RUNNING, new Timestamp(System.currentTimeMillis()), "test response"));
-            Message replyMessage = session.createTextMessage(GsonFactory.createGson().toJson(supervisionEvents));
-            MessageProducer producer = session.createProducer(message.getJMSReplyTo());
-            producer.send(replyMessage);
-            return null;
-          }
-
-        }, true);
-      }
-    }).start();
+    final String queueName = properties.getAmqp().getRequestQueue() + "-" + System.currentTimeMillis();
+    new Thread(() -> serverTemplate.execute(session -> {
+      MessageConsumer consumer = session.createConsumer(new JmsQueue(queueName));
+      Message message = consumer.receive(10000);
+      Assert.assertNotNull(message);
+      Assert.assertTrue(message instanceof TextMessage);
+      //send some response (empty collection)
+      Collection<SupervisionEvent> supervisionEvents = new ArrayList<>();
+      supervisionEvents.add(new SupervisionEventImpl(SupervisionEntity.PROCESS, 1L, "P_TEST", SupervisionStatus.RUNNING, new Timestamp(System.currentTimeMillis()), "test response"));
+      Message replyMessage = session.createTextMessage(GsonFactory.createGson().toJson(supervisionEvents));
+      MessageProducer producer = session.createProducer(message.getJMSReplyTo());
+      producer.send(replyMessage);
+      return null;
+    }, true)).start();
     Collection<SupervisionEvent> response = jmsProxy.sendRequest(jsonRequest, queueName, 10000); //wait 10s for an answer
     Assert.assertNotNull(response);
   }
@@ -308,46 +294,36 @@ public class JmsProxyTest {
 
     ClientRequestImpl<ConfigurationReport> jsonRequest = new ClientRequestImpl<>(ConfigurationReport.class);
     final String queueName = properties.getJms().getRequestQueue() + "-" + System.currentTimeMillis();
-    new Thread(new Runnable() {
-      @Override
-      public void run() {
-        serverTemplate.execute(new SessionCallback<Object>() {
+    new Thread(() -> serverTemplate.execute(session -> {
+      MessageConsumer consumer = session.createConsumer(new JmsQueue(queueName));
+      Message message = consumer.receive(10000);
+      Assert.assertNotNull(message);
+      Assert.assertTrue(message instanceof TextMessage);
 
-          @Override
-          public Object doInJms(Session session) throws JMSException {
-            MessageConsumer consumer = session.createConsumer(new ActiveMQQueue(queueName));
-            Message message = consumer.receive(10000);
-            Assert.assertNotNull(message);
-            Assert.assertTrue(message instanceof TextMessage);
+      //send progress reports
+      MessageProducer producer = session.createProducer(message.getJMSReplyTo());
+      Collection<ConfigurationReport> configReport = new ArrayList<>();
+      configReport.add(new ConfigurationReport(10, 5, 20, 2, "fake progress"));
+      Message replyMessage = session.createTextMessage(GsonFactory.createGson().toJson(configReport));
+      producer.send(replyMessage);
 
-            //send progress reports
-            MessageProducer producer = session.createProducer(message.getJMSReplyTo());
-            Collection<ConfigurationReport> configReport = new ArrayList<>();
-            configReport.add(new ConfigurationReport(10, 5, 20, 2, "fake progress"));
-            Message replyMessage = session.createTextMessage(GsonFactory.createGson().toJson(configReport));
-            producer.send(replyMessage);
+      configReport.clear();
+      configReport.add(new ConfigurationReport(1, 1, 2, 1, "fake progress"));
+      replyMessage = session.createTextMessage(GsonFactory.createGson().toJson(configReport));
+      producer.send(replyMessage);
 
-            configReport.clear();
-            configReport.add(new ConfigurationReport(1, 1, 2, 1, "fake progress"));
-            replyMessage = session.createTextMessage(GsonFactory.createGson().toJson(configReport));
-            producer.send(replyMessage);
+      configReport.clear();
+      configReport.add(new ConfigurationReport(10, 6, 22, 10, "fake progress"));
+      replyMessage = session.createTextMessage(GsonFactory.createGson().toJson(configReport));
+      producer.send(replyMessage);
 
-            configReport.clear();
-            configReport.add(new ConfigurationReport(10, 6, 22, 10, "fake progress"));
-            replyMessage = session.createTextMessage(GsonFactory.createGson().toJson(configReport));
-            producer.send(replyMessage);
-
-            //send result
-            configReport.clear();
-            configReport.add(new ConfigurationReport(10L, "name", "user"));
-            replyMessage = session.createTextMessage(GsonFactory.createGson().toJson(configReport));
-            producer.send(replyMessage);
-            return null;
-          }
-
-        }, true);
-      }
-    }).start();
+      //send result
+      configReport.clear();
+      configReport.add(new ConfigurationReport(10L, "name", "user"));
+      replyMessage = session.createTextMessage(GsonFactory.createGson().toJson(configReport));
+      producer.send(replyMessage);
+      return null;
+    }, true)).start();
     Collection<ConfigurationReport> response = jmsProxy.sendRequest(jsonRequest, queueName, 10000, reportListener); //wait 10s for an answer
     Assert.assertNotNull(response);
     Assert.assertTrue(response.iterator().next().isResult());
@@ -373,46 +349,36 @@ public class JmsProxyTest {
 
     ClientRequestImpl<ConfigurationReport> jsonRequest = new ClientRequestImpl<>(ConfigurationReport.class);
     final String queueName = properties.getJms().getRequestQueue() + "-" + System.currentTimeMillis();
-    new Thread(new Runnable() {
-      @Override
-      public void run() {
-        serverTemplate.execute(new SessionCallback<Object>() {
+    new Thread(() -> serverTemplate.execute(session -> {
+      MessageConsumer consumer = session.createConsumer(new JmsQueue(queueName));
+      Message message = consumer.receive(10000);
+      Assert.assertNotNull(message);
+      Assert.assertTrue(message instanceof TextMessage);
 
-          @Override
-          public Object doInJms(Session session) throws JMSException {
-            MessageConsumer consumer = session.createConsumer(new ActiveMQQueue(queueName));
-            Message message = consumer.receive(10000);
-            Assert.assertNotNull(message);
-            Assert.assertTrue(message instanceof TextMessage);
+      //send progress reports
+      MessageProducer producer = session.createProducer(message.getJMSReplyTo());
+      Collection<ConfigurationReport> configReport = new ArrayList<>();
+      configReport.add(new ConfigurationReport(10, 5, 20, 2, "fake progress"));
+      Message replyMessage = session.createTextMessage(GsonFactory.createGson().toJson(configReport));
+      producer.send(replyMessage);
 
-            //send progress reports
-            MessageProducer producer = session.createProducer(message.getJMSReplyTo());
-            Collection<ConfigurationReport> configReport = new ArrayList<>();
-            configReport.add(new ConfigurationReport(10, 5, 20, 2, "fake progress"));
-            Message replyMessage = session.createTextMessage(GsonFactory.createGson().toJson(configReport));
-            producer.send(replyMessage);
+      configReport.clear();
+      configReport.add(new ConfigurationReport(1, 1, 2, 1, "fake progress"));
+      replyMessage = session.createTextMessage(GsonFactory.createGson().toJson(configReport));
+      producer.send(replyMessage);
 
-            configReport.clear();
-            configReport.add(new ConfigurationReport(1, 1, 2, 1, "fake progress"));
-            replyMessage = session.createTextMessage(GsonFactory.createGson().toJson(configReport));
-            producer.send(replyMessage);
+      configReport.clear();
+      configReport.add(new ConfigurationReport(10, 6, 22, 10, "fake progress"));
+      replyMessage = session.createTextMessage(GsonFactory.createGson().toJson(configReport));
+      producer.send(replyMessage);
 
-            configReport.clear();
-            configReport.add(new ConfigurationReport(10, 6, 22, 10, "fake progress"));
-            replyMessage = session.createTextMessage(GsonFactory.createGson().toJson(configReport));
-            producer.send(replyMessage);
-
-            //send result
-            configReport.clear();
-            configReport.add(new ConfigurationReport(false, "error occurred"));
-            replyMessage = session.createTextMessage(GsonFactory.createGson().toJson(configReport));
-            producer.send(replyMessage);
-            return null;
-          }
-
-        }, true);
-      }
-    }).start();
+      //send result
+      configReport.clear();
+      configReport.add(new ConfigurationReport(false, "error occurred"));
+      replyMessage = session.createTextMessage(GsonFactory.createGson().toJson(configReport));
+      producer.send(replyMessage);
+      return null;
+    }, true)).start();
     boolean exceptionCaught = false;
     Collection<ConfigurationReport> response = null;
     try {

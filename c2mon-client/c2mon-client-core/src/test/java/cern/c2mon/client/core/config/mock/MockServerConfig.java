@@ -16,8 +16,8 @@
  *****************************************************************************/
 package cern.c2mon.client.core.config.mock;
 
-import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.activemq.command.ActiveMQQueue;
+import org.apache.qpid.jms.JmsConnectionFactory;
+import org.apache.qpid.jms.JmsQueue;
 import org.springframework.context.annotation.Bean;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
 import org.springframework.jms.listener.MessageListenerContainer;
@@ -26,10 +26,10 @@ import org.springframework.jms.listener.SessionAwareMessageListener;
 public class MockServerConfig {
 
   @Bean
-  public MessageListenerContainer mockServerListener(ActiveMQConnectionFactory connectionFactory) {
+  public MessageListenerContainer mockServerListener(JmsConnectionFactory connectionFactory) {
     DefaultMessageListenerContainer container = new DefaultMessageListenerContainer();
     container.setConnectionFactory(connectionFactory);
-    container.setDestination(new ActiveMQQueue("c2mon.client.request"));
+    container.setDestination(new JmsQueue("c2mon.client.request"));
     container.setMessageListener((SessionAwareMessageListener) (message, session) -> {
       session.createProducer(message.getJMSReplyTo()).send(session.createTextMessage("[]"));
     });

@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.client.core.config;
 
+import cern.c2mon.shared.client.config.ClientAmqpProperties;
 import cern.c2mon.shared.client.config.ClientJmsProperties;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -43,6 +44,11 @@ public class C2monClientProperties {
    * JMS properties
    */
   private final ClientJmsProperties jms = new ClientJmsProperties();
+
+  /**
+   * AMQP properties
+   */
+  private final ClientAmqpProperties amqp = new ClientAmqpProperties();
 
   /**
    * Elasticsearch properties

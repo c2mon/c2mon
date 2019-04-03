@@ -16,9 +16,8 @@
  *****************************************************************************/
 package cern.c2mon.client.core.config;
 
-import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.qpid.jms.JmsConnectionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jms.connection.CachingConnectionFactory;
@@ -37,10 +36,8 @@ public class JmsConfig {
   private C2monClientProperties properties;
 
   @Bean
-  public ActiveMQConnectionFactory clientJmsConnectionFactory() {
-    ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory(properties.getJms().getUrl());
-    factory.setTrustAllPackages(true);
-    return factory;
+  public JmsConnectionFactory clientJmsConnectionFactory() {
+    return new JmsConnectionFactory(properties.getAmqp().getUrl());
   }
 
   @Bean

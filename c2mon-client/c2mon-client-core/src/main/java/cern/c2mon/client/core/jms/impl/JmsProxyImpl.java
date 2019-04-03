@@ -19,6 +19,7 @@ package cern.c2mon.client.core.jms.impl;
 import java.io.Serializable;
 import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
+import java.net.URI;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,26 +32,13 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.annotation.PreDestroy;
-import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
-import javax.jms.DeliveryMode;
-import javax.jms.Destination;
-import javax.jms.ExceptionListener;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageProducer;
-import javax.jms.ObjectMessage;
-import javax.jms.Session;
-import javax.jms.TemporaryQueue;
-import javax.jms.TextMessage;
-import javax.jms.Topic;
+import javax.jms.*;
 
 import com.google.gson.JsonSyntaxException;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.activemq.command.ActiveMQQueue;
-import org.apache.activemq.command.ActiveMQTopic;
+import org.apache.qpid.jms.JmsConnectionFactory;
+import org.apache.qpid.jms.JmsQueue;
+import org.apache.qpid.jms.JmsTopic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jmx.export.annotation.ManagedOperation;
@@ -64,6 +52,8 @@ import cern.c2mon.client.core.listener.TagUpdateListener;
 import cern.c2mon.shared.client.request.ClientRequestReport;
 import cern.c2mon.shared.client.request.ClientRequestResult;
 import cern.c2mon.shared.client.request.JsonRequest;
+
+import java.lang.IllegalStateException;
 
 /**
  * Implementation of the JmsProxy singleton bean. Also see the interface for
@@ -256,9 +246,9 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
                       final SlowConsumerListener slowConsumerListener,
                       final C2monClientProperties properties) {
     this.jmsConnectionFactory = connectionFactory;
-    this.supervisionTopic = new ActiveMQTopic(properties.getJms().getSupervisionTopic());;
-    this.heartbeatTopic = new ActiveMQTopic(properties.getJms().getHeartbeatTopic());;
-    this.alarmTopic = new ActiveMQTopic(properties.getJms().getAlarmTopic());;
+    this.supervisionTopic = new JmsTopic(properties.getJms().getSupervisionTopic());;
+    this.heartbeatTopic = new JmsTopic(properties.getJms().getHeartbeatTopic());;
+    this.alarmTopic = new JmsTopic(properties.getJms().getAlarmTopic());;
     this.adminMessageTopic = null;
     this.slowConsumerListener = slowConsumerListener;
 
@@ -300,7 +290,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
    * Sets the prefix id on the JMS connection factory. Only works if JMS
    * connection factory is ActiveMQ.
    */
-  private void setActiveMQConnectionPrefix() {
+  private void setConnectionPrefix() {
     String pid = ManagementFactory.getRuntimeMXBean().getName().split("@")[0];
 
     String hostname = null;
@@ -312,8 +302,8 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
 
     String clientIdPrefix = "C2MON-CLIENT-" + System.getProperty("user.name") + "@" + hostname + "[" + pid + "]";
 
-    if (jmsConnectionFactory instanceof ActiveMQConnectionFactory) {
-      ((ActiveMQConnectionFactory) jmsConnectionFactory).setClientIDPrefix(clientIdPrefix);
+    if (jmsConnectionFactory instanceof JmsConnectionFactory) {
+      ((JmsConnectionFactory) jmsConnectionFactory).setClientIDPrefix(clientIdPrefix);
     }
   }
 
@@ -346,6 +336,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
       notifyConnectionListenerOnConnection();
     }
   }
+
 
   private void ensureConnection() {
     if (!running) {
@@ -421,12 +412,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
     try {
       if (connected) {
         disconnect(); // notifies listeners
-        new Thread(new Runnable() {
-          @Override
-          public void run() {
-            connect();
-          }
-        }).start();
+        new Thread(() -> connect()).start();
       }
     } finally {
       connectingWriteLock.unlock();
@@ -635,7 +621,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
       try {
         final Message messageObj = session.createTextMessage(message);
 
-        final MessageProducer producer = session.createProducer(new ActiveMQTopic(topicName));
+        final MessageProducer producer = session.createProducer(new JmsTopic(topicName));
         producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
         producer.setTimeToLive(JMS_MESSAGE_TIMEOUT);
         producer.send(messageObj);
@@ -683,7 +669,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
         MessageConsumer consumer = session.createConsumer(replyQueue);
         try {
           message.setJMSReplyTo(replyQueue);
-          MessageProducer producer = session.createProducer(new ActiveMQQueue(queueName));
+          MessageProducer producer = session.createProducer(new JmsQueue(queueName));
           producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
           producer.setTimeToLive(JMS_MESSAGE_TIMEOUT);
           producer.send(message);
@@ -985,7 +971,7 @@ public final class JmsProxyImpl implements JmsProxy, ExceptionListener {
   public void init() {
     running = true;
     shutdownRequested = false;
-    setActiveMQConnectionPrefix();
+    setConnectionPrefix();
     connect();
   }
 
