@@ -37,7 +37,7 @@ import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.AlarmCacheUpdater;
 import cern.c2mon.server.common.config.ServerConstants;
-import cern.c2mon.server.common.tag.Tag;
+import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.shared.client.alarm.AlarmQuery;
 
 /**
@@ -191,6 +191,8 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
           AlarmQuery query = AlarmQuery.builder().oscillating(true).build();
           Collection<Long> oscillatingAlarmIds = alarmCache.findAlarm(query);
           oscillatingAlarmIds.stream().forEach(this::checkOscillation);
+            DataTag dataTag = dataTagCache.get(alarmCopy.getDataTagId());
+              alarmCopy.setInfo(AlarmCacheUpdater.evaluateAdditionalInfo(alarmCopy, dataTag));
         } catch (Exception e) {
           log.error("Unexpected exception when checking the active oscillating alarms", e);
         }
