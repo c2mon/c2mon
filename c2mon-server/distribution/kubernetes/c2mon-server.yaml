@@ -44,3 +44,4 @@ spec:
     io.kompose.service: c2mon-server
 status:
   loadBalancer: {}
+---

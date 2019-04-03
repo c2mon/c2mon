@@ -42,3 +42,4 @@ spec:
       targetPort: 8080
   selector:
     io.kompose.service: c2mon-web
+---

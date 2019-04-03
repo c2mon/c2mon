@@ -41,3 +41,4 @@ spec:
     io.kompose.service: mq
 status:
   loadBalancer: {}
+---

@@ -21,3 +21,4 @@ spec:
           value: failover:tcp://mq:61616
         - name: C2MON_CLIENT_JMS_URL
           value: failover:tcp://mq:61616
+---

@@ -26,12 +26,8 @@
           <phase>generate-sources</phase>
           <configuration>
             <target>
-              <concat destfile="test.file" append="yes" force="yes">
-                <fileset dir="." includes="*.yaml" excludes="${kubernetes.file}"/>
-                <filterchain>
-                  <tailfilter lines="3"/>
-                </filterchain>
-              </concat>
+              <!-- Currently expects the files ending with the yaml separator and \n,
+              should probably enforce it using a plugin? !-->
               <concat destfile="${kubernetes.file}" force="yes">
                 <fileset dir="." includes="*.yaml" excludes="${kubernetes.file}"/>
               </concat>

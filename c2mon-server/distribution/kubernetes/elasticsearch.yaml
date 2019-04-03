@@ -56,3 +56,4 @@ spec:
         - containerPort: 9300
       restartPolicy: Always
 status: {}
+---
