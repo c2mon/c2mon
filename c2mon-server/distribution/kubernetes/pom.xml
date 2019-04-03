@@ -13,7 +13,7 @@
   <packaging>pom</packaging>
 
   <properties>
-    <kubernetes.file>c2mon-kubernetes-single.yaml</kubernetes.file>
+    <kubernetes.file>c2mon-kube-single.yaml</kubernetes.file>
   </properties>
 
   <build>
