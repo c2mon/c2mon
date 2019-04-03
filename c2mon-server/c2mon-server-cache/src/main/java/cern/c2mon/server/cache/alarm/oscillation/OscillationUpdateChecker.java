@@ -225,8 +225,9 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
           alarmCopy.setInfo(AlarmCacheUpdater.evaluateAdditionalInfo(alarmCopy, tag));
           log.trace(" -> Refreshing alarm cache for #{}", alarmId);
           alarmCache.put(alarmCopy.getId(), alarmCopy);
+          log.trace(" -> Refreshed Alarm cache for #{}", alarmId);
       } else {
-          log.trace(" -> ! Alarm #{} is still oscillating - no change", alarmId);
+          log.trace(" -> (!) Alarm #{} is still oscillating - no change", alarmId);
       }
     } catch (CacheElementNotFoundException e) {
       log.error("Failed to locate corresponding tag in cache for alarm #{}. This should never happen!", alarmId);
