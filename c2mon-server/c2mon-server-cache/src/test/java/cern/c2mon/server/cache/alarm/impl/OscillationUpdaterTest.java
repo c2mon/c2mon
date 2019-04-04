@@ -30,8 +30,6 @@ public class OscillationUpdaterTest {
   private OscillationUpdater oscUpdater;
   private DataTagCacheObject dataTagCacheObject;
 
-  private AlarmCache alarmCache;
-
   @Autowired
   OscillationProperties oscillationProperties;
 
