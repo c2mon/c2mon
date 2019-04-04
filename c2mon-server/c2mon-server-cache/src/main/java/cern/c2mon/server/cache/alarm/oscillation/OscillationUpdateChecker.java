@@ -70,7 +70,7 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
   /**
    * How often the timer checks whether the oscillation timer have expired.
    */
-  private static final int SCAN_INTERVAL = 10000;
+  private int scanInterval = 10000;
 
   /**
    * The time the server waits before doing first checks at start up (this gives
@@ -90,6 +90,9 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
   private final TagFacadeGateway tagFacade;
 
   private OscillationUpdater oscillationUpdater;
+
+  @Autowired
+  OscillationProperties oscillationProperties;
 
   /** Reference to the clusterCache to share values across the cluster nodes */
   private final ClusterCache clusterCache;
@@ -121,8 +124,6 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
     this.alarmCacheUpdater = alarmCacheUpdater;
   }
 
-  @Autowired
-  OscillationProperties oscillationProperties;
 
   /**
    * Initializes the clustered values
@@ -130,6 +131,8 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
   @PostConstruct
   public void init() {
     log.trace("Initialising Alarm oscillation checker ...");
+    scanInterval = oscillationProperties.getCheckInterval() * 1000; 
+    
     clusterCache.acquireWriteLockOnKey(LAST_CHECK_INITIALISATION_KEY);
     try {
       if (!clusterCache.hasKey(LAST_CHECK_INITIALISATION_KEY)) {
@@ -149,7 +152,7 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
   public synchronized void start() {
     log.info("Starting the C2MON Alarm oscillation timer mechanism.");
     timer = new Timer("AlarmOscillationChecker");
-    timer.schedule(this, INITIAL_SCAN_DELAY, SCAN_INTERVAL);
+    timer.schedule(this, INITIAL_SCAN_DELAY, scanInterval);
     running = true;
   }
 

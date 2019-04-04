@@ -42,4 +42,11 @@ public class OscillationProperties {
 
   /** The time in seconds before the alarm oscillation flag gets removed once the flapping has stopped */
   private int timeOscillationAlive = 180;
+  
+  /** 
+   * Define how often oscillating alarms are checked in the cache to see if they are still alive (in seconds)
+   * @see OscillationUpdateChecker
+   */
+  private int checkInterval = 60;
+  
 }
