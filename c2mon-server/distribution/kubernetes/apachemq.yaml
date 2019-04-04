@@ -1,6 +1,7 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
+  namespace: c2mon-dev
   labels:
     io.kompose.service: mq
   name: mq
@@ -26,6 +27,7 @@ status: {}
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: c2mon-dev
   labels:
     io.kompose.service: mq
   name: mq

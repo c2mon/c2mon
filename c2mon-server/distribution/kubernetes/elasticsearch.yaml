@@ -1,6 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: c2mon-dev
   name: es
   labels:
     service: es
@@ -14,7 +15,7 @@ spec:
   selector:
     io.kompose.service: es
 ---
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   creationTimestamp: null
@@ -22,9 +23,13 @@ metadata:
     io.kompose.service: es
   name: es-node
 spec:
-  replicas: 1
+  serviceName: es
+  selector:
+    matchLabels:
+      io.kompose.service: es
   template:
     metadata:
+      namespace: c2mon-dev
       creationTimestamp: null
       labels:
         io.kompose.service: es
@@ -55,5 +60,4 @@ spec:
         - containerPort: 9200
         - containerPort: 9300
       restartPolicy: Always
-status: {}
 ---

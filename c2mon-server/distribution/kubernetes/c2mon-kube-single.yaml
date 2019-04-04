@@ -1,6 +1,12 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: c2mon-dev
+---
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
+  namespace: c2mon-dev
   labels:
     io.kompose.service: mq
   name: mq
@@ -26,6 +32,7 @@ status: {}
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: c2mon-dev
   labels:
     io.kompose.service: mq
   name: mq
@@ -45,6 +52,7 @@ status:
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
+  namespace: c2mon-dev
   creationTimestamp: null
   labels:
     io.kompose.service: c2mon-server
@@ -76,6 +84,7 @@ apiVersion: v1
 kind: Service
 metadata:
   creationTimestamp: null
+  namespace: c2mon-dev
   labels:
     io.kompose.service: c2mon-server
   name: c2mon-server
@@ -92,6 +101,7 @@ status:
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
+  namespace: c2mon-dev
   creationTimestamp: null
   labels:
     io.kompose.service: c2mon-web
@@ -122,6 +132,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: c2mon-dev
   creationTimestamp: null
   labels:
     io.kompose.service: c2mon-web
@@ -138,6 +149,7 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   creationTimestamp: null
+  namespace: c2mon-dev
   labels:
     io.kompose.service: daq
   name: daq
@@ -161,6 +173,7 @@ spec:
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
+  namespace: c2mon-dev
   creationTimestamp: null
   labels:
     io.kompose.service: db
@@ -187,6 +200,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: c2mon-dev
   creationTimestamp: null
   labels:
     io.kompose.service: db
@@ -204,6 +218,7 @@ status:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: c2mon-dev
   name: es
   labels:
     service: es
@@ -217,7 +232,7 @@ spec:
   selector:
     io.kompose.service: es
 ---
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   creationTimestamp: null
@@ -225,9 +240,13 @@ metadata:
     io.kompose.service: es
   name: es-node
 spec:
-  replicas: 1
+  serviceName: es
+  selector:
+    matchLabels:
+      io.kompose.service: es
   template:
     metadata:
+      namespace: c2mon-dev
       creationTimestamp: null
       labels:
         io.kompose.service: es
@@ -258,5 +277,4 @@ spec:
         - containerPort: 9200
         - containerPort: 9300
       restartPolicy: Always
-status: {}
 ---

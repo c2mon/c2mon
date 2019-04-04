@@ -14,6 +14,7 @@
 
   <properties>
     <kubernetes.file>c2mon-kube-single.yaml</kubernetes.file>
+    <kubernetes.namespace-file>c2mon-namespace.yaml</kubernetes.namespace-file>
   </properties>
 
   <build>
@@ -29,7 +30,8 @@
               <!-- Currently expects the files ending with the yaml separator and \n,
               should probably enforce it using a plugin? !-->
               <concat destfile="${kubernetes.file}" force="yes">
-                <fileset dir="." includes="*.yaml" excludes="${kubernetes.file}"/>
+                <fileset dir="." includes="*.yaml" excludes="${kubernetes.file},${kubernetes.namespace-file}"/>
+                <header file="${kubernetes.namespace-file}"></header>
               </concat>
             </target>
           </configuration>

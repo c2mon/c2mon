@@ -2,6 +2,7 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   creationTimestamp: null
+  namespace: c2mon-dev
   labels:
     io.kompose.service: daq
   name: daq
