@@ -34,6 +34,8 @@
                 <concat destfile="${project.build.directory}/${docker.entrypoint}/c2mon-mysql-schema.sql">
                   <!-- also need a prelude to setup the DB, add a user, change user etc... -->
                   <fileset
+                      file="${project.basedir}/../../../c2mon-server-cachedbaccess/src/main/resources/sql/cache-schema-mysql.sql"/>
+                  <fileset
                       file="${project.basedir}/../../../c2mon-server-history/src/main/resources/sql/history-schema-mysql.sql"/>
                   <fileset
                       file="${project.basedir}/../../../c2mon-server-configuration/src/main/resources/sql/config-schema-mysql.sql"/>
