@@ -20,8 +20,10 @@ spec:
           value: http://es:9200
         - name: C2MON_CLIENT_JMS_URL
           value: tcp://mq:61616
-        - name: C2MON_SERVER_JDBC_URL
+        - name: C2MON_CLIENT_HISTORY_JDBC_URL
           value: jdbc:mysql://db/tim
+        - name: C2MON_CLIENT_HISTORY_JDBC_USERNAME
+          value: root
         - name: C2MON_CLIENT_HISTORY_JDBC_VALIDATION-QUERY
           value: SELECT 1
         name: c2mon-web
