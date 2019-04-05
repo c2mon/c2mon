@@ -75,6 +75,14 @@ spec:
           value: "false"
         - name: C2MON_SERVER_JMS_URL
           value: tcp://mq:61616
+        - name: C2MON_SERVER_CACHEDBACCESS_JDBC_VALIDATION-QUERY
+          value: SELECT 1
+        - name: C2MON_SERVER_JDBC_DRIVER-CLASS-NAME
+          value: com.mysql.jdbc.Driver
+        - name: C2MON_SERVER_JDBC_URL
+          value: jdbc:mysql://db/tim
+        - name: C2MON_SERVER_JDBC_USERNAME
+          value: root
         image: cern/c2mon
         name: c2mon-server
         resources: {}
@@ -118,12 +126,12 @@ spec:
       - env:
         - name: C2MON_SERVER_ELASTICSEARCH_HOST
           value: http://es:9200
-        - name: C2MON_PORT_61616_TCP
+        - name: C2MON_CLIENT_JMS_URL
           value: tcp://mq:61616
-        - name: C2MON_PORT_9001_TCP_ADDR
-          value: c2mon-server
         - name: C2MON_SERVER_JDBC_URL
-          value: jdbc:hsqldb:file:///tmp/c2mondb;sql.syntax_ora=true;hsqldb.default_table_type=cached;hsqldb.cache_rows=1000;hsqldb.result_max_memory_rows=2000;hsqldb.cache_size=100
+          value: jdbc:mysql://db/tim
+        - name: C2MON_CLIENT_HISTORY_JDBC_VALIDATION-QUERY
+          value: SELECT 1
         name: c2mon-web
         image: cern/c2mon-web-ui
         ports:
