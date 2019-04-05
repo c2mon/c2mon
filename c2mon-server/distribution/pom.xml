@@ -14,6 +14,7 @@
   <modules>
     <module>tar</module>
     <module>images</module>
+    <module>kubernetes</module>
   </modules>
 
   <dependencyManagement>

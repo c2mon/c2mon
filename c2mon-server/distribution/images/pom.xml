@@ -72,7 +72,6 @@
           </to>
           <container>
             <useCurrentTimestamp>true</useCurrentTimestamp>
-            <entrypoint>INHERIT</entrypoint>
           </container>
         </configuration>
       </plugin>
