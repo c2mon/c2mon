@@ -244,6 +244,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   creationTimestamp: null
+  namespace: c2mon-dev
   labels:
     io.kompose.service: es
   name: es-node
