@@ -38,6 +38,7 @@ pages:
       - General Overview: 'user-guide/daq-api/index.md'
       - 'user-guide/daq-api/DAQ_module_developer_guide.md'
       - 'user-guide/daq-api/DAQ_module_testing_guide.md'
+    - Kubernetes: 'user-guide/kubernetes_config.md'
   - About:
     - 'about/CHANGELOG.md'
     - Contributing: 'about/CONTRIBUTING.md'
