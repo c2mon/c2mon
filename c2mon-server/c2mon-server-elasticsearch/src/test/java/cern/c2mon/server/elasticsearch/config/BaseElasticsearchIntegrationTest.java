@@ -86,7 +86,7 @@ public abstract class BaseElasticsearchIntegrationTest {
       log.debug("Elasticseach cluster ready for testing!");
     } catch (ExecutionException | TimeoutException e) {
       Assert.fail("Timeout when waiting for embedded elasticsearch node to start!");
-      throw new RuntimeException("Timeout when waiting for embedded elasticsearch node to start!");
+      throw new RuntimeException("Timeout when waiting for embedded elasticsearch node to start!", e);
     }
   }
 
