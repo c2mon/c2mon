@@ -18,4 +18,18 @@
     <image.name>c2mon-mq</image.name>
   </properties>
 
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>com.google.cloud.tools</groupId>
+        <artifactId>jib-maven-plugin</artifactId>
+        <configuration>
+          <container>
+            <entrypoint>INHERIT</entrypoint>
+          </container>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
 </project>
