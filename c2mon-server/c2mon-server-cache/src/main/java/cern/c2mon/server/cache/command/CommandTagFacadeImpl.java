@@ -237,6 +237,11 @@ public class CommandTagFacadeImpl extends AbstractFacade<CommandTag> implements 
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "NumberFormatException: Unable to convert parameter \"equipmentId\" to Long: " + tmpStr);
       }
     }
+
+    if (commandTagCacheObject.getEquipmentId() != null) {
+      commandTagUpdate.setEquipmentId(commandTagCacheObject.getEquipmentId());
+    }
+
     return commandTagUpdate;
   }
 
