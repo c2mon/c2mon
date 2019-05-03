@@ -25,11 +25,6 @@ package cern.c2mon.server.cache.alarm;
  * calling the registerForUpdates method to register your
  * listener.
  * 
- * <p>If alarms do not need publishing to the client together
- * with the tags, there is also the option of using the simpler
- * AlarmEvaluator, which simply evaluates the alarms in an
- * asynchronous manner.
- * 
  * <p>Listeners are notified on the cache notification threads
  * (i.e. this aggregator does not create any extra threads).
  * 
