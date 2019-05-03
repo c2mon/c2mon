@@ -84,11 +84,6 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
   private boolean active = false;
 
   /**
-   * Whether the alarm was previously active
-   **/
-  private boolean lastActiveState;
-
-  /**
    * <code>true</code> if the alarm state is active as maintained internally. This state is not exposed to listeners
    * and only used for the purpose of detecting and maintaining oscillation.
    * It always reflect the true state of an alarm, regardless of oscillation status
