@@ -32,11 +32,13 @@ import lombok.extern.slf4j.Slf4j;
 import cern.c2mon.server.cache.AlarmCache;
 import cern.c2mon.server.cache.AliveTimerFacade;
 import cern.c2mon.server.cache.ClusterCache;
+import cern.c2mon.server.cache.TagFacadeGateway;
 import cern.c2mon.server.cache.alarm.config.OscillationProperties;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.AlarmCacheUpdater;
 import cern.c2mon.server.common.config.ServerConstants;
+import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.client.alarm.AlarmQuery;
 
 /**
@@ -92,6 +94,8 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
   private final ClusterCache clusterCache;
 
   private final AlarmCacheUpdater alarmCacheUpdater;
+  
+  private final TagFacadeGateway tagFacadeGateway;
 
   /**
    * Constructor.
@@ -109,13 +113,15 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
 
    */
   @Autowired
-  public OscillationUpdateChecker(final AlarmCache alarmCache, final ClusterCache clusterCache, final OscillationUpdater oscillationUpdater, final AlarmCacheUpdater alarmCacheUpdater) {
+  public OscillationUpdateChecker(final AlarmCache alarmCache, final ClusterCache clusterCache, final OscillationUpdater oscillationUpdater, final AlarmCacheUpdater alarmCacheUpdater, final TagFacadeGateway tagFacadeGateway) {
     super();
     this.alarmCache = alarmCache;
     this.clusterCache = clusterCache;
     this.oscillationUpdater = oscillationUpdater;
     this.alarmCacheUpdater = alarmCacheUpdater;
+    this.tagFacadeGateway = tagFacadeGateway;
   }
+  
 
   @Autowired
   OscillationProperties oscillationProperties;
@@ -206,7 +212,12 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
       if (!oscillationUpdater.checkOscillAlive(alarmCopy)) {
           log.trace(" -> ! Alarm #{} is not oscillating anymore, resetting oscillation counter", alarmId);
           oscillationUpdater.resetOscillationCounter(alarmCopy);
-          alarmCacheUpdater.resetOscillationStatus(alarmCopy);
+          Tag tag = tagFacadeGateway.getTag(alarmCopy.getDataTagId());
+          if(tag != null) {
+            alarmCacheUpdater.resetOscillationStatus(alarmCopy, tag);
+          } else {
+              log.error("Cannot locate data tag #{} - unable to reset oscillation status", alarmCopy.getDataTagId());
+          }
       } else {
           log.trace(" -> (!) Alarm #{} is still oscillating - no change", alarmId);
       }

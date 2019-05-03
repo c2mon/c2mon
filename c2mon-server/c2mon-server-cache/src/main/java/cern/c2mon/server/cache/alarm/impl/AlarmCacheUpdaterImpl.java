@@ -21,18 +21,16 @@ import java.sql.Timestamp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import lombok.AccessLevel;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
-
 import cern.c2mon.server.cache.AlarmCache;
 import cern.c2mon.server.cache.AlarmFacade;
-import cern.c2mon.server.cache.TagFacadeGateway;
 import cern.c2mon.server.cache.alarm.oscillation.OscillationUpdater;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.AlarmCacheUpdater;
 import cern.c2mon.server.common.tag.Tag;
+import lombok.AccessLevel;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Contains the routing logic for the alarm cache update. The alarm cache listeners will get informed depending, if it
@@ -48,8 +46,8 @@ public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
   @Setter(AccessLevel.PROTECTED)
   private AlarmCache alarmCache;
   
-  @Autowired
-  private TagFacadeGateway tagFacade;
+//  @Autowired
+//  private TagFacadeGateway tagFacade;
 
   @Autowired
   @Setter(AccessLevel.PROTECTED)
@@ -93,8 +91,7 @@ public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
   }
 
   @Override
-  public void resetOscillationStatus(final AlarmCacheObject alarmCopy) {
-    Tag tag = tagFacade.getTag(alarmCopy.getDataTagId());
+  public void resetOscillationStatus(final AlarmCacheObject alarmCopy, final Tag tag) {
     alarmCopy.setOscillating(false);
     updateAlarmCacheObject(alarmCopy, tag, true);
   }

@@ -20,7 +20,7 @@ public interface AlarmCacheUpdater {
    * @param tag The tag update
    * @return The updated alarm object
    */
-  void resetOscillationStatus(final AlarmCacheObject alarm);
+  void resetOscillationStatus(final AlarmCacheObject alarm, final Tag tag);
 
   static String evaluateAdditionalInfo(final Alarm alarm, final Tag tag){
     String additionalInfo = "";

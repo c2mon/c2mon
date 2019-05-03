@@ -67,9 +67,6 @@ public class AlarmAggregatorImpl implements AlarmAggregator, C2monCacheListener<
    */
   private TagFacadeGateway tagFacadeGateway;
 
-  @Autowired
-  private OscillationUpdater oscillationUpdater;
-
   /**
    * Autowired constructor.
    * 

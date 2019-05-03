@@ -74,8 +74,8 @@ public class OscillationUpdaterTest {
   @Test
   public void testOscillDetected() {
     for (int i = 0; i < 20; i++) {
-      dataTagCacheObject.setValue(i % 2);
-      oscUpdater.update(alarmCacheObject, dataTagCacheObject);
+//      dataTagCacheObject.setValue(i % 2);
+      oscUpdater.increaseOscillCounter(alarmCacheObject);
       log.info("ALARM ACTIVE: {} - INTERNAL ACTIVE: {} - OSCILLATION: {}", alarmCacheObject.isActive(), alarmCacheObject.isInternalActive(), alarmCacheObject.isOscillating()); 
     }
     assertTrue(alarmCacheObject.isOscillating());
@@ -87,8 +87,8 @@ public class OscillationUpdaterTest {
   @Test
   public void testLowOscillChanges() {
     for (int i = 0; i < 7; i++) {
-      dataTagCacheObject.setValue(i % 2);
-      oscUpdater.update(alarmCacheObject, dataTagCacheObject);
+//      dataTagCacheObject.setValue(i % 2);
+      oscUpdater.increaseOscillCounter(alarmCacheObject);
       log.info("ALARM ACTIVE: {} - INTERNAL ACTIVE: {} - OSCILLATION: {}", alarmCacheObject.isActive(), alarmCacheObject.isInternalActive(), alarmCacheObject.isOscillating());
     }
     assertTrue(alarmCacheObject.isOscillating());
@@ -102,20 +102,10 @@ public class OscillationUpdaterTest {
       } catch (InterruptedException e) {
         e.printStackTrace();
       }
-      dataTagCacheObject.setValue(i % 2);
-      oscUpdater.update(alarmCacheObject, dataTagCacheObject);
+     // dataTagCacheObject.setValue(i % 2);
+      oscUpdater.increaseOscillCounter(alarmCacheObject);
     }
     assertTrue(alarmCacheObject.isOscillating());
-  }
-
-  @Test
-  public void testTimeOscillationAlive() throws Exception {
-    for (int i = 0; i < 7; i++) {
-      dataTagCacheObject.setValue(i % 2);
-      oscUpdater.update(alarmCacheObject, dataTagCacheObject);
-    }
-    Thread.sleep(100);
-    assertTrue(oscUpdater.checkOscillAlive(alarmCacheObject));
   }
 
   @Test
@@ -151,7 +141,6 @@ public class OscillationUpdaterTest {
     }
     log.info("===========================");
     oscUpdater.resetOscillationCounter(alarmCacheObject);
-    alarmCacheObject.setLastActiveState(false);
     alarmCacheObject.setOscillating(false);
     alarmCacheObject.setActive(false);
     alarmCacheObject.setInternalActive(false);
