@@ -23,21 +23,20 @@ import java.util.TimerTask;
 
 import javax.annotation.PostConstruct;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Service;
 
+import lombok.extern.slf4j.Slf4j;
+
 import cern.c2mon.server.cache.AlarmCache;
 import cern.c2mon.server.cache.AliveTimerFacade;
 import cern.c2mon.server.cache.ClusterCache;
-import cern.c2mon.server.cache.TagFacadeGateway;
 import cern.c2mon.server.cache.alarm.config.OscillationProperties;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.AlarmCacheUpdater;
 import cern.c2mon.server.common.config.ServerConstants;
-import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.client.alarm.AlarmQuery;
 
 /**
@@ -87,8 +86,6 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
 
   private AlarmCache alarmCache;
 
-  private final TagFacadeGateway tagFacade;
-
   private OscillationUpdater oscillationUpdater;
 
   /** Reference to the clusterCache to share values across the cluster nodes */
@@ -112,10 +109,9 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
 
    */
   @Autowired
-  public OscillationUpdateChecker(final AlarmCache alarmCache, final TagFacadeGateway tagFacade, final ClusterCache clusterCache, final OscillationUpdater oscillationUpdater, final AlarmCacheUpdater alarmCacheUpdater) {
+  public OscillationUpdateChecker(final AlarmCache alarmCache, final ClusterCache clusterCache, final OscillationUpdater oscillationUpdater, final AlarmCacheUpdater alarmCacheUpdater) {
     super();
     this.alarmCache = alarmCache;
-    this.tagFacade = tagFacade;
     this.clusterCache = clusterCache;
     this.oscillationUpdater = oscillationUpdater;
     this.alarmCacheUpdater = alarmCacheUpdater;
@@ -181,7 +177,7 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
         try {
           AlarmQuery query = AlarmQuery.builder().oscillating(true).build();
           Collection<Long> oscillatingAlarmIds = alarmCache.findAlarm(query);
-          oscillatingAlarmIds.stream().forEach(this::checkOscillation);
+          oscillatingAlarmIds.stream().forEach(this::updateAlarmOscillationFlag);
         } catch (Exception e) {
           log.error("Unexpected exception when checking the Alarm oscillation timers", e);
         }
@@ -198,11 +194,10 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
     }
   }
 
-  private void checkOscillation(Long alarmId) {
+  private void updateAlarmOscillationFlag(Long alarmId) {
     try {
       log.trace("Checking oscillation expiry for alarm #{}", alarmId);
       AlarmCacheObject alarmCopy = (AlarmCacheObject) alarmCache.getCopy(alarmId);
-      Tag tag = tagFacade.getTag(alarmCopy.getDataTagId());
       if(log.isTraceEnabled()) {
                 log.trace(" -> Alarm oscillation details osc {} first osc {} count {} al ts {}", alarmCopy.isOscillating(),
                         new Date(alarmCopy.getFirstOscTS()).toString(), alarmCopy.getCounterFault(),
@@ -211,12 +206,7 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
       if (!oscillationUpdater.checkOscillAlive(alarmCopy)) {
           log.trace(" -> ! Alarm #{} is not oscillating anymore, resetting oscillation counter", alarmId);
           oscillationUpdater.resetOscillationCounter(alarmCopy);
-          alarmCopy.setOscillating(false);
-          alarmCacheUpdater.update(alarmCopy, tag);
-          alarmCopy.setInfo(AlarmCacheUpdater.evaluateAdditionalInfo(alarmCopy, tag));
-          log.trace(" -> Refreshing alarm cache for #{}", alarmId);
-          alarmCache.put(alarmCopy.getId(), alarmCopy);
-          log.trace(" -> Refreshed Alarm cache for #{}", alarmId);
+          alarmCacheUpdater.resetOscillationStatus(alarmCopy);
       } else {
           log.trace(" -> (!) Alarm #{} is still oscillating - no change", alarmId);
       }
