@@ -46,9 +46,6 @@ public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
   @Setter(AccessLevel.PROTECTED)
   private AlarmCache alarmCache;
   
-//  @Autowired
-//  private TagFacadeGateway tagFacade;
-
   @Autowired
   @Setter(AccessLevel.PROTECTED)
   OscillationUpdater oscillationUpdater;
