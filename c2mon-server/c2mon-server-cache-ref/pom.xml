@@ -5,7 +5,7 @@
   <parent>
     <artifactId>c2mon-server-parent</artifactId>
     <groupId>cern.c2mon.server</groupId>
-    <version>1.8.17-SNAPSHOT</version>
+    <version>1.8.41-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -14,10 +14,17 @@
   <packaging>pom</packaging>
   <modules>
     <module>c2mon-cache-api</module>
-    <module>c2mon-cache-impl</module>
     <module>c2mon-cache</module>
     <module>c2mon-cache-loader</module>
   </modules>
 
-
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>cern.c2mon.server</groupId>
+        <artifactId>c2mon-cache-api</artifactId>
+        <version>${project.parent.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 </project>

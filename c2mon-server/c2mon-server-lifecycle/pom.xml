@@ -19,11 +19,14 @@
     <dependency>
       <groupId>cern.c2mon.server</groupId>
       <artifactId>c2mon-cache</artifactId>
-      <version>1.8.17-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>cern.c2mon.server</groupId>
       <artifactId>c2mon-server-cache</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.server</groupId>
+      <artifactId>c2mon-cache-loader</artifactId>
     </dependency>
     <dependency>
       <groupId>cern.c2mon.server</groupId>
@@ -118,6 +121,12 @@
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.server</groupId>
+      <artifactId>c2mon-cache-loader</artifactId>
+      <version>1.8.41-SNAPSHOT</version>
+      <scope>compile</scope>
     </dependency>
   </dependencies>
 

@@ -5,7 +5,7 @@
   <parent>
     <artifactId>c2mon-server-cache-ref</artifactId>
     <groupId>cern.c2mon.server</groupId>
-    <version>1.8.17-SNAPSHOT</version>
+    <version>1.8.41-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -16,7 +16,6 @@
     <dependency>
       <groupId>cern.c2mon.server</groupId>
       <artifactId>c2mon-cache-api</artifactId>
-      <version>1.8.17-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.mybatis</groupId>

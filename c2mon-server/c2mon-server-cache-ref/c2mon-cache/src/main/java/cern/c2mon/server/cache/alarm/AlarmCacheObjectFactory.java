@@ -61,7 +61,7 @@ public class AlarmCacheObjectFactory extends AbstractCacheObjectFactory<Alarm> {
     AlarmCacheObject alarmCacheObject = new AlarmCacheObject(id);
 
     // Initialise run-time parameters with default values
-    alarmCacheObject.setState(AlarmCondition.TERMINATE);
+//    alarmCacheObject.setState(AlarmCondition.TERMINATE);
     alarmCacheObject.setTimestamp(new Timestamp(0));
     alarmCacheObject.setInfo("");
 
