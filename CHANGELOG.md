@@ -6,7 +6,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 All issues referenced in parentheses can be consulted under [CERN GitLab](https://gitlab.cern.ch/c2mon/c2mon/issues).
 For more details on a given release, please check also the [Milestone planning](https://gitlab.cern.ch/c2mon/c2mon/milestones?state=all).
 
+
 ## [Unreleased]
+
+### Added
+
+### Changed
+
+### Fixed
+
+
+## [1.8.41]
 
 ### Added
 - Client API: Added method to clear local command cache (22abcb48)
@@ -16,11 +26,17 @@ For more details on a given release, please check also the [Milestone planning](
 
 ### Changed
 - Cient API: Set ActiveMQ prefetch limit to 100 to avoid slow consumer problem (#240)
+- Updated C2MON Docker examples for Kubernetes (#205)
 
 ### Fixed
 - Server: Fixed `clone()` method of `AlarmCacheObject` (5bf7a831)
 - Server: Fixed alarm state mapping to `Boolean` for database and source timestamp indexing for ElasticSearch (1627915c)
+- Server: Fixed bugs in alarm oscillation control logic introduced with last release (#233, #243, #246, #248, #145)
+- Server: Fixed problem of alarm history which logged active alarms several times with the same timestamp (#205)
+- Client API: ActiveMQ prefetch limit is now set in the code to 100 to avoid slow consumer problems (#240)
 
+### Removed
+- Removed dependency to `javax.el` validator annotations (#249)
 
 ## [1.8.40] - 2019-02-01
 **Please note**,  upgrading to this version requires changes in the database schema. This was necessary in order to implement the alarm oscillation control feature (see #145).
@@ -347,7 +363,8 @@ This patch contains bug fixes for the DAQ layer.
 - Remove of EquipmentLogger concept from DAQ Core (#56)
 
 
-[Unreleased]: https://gitlab.cern.ch/c2mon/c2mon/milestones/34
+[Unreleased]: https://gitlab.cern.ch/c2mon/c2mon/milestones/35
+[1.8.41]: https://gitlab.cern.ch/c2mon/c2mon/milestones/34
 [1.8.40]: https://gitlab.cern.ch/c2mon/c2mon/milestones/31
 [1.8.39]: https://gitlab.cern.ch/c2mon/c2mon/milestones/30
 [1.8.36]: https://gitlab.cern.ch/c2mon/c2mon/milestones/29
