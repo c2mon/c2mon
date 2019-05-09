@@ -5,7 +5,7 @@
   <parent>
     <groupId>cern.c2mon</groupId>
     <artifactId>c2mon</artifactId>
-    <version>1.8.41-SNAPSHOT</version>
+    <version>1.8.41</version>
   </parent>
 
   <groupId>cern.c2mon.daq</groupId>
@@ -132,12 +132,11 @@
               <phase>install</phase>
               <configuration>
                 <target>
-                  <gunzip src="${project.build.directory}/${project.artifactId}-${project.version}-dist.tar.gz"/>
-                  <untar src="${project.build.directory}/${project.artifactId}-${project.version}-dist.tar"
-                         dest="${project.build.directory}/distribution${daq.home}"/>
+                  <gunzip src="${project.build.directory}/${project.artifactId}-${project.version}-dist.tar.gz" />
+                  <untar src="${project.build.directory}/${project.artifactId}-${project.version}-dist.tar" dest="${project.build.directory}/distribution${daq.home}" />
                   <copy todir="${project.build.directory}/distribution${daq.home}" overwrite="true">
-                    <fileset dir="${project.build.directory}/distribution/tar"/>
-                    <fileset dir="${project.build.directory}/distribution/docker"/>
+                    <fileset dir="${project.build.directory}/distribution/tar" />
+                    <fileset dir="${project.build.directory}/distribution/docker" />
                   </copy>
                 </target>
               </configuration>

@@ -5,7 +5,7 @@
   <parent>
     <groupId>cern.c2mon.server</groupId>
     <artifactId>distribution</artifactId>
-    <version>1.8.41-SNAPSHOT</version>
+    <version>1.8.41</version>
   </parent>
 
   <artifactId>kubernetes</artifactId>
@@ -30,8 +30,8 @@
               <!-- Currently expects the files ending with the yaml separator and \n,
               should probably enforce it using a plugin? !-->
               <concat destfile="${kubernetes.file}" force="yes">
-                <fileset dir="." includes="*.yaml" excludes="${kubernetes.file},${kubernetes.namespace-file}"/>
-                <header file="${kubernetes.namespace-file}"></header>
+                <fileset dir="." includes="*.yaml" excludes="${kubernetes.file},${kubernetes.namespace-file}" />
+                <header file="${kubernetes.namespace-file}" />
               </concat>
             </target>
           </configuration>
