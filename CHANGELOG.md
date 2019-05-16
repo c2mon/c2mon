@@ -16,7 +16,7 @@ For more details on a given release, please check also the [Milestone planning](
 ### Fixed
 
 
-## [1.8.41]
+## [1.8.41] - 2019-05-09
 
 ### Added
 - Client API: Added method to clear local command cache (22abcb48)
