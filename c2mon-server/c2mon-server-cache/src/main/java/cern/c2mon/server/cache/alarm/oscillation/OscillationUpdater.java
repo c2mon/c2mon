@@ -61,12 +61,16 @@ public final class OscillationUpdater {
         return (systemTime - alarmTs) < (oscillationProperties.getTimeOscillationAlive() * 1000);
     }
 
-    public void increaseOscillCounter(AlarmCacheObject alarmCacheObject) {
-        alarmCacheObject.setCounterFault(alarmCacheObject.getCounterFault() + 1);
-        if (alarmCacheObject.getCounterFault() == 1
-                || ((alarmCacheObject.getCounterFault() % oscillationProperties.getOscNumbers()) == 0)) {
+    public void updateOscillationStatus(AlarmCacheObject alarmCacheObject) {
+        
+        if (alarmCacheObject.getCounterFault() % oscillationProperties.getOscNumbers() == 0) {
             alarmCacheObject.setFirstOscTS(System.currentTimeMillis()-1);
         }
+        if ( (! alarmCacheObject.isOscillating()) && (isOscillationExpired(alarmCacheObject))) {
+            alarmCacheObject.setCounterFault(0);
+        }
+        
+        alarmCacheObject.setCounterFault(alarmCacheObject.getCounterFault() + 1);
         
         if(checkOscillConditions(alarmCacheObject)) {
             // We only change the oscillation status if the alarm is currently oscillating.
@@ -91,7 +95,11 @@ public final class OscillationUpdater {
      */
     private boolean checkOscillConditions(AlarmCacheObject alarmCacheObject) {
         return ((alarmCacheObject.getCounterFault() >= oscillationProperties.getOscNumbers())
-                && ((System.currentTimeMillis() - alarmCacheObject.getFirstOscTS())
-                    <= oscillationProperties.getTimeRange() * 1000));
+                && (!isOscillationExpired(alarmCacheObject)));
+    }
+
+    private boolean isOscillationExpired(AlarmCacheObject alarmCacheObject) {
+        return (System.currentTimeMillis() - alarmCacheObject.getFirstOscTS())
+            > oscillationProperties.getTimeRange() * 1000;
     }
 }

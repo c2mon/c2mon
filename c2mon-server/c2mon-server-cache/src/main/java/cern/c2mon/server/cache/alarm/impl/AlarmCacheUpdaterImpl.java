@@ -166,7 +166,7 @@ public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
     
     // Check the oscillating status
     boolean wasAlreadyOscillating = alarmCacheObject.isOscillating();
-    oscillationUpdater.increaseOscillCounter(alarmCacheObject);
+    oscillationUpdater.updateOscillationStatus(alarmCacheObject);
     
     changeInfoField(alarmCacheObject, tag);
     changeTimestamps(alarmCacheObject, tag);

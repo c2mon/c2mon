@@ -75,7 +75,7 @@ public class OscillationUpdaterTest {
   public void testOscillDetected() {
     for (int i = 0; i < 20; i++) {
 //      dataTagCacheObject.setValue(i % 2);
-      oscUpdater.increaseOscillCounter(alarmCacheObject);
+      oscUpdater.updateOscillationStatus(alarmCacheObject);
       log.info("ALARM ACTIVE: {} - INTERNAL ACTIVE: {} - OSCILLATION: {}", alarmCacheObject.isActive(), alarmCacheObject.isInternalActive(), alarmCacheObject.isOscillating()); 
     }
     assertTrue(alarmCacheObject.isOscillating());
@@ -88,7 +88,7 @@ public class OscillationUpdaterTest {
   public void testLowOscillChanges() {
     for (int i = 0; i < 7; i++) {
 //      dataTagCacheObject.setValue(i % 2);
-      oscUpdater.increaseOscillCounter(alarmCacheObject);
+      oscUpdater.updateOscillationStatus(alarmCacheObject);
       log.info("ALARM ACTIVE: {} - INTERNAL ACTIVE: {} - OSCILLATION: {}", alarmCacheObject.isActive(), alarmCacheObject.isInternalActive(), alarmCacheObject.isOscillating());
     }
     assertTrue(alarmCacheObject.isOscillating());
@@ -103,7 +103,7 @@ public class OscillationUpdaterTest {
         e.printStackTrace();
       }
      // dataTagCacheObject.setValue(i % 2);
-      oscUpdater.increaseOscillCounter(alarmCacheObject);
+      oscUpdater.updateOscillationStatus(alarmCacheObject);
     }
     assertTrue(alarmCacheObject.isOscillating());
   }
