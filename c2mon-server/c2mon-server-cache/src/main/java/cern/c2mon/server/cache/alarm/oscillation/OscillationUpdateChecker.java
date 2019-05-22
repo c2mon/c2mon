@@ -71,7 +71,7 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
   /**
    * How often the timer checks whether the oscillation timer have expired.
    */
-  private static final int SCAN_INTERVAL = 10000;
+  private static final int SCAN_INTERVAL = 60000;
 
   /**
    * The time the server waits before doing first checks at start up (this gives
