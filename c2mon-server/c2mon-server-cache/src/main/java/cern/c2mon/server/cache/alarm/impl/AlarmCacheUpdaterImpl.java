@@ -123,12 +123,13 @@ public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
     }
     
     // Default case: change the alarm's state
-    // (1) if the alarm has never been initialised
+    // (1) if the alarm has never been initialised OR
     // (2) if tag is VALID and the alarm changes from ACTIVE->TERMINATE or TERMINATE->ACTIVE
     if (isAlarmUninitialised(alarmCacheObject) || (tag.isValid() && alarmStateHasChanged) ) {
-      return changeAlarmState(alarmCacheObject, tag, newState);
+      return commitAlarmStateChange(alarmCacheObject, tag);
     }
 
+    // Check if INFO field has changed and alarm is active
     String oldAlarmInfo = alarmCacheObject.getInfo();
     changeInfoField(alarmCacheObject, tag);
     if (!alarmCacheObject.getInfo().equals(oldAlarmInfo) && (alarmCacheObject.isActive() || resetOscillationStatus)) {
@@ -161,15 +162,16 @@ public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
     alarmCacheObject.setInfo(AlarmCacheUpdater.evaluateAdditionalInfo(alarmCacheObject, tag));
   }
   
-  private AlarmCacheObject changeAlarmState(final AlarmCacheObject alarmCacheObject, final Tag tag, boolean newState) {
-    log.trace("Alarm #{} changed STATE to {}", alarmCacheObject.getId(), newState);
+  private AlarmCacheObject commitAlarmStateChange(final AlarmCacheObject alarmCacheObject, final Tag tag) {
+    log.trace("Alarm #{} changed STATE to {}", alarmCacheObject.getId(), alarmCacheObject.isActive());
+    
+    changeTimestamps(alarmCacheObject, tag);
     
     // Check the oscillating status
     boolean wasAlreadyOscillating = alarmCacheObject.isOscillating();
     oscillationUpdater.updateOscillationStatus(alarmCacheObject);
     
     changeInfoField(alarmCacheObject, tag);
-    changeTimestamps(alarmCacheObject, tag);
 
     if (alarmCacheObject.isOscillating()) {
         // When oscillating we force the alarm to *active*
