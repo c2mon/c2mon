@@ -178,16 +178,6 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
     return this.dataTagId;
   }
 
-  /**
-   * Checks if the Oscillation is ACTIVE.
-   *
-   * @return true if the oscillation is true.
-   */
-  @Override
-  public boolean isOscillating() {
-    return oscillating;
-  }
-
   @Override
   public String toString() {
     return toString(false);
