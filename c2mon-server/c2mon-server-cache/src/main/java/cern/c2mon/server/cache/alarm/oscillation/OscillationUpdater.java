@@ -61,18 +61,24 @@ public final class OscillationUpdater {
         return (systemTime - alarmTs) < (oscillationProperties.getTimeOscillationAlive() * 1000);
     }
 
+    /**
+     * Increases the oscillation counter and evaluates if the alarm is oscillating or not.
+     * @param alarmCacheObject an updated alarm cache object with the new state
+     */
     public void updateOscillationStatus(AlarmCacheObject alarmCacheObject) {
         
         if (alarmCacheObject.getCounterFault() % oscillationProperties.getOscNumbers() == 0) {
-            alarmCacheObject.setFirstOscTS(System.currentTimeMillis()-1);
+            alarmCacheObject.setFirstOscTS(alarmCacheObject.getSourceTimestamp().getTime());
         }
         if ( (! alarmCacheObject.isOscillating()) && (isOscillationExpired(alarmCacheObject))) {
             alarmCacheObject.setCounterFault(0);
         }
         
+        // Increase oscillation counter
         alarmCacheObject.setCounterFault(alarmCacheObject.getCounterFault() + 1);
         
         if(checkOscillConditions(alarmCacheObject)) {
+            log.debug("Setting oscillation flag == true for alarm #{}", alarmCacheObject.getId());
             // We only change the oscillation status if the alarm is currently oscillating.
             // Expiring the oscillation is the work of the OscillationUpdateChecker class.
             alarmCacheObject.setOscillating(true);
@@ -94,12 +100,12 @@ public final class OscillationUpdater {
      * @return true, if alarm shall be marked as oscillating.
      */
     private boolean checkOscillConditions(AlarmCacheObject alarmCacheObject) {
-        return ((alarmCacheObject.getCounterFault() >= oscillationProperties.getOscNumbers())
+        return ((alarmCacheObject.getCounterFault() > oscillationProperties.getOscNumbers())
                 && (!isOscillationExpired(alarmCacheObject)));
     }
 
     private boolean isOscillationExpired(AlarmCacheObject alarmCacheObject) {
-        return (System.currentTimeMillis() - alarmCacheObject.getFirstOscTS())
+        return (alarmCacheObject.getSourceTimestamp().getTime() - alarmCacheObject.getFirstOscTS())
             > oscillationProperties.getTimeRange() * 1000;
     }
 }

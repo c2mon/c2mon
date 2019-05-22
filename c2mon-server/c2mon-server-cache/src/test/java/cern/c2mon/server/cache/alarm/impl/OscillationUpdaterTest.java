@@ -2,6 +2,7 @@ package cern.c2mon.server.cache.alarm.impl;
 
 import static org.easymock.EasyMock.createMock;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.sql.Timestamp;
@@ -38,12 +39,12 @@ public class OscillationUpdaterTest {
   @SuppressWarnings("serial")
   @Before
   public void setup() {
-    alarmCacheObject = new AlarmCacheObject();
+    alarmCacheObject = new AlarmCacheObject(1234L);
     oscUpdater = new OscillationUpdater();
     dataTagCacheObject = new DataTagCacheObject();
     oscillationProperties = new OscillationProperties();
     oscillationProperties.setOscNumbers(3);
-    oscillationProperties.setTimeRange(600);
+    oscillationProperties.setTimeRange(50);
     oscUpdater.setOscillationProperties(oscillationProperties);
 
     dataTagCacheObject.setSourceTimestamp(new Timestamp(System.currentTimeMillis() - 60000));
@@ -73,12 +74,25 @@ public class OscillationUpdaterTest {
   // than the for oscillations counter..
   @Test
   public void testOscillDetected() {
+    long sourceTimestamp = System.currentTimeMillis() - 100000;
     for (int i = 0; i < 20; i++) {
-//      dataTagCacheObject.setValue(i % 2);
+      alarmCacheObject.setSourceTimestamp(new Timestamp(sourceTimestamp + 1000));
       oscUpdater.updateOscillationStatus(alarmCacheObject);
       log.info("ALARM ACTIVE: {} - INTERNAL ACTIVE: {} - OSCILLATION: {}", alarmCacheObject.isActive(), alarmCacheObject.isInternalActive(), alarmCacheObject.isOscillating()); 
     }
     assertTrue(alarmCacheObject.isOscillating());
+  }
+  
+  @Test
+  public void testAlarmNotOscillating() {
+    long sourceTimestamp = System.currentTimeMillis();
+    alarmCacheObject.setSourceTimestamp(new Timestamp(sourceTimestamp));
+    for (int i = 0; i < 20; i++) {
+      alarmCacheObject.setSourceTimestamp(new Timestamp(alarmCacheObject.getSourceTimestamp().getTime() + 30000L));
+      oscUpdater.updateOscillationStatus(alarmCacheObject);
+      log.info("SOURCE TIMESTAMP: {} - ALARM ACTIVE: {} - INTERNAL ACTIVE: {} - OSCILLATION: {}", alarmCacheObject.getSourceTimestamp(), alarmCacheObject.isActive(), alarmCacheObject.isInternalActive(), alarmCacheObject.isOscillating()); 
+    }
+    assertFalse(alarmCacheObject.isOscillating());
   }
 
   // we test if the oscillation is detected. For loop will generate a sequence
@@ -118,8 +132,9 @@ public class OscillationUpdaterTest {
     
     oscUpdater.resetOscillationCounter(alarmCacheObject);
     
-    for (int i = 1; i < 6; i++) {
+    for (int i = 1; i <= oscillationProperties.getOscNumbers(); i++) {
       dataTagCacheObject.setValue(i % 2);
+      dataTagCacheObject.setSourceTimestamp(new Timestamp(System.currentTimeMillis() + i));
 
       // Notify the mock object that we expect put() to be called
       if (i <= oscillationProperties.getOscNumbers()) {
@@ -145,9 +160,9 @@ public class OscillationUpdaterTest {
     alarmCacheObject.setActive(false);
     alarmCacheObject.setInternalActive(false);
 
-    for (int i = 1; i < 9; i++) {
+    for (int i = 0; i < 6; i++) {
 
-      dataTagCacheObject.setValue(i % 2);
+      dataTagCacheObject.setValue((i + 1) % 2);
       // Notify the mock object that we expect put() to be called
       if (i <= oscillationProperties.getOscNumbers()) {
         myAlarmCache.put(alarmCacheObject.getId(), alarmCacheObject);
