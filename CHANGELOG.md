@@ -16,6 +16,17 @@ For more details on a given release, please check also the [Milestone planning](
 ### Fixed
 
 
+## [1.8.42] - 2019-05-28
+
+### Added
+
+### Changed
+
+### Fixed
+- Alarm oscillation feature introduced as alpha version in [1.8.40] passed now all internal CERN stress test criterias and can be considered as stable (#145)
+- Corrected a misreferenced property name in `c2mon-server.properties` file (#261)
+
+
 ## [1.8.41] - 2019-05-09
 
 ### Added
@@ -363,7 +374,8 @@ This patch contains bug fixes for the DAQ layer.
 - Remove of EquipmentLogger concept from DAQ Core (#56)
 
 
-[Unreleased]: https://gitlab.cern.ch/c2mon/c2mon/milestones/35
+[Unreleased]: https://gitlab.cern.ch/c2mon/c2mon/milestones/36
+[1.8.42]: https://gitlab.cern.ch/c2mon/c2mon/milestones/35
 [1.8.41]: https://gitlab.cern.ch/c2mon/c2mon/milestones/34
 [1.8.40]: https://gitlab.cern.ch/c2mon/c2mon/milestones/31
 [1.8.39]: https://gitlab.cern.ch/c2mon/c2mon/milestones/30
