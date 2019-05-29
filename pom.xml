@@ -40,6 +40,8 @@
     <org.slf4j.version>1.7.5</org.slf4j.version>
     <org.apache.activemq.version>5.15.2</org.apache.activemq.version>
     <elasticsearch.version>5.6.0</elasticsearch.version>
+    <!-- Should mostly be the same as above, see https://hub.docker.com/_/elasticsearch?tab=tags -->
+    <elasticsearch.dockertag>5.6</elasticsearch.dockertag>
     <mockito-all.version>1.10.19</mockito-all.version>
 
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

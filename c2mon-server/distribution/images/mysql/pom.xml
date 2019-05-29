@@ -13,8 +13,10 @@
   <packaging>jar</packaging>
 
   <properties>
-    <image.base>mysql:5.7.15</image.base>
-    <image.name>c2mon-mysql</image.name>
+    <mysql.version>5.7.15</mysql.version>
+    <image.base>mysql:${mysql.version}</image.base>
+    <image.tag>mysql-${mysql.version}-c2mon-${project.version}</image.tag>
+    <repository>cern/c2mon-ext</repository>
     <docker.entrypoint>docker-entrypoint-initdb.d</docker.entrypoint>
   </properties>
 
