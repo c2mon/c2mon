@@ -20,7 +20,7 @@ spec:
         io.kompose.service: mq
     spec:
       containers:
-      - image: cern/c2mon-mq
+      - image: cern/c2mon-ext:activemq-5.15.2-c2mon-1.8.43-SNAPSHOT
         name: mq
         ports:
         - containerPort: 61616
@@ -83,7 +83,7 @@ spec:
           value: jdbc:mysql://db/tim
         - name: C2MON_SERVER_JDBC_USERNAME
           value: root
-        image: cern/c2mon
+        image: cern/c2mon:1.8.43-SNAPSHOT
         name: c2mon-server
         resources: {}
       restartPolicy: Always
@@ -202,7 +202,7 @@ spec:
       - env:
         - name: MYSQL_ALLOW_EMPTY_PASSWORD
           value: "yes"
-        image: cern/c2mon-mysql
+        image: cern/c2mon-ext:mysql-5.7.15-c2mon-1.8.43-SNAPSHOT
         name: db
         ports:
         - containerPort: 3306
@@ -266,7 +266,7 @@ spec:
       name: c2mon-es-node
     spec:
       containers:
-      - image: cern/c2mon-es
+      - image: cern/c2mon-ext:elasticsearch-5.6-c2mon-1.8.43-SNAPSHOT
         name: c2mon-es-node
         env:
         - name: namespace
