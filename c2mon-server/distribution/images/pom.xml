@@ -20,9 +20,9 @@
 
   <properties>
     <image.base />
-    <image.name />
     <registry>registry.hub.docker.com</registry>
-    <repository>cern/${image.name}</repository>
+    <repository></repository>
+    <image.tag></image.tag>
   </properties>
 
   <build>
@@ -65,8 +65,7 @@
           <to>
             <image>${registry}/${repository}</image>
             <tags>
-              <tag>${project.version}</tag>
-              <tag>latest</tag>
+              <tag>${image.tag}</tag>
             </tags>
           </to>
           <container>

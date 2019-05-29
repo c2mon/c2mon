@@ -13,8 +13,9 @@
   <packaging>jar</packaging>
 
   <properties>
-    <image.base>elasticsearch:5.6.16-alpine</image.base>
-    <image.name>c2mon-es</image.name>
+    <image.base>elasticsearch:${elasticsearch.dockertag}-alpine</image.base>
+    <image.tag>elasticsearch-${elasticsearch.dockertag}-c2mon-${project.version}</image.tag>
+    <repository>cern/c2mon-ext</repository>
   </properties>
 
   <build>
