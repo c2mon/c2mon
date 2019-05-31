@@ -1,0 +1,10 @@
+apiVersion: 1
+datasources:
+  - name: MySQL Tim
+    type: mysql
+    access: proxy
+    url: db
+    database: tim
+    user: root
+    isDefault: true
+    editable: true

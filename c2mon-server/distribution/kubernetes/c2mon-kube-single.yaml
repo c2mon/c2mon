@@ -152,6 +152,8 @@ spec:
     - name: http
       port: 8080
       targetPort: 8080
+      nodePort: 31322
+  type: NodePort
   selector:
     io.kompose.service: c2mon-web
 ---
@@ -289,3 +291,39 @@ spec:
         - containerPort: 9300
       restartPolicy: Always
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: c2mon-dev
+  labels:
+    io.kompose.service: grafana
+  name: grafana
+spec:
+  ports:
+  - name: "3000"
+    port: 3000
+    targetPort: 3000
+    nodePort: 31323
+  type: NodePort
+  selector:
+    io.kompose.service: grafana
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  namespace: c2mon-dev
+  labels:
+    io.kompose.service: grafana
+  name: grafana
+spec:
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: grafana
+    spec:
+      containers:
+      - image: cernoss/c2mon-grafana:1.8.41-SNAPSHOT
+        name: grafana
+        ports:
+        - containerPort: 3000

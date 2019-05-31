@@ -46,7 +46,8 @@ The cluster creates the namespace 'c2mon-dev' and starts the following pods:
 - [C2mon Web UI](http://github.com/c2mon/c2mon-web-ui),
 - [ActiveMQ v5.14.3](http://activemq.apache.org/) JMS broker,
 - [Elasticsearch v5.6.0](https://www.elastic.co/products/elasticsearch) single cluster node,
-- [MySQL 5.7.15]( ) database.
+- [MySQL 5.7.15](https://www.mysql.com/) database.
+- [Grafana 6.1.2](https://grafana.com/) dashboards UI
 
 _Additionally, there are a number of deployments that orchestrate and services that discover these pods_  
 
@@ -92,20 +93,24 @@ The C22MON cluster comes preconfigured with a [Hostmetrics DAQ](https://github.c
 _Implementation Note: Due to VM Driver differences this DAQ behaves differently across different Kubernetes environments - it may log the container's virtual resources, or it may log the host machine's resource values!_
 
 
-## Start C2MON Web User Interface
+## Consult C2MON Web User Interface
 
 The C2MON cluster comes with a web-based application called [c2mon-web-ui](http://github.com/c2mon/c2mon-web-ui), that you can use to do various things such as view metric history, monitor alarms, inspect configurations and view statistics about C2MON clusters.
 
-Run:
-```shell
-kubectl port-forward svc/c2mon-web 8080:8080
-```
-You can now consult the C2MON Web User Interface on http://localhost:8080/c2mon-web-ui/
+This is by default running in: http://your_cluster_ip:31322/c2mon-web-ui/
+
+## Grafana dashboards
+
+The C2MON cluster also comes with a Grafana instance, preconfigured with the MySQL datasource and a dashboard for consulting the data provided by the hostmetrics DAQ.
+
+Check it out in http://your_cluster_ip:31323/ and select the **hostmetrics** dashboard.
+
+To perform any changes visit http://your_cluster_ip:31323/login, use `admin/admin` and then change the password if desired.
 
 <!-- ### Inspecting the data
 
 **TODO**: write a brief section on how to find and interpret metrics using the web interface
- -->port-forward 
+ -->
 
 
 ## What's next?

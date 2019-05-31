@@ -44,6 +44,8 @@ spec:
     - name: http
       port: 8080
       targetPort: 8080
+      nodePort: 31322
+  type: NodePort
   selector:
     io.kompose.service: c2mon-web
 ---

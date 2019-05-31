@@ -16,6 +16,7 @@
     <module>server</module>
     <module>es</module>
     <module>mq</module>
+    <module>grafana</module>
   </modules>
 
   <properties>
