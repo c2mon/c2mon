@@ -180,7 +180,7 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
         try {
           Collection<Long> oscillatingAlarmIds = alarmCache.findAlarm(alarmCacheQuery);
           if (oscillatingAlarmIds.isEmpty()) {
-            log.info("Currently no oscillating alarms");
+            log.debug("Currently no oscillating alarms");
           } else {
             log.warn("Currently {} oscillating alarms", oscillatingAlarmIds.size());
             oscillatingAlarmIds.stream().forEach(this::updateAlarmOscillationFlag);
