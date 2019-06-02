@@ -33,7 +33,6 @@ import cern.c2mon.server.cache.AlarmCache;
 import cern.c2mon.server.cache.AliveTimerFacade;
 import cern.c2mon.server.cache.ClusterCache;
 import cern.c2mon.server.cache.TagFacadeGateway;
-import cern.c2mon.server.cache.alarm.config.OscillationProperties;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.AlarmCacheUpdater;
@@ -71,13 +70,13 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
   /**
    * How often the timer checks whether the oscillation timer have expired.
    */
-  private static final int SCAN_INTERVAL = 60000;
+  private static final long SCAN_INTERVAL = 60000L;
 
   /**
    * The time the server waits before doing first checks at start up (this gives
    * time for incoming alarms to be processed).
    */
-  private static final int INITIAL_SCAN_DELAY = 120000;
+  private static final long INITIAL_SCAN_DELAY = 120000L;
 
   /**
    * Lifecycle flag.
@@ -86,9 +85,9 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
 
   private Timer timer;
 
-  private AlarmCache alarmCache;
+  private final AlarmCache alarmCache;
 
-  private OscillationUpdater oscillationUpdater;
+  private final OscillationUpdater oscillationUpdater;
 
   /** Reference to the clusterCache to share values across the cluster nodes */
   private final ClusterCache clusterCache;
@@ -96,6 +95,8 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
   private final AlarmCacheUpdater alarmCacheUpdater;
   
   private final TagFacadeGateway tagFacadeGateway;
+  
+  private final AlarmQuery alarmCacheQuery = AlarmQuery.builder().oscillating(true).build();
 
   /**
    * Constructor.
@@ -110,7 +111,6 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
    *          the instance that check oscillation statuses.
    * @param AlarmCacheUpdater
    *          the alarm cache updater.
-
    */
   @Autowired
   public OscillationUpdateChecker(final AlarmCache alarmCache, final ClusterCache clusterCache, final OscillationUpdater oscillationUpdater, final AlarmCacheUpdater alarmCacheUpdater, final TagFacadeGateway tagFacadeGateway) {
@@ -122,9 +122,6 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
     this.tagFacadeGateway = tagFacadeGateway;
   }
   
-
-  @Autowired
-  OscillationProperties oscillationProperties;
 
   /**
    * Initializes the clustered values
@@ -176,14 +173,18 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
     clusterCache.acquireWriteLockOnKey(LAST_CHECK_LONG);
     try {
       Long lastCheck = (Long) clusterCache.getCopy(LAST_CHECK_LONG);
-      if (System.currentTimeMillis() - lastCheck.longValue() < 9000) {
+      if (System.currentTimeMillis() - lastCheck.longValue() < SCAN_INTERVAL - 500L) {
         log.debug("Skipping alarm oscillation check as already performed.");
       } else {
         log.debug("checking alarm oscillation timers ... ");
         try {
-          AlarmQuery query = AlarmQuery.builder().oscillating(true).build();
-          Collection<Long> oscillatingAlarmIds = alarmCache.findAlarm(query);
-          oscillatingAlarmIds.stream().forEach(this::updateAlarmOscillationFlag);
+          Collection<Long> oscillatingAlarmIds = alarmCache.findAlarm(alarmCacheQuery);
+          if (oscillatingAlarmIds.isEmpty()) {
+            log.info("Currently no oscillating alarms");
+          } else {
+            log.warn("Currently {} oscillating alarms", oscillatingAlarmIds.size());
+            oscillatingAlarmIds.stream().forEach(this::updateAlarmOscillationFlag);
+          }
         } catch (Exception e) {
           log.error("Unexpected exception when checking the Alarm oscillation timers", e);
         }
@@ -191,9 +192,7 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
         lastCheck = Long.valueOf(System.currentTimeMillis());
         clusterCache.put(LAST_CHECK_LONG, lastCheck);
 
-        if (log.isDebugEnabled()) {
-          log.debug("run() : finished checking alarm oscillation timers ... ");
-        }
+        log.debug("finished checking alarm oscillation timers");
       } // end of else block
     } finally {
       clusterCache.releaseWriteLockOnKey(LAST_CHECK_LONG);
