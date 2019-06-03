@@ -10,6 +10,7 @@ For more details on a given release, please check also the [Milestone planning](
 ## [Unreleased]
 
 ### Added
+- Added a warning log message that informs every minute how many alarms are currently oscillating. In case of no oscillating alarms, only a debug message is logged.
 
 ### Changed
 
@@ -17,10 +18,6 @@ For more details on a given release, please check also the [Milestone planning](
 
 
 ## [1.8.42] - 2019-05-28
-
-### Added
-
-### Changed
 
 ### Fixed
 - Alarm oscillation feature introduced as alpha version in [1.8.40] passed now all internal CERN stress test criterias and can be considered as stable (#145)
