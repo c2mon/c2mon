@@ -62,6 +62,10 @@
       "type": "keyword",
       "index": true
     },
+    "alarmIds": {
+      "type": "long",
+      "dynamic": "true"
+    },
     "timestamp": {
       "type": "date",
       "format": "epoch_millis"

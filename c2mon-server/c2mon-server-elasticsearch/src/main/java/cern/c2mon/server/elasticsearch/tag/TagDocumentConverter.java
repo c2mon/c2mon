@@ -84,6 +84,7 @@ public class TagDocumentConverter extends BaseTagDocumentConverter<TagDocument> 
         } else {
             tagDocument.put("valueObject", tag.getValue());
         }
+        tagDocument.put("alarmIds", tag.getAlarmIds());
         return tagDocument;
     }
 
