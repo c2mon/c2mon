@@ -103,6 +103,7 @@ public class TagImplTest {
             "getInfo",
             tagId,
             new Timestamp(System.currentTimeMillis()),
+            new Timestamp(System.currentTimeMillis() - 10),
             true);
       alarmValue.setMetadata(metadata.getMetadata());
     return alarmValue;
