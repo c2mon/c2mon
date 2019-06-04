@@ -6,15 +6,22 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 All issues referenced in parentheses can be consulted under [CERN GitLab](https://gitlab.cern.ch/c2mon/c2mon/issues).
 For more details on a given release, please check also the [Milestone planning](https://gitlab.cern.ch/c2mon/c2mon/milestones?state=all).
 
-
 ## [Unreleased]
 
 ### Added
-- Added a warning log message that informs every minute how many alarms are currently oscillating. In case of no oscillating alarms, only a debug message is logged.
 
 ### Changed
 
 ### Fixed
+
+
+## [1.8.43] - 2019-06-04
+
+### Added
+- Server: Added a warning log message that informs every minute how many alarms are currently oscillating. In case of no oscillating alarms, only a debug message is logged.
+- Deployment: Added Grafana to C2MON's Kubernetes configuration as well as predefined sample dashboards (!219)
+- Client API: Added source timestamp to client alarm object (#237)
+- Elasticsearch: Added alarm ids to ES tag document (#265)
 
 
 ## [1.8.42] - 2019-05-28
@@ -371,7 +378,8 @@ This patch contains bug fixes for the DAQ layer.
 - Remove of EquipmentLogger concept from DAQ Core (#56)
 
 
-[Unreleased]: https://gitlab.cern.ch/c2mon/c2mon/milestones/36
+[Unreleased]: https://gitlab.cern.ch/c2mon/c2mon/milestones/37
+[1.8.43]: https://gitlab.cern.ch/c2mon/c2mon/milestones/36
 [1.8.42]: https://gitlab.cern.ch/c2mon/c2mon/milestones/35
 [1.8.41]: https://gitlab.cern.ch/c2mon/c2mon/milestones/34
 [1.8.40]: https://gitlab.cern.ch/c2mon/c2mon/milestones/31
