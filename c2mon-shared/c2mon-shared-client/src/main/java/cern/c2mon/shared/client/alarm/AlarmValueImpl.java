@@ -51,28 +51,25 @@ import cern.c2mon.shared.client.request.ClientRequestReport;
 @Root(name = "AlarmValue")
 @Data
 @Slf4j
+@AllArgsConstructor
+@Builder
 public final class AlarmValueImpl extends ClientRequestReport implements AlarmValue, Cloneable {
 
   /** Alarm id */
-  @NotNull
-  @Min(1)
   @Attribute
   private Long id;
 
   /** LASER alarm fault code */
-  @NotNull
   @Element
   private int faultCode;
 
   /** LASER alarm fault family */
-  @NotNull
   @Element
   private String faultFamily;
 
   // ToDo: correct typo in next major release ->
   // https://gitlab.cern.ch/c2mon/c2mon/issues/149
   /** LASER alarm fault member */
-  @NotNull
   @Element
   private String faultMemeber;
 
@@ -81,8 +78,6 @@ public final class AlarmValueImpl extends ClientRequestReport implements AlarmVa
   private String info;
 
   /** Unique identifier of the Tag to which the alarm is attached */
-  @NotNull
-  @Min(1)
   @Element
   private Long tagId;
 
@@ -91,8 +86,6 @@ public final class AlarmValueImpl extends ClientRequestReport implements AlarmVa
   private String tagDescription;
 
   /** UTC timestamp of the alarm's last state change */
-  @NotNull
-  @Past
   @Element
   private Timestamp timestamp;
 
@@ -103,11 +96,15 @@ public final class AlarmValueImpl extends ClientRequestReport implements AlarmVa
   /** <code>true</code>, if the oscillation is active */
   @Element
   private boolean oscillating;
+  
+  /** UTC timestamp of the alarm's source tag timestamp */
+  @Element
+  private Timestamp sourceTimestamp;
+  
 
   /**
    * Metadata according to the tag in this class.
    */
-  @NotNull
   private Map<String, Object> metadata = new HashMap<>();
 
   /**
@@ -118,8 +115,9 @@ public final class AlarmValueImpl extends ClientRequestReport implements AlarmVa
   }
 
   /**
-   * Default Constructor
+   * Legacy full arg Constructor (deprecated)
    * 
+   * @deprecated Since 1.8.43
    * @param pId
    *          Alarm id
    * @param pFaultCode
@@ -149,34 +147,6 @@ public final class AlarmValueImpl extends ClientRequestReport implements AlarmVa
     active = isActive;
   }
 
-  /**
-   * Default Constructor
-   * 
-   * @param pId
-   *          Alarm id
-   * @param pFaultCode
-   *          LASER alarm fault code
-   * @param pFaultMember
-   *          LASER alarm fault memeber
-   * @param pFaultFamily
-   *          LASER alarm fault family
-   * @param pInfo
-   *          Free text for additional information about the alarm
-   * @param pTagId
-   *          Unique identifier of the Tag to which the alarm is attached
-   * @param pTagDescription
-   *          Description for the Tag to which the alarm is attached
-   * @param pTimestamp
-   *          UTC timestamp of the alarm's last state change
-   * @param isActive
-   *          <code>true</code>, if the alarm is active
-   */
-  public AlarmValueImpl(final Long pId, final int pFaultCode, final String pFaultMember, final String pFaultFamily, final String pInfo, final Long pTagId,
-      final String pTagDescription, final Timestamp pTimestamp, final boolean isActive) {
-    this(pId, pFaultCode, pFaultMember, pFaultFamily, pInfo, pTagId, pTimestamp, isActive);
-    tagDescription = pTagDescription;
-  }
-  
   /**
    * Default Constructor
    * 

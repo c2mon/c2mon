@@ -146,15 +146,17 @@ public abstract class TransferObjectFactory {
     AlarmValueImpl alarmValueImpl = null;
 
     if (alarm != null) {
-      alarmValueImpl = new AlarmValueImpl(alarm.getId(),
-          alarm.getFaultCode(),
-          alarm.getFaultMember(),
-          alarm.getFaultFamily(),
-          alarm.getInfo(),
-          alarm.getTagId(),
-          alarm.getTimestamp(),
-          alarm.isActive(),
-          alarm.isOscillating());
+      alarmValueImpl = AlarmValueImpl.builder()
+              .id(alarm.getId())
+              .faultCode(alarm.getFaultCode())
+              .faultMemeber(alarm.getFaultMember())
+              .faultFamily(alarm.getFaultFamily())
+              .info(alarm.getInfo())
+              .tagId(alarm.getTagId())
+              .timestamp(alarm.getTimestamp())
+              .active(alarm.isActive())
+              .oscillating(alarm.isOscillating())
+              .sourceTimestamp(alarm.getSourceTimestamp()).build();
 
       if (alarm.getMetadata() != null) {
         alarmValueImpl.setMetadata(alarm.getMetadata().getMetadata());
@@ -285,16 +287,18 @@ public abstract class TransferObjectFactory {
       List<AlarmValueImpl> alarmValues = new ArrayList<AlarmValueImpl>(alarms.size());
       for (Alarm alarm : alarms) {
         AlarmValueImpl alarmValue =
-            new AlarmValueImpl(
-                alarm.getId(),
-                alarm.getFaultCode(),
-                alarm.getFaultMember(),
-                alarm.getFaultFamily(),
-                alarm.getInfo(),
-                alarm.getTagId(),
-                alarm.getTimestamp(),
-                alarm.isActive(),
-                alarm.isOscillating());
+                AlarmValueImpl.builder()
+                .id(alarm.getId())
+                .faultCode(alarm.getFaultCode())
+                .faultMemeber(alarm.getFaultMember())
+                .faultFamily(alarm.getFaultFamily())
+                .info(alarm.getInfo())
+                .tagId(alarm.getTagId())
+                .timestamp(alarm.getTimestamp())
+                .active(alarm.isActive())
+                .oscillating(alarm.isOscillating())
+                .sourceTimestamp(alarm.getSourceTimestamp()).build();    
+                
         if (alarm.getMetadata()!= null){
           alarmValue.setMetadata(alarm.getMetadata().getMetadata());
         }

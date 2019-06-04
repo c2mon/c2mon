@@ -40,6 +40,11 @@ public interface AlarmValue extends ClientRequestResult {
    */
   Timestamp getTimestamp();
   
+  /** UTC timestamp of the alarm's source tag timestamp 
+   * @return the UTC timestamp of the alarm's source tag timestamp 
+   */
+  Timestamp getSourceTimestamp();
+
   /**
    * Get the optional additional info on the alarm that is to be sent to
    * LASER as a "user-defined" fault state property.
