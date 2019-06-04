@@ -63,7 +63,7 @@
       "index": true
     },
     "alarmIds": {
-      "type": "long",
+      "type": "long"
     },
     "timestamp": {
       "type": "date",
