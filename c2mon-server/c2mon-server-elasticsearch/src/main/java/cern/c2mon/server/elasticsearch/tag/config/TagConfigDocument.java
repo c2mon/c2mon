@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-
 package cern.c2mon.server.elasticsearch.tag.config;
 
 import java.util.HashMap;

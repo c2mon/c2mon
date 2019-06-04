@@ -14,8 +14,14 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-
 package cern.c2mon.server.elasticsearch.tag.config;
+
+import java.util.Collections;
+import java.util.List;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import cern.c2mon.server.cache.TagFacadeGateway;
 import cern.c2mon.server.common.alarm.Alarm;
@@ -23,12 +29,6 @@ import cern.c2mon.server.common.listener.ConfigurationEventListener;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Listens for tag configuration events, converts them to
