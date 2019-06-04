@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2019 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -16,22 +16,19 @@
  *****************************************************************************/
 package cern.c2mon.shared.client.tag;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertTrue;
-
 import java.sql.Timestamp;
 
-import cern.c2mon.shared.client.serializer.TransferTagSerializer;
-import cern.c2mon.shared.client.tag.TagMode;
-import cern.c2mon.shared.client.tag.TagValueUpdate;
-import cern.c2mon.shared.client.tag.TransferTagValueImpl;
 import org.junit.Test;
 
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.alarm.AlarmValueImpl;
+import cern.c2mon.shared.client.serializer.TransferTagSerializer;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class TransferTagValueImplTest {
 
@@ -139,15 +136,15 @@ public class TransferTagValueImplTest {
   public void testAlarmValueAdding() {
     TransferTagValueImpl tagValue = createTagForValue(Integer.valueOf(234234));
     AlarmValueImpl alarmValid =
-      new AlarmValueImpl(12342L, 1, "FaultMember1", "FaultFamily1", "Info1",
-                         1234L, new Timestamp(System.currentTimeMillis()), true);
+        new AlarmValueImpl(12342L, 1, "FaultMember1", "FaultFamily1", "Info1", 1234L,
+            new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis() - 10), true);
 
     assertTrue(tagValue.addAlarmValue(alarmValid));
 
 
     AlarmValueImpl alarmInvalid =
-      new AlarmValueImpl(12342L, 1, "FaultMember1", "FaultFamily1", "Info1",
-                         4532453L, new Timestamp(System.currentTimeMillis()), true);
+        new AlarmValueImpl(12342L, 1, "FaultMember1", "FaultFamily1", "Info1", 4532453L,
+            new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis() - 10), true);
     assertFalse(tagValue.addAlarmValue(alarmInvalid));
 
     assertEquals(1, tagValue.getAlarms().size());

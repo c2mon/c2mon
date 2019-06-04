@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2019 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -46,9 +46,9 @@ import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEnti
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
 import cern.c2mon.shared.util.json.GsonFactory;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class ClientRequestImplTest {
 
@@ -79,12 +79,12 @@ public class ClientRequestImplTest {
   public void testRequestTimeouts() {
 
     ClientRequestImpl<TagValueUpdate> tagRequest =
-      new ClientRequestImpl<TagValueUpdate>(TagValueUpdate.class);
+      new ClientRequestImpl<>(TagValueUpdate.class);
 
     assertTrue(tagRequest.getTimeout() == 10000);
 
     ClientRequestImpl<ProcessXmlResponse> daqXmlRequest =
-      new ClientRequestImpl<ProcessXmlResponse>(ProcessXmlResponse.class);
+      new ClientRequestImpl<>(ProcessXmlResponse.class);
 
     assertTrue(daqXmlRequest.getTimeout() == 120000);
   }
@@ -92,7 +92,7 @@ public class ClientRequestImplTest {
   @Test
   public void testJsonMessageSerialization() {
     ClientRequestImpl<TagValueUpdate> tagRequest =
-      new ClientRequestImpl<TagValueUpdate>(TagValueUpdate.class);
+      new ClientRequestImpl<>(TagValueUpdate.class);
     tagRequest.addTagIds(Arrays.asList(123L, 4324L, 4535L, 123L));
 
     String json = tagRequest.toJson();
@@ -108,7 +108,7 @@ public class ClientRequestImplTest {
   @Test
   public void testAlarmJsonMessageSerialization() {
     ClientRequestImpl<AlarmValue> tagRequest =
-      new ClientRequestImpl<AlarmValue>(AlarmValue.class);
+      new ClientRequestImpl<>(AlarmValue.class);
     tagRequest.addTagIds(Arrays.asList(123L, 4324L, 4535L, 123L));
 
     String json = tagRequest.toJson();
@@ -125,7 +125,7 @@ public class ClientRequestImplTest {
   public void testActiveAlarmJsonMessageSerialization() {
 
     ClientRequestImpl<AlarmValue> alarmsRequest =
-      new ClientRequestImpl<AlarmValue>(
+      new ClientRequestImpl<>(
           ClientRequest.ResultType.TRANSFER_ALARM_LIST,
           ClientRequest.RequestType.ACTIVE_ALARMS_REQUEST,
           10000
@@ -141,7 +141,7 @@ public class ClientRequestImplTest {
   @Test
   public void testTagConfigurationJsonMessageSerialization() {
     ClientRequestImpl<TagConfig> tagRequest =
-      new ClientRequestImpl<TagConfig>(TagConfig.class);
+      new ClientRequestImpl<>(TagConfig.class);
     tagRequest.addTagIds(Arrays.asList(123L, 4324L, 4535L, 123L));
 
     String json = tagRequest.toJson();
@@ -157,7 +157,7 @@ public class ClientRequestImplTest {
   @Test
   public void testConfigurationReportJsonMessageSerialization() {
     ClientRequestImpl<ConfigurationReport> tagRequest =
-      new ClientRequestImpl<ConfigurationReport>(ConfigurationReport.class);
+      new ClientRequestImpl<>(ConfigurationReport.class);
     tagRequest.addTagIds(Arrays.asList(123L, 4324L, 4535L, 123L));
 
     String json = tagRequest.toJson();
@@ -173,7 +173,7 @@ public class ClientRequestImplTest {
   @Test
   public void testJsonResponseDeserialization() {
     ClientRequestImpl<TagUpdate> tagRequest =
-      new ClientRequestImpl<TagUpdate>(TagUpdate.class);
+      new ClientRequestImpl<>(TagUpdate.class);
     tagRequest.addTagIds(Arrays.asList(123L, 4324L, 4535L));
 
 
@@ -194,7 +194,7 @@ public class ClientRequestImplTest {
   @Test
   public void testAlarmJsonResponseDeserialization() {
     ClientRequestImpl<AlarmValue> alarmRequest =
-      new ClientRequestImpl<AlarmValue>(AlarmValue.class);
+      new ClientRequestImpl<>(AlarmValue.class);
     alarmRequest.addTagIds(Arrays.asList(123L, 4324L, 4535L, 123L));
 
     AlarmValue originalAlarm = createAlarm(123L) ;
@@ -219,7 +219,7 @@ public class ClientRequestImplTest {
   @Test
   public void testConfigurationReportJsonResponseDeserialization() {
     ClientRequestImpl<ConfigurationReport> tagRequest =
-      new ClientRequestImpl<ConfigurationReport>(ConfigurationReport.class);
+      new ClientRequestImpl<>(ConfigurationReport.class);
     tagRequest.addTagIds(Arrays.asList(123L, 4324L, 4535L, 123L));
 
     ConfigurationReport originalConfigurationReport = createConfigurationReport(123L) ;
@@ -244,7 +244,7 @@ public class ClientRequestImplTest {
   @Test
   public void testTagConfigurationJsonResponseDeserialization() {
     ClientRequestImpl<TagConfig> tagRequest =
-      new ClientRequestImpl<TagConfig>(TagConfig.class);
+      new ClientRequestImpl<>(TagConfig.class);
     tagRequest.addTagIds(Arrays.asList(123L, 4324L, 4535L, 123L));
 
     TagConfig originalTagConfig = createTagConfig(123L) ;
@@ -343,7 +343,7 @@ public class ClientRequestImplTest {
   @Test
   public void testSupervisionEventRequest() {
     ClientRequestImpl<SupervisionEvent> tagRequest =
-      new ClientRequestImpl<SupervisionEvent>(SupervisionEvent.class);
+      new ClientRequestImpl<>(SupervisionEvent.class);
 
     String json = tagRequest.toJson();
     ClientRequest receivedRequest = ClientRequestImpl.fromJson(json);
@@ -363,7 +363,7 @@ public class ClientRequestImplTest {
   @Test
   public void testProcessNamesRequest() {
     ClientRequestImpl<ProcessNameResponse> processNameRequest =
-      new ClientRequestImpl<ProcessNameResponse>(ProcessNameResponse.class);
+      new ClientRequestImpl<>(ProcessNameResponse.class);
 
     String json = processNameRequest.toJson();
     ClientRequest receivedRequest = ClientRequestImpl.fromJson(json);
@@ -374,7 +374,7 @@ public class ClientRequestImplTest {
 
     //fake response from server
     ProcessNameResponse processResponse = new ProcessNameResponseImpl("process name");
-    Collection<ProcessNameResponse> responseList = new ArrayList<ProcessNameResponse>();
+    Collection<ProcessNameResponse> responseList = new ArrayList<>();
     responseList.add(processResponse);
 
     String jsonResponse = gson.toJson(responseList);
@@ -386,7 +386,7 @@ public class ClientRequestImplTest {
   @Test
   public void testProcessXmlRequest() {
     ClientRequestImpl<ProcessXmlResponse> xmlRequest =
-      new ClientRequestImpl<ProcessXmlResponse>(ProcessXmlResponse.class);
+      new ClientRequestImpl<>(ProcessXmlResponse.class);
     xmlRequest.setRequestParameter("request parameter");
     String json = xmlRequest.toJson();
     ClientRequest receivedRequest = ClientRequestImpl.fromJson(json);
@@ -398,7 +398,7 @@ public class ClientRequestImplTest {
     //fake response from server
     ProcessXmlResponse xmlResponse = new ProcessXmlResponseImpl();
     ((ProcessXmlResponseImpl) xmlResponse).setProcessXML("xml string");
-    Collection<ProcessXmlResponse> responseList = new ArrayList<ProcessXmlResponse>();
+    Collection<ProcessXmlResponse> responseList = new ArrayList<>();
     responseList.add(xmlResponse);
 
     String jsonResponse = gson.toJson(responseList);
@@ -468,7 +468,7 @@ public class ClientRequestImplTest {
 
     Collection<SupervisionEvent> responseList = null;
     if (tagRequest.getRequestType() == ClientRequest.RequestType.SUPERVISION_REQUEST) {
-      responseList = new ArrayList<SupervisionEvent>();
+      responseList = new ArrayList<>();
       for (int i = 0; i < size; i++) {
         responseList.add(
             new SupervisionEventImpl(SupervisionEntity.PROCESS, Long.valueOf(i), "P_TEST", SupervisionStatus.RUNNING, new Timestamp(System.currentTimeMillis()), "supervision event " + i));
@@ -630,7 +630,7 @@ public class ClientRequestImplTest {
     tagConfig.setRuleIds(Arrays.asList(123L, 4324L, 4535L));
 
     tagConfig.setLogged(Boolean.FALSE);
-    ArrayList<String> processNames = new ArrayList<String>();
+    ArrayList<String> processNames = new ArrayList<>();
     processNames.add("Process1");
     processNames.add("Process2");
     tagConfig.setProcessNames(processNames);
@@ -650,6 +650,7 @@ public class ClientRequestImplTest {
         "test Info",
         123L,
         new Timestamp(System.currentTimeMillis()),
+        new Timestamp(System.currentTimeMillis() - 10),
         true);
   }
 

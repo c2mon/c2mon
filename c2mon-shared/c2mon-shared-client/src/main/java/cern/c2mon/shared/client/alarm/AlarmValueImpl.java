@@ -21,19 +21,17 @@ import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.Root;
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.convert.AnnotationStrategy;
 import org.simpleframework.xml.core.Persister;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
 
 import cern.c2mon.shared.client.request.ClientRequestReport;
 
@@ -96,11 +94,11 @@ public final class AlarmValueImpl extends ClientRequestReport implements AlarmVa
   /** <code>true</code>, if the oscillation is active */
   @Element
   private boolean oscillating;
-  
+
   /** UTC timestamp of the alarm's source tag timestamp */
   @Element
   private Timestamp sourceTimestamp;
-  
+
 
   /**
    * Metadata according to the tag in this class.
@@ -111,12 +109,12 @@ public final class AlarmValueImpl extends ClientRequestReport implements AlarmVa
    * Hidden Constructor needed for JSON
    */
   private AlarmValueImpl() {
-    this(null, -1, null, null, null, null, null, false);
+    this(null, -1, null, null, null, null, null, null, false);
   }
 
   /**
    * Legacy full arg Constructor (deprecated)
-   * 
+   *
    * @deprecated Since 1.8.43
    * @param pId
    *          Alarm id
@@ -130,26 +128,30 @@ public final class AlarmValueImpl extends ClientRequestReport implements AlarmVa
    *          Free text for additional information about the alarm
    * @param pTagId
    *          Unique identifier of the Tag to which the alarm is attached
-   * @param pTimestamp
+   * @param timestamp
    *          UTC timestamp of the alarm's last state change
+   * @param sourceTimestamp
+   *          the source timestamp
    * @param isActive
    *          <code>true</code>, if the alarm is active
    */
+  @Deprecated
   public AlarmValueImpl(final Long pId, final int pFaultCode, final String pFaultMember, final String pFaultFamily, final String pInfo, final Long pTagId,
-      final Timestamp pTimestamp, final boolean isActive) {
+      final Timestamp timestamp, final Timestamp sourceTimestamp, final boolean isActive) {
     id = pId;
     faultCode = pFaultCode;
     faultMemeber = pFaultMember;
     faultFamily = pFaultFamily;
     info = pInfo;
     tagId = pTagId;
-    timestamp = pTimestamp;
+    this.timestamp = timestamp;
+    this.sourceTimestamp = sourceTimestamp;
     active = isActive;
   }
 
   /**
    * Default Constructor
-   * 
+   *
    * @param pId
    *          Alarm id
    * @param pFaultCode
@@ -166,16 +168,18 @@ public final class AlarmValueImpl extends ClientRequestReport implements AlarmVa
    *          Description for the Tag to which the alarm is attached
    * @param pTimestamp
    *          UTC timestamp of the alarm's last state change
+   * @param sourceTimestamp
+   *          the source timestamp
    * @param isActive
    *          <code>true</code>, if the alarm is active
    */
   public AlarmValueImpl(final Long pId, final int pFaultCode, final String pFaultMember, final String pFaultFamily, final String pInfo, final Long pTagId,
-      final Timestamp pTimestamp, final boolean isActive, final boolean isOscillating) {
-    this(pId, pFaultCode, pFaultMember, pFaultFamily, pInfo, pTagId, pTimestamp, isActive);
+      final Timestamp pTimestamp, final Timestamp sourceTimestamp, final boolean isActive, final boolean isOscillating) {
+    this(pId, pFaultCode, pFaultMember, pFaultFamily, pInfo, pTagId, pTimestamp, sourceTimestamp, isActive);
     this.oscillating = isOscillating;
   }
-  
- 
+
+
 
   @Override
   @JsonIgnore
