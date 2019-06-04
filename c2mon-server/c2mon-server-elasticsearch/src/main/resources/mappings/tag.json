@@ -64,7 +64,6 @@
     },
     "alarmIds": {
       "type": "long",
-      "dynamic": "true"
     },
     "timestamp": {
       "type": "date",
