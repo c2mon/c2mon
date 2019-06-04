@@ -5,6 +5,9 @@
     </encoder>
   </appender>
 
+  <logger name="cern.c2mon.client" level="DEBUG"/>
+  <logger name="cern.c2mon.server.elasticsearch.client.ElasticsearchClientImpl" level="WARN"/>
+
   <root level="info">
     <appender-ref ref="STDOUT"/>
   </root>

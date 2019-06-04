@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2019 CERN. All rights not expressly granted are reserved.
  * 
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -16,12 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.shared.client.request;
 
-import javax.validation.constraints.NotNull;
-
-import cern.c2mon.shared.util.json.GsonFactory;
-
-import com.google.gson.Gson;
-
 /**
  * This class implements the <code>ClientRequestErrorReport</code> interface 
  * which is used to indicate whether the <code>ClientRequest</code>
@@ -35,7 +29,6 @@ public class ClientRequestErrorReportImpl implements ClientRequestErrorReport {
   private final String errorMessage;  
 
   /** The RequestExecutionStatus */
-  @NotNull
   private final RequestExecutionStatus requestStatus;
   
   /**

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2019 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -23,46 +23,31 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
-import cern.c2mon.shared.client.serializer.TransferTagSerializer;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 
+import lombok.Getter;
+
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.alarm.AlarmValueImpl;
-import cern.c2mon.shared.client.command.CommandExecuteRequest;
-import cern.c2mon.shared.client.command.CommandReport;
-import cern.c2mon.shared.client.command.CommandReportImpl;
-import cern.c2mon.shared.client.command.CommandTagHandle;
-import cern.c2mon.shared.client.command.CommandTagHandleImpl;
+import cern.c2mon.shared.client.command.*;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.ConfigurationReportHeader;
-import cern.c2mon.shared.client.device.DeviceClassNameResponse;
-import cern.c2mon.shared.client.device.DeviceClassNameResponseImpl;
-import cern.c2mon.shared.client.device.DeviceInfo;
-import cern.c2mon.shared.client.device.TransferDevice;
-import cern.c2mon.shared.client.device.TransferDeviceImpl;
+import cern.c2mon.shared.client.device.*;
 import cern.c2mon.shared.client.process.ProcessNameResponse;
 import cern.c2mon.shared.client.process.ProcessNameResponseImpl;
 import cern.c2mon.shared.client.process.ProcessXmlResponse;
 import cern.c2mon.shared.client.process.ProcessXmlResponseImpl;
+import cern.c2mon.shared.client.serializer.TransferTagSerializer;
 import cern.c2mon.shared.client.statistics.TagStatisticsResponse;
 import cern.c2mon.shared.client.statistics.TagStatisticsResponseImpl;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
-import cern.c2mon.shared.client.tag.TagConfig;
-import cern.c2mon.shared.client.tag.TagConfigImpl;
-import cern.c2mon.shared.client.tag.TagUpdate;
-import cern.c2mon.shared.client.tag.TagValueUpdate;
-import cern.c2mon.shared.client.tag.TransferTagImpl;
-import cern.c2mon.shared.client.tag.TransferTagValueImpl;
+import cern.c2mon.shared.client.tag.*;
 import cern.c2mon.shared.util.json.GsonFactory;
-import lombok.Getter;
 
 /**
  * This class implements the <code>ClientRequest</code> interface
@@ -79,11 +64,11 @@ public class ClientRequestImpl<T extends ClientRequestResult> implements ClientR
   private static transient Gson gson = null;
 
   /** The request type */
-  @NotNull @Getter
+  @Getter
   private final RequestType requestType;
 
   /** The expected result type */
-  @NotNull @Getter
+  @Getter
   private final ResultType resultType;
 
   /** Requests from the Client API to the C2MON server have different timeouts depending on their type.
@@ -92,11 +77,11 @@ public class ClientRequestImpl<T extends ClientRequestResult> implements ClientR
   private int requestTimeout;
 
   /** List of ids. Please note this field should one day be renamed to ids. */
-  @Size(min = 0) @Getter(onMethod=@__({@Deprecated}))
+  @Getter(onMethod=@__({@Deprecated}))
   private final Collection<Long> tagIds = new HashSet<Long>();
 
   /** List of regular expressions, which is e.g. used to search via tag name */
-  @Size(min = 0) @Getter
+  @Getter
   private final Collection<String> regexList = new HashSet<String>();
 
   /** Request parameter */

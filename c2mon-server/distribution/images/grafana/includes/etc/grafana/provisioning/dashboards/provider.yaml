@@ -1,0 +1,10 @@
+apiVersion: 1
+
+providers:
+  - name: 'default-provider'
+    orgId: 1
+    folder: ''
+    type: file
+    editable: true
+    options:
+      path: /dashboards

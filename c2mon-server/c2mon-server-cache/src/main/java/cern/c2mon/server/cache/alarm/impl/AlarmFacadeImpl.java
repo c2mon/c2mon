@@ -268,12 +268,6 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
     }
   }
 
-//  private void checkOscillation(Alarm alarm) {
-//
-
-
-  //
-
   /**
    * Perform a series of consistency checks on the AlarmCacheObject. This method
    * should be invoked if an AlarmCacheObject was created from a list of named

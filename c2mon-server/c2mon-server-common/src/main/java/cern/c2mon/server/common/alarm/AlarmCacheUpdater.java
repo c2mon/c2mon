@@ -4,10 +4,26 @@ import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.common.datatag.DataTagConstants;
 
 public interface AlarmCacheUpdater {
+  
+  /**
+   * Computes the alarm state corresponding to the new tag value and updates the Alarm cache, if required.
+   * @param alarm The current alarm object in the cache
+   * @param tag The tag update
+   * @return The updated alarm object
+   */
   Alarm update(final Alarm alarm, final Tag tag);
+  
+  /**
+   * Resets the oscillation flag to false and computes the alarm state corresponding to the actual tag value. 
+   * It will also updates the Alarm cache and notify the listeners.
+   * @param alarm The current alarm object in the cache
+   * @param tag The tag update
+   * @return The updated alarm object
+   */
+  void resetOscillationStatus(final AlarmCacheObject alarm, final Tag tag);
 
   static String evaluateAdditionalInfo(final Alarm alarm, final Tag tag){
-    String additionalInfo = null;
+    String additionalInfo = "";
 
     if (tag != null) {
       switch (tag.getMode()) {

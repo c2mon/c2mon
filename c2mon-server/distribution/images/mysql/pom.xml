@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>cern.c2mon.server</groupId>
+    <artifactId>c2mon-docker-parent</artifactId>
+    <version>1.8.43-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>img-mysql</artifactId>
+  <name>c2mon-server :: mysql image</name>
+  <packaging>jar</packaging>
+
+  <properties>
+    <image.base>mysql:5.7.15</image.base>
+    <image.name>c2mon-mysql</image.name>
+    <docker.entrypoint>docker-entrypoint-initdb.d</docker.entrypoint>
+  </properties>
+
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>generate-sources</phase>
+            <configuration>
+              <target>
+                <!-- we send the file here so that it's copied over to the docker entrypoint
+                and then picked up by the mysql init process
+                See: https://hub.docker.com/_/mysql?tab=description -->
+                <concat destfile="${project.build.directory}/${docker.entrypoint}/c2mon-mysql-schema.sql">
+                  <!-- also need a prelude to setup the DB, add a user, change user etc... -->
+                  <fileset file="${project.basedir}/../../../c2mon-server-cachedbaccess/src/main/resources/sql/cache-schema-mysql.sql" />
+                  <fileset file="${project.basedir}/../../../c2mon-server-history/src/main/resources/sql/history-schema-mysql.sql" />
+                  <fileset file="${project.basedir}/../../../c2mon-server-configuration/src/main/resources/sql/config-schema-mysql.sql" />
+                </concat>
+              </target>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>com.google.cloud.tools</groupId>
+        <artifactId>jib-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>deploy</phase>
+            <id>build</id>
+          </execution>
+        </executions>
+        <configuration>
+          <container>
+            <ports>
+              <port>3306</port>
+            </ports>
+            <entrypoint>
+              <entrypoint>INHERIT</entrypoint>
+            </entrypoint>
+            <environment>
+              <MYSQL_DATABASE>tim</MYSQL_DATABASE>
+              <MYSQL_ALLOW_EMPTY_PASSWORD>yes</MYSQL_ALLOW_EMPTY_PASSWORD>
+            </environment>
+          </container>
+          <extraDirectory>
+            <path>${project.build.directory}/</path>
+          </extraDirectory>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

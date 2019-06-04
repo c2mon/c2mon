@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2019 CERN. All rights not expressly granted are reserved.
  * 
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -18,12 +18,9 @@ package cern.c2mon.client.common.admin;
 
 import java.sql.Timestamp;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Past;
+import com.google.gson.Gson;
 
 import cern.c2mon.shared.util.json.GsonFactory;
-
-import com.google.gson.Gson;
 
 /**
  * Implementation of the BroadcastMessage which is used to send messages to the
@@ -38,20 +35,15 @@ public class BroadcastMessageImpl implements BroadcastMessage {
   private static transient Gson gson = null;
 
   /** the type of message */
-  @NotNull
   private BroadcastMessageType type;
 
   /** the sender of the message */
-  @NotNull
   private String sender;
 
   /** the message */
-  @NotNull
   private String message;
 
   /** the time of when the message was created */
-  @NotNull
-  @Past
   private Timestamp timestamp;
 
   /**

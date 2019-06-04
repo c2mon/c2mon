@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>cern.c2mon.server</groupId>
+    <artifactId>distribution</artifactId>
+    <version>1.8.43-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>c2mon-docker-parent</artifactId>
+  <packaging>pom</packaging>
+
+  <modules>
+    <module>mysql</module>
+    <module>server</module>
+    <module>es</module>
+    <module>mq</module>
+    <module>grafana</module>
+  </modules>
+
+  <properties>
+    <image.base />
+    <image.name />
+    <registry>registry.hub.docker.com</registry>
+    <repository>cern/${image.name}</repository>
+  </properties>
+
+  <build>
+    <plugins>
+      <!-- Building this so jib doesn't crash for missing folder -->
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>generate-sources</phase>
+            <configuration>
+              <target>
+                <mkdir dir="${project.build.directory}/classes" />
+              </target>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>com.google.cloud.tools</groupId>
+        <artifactId>jib-maven-plugin</artifactId>
+        <version>1.0.2</version>
+        <executions>
+          <execution>
+            <phase>deploy</phase>
+            <id>build</id>
+            <goals>
+              <goal>build</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <from>
+            <image>${image.base}</image>
+          </from>
+          <to>
+            <image>${registry}/${repository}</image>
+            <tags>
+              <tag>${project.version}</tag>
+              <tag>latest</tag>
+            </tags>
+          </to>
+          <container>
+            <useCurrentTimestamp>true</useCurrentTimestamp>
+          </container>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-deploy-plugin</artifactId>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-install-plugin</artifactId>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

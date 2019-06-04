@@ -5,7 +5,7 @@
   <parent>
     <groupId>cern.c2mon</groupId>
     <artifactId>c2mon</artifactId>
-    <version>1.8.41-SNAPSHOT</version>
+    <version>1.8.43-SNAPSHOT</version>
   </parent>
 
   <groupId>cern.c2mon.daq</groupId>
@@ -19,7 +19,11 @@
   </modules>
 
   <properties>
-    <docker.image.base>java:8-jdk</docker.image.base>
+    <image.base>java:8-jdk</image.base>
+    <image.name>${project.artifactId}</image.name>
+    <registry>registry.hub.docker.com</registry>
+    <repository>cern/c2mon-daq</repository>
+    <daq.home>/${project.artifactId}-${project.version}</daq.home>
   </properties>
 
   <dependencies>
@@ -76,7 +80,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-dependency-plugin</artifactId>
-          <version>2.6</version>
+          <version>2.10</version>
           <executions>
             <execution>
               <id>unpack</id>
@@ -112,6 +116,7 @@
                 <goal>single</goal>
               </goals>
               <configuration>
+                <finalName>${project.artifactId}-${project.version}</finalName>
                 <descriptors>
                   <descriptor>${project.build.directory}/distribution/tar/assembly.xml</descriptor>
                 </descriptors>
@@ -120,79 +125,94 @@
           </executions>
         </plugin>
 
-        <!-- Generic docker image configuration -->
         <plugin>
-          <groupId>com.spotify</groupId>
-          <artifactId>docker-maven-plugin</artifactId>
-          <version>0.4.10</version>
+          <artifactId>maven-antrun-plugin</artifactId>
           <executions>
             <execution>
-              <id>build-image</id>
-              <phase>package</phase>
+              <phase>install</phase>
+              <configuration>
+                <target>
+                  <gunzip src="${project.build.directory}/${project.artifactId}-${project.version}-dist.tar.gz" />
+                  <untar src="${project.build.directory}/${project.artifactId}-${project.version}-dist.tar" dest="${project.build.directory}/distribution${daq.home}" />
+                  <copy todir="${project.build.directory}/distribution${daq.home}" overwrite="true">
+                    <fileset dir="${project.build.directory}/distribution/tar" />
+                    <fileset dir="${project.build.directory}/distribution/docker" />
+                  </copy>
+                </target>
+              </configuration>
+              <goals>
+                <goal>run</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+
+        <plugin>
+          <groupId>com.google.cloud.tools</groupId>
+          <artifactId>jib-maven-plugin</artifactId>
+          <version>1.0.2</version>
+          <executions>
+            <execution>
+              <phase>deploy</phase>
+              <id>build</id>
               <goals>
                 <goal>build</goal>
               </goals>
             </execution>
-            <execution>
-              <id>push-image</id>
-              <phase>deploy</phase>
-              <goals>
-                <goal>push</goal>
-              </goals>
-              <configuration>
-                <imageName>gitlab-registry.cern.ch/c2mon/${project.artifactId}</imageName>
-              </configuration>
-            </execution>
           </executions>
           <configuration>
-            <imageName>gitlab-registry.cern.ch/c2mon/${project.artifactId}</imageName>
-            <baseImage>${docker.image.base}</baseImage>
-            <serverId>gitlab-registry.cern.ch</serverId>
-            <registryUrl>https://gitlab-registry.cern.ch</registryUrl>
-            <forceTags>true</forceTags>
-            <imageTags>
-              <imageTag>${project.version}</imageTag>
-            </imageTags>
-            <workdir>/${project.artifactId}</workdir>
-            <entryPoint>["/docker-entrypoint.sh"]</entryPoint>
-            <exposes>
-              <expose>1099</expose>
-            </exposes>
-            <runs>
-              <run>chmod 755 /docker-entrypoint.sh</run>
-              <run>chmod 755 /${project.artifactId}/bin/*</run>
-              <run>apt-get install -y --no-install-recommends xz-utils</run> <!--lsof command-not-found-->
-              <run>rm -rf /var/lib/apt/lists/*</run>
-            </runs>
-            <env>
-              <basedir>${project.artifactId}</basedir>
-              <LD_LIBRARY_PATH>/${project.artifactId}/lib_so</LD_LIBRARY_PATH>
-              <C2MON_DAQ_JMS_URL>tcp://0.0.0.0:61616</C2MON_DAQ_JMS_URL>
-            </env>
-            <volumes>
-              <volume>/${project.artifactId}/log</volume>
-              <volume>/${project.artifactId}/conf</volume>
-            </volumes>
-            <resources>
-              <resource>
-                <directory>${project.build.directory}</directory>
-                <include>${project.artifactId}-${project.version}-dist.tar.gz</include>
-                <targetPath>/${project.artifactId}</targetPath>
-              </resource>
-              <resource>
-                <directory>${project.build.directory}/distribution/docker/conf</directory>
-                <targetPath>/${project.artifactId}/conf</targetPath>
-              </resource>
-              <resource>
-                <directory>${project.build.directory}/distribution/docker</directory>
-                <includes>
-                  <include>docker-entrypoint.sh</include>
-                </includes>
-                <targetPath>/</targetPath>
-              </resource>
-            </resources>
+            <from>
+              <image>${image.base}</image>
+            </from>
+            <to>
+              <image>${registry}/${repository}</image>
+              <tags>
+                <tag>${project.artifactId}-${project.version}</tag>
+              </tags>
+            </to>
+            <container>
+              <useCurrentTimestamp>true</useCurrentTimestamp>
+              <ports>
+                <port>1099</port>
+              </ports>
+              <workingDirectory>${daq.home}</workingDirectory>
+              <entrypoint>
+                <entrypoint>./docker-entrypoint.sh</entrypoint>
+                <entrypoint>bin/C2MON-DAQ-STARTUP.jvm</entrypoint>
+                <entrypoint>-f</entrypoint>
+                <entrypoint>P_HOST01</entrypoint>
+              </entrypoint>
+              <environment>
+                <basedir>${project.artifactId}</basedir>
+                <LD_LIBRARY_PATH>/${project.artifactId}/lib_so</LD_LIBRARY_PATH>
+                <C2MON_DAQ_JMS_URL>tcp://0.0.0.0:61616</C2MON_DAQ_JMS_URL>
+                <DAQ_HOME>${daq.home}</DAQ_HOME>
+              </environment>
+              <volumes>
+                <volume>/log</volume>
+                <volume>/conf</volume>
+              </volumes>
+            </container>
+            <extraDirectory>
+              <path>${project.build.directory}/distribution</path>
+              <permissions>
+                <permission>
+                  <file>${daq.home}/bin/C2MON-DAQ-STARTUP.jvm</file>
+                  <mode>755</mode>
+                </permission>
+                <permission>
+                  <file>${daq.home}/bin/daqprocess.sh</file>
+                  <mode>755</mode>
+                </permission>
+                <permission>
+                  <file>${daq.home}/docker-entrypoint.sh</file>
+                  <mode>755</mode>
+                </permission>
+              </permissions>
+            </extraDirectory>
           </configuration>
         </plugin>
+
       </plugins>
     </pluginManagement>
   </build>

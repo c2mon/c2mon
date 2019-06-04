@@ -23,7 +23,7 @@
       <password>${env.ARTIFACTORY_PASSWORD}</password>
     </server>
     <server>
-      <id>gitlab-registry.cern.ch</id>
+      <id>registry.hub.docker.com</id>
       <username>${env.DOCKER_USERNAME}</username>
       <password>${env.DOCKER_PASSWORD}</password>
       <configuration>

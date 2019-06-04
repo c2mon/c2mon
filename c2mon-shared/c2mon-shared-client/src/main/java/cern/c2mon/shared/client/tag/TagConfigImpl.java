@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2019 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -19,24 +19,13 @@ package cern.c2mon.shared.client.tag;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-
-import lombok.Data;
-import org.simpleframework.xml.Attribute;
-import org.simpleframework.xml.Element;
-import org.simpleframework.xml.ElementList;
-import org.simpleframework.xml.ElementMap;
-import org.simpleframework.xml.Root;
-import org.simpleframework.xml.Serializer;
+import org.simpleframework.xml.*;
 import org.simpleframework.xml.convert.AnnotationStrategy;
 import org.simpleframework.xml.core.Persister;
+
+import lombok.Data;
 
 import cern.c2mon.shared.client.request.ClientRequestReport;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
@@ -48,7 +37,7 @@ import cern.c2mon.shared.util.json.GsonFactory;
 public class TagConfigImpl extends ClientRequestReport implements TagConfig {
 
   /** The unique tag id */
-  @NotNull @Min(1) @Attribute
+  @Attribute
   private Long id;
 
   /**

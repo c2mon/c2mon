@@ -5,7 +5,7 @@
   <parent>
     <groupId>cern.c2mon.server</groupId>
     <artifactId>c2mon-server-parent</artifactId>
-    <version>1.8.41-SNAPSHOT</version>
+    <version>1.8.43-SNAPSHOT</version>
   </parent>
 
   <artifactId>distribution</artifactId>
@@ -13,7 +13,8 @@
 
   <modules>
     <module>tar</module>
-    <module>docker</module>
+    <module>images</module>
+    <module>kubernetes</module>
   </modules>
 
   <dependencyManagement>

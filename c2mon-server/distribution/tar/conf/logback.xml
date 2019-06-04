@@ -4,6 +4,7 @@
 
 
   <property name="LOG_FILE"          value="${LOG_PATH:-/tmp}/c2mon.log"/>
+  <property name="ALARM_LOG_FILE"    value="${LOG_PATH:-/tmp}/c2mon.alarm.log"/>
   <property name="TAG_LOG_FILE"      value="${LOG_PATH:-/tmp}/c2mon.tag.log"/>
   <property name="RULE_LOG_FILE"     value="${LOG_PATH:-/tmp}/c2mon.ruletag.log"/>
   <property name="ERROR_LOG_FILE"    value="${LOG_PATH:-/tmp}/c2mon.error.log"/>
@@ -17,6 +18,19 @@
     </encoder>
     <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
       <fileNamePattern>${LOG_FILE}.%i</fileNamePattern>
+    </rollingPolicy>
+    <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+      <MaxFileSize>10MB</MaxFileSize>
+    </triggeringPolicy>
+  </appender>
+
+  <appender name="AlarmAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${ALARM_LOG_FILE}</file>
+    <encoder>
+      <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %msg%n</pattern>
+    </encoder>
+    <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+      <fileNamePattern>${ALARM_LOG_FILE}.%i</fileNamePattern>
     </rollingPolicy>
     <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
       <MaxFileSize>10MB</MaxFileSize>
@@ -78,6 +92,10 @@
     </triggeringPolicy>
   </appender>
 
+
+  <logger name="AlarmLogger" level="INFO" additivity="false">
+    <appender-ref ref="AlarmAppender"/>
+  </logger>
 
   <logger name="SourceDataTagLogger" level="INFO" additivity="false">
     <appender-ref ref="TagAppender"/>

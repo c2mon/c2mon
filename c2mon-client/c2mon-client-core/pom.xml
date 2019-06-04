@@ -5,7 +5,7 @@
   <parent>
     <groupId>cern.c2mon.client</groupId>
     <artifactId>c2mon-client</artifactId>
-    <version>1.8.41-SNAPSHOT</version>
+    <version>1.8.43-SNAPSHOT</version>
   </parent>
 
   <artifactId>c2mon-client-core</artifactId>
@@ -67,17 +67,6 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-autoconfigure</artifactId>
     </dependency>
-    
-    <!-- Bean Validation provider -->
-    <dependency>
-        <groupId>org.hibernate</groupId>
-        <artifactId>hibernate-validator</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.glassfish.web</groupId>
-      <artifactId>javax.el</artifactId>
-    </dependency>
-
     <dependency>
       <groupId>io.searchbox</groupId>
       <artifactId>jest</artifactId>
@@ -132,8 +121,21 @@
     <dependency>
       <groupId>org.awaitility</groupId>
       <artifactId>awaitility</artifactId>
-      <version>3.1.5</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>**/ElasticsearchServiceTest.java</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

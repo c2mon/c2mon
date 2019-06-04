@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>cern.c2mon.server</groupId>
+    <artifactId>c2mon-docker-parent</artifactId>
+    <version>1.8.43-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>img-grafana</artifactId>
+  <name>c2mon-server :: grafana image</name>
+  <packaging>jar</packaging>
+
+  <properties>
+    <grafana.version>6.1.2</grafana.version>
+    <image.base>grafana/grafana:${grafana.version}</image.base>
+    <image.name>grafana-${grafana.version}-c2mon-${project.version}</image.name>
+    <repository>cern/c2mon-ext</repository>
+  </properties>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>com.google.cloud.tools</groupId>
+        <artifactId>jib-maven-plugin</artifactId>
+        <configuration>
+          <container>
+            <entrypoint>INHERIT</entrypoint>
+          </container>
+          <to>
+            <tags>
+              <tag>${image.name}</tag>
+            </tags>
+          </to>
+          <extraDirectory>
+            <path>includes</path>
+          </extraDirectory>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

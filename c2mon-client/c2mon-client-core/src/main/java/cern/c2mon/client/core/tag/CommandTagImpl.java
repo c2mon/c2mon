@@ -20,9 +20,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.Root;
@@ -63,7 +60,6 @@ public class CommandTagImpl<T> implements CommandTag<T>, Cloneable {
   /**
    * Name of the CommandTag represented by the present CommandTagHandle object.
    */
-  @NotNull
   @Attribute
   private String name;
   
@@ -71,7 +67,6 @@ public class CommandTagImpl<T> implements CommandTag<T>, Cloneable {
    * Unique numeric identifier of the CommandTag represented by the 
    * present CommandTagHandle object.
    */
-  @NotNull @Min(1)
   @Attribute
   private Long id;
   
@@ -107,7 +102,6 @@ public class CommandTagImpl<T> implements CommandTag<T>, Cloneable {
    * has not received a CommandTagReport after 'clientTimeout' milliseconds,
    * it should consider the command execution as failed.
    */
-  @NotNull @Min(0) 
   @Element 
   private int clientTimeout;
 

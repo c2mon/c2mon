@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>cern.c2mon.server</groupId>
+    <artifactId>c2mon-docker-parent</artifactId>
+    <version>1.8.43-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>img-es</artifactId>
+  <name>c2mon-server :: elastic search image</name>
+  <packaging>jar</packaging>
+
+  <properties>
+    <image.base>elasticsearch:5.6.16-alpine</image.base>
+    <image.name>c2mon-es</image.name>
+  </properties>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>com.google.cloud.tools</groupId>
+        <artifactId>jib-maven-plugin</artifactId>
+        <configuration>
+          <container>
+            <environment>
+              <!-- Ensure correct permission settings for user for volume -->
+              <TAKE_FILE_OWNERSHIP>1</TAKE_FILE_OWNERSHIP>
+              <ES_JAVA_OPTS>-Xms512m -Xmx512m</ES_JAVA_OPTS>
+            </environment>
+            <entrypoint>INHERIT</entrypoint>
+          </container>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

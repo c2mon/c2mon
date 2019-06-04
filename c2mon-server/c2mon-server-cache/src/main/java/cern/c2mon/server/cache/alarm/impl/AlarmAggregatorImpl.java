@@ -17,7 +17,6 @@
 package cern.c2mon.server.cache.alarm.impl;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -31,7 +30,6 @@ import cern.c2mon.server.cache.CacheSupervisionListener;
 import cern.c2mon.server.cache.TagFacadeGateway;
 import cern.c2mon.server.cache.alarm.AlarmAggregator;
 import cern.c2mon.server.cache.alarm.AlarmAggregatorListener;
-import cern.c2mon.server.cache.alarm.oscillation.OscillationUpdater;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.tag.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -67,9 +65,6 @@ public class AlarmAggregatorImpl implements AlarmAggregator, C2monCacheListener<
    */
   private TagFacadeGateway tagFacadeGateway;
 
-  @Autowired
-  private OscillationUpdater oscillationUpdater;
-
   /**
    * Autowired constructor.
    * 
@@ -86,7 +81,7 @@ public class AlarmAggregatorImpl implements AlarmAggregator, C2monCacheListener<
     super();
     this.cacheRegistrationService = cacheRegistrationService;
     this.tagFacadeGateway = tagFacadeGateway;
-    listeners = new ArrayList<AlarmAggregatorListener>();
+    listeners = new ArrayList<>();
   }
 
   /**

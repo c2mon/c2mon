@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,13 +35,6 @@ public class Metadata implements Serializable, Cloneable {
     return null;
   }
 
-  /**
-   * @return a map representation of the metadata
-   */
-  public Map<String, Object> toMap() {
-    return new HashMap<>(this.metadata);
-  }
-
   public static Map<String, Object> fromJSON(String json) {
     try {
       TypeReference<HashMap<String, Object>> typeRef = new TypeReference<HashMap<String, Object>>() {};
@@ -52,11 +46,27 @@ public class Metadata implements Serializable, Cloneable {
     return null;
   }
 
+  /**
+   * @return a map representation of the metadata
+   */
+  public Map<String, Object> toMap() {
+    return new HashMap<>(this.metadata);
+  }
+
   public void addMetadata(String key, Object value) {
     metadata.put(key, value);
   }
 
   public void removeMetadata(String key) {
     metadata.remove(key);
+  }
+
+  @Override
+  public Metadata clone() throws CloneNotSupportedException {
+    Metadata clone = (Metadata) super.clone();
+
+    clone.metadata = this.metadata.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+    return clone;
   }
 }

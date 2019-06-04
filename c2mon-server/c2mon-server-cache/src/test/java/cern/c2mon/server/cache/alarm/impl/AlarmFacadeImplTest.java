@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.cache.alarm;
+package cern.c2mon.server.cache.alarm.impl;
 
 import java.sql.Timestamp;
 
@@ -100,10 +100,7 @@ public class AlarmFacadeImplTest {
     EasyMock.verify(alarmCache, tagLocationService);
 
     assertEquals(false, currentAlarmState.isActive());
-    assertTrue(newAlarm.getTimestamp().equals(tag.getCacheTimestamp()));
-    assertTrue("Source timestamp was not properly set",newAlarm.getSourceTimestamp().equals(tag.getTimestamp()));
     assertEquals(false, currentAlarmState.isActive()); //also update alarm parameter object (usually in cache)
-    assertTrue(currentAlarmState.getTimestamp().equals(tag.getCacheTimestamp()));
   }
 
   /**
@@ -137,9 +134,9 @@ public class AlarmFacadeImplTest {
     EasyMock.verify(alarmCache, tagLocationService);
 
     assertEquals(false, newAlarm.isActive());
-    assertTrue(newAlarm.getTimestamp().equals(tag.getCacheTimestamp()));
+    assertTrue(newAlarm.getSourceTimestamp().equals(tag.getTimestamp()));
     assertEquals(false, currentAlarmState.isActive()); //also update alarm parameter object (usually in cache)
-    assertTrue(currentAlarmState.getTimestamp().equals(tag.getCacheTimestamp()));
+    assertTrue(currentAlarmState.getSourceTimestamp().equals(tag.getTimestamp()));
   }
 
   /**
