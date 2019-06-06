@@ -27,8 +27,6 @@ import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.loader.CacheLoader;
 import net.sf.ehcache.search.Attribute;
 import net.sf.ehcache.search.Results;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jmx.export.annotation.ManagedResource;
@@ -72,24 +70,8 @@ public class DataTagCacheImpl extends AbstractTagCache<DataTag> implements DataT
   public void init() {
     log.debug("Initializing the DataTag cache...");
 
-    try {
-      getCache().setNodeBulkLoadEnabled(true);
-    } catch (UnsupportedOperationException ex) {
-      log.warn("setNodeBulkLoadEnabled() method threw an exception when "
-          + "loading the cache (UnsupportedOperationException) - this is "
-          + "normal behaviour in a single-server mode and can be ignored");
-    }
-
     //common initialization (other than preload, which needs synch below)
     commonInit();
-
-    try {
-      getCache().setNodeBulkLoadEnabled(false);
-    } catch (UnsupportedOperationException ex) {
-      log.warn("setNodeBulkLoadEnabled() method threw an exception when "
-          + "loading the cache (UnsupportedOperationException) - this is "
-          + "normal behaviour in a single-server mode and can be ignored");
-    }
 
     log.info("DataTag cache initialization complete");
   }
