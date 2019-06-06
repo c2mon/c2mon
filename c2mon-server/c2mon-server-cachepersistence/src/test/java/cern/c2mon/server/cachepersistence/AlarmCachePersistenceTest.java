@@ -113,6 +113,7 @@ public class AlarmCachePersistenceTest {
     objectInDB = (AlarmCacheObject) alarmMapper.getItem(originalObject.getId());
     assertNotNull(objectInDB);
     assertEquals(true, objectInDB.isActive());
+    assertEquals(objectInDB.isActive(), objectInDB.isInternalActive());
 
     //clean up...
     //remove from cache
