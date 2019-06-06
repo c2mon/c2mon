@@ -91,7 +91,7 @@ public class AlarmFacadeImplTest {
     assertFalse(tag.isValid());
 
     alarmCache.acquireWriteLockOnKey(currentAlarmState.getId());
-    EasyMock.expect(alarmCache.get(currentAlarmState.getId())).andReturn(currentAlarmState);
+    EasyMock.expect(alarmCache.getCopy(currentAlarmState.getId())).andReturn(currentAlarmState);
     // TODO : Expect a put as well (or leave it as a "nice" mock)
     alarmCache.releaseWriteLockOnKey(currentAlarmState.getId());
     EasyMock.replay(alarmCache, tagLocationService);
@@ -124,7 +124,7 @@ public class AlarmFacadeImplTest {
 
     // Recording Mock calls
     alarmCache.acquireWriteLockOnKey(currentAlarmState.getId());
-    EasyMock.expect(alarmCache.get(currentAlarmState.getId())).andReturn(currentAlarmState);
+    EasyMock.expect(alarmCache.getCopy(currentAlarmState.getId())).andReturn(currentAlarmState);
     alarmCache.put(currentAlarmState.getId(), currentAlarmState);
     alarmCache.releaseWriteLockOnKey(currentAlarmState.getId());
     EasyMock.replay(alarmCache, tagLocationService);
@@ -157,7 +157,7 @@ public class AlarmFacadeImplTest {
     assertEquals(true, alarm.getCondition().evaluateState(tag.getValue()));
 
     alarmCache.acquireWriteLockOnKey(alarm.getId());
-    EasyMock.expect(alarmCache.get(alarm.getId())).andReturn(alarm);
+    EasyMock.expect(alarmCache.getCopy(alarm.getId())).andReturn(alarm);
     // record expected notification call with EasyMock
     alarmCache.put(alarm.getId(), alarm);
     alarmCache.releaseWriteLockOnKey(alarm.getId());
@@ -182,7 +182,7 @@ public class AlarmFacadeImplTest {
 
     EasyMock.reset(alarmCache, tagLocationService);
     alarmCache.acquireWriteLockOnKey(alarm2.getId());
-    EasyMock.expect(alarmCache.get(alarm2.getId())).andReturn(alarm2);
+    EasyMock.expect(alarmCache.getCopy(alarm2.getId())).andReturn(alarm2);
     alarmCache.releaseWriteLockOnKey(alarm2.getId());
     EasyMock.replay(alarmCache, tagLocationService);
 
