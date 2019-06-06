@@ -247,7 +247,7 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
   public Alarm update(final Long alarmId, final Tag tag) {
     alarmCache.acquireWriteLockOnKey(alarmId);
     try {
-      Alarm alarm = alarmCache.get(alarmId);
+      Alarm alarm = alarmCache.getCopy(alarmId);
       // Notice, in this case the update() method is putting the changes back
       // into the cache
       return alarmCacheUpdater.update(alarm, tag);
@@ -260,7 +260,7 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
   public void evaluateAlarm(Long alarmId) {
     alarmCache.acquireWriteLockOnKey(alarmId);
     try {
-      Alarm alarm = alarmCache.get(alarmId);
+      Alarm alarm = alarmCache.getCopy(alarmId);
       Tag tag = tagLocationService.getCopy(alarm.getTagId());
       alarmCacheUpdater.update(alarm, tag);
     } finally {
