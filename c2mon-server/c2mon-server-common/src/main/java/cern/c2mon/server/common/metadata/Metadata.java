@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -65,7 +64,7 @@ public class Metadata implements Serializable, Cloneable {
   public Metadata clone() throws CloneNotSupportedException {
     Metadata clone = (Metadata) super.clone();
 
-    clone.metadata = this.metadata.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    clone.metadata = toMap();
 
     return clone;
   }
