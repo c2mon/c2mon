@@ -48,7 +48,7 @@ import cern.c2mon.shared.common.Cacheable;
  *
  * @param <T> the type held by the given cache
  */
-@ManagedResource
+@ManagedResource(objectName="cern.c2mon:type=BatchPersistenceManager")
 public class BatchPersistenceManagerImpl<T extends Cacheable> implements BatchPersistenceManager, SmartLifecycle {
 
   /**
