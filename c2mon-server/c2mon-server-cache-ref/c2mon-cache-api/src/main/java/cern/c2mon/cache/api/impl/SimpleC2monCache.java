@@ -11,7 +11,7 @@ import javax.cache.processor.EntryProcessor;
 import javax.cache.processor.EntryProcessorException;
 import javax.cache.processor.EntryProcessorResult;
 
-import cern.c2mon.cache.api.Cache;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.transactions.TransactionalCallable;
 import cern.c2mon.shared.common.Cacheable;
 
@@ -20,11 +20,11 @@ import cern.c2mon.shared.common.Cacheable;
  *
  * @author Szymon Halastra
  */
-public class SimpleCache<V extends Cacheable> extends Cache<Long, V> {
+public class SimpleC2monCache<V extends Cacheable> extends C2monCache<Long, V> {
 
   private final ConcurrentMap<Long, V> cache;
 
-  public SimpleCache(String cacheName) {
+  public SimpleC2monCache(String cacheName) {
     super(cacheName);
     this.cache = new ConcurrentHashMap<>(100);
   }
@@ -96,15 +96,5 @@ public class SimpleCache<V extends Cacheable> extends Cache<Long, V> {
       return Optional.empty();
     }
     return Optional.of(returnValue);
-  }
-
-  @Override
-  public void lockOnKey(Long key) {
-
-  }
-
-  @Override
-  public void unlockOnKey(Long key) {
-
   }
 }

@@ -17,7 +17,7 @@ import cern.c2mon.shared.common.Cacheable;
 public class ListenerService<K, V extends Cacheable> implements Listener<V> {
 
   /**
-   * Reference to the Cache event listeners
+   * Reference to the C2monCache event listeners
    */
   private LinkedBlockingDeque<CacheListener<? super V>> cacheListeners = new LinkedBlockingDeque<>();
 

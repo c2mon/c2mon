@@ -7,7 +7,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import cern.c2mon.cache.AbstractCacheLoaderTest;
-import cern.c2mon.cache.api.Cache;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.dbaccess.AliveTimerMapper;
 import cern.c2mon.server.common.alive.AliveTimer;
 import cern.c2mon.server.common.alive.AliveTimerCacheObject;
@@ -21,7 +21,7 @@ import static org.springframework.test.util.AssertionErrors.assertEquals;
 public class AliveTimerCacheLoaderTest extends AbstractCacheLoaderTest {
 
   @Autowired
-  private Cache<Long, AliveTimer> aliveTimerCacheRef;
+  private C2monCache<Long, AliveTimer> aliveTimerCacheRef;
 
   @Autowired
   private AliveTimerMapper aliveTimerMapper;

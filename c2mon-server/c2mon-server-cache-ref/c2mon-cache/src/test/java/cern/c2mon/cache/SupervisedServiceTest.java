@@ -6,7 +6,7 @@ import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
-import cern.c2mon.cache.api.Cache;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.service.SupervisedService;
 import cern.c2mon.server.cache.SupervisedServiceImpl;
 import cern.c2mon.server.cache.alivetimer.AliveTimerService;
@@ -27,17 +27,17 @@ import static org.junit.Assert.*;
  */
 public class SupervisedServiceTest {
 
-  private Cache cache;
+  private C2monCache c2monCache;
   private AliveTimerService aliveTimerService;
 
   private SupervisedService<Supervised> supervisedService;
 
   @Before
   public void init() {
-    cache = EasyMock.createNiceMock(Cache.class);
+    c2monCache = EasyMock.createNiceMock(C2monCache.class);
     aliveTimerService = EasyMock.createNiceMock(AliveTimerService.class);
 
-    supervisedService = new SupervisedServiceImpl<>(cache, aliveTimerService);
+    supervisedService = new SupervisedServiceImpl<>(c2monCache, aliveTimerService);
   }
 
   @Test
@@ -220,8 +220,8 @@ public class SupervisedServiceTest {
   }
 
   private void prepareMock(Supervised equipment) {
-    expect(cache.get(equipment.getId())).andReturn(equipment);
+    expect(c2monCache.get(equipment.getId())).andReturn(equipment);
 
-    replay(cache);
+    replay(c2monCache);
   }
 }

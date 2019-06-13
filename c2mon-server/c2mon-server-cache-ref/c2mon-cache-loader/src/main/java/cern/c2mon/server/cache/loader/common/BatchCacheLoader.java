@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-import cern.c2mon.cache.api.Cache;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.loader.CacheLoader;
 import cern.c2mon.server.cache.loader.BatchCacheLoaderDAO;
 import cern.c2mon.shared.common.Cacheable;
@@ -46,7 +46,7 @@ public class BatchCacheLoader<K extends Number, V extends Cacheable> implements 
   /**
    * Reference to C2monCache
    */
-  private final Cache<Long, V> cache;
+  private final C2monCache<Long, V> c2monCache;
 
   /**
    * Reference to batch loader DAO
@@ -58,19 +58,19 @@ public class BatchCacheLoader<K extends Number, V extends Cacheable> implements 
    * for the different caches).
    *
    * @param cacheLoaderTaskExecutor
-   * @param cache            the cache to load from the DB
+   * @param c2monCache            the c2monCache to load from the DB
    * @param cacheLoaderDAO   the DAO for accessing the DB
    * @param batchSize        the number of object loaded in a single task
    * @param threadNamePrefix the name of thread pool
    */
-  public BatchCacheLoader(ThreadPoolTaskExecutor cacheLoaderTaskExecutor, final Cache<Long, V> cache,
+  public BatchCacheLoader(ThreadPoolTaskExecutor cacheLoaderTaskExecutor, final C2monCache<Long, V> c2monCache,
                           final BatchCacheLoaderDAO<K, V> cacheLoaderDAO,
                           final int batchSize,
                           final String threadNamePrefix) {
     this.cacheLoaderTaskExecutor = cacheLoaderTaskExecutor;
     this.batchSize = batchSize;
     this.batchCacheLoaderDAO = cacheLoaderDAO;
-    this.cache = cache;
+    this.c2monCache = c2monCache;
     this.threadNamePrefix = threadNamePrefix;
 
     log.info("BatchCacheLoader after ref initialized");
@@ -78,10 +78,10 @@ public class BatchCacheLoader<K extends Number, V extends Cacheable> implements 
 
   @Override
   public void preload() {
-    log.debug("preload() - Start preloading data for cache " + cache.getName());
+    log.debug("preload() - Start preloading data for c2monCache " + c2monCache.getName());
 
     Integer lastRow = batchCacheLoaderDAO.getMaxRow(); // 0 if no cache objects!
-    log.info("Preload is running for " + cache.getName());
+    log.info("Preload is running for " + c2monCache.getName());
 
     cacheLoaderTaskExecutor.setThreadNamePrefix(this.threadNamePrefix);
     cacheLoaderTaskExecutor.initialize();
@@ -106,7 +106,7 @@ public class BatchCacheLoader<K extends Number, V extends Cacheable> implements 
       log.error("Interrupted while waiting for cache loading threads to terminate.", e);
     }
     cacheLoaderTaskExecutor.shutdown();
-    log.debug("preload() - Finished preload for cache " + cache.getName());
+    log.debug("preload() - Finished preload for cache " + c2monCache.getName());
   }
 
   /**
@@ -135,9 +135,9 @@ public class BatchCacheLoader<K extends Number, V extends Cacheable> implements 
       //preloadBuffer.putAll(cacheLoaderMap);
       for (Long key : cacheLoaderMap.keySet()) {
         if (log.isTraceEnabled()) {
-          log.trace("MapLoaderTask - Putting key {} to cache {}", key, cache.getName());
+          log.trace("MapLoaderTask - Putting key {} to cache {}", key, c2monCache.getName());
         }
-        cache.put(key, cacheLoaderMap.get(key));
+        c2monCache.put(key, cacheLoaderMap.get(key));
       }
       return null;
     }

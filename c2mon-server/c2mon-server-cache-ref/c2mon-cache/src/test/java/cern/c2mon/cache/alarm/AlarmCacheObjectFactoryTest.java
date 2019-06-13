@@ -9,11 +9,11 @@ import org.junit.Test;
 import cern.c2mon.server.cache.alarm.AlarmCacheObjectFactory;
 import cern.c2mon.server.cache.alarm.AlarmService;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
-import cern.c2mon.server.common.alarm.AlarmCondition;
 import cern.c2mon.shared.common.ConfigurationException;
 
 import static org.easymock.EasyMock.*;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * @author Szymon Halastra
@@ -50,7 +50,6 @@ public class AlarmCacheObjectFactoryTest {
     assertEquals("alarm should have dataTagId set", Long.valueOf(100L), alarm.getDataTagId());
     assertEquals("alarm should have faultFamily set", "fault-family", alarm.getFaultFamily());
     assertEquals("alarm should have faultMember set", "fault-member", alarm.getFaultMember());
-    assertEquals("alarm should have alarmCondition set", alarm.getState(), AlarmCondition.TERMINATE);
     assertEquals("alarm should have alarm topic set", "tim.alarm", alarm.getTopic());
   }
 

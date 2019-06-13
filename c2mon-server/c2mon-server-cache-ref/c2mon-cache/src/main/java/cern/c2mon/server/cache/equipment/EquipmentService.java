@@ -5,16 +5,11 @@ import java.util.Collection;
 import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.cache.api.Cache;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.service.AbstractEquipmentService;
 import cern.c2mon.cache.api.service.SupervisedService;
-import cern.c2mon.server.cache.CoreAbstractEquipmentService;
-import cern.c2mon.server.cache.SupervisedServiceImpl;
-import cern.c2mon.server.cache.alivetimer.AliveTimerService;
-import cern.c2mon.server.cache.commfault.CommFaultService;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.process.Process;
@@ -29,33 +24,33 @@ import cern.c2mon.shared.common.supervision.SupervisionConstants;
 @Service
 public class EquipmentService implements SupervisedService<Equipment>, AbstractEquipmentService {
 
-  private final Cache<Long, Equipment> equipmentCacheRef;
+  private C2monCache<Long, Equipment> equipmentCacheRef;
 
-  private final Cache<Long, Process> processCacheRef;
+  private C2monCache<Long, Process> processCacheRef;
 
-  private final Cache<Long, DataTag> dataTagCacheRef;
+  private C2monCache<Long, DataTag> dataTagCacheRef;
 
-  private final SupervisedService<Equipment> supervisedService;
+  private SupervisedService<Equipment> supervisedService;
 
-  private final AbstractEquipmentService coreEquipmentService;
+  private AbstractEquipmentService coreEquipmentService;
 
-  @Autowired
-  public EquipmentService(final Cache<Long, Equipment> equipmentCacheRef, final Cache<Long, Process> processCacheRef,
-                          final Cache<Long, DataTag> dataTagCacheRef, final AliveTimerService aliveTimerService, final CommFaultService commFaultService) {
-    this.equipmentCacheRef = equipmentCacheRef;
-    this.processCacheRef = processCacheRef;
-    this.dataTagCacheRef = dataTagCacheRef;
-
-    this.supervisedService = new SupervisedServiceImpl(equipmentCacheRef, aliveTimerService);
-    this.coreEquipmentService = new CoreAbstractEquipmentService<>(equipmentCacheRef, commFaultService);
-  }
+//  @Autowired
+//  public EquipmentService(final C2monCache<Long, Equipment> equipmentCacheRef, final C2monCache<Long, Process> processCacheRef,
+//                          final C2monCache<Long, DataTag> dataTagCacheRef, final AliveTimerService aliveTimerService, final CommFaultService commFaultService) {
+//    this.equipmentCacheRef = equipmentCacheRef;
+//    this.processCacheRef = processCacheRef;
+//    this.dataTagCacheRef = dataTagCacheRef;
+//
+//    this.supervisedService = new SupervisedServiceImpl(equipmentCacheRef, aliveTimerService);
+//    this.coreEquipmentService = new CoreAbstractEquipmentService<>(equipmentCacheRef, commFaultService);
+//  }
 
   //TODO: write this method
   public Collection<? extends Long> getDataTagIds(long equipmentId) {
     return null;
   }
 
-  public Cache getCache() {
+  public C2monCache getCache() {
     return this.equipmentCacheRef;
   }
 

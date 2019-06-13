@@ -9,13 +9,13 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>cern.c2mon.server</groupId>
   <artifactId>c2mon-server-cache-ref</artifactId>
   <packaging>pom</packaging>
   <modules>
     <module>c2mon-cache-api</module>
     <module>c2mon-cache</module>
     <module>c2mon-cache-loader</module>
+    <module>c2mon-server-cache-ignite</module>
   </modules>
 
   <dependencyManagement>
@@ -23,6 +23,11 @@
       <dependency>
         <groupId>cern.c2mon.server</groupId>
         <artifactId>c2mon-cache-api</artifactId>
+        <version>${project.parent.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>cern.c2mon.server</groupId>
+        <artifactId>c2mon-server-cache-ignite</artifactId>
         <version>${project.parent.version}</version>
       </dependency>
     </dependencies>

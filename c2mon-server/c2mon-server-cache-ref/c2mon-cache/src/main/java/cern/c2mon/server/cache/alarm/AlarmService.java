@@ -1,17 +1,10 @@
 package cern.c2mon.server.cache.alarm;
 
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.cache.api.Cache;
-import cern.c2mon.server.common.alarm.*;
+import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.common.datatag.DataTagConstants;
 
@@ -24,70 +17,70 @@ import cern.c2mon.shared.common.datatag.DataTagConstants;
 @Service
 public class AlarmService {
 
-  private Cache<Long, Alarm> alarmCacheRef;
+  private C2monCache<Long, Alarm> alarmCacheRef;
 
-  private Cache<Long, Tag> tagCacheRef;
+  private C2monCache<Long, Tag> tagCacheRef;
 
-  @Autowired
-  public AlarmService(final Cache<Long, Alarm> alarmCacheRef, final Cache<Long, Tag> tagCacheRef) {
-    this.alarmCacheRef = alarmCacheRef;
-    this.tagCacheRef = tagCacheRef;
-  }
+//  @Autowired
+//  public AlarmService(final C2monCache<Long, Alarm> alarmCacheRef, final C2monCache<Long, Tag> tagCacheRef) {
+//    this.alarmCacheRef = alarmCacheRef;
+//    this.tagCacheRef = tagCacheRef;
+//  }
 
-  public Alarm update(final Long alarmId, final Tag tag) {
-    alarmCacheRef.lockOnKey(alarmId);
-    try {
-      Alarm alarm = alarmCacheRef.get(alarmId);
-      // Notice, in this case the update() method is putting the changes back into the cache
-      return update(alarmId, tag);
-    } finally {
-      alarmCacheRef.unlockOnKey(alarmId);
-    }
-  }
-
-  public void evaluateAlarm(Long alarmId) {
-    alarmCacheRef.lockOnKey(alarmId);
-    try {
-      Alarm alarm = alarmCacheRef.get(alarmId);
-      Tag tag = tagCacheRef.get(alarm.getTagId());
-      update(alarmId, tag);
-    } finally {
-      alarmCacheRef.unlockOnKey(alarmId);
-    }
-  }
-
-  public List<Alarm> evaluateAlarms(final Tag tag) {
-    List<Alarm> linkedAlarms = new ArrayList<>();
-    tagCacheRef.lockOnKey(tag.getId());
-    try {
-      for (Long alarmId : tag.getAlarmIds()) {
-        linkedAlarms.add(update(alarmId, tag));
-      }
-    } finally {
-      tagCacheRef.unlockOnKey(tag.getId());
-    }
-    return linkedAlarms;
-  }
-
-  /**
-   * Accesses and locks Tag in cache, fetches associated
-   * alarms (since Alarm evaluation is on the same thread as
-   * the Tag cache update, these correspond to the Tag value
-   * and cannot be modified during this method).
-   */
-  public TagWithAlarms getTagWithAlarms(Long id) {
-    tagCacheRef.lockOnKey(id);
-    try {
-      Tag tag = tagCacheRef.get(id);
-      Collection<Alarm> alarms = new LinkedList<>();
-      for (Long alarmId : tag.getAlarmIds()) {
-        alarms.add(alarmCacheRef.get(alarmId));
-      }
-      return new TagWithAlarmsImpl(tag, alarms);
-    } finally {
-      tagCacheRef.unlockOnKey(id);
-    }
-  }
+//  public Alarm update(final Long alarmId, final Tag tag) {
+//    alarmCacheRef.lockOnKey(alarmId);
+//    try {
+//      Alarm alarm = alarmCacheRef.get(alarmId);
+//      // Notice, in this case the update() method is putting the changes back into the cache
+//      return update(alarmId, tag);
+//    } finally {
+//      alarmCacheRef.unlockOnKey(alarmId);
+//    }
+//  }
+//
+//  public void evaluateAlarm(Long alarmId) {
+//    alarmCacheRef.lockOnKey(alarmId);
+//    try {
+//      Alarm alarm = alarmCacheRef.get(alarmId);
+//      Tag tag = tagCacheRef.get(alarm.getTagId());
+//      update(alarmId, tag);
+//    } finally {
+//      alarmCacheRef.unlockOnKey(alarmId);
+//    }
+//  }
+//
+//  public List<Alarm> evaluateAlarms(final Tag tag) {
+//    List<Alarm> linkedAlarms = new ArrayList<>();
+//    tagCacheRef.lockOnKey(tag.getId());
+//    try {
+//      for (Long alarmId : tag.getAlarmIds()) {
+//        linkedAlarms.add(update(alarmId, tag));
+//      }
+//    } finally {
+//      tagCacheRef.unlockOnKey(tag.getId());
+//    }
+//    return linkedAlarms;
+//  }
+//
+//  /**
+//   * Accesses and locks Tag in cache, fetches associated
+//   * alarms (since Alarm evaluation is on the same thread as
+//   * the Tag cache update, these correspond to the Tag value
+//   * and cannot be modified during this method).
+//   */
+//  public TagWithAlarms getTagWithAlarms(Long id) {
+//    tagCacheRef.lockOnKey(id);
+//    try {
+//      Tag tag = tagCacheRef.get(id);
+//      Collection<Alarm> alarms = new LinkedList<>();
+//      for (Long alarmId : tag.getAlarmIds()) {
+//        alarms.add(alarmCacheRef.get(alarmId));
+//      }
+//      return new TagWithAlarmsImpl(tag, alarms);
+//    } finally {
+//      tagCacheRef.unlockOnKey(id);
+//    }
+//  }
 
   /**
    * Logic kept the same as in TIM1.

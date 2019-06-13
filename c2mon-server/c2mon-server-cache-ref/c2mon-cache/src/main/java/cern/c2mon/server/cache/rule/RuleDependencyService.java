@@ -1,10 +1,9 @@
 package cern.c2mon.server.cache.rule;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.cache.api.Cache;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.tag.AbstractTagCacheObject;
 import cern.c2mon.server.common.tag.Tag;
 
@@ -16,12 +15,12 @@ import cern.c2mon.server.common.tag.Tag;
 @Service
 public class RuleDependencyService {
 
-  private Cache<Long, Tag> tagCacheRef;
+  private C2monCache<Long, Tag> tagCacheRef;
 
-  @Autowired
-  public RuleDependencyService(final Cache<Long, Tag> tagCacheRef) {
-    this.tagCacheRef = tagCacheRef;
-  }
+//  @Autowired
+//  public RuleDependencyService(final C2monCache<Long, Tag> tagCacheRef) {
+//    this.tagCacheRef = tagCacheRef;
+//  }
 
   /**
    * Adds the rule to the list of those that need evaluating when

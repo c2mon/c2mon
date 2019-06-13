@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 import lombok.extern.slf4j.Slf4j;
 
-import cern.c2mon.cache.api.Cache;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.loader.CacheLoader;
 import cern.c2mon.server.cache.loader.CacheLoaderDAO;
 import cern.c2mon.shared.common.Cacheable;
@@ -47,7 +47,7 @@ public class SimpleCacheLoader<T extends Cacheable> implements CacheLoader {
    */
   private Map<Long, T> preloadBuffer = new ConcurrentHashMap<>();
 
-  private final Cache cache;
+  private final C2monCache c2monCache;
 
   private final CacheLoaderDAO<T> cacheLoaderDAO;
 
@@ -55,13 +55,13 @@ public class SimpleCacheLoader<T extends Cacheable> implements CacheLoader {
    * Constructor (used in Spring XML to instantiate the loaders
    * for the different caches).
    *
-   * @param cache            the cache to load from the DB
+   * @param c2monCache            the c2monCache to load from the DB
    * @param cacheLoaderDAO   the DAO for accessing the DB
    * @param executor
    * @param threadNamePrefix
    */
-  public SimpleCacheLoader(Cache cache, CacheLoaderDAO<T> cacheLoaderDAO) {
-    this.cache = cache;
+  public SimpleCacheLoader(C2monCache c2monCache, CacheLoaderDAO<T> cacheLoaderDAO) {
+    this.c2monCache = c2monCache;
     this.cacheLoaderDAO = cacheLoaderDAO;
   }
 
@@ -169,7 +169,7 @@ public class SimpleCacheLoader<T extends Cacheable> implements CacheLoader {
     public void run() {
       while (!keyList.isEmpty()) {
         Object key = keyList.pollFirst();
-        cache.put(key, preloadBuffer.get(key));
+        c2monCache.put(key, preloadBuffer.get(key));
       }
     }
   }

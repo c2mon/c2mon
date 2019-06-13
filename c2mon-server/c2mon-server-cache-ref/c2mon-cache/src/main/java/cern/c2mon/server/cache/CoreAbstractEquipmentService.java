@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import cern.c2mon.cache.api.Cache;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.service.AbstractEquipmentService;
 import cern.c2mon.server.cache.commfault.CommFaultService;
 import cern.c2mon.server.common.commfault.CommFaultTag;
@@ -15,12 +15,12 @@ import cern.c2mon.server.common.equipment.AbstractEquipment;
  */
 public class CoreAbstractEquipmentService<T extends AbstractEquipment> implements AbstractEquipmentService {
 
-  private Cache<Long, T> cache;
+  private C2monCache<Long, T> c2monCache;
 
-  private Cache<Long, CommFaultTag> commFaultTagCache;
+  private C2monCache<Long, CommFaultTag> commFaultTagCache;
 
-  public CoreAbstractEquipmentService(Cache<Long, T> cache, CommFaultService commFaultService) {
-    this.cache = cache;
+  public CoreAbstractEquipmentService(C2monCache<Long, T> c2monCache, CommFaultService commFaultService) {
+    this.c2monCache = c2monCache;
     this.commFaultTagCache = commFaultService.getCache();
   }
 
@@ -32,7 +32,7 @@ public class CoreAbstractEquipmentService<T extends AbstractEquipment> implement
 
   @Override
   public void removeCommFault(final Long abstractEquipmentId) {
-    T equipment = cache.get(abstractEquipmentId);
+    T equipment = c2monCache.get(abstractEquipmentId);
     Long commFaultId = equipment.getCommFaultTagId();
     if (commFaultId != null) {
       commFaultTagCache.remove(commFaultId);
@@ -44,7 +44,7 @@ public class CoreAbstractEquipmentService<T extends AbstractEquipment> implement
     HashMap<Long, Long> returnMap = new HashMap<>();
     Set<Long> equipmentKeys = commFaultTagCache.getKeys();
     for (Long equipmentId : equipmentKeys) {
-      AbstractEquipment equipment = cache.get(equipmentId);
+      AbstractEquipment equipment = c2monCache.get(equipmentId);
       Long aliveId = equipment.getAliveTagId();
       if (aliveId != null) {
         returnMap.put(aliveId, equipmentId);

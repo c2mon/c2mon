@@ -14,16 +14,6 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-context-support</artifactId>
-      <version>4.3.9.RELEASE</version>
-    </dependency>
-    <dependency>
       <groupId>cern.c2mon.shared</groupId>
       <artifactId>c2mon-shared-common</artifactId>
     </dependency>
@@ -31,13 +21,29 @@
       <groupId>cern.c2mon.server</groupId>
       <artifactId>c2mon-server-cachedbaccess</artifactId>
     </dependency>
+    <dependency>
+      <groupId>cern.c2mon.server</groupId>
+      <artifactId>c2mon-server-cache-ignite</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context-support</artifactId>
+      <version>4.3.9.RELEASE</version>
+    </dependency>
 
     <dependency>
       <groupId>javax.cache</groupId>
       <artifactId>cache-api</artifactId>
       <version>1.0.0</version>
     </dependency>
-    
+
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <scope>compile</scope>
+    </dependency>
+
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>

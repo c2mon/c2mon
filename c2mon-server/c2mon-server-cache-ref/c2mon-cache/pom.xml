@@ -15,6 +15,14 @@
   <dependencies>
     <dependency>
       <groupId>cern.c2mon.server</groupId>
+      <artifactId>c2mon-cache-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.server</groupId>
+      <artifactId>c2mon-server-cache-ignite</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.server</groupId>
       <artifactId>c2mon-server-common</artifactId>
     </dependency>
     <dependency>

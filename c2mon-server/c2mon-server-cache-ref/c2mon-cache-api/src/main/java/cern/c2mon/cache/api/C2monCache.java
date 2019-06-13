@@ -18,7 +18,6 @@ import cern.c2mon.cache.api.listener.CacheListener;
 import cern.c2mon.cache.api.listener.Listener;
 import cern.c2mon.cache.api.listener.ListenerService;
 import cern.c2mon.cache.api.loader.CacheLoader;
-import cern.c2mon.cache.api.lock.C2monLock;
 import cern.c2mon.cache.api.transactions.TransactionalCallable;
 import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.shared.common.Cacheable;
@@ -31,7 +30,7 @@ import cern.c2mon.shared.common.Cacheable;
  * @author Szymon Halastra
  */
 @Slf4j
-public abstract class Cache<K, V extends Cacheable> extends ApplicationObjectSupport implements Listener<V>, Serializable, C2monLock<K> {
+public abstract class C2monCache<K, V extends Cacheable> extends ApplicationObjectSupport implements Listener<V>, Serializable {
 
   private final String cacheName;
 
@@ -43,7 +42,7 @@ public abstract class Cache<K, V extends Cacheable> extends ApplicationObjectSup
    * Reference to cache loader.
    */
 
-  public Cache(String cacheName) {
+  public C2monCache(String cacheName) {
     this.cacheName = cacheName;
     this.listenerService = new ListenerService<>();
   }
@@ -97,7 +96,7 @@ public abstract class Cache<K, V extends Cacheable> extends ApplicationObjectSup
       }
       //if unable to find in DB
       if (result == null) {
-        throw new CacheElementNotFoundException("Failed to locate cache element with id " + key + " (Cache is " + this.cacheName + ")");
+        throw new CacheElementNotFoundException("Failed to locate cache element with id " + key + " (C2monCache is " + this.cacheName + ")");
       }
       else {
         doPostDbLoading(result);

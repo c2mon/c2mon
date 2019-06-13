@@ -4,14 +4,11 @@ import java.sql.Timestamp;
 import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.cache.api.Cache;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.service.AbstractEquipmentService;
 import cern.c2mon.cache.api.service.SupervisedService;
-import cern.c2mon.server.cache.CoreAbstractEquipmentService;
-import cern.c2mon.server.cache.SupervisedServiceImpl;
 import cern.c2mon.server.cache.alivetimer.AliveTimerService;
 import cern.c2mon.server.cache.commfault.CommFaultService;
 import cern.c2mon.server.common.subequipment.SubEquipment;
@@ -25,7 +22,7 @@ import cern.c2mon.shared.common.supervision.SupervisionConstants;
 @Service
 public class SubEquipmentService implements SupervisedService<SubEquipment>, AbstractEquipmentService {
 
-  private Cache<Long, SubEquipment> subEquipmentCacheRef;
+  private C2monCache<Long, SubEquipment> subEquipmentCacheRef;
 
   private SupervisedService<SubEquipment> supervisedService;
 
@@ -35,17 +32,17 @@ public class SubEquipmentService implements SupervisedService<SubEquipment>, Abs
 
   private AliveTimerService aliveTimerService;
 
-  @Autowired
-  public SubEquipmentService(Cache<Long, SubEquipment> subEquipmentCacheRef, CommFaultService commFaultService, AliveTimerService aliveTimerService) {
-    this.subEquipmentCacheRef = subEquipmentCacheRef;
-    this.commFaultService = commFaultService;
-    this.aliveTimerService = aliveTimerService;
+//  @Autowired
+//  public SubEquipmentService(C2monCache<Long, SubEquipment> subEquipmentCacheRef, CommFaultService commFaultService, AliveTimerService aliveTimerService) {
+//    this.subEquipmentCacheRef = subEquipmentCacheRef;
+//    this.commFaultService = commFaultService;
+//    this.aliveTimerService = aliveTimerService;
+//
+//    this.supervisedService = new SupervisedServiceImpl<>(subEquipmentCacheRef, aliveTimerService);
+//    this.abstractEquipmentService = new CoreAbstractEquipmentService<>(subEquipmentCacheRef, commFaultService);
+//  }
 
-    this.supervisedService = new SupervisedServiceImpl<>(subEquipmentCacheRef, aliveTimerService);
-    this.abstractEquipmentService = new CoreAbstractEquipmentService<>(subEquipmentCacheRef, commFaultService);
-  }
-
-  public Cache getCache() {
+  public C2monCache getCache() {
     return subEquipmentCacheRef;
   }
 

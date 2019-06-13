@@ -5,7 +5,7 @@ import java.util.Properties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import cern.c2mon.cache.api.Cache;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.CoreAbstractEquipmentService;
 import cern.c2mon.server.cache.tag.TagCacheObjectFactory;
 import cern.c2mon.server.common.datatag.DataTag;
@@ -23,7 +23,7 @@ import static cern.c2mon.shared.common.type.TypeConverter.getType;
 public class DataTagCacheObjectFactory extends TagCacheObjectFactory<DataTag> {
 
   @Autowired
-  public DataTagCacheObjectFactory(Cache<Long, DataTag> dataTagCacheRef,
+  public DataTagCacheObjectFactory(C2monCache<Long, DataTag> dataTagCacheRef,
                                    CoreAbstractEquipmentService coreAbstractEquipmentService) {
     super(dataTagCacheRef, coreAbstractEquipmentService);
   }

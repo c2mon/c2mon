@@ -4,13 +4,12 @@ import java.sql.Timestamp;
 
 import lombok.extern.slf4j.Slf4j;
 
-import cern.c2mon.cache.api.Cache;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.service.SupervisedService;
 import cern.c2mon.server.cache.alivetimer.AliveTimerService;
 import cern.c2mon.server.common.process.ProcessCacheObject;
 import cern.c2mon.server.common.supervision.Supervised;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
-import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
 import cern.c2mon.shared.common.supervision.SupervisionConstants;
 
 /**
@@ -20,70 +19,70 @@ import cern.c2mon.shared.common.supervision.SupervisionConstants;
 @Slf4j
 public class SupervisedServiceImpl<T extends Supervised> implements SupervisedService<T> {
 
-  private final Cache<Long, T> cache;
+  private final C2monCache<Long, T> c2monCache;
 
   private final AliveTimerService aliveTimerService;
 
-  private final Cache aliveTimerCache;
+  private final C2monCache aliveTimerCache;
 
   private SupervisionConstants.SupervisionEntity supervisionEntity;
 
-  public SupervisedServiceImpl(final Cache<Long, T> cache, final AliveTimerService aliveTimerService) {
-    this.cache = cache;
+  public SupervisedServiceImpl(final C2monCache<Long, T> c2monCache, final AliveTimerService aliveTimerService) {
+    this.c2monCache = c2monCache;
     this.aliveTimerService = aliveTimerService;
     this.aliveTimerCache = aliveTimerService.getCache();
   }
 
   @Override
   public void start(Long id, Timestamp timestamp) {
-    cache.lockOnKey(id);
-    try {
-      T supervised = cache.get(id);
-      start(supervised, timestamp);
-      cache.put(id, supervised);
-    } finally {
-      cache.unlockOnKey(id);
-    }
+//    c2monCache.lockOnKey(id);
+//    try {
+//      T supervised = c2monCache.get(id);
+//      start(supervised, timestamp);
+//      c2monCache.put(id, supervised);
+//    } finally {
+//      c2monCache.unlockOnKey(id);
+//    }
   }
 
   @Override
   public void stop(Long id, Timestamp timestamp) {
-    cache.lockOnKey(id);
-    try {
-      T supervised = cache.get(id);
-      stop(supervised, timestamp);
-      cache.put(id, supervised);
-    } finally {
-      cache.unlockOnKey(id);
-    }
+//    c2monCache.lockOnKey(id);
+//    try {
+//      T supervised = c2monCache.get(id);
+//      stop(supervised, timestamp);
+//      c2monCache.put(id, supervised);
+//    } finally {
+//      c2monCache.unlockOnKey(id);
+//    }
   }
 
   @Override
   public void resume(Long id, Timestamp timestamp, String message) {
-    cache.lockOnKey(id);
-    try {
-      T supervised = cache.get(id);
-      if (!supervised.getSupervisionStatus().equals(SupervisionConstants.SupervisionStatus.RUNNING)) {
-        resume(supervised, timestamp, message);
-        cache.put(id, supervised);
-      }
-    } finally {
-      cache.unlockOnKey(id);
-    }
+//    c2monCache.lockOnKey(id);
+//    try {
+//      T supervised = c2monCache.get(id);
+//      if (!supervised.getSupervisionStatus().equals(SupervisionConstants.SupervisionStatus.RUNNING)) {
+//        resume(supervised, timestamp, message);
+//        c2monCache.put(id, supervised);
+//      }
+//    } finally {
+//      c2monCache.unlockOnKey(id);
+//    }
   }
 
   @Override
   public void suspend(Long id, Timestamp timestamp, String message) {
-    cache.lockOnKey(id);
-    try {
-      T supervised = cache.get(id);
-      if (isRunning(supervised) || isUncertain(supervised)) {
-        suspend(supervised, timestamp, message);
-        cache.put(id, supervised);
-      }
-    } finally {
-      cache.unlockOnKey(id);
-    }
+//    c2monCache.lockOnKey(id);
+//    try {
+//      T supervised = c2monCache.get(id);
+//      if (isRunning(supervised) || isUncertain(supervised)) {
+//        suspend(supervised, timestamp, message);
+//        c2monCache.put(id, supervised);
+//      }
+//    } finally {
+//      c2monCache.unlockOnKey(id);
+//    }
   }
 
   @Override
@@ -96,70 +95,76 @@ public class SupervisedServiceImpl<T extends Supervised> implements SupervisedSe
 
   @Override
   public boolean isRunning(final Long id) {
-    cache.lockOnKey(id);
-    try {
-      return isRunning(cache.get(id));
-    } finally {
-      cache.unlockOnKey(id);
-    }
+//    c2monCache.lockOnKey(id);
+//    try {
+//      return isRunning(c2monCache.get(id));
+//    } finally {
+//      c2monCache.unlockOnKey(id);
+//    }
+
+    return false;
   }
 
   @Override
   public boolean isUncertain(final T supervised) {
-    cache.lockOnKey(supervised.getId());
-    try {
-      return supervised.getSupervisionStatus() != null
-              && supervised.getSupervisionStatus().equals(SupervisionConstants.SupervisionStatus.UNCERTAIN);
-    } finally {
-      cache.unlockOnKey(supervised.getId());
-    }
+//    c2monCache.lockOnKey(supervised.getId());
+//    try {
+//      return supervised.getSupervisionStatus() != null
+//              && supervised.getSupervisionStatus().equals(SupervisionConstants.SupervisionStatus.UNCERTAIN);
+//    } finally {
+//      c2monCache.unlockOnKey(supervised.getId());
+//    }
+
+    return false;
   }
 
   @Override
   public SupervisionEvent getSupervisionStatus(final Long id) {
-    cache.lockOnKey(id);
-    try {
-      T supervised = cache.get(id);
-      if (log.isTraceEnabled()) {
-        log.trace("Getting supervision status: " + getSupervisionEntity() + " " + supervised.getName() + " is " + supervised.getSupervisionStatus());
-      }
-      Timestamp supervisionTime;
-      String supervisionMessage;
-      if (supervised.getStatusTime() != null) {
-        supervisionTime = supervised.getStatusTime();
-      }
-      else {
-        supervisionTime = new Timestamp(System.currentTimeMillis());
-      }
-      if (supervised.getStatusDescription() != null) {
-        supervisionMessage = supervised.getStatusDescription();
-      }
-      else {
-        supervisionMessage = getSupervisionEntity() + " " + supervised.getName() + " is " + supervised.getSupervisionStatus();
-      }
-      return new SupervisionEventImpl(getSupervisionEntity(), id, supervised.getName(), supervised.getSupervisionStatus(),
-              supervisionTime, supervisionMessage);
-    } finally {
-      cache.unlockOnKey(id);
-    }
+//    c2monCache.lockOnKey(id);
+//    try {
+//      T supervised = c2monCache.get(id);
+//      if (log.isTraceEnabled()) {
+//        log.trace("Getting supervision status: " + getSupervisionEntity() + " " + supervised.getName() + " is " + supervised.getSupervisionStatus());
+//      }
+//      Timestamp supervisionTime;
+//      String supervisionMessage;
+//      if (supervised.getStatusTime() != null) {
+//        supervisionTime = supervised.getStatusTime();
+//      }
+//      else {
+//        supervisionTime = new Timestamp(System.currentTimeMillis());
+//      }
+//      if (supervised.getStatusDescription() != null) {
+//        supervisionMessage = supervised.getStatusDescription();
+//      }
+//      else {
+//        supervisionMessage = getSupervisionEntity() + " " + supervised.getName() + " is " + supervised.getSupervisionStatus();
+//      }
+//      return new SupervisionEventImpl(getSupervisionEntity(), id, supervised.getName(), supervised.getSupervisionStatus(),
+//              supervisionTime, supervisionMessage);
+//    } finally {
+//      c2monCache.unlockOnKey(id);
+//    }
+
+    return null;
   }
 
   @Override
   public void refreshAndNotifyCurrentSupervisionStatus(final Long id) {
-    cache.lockOnKey(id);
-    Timestamp refreshTime = new Timestamp(System.currentTimeMillis());
-    try {
-      T supervised = cache.get(id);
-      supervised.setStatusTime(refreshTime);
-      cache.put(supervised.getId(), supervised);
-    } finally {
-      cache.unlockOnKey(id);
-    }
+//    c2monCache.lockOnKey(id);
+//    Timestamp refreshTime = new Timestamp(System.currentTimeMillis());
+//    try {
+//      T supervised = c2monCache.get(id);
+//      supervised.setStatusTime(refreshTime);
+//      c2monCache.put(supervised.getId(), supervised);
+//    } finally {
+//      c2monCache.unlockOnKey(id);
+//    }
   }
 
   @Override
   public void removeAliveTimer(final Long supervisedId) {
-    T supervised = cache.get(supervisedId);
+    T supervised = c2monCache.get(supervisedId);
     Long aliveId = supervised.getAliveTagId();
     if (aliveId != null) {
       aliveTimerService.stop(aliveId);
@@ -190,7 +195,7 @@ public class SupervisedServiceImpl<T extends Supervised> implements SupervisedSe
 
   @Override
   public void loadAndStartAliveTag(final Long supervisedId) {
-    T supervised = cache.get(supervisedId);
+    T supervised = c2monCache.get(supervisedId);
     Long aliveId = supervised.getAliveTagId();
     /*aliveTimerCache.loadFromDb(aliveId);*/ //TODO: implement loadFromDB, before that think how it should be implemented and designed
     if (aliveId != null) {

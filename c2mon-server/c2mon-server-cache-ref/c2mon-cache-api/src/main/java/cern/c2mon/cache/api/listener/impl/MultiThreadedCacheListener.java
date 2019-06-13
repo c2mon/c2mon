@@ -28,7 +28,7 @@ import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.shared.common.Cacheable;
 
 /**
- * Cache listener implementation providing a pool of threads calling
+ * C2monCache listener implementation providing a pool of threads calling
  * the <code>notifyElementUpdated</code> on the {@link CacheListener}
  * interface.
  * <p>
@@ -260,7 +260,7 @@ public class MultiThreadedCacheListener<T extends Cacheable> implements CacheLis
           }
         }
         catch (InterruptedException e) {
-          log.warn("Cache Listener thread interrupted in MultiThreadedListener.", e);
+          log.warn("C2monCache Listener thread interrupted in MultiThreadedListener.", e);
         }
       }
 

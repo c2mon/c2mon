@@ -9,7 +9,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import cern.c2mon.cache.AbstractCacheLoaderTest;
-import cern.c2mon.cache.api.Cache;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.dbaccess.CommandTagMapper;
 import cern.c2mon.server.common.command.CommandTagCacheObject;
 import cern.c2mon.server.test.CacheObjectComparison;
@@ -23,7 +23,7 @@ import static org.junit.Assert.*;
 public class CommandTagCacheLoaderTest extends AbstractCacheLoaderTest {
 
   @Autowired
-  private Cache<Long, CommandTag> commandTagCacheRef;
+  private C2monCache<Long, CommandTag> commandTagCacheRef;
 
   @Autowired
   private CommandTagMapper commandTagMapper;

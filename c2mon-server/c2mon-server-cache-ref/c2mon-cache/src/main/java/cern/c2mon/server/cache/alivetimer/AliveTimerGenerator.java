@@ -1,9 +1,8 @@
 package cern.c2mon.server.cache.alivetimer;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.cache.api.Cache;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.alive.AliveTimer;
 import cern.c2mon.server.common.alive.AliveTimerCacheObject;
 import cern.c2mon.server.common.equipment.Equipment;
@@ -16,12 +15,12 @@ import cern.c2mon.server.common.subequipment.SubEquipment;
 @Service
 public class AliveTimerGenerator {
 
-  private Cache<Long, AliveTimer> aliveTimerCacheRef;
+  private C2monCache<Long, AliveTimer> aliveTimerCacheRef;
 
-  @Autowired
-  public AliveTimerGenerator(final Cache<Long, AliveTimer> aliveTimerCacheRef) {
-    this.aliveTimerCacheRef = aliveTimerCacheRef;
-  }
+//  @Autowired
+//  public AliveTimerGenerator(final C2monCache<Long, AliveTimer> aliveTimerCacheRef) {
+//    this.aliveTimerCacheRef = aliveTimerCacheRef;
+//  }
 
   public void generate(Equipment equipment) {
     AliveTimer aliveTimer = new AliveTimerCacheObject(equipment.getAliveTagId(), equipment.getId(), equipment.getName(),

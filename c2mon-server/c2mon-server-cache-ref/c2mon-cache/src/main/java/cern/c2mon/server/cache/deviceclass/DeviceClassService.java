@@ -3,10 +3,9 @@ package cern.c2mon.server.cache.deviceclass;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.cache.api.Cache;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.device.DeviceClass;
 
 /**
@@ -16,12 +15,12 @@ import cern.c2mon.server.common.device.DeviceClass;
 @Service
 public class DeviceClassService {
 
-  private Cache<Long, DeviceClass> deviceClassCacheRef;
+  private C2monCache<Long, DeviceClass> deviceClassCacheRef;
 
-  @Autowired
-  public DeviceClassService(Cache<Long, DeviceClass> deviceClassCacheRef) {
-    this.deviceClassCacheRef = deviceClassCacheRef;
-  }
+//  @Autowired
+//  public DeviceClassService(C2monCache<Long, DeviceClass> deviceClassCacheRef) {
+//    this.deviceClassCacheRef = deviceClassCacheRef;
+//  }
 
   public List<String> getDeviceClassNames() {
     List<String> classNames = new ArrayList<>();

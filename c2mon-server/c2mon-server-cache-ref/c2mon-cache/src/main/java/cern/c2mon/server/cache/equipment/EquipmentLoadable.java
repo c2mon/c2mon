@@ -1,12 +1,9 @@
 package cern.c2mon.server.cache.equipment;
 
-import javax.annotation.PostConstruct;
-
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import cern.c2mon.cache.api.Cache;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.DbLoadable;
 import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.control.ControlTagCacheObject;
@@ -20,22 +17,22 @@ import cern.c2mon.shared.common.ConfigurationException;
 @Component
 public class EquipmentLoadable implements DbLoadable<Equipment> {
 
-  private final Cache<Long, Equipment> equipmentCacheRef;
+  private C2monCache<Long, Equipment> equipmentCacheRef;
 
-  private final Cache<Long, ControlTag> controlTagCacheRef;
+  private C2monCache<Long, ControlTag> controlTagCacheRef;
 
-  @Autowired
-  public EquipmentLoadable(Cache<Long, Equipment> equipmentCacheRef, Cache<Long, ControlTag> controlTagCacheRef) {
-    this.equipmentCacheRef = equipmentCacheRef;
-    this.controlTagCacheRef = controlTagCacheRef;
-  }
+//  @Autowired
+//  public EquipmentLoadable(C2monCache<Long, Equipment> equipmentCacheRef, C2monCache<Long, ControlTag> controlTagCacheRef) {
+//    this.equipmentCacheRef = equipmentCacheRef;
+//    this.controlTagCacheRef = controlTagCacheRef;
+//  }
 
-  @PostConstruct
-  public void init() {
-    for (Long key : equipmentCacheRef.getKeys()) {
-      doPostDbLoading(equipmentCacheRef.get(key));
-    }
-  }
+//  @PostConstruct
+//  public void init() {
+//    for (Long key : equipmentCacheRef.getKeys()) {
+//      doPostDbLoading(equipmentCacheRef.get(key));
+//    }
+//  }
 
   @Override
   public void doPostDbLoading(Equipment equipment) {

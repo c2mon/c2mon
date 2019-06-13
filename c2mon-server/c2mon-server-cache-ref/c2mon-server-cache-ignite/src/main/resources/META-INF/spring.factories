@@ -1,0 +1,1 @@
+cern.c2mon.cache.api.spi.C2monCacheProvider=cern.c2mon.cache.impl.IgniteC2monCacheProvider

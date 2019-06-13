@@ -4,12 +4,10 @@ import java.sql.Timestamp;
 import java.util.Collection;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.cache.api.Cache;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.service.SupervisedService;
-import cern.c2mon.server.cache.alivetimer.AliveTimerService;
 import cern.c2mon.server.cache.equipment.EquipmentService;
 import cern.c2mon.server.cache.subequipment.SubEquipmentService;
 import cern.c2mon.server.common.alive.AliveTimer;
@@ -34,24 +32,24 @@ public class ProcessService implements ProcessOperationService, SupervisedServic
 
   private SubEquipmentService subEquipmentService;
 
-  private Cache<Long, AliveTimer> aliveTimerCacheRef;
+  private C2monCache<Long, AliveTimer> aliveTimerCacheRef;
 
-  private Cache<Long, Process> processCacheRef;
+  private C2monCache<Long, Process> processCacheRef;
 
   private ServerProperties properties;
 
-  @Autowired
-  public ProcessService(final EquipmentService equipmentService, final AliveTimerService aliveTimerService,
-                        final Cache<Long, Process> processCacheRef, final ServerProperties properties) {
-    this.equipmentService = equipmentService;
-    this.processCacheRef = processCacheRef;
-    this.aliveTimerCacheRef = aliveTimerService.getCache();
-    this.properties = properties;
+//  @Autowired
+//  public ProcessService(final EquipmentService equipmentService, final AliveTimerService aliveTimerService,
+//                        final C2monCache<Long, Process> processCacheRef, final ServerProperties properties) {
+//    this.equipmentService = equipmentService;
+//    this.processCacheRef = processCacheRef;
+//    this.aliveTimerCacheRef = aliveTimerService.getCache();
+//    this.properties = properties;
+//
+//    this.processOperationService = new ProcessOperationServiceImpl(processCacheRef, equipmentService, aliveTimerService, properties);
+//  }
 
-    this.processOperationService = new ProcessOperationServiceImpl(processCacheRef, equipmentService, aliveTimerService, properties);
-  }
-
-  public Cache getCache() {
+  public C2monCache getCache() {
     return processCacheRef;
   }
 

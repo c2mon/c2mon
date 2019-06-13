@@ -4,8 +4,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import cern.c2mon.cache.api.Cache;
-import cern.c2mon.cache.api.impl.SimpleCache;
+import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.impl.SimpleC2monCache;
 import cern.c2mon.server.cache.alivetimer.AliveTimerGenerator;
 import cern.c2mon.server.common.alive.AliveTimer;
 import cern.c2mon.server.common.alive.AliveTimerCacheObject;
@@ -27,13 +27,13 @@ public class AliveTimerGeneratorTest {
 
   private static final int ALIVE_INTERVAL = 1000;
 
-  private Cache<Long, AliveTimer> aliveTimerCache;
+  private C2monCache<Long, AliveTimer> aliveTimerCache;
   private AliveTimerGenerator generator;
 
   @Before
   public void init() {
-    aliveTimerCache = new SimpleCache<>("aliveTimerCache");
-    generator = new AliveTimerGenerator(aliveTimerCache);
+    aliveTimerCache = new SimpleC2monCache<>("aliveTimerCache");
+//    generator = new AliveTimerGenerator(aliveTimerCache);
   }
 
   @After

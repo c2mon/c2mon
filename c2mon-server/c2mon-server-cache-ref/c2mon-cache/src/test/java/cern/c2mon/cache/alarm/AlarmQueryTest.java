@@ -6,7 +6,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import cern.c2mon.cache.api.Cache;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.shared.client.alarm.AlarmQuery;
@@ -22,7 +22,7 @@ import static org.junit.Assert.assertNotNull;
 public class AlarmQueryTest extends AlarmCacheLoaderTest {
 
   @Autowired
-  private Cache<Long, Alarm> alarmCacheRef;
+  private C2monCache<Long, Alarm> alarmCacheRef;
 
   @Test
   @Ignore
@@ -39,7 +39,7 @@ public class AlarmQueryTest extends AlarmCacheLoaderTest {
   public void testGetActiveAlarms() {
     AlarmQuery query = AlarmQuery.builder().active(true).build();
     AlarmCacheObject toChange = (AlarmCacheObject) alarmCacheRef.get(350000L);
-    toChange.setState("ACTIVE");
+//    toChange.setState("ACTIVE");
 
     alarmCacheRef.put(toChange.getId(), toChange);
     Collection<Long> result = null; /*alarmCacheRef.findAlarm(query);*/

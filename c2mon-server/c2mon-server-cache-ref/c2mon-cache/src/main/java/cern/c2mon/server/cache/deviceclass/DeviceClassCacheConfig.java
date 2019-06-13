@@ -1,15 +1,6 @@
 package cern.c2mon.server.cache.deviceclass;
 
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import cern.c2mon.cache.api.Cache;
-import cern.c2mon.cache.api.factory.AbstractCacheFactory;
-import cern.c2mon.cache.api.loader.CacheLoader;
-import cern.c2mon.server.cache.CacheName;
-import cern.c2mon.server.cache.loader.DeviceClassDAO;
-import cern.c2mon.server.cache.loader.common.SimpleCacheLoader;
-import cern.c2mon.server.common.device.DeviceClass;
 
 /**
  * @author Szymon Halastra
@@ -18,14 +9,14 @@ import cern.c2mon.server.common.device.DeviceClass;
 @Configuration
 public class DeviceClassCacheConfig {
 
-  @Bean(name = CacheName.Names.DEVICECLASS)
-  public Cache createCache(AbstractCacheFactory cachingFactory, DeviceClassDAO deviceClassDAO) {
-    Cache cache = cachingFactory.createCache(CacheName.DEVICECLASS.getLabel(), Long.class,
-            DeviceClass.class);
-
-    CacheLoader cacheLoader = new SimpleCacheLoader<>(cache, deviceClassDAO);
-    cache.setCacheLoader(cacheLoader);
-
-    return cache;
-  }
+//  @Bean(name = CacheName.Names.DEVICECLASS)
+//  public C2monCache createCache(AbstractCacheFactory cachingFactory, DeviceClassDAO deviceClassDAO) {
+//    C2monCache cache = cachingFactory.createCache(CacheName.DEVICECLASS.getLabel(), Long.class,
+//            DeviceClass.class);
+//
+//    CacheLoader cacheLoader = new SimpleCacheLoader<>(cache, deviceClassDAO);
+//    cache.setCacheLoader(cacheLoader);
+//
+//    return cache;
+//  }
 }
