@@ -1,13 +1,17 @@
 package cern.c2mon.cache.impl.configuration;
 
+import org.apache.ignite.IgniteLogger;
 import org.apache.ignite.IgniteSpringBean;
 import org.apache.ignite.configuration.IgniteConfiguration;
+import org.apache.ignite.logger.slf4j.Slf4jLogger;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import static cern.c2mon.cache.impl.C2monCacheProperties.METRICS_LOG_FREQUENCY;
+import static org.apache.ignite.IgniteSystemProperties.IGNITE_PERFORMANCE_SUGGESTIONS_DISABLED;
+import static org.apache.ignite.IgniteSystemProperties.IGNITE_QUIET;
 
 /**
  * @author Szymon Halastra
@@ -20,6 +24,8 @@ public class C2monIgniteConfiguration {
     ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("ignite-config.xml");
 
     IgniteConfiguration config = (IgniteConfiguration) context.getBean("base-ignite.cfg");
+
+    config.setGridLogger(new Slf4jLogger());
 
     config.setMetricsLogFrequency(METRICS_LOG_FREQUENCY);
 

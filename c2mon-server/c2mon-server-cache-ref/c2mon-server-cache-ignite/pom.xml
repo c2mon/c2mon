@@ -13,32 +13,40 @@
   <artifactId>c2mon-server-cache-ignite</artifactId>
   <version>1.8.41-SNAPSHOT</version>
 
+  <properties>
+    <ignite.version>2.7.5</ignite.version>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>cern.c2mon.server</groupId>
       <artifactId>c2mon-cache-api</artifactId>
-      <version>1.8.41-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.apache.ignite</groupId>
       <artifactId>ignite-core</artifactId>
-      <version>2.1.0</version>
+      <version>${ignite.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.ignite</groupId>
       <artifactId>ignite-spring</artifactId>
-      <version>2.1.0</version>
+      <version>${ignite.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.ignite</groupId>
       <artifactId>ignite-indexing</artifactId>
-      <version>2.1.0</version>
+      <version>${ignite.version}</version>
       <exclusions>
         <exclusion>
           <groupId>org.apache.lucene</groupId>
           <artifactId>lucene-core</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.ignite</groupId>
+      <artifactId>ignite-slf4j</artifactId>
+      <version>${ignite.version}</version>
     </dependency>
   </dependencies>
 </project>

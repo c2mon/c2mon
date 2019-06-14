@@ -11,6 +11,7 @@
 
   <artifactId>c2mon-server-cache-ref</artifactId>
   <packaging>pom</packaging>
+
   <modules>
     <module>c2mon-cache-api</module>
     <module>c2mon-cache</module>
