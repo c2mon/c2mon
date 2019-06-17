@@ -13,7 +13,6 @@
   <packaging>jar</packaging>
 
   <properties>
-    <grafana.version>6.1.2</grafana.version>
     <image.base>grafana/grafana:${grafana.version}</image.base>
     <image.name>grafana-${grafana.version}-c2mon-${project.version}</image.name>
     <repository>cern/c2mon-ext</repository>
