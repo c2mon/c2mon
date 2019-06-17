@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -20,9 +21,11 @@
   </modules>
 
   <properties>
-    <image.base />
-    <registry>registry.hub.docker.com</registry>
-    <repository></repository>
+    <image.base/>
+    <gitlab>gitlab-registry.cern.ch/c2mon</gitlab>
+    <gitlab-repo></gitlab-repo>
+    <dockerhub>registry.hub.docker.com</dockerhub>
+    <dockerhub-repo></dockerhub-repo>
     <image.tag></image.tag>
   </properties>
 
@@ -36,7 +39,7 @@
             <phase>generate-sources</phase>
             <configuration>
               <target>
-                <mkdir dir="${project.build.directory}/classes" />
+                <mkdir dir="${project.build.directory}/classes"/>
               </target>
             </configuration>
             <goals>
@@ -49,14 +52,32 @@
       <plugin>
         <groupId>com.google.cloud.tools</groupId>
         <artifactId>jib-maven-plugin</artifactId>
-        <version>1.0.2</version>
+        <version>1.3.0</version>
         <executions>
           <execution>
             <phase>deploy</phase>
-            <id>build</id>
+            <id>build-dockerhub</id>
             <goals>
               <goal>build</goal>
             </goals>
+            <configuration>
+              <to>
+                <image>${dockerhub}/${dockerhub-repo}</image>
+              </to>
+            </configuration>
+          </execution>
+          <execution>
+            <phase>deploy</phase>
+            <id>build-gitlab</id>
+            <goals>
+              <goal>build</goal>
+            </goals>
+            <configuration>
+              <skip>true</skip>
+              <to>
+                <image>${gitlab}/${gitlab-repo}</image>
+              </to>
+            </configuration>
           </execution>
         </executions>
         <configuration>
@@ -64,7 +85,6 @@
             <image>${image.base}</image>
           </from>
           <to>
-            <image>${registry}/${repository}</image>
             <tags>
               <tag>${image.tag}</tag>
             </tags>
