@@ -119,15 +119,15 @@ public class ProcessService implements ProcessOperationService, SupervisedServic
   }
 
   @Override
-  public void stop(Process supervised, Timestamp timestamp) {
+  public void stop(Process process, Timestamp timestamp) {
     processCacheRef.executeTransaction(() -> {
-      ProcessCacheObject processCacheObject = (ProcessCacheObject) supervised;
+      ProcessCacheObject processCacheObject = (ProcessCacheObject) process;
       processCacheObject.setCurrentHost(null);
       processCacheObject.setStartupTime(null);
       processCacheObject.setRequiresReboot(Boolean.FALSE);
       processCacheObject.setProcessPIK(null);
       processCacheObject.setLocalConfig(null);
-      supervisedService.stop(supervised, timestamp);
+      supervisedService.stop(process, timestamp);
 
       return null;
     });
