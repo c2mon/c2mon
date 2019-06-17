@@ -32,7 +32,7 @@ spec:
           value: jdbc:mysql://db/tim
         - name: C2MON_SERVER_JDBC_USERNAME
           value: root
-        image: cern/c2mon:1.8.45
+        image: cern/c2mon:1.8.46-SNAPSHOT
         name: c2mon-server
         resources: {}
       restartPolicy: Always
