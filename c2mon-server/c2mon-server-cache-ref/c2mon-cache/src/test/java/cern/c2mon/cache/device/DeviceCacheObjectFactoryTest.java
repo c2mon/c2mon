@@ -4,6 +4,7 @@ import java.util.*;
 
 import org.easymock.EasyMock;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import cern.c2mon.cache.api.C2monCache;
@@ -22,6 +23,7 @@ public class DeviceCacheObjectFactoryTest {
   }
 
   @Test
+  @Ignore
   public void createDeviceCacheObject() throws IllegalAccessException, ClassNotFoundException {
 //    reset(deviceClassCache);
 //
@@ -77,6 +79,7 @@ public class DeviceCacheObjectFactoryTest {
   }
 
   @Test
+  @Ignore
   public void parseXMLWithInvalidXML() throws IllegalAccessException {
 //    Properties deviceProperties = createDeviceProperties();
 //
@@ -97,6 +100,7 @@ public class DeviceCacheObjectFactoryTest {
   }
 
   @Test
+  @Ignore
   public void parseXMLWithInvalidString() throws IllegalAccessException {
 //    Properties deviceProperties = createDeviceProperties();
 //
@@ -120,6 +124,7 @@ public class DeviceCacheObjectFactoryTest {
   }
 
   @Test
+  @Ignore
   public void createDeviceWithInvalidDeviceClass() throws IllegalAccessException {
 //    Properties deviceProperties = createDeviceProperties();
 //
@@ -140,6 +145,7 @@ public class DeviceCacheObjectFactoryTest {
   }
 
   @Test
+  @Ignore
   public void createDeviceWithInvalidPropertyName() throws IllegalAccessException {
 //    Properties deviceProperties = createDeviceProperties();
 //
@@ -161,6 +167,7 @@ public class DeviceCacheObjectFactoryTest {
   }
 
   @Test
+  @Ignore
   public void createDeviceWithEmptyPropertyList() throws IllegalAccessException {
 //    Properties deviceProperties = createDeviceProperties();
 //
@@ -181,6 +188,7 @@ public class DeviceCacheObjectFactoryTest {
   }
 
   @Test
+  @Ignore
   public void createDeviceWithEmptyCommandList() throws IllegalAccessException {
 //    Properties deviceProperties = createDeviceProperties();
 //

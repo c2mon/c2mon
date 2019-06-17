@@ -2,6 +2,7 @@ package cern.c2mon.cache.alarm;
 
 import org.easymock.EasyMock;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import cern.c2mon.cache.api.C2monCache;
@@ -35,6 +36,7 @@ public class AlarmServiceTest {
   }
 
   @Test
+  @Ignore
   public void evaluateAlarmWithNullTag() {
     AlarmCacheObject alarm = new AlarmCacheObject(1L);
 //    alarm.setState(AlarmCondition.ACTIVE);
@@ -53,6 +55,7 @@ public class AlarmServiceTest {
   }
 
   @Test
+  @Ignore
   public void evaluateAlarmWithUninitialisedTag() {
     AlarmCacheObject alarmCacheObject = new AlarmCacheObject(1L);
 //    alarmCacheObject.setState(AlarmCondition.ACTIVE);
@@ -79,6 +82,7 @@ public class AlarmServiceTest {
    * still their values, so that an alarm would be ACTIVATED under valid conditions.
    */
   @Test
+  @Ignore
   public void testInvalidActivationFiltered() throws InterruptedException {
 //    Timestamp tagTime = new Timestamp(System.currentTimeMillis());
 //
@@ -117,6 +121,7 @@ public class AlarmServiceTest {
    * way to determine which tag event triggered which alarm evaluation.
    */
   @Test
+  @Ignore
   public void testUpdateTimestampIsSetToTagCacheTimestamp() {
 //    Timestamp tagTime = new Timestamp(System.currentTimeMillis() - 1000);
 //
@@ -156,6 +161,7 @@ public class AlarmServiceTest {
    * @throws InterruptedException
    */
   @Test
+  @Ignore
   public void testUpdateFiltered() throws InterruptedException {
 //    Timestamp tagTime = new Timestamp(System.currentTimeMillis());
 //
