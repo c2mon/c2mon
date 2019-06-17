@@ -4,6 +4,10 @@ A Hello World guide to get C2MON up and running with some sample data.
 
 ---
 
+## Using Kubernetes
+
+Are you a Kubernetes user? You can quickly create the full C2MON stack described below using the [K8S Quickstart](user-guide/kubernetes_config). Alternatively, read on to learn how to create a C2MON stack step by step!
+
 ## Running the server
 
 The first thing to do is to get a C2MON server up and running. The server is a standalone application that receives data from acquisition processes (DAQs) and pushes it to client applications.
@@ -69,15 +73,14 @@ It is also advisable to take a look into the `log/c2mon.log` file. When C2MON st
 ... [main] cern.c2mon.server.ServerStartup : C2MON server is now initialised
 ```
 
-
 ### Using the Docker image
 
-We push a Docker container of the server to the [CERN Docker registry](https://gitlab.cern.ch/c2mon/c2mon/container_registry).
+We push a Docker container of the server to the [CERN Docker registry](https://hub.docker.com/r/cern/c2mon).
 To run the image:
 
 ```bash
 docker run --rm --name c2mon -it -p 0.0.0.0:1099:1099 -p 0.0.0.0:9001:9001 -p 0.0.0.0:61616:61616 -p 0.0.0.0:9200:9200 \
-  gitlab-registry.cern.ch/c2mon/c2mon
+  cern/c2mon
 ```
 
 
@@ -99,7 +102,7 @@ For example, if the JDBC driver libraries ```ojdbc.jar``` and ```orai18n.jar``` 
 ```bash
 docker run --rm --name c2mon -it -p 0.0.0.0:1099:1099 -p 0.0.0.0:9001:9001 -p 0.0.0.0:61616:61616 -p 0.0.0.0:9200:9200 \
   -v `pwd`/ojdbc.jar:/c2mon-server/lib/ojdbc.jar:z -v `pwd`/orai18n.jar:/c2mon-server/lib/orai18n.jar:z \
-  gitlab-registry.cern.ch/c2mon/c2mon
+  cern/c2mon
 ```
 
 
@@ -150,11 +153,11 @@ You can now consult the C2MON Web User Interface on http://localhost:8080/c2mon-
 
 ### Using the Docker image
 
-We push the c2mon-web-ui Docker images to the [CERN Docker registry](https://gitlab.cern.ch/c2mon/c2mon-web-ui/container_registry).
+We push the c2mon-web-ui Docker images to the [CERN Docker registry](https://hub.docker.com/r/cern/c2mon-web-ui).
 To run the image:
 
 ```bash
-docker run --rm --name web-ui -ti --link c2mon:c2mon -p 0.0.0.0:8080:8080 gitlab-registry.cern.ch/c2mon/c2mon-web-ui
+docker run --rm --name web-ui -ti --link c2mon:c2mon -p 0.0.0.0:8080:8080 cern/c2mon-web-ui
 ```
 
 You can now consult the C2MON Web User Interface on http://localhost:8080/c2mon-web-ui/
