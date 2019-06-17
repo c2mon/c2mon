@@ -15,7 +15,8 @@
   <properties>
     <image.base>grafana/grafana:${grafana.version}</image.base>
     <image.name>grafana-${grafana.version}-c2mon-${project.version}</image.name>
-    <repository>cern/c2mon-ext</repository>
+    <gitlab-repo>c2mon-ext</gitlab-repo>
+    <dockerhub-repo>cern/c2mon-ext</dockerhub-repo>
   </properties>
 
   <build>
@@ -32,9 +33,9 @@
               <tag>${image.name}</tag>
             </tags>
           </to>
-          <extraDirectory>
-            <path>includes</path>
-          </extraDirectory>
+          <extraDirectories>
+            <paths>includes</paths>
+          </extraDirectories>
         </configuration>
       </plugin>
     </plugins>

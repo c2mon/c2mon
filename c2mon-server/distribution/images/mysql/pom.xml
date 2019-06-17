@@ -15,7 +15,8 @@
   <properties>
     <image.base>mysql:${mysql.version}</image.base>
     <image.tag>mysql-${mysql.version}-c2mon-${project.version}</image.tag>
-    <repository>cern/c2mon-ext</repository>
+    <gitlab-repo>c2mon-ext</gitlab-repo>
+    <dockerhub-repo>cern/c2mon-ext</dockerhub-repo>
     <docker.entrypoint>docker-entrypoint-initdb.d</docker.entrypoint>
   </properties>
 
@@ -31,7 +32,7 @@
                 <!-- we send the file here so that it's copied over to the docker entrypoint
                 and then picked up by the mysql init process
                 See: https://hub.docker.com/_/mysql?tab=description -->
-                <concat destfile="${project.build.directory}/${docker.entrypoint}/c2mon-mysql-schema.sql">
+                <concat destfile="${project.build.directory}/mount/${docker.entrypoint}/c2mon-mysql-schema.sql">
                   <!-- also need a prelude to setup the DB, add a user, change user etc... -->
                   <fileset file="${project.basedir}/../../../c2mon-server-cachedbaccess/src/main/resources/sql/cache-schema-mysql.sql" />
                   <fileset file="${project.basedir}/../../../c2mon-server-history/src/main/resources/sql/history-schema-mysql.sql" />
@@ -68,9 +69,9 @@
               <MYSQL_ALLOW_EMPTY_PASSWORD>yes</MYSQL_ALLOW_EMPTY_PASSWORD>
             </environment>
           </container>
-          <extraDirectory>
-            <path>${project.build.directory}/</path>
-          </extraDirectory>
+          <extraDirectories>
+              <paths>${project.build.directory}/mount/</paths>
+          </extraDirectories>
         </configuration>
       </plugin>
     </plugins>
