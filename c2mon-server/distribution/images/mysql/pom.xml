@@ -13,7 +13,6 @@
   <packaging>jar</packaging>
 
   <properties>
-    <mysql.version>5.7.15</mysql.version>
     <image.base>mysql:${mysql.version}</image.base>
     <image.tag>mysql-${mysql.version}-c2mon-${project.version}</image.tag>
     <repository>cern/c2mon-ext</repository>
