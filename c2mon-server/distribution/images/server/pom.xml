@@ -13,7 +13,7 @@
   <packaging>jar</packaging>
 
   <properties>
-    <image.base>openjdk:8-jdk</image.base>
+    <image.base>openjdk:8-jdk-slim</image.base>
     <image.tag>${project.version}</image.tag>
     <c2mon.home>/c2mon-server-${project.version}</c2mon.home>
     <repository>cern/c2mon</repository>
