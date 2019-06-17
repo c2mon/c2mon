@@ -37,7 +37,7 @@ spec:
       name: c2mon-es-node
     spec:
       containers:
-      - image: cern/c2mon-ext:elasticsearch-5.6-c2mon-1.8.43-SNAPSHOT
+      - image: cern/c2mon-ext:elasticsearch-5.6-c2mon-1.8.45
         name: c2mon-es-node
         env:
         - name: namespace

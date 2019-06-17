@@ -15,7 +15,7 @@ spec:
         io.kompose.service: mq
     spec:
       containers:
-      - image: cern/c2mon-ext:activemq-5.15.2-c2mon-1.8.43-SNAPSHOT
+      - image: cern/c2mon-ext:activemq-5.15.2-c2mon-1.8.45
         name: mq
         ports:
         - containerPort: 61616

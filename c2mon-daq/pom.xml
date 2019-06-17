@@ -179,8 +179,6 @@
               <entrypoint>
                 <entrypoint>./docker-entrypoint.sh</entrypoint>
                 <entrypoint>bin/C2MON-DAQ-STARTUP.jvm</entrypoint>
-                <entrypoint>-f</entrypoint>
-                <entrypoint>P_HOST01</entrypoint>
               </entrypoint>
               <environment>
                 <basedir>${project.artifactId}</basedir>
