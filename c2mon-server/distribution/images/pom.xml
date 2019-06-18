@@ -27,6 +27,7 @@
     <dockerhub>registry.hub.docker.com</dockerhub>
     <dockerhub-repo></dockerhub-repo>
     <image.tag></image.tag>
+    <skipDocker>false</skipDocker>
   </properties>
 
   <build>
@@ -92,6 +93,7 @@
           <container>
             <useCurrentTimestamp>true</useCurrentTimestamp>
           </container>
+          <skip>${skipDocker}</skip>
         </configuration>
       </plugin>
 
@@ -102,6 +104,7 @@
           <skip>true</skip>
         </configuration>
       </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-install-plugin</artifactId>
@@ -110,6 +113,19 @@
         </configuration>
       </plugin>
     </plugins>
+
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <version>2.10</version>
+          <configuration>
+            <skip>${skipDocker}</skip>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
   </build>
 
 </project>
