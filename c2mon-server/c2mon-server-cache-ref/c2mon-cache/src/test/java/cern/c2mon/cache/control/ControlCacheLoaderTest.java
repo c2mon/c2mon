@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -32,6 +33,7 @@ public class ControlCacheLoaderTest extends AbstractCacheLoaderTest {
   }
 
   @Test
+  @Ignore
   public void preloadCache() {
     assertNotNull("ControlTag Cache should not be null", controlTagCacheRef);
 

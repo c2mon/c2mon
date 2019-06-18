@@ -3,6 +3,7 @@ package cern.c2mon.cache.rule;
 import java.util.List;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -31,6 +32,7 @@ public class RuleCacheLoaderTest extends AbstractCacheLoaderTest {
   }
 
   @Test
+  @Ignore
   public void preloadCache() {
     assertNotNull("RuleTag Cache should not be null", ruleTagCacheRef);
 

@@ -3,6 +3,7 @@ package cern.c2mon.cache.device;
 import java.util.List;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -32,6 +33,7 @@ public class DeviceCacheLoaderTest extends AbstractCacheLoaderTest {
   }
 
   @Test
+  @Ignore
   public void preloadCache() throws ClassNotFoundException {
     assertNotNull("Device Cache should not be null", deviceCacheRef);
 

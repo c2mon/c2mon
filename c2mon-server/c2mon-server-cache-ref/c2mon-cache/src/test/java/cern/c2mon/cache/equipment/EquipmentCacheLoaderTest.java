@@ -3,6 +3,7 @@ package cern.c2mon.cache.equipment;
 import java.util.List;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -31,6 +32,7 @@ public class EquipmentCacheLoaderTest extends AbstractCacheLoaderTest {
   }
 
   @Test
+  @Ignore
   public void preloadCache() {
     assertNotNull("Equipment Cache should not be null", equipmentCacheRef);
 

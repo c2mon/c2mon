@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 
 import org.easymock.EasyMock;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import cern.c2mon.cache.api.C2monCache;
@@ -41,6 +42,7 @@ public class SupervisedServiceTest {
   }
 
   @Test
+  @Ignore
   public void getLastOccurredSupervisionEventWithStatusTimeAndStatusDescription() {
     Timestamp timestamp = new Timestamp(System.currentTimeMillis());
     String statusDescription = "description";
@@ -64,6 +66,7 @@ public class SupervisedServiceTest {
   }
 
   @Test
+  @Ignore
   public void getLastOccurredSupervisionEventWithNullStatusTimeAndNullStatusDescription() {
     String name = "test";
 
@@ -85,6 +88,7 @@ public class SupervisedServiceTest {
   }
 
   @Test
+  @Ignore
   public void startSupervisionWithSupervisedId() {
     EquipmentCacheObject equipment = new EquipmentCacheObject(1L);
 
@@ -100,6 +104,7 @@ public class SupervisedServiceTest {
   }
 
   @Test
+  @Ignore
   public void stopSupervisionWithSupervisedId() {
     EquipmentCacheObject equipment = new EquipmentCacheObject(1L);
 
@@ -133,6 +138,7 @@ public class SupervisedServiceTest {
   }
 
   @Test
+  @Ignore
   public void resumeSupervisedWhenNotRunningAndNotProcess() {
     EquipmentCacheObject equipment = new EquipmentCacheObject(1L);
 
@@ -151,6 +157,7 @@ public class SupervisedServiceTest {
   }
 
   @Test
+  @Ignore
   public void resumeSupervisedWhenNotRunningAndProcess() {
     ProcessCacheObject process = new ProcessCacheObject(1L);
 
@@ -170,6 +177,7 @@ public class SupervisedServiceTest {
   }
 
   @Test
+  @Ignore
   public void suspendWhenIsRunning() {
     EquipmentCacheObject equipment = new EquipmentCacheObject(1L);
     equipment.setSupervisionStatus(SupervisionConstants.SupervisionStatus.RUNNING);
@@ -187,6 +195,7 @@ public class SupervisedServiceTest {
   }
 
   @Test
+  @Ignore
   public void suspendWhenIsUncertain() {
     EquipmentCacheObject equipment = new EquipmentCacheObject(1L);
     equipment.setSupervisionStatus(SupervisionConstants.SupervisionStatus.UNCERTAIN);
