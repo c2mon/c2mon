@@ -1,18 +1,18 @@
 package cern.c2mon.server.common.util;
 
-import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
-import org.springframework.core.io.Resource;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
-import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
+import java.util.List;
+
+import javax.sql.DataSource;
 
 import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
 import lombok.extern.slf4j.Slf4j;
-
-import javax.sql.DataSource;
-import java.util.List;
+import org.springframework.boot.jdbc.DataSourceBuilder;
+import org.springframework.core.io.Resource;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
+import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 
 import static org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType.HSQL;
 

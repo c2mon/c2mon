@@ -35,14 +35,15 @@
 
 
   <properties>
-    <org.springframework.version>4.3.4.RELEASE</org.springframework.version>
-    <org.springframework.boot.version>1.4.2.RELEASE</org.springframework.boot.version>
+    <org.springframework.version>5.1.2.RELEASE</org.springframework.version>
+    <org.springframework.boot.version>2.1.0.RELEASE</org.springframework.boot.version>
     <org.slf4j.version>1.7.5</org.slf4j.version>
-    <org.apache.activemq.version>5.15.2</org.apache.activemq.version>
+    <org.apache.activemq.version>5.15.6</org.apache.activemq.version>
     <elasticsearch.version>5.6.0</elasticsearch.version>
     <!-- Should mostly be the same as above, see https://hub.docker.com/_/elasticsearch?tab=tags -->
     <elasticsearch.dockertag>5.6</elasticsearch.dockertag>
     <mockito-all.version>1.10.19</mockito-all.version>
+    <com.fasterxml.jackson.core>2.9.2</com.fasterxml.jackson.core>
     <!-- Start: Used for K8S distributions -->
     <grafana.version>6.1.2</grafana.version>
     <mysql.version>5.7.15</mysql.version>
@@ -78,7 +79,7 @@
       <dependency>
         <groupId>org.projectlombok</groupId>
         <artifactId>lombok</artifactId>
-        <version>1.16.16</version>
+        <version>1.18.4</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
@@ -89,11 +90,6 @@
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-beans</artifactId>
-        <version>${org.springframework.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-context</artifactId>
         <version>${org.springframework.version}</version>
       </dependency>
       <dependency>
@@ -119,7 +115,7 @@
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
-        <artifactId>spring-jdbc</artifactId>
+        <artifactId>spring-context</artifactId>
         <version>${org.springframework.version}</version>
       </dependency>
       <dependency>
@@ -129,8 +125,23 @@
       </dependency>
       <dependency>
         <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-jpa</artifactId>
+        <version>${org.springframework.boot.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-logging</artifactId>
         <version>${org.springframework.boot.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jul-to-slf4j</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-to-slf4j</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.springframework.boot</groupId>
@@ -140,6 +151,11 @@
       <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-configuration-processor</artifactId>
+        <version>${org.springframework.boot.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-activemq</artifactId>
         <version>${org.springframework.boot.version}</version>
       </dependency>
       <dependency>
@@ -201,6 +217,11 @@
         <version>4.5.1</version>
         <scope>runtime</scope>
       </dependency>
+      <dependency>
+        <groupId>javax.jms</groupId>
+        <artifactId>javax.jms-api</artifactId>
+        <version>2.0.1</version>
+      </dependency>
 
       <dependency>
         <groupId>commons-dbcp</groupId>
@@ -230,17 +251,17 @@
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-annotations</artifactId>
-        <version>2.6.5</version>
+        <version>${com.fasterxml.jackson.core}</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-core</artifactId>
-        <version>2.6.5</version>
+        <version>${com.fasterxml.jackson.core}</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-databind</artifactId>
-        <version>2.6.5</version>
+        <version>${com.fasterxml.jackson.core}</version>
       </dependency>
       <!-- The following dependencies are required for using Ehcache & BigMemory.
            ehcache-ee-2.7.5 is shipped together with bigmemory-4.0.5 -->
@@ -272,7 +293,7 @@
       <dependency>
         <groupId>com.google.code.gson</groupId>
         <artifactId>gson</artifactId>
-        <version>2.2.2</version>
+        <version>2.8.4</version>
       </dependency>
       <dependency>
         <groupId>commons-lang</groupId>
@@ -419,7 +440,7 @@
             <tagNameFormat>@{project.version}</tagNameFormat>
           </configuration>
         </plugin>
-
+      
         <plugin>
           <groupId>org.sonarsource.scanner.maven</groupId>
           <artifactId>sonar-maven-plugin</artifactId>
@@ -477,7 +498,7 @@
           <mavenVersion>3.3.1</mavenVersion>
         </configuration>
       </plugin>
-
+      
       <!-- Analyze vulnerabilities in dependencies -->
       <plugin>
         <groupId>org.owasp</groupId>
