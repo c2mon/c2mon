@@ -92,7 +92,7 @@
           <container>
             <useCurrentTimestamp>true</useCurrentTimestamp>
           </container>
-          <skip>${skipDocker}</skip>
+          <skip>true</skip>
         </configuration>
       </plugin>
 

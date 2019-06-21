@@ -87,6 +87,7 @@
               </permission>
             </permissions>
           </extraDirectory>
+          <skip>${skipDocker}</skip>
         </configuration>
       </plugin>
     </plugins>
