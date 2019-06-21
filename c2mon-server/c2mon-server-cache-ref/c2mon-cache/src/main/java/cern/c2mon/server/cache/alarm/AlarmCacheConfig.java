@@ -26,7 +26,7 @@ public class AlarmCacheConfig {
   @Autowired
   private CacheLoaderProperties properties;
 
-  @Bean(name = CacheName.Names.ALARM)
+//  @Bean(name = CacheName.Names.ALARM)
   public C2monCache createCache(AbstractCacheFactory cachingFactory, AlarmLoaderDAO alarmLoaderDAORef) {
     C2monCache cache = cachingFactory.createCache(CacheName.ALARM.getLabel(), Long.class, Alarm.class);
 
