@@ -125,7 +125,6 @@
     <dependency>
       <groupId>cern.c2mon.server</groupId>
       <artifactId>c2mon-cache-loader</artifactId>
-      <version>1.8.41-SNAPSHOT</version>
       <scope>compile</scope>
     </dependency>
   </dependencies>
