@@ -14,7 +14,7 @@
 
   <properties>
     <image.base>openjdk:8-jdk-slim</image.base>
-    <image.tag>${project.version}</image.tag>
+    <image.tag>experimental-cache-${project.version}</image.tag>
     <c2mon.home>/c2mon-server-${project.version}</c2mon.home>
     <gitlab-repo>c2mon</gitlab-repo>
     <dockerhub-repo>cern/c2mon</dockerhub-repo>
