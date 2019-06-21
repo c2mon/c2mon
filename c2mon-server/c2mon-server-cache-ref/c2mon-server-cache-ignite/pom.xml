@@ -7,11 +7,11 @@
   <parent>
     <artifactId>c2mon-server-cache-ref</artifactId>
     <groupId>cern.c2mon.server</groupId>
-    <version>1.8.41-SNAPSHOT</version>
+    <version>1.8.46-SNAPSHOT</version>
   </parent>
 
   <artifactId>c2mon-server-cache-ignite</artifactId>
-  <version>1.8.41-SNAPSHOT</version>
+  <version>1.8.46-SNAPSHOT</version>
 
   <properties>
     <ignite.version>2.7.5</ignite.version>
