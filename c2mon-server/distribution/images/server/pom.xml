@@ -17,7 +17,7 @@
     <image.tag>experimental-cache-${project.version}</image.tag>
     <c2mon.home>/c2mon-server-${project.version}</c2mon.home>
     <gitlab-repo>c2mon</gitlab-repo>
-    <dockerhub-repo>cern/c2mon</dockerhub-repo>
+    <dockerhub-repo>cern/pandora-c2mon-cache</dockerhub-repo>
   </properties>
 
   <build>
