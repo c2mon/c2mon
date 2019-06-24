@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2019 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -16,10 +16,7 @@
  ******************************************************************************/
 package cern.c2mon.client.core.service.impl;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.jms.JMSException;
@@ -95,6 +92,15 @@ public class AlarmServiceImpl implements AlarmService, AlarmListener {
     } finally {
       alarmListenersLock.writeLock().unlock();
     }
+  }
+  
+  @Override
+  public Optional<AlarmValue> getAlarm(Long alarmId) {
+    Collection<AlarmValue> list = getAlarms(Arrays.asList(alarmId));
+    if (!list.isEmpty()) {
+      return Optional.of(list.iterator().next());
+    }
+    return Optional.empty();
   }
   
   @Override

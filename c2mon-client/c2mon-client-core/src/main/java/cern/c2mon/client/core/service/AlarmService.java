@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2019 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -17,6 +17,7 @@
 package cern.c2mon.client.core.service;
 
 import java.util.Collection;
+import java.util.Optional;
 
 import javax.jms.JMSException;
 
@@ -26,8 +27,7 @@ import cern.c2mon.shared.client.alarm.AlarmValue;
 public interface AlarmService {
 
   /**
-   * Registers an <code>AlarmListener</code> to the <code>TagServiceImpl</code>.
-   * @param listener The listener to be registered
+   * Registers an <code>AlarmListener</code> to receive updates about alarm changes
    * @throws JMSException
    */
   void addAlarmListener(AlarmListener listener) throws JMSException;
@@ -35,13 +35,22 @@ public interface AlarmService {
   /**
    * Returns an {@link AlarmValue} object for every valid id on the list.
    * The values are fetched from the server.
-   * However, in case of a connection error or an unknown tag id the corresponding
+   * However, in case of a connection error or an unknown alarm id the corresponding
    * tag might be missing.
    *
    * @param alarmIds A collection of alarm id's
    * @return A collection of all <code>AlarmValue</code> objects
    */
   Collection<AlarmValue> getAlarms(final Collection<Long> alarmIds);
+  
+  /**
+   * Returns the {@link AlarmValue} object for the given alarm id.
+   * The value is directly fetched from the server.
+   *
+   * @param alarmId The alarm id
+   * @return The given alarm <code>AlarmValue</code>, if it exists
+   */
+  Optional<AlarmValue> getAlarm(final Long alarmId);
   
   /**
    * Returns an {@link AlarmValue} object for every active alarm found
@@ -52,8 +61,7 @@ public interface AlarmService {
   Collection<AlarmValue> getAllActiveAlarms();
   
   /**
-   * Unregisters an <code>AlarmListener</code> from the <code>TagServiceImpl</code>.
-   * @param listener The listener to be unregistered
+   * Unregisters the given <code>AlarmListener</code> instance from receiving alarm updates.
    * @throws JMSException
    */
   void removeAlarmListener(AlarmListener listener) throws JMSException;
