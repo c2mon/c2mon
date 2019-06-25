@@ -1,4 +1,4 @@
-package cern.c2mon.server.cache.alarm;
+package cern.c2mon.server.cache.alarm.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -26,7 +26,7 @@ public class AlarmCacheConfig {
   @Autowired
   private CacheLoaderProperties properties;
 
-//  @Bean(name = CacheName.Names.ALARM)
+  @Bean(name = CacheName.Names.ALARM)
   public C2monCache createCache(AbstractCacheFactory cachingFactory, AlarmLoaderDAO alarmLoaderDAORef) {
     C2monCache cache = cachingFactory.createCache(CacheName.ALARM.getLabel(), Long.class, Alarm.class);
 
