@@ -1,10 +1,10 @@
 package cern.c2mon.cache.impl;
 
-import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.spi.C2monAlarmCacheQueryProvider;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import org.apache.ignite.IgniteCache;
+import org.apache.ignite.cache.query.ScanQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
@@ -15,11 +15,15 @@ public class IgniteC2monAlarmCacheQueryProvider implements C2monAlarmCacheQueryP
   private final IgniteCache<String, Long> lastAccessCache;
 
   @Autowired
-  private final C2monCache<Long, Alarm> alarmCacheRef;
+  private final IgniteCache<Long, Alarm> alarmCacheRef;
 
   @Override
   public List<AlarmCacheObject> getOscillatingAlarms() {
-    return alarmCacheRef;
+    return alarmCacheRef.query(new ScanQuery<Long, Alarm>(
+      (key, alarm) -> alarm.isOscillating()),
+      // TODO Verify we want this cast - are we using AlarmCacheObjects downstream?
+      longAlarmEntry -> (AlarmCacheObject) longAlarmEntry.getValue()
+    ).getAll();
   }
 
   @Override
