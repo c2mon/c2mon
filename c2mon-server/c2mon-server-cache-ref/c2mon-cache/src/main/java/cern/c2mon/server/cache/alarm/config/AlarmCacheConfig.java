@@ -1,40 +1,23 @@
 package cern.c2mon.server.cache.alarm.config;
 
+import cern.c2mon.server.cache.C2monCacheFactory;
+import cern.c2mon.server.cache.C2monCacheTyped;
+import cern.c2mon.server.cache.CacheName;
+import cern.c2mon.server.cache.alarm.C2monCacheConfig;
+import cern.c2mon.server.cache.loader.AlarmLoaderDAO;
+import cern.c2mon.server.common.alarm.Alarm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-
-import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.cache.api.factory.AbstractCacheFactory;
-import cern.c2mon.cache.api.loader.CacheLoader;
-import cern.c2mon.server.cache.CacheName;
-import cern.c2mon.server.cache.loader.AlarmLoaderDAO;
-import cern.c2mon.server.cache.loader.common.BatchCacheLoader;
-import cern.c2mon.server.cache.loader.config.CacheLoaderProperties;
-import cern.c2mon.server.common.alarm.Alarm;
 
 /**
  * @author Szymon Halastra
+ * @author Alexandros Papageorgiou Koufidis
  */
-@Configuration
-public class AlarmCacheConfig {
-
-  @Autowired
-  private ThreadPoolTaskExecutor cacheLoaderTaskExecutor;
-
-  @Autowired
-  private CacheLoaderProperties properties;
+public class AlarmCacheConfig extends C2monCacheConfig<Alarm> {
 
   @Bean(name = CacheName.Names.ALARM)
-  public C2monCache createCache(AbstractCacheFactory cachingFactory, AlarmLoaderDAO alarmLoaderDAORef) {
-    C2monCache cache = cachingFactory.createCache(CacheName.ALARM.getLabel(), Long.class, Alarm.class);
-
-    CacheLoader cacheLoader = new BatchCacheLoader<Long, Alarm>(cacheLoaderTaskExecutor, cache, alarmLoaderDAORef,
-            properties.getBatchSize(), "AlarmCacheLoader-");
-
-    cache.setCacheLoader(cacheLoader);
-
-    return cache;
+  @Autowired
+  public C2monCacheTyped<Alarm> createCache(AlarmLoaderDAO alarmLoaderDAORef) {
+    return super.createCache(alarmLoaderDAORef, CacheName.ALARM.getLabel(), Alarm.class, "AlarmCacheLoader-");
   }
 }

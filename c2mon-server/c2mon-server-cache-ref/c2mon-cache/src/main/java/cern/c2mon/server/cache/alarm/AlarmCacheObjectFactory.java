@@ -31,8 +31,8 @@ public class AlarmCacheObjectFactory extends AbstractCacheObjectFactory<Alarm> {
   }
 
   /**
-   * Create an AlarmCacheObject from a collection of named properties.
-   * The following properties are expected in the collection:
+   * Create an AlarmCacheObject from a collection of named properties. The
+   * following properties are expected in the collection:
    * <ul>
    * <li>id</li>
    * <li>dataTagId</li>
@@ -41,68 +41,78 @@ public class AlarmCacheObjectFactory extends AbstractCacheObjectFactory<Alarm> {
    * <li>faultCode</li>
    * <li>alarmCondition</li>
    * </ul>
-   * <p>
+   *
    * A ConfigurationException will be thrown if one of the parameters cannot be
    * decoded to the right format. Even if no exception is thrown, it is
    * advisable to call the validate() method on the newly created object, which
    * will perform further consistency checks.
-   * <p>
+   *
    * Please note that neither this constructor nor the validate method can
    * perform dependency checks. It is up to the user to ensure that the DataTag
    * to which the alarm is attached exists.
    *
-   * @param id         the id of the alarm object
-   * @param properties the properties containing the values for the alarm fields
-   *
+   * @param id
+   *          the id of the alarm object
    * @return the alarm object created
    */
   @Override
   public Alarm createCacheObject(Long id) {
-    AlarmCacheObject alarmCacheObject = new AlarmCacheObject(id);
+    AlarmCacheObject alarm = new AlarmCacheObject(id);
 
     // Initialise run-time parameters with default values
-//    alarmCacheObject.setState(AlarmCondition.TERMINATE);
-    alarmCacheObject.setTimestamp(new Timestamp(0));
-    alarmCacheObject.setInfo("");
+    alarm.setActive(false);
+    alarm.setInternalActive(false);
+    alarm.setTimestamp(new Timestamp(0));
+    alarm.setSourceTimestamp(new Timestamp(0));
+    alarm.setInfo("");
 
-    return alarmCacheObject;
+    return alarm;
   }
 
+  /**
+   * Given an alarm object, reset some of its fields according to the passed
+   * properties.
+   *
+   * @param alarmProperties
+   *          the properties object containing the fields
+   * @param alarm
+   *          the alarm object to modify (is modified by this method)
+   * @return always returns null, as no alarm change needs propagating to the
+   *         DAQ layer
+   * @throws ConfigurationException
+   *           if cannot configure the Alarm from the properties
+   */
   @Override
-  public Change configureCacheObject(Alarm alarm, Properties properties) {
+  public Change configureCacheObject(Alarm alarm, Properties alarmProperties) {
     AlarmCacheObject alarmCacheObject = (AlarmCacheObject) alarm;
     String tmpStr = null;
-    if ((tmpStr = properties.getProperty("dataTagId")) != null) {
-      alarmCacheObject.setDataTagId(parseLong(tmpStr, "dataTagId"));
+    if ((tmpStr = alarmProperties.getProperty("dataTagId")) != null) {
+      alarmCacheObject.setDataTagId(parseLong(tmpStr,"dataTagId"));
     }
-    if (properties.getProperty("faultFamily") != null) {
-      alarmCacheObject.setFaultFamily(properties.getProperty("faultFamily"));
+    if (alarmProperties.getProperty("faultFamily") != null) {
+      alarmCacheObject.setFaultFamily(alarmProperties.getProperty("faultFamily"));
     }
-    if (properties.getProperty("faultMember") != null) {
-      alarmCacheObject.setFaultMember(properties.getProperty("faultMember"));
-    }
-
-    if ((tmpStr = properties.getProperty("faultCode")) != null) {
-      alarmCacheObject.setFaultCode(parseInt(tmpStr, "faultCode"));
+    if (alarmProperties.getProperty("faultMember") != null) {
+      alarmCacheObject.setFaultMember(alarmProperties.getProperty("faultMember"));
     }
 
-    if ((tmpStr = properties.getProperty("alarmCondition")) != null) {
+    if ((tmpStr = alarmProperties.getProperty("faultCode")) != null) {
+      alarmCacheObject.setFaultCode(parseInt(tmpStr,"faultCode"));
+    }
+
+    if ((tmpStr = alarmProperties.getProperty("alarmCondition")) != null) {
       try {
         alarmCacheObject.setCondition(AlarmCondition.fromConfigXML(tmpStr));
-      }
-      catch (Exception e) {
+      } catch (Exception e) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
-                "Exception: Unable to create AlarmCondition object from parameter \"alarmCondition\": \n" + tmpStr);
+          "Exception: Unable to create AlarmCondition object from parameter \"alarmCondition\": \n" + tmpStr);
       }
     }
 
     // ALARM metadata
-    tmpStr = properties.getProperty("metadata");
-    if (tmpStr != null) {
-      Metadata metadata = new Metadata();
-      metadata.setMetadata(Metadata.fromJSON(tmpStr));
-      alarmCacheObject.setMetadata(metadata);
-    }
+    // TODO Refactor this
+//    cern.c2mon.server.common.metadata.Metadata newMetadata = MetadataUtils.parseMetadataConfiguration(alarmProperties, alarmCacheObject.getMetadata());
+//    alarmCacheObject.setMetadata(newMetadata);
 
     // set the JMS topic
     alarmCacheObject.setTopic(alarmService.getTopicForAlarm(alarmCacheObject));

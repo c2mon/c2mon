@@ -17,6 +17,7 @@
 package cern.c2mon.server.cache.alarm.oscillation;
 
 import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.server.cache.C2monCacheTyped;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.cache.api.spi.C2monAlarmCacheQueryProvider;
 import cern.c2mon.server.common.alarm.Alarm;
@@ -45,6 +46,9 @@ import java.util.TimerTask;
  * alive-interval/3 milliseconds have expired since the last alive message
  * arrived, where alive-interval is specific to the AliveTimer object (see
  * <code>hasExpired</code> in {@link AliveTimerFacade}).
+ *
+ * @author Alexandros Papageorgiou
+ * @author Brice Copy
  */
 @Service
 @Slf4j
@@ -81,7 +85,7 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
 
   private Timer timer;
 
-  private final C2monCache<Long, Alarm> alarmCacheRef;
+  private final C2monCacheTyped<Alarm> alarmCacheRef;
 
   private final C2monAlarmCacheQueryProvider alarmCacheQueryProvider;
 
@@ -89,7 +93,8 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
 
   private final AlarmCacheUpdater alarmCacheUpdater;
 
-  private final C2monCache<Long, DataTag> dataTagCacheRef;
+  // TODO Turn this on when ready
+  private final C2monCache<Long, DataTag> dataTagCacheRef = null;
 
   /**
    * Constructor.
@@ -106,22 +111,22 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
    *          the alarm cache updater.
    */
   @Autowired
-  public OscillationUpdateChecker(final C2monCache<Long,Alarm> alarmCacheRef, final C2monAlarmCacheQueryProvider alarmCacheQueryProvider,
-                                  final OscillationUpdater oscillationUpdater, final AlarmCacheUpdater alarmCacheUpdater,
-                                  final  C2monCache<Long, DataTag> dataTagCacheRef) {
+  public OscillationUpdateChecker(final C2monCacheTyped<Alarm> alarmCacheRef, final C2monAlarmCacheQueryProvider alarmCacheQueryProvider,
+                                  final OscillationUpdater oscillationUpdater, final AlarmCacheUpdater alarmCacheUpdater/*,
+                                  final  C2monCacheTyped<DataTag> dataTagCacheRef*/) {
     super();
     this.alarmCacheRef = alarmCacheRef;
     this.alarmCacheQueryProvider = alarmCacheQueryProvider;
     this.oscillationUpdater = oscillationUpdater;
     this.alarmCacheUpdater = alarmCacheUpdater;
-    this.dataTagCacheRef = dataTagCacheRef;
+//    this.dataTagCacheRef = dataTagCacheRef;
   }
 
 
   /**
    * Initializes the clustered values
    */
-  @PostConstruct
+//  @PostConstruct TODO find an alternative for these calls?
   public void init() {
     log.trace("Initialising Alarm oscillation checker ...");
     alarmCacheRef.executeTransaction( () -> {

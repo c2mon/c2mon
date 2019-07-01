@@ -1,6 +1,7 @@
 package cern.c2mon.cache.api.factory;
 
 import java.util.Properties;
+import java.util.function.Function;
 
 import cern.c2mon.shared.common.Cacheable;
 import cern.c2mon.shared.common.ConfigurationException;
@@ -66,32 +67,24 @@ public abstract class AbstractCacheObjectFactory<T extends Cacheable> {
   public abstract void validateConfig(T cacheable) throws ConfigurationException;
 
   protected Integer parseInt(String integerInString, String paramName) {
-    try {
-      return Integer.parseInt(integerInString);
-    }
-    catch (NumberFormatException e) {
-      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
-              "NumberFormatException: Unable to convert parameter \" " + paramName + " \" to int: " + integerInString);
-    }
+    return safeParse(Integer::parseInt, integerInString, paramName);
   }
 
   protected Short parseShort(String shortInString, String paramName) {
-    try {
-      return Short.parseShort(shortInString);
-    }
-    catch (NumberFormatException e) {
-      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
-              "NumberFormatException: Unable to convert parameter \"" + paramName + "\" to short: " + shortInString);
-    }
+    return safeParse(Short::parseShort, shortInString,paramName);
   }
 
   protected Long parseLong(String longInString, String paramName) {
+    return safeParse(Long::parseLong, longInString, paramName);
+  }
+
+  protected <V> V safeParse(Function<String,V> parser, String element, String paramName){
     try {
-      return Long.parseLong(longInString);
+      return parser.apply(element);
     }
     catch (NumberFormatException e) {
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
-              "NumberFormatException: Unable to convert parameter \"" + paramName + "\" to short: " + longInString);
+        "NumberFormatException: Unable to convert parameter \"" + paramName + "\" using " + parser.getClass() + " parser : " + element);
     }
   }
 

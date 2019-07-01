@@ -21,7 +21,7 @@ import java.util.Observer;
 /**
  * The AlarmAggregator bean listens for Tag updates,
  * evaluates all associated alarms and passes the result
- * to registered {@link AlarmAggregatorListener}s.
+ * to registered {@link Observer}s.
  *
  * <p>Standard usage involves wiring it into your class and
  * calling the registerForUpdates method to register your

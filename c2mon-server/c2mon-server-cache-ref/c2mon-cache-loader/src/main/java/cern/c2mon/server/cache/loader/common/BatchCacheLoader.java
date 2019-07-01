@@ -19,7 +19,7 @@ import cern.c2mon.shared.common.Cacheable;
  * @author Szymon Halastra
  */
 @Slf4j
-public class BatchCacheLoader<K extends Number, V extends Cacheable> implements CacheLoader {
+public class BatchCacheLoader<K extends Number, V extends Cacheable> implements CacheLoader<K,V> {
 
   /**
    * Executor for loading the cache using multiple threads.

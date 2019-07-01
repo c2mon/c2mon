@@ -1,19 +1,20 @@
 package cern.c2mon.cache.api.factory;
 
 import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.shared.common.Cacheable;
 
 /**
  * @author Szymon Halastra
  */
 public abstract class AbstractCacheFactory {
 
+  // Why two methods for the same thing? Is getCachingFactory a hook for sth?
   public AbstractCacheFactory getFactory() {
-    AbstractCacheFactory abstractFactory = getCachingFactory();
-
-    return abstractFactory;
+    return getCachingFactory();
   }
 
-  public abstract C2monCache createCache(String name, Class<?> keyType, Class<?> valueType);
+  public abstract <K, V extends Cacheable> C2monCache createCache(String name, Class<K> keyType, Class<V> valueType);
 
   public abstract AbstractCacheFactory getCachingFactory();
 }
+

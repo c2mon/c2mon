@@ -16,8 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.alarm.impl;
 
-import cern.c2mon.server.cache.AlarmCache;
-import cern.c2mon.server.cache.AlarmFacade;
+import cern.c2mon.server.cache.C2monCacheTyped;
 import cern.c2mon.server.cache.alarm.oscillation.OscillationUpdater;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
@@ -43,7 +42,7 @@ public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
 
   @Autowired
   @Setter(AccessLevel.PROTECTED)
-  private AlarmCache alarmCache;
+  private C2monCacheTyped<Alarm> alarmCache;
 
   @Autowired
   @Setter(AccessLevel.PROTECTED)
@@ -178,7 +177,7 @@ public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
         alarmCacheObject.setActive(true);
     }
     if (wasAlreadyOscillating) {
-        alarmCache.putQuiet(alarmCacheObject);
+        alarmCache.putQuiet(alarmCacheObject.getId(), alarmCacheObject);
     } else {
         alarmCache.put(alarmCacheObject.getId(), alarmCacheObject);
     }

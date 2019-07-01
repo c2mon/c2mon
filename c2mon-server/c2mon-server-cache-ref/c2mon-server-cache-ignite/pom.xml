@@ -23,6 +23,10 @@
       <artifactId>c2mon-cache-api</artifactId>
     </dependency>
     <dependency>
+      <groupId>cern.c2mon.server</groupId>
+      <artifactId>c2mon-cache</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.apache.ignite</groupId>
       <artifactId>ignite-core</artifactId>
       <version>${ignite.version}</version>
@@ -47,6 +51,23 @@
       <groupId>org.apache.ignite</groupId>
       <artifactId>ignite-slf4j</artifactId>
       <version>${ignite.version}</version>
+    </dependency>
+
+    <!-- Test dependencies -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymock</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

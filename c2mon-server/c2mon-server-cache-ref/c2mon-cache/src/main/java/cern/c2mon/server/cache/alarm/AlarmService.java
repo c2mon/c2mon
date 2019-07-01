@@ -1,6 +1,7 @@
 package cern.c2mon.server.cache.alarm;
 
-import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
+import cern.c2mon.cache.api.listener.CacheSupervisionListener;
+import cern.c2mon.server.cache.C2monCacheTyped;
 import cern.c2mon.server.common.alarm.AlarmCacheUpdater;
 import cern.c2mon.server.common.alarm.TagWithAlarms;
 import cern.c2mon.server.common.alarm.TagWithAlarmsImpl;
@@ -11,31 +12,32 @@ import org.springframework.stereotype.Service;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.tag.Tag;
-import cern.c2mon.shared.common.datatag.DataTagConstants;
 
 import java.util.*;
 
 /**
  * @author Szymon Halastra
+ * @author Alexandros Papageorgiou
+ * @author Brice Copy
  */
 //TODO: change name for more proper
 
 @Slf4j
 @Service
-public class AlarmService implements AlarmAggregator {
+public class AlarmService implements AlarmAggregator, CacheSupervisionListener<Tag> {
 
-  private C2monCache<Long, Alarm> alarmCacheRef;
+  private C2monCacheTyped<Alarm> alarmCacheRef;
 
   private C2monCache<Long, Tag> tagCacheRef;
 
-  private Observable alarmUpdateObservable;
+  private Observable alarmUpdateObservable = new Observable();
 
   private AlarmCacheUpdater alarmCacheUpdater;
 
   @Autowired
-  public AlarmService(final C2monCache<Long, Alarm> alarmCacheRef, final C2monCache<Long, Tag> tagCacheRef, final AlarmCacheUpdater alarmCacheUpdater) {
+  public AlarmService(final C2monCacheTyped<Alarm> alarmCacheRef, /*final C2monCache<Long, Tag> tagCacheRef,*/ final AlarmCacheUpdater alarmCacheUpdater) {
     this.alarmCacheRef = alarmCacheRef;
-    this.tagCacheRef = tagCacheRef;
+//    this.tagCacheRef = tagCacheRef;
     this.alarmCacheUpdater = alarmCacheUpdater;
   }
 
@@ -59,7 +61,12 @@ public class AlarmService implements AlarmAggregator {
     List<Alarm> linkedAlarms = new ArrayList<>();
     alarmCacheRef.executeTransaction( () -> {
       for (Long alarmId : tag.getAlarmIds()) {
-        linkedAlarms.add(update(alarmId, tag));
+        try {
+          linkedAlarms.add(update(alarmId, tag));
+        }
+        catch (Exception e) {
+          log.error("Exception caught when attempting to evaluate alarm ID " + alarmId + "  for tag " + tag.getId() + " - publishing to the client with no attached alarms.", e);
+        }
       }
       return null;
     });
@@ -111,6 +118,13 @@ public class AlarmService implements AlarmAggregator {
   @Override
   public void registerForTagUpdates(Observer aggregatorObserver) {
     alarmUpdateObservable.addObserver(aggregatorObserver);
+  }
+
+  @Override
+  public void onSupervisionChange(Tag tag) {
+    log.trace("Evaluating alarm for tag " + tag.getId() + " due to supervision status notification.");
+
+    evaluateAlarms(tag);
   }
 
   //TODO: move and modify code from AbstractTagFacade connected with Alarms
