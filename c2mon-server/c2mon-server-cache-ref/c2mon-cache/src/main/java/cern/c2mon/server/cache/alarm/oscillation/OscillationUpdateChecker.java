@@ -16,8 +16,8 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.alarm.oscillation;
 
+import cern.c2mon.cache.api.AbstractCache;
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.server.cache.C2monCacheTyped;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.cache.api.spi.C2monAlarmCacheQueryProvider;
 import cern.c2mon.server.common.alarm.Alarm;
@@ -31,7 +31,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.util.Date;
 import java.util.List;
 import java.util.Timer;
@@ -85,7 +84,7 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
 
   private Timer timer;
 
-  private final C2monCacheTyped<Alarm> alarmCacheRef;
+  private final C2monCache<Alarm> alarmCacheRef;
 
   private final C2monAlarmCacheQueryProvider alarmCacheQueryProvider;
 
@@ -94,7 +93,7 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
   private final AlarmCacheUpdater alarmCacheUpdater;
 
   // TODO Turn this on when ready
-  private final C2monCache<Long, DataTag> dataTagCacheRef = null;
+  private final AbstractCache<Long, DataTag> dataTagCacheRef = null;
 
   /**
    * Constructor.
@@ -111,7 +110,7 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
    *          the alarm cache updater.
    */
   @Autowired
-  public OscillationUpdateChecker(final C2monCacheTyped<Alarm> alarmCacheRef, final C2monAlarmCacheQueryProvider alarmCacheQueryProvider,
+  public OscillationUpdateChecker(final C2monCache<Alarm> alarmCacheRef, final C2monAlarmCacheQueryProvider alarmCacheQueryProvider,
                                   final OscillationUpdater oscillationUpdater, final AlarmCacheUpdater alarmCacheUpdater/*,
                                   final  C2monCacheTyped<DataTag> dataTagCacheRef*/) {
     super();

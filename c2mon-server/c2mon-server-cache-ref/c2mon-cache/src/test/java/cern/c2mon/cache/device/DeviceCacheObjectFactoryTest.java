@@ -7,7 +7,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.AbstractCache;
 import cern.c2mon.server.common.device.*;
 
 /**
@@ -15,11 +15,11 @@ import cern.c2mon.server.common.device.*;
  */
 public class DeviceCacheObjectFactoryTest {
 
-  private C2monCache<Long, DeviceClass> deviceClassCache;
+  private AbstractCache<Long, DeviceClass> deviceClassCache;
 
   @Before
   public void init() {
-    deviceClassCache = EasyMock.createNiceMock(C2monCache.class);
+    deviceClassCache = EasyMock.createNiceMock(AbstractCache.class);
   }
 
   @Test

@@ -5,7 +5,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.AbstractCache;
 import cern.c2mon.cache.api.impl.SimpleC2monCache;
 import cern.c2mon.server.cache.alivetimer.AliveTimerGenerator;
 import cern.c2mon.server.common.alive.AliveTimer;
@@ -28,7 +28,7 @@ public class AliveTimerGeneratorTest {
 
   private static final int ALIVE_INTERVAL = 1000;
 
-  private C2monCache<Long, AliveTimer> aliveTimerCache;
+  private AbstractCache<Long, AliveTimer> aliveTimerCache;
   private AliveTimerGenerator generator;
 
   @Before

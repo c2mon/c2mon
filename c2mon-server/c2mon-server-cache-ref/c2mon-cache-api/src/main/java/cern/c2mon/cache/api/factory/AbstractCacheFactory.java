@@ -1,6 +1,6 @@
 package cern.c2mon.cache.api.factory;
 
-import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.AbstractCache;
 import cern.c2mon.shared.common.Cacheable;
 
 /**
@@ -13,7 +13,7 @@ public abstract class AbstractCacheFactory {
     return getCachingFactory();
   }
 
-  public abstract <K, V extends Cacheable> C2monCache createCache(String name, Class<K> keyType, Class<V> valueType);
+  public abstract <K, V extends Cacheable> AbstractCache createCache(String name, Class<K> keyType, Class<V> valueType);
 
   public abstract AbstractCacheFactory getCachingFactory();
 }

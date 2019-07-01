@@ -7,9 +7,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class C2monCacheLoader<K, V extends Cacheable> {
 
-  private C2monCache<K, V> cache;
+  private AbstractCache<K, V> cache;
 
-  public C2monCacheLoader(C2monCache<K, V> cache) {
+  public C2monCacheLoader(AbstractCache<K, V> cache) {
     this.cache = cache;
   }
 

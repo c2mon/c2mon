@@ -1,7 +1,7 @@
 package cern.c2mon.cache.impl;
 
 import cern.c2mon.cache.api.spi.C2monAlarmCacheQueryProvider;
-import cern.c2mon.server.cache.C2monCacheTyped;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import org.apache.ignite.IgniteCache;
@@ -22,10 +22,10 @@ public class IgniteC2monAlarmCacheQueryProvider implements C2monAlarmCacheQueryP
   // TODO enable this
   private final IgniteCache<String, Long> lastAccessCache = null;
 
-  private final C2monCacheTyped<Alarm> alarmCacheRef;
+  private final C2monCache<Alarm> alarmCacheRef;
 
   @Autowired
-  public IgniteC2monAlarmCacheQueryProvider(/*final IgniteCache<String, Long> lastAccessCache,*/ final C2monCacheTyped<Alarm> alarmCacheRef) {
+  public IgniteC2monAlarmCacheQueryProvider(/*final IgniteCache<String, Long> lastAccessCache,*/ final C2monCache<Alarm> alarmCacheRef) {
 //    this.lastAccessCache = lastAccessCache;
     this.alarmCacheRef = alarmCacheRef;
   }

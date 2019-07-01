@@ -26,7 +26,7 @@ public class SimpleCacheTest {
 
   @Test
   public void getAllEntriesByProvidedKeySet() {
-    C2monCache<Long, DataTag> c2monCache = new SimpleC2monCache<>("simple-c2monCache");
+    AbstractCache<Long, DataTag> c2monCache = new SimpleC2monCache<>("simple-c2monCache");
     assertNotNull("C2monCache should be not null", c2monCache);
 
     Map<Long, DataTag> map = new HashMap<>();

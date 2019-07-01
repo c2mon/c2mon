@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 import lombok.extern.slf4j.Slf4j;
 
-import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.AbstractCache;
 import cern.c2mon.cache.api.loader.CacheLoader;
 import cern.c2mon.server.cache.loader.CacheLoaderDAO;
 import cern.c2mon.shared.common.Cacheable;
@@ -47,7 +47,7 @@ public class SimpleCacheLoader<T extends Cacheable> implements CacheLoader {
    */
   private Map<Long, T> preloadBuffer = new ConcurrentHashMap<>();
 
-  private final C2monCache c2monCache;
+  private final AbstractCache c2monCache;
 
   private final CacheLoaderDAO<T> cacheLoaderDAO;
 
@@ -60,7 +60,7 @@ public class SimpleCacheLoader<T extends Cacheable> implements CacheLoader {
    * @param executor
    * @param threadNamePrefix
    */
-  public SimpleCacheLoader(C2monCache c2monCache, CacheLoaderDAO<T> cacheLoaderDAO) {
+  public SimpleCacheLoader(AbstractCache c2monCache, CacheLoaderDAO<T> cacheLoaderDAO) {
     this.c2monCache = c2monCache;
     this.cacheLoaderDAO = cacheLoaderDAO;
   }

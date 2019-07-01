@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.AbstractCache;
 import cern.c2mon.server.common.device.DeviceClass;
 
 /**
@@ -15,7 +15,7 @@ import cern.c2mon.server.common.device.DeviceClass;
 @Service
 public class DeviceClassService {
 
-  private C2monCache<Long, DeviceClass> deviceClassCacheRef;
+  private AbstractCache<Long, DeviceClass> deviceClassCacheRef;
 
 //  @Autowired
 //  public DeviceClassService(C2monCache<Long, DeviceClass> deviceClassCacheRef) {

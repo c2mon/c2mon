@@ -3,7 +3,7 @@ package cern.c2mon.server.cache.equipment;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.AbstractCache;
 import cern.c2mon.cache.api.DbLoadable;
 import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.control.ControlTagCacheObject;
@@ -17,9 +17,9 @@ import cern.c2mon.shared.common.ConfigurationException;
 @Component
 public class EquipmentLoadable implements DbLoadable<Equipment> {
 
-  private C2monCache<Long, Equipment> equipmentCacheRef;
+  private AbstractCache<Long, Equipment> equipmentCacheRef;
 
-  private C2monCache<Long, ControlTag> controlTagCacheRef;
+  private AbstractCache<Long, ControlTag> controlTagCacheRef;
 
 //  @Autowired
 //  public EquipmentLoadable(C2monCache<Long, Equipment> equipmentCacheRef, C2monCache<Long, ControlTag> controlTagCacheRef) {

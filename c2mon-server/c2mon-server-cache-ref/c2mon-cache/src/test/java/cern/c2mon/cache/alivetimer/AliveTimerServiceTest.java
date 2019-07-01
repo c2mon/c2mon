@@ -8,7 +8,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.AbstractCache;
 import cern.c2mon.cache.api.impl.SimpleC2monCache;
 import cern.c2mon.server.cache.alivetimer.AliveTimerService;
 import cern.c2mon.server.common.alive.AliveTimer;
@@ -22,7 +22,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class AliveTimerServiceTest {
 
-  private C2monCache<Long, AliveTimer> aliveTimerCacheRef;
+  private AbstractCache<Long, AliveTimer> aliveTimerCacheRef;
 
   private AliveTimerService aliveTimerService;
 

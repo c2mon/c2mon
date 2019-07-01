@@ -1,11 +1,10 @@
 package cern.c2mon.cache.impl;
 
-import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.listener.Listener;
 import cern.c2mon.cache.api.listener.ListenerService;
 import cern.c2mon.cache.api.loader.CacheLoader;
 import cern.c2mon.cache.api.transactions.TransactionalCallable;
-import cern.c2mon.server.cache.C2monCacheTyped;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.shared.common.Cacheable;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,7 +21,6 @@ import org.apache.ignite.transactions.TransactionDeadlockException;
 import org.apache.ignite.transactions.TransactionTimeoutException;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.annotation.PostConstruct;
 import javax.cache.CacheException;
 import javax.cache.CacheManager;
 import javax.cache.configuration.CacheEntryListenerConfiguration;
@@ -37,7 +35,7 @@ import java.util.*;
  * @author Szymon Halastra
  */
 @Slf4j
-public class IgniteC2monCache<V extends Cacheable> implements C2monCacheTyped<V> {
+public class IgniteC2monCache<V extends Cacheable> implements C2monCache<V> {
 
   private final String cacheName;
 

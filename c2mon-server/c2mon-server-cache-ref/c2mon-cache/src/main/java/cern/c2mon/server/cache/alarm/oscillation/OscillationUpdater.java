@@ -16,9 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.alarm.oscillation;
 
-import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.alarm.OscillationProperties;
-import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;

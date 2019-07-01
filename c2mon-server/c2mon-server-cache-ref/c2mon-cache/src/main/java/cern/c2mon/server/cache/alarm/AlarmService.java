@@ -1,7 +1,7 @@
 package cern.c2mon.server.cache.alarm;
 
 import cern.c2mon.cache.api.listener.CacheSupervisionListener;
-import cern.c2mon.server.cache.C2monCacheTyped;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.alarm.AlarmCacheUpdater;
 import cern.c2mon.server.common.alarm.TagWithAlarms;
 import cern.c2mon.server.common.alarm.TagWithAlarmsImpl;
@@ -9,7 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.AbstractCache;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.tag.Tag;
 
@@ -26,16 +26,16 @@ import java.util.*;
 @Service
 public class AlarmService implements AlarmAggregator, CacheSupervisionListener<Tag> {
 
-  private C2monCacheTyped<Alarm> alarmCacheRef;
+  private C2monCache<Alarm> alarmCacheRef;
 
-  private C2monCache<Long, Tag> tagCacheRef;
+  private AbstractCache<Long, Tag> tagCacheRef;
 
   private Observable alarmUpdateObservable = new Observable();
 
   private AlarmCacheUpdater alarmCacheUpdater;
 
   @Autowired
-  public AlarmService(final C2monCacheTyped<Alarm> alarmCacheRef, /*final C2monCache<Long, Tag> tagCacheRef,*/ final AlarmCacheUpdater alarmCacheUpdater) {
+  public AlarmService(final C2monCache<Alarm> alarmCacheRef, /*final C2monCache<Long, Tag> tagCacheRef,*/ final AlarmCacheUpdater alarmCacheUpdater) {
     this.alarmCacheRef = alarmCacheRef;
 //    this.tagCacheRef = tagCacheRef;
     this.alarmCacheUpdater = alarmCacheUpdater;

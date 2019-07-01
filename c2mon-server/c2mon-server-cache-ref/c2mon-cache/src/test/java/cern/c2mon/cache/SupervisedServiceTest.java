@@ -7,7 +7,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.AbstractCache;
 import cern.c2mon.cache.api.service.SupervisedService;
 import cern.c2mon.server.cache.SupervisedServiceImpl;
 import cern.c2mon.server.cache.alivetimer.AliveTimerService;
@@ -28,14 +28,14 @@ import static org.junit.Assert.*;
  */
 public class SupervisedServiceTest {
 
-  private C2monCache c2monCache;
+  private AbstractCache c2monCache;
   private AliveTimerService aliveTimerService;
 
   private SupervisedService<Supervised> supervisedService;
 
   @Before
   public void init() {
-    c2monCache = EasyMock.createNiceMock(C2monCache.class);
+    c2monCache = EasyMock.createNiceMock(AbstractCache.class);
     aliveTimerService = EasyMock.createNiceMock(AliveTimerService.class);
 
     supervisedService = new SupervisedServiceImpl<>(c2monCache, aliveTimerService);

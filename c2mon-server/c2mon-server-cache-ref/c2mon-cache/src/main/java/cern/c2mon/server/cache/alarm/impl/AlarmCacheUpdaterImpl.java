@@ -16,7 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.alarm.impl;
 
-import cern.c2mon.server.cache.C2monCacheTyped;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.alarm.oscillation.OscillationUpdater;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
@@ -42,7 +42,7 @@ public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
 
   @Autowired
   @Setter(AccessLevel.PROTECTED)
-  private C2monCacheTyped<Alarm> alarmCache;
+  private C2monCache<Alarm> alarmCache;
 
   @Autowired
   @Setter(AccessLevel.PROTECTED)

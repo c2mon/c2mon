@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.AbstractCache;
 import cern.c2mon.cache.api.service.AbstractEquipmentService;
 import cern.c2mon.server.cache.commfault.CommFaultService;
 import cern.c2mon.server.common.commfault.CommFaultTag;
@@ -15,11 +15,11 @@ import cern.c2mon.server.common.equipment.AbstractEquipment;
  */
 public class CoreAbstractEquipmentService<T extends AbstractEquipment> implements AbstractEquipmentService {
 
-  private C2monCache<Long, T> c2monCache;
+  private AbstractCache<Long, T> c2monCache;
 
-  private C2monCache<Long, CommFaultTag> commFaultTagCache;
+  private AbstractCache<Long, CommFaultTag> commFaultTagCache;
 
-  public CoreAbstractEquipmentService(C2monCache<Long, T> c2monCache, CommFaultService commFaultService) {
+  public CoreAbstractEquipmentService(AbstractCache<Long, T> c2monCache, CommFaultService commFaultService) {
     this.c2monCache = c2monCache;
     this.commFaultTagCache = commFaultService.getCache();
   }

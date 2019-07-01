@@ -3,7 +3,7 @@ package cern.c2mon.server.cache.rule;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.AbstractCache;
 import cern.c2mon.server.common.tag.AbstractTagCacheObject;
 import cern.c2mon.server.common.tag.Tag;
 
@@ -15,7 +15,7 @@ import cern.c2mon.server.common.tag.Tag;
 @Service
 public class RuleDependencyService {
 
-  private C2monCache<Long, Tag> tagCacheRef;
+  private AbstractCache<Long, Tag> tagCacheRef;
 
 //  @Autowired
 //  public RuleDependencyService(final C2monCache<Long, Tag> tagCacheRef) {

@@ -1,6 +1,6 @@
 package cern.c2mon.cache.impl;
 
-import cern.c2mon.server.cache.C2monCacheTyped;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.impl.configuration.C2monIgniteConfiguration;
 import cern.c2mon.server.cache.CacheModuleRef;
 import cern.c2mon.server.cache.alarm.config.AlarmCacheConfig;
@@ -26,7 +26,7 @@ import static org.junit.Assert.assertNotEquals;
 public class AutoWireTest {
 
   @Autowired
-  private C2monCacheTyped<Alarm> alarmCacheRef;
+  private C2monCache<Alarm> alarmCacheRef;
 
   @Test
   public void simpleWire() {
