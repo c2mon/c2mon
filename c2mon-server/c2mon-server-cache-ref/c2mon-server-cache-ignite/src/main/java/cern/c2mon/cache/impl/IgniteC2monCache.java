@@ -34,39 +34,17 @@ import java.util.*;
 /**
  * @author Szymon Halastra
  */
-@Slf4j
-public class IgniteC2monCache<V extends Cacheable> implements C2monCache<V> {
+public class IgniteC2monCache<V extends Cacheable> extends IgniteC2monCacheBase<Long,V> implements C2monCache<V> {
 
-  private final String cacheName;
-
-  @Autowired
-  private IgniteSpringBean C2monIgnite;
-
-  @Getter
-  @Setter
-  private CacheLoader<Long, V> cacheLoader;
-
-  private IgniteCache<Long, V> cache;
-  private CacheConfiguration<Long, V> cacheCfg;
   private Listener<V> listenerService;
 
-  protected IgniteC2monCache(String cacheName) {
+  public IgniteC2monCache(String cacheName) {
     this(cacheName, new DefaultIgniteCacheConfiguration<>(cacheName));
   }
 
-  public IgniteC2monCache(String cacheName, CacheConfiguration<Long, V> cacheCfg) {
-    this.cacheName = cacheName;
-    this.cacheCfg = cacheCfg;
+  public IgniteC2monCache(String cacheName, CacheConfiguration<Long, V> cacheConfiguration) {
+    super(cacheName, cacheConfiguration);
     this.listenerService = new ListenerService<>();
-  }
-
-  public void init() {
-    cache = C2monIgnite.getOrCreateCache(cacheName);
-    C2monIgnite.addCacheConfiguration(cacheCfg);
-
-    if (cacheLoader != null) {
-      cacheLoader.preload();
-    }
   }
 
   public <T, R> QueryCursor<R> query(Query<T> query, IgniteClosure<T, R> closure){
@@ -78,178 +56,6 @@ public class IgniteC2monCache<V extends Cacheable> implements C2monCache<V> {
     return listenerService;
   }
 
-  @Override
-  public V get(Long key) throws IllegalArgumentException {
-    if (key instanceof Number) {
-      return cache.get(key);
-    } else {
-      throw new IllegalArgumentException();
-    }
-  }
-
-  @Override
-  public boolean containsKey(Long key) {
-    return cache.containsKey(key);
-  }
-
-  @Override
-  public void put(Long key, V value) {
-    cache.put(key, value);
-  }
-
-  @Override
-  public boolean remove(Long key) {
-    return cache.remove(key);
-  }
-
-  @Override
-  public Set<Long> getKeys() {
-    Set<Long> keys = new TreeSet<>();
-    cache.query(new ScanQuery<>(null)).forEach(objectObjectEntry -> keys.add((Long) objectObjectEntry.getKey()));
-
-    return keys;
-  }
-
-  @Override
-  public void putAll(Map<? extends Long, ? extends V> map) {
-    cache.putAll(map);
-  }
-
-  @Override
-  public Map<Long, V> getAll(Set<? extends Long> keys) {
-    return cache.getAll(keys);
-  }
-
-  @Override
-  public <T> T invoke(Long var1, EntryProcessor<Long, V, T> var2, Object... var3) throws EntryProcessorException {
-    return cache.invoke(var1, var2, var3);
-  }
-
-  @Override
-  public <T> Map<Long, EntryProcessorResult<T>> invokeAll(Set<? extends Long> var1, EntryProcessor<Long, V, T> var2, Object... var3) {
-    return cache.invokeAll(var1, var2, var3);
-  }
-
-  @Override
-  public <S> Optional<S> executeTransaction(TransactionalCallable<S> callable) {
-    try (Transaction tx = C2monIgnite.transactions().txStart()) {
-
-      S returnValue = callable.call();
-
-      tx.commit();
-
-      return Optional.of(returnValue);
-    } catch (CacheException e) {
-      if (e.getCause() instanceof TransactionTimeoutException &&
-        e.getCause().getCause() instanceof TransactionDeadlockException) {
-        log.error("DeadLock occurred", e.getCause().getCause().getMessage());
-      }
-    }
-
-    return Optional.empty();
-  }
-
 
   // --- Unused methods ---
-
-
-  @Override
-  public void loadAll(Set<? extends Long> set, boolean b, CompletionListener completionListener) {
-
-  }
-
-  @Override
-  public V getAndPut(Long k, V v) {
-    return null;
-  }
-
-  @Override
-  public boolean putIfAbsent(Long k, V v) {
-    return false;
-  }
-
-  @Override
-  public boolean remove(Long k, V v) {
-    return false;
-  }
-
-  @Override
-  public V getAndRemove(Long k) {
-    return null;
-  }
-
-  @Override
-  public boolean replace(Long k, V v, V v1) {
-    return false;
-  }
-
-  @Override
-  public boolean replace(Long k, V v) {
-    return false;
-  }
-
-  @Override
-  public V getAndReplace(Long k, V v) {
-    return null;
-  }
-
-  @Override
-  public void removeAll(Set<? extends Long> set) {
-
-  }
-
-  @Override
-  public void removeAll() {
-
-  }
-
-  @Override
-  public void clear() {
-
-  }
-
-  @Override
-  public <C extends Configuration<Long, V>> C getConfiguration(Class<C> aClass) {
-    return null;
-  }
-
-  @Override
-  public String getName() {
-    return null;
-  }
-
-  @Override
-  public CacheManager getCacheManager() {
-    return null;
-  }
-
-  @Override
-  public void close() {
-
-  }
-
-  @Override
-  public boolean isClosed() {
-    return false;
-  }
-
-  @Override
-  public <T> T unwrap(Class<T> aClass) {
-    return null;
-  }
-
-  @Override
-  public void registerCacheEntryListener(CacheEntryListenerConfiguration<Long, V> cacheEntryListenerConfiguration) {
-
-  }
-
-  @Override
-  public void deregisterCacheEntryListener(CacheEntryListenerConfiguration<Long, V> cacheEntryListenerConfiguration) {
-
-  }
-
-  @Override
-  public Iterator<Entry<Long, V>> iterator() {
-    return null;
-  }
 }
