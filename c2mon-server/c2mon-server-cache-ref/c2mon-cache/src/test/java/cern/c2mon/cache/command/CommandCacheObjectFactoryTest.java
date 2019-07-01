@@ -7,7 +7,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import cern.c2mon.cache.api.AbstractCache;
+import cern.c2mon.cache.api.C2monCacheBase;
 import cern.c2mon.server.cache.command.CommandCacheObjectFactory;
 import cern.c2mon.server.common.command.CommandTagCacheObject;
 import cern.c2mon.server.common.equipment.Equipment;
@@ -22,13 +22,13 @@ import static org.junit.Assert.fail;
  */
 public class CommandCacheObjectFactoryTest {
 
-  private AbstractCache<Long, Equipment> equipmentCache;
+  private C2monCacheBase<Long, Equipment> equipmentCache;
 
   private CommandCacheObjectFactory factory;
 
   @Before
   public void init() {
-    equipmentCache = EasyMock.createNiceMock(AbstractCache.class);
+    equipmentCache = EasyMock.createNiceMock(C2monCacheBase.class);
 
 //    factory = new CommandCacheObjectFactory(equipmentCache);
   }

@@ -51,7 +51,7 @@ public class IgniteC2monCache<V extends Cacheable> implements C2monCache<V> {
   private Listener<V> listenerService;
 
   protected IgniteC2monCache(String cacheName) {
-    this(cacheName, new DefaultIgniteC2monCacheConfiguration<>(cacheName));
+    this(cacheName, new DefaultIgniteCacheConfiguration<>(cacheName));
   }
 
   public IgniteC2monCache(String cacheName, CacheConfiguration<Long, V> cacheCfg) {

@@ -8,7 +8,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import cern.c2mon.cache.AbstractCacheLoaderTest;
-import cern.c2mon.cache.api.AbstractCache;
+import cern.c2mon.cache.api.C2monCacheBase;
 import cern.c2mon.server.cache.dbaccess.DeviceMapper;
 import cern.c2mon.server.common.device.Device;
 import cern.c2mon.shared.client.device.DeviceProperty;
@@ -22,7 +22,7 @@ import static org.junit.Assert.*;
 public class DeviceCacheLoaderTest extends AbstractCacheLoaderTest {
 
   @Autowired
-  private AbstractCache<Long, Device> deviceCacheRef;
+  private C2monCacheBase<Long, Device> deviceCacheRef;
 
   @Autowired
   private DeviceMapper deviceMapper;

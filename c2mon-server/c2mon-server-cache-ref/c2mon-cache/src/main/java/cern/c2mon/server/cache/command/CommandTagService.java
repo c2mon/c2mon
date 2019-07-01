@@ -3,7 +3,7 @@ package cern.c2mon.server.cache.command;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.cache.api.AbstractCache;
+import cern.c2mon.cache.api.C2monCacheBase;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.shared.common.command.CommandTag;
 import cern.c2mon.shared.common.command.SourceCommandTag;
@@ -15,7 +15,7 @@ import cern.c2mon.shared.common.command.SourceCommandTag;
 @Service
 public class CommandTagService {
 
-  private AbstractCache<Long, CommandTag> commandTagCacheRef;
+  private C2monCacheBase<Long, CommandTag> commandTagCacheRef;
 
 //  @Autowired
 //  public CommandTagService(C2monCache<Long, CommandTag> commandTagCacheRef) {

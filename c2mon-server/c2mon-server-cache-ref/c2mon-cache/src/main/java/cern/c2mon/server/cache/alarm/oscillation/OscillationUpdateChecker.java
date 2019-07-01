@@ -16,7 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.alarm.oscillation;
 
-import cern.c2mon.cache.api.AbstractCache;
+import cern.c2mon.cache.api.C2monCacheBase;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.cache.api.spi.C2monAlarmCacheQueryProvider;
@@ -93,7 +93,7 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
   private final AlarmCacheUpdater alarmCacheUpdater;
 
   // TODO Turn this on when ready
-  private final AbstractCache<Long, DataTag> dataTagCacheRef = null;
+  private final C2monCacheBase<Long, DataTag> dataTagCacheRef = null;
 
   /**
    * Constructor.

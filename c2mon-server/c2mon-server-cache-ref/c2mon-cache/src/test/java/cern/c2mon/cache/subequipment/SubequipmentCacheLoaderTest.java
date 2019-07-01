@@ -8,7 +8,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import cern.c2mon.cache.AbstractCacheLoaderTest;
-import cern.c2mon.cache.api.AbstractCache;
+import cern.c2mon.cache.api.C2monCacheBase;
 import cern.c2mon.server.cache.dbaccess.SubEquipmentMapper;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
@@ -21,7 +21,7 @@ import static org.junit.Assert.*;
 public class SubequipmentCacheLoaderTest extends AbstractCacheLoaderTest {
 
   @Autowired
-  private AbstractCache<Long, SubEquipment> subEquipmentCacheRef;
+  private C2monCacheBase<Long, SubEquipment> subEquipmentCacheRef;
 
   @Autowired
   private SubEquipmentMapper subEquipmentMapper;

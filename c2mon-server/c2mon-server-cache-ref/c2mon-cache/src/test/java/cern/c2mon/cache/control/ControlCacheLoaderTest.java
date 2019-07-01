@@ -10,7 +10,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import cern.c2mon.cache.AbstractCacheLoaderTest;
-import cern.c2mon.cache.api.AbstractCache;
+import cern.c2mon.cache.api.C2monCacheBase;
 import cern.c2mon.server.cache.dbaccess.ControlTagMapper;
 import cern.c2mon.server.common.control.ControlTag;
 
@@ -22,7 +22,7 @@ import static org.junit.Assert.*;
 public class ControlCacheLoaderTest extends AbstractCacheLoaderTest {
 
   @Autowired
-  private AbstractCache<Long, ControlTag> controlTagCacheRef;
+  private C2monCacheBase<Long, ControlTag> controlTagCacheRef;
 
   @Autowired
   private ControlTagMapper controlTagMapper;

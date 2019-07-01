@@ -9,7 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.cache.api.AbstractCache;
+import cern.c2mon.cache.api.C2monCacheBase;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.tag.Tag;
 
@@ -28,7 +28,7 @@ public class AlarmService implements AlarmAggregator, CacheSupervisionListener<T
 
   private C2monCache<Alarm> alarmCacheRef;
 
-  private AbstractCache<Long, Tag> tagCacheRef;
+  private C2monCacheBase<Long, Tag> tagCacheRef;
 
   private Observable alarmUpdateObservable = new Observable();
 

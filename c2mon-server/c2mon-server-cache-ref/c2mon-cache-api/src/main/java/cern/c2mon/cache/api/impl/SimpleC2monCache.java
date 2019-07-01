@@ -12,7 +12,7 @@ import javax.cache.processor.EntryProcessor;
 import javax.cache.processor.EntryProcessorException;
 import javax.cache.processor.EntryProcessorResult;
 
-import cern.c2mon.cache.api.AbstractCache;
+import cern.c2mon.cache.api.C2monCacheBase;
 import cern.c2mon.cache.api.listener.Listener;
 import cern.c2mon.cache.api.loader.CacheLoader;
 import cern.c2mon.cache.api.transactions.TransactionalCallable;
@@ -23,7 +23,7 @@ import cern.c2mon.shared.common.Cacheable;
  *
  * @author Szymon Halastra
  */
-public class SimpleC2monCache<V extends Cacheable> implements AbstractCache<Long, V> {
+public class SimpleC2monCache<V extends Cacheable> implements C2monCacheBase<Long, V> {
 
   private final ConcurrentMap<Long, V> cache;
 

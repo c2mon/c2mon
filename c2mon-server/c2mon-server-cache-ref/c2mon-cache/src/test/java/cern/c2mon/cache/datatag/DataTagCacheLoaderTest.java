@@ -8,7 +8,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import cern.c2mon.cache.AbstractCacheLoaderTest;
-import cern.c2mon.cache.api.AbstractCache;
+import cern.c2mon.cache.api.C2monCacheBase;
 import cern.c2mon.server.cache.dbaccess.DataTagMapper;
 import cern.c2mon.server.common.datatag.DataTag;
 
@@ -20,7 +20,7 @@ import static org.junit.Assert.*;
 public class DataTagCacheLoaderTest extends AbstractCacheLoaderTest {
 
   @Autowired
-  private AbstractCache<Long, DataTag> dataTagCacheRef;
+  private C2monCacheBase<Long, DataTag> dataTagCacheRef;
 
   @Autowired
   private DataTagMapper dataTagMapper;

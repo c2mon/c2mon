@@ -6,7 +6,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import cern.c2mon.cache.api.AbstractCache;
+import cern.c2mon.cache.api.C2monCacheBase;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.shared.client.alarm.AlarmQuery;
@@ -22,7 +22,7 @@ import static org.junit.Assert.assertNotNull;
 public class AlarmQueryTest extends AlarmCacheLoaderTest {
 
   @Autowired
-  private AbstractCache<Long, Alarm> alarmCacheRef;
+  private C2monCacheBase<Long, Alarm> alarmCacheRef;
 
   @Test
   @Ignore

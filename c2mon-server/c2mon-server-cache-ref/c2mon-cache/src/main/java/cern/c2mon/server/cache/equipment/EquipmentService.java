@@ -7,7 +7,7 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.cache.api.AbstractCache;
+import cern.c2mon.cache.api.C2monCacheBase;
 import cern.c2mon.cache.api.service.AbstractEquipmentService;
 import cern.c2mon.cache.api.service.SupervisedService;
 import cern.c2mon.server.common.datatag.DataTag;
@@ -24,11 +24,11 @@ import cern.c2mon.shared.common.supervision.SupervisionConstants;
 @Service
 public class EquipmentService implements SupervisedService<Equipment>, AbstractEquipmentService {
 
-  private AbstractCache<Long, Equipment> equipmentCacheRef;
+  private C2monCacheBase<Long, Equipment> equipmentCacheRef;
 
-  private AbstractCache<Long, Process> processCacheRef;
+  private C2monCacheBase<Long, Process> processCacheRef;
 
-  private AbstractCache<Long, DataTag> dataTagCacheRef;
+  private C2monCacheBase<Long, DataTag> dataTagCacheRef;
 
   private SupervisedService<Equipment> supervisedService;
 
@@ -50,7 +50,7 @@ public class EquipmentService implements SupervisedService<Equipment>, AbstractE
     return null;
   }
 
-  public AbstractCache getCache() {
+  public C2monCacheBase getCache() {
     return this.equipmentCacheRef;
   }
 

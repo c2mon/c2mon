@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 
-import cern.c2mon.cache.api.AbstractCache;
+import cern.c2mon.cache.api.C2monCacheBase;
 import cern.c2mon.cache.api.factory.AbstractCacheObjectFactory;
 import cern.c2mon.server.cache.CoreAbstractEquipmentService;
 import cern.c2mon.server.common.control.ControlTag;
@@ -34,11 +34,11 @@ import cern.c2mon.shared.daq.config.HardwareAddressUpdate;
  */
 public abstract class TagCacheObjectFactory<T extends Tag> extends AbstractCacheObjectFactory<T> {
 
-  private final AbstractCache<Long, T> tagCacheRef;
+  private final C2monCacheBase<Long, T> tagCacheRef;
 
   private final CoreAbstractEquipmentService coreAbstractEquipmentService;
 
-  public TagCacheObjectFactory(AbstractCache<Long, T> tagCacheRef, CoreAbstractEquipmentService coreAbstractEquipmentService) {
+  public TagCacheObjectFactory(C2monCacheBase<Long, T> tagCacheRef, CoreAbstractEquipmentService coreAbstractEquipmentService) {
     this.tagCacheRef = tagCacheRef;
     this.coreAbstractEquipmentService = coreAbstractEquipmentService;
   }
