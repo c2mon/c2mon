@@ -626,18 +626,14 @@ public class TagController implements TagUpdateListener, SupervisionListener {
    */
   public void validate(final TagQualityStatus statusToRemove) {
     Tag clone = null;
-    getUpdateTagLock().writeLock().lock();
-    try {
-      if (log.isTraceEnabled()) {
-        log.trace("validate() - Removing " + statusToRemove + " quality status from tag " + this.getTagImpl().getId());
-      }
-      if (this.getTagImpl().getDataTagQuality().isInvalidStatusSet(statusToRemove)) {
-        // remove the quality status
-        this.getTagImpl().getDataTagQuality().removeInvalidStatus(statusToRemove);
-        clone = this.getTagImpl().clone();
-      }
-    } finally {
-      this.getTagImpl().getUpdateTagLock().writeLock().unlock();
+
+    if (log.isTraceEnabled()) {
+      log.trace("validate() - Removing " + statusToRemove + " quality status from tag " + this.getTagImpl().getId());
+    }
+    if (this.getTagImpl().getDataTagQuality().isInvalidStatusSet(statusToRemove)) {
+      // remove the quality status
+      this.getTagImpl().getDataTagQuality().removeInvalidStatus(statusToRemove);
+      clone = this.getTagImpl().clone();
     }
 
     if (clone != null) {
