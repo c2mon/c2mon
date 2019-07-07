@@ -7,7 +7,6 @@ All issues referenced in parentheses can be consulted under [CERN GitLab](https:
 For more details on a given release, please check also the [Milestone planning](https://gitlab.cern.ch/c2mon/c2mon/milestones?state=all).
 
 ## [Unreleased]
-
 ### Added
 
 ### Changed
@@ -15,8 +14,18 @@ For more details on a given release, please check also the [Milestone planning](
 ### Fixed
 
 
-## [1.8.43] - 2019-06-04
+## 1.8.45 - 2019-06-07
+### Fixed
+- Server: Prevent `NullPointerException` when cloning Metadata with `null` values
 
+
+## 1.8.44 - 2019-06-06
+### Fixed
+- Server: Remove Terracotta bulk load calls as batch loading of data tag into the cache fails randomly due to this (#268)
+- Server: When reloading the cache from the backup database the internal alarm oscillation fields are wrongly initialized (#267)
+
+
+## [1.8.43] - 2019-06-04
 ### Added
 - Server: Added a warning log message that informs every minute how many alarms are currently oscillating. In case of no oscillating alarms, only a debug message is logged.
 - Deployment: Added Grafana to C2MON's Kubernetes configuration as well as predefined sample dashboards (!219)
