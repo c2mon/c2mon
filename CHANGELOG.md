@@ -16,7 +16,7 @@ For more details on a given release, please check also the [Milestone planning](
 
 ## 1.8.45 - 2019-06-07
 ### Fixed
-- Server: Prevent `NullPointerException` when cloning Metadata with `null` values
+- Server: Prevent `NullPointerException` when cloning Metadata with `null` values (#270)
 
 
 ## 1.8.44 - 2019-06-06
