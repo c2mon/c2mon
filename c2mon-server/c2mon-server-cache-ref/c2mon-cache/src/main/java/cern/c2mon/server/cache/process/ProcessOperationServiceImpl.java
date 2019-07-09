@@ -5,7 +5,7 @@ import java.util.*;
 
 import lombok.extern.slf4j.Slf4j;
 
-import cern.c2mon.cache.api.C2monCacheBase;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.cache.api.service.SupervisedService;
 import cern.c2mon.server.cache.SupervisedServiceImpl;
@@ -32,8 +32,8 @@ public class ProcessOperationServiceImpl implements ProcessOperationService {
    */
   private static final int PIK_MIN = 100000;
 
-  private C2monCacheBase<Process> processCache;
-  private C2monCacheBase<AliveTimer> aliveTimerCache;
+  private C2monCache<Process> processCache;
+  private C2monCache<AliveTimer> aliveTimerCache;
 
   private EquipmentService equipmentService;
 
@@ -41,7 +41,7 @@ public class ProcessOperationServiceImpl implements ProcessOperationService {
 
   private SupervisedService<Process> supervisedService;
 
-  public ProcessOperationServiceImpl(C2monCacheBase<Process> processCache, EquipmentService equipmentService,
+  public ProcessOperationServiceImpl(C2monCache<Process> processCache, EquipmentService equipmentService,
                                      AliveTimerService aliveTimerService, ServerProperties properties) {
     this.processCache = processCache;
     this.aliveTimerCache = aliveTimerService.getCache();

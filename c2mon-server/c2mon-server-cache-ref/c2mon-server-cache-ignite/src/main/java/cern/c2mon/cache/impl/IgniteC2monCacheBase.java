@@ -1,6 +1,6 @@
 package cern.c2mon.cache.impl;
 
-import cern.c2mon.cache.api.C2monCacheBase;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.listener.Listener;
 import cern.c2mon.cache.api.listener.ListenerService;
 import cern.c2mon.cache.api.loader.CacheLoader;
@@ -34,7 +34,7 @@ import javax.cache.processor.EntryProcessorResult;
 import java.util.*;
 
 @Slf4j
-public class IgniteC2monCacheBase<V extends Cacheable> implements C2monCacheBase<V> {
+public class IgniteC2monCacheBase<V extends Cacheable> implements C2monCache<V> {
 
   protected final String cacheName;
 

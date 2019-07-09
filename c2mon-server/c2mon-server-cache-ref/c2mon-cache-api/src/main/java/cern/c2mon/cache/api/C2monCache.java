@@ -18,7 +18,7 @@ import java.util.Set;
  * @param <V> cache element type
  * @author Szymon Halastra
  */
-public interface C2monCacheBase<V extends Cacheable> extends Cache<Long, V>, Serializable, Listener<V> {
+public interface C2monCache<V extends Cacheable> extends Cache<Long, V>, Serializable, Listener<V> {
 
   CacheLoader getCacheLoader();
 

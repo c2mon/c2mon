@@ -1,6 +1,6 @@
 package cern.c2mon.server.cache.alarm.config;
 
-import cern.c2mon.cache.api.C2monCacheBase;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.factory.AbstractCacheFactory;
 import cern.c2mon.server.cache.Timestamp;
 import cern.c2mon.server.cache.alarm.AbstractCacheConfig;
@@ -20,7 +20,7 @@ public class TimestampCacheConfig extends AbstractCacheConfig<Timestamp> {
 
   @Bean(name = "timestampCacheRef")
   @Autowired
-  public C2monCacheBase<Timestamp> createCache(BatchCacheLoaderDAO<Timestamp> timestampLoaderDao) {
+  public C2monCache<Timestamp> createCache(BatchCacheLoaderDAO<Timestamp> timestampLoaderDao) {
     // TODO This should declare the cache with a CacheName
     return super.createCache(timestampLoaderDao, "timestampCacheRef", Timestamp.class, "TimestampCacheLoader-");
   }

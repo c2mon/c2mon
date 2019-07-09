@@ -16,7 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.alarm.oscillation;
 
-import cern.c2mon.cache.api.C2monCacheBase;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.cache.api.spi.C2monAlarmCacheQueryProvider;
 import cern.c2mon.server.common.alarm.Alarm;
@@ -85,7 +85,7 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
 
   private Timer timer;
 
-  private final C2monCacheBase<Alarm> alarmCacheRef;
+  private final C2monCache<Alarm> alarmCacheRef;
 
   private final C2monAlarmCacheQueryProvider alarmCacheQueryProvider;
 
@@ -94,7 +94,7 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
   private final AlarmCacheUpdater alarmCacheUpdater;
 
   // TODO Turn this on when ready
-  private final C2monCacheBase<DataTag> dataTagCacheRef = null;
+  private final C2monCache<DataTag> dataTagCacheRef = null;
 
   /**
    * Constructor.
@@ -111,7 +111,7 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
    *          the alarm cache updater.
    */
   @Autowired
-  public OscillationUpdateChecker(final C2monCacheBase<Alarm> alarmCacheRef, final C2monAlarmCacheQueryProvider alarmCacheQueryProvider,
+  public OscillationUpdateChecker(final C2monCache<Alarm> alarmCacheRef, final C2monAlarmCacheQueryProvider alarmCacheQueryProvider,
                                   final OscillationUpdater oscillationUpdater, final AlarmCacheUpdater alarmCacheUpdater/*,
                                   final  C2monCacheTyped<DataTag> dataTagCacheRef*/) {
     super();

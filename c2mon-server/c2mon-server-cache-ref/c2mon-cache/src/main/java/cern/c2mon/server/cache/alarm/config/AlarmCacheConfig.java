@@ -1,6 +1,6 @@
 package cern.c2mon.server.cache.alarm.config;
 
-import cern.c2mon.cache.api.C2monCacheBase;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.factory.AbstractCacheFactory;
 import cern.c2mon.server.cache.CacheName;
 import cern.c2mon.server.cache.alarm.AbstractCacheConfig;
@@ -23,7 +23,7 @@ public class AlarmCacheConfig extends AbstractCacheConfig<Alarm> {
 
   @Bean(name = CacheName.Names.ALARM)
   @Autowired
-  public C2monCacheBase<Alarm> createCache(AlarmLoaderDAO alarmLoaderDAORef) {
+  public C2monCache<Alarm> createCache(AlarmLoaderDAO alarmLoaderDAORef) {
     return super.createCache(alarmLoaderDAORef, CacheName.ALARM.getLabel(), Alarm.class, "AlarmCacheLoader-");
   }
 }

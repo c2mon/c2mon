@@ -1,6 +1,6 @@
 package cern.c2mon.server.cache.loader.loaders;
 
-import cern.c2mon.cache.api.C2monCacheBase;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.cache.loader.AlarmLoaderDAO;
 import cern.c2mon.server.cache.loader.common.BatchCacheLoader;
@@ -29,7 +29,7 @@ import static org.junit.Assert.assertNotNull;
 }, loader = AnnotationConfigContextLoader.class)
 public class BatchCacheLoaderTest {
 
-  private C2monCacheBase<Alarm> alarmCacheRef;
+  private C2monCache<Alarm> alarmCacheRef;
 
   @Autowired
   private ThreadPoolTaskExecutor cacheLoaderTaskExecutor;

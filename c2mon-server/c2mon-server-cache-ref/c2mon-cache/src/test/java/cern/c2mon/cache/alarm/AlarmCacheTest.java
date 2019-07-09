@@ -4,7 +4,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import cern.c2mon.cache.api.C2monCacheBase;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.dbaccess.AlarmMapper;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
@@ -16,7 +16,7 @@ import cern.c2mon.server.test.CacheObjectComparison;
 public class AlarmCacheTest extends AlarmCacheLoaderTest {
 
   @Autowired
-  private C2monCacheBase<Alarm> alarmCacheRef;
+  private C2monCache<Alarm> alarmCacheRef;
 
   @Autowired
   private AlarmMapper alarmMapper;

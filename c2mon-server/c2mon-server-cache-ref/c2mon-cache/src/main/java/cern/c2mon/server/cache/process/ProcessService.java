@@ -6,7 +6,7 @@ import java.util.Collection;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.cache.api.C2monCacheBase;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.service.SupervisedService;
 import cern.c2mon.server.cache.equipment.EquipmentService;
 import cern.c2mon.server.cache.subequipment.SubEquipmentService;
@@ -32,9 +32,9 @@ public class ProcessService implements ProcessOperationService, SupervisedServic
 
   private SubEquipmentService subEquipmentService;
 
-  private C2monCacheBase<AliveTimer> aliveTimerCacheRef;
+  private C2monCache<AliveTimer> aliveTimerCacheRef;
 
-  private C2monCacheBase<Process> processCacheRef;
+  private C2monCache<Process> processCacheRef;
 
   private ServerProperties properties;
 
@@ -49,7 +49,7 @@ public class ProcessService implements ProcessOperationService, SupervisedServic
 //    this.processOperationService = new ProcessOperationServiceImpl(processCacheRef, equipmentService, aliveTimerService, properties);
 //  }
 
-  public C2monCacheBase getCache() {
+  public C2monCache getCache() {
     return processCacheRef;
   }
 

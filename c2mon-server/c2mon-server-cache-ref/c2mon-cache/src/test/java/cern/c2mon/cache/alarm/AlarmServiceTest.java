@@ -5,7 +5,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import cern.c2mon.cache.api.C2monCacheBase;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.alarm.AlarmService;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
@@ -24,14 +24,14 @@ public class AlarmServiceTest {
 
   private AlarmService alarmService;
 
-  private C2monCacheBase<Tag> tagCache;
+  private C2monCache<Tag> tagCache;
 
-  private C2monCacheBase<Alarm> alarmCache;
+  private C2monCache<Alarm> alarmCache;
 
   @Before
   public void setup() {
-    alarmCache = EasyMock.createNiceMock(C2monCacheBase.class);
-    tagCache = EasyMock.createStrictMock(C2monCacheBase.class);
+    alarmCache = EasyMock.createNiceMock(C2monCache.class);
+    tagCache = EasyMock.createStrictMock(C2monCache.class);
 //    alarmService = new AlarmService(alarmCache, tagCache);
   }
 

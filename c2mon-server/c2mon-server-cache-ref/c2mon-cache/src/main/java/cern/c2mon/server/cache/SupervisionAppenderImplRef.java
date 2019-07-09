@@ -20,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.cache.api.C2monCacheBase;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.SupervisionAppender;
 import cern.c2mon.server.cache.equipment.EquipmentService;
 import cern.c2mon.server.cache.process.ProcessService;
@@ -44,9 +44,9 @@ public class SupervisionAppenderImplRef implements SupervisionAppender {
    * Process and Equipment bean interfaces.
    */
   private ProcessService processService;
-  private C2monCacheBase<Process> processCacheRef;
+  private C2monCache<Process> processCacheRef;
   private EquipmentService equipmentService;
-  private C2monCacheBase<Equipment> equipmentCacheRef;
+  private C2monCache<Equipment> equipmentCacheRef;
 
   @Autowired
   public SupervisionAppenderImplRef(ProcessService processService, EquipmentService equipmentService) {

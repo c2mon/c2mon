@@ -1,6 +1,6 @@
 package cern.c2mon.cache.impl;
 
-import cern.c2mon.cache.api.C2monCacheBase;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.factory.AbstractCacheFactory;
 import cern.c2mon.shared.common.Cacheable;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 public class IgniteFactory extends AbstractCacheFactory {
 
   @Override
-  public <V extends Cacheable> C2monCacheBase<V> createCache(String name, Class<V> valueType) {
+  public <V extends Cacheable> C2monCache<V> createCache(String name, Class<V> valueType) {
     CacheConfiguration<Long, V> cacheConfiguration = new DefaultIgniteCacheConfiguration<>(name);
 
     cacheConfiguration.setIndexedTypes(Long.class, valueType);
