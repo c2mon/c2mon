@@ -2,7 +2,7 @@ package cern.c2mon.cache.impl;
 
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.spi.C2monAlarmCacheQueryProvider;
-import cern.c2mon.server.cache.Timestamp;
+import cern.c2mon.server.cache.alarm.AlarmServiceTimestamp;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import org.apache.ignite.cache.query.ScanQuery;
@@ -19,12 +19,12 @@ import java.util.List;
 @Component
 public class IgniteC2monAlarmCacheQueryProvider implements C2monAlarmCacheQueryProvider {
 
-  private final C2monCache<Timestamp> lastAccessCache;
+  private final C2monCache<AlarmServiceTimestamp> lastAccessCache;
 
   private final C2monCache<Alarm> alarmCacheRef;
 
   @Autowired
-  public IgniteC2monAlarmCacheQueryProvider(final C2monCache<Timestamp> lastAccessCache, final C2monCache<Alarm> alarmCacheRef) {
+  public IgniteC2monAlarmCacheQueryProvider(final C2monCache<AlarmServiceTimestamp> lastAccessCache, final C2monCache<Alarm> alarmCacheRef) {
     this.lastAccessCache = lastAccessCache;
     this.alarmCacheRef = alarmCacheRef;
   }
@@ -47,7 +47,7 @@ public class IgniteC2monAlarmCacheQueryProvider implements C2monAlarmCacheQueryP
   @Override
   public void setLastOscillationCheck(long timestampMillis) {
     Long key = (long) this.getClass().getName().hashCode();
-    lastAccessCache.put(key, new Timestamp(key, timestampMillis));
+    lastAccessCache.put(key, new AlarmServiceTimestamp(key, timestampMillis));
   }
 
   private List<AlarmCacheObject> getAlarmsApplyingQuery(IgniteBiPredicate<Long, Alarm> filter) {

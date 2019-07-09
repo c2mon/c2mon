@@ -9,7 +9,6 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>cern.c2mon.server</groupId>
   <artifactId>c2mon-cache-loader</artifactId>
 
   <dependencies>

@@ -1,16 +1,16 @@
 package cern.c2mon.server.cache.alarm;
 
+import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.listener.CacheListener;
 import cern.c2mon.cache.api.listener.CacheSupervisionListener;
+import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheUpdater;
 import cern.c2mon.server.common.alarm.TagWithAlarms;
 import cern.c2mon.server.common.alarm.TagWithAlarmsImpl;
+import cern.c2mon.server.common.tag.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.server.common.alarm.Alarm;
-import cern.c2mon.server.common.tag.Tag;
 
 import java.util.*;
 
@@ -23,7 +23,7 @@ import java.util.*;
 
 @Slf4j
 @Service
-public class AlarmService implements AlarmAggregator, CacheSupervisionListener<Tag> {
+public class AlarmService implements AlarmAggregator, CacheSupervisionListener<Tag>, CacheListener<Tag> {
 
   private C2monCache<Alarm> alarmCacheRef;
 
@@ -34,14 +34,14 @@ public class AlarmService implements AlarmAggregator, CacheSupervisionListener<T
   private AlarmCacheUpdater alarmCacheUpdater;
 
   @Autowired
-  public AlarmService(final C2monCache<Alarm> alarmCacheRef, /*final C2monCache<Long, Tag> tagCacheRef,*/ final AlarmCacheUpdater alarmCacheUpdater) {
+  public AlarmService(final C2monCache<Alarm> alarmCacheRef, /*final C2monCache<Tag> tagCacheRef,*/ final AlarmCacheUpdater alarmCacheUpdater) {
     this.alarmCacheRef = alarmCacheRef;
 //    this.tagCacheRef = tagCacheRef;
     this.alarmCacheUpdater = alarmCacheUpdater;
   }
 
   public Alarm update(final Long alarmId, final Tag tag) {
-    return alarmCacheRef.executeTransaction( () -> {
+    return alarmCacheRef.executeTransaction(() -> {
       Alarm alarm = alarmCacheRef.get(alarmId);
       // Notice, in this case the update() method is putting the changes back into the cache
       return alarmCacheUpdater.update(alarm, tag);
@@ -49,7 +49,7 @@ public class AlarmService implements AlarmAggregator, CacheSupervisionListener<T
   }
 
   public void evaluateAlarm(Long alarmId) {
-    alarmCacheRef.executeTransaction( () -> {
+    alarmCacheRef.executeTransaction(() -> {
       Alarm alarm = alarmCacheRef.get(alarmId);
       Tag tag = tagCacheRef.get(alarm.getTagId());
       return update(alarmId, tag);
@@ -58,12 +58,11 @@ public class AlarmService implements AlarmAggregator, CacheSupervisionListener<T
 
   public List<Alarm> evaluateAlarms(final Tag tag) {
     List<Alarm> linkedAlarms = new ArrayList<>();
-    alarmCacheRef.executeTransaction( () -> {
+    alarmCacheRef.executeTransaction(() -> {
       for (Long alarmId : tag.getAlarmIds()) {
         try {
           linkedAlarms.add(update(alarmId, tag));
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
           log.error("Exception caught when attempting to evaluate alarm ID " + alarmId + "  for tag " + tag.getId() + " - publishing to the client with no attached alarms.", e);
         }
       }
@@ -79,7 +78,7 @@ public class AlarmService implements AlarmAggregator, CacheSupervisionListener<T
    * and cannot be modified during this method).
    */
   public TagWithAlarms getTagWithAlarms(Long id) {
-    return alarmCacheRef.executeTransaction( () -> {
+    return alarmCacheRef.executeTransaction(() -> {
       Tag tag = tagCacheRef.get(id);
       Collection<Alarm> alarms = new LinkedList<>();
       for (Long alarmId : tag.getAlarmIds()) {
@@ -94,7 +93,6 @@ public class AlarmService implements AlarmAggregator, CacheSupervisionListener<T
    * clients (currently the same for all alarms, so returns a constant).
    *
    * @param alarm the alarm for which the topic should be provided
-   *
    * @return a valid JMS topic name for the alarm
    */
   public String getTopicForAlarm(final Alarm alarm) {
@@ -124,6 +122,33 @@ public class AlarmService implements AlarmAggregator, CacheSupervisionListener<T
     log.trace("Evaluating alarm for tag " + tag.getId() + " due to supervision status notification.");
 
     evaluateAlarms(tag);
+
+  }
+
+  @Override
+  public void notifyElementUpdated(Tag cacheable) {
+    List<Alarm> alarmList = evaluateAlarms(cacheable);
+    notifyListeners(cacheable, alarmList);
+  }
+
+  @Override
+  public void confirmStatus(Tag cacheable) {
+    // No-op
+  }
+
+  /**
+   * Notify the listeners of a tag update with associated alarms.
+   *
+   * @param tag       the Tag that has been updated
+   * @param alarmList the associated list of evaluated alarms
+   */
+  private void notifyListeners(final Tag tag, final List<Alarm> alarmList) {
+    try {
+      alarmUpdateObservable.notifyObservers(new AlarmUpdateTuple((Tag) tag.clone(), alarmList));
+    } catch (CloneNotSupportedException e) {
+      log.error("Unexpected exception caught: clone should be implemented for this class! " + "Alarm & tag listener was not notified: ");
+    }
+
   }
 
   //TODO: move and modify code from AbstractTagFacade connected with Alarms
