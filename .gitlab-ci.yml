@@ -7,7 +7,7 @@ stages:
 clean_elasticsearch:
   type: clean
   script:
-    - rm -Rf /tmp/elasticsearch-node
+    - rm -Rf /tmp/es-cluster*
 
 # Fully build and publish master branch
 build_and_publish:
