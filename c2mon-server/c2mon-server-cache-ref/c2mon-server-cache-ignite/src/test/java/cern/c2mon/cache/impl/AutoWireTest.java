@@ -3,82 +3,35 @@ package cern.c2mon.cache.impl;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.impl.configuration.C2monIgniteConfiguration;
 import cern.c2mon.server.cache.CacheModuleRef;
-import cern.c2mon.server.cache.alarm.TestObserver;
 import cern.c2mon.server.cache.alarm.config.AlarmCacheConfig;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.config.CommonModule;
-import javafx.beans.value.ObservableValue;
-import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.util.Observable;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
-//@RunWith(SpringJUnit4ClassRunner.class)
-//@ContextConfiguration(classes = {
-//  CommonModule.class,
-//  CacheModuleRef.class,
-//  C2monIgniteConfiguration.class,
-//  AlarmCacheConfig.class
-//})
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = {
+  CommonModule.class,
+  CacheModuleRef.class,
+  C2monIgniteConfiguration.class,
+  AlarmCacheConfig.class
+})
 public class AutoWireTest {
 
-//  @Autowired
+  //  @Autowired
   private C2monCache<Alarm> alarmCacheRef;
 
-//  @Test
+  //  @Test
   public void simpleWire() {
     assertNotEquals(alarmCacheRef, null);
     Alarm alarm = new AlarmCacheObject();
     alarmCacheRef.init();
     alarmCacheRef.put(1L, alarm);
     assertEquals(alarmCacheRef.get(1L), alarm);
-  }
-
-  ObservableValue observable;
-
-  @Test
-  public void testObservers() {
-    AlarmCacheObject alarm = new AlarmCacheObject();
-    alarm.setId(5L);
-    observable = new ObservableValue(null);
-
-    registerForTestTagUpdates((AlarmCacheObject item) -> {
-      System.out.println(item.getId());
-    });
-
-    observable.setValue(alarm);
-
-    observable.notifyObservers(alarm);
-  }
-
-
-
-  <V> void registerForTestTagUpdates(TestObserver<V> aggregatorObserver) {
-    observable.addObserver(aggregatorObserver);
-  }
-
-  class ObservableValue extends Observable
-  {
-    private Object n = null;
-    public ObservableValue(Object n)
-    {
-      this.n = n;
-    }
-    public void setValue(Object n)
-    {
-      this.n = n;
-      setChanged();
-    }
-    public Object getValue()
-    {
-      return n;
-    }
   }
 }

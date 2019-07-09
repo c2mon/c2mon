@@ -16,33 +16,30 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.alarm;
 
-import java.util.Observer;
+import cern.c2mon.server.common.alarm.Alarm;
+import cern.c2mon.server.common.tag.Tag;
+
+import java.util.List;
 
 /**
- * The AlarmAggregator bean listens for Tag updates,
- * evaluates all associated alarms and passes the result
- * to registered {@link Observer}s.
- *
- * <p>Standard usage involves wiring it into your class and
- * calling the registerForUpdates method to register your
- * listener.
- *
- * <p>Listeners are notified on the cache notification threads
- * (i.e. this aggregator does not create any extra threads).
+ * Interface that must be implemented by classes wishing
+ * to received Tag updates together with all associated
+ * <b>evaluated</b> alarms.
  *
  * @author Mark Brightwell
+ *
  */
-public interface AlarmAggregator {
+@FunctionalInterface
+public interface AlarmAggregatorListener {
 
   /**
-   * Register this listener to received alarm & tag update notifications.
+   * Is called when a Tag update has been received, and associated
+   * alarms have been evaluated.
    *
-   * You can use the lambda syntax to declare the listener argument like so:
-   *
-   * {@code (tag, alarms) -> { ... } }
-   *
-   * @param aggregatorObserver the listener that should be notified
+   * @param tag the updated Tag
+   * @param alarms the new values of the associated alarms;
+   *          this list is <b>null</b> if no alarms are associated to the tag
    */
-  void registerForTagUpdates(AlarmAggregatorListener aggregatorObserver);
+  void notifyOnUpdate(Tag tag, List<Alarm> alarms);
 
 }

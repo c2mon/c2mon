@@ -12,7 +12,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * @author Szymon Halastra
@@ -29,7 +32,7 @@ public class AlarmService implements AlarmAggregator, CacheSupervisionListener<T
 
   private C2monCache<Tag> tagCacheRef;
 
-  private Observable alarmUpdateObservable = new Observable();
+  private List<AlarmAggregatorListener> alarmUpdateObservable = new ArrayList<>();
 
   private AlarmCacheUpdater alarmCacheUpdater;
 
@@ -113,8 +116,8 @@ public class AlarmService implements AlarmAggregator, CacheSupervisionListener<T
 
 
   @Override
-  public void registerForTagUpdates(Observer aggregatorObserver) {
-    alarmUpdateObservable.addObserver(aggregatorObserver);
+  public void registerForTagUpdates(AlarmAggregatorListener aggregatorObserver) {
+    alarmUpdateObservable.add(aggregatorObserver);
   }
 
   @Override
@@ -143,12 +146,13 @@ public class AlarmService implements AlarmAggregator, CacheSupervisionListener<T
    * @param alarmList the associated list of evaluated alarms
    */
   private void notifyListeners(final Tag tag, final List<Alarm> alarmList) {
-    try {
-      alarmUpdateObservable.notifyObservers(new AlarmUpdateTuple((Tag) tag.clone(), alarmList));
-    } catch (CloneNotSupportedException e) {
-      log.error("Unexpected exception caught: clone should be implemented for this class! " + "Alarm & tag listener was not notified: ");
+    for (AlarmAggregatorListener listener : alarmUpdateObservable) {
+      try {
+        listener.notifyOnUpdate((Tag) tag.clone(), alarmList);
+      } catch (CloneNotSupportedException e) {
+        log.error("Unexpected exception caught: clone should be implemented for this class! " + "Alarm & tag listener was not notified: ");
+      }
     }
-
   }
 
   //TODO: move and modify code from AbstractTagFacade connected with Alarms
