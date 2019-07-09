@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2019 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -17,19 +17,21 @@
 
 package cern.c2mon.server.elasticsearch.tag.config;
 
-import cern.c2mon.server.common.datatag.DataTagCacheObject;
-import cern.c2mon.server.elasticsearch.Indices;
-import cern.c2mon.server.elasticsearch.config.BaseElasticsearchIntegrationTest;
-import cern.c2mon.server.elasticsearch.junit.CachePopulationRule;
-import cern.c2mon.server.elasticsearch.util.EntityUtils;
+import java.util.Map;
+
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.index.IndexNotFoundException;
 import org.elasticsearch.search.SearchHit;
 import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Map;
+import cern.c2mon.server.common.datatag.DataTagCacheObject;
+import cern.c2mon.server.elasticsearch.Indices;
+import cern.c2mon.server.elasticsearch.config.BaseElasticsearchIntegrationTest;
+import cern.c2mon.server.elasticsearch.junit.CachePopulationRule;
+import cern.c2mon.server.elasticsearch.util.EntityUtils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -77,9 +79,11 @@ public class TagConfigDocumentIndexerTests extends BaseElasticsearchIntegrationT
   @Test
   public void reindexTagConfigDocuments() throws Exception {
     final String index = Indices.indexFor(new TagConfigDocument());
-    //Delete the index first
-    DeleteIndexResponse deleteResponse = client.getClient().admin().indices().prepareDelete(index).get();
-    assertTrue("The index could not be deleted", deleteResponse.isAcknowledged());
+    if (!Indices.exists(index)) {
+      //Delete the index first
+      DeleteIndexResponse deleteResponse = client.getClient().admin().indices().prepareDelete(index).get();
+      assertTrue("The index could not be deleted", deleteResponse.isAcknowledged());
+    }
     //reindex everything from the cache
     this.indexer.reindexAllTagConfigDocuments();
     // Refresh the index to make sure the document is searchable
@@ -95,7 +99,7 @@ public class TagConfigDocumentIndexerTests extends BaseElasticsearchIntegrationT
     testUpdate(true);
   }
 
-  @Test
+  @Test(expected = IndexNotFoundException.class)
   public void updateMissingDataTag() throws Exception {
     testUpdate(false);
   }
