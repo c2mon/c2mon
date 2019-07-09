@@ -16,7 +16,7 @@ import cern.c2mon.server.test.CacheObjectComparison;
 public class AlarmCacheTest extends AlarmCacheLoaderTest {
 
   @Autowired
-  private C2monCacheBase<Long, Alarm> alarmCacheRef;
+  private C2monCacheBase<Alarm> alarmCacheRef;
 
   @Autowired
   private AlarmMapper alarmMapper;

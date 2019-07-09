@@ -17,14 +17,14 @@ import cern.c2mon.server.common.alive.AliveTimer;
 @Service
 public class AliveTimerService {
 
-  private C2monCacheBase<Long, AliveTimer> aliveTimerCacheRef;
+  private C2monCacheBase<AliveTimer> aliveTimerCacheRef;
 
 //  @Autowired
 //  public AliveTimerService(C2monCache<Long, AliveTimer> aliveTimerCacheRef) {
 //    this.aliveTimerCacheRef = aliveTimerCacheRef;
 //  }
 
-  public C2monCacheBase<Long, AliveTimer> getCache() {
+  public C2monCacheBase<AliveTimer> getCache() {
     return aliveTimerCacheRef;
   }
 

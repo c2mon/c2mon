@@ -29,7 +29,7 @@ import cern.c2mon.shared.daq.config.HardwareAddressUpdate;
 @Component
 public class CommandCacheObjectFactory extends AbstractCacheObjectFactory<CommandTag> {
 
-  private C2monCacheBase<Long, Equipment> equipmentCacheRef;
+  private C2monCacheBase<Equipment> equipmentCacheRef;
 
 //  @Autowired
 //  public CommandCacheObjectFactory(C2monCache<Long, Equipment> equipmentCacheRef) {

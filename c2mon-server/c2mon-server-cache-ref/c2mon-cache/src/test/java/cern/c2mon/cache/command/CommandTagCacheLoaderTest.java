@@ -24,7 +24,7 @@ import static org.junit.Assert.*;
 public class CommandTagCacheLoaderTest extends AbstractCacheLoaderTest {
 
   @Autowired
-  private C2monCacheBase<Long, CommandTag> commandTagCacheRef;
+  private C2monCacheBase<CommandTag> commandTagCacheRef;
 
   @Autowired
   private CommandTagMapper commandTagMapper;

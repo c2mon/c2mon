@@ -22,7 +22,7 @@ import cern.c2mon.shared.common.supervision.SupervisionConstants;
 @Service
 public class SubEquipmentService implements SupervisedService<SubEquipment>, AbstractEquipmentService {
 
-  private C2monCacheBase<Long, SubEquipment> subEquipmentCacheRef;
+  private C2monCacheBase<SubEquipment> subEquipmentCacheRef;
 
   private SupervisedService<SubEquipment> supervisedService;
 

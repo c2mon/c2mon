@@ -22,7 +22,7 @@ import static org.junit.Assert.*;
 public class AlarmCacheLoaderTest extends AbstractCacheLoaderTest {
 
   @Autowired
-  private C2monCacheBase<Long, Alarm> alarmCacheRef;
+  private C2monCacheBase<Alarm> alarmCacheRef;
 
   @Autowired
   private AlarmMapper alarmMapper;

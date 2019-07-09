@@ -15,7 +15,7 @@ import cern.c2mon.server.common.device.DeviceClass;
 @Service
 public class DeviceClassService {
 
-  private C2monCacheBase<Long, DeviceClass> deviceClassCacheRef;
+  private C2monCacheBase<DeviceClass> deviceClassCacheRef;
 
 //  @Autowired
 //  public DeviceClassService(C2monCache<Long, DeviceClass> deviceClassCacheRef) {

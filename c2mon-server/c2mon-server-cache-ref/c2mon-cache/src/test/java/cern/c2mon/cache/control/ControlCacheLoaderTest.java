@@ -22,7 +22,7 @@ import static org.junit.Assert.*;
 public class ControlCacheLoaderTest extends AbstractCacheLoaderTest {
 
   @Autowired
-  private C2monCacheBase<Long, ControlTag> controlTagCacheRef;
+  private C2monCacheBase<ControlTag> controlTagCacheRef;
 
   @Autowired
   private ControlTagMapper controlTagMapper;

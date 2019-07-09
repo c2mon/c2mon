@@ -15,11 +15,11 @@ import cern.c2mon.server.common.equipment.AbstractEquipment;
  */
 public class CoreAbstractEquipmentService<T extends AbstractEquipment> implements AbstractEquipmentService {
 
-  private C2monCacheBase<Long, T> c2monCache;
+  private C2monCacheBase<T> c2monCache;
 
-  private C2monCacheBase<Long, CommFaultTag> commFaultTagCache;
+  private C2monCacheBase<CommFaultTag> commFaultTagCache;
 
-  public CoreAbstractEquipmentService(C2monCacheBase<Long, T> c2monCache, CommFaultService commFaultService) {
+  public CoreAbstractEquipmentService(C2monCacheBase<T> c2monCache, CommFaultService commFaultService) {
     this.c2monCache = c2monCache;
     this.commFaultTagCache = commFaultService.getCache();
   }

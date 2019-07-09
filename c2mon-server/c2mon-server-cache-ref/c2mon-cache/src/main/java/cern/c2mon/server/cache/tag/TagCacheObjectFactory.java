@@ -34,11 +34,11 @@ import cern.c2mon.shared.daq.config.HardwareAddressUpdate;
  */
 public abstract class TagCacheObjectFactory<T extends Tag> extends AbstractCacheObjectFactory<T> {
 
-  private final C2monCacheBase<Long, T> tagCacheRef;
+  private final C2monCacheBase<T> tagCacheRef;
 
   private final CoreAbstractEquipmentService coreAbstractEquipmentService;
 
-  public TagCacheObjectFactory(C2monCacheBase<Long, T> tagCacheRef, CoreAbstractEquipmentService coreAbstractEquipmentService) {
+  public TagCacheObjectFactory(C2monCacheBase<T> tagCacheRef, CoreAbstractEquipmentService coreAbstractEquipmentService) {
     this.tagCacheRef = tagCacheRef;
     this.coreAbstractEquipmentService = coreAbstractEquipmentService;
   }

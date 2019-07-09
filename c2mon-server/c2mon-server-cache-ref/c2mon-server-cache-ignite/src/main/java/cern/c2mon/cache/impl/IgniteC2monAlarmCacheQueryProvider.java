@@ -1,10 +1,10 @@
 package cern.c2mon.cache.impl;
 
+import cern.c2mon.cache.api.C2monCacheBase;
 import cern.c2mon.cache.api.spi.C2monAlarmCacheQueryProvider;
-import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.server.cache.Timestamp;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
-import org.apache.ignite.IgniteCache;
 import org.apache.ignite.cache.query.ScanQuery;
 import org.apache.ignite.lang.IgniteBiPredicate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,14 +19,13 @@ import java.util.List;
 @Component
 public class IgniteC2monAlarmCacheQueryProvider implements C2monAlarmCacheQueryProvider {
 
-  // TODO enable this
-  private final IgniteCache<String, Long> lastAccessCache = null;
+  private final C2monCacheBase<Timestamp> lastAccessCache;
 
-  private final C2monCache<Alarm> alarmCacheRef;
+  private final C2monCacheBase<Alarm> alarmCacheRef;
 
   @Autowired
-  public IgniteC2monAlarmCacheQueryProvider(/*final IgniteCache<String, Long> lastAccessCache,*/ final C2monCache<Alarm> alarmCacheRef) {
-//    this.lastAccessCache = lastAccessCache;
+  public IgniteC2monAlarmCacheQueryProvider(final C2monCacheBase<Timestamp> lastAccessCache, final C2monCacheBase<Alarm> alarmCacheRef) {
+    this.lastAccessCache = lastAccessCache;
     this.alarmCacheRef = alarmCacheRef;
   }
 
@@ -42,16 +41,17 @@ public class IgniteC2monAlarmCacheQueryProvider implements C2monAlarmCacheQueryP
 
   @Override
   public long getLastOscillationCheck() {
-    return lastAccessCache.get(this.getClass().getName());
+    return lastAccessCache.get((long) this.getClass().getName().hashCode()).getTimeInMillis();
   }
 
   @Override
   public void setLastOscillationCheck(long timestampMillis) {
-    lastAccessCache.put(this.getClass().getName(), timestampMillis);
+    Long key = (long) this.getClass().getName().hashCode();
+    lastAccessCache.put(key, new Timestamp(key, timestampMillis));
   }
 
   private List<AlarmCacheObject> getAlarmsApplyingQuery(IgniteBiPredicate<Long, Alarm> filter) {
-    return ((IgniteC2monCache<Alarm>) alarmCacheRef).query(new ScanQuery<>(filter),
+    return ((IgniteC2monCacheBase<Alarm>) alarmCacheRef).query(new ScanQuery<>(filter),
       // TODO Verify we want this cast - are we using AlarmCacheObjects downstream?
       longAlarmEntry -> (AlarmCacheObject) longAlarmEntry.getValue()
     ).getAll();

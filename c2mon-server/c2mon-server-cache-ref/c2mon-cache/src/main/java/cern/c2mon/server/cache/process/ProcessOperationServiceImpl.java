@@ -32,8 +32,8 @@ public class ProcessOperationServiceImpl implements ProcessOperationService {
    */
   private static final int PIK_MIN = 100000;
 
-  private C2monCacheBase<Long, Process> processCache;
-  private C2monCacheBase<Long, AliveTimer> aliveTimerCache;
+  private C2monCacheBase<Process> processCache;
+  private C2monCacheBase<AliveTimer> aliveTimerCache;
 
   private EquipmentService equipmentService;
 
@@ -41,7 +41,7 @@ public class ProcessOperationServiceImpl implements ProcessOperationService {
 
   private SupervisedService<Process> supervisedService;
 
-  public ProcessOperationServiceImpl(C2monCacheBase<Long, Process> processCache, EquipmentService equipmentService,
+  public ProcessOperationServiceImpl(C2monCacheBase<Process> processCache, EquipmentService equipmentService,
                                      AliveTimerService aliveTimerService, ServerProperties properties) {
     this.processCache = processCache;
     this.aliveTimerCache = aliveTimerService.getCache();

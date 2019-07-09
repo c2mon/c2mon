@@ -12,7 +12,6 @@ import javax.cache.processor.EntryProcessor;
 import javax.cache.processor.EntryProcessorException;
 import javax.cache.processor.EntryProcessorResult;
 
-import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.C2monCacheBase;
 import cern.c2mon.cache.api.listener.Listener;
 import cern.c2mon.cache.api.loader.CacheLoader;
@@ -24,7 +23,7 @@ import cern.c2mon.shared.common.Cacheable;
  *
  * @author Szymon Halastra
  */
-public class SimpleC2monCache<V extends Cacheable> implements C2monCache<V> {
+public class SimpleC2monCache<V extends Cacheable> implements C2monCacheBase<V> {
 
   private final ConcurrentMap<Long, V> cache;
 
@@ -114,12 +113,12 @@ public class SimpleC2monCache<V extends Cacheable> implements C2monCache<V> {
   }
 
   @Override
-  public CacheLoader<Long, V> getCacheLoader() {
+  public CacheLoader<V> getCacheLoader() {
     return null;
   }
 
   @Override
-  public void setCacheLoader(CacheLoader<Long, V> cacheLoader) {
+  public void setCacheLoader(CacheLoader<V> cacheLoader) {
 
   }
 

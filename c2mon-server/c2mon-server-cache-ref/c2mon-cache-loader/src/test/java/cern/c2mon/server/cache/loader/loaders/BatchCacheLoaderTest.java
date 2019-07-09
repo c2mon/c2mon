@@ -1,13 +1,5 @@
 package cern.c2mon.server.cache.loader.loaders;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.support.AnnotationConfigContextLoader;
-
 import cern.c2mon.cache.api.C2monCacheBase;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.cache.loader.AlarmLoaderDAO;
@@ -16,6 +8,13 @@ import cern.c2mon.server.cache.loader.config.CacheLoaderModuleRef;
 import cern.c2mon.server.cache.loader.config.CacheLoaderProperties;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.config.CommonModule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
 import static org.junit.Assert.assertNotNull;
 
@@ -24,13 +23,13 @@ import static org.junit.Assert.assertNotNull;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {
-        CommonModule.class,
-        CacheLoaderModuleRef.class,
-        CacheDbAccessModule.class
+  CommonModule.class,
+  CacheLoaderModuleRef.class,
+  CacheDbAccessModule.class
 }, loader = AnnotationConfigContextLoader.class)
 public class BatchCacheLoaderTest {
 
-  private C2monCacheBase<Long, Alarm> alarmCacheRef;
+  private C2monCacheBase<Alarm> alarmCacheRef;
 
   @Autowired
   private ThreadPoolTaskExecutor cacheLoaderTaskExecutor;
@@ -41,12 +40,12 @@ public class BatchCacheLoaderTest {
   @Autowired
   private CacheLoaderProperties properties;
 
-  private BatchCacheLoader<Long, Alarm> batchCacheLoader;
+  private BatchCacheLoader<Alarm> batchCacheLoader;
 
   @Test
   public void preloadCacheFromDb() {
     batchCacheLoader = new BatchCacheLoader<>(cacheLoaderTaskExecutor, alarmCacheRef, alarmLoaderDAO,
-            properties.getBatchSize(), "AlarmLoader-");
+      properties.getBatchSize(), "AlarmLoader-");
     assertNotNull("Cache loader should not be null", batchCacheLoader);
   }
 }

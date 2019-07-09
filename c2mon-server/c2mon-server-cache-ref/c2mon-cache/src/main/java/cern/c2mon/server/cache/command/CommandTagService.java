@@ -15,7 +15,7 @@ import cern.c2mon.shared.common.command.SourceCommandTag;
 @Service
 public class CommandTagService {
 
-  private C2monCacheBase<Long, CommandTag> commandTagCacheRef;
+  private C2monCacheBase<CommandTag> commandTagCacheRef;
 
 //  @Autowired
 //  public CommandTagService(C2monCache<Long, CommandTag> commandTagCacheRef) {

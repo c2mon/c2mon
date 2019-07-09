@@ -21,7 +21,7 @@ import static org.junit.Assert.*;
 public class SubequipmentCacheLoaderTest extends AbstractCacheLoaderTest {
 
   @Autowired
-  private C2monCacheBase<Long, SubEquipment> subEquipmentCacheRef;
+  private C2monCacheBase<SubEquipment> subEquipmentCacheRef;
 
   @Autowired
   private SubEquipmentMapper subEquipmentMapper;

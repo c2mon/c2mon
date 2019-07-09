@@ -25,7 +25,7 @@ public class ProcessCacheLoaderTest extends AbstractCacheLoaderTest {
   private ProcessMapper processMapper;
 
   @Autowired
-  private C2monCacheBase<Long, Process> processCacheRef;
+  private C2monCacheBase<Process> processCacheRef;
 
   @Before
   public void init() {

@@ -23,7 +23,7 @@ import static cern.c2mon.shared.common.type.TypeConverter.getType;
 public class DataTagCacheObjectFactory extends TagCacheObjectFactory<DataTag> {
 
   @Autowired
-  public DataTagCacheObjectFactory(C2monCacheBase<Long, DataTag> dataTagCacheRef,
+  public DataTagCacheObjectFactory(C2monCacheBase<DataTag> dataTagCacheRef,
                                    CoreAbstractEquipmentService coreAbstractEquipmentService) {
     super(dataTagCacheRef, coreAbstractEquipmentService);
   }

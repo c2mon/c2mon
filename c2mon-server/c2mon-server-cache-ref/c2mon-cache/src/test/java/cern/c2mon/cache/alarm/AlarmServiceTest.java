@@ -24,9 +24,9 @@ public class AlarmServiceTest {
 
   private AlarmService alarmService;
 
-  private C2monCacheBase<Long, Tag> tagCache;
+  private C2monCacheBase<Tag> tagCache;
 
-  private C2monCacheBase<Long, Alarm> alarmCache;
+  private C2monCacheBase<Alarm> alarmCache;
 
   @Before
   public void setup() {

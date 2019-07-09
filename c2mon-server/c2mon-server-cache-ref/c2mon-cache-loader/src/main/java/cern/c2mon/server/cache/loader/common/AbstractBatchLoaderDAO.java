@@ -21,7 +21,7 @@ import cern.c2mon.shared.common.Cacheable;
  */
 @Slf4j
 public abstract class AbstractBatchLoaderDAO<K extends Number, T extends Cacheable> extends AbstractSimpleLoaderDAO<T> implements
-        BatchCacheLoaderDAO<K, T> {
+        BatchCacheLoaderDAO<T> {
 
   /**
    * Mapper required for batch loading.

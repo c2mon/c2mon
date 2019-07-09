@@ -15,7 +15,7 @@ import cern.c2mon.server.common.equipment.AbstractEquipment;
 @Service
 public class CommFaultService {
 
-  private C2monCacheBase<Long, CommFaultTag> commFaultTagCacheRef;
+  private C2monCacheBase<CommFaultTag> commFaultTagCacheRef;
 
 //  @Autowired
 //  public CommFaultService(final C2monCache<Long, CommFaultTag> commFaultTagCacheRef) {

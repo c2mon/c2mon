@@ -22,7 +22,7 @@ import static org.junit.Assert.fail;
  */
 public class CommandCacheObjectFactoryTest {
 
-  private C2monCacheBase<Long, Equipment> equipmentCache;
+  private C2monCacheBase<Equipment> equipmentCache;
 
   private CommandCacheObjectFactory factory;
 

@@ -17,9 +17,9 @@ import cern.c2mon.shared.common.ConfigurationException;
 @Component
 public class EquipmentLoadable implements DbLoadable<Equipment> {
 
-  private C2monCacheBase<Long, Equipment> equipmentCacheRef;
+  private C2monCacheBase<Equipment> equipmentCacheRef;
 
-  private C2monCacheBase<Long, ControlTag> controlTagCacheRef;
+  private C2monCacheBase<ControlTag> controlTagCacheRef;
 
 //  @Autowired
 //  public EquipmentLoadable(C2monCache<Long, Equipment> equipmentCacheRef, C2monCache<Long, ControlTag> controlTagCacheRef) {

@@ -15,7 +15,7 @@ import cern.c2mon.server.common.subequipment.SubEquipment;
 @Service
 public class AliveTimerGenerator {
 
-  private C2monCacheBase<Long, AliveTimer> aliveTimerCacheRef;
+  private C2monCacheBase<AliveTimer> aliveTimerCacheRef;
 
 //  @Autowired
 //  public AliveTimerGenerator(final C2monCache<Long, AliveTimer> aliveTimerCacheRef) {

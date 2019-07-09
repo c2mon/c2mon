@@ -21,7 +21,7 @@ import static org.junit.Assert.*;
 public class RuleCacheLoaderTest extends AbstractCacheLoaderTest {
 
   @Autowired
-  private C2monCacheBase<Long, RuleTag> ruleTagCacheRef;
+  private C2monCacheBase<RuleTag> ruleTagCacheRef;
 
   @Autowired
   private RuleTagMapper ruleTagMapper;

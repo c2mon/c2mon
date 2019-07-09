@@ -32,9 +32,9 @@ public class ProcessService implements ProcessOperationService, SupervisedServic
 
   private SubEquipmentService subEquipmentService;
 
-  private C2monCacheBase<Long, AliveTimer> aliveTimerCacheRef;
+  private C2monCacheBase<AliveTimer> aliveTimerCacheRef;
 
-  private C2monCacheBase<Long, Process> processCacheRef;
+  private C2monCacheBase<Process> processCacheRef;
 
   private ServerProperties properties;
 

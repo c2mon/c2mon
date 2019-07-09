@@ -22,7 +22,7 @@ import static org.springframework.test.util.AssertionErrors.assertEquals;
 public class AliveTimerCacheLoaderTest extends AbstractCacheLoaderTest {
 
   @Autowired
-  private C2monCacheBase<Long, AliveTimer> aliveTimerCacheRef;
+  private C2monCacheBase<AliveTimer> aliveTimerCacheRef;
 
   @Autowired
   private AliveTimerMapper aliveTimerMapper;

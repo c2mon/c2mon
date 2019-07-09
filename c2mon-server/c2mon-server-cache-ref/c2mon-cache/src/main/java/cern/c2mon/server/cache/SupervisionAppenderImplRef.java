@@ -44,9 +44,9 @@ public class SupervisionAppenderImplRef implements SupervisionAppender {
    * Process and Equipment bean interfaces.
    */
   private ProcessService processService;
-  private C2monCacheBase<Long, Process> processCacheRef;
+  private C2monCacheBase<Process> processCacheRef;
   private EquipmentService equipmentService;
-  private C2monCacheBase<Long, Equipment> equipmentCacheRef;
+  private C2monCacheBase<Equipment> equipmentCacheRef;
 
   @Autowired
   public SupervisionAppenderImplRef(ProcessService processService, EquipmentService equipmentService) {

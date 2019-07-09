@@ -17,7 +17,6 @@
 package cern.c2mon.server.cache.alarm.oscillation;
 
 import cern.c2mon.cache.api.C2monCacheBase;
-import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.cache.api.spi.C2monAlarmCacheQueryProvider;
 import cern.c2mon.server.common.alarm.Alarm;
@@ -29,6 +28,8 @@ import cern.c2mon.server.common.tag.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.SmartLifecycle;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -84,7 +85,7 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
 
   private Timer timer;
 
-  private final C2monCache<Alarm> alarmCacheRef;
+  private final C2monCacheBase<Alarm> alarmCacheRef;
 
   private final C2monAlarmCacheQueryProvider alarmCacheQueryProvider;
 
@@ -93,7 +94,7 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
   private final AlarmCacheUpdater alarmCacheUpdater;
 
   // TODO Turn this on when ready
-  private final C2monCacheBase<Long, DataTag> dataTagCacheRef = null;
+  private final C2monCacheBase<DataTag> dataTagCacheRef = null;
 
   /**
    * Constructor.
@@ -110,7 +111,7 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
    *          the alarm cache updater.
    */
   @Autowired
-  public OscillationUpdateChecker(final C2monCache<Alarm> alarmCacheRef, final C2monAlarmCacheQueryProvider alarmCacheQueryProvider,
+  public OscillationUpdateChecker(final C2monCacheBase<Alarm> alarmCacheRef, final C2monAlarmCacheQueryProvider alarmCacheQueryProvider,
                                   final OscillationUpdater oscillationUpdater, final AlarmCacheUpdater alarmCacheUpdater/*,
                                   final  C2monCacheTyped<DataTag> dataTagCacheRef*/) {
     super();
@@ -125,8 +126,8 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
   /**
    * Initializes the clustered values
    */
-//  @PostConstruct TODO find an alternative for these calls?
-  public void init() {
+  @EventListener
+  public void init(ContextRefreshedEvent event) {
     log.trace("Initialising Alarm oscillation checker ...");
     alarmCacheRef.executeTransaction( () -> {
       alarmCacheQueryProvider.setLastOscillationCheck(0);

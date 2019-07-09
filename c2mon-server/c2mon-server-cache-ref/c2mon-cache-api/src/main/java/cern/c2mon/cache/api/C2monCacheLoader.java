@@ -5,15 +5,15 @@ import cern.c2mon.shared.common.Cacheable;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class C2monCacheLoader<K, V extends Cacheable> {
+public class C2monCacheLoader<V extends Cacheable> {
 
-  private C2monCacheBase<K, V> cache;
+  private C2monCacheBase<V> cache;
 
-  public C2monCacheLoader(C2monCacheBase<K, V> cache) {
+  public C2monCacheLoader(C2monCacheBase<V> cache) {
     this.cache = cache;
   }
 
-  public V loadFromDb(K key) {
+  public V loadFromDb(Long key) {
     V result;
 
     if (!cache.containsKey(key)) {
@@ -38,7 +38,7 @@ public class C2monCacheLoader<K, V extends Cacheable> {
     }
   }
 
-  private V getFromDb(final K key) {
+  private V getFromDb(final Long key) {
     throw new UnsupportedOperationException("Not yet implemented"); //TODO: used for lazy loading, not required by C2mon, can be added in a future
   }
 

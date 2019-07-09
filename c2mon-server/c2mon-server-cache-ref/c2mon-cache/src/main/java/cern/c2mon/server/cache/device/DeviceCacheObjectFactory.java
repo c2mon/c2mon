@@ -20,7 +20,7 @@ import cern.c2mon.shared.daq.config.Change;
 @Component
 public class DeviceCacheObjectFactory extends AbstractCacheObjectFactory<Device> {
 
-  private C2monCacheBase<Long, DeviceClass> deviceClassCacheRef;
+  private C2monCacheBase<DeviceClass> deviceClassCacheRef;
 
 //  @Autowired
 //  public DeviceCacheObjectFactory(C2monCache<Long, DeviceClass> deviceClassCacheRef) {

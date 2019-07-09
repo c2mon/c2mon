@@ -23,7 +23,7 @@ import static org.junit.Assert.*;
 public class CommfaultCacheLoaderTest extends AbstractCacheLoaderTest {
 
   @Autowired
-  private C2monCacheBase<Long, CommFaultTag> commFaultTagCacheRef;
+  private C2monCacheBase<CommFaultTag> commFaultTagCacheRef;
 
   @Autowired
   private CommFaultTagMapper commFaultTagMapper;

@@ -19,7 +19,7 @@ import cern.c2mon.shared.common.supervision.SupervisionConstants;
 @Slf4j
 public class SupervisedServiceImpl<T extends Supervised> implements SupervisedService<T> {
 
-  private final C2monCacheBase<Long, T> c2monCache;
+  private final C2monCacheBase<T> c2monCache;
 
   private final AliveTimerService aliveTimerService;
 
@@ -27,7 +27,7 @@ public class SupervisedServiceImpl<T extends Supervised> implements SupervisedSe
 
   private SupervisionConstants.SupervisionEntity supervisionEntity;
 
-  public SupervisedServiceImpl(final C2monCacheBase<Long, T> c2monCache, final AliveTimerService aliveTimerService) {
+  public SupervisedServiceImpl(final C2monCacheBase<T> c2monCache, final AliveTimerService aliveTimerService) {
     this.c2monCache = c2monCache;
     this.aliveTimerService = aliveTimerService;
     this.aliveTimerCache = aliveTimerService.getCache();

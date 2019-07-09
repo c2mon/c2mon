@@ -24,11 +24,11 @@ import cern.c2mon.shared.common.supervision.SupervisionConstants;
 @Service
 public class EquipmentService implements SupervisedService<Equipment>, AbstractEquipmentService {
 
-  private C2monCacheBase<Long, Equipment> equipmentCacheRef;
+  private C2monCacheBase<Equipment> equipmentCacheRef;
 
-  private C2monCacheBase<Long, Process> processCacheRef;
+  private C2monCacheBase<Process> processCacheRef;
 
-  private C2monCacheBase<Long, DataTag> dataTagCacheRef;
+  private C2monCacheBase<DataTag> dataTagCacheRef;
 
   private SupervisedService<Equipment> supervisedService;
 

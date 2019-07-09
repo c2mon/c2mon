@@ -23,11 +23,11 @@ import cern.c2mon.shared.common.Cacheable;
 /**
  * DAO that must be provided for using the C2MON batch loading mechanism.
  *
- * @param <T> the type of cache object
+ * @param <V> the type of cache object
  *
  * @author Mark Brightwell
  */
-public interface BatchCacheLoaderDAO<K extends Number, V extends Cacheable> extends SimpleCacheLoaderDAO<V> {
+public interface BatchCacheLoaderDAO<V extends Cacheable> extends SimpleCacheLoaderDAO<V> {
 
   /**
    * Returns the highest row number of elements to be loaded. Returns 0 if no

@@ -22,7 +22,7 @@ import static org.junit.Assert.*;
 public class DeviceCacheLoaderTest extends AbstractCacheLoaderTest {
 
   @Autowired
-  private C2monCacheBase<Long, Device> deviceCacheRef;
+  private C2monCacheBase<Device> deviceCacheRef;
 
   @Autowired
   private DeviceMapper deviceMapper;

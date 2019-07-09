@@ -15,7 +15,7 @@ import cern.c2mon.server.common.device.*;
  */
 public class DeviceCacheObjectFactoryTest {
 
-  private C2monCacheBase<Long, DeviceClass> deviceClassCache;
+  private C2monCacheBase<DeviceClass> deviceClassCache;
 
   @Before
   public void init() {

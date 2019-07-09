@@ -19,7 +19,7 @@ import cern.c2mon.shared.common.Cacheable;
  * @author Szymon Halastra
  */
 @Slf4j
-public class BatchCacheLoader<K extends Number, V extends Cacheable> implements CacheLoader<K,V> {
+public class BatchCacheLoader<V extends Cacheable> implements CacheLoader<V> {
 
   /**
    * Executor for loading the cache using multiple threads.
@@ -46,12 +46,12 @@ public class BatchCacheLoader<K extends Number, V extends Cacheable> implements 
   /**
    * Reference to C2monCache
    */
-  private final C2monCacheBase<Long, V> c2monCache;
+  private final C2monCacheBase<V> c2monCache;
 
   /**
    * Reference to batch loader DAO
    */
-  private final BatchCacheLoaderDAO<K, V> batchCacheLoaderDAO;
+  private final BatchCacheLoaderDAO<V> batchCacheLoaderDAO;
 
   /**
    * Constructor (used in Spring XML to instantiate the loaders
@@ -63,8 +63,8 @@ public class BatchCacheLoader<K extends Number, V extends Cacheable> implements 
    * @param batchSize        the number of object loaded in a single task
    * @param threadNamePrefix the name of thread pool
    */
-  public BatchCacheLoader(ThreadPoolTaskExecutor cacheLoaderTaskExecutor, final C2monCacheBase<Long, V> c2monCache,
-                          final BatchCacheLoaderDAO<K, V> cacheLoaderDAO,
+  public BatchCacheLoader(ThreadPoolTaskExecutor cacheLoaderTaskExecutor, final C2monCacheBase<V> c2monCache,
+                          final BatchCacheLoaderDAO<V> cacheLoaderDAO,
                           final int batchSize,
                           final String threadNamePrefix) {
     this.cacheLoaderTaskExecutor = cacheLoaderTaskExecutor;

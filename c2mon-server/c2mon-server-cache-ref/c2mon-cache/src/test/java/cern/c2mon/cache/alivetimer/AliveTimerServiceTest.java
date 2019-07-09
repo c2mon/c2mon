@@ -22,7 +22,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class AliveTimerServiceTest {
 
-  private C2monCacheBase<Long, AliveTimer> aliveTimerCacheRef;
+  private C2monCacheBase<AliveTimer> aliveTimerCacheRef;
 
   private AliveTimerService aliveTimerService;
 

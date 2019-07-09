@@ -28,7 +28,7 @@ public class AliveTimerGeneratorTest {
 
   private static final int ALIVE_INTERVAL = 1000;
 
-  private C2monCacheBase<Long, AliveTimer> aliveTimerCache;
+  private C2monCacheBase<AliveTimer> aliveTimerCache;
   private AliveTimerGenerator generator;
 
   @Before

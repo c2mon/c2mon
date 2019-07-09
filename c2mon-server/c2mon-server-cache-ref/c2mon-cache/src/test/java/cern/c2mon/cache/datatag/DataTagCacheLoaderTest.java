@@ -20,7 +20,7 @@ import static org.junit.Assert.*;
 public class DataTagCacheLoaderTest extends AbstractCacheLoaderTest {
 
   @Autowired
-  private C2monCacheBase<Long, DataTag> dataTagCacheRef;
+  private C2monCacheBase<DataTag> dataTagCacheRef;
 
   @Autowired
   private DataTagMapper dataTagMapper;

@@ -22,7 +22,7 @@ import static org.junit.Assert.assertNotNull;
 public class AlarmQueryTest extends AlarmCacheLoaderTest {
 
   @Autowired
-  private C2monCacheBase<Long, Alarm> alarmCacheRef;
+  private C2monCacheBase<Alarm> alarmCacheRef;
 
   @Test
   @Ignore

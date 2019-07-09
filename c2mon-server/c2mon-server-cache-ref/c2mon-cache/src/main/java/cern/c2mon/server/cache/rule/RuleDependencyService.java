@@ -15,7 +15,7 @@ import cern.c2mon.server.common.tag.Tag;
 @Service
 public class RuleDependencyService {
 
-  private C2monCacheBase<Long, Tag> tagCacheRef;
+  private C2monCacheBase<Tag> tagCacheRef;
 
 //  @Autowired
 //  public RuleDependencyService(final C2monCache<Long, Tag> tagCacheRef) {

@@ -23,6 +23,6 @@ import cern.c2mon.server.common.alarm.Alarm;
  *
  * @author Mark Brightwell
  */
-public interface AlarmLoaderDAO extends ConfigurableDAO<Alarm>, BatchCacheLoaderDAO<Long, Alarm> {
+public interface AlarmLoaderDAO extends ConfigurableDAO<Alarm>, BatchCacheLoaderDAO<Alarm> {
 
 }

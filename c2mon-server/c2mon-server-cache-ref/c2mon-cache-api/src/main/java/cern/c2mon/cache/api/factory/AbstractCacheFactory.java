@@ -13,7 +13,7 @@ public abstract class AbstractCacheFactory {
     return getCachingFactory();
   }
 
-  public abstract <K, V extends Cacheable> C2monCacheBase createCache(String name, Class<K> keyType, Class<V> valueType);
+  public abstract <V extends Cacheable> C2monCacheBase<V> createCache(String name, Class<V> valueType);
 
   public abstract AbstractCacheFactory getCachingFactory();
 }
