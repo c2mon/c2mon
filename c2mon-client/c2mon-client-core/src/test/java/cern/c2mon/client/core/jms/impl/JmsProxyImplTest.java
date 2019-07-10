@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2019 CERN. All rights not expressly granted are reserved.
  * 
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -16,22 +16,16 @@
  *****************************************************************************/
 package cern.c2mon.client.core.jms.impl;
 
-import javax.jms.Connection;
-import javax.jms.ConnectionFactory;
-import javax.jms.Destination;
-import javax.jms.ExceptionListener;
-import javax.jms.JMSException;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageListener;
-import javax.jms.Session;
+import javax.jms.*;
 
-import cern.c2mon.client.core.config.C2monClientProperties;
-import cern.c2mon.client.core.jms.JmsProxy;
-import cern.c2mon.client.core.jms.TopicRegistrationDetails;
+import org.apache.activemq.ActiveMQConnection;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
+import cern.c2mon.client.core.config.C2monClientProperties;
+import cern.c2mon.client.core.jms.JmsProxy;
+import cern.c2mon.client.core.jms.TopicRegistrationDetails;
 import cern.c2mon.client.core.listener.TagUpdateListener;
 import cern.c2mon.shared.client.request.ClientRequestResult;
 import cern.c2mon.shared.client.request.JsonRequest;
@@ -54,13 +48,13 @@ public class JmsProxyImplTest {
    * Mocks
    */
   ConnectionFactory connectionFactory;
-  Connection connection;
+  ActiveMQConnection connection;
   Session session;
   
   @Before
   public void setUp() {
     connectionFactory = EasyMock.createNiceMock(ConnectionFactory.class);
-    connection = EasyMock.createNiceMock(Connection.class);
+    connection = EasyMock.createNiceMock(ActiveMQConnection.class);
     session = EasyMock.createNiceMock(Session.class);
     SlowConsumerListener slowConsumerListener = EasyMock.createNiceMock(SlowConsumerListener.class);
     jmsProxy = new JmsProxyImpl(connectionFactory, slowConsumerListener, new C2monClientProperties());

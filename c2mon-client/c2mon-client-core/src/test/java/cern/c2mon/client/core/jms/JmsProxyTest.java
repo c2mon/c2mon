@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2019 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -39,6 +39,7 @@ import cern.c2mon.client.common.listener.ClientRequestReportListener;
 import cern.c2mon.client.core.listener.TagUpdateListener;
 import cern.c2mon.client.core.config.C2monClientProperties;
 import cern.c2mon.client.core.config.mock.MockServerConfig;
+import cern.c2mon.client.core.jms.impl.JmsProxyImpl;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.request.*;
 import cern.c2mon.shared.client.serializer.TransferTagSerializer;
@@ -271,7 +272,7 @@ public class JmsProxyTest {
 
   /**
    * Tests reconnect works when onException is called and that registered
-   * connection listeners are notified correcly. Test runs with both supervision and update
+   * connection listeners are notified correctly. Test runs with both supervision and update
    * listeners registered and check if reconnected afterwards.
    * @throws JMSException
    * @throws InterruptedException
@@ -284,7 +285,7 @@ public class JmsProxyTest {
       public void onConnection() { latch.countDown(); }
       public void onDisconnection() { latch.countDown(); }
     });
-    ((ExceptionListener) jmsProxy).onException(new JMSException("test exception handling"));
+    ((JmsProxyImpl) jmsProxy).getConnection().getTransport().getTransportListener().transportInterupted();
 
     latch.await();
 

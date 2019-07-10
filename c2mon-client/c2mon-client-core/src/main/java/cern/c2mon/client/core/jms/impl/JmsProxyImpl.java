@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2019 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -34,8 +34,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import javax.annotation.PreDestroy;
 import javax.jms.*;
 
-import com.google.gson.JsonSyntaxException;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.ActiveMQConnection;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.command.ActiveMQQueue;
@@ -45,6 +43,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Component;
+
+import com.google.gson.JsonSyntaxException;
+
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 import cern.c2mon.client.common.listener.ClientRequestReportListener;
 import cern.c2mon.client.core.config.C2monClientProperties;
@@ -113,6 +116,7 @@ public final class JmsProxyImpl implements JmsProxy {
   /**
    * The unique JMS connection used.
    */
+  @Getter
   private ActiveMQConnection connection;
 
   /**
