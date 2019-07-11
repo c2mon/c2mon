@@ -19,6 +19,7 @@ Pleaes not that C2MON depends now on Spring 5! Please upgrade accordingly your c
 - Client API: Since last ActiveMQ upgrade clients were not anymore correctly informed about JMS broker disconnection (#273)
 - Client API: Fixed a JMS resource bug related to the configuration queue where consumers were never deleted (#266)
 - Deployment: Updated C2MON Docker image and Kubernetes files to match the versions in production (#259, #269, #271)
+- Server: Fixed ES Unit tests and switched to [elasticsearch-cluster-runner](https://github.com/codelibs/elasticsearch-cluster-runner) to start the embedded Elasticsearch instance (CM-215)
 
 
 ## 1.8.45 - 2019-06-07
