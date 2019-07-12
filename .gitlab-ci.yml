@@ -7,7 +7,7 @@ stages:
 clean_elasticsearch:
   type: clean
   script:
-    - killall -q java
+    - killall -q java || true
     - rm -Rf /tmp/es-cluster*
 
 # Fully build and publish master branch
