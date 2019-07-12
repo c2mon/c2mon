@@ -53,6 +53,6 @@ sonar_preview:
 quality_assurance:
   stage: sonar
   script:
-    - mvn package dependency-check:aggregate sonar:sonar -Dmaven.test.skip=true -DskipDocker=true -Dsonar.host.url=${SONAR_URL} -Dsonar.dependencyCheck.reportPath=target/dependency-check-report.xml --settings settings.xml
+    - mvn package sonar:sonar -Dmaven.test.skip=true -DskipDocker=true -Dsonar.host.url=${SONAR_URL} -Dsonar.dependencyCheck.reportPath=target/dependency-check-report.xml --settings settings.xml
   only:
     - master
