@@ -18,6 +18,9 @@ package cern.c2mon.server.cache.alarm.impl;
 
 import java.sql.Timestamp;
 
+import lombok.AccessLevel;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,9 +31,6 @@ import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.AlarmCacheUpdater;
 import cern.c2mon.server.common.tag.Tag;
-import lombok.AccessLevel;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * Contains the routing logic for the alarm cache update. The alarm cache listeners will get informed depending, if it
@@ -45,7 +45,7 @@ public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
   @Autowired
   @Setter(AccessLevel.PROTECTED)
   private AlarmCache alarmCache;
-  
+
   @Autowired
   @Setter(AccessLevel.PROTECTED)
   OscillationUpdater oscillationUpdater;
@@ -98,10 +98,10 @@ public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
    * <li> compute the new alarm state
    * <li> changes the oscillation status
    * <li> update info field and timestamps
-   * 
+   *
    * @param alarmCacheObject The current alarm cache object
    * @param tag the tag update
-   * @param resetOscillationStatus true, if method is triggered byu the Oscillation updater task
+   * @param resetOscillationStatus true, if method is triggered by the Oscillation updater task
    * @return The updated alarm cache object
    */
   private AlarmCacheObject updateAlarmCacheObject(final AlarmCacheObject alarmCacheObject, final Tag tag, boolean resetOscillationStatus) {
@@ -121,7 +121,7 @@ public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
       alarmCacheObject.setActive(newState);
       alarmCacheObject.setInternalActive(newState);
     }
-    
+
     // Default case: change the alarm's state
     // (1) if the alarm has never been initialised OR
     // (2) if tag is VALID and the alarm changes from ACTIVE->TERMINATE or TERMINATE->ACTIVE
@@ -145,32 +145,32 @@ public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
 
     return alarmCacheObject;
   }
-  
+
   boolean isAlarmUninitialised(final AlarmCacheObject alarmCacheObject) {
     return alarmCacheObject.getTimestamp() == null || alarmCacheObject.getTimestamp().getTime() == 0L;
   }
-  
+
   private void changeTimestamps(final AlarmCacheObject alarmCacheObject, final Tag tag) {
     alarmCacheObject.setTimestamp(new Timestamp(System.currentTimeMillis()));
     alarmCacheObject.setSourceTimestamp(tag.getTimestamp());
   }
-  
+
   /**
    * Build up a prefix according to the tag value's validity and mode
    */
   private void changeInfoField(final AlarmCacheObject alarmCacheObject, final Tag tag) {
     alarmCacheObject.setInfo(AlarmCacheUpdater.evaluateAdditionalInfo(alarmCacheObject, tag));
   }
-  
+
   private AlarmCacheObject commitAlarmStateChange(final AlarmCacheObject alarmCacheObject, final Tag tag) {
     log.trace("Alarm #{} changed STATE to {}", alarmCacheObject.getId(), alarmCacheObject.isActive());
-    
+
     changeTimestamps(alarmCacheObject, tag);
-    
+
     // Check the oscillating status
     boolean wasAlreadyOscillating = alarmCacheObject.isOscillating();
     oscillationUpdater.updateOscillationStatus(alarmCacheObject);
-    
+
     changeInfoField(alarmCacheObject, tag);
 
     if (alarmCacheObject.isOscillating()) {

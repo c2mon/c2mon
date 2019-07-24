@@ -23,11 +23,10 @@ import java.util.TimerTask;
 
 import javax.annotation.PostConstruct;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Service;
-
-import lombok.extern.slf4j.Slf4j;
 
 import cern.c2mon.server.cache.AlarmCache;
 import cern.c2mon.server.cache.AliveTimerFacade;
@@ -93,9 +92,9 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
   private final ClusterCache clusterCache;
 
   private final AlarmCacheUpdater alarmCacheUpdater;
-  
+
   private final TagFacadeGateway tagFacadeGateway;
-  
+
   private final AlarmQuery alarmCacheQuery = AlarmQuery.builder().oscillating(true).build();
 
   /**
@@ -121,7 +120,7 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
     this.alarmCacheUpdater = alarmCacheUpdater;
     this.tagFacadeGateway = tagFacadeGateway;
   }
-  
+
 
   /**
    * Initializes the clustered values
@@ -203,14 +202,16 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
     try {
       log.trace("Checking oscillation expiry for alarm #{}", alarmId);
       AlarmCacheObject alarmCopy = (AlarmCacheObject) alarmCache.getCopy(alarmId);
-      if(log.isTraceEnabled()) {
-                log.trace(" -> Alarm oscillation details osc {} first osc {} count {} al ts {}", alarmCopy.isOscillating(),
-                        new Date(alarmCopy.getFirstOscTS()).toString(), alarmCopy.getCounterFault(),
-                        alarmCopy.getTimestamp().toString());
-            }
+
+      if (log.isTraceEnabled() && !alarmCopy.getFifoSourceTimestamps().isEmpty()) {
+        log.trace(" -> Alarm oscillation details osc {} first osc {} count {} al ts {}", alarmCopy.isOscillating(),
+            new Date(alarmCopy.getFifoSourceTimestamps().getFirst()).toString(),
+            alarmCopy.getFifoSourceTimestamps().size(), alarmCopy.getTimestamp().toString());
+      }
+
       if (!oscillationUpdater.checkOscillAlive(alarmCopy)) {
           log.trace(" -> ! Alarm #{} is not oscillating anymore, resetting oscillation counter", alarmId);
-          oscillationUpdater.resetOscillationCounter(alarmCopy);
+          alarmCopy.setOscillating(false);
           Tag tag = tagFacadeGateway.getTag(alarmCopy.getDataTagId());
           if(tag != null) {
             alarmCacheUpdater.resetOscillationStatus(alarmCopy, tag);

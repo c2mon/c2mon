@@ -17,21 +17,21 @@
 package cern.c2mon.server.cache.alarm.oscillation;
 
 import java.sql.Timestamp;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import java.util.LinkedList;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import cern.c2mon.server.cache.AlarmCache;
 import cern.c2mon.server.cache.alarm.config.OscillationProperties;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 
 /**
+ * Contains the logic for evaluating, if an alarm is oscillating
  *
- * @author Emiliano Piselli
- *
+ * @author Emiliano Piselli, Matthias Braeger
  */
 @Component
 @Data
@@ -45,7 +45,7 @@ public final class OscillationUpdater {
     OscillationProperties oscillationProperties;
 
     /**
-     * Check, if the alarm shall still keep its oscillation flag. This is the case, if the last alarm update was longer ago than the defined threshold. 
+     * Check, if the alarm shall still keep its oscillation flag. This is the case, if the last alarm update was longer ago than the defined threshold.
      * @see OscillationProperties#getTimeOscillationAlive()
      * @param alarmCacheObject The current alarm object of the cache
      * @return true, if the alarm shall still keep its oscillation flag
@@ -66,29 +66,30 @@ public final class OscillationUpdater {
      * @param alarmCacheObject an updated alarm cache object with the new state
      */
     public void updateOscillationStatus(AlarmCacheObject alarmCacheObject) {
-        
-        if (alarmCacheObject.getCounterFault() % oscillationProperties.getOscNumbers() == 0) {
-            alarmCacheObject.setFirstOscTS(alarmCacheObject.getSourceTimestamp().getTime());
-        }
-        if ( (! alarmCacheObject.isOscillating()) && (isOscillationExpired(alarmCacheObject))) {
-            alarmCacheObject.setCounterFault(0);
-        }
-        
-        // Increase oscillation counter
-        alarmCacheObject.setCounterFault(alarmCacheObject.getCounterFault() + 1);
-        
-        if(checkOscillConditions(alarmCacheObject)) {
-            log.debug("Setting oscillation flag == true for alarm #{}", alarmCacheObject.getId());
-            // We only change the oscillation status if the alarm is currently oscillating.
-            // Expiring the oscillation is the work of the OscillationUpdateChecker class.
-            alarmCacheObject.setOscillating(true);
-        }
+
+      updateOscTimestampList(alarmCacheObject);
+
+      if (!alarmCacheObject.isOscillating() && isAlarmOscillating(alarmCacheObject)) {
+        log.debug("Setting oscillation flag == true for alarm #{}", alarmCacheObject.getId());
+      }
+      alarmCacheObject.setOscillating(isAlarmOscillating(alarmCacheObject));
     }
 
-    public void resetOscillationCounter(AlarmCacheObject alarmCacheObject) {
-        alarmCacheObject.setCounterFault(0);
-        alarmCacheObject.setOscillating(false);
-        alarmCacheObject.setFirstOscTS(0);
+    /**
+     * Adds the current source timestamp to the oscillation FIFO list for comparison and makes sure that the list
+     * of n previous source timestamps is never bigger than the configured OSC numbers.
+     *
+     * @param alarmCacheObject the alarm to treat
+     */
+    private void updateOscTimestampList(AlarmCacheObject alarmCacheObject) {
+      if (alarmCacheObject.getFifoSourceTimestamps() == null) {
+        alarmCacheObject.setFifoSourceTimestamps(new LinkedList<>());
+      }
+
+      while (alarmCacheObject.getFifoSourceTimestamps().size() > oscillationProperties.getOscNumbers()) {
+        alarmCacheObject.getFifoSourceTimestamps().removeFirst();
+      }
+      alarmCacheObject.getFifoSourceTimestamps().add(alarmCacheObject.getSourceTimestamp().getTime());
     }
 
     /**
@@ -99,13 +100,16 @@ public final class OscillationUpdater {
      *            the alarm cache object containing already the new alarm state.
      * @return true, if alarm shall be marked as oscillating.
      */
-    private boolean checkOscillConditions(AlarmCacheObject alarmCacheObject) {
-        return ((alarmCacheObject.getCounterFault() > oscillationProperties.getOscNumbers())
-                && (!isOscillationExpired(alarmCacheObject)));
+    private boolean isAlarmOscillating(AlarmCacheObject alarmCacheObject) {
+        return ((alarmCacheObject.getFifoSourceTimestamps().size() > oscillationProperties.getOscNumbers())
+                && isInOscillationTimeTriggerRange(alarmCacheObject));
     }
 
-    private boolean isOscillationExpired(AlarmCacheObject alarmCacheObject) {
-        return (alarmCacheObject.getSourceTimestamp().getTime() - alarmCacheObject.getFirstOscTS())
-            > oscillationProperties.getTimeRange() * 1000;
+    private boolean isInOscillationTimeTriggerRange(AlarmCacheObject alarmCacheObject) {
+        if (log.isTraceEnabled()) {
+          log.trace("isInOscillationTimeRange?: {} <= {}", alarmCacheObject.getSourceTimestamp().getTime() - alarmCacheObject.getFifoSourceTimestamps().getFirst(), oscillationProperties.getTimeRange() * 1000);
+        }
+        return (alarmCacheObject.getSourceTimestamp().getTime() - alarmCacheObject.getFifoSourceTimestamps().getFirst())
+            <= (oscillationProperties.getTimeRange() * 1000);
     }
 }

@@ -17,6 +17,7 @@
 package cern.c2mon.server.common.alarm;
 
 import java.sql.Timestamp;
+import java.util.LinkedList;
 
 import lombok.Data;
 
@@ -83,22 +84,6 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
    */
   private boolean active = false;
 
-  /**
-   * <code>true</code> if the alarm state is active as maintained internally. This state is not exposed to listeners
-   * and only used for the purpose of detecting and maintaining oscillation.
-   * It always reflect the true state of an alarm, regardless of oscillation status
-   * (in contrast with the attribute <b>active</b> which may be forced to <code>true</code> if an oscillation is ongoing).
-   */
-  private boolean internalActive;
-
-  private int counterFault;
-
-  /** Timestamp in milliseconds, when oscillation flag was set has started */
-  private long firstOscTS;
-
-  /** Set to <code>true</code>, if alarm starts oscillating */
-  private boolean oscillating;
-
   /** Same as the server timestamp of the tag, that triggered the alarm state change */
   private Timestamp timestamp;
 
@@ -114,6 +99,25 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
    * Name of the JMS topic on which the alarm will be distributed to clients.
    */
   private String topic = "c2mon.client.alarm";
+
+  ///////////////////////////////////////////////////////////////////////////////
+  /////////// VARIABLES REQUIRED FOR DETECTING ALARM OSCILLATION ////////////////
+  ///////////////////////////////////////////////////////////////////////////////
+
+  /**
+   * <code>true</code> if the alarm state is active as maintained internally. This state is not exposed to listeners
+   * and only used for the purpose of detecting and maintaining oscillation.
+   * It always reflect the true state of an alarm, regardless of oscillation status
+   * (in contrast with the attribute <b>active</b> which may be forced to <code>true</code> if an oscillation is ongoing).
+   */
+  private boolean internalActive;
+
+  /** Used to keep the n last source timestamps to calculate the oscillation time range */
+  private LinkedList<Long> fifoSourceTimestamps = new LinkedList<>();
+
+  /** Set to <code>true</code>, if alarm starts oscillating */
+  private boolean oscillating;
+
 
   /**
    * Default constructor.
@@ -185,10 +189,11 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
 
   /**
    * Convert the object to string, with optional extended debug information.
-   * 
+   *
    * @param extended <code>true</code> to obtain debug information.
    * @return A string representation of the object.
    */
+  @Override
   public String toString(boolean extended) {
     StringBuilder str = new StringBuilder();
 
