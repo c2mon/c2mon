@@ -38,11 +38,15 @@ import cern.c2mon.server.common.alarm.AlarmCacheObject;
 @Slf4j
 public final class OscillationUpdater {
 
-    @Autowired
-    AlarmCache alarmCache;
+    private final AlarmCache alarmCache;
+
+    private final OscillationProperties oscillationProperties;
 
     @Autowired
-    OscillationProperties oscillationProperties;
+    public OscillationUpdater(AlarmCache alarmCache, OscillationProperties oscillationProperties) {
+      this.alarmCache = alarmCache;
+      this.oscillationProperties = oscillationProperties;
+    }
 
     /**
      * Check, if the alarm shall still keep its oscillation flag. This is the case, if the last alarm update was longer ago than the defined threshold.
@@ -71,8 +75,8 @@ public final class OscillationUpdater {
 
       if (!alarmCacheObject.isOscillating() && isAlarmOscillating(alarmCacheObject)) {
         log.debug("Setting oscillation flag == true for alarm #{}", alarmCacheObject.getId());
+        alarmCacheObject.setOscillating(true);
       }
-      alarmCacheObject.setOscillating(isAlarmOscillating(alarmCacheObject));
     }
 
     /**

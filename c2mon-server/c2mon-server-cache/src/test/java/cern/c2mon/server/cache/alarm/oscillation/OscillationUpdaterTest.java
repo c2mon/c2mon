@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.cache.alarm.impl;
+package cern.c2mon.server.cache.alarm.oscillation;
 
 import java.sql.Timestamp;
 
@@ -26,7 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import cern.c2mon.server.cache.AlarmCache;
 import cern.c2mon.server.cache.alarm.config.OscillationProperties;
-import cern.c2mon.server.cache.alarm.oscillation.OscillationUpdater;
+import cern.c2mon.server.cache.alarm.impl.AlarmCacheUpdaterImpl;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.AlarmCondition;
@@ -46,6 +46,8 @@ public class OscillationUpdaterTest {
   private OscillationUpdater oscUpdater;
   private DataTagCacheObject dataTagCacheObject;
 
+  AlarmCache alarmCache = createMock(AlarmCache.class);
+
   @Autowired
   OscillationProperties oscillationProperties;
 
@@ -53,12 +55,14 @@ public class OscillationUpdaterTest {
   @Before
   public void setup() {
     alarmCacheObject = new AlarmCacheObject(1234L);
-    oscUpdater = new OscillationUpdater();
-    dataTagCacheObject = new DataTagCacheObject();
+
     oscillationProperties = new OscillationProperties();
     oscillationProperties.setOscNumbers(3);
     oscillationProperties.setTimeRange(50);
-    oscUpdater.setOscillationProperties(oscillationProperties);
+
+    oscUpdater = new OscillationUpdater(alarmCache, oscillationProperties);
+    dataTagCacheObject = new DataTagCacheObject();
+
 
     dataTagCacheObject.setSourceTimestamp(new Timestamp(System.currentTimeMillis() - 60000));
     dataTagCacheObject.setValue(0);
@@ -159,7 +163,9 @@ public class OscillationUpdaterTest {
 
 
   /**
-   * 5 oscillation in 180 seconds are the trigger and we are just out. This time we start from an oscillating alarm
+   * 5 oscillation in 180 seconds are the trigger and we are just out. This time we start from an oscillating alarm, but
+   * as only the {@link OscillationUpdateChecker} is allowed to reset the flag, the alarm should remain with the
+   * oscillation flag on.
    */
   @Test
   public void testTimestampNotInRange2() {
@@ -176,7 +182,7 @@ public class OscillationUpdaterTest {
       oscUpdater.updateOscillationStatus(alarmCacheObject);
       log.info("ALARM ACTIVE: {} - INTERNAL ACTIVE: {} - OSCILLATION: {}", alarmCacheObject.isActive(), alarmCacheObject.isInternalActive(), alarmCacheObject.isOscillating());
     }
-    assertFalse("The alarm should NOT be set as oscillating", alarmCacheObject.isOscillating());
+    assertTrue("The alarm should remain with the oscillating flag on", alarmCacheObject.isOscillating());
   }
 
   @Test
@@ -195,14 +201,15 @@ public class OscillationUpdaterTest {
     }
     assertTrue("The alarm should be set as oscillating", alarmCacheObject.isOscillating());
 
-    // Now we slow down and the oscillation should be removed
+    // Now we slow down and the oscillation, but the oscillation flag should remain as only the OscillationUpdateChecker
+    // is allowed to remove the oscillation flag.
     for (int i = 0; i < 7; i++) {
       alarmCacheObject.setActive(!alarmCacheObject.isActive());
       alarmCacheObject.setSourceTimestamp(new Timestamp(alarmCacheObject.getSourceTimestamp().getTime() + 36500));
       oscUpdater.updateOscillationStatus(alarmCacheObject);
       log.info("ALARM ACTIVE: {} - INTERNAL ACTIVE: {} - OSCILLATION: {}", alarmCacheObject.isActive(), alarmCacheObject.isInternalActive(), alarmCacheObject.isOscillating());
     }
-    assertFalse("The alarm should NOT be set as oscillating", alarmCacheObject.isOscillating());
+    assertTrue("The alarm should remain as oscillating", alarmCacheObject.isOscillating());
   }
 
   @Test
@@ -234,11 +241,7 @@ public class OscillationUpdaterTest {
 
   @Test
   public void testOscillationInfo() throws Exception {
-    AlarmCache myAlarmCache = createMock(AlarmCache.class);
-
-    AlarmCacheUpdaterImpl myAlarmCacheUpdater = new AlarmCacheUpdaterImpl();
-    myAlarmCacheUpdater.setAlarmCache(myAlarmCache);
-    myAlarmCacheUpdater.setOscillationUpdater(this.oscUpdater);
+    AlarmCacheUpdaterImpl myAlarmCacheUpdater = new AlarmCacheUpdaterImpl(alarmCache, oscUpdater);
 
     alarmCacheObject.setOscillating(false);
     for (int i = 1; i <= oscillationProperties.getOscNumbers(); i++) {
@@ -247,12 +250,12 @@ public class OscillationUpdaterTest {
 
       // Notify the mock object that we expect put() to be called
       if (i <= oscillationProperties.getOscNumbers()) {
-        myAlarmCache.put(alarmCacheObject.getId(), alarmCacheObject);
+        alarmCache.put(alarmCacheObject.getId(), alarmCacheObject);
       } else {
-        myAlarmCache.putQuiet(alarmCacheObject);
+        alarmCache.putQuiet(alarmCacheObject);
       }
       EasyMock.expectLastCall();
-      EasyMock.replay(myAlarmCache);
+      EasyMock.replay(alarmCache);
 
       myAlarmCacheUpdater.update(alarmCacheObject, dataTagCacheObject);
       log.info("ALARM ACTIVE: {} - INTERNAL ACTIVE: {} OSCILLATION: {} INFO: {} firstOscTS {} counter {} ", alarmCacheObject.isActive(), alarmCacheObject.isInternalActive(), alarmCacheObject.isOscillating(), alarmCacheObject.getInfo(), alarmCacheObject.getFifoSourceTimestamps().getFirst(), alarmCacheObject.getFifoSourceTimestamps().size());
@@ -260,8 +263,8 @@ public class OscillationUpdaterTest {
       if(alarmCacheObject.isOscillating()) {
         assertTrue("If an alarm is oscillating, it must be active", alarmCacheObject.isActive());
       }
-      EasyMock.verify(myAlarmCache);
-      EasyMock.reset(myAlarmCache);
+      EasyMock.verify(alarmCache);
+      EasyMock.reset(alarmCache);
     }
     log.info("===========================");
     alarmCacheObject.getFifoSourceTimestamps().clear();
@@ -274,18 +277,18 @@ public class OscillationUpdaterTest {
       dataTagCacheObject.setValue((i + 1) % 2);
       // Notify the mock object that we expect put() to be called
       if (i <= oscillationProperties.getOscNumbers()) {
-        myAlarmCache.put(alarmCacheObject.getId(), alarmCacheObject);
+        alarmCache.put(alarmCacheObject.getId(), alarmCacheObject);
       } else {
-        myAlarmCache.putQuiet(alarmCacheObject);
+        alarmCache.putQuiet(alarmCacheObject);
       }
       EasyMock.expectLastCall();
-      EasyMock.replay(myAlarmCache);
+      EasyMock.replay(alarmCache);
 
       myAlarmCacheUpdater.update(alarmCacheObject, dataTagCacheObject);
       log.info("ALARM ACTIVE: {} - INTERNAL ACTIVE: {} OSCILLATION: {} INFO: {} firstOscTS {} counter {} ", alarmCacheObject.isActive(), alarmCacheObject.isInternalActive(), alarmCacheObject.isOscillating(), alarmCacheObject.getInfo(), alarmCacheObject.getFifoSourceTimestamps().getFirst(), alarmCacheObject.getFifoSourceTimestamps().size());
 
-      EasyMock.verify(myAlarmCache);
-      EasyMock.reset(myAlarmCache);
+      EasyMock.verify(alarmCache);
+      EasyMock.reset(alarmCache);
     }
   }
 }
