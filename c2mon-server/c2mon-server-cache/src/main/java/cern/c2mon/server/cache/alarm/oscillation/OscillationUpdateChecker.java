@@ -64,12 +64,12 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
    * Across server cluster it assures that the alive check only takes place on a
    * single server.
    */
-  private static final String LAST_CHECK_LONG = OscillationUpdateChecker.class.getName() + ".lastAliveTimerCheck";
+  protected static final String LAST_CHECK_LONG = OscillationUpdateChecker.class.getName() + ".lastAliveTimerCheck";
 
   /**
    * How often the timer checks whether the oscillation timer have expired.
    */
-  private static final long SCAN_INTERVAL = 60000L;
+  protected static final long SCAN_INTERVAL = 60000L;
 
   /**
    * The time the server waits before doing first checks at start up (this gives
@@ -95,7 +95,7 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
 
   private final TagFacadeGateway tagFacadeGateway;
 
-  private final AlarmQuery alarmCacheQuery = AlarmQuery.builder().oscillating(true).build();
+  protected final AlarmQuery alarmCacheQuery = AlarmQuery.builder().oscillating(true).build();
 
   /**
    * Constructor.
@@ -181,7 +181,7 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
           if (oscillatingAlarmIds.isEmpty()) {
             log.debug("Currently no oscillating alarms");
           } else {
-            log.warn("Currently {} oscillating alarms", oscillatingAlarmIds.size());
+            log.info("Currently {} oscillating alarms", oscillatingAlarmIds.size());
             oscillatingAlarmIds.stream().forEach(this::updateAlarmOscillationFlag);
           }
         } catch (Exception e) {
@@ -210,13 +210,12 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
       }
 
       if (!oscillationUpdater.checkOscillAlive(alarmCopy)) {
-          log.trace(" -> ! Alarm #{} is not oscillating anymore, resetting oscillation counter", alarmId);
-          alarmCopy.setOscillating(false);
+          log.trace(" -> ! Alarm #{} is not oscillating anymore, resetting oscillation flag", alarmId);
           Tag tag = tagFacadeGateway.getTag(alarmCopy.getDataTagId());
           if(tag != null) {
             alarmCacheUpdater.resetOscillationStatus(alarmCopy, tag);
           } else {
-              log.error("Cannot locate data tag #{} - unable to reset oscillation status", alarmCopy.getDataTagId());
+            log.error("Cannot locate data tag #{} - unable to reset oscillation status", alarmCopy.getDataTagId());
           }
       } else {
           log.trace(" -> (!) Alarm #{} is still oscillating - no change", alarmId);

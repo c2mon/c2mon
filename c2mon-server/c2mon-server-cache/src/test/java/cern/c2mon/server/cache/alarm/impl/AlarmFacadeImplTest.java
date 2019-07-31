@@ -25,15 +25,9 @@ import org.junit.Test;
 import cern.c2mon.server.cache.AlarmCache;
 import cern.c2mon.server.cache.TagLocationService;
 import cern.c2mon.server.cache.alarm.config.OscillationProperties;
-import cern.c2mon.server.cache.alarm.impl.AlarmCacheUpdaterImpl;
-import cern.c2mon.server.cache.alarm.impl.AlarmFacadeImpl;
 import cern.c2mon.server.cache.alarm.oscillation.OscillationUpdater;
-import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
-import cern.c2mon.server.common.alarm.AlarmCacheUpdater;
-import cern.c2mon.server.common.alarm.AlarmCondition;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
-import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.test.CacheObjectCreation;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
@@ -56,18 +50,15 @@ public class AlarmFacadeImplTest {
   private AlarmCache alarmCache;
 
   private TagLocationService tagLocationService;
-  
+
   private AlarmCacheUpdaterImpl alarmCacheUpdater;
 
   @Before
   public void setup() {
     alarmCache = EasyMock.createNiceMock(AlarmCache.class);
     tagLocationService = EasyMock.createStrictMock(TagLocationService.class);
-    alarmCacheUpdater = new AlarmCacheUpdaterImpl();
-    OscillationUpdater oscillationUpdater = new OscillationUpdater();
-    oscillationUpdater.setOscillationProperties(new OscillationProperties());
-    alarmCacheUpdater.setOscillationUpdater(oscillationUpdater);
-    alarmCacheUpdater.setAlarmCache(alarmCache);
+    OscillationUpdater oscillationUpdater = new OscillationUpdater(alarmCache, new OscillationProperties());
+    alarmCacheUpdater = new AlarmCacheUpdaterImpl(alarmCache, oscillationUpdater);
     alarmFacadeImpl = new AlarmFacadeImpl(alarmCache, tagLocationService, alarmCacheUpdater);
   }
 
@@ -96,7 +87,7 @@ public class AlarmFacadeImplTest {
     alarmCache.releaseWriteLockOnKey(currentAlarmState.getId());
     EasyMock.replay(alarmCache, tagLocationService);
     //(1)test update works
-    AlarmCacheObject newAlarm = (AlarmCacheObject) alarmFacadeImpl.update(currentAlarmState.getId(), tag);
+    alarmFacadeImpl.update(currentAlarmState.getId(), tag);
     EasyMock.verify(alarmCache, tagLocationService);
 
     assertEquals(false, currentAlarmState.isActive());
@@ -116,7 +107,7 @@ public class AlarmFacadeImplTest {
     AlarmCacheObject currentAlarmState = CacheObjectCreation.createTestAlarm2();
     Timestamp origTime = new Timestamp(System.currentTimeMillis() - 50000);
     currentAlarmState.setTimestamp(origTime);
-    tag.setSourceTimestamp(tagTime); 
+    tag.setSourceTimestamp(tagTime);
     //check set as expected
     assertEquals(true, currentAlarmState.isActive());
     assertEquals(false, currentAlarmState.getCondition().evaluateState(tag.getValue()));

@@ -18,8 +18,6 @@ package cern.c2mon.server.cache.alarm.impl;
 
 import java.sql.Timestamp;
 
-import lombok.AccessLevel;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -42,13 +40,20 @@ import cern.c2mon.server.common.tag.Tag;
 @Slf4j
 public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
 
-  @Autowired
-  @Setter(AccessLevel.PROTECTED)
-  private AlarmCache alarmCache;
+  private final AlarmCache alarmCache;
 
+  private final OscillationUpdater oscillationUpdater;
+
+  /**
+   * Default Constructor
+   * @param alarmCache The alarm cache instance
+   * @param oscillationUpdater The oscillation updater
+   */
   @Autowired
-  @Setter(AccessLevel.PROTECTED)
-  OscillationUpdater oscillationUpdater;
+  public AlarmCacheUpdaterImpl(AlarmCache alarmCache, OscillationUpdater oscillationUpdater) {
+    this.alarmCache = alarmCache;
+    this.oscillationUpdater = oscillationUpdater;
+  }
 
   /**
    * Logic kept the same as in TIM1 (see {@link AlarmFacade}). The locking of
@@ -125,8 +130,8 @@ public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
     // Default case: change the alarm's state
     // (1) if the alarm has never been initialised OR
     // (2) if tag is VALID and the alarm changes from ACTIVE->TERMINATE or TERMINATE->ACTIVE
-    if (isAlarmUninitialised(alarmCacheObject) || (tag.isValid() && alarmStateHasChanged) ) {
-      return commitAlarmStateChange(alarmCacheObject, tag);
+    if (isAlarmUninitialised(alarmCacheObject) || (tag.isValid() && (alarmStateHasChanged || resetOscillationStatus)) ) {
+      return commitAlarmStateChange(alarmCacheObject, tag, resetOscillationStatus);
     }
 
     // Check if INFO field has changed and alarm is active
@@ -162,14 +167,16 @@ public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
     alarmCacheObject.setInfo(AlarmCacheUpdater.evaluateAdditionalInfo(alarmCacheObject, tag));
   }
 
-  private AlarmCacheObject commitAlarmStateChange(final AlarmCacheObject alarmCacheObject, final Tag tag) {
+  private AlarmCacheObject commitAlarmStateChange(final AlarmCacheObject alarmCacheObject, final Tag tag, boolean resetOscillationStatus) {
     log.trace("Alarm #{} changed STATE to {}", alarmCacheObject.getId(), alarmCacheObject.isActive());
 
     changeTimestamps(alarmCacheObject, tag);
 
-    // Check the oscillating status
     boolean wasAlreadyOscillating = alarmCacheObject.isOscillating();
-    oscillationUpdater.updateOscillationStatus(alarmCacheObject);
+    if (!resetOscillationStatus) {
+      // Check the oscillating status
+      oscillationUpdater.updateOscillationStatus(alarmCacheObject);
+    }
 
     changeInfoField(alarmCacheObject, tag);
 
