@@ -167,15 +167,13 @@ public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
     alarmCacheObject.setInfo(AlarmCacheUpdater.evaluateAdditionalInfo(alarmCacheObject, tag));
   }
 
-  private AlarmCacheObject commitAlarmStateChange(final AlarmCacheObject alarmCacheObject, final Tag tag, boolean resetOscillationStatus) {
+  protected AlarmCacheObject commitAlarmStateChange(final AlarmCacheObject alarmCacheObject, final Tag tag, boolean resetOscillationStatus) {
     log.trace("Alarm #{} changed STATE to {}", alarmCacheObject.getId(), alarmCacheObject.isActive());
-
-    changeTimestamps(alarmCacheObject, tag);
 
     boolean wasAlreadyOscillating = alarmCacheObject.isOscillating();
     if (!resetOscillationStatus) {
       // Check the oscillating status
-      oscillationUpdater.updateOscillationStatus(alarmCacheObject);
+      oscillationUpdater.updateOscillationStatus(alarmCacheObject, tag.getTimestamp().getTime());
     }
 
     changeInfoField(alarmCacheObject, tag);
@@ -185,9 +183,11 @@ public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
         // (only the *internalActive* property reflects the true status)
         alarmCacheObject.setActive(true);
     }
+
     if (wasAlreadyOscillating) {
         alarmCache.putQuiet(alarmCacheObject);
     } else {
+        changeTimestamps(alarmCacheObject, tag);
         alarmCache.put(alarmCacheObject.getId(), alarmCacheObject);
     }
 

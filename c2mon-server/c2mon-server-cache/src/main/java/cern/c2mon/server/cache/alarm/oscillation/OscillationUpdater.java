@@ -68,10 +68,11 @@ public final class OscillationUpdater {
     /**
      * Increases the oscillation counter and evaluates if the alarm is oscillating or not.
      * @param alarmCacheObject an updated alarm cache object with the new state
+     * @param tag The latest tag event
      */
-    public void updateOscillationStatus(AlarmCacheObject alarmCacheObject) {
+    public void updateOscillationStatus(AlarmCacheObject alarmCacheObject, long sourceTimestamp) {
 
-      updateOscTimestampList(alarmCacheObject);
+      updateOscTimestampList(alarmCacheObject, sourceTimestamp);
 
       if (!alarmCacheObject.isOscillating() && isAlarmOscillating(alarmCacheObject)) {
         log.debug("Setting oscillation flag == true for alarm #{}", alarmCacheObject.getId());
@@ -85,7 +86,7 @@ public final class OscillationUpdater {
      *
      * @param alarmCacheObject the alarm to treat
      */
-    private void updateOscTimestampList(AlarmCacheObject alarmCacheObject) {
+    private void updateOscTimestampList(AlarmCacheObject alarmCacheObject, long sourceTimestamp) {
       if (alarmCacheObject.getFifoSourceTimestamps() == null) {
         alarmCacheObject.setFifoSourceTimestamps(new LinkedList<>());
       }
@@ -93,7 +94,7 @@ public final class OscillationUpdater {
       while (alarmCacheObject.getFifoSourceTimestamps().size() > oscillationProperties.getOscNumbers()) {
         alarmCacheObject.getFifoSourceTimestamps().removeFirst();
       }
-      alarmCacheObject.getFifoSourceTimestamps().add(alarmCacheObject.getSourceTimestamp().getTime());
+      alarmCacheObject.getFifoSourceTimestamps().add(sourceTimestamp);
     }
 
     /**
@@ -110,10 +111,11 @@ public final class OscillationUpdater {
     }
 
     private boolean isInOscillationTimeTriggerRange(AlarmCacheObject alarmCacheObject) {
-        if (log.isTraceEnabled()) {
-          log.trace("isInOscillationTimeRange?: {} <= {}", alarmCacheObject.getSourceTimestamp().getTime() - alarmCacheObject.getFifoSourceTimestamps().getFirst(), oscillationProperties.getTimeRange() * 1000);
-        }
-        return (alarmCacheObject.getSourceTimestamp().getTime() - alarmCacheObject.getFifoSourceTimestamps().getFirst())
-            <= (oscillationProperties.getTimeRange() * 1000);
+      long first = alarmCacheObject.getFifoSourceTimestamps().getFirst();
+      long last = alarmCacheObject.getFifoSourceTimestamps().getLast();
+      if (log.isTraceEnabled()) {
+        log.trace("isInOscillationTimeRange?: {} <= {}", last - first, oscillationProperties.getTimeRange() * 1000);
+      }
+      return (last - first) <= (oscillationProperties.getTimeRange() * 1000);
     }
 }

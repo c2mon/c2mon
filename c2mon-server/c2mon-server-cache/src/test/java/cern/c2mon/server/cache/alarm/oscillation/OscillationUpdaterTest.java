@@ -22,7 +22,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import cern.c2mon.server.cache.AlarmCache;
 import cern.c2mon.server.cache.alarm.config.OscillationProperties;
@@ -46,10 +45,8 @@ public class OscillationUpdaterTest {
   private OscillationUpdater oscUpdater;
   private DataTagCacheObject dataTagCacheObject;
 
-  AlarmCache alarmCache = createMock(AlarmCache.class);
-
-  @Autowired
-  OscillationProperties oscillationProperties;
+  private AlarmCache alarmCache = createMock(AlarmCache.class);
+  private OscillationProperties oscillationProperties;
 
   @SuppressWarnings("serial")
   @Before
@@ -93,12 +90,13 @@ public class OscillationUpdaterTest {
    */
   @Test
   public void testOscillDetected() {
-    alarmCacheObject.setSourceTimestamp(new Timestamp(System.currentTimeMillis() - 500000));
+    long sourceTimestamp = System.currentTimeMillis() - 500000L;
+    alarmCacheObject.setSourceTimestamp(new Timestamp(sourceTimestamp));
     assertFalse(alarmCacheObject.isOscillating());
     for (int i = 0; i < 20; i++) {
       alarmCacheObject.setActive(!alarmCacheObject.isActive());
-      alarmCacheObject.setSourceTimestamp(new Timestamp(alarmCacheObject.getSourceTimestamp().getTime() + 1000));
-      oscUpdater.updateOscillationStatus(alarmCacheObject);
+      sourceTimestamp = sourceTimestamp + 1000L;
+      oscUpdater.updateOscillationStatus(alarmCacheObject, sourceTimestamp);
       log.info("ALARM ACTIVE: {} - INTERNAL ACTIVE: {} - OSCILLATION: {}", alarmCacheObject.isActive(), alarmCacheObject.isInternalActive(), alarmCacheObject.isOscillating());
     }
     assertTrue(alarmCacheObject.isOscillating());
@@ -106,12 +104,13 @@ public class OscillationUpdaterTest {
 
   @Test
   public void testAlarmNotOscillating() {
-    alarmCacheObject.setSourceTimestamp(new Timestamp(System.currentTimeMillis() - 500000));
+    long sourceTimestamp = System.currentTimeMillis() - 500000L;
+    alarmCacheObject.setSourceTimestamp(new Timestamp(sourceTimestamp));
     assertFalse(alarmCacheObject.isOscillating());
     for (int i = 0; i < 20; i++) {
       alarmCacheObject.setActive(!alarmCacheObject.isActive());
-      alarmCacheObject.setSourceTimestamp(new Timestamp(alarmCacheObject.getSourceTimestamp().getTime() + 30000L));
-      oscUpdater.updateOscillationStatus(alarmCacheObject);
+      sourceTimestamp = sourceTimestamp + 30000L;
+      oscUpdater.updateOscillationStatus(alarmCacheObject, sourceTimestamp);
       log.info("SOURCE TIMESTAMP: {} - ALARM ACTIVE: {} - INTERNAL ACTIVE: {} - OSCILLATION: {}", alarmCacheObject.getSourceTimestamp(), alarmCacheObject.isActive(), alarmCacheObject.isInternalActive(), alarmCacheObject.isOscillating());
     }
     assertFalse(alarmCacheObject.isOscillating());
@@ -130,12 +129,13 @@ public class OscillationUpdaterTest {
     oscillationProperties.setTimeRange(180);
     oscillationProperties.setTimeOscillationAlive(180);
 
-    alarmCacheObject.setSourceTimestamp(new Timestamp(System.currentTimeMillis() - 500000));
+    long sourceTimestamp = System.currentTimeMillis() - 500000L;
+    alarmCacheObject.setSourceTimestamp(new Timestamp(sourceTimestamp));
     assertFalse(alarmCacheObject.isOscillating());
     for (int i = 0; i < 7; i++) {
       alarmCacheObject.setActive(!alarmCacheObject.isActive());
-      alarmCacheObject.setSourceTimestamp(new Timestamp(alarmCacheObject.getSourceTimestamp().getTime() + 36000));
-      oscUpdater.updateOscillationStatus(alarmCacheObject);
+      sourceTimestamp = sourceTimestamp + 36000L;
+      oscUpdater.updateOscillationStatus(alarmCacheObject, sourceTimestamp);
       log.info("ALARM ACTIVE: {} - INTERNAL ACTIVE: {} - OSCILLATION: {}", alarmCacheObject.isActive(), alarmCacheObject.isInternalActive(), alarmCacheObject.isOscillating());
     }
     assertTrue("The alarm should be set as oscillating", alarmCacheObject.isOscillating());
@@ -150,12 +150,13 @@ public class OscillationUpdaterTest {
     oscillationProperties.setTimeRange(180);
     oscillationProperties.setTimeOscillationAlive(180);
 
-    alarmCacheObject.setSourceTimestamp(new Timestamp(System.currentTimeMillis() - 500000));
+    long sourceTimestamp = System.currentTimeMillis() - 500000L;
+    alarmCacheObject.setSourceTimestamp(new Timestamp(sourceTimestamp));
     assertFalse(alarmCacheObject.isOscillating());
     for (int i = 0; i < 7; i++) {
       alarmCacheObject.setActive(!alarmCacheObject.isActive());
-      alarmCacheObject.setSourceTimestamp(new Timestamp(alarmCacheObject.getSourceTimestamp().getTime() + 36500));
-      oscUpdater.updateOscillationStatus(alarmCacheObject);
+      sourceTimestamp = sourceTimestamp + 36500L;
+      oscUpdater.updateOscillationStatus(alarmCacheObject, sourceTimestamp);
       log.info("ALARM ACTIVE: {} - INTERNAL ACTIVE: {} - OSCILLATION: {}", alarmCacheObject.isActive(), alarmCacheObject.isInternalActive(), alarmCacheObject.isOscillating());
     }
     assertFalse("The alarm should NOT be set as oscillating", alarmCacheObject.isOscillating());
@@ -174,12 +175,13 @@ public class OscillationUpdaterTest {
     oscillationProperties.setTimeOscillationAlive(180);
 
     alarmCacheObject.setOscillating(true);
-    alarmCacheObject.setSourceTimestamp(new Timestamp(System.currentTimeMillis() - 500000));
+    long sourceTimestamp = System.currentTimeMillis() - 500000L;
+    alarmCacheObject.setSourceTimestamp(new Timestamp(sourceTimestamp));
     assertTrue(alarmCacheObject.isOscillating());
     for (int i = 0; i < 7; i++) {
       alarmCacheObject.setActive(!alarmCacheObject.isActive());
-      alarmCacheObject.setSourceTimestamp(new Timestamp(alarmCacheObject.getSourceTimestamp().getTime() + 36500));
-      oscUpdater.updateOscillationStatus(alarmCacheObject);
+      sourceTimestamp = sourceTimestamp + 36500L;
+      oscUpdater.updateOscillationStatus(alarmCacheObject, sourceTimestamp);
       log.info("ALARM ACTIVE: {} - INTERNAL ACTIVE: {} - OSCILLATION: {}", alarmCacheObject.isActive(), alarmCacheObject.isInternalActive(), alarmCacheObject.isOscillating());
     }
     assertTrue("The alarm should remain with the oscillating flag on", alarmCacheObject.isOscillating());
@@ -191,12 +193,13 @@ public class OscillationUpdaterTest {
     oscillationProperties.setTimeRange(180);
     oscillationProperties.setTimeOscillationAlive(180);
 
-    alarmCacheObject.setSourceTimestamp(new Timestamp(System.currentTimeMillis() - 500000));
+    long sourceTimestamp = System.currentTimeMillis() - 500000L;
+    alarmCacheObject.setSourceTimestamp(new Timestamp(sourceTimestamp));
     assertFalse(alarmCacheObject.isOscillating());
     for (int i = 0; i < 7; i++) {
       alarmCacheObject.setActive(!alarmCacheObject.isActive());
-      alarmCacheObject.setSourceTimestamp(new Timestamp(alarmCacheObject.getSourceTimestamp().getTime() + 36000));
-      oscUpdater.updateOscillationStatus(alarmCacheObject);
+      sourceTimestamp = sourceTimestamp + 36000L;
+      oscUpdater.updateOscillationStatus(alarmCacheObject, sourceTimestamp);
       log.info("ALARM ACTIVE: {} - INTERNAL ACTIVE: {} - OSCILLATION: {}", alarmCacheObject.isActive(), alarmCacheObject.isInternalActive(), alarmCacheObject.isOscillating());
     }
     assertTrue("The alarm should be set as oscillating", alarmCacheObject.isOscillating());
@@ -205,8 +208,8 @@ public class OscillationUpdaterTest {
     // is allowed to remove the oscillation flag.
     for (int i = 0; i < 7; i++) {
       alarmCacheObject.setActive(!alarmCacheObject.isActive());
-      alarmCacheObject.setSourceTimestamp(new Timestamp(alarmCacheObject.getSourceTimestamp().getTime() + 36500));
-      oscUpdater.updateOscillationStatus(alarmCacheObject);
+      sourceTimestamp = sourceTimestamp + 36500L;
+      oscUpdater.updateOscillationStatus(alarmCacheObject, sourceTimestamp);
       log.info("ALARM ACTIVE: {} - INTERNAL ACTIVE: {} - OSCILLATION: {}", alarmCacheObject.isActive(), alarmCacheObject.isInternalActive(), alarmCacheObject.isOscillating());
     }
     assertTrue("The alarm should remain as oscillating", alarmCacheObject.isOscillating());
@@ -214,13 +217,14 @@ public class OscillationUpdaterTest {
 
   @Test
   public void testChangeConfig() {
-    alarmCacheObject.setSourceTimestamp(new Timestamp(System.currentTimeMillis() - 500000));
+    long sourceTimestamp = System.currentTimeMillis() - 500000L;
+    alarmCacheObject.setSourceTimestamp(new Timestamp(sourceTimestamp));
     assertFalse(alarmCacheObject.isOscillating());
 
     for (int i = 0; i < 6; i++) {
       alarmCacheObject.setActive(!alarmCacheObject.isActive());
-      alarmCacheObject.setSourceTimestamp(new Timestamp(alarmCacheObject.getSourceTimestamp().getTime() + 36000));
-      oscUpdater.updateOscillationStatus(alarmCacheObject);
+      sourceTimestamp = sourceTimestamp + 36000L;
+      oscUpdater.updateOscillationStatus(alarmCacheObject, sourceTimestamp);
       log.info("ALARM ACTIVE: {} - INTERNAL ACTIVE: {} - OSCILLATION: {}", alarmCacheObject.isActive(), alarmCacheObject.isInternalActive(), alarmCacheObject.isOscillating());
     }
     assertFalse("The alarm should NOT be set as oscillating", alarmCacheObject.isOscillating());
@@ -232,8 +236,8 @@ public class OscillationUpdaterTest {
     // Now should see an oscillation
     for (int i = 0; i < 6; i++) {
       alarmCacheObject.setActive(!alarmCacheObject.isActive());
-      alarmCacheObject.setSourceTimestamp(new Timestamp(alarmCacheObject.getSourceTimestamp().getTime() + 36000));
-      oscUpdater.updateOscillationStatus(alarmCacheObject);
+      sourceTimestamp = sourceTimestamp + 36000L;
+      oscUpdater.updateOscillationStatus(alarmCacheObject, sourceTimestamp);
       log.info("ALARM ACTIVE: {} - INTERNAL ACTIVE: {} - OSCILLATION: {}", alarmCacheObject.isActive(), alarmCacheObject.isInternalActive(), alarmCacheObject.isOscillating());
     }
     assertTrue("The alarm should be set as oscillating", alarmCacheObject.isOscillating());
