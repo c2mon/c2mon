@@ -55,14 +55,18 @@ public final class OscillationUpdater {
      * @return true, if the alarm shall still keep its oscillation flag
      */
     public boolean checkOscillAlive(AlarmCacheObject alarmCacheObject) {
-        long systemTime = System.currentTimeMillis();
-        long alarmTs = alarmCacheObject.getTimestamp().getTime();
-        if (log.isTraceEnabled()) {
-            log.trace(" -> OscillationUpdater.checkOscillAlive()  Alarm #{} diff: {} systime : {} alarmts : {}",
-                    alarmCacheObject.getId(), (systemTime - alarmTs), new Timestamp(systemTime),
-                    alarmCacheObject.getTimestamp().toString());
-        }
-        return (systemTime - alarmTs) < (oscillationProperties.getTimeOscillationAlive() * 1000);
+      long alarmTs = alarmCacheObject.getSourceTimestamp().getTime();
+      if (!alarmCacheObject.getFifoSourceTimestamps().isEmpty()) {
+        alarmTs = alarmCacheObject.getFifoSourceTimestamps().getLast();
+      }
+
+      long systemTime = System.currentTimeMillis();
+      if (log.isTraceEnabled()) {
+          log.trace(" -> checkOscillAlive(): Alarm #{} diff: {} systime : {} alarmts : {}",
+                  alarmCacheObject.getId(), (systemTime - alarmTs), new Timestamp(systemTime),
+                  alarmCacheObject.getTimestamp().toString());
+      }
+      return (systemTime - alarmTs) < (oscillationProperties.getTimeOscillationAlive() * 1000);
     }
 
     /**

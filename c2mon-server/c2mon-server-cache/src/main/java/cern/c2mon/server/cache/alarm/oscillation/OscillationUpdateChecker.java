@@ -203,19 +203,13 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
       log.trace("Checking oscillation expiry for alarm #{}", alarmId);
       AlarmCacheObject alarmCopy = (AlarmCacheObject) alarmCache.getCopy(alarmId);
 
-      if (log.isTraceEnabled() && !alarmCopy.getFifoSourceTimestamps().isEmpty()) {
-        log.trace(" -> Alarm oscillation details osc {} first osc {} count {} al ts {}", alarmCopy.isOscillating(),
-            new Date(alarmCopy.getFifoSourceTimestamps().getFirst()).toString(),
-            alarmCopy.getFifoSourceTimestamps().size(), alarmCopy.getTimestamp().toString());
-      }
-
       if (!oscillationUpdater.checkOscillAlive(alarmCopy)) {
           log.trace(" -> ! Alarm #{} is not oscillating anymore, resetting oscillation flag", alarmId);
           Tag tag = tagFacadeGateway.getTag(alarmCopy.getDataTagId());
           if(tag != null) {
             alarmCacheUpdater.resetOscillationStatus(alarmCopy, tag);
           } else {
-            log.error("Cannot locate data tag #{} - unable to reset oscillation status", alarmCopy.getDataTagId());
+            log.error("Cannot locate data tag #{} for alarm #{} - unable to reset oscillation status", alarmCopy.getDataTagId(), alarmId);
           }
       } else {
           log.trace(" -> (!) Alarm #{} is still oscillating - no change", alarmId);

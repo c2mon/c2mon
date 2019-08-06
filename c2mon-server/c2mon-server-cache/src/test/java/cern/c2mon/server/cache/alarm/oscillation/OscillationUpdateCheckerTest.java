@@ -49,32 +49,38 @@ public class OscillationUpdateCheckerTest {
   private DataTagCacheObject tag;
   private AlarmCache alarmCache;
   private TagFacadeGateway tagFacadeGateway;
+  OscillationProperties oscillationProperties;
 
   @Before
   public void setup() {
     alarmCache = EasyMock.createStrictMock(AlarmCache.class);
     clusterCache = EasyMock.createNiceMock(ClusterCache.class);
     tagFacadeGateway = EasyMock.createStrictMock(TagFacadeGateway.class);
-    OscillationUpdater oscillationUpdater = new OscillationUpdater(alarmCache, new OscillationProperties());
+    oscillationProperties = new OscillationProperties();
+    OscillationUpdater oscillationUpdater = new OscillationUpdater(alarmCache, oscillationProperties);
     AlarmCacheUpdater alarmCacheUpdater = new AlarmCacheUpdaterImpl(alarmCache, oscillationUpdater);
     oscillationUpdateChecker = new OscillationUpdateChecker(alarmCache, clusterCache, oscillationUpdater, alarmCacheUpdater, tagFacadeGateway);
 
-    alarm = new AlarmCacheObject();
-    alarm.setId(123L);
-    alarm.setDataTagId(987L);
-    alarm.setActive(true);
-    alarm.setInternalActive(true);
-    alarm.setTimestamp(new Timestamp(System.currentTimeMillis() - 500000L));
-    alarm.setSourceTimestamp(alarm.getTimestamp());
-    alarm.setCondition(new ValueAlarmCondition(Boolean.TRUE));
-
     tag = new DataTagCacheObject();
-    tag.setId(alarm.getDataTagId());
+    tag.setId(987L);
     tag.setValue(Boolean.FALSE);
     DataTagQuality dataTagQuality = new DataTagQualityImpl();
     dataTagQuality.validate();
     tag.setDataTagQuality(dataTagQuality);
     tag.setSourceTimestamp(new Timestamp(System.currentTimeMillis() - 100000L));
+
+    alarm = new AlarmCacheObject();
+    alarm.setId(123L);
+    alarm.setDataTagId(tag.getId());
+    alarm.setActive(true);
+    alarm.setInternalActive(true);
+    alarm.setTimestamp(new Timestamp(System.currentTimeMillis() - 500000L));
+    alarm.setSourceTimestamp(alarm.getTimestamp());
+    alarm.setCondition(new ValueAlarmCondition(Boolean.TRUE));
+    int n = 1;
+    while(alarm.getFifoSourceTimestamps().size() < oscillationProperties.getOscNumbers()) {
+      alarm.getFifoSourceTimestamps().add(alarm.getSourceTimestamp().getTime() + (30000 * n++));
+    }
   }
 
   @Test
@@ -108,6 +114,42 @@ public class OscillationUpdateCheckerTest {
     recordMockCallsForOscillatingAlarm();
     oscillationUpdateChecker.run();
     checkResult(false);
+  }
+
+  @Test
+  public void testRunWithKeepingOscillation() {
+    int n = 1;
+    long currentTime = System.currentTimeMillis();
+    alarm.getFifoSourceTimestamps().clear();
+    while(alarm.getFifoSourceTimestamps().size() < oscillationProperties.getOscNumbers()) {
+      alarm.getFifoSourceTimestamps().addFirst(currentTime - (10000 * n++));
+    }
+    setOscillating(alarm);
+    assertTrue(alarm.isOscillating());
+    assertTrue(alarm.isInternalActive());
+    assertTrue(alarm.isActive());
+    assertEquals("[OSC]", alarm.getInfo());
+    assertNotEquals(tag.getTimestamp(), alarm.getSourceTimestamp());
+
+    // record mocks
+    EasyMock.reset(clusterCache, alarmCache, tagFacadeGateway);
+    clusterCache.acquireWriteLockOnKey(OscillationUpdateChecker.LAST_CHECK_LONG);
+    EasyMock.expect(clusterCache.getCopy(OscillationUpdateChecker.LAST_CHECK_LONG))
+        .andReturn(Long.valueOf(OscillationUpdateChecker.SCAN_INTERVAL - 1000L));
+    EasyMock.expect(alarmCache.findAlarm(oscillationUpdateChecker.alarmCacheQuery)).andReturn(Arrays.asList(alarm.getId()));
+    EasyMock.expect(alarmCache.getCopy(alarm.getId())).andReturn(alarm);
+    EasyMock.replay(clusterCache, alarmCache, tagFacadeGateway);
+
+    // start test
+    oscillationUpdateChecker.run();
+
+    // Verify result
+    EasyMock.verify(clusterCache, alarmCache, tagFacadeGateway);
+    assertTrue(alarm.isOscillating());
+    assertTrue(alarm.isInternalActive()); // remains unchanged as the evaluation does not take place
+    assertEquals(true, alarm.isActive());
+    assertEquals("[OSC]", alarm.getInfo());
+    assertNotEquals(tag.getTimestamp(), alarm.getSourceTimestamp());
   }
 
   /**
