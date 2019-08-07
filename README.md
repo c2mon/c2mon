@@ -9,7 +9,8 @@ of monitoring and control system or a full SCADA application.
 See the current [reference docs][].
 
 ## Issue tracking
-Please report issues on GitLab via the [issue tracker][].
+All C2MON issues are tracked and maintained within the [CERN JIRA][] system. Unfortuntaly, people from outside are not allowed to create tickets in [CERN JIRA][],
+but you are welcome report any issues via [GitHub issues][].
 
 ## Release notes
 Please have a look into the [CHANGELOG.md][] file.
@@ -49,7 +50,8 @@ C2MON is released under the [GNU LGPLv3 License][].
 
 [Javadoc]: https://c2mon.web.cern.ch/c2mon/javadoc/
 [reference docs]: http://c2mon.web.cern.ch/c2mon/docs/latest/
-[issue tracker]: https://gitlab.cern.ch/c2mon/c2mon/issues
+[CERN JIRA]: https://its.cern.ch/jira/projects/CM
+[GitHub issues]: https://github.com/c2mon/c2mon/issues
 [CHANGELOG.md]: /CHANGELOG.md
 [Find here]: https://gitlab.cern.ch/c2mon/c2mon/milestones?state=all
 [Maven]: http://maven.apache.org
