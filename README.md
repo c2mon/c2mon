@@ -9,8 +9,8 @@ of monitoring and control system or a full SCADA application.
 See the current [reference docs][].
 
 ## Issue tracking
-All C2MON issues are tracked and maintained within the [CERN JIRA][] system. Unfortuntaly, people from outside are not allowed to create tickets in [CERN JIRA][],
-but you are welcome report any issues via [GitHub issues][].
+All C2MON issues are tracked and maintained within the [CERN JIRA][] system. Unfortuntaly, users from outside are not allowed to create tickets in [CERN JIRA][],
+but you are welcome to open [GitHub issues][] or to send an email to c2mon-support@cern.ch.
 
 ## Release notes
 Please have a look into the [CHANGELOG.md][] file.
@@ -31,10 +31,14 @@ a cross-platform, self-contained bootstrap mechanism for the build.
 
 ### Prerequisites
 
-[Git][] and [JDK 8 update 20 or later][JDK8 build]
+[Git][] and [JDK 8 update 152 or later][JDK8 build]
 
 Be sure that your `JAVA_HOME` environment variable points to the `jdk1.8.0` folder
 extracted from the JDK download.
+
+#### IDEs
+
+To reduce the boiler plate code we make use of [Lombok](https://projectlombok.org/), which requires to be [setup in your IDE](https://projectlombok.org/setup/overview) in order to compile the project.
 
 ### Check out sources
 `git clone git@github.com:c2mon/c2mon.git`
@@ -49,7 +53,7 @@ extracted from the JDK download.
 C2MON is released under the [GNU LGPLv3 License][].
 
 [Javadoc]: https://c2mon.web.cern.ch/c2mon/javadoc/
-[reference docs]: http://c2mon.web.cern.ch/c2mon/docs/latest/
+[reference docs]: http://c2mon.web.cern.ch/c2mon/docs/
 [CERN JIRA]: https://its.cern.ch/jira/projects/CM
 [GitHub issues]: https://github.com/c2mon/c2mon/issues
 [CHANGELOG.md]: /CHANGELOG.md
