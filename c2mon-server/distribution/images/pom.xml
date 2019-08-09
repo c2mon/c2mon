@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>cern.c2mon.server</groupId>
     <artifactId>distribution</artifactId>
-    <version>1.8.46-SNAPSHOT</version>
+    <version>1.9.0</version>
   </parent>
 
   <artifactId>c2mon-docker-parent</artifactId>
@@ -21,12 +20,12 @@
   </modules>
 
   <properties>
-    <image.base/>
+    <image.base />
     <gitlab>gitlab-registry.cern.ch/c2mon</gitlab>
-    <gitlab-repo></gitlab-repo>
+    <gitlab-repo />
     <dockerhub>registry.hub.docker.com</dockerhub>
-    <dockerhub-repo></dockerhub-repo>
-    <image.tag></image.tag>
+    <dockerhub-repo />
+    <image.tag />
     <skipDocker>false</skipDocker>
   </properties>
 
@@ -40,7 +39,7 @@
             <phase>generate-sources</phase>
             <configuration>
               <target>
-                <mkdir dir="${project.build.directory}/classes"/>
+                <mkdir dir="${project.build.directory}/classes" />
               </target>
             </configuration>
             <goals>
