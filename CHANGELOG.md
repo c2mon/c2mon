@@ -3,14 +3,23 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
-All issues referenced in parentheses can be consulted under [CERN GitLab](https://gitlab.cern.ch/c2mon/c2mon/issues).
-For more details on a given release, please check also the [Milestone planning](https://gitlab.cern.ch/c2mon/c2mon/milestones?state=all).
+All issues referenced in parentheses can be consulted under [CERN JIRA](https://its.cern.ch/jira/projects/CM).
+For more details on a given release, please check also the [version planning](https://its.cern.ch/jira/projects/CM/versions).
 
-## [1.9.0 Unreleased]
 
-Pleaes not that C2MON depends now on Spring 5! Please upgrade accordingly your client applications and make sure you use the same Spring version as specified in the [Maven POM](pom.xml).
-
+## [Unreleased]
 ### Added
+
+### Changed
+
+### Fixed
+
+
+## [1.9.0] - 2019-08-09
+
+**C2MON depends now on Spring 5!** Please upgrade accordingly your client applications and make sure you use the same Spring version as specified in the [Maven POM](pom.xml).
+
+We also migrated our issue tracking system from Gitlab to [JIRA](https://its.cern.ch/jira/projects/CM). Furthermore, users from outside of CERN have now the possiblity to report issues directly on [GitHub](https://github.com/c2mon/c2mon/issues).
 
 ### Changed
 - Upgrade of Spring dependencies to 5.1.2.RELEASE and for Spring Boot to 2.1.0.RELEASE (#228)
@@ -20,6 +29,7 @@ Pleaes not that C2MON depends now on Spring 5! Please upgrade accordingly your c
 - Client API: Fixed a JMS resource bug related to the configuration queue where consumers were never deleted (#266)
 - Deployment: Updated C2MON Docker image and Kubernetes files to match the versions in production (#259, #269, #271)
 - Server: Fixed ES Unit tests and switched to [elasticsearch-cluster-runner](https://github.com/codelibs/elasticsearch-cluster-runner) to start the embedded Elasticsearch instance (CM-215)
+- Server: A major refactoring of the Alarm oscillation feature was done since is it was not correctly working when changing the default properties. Many addition tests were written to make sure that the logic is finally water-proof (CM-219).
 
 
 ## 1.8.45 - 2019-06-07
@@ -395,7 +405,8 @@ This patch contains bug fixes for the DAQ layer.
 - Remove of EquipmentLogger concept from DAQ Core (#56)
 
 
-[1.9.0 Unreleased]: https://gitlab.cern.ch/c2mon/c2mon/milestones/37
+[Unreleased]: https://its.cern.ch/jira/projects/CM/versions
+[1.9.0]: https://its.cern.ch/jira/projects/CM/versions/31979
 [1.8.43]: https://gitlab.cern.ch/c2mon/c2mon/milestones/36
 [1.8.42]: https://gitlab.cern.ch/c2mon/c2mon/milestones/35
 [1.8.41]: https://gitlab.cern.ch/c2mon/c2mon/milestones/34
