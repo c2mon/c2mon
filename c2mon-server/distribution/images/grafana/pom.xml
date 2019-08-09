@@ -5,7 +5,7 @@
   <parent>
     <groupId>cern.c2mon.server</groupId>
     <artifactId>c2mon-docker-parent</artifactId>
-    <version>1.9.0</version>
+    <version>1.9.1-SNAPSHOT</version>
   </parent>
 
   <artifactId>img-grafana</artifactId>
