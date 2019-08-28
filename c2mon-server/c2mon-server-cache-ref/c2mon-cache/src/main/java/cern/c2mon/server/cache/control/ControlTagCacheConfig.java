@@ -1,21 +1,31 @@
 package cern.c2mon.server.cache.control;
 
+import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.factory.AbstractCacheFactory;
+import cern.c2mon.server.cache.AbstractSimpleCacheConfig;
+import cern.c2mon.server.cache.CacheName;
+import cern.c2mon.server.cache.loader.CacheLoaderDAO;
+import cern.c2mon.server.common.control.ControlTag;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
  * @author Szymon Halastra
+ * @author Alexandros Papageorgiou Koufidis
  */
 
 @Configuration
-public class ControlTagCacheConfig {
+public class ControlTagCacheConfig extends AbstractSimpleCacheConfig<ControlTag> {
 
-//  @Bean(name = CacheName.Names.CONTROL)
-//  public C2monCache createCache(AbstractCacheFactory cachingFactory, ControlTagLoaderDAO controlTagLoaderDAO) {
-//    C2monCache cache = cachingFactory.createCache(CacheName.CONTROLTAG.getLabel(), Long.class, ControlTag.class);
-//
-//    CacheLoader cacheLoader = new SimpleCacheLoader<>(cache, controlTagLoaderDAO);
-//    cache.setCacheLoader(cacheLoader);
-//
-//    return cache;
-//  }
+  @Autowired
+  protected ControlTagCacheConfig(AbstractCacheFactory cachingFactory, CacheLoaderDAO<ControlTag> cacheLoaderDAORef) {
+    super(cachingFactory, CacheName.CONTROLTAG, ControlTag.class, cacheLoaderDAORef);
+  }
+
+  @Bean(name = CacheName.Names.CONTROLTAG)
+  @Override
+  public C2monCache<ControlTag> createCache() {
+    return super.createCache();
+  }
 }

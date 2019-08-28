@@ -1,20 +1,30 @@
 package cern.c2mon.server.cache.device;
 
+import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.factory.AbstractCacheFactory;
+import cern.c2mon.server.cache.AbstractSimpleCacheConfig;
+import cern.c2mon.server.cache.CacheName;
+import cern.c2mon.server.cache.loader.CacheLoaderDAO;
+import cern.c2mon.server.common.device.Device;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
  * @author Szymon Halastra
+ * @author Alexandros Papageorgiou Koufidis
  */
 @Configuration
-public class DeviceCacheConfig {
+public class DeviceCacheConfig extends AbstractSimpleCacheConfig<Device> {
 
-//  @Bean(name = CacheName.Names.DEVICE)
-//  public C2monCache createCache(AbstractCacheFactory cachingFactory, DeviceDAO deviceDAO) {
-//    C2monCache cache = cachingFactory.createCache(CacheName.DEVICE.getLabel(), Long.class, Device.class);
-//
-//    CacheLoader cacheLoader = new SimpleCacheLoader<>(cache, deviceDAO);
-//    cache.setCacheLoader(cacheLoader);
-//
-//    return cache;
-//  }
+  @Autowired
+  protected DeviceCacheConfig(AbstractCacheFactory cachingFactory, CacheLoaderDAO<Device> cacheLoaderDAORef) {
+    super(cachingFactory, CacheName.DEVICE, Device.class, cacheLoaderDAORef);
+  }
+
+  @Bean(name = CacheName.Names.DEVICE)
+  @Override
+  public C2monCache<Device> createCache() {
+    return super.createCache();
+  }
 }

@@ -38,7 +38,7 @@ import cern.c2mon.shared.common.Cacheable;
  * as better performance for large caches
  */
 @Slf4j
-public class SimpleCacheLoader<T extends Cacheable> implements CacheLoader {
+public class SimpleCacheLoader<T extends Cacheable> implements CacheLoader<T> {
 
   /**
    * The map used to load objects into the cache from the DB at startup.

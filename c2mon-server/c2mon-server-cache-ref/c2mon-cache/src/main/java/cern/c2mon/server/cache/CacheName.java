@@ -26,17 +26,17 @@ public enum CacheName {
   /**
    * Command cache.
    */
-  COMMAND(Names.COMMAND),
+  COMMANDTAG(Names.COMMANDTAG),
 
   /**
    * CommFault cache.
    */
-  COMMFAULT(Names.COMMFAULT),
+  COMMFAULTTAG(Names.COMMFAULTTAG),
 
   /**
    * ControlTag cache.
    */
-  CONTROLTAG(Names.CONTROL),
+  CONTROLTAG(Names.CONTROLTAG),
 
   /**
    * DataTag cache.
@@ -66,7 +66,7 @@ public enum CacheName {
   /**
    * RuleTag cache.
    */
-  RULETAG(Names.RULE),
+  RULETAG(Names.RULETAG),
 
   /**
    * SubEquipment cache.
@@ -88,15 +88,15 @@ public enum CacheName {
   public static class Names {
     public static final String ALARM = "alarmCacheRef";
     public static final String ALIVETIMER = "aliveTimerCacheRef";
-    public static final String COMMAND = "commandTagCacheRef";
-    public static final String COMMFAULT = "commFaultTagCacheRef";
-    public static final String CONTROL = "controlTagCacheRef";
+    public static final String COMMANDTAG = "commandTagCacheRef";
+    public static final String COMMFAULTTAG = "commFaultTagCacheRef";
+    public static final String CONTROLTAG = "controlTagCacheRef";
     public static final String DATATAG = "dataTagCacheRef";
     public static final String DEVICE = "deviceCacheRef";
     public static final String DEVICECLASS = "deviceClassCacheRef";
     public static final String EQUIPMENT = "equipmentCacheRef";
     public static final String PROCESS = "processCacheRef";
-    public static final String RULE = "ruleTagCacheRef";
+    public static final String RULETAG = "ruleTagCacheRef";
     public static final String SUBEQUIPMENT = "subEquipmentCacheRef";
     public static final String TAG= "tagCacheRef";
   }

@@ -1,11 +1,11 @@
-package cern.c2mon.server.cache.commfault;
+package cern.c2mon.server.cache.process;
 
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.factory.AbstractCacheFactory;
 import cern.c2mon.server.cache.AbstractSimpleCacheConfig;
 import cern.c2mon.server.cache.CacheName;
 import cern.c2mon.server.cache.loader.CacheLoaderDAO;
-import cern.c2mon.server.common.commfault.CommFaultTag;
+import cern.c2mon.server.common.process.Process;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,16 +15,16 @@ import org.springframework.context.annotation.Configuration;
  * @author Alexandros Papageorgiou Koufidis
  */
 @Configuration
-public class CommFaultTagCacheConfig extends AbstractSimpleCacheConfig<CommFaultTag> {
+public class ProcessCacheConfig extends AbstractSimpleCacheConfig<Process> {
 
   @Autowired
-  public CommFaultTagCacheConfig(AbstractCacheFactory cachingFactory, CacheLoaderDAO<CommFaultTag> cacheLoaderDAORef) {
-    super(cachingFactory, CacheName.COMMFAULTTAG, CommFaultTag.class, cacheLoaderDAORef);
+  public ProcessCacheConfig(AbstractCacheFactory cachingFactory, CacheLoaderDAO<Process> cacheLoaderDAORef) {
+    super(cachingFactory, CacheName.PROCESS, Process.class, cacheLoaderDAORef);
   }
 
-  @Bean(name = CacheName.Names.COMMFAULTTAG)
+  @Bean(name = CacheName.Names.PROCESS)
   @Override
-  public C2monCache<CommFaultTag> createCache() {
+  public C2monCache<Process> createCache() {
     return super.createCache();
   }
 }

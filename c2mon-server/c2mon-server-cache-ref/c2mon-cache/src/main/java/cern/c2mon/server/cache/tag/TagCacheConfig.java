@@ -8,6 +8,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class TagCacheConfig {
 
+  // TODO (Alex): Does this even have a reason for existing? We don't seem to use the TAG cache anywhere?
+
 //  @Bean(name = CacheName.Names.TAG)
 //  public C2monCache createCache(AbstractCacheFactory cachingFactory) {
 //    //TODO: temporary it has null in place of SingleEntryLoader
