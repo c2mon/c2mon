@@ -1,13 +1,12 @@
 package cern.c2mon.server.cache.alivetimer;
 
-import java.util.Optional;
-
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.alive.AliveTimer;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 /**
  * @author Szymon Halastra
@@ -38,11 +37,9 @@ public class AliveTimerService {
         AliveTimer aliveTimer = aliveTimerCacheRef.get(aliveId);
         update(aliveTimer);
         aliveTimerCacheRef.put(aliveId, aliveTimer);
-      }
-      catch (CacheElementNotFoundException cacheEx) {
+      } catch (CacheElementNotFoundException cacheEx) {
         log.error("Cannot locate the AliveTimer in the cache (Id is " + aliveId + ") - unable to update it.", cacheEx);
-      }
-      catch (Exception e) {
+      } catch (Exception e) {
         log.error("updatedAliveTimer() failed for an unknown reason: ", e);
       }
 
@@ -71,8 +68,7 @@ public class AliveTimerService {
       for (Long currentId : aliveTimerCacheRef.getKeys()) {
         start(currentId);
       }
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       log.error("Unable to retrieve list of alive timers from cache when attempting to start the timers.", e);
     }
   }
@@ -83,8 +79,7 @@ public class AliveTimerService {
       for (Long currentId : aliveTimerCacheRef.getKeys()) {
         stop(currentId);
       }
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       log.error("Unable to retrieve list of alive timers from cache when attempting to stop all timers.", e);
     }
   }
@@ -95,11 +90,9 @@ public class AliveTimerService {
         AliveTimer aliveTimer = aliveTimerCacheRef.get(id);
         start(aliveTimer);
         aliveTimerCacheRef.put(id, aliveTimer);
-      }
-      catch (CacheElementNotFoundException cacheEx) {
+      } catch (CacheElementNotFoundException cacheEx) {
         log.error("Cannot locate the AliveTimer in the cache (Id is " + id + ") - unable to start it.");
-      }
-      catch (Exception e) {
+      } catch (Exception e) {
         log.error("Unable to start the alive timer " + id, e);
       }
 
@@ -115,11 +108,9 @@ public class AliveTimerService {
         stop(aliveTimer);
 
         aliveTimerCacheRef.put(id, aliveTimer);
-      }
-      catch (CacheElementNotFoundException cacheEx) {
+      } catch (CacheElementNotFoundException cacheEx) {
         log.error("Cannot locate the AliveTimer in the cache (Id is " + id + ") - unable to stop it.");
-      }
-      catch (Exception e) {
+      } catch (Exception e) {
         log.error("Unable to stop the alive timer " + id, e);
       }
 
@@ -141,13 +132,7 @@ public class AliveTimerService {
 
     aliveTimer.setActive(true);
     aliveTimer.setLastUpdate(System.currentTimeMillis());
-    if (log.isDebugEnabled()) {
-      StringBuffer str = new StringBuffer("Updated alive timer for ");
-      str.append(AliveTimer.ALIVE_TYPE_PROCESS + " ");
-      str.append(aliveTimer.getRelatedName());
-      str.append(".");
-      log.debug(str.toString());
-    }
+    log.debug("Updated alive timer for " + AliveTimer.ALIVE_TYPE_PROCESS + " " + aliveTimer.getRelatedName() + ".");
   }
 
   /**
@@ -155,13 +140,7 @@ public class AliveTimerService {
    */
   private void start(final AliveTimer aliveTimer) {
     if (!aliveTimer.isActive()) {
-      if (log.isDebugEnabled()) {
-        StringBuffer str = new StringBuffer("start() : starting alive for ");
-        str.append(AliveTimer.ALIVE_TYPE_PROCESS + " ");
-        str.append(aliveTimer.getRelatedName());
-        str.append(".");
-        log.debug(str.toString());
-      }
+      log.debug("start() : starting alive for " + AliveTimer.ALIVE_TYPE_PROCESS + " " + aliveTimer.getRelatedName() + ".");
       aliveTimer.setActive(true);
       aliveTimer.setLastUpdate(System.currentTimeMillis());
     }
@@ -172,13 +151,7 @@ public class AliveTimerService {
    */
   private void stop(final AliveTimer aliveTimer) {
     if (aliveTimer.isActive()) {
-      if (log.isDebugEnabled()) {
-        StringBuffer str = new StringBuffer("stop() : stopping alive for ");
-        str.append(aliveTimer.getAliveTypeDescription() + " ");
-        str.append(aliveTimer.getRelatedName());
-        str.append(".");
-        log.debug(str.toString());
-      }
+      log.debug("stop() : stopping alive for " + aliveTimer.getAliveTypeDescription() + AliveTimer.ALIVE_TYPE_PROCESS + " " + aliveTimer.getRelatedName() + ".");
       aliveTimer.setActive(false);
       aliveTimer.setLastUpdate(System.currentTimeMillis());
     }

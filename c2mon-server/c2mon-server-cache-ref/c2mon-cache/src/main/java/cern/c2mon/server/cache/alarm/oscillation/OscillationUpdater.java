@@ -47,11 +47,11 @@ public final class OscillationUpdater {
     public boolean checkOscillAlive(AlarmCacheObject alarmCacheObject) {
         long systemTime = System.currentTimeMillis();
         long alarmTs = alarmCacheObject.getTimestamp().getTime();
-        if (log.isTraceEnabled()) {
-            log.trace(" -> OscillationUpdater.checkOscillAlive()  Alarm #{} diff: {} systime : {} alarmts : {}",
-                    alarmCacheObject.getId(), (systemTime - alarmTs), new Timestamp(systemTime),
-                    alarmCacheObject.getTimestamp().toString());
-        }
+
+        log.trace(" -> OscillationUpdater.checkOscillAlive()  Alarm #{} diff: {} systime : {} alarmts : {}",
+            alarmCacheObject.getId(), (systemTime - alarmTs), new Timestamp(systemTime),
+            alarmCacheObject.getTimestamp().toString());
+
         return (systemTime - alarmTs) < (oscillationProperties.getTimeOscillationAlive() * 1000);
     }
 
