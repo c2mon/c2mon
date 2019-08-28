@@ -6,13 +6,20 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 All issues referenced in parentheses can be consulted under [CERN JIRA](https://its.cern.ch/jira/projects/CM).
 For more details on a given release, please check also the [version planning](https://its.cern.ch/jira/projects/CM/versions).
 
-
 ## [Unreleased]
 ### Added
 
 ### Changed
 
 ### Fixed
+
+
+## 1.9.1 - 2019-08-28
+### Changed
+- Server:  Increase sleeping time to 3 sec before trying to reconnect ES, if it is not yet in yellow or green state (CM-215)
+
+### Fixed
+- Server: Fixed a dependency problem introduced with [elasticsearch-cluster-runner](https://github.com/codelibs/elasticsearch-cluster-runner) that prevented to start Elasticsearch (CM-215)
 
 
 ## [1.9.0] - 2019-08-09
