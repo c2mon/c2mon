@@ -131,7 +131,8 @@ public class ElasticsearchClientImpl implements ElasticsearchClient {
             }
 
             try {
-              Thread.sleep(100L);
+              log.info("Waiting 3 sec before retrying to connect to Elasticsearch...");
+              Thread.sleep(3000L);
             } catch (InterruptedException ignored) {
             }
           }
