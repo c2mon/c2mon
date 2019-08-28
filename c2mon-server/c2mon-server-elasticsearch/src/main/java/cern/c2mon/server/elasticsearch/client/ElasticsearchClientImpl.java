@@ -37,7 +37,6 @@ import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.node.NodeValidationException;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 
@@ -63,7 +62,6 @@ public class ElasticsearchClientImpl implements ElasticsearchClient {
   @Getter
   private static ElasticsearchClusterRunner runner = null;
 
-  @Autowired
   public ElasticsearchClientImpl(ElasticsearchProperties properties) throws NodeValidationException {
     this.properties = properties;
 
