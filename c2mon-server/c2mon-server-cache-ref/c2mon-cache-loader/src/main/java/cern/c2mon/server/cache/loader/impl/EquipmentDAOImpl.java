@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.loader.impl;
 
+import cern.c2mon.server.cache.loader.CacheLoaderName;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,8 +31,7 @@ import cern.c2mon.server.common.equipment.EquipmentCacheObject;
  *
  * @author Mark Brightwell
  */
-//TODO: refer a name
-@Service("equipmentDAORef")
+@Service(CacheLoaderName.Names.EQUIPMENT)
 public class EquipmentDAOImpl extends AbstractDefaultLoaderDAO<Equipment> implements EquipmentDAO {
 
   private EquipmentMapper equipmentMapper;

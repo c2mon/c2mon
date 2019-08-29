@@ -18,6 +18,7 @@ package cern.c2mon.server.cache.loader.impl;
 
 import java.util.List;
 
+import cern.c2mon.server.cache.loader.CacheLoaderName;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -36,8 +37,7 @@ import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
  * @author Mark Brightwell
  */
 @Slf4j
-//TODO: refer a name
-@Service("subEquipmentDAORef")
+@Service(CacheLoaderName.Names.SUBEQUIPMENT)
 public class SubEquipmentDAOImpl extends AbstractDefaultLoaderDAO<SubEquipment> implements SubEquipmentDAO {
 
   /**

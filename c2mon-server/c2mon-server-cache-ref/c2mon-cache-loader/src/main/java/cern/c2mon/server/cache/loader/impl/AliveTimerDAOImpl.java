@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.loader.impl;
 
+import cern.c2mon.server.cache.loader.CacheLoaderName;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,8 +30,7 @@ import cern.c2mon.server.common.alive.AliveTimer;
  *
  * @author Mark Brightwell
  */
-//TODO: refer a name
-@Service("aliveTimerDAORef")
+@Service(CacheLoaderName.Names.ALIVETIMER)
 public class AliveTimerDAOImpl extends AbstractDefaultLoaderDAO<AliveTimer> implements AliveTimerDAO {
 
   /**

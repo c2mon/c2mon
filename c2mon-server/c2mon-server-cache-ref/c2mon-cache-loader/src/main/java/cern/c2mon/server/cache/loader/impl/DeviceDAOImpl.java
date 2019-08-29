@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.loader.impl;
 
+import cern.c2mon.server.cache.loader.CacheLoaderName;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,8 +34,7 @@ import cern.c2mon.shared.client.device.DeviceProperty;
  * @author Justin Lewis Salmon
  */
 @Slf4j
-//TODO: refer a name
-@Service("deviceDAORef")
+@Service(CacheLoaderName.Names.DEVICE)
 public class DeviceDAOImpl extends AbstractDefaultLoaderDAO<Device> implements DeviceDAO {
 
   /**

@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.loader.impl;
 
+import cern.c2mon.server.cache.loader.CacheLoaderName;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,8 +31,7 @@ import cern.c2mon.shared.common.command.CommandTag;
  *
  * @author Mark Brightwell
  */
-//TODO: refer a name
-@Service("commandTagDAORef")
+@Service(CacheLoaderName.Names.COMMANDTAG)
 public class CommandTagDAOImpl extends AbstractDefaultLoaderDAO<CommandTag> implements CommandTagDAO {
 
   /**
