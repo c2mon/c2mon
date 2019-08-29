@@ -16,7 +16,7 @@ import java.sql.Timestamp;
  */
 @Slf4j
 @Service
-public class TagService<T extends Tag> implements CommonTagOperations<T> {
+public abstract class AbstractTagService<T extends Tag> implements CommonTagOperations<T> {
 
   @Override
   public void validate(T tag) {

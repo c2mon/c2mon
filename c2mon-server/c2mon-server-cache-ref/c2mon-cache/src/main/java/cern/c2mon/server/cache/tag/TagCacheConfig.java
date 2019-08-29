@@ -23,7 +23,6 @@ public class TagCacheConfig extends AbstractSimpleCacheConfig<Tag> {
   }
 
   @Override
-  @Bean(name = CacheName.Names.TAG)
   public C2monCache<Tag> createCache() {
     return super.createCache();
   }
