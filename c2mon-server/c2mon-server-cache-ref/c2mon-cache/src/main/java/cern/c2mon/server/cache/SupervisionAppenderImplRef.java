@@ -53,8 +53,8 @@ public class SupervisionAppenderImplRef implements SupervisionAppender {
     this.processService = processService;
     this.equipmentService = equipmentService;
 
-    this.processCacheRef = processService.getCache();
-    this.equipmentCacheRef = equipmentService.getCache();
+    this.processCacheRef = processService.getProcessCacheRef();
+    this.equipmentCacheRef = equipmentService.getEquipmentCacheRef();
   }
 
   @Override

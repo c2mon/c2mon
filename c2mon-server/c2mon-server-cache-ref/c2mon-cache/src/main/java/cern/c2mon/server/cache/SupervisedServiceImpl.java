@@ -19,7 +19,7 @@ import cern.c2mon.shared.common.supervision.SupervisionConstants;
 @Slf4j
 public class SupervisedServiceImpl<T extends Supervised> implements SupervisedService<T> {
 
-  private final C2monCache<T> c2monCache;
+  protected final C2monCache<T> cacheRef;
 
   private final AliveTimerService aliveTimerService;
 
@@ -27,8 +27,8 @@ public class SupervisedServiceImpl<T extends Supervised> implements SupervisedSe
 
   private SupervisionConstants.SupervisionEntity supervisionEntity;
 
-  public SupervisedServiceImpl(final C2monCache<T> c2monCache, final AliveTimerService aliveTimerService) {
-    this.c2monCache = c2monCache;
+  public SupervisedServiceImpl(final C2monCache<T> cacheRef, final AliveTimerService aliveTimerService) {
+    this.cacheRef = cacheRef;
     this.aliveTimerService = aliveTimerService;
     this.aliveTimerCache = aliveTimerService.getCache();
   }
@@ -164,7 +164,7 @@ public class SupervisedServiceImpl<T extends Supervised> implements SupervisedSe
 
   @Override
   public void removeAliveTimer(final Long supervisedId) {
-    T supervised = c2monCache.get(supervisedId);
+    T supervised = cacheRef.get(supervisedId);
     Long aliveId = supervised.getAliveTagId();
     if (aliveId != null) {
       aliveTimerService.stop(aliveId);
@@ -195,7 +195,7 @@ public class SupervisedServiceImpl<T extends Supervised> implements SupervisedSe
 
   @Override
   public void loadAndStartAliveTag(final Long supervisedId) {
-    T supervised = c2monCache.get(supervisedId);
+    T supervised = cacheRef.get(supervisedId);
     Long aliveId = supervised.getAliveTagId();
     /*aliveTimerCache.loadFromDb(aliveId);*/ //TODO: implement loadFromDB, before that think how it should be implemented and designed
     if (aliveId != null) {

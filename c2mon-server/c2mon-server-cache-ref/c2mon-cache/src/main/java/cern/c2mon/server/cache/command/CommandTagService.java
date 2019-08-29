@@ -1,6 +1,7 @@
 package cern.c2mon.server.cache.command;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.cache.api.C2monCache;
@@ -17,10 +18,10 @@ public class CommandTagService {
 
   private C2monCache<CommandTag> commandTagCacheRef;
 
-//  @Autowired
-//  public CommandTagService(C2monCache<Long, CommandTag> commandTagCacheRef) {
-//    this.commandTagCacheRef = commandTagCacheRef;
-//  }
+  @Autowired
+  public CommandTagService(C2monCache<CommandTag> commandTagCacheRef) {
+    this.commandTagCacheRef = commandTagCacheRef;
+  }
 
   /**
    * Generates the XML needed to send to the DAQ at start-up.

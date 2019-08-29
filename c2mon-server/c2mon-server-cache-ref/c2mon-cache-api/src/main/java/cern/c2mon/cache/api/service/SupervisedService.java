@@ -24,7 +24,7 @@ import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.common.supervision.SupervisionConstants;
 
 /**
- * Implemented by Facade beans linked to Supervised cache
+ * Implemented by beans linked to Supervised cache
  * objects (so Process, Equipment and SubEquipment).
  *
  * @param <T> the cache object type

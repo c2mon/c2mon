@@ -22,8 +22,6 @@ import java.util.List;
  * @author Alexandros Papageorgiou
  * @author Brice Copy
  */
-//TODO: change name for more proper
-
 @Slf4j
 @Service
 public class AlarmService implements AlarmAggregator, CacheSupervisionListener<Tag>, CacheListener<Tag> {
@@ -37,9 +35,9 @@ public class AlarmService implements AlarmAggregator, CacheSupervisionListener<T
   private AlarmCacheUpdater alarmCacheUpdater;
 
   @Autowired
-  public AlarmService(final C2monCache<Alarm> alarmCacheRef, /*final C2monCache<Tag> tagCacheRef,*/ final AlarmCacheUpdater alarmCacheUpdater) {
+  public AlarmService(final C2monCache<Alarm> alarmCacheRef, final C2monCache<Tag> tagCacheRef, final AlarmCacheUpdater alarmCacheUpdater) {
     this.alarmCacheRef = alarmCacheRef;
-//    this.tagCacheRef = tagCacheRef;
+    this.tagCacheRef = tagCacheRef;
     this.alarmCacheUpdater = alarmCacheUpdater;
   }
 

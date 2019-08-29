@@ -33,18 +33,9 @@ public class SubEquipmentService implements SupervisedService<SubEquipment>, Abs
   @Delegate(types = AbstractEquipmentService.class)
   private AbstractEquipmentService abstractEquipmentService;
 
-  private CommFaultService commFaultService;
-
-  private AliveTimerService aliveTimerService;
-
-  public SubEquipmentService() {
-  }
-
   @Autowired
   public SubEquipmentService(C2monCache<SubEquipment> subEquipmentCacheRef, CommFaultService commFaultService, AliveTimerService aliveTimerService) {
     this.subEquipmentCacheRef = subEquipmentCacheRef;
-    this.commFaultService = commFaultService;
-    this.aliveTimerService = aliveTimerService;
 
     this.supervisedService = new SupervisedServiceImpl<>(subEquipmentCacheRef, aliveTimerService);
     this.abstractEquipmentService = new CoreAbstractEquipmentService<>(subEquipmentCacheRef, commFaultService);

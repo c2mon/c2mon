@@ -5,6 +5,7 @@ import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
 import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 
@@ -14,6 +15,7 @@ import java.sql.Timestamp;
  * @param <T> the Tag class this Facade acts on
  */
 @Slf4j
+@Service
 public class TagService<T extends Tag> implements CommonTagOperations<T> {
 
   @Override
