@@ -1,18 +1,31 @@
 package cern.c2mon.server.cache.tag;
 
+import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.factory.AbstractCacheFactory;
+import cern.c2mon.server.cache.CacheName;
+import cern.c2mon.server.cache.config.AbstractSimpleCacheConfig;
+import cern.c2mon.server.cache.loader.CacheLoaderDAO;
+import cern.c2mon.server.common.tag.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
  * @author Szymon Halastra
+ * @author Alexandros Papageorgiou Koufidis
  */
 @Configuration
-public class TagCacheConfig {
+public class TagCacheConfig extends AbstractSimpleCacheConfig<Tag> {
 
-  // TODO (Alex): Does this even have a reason for existing? We don't seem to use the TAG cache anywhere?
+  @Autowired
+  public TagCacheConfig(AbstractCacheFactory cachingFactory, CacheLoaderDAO<Tag> cacheLoaderDAORef) {
+    super(cachingFactory, CacheName.TAG, Tag.class, cacheLoaderDAORef);
+  }
 
-//  @Bean(name = CacheName.Names.TAG)
-//  public C2monCache createCache(AbstractCacheFactory cachingFactory) {
-//    //TODO: temporary it has null in place of SingleEntryLoader
-//    return cachingFactory.createCache(CacheName.TAG.getLabel(), Long.class, Tag.class);
-//  }
+  @Override
+  @Bean(name = CacheName.Names.TAG)
+  public C2monCache<Tag> createCache() {
+    return super.createCache();
+  }
+
 }
