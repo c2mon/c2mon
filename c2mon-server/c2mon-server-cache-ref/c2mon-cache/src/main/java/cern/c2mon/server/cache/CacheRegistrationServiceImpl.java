@@ -23,8 +23,6 @@ import cern.c2mon.cache.api.listener.CacheRegistrationService;
 import cern.c2mon.cache.api.listener.CacheSupervisionListener;
 import cern.c2mon.cache.api.listener.impl.DefaultBufferedCacheListener;
 import cern.c2mon.cache.api.listener.impl.MultiThreadedCacheListener;
-import cern.c2mon.server.cache.*;
-import cern.c2mon.server.cache.config.CacheProperties;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.server.common.control.ControlTag;
@@ -117,16 +115,17 @@ public class CacheRegistrationServiceImpl implements CacheRegistrationService {
 
   @Override
   public void registerForSupervisionChanges(CacheSupervisionListener<Tag> cacheSupervisionListener) {
-    dataTagCache.registerListenerWithSupervision(cacheSupervisionListener);
-    ruleTagCache.registerListenerWithSupervision(cacheSupervisionListener);
+//    dataTagCache.registerListenerWithSupervision(cacheSupervisionListener);
+//    ruleTagCache.registerListenerWithSupervision(cacheSupervisionListener);
   }
 
 
   @Override
   public Lifecycle registerToAllTags(final CacheListener<Tag> tagCacheListener) {
-    CacheListener<Tag> wrappedCacheListener = new CacheListener<Tag>(tagCacheListener);
-    registerListenerToTags(wrappedCacheListener);
-    return wrappedCacheListener;
+//    CacheListener<Tag> wrappedCacheListener = new CacheListener<Tag>(tagCacheListener);
+//    registerListenerToTags(wrappedCacheListener);
+//    return wrappedCacheListener;
+    return null;
   }
 
   @Override
@@ -166,10 +165,11 @@ public class CacheRegistrationServiceImpl implements CacheRegistrationService {
 
   @Override
   public Lifecycle registerBufferedListenerToTags(final BufferedCacheListener<Tag> bufferListener) {
-    int frequency = properties.getBufferedListenerPullFrequency();
-    DefaultBufferedCacheListener<Tag> bufferedCacheListener = new DefaultBufferedCacheListener<>(bufferListener, frequency);
-    registerListenerToTags(bufferedCacheListener);
-    return bufferedCacheListener;
+//    int frequency = properties.getBufferedListenerPullFrequency();
+//    DefaultBufferedCacheListener<Tag> bufferedCacheListener = new DefaultBufferedCacheListener<>(bufferListener, frequency);
+//    registerListenerToTags(bufferedCacheListener);
+//    return bufferedCacheListener;
+    return null;
   }
 
   @Override

@@ -76,7 +76,12 @@ public enum CacheName {
   /**
    * Tag cache - stores DataTag, RuleTag and ControlTag
    */
-  TAG(Names.TAG);
+  TAG(Names.TAG),
+
+  /**
+   * Alarm timestamp cache - currently testing
+   */
+  ALARM_TIMESTAMP(Names.ALARM_TIMESTAMP);
 
   @Getter
   private final String label;
@@ -99,5 +104,6 @@ public enum CacheName {
     public static final String RULETAG = "ruleTagCacheRef";
     public static final String SUBEQUIPMENT = "subEquipmentCacheRef";
     public static final String TAG= "tagCacheRef";
+    public static final String ALARM_TIMESTAMP = "timestampCacheRef";
   }
 }
