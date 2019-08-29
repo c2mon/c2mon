@@ -2,7 +2,7 @@ package cern.c2mon.server.cache.rule;
 
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.factory.AbstractCacheFactory;
-import cern.c2mon.server.cache.AbstractBatchCacheConfig;
+import cern.c2mon.server.cache.config.AbstractBatchCacheConfig;
 import cern.c2mon.server.cache.CacheName;
 import cern.c2mon.server.cache.loader.BatchCacheLoaderDAO;
 import cern.c2mon.server.cache.loader.config.CacheLoaderProperties;

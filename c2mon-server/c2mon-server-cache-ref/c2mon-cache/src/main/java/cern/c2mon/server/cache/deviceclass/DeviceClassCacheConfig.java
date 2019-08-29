@@ -2,7 +2,7 @@ package cern.c2mon.server.cache.deviceclass;
 
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.factory.AbstractCacheFactory;
-import cern.c2mon.server.cache.AbstractSimpleCacheConfig;
+import cern.c2mon.server.cache.config.AbstractSimpleCacheConfig;
 import cern.c2mon.server.cache.CacheName;
 import cern.c2mon.server.cache.loader.CacheLoaderDAO;
 import cern.c2mon.server.common.device.DeviceClass;

@@ -1,8 +1,9 @@
-package cern.c2mon.server.cache;
+package cern.c2mon.server.cache.config;
 
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.factory.AbstractCacheFactory;
 import cern.c2mon.cache.api.loader.CacheLoader;
+import cern.c2mon.server.cache.CacheName;
 import cern.c2mon.shared.common.Cacheable;
 
 
