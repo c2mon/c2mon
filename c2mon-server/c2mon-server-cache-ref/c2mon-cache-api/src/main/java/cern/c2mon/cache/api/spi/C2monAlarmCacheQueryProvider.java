@@ -5,6 +5,7 @@ import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import java.util.List;
 
 /**
+ * TODO This may need to move to a more appropriate location
  *
  * @author Alexandros Papageorgiou
  * @author Brice Copy

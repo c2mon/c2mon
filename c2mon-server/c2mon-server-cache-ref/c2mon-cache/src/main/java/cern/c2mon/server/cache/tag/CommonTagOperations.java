@@ -20,6 +20,8 @@ import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
 
 import java.sql.Timestamp;
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * Interface exposing common methods for modifying Tag objects
@@ -91,6 +93,27 @@ public interface CommonTagOperations<T extends Tag> {
    */
   void updateValue(T tag, Object value, String valueDesc);
 
-
+  /**
+   * As opposed to the <code>invalidate()</code> methods, this method allows fine grained control of the quality of the
+   * datatag: in a single call, multiple quality flags can be added and/or removed and and new quality description
+   * can optionally be given.
+   *
+   * <p>To be used for internal server invalidation/validations as only sets the cache timestamp!
+   *
+   * <p><b>IMPORTANT:</b> this method should be used in preference to multiple calls the the invalidate() method since it results
+   * in a SINGLE notification to the cache listeners (each call to invalidate() results in a new object been passed to all
+   * module listeners).
+   *
+   * <p>This method is (write-)synchronized on the DataTag object.
+   *
+   * @param tagId unique id of the Tag
+   * @param flagsToAdd added flags
+   * @param flagsToRemove removed flags
+   * @param qualityDescriptions for flags that are set, will attempt to retrieve descriptions from this map
+   * @param timestamp sets the cache timestamp
+   *
+   */
+  void setQuality(Long tagId, Collection<TagQualityStatus> flagsToAdd, Collection<TagQualityStatus> flagsToRemove,
+                  Map<TagQualityStatus, String> qualityDescriptions, Timestamp timestamp);
 
 }

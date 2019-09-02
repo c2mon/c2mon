@@ -103,7 +103,7 @@ public enum CacheName {
     public static final String PROCESS = "processCacheRef";
     public static final String RULETAG = "ruleTagCacheRef";
     public static final String SUBEQUIPMENT = "subEquipmentCacheRef";
-    public static final String TAG= "tagCacheRef";
+    public static final String TAG= "tagCacheRef"; // ATTENTION: Not a real cache!
     public static final String ALARM_TIMESTAMP = "timestampCacheRef";
   }
 }
