@@ -83,7 +83,22 @@ public abstract class AbstractTagService<T extends Tag> implements CommonTagOper
 
   @Override
   public void setQuality(Long tagId, Collection<TagQualityStatus> flagsToAdd, Collection<TagQualityStatus> flagsToRemove, Map<TagQualityStatus, String> qualityDescriptions, Timestamp timestamp) {
+    T tag = cacheRef.get(tagId);
+    if (flagsToRemove == null && flagsToAdd == null) {
+      log.warn("Attempting to set quality in TagFacade with no Quality flags to remove or set!");
+    }
 
+    if (flagsToRemove != null) {
+      for (TagQualityStatus status : flagsToRemove) {
+        tag.getDataTagQuality().removeInvalidStatus(status);
+      }
+    }
+    if (flagsToAdd != null) {
+      for (TagQualityStatus status : flagsToAdd) {
+        tag.getDataTagQuality().addInvalidStatus(status, qualityDescriptions.get(status));
+      }
+    }
+    ((AbstractTagCacheObject) tag).setCacheTimestamp(timestamp);
   }
 
   /**

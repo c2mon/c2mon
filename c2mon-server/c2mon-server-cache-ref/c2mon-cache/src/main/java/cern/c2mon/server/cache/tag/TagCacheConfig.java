@@ -8,23 +8,17 @@ import cern.c2mon.server.cache.loader.CacheLoaderDAO;
 import cern.c2mon.server.common.tag.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * @author Szymon Halastra
  * @author Alexandros Papageorgiou Koufidis
+ *
+ * This is declared here only to maintain convention with all other cache declarations
+ *
+ * It does nothing
+ * @see TagCacheFacade
  */
-@Configuration
-public class TagCacheConfig extends AbstractSimpleCacheConfig<Tag> {
-
-  @Autowired
-  public TagCacheConfig(AbstractCacheFactory cachingFactory, CacheLoaderDAO<Tag> cacheLoaderDAORef) {
-    super(cachingFactory, CacheName.TAG, Tag.class, cacheLoaderDAORef);
-  }
-
-  @Override
-  public C2monCache<Tag> createCache() {
-    return super.createCache();
-  }
+public class TagCacheConfig {
 
 }
