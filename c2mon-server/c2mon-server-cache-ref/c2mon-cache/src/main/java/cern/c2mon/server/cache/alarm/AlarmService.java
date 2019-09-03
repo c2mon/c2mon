@@ -3,6 +3,7 @@ package cern.c2mon.server.cache.alarm;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.listener.CacheListener;
 import cern.c2mon.cache.api.listener.CacheSupervisionListener;
+import cern.c2mon.server.cache.tag.TagCacheFacade;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheUpdater;
 import cern.c2mon.server.common.alarm.TagWithAlarms;
@@ -28,14 +29,14 @@ public class AlarmService implements AlarmAggregator, CacheSupervisionListener<T
 
   private C2monCache<Alarm> alarmCacheRef;
 
-  private C2monCache<Tag> tagCacheRef;
+  private TagCacheFacade tagCacheRef;
 
   private List<AlarmAggregatorListener> alarmUpdateObservable = new ArrayList<>();
 
   private AlarmCacheUpdater alarmCacheUpdater;
 
   @Autowired
-  public AlarmService(final C2monCache<Alarm> alarmCacheRef, final C2monCache<Tag> tagCacheRef, final AlarmCacheUpdater alarmCacheUpdater) {
+  public AlarmService(final C2monCache<Alarm> alarmCacheRef, final TagCacheFacade tagCacheRef, final AlarmCacheUpdater alarmCacheUpdater) {
     this.alarmCacheRef = alarmCacheRef;
     this.tagCacheRef = tagCacheRef;
     this.alarmCacheUpdater = alarmCacheUpdater;

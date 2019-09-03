@@ -19,6 +19,7 @@ package cern.c2mon.server.cache.alarm.oscillation;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.cache.api.spi.C2monAlarmCacheQueryProvider;
+import cern.c2mon.server.cache.alarm.AlarmServiceTimestamp;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.AlarmCacheUpdater;
@@ -30,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.core.Ordered;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -87,49 +89,49 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
 
   private final C2monCache<Alarm> alarmCacheRef;
 
+  private final C2monCache<AlarmServiceTimestamp> timestampCacheRef;
+
   private final C2monAlarmCacheQueryProvider alarmCacheQueryProvider;
 
   private final OscillationUpdater oscillationUpdater;
 
   private final AlarmCacheUpdater alarmCacheUpdater;
 
-  // TODO Turn this on when ready
-  private final C2monCache<DataTag> dataTagCacheRef = null;
+  private final C2monCache<DataTag> dataTagCacheRef;
 
   /**
    * Constructor.
-   *
-   * @param alarmCacheRef
+   *  @param alarmCacheRef
    *          the alarm cache to retrieve and update alarm cache objects.
-   * @param dataTagCacheRef
-   *          the data tag cache to retrieve data tag objects and check their original values.
+   * @param timestampCacheRef
    * @param alarmCacheQueryProvider
    *          the query provider on the alarm cache to query for oscillation
    * @param oscillationUpdater
-   *          the instance that check oscillation statuses.
+ *          the instance that check oscillation statuses.
    * @param alarmCacheUpdater
-   *          the alarm cache updater.
+   * @param dataTagCacheRef
+*          the data tag cache to retrieve data tag objects and check their original values.
    */
   @Autowired
-  public OscillationUpdateChecker(final C2monCache<Alarm> alarmCacheRef, final C2monAlarmCacheQueryProvider alarmCacheQueryProvider,
-                                  final OscillationUpdater oscillationUpdater, final AlarmCacheUpdater alarmCacheUpdater/*,
-                                  final  C2monCacheTyped<DataTag> dataTagCacheRef*/) {
+  public OscillationUpdateChecker(final C2monCache<Alarm> alarmCacheRef, C2monCache<AlarmServiceTimestamp> timestampCacheRef, final C2monAlarmCacheQueryProvider alarmCacheQueryProvider,
+                                  final OscillationUpdater oscillationUpdater, final AlarmCacheUpdater alarmCacheUpdater,
+                                  final C2monCache<DataTag> dataTagCacheRef) {
     super();
     this.alarmCacheRef = alarmCacheRef;
+    this.timestampCacheRef = timestampCacheRef;
     this.alarmCacheQueryProvider = alarmCacheQueryProvider;
     this.oscillationUpdater = oscillationUpdater;
     this.alarmCacheUpdater = alarmCacheUpdater;
-//    this.dataTagCacheRef = dataTagCacheRef;
+    this.dataTagCacheRef = dataTagCacheRef;
   }
 
 
   /**
    * Initializes the clustered values
    */
-  @EventListener
-  public void init(ContextRefreshedEvent event) {
+  public void init() {
     log.trace("Initialising Alarm oscillation checker ...");
-    alarmCacheRef.executeTransaction( () -> {
+    timestampCacheRef.executeTransaction( () -> {
       alarmCacheQueryProvider.setLastOscillationCheck(0);
       return null;
     });
@@ -141,6 +143,7 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
    */
   @Override
   public synchronized void start() {
+    init();
     log.info("Starting the C2MON Alarm oscillation timer mechanism.");
     timer = new Timer("AlarmOscillationChecker");
     timer.schedule(this, INITIAL_SCAN_DELAY, SCAN_INTERVAL);

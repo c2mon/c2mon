@@ -34,6 +34,11 @@
           <property name="atomicityMode" value="TRANSACTIONAL"/>
         </bean>
         <bean class="org.apache.ignite.configuration.CacheConfiguration">
+          <property name="name" value="timestampCacheRef"/>
+          <property name="cacheMode" value="REPLICATED"/>
+          <property name="atomicityMode" value="TRANSACTIONAL"/>
+        </bean>
+        <bean class="org.apache.ignite.configuration.CacheConfiguration">
           <property name="name" value="aliveTimerCacheRef"/>
           <property name="cacheMode" value="REPLICATED"/>
           <property name="atomicityMode" value="TRANSACTIONAL"/>
@@ -85,11 +90,6 @@
         </bean>
         <bean class="org.apache.ignite.configuration.CacheConfiguration">
           <property name="name" value="subEquipmentCacheRef"/>
-          <property name="cacheMode" value="REPLICATED"/>
-          <property name="atomicityMode" value="TRANSACTIONAL"/>
-        </bean>
-        <bean class="org.apache.ignite.configuration.CacheConfiguration">
-          <property name="name" value="tagCacheRef"/>
           <property name="cacheMode" value="REPLICATED"/>
           <property name="atomicityMode" value="TRANSACTIONAL"/>
         </bean>

@@ -8,6 +8,8 @@ import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.tag.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Component;
 
 import javax.cache.Cache;
 import javax.cache.CacheManager;
@@ -29,6 +31,7 @@ import java.util.*;
  *
  * @see TagCacheFacade#put(Long, Tag)
  */
+@Component
 public class TagCacheFacade implements Cache<Long, Tag> {
 
   private static final String UNSUPPORTED_OPERATION = "The unified tag cache is not a real cache, but only acts as a facade to the Control tag, Data tag and Rule tag. This operation is not supported";
