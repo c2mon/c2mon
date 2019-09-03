@@ -11,32 +11,33 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Alexandros Papageorgiou
  * @author Brice Copy
  */
 @Component
-public class IgniteC2monAlarmCacheQueryProvider implements C2monAlarmCacheQueryProvider {
+public class IgniteC2monAlarmCacheQueryProvider extends IgniteCacheQueryProvider implements C2monAlarmCacheQueryProvider {
 
   private final C2monCache<AlarmServiceTimestamp> lastAccessCache;
 
-  private final C2monCache<Alarm> alarmCacheRef;
+  private final IgniteC2monCacheBase<Alarm> alarmCacheRef;
 
   @Autowired
   public IgniteC2monAlarmCacheQueryProvider(final C2monCache<AlarmServiceTimestamp> lastAccessCache, final C2monCache<Alarm> alarmCacheRef) {
     this.lastAccessCache = lastAccessCache;
-    this.alarmCacheRef = alarmCacheRef;
+    this.alarmCacheRef = (IgniteC2monCacheBase<Alarm>) alarmCacheRef;
   }
 
   @Override
   public List<AlarmCacheObject> getOscillatingAlarms() {
-    return getAlarmsApplyingQuery((key, alarm) -> alarm.isOscillating());
+    return filterAndCast(alarmCacheRef,(key, alarm) -> alarm.isOscillating());
   }
 
   @Override
   public List<AlarmCacheObject> getActiveAlarms() {
-    return getAlarmsApplyingQuery((key, alarm) -> alarm.isActive());
+    return filterAndCast(alarmCacheRef, (key, alarm) -> alarm.isActive());
   }
 
   @Override
@@ -50,10 +51,7 @@ public class IgniteC2monAlarmCacheQueryProvider implements C2monAlarmCacheQueryP
     lastAccessCache.put(key, new AlarmServiceTimestamp(key, timestampMillis));
   }
 
-  private List<AlarmCacheObject> getAlarmsApplyingQuery(IgniteBiPredicate<Long, Alarm> filter) {
-    return ((IgniteC2monCacheBase<Alarm>) alarmCacheRef).query(new ScanQuery<>(filter),
-      // TODO Verify we want this cast - are we using AlarmCacheObjects downstream?
-      longAlarmEntry -> (AlarmCacheObject) longAlarmEntry.getValue()
-    ).getAll();
+  protected List<AlarmCacheObject> filterAndCast(IgniteC2monCacheBase<Alarm> cache, IgniteBiPredicate<Long, Alarm> filter) {
+    return super.filter(cache, filter).stream().map(alarm -> (AlarmCacheObject) alarm).collect(Collectors.toList());
   }
 }
