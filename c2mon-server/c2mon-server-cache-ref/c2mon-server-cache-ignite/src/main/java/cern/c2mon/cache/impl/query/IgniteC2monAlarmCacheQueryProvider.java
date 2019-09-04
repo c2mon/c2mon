@@ -1,11 +1,11 @@
-package cern.c2mon.cache.impl;
+package cern.c2mon.cache.impl.query;
 
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.spi.C2monAlarmCacheQueryProvider;
+import cern.c2mon.cache.impl.IgniteC2monCache;
 import cern.c2mon.server.cache.alarm.AlarmServiceTimestamp;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
-import org.apache.ignite.cache.query.ScanQuery;
 import org.apache.ignite.lang.IgniteBiPredicate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -22,17 +22,17 @@ public class IgniteC2monAlarmCacheQueryProvider extends IgniteCacheQueryProvider
 
   private final C2monCache<AlarmServiceTimestamp> lastAccessCache;
 
-  private final IgniteC2monCacheBase<Alarm> alarmCacheRef;
+  private final IgniteC2monCache<Alarm> alarmCacheRef;
 
   @Autowired
   public IgniteC2monAlarmCacheQueryProvider(final C2monCache<AlarmServiceTimestamp> lastAccessCache, final C2monCache<Alarm> alarmCacheRef) {
     this.lastAccessCache = lastAccessCache;
-    this.alarmCacheRef = (IgniteC2monCacheBase<Alarm>) alarmCacheRef;
+    this.alarmCacheRef = (IgniteC2monCache<Alarm>) alarmCacheRef;
   }
 
   @Override
   public List<AlarmCacheObject> getOscillatingAlarms() {
-    return filterAndCast(alarmCacheRef,(key, alarm) -> alarm.isOscillating());
+    return filterAndCast(alarmCacheRef, (key, alarm) -> alarm.isOscillating());
   }
 
   @Override
@@ -51,7 +51,7 @@ public class IgniteC2monAlarmCacheQueryProvider extends IgniteCacheQueryProvider
     lastAccessCache.put(key, new AlarmServiceTimestamp(key, timestampMillis));
   }
 
-  protected List<AlarmCacheObject> filterAndCast(IgniteC2monCacheBase<Alarm> cache, IgniteBiPredicate<Long, Alarm> filter) {
+  protected List<AlarmCacheObject> filterAndCast(IgniteC2monCache<Alarm> cache, IgniteBiPredicate<Long, Alarm> filter) {
     return super.filter(cache, filter).stream().map(alarm -> (AlarmCacheObject) alarm).collect(Collectors.toList());
   }
 }

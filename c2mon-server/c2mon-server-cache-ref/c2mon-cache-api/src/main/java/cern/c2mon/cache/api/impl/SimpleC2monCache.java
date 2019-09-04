@@ -1,8 +1,11 @@
 package cern.c2mon.cache.api.impl;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.listener.Listener;
+import cern.c2mon.cache.api.loader.CacheLoader;
+import cern.c2mon.cache.api.transactions.TransactionalCallable;
+import cern.c2mon.shared.common.Cacheable;
+import org.springframework.context.event.ContextRefreshedEvent;
 
 import javax.cache.CacheManager;
 import javax.cache.configuration.CacheEntryListenerConfiguration;
@@ -11,12 +14,9 @@ import javax.cache.integration.CompletionListener;
 import javax.cache.processor.EntryProcessor;
 import javax.cache.processor.EntryProcessorException;
 import javax.cache.processor.EntryProcessorResult;
-
-import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.cache.api.listener.Listener;
-import cern.c2mon.cache.api.loader.CacheLoader;
-import cern.c2mon.cache.api.transactions.TransactionalCallable;
-import cern.c2mon.shared.common.Cacheable;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * Class used only for testing, as a simple implementation of C2monCache
@@ -33,6 +33,7 @@ public class SimpleC2monCache<V extends Cacheable> implements C2monCache<V> {
 
 
   @SuppressWarnings("NotRequiredForUnitTesting")
+  @Override
   public void init() {
 
   }
@@ -203,10 +204,15 @@ public class SimpleC2monCache<V extends Cacheable> implements C2monCache<V> {
   public <S> Optional<S> executeTransaction(TransactionalCallable<S> callable) {
     S returnValue = callable.call();
 
-    if(returnValue == null) {
+    if (returnValue == null) {
       return Optional.empty();
     }
     return Optional.of(returnValue);
+  }
+
+  @Override
+  public void executeTransaction(Runnable callable) {
+    callable.run();
   }
 
   @Override

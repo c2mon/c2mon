@@ -9,8 +9,8 @@ import cern.c2mon.shared.common.Cacheable;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ignite.Ignite;
 import org.apache.ignite.IgniteCache;
-import org.apache.ignite.IgniteSpringBean;
 import org.apache.ignite.cache.query.Query;
 import org.apache.ignite.cache.query.QueryCursor;
 import org.apache.ignite.cache.query.ScanQuery;
@@ -19,10 +19,8 @@ import org.apache.ignite.lang.IgniteClosure;
 import org.apache.ignite.transactions.Transaction;
 import org.apache.ignite.transactions.TransactionDeadlockException;
 import org.apache.ignite.transactions.TransactionTimeoutException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.context.event.EventListener;
 
+import javax.annotation.PostConstruct;
 import javax.cache.CacheException;
 import javax.cache.CacheManager;
 import javax.cache.configuration.CacheEntryListenerConfiguration;
@@ -34,33 +32,37 @@ import javax.cache.processor.EntryProcessorResult;
 import java.util.*;
 
 @Slf4j
-public class IgniteC2monCacheBase<V extends Cacheable> implements C2monCache<V> {
+public class IgniteC2monCache<V extends Cacheable> implements C2monCache<V> {
 
   protected final String cacheName;
+  private final Ignite igniteInstance;
 
   @Getter
   @Setter
+//  TODO This should be activated and connected
   protected CacheLoader<V> cacheLoader;
 
   protected CacheConfiguration<Long, V> cacheCfg;
   protected IgniteCache<Long, V> cache;
   private Listener<V> listenerService;
-  @Autowired
-  private IgniteSpringBean C2monIgnite;
 
-  public IgniteC2monCacheBase(String cacheName) {
-    this(cacheName, new DefaultIgniteCacheConfiguration<>(cacheName));
-  }
 
-  public IgniteC2monCacheBase(String cacheName, CacheConfiguration<Long, V> cacheCfg) {
+  public IgniteC2monCache(String cacheName, CacheConfiguration<Long, V> cacheCfg, Ignite igniteInstance) {
     this.cacheName = cacheName;
     this.cacheCfg = cacheCfg;
+    this.igniteInstance = igniteInstance;
     this.listenerService = new ListenerService<>();
   }
 
-  @EventListener
-  public void init(ContextRefreshedEvent event) {
-    init();
+  @Override
+  @PostConstruct
+  public void init() {
+    igniteInstance.addCacheConfiguration(cacheCfg);
+    cache = igniteInstance.getOrCreateCache(cacheName);
+
+    if (cacheLoader != null) {
+      cacheLoader.preload();
+    }
   }
 
   public <T, R> QueryCursor<R> query(Query<T> query, IgniteClosure<T, R> closure) {
@@ -73,18 +75,8 @@ public class IgniteC2monCacheBase<V extends Cacheable> implements C2monCache<V> 
   }
 
   @Override
-  public void init() {
-    cache = C2monIgnite.getOrCreateCache(cacheName);
-    C2monIgnite.addCacheConfiguration(cacheCfg);
-
-    if (cacheLoader != null) {
-      cacheLoader.preload();
-    }
-  }
-
-  @Override
   public <S> Optional<S> executeTransaction(TransactionalCallable<S> callable) {
-    try (Transaction tx = C2monIgnite.transactions().txStart()) {
+    try (Transaction tx = igniteInstance.transactions().txStart()) {
 
       S returnValue = callable.call();
 
@@ -101,12 +93,27 @@ public class IgniteC2monCacheBase<V extends Cacheable> implements C2monCache<V> 
     return Optional.empty();
   }
 
+  @Override
+  public void executeTransaction(Runnable runnable) {
+    try (Transaction tx = igniteInstance.transactions().txStart()) {
+
+      runnable.run();
+
+      tx.commit();
+    } catch (CacheException e) {
+      if (e.getCause() instanceof TransactionTimeoutException &&
+        e.getCause().getCause() instanceof TransactionDeadlockException) {
+        log.error("DeadLock occurred", e.getCause().getCause().getMessage());
+      }
+    }
+  }
+
 
   // Cache methods
 
   @Override
   public V get(Long key) throws IllegalArgumentException {
-    if (key instanceof Number) {
+    if (key != null) {
       return cache.get(key);
     } else {
       throw new IllegalArgumentException();

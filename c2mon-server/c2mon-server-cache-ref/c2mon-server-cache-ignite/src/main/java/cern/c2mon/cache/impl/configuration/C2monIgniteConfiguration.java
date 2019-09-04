@@ -1,5 +1,6 @@
 package cern.c2mon.cache.impl.configuration;
 
+import cern.c2mon.cache.impl.IgniteC2monBean;
 import org.apache.ignite.IgniteSpringBean;
 import org.apache.ignite.configuration.IgniteConfiguration;
 import org.apache.ignite.logger.slf4j.Slf4jLogger;
@@ -30,9 +31,7 @@ public class C2monIgniteConfiguration {
   }
 
   @Bean(name = "C2monIgnite")
-  public IgniteSpringBean createIgniteSpringBean() {
-    IgniteSpringBean igniteSpringBean = new IgniteSpringBean();
-    igniteSpringBean.setConfiguration(configureIgnite());
-    return igniteSpringBean;
+  public IgniteC2monBean createIgniteSpringBean() {
+    return new IgniteC2monBean(configureIgnite());
   }
 }

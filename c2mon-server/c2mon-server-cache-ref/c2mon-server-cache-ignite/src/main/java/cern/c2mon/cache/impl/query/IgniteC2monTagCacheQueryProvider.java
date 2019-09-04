@@ -1,7 +1,8 @@
-package cern.c2mon.cache.impl;
+package cern.c2mon.cache.impl.query;
 
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.spi.C2monTagCacheQueryProvider;
+import cern.c2mon.cache.impl.IgniteC2monCache;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.TagWithAlarms;
 import cern.c2mon.server.common.alarm.TagWithAlarmsImpl;
@@ -14,13 +15,13 @@ import java.util.stream.Collectors;
 
 public class IgniteC2monTagCacheQueryProvider extends IgniteCacheQueryProvider implements C2monTagCacheQueryProvider {
 
-  private final IgniteC2monCacheBase<Alarm> alarmCache;
-  private final IgniteC2monCacheBase<Tag> tagCache;
+  private final IgniteC2monCache<Alarm> alarmCache;
+  private final IgniteC2monCache<Tag> tagCache;
 
   @Autowired
   public IgniteC2monTagCacheQueryProvider(final C2monCache<Alarm> alarmCache, final C2monCache<Tag> tagCache) {
-    this.alarmCache = (IgniteC2monCacheBase<Alarm>) alarmCache;
-    this.tagCache = (IgniteC2monCacheBase<Tag>) tagCache;
+    this.alarmCache = (IgniteC2monCache<Alarm>) alarmCache;
+    this.tagCache = (IgniteC2monCache<Tag>) tagCache;
   }
 
   @Override

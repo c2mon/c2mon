@@ -129,11 +129,11 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
   /**
    * Initializes the clustered values
    */
-  public void init() {
+  @EventListener
+  public void init(ContextRefreshedEvent event) {
     log.trace("Initialising Alarm oscillation checker ...");
     timestampCacheRef.executeTransaction( () -> {
       alarmCacheQueryProvider.setLastOscillationCheck(0);
-      return null;
     });
     log.trace("Initialisation complete.");
   }
@@ -143,7 +143,6 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
    */
   @Override
   public synchronized void start() {
-    init();
     log.info("Starting the C2MON Alarm oscillation timer mechanism.");
     timer = new Timer("AlarmOscillationChecker");
     timer.schedule(this, INITIAL_SCAN_DELAY, SCAN_INTERVAL);
