@@ -8,6 +8,7 @@ import cern.c2mon.cache.api.transactions.TransactionalCallable;
 import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.shared.common.Cacheable;
 
+import javax.annotation.PostConstruct;
 import javax.cache.Cache;
 import java.io.Serializable;
 import java.util.Optional;
@@ -17,6 +18,8 @@ import java.util.Set;
 /**
  * @param <V> cache element type
  * @author Szymon Halastra
+ * @author Alexandros Papageorgiou Koufidis
+ * @author Brice Copy
  */
 public interface C2monCache<V extends Cacheable> extends Cache<Long, V>, Serializable, Listener<V> {
 
@@ -27,9 +30,12 @@ public interface C2monCache<V extends Cacheable> extends Cache<Long, V>, Seriali
   // TODO Do we want this?
   Set<Long> getKeys();
 
+  @PostConstruct
   void init();
 
-  <S> Optional<S> executeTransaction(TransactionalCallable<S> callable);
+  <T> Optional<T> executeTransaction(TransactionalCallable<T> callable);
+
+  void executeTransaction(Runnable callable);
 
   default void putQuiet(Long key, V value) {
     put(key, value);
