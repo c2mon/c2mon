@@ -9,7 +9,7 @@ of monitoring and control system or a full SCADA application.
 See the current [reference docs][].
 
 ## Issue tracking
-All C2MON issues are tracked and maintained within the [CERN JIRA][] system. Unfortuntaly, users from outside are not allowed to create tickets in [CERN JIRA][],
+All C2MON issues are tracked and maintained within the [CERN JIRA][] system. Unfortunetaly, users from outside are not allowed to create tickets in [CERN JIRA][],
 but you are welcome to open [GitHub issues][] or to send an email to c2mon-support@cern.ch.
 
 ## Release notes
