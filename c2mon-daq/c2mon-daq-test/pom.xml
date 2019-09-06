@@ -8,6 +8,17 @@
     <version>1.9.3-SNAPSHOT</version>
   </parent>
 
+   <distributionManagement>
+     <repository>
+       <id>c2mon-nexus-releases</id>
+       <url>${nexus.releases.url}</url>
+     </repository>
+     <snapshotRepository>
+       <id>c2mon-nexus-releases</id>
+       <url>${nexus.snapshots.url}</url>
+     </snapshotRepository>
+  </distributionManagement>
+
   <artifactId>c2mon-daq-test</artifactId>
   <packaging>jar</packaging>
 
