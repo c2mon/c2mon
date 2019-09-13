@@ -6,8 +6,6 @@ stages:
 
 clean_elasticsearch:
   type: clean
-  variables:
-    GIT_STRATEGY: none
   script:
     - killall -q java || true
     - rm -Rf /tmp/es-cluster*
