@@ -115,8 +115,8 @@ public class CacheRegistrationServiceImpl implements CacheRegistrationService {
 
   @Override
   public void registerForSupervisionChanges(CacheSupervisionListener<Tag> cacheSupervisionListener) {
-//    dataTagCache.registerListenerWithSupervision(cacheSupervisionListener);
-//    ruleTagCache.registerListenerWithSupervision(cacheSupervisionListener);
+    dataTagCache.registerListenerWithSupervision(cacheSupervisionListener);
+    ruleTagCache.registerListenerWithSupervision(cacheSupervisionListener);
   }
 
 

@@ -1,5 +1,6 @@
 package cern.c2mon.cache.api.listener;
 
+import java.util.List;
 import java.util.concurrent.LinkedBlockingDeque;
 
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +21,8 @@ public class ListenerService<K, V extends Cacheable> implements Listener<V> {
    * Reference to the C2monCache event listeners
    */
   private LinkedBlockingDeque<CacheListener<? super V>> cacheListeners = new LinkedBlockingDeque<>();
+
+  private List<CacheSupervisionListener<? super V>> cacheSupervisionListeners;
 
   public ListenerService() {
   }
@@ -42,6 +45,21 @@ public class ListenerService<K, V extends Cacheable> implements Listener<V> {
       V cloned = (V) cacheable.clone();
       for (CacheListener<? super V> listener : cacheListeners) {
         listener.notifyElementUpdated(cloned);
+      }
+    }
+    catch (CloneNotSupportedException e) {
+      log.error("CloneNotSupportedException caught while cloning a cache element - this should never happen!", e);
+      throw new RuntimeException("CloneNotSupportedException caught while cloning a cache element - this should never happen!", e);
+    }
+  }
+
+  @Override
+  public void notifyListenersOfSupervisionChange(V tag) {
+    try {
+      @SuppressWarnings("unchecked")
+      V cloned = (V) tag.clone();
+      for (CacheSupervisionListener<? super V> listener : cacheSupervisionListeners) {
+        listener.onSupervisionChange(cloned);
       }
     }
     catch (CloneNotSupportedException e) {
@@ -75,6 +93,11 @@ public class ListenerService<K, V extends Cacheable> implements Listener<V> {
     MultiThreadedCacheListener<? super V> wrappedCacheListener = new MultiThreadedCacheListener<>(cacheListener, 1000, 0);
     cacheListeners.add(wrappedCacheListener);
     return wrappedCacheListener;
+  }
+
+  @Override
+  public void registerListenerWithSupervision(CacheSupervisionListener<? super V> cacheSupervisionListener) {
+    cacheSupervisionListeners.add(cacheSupervisionListener);
   }
 
   @Override

@@ -16,24 +16,16 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.tag;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-
-import cern.c2mon.server.cache.config.CacheProperties;
-import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import cern.c2mon.server.cache.C2monCacheWithSupervision;
 import cern.c2mon.server.cache.CacheSupervisionListener;
 import cern.c2mon.server.cache.ClusterCache;
 import cern.c2mon.server.cache.common.AbstractCache;
-import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
+import cern.c2mon.server.cache.config.CacheProperties;
 import cern.c2mon.server.cache.loading.SimpleCacheLoaderDAO;
+import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
 import cern.c2mon.server.common.tag.AbstractTagCacheObject;
 import cern.c2mon.server.common.tag.Tag;
+import lombok.extern.slf4j.Slf4j;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.loader.CacheLoader;
 import net.sf.ehcache.search.Attribute;
@@ -41,28 +33,33 @@ import net.sf.ehcache.search.Query;
 import net.sf.ehcache.search.Result;
 import net.sf.ehcache.search.Results;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
 /**
  * Common methods used by all tag caches (data, control and rule tags).
  * Objects in these caches are {@link AbstractTagCacheObject}s and implement
  * the {@link Tag} interface.
- *
+ * <p>
  * TODO still need to add listener lifecycle callback if add listeners on new threads (not available so far)
  *
  * @param <T> cache object type
- *
  * @author Mark Brightwell
- *
  */
 @Slf4j
 public abstract class AbstractTagCache<T extends Tag> extends AbstractCache<Long, T> implements C2monCacheWithSupervision<Long, T> {
 
-  /** The max result size should avoid to run into an OutOfMemory Exception when doing a wildcard search */
+  /**
+   * The max result size should avoid to run into an OutOfMemory Exception when doing a wildcard search
+   */
   private static final int MAX_RESULT_SIZE = 100000;
 
   /**
    * Synchronized list.
    */
-  private final List<CacheSupervisionListener< ? super T>> listenersWithSupervision;
+  private final List<CacheSupervisionListener<? super T>> listenersWithSupervision;
   private final ReentrantReadWriteLock listenerLock;
 
   /**
@@ -99,7 +96,7 @@ public abstract class AbstractTagCache<T extends Tag> extends AbstractCache<Long
   private void notifyListenersWithSupervision(final T tag) {
     listenerLock.readLock().lock();
     try {
-      for (CacheSupervisionListener< ? super T> cacheListener : listenersWithSupervision) {
+      for (CacheSupervisionListener<? super T> cacheListener : listenersWithSupervision) {
         cacheListener.onSupervisionChange(tag);
       }
     } finally {
@@ -108,7 +105,7 @@ public abstract class AbstractTagCache<T extends Tag> extends AbstractCache<Long
   }
 
   @Override
-  public void registerListenerWithSupervision(CacheSupervisionListener< ? super T> timCacheListener) {
+  public void registerListenerWithSupervision(CacheSupervisionListener<? super T> timCacheListener) {
     listenerLock.writeLock().lock();
     try {
       listenersWithSupervision.add(timCacheListener);
@@ -141,8 +138,7 @@ public abstract class AbstractTagCache<T extends Tag> extends AbstractCache<Long
       results = query.includeKeys().addCriteria(tagName.ilike(name)).maxResults(1).execute();
 
       return results.hasKeys();
-    }
-    finally {
+    } finally {
       if (results != null) {
         // Discard the results when done to free up cache resources.
         results.discard();
@@ -189,7 +185,7 @@ public abstract class AbstractTagCache<T extends Tag> extends AbstractCache<Long
    * WARN: Expressions starting with a leading wildcard character are
    * potentially very expensive (ie. full scan) for indexed caches
    *
-   * @param regex The regular expression including '?' and '*'
+   * @param regex      The regular expression including '?' and '*'
    * @param maxResults the maximum amount of results that shall be returned
    * @return All tags where the tag name is matching the regular expression.
    * Please note, that the result is limited by {@code maxResults}
@@ -206,7 +202,7 @@ public abstract class AbstractTagCache<T extends Tag> extends AbstractCache<Long
 
     if (regex.equals("*")) {
       int counter = 0;
-      for (Long  key : getKeys()) {
+      for (Long key : getKeys()) {
         resultList.add(get(key));
 
         counter++;
@@ -215,8 +211,7 @@ public abstract class AbstractTagCache<T extends Tag> extends AbstractCache<Long
           break;
         }
       }
-    }
-    else {
+    } else {
       try {
         Ehcache ehcache = getCache();
         Attribute<String> tagName = ehcache.getSearchAttribute("tagName");
@@ -231,13 +226,11 @@ public abstract class AbstractTagCache<T extends Tag> extends AbstractCache<Long
           key = (Long) result.getKey();
           if (key != null) {
             resultList.add(get(key));
-          }
-          else {
+          } else {
             log.warn(String.format("findByNameWildcard() - Regex \"%s\" returned a null key for cache %s", regex, getCacheName()));
           }
         }
-      }
-      finally {
+      } finally {
         if (results != null) {
           // Discard the results when done to free up cache resources.
           results.discard();
