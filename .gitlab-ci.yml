@@ -25,7 +25,7 @@ build:
   tags: 
     - docker-privileged
   type: build
-  image: gitlab-registry.cern.ch/industrial-controls/swinfra/mvn-dind:baseline
+  image: gitlab-registry.cern.ch/industrial-controls/sw-infra/mvn-dind:baseline
   services:    
     - docker:19.03.0-dind
   variables:
