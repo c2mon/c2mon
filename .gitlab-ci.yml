@@ -22,8 +22,18 @@ build_and_publish:
 
 # Just run tests on feature branches
 build:
+  tags: 
+    - docker-privileged
   type: build
+  image: mvn-dind:baseline
+  services:    
+    - docker:19.03.0-dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375/
+    DOCKER_DRIVER: overlay2
+    DOCKER_TLS_CERTDIR: ""
   script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
     - mvn -q -U -B clean test -DskipDocker=true --settings settings.xml -Ddependencies.set.direct --debug -X
   except:
     - master
