@@ -127,7 +127,11 @@ public class IgniteC2monCache<V extends Cacheable> implements C2monCache<V> {
 
   @Override
   public void put(Long key, V value) {
-    cache.put(key, value);
+    if (value != null && key != null) {
+      cache.put(key, value);
+    } else {
+      throw new IllegalArgumentException();
+    }
   }
 
   @Override
@@ -163,106 +167,104 @@ public class IgniteC2monCache<V extends Cacheable> implements C2monCache<V> {
     return keys;
   }
 
-  // ===========  Not yet done  ===========
-
   @Override
   public void loadAll(Set<? extends Long> set, boolean b, CompletionListener completionListener) {
-
+    cache.loadAll(set, b, completionListener);
   }
 
   @Override
   public V getAndPut(Long k, V v) {
-    return null;
+    return cache.getAndPut(k, v);
   }
 
   @Override
   public boolean putIfAbsent(Long k, V v) {
-    return false;
+    return cache.putIfAbsent(k, v);
   }
 
   @Override
   public boolean remove(Long k, V v) {
-    return false;
+    return cache.remove(k, v);
   }
 
   @Override
   public V getAndRemove(Long k) {
-    return null;
+    return cache.getAndRemove(k);
   }
 
   @Override
   public boolean replace(Long k, V v, V v1) {
-    return false;
+    return cache.replace(k, v, v1);
   }
 
   @Override
   public boolean replace(Long k, V v) {
-    return false;
+    return cache.replace(k, v);
   }
 
   @Override
   public V getAndReplace(Long k, V v) {
-    return null;
+    return cache.getAndReplace(k, v);
   }
 
   @Override
   public void removeAll(Set<? extends Long> set) {
-
+    cache.removeAll(set);
   }
 
   @Override
   public void removeAll() {
-
+    cache.removeAll();
   }
 
   @Override
   public void clear() {
-
+    cache.clear();
   }
 
   @Override
   public <C extends Configuration<Long, V>> C getConfiguration(Class<C> aClass) {
-    return null;
+    return cache.getConfiguration(aClass);
   }
 
   @Override
   public String getName() {
-    return null;
+    return cacheName;
   }
 
   @Override
   public CacheManager getCacheManager() {
-    return null;
+    return cache.getCacheManager();
   }
 
   @Override
   public void close() {
-
+    cache.close();
   }
 
   @Override
   public boolean isClosed() {
-    return false;
+    return cache.isClosed();
   }
 
   @Override
   public <T> T unwrap(Class<T> aClass) {
-    return null;
+    return cache.unwrap(aClass);
   }
 
 
   @Override
   public void registerCacheEntryListener(CacheEntryListenerConfiguration<Long, V> cacheEntryListenerConfiguration) {
-
+    cache.registerCacheEntryListener(cacheEntryListenerConfiguration);
   }
 
   @Override
   public void deregisterCacheEntryListener(CacheEntryListenerConfiguration<Long, V> cacheEntryListenerConfiguration) {
-
+    cache.deregisterCacheEntryListener(cacheEntryListenerConfiguration);
   }
 
   @Override
   public Iterator<Entry<Long, V>> iterator() {
-    return null;
+    return cache.iterator();
   }
 }

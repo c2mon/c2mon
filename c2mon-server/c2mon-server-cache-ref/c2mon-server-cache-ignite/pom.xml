@@ -23,10 +23,6 @@
       <artifactId>c2mon-cache-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>cern.c2mon.server</groupId>
-      <artifactId>c2mon-cache</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.apache.ignite</groupId>
       <artifactId>ignite-core</artifactId>
       <version>${ignite.version}</version>

@@ -3,7 +3,7 @@ package cern.c2mon.server.cache.alarm.config;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.factory.AbstractCacheFactory;
 import cern.c2mon.server.cache.CacheName;
-import cern.c2mon.server.cache.alarm.AlarmServiceTimestamp;
+import cern.c2mon.server.common.alarm.AlarmServiceTimestamp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

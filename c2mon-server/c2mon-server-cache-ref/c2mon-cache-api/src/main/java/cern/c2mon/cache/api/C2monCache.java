@@ -29,7 +29,6 @@ public interface C2monCache<V extends Cacheable> extends Cache<Long, V>, Seriali
 
   void setCacheLoader(CacheLoader<V> cacheLoader);
 
-  // TODO Do we want this?
   Set<Long> getKeys();
 
   @PostConstruct
@@ -43,12 +42,56 @@ public interface C2monCache<V extends Cacheable> extends Cache<Long, V>, Seriali
     put(key, value);
   }
 
-  @Delegate(types = Listener.class)
   Listener<V> getListenerService();
 
   // TODO Document this to show it should be default behavior
   default void putAndNotify(Long key, V value) {
     put(key, value);
     notifyListenersOfUpdate(value);
+  }
+
+  @Override
+  default void notifyListenersOfUpdate(V cacheable) {
+    getListenerService().notifyListenersOfUpdate(cacheable);
+  }
+
+  @Override
+  default void notifyListenersOfSupervisionChange(V tag) {
+    getListenerService().notifyListenersOfSupervisionChange(tag);
+  }
+
+  @Override
+  default void notifyListenerStatusConfirmation(V cacheable, long timestamp) {
+    getListenerService().notifyListenerStatusConfirmation(cacheable, timestamp);
+  }
+
+  @Override
+  default void registerSynchronousListener(CacheListener<? super V> cacheListener) {
+    getListenerService().registerSynchronousListener(cacheListener);
+  }
+
+  @Override
+  default Lifecycle registerListener(CacheListener<? super V> cacheListener) {
+    return getListenerService().registerListener(cacheListener);
+  }
+
+  @Override
+  default void registerListenerWithSupervision(CacheSupervisionListener<? super V> cacheSupervisionListener) {
+    getListenerService().registerListenerWithSupervision(cacheSupervisionListener);
+  }
+
+  @Override
+  default Lifecycle registerThreadedListener(CacheListener<? super V> cacheListener, int queueCapacity, int threadPoolSize) {
+    return getListenerService().registerThreadedListener(cacheListener, queueCapacity, threadPoolSize);
+  }
+
+  @Override
+  default Lifecycle registerBufferedListener(BufferedCacheListener<Cacheable> bufferedCacheListener, int frequency) {
+    return getListenerService().registerBufferedListener(bufferedCacheListener, frequency);
+  }
+
+  @Override
+  default Lifecycle registerKeyBufferedListener(BufferedCacheListener<Long> bufferedCacheListener, int frequency) {
+    return getListenerService().registerKeyBufferedListener(bufferedCacheListener, frequency);
   }
 }

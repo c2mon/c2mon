@@ -1,6 +1,5 @@
-package cern.c2mon.server.cache.alarm;
+package cern.c2mon.server.common.alarm;
 
-import cern.c2mon.server.cache.TimestampKeyEnum;
 import cern.c2mon.shared.common.Cacheable;
 import lombok.Getter;
 
@@ -10,14 +9,14 @@ public class AlarmServiceTimestamp implements Cacheable {
 
   private long id;
 
-  @Override
-  public Long getId() {
-    return id;
-  }
-
   public AlarmServiceTimestamp(Long id, long timeInMillis) {
     this.id = id;
     this.timeInMillis = timeInMillis;
+  }
+
+  @Override
+  public Long getId() {
+    return id;
   }
 
   @Override

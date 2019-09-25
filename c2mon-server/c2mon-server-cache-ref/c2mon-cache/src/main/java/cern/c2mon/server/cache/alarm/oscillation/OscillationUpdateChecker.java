@@ -19,7 +19,7 @@ package cern.c2mon.server.cache.alarm.oscillation;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.cache.api.spi.C2monAlarmCacheQueryProvider;
-import cern.c2mon.server.cache.alarm.AlarmServiceTimestamp;
+import cern.c2mon.server.common.alarm.AlarmServiceTimestamp;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.AlarmCacheUpdater;
@@ -31,7 +31,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
-import org.springframework.core.Ordered;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;

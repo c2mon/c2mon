@@ -21,9 +21,6 @@ import static org.junit.Assert.assertNotNull;
 //TODO: remove @Ignore annotation when Query API will be created
 public class AlarmQueryTest extends AlarmCacheLoaderTest {
 
-  @Autowired
-  private C2monCache<Alarm> alarmCacheRef;
-
   @Test
   @Ignore
   public void testFindAlarms() {

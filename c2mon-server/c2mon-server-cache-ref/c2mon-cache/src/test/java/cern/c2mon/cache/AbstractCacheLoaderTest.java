@@ -1,5 +1,6 @@
 package cern.c2mon.cache;
 
+import cern.c2mon.cache.impl.configuration.C2monIgniteConfiguration;
 import org.junit.Rule;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,8 @@ import cern.c2mon.server.common.config.CommonModule;
         CacheModuleRef.class,
         CacheDbAccessModule.class,
         CacheLoaderModuleRef.class,
-        CachePopulationRule.class
+        CachePopulationRule.class,
+        C2monIgniteConfiguration.class
 })
 public abstract class AbstractCacheLoaderTest {
 

@@ -22,7 +22,7 @@ public class ListenerService<K, V extends Cacheable> implements Listener<V> {
    */
   private LinkedBlockingDeque<CacheListener<? super V>> cacheListeners = new LinkedBlockingDeque<>();
 
-  private List<CacheSupervisionListener<? super V>> cacheSupervisionListeners;
+  private LinkedBlockingDeque<CacheSupervisionListener<? super V>> cacheSupervisionListeners = new LinkedBlockingDeque<>();
 
   public ListenerService() {
   }

@@ -2,6 +2,7 @@ package cern.c2mon.server.cache.alarm;
 
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.listener.CacheListener;
+import cern.c2mon.cache.api.listener.CacheRegistrationService;
 import cern.c2mon.cache.api.listener.CacheSupervisionListener;
 import cern.c2mon.server.cache.tag.TagCacheFacade;
 import cern.c2mon.server.common.alarm.Alarm;
@@ -13,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -35,11 +37,20 @@ public class AlarmService implements AlarmAggregator, CacheSupervisionListener<T
 
   private AlarmCacheUpdater alarmCacheUpdater;
 
+  private CacheRegistrationService cacheRegistrationService;
+
   @Autowired
-  public AlarmService(final C2monCache<Alarm> alarmCacheRef, final TagCacheFacade tagCacheRef, final AlarmCacheUpdater alarmCacheUpdater) {
+  public AlarmService(final C2monCache<Alarm> alarmCacheRef, final TagCacheFacade tagCacheRef, final AlarmCacheUpdater alarmCacheUpdater, CacheRegistrationService cacheRegistrationService) {
     this.alarmCacheRef = alarmCacheRef;
     this.tagCacheRef = tagCacheRef;
     this.alarmCacheUpdater = alarmCacheUpdater;
+    this.cacheRegistrationService = cacheRegistrationService;
+  }
+
+  @PostConstruct
+  public void init(){
+    cacheRegistrationService.registerSynchronousToAllTags(this);
+    cacheRegistrationService.registerForSupervisionChanges(this);
   }
 
   public Alarm update(final Long alarmId, final Tag tag) {

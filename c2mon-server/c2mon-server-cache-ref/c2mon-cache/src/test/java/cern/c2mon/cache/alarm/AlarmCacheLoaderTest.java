@@ -22,10 +22,10 @@ import static org.junit.Assert.*;
 public class AlarmCacheLoaderTest extends AbstractCacheLoaderTest {
 
   @Autowired
-  private C2monCache<Alarm> alarmCacheRef;
+  protected C2monCache<Alarm> alarmCacheRef;
 
   @Autowired
-  private AlarmMapper alarmMapper;
+  protected AlarmMapper alarmMapper;
 
   @Before
   public void prepare() {
@@ -34,7 +34,6 @@ public class AlarmCacheLoaderTest extends AbstractCacheLoaderTest {
   }
 
   @Test
-  @Ignore
   public void preloadCache() {
     assertNotNull("Alarm Cache should not be null", alarmCacheRef);
 

@@ -21,6 +21,11 @@
       <artifactId>c2mon-cache-loader</artifactId>
     </dependency>
     <dependency>
+      <groupId>cern.c2mon.server</groupId>
+      <artifactId>c2mon-server-cache-ignite</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-context-support</artifactId>
       <version>4.3.9.RELEASE</version>
