@@ -1,7 +1,10 @@
 package cern.c2mon.cache.datatag;
 
 import java.util.List;
+import java.util.Map;
 
+import cern.c2mon.server.cache.dbaccess.LoaderMapper;
+import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -17,7 +20,7 @@ import static org.junit.Assert.*;
 /**
  * @author Szymon Halastra
  */
-public class DataTagCacheLoaderTest extends AbstractCacheLoaderTest {
+public class DataTagCacheLoaderTest extends AbstractCacheLoaderTest<DataTag> {
 
   @Autowired
   private C2monCache<DataTag> dataTagCacheRef;
@@ -25,26 +28,32 @@ public class DataTagCacheLoaderTest extends AbstractCacheLoaderTest {
   @Autowired
   private DataTagMapper dataTagMapper;
 
-  @Before
-  public void init() {
-    dataTagCacheRef.init();
+  @Override
+  protected LoaderMapper<DataTag> getMapper() {
+    return dataTagMapper;
   }
 
-  @Test
-  @Ignore
-  public void preloadCache() {
-    assertNotNull("DataTag Cache should not be null", dataTagCacheRef);
-
-    List<DataTag> dataTagList = dataTagMapper.getAll();
-
-    assertTrue("List of data tags should not be empty", dataTagList.size() > 0);
-
-    assertEquals("Size of cache and DB mapping should be equal", dataTagList.size(), dataTagCacheRef.getKeys().size());
-    //compare all the objects from the cache and buffer
-    for (DataTag currentTag : dataTagList) {
+  @Override
+  protected void compareLists(List<DataTag> mapperList, Map<Long, DataTag> cacheList) {
+    for (DataTag currentTag : mapperList) {
       //equality of DataTagCacheObjects => currently only compares names
       assertEquals("Cached DataTag should have the same name as in DB",
-              currentTag.getName(), (dataTagCacheRef.get(currentTag.getId())).getName());
+        currentTag.getName(), (cacheList.get(currentTag.getId())).getName());
     }
+  }
+
+  @Override
+  protected DataTag getSample() {
+    return new DataTagCacheObject();
+  }
+
+  @Override
+  protected Long getExistingKey() {
+    return 200000L;
+  }
+
+  @Override
+  protected C2monCache<DataTag> getCache() {
+    return dataTagCacheRef;
   }
 }

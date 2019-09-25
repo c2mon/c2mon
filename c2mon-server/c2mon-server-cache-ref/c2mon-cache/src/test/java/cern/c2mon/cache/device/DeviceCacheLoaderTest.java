@@ -1,7 +1,10 @@
 package cern.c2mon.cache.device;
 
 import java.util.List;
+import java.util.Map;
 
+import cern.c2mon.server.cache.dbaccess.LoaderMapper;
+import cern.c2mon.server.common.device.DeviceCacheObject;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -19,7 +22,7 @@ import static org.junit.Assert.*;
 /**
  * @author Szymon Halastra
  */
-public class DeviceCacheLoaderTest extends AbstractCacheLoaderTest {
+public class DeviceCacheLoaderTest extends AbstractCacheLoaderTest<Device> {
 
   @Autowired
   private C2monCache<Device> deviceCacheRef;
@@ -27,24 +30,15 @@ public class DeviceCacheLoaderTest extends AbstractCacheLoaderTest {
   @Autowired
   private DeviceMapper deviceMapper;
 
-  @Before
-  public void init() {
-    deviceCacheRef.init();
+  @Override
+  protected LoaderMapper<Device> getMapper() {
+    return deviceMapper;
   }
 
-  @Test
-  @Ignore
-  public void preloadCache() throws ClassNotFoundException {
-    assertNotNull("Device Cache should not be null", deviceCacheRef);
-
-    List<Device> deviceList = deviceMapper.getAll();
-
-    assertTrue("List of devices should not be empty", deviceList.size() > 0);
-
-    assertEquals("Size of cache and DB mapping should be equal", deviceList.size(), deviceCacheRef.getKeys().size());
-    // Compare all the objects from the cache and buffer
-    for (Device device : deviceList) {
-      Device fromCache = deviceCacheRef.get(device.getId());
+  @Override
+  protected void compareLists(List<Device> mapperList, Map<Long, Device> cacheList) throws ClassNotFoundException {
+    for (Device device : mapperList) {
+      Device fromCache = cacheList.get(device.getId());
 
       assertEquals("Cached Device should have the same name as in DB", device.getName(), fromCache.getName());
 
@@ -54,10 +48,25 @@ public class DeviceCacheLoaderTest extends AbstractCacheLoaderTest {
       }
     }
 
-    for (Device currentDevice : deviceList) {
+    for (Device currentDevice : mapperList) {
       // Equality of DataTagCacheObjects => currently only compares names
       assertEquals("Cached Device should have the same name as in DB",
-              currentDevice.getName(), (deviceCacheRef.get(currentDevice.getId()).getName()));
+        currentDevice.getName(), (deviceCacheRef.get(currentDevice.getId()).getName()));
     }
+  }
+
+  @Override
+  protected Device getSample() {
+    return new DeviceCacheObject();
+  }
+
+  @Override
+  protected Long getExistingKey() {
+    return 300L;
+  }
+
+  @Override
+  protected C2monCache<Device> getCache() {
+    return deviceCacheRef;
   }
 }

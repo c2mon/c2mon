@@ -1,8 +1,6 @@
 package cern.c2mon.cache;
 
-import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.shared.common.Cacheable;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -12,21 +10,7 @@ import static org.junit.Assert.*;
  * @author Szymon Halastra
  * @author Alexandros Papageorgiou
  */
-public abstract class CacheCRUDTest<V extends Cacheable> extends AbstractCacheLoaderTest {
-
-  private C2monCache<V> cache;
-
-  @Before
-  public void init() {
-    this.cache = getCache();
-    cache.clear();
-    assertEquals(0, cache.getAll(cache.getKeys()).size());
-    cache.init();
-  }
-
-  protected abstract C2monCache<V> getCache();
-
-  protected abstract Long getExistingKey();
+public abstract class AbstractCacheCRUDTest<V extends Cacheable> extends AbstractCacheTest<V> {
 
   protected abstract V getSample();
 

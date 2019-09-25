@@ -1,9 +1,12 @@
 package cern.c2mon.cache.deviceclass;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import cern.c2mon.server.cache.dbaccess.LoaderMapper;
+import cern.c2mon.server.common.device.DeviceClassCacheObject;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -19,7 +22,7 @@ import static org.junit.Assert.*;
 /**
  * @author Szymon Halastra
  */
-public class DeviceClassCacheLoaderTest extends AbstractCacheLoaderTest {
+public class DeviceClassCacheLoaderTest extends AbstractCacheLoaderTest<DeviceClass> {
 
   @Autowired
   private C2monCache<DeviceClass> deviceClassCacheRef;
@@ -27,27 +30,32 @@ public class DeviceClassCacheLoaderTest extends AbstractCacheLoaderTest {
   @Autowired
   private DeviceClassMapper deviceClassMapper;
 
-  @Before
-  public void init() {
-    deviceClassCacheRef.init();
+  @Override
+  protected LoaderMapper<DeviceClass> getMapper() {
+    return deviceClassMapper;
   }
 
-  @Test
-  @Ignore
-  public void preloadCache() {
-    assertNotNull("DataTag Cache should not be null", deviceClassCacheRef);
-
-    List<DeviceClass> deviceClassList = deviceClassMapper.getAll();
-
-    Set<Long> keySet = deviceClassList.stream().map(DeviceClass::getId).collect(Collectors.toSet());
-    assertTrue("List of DeviceClass tags should not be empty", deviceClassList.size() > 0);
-
-    assertEquals("Size of cache and DB mapping should be equal", deviceClassList.size(), deviceClassCacheRef.getKeys().size());
-    // Compare all the objects from the cache and buffer
-    for (DeviceClass currentDeviceClass : deviceClassList) {
+  @Override
+  protected void compareLists(List<DeviceClass> mapperList, Map<Long, DeviceClass> cacheList) throws ClassNotFoundException {
+    for (DeviceClass currentDeviceClass : mapperList) {
       // Equality of DataTagCacheObjects => currently only compares names
       assertEquals("Cached DataTag should have the same name as in DB",
-              currentDeviceClass.getName(), (deviceClassCacheRef.get(currentDeviceClass.getId()).getName()));
+        currentDeviceClass.getName(), (cacheList.get(currentDeviceClass.getId()).getName()));
     }
+  }
+
+  @Override
+  protected DeviceClass getSample() {
+    return new DeviceClassCacheObject(0L);
+  }
+
+  @Override
+  protected Long getExistingKey() {
+    return 400L;
+  }
+
+  @Override
+  protected C2monCache<DeviceClass> getCache() {
+    return deviceClassCacheRef;
   }
 }

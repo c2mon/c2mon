@@ -1,9 +1,11 @@
 package cern.c2mon.cache.command;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import cern.c2mon.server.cache.dbaccess.LoaderMapper;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -21,7 +23,7 @@ import static org.junit.Assert.*;
 /**
  * @author Szymon Halastra
  */
-public class CommandTagCacheLoaderTest extends AbstractCacheLoaderTest {
+public class CommandTagCacheLoaderTest extends AbstractCacheLoaderTest<CommandTag> {
 
   @Autowired
   private C2monCache<CommandTag> commandTagCacheRef;
@@ -29,27 +31,31 @@ public class CommandTagCacheLoaderTest extends AbstractCacheLoaderTest {
   @Autowired
   private CommandTagMapper commandTagMapper;
 
-  @Before
-  public void prepare() {
-    commandTagCacheRef.init();
+  @Override
+  protected LoaderMapper<CommandTag> getMapper() {
+    return commandTagMapper;
   }
 
-  @Test
-  @Ignore
-  public void preloadCache() {
-    assertNotNull("CommandTag Cache should not be null", commandTagCacheRef);
-
-    List<CommandTag> commandList = commandTagMapper.getAll();
-
-    Set<Long> keySet = commandList.stream().map(CommandTag::getId).collect(Collectors.toSet());
-    assertTrue("List of command tags should not be empty", commandList.size() > 0);
-
-    assertEquals("Size of cache and DB mapping should be equal", commandList.size(), commandTagCacheRef.getKeys().size());
-
-    //compare all the objects from the cache and buffer
-    for (CommandTag currentCommandTag : commandList) {
+  @Override
+  protected void compareLists(List<CommandTag> mapperList, Map<Long, CommandTag> cacheList) {
+    for (CommandTag currentCommandTag : mapperList) {
       CacheObjectComparison.equals((CommandTagCacheObject) currentCommandTag,
-              (CommandTagCacheObject) commandTagCacheRef.get(currentCommandTag.getId()));
+        (CommandTagCacheObject) cacheList.get(currentCommandTag.getId()));
     }
+  }
+
+  @Override
+  protected CommandTag getSample() {
+    return new CommandTagCacheObject(0L);
+  }
+
+  @Override
+  protected Long getExistingKey() {
+    return 11000L;
+  }
+
+  @Override
+  protected C2monCache<CommandTag> getCache() {
+    return commandTagCacheRef;
   }
 }

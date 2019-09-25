@@ -4,10 +4,7 @@ import java.util.Collection;
 
 import org.junit.Ignore;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.shared.client.alarm.AlarmQuery;
 
@@ -19,7 +16,7 @@ import static org.junit.Assert.assertNotNull;
  */
 
 //TODO: remove @Ignore annotation when Query API will be created
-public class AlarmQueryTest extends AlarmCacheLoaderTest {
+public class AlarmQueryTest extends AlarmCacheTest {
 
   @Test
   @Ignore
@@ -35,10 +32,10 @@ public class AlarmQueryTest extends AlarmCacheLoaderTest {
   @Ignore
   public void testGetActiveAlarms() {
     AlarmQuery query = AlarmQuery.builder().active(true).build();
-    AlarmCacheObject toChange = (AlarmCacheObject) alarmCacheRef.get(350000L);
+    AlarmCacheObject toChange = (AlarmCacheObject) cache.get(350000L);
 //    toChange.setState("ACTIVE");
 
-    alarmCacheRef.put(toChange.getId(), toChange);
+    cache.put(toChange.getId(), toChange);
     Collection<Long> result = null; /*alarmCacheRef.findAlarm(query);*/
     assertNotNull(result);
     assertEquals("Search result != 1", 1, result.size());

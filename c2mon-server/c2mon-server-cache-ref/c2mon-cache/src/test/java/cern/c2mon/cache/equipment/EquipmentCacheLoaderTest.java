@@ -1,24 +1,22 @@
 package cern.c2mon.cache.equipment;
 
-import java.util.List;
-
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import cern.c2mon.cache.AbstractCacheLoaderTest;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.dbaccess.EquipmentMapper;
+import cern.c2mon.server.cache.dbaccess.LoaderMapper;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.equipment.EquipmentCacheObject;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import static org.junit.Assert.*;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Szymon Halastra
  */
-public class EquipmentCacheLoaderTest extends AbstractCacheLoaderTest {
+public class EquipmentCacheLoaderTest extends AbstractCacheLoaderTest<Equipment> {
 
   @Autowired
   private C2monCache<Equipment> equipmentCacheRef;
@@ -26,27 +24,33 @@ public class EquipmentCacheLoaderTest extends AbstractCacheLoaderTest {
   @Autowired
   private EquipmentMapper equipmentMapper;
 
-  @Before
-  public void init() {
-    equipmentCacheRef.init();
+  @Override
+  protected LoaderMapper<Equipment> getMapper() {
+    return equipmentMapper;
   }
 
-  @Test
-  @Ignore
-  public void preloadCache() {
-    assertNotNull("Equipment Cache should not be null", equipmentCacheRef);
-
-    List<Equipment> equipmentList = equipmentMapper.getAll();
-
-    assertTrue("List of equipment tags should not be empty", equipmentList.size() > 0);
-
-    assertEquals("Size of cache and DB mapping should be equal", equipmentList.size(), equipmentCacheRef.getKeys().size());
-    //compare all the objects from the cache and buffer
-    for (Equipment anEquipmentList : equipmentList) {
+  @Override
+  protected void compareLists(List<Equipment> mapperList, Map<Long, Equipment> cacheList) {
+    for (Equipment anEquipmentList : mapperList) {
       EquipmentCacheObject currentEquipment = (EquipmentCacheObject) anEquipmentList;
       //only compares one field so far
       assertEquals("Cached Equipment should have the same name as in DB",
-              currentEquipment.getName(), ((equipmentCacheRef.get(currentEquipment.getId())).getName()));
+        currentEquipment.getName(), ((cacheList.get(currentEquipment.getId())).getName()));
     }
+  }
+
+  @Override
+  protected Equipment getSample() {
+    return new EquipmentCacheObject();
+  }
+
+  @Override
+  protected Long getExistingKey() {
+    return 150L;
+  }
+
+  @Override
+  protected C2monCache<Equipment> getCache() {
+    return equipmentCacheRef;
   }
 }

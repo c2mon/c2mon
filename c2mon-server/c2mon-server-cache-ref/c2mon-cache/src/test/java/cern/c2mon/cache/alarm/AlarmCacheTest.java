@@ -1,27 +1,54 @@
 package cern.c2mon.cache.alarm;
 
-import org.junit.Ignore;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
+import cern.c2mon.cache.AbstractCacheLoaderTest;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.dbaccess.AlarmMapper;
+import cern.c2mon.server.cache.dbaccess.LoaderMapper;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
-import cern.c2mon.server.test.CacheObjectComparison;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Szymon Halastra
+ * @author Alexandros Papageorgiou
  */
-public class AlarmCacheTest extends AlarmCacheLoaderTest {
+public class AlarmCacheTest extends AbstractCacheLoaderTest<Alarm> {
 
-  /**
-   * Tests the get method retrieves an existing Alarm correctly.
-   */
-  @Test
-  public void testGet() {
-    AlarmCacheObject cacheObject = (AlarmCacheObject) alarmCacheRef.get(350000L);
-    AlarmCacheObject objectInDb = (AlarmCacheObject) alarmMapper.getItem(350000L);
-    CacheObjectComparison.equals(cacheObject, objectInDb);
+  @Autowired
+  protected AlarmMapper alarmMapper;
+  @Autowired
+  private C2monCache<Alarm> alarmCacheRef;
+
+  @Override
+  protected void compareLists(List<Alarm> mapperList, Map<Long, Alarm> cacheList) {
+    for (Alarm alarm : mapperList) {
+      //compare ids of associated datatags
+      assertEquals("Cached Alarm should have the same name as Alarm in DB", alarm.getTagId(), cache.get(alarm.getId()).getTagId());
+    }
+  }
+
+  @Override
+  protected LoaderMapper<Alarm> getMapper() {
+    return alarmMapper;
+  }
+
+  @Override
+  protected Long getExistingKey() {
+    return 350000L;
+  }
+
+  @Override
+  protected C2monCache<Alarm> getCache() {
+    return alarmCacheRef;
+  }
+
+  @Override
+  protected Alarm getSample() {
+    return new AlarmCacheObject();
   }
 }

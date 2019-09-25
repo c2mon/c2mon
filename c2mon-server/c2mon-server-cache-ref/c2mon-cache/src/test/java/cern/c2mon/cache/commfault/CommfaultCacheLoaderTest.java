@@ -1,9 +1,11 @@
 package cern.c2mon.cache.commfault;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import cern.c2mon.server.cache.dbaccess.LoaderMapper;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -20,7 +22,7 @@ import static org.junit.Assert.*;
 /**
  * @author Szymon Halastra
  */
-public class CommfaultCacheLoaderTest extends AbstractCacheLoaderTest {
+public class CommfaultCacheLoaderTest extends AbstractCacheLoaderTest<CommFaultTag> {
 
   @Autowired
   private C2monCache<CommFaultTag> commFaultTagCacheRef;
@@ -28,28 +30,33 @@ public class CommfaultCacheLoaderTest extends AbstractCacheLoaderTest {
   @Autowired
   private CommFaultTagMapper commFaultTagMapper;
 
-  @Before
-  public void init() {
-    commFaultTagCacheRef.init();
+  @Override
+  protected LoaderMapper<CommFaultTag> getMapper() {
+    return commFaultTagMapper;
   }
 
-  @Test
-  @Ignore
-  public void preloadCache() {
-    assertNotNull("Commfault Cache should not be null", commFaultTagCacheRef);
-
-    List<CommFaultTag> commFaultList = commFaultTagMapper.getAll();
-
-    Set<Long> keySet = commFaultList.stream().map(CommFaultTag::getId).collect(Collectors.toSet());
-    assertTrue("List of alarms should not be empty", commFaultList.size() > 0);
-
-    assertEquals("Size of cache and DB mapping should be equal", commFaultList.size(), commFaultTagCacheRef.getKeys().size());
-    //compare all the objects from the cache and buffer
-    for (CommFaultTag aCommFaultList : commFaultList) {
+  @Override
+  protected void compareLists(List<CommFaultTag> mapperList, Map<Long, CommFaultTag> cacheList) {
+    for (CommFaultTag aCommFaultList : mapperList) {
       CommFaultTagCacheObject currentTag = (CommFaultTagCacheObject) aCommFaultList;
       //equality of DataTagCacheObjects => currently only compares names
       assertEquals("Cached CommfaultTag should have the same name as in DB",
-              currentTag.getEquipmentId(), ((commFaultTagCacheRef.get(currentTag.getId())).getEquipmentId()));
+        currentTag.getEquipmentId(), ((cacheList.get(currentTag.getId())).getEquipmentId()));
     }
+  }
+
+  @Override
+  protected CommFaultTag getSample() {
+    return new CommFaultTagCacheObject();
+  }
+
+  @Override
+  protected Long getExistingKey() {
+    return 60000L;
+  }
+
+  @Override
+  protected C2monCache<CommFaultTag> getCache() {
+    return commFaultTagCacheRef;
   }
 }

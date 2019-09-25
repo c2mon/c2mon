@@ -1,24 +1,22 @@
 package cern.c2mon.cache.subequipment;
 
-import java.util.List;
-
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import cern.c2mon.cache.AbstractCacheLoaderTest;
 import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.server.cache.dbaccess.LoaderMapper;
 import cern.c2mon.server.cache.dbaccess.SubEquipmentMapper;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import static org.junit.Assert.*;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Szymon Halastra
  */
-public class SubequipmentCacheLoaderTest extends AbstractCacheLoaderTest {
+public class SubequipmentCacheLoaderTest extends AbstractCacheLoaderTest<SubEquipment> {
 
   @Autowired
   private C2monCache<SubEquipment> subEquipmentCacheRef;
@@ -26,27 +24,33 @@ public class SubequipmentCacheLoaderTest extends AbstractCacheLoaderTest {
   @Autowired
   private SubEquipmentMapper subEquipmentMapper;
 
-  @Before
-  public void init() {
-    subEquipmentCacheRef.init();
+  @Override
+  protected LoaderMapper<SubEquipment> getMapper() {
+    return subEquipmentMapper;
   }
 
-  @Test
-  @Ignore
-  public void preloadCache() {
-    assertNotNull("SubEquipment Cache should not be null", subEquipmentCacheRef);
-
-    List<cern.c2mon.server.common.subequipment.SubEquipment> subEquipmentList = subEquipmentMapper.getAll();
-
-    assertTrue("List of subEquipment tags should not be empty", subEquipmentList.size() > 0);
-
-    assertEquals("Size of cache and DB mapping should be equal", subEquipmentList.size(), subEquipmentCacheRef.getKeys().size());
-    //compare all the objects from the cache and buffer
-    for (SubEquipment aSubEquipmentList : subEquipmentList) {
+  @Override
+  protected void compareLists(List<SubEquipment> mapperList, Map<Long, SubEquipment> cacheList) throws ClassNotFoundException {
+    for (SubEquipment aSubEquipmentList : mapperList) {
       SubEquipmentCacheObject currentSubEquipment = (SubEquipmentCacheObject) aSubEquipmentList;
       //only compares one field so far
       assertEquals("Cached SubEquipment should have the same name as in DB",
-              currentSubEquipment.getName(), ((subEquipmentCacheRef.get(currentSubEquipment.getId())).getName()));
+        currentSubEquipment.getName(), ((cacheList.get(currentSubEquipment.getId())).getName()));
     }
+  }
+
+  @Override
+  protected SubEquipment getSample() {
+    return new SubEquipmentCacheObject();
+  }
+
+  @Override
+  protected Long getExistingKey() {
+    return 250L;
+  }
+
+  @Override
+  protected C2monCache<SubEquipment> getCache() {
+    return subEquipmentCacheRef;
   }
 }

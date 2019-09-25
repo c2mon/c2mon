@@ -1,7 +1,9 @@
 package cern.c2mon.cache.rule;
 
 import java.util.List;
+import java.util.Map;
 
+import cern.c2mon.server.cache.dbaccess.LoaderMapper;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -18,7 +20,7 @@ import static org.junit.Assert.*;
 /**
  * @author Szymon Halastra
  */
-public class RuleCacheLoaderTest extends AbstractCacheLoaderTest {
+public class RuleCacheLoaderTest extends AbstractCacheLoaderTest<RuleTag> {
 
   @Autowired
   private C2monCache<RuleTag> ruleTagCacheRef;
@@ -26,27 +28,33 @@ public class RuleCacheLoaderTest extends AbstractCacheLoaderTest {
   @Autowired
   private RuleTagMapper ruleTagMapper;
 
-  @Before
-  public void init() {
-    ruleTagCacheRef.init();
+  @Override
+  protected LoaderMapper<RuleTag> getMapper() {
+    return ruleTagMapper;
   }
 
-  @Test
-  @Ignore
-  public void preloadCache() {
-    assertNotNull("RuleTag Cache should not be null", ruleTagCacheRef);
-
-    List<RuleTag> ruleList = ruleTagMapper.getAll();
-
-    assertTrue("List of rule tags should not be empty", ruleList.size() > 0);
-
-    assertEquals("Size of cache and DB mapping should be equal", ruleList.size(), ruleTagCacheRef.getKeys().size());
-    //compare all the objects from the cache and buffer
-    for (RuleTag aRuleList : ruleList) {
+  @Override
+  protected void compareLists(List<RuleTag> mapperList, Map<Long, RuleTag> cacheList) throws ClassNotFoundException {
+    for (RuleTag aRuleList : mapperList) {
       RuleTagCacheObject currentRule = (RuleTagCacheObject) aRuleList;
       //only compares one field so far (name, which does not change when server is running!)
       assertEquals("Cached RuleTag should have the same name as in DB",
-              currentRule.getName(), ((ruleTagCacheRef.get(currentRule.getId())).getName()));
+        currentRule.getName(), ((cacheList.get(currentRule.getId())).getName()));
     }
+  }
+
+  @Override
+  protected RuleTag getSample() {
+    return new RuleTagCacheObject();
+  }
+
+  @Override
+  protected Long getExistingKey() {
+    return 60011L;
+  }
+
+  @Override
+  protected C2monCache<RuleTag> getCache() {
+    return ruleTagCacheRef;
   }
 }
