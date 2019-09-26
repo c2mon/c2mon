@@ -23,6 +23,7 @@ import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.sql.Timestamp;
 import java.util.HashSet;
@@ -42,6 +43,7 @@ import java.util.Set;
  *
  */
 @Data
+@ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 public class DataTagCacheObject extends AbstractTagCacheObject implements DataTag {

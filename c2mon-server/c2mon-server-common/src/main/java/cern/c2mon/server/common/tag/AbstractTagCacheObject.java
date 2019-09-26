@@ -21,6 +21,7 @@ import cern.c2mon.shared.common.datatag.DataTagConstants;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.Serializable;
@@ -132,6 +133,7 @@ public abstract class AbstractTagCacheObject implements Cloneable, Serializable 
    * (if at all). It should be set when the cache object is
    * added to the cache.
    */
+  @EqualsAndHashCode.Exclude
   private Timestamp cacheTimestamp;
 
   /**
@@ -184,8 +186,17 @@ public abstract class AbstractTagCacheObject implements Cloneable, Serializable 
 
   /**
    * Synchronization locks
+   *
+   * These are excluded from the equals and hashcode methods, {@code ReentrantReadWriteLock}
+   * does NOT provide an equals and hashcode implementation by itself, which causes the
+   * {@code CommandTagCacheObject#equals} to always return false
+   * The reasoning seems to be similar to this
+   * <a href=https://stackoverflow.com/questions/7567502/why-are-two-atomicintegers-never-equal>SO Discussion
+   * on why AtomicInteger has no equals</a>
    */
+  @EqualsAndHashCode.Exclude
   private ReadLock readLock;
+  @EqualsAndHashCode.Exclude
   private WriteLock writeLock;
 
   /**
