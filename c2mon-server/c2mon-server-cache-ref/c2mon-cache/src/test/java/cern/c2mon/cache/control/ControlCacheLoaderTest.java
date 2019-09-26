@@ -1,23 +1,17 @@
 package cern.c2mon.cache.control;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import cern.c2mon.server.cache.dbaccess.LoaderMapper;
-import cern.c2mon.server.common.control.ControlTagCacheObject;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import cern.c2mon.cache.AbstractCacheLoaderTest;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.dbaccess.ControlTagMapper;
+import cern.c2mon.server.cache.dbaccess.LoaderMapper;
 import cern.c2mon.server.common.control.ControlTag;
+import cern.c2mon.server.common.control.ControlTagCacheObject;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import static org.junit.Assert.*;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Szymon Halastra
@@ -51,7 +45,7 @@ public class ControlCacheLoaderTest extends AbstractCacheLoaderTest<ControlTag> 
 
   @Override
   protected Long getExistingKey() {
-    return 0L;
+    return 1220L;
   }
 
   @Override

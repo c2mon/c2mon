@@ -19,8 +19,10 @@ package cern.c2mon.server.common.control;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 @NoArgsConstructor
 public class ControlTagCacheObject extends DataTagCacheObject implements ControlTag {
 

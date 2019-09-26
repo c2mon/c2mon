@@ -1,23 +1,17 @@
 package cern.c2mon.cache.commfault;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import cern.c2mon.server.cache.dbaccess.LoaderMapper;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import cern.c2mon.cache.AbstractCacheLoaderTest;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.dbaccess.CommFaultTagMapper;
+import cern.c2mon.server.cache.dbaccess.LoaderMapper;
 import cern.c2mon.server.common.commfault.CommFaultTag;
 import cern.c2mon.server.common.commfault.CommFaultTagCacheObject;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import static org.junit.Assert.*;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Szymon Halastra
@@ -52,7 +46,7 @@ public class CommfaultCacheLoaderTest extends AbstractCacheLoaderTest<CommFaultT
 
   @Override
   protected Long getExistingKey() {
-    return 60000L;
+    return 1223L;
   }
 
   @Override

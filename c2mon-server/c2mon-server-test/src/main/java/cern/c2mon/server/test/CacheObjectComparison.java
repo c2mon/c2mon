@@ -48,7 +48,7 @@ public final class CacheObjectComparison {
     assertEquals(commandTag1.getDataType(), commandTag2.getDataType());
     assertEquals(commandTag1.getMode(), commandTag2.getMode());
     assertEquals(commandTag1.getEquipmentId(), commandTag2.getEquipmentId());
-    assertEquals(commandTag1.getHardwareAddress().toConfigXML(), commandTag2.getHardwareAddress().toConfigXML());
+    assertEquals(commandTag1.getHardwareAddress(), commandTag2.getHardwareAddress());
     assertEquals(commandTag1.getSourceTimeout(), commandTag2.getSourceTimeout());
     assertEquals(commandTag1.getSourceRetries(), commandTag2.getSourceRetries());
     assertEquals(commandTag1.getExecTimeout(), commandTag2.getExecTimeout());
