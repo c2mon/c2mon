@@ -43,7 +43,7 @@ public class AliveTimerCacheLoaderTest extends AbstractCacheLoaderTest<AliveTime
 
   @Override
   protected Long getExistingKey() {
-    return null;
+    return 1224L;
   }
 
   @Override

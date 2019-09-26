@@ -189,7 +189,7 @@ public abstract class AbstractTagCacheObject implements Cloneable, Serializable 
   private WriteLock writeLock;
 
   /**
-   * Default public constructor. TODO remove unused constructors
+   * Default public constructor.
    *
    * Sets the default value of the quality to UNINITIALISED with no
    * description; the description should be added at a later stage
@@ -238,26 +238,6 @@ public abstract class AbstractTagCacheObject implements Cloneable, Serializable 
       cacheObject.cacheTimestamp = (Timestamp) cacheTimestamp.clone();
     }
     return cacheObject;
-  }
-
-  /**
-   * only compare ids so far
-   */
-  @Override
-  public boolean equals(Object dataTag) {
-    if (dataTag instanceof AbstractTagCacheObject) {
-      return this.id.equals(((AbstractTagCacheObject) dataTag).getId());
-    } else {
-      return false;
-    }
-  }
-
-  /**
-   * Hashcode method - keep consistent with equals()!
-   */
-  @Override
-  public int hashCode() {
-    return this.id.hashCode();
   }
 
   /**
