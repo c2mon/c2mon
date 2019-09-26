@@ -43,7 +43,7 @@ public class EntityUtils {
   public static Alarm createAlarm() {
     AlarmCacheObject alarm = new AlarmCacheObject();
     alarm.setId(1L);
-    alarm.setTagId(2L);
+    alarm.setDataTagId(2L);
     alarm.setFaultFamily("fault family");
     alarm.setFaultMember("fault member");
     alarm.setFaultCode(0);

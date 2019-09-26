@@ -39,13 +39,13 @@ public class AlarmServiceTest {
   public void evaluateAlarmWithNullTag() {
     AlarmCacheObject alarm = new AlarmCacheObject(1L);
 //    alarm.setState(AlarmCondition.ACTIVE);
-    alarm.setTagId(1L);
+    alarm.setDataTagId(1L);
 
     DataTagCacheObject tag = new DataTagCacheObject(1L);
     tag.setValue(null);
 
     expect(alarmCache.get(1L)).andReturn(alarm);
-    expect(tagCache.get(alarm.getTagId())).andReturn(tag);
+    expect(tagCache.get(alarm.getDataTagId())).andReturn(tag);
     replay(alarmCache, tagCache);
 
 //    alarmService.evaluateAlarm(alarm.getId());
@@ -58,7 +58,7 @@ public class AlarmServiceTest {
   public void evaluateAlarmWithUninitialisedTag() {
     AlarmCacheObject alarmCacheObject = new AlarmCacheObject(1L);
 //    alarmCacheObject.setState(AlarmCondition.ACTIVE);
-    alarmCacheObject.setTagId(1L);
+    alarmCacheObject.setDataTagId(1L);
 
     DataTagCacheObject tagCacheObject = new DataTagCacheObject(1L);
     DataTagQualityImpl dataTagQuality = new DataTagQualityImpl(TagQualityStatus.UNINITIALISED);

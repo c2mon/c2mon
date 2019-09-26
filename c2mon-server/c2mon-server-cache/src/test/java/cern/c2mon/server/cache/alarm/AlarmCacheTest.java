@@ -16,13 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.alarm;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import cern.c2mon.server.cache.AbstractCacheIntegrationTest;
 import cern.c2mon.server.cache.AlarmCache;
 import cern.c2mon.server.cache.alarm.impl.AlarmCacheImpl;
@@ -31,6 +24,12 @@ import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.test.CacheObjectComparison;
 import cern.c2mon.shared.client.alarm.AlarmQuery;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -63,7 +62,7 @@ public class AlarmCacheTest extends AbstractCacheIntegrationTest {
     while (it.hasNext()) {
       Alarm alarm = it.next();
       //compare ids of associated datatags
-      assertEquals(alarm.getTagId(), alarmCache.getCopy(alarm.getId()).getTagId());
+      assertEquals(alarm.getDataTagId(), alarmCache.getCopy(alarm.getId()).getDataTagId());
     }
   }
 

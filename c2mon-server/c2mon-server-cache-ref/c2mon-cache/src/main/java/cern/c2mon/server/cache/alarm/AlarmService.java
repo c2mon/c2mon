@@ -64,7 +64,7 @@ public class AlarmService implements AlarmAggregator, CacheSupervisionListener<T
   public void evaluateAlarm(Long alarmId) {
     alarmCacheRef.executeTransaction(() -> {
       Alarm alarm = alarmCacheRef.get(alarmId);
-      Tag tag = tagCacheRef.get(alarm.getTagId());
+      Tag tag = tagCacheRef.get(alarm.getDataTagId());
       return update(alarmId, tag);
     });
   }

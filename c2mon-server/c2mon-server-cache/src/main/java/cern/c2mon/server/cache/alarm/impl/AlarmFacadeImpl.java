@@ -204,7 +204,7 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
     String tmpStr = null;
     if ((tmpStr = alarmProperties.getProperty("dataTagId")) != null) {
       try {
-        alarmCacheObject.setTagId(Long.valueOf(tmpStr));
+        alarmCacheObject.setDataTagId(Long.valueOf(tmpStr));
       } catch (NumberFormatException e) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "NumberFormatException: Unable to convert parameter \"dataTagId\" to Long: " + tmpStr);
       }
@@ -260,7 +260,7 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
     alarmCache.acquireWriteLockOnKey(alarmId);
     try {
       Alarm alarm = alarmCache.getCopy(alarmId);
-      Tag tag = tagLocationService.getCopy(alarm.getTagId());
+      Tag tag = tagLocationService.getCopy(alarm.getDataTagId());
       alarmCacheUpdater.update(alarm, tag);
     } finally {
       alarmCache.releaseWriteLockOnKey(alarmId);
@@ -282,7 +282,7 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
     if (alarm.getId() == null) {
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"id\" cannot be null");
     }
-    if (alarm.getTagId() == null) {
+    if (alarm.getDataTagId() == null) {
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"dataTagId\" cannot be null");
     }
     if (alarm.getFaultFamily() == null) {

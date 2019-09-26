@@ -16,10 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.server.client.util;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.TagWithAlarms;
 import cern.c2mon.server.common.control.ControlTag;
@@ -33,14 +29,15 @@ import cern.c2mon.shared.client.device.DeviceClassNameResponse;
 import cern.c2mon.shared.client.device.DeviceClassNameResponseImpl;
 import cern.c2mon.shared.client.device.TransferDevice;
 import cern.c2mon.shared.client.device.TransferDeviceImpl;
-import cern.c2mon.shared.client.tag.Publisher;
-import cern.c2mon.shared.client.tag.TagConfigImpl;
-import cern.c2mon.shared.client.tag.TagMode;
-import cern.c2mon.shared.client.tag.TransferTagImpl;
-import cern.c2mon.shared.client.tag.TransferTagValueImpl;
+import cern.c2mon.shared.client.tag.*;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 
-import static cern.c2mon.shared.common.type.TypeConverter.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import static cern.c2mon.shared.common.type.TypeConverter.getType;
+import static cern.c2mon.shared.common.type.TypeConverter.isKnownClass;
 
 /**
  * Factory class for creating transfer objects for sending to the C2MON client layer
@@ -152,7 +149,7 @@ public abstract class TransferObjectFactory {
               .faultMemeber(alarm.getFaultMember())
               .faultFamily(alarm.getFaultFamily())
               .info(alarm.getInfo())
-              .tagId(alarm.getTagId())
+              .tagId(alarm.getDataTagId())
               .timestamp(alarm.getTimestamp())
               .active(alarm.isActive())
               .oscillating(alarm.isOscillating())
@@ -293,12 +290,12 @@ public abstract class TransferObjectFactory {
                 .faultMemeber(alarm.getFaultMember())
                 .faultFamily(alarm.getFaultFamily())
                 .info(alarm.getInfo())
-                .tagId(alarm.getTagId())
+                .tagId(alarm.getDataTagId())
                 .timestamp(alarm.getTimestamp())
                 .active(alarm.isActive())
                 .oscillating(alarm.isOscillating())
-                .sourceTimestamp(alarm.getSourceTimestamp()).build();    
-                
+                .sourceTimestamp(alarm.getSourceTimestamp()).build();
+
         if (alarm.getMetadata()!= null){
           alarmValue.setMetadata(alarm.getMetadata().getMetadata());
         }

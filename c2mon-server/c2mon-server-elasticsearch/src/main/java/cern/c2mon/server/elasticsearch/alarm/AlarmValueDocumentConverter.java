@@ -16,9 +16,8 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch.alarm;
 
-import org.springframework.stereotype.Component;
-
 import cern.c2mon.server.common.alarm.Alarm;
+import org.springframework.stereotype.Component;
 
 /**
  * Converts {@link Alarm} instances to {@link AlarmDocument} instances with values included.
@@ -32,7 +31,7 @@ public class AlarmValueDocumentConverter extends BaseAlarmDocumentConverter {
   @Override
   public AlarmDocument convert(Alarm alarm) {
     AlarmDocument document = super.convert(alarm);
-    document.put("tagId", alarm.getTagId());
+    document.put("tagId", alarm.getDataTagId());
     document.put("active", alarm.isActive());
     document.put("activeNumeric", alarm.isActive() ? 1 : 0);
     document.put("info", alarm.getInfo());

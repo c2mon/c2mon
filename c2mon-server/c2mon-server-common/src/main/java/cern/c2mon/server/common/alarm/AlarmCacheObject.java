@@ -200,7 +200,7 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
 
     str.append(getId())
        .append('\t')
-       .append(getTagId())
+       .append(this.getDataTagId())
        .append('\t')
        .append(getTimestamp())
        .append('\t')

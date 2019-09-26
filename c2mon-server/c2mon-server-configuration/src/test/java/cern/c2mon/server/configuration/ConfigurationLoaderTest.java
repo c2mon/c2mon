@@ -1134,7 +1134,7 @@ public class ConfigurationLoaderTest {
 
     AlarmCacheObject cacheObject = (AlarmCacheObject) alarmCache.get(300000L);
     AlarmCacheObject expectedObject = new AlarmCacheObject(300000L);
-    expectedObject.setTagId(200003L);
+    expectedObject.setDataTagId(200003L);
     expectedObject.setFaultFamily("fault family");
     expectedObject.setFaultMember("fault member");
     expectedObject.setFaultCode(223);
@@ -1145,7 +1145,7 @@ public class ConfigurationLoaderTest {
     ObjectEqualityComparison.assertAlarmEquals(expectedObject, cacheObject);
 
     // also check that the Tag was updated
-    Tag tag = tagLocationService.get(expectedObject.getTagId());
+    Tag tag = tagLocationService.get(expectedObject.getDataTagId());
     assertTrue(tag.getAlarmIds().contains(expectedObject.getId()));
 
     // update should succeed
@@ -1182,7 +1182,7 @@ public class ConfigurationLoaderTest {
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
     assertFalse(alarmCache.hasKey(350000L));
     assertNull(alarmMapper.getItem(350000L));
-    Tag tag = tagLocationService.get(alarm.getTagId());
+    Tag tag = tagLocationService.get(alarm.getDataTagId());
     assertFalse(tag.getAlarmIds().contains(alarm.getId()));
     verify(mockManager);
     verify(checker);

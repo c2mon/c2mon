@@ -16,18 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.server.client.publish;
 
-import javax.annotation.PostConstruct;
-
-import com.google.gson.Gson;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.SmartLifecycle;
-import org.springframework.jms.JmsException;
-import org.springframework.jmx.export.annotation.ManagedOperation;
-import org.springframework.jmx.export.annotation.ManagedResource;
-import org.springframework.stereotype.Service;
-
 import cern.c2mon.server.cache.C2monCacheListener;
 import cern.c2mon.server.cache.CacheRegistrationService;
 import cern.c2mon.server.cache.TagLocationService;
@@ -42,6 +30,17 @@ import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.util.jms.JmsSender;
 import cern.c2mon.shared.util.json.GsonFactory;
+import com.google.gson.Gson;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.SmartLifecycle;
+import org.springframework.jms.JmsException;
+import org.springframework.jmx.export.annotation.ManagedOperation;
+import org.springframework.jmx.export.annotation.ManagedResource;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.PostConstruct;
 
 /**
  * Publishes active alarms to the C2MON client applications on the
@@ -120,7 +119,7 @@ public class AlarmPublisher implements C2monCacheListener<Alarm>, SmartLifecycle
   @Override
   public void notifyElementUpdated(final Alarm alarm) {
 
-    Long tagId = alarm.getTagId();
+    Long tagId = alarm.getDataTagId();
     AlarmValue alarmValue = null;
 
     if (tagLocationService.isInTagCache(tagId)) {

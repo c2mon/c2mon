@@ -42,7 +42,7 @@ public class IgniteC2monTagCacheQueryProvider extends IgniteCacheQueryProvider i
   @Override
   public List<Alarm> getAlarms(Tag tag) {
 //    TODO Check what happens if tag id is modified on the fly?
-    return filter(alarmCache, (aLong, alarm) -> alarm.getTagId().equals(tag.getId()));
+    return filter(alarmCache, (aLong, alarm) -> alarm.getDataTagId().equals(tag.getId()));
   }
 
   @Override

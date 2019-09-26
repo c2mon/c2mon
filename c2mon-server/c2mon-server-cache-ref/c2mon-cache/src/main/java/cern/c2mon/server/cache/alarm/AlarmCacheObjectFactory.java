@@ -85,7 +85,7 @@ public class AlarmCacheObjectFactory extends AbstractCacheObjectFactory<Alarm> {
     AlarmCacheObject alarmCacheObject = (AlarmCacheObject) alarm;
     String tmpStr = null;
     if ((tmpStr = alarmProperties.getProperty("dataTagId")) != null) {
-      alarmCacheObject.setTagId(parseLong(tmpStr,"dataTagId"));
+      alarmCacheObject.setDataTagId(parseLong(tmpStr,"dataTagId"));
     }
     if (alarmProperties.getProperty("faultFamily") != null) {
       alarmCacheObject.setFaultFamily(alarmProperties.getProperty("faultFamily"));
@@ -123,7 +123,7 @@ public class AlarmCacheObjectFactory extends AbstractCacheObjectFactory<Alarm> {
     if (alarm.getId() == null) {
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"id\" cannot be null");
     }
-    if (alarm.getTagId() == null) {
+    if (alarm.getDataTagId() == null) {
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"dataTagId\" cannot be null");
     }
     if (alarm.getFaultFamily() == null) {

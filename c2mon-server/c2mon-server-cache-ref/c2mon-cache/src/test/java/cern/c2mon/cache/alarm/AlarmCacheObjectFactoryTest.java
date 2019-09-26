@@ -46,7 +46,7 @@ public class AlarmCacheObjectFactoryTest {
 
     AlarmCacheObject alarm = (AlarmCacheObject) factory.createCacheObject(1L, properties);
 
-    assertEquals("alarm should have dataTagId set", Long.valueOf(100L), alarm.getTagId());
+    assertEquals("alarm should have dataTagId set", Long.valueOf(100L), alarm.getDataTagId());
     assertEquals("alarm should have faultFamily set", "fault-family", alarm.getFaultFamily());
     assertEquals("alarm should have faultMember set", "fault-member", alarm.getFaultMember());
     assertEquals("alarm should have alarm topic set", "tim.alarm", alarm.getTopic());

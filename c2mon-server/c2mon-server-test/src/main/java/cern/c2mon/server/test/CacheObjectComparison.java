@@ -107,7 +107,7 @@ public final class CacheObjectComparison {
    */
   public static void equals(final AlarmCacheObject alarm1, final AlarmCacheObject alarm2) {
     assertEquals(alarm1.getId(), alarm2.getId());
-    assertEquals(alarm1.getTagId(), alarm2.getTagId());
+    assertEquals(alarm1.getDataTagId(), alarm2.getDataTagId());
     assertEquals(alarm1.getFaultCode(), alarm2.getFaultCode());
     assertEquals(alarm1.getFaultFamily(), alarm2.getFaultFamily());
     assertEquals(alarm1.getFaultMember(), alarm2.getFaultMember());

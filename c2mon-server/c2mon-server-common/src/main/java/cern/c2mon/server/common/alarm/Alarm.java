@@ -17,11 +17,11 @@
 
 package cern.c2mon.server.common.alarm;
 
-import java.sql.Timestamp;
-
 import cern.c2mon.server.common.metadata.Metadata;
 import cern.c2mon.shared.client.alarm.condition.AlarmCondition;
 import cern.c2mon.shared.common.Cacheable;
+
+import java.sql.Timestamp;
 
 /**
  * Interface giving access to the most important attributes of an Alarm
@@ -81,7 +81,7 @@ public interface Alarm extends Cacheable {
    * Get the unique identifier of the Tag to which the alarm is attached
    * @return the unique identifier of the Tag
    */
-  Long getTagId();
+  Long getDataTagId();
 
   /**
    * Get the AlarmCondition object associated with this Alarm

@@ -69,7 +69,7 @@ public final class CacheObjectCreation {
     alarm1.setActive(false);
     alarm1.setInternalActive(false);
     alarm1.setTimestamp(new Timestamp(System.currentTimeMillis() - 2000));
-    alarm1.setTagId(100003L);
+    alarm1.setDataTagId(100003L);
     return alarm1;
   }
 
@@ -90,7 +90,7 @@ public final class CacheObjectCreation {
     alarm3.setActive(false);
     alarm3.setInternalActive(false);
     alarm3.setTimestamp(new Timestamp(System.currentTimeMillis() - 2000));
-    alarm3.setTagId(100003L);
+    alarm3.setDataTagId(100003L);
     Metadata metadata = new Metadata();
     metadata.addMetadata("testMetadata",11);
     alarm3.setMetadata(metadata);

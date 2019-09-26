@@ -16,9 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.helper;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alive.AliveTimerCacheObject;
 import cern.c2mon.server.common.command.CommandTagCacheObject;
@@ -38,6 +35,9 @@ import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.test.device.ObjectComparison;
 import cern.c2mon.shared.client.device.DeviceCommand;
 import cern.c2mon.shared.client.device.DeviceProperty;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Junit helper class for comparing cache objects.
@@ -177,7 +177,7 @@ public class ObjectEqualityComparison {
     assertEquals(expectedObject.getFaultMember(), cacheObject.getFaultMember());
     assertEquals(expectedObject.getFaultCode(), cacheObject.getFaultCode());
     assertEquals(expectedObject.getCondition(), cacheObject.getCondition());
-    assertEquals(expectedObject.getTagId(), cacheObject.getTagId());
+    assertEquals(expectedObject.getDataTagId(), cacheObject.getDataTagId());
   }
 
   public static void assertDeviceClassEquals(DeviceClassCacheObject expectedObject, DeviceClassCacheObject cacheObject) throws ClassNotFoundException {
