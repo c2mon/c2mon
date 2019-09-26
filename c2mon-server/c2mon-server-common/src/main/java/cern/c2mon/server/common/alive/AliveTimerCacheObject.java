@@ -122,7 +122,8 @@ public class AliveTimerCacheObject implements AliveTimer {
     @Override
     public AliveTimerCacheObject clone() throws CloneNotSupportedException {
         AliveTimerCacheObject aliveTimer = (AliveTimerCacheObject) super.clone();
-        aliveTimer.dependentAliveTimerIds = new ArrayList<Long>(this.dependentAliveTimerIds);
+        if (this.dependentAliveTimerIds != null)
+            aliveTimer.dependentAliveTimerIds = new ArrayList<>(this.dependentAliveTimerIds);
 
         return aliveTimer;
     }

@@ -22,6 +22,7 @@ import cern.c2mon.shared.common.command.CommandExecutionDetails;
 import cern.c2mon.shared.common.command.CommandTag;
 import cern.c2mon.shared.common.datatag.address.HardwareAddress;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.simpleframework.xml.Transient;
 
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -35,6 +36,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
  * @param <T> the type of the values that can be set for this command
  */
 @Data
+@NoArgsConstructor
 public final class CommandTagCacheObject<T> implements CommandTag<T> {
 
     private static final long serialVersionUID = -5348795528961997767L;

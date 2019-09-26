@@ -17,6 +17,7 @@
 package cern.c2mon.server.common.device;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +29,7 @@ import java.util.List;
  * @author Justin Lewis Salmon
  */
 @Data
+@NoArgsConstructor
 public class DeviceClassCacheObject implements DeviceClass {
 
   /**
@@ -38,7 +40,7 @@ public class DeviceClassCacheObject implements DeviceClass {
   /**
    * The unique ID of the device class.
    */
-  private final Long id;
+  private Long id;
 
   /**
    * The name of the device class.

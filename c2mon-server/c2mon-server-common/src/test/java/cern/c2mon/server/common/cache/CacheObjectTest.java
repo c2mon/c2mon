@@ -37,23 +37,34 @@ public abstract class CacheObjectTest<T extends Cacheable> {
   }
 
   @Test
-  public void cloneIsImplemented() {
+  public void cloneIsImplementedProperly() {
     // This should be verified in compile time due to Generics limitation above, but let's test anyway
     Assert.assertThat(sample, CoreMatchers.instanceOf(Cloneable.class));
-  }
-
-  @Test
-  public void equalsIsImplemented() {
-    assertEquals(sample, sample);
-//    a.equals(a)
-  }
-
-  @Test
-  public void cloneIsUnrelatedToSourceObject() {
     try {
       assertEquals(sample, sample.clone());
     } catch (CloneNotSupportedException e) {
       fail();
     }
+  }
+
+  @Test
+  public void equalsIsImplemented() {
+    assertEquals(sample, sample);
+  }
+
+  @Test
+  public void cloneCreatesDeepCopy() {
+    try {
+      T cloneObject = (T) sample.clone();
+      // Mutate object
+//      mutateObject(cloneObject);
+//      assertNotEquals(sample, cloneObject);
+    } catch (CloneNotSupportedException e) {
+      fail();
+    }
+  }
+
+  protected void mutateObject(T cloneObject) {
+    // TODO Make this abstract to force children implementation
   }
 }
