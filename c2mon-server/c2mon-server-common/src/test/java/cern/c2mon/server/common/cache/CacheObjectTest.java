@@ -37,7 +37,7 @@ public abstract class CacheObjectTest<T extends Cacheable> {
   }
 
   @Test
-  public void cloneIsImplementedProperly() {
+  public void cloneIsImplemented() {
     // This should be verified in compile time due to Generics limitation above, but let's test anyway
     Assert.assertThat(sample, CoreMatchers.instanceOf(Cloneable.class));
     try {

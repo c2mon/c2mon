@@ -22,6 +22,7 @@ import cern.c2mon.shared.common.command.CommandExecutionDetails;
 import cern.c2mon.shared.common.command.CommandTag;
 import cern.c2mon.shared.common.datatag.address.HardwareAddress;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.simpleframework.xml.Transient;
 
@@ -132,9 +133,21 @@ public final class CommandTagCacheObject<T> implements CommandTag<T> {
 
     /**
      * Synchronization lock
+     *
+     * These are excluded from the equals and hashcode methods, {@code ReentrantReadWriteLock}
+     * does NOT provide an equals and hashcode implementation by itself, which causes the
+     * {@code CommandTagCacheObject#equals} to always return false
+     * The reasoning seems to be similar to this
+     * <a href=https://stackoverflow.com/questions/7567502/why-are-two-atomicintegers-never-equal>SO Discussion
+     * on why AtomicInteger has no equals</a>
      */
+    @EqualsAndHashCode.Exclude
     private ReentrantReadWriteLock aliveLock = new ReentrantReadWriteLock();
+
+    @EqualsAndHashCode.Exclude
     private ReadLock readLock = aliveLock.readLock();
+
+    @EqualsAndHashCode.Exclude
     private WriteLock writeLock = aliveLock.writeLock();
 
     /**
