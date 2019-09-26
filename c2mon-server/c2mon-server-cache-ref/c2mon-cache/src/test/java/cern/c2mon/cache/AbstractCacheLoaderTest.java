@@ -38,18 +38,18 @@ public abstract class AbstractCacheLoaderTest<V extends Cacheable> extends Abstr
     assertNotNull("Cache should not be null", cache);
     assertNotNull("Mapper should not be null", mapper);
 
-    List<V> itemList = mapper.getAll();
+    List<V> dbItems = mapper.getAll();
 
-    assertTrue("List of DB mapped objects should not be empty", itemList.size() > 0);
+    assertTrue("List of DB mapped objects should not be empty", dbItems.size() > 0);
 
-    assertEquals("Size of cache and DB mapping should be equal", itemList.size(), cache.getKeys().size());
+    assertEquals("Size of cache and DB mapping should be equal", dbItems.size(), cache.getKeys().size());
     //compare all the objects from the cache and buffer
     try {
-      for (V item : itemList) {
-        assertTrue(cache.containsKey(item.getId()));
-        assertEquals(item, cache.get(item.getId()));
+      for (V dbItem : dbItems) {
+        assertTrue("Cache should include a key for object with id " + dbItem.getId(), cache.containsKey(dbItem.getId()));
+        assertEquals("Object should be equal in DB and cache", dbItem, cache.get(dbItem.getId()));
       }
-      customCompare(itemList, cache.getAll(cache.getKeys()));
+      customCompare(dbItems, cache.getAll(cache.getKeys()));
     } catch (ClassNotFoundException e) {
       e.printStackTrace();
       fail();
