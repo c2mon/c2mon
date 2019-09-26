@@ -1,13 +1,17 @@
 package cern.c2mon.server.common.cache;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 import cern.c2mon.shared.common.Cacheable;
 import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 public abstract class CacheObjectTest<T extends Cacheable> {
+
   private final T sample;
 
   protected CacheObjectTest(T sample) {
@@ -22,7 +26,8 @@ public abstract class CacheObjectTest<T extends Cacheable> {
   }
 
   /**
-   * @see <a href=https://docs.oracle.com/javase/tutorial/reflect/member/ctorInstance.html>Class.newInstance() doc</a>
+   * @see <a href=https://docs.oracle.com/javase/tutorial/reflect/member/ctorInstance.html>Class.newInstance()
+   * doc</a>
    */
   @Test
   public void hasDefaultEmptyCtor() {
@@ -32,7 +37,7 @@ public abstract class CacheObjectTest<T extends Cacheable> {
       // This also verifies we didn't go to a parent Ctor
       assertEquals(newInstance.getClass(), sample.getClass());
     } catch (InstantiationException | IllegalAccessException e) {
-      fail();
+      fail("An empty default Ctor should be implemented for all cache objects");
     }
   }
 
@@ -43,12 +48,18 @@ public abstract class CacheObjectTest<T extends Cacheable> {
     try {
       assertEquals(sample, sample.clone());
     } catch (CloneNotSupportedException e) {
-      fail();
+      fail("Clone should be implemented for all cache objects");
     }
   }
 
   @Test
   public void equalsIsImplemented() {
+    try {
+      assertEquals(sample.getClass(),
+          sample.getClass().getMethod("equals", Object.class).getDeclaringClass());
+    } catch (NoSuchMethodException e) {
+      fail("Equals should be implemented for all cache objects");
+    }
     assertEquals(sample, sample);
   }
 

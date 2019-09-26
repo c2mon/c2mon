@@ -34,10 +34,7 @@ public interface Cacheable extends Serializable, Cloneable  {
 
   /**
    * Needed for cache listeners, which always clone the object before
-   * notifying the listener. However, is currently only implemented
-   * for Tags
-   *
-   * TODO move to Tag and only allow cache notification for Tag?
+   * notifying the listener.
    *
    * @return the clone
    * @throws CloneNotSupportedException if not implemented/supported so far
