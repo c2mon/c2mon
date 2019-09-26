@@ -30,7 +30,7 @@ public class CommfaultCacheLoaderTest extends AbstractCacheLoaderTest<CommFaultT
   }
 
   @Override
-  protected void compareLists(List<CommFaultTag> mapperList, Map<Long, CommFaultTag> cacheList) {
+  protected void customCompare(List<CommFaultTag> mapperList, Map<Long, CommFaultTag> cacheList) {
     for (CommFaultTag aCommFaultList : mapperList) {
       CommFaultTagCacheObject currentTag = (CommFaultTagCacheObject) aCommFaultList;
       //equality of DataTagCacheObjects => currently only compares names

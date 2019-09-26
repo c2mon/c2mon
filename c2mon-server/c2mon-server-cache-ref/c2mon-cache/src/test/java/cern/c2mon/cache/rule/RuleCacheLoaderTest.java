@@ -1,21 +1,17 @@
 package cern.c2mon.cache.rule;
 
-import java.util.List;
-import java.util.Map;
-
-import cern.c2mon.server.cache.dbaccess.LoaderMapper;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import cern.c2mon.cache.AbstractCacheLoaderTest;
 import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.server.cache.dbaccess.LoaderMapper;
 import cern.c2mon.server.cache.dbaccess.RuleTagMapper;
 import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.rule.RuleTagCacheObject;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import static org.junit.Assert.*;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Szymon Halastra
@@ -34,7 +30,7 @@ public class RuleCacheLoaderTest extends AbstractCacheLoaderTest<RuleTag> {
   }
 
   @Override
-  protected void compareLists(List<RuleTag> mapperList, Map<Long, RuleTag> cacheList) throws ClassNotFoundException {
+  protected void customCompare(List<RuleTag> mapperList, Map<Long, RuleTag> cacheList) throws ClassNotFoundException {
     for (RuleTag aRuleList : mapperList) {
       RuleTagCacheObject currentRule = (RuleTagCacheObject) aRuleList;
       //only compares one field so far (name, which does not change when server is running!)

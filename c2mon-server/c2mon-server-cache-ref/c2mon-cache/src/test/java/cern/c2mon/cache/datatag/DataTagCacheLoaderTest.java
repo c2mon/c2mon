@@ -1,21 +1,17 @@
 package cern.c2mon.cache.datatag;
 
-import java.util.List;
-import java.util.Map;
-
-import cern.c2mon.server.cache.dbaccess.LoaderMapper;
-import cern.c2mon.server.common.datatag.DataTagCacheObject;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import cern.c2mon.cache.AbstractCacheLoaderTest;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.dbaccess.DataTagMapper;
+import cern.c2mon.server.cache.dbaccess.LoaderMapper;
 import cern.c2mon.server.common.datatag.DataTag;
+import cern.c2mon.server.common.datatag.DataTagCacheObject;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import static org.junit.Assert.*;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Szymon Halastra
@@ -34,7 +30,7 @@ public class DataTagCacheLoaderTest extends AbstractCacheLoaderTest<DataTag> {
   }
 
   @Override
-  protected void compareLists(List<DataTag> mapperList, Map<Long, DataTag> cacheList) {
+  protected void customCompare(List<DataTag> mapperList, Map<Long, DataTag> cacheList) {
     for (DataTag currentTag : mapperList) {
       //equality of DataTagCacheObjects => currently only compares names
       assertEquals("Cached DataTag should have the same name as in DB",

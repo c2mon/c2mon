@@ -30,7 +30,7 @@ public class SubequipmentCacheLoaderTest extends AbstractCacheLoaderTest<SubEqui
   }
 
   @Override
-  protected void compareLists(List<SubEquipment> mapperList, Map<Long, SubEquipment> cacheList) throws ClassNotFoundException {
+  protected void customCompare(List<SubEquipment> mapperList, Map<Long, SubEquipment> cacheList) throws ClassNotFoundException {
     for (SubEquipment aSubEquipmentList : mapperList) {
       SubEquipmentCacheObject currentSubEquipment = (SubEquipmentCacheObject) aSubEquipmentList;
       //only compares one field so far

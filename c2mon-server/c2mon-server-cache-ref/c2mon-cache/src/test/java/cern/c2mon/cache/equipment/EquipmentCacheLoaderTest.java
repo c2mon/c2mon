@@ -30,7 +30,7 @@ public class EquipmentCacheLoaderTest extends AbstractCacheLoaderTest<Equipment>
   }
 
   @Override
-  protected void compareLists(List<Equipment> mapperList, Map<Long, Equipment> cacheList) {
+  protected void customCompare(List<Equipment> mapperList, Map<Long, Equipment> cacheList) {
     for (Equipment anEquipmentList : mapperList) {
       EquipmentCacheObject currentEquipment = (EquipmentCacheObject) anEquipmentList;
       //only compares one field so far

@@ -30,7 +30,7 @@ public class ControlCacheLoaderTest extends AbstractCacheLoaderTest<ControlTag> 
   }
 
   @Override
-  protected void compareLists(List<ControlTag> mapperList, Map<Long, ControlTag> cacheList) {
+  protected void customCompare(List<ControlTag> mapperList, Map<Long, ControlTag> cacheList) {
     for (ControlTag currentTag : mapperList) {
       //equality of DataTagCacheObjects => currently only compares names
       assertEquals("Cached ControlTag should have the same name as in DB",

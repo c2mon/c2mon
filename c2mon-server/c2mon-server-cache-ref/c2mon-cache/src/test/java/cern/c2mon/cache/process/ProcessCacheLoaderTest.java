@@ -32,7 +32,7 @@ public class ProcessCacheLoaderTest extends AbstractCacheLoaderTest<Process> {
   }
 
   @Override
-  protected void compareLists(List<Process> mapperList, Map<Long, Process> cacheList) throws ClassNotFoundException {
+  protected void customCompare(List<Process> mapperList, Map<Long, Process> cacheList) throws ClassNotFoundException {
     for (Process process : mapperList) {
       Process currentProcess = (Process) process;
       //equality of DataTagCacheObjects => currently only compares names

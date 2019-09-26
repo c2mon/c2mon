@@ -1,23 +1,19 @@
 package cern.c2mon.cache.device;
 
-import java.util.List;
-import java.util.Map;
-
-import cern.c2mon.server.cache.dbaccess.LoaderMapper;
-import cern.c2mon.server.common.device.DeviceCacheObject;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import cern.c2mon.cache.AbstractCacheLoaderTest;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.dbaccess.DeviceMapper;
+import cern.c2mon.server.cache.dbaccess.LoaderMapper;
 import cern.c2mon.server.common.device.Device;
+import cern.c2mon.server.common.device.DeviceCacheObject;
 import cern.c2mon.shared.client.device.DeviceProperty;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
+import java.util.Map;
 
 import static cern.c2mon.server.test.device.ObjectComparison.assertDevicePropertyListContains;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Szymon Halastra
@@ -36,7 +32,7 @@ public class DeviceCacheLoaderTest extends AbstractCacheLoaderTest<Device> {
   }
 
   @Override
-  protected void compareLists(List<Device> mapperList, Map<Long, Device> cacheList) throws ClassNotFoundException {
+  protected void customCompare(List<Device> mapperList, Map<Long, Device> cacheList) throws ClassNotFoundException {
     for (Device device : mapperList) {
       Device fromCache = cacheList.get(device.getId());
 

@@ -5,15 +5,11 @@ import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.dbaccess.AliveTimerMapper;
 import cern.c2mon.server.common.alive.AliveTimer;
 import cern.c2mon.server.common.alive.AliveTimerCacheObject;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertNotNull;
 import static org.springframework.test.util.AssertionErrors.assertEquals;
 
 /**
@@ -33,7 +29,7 @@ public class AliveTimerCacheLoaderTest extends AbstractCacheLoaderTest<AliveTime
   }
 
   @Override
-  protected void compareLists(List<AliveTimer> mapperList, Map<Long, AliveTimer> cacheList) {
+  protected void customCompare(List<AliveTimer> mapperList, Map<Long, AliveTimer> cacheList) {
     for (AliveTimer anAliveList : mapperList) {
       AliveTimerCacheObject currentTimer = (AliveTimerCacheObject) anAliveList;
       //only compares one field so far

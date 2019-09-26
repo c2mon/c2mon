@@ -25,7 +25,7 @@ public class AlarmCacheTest extends AbstractCacheLoaderTest<Alarm> {
   private C2monCache<Alarm> alarmCacheRef;
 
   @Override
-  protected void compareLists(List<Alarm> mapperList, Map<Long, Alarm> cacheList) {
+  protected void customCompare(List<Alarm> mapperList, Map<Long, Alarm> cacheList) {
     for (Alarm alarm : mapperList) {
       //compare ids of associated datatags
       assertEquals("Cached Alarm should have the same name as Alarm in DB", alarm.getDataTagId(), cache.get(alarm.getId()).getDataTagId());

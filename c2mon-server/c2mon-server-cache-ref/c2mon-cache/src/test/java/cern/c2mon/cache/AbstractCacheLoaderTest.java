@@ -1,19 +1,12 @@
 package cern.c2mon.cache;
 
 import cern.c2mon.server.cache.dbaccess.LoaderMapper;
-import cern.c2mon.server.common.alarm.AlarmCacheObject;
-import cern.c2mon.server.common.command.CommandTagCacheObject;
-import cern.c2mon.server.common.control.ControlTagCacheObject;
-import cern.c2mon.server.common.tag.AbstractTagCacheObject;
-import cern.c2mon.server.test.CacheObjectComparison;
 import cern.c2mon.shared.common.Cacheable;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
@@ -52,12 +45,16 @@ public abstract class AbstractCacheLoaderTest<V extends Cacheable> extends Abstr
     assertEquals("Size of cache and DB mapping should be equal", itemList.size(), cache.getKeys().size());
     //compare all the objects from the cache and buffer
     try {
-      compareLists(itemList, cache.getAll(cache.getKeys()));
+      for (V item : itemList) {
+        assertTrue(cache.containsKey(item.getId()));
+        assertEquals(item, cache.get(item.getId()));
+      }
+      customCompare(itemList, cache.getAll(cache.getKeys()));
     } catch (ClassNotFoundException e) {
       e.printStackTrace();
       fail();
     }
   }
 
-  protected abstract void compareLists(List<V> mapperList, Map<Long, V> cacheList) throws ClassNotFoundException;
+  protected abstract void customCompare(List<V> mapperList, Map<Long, V> cacheList) throws ClassNotFoundException;
 }
