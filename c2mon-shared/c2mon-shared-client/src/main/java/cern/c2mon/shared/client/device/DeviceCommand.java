@@ -1,25 +1,29 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.shared.client.device;
 
-import java.io.Serializable;
-
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
+
+import java.io.Serializable;
 
 /**
  * Simple XML mapper bean representing a device command. Used when deserialising
@@ -27,6 +31,9 @@ import org.simpleframework.xml.Element;
  *
  * @author Justin Lewis Salmon
  */
+@Data
+@NoArgsConstructor
+@Setter(AccessLevel.NONE)
 public class DeviceCommand implements Cloneable, Serializable {
 
   private static final long serialVersionUID = 7331198531306903558L;
@@ -81,56 +88,5 @@ public class DeviceCommand implements Cloneable, Serializable {
     if (resultType != null) {
       this.resultType = resultType;
     }
-  }
-
-  /**
-   * Constructor not used (needed for SimpleXML).
-   */
-  public DeviceCommand() {
-  }
-
-  /**
-   * Get the unique ID of the command.
-   *
-   * @return the name of the command
-   */
-  public Long getId() {
-    return id;
-  }
-
-  /**
-   * Get the unique name of the command.
-   *
-   * @return the name of the command
-   */
-  public String getName() {
-    return name;
-  }
-
-  /**
-   * Get the value of this command.
-   *
-   * @return the client rule string
-   */
-  public String getValue() {
-    return value;
-  }
-
-  /**
-   * Get the category of this command.
-   *
-   * @return the constant value
-   */
-  public String getCategory() {
-    return category;
-  }
-
-  /**
-   * Get the raw result type string of this command.
-   *
-   * @return the result type
-   */
-  public String getResultType() {
-    return resultType;
   }
 }
