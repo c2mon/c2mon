@@ -9,4 +9,10 @@ public class AliveTimerCacheObjectTest extends CacheObjectTest<AliveTimerCacheOb
   public AliveTimerCacheObjectTest() {
     super(sample);
   }
+
+  @Override
+  protected void mutateObject(AliveTimerCacheObject cloneObject) {
+      cloneObject.setAliveInterval(420);
+      cloneObject.setLastUpdate(1337);
+  }
 }

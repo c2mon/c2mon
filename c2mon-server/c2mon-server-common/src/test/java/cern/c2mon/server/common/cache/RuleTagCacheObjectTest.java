@@ -9,4 +9,9 @@ public class RuleTagCacheObjectTest extends CacheObjectTest<RuleTagCacheObject> 
   public RuleTagCacheObjectTest() {
     super(sample);
   }
+
+  @Override
+  protected void mutateObject(RuleTagCacheObject cloneObject) {
+      cloneObject.setRuleText("Working software over comprehensive documentation");
+  }
 }

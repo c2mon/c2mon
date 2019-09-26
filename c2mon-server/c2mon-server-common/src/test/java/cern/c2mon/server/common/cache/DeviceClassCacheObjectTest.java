@@ -9,4 +9,9 @@ public class DeviceClassCacheObjectTest extends CacheObjectTest<DeviceClassCache
   public DeviceClassCacheObjectTest() {
     super(sample);
   }
+
+  @Override
+  protected void mutateObject(DeviceClassCacheObject cloneObject) {
+      cloneObject.setName("KInda secret device");
+  }
 }

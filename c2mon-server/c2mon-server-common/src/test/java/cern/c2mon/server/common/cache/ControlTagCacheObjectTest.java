@@ -9,4 +9,10 @@ public class ControlTagCacheObjectTest extends CacheObjectTest<AlarmCacheObject>
   public ControlTagCacheObjectTest() {
     super(sample);
   }
+
+  @Override
+  protected void mutateObject(AlarmCacheObject cloneObject) {
+      cloneObject.setFirstOscTS(12345);
+      cloneObject.setInternalActive(false);
+  }
 }

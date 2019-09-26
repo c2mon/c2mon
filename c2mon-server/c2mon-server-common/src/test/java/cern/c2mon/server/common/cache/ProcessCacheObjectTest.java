@@ -9,4 +9,9 @@ public class ProcessCacheObjectTest extends CacheObjectTest<ProcessCacheObject> 
   public ProcessCacheObjectTest() {
     super(sample);
   }
+
+  @Override
+  protected void mutateObject(ProcessCacheObject cloneObject) {
+      cloneObject.setDescription("People over processes");
+  }
 }

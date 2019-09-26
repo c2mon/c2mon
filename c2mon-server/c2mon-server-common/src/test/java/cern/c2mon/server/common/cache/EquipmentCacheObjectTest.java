@@ -9,4 +9,10 @@ public class EquipmentCacheObjectTest extends CacheObjectTest<EquipmentCacheObje
   public EquipmentCacheObjectTest() {
     super(sample);
   }
+
+  @Override
+  protected void mutateObject(EquipmentCacheObject cloneObject) {
+      cloneObject.setAddress("Test address with spaces");
+      cloneObject.setProcessId(1234567L);
+  }
 }

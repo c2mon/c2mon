@@ -9,4 +9,10 @@ public class SubEquipmentCacheObjectTest extends CacheObjectTest<SubEquipmentCac
   public SubEquipmentCacheObjectTest() {
     super(sample);
   }
+
+  @Override
+  protected void mutateObject(SubEquipmentCacheObject cloneObject) {
+      cloneObject.setParentId(123L);
+      cloneObject.setDescription("Test");
+  }
 }

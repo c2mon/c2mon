@@ -9,4 +9,9 @@ public class AlarmCacheObjectTest extends CacheObjectTest<AlarmCacheObject> {
   public AlarmCacheObjectTest() {
     super(sample);
   }
+
+  @Override
+  protected void mutateObject(AlarmCacheObject cloneObject) {
+    cloneObject.setFaultCode(123);
+  }
 }

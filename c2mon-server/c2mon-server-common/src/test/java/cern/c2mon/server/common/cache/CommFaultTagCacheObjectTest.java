@@ -9,4 +9,9 @@ public class CommFaultTagCacheObjectTest extends CacheObjectTest<CommFaultTagCac
   public CommFaultTagCacheObjectTest() {
     super(sample);
   }
+
+  @Override
+  protected void mutateObject(CommFaultTagCacheObject cloneObject) {
+      cloneObject.setStateTagId(1234L);
+  }
 }

@@ -57,14 +57,12 @@ public abstract class CacheObjectTest<T extends Cacheable> {
     try {
       T cloneObject = (T) sample.clone();
       // Mutate object
-//      mutateObject(cloneObject);
-//      assertNotEquals(sample, cloneObject);
+      mutateObject(cloneObject);
+      assertNotEquals(sample, cloneObject);
     } catch (CloneNotSupportedException e) {
       fail();
     }
   }
 
-  protected void mutateObject(T cloneObject) {
-    // TODO Make this abstract to force children implementation
-  }
+  protected abstract void mutateObject(T cloneObject);
 }
