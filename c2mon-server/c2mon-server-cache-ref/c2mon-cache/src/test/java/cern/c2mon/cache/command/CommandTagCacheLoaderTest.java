@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author Szymon Halastra
+ * @author Alexandros Papageorgiou
  */
 public class CommandTagCacheLoaderTest extends AbstractCacheLoaderTest<CommandTag> {
 

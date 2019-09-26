@@ -13,7 +13,7 @@ import java.util.Map;
 import static org.springframework.test.util.AssertionErrors.assertEquals;
 
 /**
- * @author Szymon Halastra
+ * @author Alexandros Papageorgiou
  */
 public class AliveTimerCacheLoaderTest extends AbstractCacheLoaderTest<AliveTimer> {
 

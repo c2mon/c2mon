@@ -16,7 +16,7 @@ import static cern.c2mon.server.test.device.ObjectComparison.assertDevicePropert
 import static org.junit.Assert.assertEquals;
 
 /**
- * @author Szymon Halastra
+ * @author Alexandros Papageorgiou
  */
 public class DeviceCacheLoaderTest extends AbstractCacheLoaderTest<Device> {
 

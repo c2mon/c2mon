@@ -10,7 +10,10 @@ import java.util.Map;
 
 import static org.junit.Assert.*;
 
-
+/**
+ *
+ * @author Alexandros Papageorgiou
+ */
 public abstract class AbstractCacheLoaderTest<V extends Cacheable> extends AbstractCacheCRUDTest<V> {
 
   protected LoaderMapper<V> mapper;

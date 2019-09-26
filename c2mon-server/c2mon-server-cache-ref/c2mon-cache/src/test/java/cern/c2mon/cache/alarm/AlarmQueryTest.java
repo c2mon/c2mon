@@ -1,12 +1,11 @@
 package cern.c2mon.cache.alarm;
 
-import java.util.Collection;
-
+import cern.c2mon.server.common.alarm.AlarmCacheObject;
+import cern.c2mon.shared.client.alarm.AlarmQuery;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import cern.c2mon.server.common.alarm.AlarmCacheObject;
-import cern.c2mon.shared.client.alarm.AlarmQuery;
+import java.util.Collection;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -16,7 +15,7 @@ import static org.junit.Assert.assertNotNull;
  */
 
 //TODO: remove @Ignore annotation when Query API will be created
-public class AlarmQueryTest extends AlarmCacheTest {
+public class AlarmQueryTest extends AlarmCacheLoaderTest {
 
   @Test
   @Ignore

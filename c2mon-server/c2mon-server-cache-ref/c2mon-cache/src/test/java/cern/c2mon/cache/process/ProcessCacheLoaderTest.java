@@ -16,7 +16,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * This is an integration test for loading cache from DB using embedded cache
  *
- * @author Szymon Halastra
+ * @author Alexandros Papageorgiou
  */
 public class ProcessCacheLoaderTest extends AbstractCacheLoaderTest<Process> {
 

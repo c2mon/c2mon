@@ -17,7 +17,7 @@ import static org.junit.Assert.assertEquals;
  * @author Szymon Halastra
  * @author Alexandros Papageorgiou
  */
-public class AlarmCacheTest extends AbstractCacheLoaderTest<Alarm> {
+public class AlarmCacheLoaderTest extends AbstractCacheLoaderTest<Alarm> {
 
   @Autowired
   protected AlarmMapper alarmMapper;

@@ -14,7 +14,7 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 
 /**
- * @author Szymon Halastra
+ * @author Alexandros Papageorgiou
  */
 public class DeviceClassCacheLoaderTest extends AbstractCacheLoaderTest<DeviceClass> {
 
