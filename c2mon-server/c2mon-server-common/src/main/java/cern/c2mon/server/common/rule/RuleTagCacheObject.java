@@ -20,6 +20,7 @@ import cern.c2mon.server.common.tag.AbstractTagCacheObject;
 import cern.c2mon.shared.rule.RuleExpression;
 import cern.c2mon.shared.rule.RuleFormatException;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,8 +34,9 @@ import java.util.*;
  * @author Mark Brightwell
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class RuleTagCacheObject extends AbstractTagCacheObject implements RuleTag, Cloneable {
+public class RuleTagCacheObject extends AbstractTagCacheObject implements RuleTag {
 
     private static final long serialVersionUID = -3382383610136394447L;
 
