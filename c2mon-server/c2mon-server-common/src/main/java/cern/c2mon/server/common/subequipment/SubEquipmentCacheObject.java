@@ -16,12 +16,10 @@
  *****************************************************************************/
 package cern.c2mon.server.common.subequipment;
 
-import java.util.Collection;
-import java.util.LinkedList;
-
 import cern.c2mon.server.common.equipment.AbstractEquipmentCacheObject;
-import cern.c2mon.shared.common.Cacheable;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEntity;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 // TODO move out all logic to facade bean (configXML, validation)
 
@@ -33,13 +31,17 @@ import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEnti
  *
  * @author mruizgar
  */
-public class SubEquipmentCacheObject extends AbstractEquipmentCacheObject implements SubEquipment, Cacheable, Cloneable {
+@Data
+@EqualsAndHashCode(callSuper = true)
+public class SubEquipmentCacheObject extends AbstractEquipmentCacheObject implements SubEquipment {
 
     private static final long serialVersionUID = -3616744745556547068L;
     /**
      * The id of the subequipment's parent, to the equipment it is attached
      */
     private Long parentId;
+
+    private final SupervisionEntity supervisionEntity = SupervisionEntity.SUBEQUIPMENT;
 
     /**
      * Public default constructor (needed by iBatis).
@@ -54,13 +56,6 @@ public class SubEquipmentCacheObject extends AbstractEquipmentCacheObject implem
         super(id);
         this.setHandlerClassName("-");
     }
-
-    /**
-     * Constructor with minimal set of non-null fields.
-     */
-    // public SubEquipmentCacheObject(Long id, String name, String handlerClass, Long stateTagId) {
-    // super(id, name, handlerClass, stateTagId);
-    // }
 
     /**
      * Clones the SubEquipment object.
@@ -89,25 +84,5 @@ public class SubEquipmentCacheObject extends AbstractEquipmentCacheObject implem
 
         super(pId, pName, pDescription, pHandlerClassName, pStateTagId, pAliveTagId, pAliveInterval, pCommfaultTagId);
         this.parentId = pParentId;
-    }
-
-    /**
-     * @return the parentId
-     */
-    @Override
-    public final Long getParentId() {
-        return parentId;
-    }
-
-    /**
-     * @param parentId the parentId to set
-     */
-    public final void setParentId(Long parentId) {
-        this.parentId = parentId;
-    }
-
-    @Override
-    public SupervisionEntity getSupervisionEntity() {
-        return SupervisionEntity.SUBEQUIPMENT;
     }
 }

@@ -16,12 +16,8 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.api.util;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import org.springframework.stereotype.Service;
-
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
+import cern.c2mon.server.common.alarm.AlarmCondition;
 import cern.c2mon.server.common.command.CommandTagCacheObject;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.common.equipment.EquipmentCacheObject;
@@ -29,7 +25,6 @@ import cern.c2mon.server.common.metadata.Metadata;
 import cern.c2mon.server.common.process.ProcessCacheObject;
 import cern.c2mon.server.common.rule.RuleTagCacheObject;
 import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
-import cern.c2mon.shared.client.alarm.condition.AlarmCondition;
 import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
 import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
 import cern.c2mon.shared.client.configuration.api.equipment.Equipment;
@@ -39,6 +34,10 @@ import cern.c2mon.shared.client.configuration.api.tag.CommandTag;
 import cern.c2mon.shared.client.configuration.api.tag.DataTag;
 import cern.c2mon.shared.client.configuration.api.tag.RuleTag;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
+import org.springframework.stereotype.Service;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author Franz Ritter
@@ -305,7 +304,7 @@ public class CacheObjectFactory {
   public AlarmCacheObject buildAlarmUpdateCacheObject(AlarmCacheObject originalObject, Alarm configObject) {
     AlarmCacheObject result = null;
     try {
-      result = originalObject.clone();
+      result = (AlarmCacheObject) originalObject.clone();
       setCacheAlarmCacheObjectFields(result, configObject);
 
     } catch (CloneNotSupportedException e) {
@@ -325,7 +324,7 @@ public class CacheObjectFactory {
   private AlarmCacheObject setCacheAlarmCacheObjectFields(AlarmCacheObject cacheObject, Alarm configObject) {
 
     if (configObject.getDataTagId() != null) {
-      cacheObject.setDataTagId(configObject.getDataTagId());
+      cacheObject.setTagId(configObject.getDataTagId());
     }
     if (configObject.getFaultFamily() != null) {
       cacheObject.setFaultFamily(configObject.getFaultFamily());

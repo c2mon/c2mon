@@ -1,20 +1,22 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.server.common.device;
+
+import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +27,8 @@ import java.util.List;
  *
  * @author Justin Lewis Salmon
  */
-public class DeviceClassCacheObject implements DeviceClass, Cloneable {
+@Data
+public class DeviceClassCacheObject implements DeviceClass {
 
   /**
    * Serial version UID, since cloneable
@@ -86,34 +89,9 @@ public class DeviceClassCacheObject implements DeviceClass, Cloneable {
     this.description = null;
   }
 
-  @Override
-  public Long getId() {
-    return id;
-  }
-
-  @Override
-  public String getName() {
-    return name;
-  }
-
-  @Override
-  public String getDescription() {
-    return description;
-  }
-
-  @Override
-  public List<Property> getProperties() {
-    return properties;
-  }
-
-  @Override
-  public List<Command> getCommands() {
-    return commands;
-  }
-
   @SuppressWarnings("unchecked")
   @Override
-  public Object clone() throws CloneNotSupportedException {
+  public DeviceClassCacheObject clone() throws CloneNotSupportedException {
     DeviceClassCacheObject clone = (DeviceClassCacheObject) super.clone();
 
     clone.properties = (List<Property>) ((ArrayList<Property>) properties).clone();
@@ -121,62 +99,6 @@ public class DeviceClassCacheObject implements DeviceClass, Cloneable {
     clone.deviceIds = (List<Long>) ((ArrayList<Long>) deviceIds).clone();
 
     return clone;
-  }
-
-  /**
-   * Set the name of the device class.
-   *
-   * @param name the device class name to set
-   */
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  /**
-   * Set the description of the device class.
-   *
-   * @param description the device class description to set
-   */
-  public void setDescription(String description) {
-    this.description = description;
-  }
-
-  /**
-   * Retrieve the list of IDs corresponding to Device instances that are members
-   * of this device class.
-   *
-   * @return the list of device IDs
-   */
-  public List<Long> getDeviceIds() {
-    return deviceIds;
-  }
-
-  /**
-   * Set the list of IDs corresponding to Device instances that are members of
-   * this device class.
-   *
-   * @param deviceIds the list of device IDs to set
-   */
-  public void setDeviceIds(List<Long> deviceIds) {
-    this.deviceIds = deviceIds;
-  }
-
-  /**
-   * Set the list of properties that belong to this device.
-   *
-   * @param properties the properties to set
-   */
-  public void setProperties(List<Property> properties) {
-    this.properties = properties;
-  }
-
-  /**
-   * Set the list of commands that belong to this device.
-   *
-   * @param commands the commands to set
-   */
-  public void setCommands(List<Command> commands) {
-    this.commands = commands;
   }
 
   @Override

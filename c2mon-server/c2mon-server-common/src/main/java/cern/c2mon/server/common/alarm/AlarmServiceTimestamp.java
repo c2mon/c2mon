@@ -20,7 +20,7 @@ public class AlarmServiceTimestamp implements Cacheable {
   }
 
   @Override
-  public Object clone() throws CloneNotSupportedException {
-    return super.clone();
+  public AlarmServiceTimestamp clone() throws CloneNotSupportedException {
+    return (AlarmServiceTimestamp) super.clone();
   }
 }

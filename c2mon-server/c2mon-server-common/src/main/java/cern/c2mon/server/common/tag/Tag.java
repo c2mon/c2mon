@@ -16,14 +16,14 @@
  *****************************************************************************/
 package cern.c2mon.server.common.tag;
 
+import cern.c2mon.server.common.metadata.Metadata;
+import cern.c2mon.shared.common.Cacheable;
+import cern.c2mon.shared.common.datatag.DataTagQuality;
+import cern.c2mon.shared.common.rule.RuleInputValue;
+
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.Set;
-
-import cern.c2mon.shared.common.Cacheable;
-import cern.c2mon.shared.common.datatag.DataTagQuality;
-import cern.c2mon.server.common.metadata.Metadata;
-import cern.c2mon.shared.common.rule.RuleInputValue;
 
 /**
  * The Tag interface is the common interface for all tag objects within the TIM system:
@@ -49,7 +49,7 @@ public interface Tag extends RuleInputValue, Cacheable {
    */
   String getName();
 
-  Object clone() throws CloneNotSupportedException;
+  Tag clone() throws CloneNotSupportedException;
 
   /** Get a free-text description of the tag */
   String getDescription();

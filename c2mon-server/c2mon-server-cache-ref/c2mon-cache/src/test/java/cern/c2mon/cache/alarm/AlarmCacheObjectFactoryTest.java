@@ -1,15 +1,14 @@
 package cern.c2mon.cache.alarm;
 
-import java.util.Properties;
-
-import org.easymock.EasyMock;
-import org.junit.Before;
-import org.junit.Test;
-
 import cern.c2mon.server.cache.alarm.AlarmCacheObjectFactory;
 import cern.c2mon.server.cache.alarm.AlarmService;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.shared.common.ConfigurationException;
+import org.easymock.EasyMock;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.util.Properties;
 
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.assertEquals;
@@ -47,7 +46,7 @@ public class AlarmCacheObjectFactoryTest {
 
     AlarmCacheObject alarm = (AlarmCacheObject) factory.createCacheObject(1L, properties);
 
-    assertEquals("alarm should have dataTagId set", Long.valueOf(100L), alarm.getDataTagId());
+    assertEquals("alarm should have dataTagId set", Long.valueOf(100L), alarm.getTagId());
     assertEquals("alarm should have faultFamily set", "fault-family", alarm.getFaultFamily());
     assertEquals("alarm should have faultMember set", "fault-member", alarm.getFaultMember());
     assertEquals("alarm should have alarm topic set", "tim.alarm", alarm.getTopic());

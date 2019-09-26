@@ -16,12 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.alarm.impl;
 
-import java.sql.Timestamp;
-import java.util.Properties;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import cern.c2mon.server.cache.AlarmCache;
 import cern.c2mon.server.cache.AlarmFacade;
 import cern.c2mon.server.cache.TagLocationService;
@@ -34,6 +28,11 @@ import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.client.alarm.condition.AlarmCondition;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.daq.config.Change;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.sql.Timestamp;
+import java.util.Properties;
 
 /**
  * Implementation of the AlarmFacade.l
@@ -205,7 +204,7 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
     String tmpStr = null;
     if ((tmpStr = alarmProperties.getProperty("dataTagId")) != null) {
       try {
-        alarmCacheObject.setDataTagId(Long.valueOf(tmpStr));
+        alarmCacheObject.setTagId(Long.valueOf(tmpStr));
       } catch (NumberFormatException e) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "NumberFormatException: Unable to convert parameter \"dataTagId\" to Long: " + tmpStr);
       }

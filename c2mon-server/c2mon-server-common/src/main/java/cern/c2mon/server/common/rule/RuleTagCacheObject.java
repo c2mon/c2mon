@@ -1,41 +1,39 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.server.common.rule;
 
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import cern.c2mon.server.common.tag.AbstractTagCacheObject;
 import cern.c2mon.shared.rule.RuleExpression;
 import cern.c2mon.shared.rule.RuleFormatException;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.sql.Timestamp;
+import java.util.*;
 
 /**
  * Cache object representing a rule in the server. Make sure to update the clone method if modifying the fields.
  *
  * @author Mark Brightwell
  */
+@Data
+@NoArgsConstructor
 public class RuleTagCacheObject extends AbstractTagCacheObject implements RuleTag, Cloneable {
 
     private static final long serialVersionUID = -3382383610136394447L;
@@ -56,19 +54,19 @@ public class RuleTagCacheObject extends AbstractTagCacheObject implements RuleTa
     private RuleExpression ruleExpression;
 
     /**
-     * Reference to all the Equipments providing tags for this rule.
+     * Reference to all the parent Equipments providing tags for this rule.
      */
-    private Set<Long> parentEquipments = new HashSet<Long>();
+    private Set<Long> equipmentIds = new HashSet<>();
 
     /**
-     * Reference to all the SubEquipments providing tags for this rule.
+     * Reference to all the parent SubEquipments providing tags for this rule.
      */
-    private Set<Long> parentSubEquipments = new HashSet<Long>();
+    private Set<Long> subEquipmentIds = new HashSet<>();
 
     /**
-     * Reference to all the Processes providing tags for this rule.
+     * Reference to all the parent Processes providing tags for this rule.
      */
-    private Set<Long> parentProcesses = new HashSet<Long>();
+    private Set<Long> processIds = new HashSet<>();
 
     /**
      * Constructor used to return a cache object when the object cannot be found in the cache.
@@ -89,11 +87,6 @@ public class RuleTagCacheObject extends AbstractTagCacheObject implements RuleTa
         setRuleText(ruleText);
     }
 
-    // TODO remove this constructor once fixed result maps
-    public RuleTagCacheObject() {
-        super();
-    }
-
     /**
      * Used for config loader.
      *
@@ -111,22 +104,22 @@ public class RuleTagCacheObject extends AbstractTagCacheObject implements RuleTa
     @Override
     public RuleTagCacheObject clone() throws CloneNotSupportedException {
         RuleTagCacheObject ruleTagCacheObject = (RuleTagCacheObject) super.clone();
-        if (this.parentEquipments != null) {
-            ruleTagCacheObject.parentEquipments = new HashSet<Long>();
-            for (Long eqId : this.parentEquipments) {
-                ruleTagCacheObject.parentEquipments.add(eqId);
+        if (this.equipmentIds != null) {
+            ruleTagCacheObject.equipmentIds = new HashSet<Long>();
+            for (Long eqId : this.equipmentIds) {
+                ruleTagCacheObject.equipmentIds.add(eqId);
             }
         }
-        if (this.parentSubEquipments != null) {
-          ruleTagCacheObject.parentSubEquipments = new HashSet<Long>();
-          for (Long subEqId : this.parentSubEquipments) {
-              ruleTagCacheObject.parentSubEquipments.add(subEqId);
+        if (this.subEquipmentIds != null) {
+          ruleTagCacheObject.subEquipmentIds = new HashSet<Long>();
+          for (Long subEqId : this.subEquipmentIds) {
+              ruleTagCacheObject.subEquipmentIds.add(subEqId);
           }
       }
-        if (this.parentProcesses != null) {
-            ruleTagCacheObject.parentProcesses = new HashSet<Long>();
-            for (Long procId : this.parentProcesses) {
-                ruleTagCacheObject.parentProcesses.add(procId);
+        if (this.processIds != null) {
+            ruleTagCacheObject.processIds = new HashSet<Long>();
+            for (Long procId : this.processIds) {
+                ruleTagCacheObject.processIds.add(procId);
             }
         }
         ruleTagCacheObject.ruleExpression = null;
@@ -140,8 +133,8 @@ public class RuleTagCacheObject extends AbstractTagCacheObject implements RuleTa
     }
 
     @Override
-    public final RuleExpression getRuleExpression() {
-        return ruleExpression;
+    public Timestamp getTimestamp() {
+      return getCacheTimestamp();
     }
 
     @Override
@@ -159,16 +152,11 @@ public class RuleTagCacheObject extends AbstractTagCacheObject implements RuleTa
     public final Collection<Long> getCopyRuleInputTagIds() {
         Collection<Long> ruleCollection;
         if (ruleExpression != null) {
-            ruleCollection = new ArrayList<Long>(ruleExpression.getInputTagIds());
+            ruleCollection = new ArrayList<>(ruleExpression.getInputTagIds());
         } else {
             ruleCollection = Collections.emptyList();
         }
         return ruleCollection;
-    }
-
-    @Override
-    public final String getRuleText() {
-        return this.ruleText;
     }
 
     /**
@@ -188,53 +176,18 @@ public class RuleTagCacheObject extends AbstractTagCacheObject implements RuleTa
         } else {
             throw new NullPointerException("Attempting to set RuleTag ruleText field to null!");
         }
-
-    }
-
-    @Override
-    public Timestamp getTimestamp() {
-        return getCacheTimestamp();
-    }
-
-    @Override
-    public void setEquipmentIds(Set<Long> parentEquipments) {
-        this.parentEquipments = parentEquipments;
-    }
-
-    @Override
-    public Set<Long> getEquipmentIds() {
-        return parentEquipments;
-    }
-
-    @Override
-    public void setProcessIds(Set<Long> parentProcesses) {
-        this.parentProcesses = parentProcesses;
-    }
-
-    @Override
-    public Set<Long> getProcessIds() {
-        return parentProcesses;
     }
 
     @Override
     public Long getLowestProcessId() {
-        if (!parentProcesses.isEmpty()) {
-            List<Long> sortedList = new ArrayList<Long>(parentProcesses);
+        if (!processIds.isEmpty()) {
+            List<Long> sortedList = new ArrayList<Long>(processIds);
             Collections.sort(sortedList);
             return sortedList.get(0);
         } else
             return 0L;
     }
 
-    @Override
-    public void setSubEquipmentIds(Set<Long> parentSubEquipments) {
-        this.parentSubEquipments = parentSubEquipments;
-    }
-
-    public Set<Long> getSubEquipmentIds() {
-      return parentSubEquipments;
-    }
-    
     @Override
     public String toString() {
       StringBuffer str = new StringBuffer();
@@ -248,7 +201,7 @@ public class RuleTagCacheObject extends AbstractTagCacheObject implements RuleTa
       str.append(getValue());
       str.append('\t');
       str.append(getDataType());
-      
+
       if (!isValid()) {
         str.append('\t');
         str.append(getDataTagQuality().getInvalidQualityStates());
@@ -256,13 +209,13 @@ public class RuleTagCacheObject extends AbstractTagCacheObject implements RuleTa
       else {
         str.append("\t0\tOK");
       }
-      
+
       if (getValueDescription() != null) {
         str.append('\t');
         // remove all \n and replace all \t characters of the value description string
         str.append(getValueDescription().replace("\n", "").replace("\t", "  ") );
       }
-      
+
       return str.toString();
     }
 }

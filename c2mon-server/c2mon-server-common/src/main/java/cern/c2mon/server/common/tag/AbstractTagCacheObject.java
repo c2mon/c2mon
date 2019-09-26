@@ -16,10 +16,10 @@
  *****************************************************************************/
 package cern.c2mon.server.common.tag;
 
+import cern.c2mon.server.common.metadata.Metadata;
 import cern.c2mon.shared.common.datatag.DataTagConstants;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
-import cern.c2mon.server.common.metadata.Metadata;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,6 +31,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
+import static cern.c2mon.shared.common.datatag.DataTagConstants.*;
+
 /**
  * Abstract tag used as basis for all tag objects in the server:
  * DataTag, ControlTag and RuleTag.
@@ -39,7 +41,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
  */
 @Slf4j
 @Data
-public abstract class AbstractTagCacheObject implements DataTagConstants, Cloneable, Serializable {
+public abstract class AbstractTagCacheObject implements Cloneable, Serializable {
 
   // TODO remove UID if not needed
   /**
@@ -408,14 +410,6 @@ public abstract class AbstractTagCacheObject implements DataTagConstants, Clonea
       this.ruleIdsString = null;
     }
 
-  }
-
-  public void setStatus(DataTagConstants.Status status) {
-    this.status = status;
-  }
-
-  public DataTagConstants.Status getStatus() {
-    return status;
   }
 
 }

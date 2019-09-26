@@ -16,8 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.server.test;
 
-import java.sql.Timestamp;
-
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.command.CommandTagCacheObject;
 import cern.c2mon.server.common.control.ControlTagCacheObject;
@@ -38,6 +36,8 @@ import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
+
+import java.sql.Timestamp;
 
 /**
  * Contains static methods for creating test cache objects.
@@ -69,7 +69,7 @@ public final class CacheObjectCreation {
     alarm1.setActive(false);
     alarm1.setInternalActive(false);
     alarm1.setTimestamp(new Timestamp(System.currentTimeMillis() - 2000));
-    alarm1.setDataTagId(100003L);
+    alarm1.setTagId(100003L);
     return alarm1;
   }
 
@@ -90,7 +90,7 @@ public final class CacheObjectCreation {
     alarm3.setActive(false);
     alarm3.setInternalActive(false);
     alarm3.setTimestamp(new Timestamp(System.currentTimeMillis() - 2000));
-    alarm3.setDataTagId(100003L);
+    alarm3.setTagId(100003L);
     Metadata metadata = new Metadata();
     metadata.addMetadata("testMetadata",11);
     alarm3.setMetadata(metadata);

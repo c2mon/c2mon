@@ -16,18 +16,17 @@
  *****************************************************************************/
 package cern.c2mon.server.common.command;
 
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
-
 import cern.c2mon.server.common.metadata.Metadata;
-import org.simpleframework.xml.Transient;
-
 import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
-import cern.c2mon.shared.common.Cacheable;
 import cern.c2mon.shared.common.command.CommandExecutionDetails;
 import cern.c2mon.shared.common.command.CommandTag;
 import cern.c2mon.shared.common.datatag.address.HardwareAddress;
+import lombok.Data;
+import org.simpleframework.xml.Transient;
+
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 /**
  * Note: does not keep the latest value of the command. Commands are logged
@@ -35,8 +34,8 @@ import cern.c2mon.shared.common.datatag.address.HardwareAddress;
  *
  * @param <T> the type of the values that can be set for this command
  */
-
-public final class CommandTagCacheObject<T> implements CommandTag<T>, Cacheable, Cloneable {
+@Data
+public final class CommandTagCacheObject<T> implements CommandTag<T> {
 
     private static final long serialVersionUID = -5348795528961997767L;
 
@@ -99,7 +98,7 @@ public final class CommandTagCacheObject<T> implements CommandTag<T>, Cacheable,
      * Hardware address of the CommandTag. The Hardware address is required by the data source to actually execute the
      * command.
      */
-    private HardwareAddress hwAddress;
+    private HardwareAddress hardwareAddress;
 
     /**
      * Minimum value for the command value.
@@ -175,7 +174,7 @@ public final class CommandTagCacheObject<T> implements CommandTag<T>, Cacheable,
 
         this.dataType = pDataType;
         this.mode = pMode;
-        this.hwAddress = pHwAddress;
+        this.hardwareAddress = pHwAddress;
         this.equipmentId = pEquipmentId;
         this.processId = pProcessId;
 
@@ -189,102 +188,8 @@ public final class CommandTagCacheObject<T> implements CommandTag<T>, Cacheable,
     }
 
     public CommandTagCacheObject(final CommandTagCacheObject<T> old) {
-        this(old.id, old.name, old.description, old.dataType, old.mode, old.equipmentId, old.processId, old.hwAddress,
+        this(old.id, old.name, old.description, old.dataType, old.mode, old.equipmentId, old.processId, old.hardwareAddress,
                 old.sourceTimeout, old.sourceRetries, old.execTimeout, old.clientTimeout, old.minimum, old.maximum);
-    }
-
-    @Override
-    public Long getId() {
-        return this.id;
-    }
-
-    @Override
-    public String getName() {
-        return this.name;
-    }
-
-    @Override
-    public String getDescription() {
-        return this.description;
-    }
-
-    @Override
-    public String getDataType() {
-        return this.dataType;
-    }
-
-    @Override
-    public short getMode() {
-        return this.mode;
-    }
-
-    @Override
-    public int getClientTimeout() {
-        return this.clientTimeout;
-    }
-
-    @Override
-    public int getExecTimeout() {
-        return this.execTimeout;
-    }
-
-    @Override
-    public int getSourceTimeout() {
-        return this.sourceTimeout;
-    }
-
-    @Override
-    public int getSourceRetries() {
-        return this.sourceRetries;
-    }
-
-    @Override
-    public HardwareAddress getHardwareAddress() {
-        return this.hwAddress;
-    }
-
-    @Override
-    public Long getEquipmentId() {
-        return this.equipmentId;
-    }
-
-    @Override
-    public Long getProcessId() {
-        return this.processId;
-    }
-
-    public void setEquipmentId(final Long newEquipmentId) {
-        this.equipmentId = newEquipmentId;
-    }
-
-    public void setProcessId(final Long newProcessId) {
-        this.processId = newProcessId;
-    }
-
-    @Override
-    public Comparable<T> getMinimum() {
-        return this.minimum;
-    }
-
-    public void setMinimum(final Comparable<T> newMinimum) {
-        this.minimum = newMinimum;
-    }
-
-    @Override
-    public Comparable<T> getMaximum() {
-        return this.maximum;
-    }
-
-    public void setMaximum(final Comparable<T> newMaximum) {
-        this.maximum = newMaximum;
-    }
-
-    public final Metadata getMetadata() {
-        return this.metadata;
-    }
-
-    public void setMetadata(Metadata data) {
-        this.metadata = data;
     }
 
     @Override
@@ -303,8 +208,8 @@ public final class CommandTagCacheObject<T> implements CommandTag<T>, Cacheable,
         str.append(dataType);
         str.append("</datatype>\n");
 
-        if (hwAddress != null) {
-            str.append(hwAddress.toConfigXML());
+        if (hardwareAddress != null) {
+            str.append(hardwareAddress.toConfigXML());
         }
 
         str.append("    </CommandTag>\n");
@@ -332,97 +237,6 @@ public final class CommandTagCacheObject<T> implements CommandTag<T>, Cacheable,
         return str.toString();
     }
 
-    /**
-     * @param hwAddress the hwAddress to set
-     */
-    public void setHardwareAddress(final HardwareAddress hwAddress) {
-        this.hwAddress = hwAddress;
-    }
-
-    /**
-     * @param clientTimeout the clientTimeout to set
-     */
-    public void setClientTimeout(final int clientTimeout) {
-        this.clientTimeout = clientTimeout;
-    }
-
-    /**
-     * @param execTimeout the execTimeout to set
-     */
-    public void setExecTimeout(final int execTimeout) {
-        this.execTimeout = execTimeout;
-    }
-
-    /**
-     * @param sourceTimeout the sourceTimeout to set
-     */
-    public void setSourceTimeout(final int sourceTimeout) {
-        this.sourceTimeout = sourceTimeout;
-    }
-
-    /**
-     * @param sourceRetries the sourceRetries to set
-     */
-    public void setSourceRetries(final int sourceRetries) {
-        this.sourceRetries = sourceRetries;
-    }
-
-    /**
-     * @param name the name to set
-     */
-    public void setName(final String name) {
-        this.name = name;
-    }
-
-    /**
-     * @param description the description to set
-     */
-    public void setDescription(final String description) {
-        this.description = description;
-    }
-
-    /**
-     * @param dataType the dataType to set
-     */
-    public void setDataType(final String dataType) {
-        this.dataType = dataType;
-    }
-
-    /**
-     * @param mode the mode to set
-     */
-    public void setMode(final short mode) {
-        this.mode = mode;
-    }
-
-    @Override
-    public RbacAuthorizationDetails getAuthorizationDetails() {
-        return authorizationDetails;
-    }
-
-    /**
-     * @param authorizationDetails the authorizationDetails to set
-     */
-    public void setAuthorizationDetails(final RbacAuthorizationDetails authorizationDetails) {
-        this.authorizationDetails = authorizationDetails;
-    }
-
-    /**
-     * @return the commandExecutionDetails
-     */
-    @Override
-    public CommandExecutionDetails<T> getCommandExecutionDetails() {
-        return commandExecutionDetails;
-    }
-
-    /**
-     * @param commandExecutionDetails the commandExecutionDetails to set
-     */
-    @Override
-    public void setCommandExecutionDetails(final CommandExecutionDetails<T> commandExecutionDetails) {
-        this.commandExecutionDetails = commandExecutionDetails;
-    }
-
     @Override
     public CommandTagCacheObject<T> clone() throws CloneNotSupportedException {
       @SuppressWarnings("unchecked")
@@ -438,8 +252,8 @@ public final class CommandTagCacheObject<T> implements CommandTag<T>, Cacheable,
 
       clone.commandExecutionDetails = null;
 
-      if (hwAddress != null) {
-        clone.hwAddress = this.hwAddress.clone();
+      if (hardwareAddress != null) {
+        clone.hardwareAddress = this.hardwareAddress.clone();
       }
 
       return clone;

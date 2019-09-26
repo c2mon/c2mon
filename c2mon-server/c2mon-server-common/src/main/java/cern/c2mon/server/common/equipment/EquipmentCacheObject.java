@@ -16,18 +16,23 @@
  *****************************************************************************/
 package cern.c2mon.server.common.equipment;
 
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.LinkedList;
-
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEntity;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
+import java.util.LinkedList;
 
 /**
  * Equipment cache object implementation.
  *
  * @author Mark Brightwell
  */
-public class EquipmentCacheObject extends AbstractEquipmentCacheObject implements Equipment, Cloneable, Serializable {
+@Data
+@EqualsAndHashCode(callSuper = true)
+@NoArgsConstructor
+public class EquipmentCacheObject extends AbstractEquipmentCacheObject implements Equipment, Serializable {
 
     private static final long serialVersionUID = -7917360710791608270L;
 
@@ -41,16 +46,18 @@ public class EquipmentCacheObject extends AbstractEquipmentCacheObject implement
      */
     private Long processId;
 
+    private final SupervisionEntity supervisionEntity = SupervisionEntity.EQUIPMENT;
+
     /**
      * Collection of the subequipments of this equipment. LinkedList since never access elements in the middle, and no
      * resizing is done on adding.
      */
-    private LinkedList<Long> subEquipmentIds = new LinkedList<Long>();
+    private LinkedList<Long> subEquipmentIds = new LinkedList<>();
 
     /**
      * Ids of all command tag attached to this equipment.
      */
-    private LinkedList<Long> commandTagIds = new LinkedList<Long>();
+    private LinkedList<Long> commandTagIds = new LinkedList<>();
 
     /**
      * Clone method that can be used by the server core and other modules to obtain their own copy of the equipment
@@ -66,12 +73,6 @@ public class EquipmentCacheObject extends AbstractEquipmentCacheObject implement
         equipmentCacheObject.subEquipmentIds = (LinkedList<Long>) this.subEquipmentIds.clone();
 
         return equipmentCacheObject;
-    }
-
-    /**
-     * Public constructor.
-     */
-    public EquipmentCacheObject() {
     }
 
     /**
@@ -104,68 +105,6 @@ public class EquipmentCacheObject extends AbstractEquipmentCacheObject implement
         super(pId, pName, pDescription, pHandlerClassName, pStateTagId, pAliveTagId, pAliveInterval, pCommfaultTagId);
         this.address = pEquipmentAddress;
         this.processId = pProcessId;
-    }
-
-    /**
-     * Get the address configuration for the EquipmentMessageHandler to be able to communicate with the equipment.
-     */
-    public String getAddress() {
-        return this.address;
-    }
-
-    /**
-     * Get the identifier of the DAQ process to which the equipment is attached.
-     *
-     * @return the identifier of the DAQ process to which the equipment is attached
-     */
-    @Override
-    public Long getProcessId() {
-        return this.processId;
-    }
-
-    @Override
-    public Collection<Long> getSubEquipmentIds() {
-        return subEquipmentIds;
-    }
-
-    /**
-     * @param address the address to set
-     */
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    /**
-     * @param processId the processId to set
-     */
-    public void setProcessId(Long processId) {
-        this.processId = processId;
-    }
-
-    /**
-     * @param subEquipmentIds the subEquipmentIds to set
-     */
-    public void setSubEquipmentIds(Collection<Long> subEquipmentIds) {
-        this.subEquipmentIds = (LinkedList<Long>) subEquipmentIds;
-    }
-
-    @Override
-    public Collection<Long> getCommandTagIds() {
-        return commandTagIds;
-    }
-
-    /**
-     * Setter methods
-     *
-     * @param commandTagIds the commandTagIds to set
-     */
-    public void setCommandTagIds(final Collection<Long> commandTagIds) {
-        this.commandTagIds = (LinkedList<Long>) commandTagIds;
-    }
-
-    @Override
-    public SupervisionEntity getSupervisionEntity() {
-        return SupervisionEntity.EQUIPMENT;
     }
 
 }

@@ -1,30 +1,32 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.server.common.datatag;
 
 
+import cern.c2mon.server.common.tag.AbstractTagCacheObject;
+import cern.c2mon.shared.common.datatag.DataTagAddress;
+import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
 import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Set;
-
-import cern.c2mon.server.common.tag.AbstractTagCacheObject;
-import cern.c2mon.shared.common.Cacheable;
-import cern.c2mon.shared.common.datatag.DataTagAddress;
-import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 
 
 /**
@@ -39,7 +41,10 @@ import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
  * @author Mark Brightwell
  *
  */
-public class DataTagCacheObject extends AbstractTagCacheObject implements DataTag, Cacheable, Cloneable {
+@Data
+@EqualsAndHashCode(callSuper = true)
+@NoArgsConstructor
+public class DataTagCacheObject extends AbstractTagCacheObject implements DataTag {
 
   /**
    * Version number of the class used during serialization/deserialization. This
@@ -112,15 +117,6 @@ public class DataTagCacheObject extends AbstractTagCacheObject implements DataTa
     setDataTagQuality(new DataTagQualityImpl());
   }
 
-  /**
-   * Default constructor
-   */
-  public DataTagCacheObject() {
-      super();
-  }
-
-
-
   //for testing only so far
   public DataTagCacheObject(final Long id) {
     super(id);
@@ -143,56 +139,6 @@ public class DataTagCacheObject extends AbstractTagCacheObject implements DataTa
   }
 
   /**
-   * Constructor This constructor should only be used to create a "fake"
-   * DataTagCacheObject representing a tag that does not exist within the TIM
-   * system. When a client requests a value for a tag ID that doesn't exist,
-   * such a fake object will be return. The DataTagQuality of this tag will
-   * clearly indicate that the tag is non-existent.
-   *
-   * @param id
-   *          identifier of the non-existing tag.
-   */
-//  public DataTagCacheObject(final Long pId) {
-//    this(
-//      pId,                     // ID
-//      "UNKNOWN",               // name
-//      "UNKNOWN",               // description
-//      "UNKNOWN",               // data type
-//      null,                    // value dictionary
-//      false,                   // control tag
-//      MODE_OPERATIONAL,        // mode
-//      false,                   // logged
-//      "N/A",                   // unit
-//      null,                    // minimum value
-//      null,                    // maximum value
-//      null,                    // address
-//      null,                    // rule text
-//      null,                    // dip address
-//      null,                    // JAPC address
-//      null,                    // value
-//      "N/A",                   // value description
-//      new Timestamp(0),        // timestamp
-//      new Timestamp(0),        // server timestamp
-//      new DataTagQuality(),    // quality
-//      false,                   // simulated flag
-//      null,                    // dependent alarms
-//      null                     // dependent rules
-//    );
-//    invalidate(DataTagQuality.INVALID_TAG,
-//        "Tag identifier not known to the system.",
-//        new Timestamp(System.currentTimeMillis()));
-//  }
-
-
-  /**
-   * TEMPORARY IMPLEMENTATION OF EQUALS (USED IN TESTING ONLY SO FAR)
-   */
-//  @Override
-//  public boolean equals(Object object) {
-//    return ((DataTagCacheObject) object).getValue() == this.getValue();
-//  }
-
-  /**
    * @param serverTimestamp the serverTimestamp to set
    */
   public void setSourceTimestamp(Timestamp serverTimestamp) {
@@ -203,49 +149,8 @@ public class DataTagCacheObject extends AbstractTagCacheObject implements DataTa
     }
   }
 
-  @Override
-  public final Long getEquipmentId() {
-    return this.equipmentId;
-  }
-
-  /**
-   * Set the equipment Id for this DataTag.
-   * @param pEquipmentId
-   */
-  public final void setEquipmentId (final Long pEquipmentId) {
-    this.equipmentId = pEquipmentId;
-  }
-
-  @Override
-  public Long getSubEquipmentId() {
-    return this.subEquipmentId;
-  }
-
-  /**
-   * Set the sub equipment Id for this DataTag.
-   * @param pSubEquipmentId
-   */
-  public final void setSubEquipmentId(final Long pSubEquipmentId) {
-    this.subEquipmentId = pSubEquipmentId;
-  }
-
-  @Override
-  public final Comparable getMinValue() {
-    return this.minValue;
-  }
-
-  @Override
-  public final Comparable getMaxValue() {
-    return this.maxValue;
-  }
-
   public final boolean hasAddress() {
     return this.address != null;
-  }
-
-  @Override
-  public final DataTagAddress getAddress() {
-    return this.address;
   }
 
   @Override
@@ -259,42 +164,6 @@ public class DataTagCacheObject extends AbstractTagCacheObject implements DataTa
     }
   }
 
-  @Override
-  public final Timestamp getSourceTimestamp() {
-    return this.sourceTimestamp;
-  }
-
-  /**
-   * @param minValue the minValue to set
-   */
-  public void setMinValue(Comparable minValue) {
-    this.minValue = minValue;
-  }
-
-
-  /**
-   * @param maxValue the maxValue to set
-   */
-  public void setMaxValue(Comparable maxValue) {
-    this.maxValue = maxValue;
-  }
-
-
-  /**
-   * @param address the address to set
-   */
-  public void setAddress(DataTagAddress address) {
-    this.address = address;
-  }
-
-  /**
-   * @return the daqTimestamp
-   */
-  @Override
-  public Timestamp getDaqTimestamp() {
-    return daqTimestamp;
-  }
-
   /**
    * @param daqTimestamp the daqTimestamp to set
    */
@@ -304,21 +173,6 @@ public class DataTagCacheObject extends AbstractTagCacheObject implements DataTa
     } else {
       this.daqTimestamp.setTime(daqTimestamp.getTime());
     }
-  }
-
-  /**
-   * @return the processId
-   */
-  @Override
-  public Long getProcessId() {
-    return processId;
-  }
-
-  /**
-   * @param processId the processId to set
-   */
-  public void setProcessId(Long processId) {
-    this.processId = processId;
   }
 
   @Override

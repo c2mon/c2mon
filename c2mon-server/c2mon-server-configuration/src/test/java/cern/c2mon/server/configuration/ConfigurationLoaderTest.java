@@ -1134,7 +1134,7 @@ public class ConfigurationLoaderTest {
 
     AlarmCacheObject cacheObject = (AlarmCacheObject) alarmCache.get(300000L);
     AlarmCacheObject expectedObject = new AlarmCacheObject(300000L);
-    expectedObject.setDataTagId(200003L);
+    expectedObject.setTagId(200003L);
     expectedObject.setFaultFamily("fault family");
     expectedObject.setFaultMember("fault member");
     expectedObject.setFaultCode(223);

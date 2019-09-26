@@ -1,10 +1,5 @@
 package cern.c2mon.cache.alarm;
 
-import org.easymock.EasyMock;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.alarm.AlarmService;
 import cern.c2mon.server.common.alarm.Alarm;
@@ -13,6 +8,10 @@ import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
+import org.easymock.EasyMock;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
@@ -40,7 +39,7 @@ public class AlarmServiceTest {
   public void evaluateAlarmWithNullTag() {
     AlarmCacheObject alarm = new AlarmCacheObject(1L);
 //    alarm.setState(AlarmCondition.ACTIVE);
-    alarm.setDataTagId(1L);
+    alarm.setTagId(1L);
 
     DataTagCacheObject tag = new DataTagCacheObject(1L);
     tag.setValue(null);
@@ -59,7 +58,7 @@ public class AlarmServiceTest {
   public void evaluateAlarmWithUninitialisedTag() {
     AlarmCacheObject alarmCacheObject = new AlarmCacheObject(1L);
 //    alarmCacheObject.setState(AlarmCondition.ACTIVE);
-    alarmCacheObject.setDataTagId(1L);
+    alarmCacheObject.setTagId(1L);
 
     DataTagCacheObject tagCacheObject = new DataTagCacheObject(1L);
     DataTagQualityImpl dataTagQuality = new DataTagQualityImpl(TagQualityStatus.UNINITIALISED);

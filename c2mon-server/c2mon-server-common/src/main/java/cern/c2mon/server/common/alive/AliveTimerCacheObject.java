@@ -1,28 +1,31 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.server.common.alive;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import cern.c2mon.shared.common.Cacheable;
-
-public class AliveTimerCacheObject implements AliveTimer, Cacheable, Cloneable {
+@Data
+@NoArgsConstructor
+public class AliveTimerCacheObject implements AliveTimer {
 
     private static final long serialVersionUID = 2151886747282763819L;
 
@@ -98,7 +101,7 @@ public class AliveTimerCacheObject implements AliveTimer, Cacheable, Cloneable {
 
     /**
      * Constructor used in iBatis sqlmap.
-     * 
+     *
      * @param aliveTagId
      * @param relatedId
      * @param relatedName
@@ -116,74 +119,17 @@ public class AliveTimerCacheObject implements AliveTimer, Cacheable, Cloneable {
         this.aliveInterval = aliveInterval;
     }
 
-    // public AliveTimer(final Long pAliveTagId, final Long pRelatedId, final String pRelatedName,
-    // final Long pRelatedStateTagId, final String pAliveType, final int pAliveInterval,
-    // final Collection pRelatedAliveTimerIds) {
-    // this.aliveTagId = pAliveTagId;
-    // this.aliveType = pAliveType;
-    // this.relatedId = pRelatedId;
-    // this.relatedName = pRelatedName;
-    // this.aliveInterval = pAliveInterval * ALIVE_TOLERANCE_FACTOR;
-    // this.relatedStateTagId = pRelatedStateTagId;
-    // this.relatedAliveTimerIds = pRelatedAliveTimerIds;
-    // if (aliveType.equals(AliveTimer.ALIVE_TYPE_PROCESS)) {
-    // this.aliveTypeDescription = AliveTimer.PROCESS_MSG;
-    // } else {
-    // if (aliveType.equals(AliveTimer.ALIVE_TYPE_EQUIPMENT)) {
-    // this.aliveTypeDescription = AliveTimer.EQUIPMENT_MSG;
-    // } else {
-    // this.aliveTypeDescription = AliveTimer.SUBEQUIPMENT_MSG;
-    // }
-    // }
-    //
-    // if (LOG.isDebugEnabled()) {
-    // StringBuffer str = new StringBuffer("AliveTimer() : creating alive for ");
-    // str.append(this.aliveTypeDescription);
-    // str.append(this.relatedName);
-    // str.append(".");
-    // LOG.debug(str);
-    // }
-    // }
-
     @Override
     public AliveTimerCacheObject clone() throws CloneNotSupportedException {
         AliveTimerCacheObject aliveTimer = (AliveTimerCacheObject) super.clone();
         aliveTimer.dependentAliveTimerIds = new ArrayList<Long>(this.dependentAliveTimerIds);
-        
+
         return aliveTimer;
     }
 
     @Override
     public Long getId() {
         return getAliveTagId();
-
-    }
-
-    public synchronized String getAliveType() {
-        return this.aliveType;
-    }
-
-    /**
-     * @return the aliveTypeDescription
-     */
-    @Override
-    public final synchronized String getAliveTypeDescription() {
-        return aliveTypeDescription;
-    }
-
-    @Override
-    public synchronized Long getRelatedId() {
-        return this.relatedId;
-    }
-
-    @Override
-    public synchronized String getRelatedName() {
-        return this.relatedName;
-    }
-
-    @Override
-    public synchronized Long getRelatedStateTagId() {
-        return this.relatedStateTagId;
     }
 
     public synchronized Timestamp getUpdateTimestamp() {
@@ -192,7 +138,7 @@ public class AliveTimerCacheObject implements AliveTimer, Cacheable, Cloneable {
 
     /**
      * Check whether this alive timer is related to a process alive tag.
-     * 
+     *
      * @return true if this alive timer is related to a process alive tag.
      */
     @Override
@@ -202,7 +148,7 @@ public class AliveTimerCacheObject implements AliveTimer, Cacheable, Cloneable {
 
     /**
      * Check whether this alive timer is related to an equipemnt alive tag.
-     * 
+     *
      * @return true if this alive timer is related to an equipemnt alive tag.
      */
     @Override
@@ -212,46 +158,16 @@ public class AliveTimerCacheObject implements AliveTimer, Cacheable, Cloneable {
 
     /**
      * Check whether this alive timer is related to a subequipemnt alive tag.
-     * 
+     *
      * @return true if this alive timer is related to an subequipent alive tag.
      */
     public synchronized boolean isSubEquipmentAliveType() {
         return (getAliveType().equals(AliveTimer.ALIVE_TYPE_SUBEQUIPMENT));
     }
 
-    @Override
-    public synchronized Collection<Long> getDependentAliveTimerIds() {
-        return this.dependentAliveTimerIds;
-    }
-
-    /**
-     * Check whether this alive timer is currently active. An alive timer is considered active it has been started and
-     * has not expired yet.
-     * 
-     * @return true if this alive timer is currently active.
-     */
-    @Override
-    public synchronized boolean isActive() {
-        return this.active;
-    }
-
-    /**
-     * @param aliveTagId the aliveTagId to set
-     */
-    public void setAliveTagId(Long aliveTagId) {
-        this.aliveTagId = aliveTagId;
-    }
-
-    /**
-     * @param aliveInterval the aliveInterval to set
-     */
-    public void setAliveInterval(Integer aliveInterval) {
-        this.aliveInterval = aliveInterval;
-    }
-
     /**
      * Sets the aliveType and accordingly the alive type description field.
-     * 
+     *
      * @param aliveType the aliveType to set
      */
     public void setAliveType(String aliveType) {
@@ -265,73 +181,6 @@ public class AliveTimerCacheObject implements AliveTimer, Cacheable, Cloneable {
                 this.aliveTypeDescription = AliveTimer.SUBEQUIPMENT_MSG;
             }
         }
-    }
-
-    /**
-     * @param aliveTypeDescription the aliveTypeDescription to set
-     */
-    public void setAliveTypeDescription(String aliveTypeDescription) {
-        this.aliveTypeDescription = aliveTypeDescription;
-    }
-
-    /**
-     * @param relatedId the relatedId to set
-     */
-    public void setRelatedId(Long relatedId) {
-        this.relatedId = relatedId;
-    }
-
-    /**
-     * @param relatedName the relatedName to set
-     */
-    public void setRelatedName(String relatedName) {
-        this.relatedName = relatedName;
-    }
-
-    /**
-     * @param relatedStateTagId the relatedStateTagId to set
-     */
-    public void setRelatedStateTagId(Long relatedStateTagId) {
-        this.relatedStateTagId = relatedStateTagId;
-    }
-
-    /**
-     * @param lastUpdate the lastUpdate to set
-     */
-    @Override
-    public void setLastUpdate(long lastUpdate) {
-        this.lastUpdate = lastUpdate;
-    }
-
-    /**
-     * @param active the active to set
-     */
-    @Override
-    public void setActive(boolean active) {
-        this.active = active;
-    }
-
-    /**
-     * @return the aliveInterval
-     */
-    @Override
-    public synchronized Integer getAliveInterval() {
-        return aliveInterval;
-    }
-
-    /**
-     * @return the aliveTagId
-     */
-    public synchronized Long getAliveTagId() {
-        return aliveTagId;
-    }
-
-    /**
-     * @return the lastUpdate
-     */
-    @Override
-    public synchronized long getLastUpdate() {
-        return lastUpdate;
     }
 
     /**

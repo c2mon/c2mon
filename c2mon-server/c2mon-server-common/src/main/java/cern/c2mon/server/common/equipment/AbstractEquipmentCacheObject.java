@@ -1,29 +1,35 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.server.common.equipment;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
 /**
  * Abstract class representing an equipment to be monitored. It contains all the common fields for the
  * SubEquipmentCacheObject and EquipmentCacheObject classes.
- * 
+ *
  * @author Mark Brightwell
  */
-public abstract class AbstractEquipmentCacheObject extends AbstractSupervisedCacheObject implements AbstractEquipment,
-        Cloneable {
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public abstract class AbstractEquipmentCacheObject extends AbstractSupervisedCacheObject implements AbstractEquipment {
 
     private static final long serialVersionUID = -5739956036131280454L;
 
@@ -48,12 +54,9 @@ public abstract class AbstractEquipmentCacheObject extends AbstractSupervisedCac
      */
     private static final Boolean COMM_FAULT_TAG_VALUE = Boolean.FALSE;
 
-    protected AbstractEquipmentCacheObject() {
-    }
-
     /**
      * Constructor. Used during runtime (re-)configuration.
-     * 
+     *
      * @param id the unique id of the equipment
      */
     protected AbstractEquipmentCacheObject(final Long id) {
@@ -63,7 +66,7 @@ public abstract class AbstractEquipmentCacheObject extends AbstractSupervisedCac
     /**
      * Constructor setting the minimal set of fields that can be expected to be non-null for all (sub-)equipment cache
      * objects circulating in the server. Is used to construct fake cache objects.
-     * 
+     *
      * @param id id
      * @param name name
      * @param handlerClass class name
@@ -77,7 +80,7 @@ public abstract class AbstractEquipmentCacheObject extends AbstractSupervisedCac
 
     /**
      * Creates a MonitoringEquipment object containing the provided information
-     * 
+     *
      * @param pId Identifier of the equipment
      * @param pName Name of the equipment
      * @param pDescription Description of the equipment
@@ -104,63 +107,14 @@ public abstract class AbstractEquipmentCacheObject extends AbstractSupervisedCac
         return (AbstractEquipmentCacheObject) super.clone();
     }
 
-    /**
-     * Get the free-text description of the equipment.
-     * 
-     * @return a free-text description of the equipment
-     */
-    public String getDescription() {
-        return this.description;
-    }
-
-    /**
-     * Get the fully qualified name of the EquipmentMessageHandler subclass used to connect to the equipment by the DAQ
-     * process.
-     * 
-     * @return the fully qualified class name of the EquipmentMessageHandler subclass used to communicate with the
-     *         equipment
-     */
-    public String getHandlerClassName() {
-        return this.handlerClassName;
-    }
-
-    /**
-     * Get the identifier of the equipment's communication fault tag.
-     * 
-     * @return the identifier of the equipment's communication fault tag
-     */
-    public Long getCommFaultTagId() {
-        return this.commFaultTagId;
-    }
 
     /**
      * Get the value of the equipment's communication fault tag that will be interpreted as a communication fault.
-     * 
+     *
      * @return the "bad" value of the equipment's communication fault tag
      */
     public Boolean getCommFaultTagValue() {
         return COMM_FAULT_TAG_VALUE;
-    }
-
-    /**
-     * @param description the description to set
-     */
-    public final void setDescription(String description) {
-        this.description = description;
-    }
-
-    /**
-     * @param handlerClassName the handlerClassName to set
-     */
-    public final void setHandlerClassName(String handlerClassName) {
-        this.handlerClassName = handlerClassName;
-    }
-
-    /**
-     * @param commFaultTagId the commFaultTagId to set
-     */
-    public final void setCommFaultTagId(Long commFaultTagId) {
-        this.commFaultTagId = commFaultTagId;
     }
 
 }

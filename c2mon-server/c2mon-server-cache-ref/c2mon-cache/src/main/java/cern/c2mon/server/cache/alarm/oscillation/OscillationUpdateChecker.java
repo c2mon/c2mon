@@ -19,10 +19,10 @@ package cern.c2mon.server.cache.alarm.oscillation;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.cache.api.spi.C2monAlarmCacheQueryProvider;
-import cern.c2mon.server.common.alarm.AlarmServiceTimestamp;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.AlarmCacheUpdater;
+import cern.c2mon.server.common.alarm.AlarmServiceTimestamp;
 import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.tag.Tag;
@@ -205,11 +205,11 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
       if (!oscillationUpdater.checkOscillAlive(alarm)) {
           log.trace(" -> ! Alarm #{} is not oscillating anymore, resetting oscillation counter", alarmId);
           oscillationUpdater.resetOscillationCounter(alarm);
-          Tag tag = dataTagCacheRef.get(alarm.getDataTagId());
+          Tag tag = dataTagCacheRef.get(alarm.getTagId());
           if(tag != null) {
             alarmCacheUpdater.resetOscillationStatus(alarm, tag);
           } else {
-              log.error("Cannot locate data tag #{} - unable to reset oscillation status", alarm.getDataTagId());
+              log.error("Cannot locate data tag #{} - unable to reset oscillation status", alarm.getTagId());
           }
       } else {
           log.trace(" -> (!) Alarm #{} is still oscillating - no change", alarmId);

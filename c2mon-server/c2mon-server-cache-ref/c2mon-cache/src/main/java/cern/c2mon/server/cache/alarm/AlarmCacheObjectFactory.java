@@ -1,18 +1,16 @@
 package cern.c2mon.server.cache.alarm;
 
-import java.sql.Timestamp;
-import java.util.Properties;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import cern.c2mon.cache.api.factory.AbstractCacheObjectFactory;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.AlarmCondition;
-import cern.c2mon.server.common.metadata.Metadata;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.daq.config.Change;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.sql.Timestamp;
+import java.util.Properties;
 
 import static cern.c2mon.server.cache.alarm.AlarmProperties.MAX_FAULT_FAMILY_LENGTH;
 import static cern.c2mon.server.cache.alarm.AlarmProperties.MAX_FAULT_MEMBER_LENGTH;
@@ -87,7 +85,7 @@ public class AlarmCacheObjectFactory extends AbstractCacheObjectFactory<Alarm> {
     AlarmCacheObject alarmCacheObject = (AlarmCacheObject) alarm;
     String tmpStr = null;
     if ((tmpStr = alarmProperties.getProperty("dataTagId")) != null) {
-      alarmCacheObject.setDataTagId(parseLong(tmpStr,"dataTagId"));
+      alarmCacheObject.setTagId(parseLong(tmpStr,"dataTagId"));
     }
     if (alarmProperties.getProperty("faultFamily") != null) {
       alarmCacheObject.setFaultFamily(alarmProperties.getProperty("faultFamily"));

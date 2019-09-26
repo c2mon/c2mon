@@ -18,8 +18,6 @@ package cern.c2mon.server.common.equipment;
 
 import java.util.Collection;
 
-import cern.c2mon.shared.common.Cacheable;
-
 /**
  * Interface to Equipment objects residing in cache. The methods exposed
  * here are thread safe and can be used on objects residing in the cache.
@@ -30,7 +28,7 @@ import cern.c2mon.shared.common.Cacheable;
  * @author Mark Brightwell
  *
  */
-public interface Equipment extends AbstractEquipment, Cacheable {
+public interface Equipment extends AbstractEquipment {
 
   /**
    * Returns the live list of SubEquipment ids attached to this
