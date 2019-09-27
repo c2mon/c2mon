@@ -5,9 +5,11 @@ import cern.c2mon.cache.api.listener.CacheListener;
 import cern.c2mon.cache.api.listener.CacheSupervisionListener;
 import cern.c2mon.cache.api.listener.Listener;
 import cern.c2mon.cache.api.loader.CacheLoader;
+import cern.c2mon.cache.api.spi.CacheQuery;
 import cern.c2mon.cache.api.transactions.TransactionalCallable;
 import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.shared.common.Cacheable;
+import java.util.Collection;
 import lombok.experimental.Delegate;
 
 import javax.annotation.PostConstruct;
@@ -31,6 +33,7 @@ public interface C2monCache<V extends Cacheable> extends Cache<Long, V>, Seriali
 
   Set<Long> getKeys();
 
+// TOOO Remove this useless annotation and test system
   @PostConstruct
   void init();
 
@@ -42,13 +45,17 @@ public interface C2monCache<V extends Cacheable> extends Cache<Long, V>, Seriali
     put(key, value);
   }
 
-  Listener<V> getListenerService();
-
   // TODO Document this to show it should be default behavior
   default void putAndNotify(Long key, V value) {
     put(key, value);
     notifyListenersOfUpdate(value);
   }
+
+  Collection<V> query(CacheQuery<V> providedQuery);
+
+//  === Listeners ===
+
+  Listener<V> getListenerService();
 
   @Override
   default void notifyListenersOfUpdate(V cacheable) {

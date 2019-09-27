@@ -53,6 +53,8 @@ public class AlarmService implements AlarmAggregator, CacheSupervisionListener<T
     this.tagCacheRef = tagCacheRef;
     this.alarmCacheUpdater = alarmCacheUpdater;
     this.cacheRegistrationService = cacheRegistrationService;
+
+    alarmCacheRef.query(obj -> obj.isOscillating() && obj.isActive());
   }
 
   @PostConstruct

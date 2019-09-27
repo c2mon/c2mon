@@ -4,8 +4,10 @@ import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.listener.Listener;
 import cern.c2mon.cache.api.listener.ListenerService;
 import cern.c2mon.cache.api.loader.CacheLoader;
+import cern.c2mon.cache.api.spi.CacheQuery;
 import cern.c2mon.cache.api.transactions.TransactionalCallable;
 import cern.c2mon.shared.common.Cacheable;
+import javax.cache.Cache;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -67,6 +69,12 @@ public class IgniteC2monCache<V extends Cacheable> implements C2monCache<V> {
 
   public <T, R> QueryCursor<R> query(Query<T> query, IgniteClosure<T, R> closure) {
     return cache.query(query, closure);
+  }
+
+  @Override
+  public Collection<V> query(CacheQuery<V> providedQuery) {
+    return cache.query(new ScanQuery<>(new IgniteC2monBiPredicate<>(providedQuery)),
+        Entry::getValue).getAll();
   }
 
   @Override
