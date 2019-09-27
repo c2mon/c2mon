@@ -29,6 +29,14 @@ import java.util.List;
 @Service
 public class AlarmService implements AlarmAggregator, CacheSupervisionListener<Tag>, CacheListener<Tag> {
 
+  /**
+   * We decided to distribute all alarms on the same topic in order to reduce
+   * the number of topics for SonicMQ, the client has to make the decision if
+   * the received alarm is useful for it, otherwise it will discard the alarm
+   * @see AlarmService#getTopicForAlarm(Alarm)
+   */
+  public static final String ALARM_TOPIC = "tim.alarm";
+
   private C2monCache<Alarm> alarmCacheRef;
 
   private TagCacheFacade tagCacheRef;
@@ -109,19 +117,7 @@ public class AlarmService implements AlarmAggregator, CacheSupervisionListener<T
    * @return a valid JMS topic name for the alarm
    */
   public String getTopicForAlarm(final Alarm alarm) {
-
-    /*
-     * StringBuffer str = new StringBuffer("tim.alarm.");
-     * str.append(pFaultFamily); str.append("."); str.append(pFaultMember);
-     * str.append("."); str.append(pFaultCode); String topic = str.toString();
-     * topic = topic.replace('$', 'X'); topic = topic.replace('*', 'X'); topic =
-     * topic.replace('#', 'X'); return topic;
-     */
-
-    // we decided to distribute all alarms on the same topic in order to reduce
-    // the number of topics for SonicMQ, the client has to make the decision if
-    // the received alarm is useful for it, otherwise it will discard the alarm
-    return "tim.alarm";
+    return ALARM_TOPIC;
   }
 
 
