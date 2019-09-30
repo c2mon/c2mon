@@ -7,17 +7,13 @@ import cern.c2mon.cache.api.loader.CacheLoader;
 import cern.c2mon.cache.api.spi.CacheQuery;
 import cern.c2mon.cache.api.transactions.TransactionalCallable;
 import cern.c2mon.shared.common.Cacheable;
-import javax.cache.Cache;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ignite.Ignite;
 import org.apache.ignite.IgniteCache;
-import org.apache.ignite.cache.query.Query;
-import org.apache.ignite.cache.query.QueryCursor;
 import org.apache.ignite.cache.query.ScanQuery;
 import org.apache.ignite.configuration.CacheConfiguration;
-import org.apache.ignite.lang.IgniteClosure;
 import org.apache.ignite.transactions.Transaction;
 import org.apache.ignite.transactions.TransactionDeadlockException;
 import org.apache.ignite.transactions.TransactionTimeoutException;
@@ -32,6 +28,8 @@ import javax.cache.processor.EntryProcessor;
 import javax.cache.processor.EntryProcessorException;
 import javax.cache.processor.EntryProcessorResult;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class IgniteC2monCache<V extends Cacheable> implements C2monCache<V> {
@@ -67,14 +65,17 @@ public class IgniteC2monCache<V extends Cacheable> implements C2monCache<V> {
     }
   }
 
-  public <T, R> QueryCursor<R> query(Query<T> query, IgniteClosure<T, R> closure) {
-    return cache.query(query, closure);
+  @Override
+  public Collection<V> query(CacheQuery<V> providedQuery) {
+    return cache.query(new ScanQuery<>(new IgniteC2monPredicateWrapper<>(providedQuery)), Entry::getValue)
+      .getAll().stream().limit(providedQuery.maxResults()).collect(Collectors.toList());
   }
 
   @Override
-  public Collection<V> query(CacheQuery<V> providedQuery) {
-    return cache.query(new ScanQuery<>(new IgniteC2monBiPredicate<>(providedQuery)),
-        Entry::getValue).getAll();
+  public Collection<V> query(Function<V, Boolean> filter) {
+    return cache.query(new ScanQuery<>(new IgniteC2monPredicateWrapper<>(filter)), Entry::getValue)
+//      TODO StreamSupport this into a stream, then apply limit
+      .getAll().stream().limit(CacheQuery.DEFAULT_MAX_RESULTS).collect(Collectors.toList());
   }
 
   @Override

@@ -1,15 +1,12 @@
 package cern.c2mon.cache.api.impl;
 
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.cache.api.listener.BufferedCacheListener;
-import cern.c2mon.cache.api.listener.CacheListener;
-import cern.c2mon.cache.api.listener.CacheSupervisionListener;
 import cern.c2mon.cache.api.listener.Listener;
 import cern.c2mon.cache.api.loader.CacheLoader;
+import cern.c2mon.cache.api.spi.CacheQuery;
 import cern.c2mon.cache.api.transactions.TransactionalCallable;
-import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.shared.common.Cacheable;
-import org.springframework.context.event.ContextRefreshedEvent;
+import lombok.NonNull;
 
 import javax.cache.CacheManager;
 import javax.cache.configuration.CacheEntryListenerConfiguration;
@@ -21,6 +18,7 @@ import javax.cache.processor.EntryProcessorResult;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.Function;
 
 /**
  * Class used only for testing, as a simple implementation of C2monCache
@@ -217,6 +215,16 @@ public class SimpleC2monCache<V extends Cacheable> implements C2monCache<V> {
   @Override
   public void executeTransaction(Runnable callable) {
     callable.run();
+  }
+
+  @Override
+  public Collection<V> query(@NonNull Function<V, Boolean> filter) {
+    return null;
+  }
+
+  @Override
+  public Collection<V> query(@NonNull CacheQuery<V> providedQuery) {
+    return null;
   }
 
   @Override

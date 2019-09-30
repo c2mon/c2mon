@@ -9,14 +9,15 @@ import cern.c2mon.cache.api.spi.CacheQuery;
 import cern.c2mon.cache.api.transactions.TransactionalCallable;
 import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.shared.common.Cacheable;
-import java.util.Collection;
-import lombok.experimental.Delegate;
+import lombok.NonNull;
 
 import javax.annotation.PostConstruct;
 import javax.cache.Cache;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 
 
 /**
@@ -33,7 +34,7 @@ public interface C2monCache<V extends Cacheable> extends Cache<Long, V>, Seriali
 
   Set<Long> getKeys();
 
-// TOOO Remove this useless annotation and test system
+  // TOOO Remove this useless annotation and test system
   @PostConstruct
   void init();
 
@@ -51,7 +52,39 @@ public interface C2monCache<V extends Cacheable> extends Cache<Long, V>, Seriali
     notifyListenersOfUpdate(value);
   }
 
-  Collection<V> query(CacheQuery<V> providedQuery);
+  /**
+   * Search the cache for objects that satisfy the given filter. More formally, the returned collection
+   * will contain all cache objects for which:
+   * <pre>
+   * filter(cacheObject) == true
+   * </pre>
+   *
+   * Important bits:
+   * <ul>
+   *   <li>To get all the cache objects, you can simply do {@code query(i -> true)}
+   *   <li>Results are capped to {@link CacheQuery#DEFAULT_MAX_RESULTS}. Want more?
+   *       Use the overloaded {@link C2monCache#query(CacheQuery)}
+   *   <li>This method makes no guarantees of thread safety. That is up to the cache implementation!
+   *   <li>C2mon uses a lot of wildcard matching. Make sure to use {@code String#matches},
+   *       or {@code String#startsWith} not {@code String#equals}!
+   * </ul>
+   *
+   *
+   * Important:
+   *
+   * @param filter must not be null, the function to filter elements by
+   * @return a {@code Collection} of results, may be empty, never null
+   */
+  Collection<V> query(@NonNull Function<V, Boolean> filter);
+
+  /**
+   * Overload of {@link C2monCache#query(Function)} allowing the user to provide additional search parameters
+   *
+   * @param providedQuery
+   * @return a {@code Collection} of results, may be empty, never null
+   * @see C2monCache#query(Function)
+   */
+  Collection<V> query(@NonNull CacheQuery<V> providedQuery);
 
 //  === Listeners ===
 

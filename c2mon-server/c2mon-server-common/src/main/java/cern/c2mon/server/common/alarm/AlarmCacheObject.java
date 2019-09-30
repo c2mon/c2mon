@@ -77,7 +77,7 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
    * type String, Numeric and Boolean. Not every Alarm needs to have a meta
    * data. Also the meta data don't have to be every time the same.
    */
-  private Metadata metadata;
+  private Metadata metadata = new Metadata();
 
   /**
    * <code>true</code>, if the alarm state is active as published to listeners
@@ -171,16 +171,6 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
       this.metadata = new Metadata();
     }
     return this.metadata;
-  }
-
-  /**
-   * Getter method.
-   *
-   * @return the unique identifier of the DataTag to which the alarm is attached
-   */
-  @Override
-  public final Long getTagId() {
-    return this.dataTagId;
   }
 
   @Override

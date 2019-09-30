@@ -9,11 +9,12 @@ import cern.c2mon.server.common.alarm.TagWithAlarmsImpl;
 import cern.c2mon.server.common.tag.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class IgniteC2monTagCacheQueryProvider extends IgniteCacheQueryProvider implements C2monTagCacheQueryProvider {
+public class IgniteC2monTagCacheQueryProvider implements C2monTagCacheQueryProvider {
 
   private final IgniteC2monCache<Alarm> alarmCache;
   private final IgniteC2monCache<Tag> tagCache;
@@ -42,21 +43,21 @@ public class IgniteC2monTagCacheQueryProvider extends IgniteCacheQueryProvider i
   @Override
   public List<Alarm> getAlarms(Tag tag) {
 //    TODO Check what happens if tag id is modified on the fly?
-    return filter(alarmCache, (aLong, alarm) -> alarm.getDataTagId().equals(tag.getId()));
+    return new ArrayList<>(alarmCache.query(alarm -> alarm.getDataTagId().equals(tag.getId())));
   }
 
   @Override
   public Tag get(String name) {
-    return filter(tagCache, (aLong, tag) -> tag.getName().equals(name)).stream().findFirst().orElse(null);
+    return tagCache.query(tag -> tag.getName().equals(name)).stream().findFirst().orElse(null);
   }
 
   @Override
   public Boolean isInTagCache(String name) {
-    return !filter(tagCache, (aLong, tag) -> tag.getName().equals(name)).isEmpty();
+    return tagCache.query(tag -> tag.getName().equals(name)).isEmpty();
   }
 
   @Override
   public Collection<Tag> findByNameWildcard(String regex) {
-    return filter(tagCache, (aLong, tag) -> tag.getName().matches(regex));
+    return tagCache.query(tag -> tag.getName().matches(regex));
   }
 }
