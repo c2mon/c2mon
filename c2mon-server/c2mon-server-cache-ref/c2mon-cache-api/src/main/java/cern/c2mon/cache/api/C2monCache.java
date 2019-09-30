@@ -69,9 +69,6 @@ public interface C2monCache<V extends Cacheable> extends Cache<Long, V>, Seriali
    *       or {@code String#startsWith} not {@code String#equals}!
    * </ul>
    *
-   *
-   * Important:
-   *
    * @param filter must not be null, the function to filter elements by
    * @return a {@code Collection} of results, may be empty, never null
    */

@@ -81,7 +81,7 @@ public enum CacheName {
   /**
    * Alarm timestamp cache - currently testing
    */
-  ALARM_TIMESTAMP(Names.ALARM_TIMESTAMP);
+  ALARM_OSCILLATION(Names.ALARM_OSCILLATION);
 
   @Getter
   private final String label;
@@ -104,6 +104,6 @@ public enum CacheName {
     public static final String RULETAG = "ruleTagCacheRef";
     public static final String SUBEQUIPMENT = "subEquipmentCacheRef";
     public static final String TAG= "tagCacheRef"; // ATTENTION: Not a real cache!
-    public static final String ALARM_TIMESTAMP = "timestampCacheRef";
+    public static final String ALARM_OSCILLATION = "oscillationCacheRef";
   }
 }

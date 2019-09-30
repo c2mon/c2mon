@@ -14,9 +14,8 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.cache.alarm.oscillation;
+package cern.c2mon.server.cache.oscillation;
 
-import cern.c2mon.server.cache.alarm.OscillationProperties;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;

@@ -14,15 +14,14 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.cache.alarm.oscillation;
+package cern.c2mon.server.cache.oscillation;
 
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
-import cern.c2mon.cache.api.spi.C2monAlarmCacheQueryProvider;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.AlarmCacheUpdater;
-import cern.c2mon.server.common.alarm.AlarmServiceTimestamp;
+import cern.c2mon.server.common.alarm.OscillationTimestamp;
 import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.tag.Tag;
@@ -33,8 +32,8 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -88,9 +87,9 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
 
   private final C2monCache<Alarm> alarmCacheRef;
 
-  private final C2monCache<AlarmServiceTimestamp> timestampCacheRef;
+  private final C2monCache<OscillationTimestamp> timestampCacheRef;
 
-  private final C2monAlarmCacheQueryProvider alarmCacheQueryProvider;
+  private final OscillationService oscillationCheckService;
 
   private final OscillationUpdater oscillationUpdater;
 
@@ -103,8 +102,8 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
    *  @param alarmCacheRef
    *          the alarm cache to retrieve and update alarm cache objects.
    * @param timestampCacheRef
-   * @param alarmCacheQueryProvider
-   *          the query provider on the alarm cache to query for oscillation
+   * @param oscillationCheckService
+   *          the component that manages the oscillation check timer
    * @param oscillationUpdater
  *          the instance that check oscillation statuses.
    * @param alarmCacheUpdater
@@ -112,13 +111,13 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
 *          the data tag cache to retrieve data tag objects and check their original values.
    */
   @Autowired
-  public OscillationUpdateChecker(final C2monCache<Alarm> alarmCacheRef, C2monCache<AlarmServiceTimestamp> timestampCacheRef, final C2monAlarmCacheQueryProvider alarmCacheQueryProvider,
+  public OscillationUpdateChecker(final C2monCache<Alarm> alarmCacheRef, C2monCache<OscillationTimestamp> timestampCacheRef, final OscillationService oscillationCheckService,
                                   final OscillationUpdater oscillationUpdater, final AlarmCacheUpdater alarmCacheUpdater,
                                   final C2monCache<DataTag> dataTagCacheRef) {
     super();
     this.alarmCacheRef = alarmCacheRef;
     this.timestampCacheRef = timestampCacheRef;
-    this.alarmCacheQueryProvider = alarmCacheQueryProvider;
+    this.oscillationCheckService = oscillationCheckService;
     this.oscillationUpdater = oscillationUpdater;
     this.alarmCacheUpdater = alarmCacheUpdater;
     this.dataTagCacheRef = dataTagCacheRef;
@@ -132,7 +131,7 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
   public void init(ContextRefreshedEvent event) {
     log.trace("Initialising Alarm oscillation checker ...");
     timestampCacheRef.executeTransaction( () -> {
-      alarmCacheQueryProvider.setLastOscillationCheck(0);
+      oscillationCheckService.setLastOscillationCheck(0);
     });
     log.trace("Initialisation complete.");
   }
@@ -167,13 +166,13 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
   @Override
   public void run() {
     alarmCacheRef.executeTransaction( () -> {
-      long lastCheck = alarmCacheQueryProvider.getLastOscillationCheck();
+      long lastCheck = oscillationCheckService.getLastOscillationCheck();
       if (System.currentTimeMillis() - lastCheck < SCAN_INTERVAL - 500L) {
         log.debug("Skipping alarm oscillation check as already performed.");
       } else {
         log.debug("checking alarm oscillation timers ... ");
         try {
-          List<AlarmCacheObject> oscillatingAlarms = alarmCacheQueryProvider.getOscillatingAlarms();
+          Collection<Alarm> oscillatingAlarms = alarmCacheRef.query(Alarm::isOscillating);
 
           if (oscillatingAlarms.isEmpty()) {
             log.debug("Currently no oscillating alarms");
@@ -185,7 +184,7 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
           log.error("Unexpected exception when checking the Alarm oscillation timers", e);
         }
 
-        alarmCacheQueryProvider.setLastOscillationCheck(System.currentTimeMillis());
+        oscillationCheckService.setLastOscillationCheck(System.currentTimeMillis());
 
         log.debug("finished checking alarm oscillation timers");
       } // end of else block
@@ -193,23 +192,24 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
     });
   }
 
-  private void updateAlarmOscillationFlag(AlarmCacheObject alarm) {
-    long alarmId = alarm.getId();
+  private void updateAlarmOscillationFlag(Alarm alarm) {
+    AlarmCacheObject alarmCacheObject = (AlarmCacheObject) alarm;
+    long alarmId = alarmCacheObject.getId();
     try {
       log.trace("Checking oscillation expiry for alarm #{}", alarmId);
       if(log.isTraceEnabled()) {
-                log.trace(" -> Alarm oscillation details osc {} first osc {} count {} al ts {}", alarm.isOscillating(),
-                        new Date(alarm.getFirstOscTS()).toString(), alarm.getCounterFault(),
-                        alarm.getTimestamp().toString());
+                log.trace(" -> Alarm oscillation details osc {} first osc {} count {} al ts {}", alarmCacheObject.isOscillating(),
+                        new Date(alarmCacheObject.getFirstOscTS()).toString(), alarmCacheObject.getCounterFault(),
+                        alarmCacheObject.getTimestamp().toString());
             }
-      if (!oscillationUpdater.checkOscillAlive(alarm)) {
+      if (!oscillationUpdater.checkOscillAlive(alarmCacheObject)) {
           log.trace(" -> ! Alarm #{} is not oscillating anymore, resetting oscillation counter", alarmId);
-          oscillationUpdater.resetOscillationCounter(alarm);
-          Tag tag = dataTagCacheRef.get(alarm.getDataTagId());
+          oscillationUpdater.resetOscillationCounter(alarmCacheObject);
+          Tag tag = dataTagCacheRef.get(alarmCacheObject.getDataTagId());
           if(tag != null) {
-            alarmCacheUpdater.resetOscillationStatus(alarm, tag);
+            alarmCacheUpdater.resetOscillationStatus(alarmCacheObject, tag);
           } else {
-              log.error("Cannot locate data tag #{} - unable to reset oscillation status", alarm.getDataTagId());
+              log.error("Cannot locate data tag #{} - unable to reset oscillation status", alarmCacheObject.getDataTagId());
           }
       } else {
           log.trace(" -> (!) Alarm #{} is still oscillating - no change", alarmId);

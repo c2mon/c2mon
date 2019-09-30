@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.alarm;
 
+import cern.c2mon.server.cache.oscillation.OscillationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
