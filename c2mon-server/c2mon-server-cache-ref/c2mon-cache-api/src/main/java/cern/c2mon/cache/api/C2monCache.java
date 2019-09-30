@@ -1,23 +1,18 @@
 package cern.c2mon.cache.api;
 
-import cern.c2mon.cache.api.listener.BufferedCacheListener;
-import cern.c2mon.cache.api.listener.CacheListener;
-import cern.c2mon.cache.api.listener.CacheSupervisionListener;
-import cern.c2mon.cache.api.listener.Listener;
+import cern.c2mon.cache.api.listener.ListenerDelegator;
 import cern.c2mon.cache.api.loader.CacheLoader;
 import cern.c2mon.cache.api.spi.CacheQuery;
 import cern.c2mon.cache.api.transactions.TransactionalCallable;
-import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.shared.common.Cacheable;
 import lombok.NonNull;
 
-import javax.annotation.PostConstruct;
-import javax.cache.Cache;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 
 /**
@@ -26,21 +21,43 @@ import java.util.function.Function;
  * @author Alexandros Papageorgiou Koufidis
  * @author Brice Copy
  */
-public interface C2monCache<V extends Cacheable> extends Cache<Long, V>, Serializable, Listener<V> {
+public interface C2monCache<V extends Cacheable> extends CacheDelegator<V>, Serializable, ListenerDelegator<V> {
 
   CacheLoader getCacheLoader();
 
   void setCacheLoader(CacheLoader<V> cacheLoader);
 
-  Set<Long> getKeys();
+  /**
+   * Default implementation for a simple getKeys function. Caches may choose to implement a version of this with
+   * better performance
+   *
+   * WILL limit the result sets to {@link CacheQuery#DEFAULT_MAX_RESULTS} results. If you would like to go over
+   * that limit, build a custom implementation like so:
+   * <pre>
+   * query(new CacheQuery<V>(i -> true).maxResults(MY_LIMIT)).stream().map(Cacheable::getId).collect(Collectors.toSet());
+   * </pre>
+   *
+   * @return a {@code Set} of the keys contained in the Cache
+   */
+  default Set<Long> getKeys() {
+    return query(i -> true).stream().map(Cacheable::getId).collect(Collectors.toSet());
+  }
 
-  // TOOO Remove this useless annotation and test system
-  @PostConstruct
   void init();
 
   <T> Optional<T> executeTransaction(TransactionalCallable<T> callable);
 
-  void executeTransaction(Runnable callable);
+  /**
+   * Alternative to {@link C2monCache#executeTransaction(TransactionalCallable)} when you don't need the result
+   *
+   * @param runnable the {@code Runnable} you want to run
+   */
+  default void executeTransaction(Runnable runnable) {
+    executeTransaction(() -> {
+      runnable.run();
+      return 1;
+    });
+  }
 
   default void putQuiet(Long key, V value) {
     put(key, value);
@@ -58,7 +75,7 @@ public interface C2monCache<V extends Cacheable> extends Cache<Long, V>, Seriali
    * <pre>
    * filter(cacheObject) == true
    * </pre>
-   *
+   * <p>
    * Important bits:
    * <ul>
    *   <li>To get all the cache objects, you can simply do {@code query(i -> true)}
@@ -82,53 +99,4 @@ public interface C2monCache<V extends Cacheable> extends Cache<Long, V>, Seriali
    * @see C2monCache#query(Function)
    */
   Collection<V> query(@NonNull CacheQuery<V> providedQuery);
-
-//  === Listeners ===
-
-  Listener<V> getListenerService();
-
-  @Override
-  default void notifyListenersOfUpdate(V cacheable) {
-    getListenerService().notifyListenersOfUpdate(cacheable);
-  }
-
-  @Override
-  default void notifyListenersOfSupervisionChange(V tag) {
-    getListenerService().notifyListenersOfSupervisionChange(tag);
-  }
-
-  @Override
-  default void notifyListenerStatusConfirmation(V cacheable, long timestamp) {
-    getListenerService().notifyListenerStatusConfirmation(cacheable, timestamp);
-  }
-
-  @Override
-  default void registerSynchronousListener(CacheListener<? super V> cacheListener) {
-    getListenerService().registerSynchronousListener(cacheListener);
-  }
-
-  @Override
-  default Lifecycle registerListener(CacheListener<? super V> cacheListener) {
-    return getListenerService().registerListener(cacheListener);
-  }
-
-  @Override
-  default void registerListenerWithSupervision(CacheSupervisionListener<? super V> cacheSupervisionListener) {
-    getListenerService().registerListenerWithSupervision(cacheSupervisionListener);
-  }
-
-  @Override
-  default Lifecycle registerThreadedListener(CacheListener<? super V> cacheListener, int queueCapacity, int threadPoolSize) {
-    return getListenerService().registerThreadedListener(cacheListener, queueCapacity, threadPoolSize);
-  }
-
-  @Override
-  default Lifecycle registerBufferedListener(BufferedCacheListener<Cacheable> bufferedCacheListener, int frequency) {
-    return getListenerService().registerBufferedListener(bufferedCacheListener, frequency);
-  }
-
-  @Override
-  default Lifecycle registerKeyBufferedListener(BufferedCacheListener<Long> bufferedCacheListener, int frequency) {
-    return getListenerService().registerKeyBufferedListener(bufferedCacheListener, frequency);
-  }
 }

@@ -1,21 +1,19 @@
 package cern.c2mon.cache.api.listener;
 
-import java.util.List;
-import java.util.concurrent.LinkedBlockingDeque;
-
-import lombok.extern.slf4j.Slf4j;
-
 import cern.c2mon.cache.api.listener.impl.BufferedKeyCacheListener;
 import cern.c2mon.cache.api.listener.impl.DefaultBufferedCacheListener;
 import cern.c2mon.cache.api.listener.impl.MultiThreadedCacheListener;
 import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.shared.common.Cacheable;
+import lombok.extern.slf4j.Slf4j;
+
+import java.util.concurrent.LinkedBlockingDeque;
 
 /**
  * @author Szymon Halastra
  */
 @Slf4j
-public class ListenerService<K, V extends Cacheable> implements Listener<V> {
+public class ListenerService<V extends Cacheable> implements Listener<V> {
 
   /**
    * Reference to the C2monCache event listeners

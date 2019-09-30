@@ -2,7 +2,6 @@ package cern.c2mon.cache.oscillation;
 
 import cern.c2mon.cache.AbstractCacheCRUDTest;
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.server.cache.oscillation.OscillationUpdateChecker;
 import cern.c2mon.server.common.alarm.OscillationTimestamp;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,9 +10,6 @@ public class OscillationCacheCRUDTest extends AbstractCacheCRUDTest<OscillationT
 
   @Autowired
   private C2monCache<OscillationTimestamp> oscillationTimestampCache;
-
-  @Autowired
-  private OscillationUpdateChecker oscillationUpdateChecker;
 
   /**
    * Guaranteed to run after parent before, so cache has been init'd
