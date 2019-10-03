@@ -10,7 +10,6 @@ import lombok.NonNull;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -51,7 +50,7 @@ public interface C2monCache<V extends Cacheable> extends CacheDelegator<V>, Seri
 
   void init();
 
-  <T> Optional<T> executeTransaction(TransactionalCallable<T> callable);
+  <T> T executeTransaction(TransactionalCallable<T> callable);
 
   /**
    * Alternative api to {@link C2monCache#executeTransaction(TransactionalCallable)} when you don't need the result

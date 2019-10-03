@@ -25,8 +25,6 @@ class SupervisedProcessServiceImpl extends SupervisedServiceImpl<Process> {
       processCacheObject.setProcessPIK(null);
       processCacheObject.setLocalConfig(null);
       this.stop(process, timestamp);
-
-      return null;
     });
   }
 
