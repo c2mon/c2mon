@@ -1,8 +1,8 @@
 package cern.c2mon.cache.impl;
 
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.cache.api.listener.Listener;
-import cern.c2mon.cache.api.listener.ListenerService;
+import cern.c2mon.cache.api.listener.CacheListenerManager;
+import cern.c2mon.cache.api.listener.CacheListenerManagerImpl;
 import cern.c2mon.cache.api.loader.CacheLoader;
 import cern.c2mon.cache.api.spi.CacheQuery;
 import cern.c2mon.cache.api.transactions.TransactionalCallable;
@@ -25,6 +25,10 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+/**
+ * @param <V>
+ * @author Alexandros Papageorgiou Koufidis
+ */
 @Slf4j
 public class IgniteC2monCache<V extends Cacheable> implements C2monCache<V> {
 
@@ -41,7 +45,7 @@ public class IgniteC2monCache<V extends Cacheable> implements C2monCache<V> {
   protected IgniteCache<Long, V> cache;
 
   @Getter
-  private Listener<V> listenerService = new ListenerService<>();
+  private CacheListenerManager<V> cacheListenerManager = new CacheListenerManagerImpl<>();
 
 
   public IgniteC2monCache(String cacheName, CacheConfiguration<Long, V> cacheCfg, Ignite igniteInstance) {
@@ -71,6 +75,7 @@ public class IgniteC2monCache<V extends Cacheable> implements C2monCache<V> {
     return StreamSupport.stream(Spliterators
       .spliteratorUnknownSize(cache.query(
         // Convert the provided query into Ignite query, keep only the keys to save on memory
+        // Null passed to ScanQuery gives us all results back
         new ScanQuery<>(null), Entry::getKey).iterator(), Spliterator.ORDERED), false)
       .limit(CacheQuery.DEFAULT_MAX_RESULTS).map(i -> (long) i).collect(Collectors.toSet());
   }
@@ -106,24 +111,5 @@ public class IgniteC2monCache<V extends Cacheable> implements C2monCache<V> {
     }
 
     return Optional.empty();
-  }
-
-  @Override
-  public V get(Long key) throws IllegalArgumentException {
-    if (key != null) {
-      return cache.get(key);
-    } else {
-      throw new IllegalArgumentException();
-    }
-  }
-
-  @Override
-  public void put(Long key, V value) {
-    if (value != null && key != null) {
-      cache.put(key, value);
-    } else {
-      throw new IllegalArgumentException();
-    }
-    notifyListenersOfUpdate(value);
   }
 }

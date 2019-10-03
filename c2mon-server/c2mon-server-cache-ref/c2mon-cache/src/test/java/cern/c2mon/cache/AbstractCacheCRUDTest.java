@@ -1,6 +1,7 @@
 package cern.c2mon.cache;
 
 import cern.c2mon.shared.common.Cacheable;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -13,6 +14,15 @@ import static org.junit.Assert.*;
 public abstract class AbstractCacheCRUDTest<V extends Cacheable> extends AbstractCacheTest<V> {
 
   protected abstract V getSample();
+  protected Long existingKey;
+
+  @Before
+  public void initKey() {
+    if (existingKey == null)
+      existingKey = getExistingKey();
+  }
+
+  protected abstract Long getExistingKey();
 
   @Test
   public void containsKey() {
@@ -40,7 +50,7 @@ public abstract class AbstractCacheCRUDTest<V extends Cacheable> extends Abstrac
 
   @Test
   public void updateExisting() {
-    cache.put(getExistingKey(), getSample());
+    cache.put(existingKey, getSample());
     assertEquals(getSample(), cache.get(getExistingKey()));
   }
 
@@ -57,7 +67,7 @@ public abstract class AbstractCacheCRUDTest<V extends Cacheable> extends Abstrac
    */
   @Test(expected = IllegalArgumentException.class)
   public void updateNullOnExisting() {
-    cache.put(getExistingKey(), null);
+    cache.put(existingKey, null);
   }
 
   @Test

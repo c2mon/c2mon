@@ -33,7 +33,7 @@ public class OscillationCacheCRUDTest extends AbstractCacheCRUDTest<OscillationT
   }
 
   @Override
-  protected C2monCache<OscillationTimestamp> getCache() {
+  protected C2monCache<OscillationTimestamp> initCache() {
     return oscillationTimestampCache;
   }
 }

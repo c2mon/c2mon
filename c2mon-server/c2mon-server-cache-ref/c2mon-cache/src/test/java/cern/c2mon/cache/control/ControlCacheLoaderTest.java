@@ -49,7 +49,7 @@ public class ControlCacheLoaderTest extends AbstractCacheLoaderTest<ControlTag> 
   }
 
   @Override
-  protected C2monCache<ControlTag> getCache() {
+  protected C2monCache<ControlTag> initCache() {
     return controlTagCacheRef;
   }
 }

@@ -19,15 +19,17 @@ package cern.c2mon.shared.common;
 import java.io.Serializable;
 
 /**
- * Common interface for all objects that reside in TIM caches.
+ * Common interface for all objects that reside in C2MON caches.
  *
  * @author Mark Brightwell
- *
+ * @implSpec It is expected that all implementation have a proper equals and hashCode implementation, as Cacheables
+ * may be put in maps and lists, as well as be compared for equality.
  */
-public interface Cacheable extends Serializable, Cloneable  {
+public interface Cacheable extends Serializable, Cloneable {
 
   /**
    * All objects have a Long id.
+   *
    * @return the id of the cache object
    */
   Long getId();

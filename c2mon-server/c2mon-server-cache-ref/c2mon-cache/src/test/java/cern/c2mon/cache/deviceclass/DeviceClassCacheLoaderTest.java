@@ -49,7 +49,7 @@ public class DeviceClassCacheLoaderTest extends AbstractCacheLoaderTest<DeviceCl
   }
 
   @Override
-  protected C2monCache<DeviceClass> getCache() {
+  protected C2monCache<DeviceClass> initCache() {
     return deviceClassCacheRef;
   }
 }

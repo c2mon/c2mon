@@ -1,10 +1,10 @@
 package cern.c2mon.server.cache.alarm;
 
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.cache.api.listener.CacheListener;
-import cern.c2mon.cache.api.listener.CacheRegistrationService;
-import cern.c2mon.cache.api.listener.CacheSupervisionListener;
+import cern.c2mon.cache.api.listener.CacheEvent;
+import cern.c2mon.cache.api.listener.impl.SingleThreadListener;
 import cern.c2mon.server.cache.tag.TagCacheFacade;
+import cern.c2mon.server.cache.tag.UnifiedTagCacheFacade;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheUpdater;
 import cern.c2mon.server.common.alarm.TagWithAlarms;
@@ -27,12 +27,13 @@ import java.util.List;
  */
 @Slf4j
 @Service
-public class AlarmService implements AlarmAggregator, CacheSupervisionListener<Tag>, CacheListener<Tag> {
+public class AlarmService implements AlarmAggregator {
 
   /**
    * We decided to distribute all alarms on the same topic in order to reduce
    * the number of topics for SonicMQ, the client has to make the decision if
    * the received alarm is useful for it, otherwise it will discard the alarm
+   *
    * @see AlarmService#getTopicForAlarm(Alarm)
    */
   public static final String ALARM_TOPIC = "tim.alarm";
@@ -45,22 +46,31 @@ public class AlarmService implements AlarmAggregator, CacheSupervisionListener<T
 
   private AlarmCacheUpdater alarmCacheUpdater;
 
-  private CacheRegistrationService cacheRegistrationService;
+  private UnifiedTagCacheFacade unifiedTagCacheFacade;
 
   @Autowired
-  public AlarmService(final C2monCache<Alarm> alarmCacheRef, final TagCacheFacade tagCacheRef, final AlarmCacheUpdater alarmCacheUpdater, CacheRegistrationService cacheRegistrationService) {
+  public AlarmService(final C2monCache<Alarm> alarmCacheRef, final TagCacheFacade tagCacheRef, final AlarmCacheUpdater alarmCacheUpdater, UnifiedTagCacheFacade unifiedTagCacheFacade) {
     this.alarmCacheRef = alarmCacheRef;
     this.tagCacheRef = tagCacheRef;
     this.alarmCacheUpdater = alarmCacheUpdater;
-    this.cacheRegistrationService = cacheRegistrationService;
+    this.unifiedTagCacheFacade = unifiedTagCacheFacade;
 
     alarmCacheRef.query(obj -> obj.isOscillating() && obj.isActive());
   }
 
   @PostConstruct
-  public void init(){
-    cacheRegistrationService.registerSynchronousToAllTags(this);
-    cacheRegistrationService.registerForSupervisionChanges(this);
+  public void init() {
+    unifiedTagCacheFacade.registerListener(new SingleThreadListener<Tag>(tag -> {
+      log.trace("Evaluating alarm for tag " + tag.getId() + " due to supervision status notification.");
+      evaluateAlarms(tag);
+    }), CacheEvent.SUPERVISION_CHANGE);
+
+
+    unifiedTagCacheFacade.registerListener(new SingleThreadListener<Tag>(tag -> {
+      log.trace("Evaluating alarm for tag " + tag.getId() + " due to update notification.");
+      List<Alarm> alarmList = evaluateAlarms(tag);
+      notifyListeners(tag, alarmList);
+    }), CacheEvent.UPDATE_ACCEPTED);
   }
 
   public Alarm update(final Long alarmId, final Tag tag) {
@@ -128,25 +138,6 @@ public class AlarmService implements AlarmAggregator, CacheSupervisionListener<T
     alarmUpdateObservable.add(aggregatorObserver);
   }
 
-  @Override
-  public void onSupervisionChange(Tag tag) {
-    log.trace("Evaluating alarm for tag " + tag.getId() + " due to supervision status notification.");
-
-    evaluateAlarms(tag);
-
-  }
-
-  @Override
-  public void notifyElementUpdated(Tag cacheable) {
-    List<Alarm> alarmList = evaluateAlarms(cacheable);
-    notifyListeners(cacheable, alarmList);
-  }
-
-  @Override
-  public void confirmStatus(Tag cacheable) {
-    // No-op
-  }
-
   /**
    * Notify the listeners of a tag update with associated alarms.
    *
@@ -156,12 +147,10 @@ public class AlarmService implements AlarmAggregator, CacheSupervisionListener<T
   private void notifyListeners(final Tag tag, final List<Alarm> alarmList) {
     for (AlarmAggregatorListener listener : alarmUpdateObservable) {
       try {
-        listener.notifyOnUpdate((Tag) tag.clone(), alarmList);
+        listener.notifyOnUpdate(tag.clone(), alarmList);
       } catch (CloneNotSupportedException e) {
         log.error("Unexpected exception caught: clone should be implemented for this class! " + "Alarm & tag listener was not notified: ");
       }
     }
   }
-
-  //TODO: move and modify code from AbstractTagFacade connected with Alarms
 }

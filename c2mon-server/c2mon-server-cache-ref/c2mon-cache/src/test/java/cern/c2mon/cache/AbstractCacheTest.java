@@ -39,21 +39,16 @@ public abstract class AbstractCacheTest<V extends Cacheable> {
   public CachePopulationRule cachePopulationRule;
 
   protected C2monCache<V> cache;
-  protected Long existingKey;
 
   @Before
   public void reload() {
     if (cache == null)
-      cache = getCache();
-    if (existingKey == null)
-      existingKey = getExistingKey();
+      cache = initCache();
     cache.clear();
     assertEquals(0, cache.getAll(cache.getKeys()).size());
     cache.init();
   }
 
-  protected abstract Long getExistingKey();
-
-  protected abstract C2monCache<V> getCache();
+  protected abstract C2monCache<V> initCache();
 }
 

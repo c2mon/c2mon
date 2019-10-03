@@ -43,7 +43,7 @@ public class AliveTimerCacheLoaderTest extends AbstractCacheLoaderTest<AliveTime
   }
 
   @Override
-  protected C2monCache<AliveTimer> getCache() {
+  protected C2monCache<AliveTimer> initCache() {
     return aliveTimerCacheRef;
   }
 
