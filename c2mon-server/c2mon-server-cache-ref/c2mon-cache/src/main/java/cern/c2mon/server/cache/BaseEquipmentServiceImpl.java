@@ -1,27 +1,38 @@
 package cern.c2mon.server.cache;
 
+import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.service.CommonEquipmentOperations;
+import cern.c2mon.server.cache.alivetimer.AliveTimerService;
+import cern.c2mon.server.cache.commfault.CommFaultService;
+import cern.c2mon.server.cache.supervision.SupervisedService;
+import cern.c2mon.server.cache.supervision.SupervisedServiceImpl;
+import cern.c2mon.server.common.commfault.CommFaultTag;
+import cern.c2mon.server.common.equipment.AbstractEquipment;
+import lombok.Getter;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.cache.api.service.AbstractEquipmentService;
-import cern.c2mon.server.cache.commfault.CommFaultService;
-import cern.c2mon.server.common.commfault.CommFaultTag;
-import cern.c2mon.server.common.equipment.AbstractEquipment;
-
 /**
  * @author Szymon Halastra
+ * @author Alexandros Papageorgiou Koufidis
  */
-public class CoreAbstractEquipmentService<T extends AbstractEquipment> implements AbstractEquipmentService {
+public class BaseEquipmentServiceImpl<T extends AbstractEquipment> implements CommonEquipmentOperations {
 
+  @Getter
   private C2monCache<T> c2monCache;
 
   private C2monCache<CommFaultTag> commFaultTagCache;
 
-  public CoreAbstractEquipmentService(C2monCache<T> c2monCache, CommFaultService commFaultService) {
+  @Getter
+  private SupervisedService<T> supervisedService;
+
+  protected BaseEquipmentServiceImpl(C2monCache<T> c2monCache, CommFaultService commFaultService, AliveTimerService aliveTimerService) {
     this.c2monCache = c2monCache;
     this.commFaultTagCache = commFaultService.getCache();
+
+    supervisedService = new SupervisedServiceImpl<>(c2monCache, aliveTimerService);
   }
 
   @Override

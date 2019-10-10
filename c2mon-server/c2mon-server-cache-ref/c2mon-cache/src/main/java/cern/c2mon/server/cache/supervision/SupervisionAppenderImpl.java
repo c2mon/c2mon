@@ -14,11 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.cache;
-
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+package cern.c2mon.server.cache.supervision;
 
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.SupervisionAppender;
@@ -29,6 +25,9 @@ import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * Helper bean for adding the supervision status to
@@ -38,7 +37,7 @@ import cern.c2mon.shared.common.datatag.TagQualityStatus;
  */
 @Slf4j
 @Service
-public class SupervisionAppenderImplRef implements SupervisionAppender {
+public class SupervisionAppenderImpl implements SupervisionAppender {
 
   /**
    * Process and Equipment bean interfaces.
@@ -49,7 +48,7 @@ public class SupervisionAppenderImplRef implements SupervisionAppender {
   private C2monCache<Equipment> equipmentCacheRef;
 
   @Autowired
-  public SupervisionAppenderImplRef(ProcessService processService, EquipmentService equipmentService) {
+  public SupervisionAppenderImpl(ProcessService processService, EquipmentService equipmentService) {
     this.processService = processService;
     this.equipmentService = equipmentService;
 

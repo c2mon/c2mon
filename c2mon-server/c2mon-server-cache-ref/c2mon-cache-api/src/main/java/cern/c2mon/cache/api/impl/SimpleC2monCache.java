@@ -13,7 +13,6 @@ import lombok.Setter;
 
 import javax.cache.Cache;
 import java.util.Collection;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -55,13 +54,8 @@ public class SimpleC2monCache<V extends Cacheable> implements C2monCache<V> {
   }
 
   @Override
-  public <S> Optional<S> executeTransaction(TransactionalCallable<S> callable) {
-    S returnValue = callable.call();
-
-    if (returnValue == null) {
-      return Optional.empty();
-    }
-    return Optional.of(returnValue);
+  public <S> S executeTransaction(TransactionalCallable<S> callable) {
+    return callable.call();
   }
 
 

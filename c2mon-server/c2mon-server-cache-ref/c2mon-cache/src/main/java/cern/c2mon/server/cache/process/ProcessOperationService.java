@@ -1,10 +1,11 @@
 package cern.c2mon.server.cache.process;
 
-import java.sql.Timestamp;
-import java.util.Collection;
-
+import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.process.ProcessCacheObject;
+
+import java.sql.Timestamp;
+import java.util.Collection;
 
 /**
  * @author Szymon Halastra
@@ -39,7 +40,7 @@ public interface ProcessOperationService {
    * the state tag!!
    * @param processId id of the process
    */
-  void errorStatus(Long processId, String errorMessage);
+  void setErrorStatus(Long processId, String errorMessage);
 
   /**
    * Returns the process id in the cache for a given Alive Timer id.
@@ -77,7 +78,7 @@ public interface ProcessOperationService {
    * @param processId id of the process
    * @param reboot true if restart required
    */
-  void requiresReboot(Long processId, Boolean reboot);
+  void setRequiresReboot(Long processId, Boolean reboot);
 
   /**
    * Sets the PIK of the process.

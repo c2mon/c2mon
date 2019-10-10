@@ -1,20 +1,16 @@
 package cern.c2mon.server.cache.equipment;
 
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.cache.api.service.AbstractEquipmentService;
-import cern.c2mon.cache.api.service.SupervisedService;
-import cern.c2mon.server.cache.CoreAbstractEquipmentService;
-import cern.c2mon.server.cache.SupervisedServiceImpl;
+import cern.c2mon.server.cache.BaseEquipmentServiceImpl;
 import cern.c2mon.server.cache.alivetimer.AliveTimerService;
 import cern.c2mon.server.cache.commfault.CommFaultService;
 import cern.c2mon.server.common.equipment.Equipment;
-import lombok.Getter;
-import lombok.experimental.Delegate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 /**
  * @author Szymon Halastra
@@ -22,38 +18,38 @@ import java.util.Collection;
  */
 @Slf4j
 @Service
-public class EquipmentService implements SupervisedService<Equipment>, AbstractEquipmentService {
-
-  @Delegate(types = SupervisedEquipmentService.class)
-  private SupervisedService<Equipment> supervisedService;
-
-  @Delegate(types = AbstractEquipmentService.class)
-  private AbstractEquipmentService coreEquipmentService;
-
-  @Getter
-  private C2monCache<Equipment> equipmentCacheRef;
+public class EquipmentService extends BaseEquipmentServiceImpl<Equipment> implements EquipmentOperations {
 
   @Autowired
   public EquipmentService(final C2monCache<Equipment> equipmentCacheRef,
                           final AliveTimerService aliveTimerService, final CommFaultService commFaultService) {
-    this.equipmentCacheRef = equipmentCacheRef;
-
-    this.supervisedService = new SupervisedServiceImpl(equipmentCacheRef, aliveTimerService);
-    this.coreEquipmentService = new CoreAbstractEquipmentService<>(equipmentCacheRef, commFaultService);
+    super(equipmentCacheRef,commFaultService,aliveTimerService);
   }
 
-  //TODO: write this method
-  public Collection<? extends Long> getDataTagIds(long equipmentId) {
+
+  @Override
+  public Collection<Long> getDataTagIds(Long equipmentId) {
+    // TODO do these with Brice
     return null;
   }
 
-  /**
-   * This interface serves only as a static type reference to {@link SupervisedService}<{@link Equipment}>
-   * <p>
-   * That is required only for the {@code @Delegate} Lombok annotation above
-   *
-   * @see <a href=https://projectlombok.org/features/experimental/Delegate>Lombok Delegate docs</a>
-   */
-  private interface SupervisedEquipmentService extends SupervisedService<Equipment> {
+  @Override
+  public Collection<Long> getEquipmentAlives() {
+    return getC2monCache().query(i -> true).stream().map(Equipment::getAliveTagId).collect(Collectors.toSet());
+  }
+
+  @Override
+  public void addEquipmentToProcess(Long equipmentId, Long processId) {
+
+  }
+
+  @Override
+  public void removeCommandFromEquipment(Long equipmentId, Long commandId) {
+
+  }
+
+  @Override
+  public void addCommandToEquipment(Long equipmentId, Long commandId) {
+
   }
 }

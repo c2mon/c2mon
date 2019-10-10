@@ -1,13 +1,12 @@
 package cern.c2mon.server.cache.commfault;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.commfault.CommFaultTag;
 import cern.c2mon.server.common.commfault.CommFaultTagCacheObject;
 import cern.c2mon.server.common.equipment.AbstractEquipment;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * @author Szymon Halastra
@@ -23,7 +22,7 @@ public class CommFaultService {
     this.commFaultTagCacheRef = commFaultTagCacheRef;
   }
 
-  public C2monCache getCache() {
+  public C2monCache<CommFaultTag> getCache() {
     return commFaultTagCacheRef;
   }
 

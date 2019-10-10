@@ -17,6 +17,7 @@
 package cern.c2mon.shared.common;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
 
 /**
  * Common interface for all objects that reside in C2MON caches.
@@ -42,4 +43,8 @@ public interface Cacheable extends Serializable, Cloneable {
    * @throws CloneNotSupportedException if not implemented/supported so far
    */
   Cacheable clone() throws CloneNotSupportedException;
+
+  Timestamp getCacheTimestamp();
+
+  void setCacheTimestamp(Timestamp timestamp);
 }

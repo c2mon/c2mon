@@ -1,21 +1,20 @@
 package cern.c2mon.cache;
 
-import java.sql.Timestamp;
-
-import org.easymock.EasyMock;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.cache.api.service.SupervisedService;
-import cern.c2mon.server.cache.SupervisedServiceImpl;
 import cern.c2mon.server.cache.alivetimer.AliveTimerService;
+import cern.c2mon.server.cache.supervision.SupervisedService;
+import cern.c2mon.server.cache.supervision.SupervisedServiceImpl;
 import cern.c2mon.server.common.equipment.EquipmentCacheObject;
 import cern.c2mon.server.common.process.ProcessCacheObject;
 import cern.c2mon.server.common.supervision.Supervised;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.common.supervision.SupervisionConstants;
+import org.easymock.EasyMock;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+
+import java.sql.Timestamp;
 
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;

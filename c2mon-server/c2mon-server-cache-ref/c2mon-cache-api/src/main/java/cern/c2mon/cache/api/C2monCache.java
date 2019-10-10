@@ -9,6 +9,7 @@ import cern.c2mon.shared.common.Cacheable;
 import lombok.NonNull;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.Set;
 import java.util.function.Function;
@@ -141,6 +142,7 @@ public interface C2monCache<V extends Cacheable> extends CacheDelegator<V>, Seri
    */
   default void putQuiet(Long key, V value) {
     if (value != null && key != null) {
+      value.setCacheTimestamp(new Timestamp(System.currentTimeMillis()));
       getCache().put(key, value);
     } else {
       throw new IllegalArgumentException();

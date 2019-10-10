@@ -1,13 +1,8 @@
 package cern.c2mon.server.cache.tag;
 
-import java.lang.reflect.Field;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Properties;
-
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.factory.AbstractCacheObjectFactory;
-import cern.c2mon.server.cache.CoreAbstractEquipmentService;
+import cern.c2mon.server.cache.BaseEquipmentServiceImpl;
 import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
@@ -25,6 +20,11 @@ import cern.c2mon.shared.daq.config.DataTagAddressUpdate;
 import cern.c2mon.shared.daq.config.DataTagUpdate;
 import cern.c2mon.shared.daq.config.HardwareAddressUpdate;
 
+import java.lang.reflect.Field;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Properties;
+
 /**
  * Creates {@link DataTag} cache object
  * {@link DataTag} contains common interface for DataTag and ControlTag
@@ -36,9 +36,9 @@ public abstract class TagCacheObjectFactory<T extends Tag> extends AbstractCache
 
   private final C2monCache<T> tagCacheRef;
 
-  private final CoreAbstractEquipmentService coreAbstractEquipmentService;
+  private final BaseEquipmentServiceImpl coreAbstractEquipmentService;
 
-  public TagCacheObjectFactory(C2monCache<T> tagCacheRef, CoreAbstractEquipmentService coreAbstractEquipmentService) {
+  public TagCacheObjectFactory(C2monCache<T> tagCacheRef, BaseEquipmentServiceImpl coreAbstractEquipmentService) {
     this.tagCacheRef = tagCacheRef;
     this.coreAbstractEquipmentService = coreAbstractEquipmentService;
   }

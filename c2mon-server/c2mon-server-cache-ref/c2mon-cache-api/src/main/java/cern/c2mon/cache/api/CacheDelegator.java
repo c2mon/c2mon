@@ -17,7 +17,7 @@ import java.util.Set;
 /**
  * This interface simply delegates all the {@code Cache} methods to the {@code CacheDelegator#getCache()} method.
  * <p>
- * None of the operations do anything other than delegate. There are no sideeffects. This class serves so
+ * None of the operations do anything other than delegate. There are no side effects. This class serves so
  * that you can override only the methods you actually need in an implementation.
  * <p>
  * Do NOT add any custom logic here. Add it to implementation of this class. If you would like to override a lot of

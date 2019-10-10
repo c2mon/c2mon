@@ -1,18 +1,17 @@
 package cern.c2mon.server.cache.datatag;
 
-import java.util.Properties;
-
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.server.cache.CoreAbstractEquipmentService;
+import cern.c2mon.server.cache.BaseEquipmentServiceImpl;
 import cern.c2mon.server.cache.tag.TagCacheObjectFactory;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.daq.config.Change;
 import cern.c2mon.shared.daq.config.DataTagUpdate;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.Properties;
 
 import static cern.c2mon.shared.common.type.TypeConverter.getType;
 
@@ -24,7 +23,7 @@ public class DataTagCacheObjectFactory extends TagCacheObjectFactory<DataTag> {
 
   @Autowired
   public DataTagCacheObjectFactory(C2monCache<DataTag> dataTagCacheRef,
-                                   CoreAbstractEquipmentService coreAbstractEquipmentService) {
+                                   BaseEquipmentServiceImpl coreAbstractEquipmentService) {
     super(dataTagCacheRef, coreAbstractEquipmentService);
   }
 

@@ -14,21 +14,20 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.cache.api.service;
-
-import java.sql.Timestamp;
+package cern.c2mon.server.cache.supervision;
 
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.supervision.Supervised;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.common.supervision.SupervisionConstants;
 
+import java.sql.Timestamp;
+
 /**
  * Implemented by beans linked to Supervised cache
  * objects (so Process, Equipment and SubEquipment).
  *
  * @param <T> the cache object type
- *
  * @author Mark Brightwell
  */
 public interface SupervisedService<T extends Supervised> {
@@ -39,7 +38,6 @@ public interface SupervisedService<T extends Supervised> {
    * one if none have yet occured for this cache object).
    *
    * @param id id of the supervised cache object
-   *
    * @return the last supervision event
    */
   SupervisionEvent getSupervisionStatus(Long id);
@@ -60,10 +58,35 @@ public interface SupervisedService<T extends Supervised> {
    * <p>
    * <p>Starts the alive timer if not already running.
    *
+   * @param id The cache id of the supervised object
+   */
+  void start(Long id);
+
+  /**
+   * Sets the status of the Supervised object to STARTUP,
+   * with associated message. Sets the timestamp to now.
+   * <p>
+   * <p>Starts the alive timer if not already running.
+   *
    * @param id        The cache id of the supervised object
    * @param timestamp time of the start
+   * @deprecated use {@link SupervisedService#start(Long)},
+   *             because we generate a new timestamp anyway
    */
-  void start(Long id, Timestamp timestamp);
+  @Deprecated
+  default void start(Long id, Timestamp timestamp){
+    start(id);
+  }
+
+  /**
+   * Sets the status of the Supervised object to STARTUP,
+   * with associated message. Sets the timestamp to now.
+   * <p>
+   * <p>Starts the alive timer if not already running.
+   *
+   * @param supervised supervised object
+   */
+  void start(final T supervised);
 
   /**
    * Sets the status of the Supervised object to STARTUP,
@@ -73,8 +96,13 @@ public interface SupervisedService<T extends Supervised> {
    *
    * @param supervised supervised object
    * @param timestamp  time of the start
+   * @deprecated use {@link SupervisedService#start(Supervised)},
+   *             because we generate a new timestamp anyway
    */
-  void start(final T supervised, final Timestamp timestamp);
+  @Deprecated
+  default void start(final T supervised, final Timestamp timestamp){
+    start(supervised);
+  }
 
   void stop(final T supervised, final Timestamp timestamp);
 
@@ -115,7 +143,6 @@ public interface SupervisedService<T extends Supervised> {
    * if the status is UNCERTAIN.
    *
    * @param supervised the cache object to check
-   *
    * @return true if it is running (or starting up)
    */
   boolean isRunning(T supervised);
@@ -127,7 +154,6 @@ public interface SupervisedService<T extends Supervised> {
    * is UNCERTAIN.
    *
    * @param id of the cache object
-   *
    * @return true if running
    */
   boolean isRunning(Long id);
@@ -136,7 +162,6 @@ public interface SupervisedService<T extends Supervised> {
    * Returns true only if the object is in UNCERTAIN status.
    *
    * @param supervised the object to check
-   *
    * @return true if the status is uncertain
    */
   boolean isUncertain(T supervised);
@@ -146,7 +171,6 @@ public interface SupervisedService<T extends Supervised> {
    * No supervised lock should be held when calling this! (lock hierarchy)
    *
    * @param id of supervised object
-   *
    * @throws CacheElementNotFoundException if the supervised object cannot be located in the corresponding cache
    */
   void removeAliveTimer(Long id);
@@ -168,11 +192,7 @@ public interface SupervisedService<T extends Supervised> {
    */
   void removeAliveDirectly(Long aliveId);
 
-  default SupervisionConstants.SupervisionEntity getSupervisionEntity() {
-    return null;
-  }
+  SupervisionConstants.SupervisionEntity getSupervisionEntity();
 
-  default void setSupervisionEntity(SupervisionConstants.SupervisionEntity entity) {
-
-  }
+  void setSupervisionEntity(SupervisionConstants.SupervisionEntity entity);
 }

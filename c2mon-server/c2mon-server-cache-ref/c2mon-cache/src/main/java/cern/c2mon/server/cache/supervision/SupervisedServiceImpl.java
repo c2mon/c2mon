@@ -1,15 +1,19 @@
-package cern.c2mon.server.cache;
+package cern.c2mon.server.cache.supervision;
 
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.cache.api.service.SupervisedService;
+import cern.c2mon.cache.api.listener.CacheEvent;
 import cern.c2mon.server.cache.alivetimer.AliveTimerService;
+import cern.c2mon.server.common.alive.AliveTimer;
 import cern.c2mon.server.common.process.ProcessCacheObject;
 import cern.c2mon.server.common.supervision.Supervised;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
-import cern.c2mon.shared.common.supervision.SupervisionConstants;
+import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
 import lombok.extern.slf4j.Slf4j;
 
 import java.sql.Timestamp;
+
+import static cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEntity;
+import static cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
 
 /**
  * @author Szymon Halastra
@@ -20,11 +24,13 @@ public class SupervisedServiceImpl<T extends Supervised> implements SupervisedSe
 
   protected final C2monCache<T> cacheRef;
 
+  // TODO Most previous supervision notifications were connected to a Tag. Do we want this behaviour?
+
   private final AliveTimerService aliveTimerService;
 
-  private final C2monCache aliveTimerCache;
+  private final C2monCache<AliveTimer> aliveTimerCache;
 
-  private SupervisionConstants.SupervisionEntity supervisionEntity;
+  private SupervisionEntity supervisionEntity;
 
   public SupervisedServiceImpl(final C2monCache<T> cacheRef, final AliveTimerService aliveTimerService) {
     this.cacheRef = cacheRef;
@@ -33,11 +39,14 @@ public class SupervisedServiceImpl<T extends Supervised> implements SupervisedSe
   }
 
   @Override
-  public void start(Long id, Timestamp timestamp) {
+  public void start(Long id) {
     cacheRef.executeTransaction(() -> {
       T supervised = cacheRef.get(id);
-      start(supervised, timestamp);
+      boolean wasRunning = isRunning(supervised);
+      start(supervised);
       cacheRef.put(id, supervised);
+      if (!wasRunning)
+        cacheRef.notifyListenersOf(CacheEvent.SUPERVISION_CHANGE, supervised);
     });
   }
 
@@ -45,8 +54,11 @@ public class SupervisedServiceImpl<T extends Supervised> implements SupervisedSe
   public void stop(Long id, Timestamp timestamp) {
     cacheRef.executeTransaction(() -> {
       T supervised = cacheRef.get(id);
+      boolean wasRunning = isRunning(supervised);
       stop(supervised, timestamp);
       cacheRef.put(id, supervised);
+      if (wasRunning)
+        cacheRef.notifyListenersOf(CacheEvent.SUPERVISION_CHANGE, supervised);
     });
   }
 
@@ -54,7 +66,7 @@ public class SupervisedServiceImpl<T extends Supervised> implements SupervisedSe
   public void resume(Long id, Timestamp timestamp, String message) {
     cacheRef.executeTransaction(() -> {
       T supervised = cacheRef.get(id);
-      if (!supervised.getSupervisionStatus().equals(SupervisionConstants.SupervisionStatus.RUNNING)) {
+      if (!supervised.getSupervisionStatus().equals(SupervisionStatus.RUNNING)) {
         resume(supervised, timestamp, message);
         cacheRef.put(id, supervised);
       }
@@ -75,9 +87,9 @@ public class SupervisedServiceImpl<T extends Supervised> implements SupervisedSe
   @Override
   public boolean isRunning(final T supervised) {
     return supervised.getSupervisionStatus() != null
-      && (supervised.getSupervisionStatus().equals(SupervisionConstants.SupervisionStatus.STARTUP)
-      || supervised.getSupervisionStatus().equals(SupervisionConstants.SupervisionStatus.RUNNING)
-      || supervised.getSupervisionStatus().equals(SupervisionConstants.SupervisionStatus.RUNNING_LOCAL));
+      && (supervised.getSupervisionStatus().equals(SupervisionStatus.STARTUP)
+      || supervised.getSupervisionStatus().equals(SupervisionStatus.RUNNING)
+      || supervised.getSupervisionStatus().equals(SupervisionStatus.RUNNING_LOCAL));
   }
 
   @Override
@@ -87,59 +99,41 @@ public class SupervisedServiceImpl<T extends Supervised> implements SupervisedSe
 
   @Override
   public boolean isUncertain(final T supervised) {
-//    c2monCache.lockOnKey(supervised.getId());
-//    try {
-//      return supervised.getSupervisionStatus() != null
-//              && supervised.getSupervisionStatus().equals(SupervisionConstants.SupervisionStatus.UNCERTAIN);
-//    } finally {
-//      c2monCache.unlockOnKey(supervised.getId());
-//    }
-
-    return false;
+    return supervised.getSupervisionStatus() != null && supervised.getSupervisionStatus().equals(SupervisionStatus.UNCERTAIN);
   }
 
   @Override
   public SupervisionEvent getSupervisionStatus(final Long id) {
-//    c2monCache.lockOnKey(id);
-//    try {
-//      T supervised = c2monCache.get(id);
-//      if (log.isTraceEnabled()) {
-//        log.trace("Getting supervision status: " + getSupervisionEntity() + " " + supervised.getName() + " is " + supervised.getSupervisionStatus());
-//      }
-//      Timestamp supervisionTime;
-//      String supervisionMessage;
-//      if (supervised.getStatusTime() != null) {
-//        supervisionTime = supervised.getStatusTime();
-//      }
-//      else {
-//        supervisionTime = new Timestamp(System.currentTimeMillis());
-//      }
-//      if (supervised.getStatusDescription() != null) {
-//        supervisionMessage = supervised.getStatusDescription();
-//      }
-//      else {
-//        supervisionMessage = getSupervisionEntity() + " " + supervised.getName() + " is " + supervised.getSupervisionStatus();
-//      }
-//      return new SupervisionEventImpl(getSupervisionEntity(), id, supervised.getName(), supervised.getSupervisionStatus(),
-//              supervisionTime, supervisionMessage);
-//    } finally {
-//      c2monCache.unlockOnKey(id);
-//    }
-
-    return null;
+    return cacheRef.executeTransaction(() -> {
+      T supervised = cacheRef.get(id);
+      if (log.isTraceEnabled()) {
+        log.trace("Getting supervision status: " + getSupervisionEntity() + " " + supervised.getName() + " is " + supervised.getSupervisionStatus());
+      }
+      Timestamp supervisionTime;
+      String supervisionMessage;
+      if (supervised.getStatusTime() != null) {
+        supervisionTime = supervised.getStatusTime();
+      } else {
+        supervisionTime = new Timestamp(System.currentTimeMillis());
+      }
+      if (supervised.getStatusDescription() != null) {
+        supervisionMessage = supervised.getStatusDescription();
+      } else {
+        supervisionMessage = getSupervisionEntity() + " " + supervised.getName() + " is " + supervised.getSupervisionStatus();
+      }
+      return new SupervisionEventImpl(getSupervisionEntity(), id, supervised.getName(), supervised.getSupervisionStatus(),
+        supervisionTime, supervisionMessage);
+    });
   }
 
   @Override
   public void refreshAndNotifyCurrentSupervisionStatus(final Long id) {
-//    c2monCache.lockOnKey(id);
-//    Timestamp refreshTime = new Timestamp(System.currentTimeMillis());
-//    try {
-//      T supervised = c2monCache.get(id);
-//      supervised.setStatusTime(refreshTime);
-//      c2monCache.put(supervised.getId(), supervised);
-//    } finally {
-//      c2monCache.unlockOnKey(id);
-//    }
+    cacheRef.executeTransaction(() -> {
+      T supervised = cacheRef.get(id);
+      supervised.setStatusTime(new Timestamp(System.currentTimeMillis()));
+      cacheRef.put(supervised.getId(), supervised);
+      cacheRef.notifyListenersOf(CacheEvent.SUPERVISION_UPDATE, supervised);
+    });
   }
 
   @Override
@@ -163,12 +157,12 @@ public class SupervisedServiceImpl<T extends Supervised> implements SupervisedSe
   }
 
   @Override
-  public SupervisionConstants.SupervisionEntity getSupervisionEntity() {
+  public SupervisionEntity getSupervisionEntity() {
     return this.supervisionEntity;
   }
 
   @Override
-  public void setSupervisionEntity(SupervisionConstants.SupervisionEntity entity) {
+  public void setSupervisionEntity(SupervisionEntity entity) {
     this.supervisionEntity = entity;
   }
 
@@ -189,14 +183,13 @@ public class SupervisedServiceImpl<T extends Supervised> implements SupervisedSe
    * <p>Starts the alive timer if not already running.
    *
    * @param supervised supervised object
-   * @param timestamp  time of the start
    */
   @Override
-  public void start(final T supervised, final Timestamp timestamp) {
+  public void start(final T supervised) {
     if (supervised.getAliveTagId() != null) {
       aliveTimerService.start(supervised.getAliveTagId());
     }
-    supervised.setSupervisionStatus(SupervisionConstants.SupervisionStatus.STARTUP);
+    supervised.setSupervisionStatus(SupervisionStatus.STARTUP);
     supervised.setStatusDescription(supervised.getSupervisionEntity() + " " + supervised.getName() + " was started");
     supervised.setStatusTime(new Timestamp(System.currentTimeMillis()));
   }
@@ -206,18 +199,18 @@ public class SupervisedServiceImpl<T extends Supervised> implements SupervisedSe
     if (supervised.getAliveTagId() != null) {
       aliveTimerService.stop(supervised.getAliveTagId());
     }
-    supervised.setSupervisionStatus(SupervisionConstants.SupervisionStatus.DOWN);
+    supervised.setSupervisionStatus(SupervisionStatus.DOWN);
     supervised.setStatusTime(timestamp);
     supervised.setStatusDescription(supervised.getSupervisionEntity() + " " + supervised.getName() + " was stopped");
   }
 
   private void resume(final T supervised, final Timestamp timestamp, final String message) {
-    supervised.setSupervisionStatus(SupervisionConstants.SupervisionStatus.RUNNING);
+    supervised.setSupervisionStatus(SupervisionStatus.RUNNING);
 
     if (supervised instanceof ProcessCacheObject) {
       ProcessCacheObject process = (ProcessCacheObject) supervised;
       if (process.getLocalConfig() != null && process.getLocalConfig().equals(ProcessCacheObject.LocalConfig.Y)) {
-        supervised.setSupervisionStatus(SupervisionConstants.SupervisionStatus.RUNNING_LOCAL);
+        supervised.setSupervisionStatus(SupervisionStatus.RUNNING_LOCAL);
       }
     }
 
@@ -226,7 +219,7 @@ public class SupervisedServiceImpl<T extends Supervised> implements SupervisedSe
   }
 
   private void suspend(final T supervised, final Timestamp timestamp, final String message) {
-    supervised.setSupervisionStatus(SupervisionConstants.SupervisionStatus.DOWN);
+    supervised.setSupervisionStatus(SupervisionStatus.DOWN);
     supervised.setStatusDescription(message);
     supervised.setStatusTime(timestamp);
   }

@@ -7,7 +7,7 @@ import java.util.Map;
  *
  * @author Szymon Halastra
  */
-public interface AbstractEquipmentService {
+public interface CommonEquipmentOperations {
 
   /**
    * Returns the Process id for a given Equipment or SubEquipment
