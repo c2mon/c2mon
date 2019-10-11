@@ -117,7 +117,7 @@ public interface C2monCache<V extends Cacheable> extends CacheDelegator<V>, Seri
    * @see C2monCache#putQuiet(Long, Cacheable) to put without notifying
    */
   @Override
-  default void put(Long key, V value) {
+  default void put(@NonNull Long key,@NonNull V value) {
     // TODO Create update_rejected event here if it fails?
     putQuiet(key, value);
     notifyListenersOf(UPDATE_ACCEPTED, value);
@@ -140,12 +140,8 @@ public interface C2monCache<V extends Cacheable> extends CacheDelegator<V>, Seri
    * @param key
    * @param value
    */
-  default void putQuiet(Long key, V value) {
-    if (value != null && key != null) {
-      value.setCacheTimestamp(new Timestamp(System.currentTimeMillis()));
-      getCache().put(key, value);
-    } else {
-      throw new IllegalArgumentException();
-    }
+  default void putQuiet(@NonNull Long key, @NonNull V value) {
+    value.setCacheTimestamp(new Timestamp(System.currentTimeMillis()));
+    getCache().put(key, value);
   }
 }
