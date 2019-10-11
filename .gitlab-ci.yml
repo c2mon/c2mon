@@ -4,8 +4,14 @@ stages:
   - deploy
   - sonar
 
+variables:
+  DOCKER_HOST: tcp://docker:2375/
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: ""
+  
+  
 clean_elasticsearch:
-  type: clean
+  stage: clean
   variables:
     GIT_STRATEGY: none
   script:
@@ -14,7 +20,7 @@ clean_elasticsearch:
 
 # Fully build and publish master branch
 build_and_publish:
-  type: build
+  stage: build
   script:
     - mvn -q -U -B clean deploy --settings settings.xml -Ddependencies.set.direct
   only:
@@ -22,8 +28,14 @@ build_and_publish:
 
 # Just run tests on feature branches
 build:
-  type: build
+  stage: build
+  tags: 
+    - docker-privileged
+  image: gitlab-registry.cern.ch/industrial-controls/sw-infra/mvn-dind:baseline
+  services:    
+    - docker:19.03.0-dind
   script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
     - mvn -q -U -B clean test -DskipDocker=true --settings settings.xml -Ddependencies.set.direct --debug -X
   except:
     - master
@@ -37,7 +49,7 @@ trigger_build:
   - master
 
 deploy_docs:
-  type: deploy
+  stage: deploy
   script:
     - echo ${KRB_PASSWORD} | kinit ${KRB_USERNAME}@CERN.CH
     - mvn -q -B clean package -pl :docs
@@ -46,7 +58,8 @@ deploy_docs:
     - master
 
 sonar_preview:
-  type: sonar
+  stage: sonar
+  image: gitlab-registry.cern.ch/industrial-controls/sw-infra/mvn-dind:baseline
   script:
     - mvn -q -U -B clean compile sonar:sonar -Dmaven.test.skip=true -DskipDocker=true -Dsonar.host.url=${SONAR_URL} -Dsonar.analysis.mode=preview -Dsonar.gitlab.commit_sha=$CI_BUILD_REF -Dsonar.gitlab.ref_name=$CI_BUILD_REF_NAME -Dsonar.gitlab.project_id=$CI_PROJECT_ID -Dsonar.gitlab.max_major_issues_gate=0 --settings settings.xml
   except:
