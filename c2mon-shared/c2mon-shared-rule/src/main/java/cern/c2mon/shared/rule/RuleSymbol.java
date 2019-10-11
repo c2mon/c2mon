@@ -44,6 +44,8 @@ public class RuleSymbol  {
 
   public static final char SYM_POWER= '^';
   
+  public static final char SYM_ABS= '~';
+  
 
   public static boolean isSymbol(final char pSymbol) {
     switch (pSymbol) {
@@ -60,6 +62,7 @@ public class RuleSymbol  {
       case SYM_MULTIPLY:
       case SYM_DIVIDE:
       case SYM_POWER:
+      case SYM_ABS:
         return true;
       default:
         return false;

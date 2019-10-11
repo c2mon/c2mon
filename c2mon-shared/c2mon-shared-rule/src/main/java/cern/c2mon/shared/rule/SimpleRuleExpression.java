@@ -134,6 +134,14 @@ public class SimpleRuleExpression extends RuleExpression implements Cloneable {
                 buffer.add(")");
                 i++;
                 break;
+            case '~':
+                buffer.add("~");
+                i++;
+                break;
+            case '%':
+                buffer.add("%");
+                i++;
+                break;
             case '=':
                 buffer.add("=");
                 i++;

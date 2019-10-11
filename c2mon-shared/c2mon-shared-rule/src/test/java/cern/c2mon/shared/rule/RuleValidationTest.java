@@ -121,6 +121,8 @@ public class RuleValidationTest {
   private static final String CORRECT_RULE_6 = "($INVALID = $INVALID)[0],(#156279 = true)[3],true[2]";
   private static final String CORRECT_RULE_7 = "($INVALID != #156278)[0],(#156279 = true)[3],true[2]";
   
+  private static final String CORRECT_RULE_8 = "((5.0 % 3.0) > 1.0)";
+  
   /**
    * A validation test against the rules above to make sure they are VALID.
    */
@@ -134,6 +136,7 @@ public class RuleValidationTest {
       RuleValidationReport validStatus5 = validateRule(CORRECT_RULE_5);
       RuleValidationReport validStatus6 = validateRule(CORRECT_RULE_6);
       RuleValidationReport validStatus7 = validateRule(CORRECT_RULE_7);
+      RuleValidationReport validStatus8 = validateRule(CORRECT_RULE_8);
       
       assertTrue(validStatus1.isValid());
       assertTrue(validStatus2.isValid());
@@ -142,6 +145,7 @@ public class RuleValidationTest {
       assertTrue(validStatus5.isValid());
       assertTrue(validStatus6.isValid());
       assertTrue(validStatus7.isValid());
+      assertTrue(validStatus8.isValid());
   }
   
   private RuleValidationReport validateRule(final RuleExpression rule) {

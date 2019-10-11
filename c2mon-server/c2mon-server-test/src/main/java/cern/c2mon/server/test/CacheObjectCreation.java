@@ -246,6 +246,36 @@ public final class CacheObjectCreation {
     return cacheObject;
   }
 
+  /**
+   * Need to first insert test equipment using EquipmentMapper
+   * @return the DataTag
+   */
+  public static DataTagCacheObject createTestDataTag4DoubleValue() {
+    //construct fake DataTagCacheObject, setting all fields
+    DataTagCacheObject cacheObject = new DataTagCacheObject();
+    cacheObject.setId(Long.valueOf(100004));  //must be non null in DB
+    cacheObject.setName("Junit_test_datatag4"); //non null
+    cacheObject.setDescription("A Double value tag");
+    cacheObject.setMode(DataTagConstants.MODE_TEST); //non null
+    cacheObject.setDataType("Double"); // non null
+    cacheObject.setLogged(false); //null allowed
+    cacheObject.setUnit("test unit m/sec");
+    cacheObject.setDipAddress("testDIPaddress");
+    cacheObject.setJapcAddress("testJAPCaddress");
+    cacheObject.setValue(5.0);
+    cacheObject.setValueDescription("test value description");
+    cacheObject.setSimulated(false); //null allowed
+    cacheObject.setEquipmentId(Long.valueOf(100)); //need test equipment inserted
+    cacheObject.setMinValue(new Float(0.3));
+    cacheObject.setMaxValue(new Float(21.2));
+    cacheObject.setAddress(new DataTagAddress());
+    cacheObject.setDataTagQuality(createValidQuality());
+    cacheObject.setCacheTimestamp(new Timestamp(System.currentTimeMillis()));
+    cacheObject.setDaqTimestamp(new Timestamp(System.currentTimeMillis()));
+    cacheObject.setSourceTimestamp(new Timestamp(System.currentTimeMillis()));
+    cacheObject.setRuleIdsString("230");
+    return cacheObject;
+  }
 
   /**
    * Creates test equipment (uses JECTEST03 foreign keys).
@@ -360,6 +390,35 @@ public final class CacheObjectCreation {
     cacheObject.setDipAddress("testDIPaddress");
     cacheObject.setJapcAddress("testJAPCaddress");
     cacheObject.setValue(Integer.valueOf(1000));
+    cacheObject.setValueDescription("test value description");
+    cacheObject.setSimulated(false); //null allowed
+    cacheObject.setDataTagQuality(createValidQuality());
+    cacheObject.setCacheTimestamp(new Timestamp(System.currentTimeMillis()));
+    cacheObject.setRuleIdsString("");
+    return cacheObject;
+  }
+  
+  /**
+   * Returns a test rule tag object
+   * @return the RuleTag
+   */
+  public static RuleTagCacheObject createTestMathExpressionRuleTag() {
+    RuleTagCacheObject cacheObject =
+        new RuleTagCacheObject(Long.valueOf(230L),
+          "JUnit_Expression_Rule",
+          "Double",
+          DataTagConstants.MODE_TEST,
+          "(#100004 % 5 )"); //rule text set here - only extra field on top of abstract class
+    cacheObject.setId(Long.valueOf(230L));  //must be non null in DB
+    cacheObject.setName("JUnit_Expression_Rule"); //non null
+    cacheObject.setDescription("test rule for math expressions");
+    cacheObject.setMode(DataTagConstants.MODE_TEST); //non null
+    cacheObject.setDataType("Double"); // non null
+    cacheObject.setLogged(false); //null allowed
+    cacheObject.setUnit("test unit m/sec");
+    cacheObject.setDipAddress("testDIPaddress");
+    cacheObject.setJapcAddress("testJAPCaddress");
+    cacheObject.setValue(Double.valueOf(1000.0));
     cacheObject.setValueDescription("test value description");
     cacheObject.setSimulated(false); //null allowed
     cacheObject.setDataTagQuality(createValidQuality());

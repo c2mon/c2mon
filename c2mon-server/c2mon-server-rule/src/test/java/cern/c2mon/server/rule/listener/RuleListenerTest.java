@@ -129,8 +129,6 @@ public class RuleListenerTest {
     //(1) first test of rule update
     //update dataTag and check rule was updated after short wait (to account for buffer mainly, and passing to new thread)
     dataTagFacade.updateAndValidate(dataTag1.getId(), Boolean.FALSE, "now false", new Timestamp(System.currentTimeMillis()));
-    //NOTIFY OF UPDATE! - can remove as moved notification into facade objects
-    //dataTagCache.notifyListenersOfUpdate(dataTag1);
 
     //check update was made
     assertEquals(Boolean.FALSE, dataTagCache.get(dataTag1.getId()).getValue());
@@ -140,9 +138,64 @@ public class RuleListenerTest {
     //(2) second test of rule update
     //update dataTag to TRUE, notify listeners and check rule was again updated
     dataTagFacade.updateAndValidate(dataTag1.getId(), Boolean.TRUE, "now true", new Timestamp(System.currentTimeMillis()));
-    //dataTagCache.notifyListenersOfUpdate(dataTag1);
     assertEquals(Boolean.TRUE, dataTagCache.get(dataTag1.getId()).getValue());
     latch2.await();
     assertEquals(Integer.valueOf(2), ruleTagCache.get(ruleTag.getId()).getValue());
+  }
+  
+  /**
+   * Tests that a update to a data tag in the cache results in
+   * an update to a rule depending on it.
+   *
+   * Uses the test data created in the cache modules.
+   * @throws InterruptedException
+   */
+  @Test
+  public void testMathExpressionRuleEvaluation() throws InterruptedException {
+    DataTag dataTag = CacheObjectCreation.createTestDataTag4DoubleValue();
+    RuleTag ruleTag = CacheObjectCreation.createTestMathExpressionRuleTag();
+
+    dataTagCache.put(dataTag.getId(), dataTag);
+    ruleTagCache.put(ruleTag.getId(), ruleTag);
+
+    final CountDownLatch latch = new CountDownLatch(1);
+    final CountDownLatch latch2 = new CountDownLatch(2);
+    
+    ruleTagCache.registerSynchronousListener(new C2monCacheListener<RuleTag>() {
+      @Override
+      public void notifyElementUpdated(RuleTag cacheable) {
+        latch.countDown();
+        latch2.countDown();
+      }
+      @Override
+      public void confirmStatus(RuleTag cacheable) {}
+    });
+
+    //check still set as expected in test class
+    assertEquals(5.0, dataTag.getValue());
+    assertEquals(Double.valueOf(1000.0), ruleTag.getValue()); //set manually in cache
+
+    //check are all in cache
+    assertTrue(dataTagCache.hasKey(dataTag.getId()));
+    assertTrue(ruleTagCache.hasKey(ruleTag.getId()));
+    //and have correct values
+    assertEquals(5.0, dataTagCache.get(dataTag.getId()).getValue() );
+    assertEquals(Double.valueOf(1000.0), ruleTagCache.get(ruleTag.getId()).getValue());
+
+    //(1) first test of rule update
+    //update dataTag and check rule was updated after short wait (to account for buffer mainly, and passing to new thread)
+    dataTagFacade.updateAndValidate(dataTag.getId(), 6.0, "now 6.0", new Timestamp(System.currentTimeMillis()));
+
+    //check update was made
+    assertEquals(6.0, dataTagCache.get(dataTag.getId()).getValue());
+    latch.await();
+    assertEquals(Double.valueOf(1.0), ruleTagCache.get(ruleTag.getId()).getValue());
+
+    //(2) second test of rule update
+    //update dataTag to TRUE, notify listeners and check rule was again updated
+    dataTagFacade.updateAndValidate(dataTag.getId(), 5.0, "now 5.0", new Timestamp(System.currentTimeMillis()));
+    assertEquals(5.0, dataTagCache.get(dataTag.getId()).getValue());
+    latch2.await();
+    assertEquals(Double.valueOf(0.0), ruleTagCache.get(ruleTag.getId()).getValue());
   }
 }

@@ -228,7 +228,16 @@ public class Parser extends AbstractParser {
           return (!xResult.equals(yResult)) ? Boolean.TRUE : Boolean.FALSE;
         }
 
-      default:
+        case MODULO:
+            /*
+             * Operator "%": Modulo operator
+             */
+            if (xResult instanceof Number && yResult instanceof Number) {
+                return ((Number) xResult).doubleValue() % ((Number) yResult).doubleValue();
+            }
+            throw new RuleEvaluationException(new StringBuffer("Error in rule definition: cannot evaluate \"")
+                    .append(xResult).append(" ").append(op).append(" ").append(yResult).append("\".").toString());
+       default:
         throw new RuleEvaluationException(new StringBuffer("Error in rule definition: invalid operator \"")
           .append(op).append("\".").toString());
     }

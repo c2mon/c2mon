@@ -66,7 +66,10 @@ public enum Operator {
   EQUALS_COMPARISON("="),
   
   /** Operator "!=": Comparison "(x NOT EQUAL TO y)" */
-  NOT_EQUALS_COMPARISON("!=");
+  NOT_EQUALS_COMPARISON("!="),
+    
+  /** Operator "%": Modulo "(x MODULO y)" */
+  MODULO("%");
   
   /**
    * @param text The text used inside a rule to represent an Operator 
