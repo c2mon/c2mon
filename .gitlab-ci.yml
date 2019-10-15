@@ -6,6 +6,8 @@ stages:
 
 clean_elasticsearch:
   stage: clean
+  tags: 
+    - c2mon
   dependencies: []
   variables:
     GIT_STRATEGY: none
@@ -16,6 +18,7 @@ clean_elasticsearch:
 # Fully build and publish master branch
 build_and_publish:
   stage: build
+  tags: [c2mon]
   dependencies: []
   script:
     - mvn -q -U -B clean deploy --settings settings.xml -Ddependencies.set.direct
@@ -25,6 +28,7 @@ build_and_publish:
 # Just run tests on feature branches
 build:
   stage: build
+  tags: [c2mon]
   dependencies: []
   script:
     - mvn -q -U -B clean test -DskipDocker=true --settings settings.xml -Ddependencies.set.direct --debug -X
@@ -34,6 +38,7 @@ build:
 
 build_docs:
   stage: build
+  tags: [docker]
   image: jekyll/builder:3.8.5
   script:
     - cd docs
@@ -50,6 +55,7 @@ build_docs:
 
 trigger_build:
   stage: deploy
+  tags: [c2mon]
   dependencies: []
   script:
     - "curl -X POST -F token=$TIM_SERVER_TOKEN -F ref=master https://gitlab.cern.ch/api/v4/projects/9859/trigger/pipeline"
@@ -58,6 +64,7 @@ trigger_build:
 
 deploy_docs:
   stage: deploy
+  tags: [no-runner-9]
   dependencies:
     - build_docs
   script:
@@ -68,6 +75,7 @@ deploy_docs:
 
 sonar_preview:
   stage: sonar
+  tags: [c2mon]
   dependencies: []
   script:
     - mvn -q -U -B clean compile sonar:sonar -Dmaven.test.skip=true -DskipDocker=true -Dsonar.host.url=${SONAR_URL} -Dsonar.analysis.mode=preview -Dsonar.gitlab.commit_sha=$CI_BUILD_REF -Dsonar.gitlab.ref_name=$CI_BUILD_REF_NAME -Dsonar.gitlab.project_id=$CI_PROJECT_ID -Dsonar.gitlab.max_major_issues_gate=0 --settings settings.xml
@@ -77,6 +85,7 @@ sonar_preview:
 
 quality_assurance:
   stage: sonar
+  tags: [c2mon]
   dependencies: []
   script:
     - mvn package sonar:sonar -Dmaven.test.skip=true -DskipDocker=true -Dsonar.host.url=${SONAR_URL} -Dsonar.dependencyCheck.reportPath=target/dependency-check-report.xml --settings settings.xml
