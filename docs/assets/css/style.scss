@@ -1,0 +1,66 @@
+---
+---
+@import 'jekyll-theme-cayman';
+@import 'jquery.mmenu.all';
+$menu-size: 16%;
+@import 'custom.cayman';
+
+.pages {
+  padding-left: 20px;
+}
+
+#my-menu {
+  padding: 10px;
+}
+
+.mm-ismenu {
+  background-image: radial-gradient();
+}
+
+.navbar-brand {
+  font-weight: bold;
+}
+
+.all-posts #search-container {
+  padding-top: 0px;
+}
+
+.all-posts #search-input {
+  margin-top: 0px;
+}
+
+.mm-menu {
+  width: $menu-size;
+}
+
+html.mm-opening .mm-page {
+  left: $menu-size;
+}
+
+.index {
+  width: inherit;
+}
+
+.index .articles h2 {
+  margin-bottom: 15px;
+  margin-top: 35px;
+  color: #FFFFFF;
+}
+
+.index .header {
+  margin-bottom: 20px;
+}
+
+td, th {
+  padding: 5px;
+}
+
+/* Reduce image size */
+img[alt="Tim Viewer: a client application build on top of C2MON"] { max-width: 50%; }
+img[alt="Water monitoring station screen as shown on the Tim Viewer"] { max-width: 50%; }
+img[alt=c2mon-layer-overview] { width: 400px; }
+img[alt=process-equipment] { width: 350px; }
+img[alt=process-data-relation] { width: 700px; }
+img[alt=supervision-tags] { width: 500px; }
+img[alt=alarm-evaluation-example] { width: 600px; }
+img[alt=eclipse-server-config] { width: 650px; }

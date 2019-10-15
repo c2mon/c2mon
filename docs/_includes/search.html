@@ -1,0 +1,26 @@
+<div class="row index all-posts">
+
+  <div id="search-container">
+    <input type="text" id="search-input" placeholder="Search...">
+    <div class="col-md-12 content-panel articles">
+      <ul id="results-container"><small>Start typing to see some results</small></ul>
+    </div>
+  </div>
+
+</div>
+
+<hr class="search-hr" />
+
+<script src="{{ site.baseurl }}/assets/js/jekyll-search.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+  SimpleJekyllSearch.init({
+    searchInput: document.getElementById('search-input'),
+    resultsContainer: document.getElementById('results-container'),
+    dataSource: '{{ site.baseurl }}/assets/json/search.json',
+    searchResultTemplate: '<li><a href="{url}" class="li-searchResult" title="{summary}">{title}<\/a><\/li>',
+    noResultsText: 'No results found',
+    limit: 10,
+    fuzzy: true,
+  })
+</script>

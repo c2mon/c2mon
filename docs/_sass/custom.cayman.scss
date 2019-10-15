@@ -1,0 +1,36 @@
+$article-size: 100%;
+
+.body-item {
+  width: $article-size - $menu-size;
+  margin-left: $menu-size;
+}
+
+.main-content {
+  width: 100%;
+  max-width: 80rem;
+}
+
+.page-header {
+  background-image: linear-gradient(90deg, #155799, #159957);
+}
+
+#my-menu {
+  background-image: linear-gradient(270deg, #155799, #156987);
+}
+
+#search-input {
+  color: black;
+}
+
+.li-searchResult,.pages-li {
+  color: white;
+}
+
+.feedback {
+  text-align: center;
+  padding: 10px;
+}
+
+.main-content hr {
+  background-image: linear-gradient(90deg, #155799, #159957);
+}

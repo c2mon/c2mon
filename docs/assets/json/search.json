@@ -1,0 +1,18 @@
+---
+layout: none
+---
+{% assign content = site.posts | concat: site.pages | where_exp:"post","post.title" %}
+[
+  {% for post in content %}
+  {
+    "title"     : "{{ post.title | escape }}",
+    "category"  : "{{ post.category }}",
+    "summary"   : "{{ post.summary }}",
+    "tags"      : "{{ post.tags | join: ', ' }}",
+    "url"       : "{{ site.baseurl }}{{ post.url }}",
+    "content"   : {{ post.content | jsonify }},
+    "date"      : "{{ post.date }}"
+    }
+    {% unless forloop.last %},{% endunless %}
+  {% endfor %}
+]

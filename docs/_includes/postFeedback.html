@@ -1,0 +1,45 @@
+{% if site.github_username %}
+<div class="content-panel feedback">
+  We <3 feedback!<br />
+  Help us <a href="{{ site.repoHost }}{{ site.repository }}{{ site.docFolder }}{{ page.url | replace: "html","md"}}">improve this page</a>
+</div>
+{% endif %}
+
+
+{% if site.related_posts.length > 0 %}
+<div class="content-panel related clearfix">
+  {% for post in site.related_posts limit:1 %}
+  <div class="related-header">
+    <a href="{{ site.baseurl }}{{ post.url }}">Read More</a>
+  </div>
+    <div class="title">
+      <a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a>
+    </div>
+    <div class="excerpt">
+       {% if post.summary %}
+        {{ post.summary | strip_html | truncatewords:30 }}
+       {% else %}
+        {{ post.excerpt | strip_html | truncatewords:30 }}
+       {% endif %}
+      <a href="{{ site.baseurl }}{{ post.url }}">Continue Reading</a>
+    </div>
+  {% endfor %}
+  <hr />
+  <div class="previous previous-next">
+    {% if page.previous %}
+    <p>
+      <a href="{{ site.baseurl }}{{ page.previous.url }}">{{ page.previous.title }}</a>
+    </p>
+    <p class="date">Published {{ page.previous.date | date: "%B %-d, %Y" }}</p>
+    {% endif %}
+  </div>
+  <div class="next previous-next">
+    {% if page.next %}
+    <p>
+      <a href="{{ site.baseurl }}{{ page.next.url }}">{{ page.next.title }}</a>
+    </p>
+    <p class="date">Published {{ page.next.date | date: "%B %-d, %Y" }}</p>
+    {% endif %}
+  </div>
+</div>
+{% endif %}

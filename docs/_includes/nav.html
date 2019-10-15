@@ -1,0 +1,46 @@
+{% assign navurl = site.url | append: site.baseurl | append: page.url %}
+
+<!-- If this is a page with subitems, ensure the navurl variable properly redirects to /index.html -->
+{% assign lastChar = navurl | slice: -1,1 %}
+{% if lastChar == '/' %}
+  {% assign navurl = navurl | append:'index.html' %}
+{% endif %}
+
+<ul class="pages">
+
+{% for item in include.nav %}
+
+    {% assign fullUrl = item.text %}
+
+    <!-- Allows for custom url spec -->
+    {% if item.url %}
+      {% assign fullUrl = item.url %}
+    {% endif %}
+    {% assign fullUrl = fullUrl | slugify | prepend:include.base | absolute_url %}
+
+    <!-- Properly redirect to index.html for pages with subitems -->
+    {% if item.subitems %}
+      {% assign fullUrl = fullUrl | append:'/index.html'  %}
+    {% else %}
+      {% assign fullUrl = fullUrl | append:'.html'  %}
+    {% endif %}
+
+    <li>
+      <a href="{{ fullUrl }}" class="pages-li">
+        {%- if navurl contains fullUrl -%}
+          <b>
+            {{ item.text }}
+          </b>
+        {% else %}
+            {{ item.text }}
+        {% endif %}
+
+        {%- if item.subitems -%}
+          <!-- Allows for skipping the "/" in menu.yml entries -->
+          {% assign fullUrl = fullUrl | replace: "/index.html","" | append:"/" %}
+          {%- include nav.html nav=item.subitems base=fullUrl -%}
+        {% endif %}
+      </a>
+    </li>
+{% endfor %}
+</ul>
