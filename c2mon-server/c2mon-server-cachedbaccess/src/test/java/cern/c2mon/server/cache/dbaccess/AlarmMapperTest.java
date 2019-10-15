@@ -16,15 +16,13 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.dbaccess;
 
-import java.sql.Timestamp;
-
-import javax.annotation.Resource;
-
-import org.junit.Test;
-
 import cern.c2mon.server.cache.dbaccess.structure.DBBatch;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.test.CacheObjectComparison;
+import org.junit.Test;
+
+import javax.annotation.Resource;
+import java.sql.Timestamp;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -91,7 +89,7 @@ public class AlarmMapperTest extends AbstractMapperTest {
     //update fields
     alarmOriginal.setActive(true);
     alarmOriginal.setInternalActive(true);
-    alarmOriginal.setTimestamp(new Timestamp(System.currentTimeMillis()));
+    alarmOriginal.setTriggerTimestamp(new Timestamp(System.currentTimeMillis()));
     alarmOriginal.setSourceTimestamp(new Timestamp(System.currentTimeMillis()));
     alarmOriginal.setInfo("updated info");
     //update in DB

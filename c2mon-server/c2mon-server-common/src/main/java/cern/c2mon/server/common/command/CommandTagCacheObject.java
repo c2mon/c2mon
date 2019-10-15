@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.common.command;
 
+import cern.c2mon.server.common.AbstractCacheableImpl;
 import cern.c2mon.server.common.metadata.Metadata;
 import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
 import cern.c2mon.shared.common.command.CommandExecutionDetails;
@@ -38,14 +39,11 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
  */
 @Data
 @NoArgsConstructor
-public final class CommandTagCacheObject<T> implements CommandTag<T> {
+@EqualsAndHashCode(callSuper = true)
+public final class CommandTagCacheObject<T> extends AbstractCacheableImpl implements CommandTag<T> {
 
     private static final long serialVersionUID = -5348795528961997767L;
 
-    /**
-     * Unique numeric identifier of the CommandTag
-     */
-    private Long id;
 
     /**
      * Unique name of the CommandTag

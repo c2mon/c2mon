@@ -20,6 +20,11 @@ import java.sql.Timestamp;
 import java.util.LinkedList;
 
 import lombok.Data;
+import cern.c2mon.server.common.AbstractCacheableImpl;
+import cern.c2mon.server.common.metadata.Metadata;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import cern.c2mon.server.common.metadata.Metadata;
 import cern.c2mon.shared.client.alarm.condition.AlarmCondition;
@@ -35,15 +40,11 @@ import cern.c2mon.shared.common.Cacheable;
  *
  */
 @Data
-public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
+@EqualsAndHashCode(callSuper = true)
+public class AlarmCacheObject extends AbstractCacheableImpl implements Alarm {
 
   /** Serial version UID */
   private static final long serialVersionUID = 794087757524662419L;
-
-  /**
-   * Internal identifier of the AlarmCacheObject.
-   */
-  private Long id;
 
   /**
    * Unique identifier of the DataTagCacheObject to which the alarm is attached.
@@ -88,14 +89,6 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
   /** Same as the server timestamp of the tag, that triggered the alarm state change */
   private Timestamp timestamp;
 
-  /** This timestamp is taken from the incoming datatag value update */
-  private Timestamp sourceTimestamp;
-
-  /**
-   * Optional info property
-   **/
-  private String info;
-
   /**
    * Name of the JMS topic on which the alarm will be distributed to clients.
    */
@@ -119,6 +112,16 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
   /** Set to <code>true</code>, if alarm starts oscillating */
   private boolean oscillating;
 
+  /** Same as the server timestamp of the tag, that triggered the alarm state change */
+  private Timestamp triggerTimestamp = new Timestamp(0);
+
+  /** This timestamp is taken from the incoming datatag value update */
+  private Timestamp sourceTimestamp = triggerTimestamp;
+
+  /**
+   * Optional info property
+   **/
+  private String info = "";
 
   /**
    * Default constructor.
@@ -156,8 +159,8 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
     if (this.metadata != null) {
       alarmCacheObject.metadata = this.metadata.clone();
     }
-    if (this.timestamp != null) {
-      alarmCacheObject.timestamp = (Timestamp) this.timestamp.clone();
+    if (this.triggerTimestamp != null) {
+      alarmCacheObject.triggerTimestamp = (Timestamp) this.triggerTimestamp.clone();
     }
     if (this.sourceTimestamp != null) {
       alarmCacheObject.sourceTimestamp = (Timestamp) this.sourceTimestamp.clone();
@@ -192,7 +195,7 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
        .append('\t')
        .append(this.getDataTagId())
        .append('\t')
-       .append(getTimestamp())
+       .append(this.getTriggerTimestamp())
        .append('\t')
        .append(getFaultFamily())
        .append('\t')

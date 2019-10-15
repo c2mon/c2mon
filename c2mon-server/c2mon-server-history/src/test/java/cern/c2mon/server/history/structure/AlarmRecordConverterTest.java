@@ -44,7 +44,7 @@ public class AlarmRecordConverterTest {
     EasyMock.expect(alarm.getFaultMember()).andReturn("FM");
     EasyMock.expect(alarm.getDataTagId()).andReturn(1L);
     EasyMock.expect(alarm.getInfo()).andReturn("");
-    EasyMock.expect(alarm.getTimestamp()).andReturn(new Timestamp(System.currentTimeMillis()));
+    EasyMock.expect(alarm.getTriggerTimestamp()).andReturn(new Timestamp(System.currentTimeMillis()));
     EasyMock.expect(alarm.getSourceTimestamp()).andReturn(new Timestamp(System.currentTimeMillis()));
     EasyMock.expect(alarm.isActive()).andReturn(true);
     EasyMock.expect(alarm.isOscillating()).andReturn(false);

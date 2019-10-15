@@ -132,7 +132,7 @@ public class DataTagCacheObject extends AbstractTagCacheObject implements DataTa
   public DataTagCacheObject clone() throws CloneNotSupportedException {
     DataTagCacheObject dataTagCacheObject = (DataTagCacheObject) super.clone();
     if (address != null) {
-      dataTagCacheObject.address = (DataTagAddress) this.address.clone();
+      dataTagCacheObject.address = this.address.clone();
     }
     if (sourceTimestamp != null) {
       dataTagCacheObject.sourceTimestamp = (Timestamp) this.sourceTimestamp.clone();

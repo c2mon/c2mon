@@ -16,15 +16,15 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.loader.impl;
 
-import cern.c2mon.server.cache.loader.CacheLoaderName;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
+import cern.c2mon.server.cache.dbaccess.DataTagMapper;
 import cern.c2mon.server.cache.dbaccess.RuleTagMapper;
+import cern.c2mon.server.cache.loader.CacheLoaderName;
 import cern.c2mon.server.cache.loader.RuleTagLoaderDAO;
 import cern.c2mon.server.cache.loader.common.AbstractBatchLoaderDAO;
 import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.rule.RuleTagCacheObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * RuleTag loader DAO.
@@ -36,8 +36,13 @@ public class RuleTagLoaderDAOImpl extends AbstractBatchLoaderDAO<Long, RuleTag> 
 
   private RuleTagMapper ruleTagMapper;
 
+  /**
+   * We add the unused dataTagMapper to ensure it will have been instantiated first - it is a
+   * dependency of {@link RuleTagMapper}! This is due to Batis 'extends' relationship in the
+   * resultMap. Check out RuleTagMapper.xml for more
+   */
   @Autowired
-  public RuleTagLoaderDAOImpl(RuleTagMapper ruleTagMapper) {
+  public RuleTagLoaderDAOImpl(DataTagMapper dataTagMapper, RuleTagMapper ruleTagMapper) {
     super(ruleTagMapper); //initial buffer size
     this.ruleTagMapper = ruleTagMapper;
   }

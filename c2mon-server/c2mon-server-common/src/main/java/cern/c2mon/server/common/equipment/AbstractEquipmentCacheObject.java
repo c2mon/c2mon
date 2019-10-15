@@ -103,7 +103,8 @@ public abstract class AbstractEquipmentCacheObject extends AbstractSupervisedCac
      * Clone implementation. All runtime information is frozen in clone, that no longer resides in cache (such as
      * SupervisionStatus).
      */
-    public AbstractEquipment clone() {
+    @Override
+    public AbstractEquipmentCacheObject clone() throws CloneNotSupportedException {
         return (AbstractEquipmentCacheObject) super.clone();
     }
 

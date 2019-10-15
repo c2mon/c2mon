@@ -47,4 +47,6 @@ public interface Cacheable extends Serializable, Cloneable {
   Timestamp getCacheTimestamp();
 
   void setCacheTimestamp(Timestamp timestamp);
+
+  <T extends Cacheable> boolean isLaterThan(T other);
 }

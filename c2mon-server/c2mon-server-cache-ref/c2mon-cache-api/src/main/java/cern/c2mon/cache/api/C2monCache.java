@@ -6,7 +6,7 @@ import cern.c2mon.cache.api.loader.CacheLoader;
 import cern.c2mon.cache.api.spi.CacheQuery;
 import cern.c2mon.cache.api.transactions.TransactionalCallable;
 import cern.c2mon.shared.common.Cacheable;
-import lombok.NonNull;
+import org.springframework.lang.NonNull;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
@@ -16,6 +16,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static cern.c2mon.cache.api.listener.CacheEvent.UPDATE_ACCEPTED;
+import static java.util.Objects.requireNonNull;
 
 
 /**
@@ -90,21 +91,33 @@ public interface C2monCache<V extends Cacheable> extends CacheDelegator<V>, Seri
   /**
    * Overload of {@link C2monCache#query(Function)} allowing the user to provide additional search parameters
    *
-   * @param providedQuery
+   * @param providedQuery must not be null, a CacheQuery to execute on the cache
    * @return a {@code Collection} of results, may be empty, never null
    * @see C2monCache#query(Function)
    */
   Collection<V> query(@NonNull CacheQuery<V> providedQuery);
 
+  /**
+   * Put an element to the cache - inserts or updates if the element existed already
+   * <p>
+   * Does NOT notify listeners of the event!
+   *
+   * @param key
+   * @param value
+   */
+  default void putQuiet(@NonNull Long key,@NonNull V value) {
+    requireNonNull(key);
+    requireNonNull(value);
+    value.setCacheTimestamp(new Timestamp(System.currentTimeMillis()));
+    getCache().put(key, value);
+  }
+
   // === Section: C2MON overrides of javax.cache.Cache methods ===
 
   @Override
-  default V get(Long key) throws IllegalArgumentException {
-    if (key != null) {
-      return getCache().get(key);
-    } else {
-      throw new IllegalArgumentException();
-    }
+  default V get(@NonNull Long key) throws IllegalArgumentException {
+    requireNonNull(key);
+    return getCache().get(key);
   }
 
   /**
@@ -117,8 +130,9 @@ public interface C2monCache<V extends Cacheable> extends CacheDelegator<V>, Seri
    * @see C2monCache#putQuiet(Long, Cacheable) to put without notifying
    */
   @Override
-  default void put(@NonNull Long key,@NonNull V value) {
-    // TODO Create update_rejected event here if it fails?
+  default void put(@NonNull Long key, @NonNull V value) {
+    requireNonNull(key);
+    requireNonNull(value);
     putQuiet(key, value);
     notifyListenersOf(UPDATE_ACCEPTED, value);
   }
@@ -130,18 +144,5 @@ public interface C2monCache<V extends Cacheable> extends CacheDelegator<V>, Seri
     // When getting here, it's quite possible that the cache is already closed, so check first!
     if (!getCache().isClosed())
       getCache().close();
-  }
-
-  /**
-   * Put an element to the cache - inserts or updates if the element existed already
-   * <p>
-   * Does NOT notify listeners of the event!
-   *
-   * @param key
-   * @param value
-   */
-  default void putQuiet(@NonNull Long key, @NonNull V value) {
-    value.setCacheTimestamp(new Timestamp(System.currentTimeMillis()));
-    getCache().put(key, value);
   }
 }

@@ -16,9 +16,11 @@
  *****************************************************************************/
 package cern.c2mon.server.common.device;
 
+import cern.c2mon.server.common.AbstractCacheableImpl;
 import cern.c2mon.shared.client.device.DeviceCommand;
 import cern.c2mon.shared.client.device.DeviceProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
@@ -32,17 +34,13 @@ import java.util.List;
  */
 @Data
 @NoArgsConstructor
-public class DeviceCacheObject implements Device {
+@EqualsAndHashCode(callSuper = true)
+public class DeviceCacheObject extends AbstractCacheableImpl implements Device {
 
   /**
    * Serial version UID, since cloneable
    */
   private static final long serialVersionUID = -5756951683926328266L;
-
-  /**
-   * The unique ID of this device.
-   */
-  private Long id;
 
   /**
    * The name of this device.

@@ -7,8 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 /**
  * @author Szymon Halastra
  */
@@ -54,12 +52,10 @@ public class AliveTimerService {
    * at least "aliveInterval" milliseconds.
    */
   public boolean hasExpired(final Long aliveTimerId) {
-    Optional<Boolean> isExpired = aliveTimerCacheRef.executeTransaction(() -> {
+    return aliveTimerCacheRef.executeTransaction(() -> {
       AliveTimer aliveTimer = aliveTimerCacheRef.get(aliveTimerId);
       return (System.currentTimeMillis() - aliveTimer.getLastUpdate() > aliveTimer.getAliveInterval() + aliveTimer.getAliveInterval() / 3);
     });
-
-    return isExpired.get();
   }
 
   public void startAllTimers() {

@@ -78,7 +78,7 @@ public class AlarmService implements AlarmAggregator {
       Alarm alarm = alarmCacheRef.get(alarmId);
       // Notice, in this case the update() method is putting the changes back into the cache
       return alarmCacheUpdater.update(alarm, tag);
-    }).orElse(null);
+    });
   }
 
   public void evaluateAlarm(Long alarmId) {
@@ -118,7 +118,7 @@ public class AlarmService implements AlarmAggregator {
         alarms.add(alarmCacheRef.get(alarmId));
       }
       return new TagWithAlarmsImpl(tag, alarms);
-    }).get();
+    });
   }
 
   /**

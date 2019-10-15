@@ -16,11 +16,15 @@
  *****************************************************************************/
 package cern.c2mon.server.common.device;
 
+import cern.c2mon.server.common.AbstractCacheableImpl;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * This class implements the <code>DeviceClass</code> interface and resides in
@@ -30,17 +34,12 @@ import java.util.List;
  */
 @Data
 @NoArgsConstructor
-public class DeviceClassCacheObject implements DeviceClass {
+public class DeviceClassCacheObject extends AbstractCacheableImpl implements DeviceClass {
 
   /**
    * Serial version UID, since cloneable
    */
   private static final long serialVersionUID = 5797114724330150853L;
-
-  /**
-   * The unique ID of the device class.
-   */
-  private Long id;
 
   /**
    * The name of the device class.
@@ -70,8 +69,8 @@ public class DeviceClassCacheObject implements DeviceClass {
   /**
    * Default constructor.
    *
-   * @param id the unique ID of the device class
-   * @param name the name of the device class
+   * @param id          the unique ID of the device class
+   * @param name        the name of the device class
    * @param description the textual description of the device class
    */
   public DeviceClassCacheObject(final Long id, final String name, final String description) {
@@ -86,9 +85,7 @@ public class DeviceClassCacheObject implements DeviceClass {
    * @param id the unique ID of the device class
    */
   public DeviceClassCacheObject(final Long id) {
-    this.id = id;
-    this.name = null;
-    this.description = null;
+    this(id, null, null);
   }
 
   @SuppressWarnings("unchecked")
@@ -105,107 +102,53 @@ public class DeviceClassCacheObject implements DeviceClass {
 
   @Override
   public List<Long> getPropertyIds() {
-    List<Long> propertyIds = new ArrayList<>();
-
-    for (Property property : properties) {
-      if (property.getId() != null) {
-        propertyIds.add(property.getId());
-      }
-    }
-
-    return propertyIds;
+    return properties.stream().map(Property::getId).filter(Objects::nonNull).collect(Collectors.toList());
   }
 
   @Override
   public List<Long> getCommandIds() {
-    List<Long> commandIds = new ArrayList<>();
-
-    for (Command command : commands) {
-      if (command.getId() != null) {
-        commandIds.add(command.getId());
-      }
-    }
-
-    return commandIds;
+    return commands.stream().map(Command::getId).filter(Objects::nonNull).collect(Collectors.toList());
   }
 
   @Override
   public List<String> getPropertyNames() {
-    List<String> propertyNames = new ArrayList<>();
-
-    for (Property property : properties) {
-      propertyNames.add(property.getName());
-    }
-
-    return propertyNames;
+    return properties.stream().map(Property::getName).filter(Objects::nonNull).collect(Collectors.toList());
   }
 
   @Override
   public List<String> getCommandNames() {
-    List<String> commandNames = new ArrayList<>();
-
-    for (Command command : commands) {
-      commandNames.add(command.getName());
-    }
-
-    return commandNames;
+    return commands.stream().map(Command::getName).filter(Objects::nonNull).collect(Collectors.toList());
   }
 
   @Override
   public Long getPropertyId(String name) {
-    for (Property property : properties) {
-      if (property.getName().equals(name)) {
-        return property.getId();
-      }
-    }
-
-    return null;
+    return properties.stream()
+      .filter(prop -> prop.getName().equals(name)).findFirst()
+      // TODO This code is a very suboptimal use of Optional. It has been chosen only to maintain
+      //  backwards compatibility with previous callers and should be dropped eventually
+      .map(Property::getId).orElse(null);
   }
 
   @Override
   public Long getCommandId(String name) {
-    for (Command command : commands) {
-      if (command.getName().equals(name)) {
-        return command.getId();
-      }
-    }
-
-    return null;
+    // TODO Same as above about suboptimal Optional
+    return commands.stream().filter(command -> command.getName().equals(name)).findFirst().map(Command::getId).orElse(null);
   }
 
   @Override
   public List<String> getFieldNames(String propertyName) {
-    List<String> fieldNames = new ArrayList<>();
-
-    for (Property property : properties) {
-      if (property.getName().equals(propertyName)) {
-        if (property.getFields() != null) {
-          for (Property field : property.getFields()) {
-            fieldNames.add(field.getName());
-          }
-          break;
-        }
-      }
-    }
-
-    return fieldNames;
+    return mapPropertyFields(propertyName, Property::getName);
   }
 
   @Override
   public List<Long> getFieldIds(String propertyName) {
-    List<Long> fieldIds = new ArrayList<>();
+    return mapPropertyFields(propertyName, Property::getId);
+  }
 
-    for (Property property : properties) {
-      if (property.getName().equals(propertyName)) {
-        if (property.getFields() != null) {
-          for (Property field : property.getFields()) {
-            fieldIds.add(field.getId());
-          }
-          break;
-        }
-      }
-    }
 
-    return fieldIds;
+  private <T> List<T> mapPropertyFields(String propertyName, Function<Property, T> mapper) {
+    return properties.stream().filter(prop -> prop.getName().equals(propertyName))
+      .findFirst().map(Property::getFields).orElse(new ArrayList<>())
+      .stream().map(mapper).collect(Collectors.toList());
   }
 }

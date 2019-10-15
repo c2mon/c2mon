@@ -1,14 +1,15 @@
 package cern.c2mon.cache.api;
 
-import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
-
-import org.junit.Test;
-
-import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.cache.api.impl.SimpleC2monCache;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
+import org.junit.Test;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static org.junit.Assert.*;
 
@@ -52,16 +53,11 @@ public class SimpleCacheTest {
     }
 
     long removedId = getRandom();
-    Optional<Boolean> isRemoved = c2monCache.executeTransaction(() -> c2monCache.remove(removedId));
-    Boolean removed = isRemoved.orElseThrow(CacheElementNotFoundException::new);
-    assertTrue("Status after entry removal should be true", removed);
+    boolean isRemoved = c2monCache.executeTransaction(() -> c2monCache.remove(removedId));
+    assertTrue("Status after entry removal should be true", isRemoved);
     assertEquals("C2monCache should have " + (MAP_SIZE - 1) + "entries after removal in transaction", MAP_SIZE - 1, c2monCache.getKeys().size());
 
-    c2monCache.executeTransaction(() -> {
-      c2monCache.put(removedId, new DataTagCacheObject(removedId));
-
-      return null;
-    });
+    c2monCache.executeTransaction(() -> c2monCache.put(removedId, new DataTagCacheObject(removedId)));
 
     assertEquals("C2monCache should have " + MAP_SIZE + " entries again", MAP_SIZE, c2monCache.getKeys().size());
     assertTrue("Removed entry should be accessible again", c2monCache.containsKey(removedId));

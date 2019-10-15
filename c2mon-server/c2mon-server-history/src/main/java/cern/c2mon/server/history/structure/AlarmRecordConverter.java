@@ -39,7 +39,7 @@ public final class AlarmRecordConverter implements LoggerConverter<Alarm> {
     alarmRecord.setFaultMember(alarm.getFaultMember());
     alarmRecord.setFaultCode(alarm.getFaultCode());
 
-    alarmRecord.setServerTimestamp(alarm.getTimestamp());
+    alarmRecord.setServerTimestamp(alarm.getTriggerTimestamp());
     alarmRecord.setSourceTimestamp(alarm.getSourceTimestamp());
 
     alarmRecord.setInfo(alarm.getInfo());

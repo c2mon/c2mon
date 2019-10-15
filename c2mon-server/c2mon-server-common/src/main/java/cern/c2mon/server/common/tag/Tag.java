@@ -49,6 +49,7 @@ public interface Tag extends RuleInputValue, Cacheable {
    */
   String getName();
 
+  @Override
   Tag clone() throws CloneNotSupportedException;
 
   /** Get a free-text description of the tag */

@@ -16,14 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.handler.impl;
 
-import java.sql.Timestamp;
-import java.util.Properties;
-
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.UnexpectedRollbackException;
-
 import cern.c2mon.server.cache.AlarmCache;
 import cern.c2mon.server.cache.AlarmFacade;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
@@ -32,6 +24,13 @@ import cern.c2mon.server.configuration.handler.AlarmConfigHandler;
 import cern.c2mon.server.configuration.handler.transacted.AlarmConfigTransacted;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.UnexpectedRollbackException;
+
+import java.sql.Timestamp;
+import java.util.Properties;
 
 /**
  * See interface documentation.
@@ -83,7 +82,7 @@ public class AlarmConfigHandlerImpl implements AlarmConfigHandler {
 
       alarm.setActive(false);
       alarm.setInfo("Alarm was removed");
-      alarm.setTimestamp(new Timestamp(System.currentTimeMillis()));
+      alarm.setTriggerTimestamp(new Timestamp(System.currentTimeMillis()));
 
       alarmCache.notifyListenersOfUpdate(alarm);
     } catch (CacheElementNotFoundException e) {

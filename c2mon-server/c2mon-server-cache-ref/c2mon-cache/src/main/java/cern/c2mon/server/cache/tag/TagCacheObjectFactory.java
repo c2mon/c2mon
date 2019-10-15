@@ -22,7 +22,6 @@ import cern.c2mon.shared.daq.config.HardwareAddressUpdate;
 
 import java.lang.reflect.Field;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Properties;
 
 /**
@@ -134,7 +133,7 @@ public abstract class TagCacheObjectFactory<T extends Tag> extends AbstractCache
   protected DataTagUpdate setCommonProperties(AbstractTagCacheObject tag, Properties properties)
           throws ConfigurationException {
 
-    Optional<DataTagUpdate> dataTagUpdate = tagCacheRef.executeTransaction(() -> {
+    return tagCacheRef.executeTransaction(() -> {
       DataTagUpdate innerDataTagUpdate = new DataTagUpdate();
       innerDataTagUpdate.setDataTagId(tag.getId());
 
@@ -217,8 +216,6 @@ public abstract class TagCacheObjectFactory<T extends Tag> extends AbstractCache
 
       return innerDataTagUpdate;
     });
-
-    return dataTagUpdate.get();
   }
 
   /**

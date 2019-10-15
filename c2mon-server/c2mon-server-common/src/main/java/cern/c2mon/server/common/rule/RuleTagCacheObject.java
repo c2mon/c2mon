@@ -22,8 +22,7 @@ import cern.c2mon.shared.rule.RuleFormatException;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.sql.Timestamp;
 import java.util.*;
@@ -33,17 +32,13 @@ import java.util.*;
  *
  * @author Mark Brightwell
  */
+@Slf4j
 @Data
-@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class RuleTagCacheObject extends AbstractTagCacheObject implements RuleTag {
 
     private static final long serialVersionUID = -3382383610136394447L;
-
-    /**
-     * Private class logger.
-     */
-    private static final Logger LOGGER = LoggerFactory.getLogger(RuleTagCacheObject.class);
 
     /**
      * The rule as a String. Should never be null for a RuleTag (set as empty String if necessary).
@@ -135,6 +130,7 @@ public class RuleTagCacheObject extends AbstractTagCacheObject implements RuleTa
     }
 
     @Override
+    // TODO Kept only because a vast number of consumers call this method, change them to call cacheTimestamp eventually
     public Timestamp getTimestamp() {
       return getCacheTimestamp();
     }
@@ -152,13 +148,9 @@ public class RuleTagCacheObject extends AbstractTagCacheObject implements RuleTa
 
     @Override
     public final Collection<Long> getCopyRuleInputTagIds() {
-        Collection<Long> ruleCollection;
-        if (ruleExpression != null) {
-            ruleCollection = new ArrayList<>(ruleExpression.getInputTagIds());
-        } else {
-            ruleCollection = Collections.emptyList();
-        }
-        return ruleCollection;
+      return (ruleExpression != null)
+        ? new ArrayList<>(ruleExpression.getInputTagIds())
+        : Collections.emptyList();
     }
 
     /**
@@ -173,7 +165,7 @@ public class RuleTagCacheObject extends AbstractTagCacheObject implements RuleTa
             try {
                 this.ruleExpression = RuleExpression.createExpression(this.ruleText);
             } catch (RuleFormatException formatEx) {
-                LOGGER.error("Exception caught in setting rule expression: unable to parse rule text: ", formatEx);
+                log.error("Exception caught in setting rule expression: unable to parse rule text: ", formatEx);
             }
         } else {
             throw new NullPointerException("Attempting to set RuleTag ruleText field to null!");

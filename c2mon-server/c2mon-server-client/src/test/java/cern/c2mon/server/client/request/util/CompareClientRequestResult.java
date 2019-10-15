@@ -52,7 +52,7 @@ public abstract class CompareClientRequestResult {
     assertEquals(valueClient.getFaultFamily(), valueServer.getFaultFamily());
     assertEquals(valueClient.getInfo(), valueServer.getInfo());
     assertEquals(valueClient.getTagId(), valueServer.getDataTagId());
-    assertEquals(valueClient.getTimestamp(), valueServer.getTimestamp());
+    assertEquals(valueClient.getTimestamp(), valueServer.getTriggerTimestamp());
     assertEquals(valueClient.isActive(), valueServer.isActive());
     if (valueServer.getMetadata() != null && valueClient.getMetadata().isEmpty()) {
       compareMetadata(valueClient.getMetadata(), valueServer.getMetadata().getMetadata());

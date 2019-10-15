@@ -45,11 +45,11 @@ public final class OscillationUpdater {
      */
     public boolean checkOscillAlive(AlarmCacheObject alarmCacheObject) {
         long systemTime = System.currentTimeMillis();
-        long alarmTs = alarmCacheObject.getTimestamp().getTime();
+        long alarmTs = alarmCacheObject.getTriggerTimestamp().getTime();
 
         log.trace(" -> OscillationUpdater.checkOscillAlive()  Alarm #{} diff: {} systime : {} alarmts : {}",
             alarmCacheObject.getId(), (systemTime - alarmTs), new Timestamp(systemTime),
-            alarmCacheObject.getTimestamp().toString());
+            alarmCacheObject.getTriggerTimestamp().toString());
 
         return (systemTime - alarmTs) < (oscillationProperties.getTimeOscillationAlive() * 1000);
     }

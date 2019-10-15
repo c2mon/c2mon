@@ -8,7 +8,6 @@ import cern.c2mon.cache.api.spi.CacheQuery;
 import cern.c2mon.cache.api.transactions.TransactionalCallable;
 import cern.c2mon.shared.common.Cacheable;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
 
 import javax.cache.Cache;
@@ -60,12 +59,12 @@ public class SimpleC2monCache<V extends Cacheable> implements C2monCache<V> {
 
 
   @Override
-  public Collection<V> query(@NonNull Function<V, Boolean> filter) {
+  public Collection<V> query(Function<V, Boolean> filter) {
     return null;
   }
 
   @Override
-  public Collection<V> query(@NonNull CacheQuery<V> providedQuery) {
+  public Collection<V> query(CacheQuery<V> providedQuery) {
     return null;
   }
 }

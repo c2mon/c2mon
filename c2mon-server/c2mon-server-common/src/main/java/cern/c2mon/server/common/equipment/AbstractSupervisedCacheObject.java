@@ -16,9 +16,11 @@
  *****************************************************************************/
 package cern.c2mon.server.common.equipment;
 
+import cern.c2mon.server.common.AbstractCacheableImpl;
 import cern.c2mon.server.common.supervision.Supervised;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
@@ -31,7 +33,8 @@ import java.sql.Timestamp;
  */
 @Data
 @NoArgsConstructor
-public abstract class AbstractSupervisedCacheObject implements Supervised {
+@EqualsAndHashCode(callSuper = true)
+public abstract class AbstractSupervisedCacheObject extends AbstractCacheableImpl implements Supervised {
 
     private static final long serialVersionUID = -7826198425602484249L;
 
@@ -44,11 +47,6 @@ public abstract class AbstractSupervisedCacheObject implements Supervised {
      * Interval in milliseconds at which the alive tag is expected to change.
      */
     private Integer aliveInterval = ALIVE_DEFAULT_INTERVAL;
-
-    /**
-     * Unique identifier of the equipment.
-     */
-    private Long id;
 
     /**
      * Unique name of the equipment.
@@ -135,8 +133,7 @@ public abstract class AbstractSupervisedCacheObject implements Supervised {
      * @return clone of cache object
      */
     @Override
-    public Supervised clone() {
-      try {
+    public AbstractSupervisedCacheObject clone() throws CloneNotSupportedException {
         AbstractSupervisedCacheObject cacheObject = (AbstractSupervisedCacheObject) super.clone();
 
         if (this.statusTime != null) {
@@ -144,8 +141,5 @@ public abstract class AbstractSupervisedCacheObject implements Supervised {
         }
 
         return cacheObject;
-      } catch (CloneNotSupportedException e) {
-        throw new RuntimeException("Exception caught in cloning Supervised object - this should not happen!", e);
-      }
     }
 }

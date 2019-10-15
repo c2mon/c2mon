@@ -17,7 +17,9 @@
 package cern.c2mon.server.common.commfault;
 
 
+import cern.c2mon.server.common.AbstractCacheableImpl;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
@@ -27,11 +29,10 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
-public class CommFaultTagCacheObject implements CommFaultTag {
+@EqualsAndHashCode(callSuper = true)
+public class CommFaultTagCacheObject extends AbstractCacheableImpl implements CommFaultTag {
 
     private static final long serialVersionUID = 8760759761176480601L;
-
-    private Long id;
 
     private final Boolean faultValue = Boolean.FALSE; // always FALSE in TIM; TRUE not supported
 
@@ -74,6 +75,7 @@ public class CommFaultTagCacheObject implements CommFaultTag {
     /**
      * Clone not supported so far.
      */
+    @Override
     public CommFaultTagCacheObject clone() throws CloneNotSupportedException {
         return (CommFaultTagCacheObject) super.clone();
     }
@@ -83,7 +85,7 @@ public class CommFaultTagCacheObject implements CommFaultTag {
     }
 
     public Boolean getOkValue() {
-        return this.faultValue.booleanValue() ? Boolean.FALSE : Boolean.TRUE;
+        return this.faultValue ? Boolean.FALSE : Boolean.TRUE;
     }
 
 }

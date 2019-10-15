@@ -2,12 +2,13 @@ package cern.c2mon.cache.api.spi;
 
 import cern.c2mon.shared.common.Cacheable;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import java.util.Comparator;
 import java.util.function.Function;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Use this class to add extra functionality to search queries. If you only add here and don't edit the Ctor,
@@ -25,7 +26,6 @@ import java.util.function.Function;
 public class CacheQuery<V extends Cacheable> implements Function<V, Boolean> {
   public static final int DEFAULT_MAX_RESULTS = 100_000;
 
-  @NonNull
   private final Function<V, Boolean> filter;
 
   /**
@@ -47,6 +47,7 @@ public class CacheQuery<V extends Cacheable> implements Function<V, Boolean> {
   private Comparator<V> sortBy;
 
   public CacheQuery(Function<V, Boolean> filter) {
+    requireNonNull(filter);
     this.filter = filter;
   }
 

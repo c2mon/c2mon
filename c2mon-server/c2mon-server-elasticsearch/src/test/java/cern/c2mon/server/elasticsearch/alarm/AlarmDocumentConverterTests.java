@@ -16,18 +16,17 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch.alarm;
 
-import java.sql.Timestamp;
-import java.util.Map;
-
+import cern.c2mon.pmanager.fallback.exception.DataFallbackException;
+import cern.c2mon.server.common.alarm.Alarm;
+import cern.c2mon.server.elasticsearch.util.EntityUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.mockito.internal.util.reflection.Whitebox;
 
-import cern.c2mon.pmanager.fallback.exception.DataFallbackException;
-import cern.c2mon.server.common.alarm.Alarm;
-import cern.c2mon.server.elasticsearch.util.EntityUtils;
+import java.sql.Timestamp;
+import java.util.Map;
 
 import static junit.framework.TestCase.assertEquals;
 
@@ -61,7 +60,8 @@ public class AlarmDocumentConverterTests {
     assertEquals(alarm.getFaultCode(), document.get("faultCode"));
     assertEquals(alarm.isActive(), document.get("active"));
     assertEquals(alarm.getInfo(), document.get("info"));
-    assertEquals(alarm.getTimestamp().getTime(), document.get(TIMESTAMP_PROPERTY));
+    assertEquals(alarm.getTriggerTimestamp().getTime(), document.get(TIMESTAMP_PROPERTY));
+    assertEquals(alarm.getSourceTimestamp().getTime(), document.get("sourceTimestamp"));
 
     Map<String, Object> metadata = (Map<String, Object>) document.get("metadata");
     assertEquals(alarm.getMetadata().getMetadata().get("building"), metadata.get("building"));

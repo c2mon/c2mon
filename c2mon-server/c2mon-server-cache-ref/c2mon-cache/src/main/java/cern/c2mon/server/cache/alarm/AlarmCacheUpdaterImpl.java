@@ -145,11 +145,11 @@ public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
   }
 
   boolean isAlarmUninitialised(final AlarmCacheObject alarmCacheObject) {
-    return alarmCacheObject.getTimestamp() == null || alarmCacheObject.getTimestamp().getTime() == 0L;
+    return alarmCacheObject.getTriggerTimestamp() == null || alarmCacheObject.getTriggerTimestamp().getTime() == 0L;
   }
 
   private void changeTimestamps(final AlarmCacheObject alarmCacheObject, final Tag tag) {
-    alarmCacheObject.setTimestamp(new Timestamp(System.currentTimeMillis()));
+    alarmCacheObject.setTriggerTimestamp(new Timestamp(System.currentTimeMillis()));
     alarmCacheObject.setSourceTimestamp(tag.getTimestamp());
   }
 

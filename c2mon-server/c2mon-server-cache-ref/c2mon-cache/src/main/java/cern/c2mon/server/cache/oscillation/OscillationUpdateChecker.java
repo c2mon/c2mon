@@ -200,7 +200,7 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
       if(log.isTraceEnabled()) {
                 log.trace(" -> Alarm oscillation details osc {} first osc {} count {} al ts {}", alarmCacheObject.isOscillating(),
                         new Date(alarmCacheObject.getFirstOscTS()).toString(), alarmCacheObject.getCounterFault(),
-                        alarmCacheObject.getTimestamp().toString());
+                        alarmCacheObject.getTriggerTimestamp().toString());
             }
       if (!oscillationUpdater.checkOscillAlive(alarmCacheObject)) {
           log.trace(" -> ! Alarm #{} is not oscillating anymore, resetting oscillation counter", alarmId);

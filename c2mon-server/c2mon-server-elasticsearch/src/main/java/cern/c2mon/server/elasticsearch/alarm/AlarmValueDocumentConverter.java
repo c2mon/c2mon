@@ -35,7 +35,7 @@ public class AlarmValueDocumentConverter extends BaseAlarmDocumentConverter {
     document.put("active", alarm.isActive());
     document.put("activeNumeric", alarm.isActive() ? 1 : 0);
     document.put("info", alarm.getInfo());
-    document.put("timestamp", alarm.getTimestamp().getTime());
+    document.put("timestamp", alarm.getTriggerTimestamp().getTime());
     document.put("sourceTimestamp", alarm.getSourceTimestamp().getTime());
     document.put("oscillating", alarm.isOscillating());
     return document;

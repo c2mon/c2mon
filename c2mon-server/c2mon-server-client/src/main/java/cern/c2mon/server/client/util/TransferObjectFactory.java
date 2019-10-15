@@ -150,7 +150,7 @@ public abstract class TransferObjectFactory {
               .faultFamily(alarm.getFaultFamily())
               .info(alarm.getInfo())
               .tagId(alarm.getDataTagId())
-              .timestamp(alarm.getTimestamp())
+              .timestamp(alarm.getTriggerTimestamp())
               .active(alarm.isActive())
               .oscillating(alarm.isOscillating())
               .sourceTimestamp(alarm.getSourceTimestamp()).build();
@@ -291,7 +291,7 @@ public abstract class TransferObjectFactory {
                 .faultFamily(alarm.getFaultFamily())
                 .info(alarm.getInfo())
                 .tagId(alarm.getDataTagId())
-                .timestamp(alarm.getTimestamp())
+                .timestamp(alarm.getTriggerTimestamp())
                 .active(alarm.isActive())
                 .oscillating(alarm.isOscillating())
                 .sourceTimestamp(alarm.getSourceTimestamp()).build();

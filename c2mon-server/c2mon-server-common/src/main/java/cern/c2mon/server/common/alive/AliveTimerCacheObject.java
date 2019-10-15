@@ -16,7 +16,9 @@
  *****************************************************************************/
 package cern.c2mon.server.common.alive;
 
+import cern.c2mon.server.common.AbstractCacheableImpl;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
@@ -25,14 +27,10 @@ import java.util.Collection;
 
 @Data
 @NoArgsConstructor
-public class AliveTimerCacheObject implements AliveTimer {
+@EqualsAndHashCode(callSuper = true)
+public class AliveTimerCacheObject extends AbstractCacheableImpl implements AliveTimer {
 
     private static final long serialVersionUID = 2151886747282763819L;
-
-    /**
-     * Unique id of the alive tag.
-     */
-    private Long aliveTagId;
 
     /**
      * Interval at which the alive tag must be updated. This interval includes the ALIVE_TOLERANCE_FACTOR in order to
@@ -96,7 +94,7 @@ public class AliveTimerCacheObject implements AliveTimer {
      * Constructor setting minimal set of non-null fields.
      */
     public AliveTimerCacheObject(Long id) {
-        this.aliveTagId = id;
+        this.id = id;
     }
 
     /**
@@ -126,11 +124,6 @@ public class AliveTimerCacheObject implements AliveTimer {
             aliveTimer.dependentAliveTimerIds = new ArrayList<>(this.dependentAliveTimerIds);
 
         return aliveTimer;
-    }
-
-    @Override
-    public Long getId() {
-        return getAliveTagId();
     }
 
     public synchronized Timestamp getUpdateTimestamp() {

@@ -21,8 +21,7 @@ import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEnti
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -41,26 +40,18 @@ import java.util.regex.Pattern;
  * and should therefore only be used on clones of the Process object residing
  * outside the cache.
  */
+@Slf4j
 @Data
-@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 public class ProcessCacheObject extends AbstractSupervisedCacheObject implements Process {
 
+  public static final Pattern PROCESS_NAME_PATTERN = Pattern.compile("P_([A-Z_0-9])+", Pattern.CASE_INSENSITIVE);
+  public static final String LOCAL_CONFIG = "Y";
+  public static final String SERVER_CONFIG = "N";
   private static final long serialVersionUID = -2235204911515127976L;
 
   private final SupervisionEntity supervisionEntity = SupervisionEntity.PROCESS;
-
-  public static final Pattern PROCESS_NAME_PATTERN = Pattern.compile("P_([A-Z_0-9])+", Pattern.CASE_INSENSITIVE);
-
-  public static final String LOCAL_CONFIG = "Y";
-
-  public static final String SERVER_CONFIG = "N";
-
-  /**
-   * LOG4J Logger for this class.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(ProcessCacheObject.class);
-
   /**
    * A description of the process.
    * -- GETTER --
@@ -128,26 +119,6 @@ public class ProcessCacheObject extends AbstractSupervisedCacheObject implements
    * Process Identifier Key (PIK) per DAQ instance
    */
   private Long processPIK;
-
-  /**
-   * Enum for describing configuration type
-   *
-   * Y for LOCAL_CONFIG or N for SERVER_CONFIG
-   */
-  public enum LocalConfig {
-    Y("LOCAL_CONFIG"), N("SERVER_CONFIG");
-
-    private String configType;
-
-    LocalConfig(String configType) {
-      this.configType = configType;
-    }
-
-    public String getConfigType() {
-      return this.configType;
-    }
-  }
-
   /**
    * The configuration type can be whether Y (LOCAL_CONFIG) or N (SERVER_CONFIG)
    */
@@ -157,12 +128,12 @@ public class ProcessCacheObject extends AbstractSupervisedCacheObject implements
    * Constructor with minimal number of non-null fields. Used when loading from
    * the DB at start up.
    *
-   * @param id the id of the process
-   * @param name the name of the process
-   * @param stateTagId the id of the state tag
-   * @param maxMessageSize the max number of updates per message from DAQ layer
+   * @param id              the id of the process
+   * @param name            the name of the process
+   * @param stateTagId      the id of the state tag
+   * @param maxMessageSize  the max number of updates per message from DAQ layer
    * @param maxMessageDelay the max delay at DAQ layer before sending the
-   *          updates
+   *                        updates
    */
   public ProcessCacheObject(Long id, String name, Long stateTagId, Integer maxMessageSize, Integer maxMessageDelay) {
     super(id, stateTagId);
@@ -182,7 +153,7 @@ public class ProcessCacheObject extends AbstractSupervisedCacheObject implements
 
   @SuppressWarnings("unchecked")
   @Override
-  public Process clone() {
+  public ProcessCacheObject clone() throws CloneNotSupportedException {
     ProcessCacheObject clone = (ProcessCacheObject) super.clone();
     clone.equipmentIds = (ArrayList<Long>) equipmentIds.clone();
     if (this.startupTime != null) {
@@ -190,5 +161,24 @@ public class ProcessCacheObject extends AbstractSupervisedCacheObject implements
     }
 
     return clone;
+  }
+
+  /**
+   * Enum for describing configuration type
+   * <p>
+   * Y for LOCAL_CONFIG or N for SERVER_CONFIG
+   */
+  public enum LocalConfig {
+    Y("LOCAL_CONFIG"), N("SERVER_CONFIG");
+
+    private String configType;
+
+    LocalConfig(String configType) {
+      this.configType = configType;
+    }
+
+    public String getConfigType() {
+      return this.configType;
+    }
   }
 }

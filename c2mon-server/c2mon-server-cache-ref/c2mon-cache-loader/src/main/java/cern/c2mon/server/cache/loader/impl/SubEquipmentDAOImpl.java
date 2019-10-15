@@ -16,20 +16,20 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.loader.impl;
 
-import java.util.List;
-
-import cern.c2mon.server.cache.loader.CacheLoaderName;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
-import org.springframework.stereotype.Service;
-
+import cern.c2mon.server.cache.dbaccess.EquipmentMapper;
 import cern.c2mon.server.cache.dbaccess.SubEquipmentMapper;
+import cern.c2mon.server.cache.loader.CacheLoaderName;
 import cern.c2mon.server.cache.loader.SubEquipmentDAO;
 import cern.c2mon.server.cache.loader.common.AbstractDefaultLoaderDAO;
 import cern.c2mon.server.common.exception.SubEquipmentException;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * SubEquipment DAO implementation.
@@ -45,8 +45,13 @@ public class SubEquipmentDAOImpl extends AbstractDefaultLoaderDAO<SubEquipment> 
    */
   private SubEquipmentMapper subEquipmentMapper;
 
+  /**
+   * We add the unused equipmentMapper to ensure it will have been instantiated first - it is a
+   * dependency of {@link SubEquipmentMapper}! This is due to Batis 'extends' relationship in the
+   * resultMap. Check out SubEquipmentMapper.xml for more
+   */
   @Autowired
-  public SubEquipmentDAOImpl(SubEquipmentMapper subEquipmentMapper) {
+  public SubEquipmentDAOImpl(EquipmentMapper equipmentMapper, SubEquipmentMapper subEquipmentMapper) {
     super(500, subEquipmentMapper);
     this.subEquipmentMapper = subEquipmentMapper;
   }

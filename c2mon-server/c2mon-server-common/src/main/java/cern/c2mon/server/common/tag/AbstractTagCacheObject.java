@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.common.tag;
 
+import cern.c2mon.server.common.AbstractCacheableImpl;
 import cern.c2mon.server.common.metadata.Metadata;
 import cern.c2mon.shared.common.datatag.DataTagConstants;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
@@ -42,7 +43,8 @@ import static cern.c2mon.shared.common.datatag.DataTagConstants.*;
  */
 @Slf4j
 @Data
-public abstract class AbstractTagCacheObject implements Cloneable, Serializable {
+@EqualsAndHashCode(callSuper = true)
+public abstract class AbstractTagCacheObject extends AbstractCacheableImpl implements Serializable {
 
   // TODO remove UID if not needed
   /**
@@ -55,11 +57,6 @@ public abstract class AbstractTagCacheObject implements Cloneable, Serializable 
    * longer value description, it will be truncated.
    */
   private static final int MAX_DESC_LENGTH = 500;
-
-  /**
-   * Unique datatag identifier (unique across all types of tags: control, datatag and rules).
-   */
-  private Long id;
 
   /**
    * Unique tag name.
@@ -127,14 +124,6 @@ public abstract class AbstractTagCacheObject implements Cloneable, Serializable 
    * Description of the tag's current value (if any)
    */
   private String valueDescription;
-
-  /**
-   * Timestamp set when the current value was saved in the cache
-   * (if at all). It should be set when the cache object is
-   * added to the cache.
-   */
-  @EqualsAndHashCode.Exclude
-  private Timestamp cacheTimestamp;
 
   /**
    * Quality of the tag's current value.
@@ -225,7 +214,7 @@ public abstract class AbstractTagCacheObject implements Cloneable, Serializable 
    * @param id
    */
   protected AbstractTagCacheObject(final Long id) {
-    this();
+    super();
     this.id = id;
   }
 
@@ -235,19 +224,16 @@ public abstract class AbstractTagCacheObject implements Cloneable, Serializable 
    * cache).
    */
   @Override
-  public Object clone() throws CloneNotSupportedException {
+  public AbstractTagCacheObject clone() throws CloneNotSupportedException {
     AbstractTagCacheObject cacheObject = (AbstractTagCacheObject) super.clone();
     ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     cacheObject.readLock = lock.readLock();
     cacheObject.writeLock = lock.writeLock();
     if (dataTagQuality != null) {
-      cacheObject.dataTagQuality = (DataTagQuality) dataTagQuality.clone();
+      cacheObject.dataTagQuality = dataTagQuality.clone();
     }
     cacheObject.alarmIds = (ArrayList<Long>) ((ArrayList<Long>) alarmIds).clone();
     cacheObject.ruleIds = (ArrayList<Long>) ((ArrayList<Long>) ruleIds).clone();
-    if (cacheTimestamp != null) {
-      cacheObject.cacheTimestamp = (Timestamp) cacheTimestamp.clone();
-    }
     return cacheObject;
   }
 
@@ -356,13 +342,6 @@ public abstract class AbstractTagCacheObject implements Cloneable, Serializable 
       this.metadata = new Metadata();
     }
     return this.metadata;
-  }
-
-  /**
-   * @param simulated the simulated to set
-   */
-  public void setSimulated(boolean simulated) {
-    this.simulated = simulated;
   }
 
   public final short getDataTagChange() {

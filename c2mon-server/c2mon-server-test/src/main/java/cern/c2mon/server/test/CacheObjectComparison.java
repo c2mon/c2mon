@@ -115,7 +115,7 @@ public final class CacheObjectComparison {
     assertEquals(alarm1.isInternalActive(), alarm2.isInternalActive());
     assertEquals(alarm1.getInfo(), alarm2.getInfo());
     assertEquals(alarm1.getCondition(), alarm2.getCondition());
-    assertEquals(alarm1.getTimestamp(), alarm2.getTimestamp());
+    assertEquals(alarm1.getTriggerTimestamp(), alarm2.getTriggerTimestamp());
     assertEquals(alarm1.isOscillating(), alarm2.isOscillating());
   }
 

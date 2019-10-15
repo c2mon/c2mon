@@ -5,9 +5,14 @@
   <!-- take "namespace=Mapper interface" for the mapper SQL statements to be picked up automatically -->
   <mapper namespace="cern.c2mon.server.cache.dbaccess.DataTagMapper">
 
-    <!-- result map below corresponds to the abstract AbstractTagCacheObject -->
-    <resultMap id="abstractTagResultMap" type="cern.c2mon.server.common.tag.AbstractTagCacheObject">
+    <resultMap id="abstractCacheableMap" type="cern.c2mon.server.common.AbstractCacheableImpl">
       <id property="id" column="TAGID" jdbcType="NUMERIC" javaType="java.lang.Long"/>
+      <result property="cacheTimestamp" column="TAGSRVTIMESTAMP" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!-- result map below corresponds to the abstract AbstractTagCacheObject -->
+    <resultMap id="abstractTagResultMap" type="cern.c2mon.server.common.tag.AbstractTagCacheObject"
+      extends="abstractCacheableMap">
       <result property="name" column="TAGNAME"/>
       <result property="description" column="TAGDESC" jdbcType="VARCHAR"/>
       <result property="mode" column="TAGMODE"/>
@@ -15,8 +20,6 @@
 
       <result property="value" column="TAGVALUE" javaType="java.lang.Object" jdbcType="VARCHAR"/>
       <result property="valueDescription" column="TAGVALUEDESC" jdbcType="VARCHAR"/>
-
-      <result property="cacheTimestamp" column="TAGSRVTIMESTAMP" jdbcType="TIMESTAMP"/>
 
       <result property="dataTagQuality" column="TAGQUALITYDESC" javaType="cern.c2mon.shared.common.datatag.DataTagQuality" jdbcType="VARCHAR"/>
 

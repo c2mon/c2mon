@@ -177,7 +177,7 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
     // Initialise run-time parameters with default values
     alarm.setActive(false);
     alarm.setInternalActive(false);
-    alarm.setTimestamp(new Timestamp(0));
+    alarm.setTriggerTimestamp(new Timestamp(0));
     alarm.setSourceTimestamp(new Timestamp(0));
     alarm.setInfo("");
 

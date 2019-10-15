@@ -67,7 +67,7 @@ public class EquipmentCacheObject extends AbstractEquipmentCacheObject implement
      */
     @Override
     @SuppressWarnings("unchecked")
-    public EquipmentCacheObject clone() {
+    public EquipmentCacheObject clone() throws CloneNotSupportedException {
         EquipmentCacheObject equipmentCacheObject = (EquipmentCacheObject) super.clone();
         equipmentCacheObject.commandTagIds = (LinkedList<Long>) this.commandTagIds.clone();
         equipmentCacheObject.subEquipmentIds = (LinkedList<Long>) this.subEquipmentIds.clone();

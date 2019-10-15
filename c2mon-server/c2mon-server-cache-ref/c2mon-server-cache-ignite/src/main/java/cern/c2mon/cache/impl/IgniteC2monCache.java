@@ -20,7 +20,10 @@ import org.apache.ignite.transactions.TransactionTimeoutException;
 
 import javax.annotation.PostConstruct;
 import javax.cache.CacheException;
-import java.util.*;
+import java.util.Collection;
+import java.util.Set;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -95,21 +98,20 @@ public class IgniteC2monCache<V extends Cacheable> implements C2monCache<V> {
   }
 
   @Override
-  public <S> Optional<S> executeTransaction(TransactionalCallable<S> callable) {
+  public <S> S executeTransaction(TransactionalCallable<S> callable) {
     try (Transaction tx = igniteInstance.transactions().txStart()) {
 
       S returnValue = callable.call();
 
       tx.commit();
 
-      return Optional.of(returnValue);
+      return returnValue;
     } catch (CacheException e) {
       if (e.getCause() instanceof TransactionTimeoutException &&
         e.getCause().getCause() instanceof TransactionDeadlockException) {
         log.error("DeadLock occurred", e.getCause().getCause().getMessage());
       }
+      throw e;
     }
-
-    return Optional.empty();
   }
 }
