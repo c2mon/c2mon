@@ -13,7 +13,7 @@
 
   <build>
     <plugins>
-      <plugin>
+      <!--plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
         <version>1.5.0</version>
@@ -33,7 +33,7 @@
             <argument>--clean</argument>
           </arguments>
         </configuration>
-      </plugin>
+      </plugin-->
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

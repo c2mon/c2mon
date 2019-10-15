@@ -12,7 +12,6 @@
     <module>c2mon-client</module>
     <module>c2mon-daq</module>
     <module>c2mon-shared</module>
-    <module>docs</module>
   </modules>
 
    <distributionManagement>
