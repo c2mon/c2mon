@@ -77,38 +77,27 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
    * time for incoming alarms to be processed).
    */
   private static final long INITIAL_SCAN_DELAY = 120000L;
-
+  private final C2monCache<Alarm> alarmCacheRef;
+  private final C2monCache<OscillationTimestamp> timestampCacheRef;
+  private final OscillationService oscillationCheckService;
+  private final OscillationUpdater oscillationUpdater;
+  private final AlarmCacheUpdater alarmCacheUpdater;
+  private final C2monCache<DataTag> dataTagCacheRef;
   /**
    * Lifecycle flag.
    */
   private volatile boolean running = false;
-
   private Timer timer;
-
-  private final C2monCache<Alarm> alarmCacheRef;
-
-  private final C2monCache<OscillationTimestamp> timestampCacheRef;
-
-  private final OscillationService oscillationCheckService;
-
-  private final OscillationUpdater oscillationUpdater;
-
-  private final AlarmCacheUpdater alarmCacheUpdater;
-
-  private final C2monCache<DataTag> dataTagCacheRef;
 
   /**
    * Constructor.
-   *  @param alarmCacheRef
-   *          the alarm cache to retrieve and update alarm cache objects.
+   *
+   * @param alarmCacheRef           the alarm cache to retrieve and update alarm cache objects.
    * @param timestampCacheRef
-   * @param oscillationCheckService
-   *          the component that manages the oscillation check timer
-   * @param oscillationUpdater
- *          the instance that check oscillation statuses.
+   * @param oscillationCheckService the component that manages the oscillation check timer
+   * @param oscillationUpdater      the instance that check oscillation statuses.
    * @param alarmCacheUpdater
-   * @param dataTagCacheRef
-*          the data tag cache to retrieve data tag objects and check their original values.
+   * @param dataTagCacheRef         the data tag cache to retrieve data tag objects and check their original values.
    */
   @Autowired
   public OscillationUpdateChecker(final C2monCache<Alarm> alarmCacheRef, C2monCache<OscillationTimestamp> timestampCacheRef, final OscillationService oscillationCheckService,
@@ -130,9 +119,7 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
   @EventListener
   public void init(ContextRefreshedEvent event) {
     log.trace("Initialising Alarm oscillation checker ...");
-    timestampCacheRef.executeTransaction( () -> {
-      oscillationCheckService.setLastOscillationCheck(0);
-    });
+    oscillationCheckService.setLastOscillationCheck(0);
     log.trace("Initialisation complete.");
   }
 
@@ -165,7 +152,7 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
    */
   @Override
   public void run() {
-    alarmCacheRef.executeTransaction( () -> {
+    alarmCacheRef.executeTransaction(() -> {
       long lastCheck = oscillationCheckService.getLastOscillationCheck();
       if (System.currentTimeMillis() - lastCheck < SCAN_INTERVAL - 500L) {
         log.debug("Skipping alarm oscillation check as already performed.");
@@ -197,22 +184,22 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
     long alarmId = alarmCacheObject.getId();
     try {
       log.trace("Checking oscillation expiry for alarm #{}", alarmId);
-      if(log.isTraceEnabled()) {
-                log.trace(" -> Alarm oscillation details osc {} first osc {} count {} al ts {}", alarmCacheObject.isOscillating(),
-                        new Date(alarmCacheObject.getFirstOscTS()).toString(), alarmCacheObject.getCounterFault(),
-                        alarmCacheObject.getTriggerTimestamp().toString());
-            }
+      if (log.isTraceEnabled()) {
+        log.trace(" -> Alarm oscillation details osc {} first osc {} count {} al ts {}", alarmCacheObject.isOscillating(),
+          new Date(alarmCacheObject.getFirstOscTS()).toString(), alarmCacheObject.getCounterFault(),
+          alarmCacheObject.getTriggerTimestamp().toString());
+      }
       if (!oscillationUpdater.checkOscillAlive(alarmCacheObject)) {
-          log.trace(" -> ! Alarm #{} is not oscillating anymore, resetting oscillation counter", alarmId);
-          oscillationUpdater.resetOscillationCounter(alarmCacheObject);
-          Tag tag = dataTagCacheRef.get(alarmCacheObject.getDataTagId());
-          if(tag != null) {
-            alarmCacheUpdater.resetOscillationStatus(alarmCacheObject, tag);
-          } else {
-              log.error("Cannot locate data tag #{} - unable to reset oscillation status", alarmCacheObject.getDataTagId());
-          }
+        log.trace(" -> ! Alarm #{} is not oscillating anymore, resetting oscillation counter", alarmId);
+        oscillationUpdater.resetOscillationCounter(alarmCacheObject);
+        Tag tag = dataTagCacheRef.get(alarmCacheObject.getDataTagId());
+        if (tag != null) {
+          alarmCacheUpdater.resetOscillationStatus(alarmCacheObject, tag);
+        } else {
+          log.error("Cannot locate data tag #{} - unable to reset oscillation status", alarmCacheObject.getDataTagId());
+        }
       } else {
-          log.trace(" -> (!) Alarm #{} is still oscillating - no change", alarmId);
+        log.trace(" -> (!) Alarm #{} is still oscillating - no change", alarmId);
       }
     } catch (CacheElementNotFoundException e) {
       log.error("Failed to locate corresponding tag in cache for alarm #{}. This should never happen!", alarmId);

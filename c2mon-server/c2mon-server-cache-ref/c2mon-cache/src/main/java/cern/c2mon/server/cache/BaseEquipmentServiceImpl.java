@@ -5,9 +5,11 @@ import cern.c2mon.cache.api.service.CommonEquipmentOperations;
 import cern.c2mon.server.cache.alivetimer.AliveTimerService;
 import cern.c2mon.server.cache.commfault.CommFaultService;
 import cern.c2mon.server.cache.supervision.SupervisedService;
+import cern.c2mon.server.cache.supervision.SupervisedServiceDelegator;
 import cern.c2mon.server.cache.supervision.SupervisedServiceImpl;
 import cern.c2mon.server.common.commfault.CommFaultTag;
 import cern.c2mon.server.common.equipment.AbstractEquipment;
+import cern.c2mon.shared.common.supervision.SupervisionConstants;
 import lombok.Getter;
 
 import java.util.HashMap;
@@ -18,7 +20,7 @@ import java.util.Set;
  * @author Szymon Halastra
  * @author Alexandros Papageorgiou Koufidis
  */
-public class BaseEquipmentServiceImpl<T extends AbstractEquipment> implements CommonEquipmentOperations {
+public abstract class BaseEquipmentServiceImpl<T extends AbstractEquipment> implements CommonEquipmentOperations, SupervisedServiceDelegator<T> {
 
   @Getter
   private C2monCache<T> c2monCache;
@@ -28,11 +30,12 @@ public class BaseEquipmentServiceImpl<T extends AbstractEquipment> implements Co
   @Getter
   private SupervisedService<T> supervisedService;
 
-  protected BaseEquipmentServiceImpl(C2monCache<T> c2monCache, CommFaultService commFaultService, AliveTimerService aliveTimerService) {
+  protected BaseEquipmentServiceImpl(C2monCache<T> c2monCache, CommFaultService commFaultService,
+                                     AliveTimerService aliveTimerService, SupervisionConstants.SupervisionEntity supervisionEntity) {
     this.c2monCache = c2monCache;
     this.commFaultTagCache = commFaultService.getCache();
 
-    supervisedService = new SupervisedServiceImpl<>(c2monCache, aliveTimerService);
+    supervisedService = new SupervisedServiceImpl<>(supervisionEntity,c2monCache, aliveTimerService);
   }
 
   @Override

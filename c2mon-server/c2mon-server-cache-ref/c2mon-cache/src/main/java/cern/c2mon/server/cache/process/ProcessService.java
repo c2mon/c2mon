@@ -65,7 +65,7 @@ public class ProcessService implements ProcessOperationService, SupervisedServic
 
       if (properties.isTestMode()) {
         // If the TEST Mode is on
-        startLocal(process, hostName, startupTime);
+        forceStart(process, hostName, startupTime);
         log.trace("start - TEST Mode - Process " + process.getName()
           + ", PIK " + process.getProcessPIK());
       } else {
@@ -131,7 +131,7 @@ public class ProcessService implements ProcessOperationService, SupervisedServic
 
   @Override
   public Boolean isRebootRequired(Long processId) {
-    return processCacheRef.executeTransaction(() -> processCacheRef.get(processId).getRequiresReboot());
+    return processCacheRef.get(processId).getRequiresReboot();
   }
 
   @Override
@@ -168,25 +168,14 @@ public class ProcessService implements ProcessOperationService, SupervisedServic
    * of state tag of the DAQ)
    * <p>
    * <p>Also starts the alive timer.
-   * <p>
-   * <p>Please note, that in case of a cache reference to the process it is up to the calling
-   * method to acquire a write lock. In case of a copy it is the calling method that has
-   * to take care of committing the changes made to the process object back to the cache.
    *
    * @param process      the Process that is starting
    * @param pHostName    the hostname of the Process
    * @param pStartupTime the start up time
    */
   private void start(final Process process, final String pHostName, final Timestamp pStartupTime) {
-    ProcessCacheObject processCacheObject = (ProcessCacheObject) process;
-    if (!supervisedService.isRunning(processCacheObject)) {
-      final Long newPIK = createProcessPIK();
-      processCacheObject.setCurrentHost(pHostName);
-      processCacheObject.setStartupTime(pStartupTime);
-      processCacheObject.setRequiresReboot(Boolean.FALSE);
-      processCacheObject.setProcessPIK(newPIK);
-      processCacheObject.setLocalConfig(ProcessCacheObject.LocalConfig.Y);
-      supervisedService.start(processCacheObject, pStartupTime);
+    if (!process.isRunning()) {
+      forceStart(process, pHostName, pStartupTime);
     }
   }
 
@@ -208,7 +197,7 @@ public class ProcessService implements ProcessOperationService, SupervisedServic
    * @param pHostName    the hostname of the Process
    * @param pStartupTime the start up time
    */
-  private void startLocal(final Process process, final String pHostName, final Timestamp pStartupTime) {
+  private void forceStart(final Process process, final String pHostName, final Timestamp pStartupTime) {
     ProcessCacheObject processCacheObject = (ProcessCacheObject) process;
     final Long newPIK = createProcessPIK();
     processCacheObject.setCurrentHost(pHostName);
@@ -216,7 +205,7 @@ public class ProcessService implements ProcessOperationService, SupervisedServic
     processCacheObject.setRequiresReboot(Boolean.FALSE);
     processCacheObject.setProcessPIK(newPIK);
     processCacheObject.setLocalConfig(ProcessCacheObject.LocalConfig.Y);
-    supervisedService.start(processCacheObject);
+    processCacheObject.start(pStartupTime);
   }
 
   /**

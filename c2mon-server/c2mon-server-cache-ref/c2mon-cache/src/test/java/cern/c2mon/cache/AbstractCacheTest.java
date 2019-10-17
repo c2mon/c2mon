@@ -34,6 +34,8 @@ import static org.junit.Assert.assertEquals;
 })
 public abstract class AbstractCacheTest<V extends Cacheable> {
 
+  protected abstract V getSample();
+
   @Rule
   @Autowired
   public CachePopulationRule cachePopulationRule;

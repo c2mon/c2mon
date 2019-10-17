@@ -1,5 +1,6 @@
 package cern.c2mon.server.common;
 
+import cern.c2mon.shared.common.CacheEvent;
 import cern.c2mon.shared.common.Cacheable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -7,6 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
 import java.sql.Timestamp;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Should be used as common base for all objects residing in caches
@@ -44,11 +47,16 @@ public abstract class AbstractCacheableImpl implements Cacheable {
   }
 
   @Override
-  public <T extends Cacheable> boolean isLaterThan(@NonNull T other) {
-    // This check may turn out unnecessary, keep an eye on it and remove if a competing use case appears
-    if (!canEqual(other))
-      throw new IllegalArgumentException("Attempting to compare against class " + other.getClass()
-        + " when own class is " + getClass());
-    return true;
+  public <T extends Cacheable> boolean preInsertValidate(T previous) {
+    // If they are the same, no need to update, so false
+    return !equals(previous);
+  }
+
+  @Override
+  public <T extends Cacheable> Set<CacheEvent> postInsertEvents(T previous) {
+    Set<CacheEvent> results = new HashSet<>();
+    if (previous == null)
+      results.add(CacheEvent.INSERTED);
+    return results;
   }
 }

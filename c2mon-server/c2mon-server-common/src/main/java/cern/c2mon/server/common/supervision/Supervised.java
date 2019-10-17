@@ -107,4 +107,61 @@ public interface Supervised extends Cacheable {
    */
   Timestamp getStatusTime();
 
+  /**
+   * Returns true if the object is either running or in
+   * the start up phase. And false if either DOWN or STOPPED, or
+   * if the status is UNCERTAIN.
+   *
+   * @return true if it is running (or starting up)
+   */
+  default boolean isRunning(){
+    // Assigning it here keeps us safe from concurrent modifications
+    SupervisionStatus status = getSupervisionStatus();
+    return status != null
+      && (status.equals(SupervisionStatus.STARTUP)
+      || status.equals(SupervisionStatus.RUNNING)
+      || status.equals(SupervisionStatus.RUNNING_LOCAL));
+  }
+
+  /**
+   * Returns true only if the object is in UNCERTAIN status.
+   *
+   * @return true if the status is uncertain
+   */
+  default boolean isUncertain() {
+    return getSupervisionStatus() != null && getSupervisionStatus().equals(SupervisionStatus.UNCERTAIN);
+  }
+
+  /**
+   * Sets the status of this Supervised object to STARTUP,
+   * with associated message.
+   * <p>
+   * <p>Starts the alive timer if not already running.
+   *
+   * Careful, this does NOT update the cache entry. You need to explicitly {@code put} for that
+   */
+  default void start(final Timestamp timestamp) {
+    setSupervisionStatus(SupervisionStatus.STARTUP);
+    setStatusDescription(getSupervisionEntity() + " " + getName() + " was started");
+    setStatusTime(timestamp);
+  }
+
+  default void stop(final Timestamp timestamp) {
+    setSupervisionStatus(SupervisionStatus.DOWN);
+    setStatusTime(timestamp);
+    setStatusDescription(getSupervisionEntity() + " " + getName() + " was stopped");
+  }
+
+  default void resume(final Timestamp timestamp, final String message) {
+    setSupervisionStatus(SupervisionStatus.RUNNING);
+    setStatusTime(timestamp);
+    setStatusDescription(message);
+  }
+
+  default void suspend(final Timestamp timestamp, final String message) {
+    setSupervisionStatus(SupervisionStatus.DOWN);
+    setStatusDescription(message);
+    setStatusTime(timestamp);
+  }
+
 }

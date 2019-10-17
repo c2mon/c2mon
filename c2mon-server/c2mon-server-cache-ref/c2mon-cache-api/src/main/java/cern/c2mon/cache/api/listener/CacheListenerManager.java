@@ -1,5 +1,6 @@
 package cern.c2mon.cache.api.listener;
 
+import cern.c2mon.shared.common.CacheEvent;
 import cern.c2mon.shared.common.Cacheable;
 
 public interface CacheListenerManager<V extends Cacheable> {

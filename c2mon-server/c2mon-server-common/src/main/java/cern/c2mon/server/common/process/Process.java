@@ -18,7 +18,9 @@ package cern.c2mon.server.common.process;
 
 import cern.c2mon.server.common.process.ProcessCacheObject.LocalConfig;
 import cern.c2mon.server.common.supervision.Supervised;
+import cern.c2mon.shared.common.supervision.SupervisionConstants;
 
+import java.sql.Timestamp;
 import java.util.Collection;
 
 /**
@@ -78,4 +80,12 @@ public interface Process extends Supervised {
    *         {@link LocalConfig.N} otherwise
    */
   LocalConfig getLocalConfig();
+
+  @Override
+  default void resume(final Timestamp timestamp, final String message) {
+    Supervised.super.resume(timestamp,message);
+    if (getLocalConfig() != null && getLocalConfig().equals(ProcessCacheObject.LocalConfig.Y)) {
+      setSupervisionStatus(SupervisionConstants.SupervisionStatus.RUNNING_LOCAL);
+    }
+  }
 }

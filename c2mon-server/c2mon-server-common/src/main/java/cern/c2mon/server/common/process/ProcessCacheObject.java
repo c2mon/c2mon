@@ -87,7 +87,7 @@ public class ProcessCacheObject extends AbstractSupervisedCacheObject implements
   /**
    * Equipments under this Process.
    */
-  private ArrayList<Long> equipmentIds = new ArrayList<Long>();
+  private ArrayList<Long> equipmentIds = new ArrayList<>();
 
   /**
    * Host the DAQ process is running on.
@@ -161,6 +161,16 @@ public class ProcessCacheObject extends AbstractSupervisedCacheObject implements
     }
 
     return clone;
+  }
+
+  @Override
+  public void stop(Timestamp timestamp) {
+    super.stop(timestamp);
+    setCurrentHost(null);
+    setStartupTime(null);
+    setRequiresReboot(Boolean.FALSE);
+    setProcessPIK(null);
+    setLocalConfig(null);
   }
 
   /**

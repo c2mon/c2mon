@@ -1,14 +1,13 @@
-package cern.c2mon.cache.api.listener;
-
-import java.util.List;
-
-import lombok.extern.slf4j.Slf4j;
-import org.junit.Test;
+package cern.c2mon.cache.api;
 
 import cern.c2mon.cache.api.parser.XmlParser;
 import cern.c2mon.server.common.device.*;
 import cern.c2mon.shared.client.device.DeviceCommand;
 import cern.c2mon.shared.client.device.DeviceProperty;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.Test;
+
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

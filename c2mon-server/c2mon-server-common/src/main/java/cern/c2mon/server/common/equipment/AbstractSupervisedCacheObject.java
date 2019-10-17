@@ -18,12 +18,15 @@ package cern.c2mon.server.common.equipment;
 
 import cern.c2mon.server.common.AbstractCacheableImpl;
 import cern.c2mon.server.common.supervision.Supervised;
+import cern.c2mon.shared.common.CacheEvent;
+import cern.c2mon.shared.common.Cacheable;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
+import java.util.Set;
 
 /**
  * Common part of all cache objects that need supervising by the server. Supervision involves an alive timer, with
@@ -91,7 +94,7 @@ public abstract class AbstractSupervisedCacheObject extends AbstractCacheableImp
     /**
      * Constructor.
      *
-     * @param id2
+     * @param id
      */
     protected AbstractSupervisedCacheObject(final Long id) {
         this();
@@ -142,4 +145,23 @@ public abstract class AbstractSupervisedCacheObject extends AbstractCacheableImp
 
         return cacheObject;
     }
+
+    @Override
+    public <T extends Cacheable> Set<CacheEvent> postInsertEvents(T previous) {
+        Set<CacheEvent> events = super.postInsertEvents(previous);
+        events.add(CacheEvent.SUPERVISION_UPDATE);
+
+        if (previous != null){
+            if (!(previous instanceof Supervised))
+                throw new IllegalArgumentException("Invalid cache item found: " + previous.getClass().getSimpleName());
+            Supervised previousSupervised = (Supervised) previous;
+            if (previousSupervised.isRunning() != isRunning())
+                events.add(CacheEvent.SUPERVISION_CHANGE);
+        }  else {
+            events.add(CacheEvent.SUPERVISION_CHANGE);
+        }
+        return events;
+    }
+
+
 }

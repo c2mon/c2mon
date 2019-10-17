@@ -5,6 +5,7 @@ import cern.c2mon.server.cache.BaseEquipmentServiceImpl;
 import cern.c2mon.server.cache.alivetimer.AliveTimerService;
 import cern.c2mon.server.cache.commfault.CommFaultService;
 import cern.c2mon.server.common.equipment.Equipment;
+import cern.c2mon.shared.common.supervision.SupervisionConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,7 @@ public class EquipmentService extends BaseEquipmentServiceImpl<Equipment> implem
   @Autowired
   public EquipmentService(final C2monCache<Equipment> equipmentCacheRef,
                           final AliveTimerService aliveTimerService, final CommFaultService commFaultService) {
-    super(equipmentCacheRef,commFaultService,aliveTimerService);
+    super(equipmentCacheRef,commFaultService,aliveTimerService, SupervisionConstants.SupervisionEntity.EQUIPMENT);
   }
 
 

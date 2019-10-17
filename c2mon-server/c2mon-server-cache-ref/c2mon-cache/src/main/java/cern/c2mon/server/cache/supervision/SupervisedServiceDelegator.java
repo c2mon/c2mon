@@ -23,94 +23,63 @@ public interface SupervisedServiceDelegator<T extends Supervised> extends Superv
   SupervisedService<T> getSupervisedService();
 
   @Override
-  default SupervisionEvent getSupervisionStatus(Long id) {
+  default SupervisionEvent getSupervisionStatus(long id) {
     return getSupervisedService().getSupervisionStatus(id);
   }
 
   @Override
-  default void refreshAndNotifyCurrentSupervisionStatus(Long id) {
+  default void refreshAndNotifyCurrentSupervisionStatus(long id) {
     getSupervisedService().refreshAndNotifyCurrentSupervisionStatus(id);
   }
 
   @Override
-  default void start(Long id) {
-    getSupervisedService().start(id);
-  }
-
-  @Override
   @Deprecated
-  default void start(Long id, Timestamp timestamp) {
-    getSupervisedService().start(id, timestamp);
+  default T start(long id, Timestamp timestamp) {
+    return getSupervisedService().start(id, timestamp);
   }
 
   @Override
-  default void start(T supervised) {
-    getSupervisedService().start(supervised);
+  default T stop(long id, Timestamp timestamp) {
+    return getSupervisedService().stop(id, timestamp);
   }
 
   @Override
-  @Deprecated
-  default void start(T supervised, Timestamp timestamp) {
-    getSupervisedService().start(supervised, timestamp);
+  default T resume(long id, Timestamp timestamp, String message) {
+    return getSupervisedService().resume(id, timestamp, message);
   }
 
   @Override
-  default void stop(T supervised, Timestamp timestamp) {
-    getSupervisedService().stop(supervised, timestamp);
+  default T suspend(long id, Timestamp timestamp, String message) {
+    return getSupervisedService().suspend(id, timestamp, message);
   }
 
   @Override
-  default void stop(Long id, Timestamp timestamp) {
-    getSupervisedService().stop(id, timestamp);
-  }
-
-  @Override
-  default void resume(Long id, Timestamp timestamp, String message) {
-    getSupervisedService().resume(id, timestamp, message);
-  }
-
-  @Override
-  default void suspend(Long id, Timestamp timestamp, String message) {
-    getSupervisedService().suspend(id, timestamp, message);
-  }
-
-  @Override
-  default boolean isRunning(T supervised) {
-    return getSupervisedService().isRunning(supervised);
-  }
-
-  @Override
-  default boolean isRunning(Long id) {
+  default boolean isRunning(long id) {
     return getSupervisedService().isRunning(id);
   }
 
   @Override
-  default boolean isUncertain(T supervised) {
-    return getSupervisedService().isUncertain(supervised);
+  default boolean isUncertain(long id) {
+    return getSupervisedService().isUncertain(id);
   }
 
   @Override
-  default void removeAliveTimer(Long id) {
+  default void removeAliveTimer(long id) {
     getSupervisedService().removeAliveTimer(id);
   }
 
   @Override
-  default void loadAndStartAliveTag(Long supervisedId) {
+  default void loadAndStartAliveTag(long supervisedId) {
     getSupervisedService().loadAndStartAliveTag(supervisedId);
   }
 
   @Override
-  default void removeAliveDirectly(Long aliveId) {
+  default void removeAliveDirectly(long aliveId) {
     getSupervisedService().removeAliveDirectly(aliveId);
   }
 
   @Override
   default SupervisionConstants.SupervisionEntity getSupervisionEntity() {
     return getSupervisedService().getSupervisionEntity();
-  }
-
-  @Override
-  default void setSupervisionEntity(SupervisionConstants.SupervisionEntity entity) {
-    getSupervisedService().setSupervisionEntity(entity);
   }
 }

@@ -1,7 +1,6 @@
 package cern.c2mon.server.cache.alarm;
 
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.cache.api.listener.CacheEvent;
 import cern.c2mon.cache.api.listener.impl.SingleThreadListener;
 import cern.c2mon.server.cache.tag.TagCacheFacade;
 import cern.c2mon.server.cache.tag.UnifiedTagCacheFacade;
@@ -10,6 +9,7 @@ import cern.c2mon.server.common.alarm.AlarmCacheUpdater;
 import cern.c2mon.server.common.alarm.TagWithAlarms;
 import cern.c2mon.server.common.alarm.TagWithAlarmsImpl;
 import cern.c2mon.server.common.tag.Tag;
+import cern.c2mon.shared.common.CacheEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

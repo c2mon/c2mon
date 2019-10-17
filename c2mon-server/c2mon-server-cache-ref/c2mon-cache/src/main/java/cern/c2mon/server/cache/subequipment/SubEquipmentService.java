@@ -4,8 +4,8 @@ import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.BaseEquipmentServiceImpl;
 import cern.c2mon.server.cache.alivetimer.AliveTimerService;
 import cern.c2mon.server.cache.commfault.CommFaultService;
-import cern.c2mon.server.cache.supervision.SupervisedServiceDelegator;
 import cern.c2mon.server.common.subequipment.SubEquipment;
+import cern.c2mon.shared.common.supervision.SupervisionConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,11 +18,11 @@ import java.util.Collection;
  */
 @Slf4j
 @Service
-public class SubEquipmentService extends BaseEquipmentServiceImpl<SubEquipment> implements SupervisedServiceDelegator<SubEquipment>, SubEquipmentOperations {
+public class SubEquipmentService extends BaseEquipmentServiceImpl<SubEquipment> implements SubEquipmentOperations {
 
   @Autowired
   public SubEquipmentService(C2monCache<SubEquipment> subEquipmentCacheRef, CommFaultService commFaultService, AliveTimerService aliveTimerService) {
-    super(subEquipmentCacheRef, commFaultService, aliveTimerService);
+    super(subEquipmentCacheRef, commFaultService, aliveTimerService, SupervisionConstants.SupervisionEntity.SUBEQUIPMENT);
   }
 
   @Override
@@ -32,7 +32,7 @@ public class SubEquipmentService extends BaseEquipmentServiceImpl<SubEquipment> 
 
   @Override
   public void addSubEquipmentToEquipment(Long subEquipmentId, Long equipmentId) {
-      // TODO Fill these in
+    // TODO Fill these in
   }
 
   @Override

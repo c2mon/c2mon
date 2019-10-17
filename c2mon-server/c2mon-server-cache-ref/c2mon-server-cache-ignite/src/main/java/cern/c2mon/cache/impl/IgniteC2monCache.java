@@ -99,7 +99,9 @@ public class IgniteC2monCache<V extends Cacheable> implements C2monCache<V> {
 
   @Override
   public <S> S executeTransaction(TransactionalCallable<S> callable) {
-    try (Transaction tx = igniteInstance.transactions().txStart()) {
+    try (Transaction tx = (igniteInstance.transactions().tx() != null ?
+      igniteInstance.transactions().tx() :
+      igniteInstance.transactions().txStart())) {
 
       S returnValue = callable.call();
 

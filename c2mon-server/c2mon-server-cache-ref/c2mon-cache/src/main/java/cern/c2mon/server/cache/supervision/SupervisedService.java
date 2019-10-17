@@ -19,7 +19,9 @@ package cern.c2mon.server.cache.supervision;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.supervision.Supervised;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
+import cern.c2mon.shared.common.Cacheable;
 import cern.c2mon.shared.common.supervision.SupervisionConstants;
+import lombok.NonNull;
 
 import java.sql.Timestamp;
 
@@ -40,7 +42,7 @@ public interface SupervisedService<T extends Supervised> {
    * @param id id of the supervised cache object
    * @return the last supervision event
    */
-  SupervisionEvent getSupervisionStatus(Long id);
+  SupervisionEvent getSupervisionStatus(long id);
 
   /**
    * Notifies all registered listeners of the current supervision status
@@ -50,121 +52,73 @@ public interface SupervisedService<T extends Supervised> {
    *
    * @param id id of the cache element
    */
-  void refreshAndNotifyCurrentSupervisionStatus(Long id);
+  void refreshAndNotifyCurrentSupervisionStatus(long id);
 
   /**
    * Sets the status of the Supervised object to STARTUP,
-   * with associated message.
-   * <p>
-   * <p>Starts the alive timer if not already running.
-   *
-   * @param id The cache id of the supervised object
-   */
-  void start(Long id);
-
-  /**
-   * Sets the status of the Supervised object to STARTUP,
-   * with associated message. Sets the timestamp to now.
+   * with associated message, then returns the updated object
    * <p>
    * <p>Starts the alive timer if not already running.
    *
    * @param id        The cache id of the supervised object
    * @param timestamp time of the start
-   * @deprecated use {@link SupervisedService#start(Long)},
-   *             because we generate a new timestamp anyway
+   * @return the cache object, after {@link Cacheable#postInsertEvents(Cacheable)}
    */
-  @Deprecated
-  default void start(Long id, Timestamp timestamp){
-    start(id);
-  }
-
-  /**
-   * Sets the status of the Supervised object to STARTUP,
-   * with associated message. Sets the timestamp to now.
-   * <p>
-   * <p>Starts the alive timer if not already running.
-   *
-   * @param supervised supervised object
-   */
-  void start(final T supervised);
-
-  /**
-   * Sets the status of the Supervised object to STARTUP,
-   * with associated message.
-   * <p>
-   * <p>Starts the alive timer if not already running.
-   *
-   * @param supervised supervised object
-   * @param timestamp  time of the start
-   * @deprecated use {@link SupervisedService#start(Supervised)},
-   *             because we generate a new timestamp anyway
-   */
-  @Deprecated
-  default void start(final T supervised, final Timestamp timestamp){
-    start(supervised);
-  }
-
-  void stop(final T supervised, final Timestamp timestamp);
+  T start(long id, @NonNull Timestamp timestamp);
 
   /**
    * Sets the status of the Supervised object to DOWN,
-   * with stop message.
+   * with stop message, then returns the updated object
    * <p>
    * <p>Stops the alive timer for this object is running.
    *
    * @param id        The cache id of the supervised object
    * @param timestamp time of the stop
+   * @return the cache object, after {@link Cacheable#postInsertEvents(Cacheable)}
    */
-  void stop(Long id, Timestamp timestamp);
+  T stop(long id, @NonNull Timestamp timestamp);
 
   /**
-   * Sets the status to running. Used when an alive comes
-   * back in after an alive expiration, or when a first
-   * alive arrives at Process startup.
+   * Sets the status to running, then returns the updated object.
+   * Used when an alive comes back in after an alive
+   * expiration, or when a first alive arrives at Process startup.
    *
    * @param id        The cache id of the supervised object
    * @param timestamp time of the running event
    * @param message   details of the event
+   * @return the cache object, after {@link Cacheable#postInsertEvents(Cacheable)}
    */
-  void resume(Long id, Timestamp timestamp, String message);
+  T resume(long id, @NonNull Timestamp timestamp, @NonNull String message);
 
   /**
    * Called when an alive expires or a commfault tag is received.
    *
+   * Returns the updated object.
+   *
    * @param id        The cache id of the supervised object
    * @param timestamp time of problem
    * @param message   details
+   * @return the cache object, after {@link Cacheable#postInsertEvents(Cacheable)}
    */
-  void suspend(Long id, Timestamp timestamp, String message);
+  T suspend(long id, @NonNull Timestamp timestamp, @NonNull String message);
 
   /**
-   * Returns true if the object is either running or in
-   * the start up phase. And false if either DOWN or STOPPED, or
-   * if the status is UNCERTAIN.
-   *
-   * @param supervised the cache object to check
-   * @return true if it is running (or starting up)
-   */
-  boolean isRunning(T supervised);
-
-
-  /**
-   * Returns true if the object is either running or in the
+   * Returns true if the object in the cache is either running or in the
    * start up phase. And false if either DOWN or STOPPED, or
    * is UNCERTAIN.
    *
    * @param id of the cache object
    * @return true if running
    */
-  boolean isRunning(Long id);
+  boolean isRunning(long id);
 
   /**
-   * Returns true only if the object is in UNCERTAIN status.
+   * Returns true only if the object in the cache is in UNCERTAIN status.
    *
-   * @param supervised the object to check
+   * @param id of the cache object
    * @return true if the status is uncertain
    */
-  boolean isUncertain(T supervised);
+  boolean isUncertain(long id);
 
   /**
    * Stops and removes the alive timer object from the cache.
@@ -173,7 +127,7 @@ public interface SupervisedService<T extends Supervised> {
    * @param id of supervised object
    * @throws CacheElementNotFoundException if the supervised object cannot be located in the corresponding cache
    */
-  void removeAliveTimer(Long id);
+  void removeAliveTimer(long id);
 
   /**
    * Loads the alive timer into the cache and starts it.
@@ -181,7 +135,7 @@ public interface SupervisedService<T extends Supervised> {
    *
    * @param supervisedId id of supervised object
    */
-  void loadAndStartAliveTag(Long supervisedId);
+  void loadAndStartAliveTag(long supervisedId);
 
   /**
    * Stops and removes this alive by alive id. Should only be
@@ -190,9 +144,7 @@ public interface SupervisedService<T extends Supervised> {
    *
    * @param aliveId id of the alive
    */
-  void removeAliveDirectly(Long aliveId);
+  void removeAliveDirectly(long aliveId);
 
   SupervisionConstants.SupervisionEntity getSupervisionEntity();
-
-  void setSupervisionEntity(SupervisionConstants.SupervisionEntity entity);
 }

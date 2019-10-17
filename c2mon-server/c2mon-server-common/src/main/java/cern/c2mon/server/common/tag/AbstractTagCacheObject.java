@@ -196,6 +196,7 @@ public abstract class AbstractTagCacheObject extends AbstractCacheableImpl imple
    * with information about this tag creation.
    */
   protected AbstractTagCacheObject() {
+    super();
     //TODO check this - done by config loader
     ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     readLock = lock.readLock();
@@ -214,7 +215,7 @@ public abstract class AbstractTagCacheObject extends AbstractCacheableImpl imple
    * @param id
    */
   protected AbstractTagCacheObject(final Long id) {
-    super();
+    this();
     this.id = id;
   }
 

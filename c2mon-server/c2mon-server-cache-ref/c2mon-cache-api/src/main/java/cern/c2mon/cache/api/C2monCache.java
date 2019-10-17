@@ -1,12 +1,13 @@
 package cern.c2mon.cache.api;
 
-import cern.c2mon.cache.api.listener.CacheEvent;
+import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.cache.api.listener.ListenerDelegator;
 import cern.c2mon.cache.api.loader.CacheLoader;
 import cern.c2mon.cache.api.spi.CacheQuery;
 import cern.c2mon.cache.api.transactions.TransactionalCallable;
+import cern.c2mon.shared.common.CacheEvent;
 import cern.c2mon.shared.common.Cacheable;
-import org.springframework.lang.NonNull;
+import lombok.NonNull;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
@@ -15,7 +16,8 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static cern.c2mon.cache.api.listener.CacheEvent.UPDATE_ACCEPTED;
+import static cern.c2mon.shared.common.CacheEvent.UPDATE_ACCEPTED;
+import static cern.c2mon.shared.common.CacheEvent.UPDATE_REJECTED;
 import static java.util.Objects.requireNonNull;
 
 
@@ -52,6 +54,15 @@ public interface C2monCache<V extends Cacheable> extends CacheDelegator<V>, Seri
 
   void init();
 
+  /**
+   * Executes the {@code callable} provided, in the current thread's transaction, if one exists,
+   * otherwise start a new one
+   *
+   * @param callable
+   * @param <T>
+   * @return
+   * @implNote Make sure that you check for the existence of a transaction before starting a new one!
+   */
   <T> T executeTransaction(TransactionalCallable<T> callable);
 
   /**
@@ -86,7 +97,7 @@ public interface C2monCache<V extends Cacheable> extends CacheDelegator<V>, Seri
    * @param filter must not be null, the function to filter elements by
    * @return a {@code Collection} of results, may be empty, never null
    */
-  Collection<V> query(@NonNull Function<V, Boolean> filter);
+  Collection<V> query(@NonNull Function<V, Boolean> filter) throws NullPointerException;
 
   /**
    * Overload of {@link C2monCache#query(Function)} allowing the user to provide additional search parameters
@@ -95,7 +106,7 @@ public interface C2monCache<V extends Cacheable> extends CacheDelegator<V>, Seri
    * @return a {@code Collection} of results, may be empty, never null
    * @see C2monCache#query(Function)
    */
-  Collection<V> query(@NonNull CacheQuery<V> providedQuery);
+  Collection<V> query(@NonNull CacheQuery<V> providedQuery) throws NullPointerException;
 
   /**
    * Put an element to the cache - inserts or updates if the element existed already
@@ -105,19 +116,41 @@ public interface C2monCache<V extends Cacheable> extends CacheDelegator<V>, Seri
    * @param key
    * @param value
    */
-  default void putQuiet(@NonNull Long key,@NonNull V value) {
-    requireNonNull(key);
-    requireNonNull(value);
+  default void putQuiet(long key, @NonNull V value) throws NullPointerException {
+    put(key, value, false);
+  }
+
+  default void put(long key, @NonNull V value, boolean notifyListeners) {
     value.setCacheTimestamp(new Timestamp(System.currentTimeMillis()));
-    getCache().put(key, value);
+    executeTransaction(() -> {
+      // Using this getter to avoid having to catch CacheElementNotFoundException
+      // thrown by our own Cache.get
+      V previous = getCache().get(key);
+      if (value.preInsertValidate(previous)) {
+        // We're in a transaction, so this can't have been modified
+        getCache().put(key, value);
+        if (notifyListeners) {
+          notifyListenersOf(UPDATE_ACCEPTED, value);
+          value.postInsertEvents(previous).forEach(event -> notifyListenersOf(event, value));
+        }
+      } else if (notifyListeners) {
+        notifyListenersOf(UPDATE_REJECTED, value);
+      }
+    });
   }
 
   // === Section: C2MON overrides of javax.cache.Cache methods ===
 
+  /**
+   * @throws CacheElementNotFoundException when no value was found mapped to this key
+   */
   @Override
-  default V get(@NonNull Long key) throws IllegalArgumentException {
+  default V get(@NonNull Long key) throws NullPointerException, CacheElementNotFoundException {
     requireNonNull(key);
-    return getCache().get(key);
+    V result = getCache().get(key);
+    if (result == null)
+      throw new CacheElementNotFoundException("Did not find value for key: " + key);
+    return result;
   }
 
   /**
@@ -130,14 +163,9 @@ public interface C2monCache<V extends Cacheable> extends CacheDelegator<V>, Seri
    * @see C2monCache#putQuiet(Long, Cacheable) to put without notifying
    */
   @Override
-  default void put(@NonNull Long key, @NonNull V value) {
-    requireNonNull(key);
-    requireNonNull(value);
-    putQuiet(key, value);
-    notifyListenersOf(UPDATE_ACCEPTED, value);
+  default void put(@NonNull Long key, @NonNull V value) throws NullPointerException {
+    put(key, value, true);
   }
-
-//  TODO Support some form of compareAndPut(V expected, V new)?
 
   @Override
   default void close() {
