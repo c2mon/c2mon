@@ -81,6 +81,9 @@ public interface Cacheable extends Serializable, Cloneable {
    * has already been inserted to the cache and changing this reference will do
    * nothing to change that reference, until you explicitly do {@code Cache.put}
    *
+   * When implementing this, make sure to call to super, in order to avoid
+   * missing any events!
+   *
    * @param previous potentially null, the previous object if one existed
    * @param <T>      type of previous object, should match the type of {@code this}
    * @return a set of all {@link CacheEvent}s that should be fired based on this change

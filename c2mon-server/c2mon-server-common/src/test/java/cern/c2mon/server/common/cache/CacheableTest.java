@@ -1,5 +1,6 @@
 package cern.c2mon.server.common.cache;
 
+import cern.c2mon.shared.common.CacheEvent;
 import cern.c2mon.shared.common.Cacheable;
 import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
@@ -87,6 +88,26 @@ public abstract class CacheableTest<T extends Cacheable> {
   @Test(expected = NullPointerException.class)
   public void timestampNonNull() {
     sample.setCacheTimestamp(null);
+  }
+
+  @Test
+  public void preInsertValidateAcceptsNull() {
+    // Should not throw - null will be passed at least once!
+    sample.preInsertValidate(null);
+    // Should almost always return true, otherwise the first item can never be inserted to the cache!
+    // There are cases where this could reasonably be false - override this test in the corresponding
+    // child class test to check for the custom logic!
+    assertTrue(sample.preInsertValidate(null));
+  }
+
+  @Test
+  public void postInsertEventsAcceptsNull() {
+    // Should not throw - null will be passed at least once!
+    sample.postInsertEvents(null);
+    // Should almost always be contained, unless an implementation for some reason doesn't want to
+    // emit this event. Usually however this test failing means you didn't call super.postInsertEvents.
+    // If you have a reasonable case, override this test in the corresponding child class test
+    assertTrue(sample.postInsertEvents(null).contains(CacheEvent.INSERTED));
   }
 
   protected abstract void mutateObject(T cloneObject);
