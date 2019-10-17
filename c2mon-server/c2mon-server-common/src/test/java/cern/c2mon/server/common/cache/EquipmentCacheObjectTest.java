@@ -2,7 +2,7 @@ package cern.c2mon.server.common.cache;
 
 import cern.c2mon.server.common.equipment.EquipmentCacheObject;
 
-public class EquipmentCacheObjectTest extends CacheObjectTest<EquipmentCacheObject> {
+public class EquipmentCacheObjectTest extends CacheableTest<EquipmentCacheObject> {
 
   private static EquipmentCacheObject sample = new EquipmentCacheObject(1L);
 

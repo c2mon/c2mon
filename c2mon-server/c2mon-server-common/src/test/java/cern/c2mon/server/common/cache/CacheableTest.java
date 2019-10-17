@@ -1,20 +1,20 @@
 package cern.c2mon.server.common.cache;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
-
 import cern.c2mon.shared.common.Cacheable;
 import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Test;
 
-public abstract class CacheObjectTest<T extends Cacheable> {
+import java.sql.Timestamp;
+import java.time.Instant;
+
+import static org.junit.Assert.*;
+
+public abstract class CacheableTest<T extends Cacheable> {
 
   private final T sample;
 
-  protected CacheObjectTest(T sample) {
+  protected CacheableTest(T sample) {
     this.sample = sample;
   }
 
@@ -56,7 +56,7 @@ public abstract class CacheObjectTest<T extends Cacheable> {
   public void equalsIsImplemented() {
     try {
       assertEquals(sample.getClass(),
-          sample.getClass().getMethod("equals", Object.class).getDeclaringClass());
+        sample.getClass().getMethod("equals", Object.class).getDeclaringClass());
     } catch (NoSuchMethodException e) {
       fail("Equals should be implemented for all cache objects");
     }
@@ -73,6 +73,20 @@ public abstract class CacheObjectTest<T extends Cacheable> {
     } catch (CloneNotSupportedException e) {
       fail();
     }
+  }
+
+  @Test
+  public void timestamp() {
+    // Initial value should never be null
+    assertNotNull(sample.getCacheTimestamp());
+    Timestamp test = Timestamp.from(Instant.EPOCH);
+    sample.setCacheTimestamp(test);
+    assertEquals(test, sample.getCacheTimestamp());
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void timestampNonNull() {
+    sample.setCacheTimestamp(null);
   }
 
   protected abstract void mutateObject(T cloneObject);

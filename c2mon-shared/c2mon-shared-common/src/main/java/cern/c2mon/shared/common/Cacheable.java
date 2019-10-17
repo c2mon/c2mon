@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.shared.common;
 
+import lombok.NonNull;
 import org.springframework.lang.Nullable;
 
 import java.io.Serializable;
@@ -49,7 +50,7 @@ public interface Cacheable extends Serializable, Cloneable {
 
   Timestamp getCacheTimestamp();
 
-  void setCacheTimestamp(Timestamp timestamp);
+  void setCacheTimestamp(@NonNull Timestamp timestamp);
 
   /**
    * Validates that {@code this} object should be inserted.

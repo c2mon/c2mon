@@ -2,7 +2,7 @@ package cern.c2mon.server.common.cache;
 
 import cern.c2mon.server.common.process.ProcessCacheObject;
 
-public class ProcessCacheObjectTest extends CacheObjectTest<ProcessCacheObject> {
+public class ProcessCacheObjectTest extends CacheableTest<ProcessCacheObject> {
 
   private static ProcessCacheObject sample = new ProcessCacheObject(1L);
 

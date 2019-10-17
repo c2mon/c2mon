@@ -4,7 +4,7 @@ import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.address.impl.HardwareAddressImpl;
 
-public class DataTagCacheObjectTest extends CacheObjectTest<DataTagCacheObject> {
+public class DataTagCacheObjectTest extends CacheableTest<DataTagCacheObject> {
 
   private static DataTagCacheObject sample = new DataTagCacheObject(1L);
 

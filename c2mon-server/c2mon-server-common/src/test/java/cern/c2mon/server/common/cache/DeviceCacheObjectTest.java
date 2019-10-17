@@ -2,7 +2,7 @@ package cern.c2mon.server.common.cache;
 
 import cern.c2mon.server.common.device.DeviceCacheObject;
 
-public class DeviceCacheObjectTest extends CacheObjectTest<DeviceCacheObject> {
+public class DeviceCacheObjectTest extends CacheableTest<DeviceCacheObject> {
 
   private static DeviceCacheObject sample = new DeviceCacheObject(1L);
 

@@ -311,17 +311,6 @@ public abstract class AbstractTagCacheObject extends AbstractCacheableImpl imple
     }
   }
 
-  /**
-   * @param timestamp the timestamp to set
-   */
-  public final void setCacheTimestamp(Timestamp timestamp) {
-    if (this.cacheTimestamp == null || timestamp == null) {
-      this.cacheTimestamp = timestamp;
-    } else {
-      this.cacheTimestamp.setTime(timestamp.getTime());
-    }
-  }
-
   public final boolean isInOperation() {
     return (mode == MODE_OPERATIONAL);
   }

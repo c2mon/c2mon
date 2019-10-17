@@ -1,9 +1,8 @@
 package cern.c2mon.server.common.cache;
 
 import cern.c2mon.server.common.command.CommandTagCacheObject;
-import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
 
-public class CommandTagCacheObjectTest extends CacheObjectTest<CommandTagCacheObject> {
+public class CommandTagCacheObjectTest extends CacheableTest<CommandTagCacheObject> {
 
   private static CommandTagCacheObject sample = new CommandTagCacheObject(1L);
 
