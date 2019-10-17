@@ -264,9 +264,7 @@ public final class CacheObjectCreation {
                                                                           Long.valueOf(1223),
                                                                           Long.valueOf(90)
                                                                           );
-    equipmentCacheObject.setStatusDescription("Status description");
-    equipmentCacheObject.setStatusTime(new Timestamp(System.currentTimeMillis()));
-    equipmentCacheObject.setSupervisionStatus(SupervisionStatus.DOWN);
+    equipmentCacheObject.setSupervision(SupervisionStatus.DOWN, "Status description", new Timestamp(System.currentTimeMillis()));
     return equipmentCacheObject;
   }
 
@@ -287,9 +285,7 @@ public final class CacheObjectCreation {
                                                                         Long.valueOf(1223),
                                                                         Long.valueOf(100)
                                                                         );
-    subEquipmentCacheObject.setStatusDescription("Status description");
-    subEquipmentCacheObject.setStatusTime(new Timestamp(System.currentTimeMillis()));
-    subEquipmentCacheObject.setSupervisionStatus(SupervisionStatus.DOWN);
+    subEquipmentCacheObject.setSupervision(SupervisionStatus.DOWN, "Status description", new Timestamp(System.currentTimeMillis()));
     return subEquipmentCacheObject;
   }
 
@@ -310,9 +306,7 @@ public final class CacheObjectCreation {
                                                                         Long.valueOf(1223),
                                                                         Long.valueOf(100)
                                                                         );
-    subEquipmentCacheObject.setStatusDescription("Status description");
-    subEquipmentCacheObject.setStatusTime(new Timestamp(System.currentTimeMillis()));
-    subEquipmentCacheObject.setSupervisionStatus(SupervisionStatus.DOWN);
+    subEquipmentCacheObject.setSupervision(SupervisionStatus.DOWN, "Status description", new Timestamp(System.currentTimeMillis()));
     return subEquipmentCacheObject;
   }
 
@@ -326,10 +320,8 @@ public final class CacheObjectCreation {
     processCacheObject.setAliveInterval(60);
     processCacheObject.setAliveTagId(Long.valueOf(510)); //FK ref
     processCacheObject.setStateTagId(510L);
-    processCacheObject.setSupervisionStatus(SupervisionStatus.DOWN);
-    processCacheObject.setStatusTime(new Timestamp(System.currentTimeMillis()));
+    processCacheObject.setSupervision(SupervisionStatus.DOWN, "Status description", new Timestamp(System.currentTimeMillis()));
     processCacheObject.setStartupTime(new Timestamp(0));
-    processCacheObject.setStatusDescription("Status description");
     processCacheObject.setCurrentHost("test host");
     processCacheObject.setRequiresReboot(false);
     processCacheObject.setProcessPIK(12345L);

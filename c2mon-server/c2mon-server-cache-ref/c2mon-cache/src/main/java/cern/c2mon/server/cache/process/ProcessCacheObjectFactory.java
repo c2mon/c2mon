@@ -1,16 +1,14 @@
 package cern.c2mon.server.cache.process;
 
-import java.util.Properties;
-
-import org.springframework.stereotype.Component;
-
 import cern.c2mon.cache.api.factory.AbstractCacheObjectFactory;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.process.ProcessCacheObject;
 import cern.c2mon.shared.common.ConfigurationException;
-import cern.c2mon.shared.common.supervision.SupervisionConstants;
 import cern.c2mon.shared.daq.config.Change;
 import cern.c2mon.shared.daq.config.ProcessConfigurationUpdate;
+import org.springframework.stereotype.Component;
+
+import java.util.Properties;
 
 /**
  * @author Szymon Halastra
@@ -20,10 +18,7 @@ public class ProcessCacheObjectFactory extends AbstractCacheObjectFactory<Proces
 
   @Override
   public Process createCacheObject(Long id) {
-    ProcessCacheObject processCacheObject = new ProcessCacheObject(id);
-    processCacheObject.setSupervisionStatus(SupervisionConstants.SupervisionStatus.DOWN);
-
-    return processCacheObject;
+    return new ProcessCacheObject(id);
   }
 
   @Override

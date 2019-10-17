@@ -24,6 +24,7 @@ import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStat
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
 import java.sql.Timestamp;
 import java.util.Set;
@@ -59,16 +60,21 @@ public abstract class AbstractSupervisedCacheObject extends AbstractCacheableImp
     /**
      * The current status of this supervision equipment.
      */
+    @NonNull
     private SupervisionStatus supervisionStatus = SupervisionStatus.DOWN;
 
     /**
      * Description/reason for the current status.
      */
+    @NonNull
     private String statusDescription;
 
     /**
      * The time of the last update of the supervision status.
+     *
+     * If you add a default value here, make sure to update {@link Supervised#hasNoEvents()}
      */
+    @NonNull
     private Timestamp statusTime;
 
     /**
@@ -89,6 +95,7 @@ public abstract class AbstractSupervisedCacheObject extends AbstractCacheableImp
      */
     protected AbstractSupervisedCacheObject(Long id2, Long stateTagId2) {
         this(id2);
+        this.stateTagId = stateTagId2;
     }
 
     /**
@@ -144,6 +151,13 @@ public abstract class AbstractSupervisedCacheObject extends AbstractCacheableImp
         }
 
         return cacheObject;
+    }
+
+    @Override
+    public void setSupervision(SupervisionStatus supervisionStatus, String statusDescription, Timestamp statusTime) {
+        setSupervisionStatus(supervisionStatus);
+        setStatusDescription(statusDescription);
+        setStatusTime(statusTime);
     }
 
     @Override

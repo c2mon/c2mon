@@ -19,6 +19,7 @@ package cern.c2mon.server.common.supervision;
 import cern.c2mon.shared.common.Cacheable;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEntity;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
+import lombok.NonNull;
 
 import java.sql.Timestamp;
 
@@ -27,7 +28,6 @@ import java.sql.Timestamp;
  * C2MON server core supervision mechanism.
  *
  * @author Mark Brightwell
- *
  */
 public interface Supervised extends Cacheable {
 
@@ -45,6 +45,15 @@ public interface Supervised extends Cacheable {
    * @return the supervision status
    */
   SupervisionStatus getSupervisionStatus();
+
+  /**
+   * Sets the status of this supervised object.
+   *
+   * @param supervisionStatus new status
+   * @deprecated use {@link Supervised#setSupervision(SupervisionStatus, String, Timestamp)} instead
+   */
+  @Deprecated
+  void setSupervisionStatus(@NonNull SupervisionStatus supervisionStatus);
 
   /**
    * Returns the id of the state tag used to publish the
@@ -73,39 +82,52 @@ public interface Supervised extends Cacheable {
 
   /**
    * Returns the entity name of this supervised object.
+   *
    * @return the supervision entity name
    */
   SupervisionEntity getSupervisionEntity();
 
   /**
    * Returns a reason/description of the current status.
-   * @return a description of the status
+   *
+   * @return a description of the status, or null
    */
   String getStatusDescription();
 
   /**
-   * Sets the status of this supervised object.
-   * @param supervisionStatus new status
-   */
-  void setSupervisionStatus(SupervisionStatus supervisionStatus);
-
-  /**
    * Sets the description of the status.
+   *
    * @param statusDescription a reason for the current status
+   * @deprecated use {@link Supervised#setSupervision(SupervisionStatus, String, Timestamp)} instead
    */
-  void setStatusDescription(String statusDescription);
-
-  /**
-   * Setter.
-   * @param supervisionTime time of the supervision event
-   */
-  void setStatusTime(Timestamp supervisionTime);
+  @Deprecated
+  void setStatusDescription(@NonNull String statusDescription);
 
   /**
    * Getter.
-   * @return the time of the last change in the supervision status
+   *
+   * @return the time of the last change in the supervision status, or null
    */
   Timestamp getStatusTime();
+
+  /**
+   * Setter.
+   *
+   * @param supervisionTime time of the supervision event
+   * @deprecated use {@link Supervised#setSupervision(SupervisionStatus, String, Timestamp)} instead
+   */
+  @Deprecated
+  void setStatusTime(@NonNull Timestamp supervisionTime);
+
+  /**
+   * Sets the supervision information for the supervised object, including
+   * status, description and time
+   *
+   * @param supervisionStatus the new status
+   * @param statusDescription a reason for the current status
+   * @param statusTime        time of the supervision event
+   */
+  void setSupervision(SupervisionStatus supervisionStatus, @NonNull String statusDescription, @NonNull Timestamp statusTime);
 
   /**
    * Returns true if the object is either running or in
@@ -114,13 +136,12 @@ public interface Supervised extends Cacheable {
    *
    * @return true if it is running (or starting up)
    */
-  default boolean isRunning(){
+  default boolean isRunning() {
     // Assigning it here keeps us safe from concurrent modifications
     SupervisionStatus status = getSupervisionStatus();
-    return status != null
-      && (status.equals(SupervisionStatus.STARTUP)
+    return status.equals(SupervisionStatus.STARTUP)
       || status.equals(SupervisionStatus.RUNNING)
-      || status.equals(SupervisionStatus.RUNNING_LOCAL));
+      || status.equals(SupervisionStatus.RUNNING_LOCAL);
   }
 
   /**
@@ -129,39 +150,40 @@ public interface Supervised extends Cacheable {
    * @return true if the status is uncertain
    */
   default boolean isUncertain() {
-    return getSupervisionStatus() != null && getSupervisionStatus().equals(SupervisionStatus.UNCERTAIN);
+    return getSupervisionStatus().equals(SupervisionStatus.UNCERTAIN);
+  }
+
+  /**
+   * Returns true only if the object has not yet received any supervision event
+   *
+   * @return true if the object has not received supervision
+   */
+  default boolean hasNoEvents() {
+    return getSupervisionStatus() == SupervisionStatus.DOWN && getStatusTime() == null;
   }
 
   /**
    * Sets the status of this Supervised object to STARTUP,
    * with associated message.
    * <p>
-   * <p>Starts the alive timer if not already running.
-   *
+   * Starts the alive timer if not already running.
+   * <p>
    * Careful, this does NOT update the cache entry. You need to explicitly {@code put} for that
    */
   default void start(final Timestamp timestamp) {
-    setSupervisionStatus(SupervisionStatus.STARTUP);
-    setStatusDescription(getSupervisionEntity() + " " + getName() + " was started");
-    setStatusTime(timestamp);
+    setSupervision(SupervisionStatus.STARTUP, getSupervisionEntity() + " " + getName() + " was started", timestamp);
   }
 
   default void stop(final Timestamp timestamp) {
-    setSupervisionStatus(SupervisionStatus.DOWN);
-    setStatusTime(timestamp);
-    setStatusDescription(getSupervisionEntity() + " " + getName() + " was stopped");
+    setSupervision(SupervisionStatus.DOWN, getSupervisionEntity() + " " + getName() + " was stopped", timestamp);
   }
 
   default void resume(final Timestamp timestamp, final String message) {
-    setSupervisionStatus(SupervisionStatus.RUNNING);
-    setStatusTime(timestamp);
-    setStatusDescription(message);
+    setSupervision(SupervisionStatus.RUNNING, message, timestamp);
   }
 
   default void suspend(final Timestamp timestamp, final String message) {
-    setSupervisionStatus(SupervisionStatus.DOWN);
-    setStatusDescription(message);
-    setStatusTime(timestamp);
+    setSupervision(SupervisionStatus.DOWN, message, timestamp);
   }
 
 }

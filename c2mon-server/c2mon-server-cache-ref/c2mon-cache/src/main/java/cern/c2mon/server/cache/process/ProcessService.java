@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.*;
 
 /**
@@ -224,6 +225,6 @@ public class ProcessService implements ProcessOperationService, SupervisedServic
 
   private void errorStatus(final Process process, final String errorMessage) {
     ProcessCacheObject processCacheObject = (ProcessCacheObject) process;
-    processCacheObject.setSupervisionStatus(SupervisionConstants.SupervisionStatus.DOWN);
+    processCacheObject.setSupervision(SupervisionConstants.SupervisionStatus.DOWN, errorMessage, Timestamp.from(Instant.now()));
   }
 }
