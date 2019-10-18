@@ -10,7 +10,7 @@
       <result property="faultCode" column="ALARMFCODE" jdbcType="NUMERIC"/>
       <result property="active" column="ALARMSTATE" jdbcType="VARCHAR" javaType="java.lang.Boolean"/>
       <result property="internalActive" column="ALARMSTATE" jdbcType="VARCHAR" javaType="java.lang.Boolean"/>
-      <result property="timestamp" column="ALARMTIME" jdbcType="TIMESTAMP"/>
+      <result property="triggerTimestamp" column="ALARMTIME" jdbcType="TIMESTAMP"/>
       <result property="sourceTimestamp" column="ALARMSOURCETIME" jdbcType="TIMESTAMP"/>
       <result property="info" column="ALARMINFO" jdbcType="VARCHAR"/>
       <result property="condition" column="ALARMCONDITION" javaType="cern.c2mon.shared.client.alarm.condition.AlarmCondition" jdbcType="VARCHAR"/>
@@ -57,7 +57,7 @@
     <update id="updateCacheable" parameterType="cern.c2mon.server.common.alarm.AlarmCacheObject">
       UPDATE ALARM
          SET ALARMSTATE = #{active,jdbcType=VARCHAR,javaType=Boolean},
-             ALARMTIME = #{timestamp,jdbcType=TIMESTAMP},
+             ALARMTIME = #{triggerTimestamp,jdbcType=TIMESTAMP},
              ALARMSOURCETIME = #{sourceTimestamp,jdbcType=TIMESTAMP},
              ALARMINFO = #{info,jdbcType=VARCHAR},
              ALARMOSCILLATION = #{oscillating,jdbcType=NUMERIC}
@@ -82,7 +82,7 @@
                 )
       VALUES (#{id},#{faultFamily},#{faultMember},#{faultCode},
               #{active,jdbcType=VARCHAR,javaType=Boolean},
-              #{timestamp,jdbcType=TIMESTAMP},
+              #{triggerTimestamp,jdbcType=TIMESTAMP},
               #{sourceTimestamp,jdbcType=TIMESTAMP}, #{info,jdbcType=VARCHAR},
               #{condition,javaType=cern.c2mon.shared.client.alarm.condition.AlarmCondition,jdbcType=VARCHAR},
               #{dataTagId,jdbcType=NUMERIC},
