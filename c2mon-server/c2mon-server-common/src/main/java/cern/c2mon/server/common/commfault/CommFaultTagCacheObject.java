@@ -76,7 +76,7 @@ public class CommFaultTagCacheObject extends AbstractCacheableImpl implements Co
      * Clone not supported so far.
      */
     @Override
-    public CommFaultTagCacheObject clone() throws CloneNotSupportedException {
+    public CommFaultTagCacheObject clone() {
         return (CommFaultTagCacheObject) super.clone();
     }
 

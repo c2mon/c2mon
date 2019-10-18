@@ -153,7 +153,7 @@ public final class CommandTagCacheObject<T> extends AbstractCacheableImpl implem
      * <p>
      * Used when loading the cache from the DB.
      *
-     * @param pId
+     * @param id
      * @param name
      * @param description
      * @param dataType
@@ -251,7 +251,7 @@ public final class CommandTagCacheObject<T> extends AbstractCacheableImpl implem
     }
 
     @Override
-    public CommandTagCacheObject<T> clone() throws CloneNotSupportedException {
+    public CommandTagCacheObject<T> clone() {
       @SuppressWarnings("unchecked")
       CommandTagCacheObject<T> clone = (CommandTagCacheObject<T>) super.clone();
 

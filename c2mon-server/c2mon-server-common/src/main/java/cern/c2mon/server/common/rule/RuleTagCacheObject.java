@@ -99,7 +99,7 @@ public class RuleTagCacheObject extends AbstractTagCacheObject implements RuleTa
      * @throws CloneNotSupportedException
      */
     @Override
-    public RuleTagCacheObject clone() throws CloneNotSupportedException {
+    public RuleTagCacheObject clone() {
         RuleTagCacheObject ruleTagCacheObject = (RuleTagCacheObject) super.clone();
         if (this.equipmentIds != null) {
             ruleTagCacheObject.equipmentIds = new HashSet<Long>();

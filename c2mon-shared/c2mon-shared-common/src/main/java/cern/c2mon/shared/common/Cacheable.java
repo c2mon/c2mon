@@ -44,9 +44,8 @@ public interface Cacheable extends Serializable, Cloneable {
    * notifying the listener.
    *
    * @return the clone
-   * @throws CloneNotSupportedException if not implemented/supported so far
    */
-  Cacheable clone() throws CloneNotSupportedException;
+  Cacheable clone();
 
   Timestamp getCacheTimestamp();
 

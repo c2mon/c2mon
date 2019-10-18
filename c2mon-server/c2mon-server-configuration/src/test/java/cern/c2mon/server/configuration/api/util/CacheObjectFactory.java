@@ -173,13 +173,8 @@ public class CacheObjectFactory {
 
   public DataTagCacheObject buildDataTagUpdateCacheObject(DataTagCacheObject originalObject, DataTag configObject) {
     DataTagCacheObject result = null;
-    try {
-      result = originalObject.clone();
-      setCacheDataTagCacheObjectFields(result, configObject);
-
-    } catch (CloneNotSupportedException e) {
-      e.printStackTrace();
-    }
+    result = originalObject.clone();
+    setCacheDataTagCacheObjectFields(result, configObject);
 
     return result;
   }
@@ -244,13 +239,8 @@ public class CacheObjectFactory {
 
   public RuleTagCacheObject buildRuleTagUpdateCacheObject(RuleTagCacheObject originalObject, RuleTag configObject) {
     RuleTagCacheObject result = null;
-    try {
-      result = originalObject.clone();
-      setCacheRuleTagCacheObjectFields(result, configObject);
-
-    } catch (CloneNotSupportedException e) {
-      e.printStackTrace();
-    }
+    result = originalObject.clone();
+    setCacheRuleTagCacheObjectFields(result, configObject);
 
     return result;
   }
@@ -302,14 +292,8 @@ public class CacheObjectFactory {
   }
 
   public AlarmCacheObject buildAlarmUpdateCacheObject(AlarmCacheObject originalObject, Alarm configObject) {
-    AlarmCacheObject result = null;
-    try {
-      result = (AlarmCacheObject) originalObject.clone();
-      setCacheAlarmCacheObjectFields(result, configObject);
-
-    } catch (CloneNotSupportedException e) {
-      e.printStackTrace();
-    }
+    AlarmCacheObject result = (AlarmCacheObject) originalObject.clone();
+    setCacheAlarmCacheObjectFields(result, configObject);
 
     return result;
   }
@@ -347,14 +331,8 @@ public class CacheObjectFactory {
   }
 
   public CommandTagCacheObject buildCommandTagUpdateCacheObject(CommandTagCacheObject originalObject, CommandTag configObject) {
-    CommandTagCacheObject result = null;
-    try {
-      result = originalObject.clone();
-      setCacheCommandTagCacheObjectFields(result, configObject);
-
-    } catch (CloneNotSupportedException e) {
-      e.printStackTrace();
-    }
+    CommandTagCacheObject result = originalObject.clone();
+    setCacheCommandTagCacheObjectFields(result, configObject);
 
     return result;
   }

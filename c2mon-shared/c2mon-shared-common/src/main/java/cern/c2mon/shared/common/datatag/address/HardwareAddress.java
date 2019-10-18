@@ -37,5 +37,5 @@ public interface HardwareAddress extends Serializable, Cloneable {
 
   void validate() throws ConfigurationException;
 
-  HardwareAddress clone() throws CloneNotSupportedException;
+  HardwareAddress clone();
 }

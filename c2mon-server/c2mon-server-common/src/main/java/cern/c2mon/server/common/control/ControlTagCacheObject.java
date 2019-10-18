@@ -51,7 +51,7 @@ public class ControlTagCacheObject extends DataTagCacheObject implements Control
    * @throws CloneNotSupportedException
    */
   @Override
-  public ControlTagCacheObject clone() throws CloneNotSupportedException {
+  public ControlTagCacheObject clone() {
     return (ControlTagCacheObject) super.clone();
   }
 }

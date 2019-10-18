@@ -86,7 +86,7 @@ public class DeviceCacheObject extends AbstractCacheableImpl implements Device {
 
   @SuppressWarnings("unchecked")
   @Override
-  public DeviceCacheObject clone() throws CloneNotSupportedException {
+  public DeviceCacheObject clone() {
     DeviceCacheObject clone = (DeviceCacheObject) super.clone();
 
     clone.deviceProperties = (List<DeviceProperty>) ((ArrayList<DeviceProperty>) deviceProperties).clone();

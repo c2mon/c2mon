@@ -225,7 +225,7 @@ public abstract class AbstractTagCacheObject extends AbstractCacheableImpl imple
    * cache).
    */
   @Override
-  public AbstractTagCacheObject clone() throws CloneNotSupportedException {
+  public AbstractTagCacheObject clone() {
     AbstractTagCacheObject cacheObject = (AbstractTagCacheObject) super.clone();
     ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     cacheObject.readLock = lock.readLock();

@@ -143,7 +143,7 @@ public abstract class AbstractSupervisedCacheObject extends AbstractCacheableImp
      * @return clone of cache object
      */
     @Override
-    public AbstractSupervisedCacheObject clone() throws CloneNotSupportedException {
+    public AbstractSupervisedCacheObject clone() {
         AbstractSupervisedCacheObject cacheObject = (AbstractSupervisedCacheObject) super.clone();
 
         if (this.statusTime != null) {

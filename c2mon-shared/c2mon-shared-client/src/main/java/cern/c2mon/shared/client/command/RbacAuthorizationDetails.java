@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -21,7 +21,7 @@ import cern.c2mon.shared.common.command.AuthorizationDetails;
 /**
  * Implementation of AuthorizationDetails for RBAC, where a class,
  * device and property are associated to every command.
- * 
+ *
  * @author Mark Brightwell
  *
  */
@@ -36,17 +36,17 @@ public class RbacAuthorizationDetails implements AuthorizationDetails, Cloneable
    * RBAC class.
    */
   private String rbacClass;
-  
+
   /**
    * RBAC device.
    */
   private String rbacDevice;
-  
+
   /**
    * RBAC property.
    */
   private String rbacProperty;
-  
+
   @Override
   public AuthorizationDetails fromJson(String json) {
     // TODO Auto-generated method stub
@@ -73,19 +73,19 @@ public class RbacAuthorizationDetails implements AuthorizationDetails, Cloneable
   public String getRbacDevice() {
     return rbacDevice;
   }
-  
+
   /**
    * Checks whether the authorization details is null or not.
    * @return true if class - device - property are all null,
    * false otherwise.
    */
   public boolean isEmpty() {
-    
+
     if (getRbacClass() == null
-        && getRbacDevice() == null 
+        && getRbacDevice() == null
           && getRbacProperty() == null)
       return true;
-    
+
     return false;
   }
 
@@ -154,10 +154,14 @@ public class RbacAuthorizationDetails implements AuthorizationDetails, Cloneable
   }
 
   @Override
-  public RbacAuthorizationDetails clone() throws CloneNotSupportedException {
-    return (RbacAuthorizationDetails) super.clone();
+  public RbacAuthorizationDetails clone() {
+    try {
+      return (RbacAuthorizationDetails) super.clone();
+    } catch (CloneNotSupportedException e) {
+      throw new RuntimeException(e);
+    }
   }
-  
-  
+
+
 
 }

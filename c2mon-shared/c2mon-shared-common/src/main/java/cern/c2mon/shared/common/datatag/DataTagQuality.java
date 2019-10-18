@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -33,9 +33,9 @@ import java.util.Map;
  * @author Matthias Braeger
  * @see TagQualityStatus
  */
- 
+
 public interface DataTagQuality extends Cloneable, Serializable {
-  
+
   /**
    * @return A copy of the Map with contains all invalid <code>TagQualityStatus</code>
    * states being set. In case of a valid tag quality this method returns an
@@ -43,14 +43,14 @@ public interface DataTagQuality extends Cloneable, Serializable {
    */
   Map<TagQualityStatus, String> getInvalidQualityStates();
 
-  
+
   /**
-   * @return true if the quality object represents a "valid" state --> no error 
+   * @return true if the quality object represents a "valid" state --> no error
    * conditions apply.
    */
   boolean isValid();
-  
-  
+
+
   /**
    * Checks whether the given quality status is set or not
    * @param status The quality status to be checked
@@ -58,18 +58,18 @@ public interface DataTagQuality extends Cloneable, Serializable {
    */
   boolean isInvalidStatusSet(final TagQualityStatus status);
 
-  
+
   /**
    * @return <code>true</code>, if the <code>UNINITIALISED</code> status is not set.
    */
   boolean isInitialised();
-  
-  
+
+
   /**
    * @return <code>true</code>, if the <code>UNDEFINED_TAG</code> status is not set.
    */
   boolean isExistingTag();
-  
+
 
   /**
    * Call this method to determine whether the source of the tag is accessible
@@ -84,106 +84,105 @@ public interface DataTagQuality extends Cloneable, Serializable {
    */
   boolean isAccessible();
 
-  
+
   /**
    * Resets all the error conditions so that the tag quality
-   * is <code>OK</code>; 
+   * is <code>OK</code>;
    */
   void validate();
 
-  
+
   /**
    * If the quality is valid, this method returns "OK". In case of an invalid
    * tag quality status this method will return the description of the quality
    * state with the highest severity (zero == highest). In case there are
    * several quality states with the same (highest) severity, a string
    * concatenation of all status descriptions is returned.
-   * @return the quality description 
+   * @return the quality description
    */
   String getDescription();
- 
+
 
   /**
    * Removes the given <code>TagQualityStatus</code>, if ever set
    * @param statusToRemove The status to remove
    */
   void removeInvalidStatus(TagQualityStatus statusToRemove);
-  
-  
+
+
   /**
    * Adds an invalidation status to the quality object without any
    * description of the reason. Better use {@link #addInvalidStatus(TagQualityStatus, String)}
    * instead.
-   * 
+   *
    * <p>Notice that any older description for this flag is removed.
-   * 
+   *
    * @param statusToAdd The invalidation status that shall be added
    * @return <code>true</code>, if the quality status has successfully been added
    */
   boolean addInvalidStatus(TagQualityStatus statusToAdd);
-  
-  
+
+
   /**
-   * Invalidate the quality object and adds the status to the current set 
+   * Invalidate the quality object and adds the status to the current set
    * of quality states.
-   * 
+   *
    * <p>Even if no description is provided (null), any older description for this
    * flag is removed.
-   * 
+   *
    * @param statusToAdd The invalidation status to be added
    * @param description free-text description of why the tag is invalidated; if null
    *                      description is set to an empty String
    * @return <code>true</code>, if the quality status has successfully been added
    */
   boolean addInvalidStatus(TagQualityStatus statusToAdd, String description);
-  
-  
+
+
   /**
    * Sets the invalidation status to the quality object but without any
-   * description of the reason. Better use 
+   * description of the reason. Better use
    * {@link #setInvalidStatus(TagQualityStatus, String)} instead. Please
    * notice that all previously added quality states are overwritten.
-   * 
+   *
    * @param status The invalidation status that shall be added
    * @return <code>true</code>, if the quality status has successfully been set
    */
   boolean setInvalidStatus(TagQualityStatus status);
-  
-  
+
+
   /**
    * Sets a new invalidation status to the quality object and adds a
    * description of the reason. Please notice that all previously
    * added quality states are overwritten.
-   * 
+   *
    * @param status The invalidation status that shall be added
    * @param description free-text description of why the tag is invalidated
    * @return <code>true</code>, if the quality status has successfully been set
    */
   boolean setInvalidStatus(TagQualityStatus status, String description);
-  
-  
+
+
   /**
    * This method replaces all older quality states by the given map.
-   *  
+   *
    * @param qualityStates map of quality states and their description.
    */
   void setInvalidStates(Map<TagQualityStatus, String> qualityStates);
-  
-  
+
+
   /**
    * Needed for cache listeners, which always clone the object before
    * notifying the listener.
-   * 
+   *
    * @return the clone
-   * @throws CloneNotSupportedException if not implemented/supported so far
    */
-  DataTagQuality clone() throws CloneNotSupportedException;
+  DataTagQuality clone();
 
 
   /**
    * Checks if the passed status flag is set with the same description.
    * A null or empty string description are treated equally.
-   * 
+   *
    * @param status check if this status is set
    * @param qualityDescription check if the description for this status is the same
    * @return true if status and description are the same

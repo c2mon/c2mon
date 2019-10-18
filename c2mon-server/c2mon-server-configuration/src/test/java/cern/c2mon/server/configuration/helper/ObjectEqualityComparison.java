@@ -48,7 +48,7 @@ public class ObjectEqualityComparison {
 
 
   public static void assertAliveTimerValuesEquals(AliveTimerCacheObject expectedObject, AliveTimerCacheObject object) {
-    assertEquals(expectedObject.getAliveTagId(), object.getAliveTagId());
+    assertEquals(expectedObject.getId(), object.getId());
     assertEquals(expectedObject.getRelatedId(), object.getRelatedId());
     assertEquals(expectedObject.getRelatedName(), object.getRelatedName());
     assertEquals(expectedObject.getRelatedStateTagId(), object.getRelatedStateTagId());

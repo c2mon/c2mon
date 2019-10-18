@@ -1,14 +1,14 @@
 package cern.c2mon.server.common.metadata;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Martin Flamm
@@ -61,11 +61,14 @@ public class Metadata implements Serializable, Cloneable {
   }
 
   @Override
-  public Metadata clone() throws CloneNotSupportedException {
-    Metadata clone = (Metadata) super.clone();
-
-    clone.metadata = toMap();
-
-    return clone;
+  public Metadata clone() {
+    Metadata clone = null;
+    try {
+      clone = (Metadata) super.clone();
+      clone.metadata = toMap();
+      return clone;
+    } catch (CloneNotSupportedException e) {
+      throw new RuntimeException(e);
+    }
   }
 }

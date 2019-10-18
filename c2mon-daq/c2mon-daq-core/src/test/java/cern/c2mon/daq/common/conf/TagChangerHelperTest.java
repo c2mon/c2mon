@@ -16,12 +16,11 @@
  *****************************************************************************/
 package cern.c2mon.daq.common.conf;
 
-import org.junit.Before;
-import org.junit.Test;
-
 import cern.c2mon.daq.common.conf.core.DefaultDataTagChanger;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.datatag.address.HardwareAddress;
+import org.junit.Before;
+import org.junit.Test;
 
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertTrue;
@@ -47,7 +46,7 @@ public class TagChangerHelperTest {
       }
 
       @Override
-      public HardwareAddress clone() throws CloneNotSupportedException {
+      public HardwareAddress clone(){
         return null;
       }
     };
@@ -64,7 +63,7 @@ public class TagChangerHelperTest {
       }
 
       @Override
-      public HardwareAddress clone() throws CloneNotSupportedException {
+      public HardwareAddress clone() {
         return null;
       }
     };

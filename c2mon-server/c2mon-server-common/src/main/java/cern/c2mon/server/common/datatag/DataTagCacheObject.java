@@ -126,10 +126,9 @@ public class DataTagCacheObject extends AbstractTagCacheObject implements DataTa
 
   /**
    * Clone implementation.
-   * @throws CloneNotSupportedException
    */
   @Override
-  public DataTagCacheObject clone() throws CloneNotSupportedException {
+  public DataTagCacheObject clone() {
     DataTagCacheObject dataTagCacheObject = (DataTagCacheObject) super.clone();
     if (address != null) {
       dataTagCacheObject.address = this.address.clone();

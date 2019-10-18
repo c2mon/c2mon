@@ -104,7 +104,7 @@ public abstract class AbstractEquipmentCacheObject extends AbstractSupervisedCac
      * SupervisionStatus).
      */
     @Override
-    public AbstractEquipmentCacheObject clone() throws CloneNotSupportedException {
+    public AbstractEquipmentCacheObject clone() {
         return (AbstractEquipmentCacheObject) super.clone();
     }
 

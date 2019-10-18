@@ -61,7 +61,7 @@ public class SubEquipmentCacheObject extends AbstractEquipmentCacheObject implem
      * Clones the SubEquipment object.
      */
     @Override
-    public SubEquipmentCacheObject clone() throws CloneNotSupportedException {
+    public SubEquipmentCacheObject clone() {
         return (SubEquipmentCacheObject) super.clone();
     }
 

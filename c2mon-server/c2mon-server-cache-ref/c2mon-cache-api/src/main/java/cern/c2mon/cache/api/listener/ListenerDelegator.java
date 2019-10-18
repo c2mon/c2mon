@@ -12,11 +12,7 @@ public interface ListenerDelegator<V extends Cacheable> extends CacheListenerMan
 
   @Override
   default void notifyListenersOf(CacheEvent event, V source) {
-    try {
-      getCacheListenerManager().notifyListenersOf(event, (V) source.clone());
-    } catch (CloneNotSupportedException e) {
-      e.printStackTrace();
-    }
+    getCacheListenerManager().notifyListenersOf(event, (V) source.clone());
   }
 
   @Override

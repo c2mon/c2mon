@@ -118,7 +118,7 @@ public class AliveTimerCacheObject extends AbstractCacheableImpl implements Aliv
     }
 
     @Override
-    public AliveTimerCacheObject clone() throws CloneNotSupportedException {
+    public AliveTimerCacheObject clone() {
         AliveTimerCacheObject aliveTimer = (AliveTimerCacheObject) super.clone();
         if (this.dependentAliveTimerIds != null)
             aliveTimer.dependentAliveTimerIds = new ArrayList<>(this.dependentAliveTimerIds);

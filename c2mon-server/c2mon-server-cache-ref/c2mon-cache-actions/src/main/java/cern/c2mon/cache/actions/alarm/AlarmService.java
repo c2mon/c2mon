@@ -146,11 +146,7 @@ public class AlarmService implements AlarmAggregator {
    */
   private void notifyListeners(final Tag tag, final List<Alarm> alarmList) {
     for (AlarmAggregatorListener listener : alarmUpdateObservable) {
-      try {
-        listener.notifyOnUpdate(tag.clone(), alarmList);
-      } catch (CloneNotSupportedException e) {
-        log.error("Unexpected exception caught: clone should be implemented for this class! " + "Alarm & tag listener was not notified: ");
-      }
+      listener.notifyOnUpdate(tag.clone(), alarmList);
     }
   }
 }

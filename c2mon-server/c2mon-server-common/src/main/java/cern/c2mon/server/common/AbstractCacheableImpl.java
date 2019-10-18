@@ -26,11 +26,16 @@ public abstract class AbstractCacheableImpl implements Cacheable {
   protected Timestamp cacheTimestamp = new Timestamp(0);
 
   @Override
-  public AbstractCacheableImpl clone() throws CloneNotSupportedException {
-    AbstractCacheableImpl clone = (AbstractCacheableImpl) super.clone();
-    // We don't check if non null because it's guaranteed (init value + setter check)
-    clone.setCacheTimestamp((Timestamp) cacheTimestamp.clone());
-    return clone;
+  public AbstractCacheableImpl clone() {
+    AbstractCacheableImpl clone = null;
+    try {
+      clone = (AbstractCacheableImpl) super.clone();
+      // We don't check if non null because it's guaranteed (init value + setter check)
+      clone.setCacheTimestamp((Timestamp) cacheTimestamp.clone());
+      return clone;
+    } catch (CloneNotSupportedException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   /**

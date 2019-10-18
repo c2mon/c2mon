@@ -151,7 +151,7 @@ public class AlarmCacheObject extends AbstractCacheableImpl implements Alarm {
    *           should never be thrown
    */
   @Override
-  public AlarmCacheObject clone() throws CloneNotSupportedException {
+  public AlarmCacheObject clone() {
     AlarmCacheObject alarmCacheObject = (AlarmCacheObject) super.clone();
     if (this.condition != null) {
       alarmCacheObject.condition = (AlarmCondition) this.condition.clone();

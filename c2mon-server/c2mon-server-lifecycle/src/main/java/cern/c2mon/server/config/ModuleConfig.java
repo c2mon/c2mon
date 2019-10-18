@@ -1,12 +1,7 @@
 package cern.c2mon.server.config;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-import org.springframework.context.support.DefaultLifecycleProcessor;
-
 import cern.c2mon.server.cache.CacheModuleRef;
-import cern.c2mon.server.cache.alarm.AlarmModule;
+import cern.c2mon.server.cache.alarm.config.AlarmModule;
 import cern.c2mon.server.cache.config.CacheModule;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.cache.loader.config.CacheLoaderModuleRef;
@@ -21,6 +16,10 @@ import cern.c2mon.server.elasticsearch.config.ElasticsearchModule;
 import cern.c2mon.server.history.config.HistoryModule;
 import cern.c2mon.server.rule.config.RuleModule;
 import cern.c2mon.server.supervision.config.SupervisionModule;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.context.support.DefaultLifecycleProcessor;
 
 /**
  * This class is responsible for importing the core C2MON server modules.

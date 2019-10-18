@@ -153,7 +153,7 @@ public class ProcessCacheObject extends AbstractSupervisedCacheObject implements
 
   @SuppressWarnings("unchecked")
   @Override
-  public ProcessCacheObject clone() throws CloneNotSupportedException {
+  public ProcessCacheObject clone() {
     ProcessCacheObject clone = (ProcessCacheObject) super.clone();
     clone.equipmentIds = (ArrayList<Long>) equipmentIds.clone();
     if (this.startupTime != null) {
