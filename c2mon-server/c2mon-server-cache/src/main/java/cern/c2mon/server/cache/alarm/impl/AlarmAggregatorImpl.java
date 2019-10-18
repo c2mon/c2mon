@@ -1,28 +1,20 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.server.cache.alarm.impl;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.annotation.PostConstruct;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.cache.C2monCacheListener;
 import cern.c2mon.server.cache.CacheRegistrationService;
@@ -33,16 +25,22 @@ import cern.c2mon.server.cache.alarm.AlarmAggregatorListener;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.tag.Tag;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.PostConstruct;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Implementation of the {@link AlarmAggregator} (a singleton bean in the server
  * context).
- * 
+ *
  * <p>
  * This implementation registers for synchronous notifications from the cache
  * (i.e. on original JMS update thread). These calls are passed through to the
  * client module on the same thread (may need adjusting).
- * 
+ *
  * @author Mark Brightwell
  *
  */
@@ -67,7 +65,7 @@ public class AlarmAggregatorImpl implements AlarmAggregator, C2monCacheListener<
 
   /**
    * Autowired constructor.
-   * 
+   *
    * @param cacheRegistrationService
    *          the cache registration service (for registration to cache update
    *          notifications)
@@ -106,12 +104,12 @@ public class AlarmAggregatorImpl implements AlarmAggregator, C2monCacheListener<
   /**
    * When an update to a Tag is received from the cache, evaluates the
    * associated Alarms and notifies the (alarm + tag) listeners.
-   * 
+   *
    * <p>
    * Notice that received Tag is a clone, but since the cache notification is
    * synchronous a lock is already held on this tag, which can therefore not be
    * modified during this call.
-   * 
+   *
    * @param tag
    *          a clone of the updated Tag received from the cache
    */
@@ -123,7 +121,7 @@ public class AlarmAggregatorImpl implements AlarmAggregator, C2monCacheListener<
 
   /**
    * Notify the listeners of a tag update with associated alarms.
-   * 
+   *
    * @param tag
    *          the Tag that has been updated
    * @param alarmList
@@ -131,11 +129,7 @@ public class AlarmAggregatorImpl implements AlarmAggregator, C2monCacheListener<
    */
   private void notifyListeners(final Tag tag, final List<Alarm> alarmList) {
     for (AlarmAggregatorListener listener : listeners) {
-      try {
-        listener.notifyOnUpdate((Tag) tag.clone(), alarmList);
-      } catch (CloneNotSupportedException e) {
-        log.error("Unexpected exception caught: clone should be implemented for this class! " + "Alarm & tag listener was not notified: " + listener.getClass().getSimpleName());
-      }
+      listener.notifyOnUpdate((Tag) tag.clone(), alarmList);
     }
   }
 

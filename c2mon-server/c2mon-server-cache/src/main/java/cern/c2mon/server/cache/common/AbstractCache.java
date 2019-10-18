@@ -16,6 +16,27 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.common;
 
+import cern.c2mon.server.cache.C2monBufferedCacheListener;
+import cern.c2mon.server.cache.C2monCacheListener;
+import cern.c2mon.server.cache.ClusterCache;
+import cern.c2mon.server.cache.config.CacheProperties;
+import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
+import cern.c2mon.server.cache.listener.BufferedKeyCacheListener;
+import cern.c2mon.server.cache.listener.CacheListener;
+import cern.c2mon.server.cache.listener.DefaultBufferedCacheListener;
+import cern.c2mon.server.cache.listener.MultiThreadedCacheListener;
+import cern.c2mon.server.cache.loading.SimpleCacheLoaderDAO;
+import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
+import cern.c2mon.server.common.component.Lifecycle;
+import cern.c2mon.server.common.config.C2monCacheName;
+import cern.c2mon.shared.common.Cacheable;
+import lombok.extern.slf4j.Slf4j;
+import net.sf.ehcache.Ehcache;
+import net.sf.ehcache.Element;
+import net.sf.ehcache.event.RegisteredEventListeners;
+import net.sf.ehcache.loader.CacheLoader;
+import org.springframework.jmx.export.annotation.ManagedOperation;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
@@ -23,30 +44,6 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingDeque;
-
-import cern.c2mon.server.cache.config.CacheProperties;
-import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
-import lombok.extern.slf4j.Slf4j;
-import net.sf.ehcache.Ehcache;
-import net.sf.ehcache.Element;
-import net.sf.ehcache.event.RegisteredEventListeners;
-import net.sf.ehcache.loader.CacheLoader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.jmx.export.annotation.ManagedOperation;
-
-import cern.c2mon.server.cache.C2monBufferedCacheListener;
-import cern.c2mon.server.cache.C2monCacheListener;
-import cern.c2mon.server.cache.ClusterCache;
-import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
-import cern.c2mon.server.cache.listener.BufferedKeyCacheListener;
-import cern.c2mon.server.cache.listener.CacheListener;
-import cern.c2mon.server.cache.listener.DefaultBufferedCacheListener;
-import cern.c2mon.server.cache.listener.MultiThreadedCacheListener;
-import cern.c2mon.server.cache.loading.SimpleCacheLoaderDAO;
-import cern.c2mon.server.common.component.Lifecycle;
-import cern.c2mon.server.common.config.C2monCacheName;
-import cern.c2mon.shared.common.Cacheable;
 
 /**
  * Abstract cache that all the other C2MON caches extend.
@@ -202,9 +199,9 @@ private final CacheProperties properties;
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 ObjectOutputStream oos = new ObjectOutputStream(baos);) {
             T reference = get(id);
-    
+
             oos.writeObject(reference);
-    
+
             ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
             ObjectInputStream ois = new ObjectInputStream(bais);
             return (T) ois.readObject();
@@ -264,28 +261,18 @@ private final CacheProperties properties;
    */
   public void notifyListenersOfUpdate(final T cacheable) {
     registeredEventListeners.notifyElementUpdated(new Element(cacheable.getId(), null), false); //only for monitoring via Ehcache: not using Ehcache listeners o.w.
-    try {
       @SuppressWarnings("unchecked")
-      T cloned = (T) cacheable.clone();
-      for (C2monCacheListener< ? super T> listener : cacheListeners) {
-        listener.notifyElementUpdated(cloned);
-      }
-    } catch (CloneNotSupportedException e) {
-      log.error(CLONE_NOT_SUPPORTED_EXCEPTION_CAUGHT_WHILE_CLONING_A_CACHE_ELEMENT, e);
-      throw new FailedCacheElementCloningException(CLONE_NOT_SUPPORTED_EXCEPTION_CAUGHT_WHILE_CLONING_A_CACHE_ELEMENT, e);
+    T cloned = (T) cacheable.clone();
+    for (C2monCacheListener< ? super T> listener : cacheListeners) {
+      listener.notifyElementUpdated(cloned);
     }
   }
 
   public void notifyListenerStatusConfirmation(final T cacheable, final long timestamp) {
-    try {
-      @SuppressWarnings("unchecked")
-      T cloned = (T) cacheable.clone();
-      for (C2monCacheListener< ? super T> listener : cacheListeners) {
-        listener.confirmStatus(cloned);
-      }
-    } catch (CloneNotSupportedException e) {
-      log.error(CLONE_NOT_SUPPORTED_EXCEPTION_CAUGHT_WHILE_CLONING_A_CACHE_ELEMENT, e);
-      throw new FailedCacheElementCloningException(CLONE_NOT_SUPPORTED_EXCEPTION_CAUGHT_WHILE_CLONING_A_CACHE_ELEMENT, e);
+    @SuppressWarnings("unchecked")
+    T cloned = (T) cacheable.clone();
+    for (C2monCacheListener< ? super T> listener : cacheListeners) {
+      listener.confirmStatus(cloned);
     }
   }
 
