@@ -26,4 +26,9 @@ public class EquipmentSupervisedServiceTest extends SupervisedServiceTest<Equipm
   protected C2monCache<Equipment> initCache() {
     return equipmentCacheRef;
   }
+
+  @Override
+  protected void mutateObject(Equipment cacheable) {
+      cacheable.getCacheTimestamp().setTime(10);
+  }
 }

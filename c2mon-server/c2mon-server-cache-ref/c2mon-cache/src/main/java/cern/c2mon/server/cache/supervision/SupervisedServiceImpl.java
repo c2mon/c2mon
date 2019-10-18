@@ -6,7 +6,6 @@ import cern.c2mon.server.common.alive.AliveTimer;
 import cern.c2mon.server.common.supervision.Supervised;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
-import cern.c2mon.shared.common.CacheEvent;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -125,12 +124,11 @@ public class SupervisedServiceImpl<T extends Supervised> implements SupervisedSe
   }
 
   @Override
-  public void refreshAndNotifyCurrentSupervisionStatus(long id) {
+  public void refresh(long id) {
     cacheRef.executeTransaction(() -> {
       T supervised = cacheRef.get(id);
       supervised.setStatusTime(new Timestamp(System.currentTimeMillis()));
       cacheRef.put(supervised.getId(), supervised);
-      cacheRef.notifyListenersOf(CacheEvent.SUPERVISION_UPDATE, supervised);
     });
   }
 

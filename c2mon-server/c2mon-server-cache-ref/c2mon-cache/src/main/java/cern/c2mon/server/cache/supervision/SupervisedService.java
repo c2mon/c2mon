@@ -46,13 +46,28 @@ public interface SupervisedService<T extends Supervised> {
 
   /**
    * Notifies all registered listeners of the current supervision status
-   * of the passed cache element. The timestamp of all events is refreshed
+   * of the cache element with given id. The timestamp of all events is refreshed
+   * to the current time. Is used for example on server startup
+   * to "refresh" all listeners in cache of server failure.
+   *
+   * @param id id of the cache element
+   * @deprecated use {@link SupervisedService#refresh(long)} instead, as any
+   *             supervision update will trigger an event
+   */
+  @Deprecated
+  default void refreshAndNotifyCurrentSupervisionStatus(long id){
+    refresh(id);
+  }
+
+  /**
+   * Notifies all registered listeners of the current supervision status
+   * of the cache element with given id. The timestamp of all events is refreshed
    * to the current time. Is used for example on server startup
    * to "refresh" all listeners in cache of server failure.
    *
    * @param id id of the cache element
    */
-  void refreshAndNotifyCurrentSupervisionStatus(long id);
+  void refresh(long id);
 
   /**
    * Sets the status of the Supervised object to STARTUP,
@@ -122,7 +137,6 @@ public interface SupervisedService<T extends Supervised> {
 
   /**
    * Stops and removes the alive timer object from the cache.
-   * No supervised lock should be held when calling this! (lock hierarchy)
    *
    * @param id of supervised object
    * @throws CacheElementNotFoundException if the supervised object cannot be located in the corresponding cache

@@ -1,35 +1,18 @@
 package cern.c2mon.cache;
 
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
-import cern.c2mon.server.cache.supervision.SupervisedService;
 import cern.c2mon.server.common.supervision.Supervised;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
-import cern.c2mon.shared.common.CacheEvent;
 import cern.c2mon.shared.common.supervision.SupervisionConstants;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.function.Supplier;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
-public abstract class SupervisedServiceTest<T extends Supervised> extends MultiThreadCacheListenerTest<T> {
-  //  protected final AtomicInteger eventCounter = new AtomicInteger(0);
-//  protected CacheListener<V> listenerAction = eq -> eventCounter.incrementAndGet();
-  protected SupervisedService<T> supervisedService;
-
-  protected abstract SupervisedService<T> getSupervisedService();
-
-  // TODO Test with other kinds of listeners too?
-
-  @Before
-  @Override
-  public void resetResults() {
-    super.resetResults();
-    supervisedService = getSupervisedService();
-  }
+public abstract class SupervisedServiceTest<T extends Supervised> extends SupervisedServiceListenerTest<T> {
 
   @Test(expected = CacheElementNotFoundException.class)
   public void getSupervisionStatusThrowsIfNonexistent() {
@@ -89,43 +72,44 @@ public abstract class SupervisedServiceTest<T extends Supervised> extends MultiT
     assertEquals(SupervisionConstants.SupervisionStatus.DOWN, sample.getSupervisionStatus());
   }
 
-
-  // Listeners
-
   @Test
-  public void refreshAndNotifyCurrentSupervisionStatus() {
+  public void isRunning() {
+    cache.put(sample.getId(), sample);
+    // Default
+    assertFalse(supervisedService.isRunning(sample.getId()));
 
+    sample.setSupervision(SupervisionConstants.SupervisionStatus.STARTUP, "", Timestamp.from(Instant.now()));
+    cache.put(sample.getId(), sample);
+    assertTrue(supervisedService.isRunning(sample.getId()));
+
+    sample.setSupervision(SupervisionConstants.SupervisionStatus.RUNNING_LOCAL, "", Timestamp.from(Instant.now()));
+    cache.put(sample.getId(), sample);
+    assertTrue(supervisedService.isRunning(sample.getId()));
+
+    sample.setSupervision(SupervisionConstants.SupervisionStatus.RUNNING, "", Timestamp.from(Instant.now()));
+    cache.put(sample.getId(), sample);
+    assertTrue(supervisedService.isRunning(sample.getId()));
+
+    sample.setSupervision(SupervisionConstants.SupervisionStatus.STOPPED, "", Timestamp.from(Instant.now()));
+    cache.put(sample.getId(), sample);
+    assertFalse(supervisedService.isRunning(sample.getId()));
+
+    sample.setSupervision(SupervisionConstants.SupervisionStatus.DOWN, "", Timestamp.from(Instant.now()));
+    cache.put(sample.getId(), sample);
+    assertFalse(supervisedService.isRunning(sample.getId()));
+
+    sample.setSupervision(SupervisionConstants.SupervisionStatus.UNCERTAIN, "", Timestamp.from(Instant.now()));
+    cache.put(sample.getId(), sample);
+    assertFalse(supervisedService.isRunning(sample.getId()));
   }
 
   @Test
-  public void supervisionChangeNotification() {
-    cache.registerListener(paramListener, CacheEvent.SUPERVISION_CHANGE);
+  public void isUncertain() {
+    sample.setSupervision(SupervisionConstants.SupervisionStatus.UNCERTAIN, "", new Timestamp(0));
 
-    cache.put(1L, sample);
+    cache.put(sample.getId(), sample);
 
-    paramListener.close();
-
-    assertEquals(1, eventCounter.get());
-  }
-
-  @Test
-  public void supervisionChangePassesCloneObject() {
-
-  }
-
-  @Test
-  public void supervisionUpdateNotification() {
-    cache.registerListener(paramListener, CacheEvent.SUPERVISION_UPDATE);
-
-    cache.put(1L, sample);
-
-    paramListener.close();
-
-    assertEquals(1, eventCounter.get());
-  }
-
-  @Test
-  public void supervisionUpdatePassesCloneObject() {
-
+    verifySupervisionEvent(sample, SupervisionConstants.SupervisionStatus.UNCERTAIN);
+    assertTrue(supervisedService.isUncertain(sample.getId()));
   }
 }

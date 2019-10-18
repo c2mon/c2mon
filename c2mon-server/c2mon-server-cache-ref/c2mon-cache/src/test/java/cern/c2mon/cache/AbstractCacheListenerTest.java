@@ -16,20 +16,20 @@ import static org.junit.Assert.assertEquals;
 public abstract class AbstractCacheListenerTest<V extends Cacheable> extends AbstractCacheTest<V> {
   protected static final AtomicInteger eventCounter = new AtomicInteger(0);
   protected final CacheListener<V> listenerAction = eq -> eventCounter.incrementAndGet();
-  protected final CacheListener<V> mutatingListenerAction = eq -> {
+  protected final CacheListener<V> mutatingListenerAction = cacheable -> {
     eventCounter.incrementAndGet();
-//    eq.getSubEquipmentIds().add(1L);
+    mutateObject(cacheable);
   };
 
   protected AbstractCacheListener<V> paramListener;
-  private AbstractCacheListener<V> mutatingListener;
+  protected AbstractCacheListener<V> mutatingListener;
   protected V sample;
-//  = new EquipmentCacheObject(1L, "Test-Eq", "Object", 100L);
-//  protected V sample2 = new EquipmentCacheObject(2L, "Test-Eq2", "Object", 101L);
 
   protected abstract AbstractCacheListener<V> generateListener();
 
-  abstract AbstractCacheListener<V> generateMutatingListener();
+  protected abstract AbstractCacheListener<V> generateMutatingListener();
+
+  protected abstract void mutateObject(V cacheable);
 
   @Before
   public void resetResults() {
@@ -50,37 +50,37 @@ public abstract class AbstractCacheListenerTest<V extends Cacheable> extends Abs
 
   @Test
   public void updateNotification() {
-    cache.registerListener(paramListener, CacheEvent.UPDATE_ACCEPTED);
-
-    cache.put(1L, sample);
-
-    assertEquals(1, cache.getKeys().size());
-
-    paramListener.close();
+    registerListenerAndPut(paramListener, CacheEvent.UPDATE_ACCEPTED);
     assertEquals(1, eventCounter.get());
   }
 
   @Test
   public void updatePassesCloneObject() {
-    cache.registerListener(mutatingListener, CacheEvent.UPDATE_ACCEPTED);
-
-    cache.put(1L, sample);
-
-    assertEquals(1, cache.getKeys().size());
-    mutatingListener.close();
-//    assertEquals("Sample object should not have been mutated! ",0, sample.getSubEquipmentIds().size());
-//    assertEquals("Cache object should not have been mutated",0, cache.get(1L).getSubEquipmentIds().size());
+    registerListenerAndPut(mutatingListener, CacheEvent.UPDATE_ACCEPTED);
+    assertEquals("Sample object should not have been mutated! ", sample, cache.get(sample.getId()));
   }
 
   @Test
   public void putQuietDoesNotSendNotification() {
-    cache.registerListener(paramListener, CacheEvent.UPDATE_ACCEPTED);
+    cache.registerListener(paramListener, CacheEvent.values());
 
     cache.putQuiet(1L, sample);
 
     assertEquals(1, cache.getKeys().size());
 
     paramListener.close();
+    assertEquals("putQuiet should not create any events", 0, eventCounter.get());
+
+  }
+
+  protected void registerListenerAndPut(AbstractCacheListener<V> listener, CacheEvent... events) {
+    cache.registerListener(listener, events);
+
+    cache.put(1L, sample);
+
+    assertEquals(1, cache.getKeys().size());
+
+    listener.close();
   }
 
   @Test

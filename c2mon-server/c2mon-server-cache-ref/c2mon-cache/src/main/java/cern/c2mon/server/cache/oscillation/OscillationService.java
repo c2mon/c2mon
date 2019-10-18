@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 /**
  * The oscillation cache is a support cache with only one key:
+ * {@link OscillationTimestamp#DEFAULT_ID}
  *
  * @author Alexandros Papageorgiou Koufidis
  */

@@ -13,7 +13,7 @@ import static org.junit.Assert.*;
 
 public abstract class SupervisedTest<T extends Supervised> {
 
-  private T sample;
+  protected T sample;
 
   protected abstract T generateSample();
 

@@ -21,7 +21,6 @@ import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.AlarmCacheUpdater;
-import cern.c2mon.server.common.alarm.OscillationTimestamp;
 import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.tag.Tag;
@@ -45,7 +44,7 @@ import java.util.TimerTask;
  * Notice that an alive timer is considered expired when alive-interval +
  * alive-interval/3 milliseconds have expired since the last alive message
  * arrived, where alive-interval is specific to the AliveTimer object (see
- * <code>hasExpired</code> in {@link AliveTimerFacade}).
+ * <code>hasExpired</code> in {@code AliveTimerFacade}).
  *
  * @author Alexandros Papageorgiou
  * @author Brice Copy
@@ -78,7 +77,6 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
    */
   private static final long INITIAL_SCAN_DELAY = 120000L;
   private final C2monCache<Alarm> alarmCacheRef;
-  private final C2monCache<OscillationTimestamp> timestampCacheRef;
   private final OscillationService oscillationCheckService;
   private final OscillationUpdater oscillationUpdater;
   private final AlarmCacheUpdater alarmCacheUpdater;
@@ -93,19 +91,17 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
    * Constructor.
    *
    * @param alarmCacheRef           the alarm cache to retrieve and update alarm cache objects.
-   * @param timestampCacheRef
    * @param oscillationCheckService the component that manages the oscillation check timer
    * @param oscillationUpdater      the instance that check oscillation statuses.
    * @param alarmCacheUpdater
    * @param dataTagCacheRef         the data tag cache to retrieve data tag objects and check their original values.
    */
   @Autowired
-  public OscillationUpdateChecker(final C2monCache<Alarm> alarmCacheRef, C2monCache<OscillationTimestamp> timestampCacheRef, final OscillationService oscillationCheckService,
+  public OscillationUpdateChecker(final C2monCache<Alarm> alarmCacheRef, final OscillationService oscillationCheckService,
                                   final OscillationUpdater oscillationUpdater, final AlarmCacheUpdater alarmCacheUpdater,
                                   final C2monCache<DataTag> dataTagCacheRef) {
     super();
     this.alarmCacheRef = alarmCacheRef;
-    this.timestampCacheRef = timestampCacheRef;
     this.oscillationCheckService = oscillationCheckService;
     this.oscillationUpdater = oscillationUpdater;
     this.alarmCacheUpdater = alarmCacheUpdater;
@@ -175,7 +171,6 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
 
         log.debug("finished checking alarm oscillation timers");
       } // end of else block
-      return null;
     });
   }
 

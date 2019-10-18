@@ -33,6 +33,11 @@ public interface SupervisedServiceDelegator<T extends Supervised> extends Superv
   }
 
   @Override
+  default void refresh(long id) {
+    getSupervisedService().refresh(id);
+  }
+
+  @Override
   @Deprecated
   default T start(long id, Timestamp timestamp) {
     return getSupervisedService().start(id, timestamp);
