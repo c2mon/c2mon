@@ -1,5 +1,11 @@
 package cern.c2mon.server.cache.loader.common;
 
+import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.loader.CacheLoader;
+import cern.c2mon.server.cache.loader.CacheLoaderDAO;
+import cern.c2mon.shared.common.Cacheable;
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -8,13 +14,6 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-
-import lombok.extern.slf4j.Slf4j;
-
-import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.cache.api.loader.CacheLoader;
-import cern.c2mon.server.cache.loader.CacheLoaderDAO;
-import cern.c2mon.shared.common.Cacheable;
 
 /**
  * Cache loader that loads the Ehcache underlying any C2monCache. It contains
@@ -47,7 +46,7 @@ public class SimpleCacheLoader<T extends Cacheable> implements CacheLoader<T> {
    */
   private Map<Long, T> preloadBuffer = new ConcurrentHashMap<>();
 
-  private final C2monCache c2monCache;
+  private final C2monCache<T> c2monCache;
 
   private final CacheLoaderDAO<T> cacheLoaderDAO;
 
@@ -57,8 +56,6 @@ public class SimpleCacheLoader<T extends Cacheable> implements CacheLoader<T> {
    *
    * @param c2monCache            the c2monCache to load from the DB
    * @param cacheLoaderDAO   the DAO for accessing the DB
-   * @param executor
-   * @param threadNamePrefix
    */
   public SimpleCacheLoader(C2monCache c2monCache, CacheLoaderDAO<T> cacheLoaderDAO) {
     this.c2monCache = c2monCache;
@@ -169,7 +166,7 @@ public class SimpleCacheLoader<T extends Cacheable> implements CacheLoader<T> {
     public void run() {
       while (!keyList.isEmpty()) {
         Object key = keyList.pollFirst();
-        c2monCache.put(key, preloadBuffer.get(key));
+        c2monCache.put((Long) key, preloadBuffer.get(key));
       }
     }
   }
