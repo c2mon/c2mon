@@ -49,7 +49,7 @@ public class DataTagCacheLoaderTest extends AbstractCacheLoaderTest<DataTag> {
   }
 
   @Override
-  protected C2monCache<DataTag> initCache() {
+  protected C2monCache<DataTag> getCache() {
     return dataTagCacheRef;
   }
 }

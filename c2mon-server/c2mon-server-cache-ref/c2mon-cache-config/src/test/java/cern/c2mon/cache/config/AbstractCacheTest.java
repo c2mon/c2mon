@@ -44,12 +44,12 @@ public abstract class AbstractCacheTest<V extends Cacheable> {
   @Before
   public void reload() {
     if (cache == null)
-      cache = initCache();
+      cache = getCache();
     cache.clear();
     assertEquals(0, cache.getAll(cache.getKeys()).size());
     cache.init();
   }
 
-  protected abstract C2monCache<V> initCache();
+  protected abstract C2monCache<V> getCache();
 }
 

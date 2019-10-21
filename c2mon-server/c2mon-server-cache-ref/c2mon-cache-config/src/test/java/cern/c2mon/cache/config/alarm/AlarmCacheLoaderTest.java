@@ -43,7 +43,7 @@ public class AlarmCacheLoaderTest extends AbstractCacheLoaderTest<Alarm> {
   }
 
   @Override
-  protected C2monCache<Alarm> initCache() {
+  protected C2monCache<Alarm> getCache() {
     return alarmCacheRef;
   }
 

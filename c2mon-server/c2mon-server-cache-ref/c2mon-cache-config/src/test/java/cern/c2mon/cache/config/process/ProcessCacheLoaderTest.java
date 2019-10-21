@@ -52,7 +52,7 @@ public class ProcessCacheLoaderTest extends AbstractCacheLoaderTest<Process> {
   }
 
   @Override
-  protected C2monCache<Process> initCache() {
+  protected C2monCache<Process> getCache() {
     return processCacheRef;
   }
 }

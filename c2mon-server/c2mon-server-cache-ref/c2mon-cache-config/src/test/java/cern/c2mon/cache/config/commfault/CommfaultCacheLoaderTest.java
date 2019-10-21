@@ -50,7 +50,7 @@ public class CommfaultCacheLoaderTest extends AbstractCacheLoaderTest<CommFaultT
   }
 
   @Override
-  protected C2monCache<CommFaultTag> initCache() {
+  protected C2monCache<CommFaultTag> getCache() {
     return commFaultTagCacheRef;
   }
 }

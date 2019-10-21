@@ -50,7 +50,7 @@ public class RuleCacheLoaderTest extends AbstractCacheLoaderTest<RuleTag> {
   }
 
   @Override
-  protected C2monCache<RuleTag> initCache() {
+  protected C2monCache<RuleTag> getCache() {
     return ruleTagCacheRef;
   }
 }

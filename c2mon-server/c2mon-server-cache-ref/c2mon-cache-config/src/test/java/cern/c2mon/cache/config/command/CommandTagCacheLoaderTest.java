@@ -47,7 +47,7 @@ public class CommandTagCacheLoaderTest extends AbstractCacheLoaderTest<CommandTa
   }
 
   @Override
-  protected C2monCache<CommandTag> initCache() {
+  protected C2monCache<CommandTag> getCache() {
     return commandTagCacheRef;
   }
 }

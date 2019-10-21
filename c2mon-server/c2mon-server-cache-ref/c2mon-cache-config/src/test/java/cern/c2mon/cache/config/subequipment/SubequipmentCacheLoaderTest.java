@@ -50,7 +50,7 @@ public class SubequipmentCacheLoaderTest extends AbstractCacheLoaderTest<SubEqui
   }
 
   @Override
-  protected C2monCache<SubEquipment> initCache() {
+  protected C2monCache<SubEquipment> getCache() {
     return subEquipmentCacheRef;
   }
 }
