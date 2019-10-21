@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
  */
 
 @Configuration
-@ComponentScan(basePackages = {"cern.c2mon.cache.actions", "cern.c2mon.cache.config", "cern.c2mon.cache.api"})
+@ComponentScan(basePackages = {"cern.c2mon.cache.actions"})
 public class CacheActionsModuleRef {
 
 }

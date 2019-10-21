@@ -27,12 +27,12 @@ import static org.junit.Assert.assertEquals;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {
   CommonModule.class,
-  CacheActionsModuleRef.class,
   CacheConfigModuleRef.class,
   CacheDbAccessModule.class,
   CacheLoaderModuleRef.class,
   CachePopulationRule.class,
-  C2monIgniteConfiguration.class
+  C2monIgniteConfiguration.class,
+  CacheActionsModuleRef.class
 })
 public abstract class AbstractCacheTest<V extends Cacheable> {
 

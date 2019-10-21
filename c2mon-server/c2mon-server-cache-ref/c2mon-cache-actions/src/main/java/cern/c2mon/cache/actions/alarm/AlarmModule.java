@@ -26,5 +26,5 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @EnableConfigurationProperties(OscillationProperties.class)
-@ComponentScan("cern.c2mon.server.cache.alarm")
+@ComponentScan("cern.c2mon.cache.actions.alarm")
 public class AlarmModule {}
