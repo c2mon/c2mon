@@ -29,7 +29,17 @@
       </dependency>
       <dependency>
         <groupId>cern.c2mon.server</groupId>
+        <artifactId>c2mon-cache-actions</artifactId>
+        <version>${project.parent.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>cern.c2mon.server</groupId>
         <artifactId>c2mon-cache-config</artifactId>
+        <version>${project.parent.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>cern.c2mon.server</groupId>
+        <artifactId>c2mon-cache-loader</artifactId>
         <version>${project.parent.version}</version>
       </dependency>
       <dependency>

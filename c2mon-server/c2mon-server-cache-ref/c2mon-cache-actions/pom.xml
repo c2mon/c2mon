@@ -18,6 +18,10 @@
     </dependency>
     <dependency>
       <groupId>cern.c2mon.server</groupId>
+      <artifactId>c2mon-cache-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.server</groupId>
       <artifactId>c2mon-cache-config</artifactId>
     </dependency>
     <dependency>
