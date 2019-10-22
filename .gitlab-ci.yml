@@ -57,7 +57,7 @@ build_server:
   dependencies: [build_shared]
   script:
     - cd c2mon-server
-    - mvn -q -U -B test-compile -pl '!distribution'
+    - mvn -q -U -B test-compile -pl '!distribution' --settings ../settings.xml
   artifacts:
     name: "c2mon-server#$CI_COMMIT_REF_NAME"
     paths: [c2mon-server]
@@ -67,7 +67,7 @@ build_client:
   dependencies: [build_shared]
   script:
     - cd c2mon-client
-    - mvn -q -U -B test-compile
+    - mvn -q -U -B test-compile --settings ../settings.xml
   artifacts:
     name: "c2mon-client#$CI_COMMIT_REF_NAME"
     paths: [c2mon-client]
@@ -77,7 +77,7 @@ build_daq:
   dependencies: [build_shared]
   script:
     - cd c2mon-daq
-    - mvn -q -U -B test-compile
+    - mvn -q -U -B test-compile --settings ../settings.xml
   artifacts:
     name: "c2mon-daq#$CI_COMMIT_REF_NAME"
     paths: [c2mon-daq]
