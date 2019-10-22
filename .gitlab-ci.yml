@@ -113,7 +113,7 @@ build_daq:
     when: on_success
     untracked: true
     reports:
-      junit: reports/*.xml]
+      junit: reports/*.xml
   except:
     - master
     - tags
