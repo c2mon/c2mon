@@ -1,5 +1,6 @@
 stages:
   - clean
+  - precompile
   - compile
   - test
   - deploy
@@ -76,6 +77,7 @@ build_docs:
 
 build_shared:
   extends: .build_base
+  stage: precompile
   script:
     - cd c2mon-shared
     - mvn -U -B test-compile
