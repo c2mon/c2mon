@@ -12,7 +12,6 @@ stages:
 
 .build_base:
   stage: compile
-  tags: [c2mon]
   dependencies: []
   artifacts:
     when: on_success
@@ -89,7 +88,6 @@ build_daq:
 
 .test_base:
   stage: test
-  tags: [c2mon]
   except:
     - master
     - tags
@@ -135,7 +133,6 @@ test_daq:
 
 sonar_preview:
   stage: qa
-  tags: [c2mon]
   dependencies:
     - build_shared
     - build_server
@@ -149,7 +146,6 @@ sonar_preview:
 
 quality_assurance:
   stage: qa
-  tags: [c2mon]
   dependencies: []
   script:
     - mvn package sonar:sonar -Dmaven.test.skip=true -DskipDocker=true -Dsonar.host.url=${SONAR_URL} -Dsonar.dependencyCheck.reportPath=target/dependency-check-report.xml --settings settings.xml
@@ -163,7 +159,6 @@ quality_assurance:
 # Fully build and publish master branch
 publish:
   stage: publish
-  tags: [c2mon]
   dependencies:
     - build_shared
     - build_server
