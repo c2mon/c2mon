@@ -46,7 +46,6 @@ variables:
 
 build_shared:
   extends: .build_base
-  tags: [c2mon]
   stage: precompile
   cache:
     policy: pull-push
