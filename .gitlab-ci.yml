@@ -1,13 +1,18 @@
 stages:
   - clean
-  - build
+  - compile
+  - test
   - deploy
   - sonar
 
+
+#  =========================
+#  ===== Stage: Clean ======
+#  =========================
+
 clean_elasticsearch:
   stage: clean
-  tags: 
-    - c2mon
+  tags: [c2mon]
   dependencies: []
   variables:
     GIT_STRATEGY: none
@@ -15,9 +20,13 @@ clean_elasticsearch:
     - killall -q java || true
     - rm -Rf /tmp/es-cluster*
 
+#  =========================
+#  ===== Stage: Compile ====
+#  =========================
+
 # Fully build and publish master branch
-build_and_publish:
-  stage: build
+.build_and_publish:
+  stage: compile
   tags: [c2mon]
   dependencies: []
   script:
@@ -26,8 +35,8 @@ build_and_publish:
     - master
 
 # Just run tests on feature branches
-build:
-  stage: build
+.build:
+  stage: compile
   tags: [c2mon]
   dependencies: []
   script:
@@ -37,7 +46,7 @@ build:
     - tags
 
 build_docs:
-  stage: build
+  stage: compile
   tags: [docker]
   image: jekyll/builder:3.8.5
   script:
@@ -52,6 +61,50 @@ build_docs:
       - _site
   only:
     - master
+
+build_server:
+  stage: compile
+  tags: [c2mon]
+  dependencies: []
+  script:
+    - mvn -q -U -B -am test-compile
+  artifacts:
+    name: c2mon-server
+    when: on_success
+    expire_in: 120 minutes
+    untracked: true
+    paths:
+      - c2mon-server
+      - c2mon-shared
+  except:
+    - master
+    - tags
+
+#  =========================
+#  ===== Stage: Test =======
+#  =========================
+
+.test_base:
+  stage: test
+  tags:
+    - c2mon
+    - test
+  dependencies:
+    - build_server
+  except:
+    - master
+    - tags
+
+test_server:
+  extends: .test_base
+  script:
+    - cd c2mon-server
+    - mvn -q -U -B -X --debug test
+
+#  =========================
+#  ===== Stage: Deploy =====
+#  =========================
+
 
 trigger_build:
   stage: deploy
