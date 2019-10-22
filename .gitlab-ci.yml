@@ -108,6 +108,10 @@ build_daq:
     - cd $TARGET
     - mvn $MAVEN_CLI_OPTS -o test && find -iname 'TEST-*.xml' -exec cp {} ../reports/ \;
   artifacts:
+    name: "$CI_JOB_NAME"
+    expire_in: 60 minutes
+    when: on_success
+    untracked: true
     reports:
       junit: reports/*.xml]
   except:
