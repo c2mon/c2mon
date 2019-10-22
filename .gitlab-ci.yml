@@ -103,6 +103,10 @@ build_daq:
 .test_base:
   stage: test
   tags: [c2mon]
+  artifacts:
+    reports:
+      junit: [reports]
+
   except:
     - master
     - tags
@@ -113,7 +117,7 @@ test_shared:
     - build_shared
   script:
     - cd c2mon-shared
-    - mvn $MAVEN_CLI_OPTS -o test
+    - mvn $MAVEN_CLI_OPTS -o test && find -iname 'TEST-*.xml' -exec cp {} ../reports/ \;
 
 test_server:
   extends: .test_base
@@ -122,7 +126,7 @@ test_server:
     - build_server
   script:
     - cd c2mon-server
-    - mvn $MAVEN_CLI_OPTS -o test
+    - mvn $MAVEN_CLI_OPTS -o test && find -iname 'TEST-*.xml' -exec cp {} ../reports/ \;
 
 test_client:
   extends: .test_base
@@ -131,7 +135,7 @@ test_client:
     - build_client
   script:
     - cd c2mon-client
-    - mvn $MAVEN_CLI_OPTS -o test
+    - mvn $MAVEN_CLI_OPTS -o test && find -iname 'TEST-*.xml' -exec cp {} ../reports/ \;
 
 test_daq:
   extends: .test_base
@@ -140,7 +144,7 @@ test_daq:
     - build_daq
   script:
     - cd c2mon-daq
-    - mvn $MAVEN_CLI_OPTS -o test
+    - mvn $MAVEN_CLI_OPTS -o test && find -iname 'TEST-*.xml' -exec cp {} ../reports/ \;
 
 #  =========================
 #  ====== Stage: QA ========
