@@ -105,7 +105,7 @@ build_daq:
   tags: [c2mon]
   artifacts:
     reports:
-      junit: [reports]
+      junit: [../reports/*.xml]
 
   except:
     - master
@@ -117,16 +117,18 @@ test_shared:
     - build_shared
   script:
     - cd c2mon-shared
-    - mvn $MAVEN_CLI_OPTS -o test && find -iname 'TEST-*.xml' -exec cp {} ../reports/ \;
+    - mvn $MAVEN_CLI_OPTS -o test && find -iname 'TEST-*.xml' -exec cp {} reports/ \;
 
 test_server:
   extends: .test_base
   dependencies:
     - build_shared
     - build_server
+  before_script:
+    - mkdir reports
   script:
     - cd c2mon-server
-    - mvn $MAVEN_CLI_OPTS -o test && find -iname 'TEST-*.xml' -exec cp {} ../reports/ \;
+    - mvn $MAVEN_CLI_OPTS -o test && find -iname 'TEST-*.xml' -exec cp {} reports/ \;
 
 test_client:
   extends: .test_base
@@ -135,7 +137,8 @@ test_client:
     - build_client
   script:
     - cd c2mon-client
-    - mvn $MAVEN_CLI_OPTS -o test && find -iname 'TEST-*.xml' -exec cp {} ../reports/ \;
+    - mkdir reports
+    - mvn $MAVEN_CLI_OPTS -o test && find -iname 'TEST-*.xml' -exec cp {} reports/ \;
 
 test_daq:
   extends: .test_base
@@ -144,7 +147,8 @@ test_daq:
     - build_daq
   script:
     - cd c2mon-daq
-    - mvn $MAVEN_CLI_OPTS -o test && find -iname 'TEST-*.xml' -exec cp {} ../reports/ \;
+    - mkdir reports
+    - mvn $MAVEN_CLI_OPTS -o test && find -iname 'TEST-*.xml' -exec cp {} reports/ \;
 
 #  =========================
 #  ====== Stage: QA ========
