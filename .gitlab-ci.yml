@@ -22,10 +22,11 @@ variables:
   stage: compile
   dependencies: []
   tags: [c2mon]
-  cache:
-    key: ${CI_COMMIT_REF_SLUG}
-    policy: pull-push
+  script:
+    - cd $TARGET
+    - mvn $MAVEN_CLI_OPTS -o test-compile
   artifacts:
+    name: "$TARGET#$CI_COMMIT_REF_NAME"
     when: on_success
     expire_in: 60 minutes
     untracked: true
@@ -41,7 +42,6 @@ build_shared:
     - cd c2mon-shared
     - mvn $MAVEN_CLI_OPTS -o test-compile
   artifacts:
-    name: "c2mon-shared#$CI_COMMIT_REF_NAME"
     paths:
       - c2mon-shared
 
@@ -69,31 +69,25 @@ build_docs:
 build_server:
   extends: .build_base
   dependencies: [build_shared]
-  script:
-    - cd c2mon-server
-    - mvn $MAVEN_CLI_OPTS -o test-compile
+  variables:
+    TARGET: "c2mon-server"
   artifacts:
-    name: "c2mon-server#$CI_COMMIT_REF_NAME"
     paths: [c2mon-server]
 
 build_client:
   extends: .build_base
   dependencies: [build_shared]
-  script:
-    - cd c2mon-client
-    - mvn $MAVEN_CLI_OPTS -o test-compile
+  variables:
+    TARGET: "c2mon-client"
   artifacts:
-    name: "c2mon-client#$CI_COMMIT_REF_NAME"
     paths: [c2mon-client]
 
 build_daq:
   extends: .build_base
   dependencies: [build_shared]
-  script:
-    - cd c2mon-daq
-    - mvn $MAVEN_CLI_OPTS -o test-compile
+  variables:
+    TARGET: "c2mon-daq"
   artifacts:
-    name: "c2mon-daq#$CI_COMMIT_REF_NAME"
     paths: [c2mon-daq]
 
 #  =========================
@@ -102,7 +96,6 @@ build_daq:
 
 .test_base:
   stage: test
-  tags: [c2mon]
   script:
     - mkdir reports
     - cd $TARGET
@@ -162,7 +155,7 @@ sonar_preview:
     - build_client
     - build_daq
   script:
-    - mvn $MAVEN_CLI_OPTS sonar:sonar -DskipDocker=true -Dsonar.host.url=${SONAR_URL} -Dsonar.analysis.mode=preview -Dsonar.gitlab.commit_sha=$CI_BUILD_REF -Dsonar.gitlab.ref_name=$CI_BUILD_REF_NAME -Dsonar.gitlab.project_id=$CI_PROJECT_ID -Dsonar.gitlab.max_major_issues_gate=0
+    - mvn $MAVEN_CLI_OPTS sonar:sonar -Dsonar.host.url=${SONAR_URL} -Dsonar.analysis.mode=preview -Dsonar.gitlab.commit_sha=$CI_BUILD_REF -Dsonar.gitlab.ref_name=$CI_BUILD_REF_NAME -Dsonar.gitlab.project_id=$CI_PROJECT_ID -Dsonar.gitlab.max_major_issues_gate=0
   except:
     - master
     - tags
