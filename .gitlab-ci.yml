@@ -2,8 +2,9 @@ stages:
   - precompile
   - compile
   - test
+  - qa
+  - publish
   - deploy
-  - sonar
 
 #  =========================
 #  === Stage: Precompile ===
@@ -34,16 +35,6 @@ build_shared:
 #  =========================
 #  ===== Stage: Compile ====
 #  =========================
-
-# Fully build and publish master branch
-.build_and_publish:
-  stage: compile
-  tags: [c2mon]
-  dependencies: []
-  script:
-    - mvn -q -U -B clean deploy --settings settings.xml -Ddependencies.set.direct
-  only:
-    - master
 
 build_docs:
   stage: compile
@@ -138,11 +129,56 @@ test_daq:
     - cd c2mon-daq
     - mvn -U -B -X --debug test
 
+#  =========================
+#  ====== Stage: QA ========
+#  =========================
+
+sonar_preview:
+  stage: qa
+  tags: [c2mon]
+  dependencies:
+    - build_shared
+    - build_server
+    - build_client
+    - build_daq
+  script:
+    - mvn -q -U -B sonar:sonar -DskipDocker=true -Dsonar.host.url=${SONAR_URL} -Dsonar.analysis.mode=preview -Dsonar.gitlab.commit_sha=$CI_BUILD_REF -Dsonar.gitlab.ref_name=$CI_BUILD_REF_NAME -Dsonar.gitlab.project_id=$CI_PROJECT_ID -Dsonar.gitlab.max_major_issues_gate=0 --settings settings.xml
+  except:
+    - master
+    - tags
+
+quality_assurance:
+  stage: qa
+  tags: [c2mon]
+  dependencies: []
+  script:
+    - mvn package sonar:sonar -Dmaven.test.skip=true -DskipDocker=true -Dsonar.host.url=${SONAR_URL} -Dsonar.dependencyCheck.reportPath=target/dependency-check-report.xml --settings settings.xml
+  only:
+    - master
+
+#  =========================
+#  ===== Stage: Publish ====
+#  =========================
+
+# Fully build and publish master branch
+publish:
+  stage: publish
+  tags: [c2mon]
+  dependencies:
+    - build_shared
+    - build_server
+    - build_client
+    - build_daq
+  script:
+    - mvn -q -U -B deploy --settings settings.xml
+  only:
+    - master
+
+# Publish docker images?
 
 #  =========================
 #  ===== Stage: Deploy =====
 #  =========================
-
 
 trigger_build:
   stage: deploy
@@ -161,28 +197,5 @@ deploy_docs:
   script:
     - echo ${KRB_PASSWORD} | kinit ${KRB_USERNAME}@CERN.CH
     - scp -o 'StrictHostKeyChecking no' -o 'GSSAPITrustDNS yes' -o 'GSSAPIDelegateCredentials yes' -B -r docs/_site/* ${KRB_USERNAME}@lxplus:/afs/cern.ch/user/c/${KRB_USERNAME}/www/c2mon.web.cern.ch/docs
-  only:
-    - master
-
-sonar_preview:
-  stage: sonar
-  tags: [c2mon]
-  dependencies:
-    - build_shared
-    - build_server
-    - build_client
-    - build_daq
-  script:
-    - mvn -q -U -B sonar:sonar -DskipDocker=true -Dsonar.host.url=${SONAR_URL} -Dsonar.analysis.mode=preview -Dsonar.gitlab.commit_sha=$CI_BUILD_REF -Dsonar.gitlab.ref_name=$CI_BUILD_REF_NAME -Dsonar.gitlab.project_id=$CI_PROJECT_ID -Dsonar.gitlab.max_major_issues_gate=0 --settings settings.xml
-  except:
-    - master
-    - tags
-
-quality_assurance:
-  stage: sonar
-  tags: [c2mon]
-  dependencies: []
-  script:
-    - mvn package sonar:sonar -Dmaven.test.skip=true -DskipDocker=true -Dsonar.host.url=${SONAR_URL} -Dsonar.dependencyCheck.reportPath=target/dependency-check-report.xml --settings settings.xml
   only:
     - master
