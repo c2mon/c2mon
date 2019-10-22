@@ -47,7 +47,6 @@ build_shared:
   cache:
     policy: pull-push
   script:
-    - ls /etc/ssl/certs/java
     - env
     - mvn $MAVEN_CLI_OPTS -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true dependency:go-offline
     - cd c2mon-shared
