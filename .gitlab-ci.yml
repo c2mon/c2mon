@@ -9,10 +9,10 @@ stages:
 variables:
   # This will suppress any download for dependencies and plugins or upload messages which would clutter the console log.
   # `showDateTime` will show the passed time in milliseconds. You need to specify `--batch-mode` to make this work.
-  MAVEN_OPTS: "-Dmaven.repo.local=$CI_BUILDS_DIR/$CI_PROJECT_DIR/.m2/repository -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true"
+  MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true"
   # As of Maven 3.3.0 instead of this you may define these options in `.mvn $MAVEN_CLI_OPTS/maven.config` so the same config is used
   # when running from the command line.
-  MAVEN_CLI_OPTS: "--quiet --threads 4.0C --batch-mode --errors --fail-at-end --show-version --settings $CI_BUILDS_DIR/$CI_PROJECT_DIR/settings.xml"
+  MAVEN_CLI_OPTS: "--quiet --threads 4.0C --batch-mode --errors --fail-at-end --show-version --settings $CI_PROJECT_DIR/settings.xml"
 
 
 #  =========================
@@ -46,9 +46,6 @@ build_shared:
   cache:
     policy: pull-push
   script:
-    - pwd
-    - echo $CI_BUILDS_DIR
-    - echo $CI_PROJECT_DIR
     - mvn $MAVEN_CLI_OPTS -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true dependency:go-offline
     - cd c2mon-shared
     - mvn $MAVEN_CLI_OPTS -o test-compile
