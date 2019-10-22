@@ -26,7 +26,7 @@ build_shared:
   stage: precompile
   script:
     - cd c2mon-shared
-    - mvn -U -B test-compile
+    - mvn -U -B test-compile --settings ../settings.xml
   artifacts:
     name: "c2mon-shared#$CI_COMMIT_REF_NAME"
     paths: [c2mon-shared]
