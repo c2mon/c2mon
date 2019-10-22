@@ -25,6 +25,10 @@ build_shared:
   extends: .build_base
   stage: precompile
   script:
+    - ls -la
+    - cd ..
+    - ls -la
+    - cd ~
     - cd c2mon-shared
     - mvn -U -B test-compile --settings ../settings.xml
   artifacts:
