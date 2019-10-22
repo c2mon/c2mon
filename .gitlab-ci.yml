@@ -62,23 +62,56 @@ build_docs:
   only:
     - master
 
-build_server:
+.build_base:
   stage: compile
   tags: [c2mon]
   dependencies: []
-  script:
-    - mvn -U -B -am test-compile
   artifacts:
-    name: c2mon-server
     when: on_success
     expire_in: 120 minutes
     untracked: true
-    paths:
-      - c2mon-server
-      - c2mon-shared
   except:
     - master
     - tags
+
+build_shared:
+  extends: .build_base
+  script:
+    - cd c2mon-shared
+    - mvn -U -B test-compile
+  artifacts:
+    name: "c2mon-shared#$CI_COMMIT_REF_NAME"
+    paths: [c2mon-shared]
+
+build_server:
+  extends: .build_base
+  dependencies: [build_shared]
+  script:
+    - cd c2mon-server
+    - mvn -U -B test-compile
+  artifacts:
+    name: "c2mon-server#$CI_COMMIT_REF_NAME"
+    paths: [c2mon-server]
+
+build_client:
+  extends: .build_base
+  dependencies: [build_shared]
+  script:
+    - cd c2mon-client
+    - mvn -U -B test-compile
+  artifacts:
+    name: "c2mon-client#$CI_COMMIT_REF_NAME"
+    paths: [c2mon-client]
+
+build_daq:
+  extends: .build_base
+  dependencies: [build_shared]
+  script:
+    - cd c2mon-daq
+    - mvn -U -B test-compile
+  artifacts:
+    name: "c2mon-daq#$CI_COMMIT_REF_NAME"
+    paths: [c2mon-daq]
 
 #  =========================
 #  ===== Stage: Test =======
@@ -87,17 +120,45 @@ build_server:
 .test_base:
   stage: test
   tags: [c2mon]
-  dependencies:
-    - build_server
   except:
     - master
     - tags
 
+test_shared:
+  extends: .test_base
+  dependencies:
+    - build_shared
+  script:
+    - cd c2mon-shared
+    - mvn -U -B -X --debug test
+
 test_server:
   extends: .test_base
+  dependencies:
+    - build_shared
+    - build_server
   script:
     - cd c2mon-server
     - mvn -U -B -X --debug test
+
+test_client:
+  extends: .test_base
+  dependencies:
+    - build_shared
+    - build_client
+  script:
+    - cd c2mon-client
+    - mvn -U -B -X --debug test
+
+test_daq:
+  extends: .test_base
+  dependencies:
+    - build_shared
+    - build_daq
+  script:
+    - cd c2mon-daq
+    - mvn -U -B -X --debug test
+
 
 #  =========================
 #  ===== Stage: Deploy =====
