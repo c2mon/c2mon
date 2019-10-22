@@ -46,6 +46,9 @@ build_shared:
   cache:
     policy: pull-push
   script:
+    - pwd
+    - echo $CI_BUILDS_DIR
+    - echo $CI_PROJECT_DIR
     - mvn $MAVEN_CLI_OPTS -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true dependency:go-offline
     - cd c2mon-shared
     - mvn $MAVEN_CLI_OPTS -o test-compile
