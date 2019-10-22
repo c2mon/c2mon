@@ -23,7 +23,7 @@ variables:
   stage: compile
   dependencies: []
   cache:
-    key: ${CI_COMMIT_REF_SLUG}
+    key: "$CI_COMMIT_REF_SLUG"
     untracked: true
     policy: pull
     paths:
