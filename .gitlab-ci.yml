@@ -67,7 +67,7 @@ build_server:
   tags: [c2mon]
   dependencies: []
   script:
-    - mvn -q -U -B -am test-compile
+    - mvn -U -B -am test-compile
   artifacts:
     name: c2mon-server
     when: on_success
@@ -86,9 +86,7 @@ build_server:
 
 .test_base:
   stage: test
-  tags:
-    - c2mon
-    - test
+  tags: [c2mon]
   dependencies:
     - build_server
   except:
@@ -99,7 +97,7 @@ test_server:
   extends: .test_base
   script:
     - cd c2mon-server
-    - mvn -q -U -B -X --debug test
+    - mvn -U -B -X --debug test
 
 #  =========================
 #  ===== Stage: Deploy =====
