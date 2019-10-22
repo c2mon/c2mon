@@ -28,7 +28,7 @@ variables:
     policy: pull-push
   artifacts:
     when: on_success
-    expire_in: 120 minutes
+    expire_in: 60 minutes
     untracked: true
   except:
     - master
@@ -39,11 +39,13 @@ build_shared:
   stage: precompile
   script:
     - mvn dependency:go-offline
-    - cd c2mon/c2mon-shared
+    - cd c2mon-shared
     - mvn -o test-compile
   artifacts:
     name: "c2mon-shared#$CI_COMMIT_REF_NAME"
-    paths: [c2mon-shared]
+    paths:
+      - .m2/repository
+      - c2mon-shared
 
 #  =========================
 #  ===== Stage: Compile ====
