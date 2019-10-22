@@ -50,6 +50,7 @@ build_shared:
   cache:
     policy: pull-push
   script:
+    - export MAVEN_OPTS=""
     - mvn $MAVEN_CLI_OPTS -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true dependency:go-offline
     - cd c2mon-shared
     - mvn $MAVEN_CLI_OPTS -o test-compile
@@ -193,6 +194,7 @@ quality_assurance:
 # Fully build and publish master branch
 publish:
   stage: publish
+  tags: [c2mon]
   dependencies:
     - build_shared
     - build_server
