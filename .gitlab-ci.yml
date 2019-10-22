@@ -21,7 +21,6 @@ variables:
 .build_base:
   stage: compile
   dependencies: []
-  tags: [c2mon]
   script:
     - cd $TARGET
     - mvn $MAVEN_CLI_OPTS -o test-compile
@@ -43,6 +42,7 @@ build_shared:
     - mvn $MAVEN_CLI_OPTS -o test-compile
   artifacts:
     paths:
+      - .m2
       - c2mon-shared
 
 #  =========================
@@ -111,13 +111,7 @@ build_daq:
     - master
     - tags
 
-test_shared:
-  extends: .test_base
-  dependencies:
-    - build_shared
-  variables:
-    TARGET: "c2mon-shared"
-
+# Ordered higher as it's the slowest to run
 test_server:
   extends: .test_base
   dependencies:
@@ -125,6 +119,13 @@ test_server:
     - build_server
   variables:
     TARGET: "c2mon-server"
+
+test_shared:
+  extends: .test_base
+  dependencies:
+    - build_shared
+  variables:
+    TARGET: "c2mon-shared"
 
 test_client:
   extends: .test_base
