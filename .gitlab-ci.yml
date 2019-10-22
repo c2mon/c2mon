@@ -119,7 +119,7 @@ test_shared:
   dependencies:
     - build_shared
   variables:
-    target: "c2mon-shared"
+    TARGET: "c2mon-shared"
 
 test_server:
   extends: .test_base
@@ -127,7 +127,7 @@ test_server:
     - build_shared
     - build_server
   variables:
-    target: "c2mon-server"
+    TARGET: "c2mon-server"
 
 test_client:
   extends: .test_base
@@ -135,7 +135,7 @@ test_client:
     - build_shared
     - build_client
   variables:
-    target: "c2mon-client"
+    TARGET: "c2mon-client"
 
 test_daq:
   extends: .test_base
@@ -143,7 +143,7 @@ test_daq:
     - build_shared
     - build_daq
   variables:
-    target: "c2mon-daq"
+    TARGET: "c2mon-daq"
 
 #  =========================
 #  ====== Stage: QA ========
