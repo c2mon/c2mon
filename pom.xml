@@ -448,10 +448,6 @@
         <plugin>
           <artifactId>maven-surefire-plugin</artifactId>
           <version>2.19.1</version>
-          <configuration>
-            <forkMode>never</forkMode>
-            <perCoreThreadCount>false</perCoreThreadCount>
-          </configuration>
         </plugin>
         <plugin>
           <artifactId>maven-jar-plugin</artifactId>
@@ -490,7 +486,7 @@
             <tagNameFormat>@{project.version}</tagNameFormat>
           </configuration>
         </plugin>
-      
+
         <plugin>
           <groupId>org.sonarsource.scanner.maven</groupId>
           <artifactId>sonar-maven-plugin</artifactId>
@@ -548,7 +544,7 @@
           <mavenVersion>3.3.1</mavenVersion>
         </configuration>
       </plugin>
-      
+
       <!-- Analyze vulnerabilities in dependencies -->
       <plugin>
         <groupId>org.owasp</groupId>
