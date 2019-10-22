@@ -1,67 +1,13 @@
 stages:
-  - clean
   - precompile
   - compile
   - test
   - deploy
   - sonar
 
-
 #  =========================
-#  ===== Stage: Clean ======
+#  === Stage: Precompile ===
 #  =========================
-
-clean_elasticsearch:
-  stage: clean
-  tags: [c2mon]
-  dependencies: []
-  variables:
-    GIT_STRATEGY: none
-  script:
-    - killall -q java || true
-    - rm -Rf /tmp/es-cluster*
-
-#  =========================
-#  ===== Stage: Compile ====
-#  =========================
-
-# Fully build and publish master branch
-.build_and_publish:
-  stage: compile
-  tags: [c2mon]
-  dependencies: []
-  script:
-    - mvn -q -U -B clean deploy --settings settings.xml -Ddependencies.set.direct
-  only:
-    - master
-
-# Just run tests on feature branches
-.build:
-  stage: compile
-  tags: [c2mon]
-  dependencies: []
-  script:
-    - mvn -q -U -B clean test -DskipDocker=true --settings settings.xml -Ddependencies.set.direct --debug -X
-  except:
-    - master
-    - tags
-
-build_docs:
-  stage: compile
-  tags: [docker]
-  image: jekyll/builder:3.8.5
-  script:
-    - cd docs
-    - jekyll build --config "_config.yml,_overwrite_url.yml"
-  artifacts:
-    name: site
-    when: on_success
-    expire_in: 7 days
-    untracked: true
-    paths:
-      - _site
-  only:
-    - master
 
 .build_base:
   stage: compile
@@ -85,12 +31,43 @@ build_shared:
     name: "c2mon-shared#$CI_COMMIT_REF_NAME"
     paths: [c2mon-shared]
 
+#  =========================
+#  ===== Stage: Compile ====
+#  =========================
+
+# Fully build and publish master branch
+.build_and_publish:
+  stage: compile
+  tags: [c2mon]
+  dependencies: []
+  script:
+    - mvn -q -U -B clean deploy --settings settings.xml -Ddependencies.set.direct
+  only:
+    - master
+
+build_docs:
+  stage: compile
+  tags: [docker]
+  image: jekyll/builder:3.8.5
+  script:
+    - cd docs
+    - jekyll build --config "_config.yml,_overwrite_url.yml"
+  artifacts:
+    name: site
+    when: on_success
+    expire_in: 7 days
+    untracked: true
+    paths:
+      - _site
+  only:
+    - master
+
 build_server:
   extends: .build_base
   dependencies: [build_shared]
   script:
     - cd c2mon-server
-    - mvn -U -B test-compile -pl '!distribution'
+    - mvn -q -U -B test-compile -pl '!distribution'
   artifacts:
     name: "c2mon-server#$CI_COMMIT_REF_NAME"
     paths: [c2mon-server]
@@ -100,7 +77,7 @@ build_client:
   dependencies: [build_shared]
   script:
     - cd c2mon-client
-    - mvn -U -B test-compile
+    - mvn -q -U -B test-compile
   artifacts:
     name: "c2mon-client#$CI_COMMIT_REF_NAME"
     paths: [c2mon-client]
@@ -110,7 +87,7 @@ build_daq:
   dependencies: [build_shared]
   script:
     - cd c2mon-daq
-    - mvn -U -B test-compile
+    - mvn -q -U -B test-compile
   artifacts:
     name: "c2mon-daq#$CI_COMMIT_REF_NAME"
     paths: [c2mon-daq]
