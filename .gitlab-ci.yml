@@ -109,7 +109,7 @@ build_daq:
     - mvn $MAVEN_CLI_OPTS -o test && find -iname 'TEST-*.xml' -exec cp {} ../reports/ \;
   artifacts:
     reports:
-      junit: /reports/*.xml]
+      junit: reports/*.xml]
   except:
     - master
     - tags
