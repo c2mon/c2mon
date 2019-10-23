@@ -37,7 +37,7 @@ variables:
       - .mvn
   script:
     - export MAVEN_OPTS=""
-    - ./mvnw -DskipTests=true -DinstallAtEnd=true install dependency:go-offline
+    - ./mvnw $MAVEN_CLI_OPTS -DskipTests=true -DinstallAtEnd=true install dependency:go-offline
   artifacts:
     name: "$TARGET#$CI_COMMIT_REF_NAME"
     when: on_success
@@ -54,19 +54,12 @@ variables:
 build_shared:
   extends: .build_base
   stage: precompile
-  cache:
-    policy: pull-push
 #  script:
 #    - export MAVEN_OPTS=""
 #  https://issues.apache.org/jira/browse/MDEP-82
 #    - ./mvnw $MAVEN_CLI_OPTS -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true org.apache.maven.plugins:maven-dependency-plugin:3.0.0:go-offline
 #    - cd c2mon-shared
 #    - ../mvnw $MAVEN_CLI_OPTS -o test-compile
-  variables:
-    TARGET: "c2mon-shared"
-  artifacts:
-    paths:
-      - c2mon-shared
 
 #  =========================
 #  ===== Stage: Compile ====
