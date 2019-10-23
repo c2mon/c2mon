@@ -34,7 +34,7 @@ variables:
       - .m2/
   script:
     - cd $TARGET
-    - mvn $MAVEN_CLI_OPTS -o test-compile
+    - ../.mvnw $MAVEN_CLI_OPTS -o test-compile
   artifacts:
     name: "$TARGET#$CI_COMMIT_REF_NAME"
     when: on_success
@@ -51,9 +51,10 @@ build_shared:
     policy: pull-push
   script:
     - export MAVEN_OPTS=""
-    - mvn $MAVEN_CLI_OPTS -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true dependency:go-offline
+#  https://issues.apache.org/jira/browse/MDEP-82
+    - ./mvnw $MAVEN_CLI_OPTS -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true org.apache.maven.plugins:maven-dependency-plugin:3.0.0:go-offline
     - cd c2mon-shared
-    - mvn $MAVEN_CLI_OPTS -o test-compile
+    - ../mvnw $MAVEN_CLI_OPTS -o test-compile
   artifacts:
     paths:
       - c2mon-shared
