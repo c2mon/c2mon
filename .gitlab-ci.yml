@@ -28,7 +28,6 @@ variables:
 .build_base:
   stage: compile
   dependencies: []
-#  tags: [c2mon]
   cache:
     key: "$CI_COMMIT_REF_SLUG"
     policy: pull
@@ -111,10 +110,12 @@ build_daq:
 
 .test_base:
   stage: test
-#  tags: [c2mon]
   cache:
     key: "$CI_COMMIT_REF_SLUG"
     policy: pull
+    paths:
+      - .m2/
+      - .mvn
   script:
     - export MAVEN_OPTS=""
     - mkdir reports
