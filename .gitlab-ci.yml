@@ -31,13 +31,13 @@ variables:
 #  tags: [c2mon]
   cache:
     key: "$CI_COMMIT_REF_SLUG"
-    policy: pull
+    policy: pull-push
     paths:
       - .m2/
       - .mvn
   script:
     - export MAVEN_OPTS=""
-    - ./mvnw -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true dependency:go-offline
+    - ./mvnw install -DskipTests=true -DinstallAtEnd=true
     - cd $TARGET
     - ../mvnw $MAVEN_CLI_OPTS test-compile
   artifacts:
