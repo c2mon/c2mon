@@ -28,12 +28,6 @@ variables:
 .build_base:
   stage: compile
   dependencies: []
-  cache:
-    key: "$CI_COMMIT_REF_SLUG"
-    policy: pull
-    paths:
-      - .m2/
-      - .mvn
   script:
     - export MAVEN_OPTS=""
     - cd $TARGET
@@ -51,14 +45,19 @@ variables:
 build_shared:
   extends: .build_base
   stage: precompile
+  cache:
+    key: "$CI_COMMIT_REF_SLUG"
+    policy: pull
+    paths:
+      - .m2/
+      - .mvn
   variables:
     TARGET: "c2mon-shared"
-#  script:
-#    - export MAVEN_OPTS=""
-#  https://issues.apache.org/jira/browse/MDEP-82
-#    - ./mvnw $MAVEN_CLI_OPTS -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true org.apache.maven.plugins:maven-dependency-plugin:3.0.0:go-offline
-#    - cd c2mon-shared
-#    - ../mvnw $MAVEN_CLI_OPTS -o test-compile
+  artifacts:
+    paths:
+      - .m2
+      - .mvn
+      - "$TARGET"
 
 #  =========================
 #  ===== Stage: Compile ====
@@ -110,12 +109,6 @@ build_daq:
 
 .test_base:
   stage: test
-  cache:
-    key: "$CI_COMMIT_REF_SLUG"
-    policy: pull
-    paths:
-      - .m2/
-      - .mvn
   script:
     - export MAVEN_OPTS=""
     - mkdir reports
@@ -124,7 +117,7 @@ build_daq:
   artifacts:
     name: "$CI_JOB_NAME"
     expire_in: 60 minutes
-    when: on_success
+    when: always
     reports:
       junit: reports/*.xml
   except:
