@@ -36,7 +36,7 @@ variables:
       - .mvn
   script:
     - export MAVEN_OPTS=""
-    - ./mvnw dependency:go-offline
+    - ./mvnw -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true dependency:go-offline
     - cd $TARGET
     - ../mvnw $MAVEN_CLI_OPTS test-compile
   artifacts:
