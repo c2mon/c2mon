@@ -34,7 +34,7 @@ variables:
       - .m2/
   script:
     - cd $TARGET
-    - mvn $MAVEN_CLI_OPTS -o test-compile
+    - ../mvnw $MAVEN_CLI_OPTS -o test-compile
   artifacts:
     name: "$TARGET#$CI_COMMIT_REF_NAME"
     when: on_success
