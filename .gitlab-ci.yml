@@ -120,7 +120,7 @@ build_daq:
     - export MAVEN_OPTS=""
     - mkdir reports
     - cd $TARGET
-    - ../mvnw $MAVEN_CLI_OPTS -X --debug surefire:test && find -iname 'TEST-*.xml' -exec cp {} ../reports/ \;
+    - ../mvnw $MAVEN_CLI_OPTS surefire:test && find -iname 'TEST-*.xml' -exec cp {} ../reports/ \;
   artifacts:
     name: "$CI_JOB_NAME"
     expire_in: 60 minutes
