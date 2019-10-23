@@ -37,6 +37,7 @@ variables:
       - .mvn
   script:
     - export MAVEN_OPTS=""
+    - cd $TARGET
     - ./mvnw test-compile
   artifacts:
     name: "$TARGET#$CI_COMMIT_REF_NAME"
