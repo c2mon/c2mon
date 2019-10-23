@@ -40,7 +40,6 @@ variables:
     name: "$TARGET#$CI_COMMIT_REF_NAME"
     when: on_success
     expire_in: 60 minutes
-    untracked: true
   except:
     - master
     - tags
@@ -76,7 +75,6 @@ build_docs:
     name: site
     when: on_success
     expire_in: 7 days
-    untracked: true
     paths:
       - _site
   only:
@@ -121,7 +119,6 @@ build_daq:
     name: "$CI_JOB_NAME"
     expire_in: 60 minutes
     when: on_success
-    untracked: true
     reports:
       junit: reports/*.xml
   except:
