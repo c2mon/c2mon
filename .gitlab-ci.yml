@@ -37,7 +37,7 @@ variables:
       - .mvn
   script:
     - export MAVEN_OPTS=""
-    - ./mvnw $MAVEN_CLI_OPTS -Dmaven.test.skip=true -DinstallAtEnd=true install dependency:go-offline
+    - ./mvnw $MAVEN_CLI_OPTS dependency:go-offline
   artifacts:
     name: "$TARGET#$CI_COMMIT_REF_NAME"
     when: on_success
@@ -112,6 +112,9 @@ build_docs:
 .test_base:
   stage: test
 #  tags: [c2mon]
+  cache:
+    key: "$CI_COMMIT_REF_SLUG"
+    policy: pull
   script:
     - export MAVEN_OPTS=""
     - mkdir reports
