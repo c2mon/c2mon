@@ -37,13 +37,16 @@ variables:
       - .mvn
   script:
     - export MAVEN_OPTS=""
-    - ./mvnw install -DskipTests=true -DinstallAtEnd=true
-    - cd $TARGET
-    - ../mvnw $MAVEN_CLI_OPTS test-compile
+    - ./mvnw -DskipTests=true -DinstallAtEnd=true install dependency:go-offline
   artifacts:
     name: "$TARGET#$CI_COMMIT_REF_NAME"
     when: on_success
     expire_in: 60 minutes
+    paths:
+      - c2mon-server
+      - c2mon-client
+      - c2mon-daq
+      - c2mon-shared
   except:
     - master
     - tags
@@ -85,7 +88,7 @@ build_docs:
   only:
     - master
 
-build_server:
+.build_server:
   extends: .build_base
   dependencies: [build_shared]
   variables:
@@ -93,7 +96,7 @@ build_server:
   artifacts:
     paths: [c2mon-server]
 
-build_client:
+.build_client:
   extends: .build_base
   dependencies: [build_shared]
   variables:
@@ -101,7 +104,7 @@ build_client:
   artifacts:
     paths: [c2mon-client]
 
-build_daq:
+.build_daq:
   extends: .build_base
   dependencies: [build_shared]
   variables:
