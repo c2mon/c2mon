@@ -42,8 +42,9 @@ variables:
   artifacts:
     name: "$TARGET#$CI_COMMIT_REF_NAME"
     when: on_success
-    untracked: true
     expire_in: 60 minutes
+    paths:
+      - "$TARGET"
   except:
     - master
     - tags
@@ -118,7 +119,7 @@ build_daq:
     - export MAVEN_OPTS=""
     - mkdir reports
     - cd $TARGET
-    - ../mvnw $MAVEN_CLI_OPTS -o surefire:test && find -iname 'TEST-*.xml' -exec cp {} ../reports/ \;
+    - ../mvnw $MAVEN_CLI_OPTS test && find -iname 'TEST-*.xml' -exec cp {} ../reports/ \;
   artifacts:
     name: "$CI_JOB_NAME"
     expire_in: 60 minutes
