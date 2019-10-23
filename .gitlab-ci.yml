@@ -33,6 +33,7 @@ variables:
     paths:
       - .m2/
   script:
+    - export MAVEN_OPTS=""
     - cd $TARGET
     - ../mvnw $MAVEN_CLI_OPTS -o test-compile
   artifacts:
