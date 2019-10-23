@@ -16,7 +16,6 @@ variables:
       -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN
       -Dorg.slf4j.simpleLogger.showDateTime=true
       -Djava.awt.headless=true
-#     The c2mon runners are quite beefy
       --threads 8.0C
       --quiet --batch-mode --errors --fail-at-end --show-version --settings $CI_PROJECT_DIR/settings.xml
 # It would be good to get the certs for this one
