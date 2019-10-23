@@ -17,7 +17,7 @@ variables:
       -Dorg.slf4j.simpleLogger.showDateTime=true
       -Djava.awt.headless=true
       --threads 4.0C
-      --quiet --batch-mode --errors --fail-at-end --show-version --settings $CI_PROJECT_DIR/settings.xml
+      --batch-mode --errors --fail-at-end --show-version --settings $CI_PROJECT_DIR/settings.xml
 # It would be good to get the certs for this one
 
 #  =========================
@@ -36,6 +36,7 @@ variables:
       - .mvn
   script:
     - export MAVEN_OPTS=""
+    - mvnw dependency:go-offline
     - cd $TARGET
     - ../mvnw $MAVEN_CLI_OPTS test-compile
   artifacts:
