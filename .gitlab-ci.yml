@@ -30,10 +30,10 @@ variables:
 #  tags: [c2mon]
   cache:
     key: "$CI_COMMIT_REF_SLUG"
-    untracked: true
     policy: pull
     paths:
       - .m2/
+      - .mvn
   script:
     - export MAVEN_OPTS=""
     - cd $TARGET
@@ -62,7 +62,6 @@ build_shared:
   artifacts:
     paths:
       - c2mon-shared
-      - .mvn
 
 #  =========================
 #  ===== Stage: Compile ====
