@@ -26,16 +26,16 @@ variables:
 .build_base:
   stage: compile
   dependencies: []
-  cache:
-    key: "$CI_COMMIT_REF_SLUG"
-    untracked: true
-    policy: pull
-    paths:
-      - .m2/
+#  cache:
+#    key: "$CI_COMMIT_REF_SLUG"
+#    untracked: true
+#    policy: pull
+#    paths:
+#      - .m2/
   script:
     - export MAVEN_OPTS=""
     - cd $TARGET
-    - ../mvnw $MAVEN_CLI_OPTS -o test-compile
+    - mvn $MAVEN_CLI_OPTS -o test-compile
   artifacts:
     name: "$TARGET#$CI_COMMIT_REF_NAME"
     when: on_success
@@ -48,17 +48,18 @@ variables:
 build_shared:
   extends: .build_base
   stage: precompile
-  cache:
-    policy: pull-push
-  script:
-    - export MAVEN_OPTS=""
+#  cache:
+#    policy: pull-push
+#  script:
+#    - export MAVEN_OPTS=""
 #  https://issues.apache.org/jira/browse/MDEP-82
-    - ./mvnw $MAVEN_CLI_OPTS -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true org.apache.maven.plugins:maven-dependency-plugin:3.0.0:go-offline
-    - cd c2mon-shared
-    - ../mvnw $MAVEN_CLI_OPTS -o test-compile
+#    - ./mvnw $MAVEN_CLI_OPTS -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true org.apache.maven.plugins:maven-dependency-plugin:3.0.0:go-offline
+#    - cd c2mon-shared
+#    - ../mvnw $MAVEN_CLI_OPTS -o test-compile
+  variables:
+    TARGET: "c2mon-shared"
   artifacts:
-    paths:
-      - c2mon-shared
+    paths: [c2mon-shared]
 
 #  =========================
 #  ===== Stage: Compile ====
@@ -112,6 +113,7 @@ build_daq:
 .test_base:
   stage: test
   script:
+    - export MAVEN_OPTS=""
     - mkdir reports
     - cd $TARGET
     - mvn $MAVEN_CLI_OPTS -o test && find -iname 'TEST-*.xml' -exec cp {} ../reports/ \;
