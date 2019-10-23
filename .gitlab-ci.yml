@@ -17,7 +17,6 @@ variables:
       -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN
       -Dorg.slf4j.simpleLogger.showDateTime=true
       -Djava.awt.headless=true
-      --threads 4.0C
       --batch-mode --errors --fail-at-end --show-version --settings $CI_PROJECT_DIR/settings.xml
 # It would be good to get the certs for this one
 
@@ -35,18 +34,18 @@ variables:
     paths:
       - .m2/
       - .mvn
-  script:
-    - export MAVEN_OPTS=""
-    - ./mvnw $MAVEN_CLI_OPTS dependency:go-offline
-  artifacts:
-    name: "$TARGET#$CI_COMMIT_REF_NAME"
-    when: on_success
-    expire_in: 60 minutes
-    paths:
       - c2mon-server
       - c2mon-client
       - c2mon-daq
       - c2mon-shared
+  script:
+    - export MAVEN_OPTS=""
+    - ./mvnw $MAVEN_CLI_OPTS -Dmaven.test.skip=true -DinstallAtEnd=true install org.apache.maven.plugins:maven-dependency-plugin:3.0.0:go-offline
+#  artifacts:
+#    name: "$TARGET#$CI_COMMIT_REF_NAME"
+#    when: on_success
+#    expire_in: 60 minutes
+#    paths:
   except:
     - master
     - tags
@@ -119,7 +118,7 @@ build_docs:
     - export MAVEN_OPTS=""
     - mkdir reports
     - cd $TARGET
-    - ../mvnw $MAVEN_CLI_OPTS test && find -iname 'TEST-*.xml' -exec cp {} ../reports/ \;
+    - ../mvnw $MAVEN_CLI_OPTS -o test && find -iname 'TEST-*.xml' -exec cp {} ../reports/ \;
   artifacts:
     name: "$CI_JOB_NAME"
     expire_in: 60 minutes
@@ -133,31 +132,31 @@ build_docs:
 # Ordered higher as it's the slowest to run
 test_server:
   extends: .test_base
-  dependencies:
-    - build_shared
+#  dependencies:
+#    - build_shared
 #    - build_server
   variables:
     TARGET: "c2mon-server"
 
 test_shared:
   extends: .test_base
-  dependencies:
-    - build_shared
+#  dependencies:
+#    - build_shared
   variables:
     TARGET: "c2mon-shared"
 
 test_client:
   extends: .test_base
-  dependencies:
-    - build_shared
+#  dependencies:
+#    - build_shared
 #    - build_client
   variables:
     TARGET: "c2mon-client"
 
 test_daq:
   extends: .test_base
-  dependencies:
-    - build_shared
+#  dependencies:
+#    - build_shared
 #    - build_daq
   variables:
     TARGET: "c2mon-daq"
