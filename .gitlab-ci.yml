@@ -88,29 +88,29 @@ build_docs:
   only:
     - master
 
-.build_server:
-  extends: .build_base
-  dependencies: [build_shared]
-  variables:
-    TARGET: "c2mon-server"
-  artifacts:
-    paths: [c2mon-server]
-
-.build_client:
-  extends: .build_base
-  dependencies: [build_shared]
-  variables:
-    TARGET: "c2mon-client"
-  artifacts:
-    paths: [c2mon-client]
-
-.build_daq:
-  extends: .build_base
-  dependencies: [build_shared]
-  variables:
-    TARGET: "c2mon-daq"
-  artifacts:
-    paths: [c2mon-daq]
+#build_server:
+#  extends: .build_base
+#  dependencies: [build_shared]
+#  variables:
+#    TARGET: "c2mon-server"
+#  artifacts:
+#    paths: [c2mon-server]
+#
+#build_client:
+#  extends: .build_base
+#  dependencies: [build_shared]
+#  variables:
+#    TARGET: "c2mon-client"
+#  artifacts:
+#    paths: [c2mon-client]
+#
+#build_daq:
+#  extends: .build_base
+#  dependencies: [build_shared]
+#  variables:
+#    TARGET: "c2mon-daq"
+#  artifacts:
+#    paths: [c2mon-daq]
 
 #  =========================
 #  ===== Stage: Test =======
@@ -139,7 +139,7 @@ test_server:
   extends: .test_base
   dependencies:
     - build_shared
-    - build_server
+#    - build_server
   variables:
     TARGET: "c2mon-server"
 
@@ -154,7 +154,7 @@ test_client:
   extends: .test_base
   dependencies:
     - build_shared
-    - build_client
+#    - build_client
   variables:
     TARGET: "c2mon-client"
 
@@ -162,7 +162,7 @@ test_daq:
   extends: .test_base
   dependencies:
     - build_shared
-    - build_daq
+#    - build_daq
   variables:
     TARGET: "c2mon-daq"
 
@@ -175,9 +175,9 @@ sonar_preview:
   tags: [c2mon]
   dependencies:
     - build_shared
-    - build_server
-    - build_client
-    - build_daq
+#    - build_server
+#    - build_client
+#    - build_daq
   script:
     - mvn $MAVEN_CLI_OPTS sonar:sonar -Dsonar.host.url=${SONAR_URL} -Dsonar.analysis.mode=preview -Dsonar.gitlab.commit_sha=$CI_BUILD_REF -Dsonar.gitlab.ref_name=$CI_BUILD_REF_NAME -Dsonar.gitlab.project_id=$CI_PROJECT_ID -Dsonar.gitlab.max_major_issues_gate=0
   except:
@@ -189,9 +189,9 @@ quality_assurance:
   tags: [c2mon]
   dependencies:
     - build_shared
-    - build_server
-    - build_client
-    - build_daq
+#    - build_server
+#    - build_client
+#    - build_daq
   script:
     - mvn $MAVEN_CLI_OPTS package sonar:sonar -Dmaven.test.skip=true -DskipDocker=true -Dsonar.host.url=${SONAR_URL} -Dsonar.dependencyCheck.reportPath=target/dependency-check-report.xml
   only:
@@ -207,9 +207,9 @@ publish:
   tags: [c2mon]
   dependencies:
     - build_shared
-    - build_server
-    - build_client
-    - build_daq
+#    - build_server
+#    - build_client
+#    - build_daq
   script:
     - mvn $MAVEN_CLI_OPTS -P ci-deploy deploy
   only:
