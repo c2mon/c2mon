@@ -37,7 +37,7 @@ variables:
   script:
     - export MAVEN_OPTS=""
     - cd $TARGET
-    - ../.mvnw $MAVEN_CLI_OPTS test-compile
+    - ../mvnw $MAVEN_CLI_OPTS test-compile
   artifacts:
     name: "$TARGET#$CI_COMMIT_REF_NAME"
     when: on_success
@@ -119,7 +119,7 @@ build_daq:
     - export MAVEN_OPTS=""
     - mkdir reports
     - cd $TARGET
-    - mvn $MAVEN_CLI_OPTS test && find -iname 'TEST-*.xml' -exec cp {} ../reports/ \;
+    - ../mvnw $MAVEN_CLI_OPTS test && find -iname 'TEST-*.xml' -exec cp {} ../reports/ \;
   artifacts:
     name: "$CI_JOB_NAME"
     expire_in: 60 minutes
