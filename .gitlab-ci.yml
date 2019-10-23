@@ -16,7 +16,7 @@ variables:
       -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN
       -Dorg.slf4j.simpleLogger.showDateTime=true
       -Djava.awt.headless=true
-      --threads 8.0C
+      --threads 4.0C
       --quiet --batch-mode --errors --fail-at-end --show-version --settings $CI_PROJECT_DIR/settings.xml
 # It would be good to get the certs for this one
 
@@ -27,13 +27,13 @@ variables:
 .build_base:
   stage: compile
   dependencies: []
-  tags: [c2mon]
-#  cache:
-#    key: "$CI_COMMIT_REF_SLUG"
-#    untracked: true
-#    policy: pull
-#    paths:
-#      - .m2/
+#  tags: [c2mon]
+  cache:
+    key: "$CI_COMMIT_REF_SLUG"
+    untracked: true
+    policy: pull
+    paths:
+      - .m2/
   script:
     - export MAVEN_OPTS=""
     - cd $TARGET
@@ -49,8 +49,8 @@ variables:
 build_shared:
   extends: .build_base
   stage: precompile
-#  cache:
-#    policy: pull-push
+  cache:
+    policy: pull-push
 #  script:
 #    - export MAVEN_OPTS=""
 #  https://issues.apache.org/jira/browse/MDEP-82
@@ -114,7 +114,7 @@ build_daq:
 
 .test_base:
   stage: test
-  tags: [c2mon]
+#  tags: [c2mon]
   script:
     - export MAVEN_OPTS=""
     - mkdir reports
