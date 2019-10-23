@@ -36,7 +36,7 @@ variables:
       - .mvn
   script:
     - export MAVEN_OPTS=""
-    - mvnw dependency:go-offline
+    - ./mvnw dependency:go-offline
     - cd $TARGET
     - ../mvnw $MAVEN_CLI_OPTS test-compile
   artifacts:
