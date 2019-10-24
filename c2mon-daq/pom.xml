@@ -15,9 +15,19 @@
   <modules>
     <module>c2mon-daq-core</module>
     <module>c2mon-daq-test</module>
-    <module>distribution</module>
   </modules>
-  
+
+  <profiles>
+    <profile>
+      <id>ci-deploy</id>
+      <modules>
+        <module>c2mon-daq-core</module>
+        <module>c2mon-daq-test</module>
+        <module>distribution</module>
+      </modules>
+    </profile>
+  </profiles>
+
   <distributionManagement>
      <repository>
        <id>c2mon-releases</id>
