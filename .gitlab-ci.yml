@@ -46,17 +46,15 @@ build_shared:
   extends: .build_base
   stage: precompile
   cache:
-    key: "$CI_COMMIT_REF_SLUG"
+    key: base
     policy: pull
     paths:
       - .m2/
-      - .mvn
   variables:
     TARGET: "c2mon-shared"
   artifacts:
     paths:
       - .m2
-      - .mvn
       - "$TARGET"
 
 #  =========================
