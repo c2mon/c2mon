@@ -4,7 +4,7 @@ title:    One platform for multiple monitoring scenarios
 summary:  Examples of C2MON in action
 ---
 
-Two major systems at CERN are based on C2MON and contributing features to the platform. Come and join our community and see how C2MON will meet also your monitoring requirements.
+One of the major CERN monitoring systems is based on C2MON and contributing features to the platform. Come and join our community and see how C2MON will meet also your monitoring requirements.
 
 {% include video.html url="OKisSUCCWLQ" %}
 > Video demonstrating TIM in action!
@@ -33,26 +33,14 @@ __TIM in numbers:__
 
 ---
 
-# DIAMON - DIAgnostic and MONitoring
-
-The purpose of the DIAMON project is to propose to the CERN operators and equipment groups tools to monitor the BE Controls infrastructure with easy to use, first line diagnostics and tools to solve problems, or help to decide about responsibilities for first line of intervention.
-
-The BE Controls Infrastructure spans over huge distances around CERN and covers a multitude of different equipment (more than 3'000 items are eligible to be monitored)!
-Main Objectives:
-
-* Provide the [CERN Control Centre (CCC)](https://www.facebook.com/pages/CERN-Control-Centre-CCC/172354182781843) operators with precise and easy to use tools to monitor the behaviour of the BE Controls Infrastructure.
-* Allow for an easy access to diagnostic tools providing more details and help to solve an eventual problem.
-
----
-
 # Your use case?
 
 Since C2MON is essentially a heterogeneous data acquisition framework with configuration, persistence, historical browsing, control and alarm functionalities, it can be suitable for building many different types of system.
 
 For example, it is used internally at CERN as an industrial SCADA system; as a network monitoring system; as a central alarm aggregation service; and as a general-purpose data proxy.
 
-Hope that makes C2MON also interesting for your business, since you could reuse it as open SCADA middleware whilst focusing on client application development.
-C2MON could be used by you:
+We hope that makes C2MON also interesting for your business, since you could reuse it as an open SCADA middleware whilst focusing on client application development.
+C2MON could be used :
 
 * To acquire and store data from different type of systems,
 * To build up a simple or highly distributed or cloud based SCADA solution,
