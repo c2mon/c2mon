@@ -1,6 +1,26 @@
+/******************************************************************************
+ * Copyright (C) 2010-2019 CERN. All rights not expressly granted are reserved.
+ * <p/>
+ * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
+ * C2MON is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation, either version 3 of the license.
+ * <p/>
+ * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
+ * more details.
+ * <p/>
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
+ *****************************************************************************/
 package cern.c2mon.client.core.elasticsearch;
 
-import cern.c2mon.client.core.config.C2monClientProperties;
+import java.io.IOException;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import io.searchbox.client.JestClient;
@@ -17,10 +37,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import cern.c2mon.client.core.config.C2monClientProperties;
 
 /**
  * @author Justin Lewis Salmon
@@ -75,18 +92,6 @@ public class ElasticsearchService {
     // Figure out the right interval
     String interval = aggregate.equals("auto") ? getInterval(min, max) : aggregate;
     log.info("Using interval: " + interval);
-//    SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-//    searchSourceBuilder.query(termQuery("id", id))
-//        .size(0)
-//        .aggregation(AggregationBuilders.filter("time-range")
-//            .filter(rangeQuery("timestamp").from(min).to(max)).subAggregation(
-//                AggregationBuilders.dateHistogram("events-per-interval")
-//                    .field("timestamp")
-//                    .interval(new DateHistogramInterval(interval))
-//                    .subAggregation(
-//                        AggregationBuilders.avg("avg-value").field("value")
-//                    )));
-//    String query = searchSourceBuilder.toString();
     String query = String.format("{\n" +
         "  \"size\" : 0,\n" +
         "  \"query\" : {\n" +
@@ -174,13 +179,6 @@ public class ElasticsearchService {
   }
 
   private List<Object[]> getRawHistory(Long id, Long min, Long max) {
-//    SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-//    searchSourceBuilder.query(boolQuery()
-//        .must(termQuery("id", id))
-//        .must(rangeQuery("timestamp").from(min).to(max)))
-//        .sort("timestamp", SortOrder.ASC)
-//        .size(1000);
-//    String query = searchSourceBuilder.toString();
     String query = String.format("{\n" +
         "  \"size\" : 1000,\n" +
         "  \"query\" : {\n" +
@@ -248,12 +246,6 @@ public class ElasticsearchService {
    * @return a list of tag ids
    */
   public List<Long> getTopTags(Integer size) {
-//    SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-//    searchSourceBuilder.aggregation(AggregationBuilders.terms("group-by-id")
-//        .field("id")
-//        .size(size))
-//        .sort("timestamp", SortOrder.DESC);
-//    String query = searchSourceBuilder.toString();
     String query = String.format("{\n" +
         "  \"sort\" : [ {\n" +
         "    \"timestamp\" : {\n" +
@@ -285,7 +277,7 @@ public class ElasticsearchService {
    * @return list of tag ids returned from elasticsearch
    */
   public Collection<Long> findTagsByQuery(String query, String errorMessage) {
-    Function<SearchResult, Collection<Long>> converter = 
+    Function<SearchResult, Collection<Long>> converter =
         result -> {
           if (!result.isSucceeded()) {
             return new ArrayList<>();
@@ -300,13 +292,6 @@ public class ElasticsearchService {
   }
 
   public Collection<Long> findTagsByNameAndMetadata(String tagNameRegex, String key, String value) {
-//  SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-//  searchSourceBuilder
-//          .query(boolQuery()
-//                    .must(regexpQuery("name", tagNameRegex))
-//                    .must(matchQuery("metadata." + key, value))
-//            );
-//  String query = searchSourceBuilder.toString();
     String query = String.format("{\n" +
         "  \"query\" : {\n" +
         "    \"bool\" : {\n" +
@@ -338,9 +323,6 @@ public class ElasticsearchService {
    * @return a list of tags whose names match the given prefix
    */
   public Collection<Long> findByName(String regexQuery) {
-//    SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-//    searchSourceBuilder.query(regexpQuery("name", regexQuery));
-//    String query = searchSourceBuilder.toString();
     String query = String.format("{\n" +
         "  \"query\" : {\n" +
         "    \"regexp\" : {\n" +
@@ -362,13 +344,6 @@ public class ElasticsearchService {
    * @return a list of tags containing the exact metadata requested
    */
   public Collection<Long> findByMetadata(String key, String value) {
-//    SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-//    searchSourceBuilder.query(matchQuery("metadata." + key, value))
-//            .aggregation(AggregationBuilders.terms("group-by-id")
-//                    .field("id")
-//                    .size(0)
-//            );
-//    String queryString = searchSourceBuilder.toString();
     String queryString = String.format("{\n" +
         "  \"query\" : {\n" +
         "    \"match\" : {\n" +
@@ -379,6 +354,23 @@ public class ElasticsearchService {
         "    }\n" +
         "  }\n" +
         "}", key, value);
+    return findTagsByQuery(queryString, "Error when collecting tags for given metadata");
+  }
+
+  /**
+   * Find all tags containing the provided metadata key.
+   *
+   * @param key   the metadata key
+   * @return a list of tags containing the metadata requested
+   */
+  public Collection<Long> findByMetadata(String key) {
+    String queryString = String.format("{\n" +
+        "  \"query\" : {\n" +
+        "    \"exists\" : {\n" +
+        "      \"field\" : \"metadata.%s\"\n" +
+        "    }\n" +
+        "  }\n" +
+        "}", key);
     return findTagsByQuery(queryString, "Error when collecting tags for given metadata");
   }
 
@@ -420,11 +412,6 @@ public class ElasticsearchService {
   }
 
   public List<Long> getTopAlarms(Integer size) {
-//    SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-//    searchSourceBuilder.aggregation(AggregationBuilders.terms("group-by-id")
-//        .field("id")
-//        .size(size));
-//    String query = searchSourceBuilder.toString();
     String query = String.format("{\n" +
         "  \"aggregations\" : {\n" +
         "    \"group-by-id\" : {\n" +
@@ -444,13 +431,6 @@ public class ElasticsearchService {
   }
 
   public List<Object[]> getAlarmHistory(Long id, Long min, Long max) {
-//    SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-//    searchSourceBuilder.query(boolQuery()
-//        .must(termQuery("id", id))
-//        .must(rangeQuery("timestamp").from(min).to(max)))
-//        .sort("timestamp", SortOrder.DESC)
-//        .size(100);
-//    String query = searchSourceBuilder.toString();
     String query = String.format("{\n" +
         "  \"size\" : 100,\n" +
         "  \"query\" : {\n" +
@@ -486,12 +466,6 @@ public class ElasticsearchService {
   }
 
   public Collection<Long> findAlarmsByName(String name) {
-//    SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-//    searchSourceBuilder.query(boolQuery()
-//        .should(regexpQuery("faultFamily", name))
-//        .should(regexpQuery("faultMember", name)))
-//        .sort("timestamp", SortOrder.DESC);
-//    String query = searchSourceBuilder.toString();
     String query = String.format("{\n" +
         "  \"query\" : {\n" +
         "    \"bool\" : {\n" +
