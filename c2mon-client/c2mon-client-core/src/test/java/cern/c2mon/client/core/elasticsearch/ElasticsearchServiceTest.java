@@ -17,188 +17,120 @@
 package cern.c2mon.client.core.elasticsearch;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.annotation.NotThreadSafe;
-import org.awaitility.Awaitility;
-import org.easymock.Mock;
-import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
-import org.elasticsearch.action.admin.indices.flush.FlushRequest;
-import org.elasticsearch.node.NodeValidationException;
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
+import org.elasticsearch.action.search.SearchResponse;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.springframework.util.FileSystemUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import cern.c2mon.client.core.config.C2monClientProperties;
-import cern.c2mon.server.cache.EquipmentCache;
-import cern.c2mon.server.cache.ProcessCache;
-import cern.c2mon.server.cache.SubEquipmentCache;
-import cern.c2mon.server.cache.TagFacadeGateway;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.elasticsearch.Indices;
-import cern.c2mon.server.elasticsearch.MappingFactory;
-import cern.c2mon.server.elasticsearch.client.ElasticsearchClientImpl;
-import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
+import cern.c2mon.server.elasticsearch.tag.config.TagConfigDocument;
 import cern.c2mon.server.elasticsearch.tag.config.TagConfigDocumentConverter;
 import cern.c2mon.server.elasticsearch.tag.config.TagConfigDocumentIndexer;
-import cern.c2mon.server.elasticsearch.tag.config.TagConfigDocumentListener;
-import cern.c2mon.shared.client.configuration.ConfigConstants;
 
-import static org.easymock.EasyMock.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-@NotThreadSafe
 @Slf4j
-public class ElasticsearchServiceTest {
+public class ElasticsearchServiceTest extends BaseElasticsearchIntegrationTest {
 
-  private ElasticsearchClientImpl client;
-  private TagConfigDocumentListener tagDocumentListener;
+  @Autowired
+  private TagConfigDocumentIndexer indexer;
+
+  @Autowired
+  private TagConfigDocumentConverter converter;
+
   private C2monClientProperties properties = new C2monClientProperties();
-  private static ElasticsearchProperties elasticsearchProperties = new ElasticsearchProperties();
-  @Mock
-  private TagFacadeGateway tagFacadeGateway;
 
-  public ElasticsearchServiceTest() throws NodeValidationException {
-    this.client = new ElasticsearchClientImpl(elasticsearchProperties);
-    Indices mustBeCreatedButVariableNotUsed = new Indices(this.client, elasticsearchProperties);
-    TagConfigDocumentIndexer indexer = new TagConfigDocumentIndexer(client, elasticsearchProperties);
-    ProcessCache processCache = createNiceMock(ProcessCache.class);
-    EquipmentCache equipmentCache = createNiceMock(EquipmentCache.class);
-    SubEquipmentCache subequipmentCache = createNiceMock(SubEquipmentCache.class);
-    TagConfigDocumentConverter converter = new TagConfigDocumentConverter(processCache, equipmentCache, subequipmentCache);
-    tagFacadeGateway = createNiceMock(TagFacadeGateway.class);
-    tagDocumentListener = new TagConfigDocumentListener(this.client, indexer, converter, tagFacadeGateway);
-  }
-
-  @BeforeClass
-  public static void cleanup() {
-    log.debug("Clean ES properties");
-    FileSystemUtils.deleteRecursively(new java.io.File(elasticsearchProperties.getEmbeddedStoragePath()));
-  }
+  private ElasticsearchService service;
 
   @Before
-  public void setupElasticsearch() throws InterruptedException, NodeValidationException {
-    try {
-      log.debug("Setup Elasticsearch cluster for testing...");
-      CompletableFuture<Void> nodeReady = CompletableFuture.runAsync(() -> {
-        client.waitForYellowStatus();
-        client.getClient().admin().indices().delete(new DeleteIndexRequest(elasticsearchProperties.getTagConfigIndex()));
-        Awaitility.await().until(() -> Indices.create(elasticsearchProperties.getTagConfigIndex(), "tag_config", MappingFactory.createTagConfigMapping()));
-      });
-      nodeReady.get(120, TimeUnit.SECONDS);
-      log.debug("Elasticseach cluster ready for testing!");
-    } catch (ExecutionException | TimeoutException e) {
-      throw new RuntimeException("Timeout when waiting for embedded elasticsearch node to start!");
-    }
+  public void before() throws Exception {
+    properties.getElasticsearch().setUrl("http://localhost:9201");
+    service = new ElasticsearchService(properties);
+    addDataTags();
   }
 
   @After
-  public void tearDown() {
-    log.debug("Closing ES client...");
-    client.close();
+  public void cleanup() throws Exception {
+    DataTagCacheObject tag = (DataTagCacheObject) EntityUtils.createDataTag1();
+
+    TagConfigDocument document = converter.convert(tag)
+            .orElseThrow(()->new Exception("Tag conversion failed"));
+    String index = Indices.indexFor(document);
+
+    // Clean up
+    DeleteIndexResponse deleteResponse = client.getClient().admin().indices().prepareDelete(index).get();
+    assertTrue(deleteResponse.isAcknowledged());
   }
 
-  @Before
-  public void resetMocks() {
-    reset(tagFacadeGateway);
-  }
+  private void addDataTags() throws Exception {
+    DataTagCacheObject tag1 = (DataTagCacheObject) EntityUtils.createDataTag1();
+    DataTagCacheObject tag2 = (DataTagCacheObject) EntityUtils.createDataTag2();
 
-  @Test
-  public void testSearchByMetadata() throws InterruptedException {
-    try {
-      Long testUserTagId = Double.doubleToLongBits(Math.random()) % 10000;
-      String testUser = Long.toHexString(Double.doubleToLongBits(Math.random()));
-      String responsible = "responsible";
-      DataTagCacheObject tag = new DataTagCacheObject(testUserTagId);
-      tag.getMetadata().getMetadata().put(responsible, testUser);
-      expect(tagFacadeGateway.getAlarms(anyObject(DataTagCacheObject.class))).andReturn(Collections.emptyList()).times(2);
-      replay(tagFacadeGateway);
-      tagDocumentListener.onConfigurationEvent(tag, ConfigConstants.Action.CREATE);
-      Long tag1234Id = Double.doubleToLongBits(Math.random()) % 10000;
-      String value1234 = "1234";
-      tag = new DataTagCacheObject(tag1234Id);
-      String key1234 = "1234";
-      tag.getMetadata().getMetadata().put(key1234, value1234);
-      tagDocumentListener.onConfigurationEvent(tag, ConfigConstants.Action.CREATE);
+    TagConfigDocument document = converter.convert(tag1)
+            .orElseThrow(()->new Exception("Tag conversion failed"));
+    indexer.indexTagConfig(document);
 
-      client.getClient().admin().indices().flush(new FlushRequest()).actionGet();
+    document = converter.convert(tag2)
+        .orElseThrow(()->new Exception("Tag conversion failed"));
+    indexer.indexTagConfig(document);
 
-      ElasticsearchService service = new ElasticsearchService(properties);
+    String index = Indices.indexFor(document);
+    assertTrue(Indices.exists(index));
 
-      Awaitility.await().until(() -> service.getDistinctMetadataKeys().size() > 0);
+    // Refresh the index to make sure the document is searchable
+    client.getClient().admin().indices().prepareRefresh(index).get();
+    client.getClient().admin().cluster().prepareHealth().setIndices(index).setWaitForYellowStatus().get();
 
-      assertEquals("There should be 2 tags, one for responsible and one for 1234", 2, service.getDistinctMetadataKeys().size());
+    // Make sure the tag exists in the index
+    SearchResponse response = client.getClient().prepareSearch(index).setRouting(tag1.getId().toString()).get();
+    assertEquals(1, response.getHits().getTotalHits());
+    response = client.getClient().prepareSearch(index).setRouting(tag2.getId().toString()).get();
+    assertEquals(1, response.getHits().getTotalHits());
 
-      Collection<Long> tagsForResponsibleUser = service.findByMetadata(responsible, testUser);
-      assertEquals("There should be one tag with responsible user set to requested value", 1, tagsForResponsibleUser.size());
-      assertEquals(testUserTagId, tagsForResponsibleUser.stream().findFirst().get());
-
-      Collection<Long> tags1234 = service.findByMetadata(key1234, value1234);
-      assertEquals("There should be one tag with 1234 parameter set to requested value", 1, tags1234.size());
-      assertEquals(tag1234Id, tags1234.stream().findFirst().get());
-    } catch (Exception e) {
-      e.printStackTrace();
-      throw e;
-    }
+    log.info("Added two documents to index {}", index);
   }
 
   @Test
-  public void testSearchByNameAndMetadata() throws InterruptedException {
-    try {
-      Long testUserTagId = Double.doubleToLongBits(Math.random()) % 10000;
-      String testUser = Long.toHexString(Double.doubleToLongBits(Math.random()));
-      String metadataKey = "metadataKey";
-      DataTagCacheObject tag = new DataTagCacheObject(testUserTagId);
-      String tagname = "tagname";
-      tag.setName(tagname);
-      tag.getMetadata().getMetadata().put(metadataKey, testUser);
-      expect(tagFacadeGateway.getAlarms(anyObject(DataTagCacheObject.class))).andReturn(Collections.emptyList()).times(3);
-      replay(tagFacadeGateway);
-      tagDocumentListener.onConfigurationEvent(tag, ConfigConstants.Action.CREATE);
+  public void testSearchByMetadata() throws Exception {
+    Collection<Long> tagsForResponsibleUser = service.findByMetadata("responsiblePerson", "Fred");
+    assertEquals("There should be one tag with responsible user set to requested value", 1, tagsForResponsibleUser.size());
+    assertEquals(Long.valueOf(1L), tagsForResponsibleUser.stream().findFirst().get());
 
-      tag = new DataTagCacheObject(Double.doubleToLongBits(Math.random()) % 10000);
-      tag.setName(tagname);
-      tag.getMetadata().getMetadata().put(metadataKey, "some other metadata value");
-      tagDocumentListener.onConfigurationEvent(tag, ConfigConstants.Action.CREATE);
-
-      tag = new DataTagCacheObject(Double.doubleToLongBits(Math.random()) % 10000);
-      tag.setName("other_tagname");
-      tag.getMetadata().getMetadata().put(metadataKey, testUser);
-      tagDocumentListener.onConfigurationEvent(tag, ConfigConstants.Action.CREATE);
-
-      client.getClient().admin().indices().flush(new FlushRequest()).actionGet();
-
-      ElasticsearchService service = new ElasticsearchService(properties);
-
-      Awaitility.await().until(() -> service.findTagsByNameAndMetadata(tagname, metadataKey, testUser).size() > 0);
-
-      Collection<Long> tagsForResponsibleUser = service.findTagsByNameAndMetadata(tagname, metadataKey, testUser);
-      assertEquals("There should be one tag with given name and metadata", 1, tagsForResponsibleUser.size());
-      assertEquals(testUserTagId, tagsForResponsibleUser.stream().findFirst().get());
-    } catch (Exception e) {
-      e.printStackTrace();
-      throw e;
-    }
+    Collection<Long> tagIds = service.findByMetadata("responsiblePerson");
+    assertEquals("There should be 2 tags with that metadata", 2, tagIds.size());
+    assertTrue("Should contain that tag id", tagIds.contains(EntityUtils.createDataTag1().getId()));
+    assertTrue("Should contain that tag id", tagIds.contains(EntityUtils.createDataTag2().getId()));
   }
 
   @Test
-  public void testSearchByName() throws InterruptedException {
-    try {
-      ElasticsearchService service = new ElasticsearchService(properties);
-      Collection<Long> tagsForResponsibleUser = service.findByName("TEST");
-      assertNotNull("The tags collection should not be null", tagsForResponsibleUser);
-      assertEquals("There tags collection should be empty", 0, tagsForResponsibleUser.size());
-    } catch (Exception e) {
-      e.printStackTrace();
-      throw e;
-    }
+  public void testGetDistinctMetadataKeys() throws Exception {
+    ElasticsearchService service = new ElasticsearchService(properties);
+    assertEquals("There should be 4 distinct metadata keys", 4, service.getDistinctMetadataKeys().size());
+  }
+
+  @Test
+  public void testSearchByNameAndMetadata() throws Exception {
+    Collection<Long> tagIds = service.findTagsByNameAndMetadata("cpu.*", "building", "2");
+    assertEquals("There should be one tag with given name and metadata", 1, tagIds.size());
+    assertEquals("Tag with id 2L should match", Long.valueOf(2L), tagIds.stream().findFirst().get());
+  }
+
+  @Test
+  public void testSearchByName() throws Exception {
+    Collection<Long> tagsForResponsibleUser = service.findByName(EntityUtils.createDataTag1().getName());
+    assertNotNull("The tags collection should not be null", tagsForResponsibleUser);
+    assertEquals("The search result should be 1", 1, tagsForResponsibleUser.size());
+
+    tagsForResponsibleUser = service.findByName("cpu.*");
+    assertNotNull("The tags collection should not be null", tagsForResponsibleUser);
+    assertEquals("The search result should be 2", 2, tagsForResponsibleUser.size());
   }
 }

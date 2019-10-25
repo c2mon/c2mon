@@ -61,7 +61,7 @@ public class TagConfigDocumentIndexer {
     this.configIndex = properties.getTagConfigIndex();
   }
 
-  void indexTagConfig(final TagConfigDocument tag) {
+  public void indexTagConfig(final TagConfigDocument tag) {
     if (!Indices.exists(configIndex)) {
       Indices.create(configIndex, TYPE, MappingFactory.createTagConfigMapping());
     }
