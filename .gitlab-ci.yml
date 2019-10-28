@@ -28,10 +28,11 @@ variables:
 .build_base:
   stage: compile
   dependencies: []
+  image: maven:3.6.2-jdk-8-slim
   script:
     - export MAVEN_OPTS=""
     - cd $TARGET
-    - ../mvnw $MAVEN_CLI_OPTS test-compile
+    - mvn $MAVEN_CLI_OPTS test-compile
   artifacts:
     name: "$TARGET#$CI_COMMIT_REF_NAME"
     when: on_success
@@ -107,11 +108,12 @@ build_daq:
 
 .test_base:
   stage: test
+  image: maven:3.6.2-jdk-8-slim
   script:
     - export MAVEN_OPTS=""
     - mkdir reports
     - cd $TARGET
-    - ../mvnw $MAVEN_CLI_OPTS surefire:test && find -iname 'TEST-*.xml' -exec cp {} ../reports/ \;
+    - mvn $MAVEN_CLI_OPTS surefire:test && find -iname 'TEST-*.xml' -exec cp {} ../reports/ \;
   artifacts:
     name: "$CI_JOB_NAME"
     expire_in: 60 minutes
@@ -162,6 +164,7 @@ test_daq:
 sonar_preview:
   stage: qa
   tags: [c2mon]
+  image: maven:3.6.2-jdk-8-slim
   dependencies:
     - build_shared
     - build_server
@@ -176,6 +179,7 @@ sonar_preview:
 quality_assurance:
   stage: qa
   tags: [c2mon]
+  image: maven:3.6.2-jdk-8-slim
   dependencies:
     - build_shared
     - build_server
@@ -194,6 +198,7 @@ quality_assurance:
 publish:
   stage: publish
   tags: [c2mon]
+  image: maven:3.6.2-jdk-8-slim
   dependencies:
     - build_shared
     - build_server
@@ -213,6 +218,7 @@ publish:
 trigger_build:
   stage: deploy
   tags: [c2mon]
+  image: appropriate/curl:3.1
   dependencies: []
   script:
     - "curl -X POST -F token=$TIM_SERVER_TOKEN -F ref=master https://gitlab.cern.ch/api/v4/projects/9859/trigger/pipeline"
