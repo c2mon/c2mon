@@ -25,9 +25,4 @@ public class SubEquipmentSupervisedServiceTest extends SupervisedServiceTest<Sub
   protected C2monCache<SubEquipment> initCache() {
     return equipmentCacheRef;
   }
-
-  @Override
-  protected void mutateObject(SubEquipment cacheable) {
-    cacheable.getStatusTime().setTime(10);
-  }
 }

@@ -6,7 +6,6 @@ import cern.c2mon.shared.common.CacheEvent;
 import cern.c2mon.shared.common.Cacheable;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -84,11 +83,30 @@ public abstract class AbstractCacheListenerTest<V extends Cacheable> extends Abs
   }
 
   @Test
-  @Ignore
-  public void manyPutsDontGetLost() {
+  public void multipleUpdatesDontGetLost() {
     cache.registerListener(paramListener, CacheEvent.UPDATE_ACCEPTED);
 
-    int repetitions = 100_000;
+    int repetitions = 100;
+
+    for (int i = 0; i < repetitions; i++) {
+      V clone = (V) sample.clone();
+      // Alternate between mutated and nonmutated object, to always turn up !equals between them
+      if (i % 2 == 0)
+        mutateObject(clone);
+      cache.put(1L, clone);
+    }
+
+    assertEquals(1, cache.getKeys().size());
+
+    paramListener.close();
+    assertEquals(repetitions, eventCounter.get());
+  }
+
+  @Test
+  public void insertingPerfectDuplicatesIsRejected() {
+    cache.registerListener(paramListener, CacheEvent.UPDATE_ACCEPTED);
+
+    int repetitions = 100;
 
     for (int i = 0; i < repetitions; i++)
       cache.put(1L, sample);
@@ -96,7 +114,7 @@ public abstract class AbstractCacheListenerTest<V extends Cacheable> extends Abs
     assertEquals(1, cache.getKeys().size());
 
     paramListener.close();
-    assertEquals(repetitions, eventCounter.get());
+    assertEquals(1, eventCounter.get());
   }
 
 }

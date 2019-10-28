@@ -25,9 +25,4 @@ public class ProcessSupervisedServiceTest extends SupervisedServiceTest<Process>
   protected C2monCache<Process> initCache() {
     return equipmentCacheRef;
   }
-
-  @Override
-  protected void mutateObject(Process cacheable) {
-    cacheable.getEquipmentIds().clear();
-  }
 }
