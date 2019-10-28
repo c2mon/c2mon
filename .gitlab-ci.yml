@@ -158,6 +158,7 @@ test_daq:
 #  ====== Stage: QA ========
 #  =========================
 
+# These tasks may need to override MAVEN_OPTS manually
 sonar_preview:
   stage: qa
   tags: [c2mon]
