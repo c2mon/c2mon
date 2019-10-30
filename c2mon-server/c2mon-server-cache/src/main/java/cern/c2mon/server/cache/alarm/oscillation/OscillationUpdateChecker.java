@@ -34,7 +34,7 @@ import cern.c2mon.server.cache.ClusterCache;
 import cern.c2mon.server.cache.TagFacadeGateway;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
-import cern.c2mon.server.common.alarm.AlarmCacheUpdater;
+import cern.c2mon.server.common.alarm.AlarmCacheObjectController;
 import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.client.alarm.AlarmQuery;
@@ -101,7 +101,7 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
   /** Reference to the clusterCache to share values across the cluster nodes */
   private final ClusterCache clusterCache;
 
-  private final AlarmCacheUpdater alarmCacheUpdater;
+  private final AlarmCacheObjectController alarmCacheUpdater;
 
   private final TagFacadeGateway tagFacadeGateway;
 
@@ -122,7 +122,7 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
    *          the alarm cache updater.
    */
   @Autowired
-  public OscillationUpdateChecker(final AlarmCache alarmCache, final ClusterCache clusterCache, final OscillationUpdater oscillationUpdater, final AlarmCacheUpdater alarmCacheUpdater, final TagFacadeGateway tagFacadeGateway) {
+  public OscillationUpdateChecker(final AlarmCache alarmCache, final ClusterCache clusterCache, final OscillationUpdater oscillationUpdater, final AlarmCacheObjectController alarmCacheUpdater, final TagFacadeGateway tagFacadeGateway) {
     super();
     this.alarmCache = alarmCache;
     this.clusterCache = clusterCache;

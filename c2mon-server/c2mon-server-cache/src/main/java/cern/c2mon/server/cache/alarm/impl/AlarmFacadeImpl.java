@@ -23,7 +23,7 @@ import cern.c2mon.server.cache.common.AbstractFacade;
 import cern.c2mon.server.cache.util.MetadataUtils;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
-import cern.c2mon.server.common.alarm.AlarmCacheUpdater;
+import cern.c2mon.server.common.alarm.AlarmCacheObjectController;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.client.alarm.condition.AlarmCondition;
 import cern.c2mon.shared.common.ConfigurationException;
@@ -70,7 +70,7 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
 
   private final TagLocationService tagLocationService;
 
-  private final AlarmCacheUpdater alarmCacheUpdater;
+  private final AlarmCacheObjectController alarmCacheUpdater;
 
 
   /**
@@ -80,7 +80,7 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
    *          the alarm cache
    */
   @Autowired
-  public AlarmFacadeImpl(final AlarmCache alarmCache, final TagLocationService tagLocationService, AlarmCacheUpdater alarmCacheUpdater) {
+  public AlarmFacadeImpl(final AlarmCache alarmCache, final TagLocationService tagLocationService, AlarmCacheObjectController alarmCacheUpdater) {
     super();
     this.alarmCache = alarmCache;
     this.tagLocationService = tagLocationService;

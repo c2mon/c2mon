@@ -5,7 +5,7 @@ import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.listener.impl.SingleThreadListener;
 import cern.c2mon.cache.config.tag.TagCacheFacade;
 import cern.c2mon.server.common.alarm.Alarm;
-import cern.c2mon.server.common.alarm.AlarmCacheUpdater;
+import cern.c2mon.server.common.alarm.AlarmCacheObjectController;
 import cern.c2mon.server.common.alarm.TagWithAlarms;
 import cern.c2mon.server.common.alarm.TagWithAlarmsImpl;
 import cern.c2mon.server.common.tag.Tag;
@@ -44,13 +44,13 @@ public class AlarmService implements AlarmAggregator {
 
   private List<AlarmAggregatorListener> alarmUpdateObservable = new ArrayList<>();
 
-  private AlarmCacheUpdater alarmCacheUpdater;
+  private AlarmCacheObjectController alarmCacheUpdater;
 
   private UnifiedTagCacheFacade unifiedTagCacheFacade;
 
   @Inject
   public AlarmService(final C2monCache<Alarm> alarmCacheRef, final TagCacheFacade tagCacheRef,
-                      final AlarmCacheUpdater alarmCacheUpdater, final UnifiedTagCacheFacade unifiedTagCacheFacade) {
+                      final AlarmCacheObjectController alarmCacheUpdater, final UnifiedTagCacheFacade unifiedTagCacheFacade) {
     this.alarmCacheRef = alarmCacheRef;
     this.tagCacheRef = tagCacheRef;
     this.alarmCacheUpdater = alarmCacheUpdater;

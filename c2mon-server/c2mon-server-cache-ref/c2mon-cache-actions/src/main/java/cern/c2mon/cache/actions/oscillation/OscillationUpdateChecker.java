@@ -20,7 +20,7 @@ import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
-import cern.c2mon.server.common.alarm.AlarmCacheUpdater;
+import cern.c2mon.server.common.alarm.AlarmCacheObjectController;
 import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.tag.Tag;
@@ -79,7 +79,7 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
   private final C2monCache<Alarm> alarmCacheRef;
   private final OscillationService oscillationCheckService;
   private final OscillationUpdater oscillationUpdater;
-  private final AlarmCacheUpdater alarmCacheUpdater;
+  private final AlarmCacheObjectController alarmCacheUpdater;
   private final C2monCache<DataTag> dataTagCacheRef;
   /**
    * Lifecycle flag.
@@ -98,7 +98,7 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
    */
   @Inject
   public OscillationUpdateChecker(final C2monCache<Alarm> alarmCacheRef, final OscillationService oscillationCheckService,
-                                  final OscillationUpdater oscillationUpdater, final AlarmCacheUpdater alarmCacheUpdater,
+                                  final OscillationUpdater oscillationUpdater, final AlarmCacheObjectController alarmCacheUpdater,
                                   final C2monCache<DataTag> dataTagCacheRef) {
     super();
     this.alarmCacheRef = alarmCacheRef;

@@ -27,7 +27,7 @@ import cern.c2mon.server.cache.AlarmFacade;
 import cern.c2mon.server.cache.alarm.oscillation.OscillationUpdater;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
-import cern.c2mon.server.common.alarm.AlarmCacheUpdater;
+import cern.c2mon.server.common.alarm.AlarmCacheObjectController;
 import cern.c2mon.server.common.tag.Tag;
 
 /**
@@ -38,7 +38,7 @@ import cern.c2mon.server.common.tag.Tag;
  */
 @Service
 @Slf4j
-public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
+public final class AlarmCacheUpdaterImpl implements AlarmCacheObjectController {
 
   private final AlarmCache alarmCache;
 
@@ -164,7 +164,7 @@ public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
    * Build up a prefix according to the tag value's validity and mode
    */
   private void changeInfoField(final AlarmCacheObject alarmCacheObject, final Tag tag) {
-    alarmCacheObject.setInfo(AlarmCacheUpdater.evaluateAdditionalInfo(alarmCacheObject, tag));
+    alarmCacheObject.setInfo(AlarmCacheObjectController.evaluateAdditionalInfo(alarmCacheObject, tag));
   }
 
   protected AlarmCacheObject commitAlarmStateChange(final AlarmCacheObject alarmCacheObject, final Tag tag, boolean resetOscillationStatus) {

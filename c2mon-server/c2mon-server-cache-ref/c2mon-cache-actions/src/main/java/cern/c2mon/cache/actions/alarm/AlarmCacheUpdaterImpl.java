@@ -20,7 +20,7 @@ import cern.c2mon.cache.actions.oscillation.OscillationUpdater;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
-import cern.c2mon.server.common.alarm.AlarmCacheUpdater;
+import cern.c2mon.server.common.alarm.AlarmCacheObjectController;
 import cern.c2mon.server.common.tag.Tag;
 import lombok.AccessLevel;
 import lombok.Setter;
@@ -38,7 +38,7 @@ import java.sql.Timestamp;
  */
 @Service
 @Slf4j
-public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
+public final class AlarmCacheUpdaterImpl implements AlarmCacheObjectController {
 
   @Inject
   @Setter(AccessLevel.PROTECTED)
@@ -157,7 +157,7 @@ public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
    * Build up a prefix according to the tag value's validity and mode
    */
   private void changeInfoField(final AlarmCacheObject alarmCacheObject, final Tag tag) {
-    alarmCacheObject.setInfo(AlarmCacheUpdater.evaluateAdditionalInfo(alarmCacheObject, tag));
+    alarmCacheObject.setInfo(AlarmCacheObjectController.evaluateAdditionalInfo(alarmCacheObject, tag));
   }
 
   private AlarmCacheObject commitAlarmStateChange(final AlarmCacheObject alarmCacheObject, final Tag tag) {

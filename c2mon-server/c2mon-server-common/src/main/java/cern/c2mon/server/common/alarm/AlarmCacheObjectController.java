@@ -3,8 +3,8 @@ package cern.c2mon.server.common.alarm;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.common.datatag.DataTagConstants;
 
-public interface AlarmCacheUpdater {
-  
+public interface AlarmCacheObjectController {
+
   /**
    * Computes the alarm state corresponding to the new tag value and updates the Alarm cache, if required.
    * @param alarm The current alarm object in the cache
@@ -12,9 +12,9 @@ public interface AlarmCacheUpdater {
    * @return The updated alarm object
    */
   Alarm update(final Alarm alarm, final Tag tag);
-  
+
   /**
-   * Resets the oscillation flag to false and computes the alarm state corresponding to the actual tag value. 
+   * Resets the oscillation flag to false and computes the alarm state corresponding to the actual tag value.
    * It will also updates the Alarm cache and notify the listeners.
    * @param alarm The current alarm object in the cache
    * @param tag The tag update
