@@ -97,7 +97,8 @@ public class AliveTimerService {
   }
 
   /**
-   * Check whether this alive timer has expired.
+   * Check whether this alive timer has expired. Adds an additional time buffer
+   * as some clocks may be slightly out of sync.
    *
    * @return true if the alive timer is active and it has not been updated since
    * at least "aliveInterval" milliseconds.
