@@ -35,7 +35,7 @@ import java.sql.Timestamp;
 public final class OscillationUpdater {
 
     @Autowired
-    OscillationProperties oscillationProperties;
+    OscillationProperties oscillationProperties = new OscillationProperties();
 
     /**
      * Check, if the alarm shall still keep its oscillation flag. This is the case, if the last alarm update was longer ago than the defined threshold.

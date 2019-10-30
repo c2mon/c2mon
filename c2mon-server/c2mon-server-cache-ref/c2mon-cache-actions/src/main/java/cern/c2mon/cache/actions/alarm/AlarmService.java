@@ -49,13 +49,12 @@ public class AlarmService implements AlarmAggregator {
   private UnifiedTagCacheFacade unifiedTagCacheFacade;
 
   @Autowired
-  public AlarmService(final C2monCache<Alarm> alarmCacheRef, final TagCacheFacade tagCacheRef, final AlarmCacheUpdater alarmCacheUpdater, UnifiedTagCacheFacade unifiedTagCacheFacade) {
+  public AlarmService(final C2monCache<Alarm> alarmCacheRef, final TagCacheFacade tagCacheRef,
+                      final AlarmCacheUpdater alarmCacheUpdater, final UnifiedTagCacheFacade unifiedTagCacheFacade) {
     this.alarmCacheRef = alarmCacheRef;
     this.tagCacheRef = tagCacheRef;
     this.alarmCacheUpdater = alarmCacheUpdater;
     this.unifiedTagCacheFacade = unifiedTagCacheFacade;
-
-    alarmCacheRef.query(obj -> obj.isOscillating() && obj.isActive());
   }
 
   @PostConstruct
@@ -99,7 +98,6 @@ public class AlarmService implements AlarmAggregator {
           log.error("Exception caught when attempting to evaluate alarm ID " + alarmId + "  for tag " + tag.getId() + " - publishing to the client with no attached alarms.", e);
         }
       }
-      return null;
     });
     return linkedAlarms;
   }

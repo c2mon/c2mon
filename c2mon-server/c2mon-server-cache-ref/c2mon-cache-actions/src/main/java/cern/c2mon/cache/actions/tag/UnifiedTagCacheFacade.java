@@ -20,23 +20,27 @@ public class UnifiedTagCacheFacade implements CacheListenerManager<Tag> {
   private final List<C2monCache<? extends Tag>> tagCaches;
 
   @Autowired
-  public UnifiedTagCacheFacade(final C2monCache<RuleTag> ruleTagCacheRef, final C2monCache<DataTag> dataTagCacheRef,
-                               final C2monCache<ControlTag> controlTagCacheRef) {
+  public UnifiedTagCacheFacade(final C2monCache<RuleTag> ruleTagCacheRef, final C2monCache<ControlTag> controlTagCacheRef,
+                               final C2monCache<DataTag> dataTagCacheRef) {
     tagCaches = Arrays.asList(ruleTagCacheRef, dataTagCacheRef, controlTagCacheRef);
   }
 
   @Override
   public void notifyListenersOf(CacheEvent event, Tag source) {
-// No-op? This should probably not be called directly? The listeners are automatically doing this, if registered
+    // No-op? This should probably not be called directly? The listeners are automatically doing this, if registered
+    // Currently leaving this as an exception to see if the control flow gets here
+    throw new UnsupportedOperationException(
+      "Attempting to call listeners on the tag cache facade, instead of the real caches. " +
+        "This operation is not allowed");
   }
 
   @Override
   public void registerListener(CacheListener listener, CacheEvent... events) {
-      tagCaches.forEach(cache -> cache.registerListener(listener,events));
+    tagCaches.forEach(cache -> cache.registerListener(listener, events));
   }
 
   @Override
   public void deregisterListener(CacheListener listener) {
-      tagCaches.forEach(cache -> cache.deregisterListener(listener));
+    tagCaches.forEach(cache -> cache.deregisterListener(listener));
   }
 }
