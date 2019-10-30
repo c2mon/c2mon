@@ -16,18 +16,18 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.loader;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.cache.loader.config.CacheLoaderModuleRef;
 import cern.c2mon.server.common.config.CommonModule;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.test.DatabasePopulationRule;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import javax.inject.Inject;
 
 import static org.junit.Assert.*;
 
@@ -41,10 +41,10 @@ import static org.junit.Assert.*;
 public class ProcessLoaderDAOTest {
 
   @Rule
-  @Autowired
+  @Inject
   public DatabasePopulationRule databasePopulationRule;
 
-  @Autowired
+  @Inject
   private ProcessDAO processDAO;
 
   @Test

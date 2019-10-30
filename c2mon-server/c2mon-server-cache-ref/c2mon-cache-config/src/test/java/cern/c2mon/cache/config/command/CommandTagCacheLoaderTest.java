@@ -7,8 +7,8 @@ import cern.c2mon.server.cache.dbaccess.LoaderMapper;
 import cern.c2mon.server.common.command.CommandTagCacheObject;
 import cern.c2mon.server.test.CacheObjectComparison;
 import cern.c2mon.shared.common.command.CommandTag;
-import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
 
@@ -17,10 +17,10 @@ import java.util.Map;
  */
 public class CommandTagCacheLoaderTest extends AbstractCacheLoaderTest<CommandTag> {
 
-  @Autowired
+  @Inject
   private C2monCache<CommandTag> commandTagCacheRef;
 
-  @Autowired
+  @Inject
   private CommandTagMapper commandTagMapper;
 
   @Override

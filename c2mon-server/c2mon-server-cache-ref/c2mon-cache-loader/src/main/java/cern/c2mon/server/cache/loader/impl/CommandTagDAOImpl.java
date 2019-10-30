@@ -16,15 +16,15 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.loader.impl;
 
-import cern.c2mon.server.cache.loader.CacheLoaderName;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import cern.c2mon.server.cache.dbaccess.CommandTagMapper;
+import cern.c2mon.server.cache.loader.CacheLoaderName;
 import cern.c2mon.server.cache.loader.CommandTagDAO;
 import cern.c2mon.server.cache.loader.common.AbstractDefaultLoaderDAO;
 import cern.c2mon.server.common.command.CommandTagCacheObject;
 import cern.c2mon.shared.common.command.CommandTag;
+import org.springframework.stereotype.Service;
+
+import javax.inject.Inject;
 
 /**
  * CommandTag DAO implementation.
@@ -39,7 +39,7 @@ public class CommandTagDAOImpl extends AbstractDefaultLoaderDAO<CommandTag> impl
    */
   private CommandTagMapper commandTagMapper;
 
-  @Autowired
+  @Inject
   public CommandTagDAOImpl(CommandTagMapper commandTagMapper) {
     super(2000, commandTagMapper);
     this.commandTagMapper = commandTagMapper;

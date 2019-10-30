@@ -9,7 +9,7 @@
 //import cern.c2mon.server.common.config.CommonModule;
 //import org.junit.Test;
 //import org.junit.runner.RunWith;
-//import org.springframework.beans.factory.annotation.Autowired;
+//import javax.inject.Inject;
 //import org.springframework.test.context.ContextConfiguration;
 //import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 //
@@ -25,7 +25,7 @@
 //})
 //public class AutoWireTest {
 //
-//  @Autowired
+//  @Inject
 //  private C2monCache<Alarm> alarmCacheRef;
 //
 //  @Test

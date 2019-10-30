@@ -6,8 +6,8 @@ import cern.c2mon.server.cache.dbaccess.DeviceClassMapper;
 import cern.c2mon.server.cache.dbaccess.LoaderMapper;
 import cern.c2mon.server.common.device.DeviceClass;
 import cern.c2mon.server.common.device.DeviceClassCacheObject;
-import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
 
@@ -18,10 +18,10 @@ import static org.junit.Assert.assertEquals;
  */
 public class DeviceClassCacheLoaderTest extends AbstractCacheLoaderTest<DeviceClass> {
 
-  @Autowired
+  @Inject
   private C2monCache<DeviceClass> deviceClassCacheRef;
 
-  @Autowired
+  @Inject
   private DeviceClassMapper deviceClassMapper;
 
   @Override

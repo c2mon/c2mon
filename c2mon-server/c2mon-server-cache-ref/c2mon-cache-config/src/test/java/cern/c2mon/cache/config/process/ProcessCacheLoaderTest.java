@@ -6,8 +6,8 @@ import cern.c2mon.server.cache.dbaccess.LoaderMapper;
 import cern.c2mon.server.cache.dbaccess.ProcessMapper;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.process.ProcessCacheObject;
-import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
 
@@ -20,10 +20,10 @@ import static org.junit.Assert.assertEquals;
  */
 public class ProcessCacheLoaderTest extends AbstractCacheLoaderTest<Process> {
 
-  @Autowired
+  @Inject
   private ProcessMapper processMapper;
 
-  @Autowired
+  @Inject
   private C2monCache<Process> processCacheRef;
 
   @Override

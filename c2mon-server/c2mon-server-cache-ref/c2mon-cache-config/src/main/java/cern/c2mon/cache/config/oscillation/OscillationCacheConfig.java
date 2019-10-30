@@ -4,16 +4,17 @@ import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.factory.AbstractCacheFactory;
 import cern.c2mon.cache.config.CacheName;
 import cern.c2mon.server.common.alarm.OscillationTimestamp;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import javax.inject.Inject;
 
 @Configuration
 public class OscillationCacheConfig {
 
   private final AbstractCacheFactory cachingFactory;
 
-  @Autowired
+  @Inject
   public OscillationCacheConfig(final AbstractCacheFactory cachingFactory) {
     this.cachingFactory = cachingFactory;
   }

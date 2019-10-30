@@ -16,14 +16,14 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.loader.impl;
 
-import cern.c2mon.server.cache.loader.CacheLoaderName;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import cern.c2mon.server.cache.dbaccess.ProcessMapper;
+import cern.c2mon.server.cache.loader.CacheLoaderName;
 import cern.c2mon.server.cache.loader.ProcessDAO;
 import cern.c2mon.server.cache.loader.common.AbstractDefaultLoaderDAO;
 import cern.c2mon.server.common.process.Process;
+import org.springframework.stereotype.Service;
+
+import javax.inject.Inject;
 
 /**
  * Process DAO implementation.
@@ -35,7 +35,7 @@ public class ProcessDAOImpl extends AbstractDefaultLoaderDAO<Process> implements
 
   private ProcessMapper processMapper;
 
-  @Autowired
+  @Inject
   public ProcessDAOImpl(ProcessMapper processMapper) {
     super(500, processMapper); // initial buffer size
     this.processMapper = processMapper;

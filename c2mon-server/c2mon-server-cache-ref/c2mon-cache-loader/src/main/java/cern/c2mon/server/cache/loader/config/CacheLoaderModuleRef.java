@@ -1,11 +1,12 @@
 package cern.c2mon.server.cache.loader.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+
+import javax.inject.Inject;
 
 /**
  * @author Justin Lewis Salmon
@@ -15,7 +16,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 @ComponentScan("cern.c2mon.server.cache.loader")
 public class CacheLoaderModuleRef {
 
-  @Autowired
+  @Inject
   private CacheLoaderProperties properties;
 
   @Bean(name = "cacheLoaderTaskExecutor")

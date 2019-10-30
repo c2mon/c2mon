@@ -23,8 +23,9 @@ import cern.c2mon.server.cache.loader.RuleTagLoaderDAO;
 import cern.c2mon.server.cache.loader.common.AbstractBatchLoaderDAO;
 import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.rule.RuleTagCacheObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import javax.inject.Inject;
 
 /**
  * RuleTag loader DAO.
@@ -41,7 +42,7 @@ public class RuleTagLoaderDAOImpl extends AbstractBatchLoaderDAO<Long, RuleTag> 
    * dependency of {@link RuleTagMapper}! This is due to Batis 'extends' relationship in the
    * resultMap. Check out RuleTagMapper.xml for more
    */
-  @Autowired
+  @Inject
   public RuleTagLoaderDAOImpl(DataTagMapper dataTagMapper, RuleTagMapper ruleTagMapper) {
     super(ruleTagMapper); //initial buffer size
     this.ruleTagMapper = ruleTagMapper;

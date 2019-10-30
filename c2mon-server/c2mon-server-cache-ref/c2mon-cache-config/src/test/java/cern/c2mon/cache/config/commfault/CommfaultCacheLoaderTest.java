@@ -6,8 +6,8 @@ import cern.c2mon.server.cache.dbaccess.CommFaultTagMapper;
 import cern.c2mon.server.cache.dbaccess.LoaderMapper;
 import cern.c2mon.server.common.commfault.CommFaultTag;
 import cern.c2mon.server.common.commfault.CommFaultTagCacheObject;
-import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
 
@@ -18,10 +18,10 @@ import static org.junit.Assert.assertEquals;
  */
 public class CommfaultCacheLoaderTest extends AbstractCacheLoaderTest<CommFaultTag> {
 
-  @Autowired
+  @Inject
   private C2monCache<CommFaultTag> commFaultTagCacheRef;
 
-  @Autowired
+  @Inject
   private CommFaultTagMapper commFaultTagMapper;
 
   @Override

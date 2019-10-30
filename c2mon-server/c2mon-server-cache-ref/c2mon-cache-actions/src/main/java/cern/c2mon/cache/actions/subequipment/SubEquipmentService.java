@@ -7,9 +7,9 @@ import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.shared.common.supervision.SupervisionConstants;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.inject.Inject;
 import java.util.Collection;
 
 /**
@@ -20,7 +20,7 @@ import java.util.Collection;
 @Service
 public class SubEquipmentService extends BaseEquipmentServiceImpl<SubEquipment> implements SubEquipmentOperations {
 
-  @Autowired
+  @Inject
   public SubEquipmentService(C2monCache<SubEquipment> subEquipmentCacheRef, CommFaultService commFaultService, AliveTimerService aliveTimerService) {
     super(subEquipmentCacheRef, commFaultService, aliveTimerService, SupervisionConstants.SupervisionEntity.SUBEQUIPMENT);
   }

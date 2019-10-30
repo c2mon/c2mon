@@ -5,14 +5,15 @@ import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.process.ProcessCacheObject;
 import lombok.Getter;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.inject.Inject;
 
 public class ProcessSupervisedServiceTest extends SupervisedServiceTest<Process> {
 
-  @Autowired
+  @Inject
   private C2monCache<Process> equipmentCacheRef;
 
-  @Autowired
+  @Inject
   @Getter
   private ProcessService supervisedService;
 

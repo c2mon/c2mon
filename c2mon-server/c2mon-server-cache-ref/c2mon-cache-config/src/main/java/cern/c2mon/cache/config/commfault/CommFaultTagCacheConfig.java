@@ -6,9 +6,10 @@ import cern.c2mon.cache.config.CacheName;
 import cern.c2mon.cache.config.config.AbstractSimpleCacheConfig;
 import cern.c2mon.server.cache.loader.CacheLoaderDAO;
 import cern.c2mon.server.common.commfault.CommFaultTag;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import javax.inject.Inject;
 
 /**
  * @author Szymon Halastra
@@ -17,7 +18,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class CommFaultTagCacheConfig extends AbstractSimpleCacheConfig<CommFaultTag> {
 
-  @Autowired
+  @Inject
   public CommFaultTagCacheConfig(AbstractCacheFactory cachingFactory, CacheLoaderDAO<CommFaultTag> cacheLoaderDAORef) {
     super(cachingFactory, CacheName.COMMFAULTTAG, CommFaultTag.class, cacheLoaderDAORef);
   }

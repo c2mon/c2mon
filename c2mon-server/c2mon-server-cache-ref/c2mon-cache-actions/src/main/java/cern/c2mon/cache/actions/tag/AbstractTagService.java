@@ -6,9 +6,9 @@ import cern.c2mon.server.common.tag.AbstractTagCacheObject;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.inject.Inject;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
@@ -28,7 +28,7 @@ public abstract class AbstractTagService<T extends Tag> implements CommonTagOper
 
   private C2monCache<T> cacheRef;
 
-  @Autowired
+  @Inject
   protected AbstractTagService(final C2monCache<T> cacheRef) {
     this.cacheRef = cacheRef;
   }

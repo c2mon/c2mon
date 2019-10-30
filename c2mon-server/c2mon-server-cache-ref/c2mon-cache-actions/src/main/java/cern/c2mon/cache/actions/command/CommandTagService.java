@@ -5,8 +5,9 @@ import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.shared.common.command.CommandTag;
 import cern.c2mon.shared.common.command.SourceCommandTag;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import javax.inject.Inject;
 
 /**
  * @author Szymon Halastra
@@ -17,7 +18,7 @@ public class CommandTagService {
 
   private C2monCache<CommandTag> commandTagCacheRef;
 
-  @Autowired
+  @Inject
   public CommandTagService(C2monCache<CommandTag> commandTagCacheRef) {
     this.commandTagCacheRef = commandTagCacheRef;
   }

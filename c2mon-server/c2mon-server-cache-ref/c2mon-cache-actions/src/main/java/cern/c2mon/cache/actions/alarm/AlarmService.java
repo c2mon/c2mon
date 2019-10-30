@@ -11,10 +11,10 @@ import cern.c2mon.server.common.alarm.TagWithAlarmsImpl;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.common.CacheEvent;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -48,7 +48,7 @@ public class AlarmService implements AlarmAggregator {
 
   private UnifiedTagCacheFacade unifiedTagCacheFacade;
 
-  @Autowired
+  @Inject
   public AlarmService(final C2monCache<Alarm> alarmCacheRef, final TagCacheFacade tagCacheRef,
                       final AlarmCacheUpdater alarmCacheUpdater, final UnifiedTagCacheFacade unifiedTagCacheFacade) {
     this.alarmCacheRef = alarmCacheRef;

@@ -19,9 +19,9 @@ package cern.c2mon.cache.actions.oscillation;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.inject.Inject;
 import java.sql.Timestamp;
 
 /**
@@ -34,7 +34,7 @@ import java.sql.Timestamp;
 @Slf4j
 public final class OscillationUpdater {
 
-    @Autowired
+    @Inject
     OscillationProperties oscillationProperties = new OscillationProperties();
 
     /**

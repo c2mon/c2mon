@@ -9,8 +9,8 @@ import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.daq.config.Change;
 import cern.c2mon.shared.daq.config.DataTagUpdate;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.inject.Inject;
 import java.util.Properties;
 
 import static cern.c2mon.shared.common.type.TypeConverter.getType;
@@ -21,7 +21,7 @@ import static cern.c2mon.shared.common.type.TypeConverter.getType;
 @Slf4j
 public class DataTagCacheObjectFactory extends TagCacheObjectFactory<DataTag> {
 
-  @Autowired
+  @Inject
   public DataTagCacheObjectFactory(C2monCache<DataTag> dataTagCacheRef,
                                    BaseEquipmentServiceImpl coreAbstractEquipmentService) {
     super(dataTagCacheRef, coreAbstractEquipmentService);

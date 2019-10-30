@@ -26,8 +26,9 @@ import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import javax.inject.Inject;
 
 /**
  * Helper bean for adding the supervision status to
@@ -47,7 +48,7 @@ public class SupervisionAppenderImpl implements SupervisionAppender {
   private EquipmentService equipmentService;
   private C2monCache<Equipment> equipmentCacheRef;
 
-  @Autowired
+  @Inject
   public SupervisionAppenderImpl(ProcessService processService, EquipmentService equipmentService) {
     this.processService = processService;
     this.equipmentService = equipmentService;

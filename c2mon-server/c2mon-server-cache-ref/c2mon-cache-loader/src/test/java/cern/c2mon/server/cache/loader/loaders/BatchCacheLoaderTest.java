@@ -10,11 +10,12 @@ import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.config.CommonModule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
+
+import javax.inject.Inject;
 
 import static org.junit.Assert.assertNotNull;
 
@@ -31,13 +32,13 @@ public class BatchCacheLoaderTest {
 
   private C2monCache<Alarm> alarmCacheRef;
 
-  @Autowired
+  @Inject
   private ThreadPoolTaskExecutor cacheLoaderTaskExecutor;
 
-  @Autowired
+  @Inject
   private AlarmLoaderDAO alarmLoaderDAO;
 
-  @Autowired
+  @Inject
   private CacheLoaderProperties properties;
 
   private BatchCacheLoader<Alarm> batchCacheLoader;

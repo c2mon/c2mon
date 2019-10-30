@@ -6,8 +6,8 @@ import cern.c2mon.server.cache.dbaccess.DataTagMapper;
 import cern.c2mon.server.cache.dbaccess.LoaderMapper;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
-import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
 
@@ -18,10 +18,10 @@ import static org.junit.Assert.assertEquals;
  */
 public class DataTagCacheLoaderTest extends AbstractCacheLoaderTest<DataTag> {
 
-  @Autowired
+  @Inject
   private C2monCache<DataTag> dataTagCacheRef;
 
-  @Autowired
+  @Inject
   private DataTagMapper dataTagMapper;
 
   @Override

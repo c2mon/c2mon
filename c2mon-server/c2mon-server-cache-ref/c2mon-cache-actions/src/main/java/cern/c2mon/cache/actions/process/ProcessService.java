@@ -14,9 +14,9 @@ import cern.c2mon.server.common.process.ProcessCacheObject;
 import cern.c2mon.shared.common.supervision.SupervisionConstants;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.inject.Inject;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.*;
@@ -47,7 +47,7 @@ public class ProcessService implements ProcessOperationService, SupervisedServic
   private SubEquipmentService subEquipmentService;
   private ServerProperties properties;
 
-  @Autowired
+  @Inject
   public ProcessService(C2monCache<Process> processCacheRef, EquipmentService equipmentService,
                         AliveTimerService aliveTimerService, SubEquipmentService subEquipmentService, ServerProperties properties) {
     this.processCacheRef = processCacheRef;

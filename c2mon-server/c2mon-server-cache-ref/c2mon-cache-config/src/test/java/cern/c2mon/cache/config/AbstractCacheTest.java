@@ -10,9 +10,10 @@ import cern.c2mon.shared.common.Cacheable;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import javax.inject.Inject;
 
 import static org.junit.Assert.assertEquals;
 
@@ -36,7 +37,7 @@ public abstract class AbstractCacheTest<V extends Cacheable> {
   protected abstract V getSample();
 
   @Rule
-  @Autowired
+  @Inject
   public CachePopulationRule cachePopulationRule;
 
   protected C2monCache<V> cache;

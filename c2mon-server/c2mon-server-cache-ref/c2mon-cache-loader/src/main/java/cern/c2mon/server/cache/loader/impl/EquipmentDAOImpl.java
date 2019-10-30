@@ -16,15 +16,15 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.loader.impl;
 
-import cern.c2mon.server.cache.loader.CacheLoaderName;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import cern.c2mon.server.cache.dbaccess.EquipmentMapper;
+import cern.c2mon.server.cache.loader.CacheLoaderName;
 import cern.c2mon.server.cache.loader.EquipmentDAO;
 import cern.c2mon.server.cache.loader.common.AbstractDefaultLoaderDAO;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.equipment.EquipmentCacheObject;
+import org.springframework.stereotype.Service;
+
+import javax.inject.Inject;
 
 /**
  * Equipment DAO implementation.
@@ -36,7 +36,7 @@ public class EquipmentDAOImpl extends AbstractDefaultLoaderDAO<Equipment> implem
 
   private EquipmentMapper equipmentMapper;
 
-  @Autowired
+  @Inject
   public EquipmentDAOImpl(EquipmentMapper equipmentMapper) {
     super(550, equipmentMapper);
     this.equipmentMapper = equipmentMapper;

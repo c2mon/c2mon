@@ -16,17 +16,17 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.loader.impl;
 
-import cern.c2mon.server.cache.loader.CacheLoaderName;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import cern.c2mon.server.cache.dbaccess.DeviceClassMapper;
+import cern.c2mon.server.cache.loader.CacheLoaderName;
 import cern.c2mon.server.cache.loader.DeviceClassDAO;
 import cern.c2mon.server.cache.loader.common.AbstractDefaultLoaderDAO;
 import cern.c2mon.server.common.device.Command;
 import cern.c2mon.server.common.device.DeviceClass;
 import cern.c2mon.server.common.device.DeviceClassCacheObject;
 import cern.c2mon.server.common.device.Property;
+import org.springframework.stereotype.Service;
+
+import javax.inject.Inject;
 
 /**
  * DeviceClass loader DAO implementation.
@@ -41,7 +41,7 @@ public class DeviceClassDAOImpl extends AbstractDefaultLoaderDAO<DeviceClass> im
    */
   private DeviceClassMapper deviceClassMapper;
 
-  @Autowired
+  @Inject
   public DeviceClassDAOImpl(final DeviceClassMapper deviceClassMapper) {
     super(2000, deviceClassMapper);
     this.deviceClassMapper = deviceClassMapper;

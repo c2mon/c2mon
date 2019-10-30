@@ -25,12 +25,12 @@ import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.tag.Tag;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
+import javax.inject.Inject;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Timer;
@@ -96,7 +96,7 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
    * @param alarmCacheUpdater
    * @param dataTagCacheRef         the data tag cache to retrieve data tag objects and check their original values.
    */
-  @Autowired
+  @Inject
   public OscillationUpdateChecker(final C2monCache<Alarm> alarmCacheRef, final OscillationService oscillationCheckService,
                                   final OscillationUpdater oscillationUpdater, final AlarmCacheUpdater alarmCacheUpdater,
                                   final C2monCache<DataTag> dataTagCacheRef) {

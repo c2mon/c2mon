@@ -4,11 +4,12 @@ import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.config.AbstractCacheCRUDTest;
 import cern.c2mon.server.common.alarm.OscillationTimestamp;
 import org.junit.Before;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.inject.Inject;
 
 public class OscillationCacheCRUDTest extends AbstractCacheCRUDTest<OscillationTimestamp> {
 
-  @Autowired
+  @Inject
   private C2monCache<OscillationTimestamp> oscillationTimestampCache;
 
   /**

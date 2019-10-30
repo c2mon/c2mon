@@ -21,7 +21,7 @@ public class DeviceCacheObjectFactory extends AbstractCacheObjectFactory<Device>
 
   private C2monCache<DeviceClass> deviceClassCacheRef;
 
-//  @Autowired
+//  @Inject
 //  public DeviceCacheObjectFactory(C2monCache<Long, DeviceClass> deviceClassCacheRef) {
 //    this.deviceClassCacheRef = deviceClassCacheRef;
 //  }

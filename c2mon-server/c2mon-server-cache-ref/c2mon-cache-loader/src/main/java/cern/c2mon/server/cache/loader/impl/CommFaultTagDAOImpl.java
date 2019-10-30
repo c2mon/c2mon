@@ -16,14 +16,14 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.loader.impl;
 
-import cern.c2mon.server.cache.loader.CacheLoaderName;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import cern.c2mon.server.cache.dbaccess.CommFaultTagMapper;
+import cern.c2mon.server.cache.loader.CacheLoaderName;
 import cern.c2mon.server.cache.loader.CommFaultTagDAO;
 import cern.c2mon.server.cache.loader.common.AbstractDefaultLoaderDAO;
 import cern.c2mon.server.common.commfault.CommFaultTag;
+import org.springframework.stereotype.Service;
+
+import javax.inject.Inject;
 
 /**
  * CommfaultTag DAO.
@@ -38,7 +38,7 @@ public class CommFaultTagDAOImpl extends AbstractDefaultLoaderDAO<CommFaultTag> 
    */
   private CommFaultTagMapper commFaultTagMapper;
 
-  @Autowired
+  @Inject
   public CommFaultTagDAOImpl(CommFaultTagMapper commFaultTagMapper) {
     super(1000, commFaultTagMapper); //initial buffer size
     this.commFaultTagMapper = commFaultTagMapper;

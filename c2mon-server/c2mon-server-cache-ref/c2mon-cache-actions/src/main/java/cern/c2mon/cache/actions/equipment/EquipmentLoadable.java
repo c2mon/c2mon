@@ -20,7 +20,7 @@ public class EquipmentLoadable implements DbLoadable<Equipment> {
 
   private C2monCache<ControlTag> controlTagCacheRef;
 
-//  @Autowired
+//  @Inject
 //  public EquipmentLoadable(C2monCache<Long, Equipment> equipmentCacheRef, C2monCache<Long, ControlTag> controlTagCacheRef) {
 //    this.equipmentCacheRef = equipmentCacheRef;
 //    this.controlTagCacheRef = controlTagCacheRef;

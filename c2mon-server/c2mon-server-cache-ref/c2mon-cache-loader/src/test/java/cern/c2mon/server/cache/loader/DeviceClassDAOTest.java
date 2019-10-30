@@ -16,22 +16,21 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.loader;
 
-import java.util.List;
-
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import cern.c2mon.server.cache.loader.config.CacheLoaderModuleRef;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
+import cern.c2mon.server.cache.loader.config.CacheLoaderModuleRef;
 import cern.c2mon.server.common.config.CommonModule;
 import cern.c2mon.server.common.device.DeviceClass;
 import cern.c2mon.server.common.device.DeviceClassCacheObject;
 import cern.c2mon.server.test.DatabasePopulationRule;
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import javax.inject.Inject;
+import java.util.List;
 
 import static org.junit.Assert.assertNotNull;
 
@@ -48,13 +47,13 @@ import static org.junit.Assert.assertNotNull;
 public class DeviceClassDAOTest {
 
   @Rule
-  @Autowired
+  @Inject
   public DatabasePopulationRule databasePopulationRule;
 
   /**
    * Component to test
    */
-  @Autowired
+  @Inject
   DeviceClassDAO deviceClassDAO;
 
   @Test

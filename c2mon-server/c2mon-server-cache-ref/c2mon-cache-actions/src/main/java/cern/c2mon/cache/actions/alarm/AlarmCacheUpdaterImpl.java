@@ -25,9 +25,9 @@ import cern.c2mon.server.common.tag.Tag;
 import lombok.AccessLevel;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.inject.Inject;
 import java.sql.Timestamp;
 
 /**
@@ -40,11 +40,11 @@ import java.sql.Timestamp;
 @Slf4j
 public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
 
-  @Autowired
+  @Inject
   @Setter(AccessLevel.PROTECTED)
   private C2monCache<Alarm> alarmCache;
 
-  @Autowired
+  @Inject
   @Setter(AccessLevel.PROTECTED)
   OscillationUpdater oscillationUpdater;
 

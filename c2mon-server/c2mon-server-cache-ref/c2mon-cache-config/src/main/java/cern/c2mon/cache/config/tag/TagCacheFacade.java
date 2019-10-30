@@ -7,7 +7,6 @@ import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.tag.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.cache.Cache;
@@ -18,6 +17,7 @@ import javax.cache.integration.CompletionListener;
 import javax.cache.processor.EntryProcessor;
 import javax.cache.processor.EntryProcessorException;
 import javax.cache.processor.EntryProcessorResult;
+import javax.inject.Inject;
 import java.util.*;
 
 /**
@@ -38,7 +38,7 @@ public class TagCacheFacade implements Cache<Long, Tag> {
   private C2monCache<DataTag> dataTagCache;
   private C2monCache<RuleTag> ruleTagCache;
 
-  @Autowired
+  @Inject
   public TagCacheFacade(final C2monCache<RuleTag> ruleTagCache, final C2monCache<ControlTag> controlTagCache, final C2monCache<DataTag> dataTagCache) {
     this.ruleTagCache = ruleTagCache;
     this.dataTagCache = dataTagCache;

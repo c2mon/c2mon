@@ -5,8 +5,8 @@ import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.inject.Inject;
 import java.util.Collection;
 
 import static org.junit.Assert.assertEquals;
@@ -18,7 +18,7 @@ import static org.junit.Assert.assertNotNull;
  */
 public class AlarmQueryTest extends AbstractCacheTest<Alarm> {
 
-  @Autowired
+  @Inject
   private C2monCache<Alarm> alarmCacheRef;
 
   @Test

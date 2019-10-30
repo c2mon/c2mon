@@ -5,8 +5,9 @@ import cern.c2mon.server.common.commfault.CommFaultTag;
 import cern.c2mon.server.common.commfault.CommFaultTagCacheObject;
 import cern.c2mon.server.common.equipment.AbstractEquipment;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import javax.inject.Inject;
 
 /**
  * @author Szymon Halastra
@@ -17,7 +18,7 @@ public class CommFaultService {
 
   private C2monCache<CommFaultTag> commFaultTagCacheRef;
 
-  @Autowired
+  @Inject
   public CommFaultService(final C2monCache<CommFaultTag> commFaultTagCacheRef) {
     this.commFaultTagCacheRef = commFaultTagCacheRef;
   }

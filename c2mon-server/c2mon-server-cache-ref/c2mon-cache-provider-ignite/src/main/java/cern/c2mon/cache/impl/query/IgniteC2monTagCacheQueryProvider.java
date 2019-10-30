@@ -7,8 +7,8 @@ import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.TagWithAlarms;
 import cern.c2mon.server.common.alarm.TagWithAlarmsImpl;
 import cern.c2mon.server.common.tag.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -19,7 +19,7 @@ public class IgniteC2monTagCacheQueryProvider implements C2monTagCacheQueryProvi
   private final IgniteC2monCache<Alarm> alarmCache;
   private final IgniteC2monCache<Tag> tagCache;
 
-  @Autowired
+  @Inject
   public IgniteC2monTagCacheQueryProvider(final C2monCache<Alarm> alarmCache, final C2monCache<Tag> tagCache) {
     this.alarmCache = (IgniteC2monCache<Alarm>) alarmCache;
     this.tagCache = (IgniteC2monCache<Tag>) tagCache;

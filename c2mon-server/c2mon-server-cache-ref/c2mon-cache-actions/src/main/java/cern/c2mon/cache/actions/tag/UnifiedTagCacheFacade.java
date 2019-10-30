@@ -8,9 +8,9 @@ import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.common.CacheEvent;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.inject.Inject;
 import java.util.Arrays;
 import java.util.List;
 
@@ -19,7 +19,7 @@ public class UnifiedTagCacheFacade implements CacheListenerManager<Tag> {
 
   private final List<C2monCache<? extends Tag>> tagCaches;
 
-  @Autowired
+  @Inject
   public UnifiedTagCacheFacade(final C2monCache<RuleTag> ruleTagCacheRef, final C2monCache<ControlTag> controlTagCacheRef,
                                final C2monCache<DataTag> dataTagCacheRef) {
     tagCaches = Arrays.asList(ruleTagCacheRef, dataTagCacheRef, controlTagCacheRef);

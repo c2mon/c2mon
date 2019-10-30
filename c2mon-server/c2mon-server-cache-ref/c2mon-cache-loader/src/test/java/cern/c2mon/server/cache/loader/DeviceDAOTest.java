@@ -16,18 +16,18 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.loader;
 
+import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
+import cern.c2mon.server.cache.loader.config.CacheLoaderModuleRef;
+import cern.c2mon.server.common.config.CommonModule;
+import cern.c2mon.server.test.DatabasePopulationRule;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import cern.c2mon.server.cache.loader.config.CacheLoaderModuleRef;
-import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
-import cern.c2mon.server.common.config.CommonModule;
-import cern.c2mon.server.test.DatabasePopulationRule;
+import javax.inject.Inject;
 
 /**
  * @author Justin Lewis Salmon
@@ -42,13 +42,13 @@ import cern.c2mon.server.test.DatabasePopulationRule;
 public class DeviceDAOTest {
 
   @Rule
-  @Autowired
+  @Inject
   public DatabasePopulationRule databasePopulationRule;
 
   /**
    * Component to test
    */
-  @Autowired
+  @Inject
   DeviceDAO deviceDAO;
 
   @Test

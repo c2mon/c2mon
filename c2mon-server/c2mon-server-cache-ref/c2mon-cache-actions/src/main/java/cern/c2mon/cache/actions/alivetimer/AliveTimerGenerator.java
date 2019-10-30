@@ -16,7 +16,7 @@ public class AliveTimerGenerator {
 
   private C2monCache<AliveTimer> aliveTimerCacheRef;
 
-//  @Autowired
+//  @Inject
 //  public AliveTimerGenerator(final C2monCache<Long, AliveTimer> aliveTimerCacheRef) {
 //    this.aliveTimerCacheRef = aliveTimerCacheRef;
 //  }

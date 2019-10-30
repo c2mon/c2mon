@@ -5,8 +5,9 @@ import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.tag.AbstractTagCacheObject;
 import cern.c2mon.server.common.tag.Tag;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import javax.inject.Inject;
 
 /**
  * @author Szymon Halastra
@@ -17,7 +18,7 @@ public class RuleDependencyService {
 
   private C2monCache<RuleTag> tagCacheRef;
 
-  @Autowired
+  @Inject
   public RuleDependencyService(final C2monCache<RuleTag> tagCacheRef) {
     this.tagCacheRef = tagCacheRef;
   }

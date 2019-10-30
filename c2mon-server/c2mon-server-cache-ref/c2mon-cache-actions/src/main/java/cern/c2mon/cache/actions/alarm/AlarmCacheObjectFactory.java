@@ -6,9 +6,9 @@ import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.AlarmCondition;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.daq.config.Change;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.inject.Inject;
 import java.sql.Timestamp;
 import java.util.Properties;
 
@@ -23,7 +23,7 @@ public class AlarmCacheObjectFactory extends AbstractCacheObjectFactory<Alarm> {
 
   private AlarmService alarmService;
 
-  @Autowired
+  @Inject
   public AlarmCacheObjectFactory(AlarmService alarmService) {
     this.alarmService = alarmService;
   }

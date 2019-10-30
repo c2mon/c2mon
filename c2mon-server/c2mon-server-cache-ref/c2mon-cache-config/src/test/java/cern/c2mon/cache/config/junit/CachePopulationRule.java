@@ -1,11 +1,11 @@
 package cern.c2mon.cache.config.junit;
 
 import org.junit.rules.ExternalResource;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 
+import javax.inject.Inject;
 import javax.sql.DataSource;
 
 /**
@@ -16,7 +16,7 @@ import javax.sql.DataSource;
  */
 public class CachePopulationRule extends ExternalResource {
 
-  @Autowired
+  @Inject
   private DataSource cacheDataSource;
 
   @Override

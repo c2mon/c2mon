@@ -6,8 +6,8 @@ import cern.c2mon.server.cache.dbaccess.LoaderMapper;
 import cern.c2mon.server.cache.dbaccess.RuleTagMapper;
 import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.rule.RuleTagCacheObject;
-import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
 
@@ -18,10 +18,10 @@ import static org.junit.Assert.assertEquals;
  */
 public class RuleCacheLoaderTest extends AbstractCacheLoaderTest<RuleTag> {
 
-  @Autowired
+  @Inject
   private C2monCache<RuleTag> ruleTagCacheRef;
 
-  @Autowired
+  @Inject
   private RuleTagMapper ruleTagMapper;
 
   @Override

@@ -3,9 +3,9 @@ package cern.c2mon.cache.actions.deviceclass;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.device.DeviceClass;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +18,7 @@ public class DeviceClassService {
 
   private C2monCache<DeviceClass> deviceClassCacheRef;
 
-  @Autowired
+  @Inject
   public DeviceClassService(C2monCache<DeviceClass> deviceClassCacheRef) {
     this.deviceClassCacheRef = deviceClassCacheRef;
   }

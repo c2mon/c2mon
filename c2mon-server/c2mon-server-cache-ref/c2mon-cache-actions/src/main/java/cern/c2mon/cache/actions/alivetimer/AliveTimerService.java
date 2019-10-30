@@ -6,8 +6,9 @@ import cern.c2mon.server.common.alive.AliveTimer;
 import cern.c2mon.server.common.alive.AliveTimerCacheObject;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import javax.inject.Inject;
 
 /**
  * Manages operations on {@link AliveTimerCacheObject}s
@@ -22,7 +23,7 @@ public class AliveTimerService {
 
   private C2monCache<AliveTimer> aliveTimerCacheRef;
 
-  @Autowired
+  @Inject
   public AliveTimerService(C2monCache<AliveTimer> aliveTimerCacheRef) {
     this.aliveTimerCacheRef = aliveTimerCacheRef;
   }

@@ -23,8 +23,9 @@ import cern.c2mon.server.cache.loader.ControlTagLoaderDAO;
 import cern.c2mon.server.cache.loader.common.AbstractDefaultLoaderDAO;
 import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.control.ControlTagCacheObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import javax.inject.Inject;
 
 /**
  * ControlTag loader DAO.
@@ -38,7 +39,7 @@ public class ControlTagLoaderDAOImpl extends AbstractDefaultLoaderDAO<ControlTag
 
   private DataTagMapper dataTagMapper;
 
-  @Autowired
+  @Inject
   public ControlTagLoaderDAOImpl(DataTagMapper dataTagMapper, ControlTagMapper controlTagMapper) {
     super(10000, controlTagMapper);
     this.controlTagMapper = controlTagMapper;

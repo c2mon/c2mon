@@ -5,14 +5,15 @@ import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
 import lombok.Getter;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.inject.Inject;
 
 public class SubEquipmentSupervisedServiceTest extends SupervisedServiceTest<SubEquipment> {
 
-  @Autowired
+  @Inject
   private C2monCache<SubEquipment> equipmentCacheRef;
 
-  @Autowired
+  @Inject
   @Getter
   private SubEquipmentService supervisedService;
 

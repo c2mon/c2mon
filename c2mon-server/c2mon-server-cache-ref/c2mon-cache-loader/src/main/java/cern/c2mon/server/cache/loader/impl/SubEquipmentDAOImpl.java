@@ -25,10 +25,10 @@ import cern.c2mon.server.common.exception.SubEquipmentException;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
+import javax.inject.Inject;
 import java.util.List;
 
 /**
@@ -50,7 +50,7 @@ public class SubEquipmentDAOImpl extends AbstractDefaultLoaderDAO<SubEquipment> 
    * dependency of {@link SubEquipmentMapper}! This is due to Batis 'extends' relationship in the
    * resultMap. Check out SubEquipmentMapper.xml for more
    */
-  @Autowired
+  @Inject
   public SubEquipmentDAOImpl(EquipmentMapper equipmentMapper, SubEquipmentMapper subEquipmentMapper) {
     super(500, subEquipmentMapper);
     this.subEquipmentMapper = subEquipmentMapper;

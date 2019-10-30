@@ -17,11 +17,11 @@
 
 package cern.c2mon.server.cache.loader.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import cern.c2mon.server.cache.dbaccess.SequenceMapper;
 import cern.c2mon.server.cache.loader.SequenceDAO;
+import org.springframework.stereotype.Service;
+
+import javax.inject.Inject;
 
 /**
  * @author Franz Ritter
@@ -32,7 +32,7 @@ public class SequenceDAOImpl implements SequenceDAO {
 
   private SequenceMapper sequenceMapper;
 
-  @Autowired
+  @Inject
   public SequenceDAOImpl(SequenceMapper sequenceMapper) {
     this.sequenceMapper = sequenceMapper;
   }

@@ -16,14 +16,14 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.loader.impl;
 
-import cern.c2mon.server.cache.loader.CacheLoaderName;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import cern.c2mon.server.cache.dbaccess.AliveTimerMapper;
 import cern.c2mon.server.cache.loader.AliveTimerDAO;
+import cern.c2mon.server.cache.loader.CacheLoaderName;
 import cern.c2mon.server.cache.loader.common.AbstractDefaultLoaderDAO;
 import cern.c2mon.server.common.alive.AliveTimer;
+import org.springframework.stereotype.Service;
+
+import javax.inject.Inject;
 
 /**
  * DAO for AliveTimer cache loading.
@@ -38,7 +38,7 @@ public class AliveTimerDAOImpl extends AbstractDefaultLoaderDAO<AliveTimer> impl
    */
   private AliveTimerMapper aliveTimerMapper;
 
-  @Autowired
+  @Inject
   public AliveTimerDAOImpl(AliveTimerMapper aliveTimerMapper) {
     super(1000, aliveTimerMapper);
     this.aliveTimerMapper = aliveTimerMapper;

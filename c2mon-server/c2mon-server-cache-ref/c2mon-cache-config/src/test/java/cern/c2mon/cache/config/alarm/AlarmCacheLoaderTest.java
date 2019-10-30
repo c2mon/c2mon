@@ -6,8 +6,8 @@ import cern.c2mon.server.cache.dbaccess.AlarmMapper;
 import cern.c2mon.server.cache.dbaccess.LoaderMapper;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
-import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
 
@@ -19,9 +19,9 @@ import static org.junit.Assert.assertEquals;
  */
 public class AlarmCacheLoaderTest extends AbstractCacheLoaderTest<Alarm> {
 
-  @Autowired
+  @Inject
   protected AlarmMapper alarmMapper;
-  @Autowired
+  @Inject
   private C2monCache<Alarm> alarmCacheRef;
 
   @Override

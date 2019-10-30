@@ -30,7 +30,7 @@ public class CommandCacheObjectFactory extends AbstractCacheObjectFactory<Comman
 
   private C2monCache<Equipment> equipmentCacheRef;
 
-//  @Autowired
+//  @Inject
 //  public CommandCacheObjectFactory(C2monCache<Long, Equipment> equipmentCacheRef) {
 //    this.equipmentCacheRef = equipmentCacheRef;
 //  }

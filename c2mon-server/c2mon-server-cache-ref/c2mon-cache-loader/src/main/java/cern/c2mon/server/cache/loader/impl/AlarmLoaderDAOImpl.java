@@ -16,15 +16,15 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.loader.impl;
 
-import cern.c2mon.server.cache.loader.CacheLoaderName;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import cern.c2mon.server.cache.dbaccess.AlarmMapper;
 import cern.c2mon.server.cache.loader.AlarmLoaderDAO;
+import cern.c2mon.server.cache.loader.CacheLoaderName;
 import cern.c2mon.server.cache.loader.common.AbstractBatchLoaderDAO;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
+import org.springframework.stereotype.Service;
+
+import javax.inject.Inject;
 
 /**
  * The DAO for loading Alarms into the cache from the database.
@@ -39,7 +39,7 @@ public class AlarmLoaderDAOImpl extends AbstractBatchLoaderDAO<Long, Alarm> impl
    */
   private AlarmMapper alarmMapper;
 
-  @Autowired
+  @Inject
   public AlarmLoaderDAOImpl(AlarmMapper alarmMapper) {
     super(alarmMapper);
     this.alarmMapper = alarmMapper;
