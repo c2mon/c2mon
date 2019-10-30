@@ -96,6 +96,7 @@ public interface C2monCache<V extends Cacheable> extends CacheDelegator<V>, Seri
    *
    * @param filter must not be null, the function to filter elements by
    * @return a {@code Collection} of results, may be empty, never null
+   * @throws NullPointerException when {@code filter} is null
    */
   Collection<V> query(@NonNull Function<V, Boolean> filter) throws NullPointerException;
 
@@ -104,6 +105,7 @@ public interface C2monCache<V extends Cacheable> extends CacheDelegator<V>, Seri
    *
    * @param providedQuery must not be null, a CacheQuery to execute on the cache
    * @return a {@code Collection} of results, may be empty, never null
+   * @throws NullPointerException when {@code providedQuery} is null
    * @see C2monCache#query(Function)
    */
   Collection<V> query(@NonNull CacheQuery<V> providedQuery) throws NullPointerException;
@@ -115,6 +117,7 @@ public interface C2monCache<V extends Cacheable> extends CacheDelegator<V>, Seri
    *
    * @param key
    * @param value
+   * @throws NullPointerException when {@code value} is null
    */
   default void putQuiet(long key, @NonNull V value) throws NullPointerException {
     put(key, value, false);
@@ -143,6 +146,7 @@ public interface C2monCache<V extends Cacheable> extends CacheDelegator<V>, Seri
 
   /**
    * @throws CacheElementNotFoundException when no value was found mapped to this key
+   * @throws NullPointerException when {@code key} is null
    */
   @Override
   default V get(@NonNull Long key) throws NullPointerException, CacheElementNotFoundException {
@@ -160,7 +164,7 @@ public interface C2monCache<V extends Cacheable> extends CacheDelegator<V>, Seri
    *
    * @param key
    * @param value
-   * @see C2monCache#putQuiet(Long, Cacheable) to put without notifying
+   * @see C2monCache#putQuiet(long, Cacheable) to put without notifying
    */
   @Override
   default void put(@NonNull Long key, @NonNull V value) throws NullPointerException {

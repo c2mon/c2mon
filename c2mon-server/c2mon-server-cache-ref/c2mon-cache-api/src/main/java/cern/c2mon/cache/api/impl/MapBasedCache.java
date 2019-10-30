@@ -55,8 +55,9 @@ public class MapBasedCache<V extends Cacheable> implements Cache<Long, V> {
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   public void put(Long key, V value) {
-    map.put(key, value);
+    map.put(key, (V) value.clone());
   }
 
   @Override
