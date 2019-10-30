@@ -5,15 +5,13 @@ import cern.c2mon.cache.api.impl.SimpleC2monCache;
 import cern.c2mon.server.common.alive.AliveTimer;
 import cern.c2mon.server.common.alive.AliveTimerCacheObject;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Szymon Halastra
@@ -27,11 +25,10 @@ public class AliveTimerServiceTest {
   @Before
   public void init() {
     aliveTimerCacheRef = new SimpleC2monCache<>("alive-timer-cache");
-//    aliveTimerService = new AliveTimerService(aliveTimerCacheRef);
+    aliveTimerService = new AliveTimerService(aliveTimerCacheRef);
   }
 
   @Test
-  @Ignore
   public void startAliveTimer() {
     AliveTimer aliveTimer = new AliveTimerCacheObject(1L);
     aliveTimer.setActive(false);
@@ -49,7 +46,6 @@ public class AliveTimerServiceTest {
   }
 
   @Test
-  @Ignore
   public void startTest() {
     AliveTimer aliveTimer = new AliveTimerCacheObject(1L);
     aliveTimer.setActive(false);
@@ -63,8 +59,7 @@ public class AliveTimerServiceTest {
   }
 
   @Test
-  @Ignore
-  public void updateAliveTimer() throws InterruptedException {
+  public void startForcedAliveTimer() throws InterruptedException {
     AliveTimer aliveTimer = new AliveTimerCacheObject(1L);
     aliveTimer.setActive(true);
 
@@ -76,49 +71,45 @@ public class AliveTimerServiceTest {
 
     Thread.sleep(100);
 
-    aliveTimerService.update(1L);
+    aliveTimerService.startOrUpdateTimestamp(1L);
 
     assertTrue("Test if AliveTimer is active", aliveTimerCacheRef.get(1L).isActive());
     assertTrue("Test if AliveTimer is updated", aliveTimerCacheRef.get(1L).getLastUpdate() != firstUpdate);
   }
 
   @Test
-  @Ignore
   public void checkExpiredAliveTimer() throws InterruptedException {
     AliveTimer aliveTimer = new AliveTimerCacheObject(1L, 2L, "test", 0L, AliveTimer.ALIVE_TYPE_EQUIPMENT, 20);
     aliveTimer.setActive(true);
 
     aliveTimerCacheRef.put(aliveTimer.getId(), aliveTimer);
 
-    aliveTimerService.update(aliveTimer.getId());
+    aliveTimerService.startOrUpdateTimestamp(aliveTimer.getId());
 
-    Thread.sleep(1000);
+    Thread.sleep(70L);
 
     boolean hasExpired = aliveTimerService.hasExpired(aliveTimer.getId());
 
     assertTrue("Test if AliveTimer is expired", hasExpired);
   }
 
-  //TODO: Even if this test works fine locally, it should be fixed to pass a remote testing on gitlab,
-  //TODO: then SuppressWarning can be removed
   @Test
-  @Ignore
-  @SuppressWarnings("Test failling only during execution on gitlab, locally works correctly")
-  public void checkActiveAliveTimer() {
+  public void checkActiveAliveTimer() throws InterruptedException {
     AliveTimer aliveTimer = new AliveTimerCacheObject(1L, 2L, "test", 0L, AliveTimer.ALIVE_TYPE_EQUIPMENT, 0);
     aliveTimer.setActive(true);
 
     aliveTimerCacheRef.put(aliveTimer.getId(), aliveTimer);
 
-    aliveTimerService.update(aliveTimer.getId());
+    aliveTimerService.startOrUpdateTimestamp(aliveTimer.getId());
+
+    Thread.sleep(10L);
 
     boolean hasExpired = aliveTimerService.hasExpired(aliveTimer.getId());
 
-    assertTrue("Test if AliveTimer is not expired", hasExpired);
+    assertTrue("AliveTimer should be expired after 0 seconds", hasExpired);
   }
 
   @Test
-  @Ignore
   public void stopAliveTimer() {
     AliveTimer aliveTimer = new AliveTimerCacheObject(1L);
     aliveTimer.setActive(true);
@@ -132,7 +123,6 @@ public class AliveTimerServiceTest {
   }
 
   @Test
-  @Ignore
   public void startAllAliveTimers() {
     int size = 10;
     Map<Long, AliveTimer> aliveTimers = new HashMap<>(size);
@@ -144,7 +134,7 @@ public class AliveTimerServiceTest {
 
     aliveTimerCacheRef.putAll(aliveTimers);
 
-    aliveTimerService.startAllTimers();
+    aliveTimerService.startAllInactiveTimers();
 
     Map<Long, AliveTimer> startedAliveTimers = aliveTimerCacheRef.getAll(aliveTimers.keySet());
 
@@ -154,12 +144,11 @@ public class AliveTimerServiceTest {
     List<Long> actualLastUpdates = startedAliveTimers.values().stream().map(AliveTimer::getLastUpdate).collect(Collectors.toList());
     List<Long> expectedZeros = new ArrayList<>(Collections.nCopies(size, 0L));
 
-    assertTrue("All AliveTimers should have active status", expectedTrue.equals(actualActive));
-    assertFalse("All AliveTimers should have last updated different than 0", expectedZeros.equals(actualLastUpdates));
+    assertEquals("All AliveTimers should have active status", expectedTrue, actualActive);
+    assertNotEquals("All AliveTimers should have last updated different than 0", expectedZeros, actualLastUpdates);
   }
 
   @Test
-  @Ignore
   public void stopAllAliveTimers() {
     int size = 10;
     Map<Long, AliveTimer> aliveTimers = new HashMap<>(size);
@@ -171,7 +160,7 @@ public class AliveTimerServiceTest {
     });
 
     aliveTimerCacheRef.putAll(aliveTimers);
-    aliveTimerService.stopAllTimers();
+    aliveTimerService.stopAllActiveTimers();
 
     Map<Long, AliveTimer> stoppedAliveTimers = aliveTimerCacheRef.getAll(aliveTimers.keySet());
     List<Boolean> actualNotActive = stoppedAliveTimers.values().stream().map(AliveTimer::isActive).collect(Collectors.toList());
@@ -180,7 +169,13 @@ public class AliveTimerServiceTest {
     List<Long> actualLastUpdates = stoppedAliveTimers.values().stream().map(AliveTimer::getLastUpdate).collect(Collectors.toList());
     List<Long> expectedZeros = new ArrayList<>(Collections.nCopies(size, 0L));
 
-    assertTrue("All AliveTimers should have active status", expectedFalse.equals(actualNotActive));
-    assertFalse("All AliveTimers should have last updated different than 0", expectedZeros.equals(actualLastUpdates));
+    assertEquals("All AliveTimers should have active status", expectedFalse, actualNotActive);
+    assertNotEquals("All AliveTimers should have last updated different than 0", expectedZeros, actualLastUpdates);
+  }
+
+  @Test
+  public void aliveTimerOpsAreSideeffects() {
+    // Test to make sure stuff like the peek, works properly for the current code
+
   }
 }
