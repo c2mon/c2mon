@@ -15,7 +15,6 @@ import cern.c2mon.server.test.CacheObjectCreation;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.sql.Timestamp;
@@ -41,7 +40,7 @@ public class AlarmServiceTest {
     dataTagCache = new SimpleC2monCache<>("data");
     TagCacheFacade tagCacheFacade = new TagCacheFacade(ruleTagCache, controlTagCache, dataTagCache);
     UnifiedTagCacheFacade unifiedTagCacheFacade = new UnifiedTagCacheFacade(ruleTagCache, controlTagCache, dataTagCache);
-    AlarmCacheUpdaterImpl alarmCacheUpdater = new AlarmCacheUpdaterImpl();
+    AlarmCacheObjectController alarmCacheUpdater = new AlarmCacheObjectController();
     alarmCacheUpdater.setOscillationUpdater(new OscillationUpdater());
     alarmCacheUpdater.setAlarmCache(alarmCache);
     alarmService = new AlarmService(alarmCache, tagCacheFacade, alarmCacheUpdater, unifiedTagCacheFacade);
@@ -62,6 +61,21 @@ public class AlarmServiceTest {
     alarmService.evaluateAlarm(alarm.getId());
 
     assertTrue("Alarm should have the same state as before evaluation", alarm.isActive());
+  }
+
+  @Test
+  public void updateReturnsDifferentObject() {
+    AlarmCacheObject alarm = CacheObjectCreation.createTestAlarm1();
+    DataTagCacheObject dataTag = CacheObjectCreation.createTestDataTag3();
+    dataTag.setDataTagQuality(new DataTagQualityImpl(TagQualityStatus.UNKNOWN_REASON));
+
+    dataTagCache.put(dataTag.getId(), dataTag);
+    alarmCache.put(alarm.getId(), alarm);
+
+    Alarm afterCache = alarmService.update(alarm.getId(), dataTag);
+
+    assertEquals(alarm, afterCache);
+    assertNotSame(alarm, afterCache);
   }
 
   @Test
@@ -117,7 +131,6 @@ public class AlarmServiceTest {
    * way to determine which tag event triggered which alarm evaluation.
    */
   @Test
-  @Ignore
   public void testUpdateTimestampIsSetToTagCacheTimestamp() {
     Timestamp tagTime = new Timestamp(System.currentTimeMillis() - 1000);
 
@@ -149,7 +162,6 @@ public class AlarmServiceTest {
    * @throws InterruptedException
    */
   @Test
-  @Ignore
   public void testUpdateFiltered() throws InterruptedException {
     Timestamp tagTime = new Timestamp(System.currentTimeMillis());
 

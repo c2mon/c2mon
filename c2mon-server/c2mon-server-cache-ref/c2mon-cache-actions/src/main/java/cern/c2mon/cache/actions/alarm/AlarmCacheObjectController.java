@@ -20,8 +20,8 @@ import cern.c2mon.cache.actions.oscillation.OscillationUpdater;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
-import cern.c2mon.server.common.alarm.AlarmCacheObjectController;
 import cern.c2mon.server.common.tag.Tag;
+import cern.c2mon.shared.common.datatag.DataTagConstants;
 import lombok.AccessLevel;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +38,7 @@ import java.sql.Timestamp;
  */
 @Service
 @Slf4j
-public final class AlarmCacheUpdaterImpl implements AlarmCacheObjectController {
+public final class AlarmCacheObjectController {
 
   @Inject
   @Setter(AccessLevel.PROTECTED)
@@ -48,12 +48,53 @@ public final class AlarmCacheUpdaterImpl implements AlarmCacheObjectController {
   @Setter(AccessLevel.PROTECTED)
   OscillationUpdater oscillationUpdater;
 
+  public static String evaluateAdditionalInfo(final Alarm alarm, final Tag tag){
+    String additionalInfo = "";
+
+    if (tag != null) {
+      switch (tag.getMode()) {
+      case DataTagConstants.MODE_MAINTENANCE:
+        if (tag.isValid()) {
+          additionalInfo = "[M]";
+        } else {
+          additionalInfo = "[M][?]";
+        }
+        break;
+      case DataTagConstants.MODE_TEST:
+        if (tag.isValid()) {
+          additionalInfo = "[T]";
+        } else {
+          additionalInfo = "[T][?]";
+        }
+        break;
+      default:
+        if (tag.isValid()) {
+          additionalInfo = "";
+        } else {
+          additionalInfo = "[?]";
+        }
+      }
+    }
+
+    if (alarm != null && alarm.isOscillating()) {
+      additionalInfo = additionalInfo + Alarm.ALARM_INFO_OSC;
+    }
+
+    if (tag != null) {
+      // Add another flag to the info if the value is simulated
+      if (tag.isSimulated()) {
+        additionalInfo = additionalInfo + "[SIM]";
+      }
+    }
+    return additionalInfo;
+  }
+
   /**
-   * Logic kept the same as in TIM1 (see {@link AlarmFacade}). The locking of
-   * the cache object is done in the public class. Notice, in this case the update()
-   * method is putting the changes back into the cache.
-   */
-  @Override
+     * Computes the alarm state corresponding to the new tag value and updates the Alarm cache, if required.
+     * @param alarm The current alarm object in the cache
+     * @param tag The tag update
+     * @return The updated alarm object
+     */
   public Alarm update(final Alarm alarm, final Tag tag) {
     AlarmCacheObject alarmCacheObject = (AlarmCacheObject) alarm;
 
@@ -85,7 +126,13 @@ public final class AlarmCacheUpdaterImpl implements AlarmCacheObjectController {
     return updateAlarmCacheObject(alarmCacheObject, tag, false);
   }
 
-  @Override
+  /**
+     * Resets the oscillation flag to false and computes the alarm state corresponding to the actual tag value.
+     * It will also updates the Alarm cache and notify the listeners.
+     * @param alarm The current alarm object in the cache
+     * @param tag The tag update
+     * @return The updated alarm object
+     */
   public void resetOscillationStatus(final AlarmCacheObject alarmCopy, final Tag tag) {
     alarmCopy.setOscillating(false);
     updateAlarmCacheObject(alarmCopy, tag, true);

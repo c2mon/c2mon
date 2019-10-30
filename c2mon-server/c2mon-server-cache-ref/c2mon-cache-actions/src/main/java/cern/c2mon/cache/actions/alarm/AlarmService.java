@@ -5,7 +5,6 @@ import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.listener.impl.SingleThreadListener;
 import cern.c2mon.cache.config.tag.TagCacheFacade;
 import cern.c2mon.server.common.alarm.Alarm;
-import cern.c2mon.server.common.alarm.AlarmCacheObjectController;
 import cern.c2mon.server.common.alarm.TagWithAlarms;
 import cern.c2mon.server.common.alarm.TagWithAlarmsImpl;
 import cern.c2mon.server.common.tag.Tag;
