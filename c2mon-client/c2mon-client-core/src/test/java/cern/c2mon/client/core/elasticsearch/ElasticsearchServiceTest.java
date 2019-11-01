@@ -52,7 +52,8 @@ public class ElasticsearchServiceTest extends BaseElasticsearchIntegrationTest {
 
   @Before
   public void before() throws Exception {
-    properties.getElasticsearch().setUrl("http://localhost:9201");
+    properties.getElasticsearch().setUrl("http://localhost:" + client.getClient().settings().get("http.port"));
+    log.info("Connecting Elasticsearch HTTP client to {}", properties.getElasticsearch().getUrl());
     service = new ElasticsearchService(properties);
     addDataTags();
   }
