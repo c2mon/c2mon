@@ -18,6 +18,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.sql.Timestamp;
+import java.util.function.BiConsumer;
 
 import static org.junit.Assert.*;
 
@@ -31,6 +32,7 @@ public class AlarmServiceTest {
 
   private C2monCache<Alarm> alarmCache;
   private C2monCache<DataTag> dataTagCache;
+  private AlarmCacheObjectController alarmCacheObjectController;
 
   @Before
   public void setup() {
@@ -40,62 +42,60 @@ public class AlarmServiceTest {
     dataTagCache = new SimpleC2monCache<>("data");
     TagCacheFacade tagCacheFacade = new TagCacheFacade(ruleTagCache, controlTagCache, dataTagCache);
     UnifiedTagCacheFacade unifiedTagCacheFacade = new UnifiedTagCacheFacade(ruleTagCache, controlTagCache, dataTagCache);
-    AlarmCacheObjectController alarmCacheUpdater = new AlarmCacheObjectController();
-    alarmCacheUpdater.setOscillationUpdater(new OscillationUpdater());
-    alarmCacheUpdater.setAlarmCache(alarmCache);
-    alarmService = new AlarmService(alarmCache, tagCacheFacade, alarmCacheUpdater, unifiedTagCacheFacade);
+    alarmCacheObjectController = new AlarmCacheObjectController();
+    alarmCacheObjectController.setOscillationUpdater(new OscillationUpdater());
+    alarmCacheObjectController.setAlarmCache(alarmCache);
+    alarmService = new AlarmService(alarmCache, tagCacheFacade, alarmCacheObjectController, unifiedTagCacheFacade);
   }
 
   @Test
   public void evaluateAlarmWithNullTag() {
-    AlarmCacheObject alarm = new AlarmCacheObject(1L);
-    alarm.setActive(true);
-    alarm.setDataTagId(1L);
-
-    DataTagCacheObject tag = new DataTagCacheObject(1L);
-    tag.setValue(null);
-
-    dataTagCache.put(tag.getId(), tag);
-    alarmCache.put(alarm.getId(), alarm);
-
-    alarmService.evaluateAlarm(alarm.getId());
-
-    assertTrue("Alarm should have the same state as before evaluation", alarm.isActive());
+    insertAlarmAndDatatagThen(
+      (alarm, __) -> alarm.setActive(true),
+      (alarm, __) -> assertTrue("Alarm should have the same state as before evaluation", alarm.isActive()));
   }
 
   @Test
   public void updateReturnsDifferentObject() {
-    AlarmCacheObject alarm = CacheObjectCreation.createTestAlarm1();
-    DataTagCacheObject dataTag = CacheObjectCreation.createTestDataTag3();
-    dataTag.setDataTagQuality(new DataTagQualityImpl(TagQualityStatus.UNKNOWN_REASON));
+    insertAlarmAndDatatagThen((alarm, dataTag) -> {
+      Alarm afterCache = alarmService.update(alarm.getId(), dataTag);
 
-    dataTagCache.put(dataTag.getId(), dataTag);
-    alarmCache.put(alarm.getId(), alarm);
+      alarmCacheObjectController.update(alarm, dataTag);
 
-    Alarm afterCache = alarmService.update(alarm.getId(), dataTag);
+      assertEquals(alarm, afterCache);
+      assertNotSame(alarm, afterCache);
+    });
+  }
 
-    assertEquals(alarm, afterCache);
-    assertNotSame(alarm, afterCache);
+  @Test
+  public void updateEvaluatesObject() {
+    insertAlarmAndDatatagThen((alarm, dataTag) -> {
+      Alarm afterCache = alarmService.update(alarm.getId(), dataTag);
+
+      // Initially the old object should not be evaluated
+      assertNotEquals(alarm, afterCache);
+
+      alarmCacheObjectController.update(alarm, dataTag);
+
+      // The effect should be the same as calling the alarmCacheController update method
+      assertEquals(alarm, afterCache);
+    });
   }
 
   @Test
   public void evaluateAlarmWithUninitialisedTag() {
-    AlarmCacheObject alarmCacheObject = new AlarmCacheObject(1L);
-    alarmCacheObject.setActive(false);
-    alarmCacheObject.setDataTagId(1L);
+    insertAlarmAndDatatagThen(
+      (alarm, dataTag) -> {
+        alarm.setActive(false);
+        alarm.setDataTagId(1L);
 
-    DataTagCacheObject dataTagCacheObject = new DataTagCacheObject(1L);
-    DataTagQualityImpl dataTagQuality = new DataTagQualityImpl(TagQualityStatus.UNINITIALISED);
-    dataTagCacheObject.setDataTagQuality(dataTagQuality);
-
-    dataTagCacheObject.setValue("value");
-
-    dataTagCache.put(dataTagCacheObject.getId(), dataTagCacheObject);
-    alarmCache.put(alarmCacheObject.getId(), alarmCacheObject);
-
-    alarmService.evaluateAlarm(alarmCacheObject.getId());
-
-    assertFalse("Alarm should have the same status as before evaluation", alarmCacheObject.isActive());
+        dataTag.setDataTagQuality(new DataTagQualityImpl(TagQualityStatus.UNINITIALISED));
+        dataTag.setValue("value");
+      },
+      (alarm, __) -> {
+        alarmService.evaluateAlarm(alarm.getId());
+        assertFalse("Alarm should have the same status as before evaluation", alarm.isActive());
+      });
   }
 
   /**
@@ -105,13 +105,14 @@ public class AlarmServiceTest {
   @Test
   public void testInvalidActivationFiltered() {
     Timestamp tagTime = new Timestamp(System.currentTimeMillis());
-
     DataTagCacheObject tag = CacheObjectCreation.createTestDataTag3();
     tag.setDataTagQuality(new DataTagQualityImpl(TagQualityStatus.UNKNOWN_REASON));
+    tag.setSourceTimestamp(tagTime);
+
     AlarmCacheObject alarm = CacheObjectCreation.createTestAlarm1();
     Timestamp origTime = new Timestamp(System.currentTimeMillis() - 1000);
     alarm.setTriggerTimestamp(origTime);
-    tag.setSourceTimestamp(tagTime);
+
     //check set as expected
     assertFalse(alarm.isActive());
     assertTrue(alarm.getCondition().evaluateState(tag.getValue()));
@@ -125,35 +126,50 @@ public class AlarmServiceTest {
     assertFalse(alarm.isActive()); //also update alarm parameter object (usually in cache)
   }
 
-  /**
-   * Testing the change of an Alarm from ACTIVE to TERMINATE. Important is also that
-   * the new alarm timestamp is set to the tag cache timestamp. This is currently the only
-   * way to determine which tag event triggered which alarm evaluation.
-   */
   @Test
-  public void testUpdateTimestampIsSetToTagCacheTimestamp() {
-    Timestamp tagTime = new Timestamp(System.currentTimeMillis() - 1000);
+  public void updateChangesTimestamp() {
+    insertAlarmAndDatatagThen(
+      (alarm, dataTag) -> {
+        Timestamp tagTime = new Timestamp(System.currentTimeMillis() - 1000);
+        dataTag.setSourceTimestamp(tagTime);
+        Timestamp alarmTime = new Timestamp(System.currentTimeMillis() - 50000);
+        alarm.setTriggerTimestamp(alarmTime);
+        alarm.setActive(true);
 
-    DataTagCacheObject tag = CacheObjectCreation.createTestDataTag();
-    AlarmCacheObject currentAlarmState = CacheObjectCreation.createTestAlarm2();
-    Timestamp origTime = new Timestamp(System.currentTimeMillis() - 50000);
-    currentAlarmState.setTriggerTimestamp(origTime);
-    tag.setSourceTimestamp(tagTime);
-    //check set as expected
-    assertTrue(currentAlarmState.isActive());
-    assertFalse(currentAlarmState.getCondition().evaluateState(tag.getValue()));
-    assertTrue(tag.isValid());
+        assertTrue(alarm.isActive());
+        assertNotEquals(alarm.getSourceTimestamp(), dataTag.getTimestamp());
+      },
+      (alarmAfterInsert, dataTag) -> {
+        AlarmCacheObject alarmAfterUpdate = (AlarmCacheObject) alarmService.update(alarmAfterInsert.getId(), dataTag);
 
-    dataTagCache.put(tag.getId(), tag);
-    alarmCache.put(currentAlarmState.getId(), currentAlarmState);
+        assertEquals(alarmAfterUpdate.getSourceTimestamp(), dataTag.getTimestamp());
+      }
+    );
+  }
 
-    //(1) test update works
-    AlarmCacheObject newAlarm = (AlarmCacheObject) alarmService.update(currentAlarmState.getId(), tag);
+  @Test
+  public void updateTerminatesAlarm() {
+    insertAlarmAndDatatagThen(
+      (alarm, dataTag) -> {
+        Timestamp tagTime = new Timestamp(System.currentTimeMillis() - 1000);
+        dataTag = CacheObjectCreation.createTestDataTag3();
+//        dataTag.setSourceTimestamp(tagTime);
+//        dataTag.setValue("DOWN");
+        Timestamp alarmTime = new Timestamp(System.currentTimeMillis() - 50000);
+        alarm = CacheObjectCreation.createTestAlarm1();
+//        alarm.setTriggerTimestamp(alarmTime);
+//        alarm.setActive(true);
 
-    assertFalse(newAlarm.isActive());
-    assertTrue(newAlarm.getSourceTimestamp().equals(tag.getTimestamp()));
-    assertFalse(currentAlarmState.isActive()); //also update alarm parameter object (usually in cache)
-    assertTrue(currentAlarmState.getSourceTimestamp().equals(tag.getTimestamp()));
+        assertTrue(alarm.isActive());
+        assertFalse(alarm.getCondition().evaluateState(dataTag.getValue()));
+        assertTrue(dataTag.isValid());
+      },
+      (alarmAfterInsert, dataTag) -> {
+        AlarmCacheObject alarmAfterUpdate = (AlarmCacheObject) alarmService.update(alarmAfterInsert.getId(), dataTag);
+        assertFalse(alarmAfterUpdate.isActive());
+        assertTrue(dataTag.isValid());
+      }
+    );
   }
 
   /**
@@ -204,5 +220,42 @@ public class AlarmServiceTest {
     assertEquals(newAlarm2.getTriggerTimestamp(), origTime);
     assertFalse(alarm2.isActive()); //original TERMINATE!
     assertEquals(alarm2.getTriggerTimestamp(), origTime);
+  }
+
+  /**
+   * Use this helper to edit the alarm and datatag before they're put in the cache
+   */
+  private void createAlarmAndDatatagThen(BiConsumer<AlarmCacheObject, DataTagCacheObject> postCreationOps) {
+    AlarmCacheObject alarm = CacheObjectCreation.createTestAlarm1();
+    DataTagCacheObject dataTag = CacheObjectCreation.createTestDataTag3();
+    dataTag.setDataTagQuality(new DataTagQualityImpl(TagQualityStatus.UNKNOWN_REASON));
+
+    postCreationOps.accept(alarm, dataTag);
+  }
+
+  /**
+   * @param preInsertMutate use this lambda to edit the alarm, datatag before they're put in the cache
+   * @param test            use this lambda to run assertions after the alarm, datatag are put in the cache
+   */
+  private void insertAlarmAndDatatagThen(BiConsumer<AlarmCacheObject, DataTagCacheObject> preInsertMutate,
+                                         BiConsumer<AlarmCacheObject, DataTagCacheObject> test) {
+    createAlarmAndDatatagThen((alarm, dataTag) -> {
+      preInsertMutate.accept(alarm, dataTag);
+
+      dataTagCache.put(dataTag.getId(), dataTag);
+      alarmCache.put(alarm.getId(), alarm);
+
+      test.accept(alarm, dataTag);
+    });
+  }
+
+  /**
+   * Overload with empty mutator
+   *
+   * @param test use this lambda to run assertions after the alarm, datatag are put in the cache
+   */
+  private void insertAlarmAndDatatagThen(BiConsumer<AlarmCacheObject, DataTagCacheObject> test) {
+    insertAlarmAndDatatagThen((__, ___) -> {
+    }, test);
   }
 }
