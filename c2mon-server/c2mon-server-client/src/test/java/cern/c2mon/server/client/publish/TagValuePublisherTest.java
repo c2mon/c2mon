@@ -22,12 +22,11 @@ import cern.c2mon.server.cache.alarm.config.AlarmModule;
 import cern.c2mon.server.cache.config.CacheModule;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.client.config.ClientModule;
-import cern.c2mon.server.common.config.CommonModule;
 import cern.c2mon.server.client.junit.ClientCachePopulationRule;
 import cern.c2mon.server.command.config.CommandModule;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.TagWithAlarms;
-import cern.c2mon.server.common.alarm.TagWithAlarmsImpl;
+import cern.c2mon.server.common.config.CommonModule;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.configuration.config.ConfigurationModule;
@@ -322,7 +321,7 @@ public class TagValuePublisherTest {
     alarms.add(alarm1); //attached to this tag
     alarms.add(alarm2); //attached to this tag
 
-    TagWithAlarms tagWithAlarms = new TagWithAlarmsImpl(tag, alarms);
+    TagWithAlarms tagWithAlarms = new TagWithAlarms(tag, alarms);
     EasyMock.expect(this.tagFacadeGateway.getTagWithAlarms(tag.getId())).andReturn(tagWithAlarms);
 
     Thread listenerThread = startListenerThreadForTransferTag(tag); //will throw exception

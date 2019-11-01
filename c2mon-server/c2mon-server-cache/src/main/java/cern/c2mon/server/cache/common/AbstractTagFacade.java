@@ -16,12 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.common;
 
-import java.lang.reflect.Field;
-import java.sql.Timestamp;
-import java.util.*;
-
-import lombok.extern.slf4j.Slf4j;
-
 import cern.c2mon.server.cache.AlarmCache;
 import cern.c2mon.server.cache.AlarmFacade;
 import cern.c2mon.server.cache.C2monCacheWithListeners;
@@ -29,7 +23,6 @@ import cern.c2mon.server.cache.CommonTagFacade;
 import cern.c2mon.server.cache.util.MetadataUtils;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.TagWithAlarms;
-import cern.c2mon.server.common.alarm.TagWithAlarmsImpl;
 import cern.c2mon.server.common.tag.AbstractTagCacheObject;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.common.ConfigurationException;
@@ -41,6 +34,11 @@ import cern.c2mon.shared.common.datatag.TagQualityStatus;
 import cern.c2mon.shared.daq.config.DataTagAddressUpdate;
 import cern.c2mon.shared.daq.config.DataTagUpdate;
 import cern.c2mon.shared.daq.config.HardwareAddressUpdate;
+import lombok.extern.slf4j.Slf4j;
+
+import java.lang.reflect.Field;
+import java.sql.Timestamp;
+import java.util.*;
 
 /**
  * Common implementation of the Tag facade logic.
@@ -365,7 +363,7 @@ public abstract class AbstractTagFacade<T extends Tag> extends AbstractFacade<T>
     tagCache.acquireReadLockOnKey(id);
     try {
       T tag = tagCache.getCopy(id);
-      return new TagWithAlarmsImpl(tag, this.getAlarms(tag));
+      return new TagWithAlarms(tag, this.getAlarms(tag));
     } finally {
       tagCache.releaseReadLockOnKey(id);
     }

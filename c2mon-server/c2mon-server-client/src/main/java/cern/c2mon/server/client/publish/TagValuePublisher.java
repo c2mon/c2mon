@@ -16,14 +16,26 @@
  *****************************************************************************/
 package cern.c2mon.server.client.publish;
 
-import java.util.List;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-
+import cern.c2mon.server.cache.AliveTimerFacade;
+import cern.c2mon.server.cache.TagFacadeGateway;
+import cern.c2mon.server.cache.TagLocationService;
+import cern.c2mon.server.cache.alarm.AlarmAggregator;
+import cern.c2mon.server.cache.alarm.AlarmAggregatorListener;
 import cern.c2mon.server.client.config.ClientProperties;
+import cern.c2mon.server.client.util.TransferObjectFactory;
+import cern.c2mon.server.common.alarm.Alarm;
+import cern.c2mon.server.common.alarm.TagWithAlarms;
+import cern.c2mon.server.common.republisher.Publisher;
+import cern.c2mon.server.common.republisher.Republisher;
+import cern.c2mon.server.common.republisher.RepublisherFactory;
+import cern.c2mon.server.common.tag.Tag;
+import cern.c2mon.server.configuration.ConfigurationUpdate;
+import cern.c2mon.server.configuration.ConfigurationUpdateListener;
 import cern.c2mon.shared.client.serializer.TransferTagSerializer;
-
+import cern.c2mon.shared.client.tag.TagValueUpdate;
+import cern.c2mon.shared.client.tag.TransferTagImpl;
+import cern.c2mon.shared.client.tag.TransferTagValueImpl;
+import cern.c2mon.shared.util.jms.JmsSender;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -32,25 +44,9 @@ import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.server.cache.AliveTimerFacade;
-import cern.c2mon.server.cache.TagFacadeGateway;
-import cern.c2mon.server.cache.TagLocationService;
-import cern.c2mon.server.cache.alarm.AlarmAggregator;
-import cern.c2mon.server.cache.alarm.AlarmAggregatorListener;
-import cern.c2mon.server.client.util.TransferObjectFactory;
-import cern.c2mon.server.common.alarm.Alarm;
-import cern.c2mon.server.common.alarm.TagWithAlarms;
-import cern.c2mon.server.common.alarm.TagWithAlarmsImpl;
-import cern.c2mon.server.common.republisher.Publisher;
-import cern.c2mon.server.common.republisher.Republisher;
-import cern.c2mon.server.common.republisher.RepublisherFactory;
-import cern.c2mon.server.common.tag.Tag;
-import cern.c2mon.server.configuration.ConfigurationUpdate;
-import cern.c2mon.server.configuration.ConfigurationUpdateListener;
-import cern.c2mon.shared.client.tag.TagValueUpdate;
-import cern.c2mon.shared.client.tag.TransferTagImpl;
-import cern.c2mon.shared.client.tag.TransferTagValueImpl;
-import cern.c2mon.shared.util.jms.JmsSender;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import java.util.List;
 
 /**
  * This class implements the <code>AlarmAggregatorListener</code>
@@ -168,7 +164,7 @@ public class TagValuePublisher implements AlarmAggregatorListener, Configuration
    */
   @Override
   public void notifyOnUpdate(final Tag tag, final List<Alarm> alarms) {
-    TagWithAlarms tagWithAlarms = new TagWithAlarmsImpl(tag, alarms);
+    TagWithAlarms tagWithAlarms = new TagWithAlarms(tag, alarms);
     try {
       publish(tagWithAlarms);
     } catch (JmsException e) {

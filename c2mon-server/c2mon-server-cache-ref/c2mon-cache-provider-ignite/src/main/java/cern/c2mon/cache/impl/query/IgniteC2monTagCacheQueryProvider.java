@@ -5,7 +5,6 @@ import cern.c2mon.cache.api.spi.C2monTagCacheQueryProvider;
 import cern.c2mon.cache.impl.IgniteC2monCache;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.TagWithAlarms;
-import cern.c2mon.server.common.alarm.TagWithAlarmsImpl;
 import cern.c2mon.server.common.tag.Tag;
 
 import javax.inject.Inject;
@@ -32,7 +31,7 @@ public class IgniteC2monTagCacheQueryProvider implements C2monTagCacheQueryProvi
 //     hence the alarms access did not need validation
     Tag tag = tagCache.get(id);
 
-    return tag != null ? new TagWithAlarmsImpl(tag, getAlarms(tag)) : null;
+    return tag != null ? new TagWithAlarms(tag, getAlarms(tag)) : null;
   }
 
   @Override

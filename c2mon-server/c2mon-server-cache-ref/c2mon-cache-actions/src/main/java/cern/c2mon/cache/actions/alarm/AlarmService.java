@@ -6,7 +6,6 @@ import cern.c2mon.cache.api.listener.impl.SingleThreadListener;
 import cern.c2mon.cache.config.tag.TagCacheFacade;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.TagWithAlarms;
-import cern.c2mon.server.common.alarm.TagWithAlarmsImpl;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.common.CacheEvent;
 import lombok.extern.slf4j.Slf4j;
@@ -114,7 +113,7 @@ public class AlarmService implements AlarmAggregator {
       for (Long alarmId : tag.getAlarmIds()) {
         alarms.add(alarmCacheRef.get(alarmId));
       }
-      return new TagWithAlarmsImpl(tag, alarms);
+      return new TagWithAlarms(tag, alarms);
     });
   }
 

@@ -27,9 +27,8 @@ import cern.c2mon.server.test.cache.*;
  * Contains static methods for creating test cache objects.
  *
  * @author Mark Brightwell
- * @deprecated use the relevant {@link AbstractCacheObjectFactory} instead
+ * @see AbstractCacheObjectFactory use this for the type safe specific samples
  */
-@Deprecated
 public final class CacheObjectCreation {
   private static final AlarmCacheObjectFactory alarmCacheObjectFactory;
   private static final ControlTagCacheObjectFactory controlTagCacheObjectFactory;

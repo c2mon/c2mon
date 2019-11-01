@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -42,25 +42,25 @@ public class TagFacadeGatewayImpl implements TagFacadeGateway {
    * Reference to the DataTagFacade bean.
    */
   private DataTagFacade dataTagFacade;
-  
+
   /**
    * Reference to the ControlTagFacade bean.
    */
   private ControlTagFacade controlTagFacade;
-  
+
   /**
    * Reference to the RuleTagFacade bean.
    */
   private RuleTagFacade ruleTagFacade;
-  
+
   /**
    * Service for locating Tags in the various caches.
    */
   private TagLocationService tagLocationService;
-  
+
   /**
    * Autowired constructor.
-   * 
+   *
    * @param dataTagFacade the DataTag facade bean
    * @param controlTagFacade the ControlTag facade
    * @param ruleTagFacade the RuleTag facade
@@ -86,7 +86,7 @@ public class TagFacadeGatewayImpl implements TagFacadeGateway {
       return (CommonTagFacade<T>) dataTagFacade;
     }
   }
-  
+
   @SuppressWarnings("unchecked")
   private <T extends Tag> CommonTagFacade<T> getFacade(final Long id) {
     if (ruleTagFacade.isInTagCache(id)) {
@@ -125,7 +125,7 @@ public class TagFacadeGatewayImpl implements TagFacadeGateway {
 
   @Override
   public TagWithAlarms getTagWithAlarms(Long id) {
-    return getFacade(id).getTagWithAlarms(id);    
+    return getFacade(id).getTagWithAlarms(id);
   }
 
   @Override
@@ -149,11 +149,11 @@ public class TagFacadeGatewayImpl implements TagFacadeGateway {
   @Override
   public Collection<TagWithAlarms> getTagsWithAlarms(String regex) {
     Collection<TagWithAlarms> tagWithAlarms = new ArrayList<>();
-    
+
     // Remove escaped wildcards and then check if there are any left
     String test = regex.replace("\\*", "").replace("\\?", "");
     boolean isRegex = test.contains("*") || test.contains("?");
-    
+
     if (isRegex) {
       Collection<Tag> tags = tagLocationService.findByNameWildcard(regex);
       for (Tag tag : tags) {
@@ -162,16 +162,16 @@ public class TagFacadeGatewayImpl implements TagFacadeGateway {
     }
     else {
       Tag tag = tagLocationService.get(regex);
-      tagWithAlarms.add(getFacade(tag).getTagWithAlarms(tag.getId()));    
+      tagWithAlarms.add(getFacade(tag).getTagWithAlarms(tag.getId()));
     }
-    
+
     return tagWithAlarms;
   }
 
   @Override
   public void setQuality(Long tagId, Collection<TagQualityStatus> flagsToAdd,
       Collection<TagQualityStatus> flagsToRemove, Map<TagQualityStatus, String> qualityDescriptions, Timestamp timestamp) {
-    
+
     getFacade(tagId).setQuality(tagId, flagsToAdd, flagsToRemove, qualityDescriptions, timestamp);
   }
 

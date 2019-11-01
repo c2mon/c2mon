@@ -90,6 +90,7 @@ public class AlarmServiceTest {
         alarm.setDataTagId(1L);
 
         dataTag.setDataTagQuality(new DataTagQualityImpl(TagQualityStatus.UNINITIALISED));
+        dataTag.setId(1L);
         dataTag.setValue("value");
       },
       (alarm, __) -> {
