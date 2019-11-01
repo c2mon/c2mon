@@ -28,7 +28,10 @@ import static org.junit.Assert.assertEquals;
  *
  * @author Mark Brightwell
  *
+ * @deprecated Please use {@link org.junit.Assert#assertEquals(Object, Object)} instead,
+ *             it has been implemented for all cache objects
  */
+@Deprecated
 public final class CacheObjectComparison {
 
   /**
@@ -40,7 +43,10 @@ public final class CacheObjectComparison {
    * Compares CommandTags.
    * @param commandTag1 first tag
    * @param commandTag2 second tag
+   * @deprecated Please use {@link org.junit.Assert#assertEquals(Object, Object)} instead,
+   *             it has been implemented for all cache objects
    */
+  @Deprecated
   public static void equals(final CommandTagCacheObject commandTag1, final CommandTagCacheObject commandTag2) {
     assertEquals(commandTag1.getId(), commandTag2.getId());
     assertEquals(commandTag1.getName(), commandTag2.getName());
@@ -65,7 +71,10 @@ public final class CacheObjectComparison {
    * Compares DataTags.
    * @param dataTag1 first tag
    * @param dataTag2 second tag
+   * @deprecated Please use {@link org.junit.Assert#assertEquals(Object, Object)} instead,
+   *             it has been implemented for all cache objects
    */
+  @Deprecated
   public static void equals(final DataTagCacheObject dataTag1, final DataTagCacheObject dataTag2) {
     equalsTag(dataTag1, dataTag2);
     assertEquals(dataTag1.getEquipmentId(), dataTag2.getEquipmentId());
@@ -81,7 +90,10 @@ public final class CacheObjectComparison {
    * Compares two Tags.
    * @param tag1 first tag
    * @param tag2 second tag
+   * @deprecated Please use {@link org.junit.Assert#assertEquals(Object, Object)} instead,
+   *             it has been implemented for all cache objects
    */
+  @Deprecated
   public static void equalsTag(final Tag tag1, final Tag tag2) {
     assertEquals(tag1.getId(), tag2.getId());
     assertEquals(tag1.getName(), tag2.getName());
@@ -104,7 +116,10 @@ public final class CacheObjectComparison {
    * Assert all Alarm fields are equal.
    * @param alarm1 first alarm
    * @param alarm2 second alarm
+   * @deprecated Please use {@link org.junit.Assert#assertEquals(Object, Object)} instead,
+   *             it has been implemented for all cache objects
    */
+  @Deprecated
   public static void equals(final AlarmCacheObject alarm1, final AlarmCacheObject alarm2) {
     assertEquals(alarm1.getId(), alarm2.getId());
     assertEquals(alarm1.getDataTagId(), alarm2.getDataTagId());
