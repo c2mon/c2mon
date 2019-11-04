@@ -48,34 +48,34 @@ import cern.c2mon.client.core.service.*;
 public class C2monServiceGateway implements ApplicationContextAware {
 
   /** The SPRING application context, which can be used as parent context */
-  private static ApplicationContext context = null;
+  private static ApplicationContext context;
 
   /**
    * The maximum amount of time in milliseconds which the C2MON ServiceGateway shall
    * wait before aborting waiting that the connection to the C2MON server is established.
    */
-  private static final Long MAX_INITIALIZATION_TIME = 60000L;
+  private static final Long MAX_INITIALIZATION_TIME = 60_000L;
 
   /** Static reference to the <code>C2monCommandManager</code> singleton instance */
-  private static CommandService commandService = null;
+  private static CommandService commandService;
 
   /** Static reference to the <code>TagService</code> singleton instance */
-  private static TagService tagService = null;
+  private static TagService tagService;
 
   /** Static reference to the <code>ConfigurationService</code> singleton instance */
-  private static ConfigurationService configurationService = null;
+  private static ConfigurationService configurationService;
 
   /** Static reference to the <code>AlarmService</code> singleton instance */
-  private static AlarmService alarmService = null;
+  private static AlarmService alarmService;
 
   /** Static reference to the <code>StatisticsService</code> singleton instance */
-  private static StatisticsService statisticsService = null;
+  private static StatisticsService statisticsService;
 
   /** Static reference to the <code>SupervisionService</code> singleton instance */
-  private static SupervisionService supervisionService = null;
+  private static SupervisionService supervisionService;
 
   /** Static reference to the <code>ElasticsearchService</code> singleton instance */
-  private static ElasticsearchService elasticsearchService = null;
+  private static ElasticsearchService elasticsearchService;
 
   /**
    * Protected default constructor

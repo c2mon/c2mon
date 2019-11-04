@@ -94,7 +94,7 @@ public class ElasticsearchService {
   }
 
   /**
-   * Please use {@link #getTagHistory(Long, Long, Long, String)} instead
+   * @deprecated Please use {@link #getTagHistory(Long, Long, Long, String)} instead
    */
   @Deprecated
   public List<Object[]> getHistory(Long id, Long min, Long max, String aggregate) {
@@ -253,7 +253,7 @@ public class ElasticsearchService {
   }
 
   /**
-   * Please use {@link #findTagsByQuery(String, Function, String, String)} instead
+   * @deprecated Please use {@link #findTagsByQuery(String, Function, String, String)} instead
    */
   @Deprecated
   public <T> T findByQuery(String query, Function<SearchResult, T> outputConverter, String indexName, String errorMessage) {
@@ -360,7 +360,7 @@ public class ElasticsearchService {
   }
 
   /**
-   * Please use {@link #findTagsByName(String)} instead
+   * @deprecated Please use {@link #findTagsByName(String)} instead
    */
   @Deprecated
   public Collection<Long> findByName(String regexQuery) {
@@ -390,7 +390,7 @@ public class ElasticsearchService {
   }
 
   /**
-   * Please use {@link #findTagsByMetadata(String, String)} instead
+   * @deprecated Please use {@link #findTagsByMetadata(String, String)} instead
    */
   @Deprecated
   public Collection<Long> findByMetadata(String key, String value) {
