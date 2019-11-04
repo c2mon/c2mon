@@ -1,10 +1,12 @@
 package cern.c2mon.cache.actions.alarm;
 
+import cern.c2mon.cache.actions.oscillation.OscillationUpdater;
 import cern.c2mon.cache.actions.tag.UnifiedTagCacheFacade;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.listener.impl.SingleThreadListener;
 import cern.c2mon.cache.config.tag.TagCacheFacade;
 import cern.c2mon.server.common.alarm.Alarm;
+import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.TagWithAlarms;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.common.CacheEvent;
@@ -17,6 +19,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+
+import static cern.c2mon.cache.actions.alarm.AlarmCacheObjectController.updateAlarmBasedOnTag;
 
 /**
  * @author Szymon Halastra
@@ -46,13 +50,17 @@ public class AlarmService implements AlarmAggregator {
 
   private UnifiedTagCacheFacade unifiedTagCacheFacade;
 
+  private OscillationUpdater oscillationUpdater;
+
   @Inject
   public AlarmService(final C2monCache<Alarm> alarmCacheRef, final TagCacheFacade tagCacheRef,
-                      final AlarmCacheObjectController alarmCacheUpdater, final UnifiedTagCacheFacade unifiedTagCacheFacade) {
+                      final AlarmCacheObjectController alarmCacheUpdater, final UnifiedTagCacheFacade unifiedTagCacheFacade,
+                      final OscillationUpdater oscillationUpdater) {
     this.alarmCacheRef = alarmCacheRef;
     this.tagCacheRef = tagCacheRef;
     this.alarmCacheUpdater = alarmCacheUpdater;
     this.unifiedTagCacheFacade = unifiedTagCacheFacade;
+    this.oscillationUpdater = oscillationUpdater;
   }
 
   @PostConstruct
@@ -73,8 +81,7 @@ public class AlarmService implements AlarmAggregator {
   public Alarm update(final Long alarmId, final Tag tag) {
     return alarmCacheRef.executeTransaction(() -> {
       Alarm alarm = alarmCacheRef.get(alarmId);
-      // Notice, in this case the update() method is putting the changes back into the cache
-      return alarmCacheUpdater.update(alarm, tag);
+      return update((AlarmCacheObject) alarm, tag, true);
     });
   }
 
@@ -98,6 +105,23 @@ public class AlarmService implements AlarmAggregator {
       }
     });
     return linkedAlarms;
+  }
+
+  private AlarmCacheObject update(final AlarmCacheObject alarmCacheObject, final Tag tag, boolean updateOscillation) {
+    if (updateOscillation) {
+      oscillationUpdater.updateOscillationStatus(alarmCacheObject);
+    }
+
+    boolean wasAlreadyOscillating = alarmCacheObject.isOscillating();
+
+    updateAlarmBasedOnTag(alarmCacheObject, tag);
+
+    if (wasAlreadyOscillating) {
+      alarmCacheRef.putQuiet(alarmCacheObject.getId(), alarmCacheObject);
+    } else {
+      alarmCacheRef.put(alarmCacheObject.getId(), alarmCacheObject);
+    }
+    return alarmCacheObject;
   }
 
   /**
@@ -144,5 +168,18 @@ public class AlarmService implements AlarmAggregator {
     for (AlarmAggregatorListener listener : alarmUpdateObservable) {
       listener.notifyOnUpdate(tag.clone(), alarmList);
     }
+  }
+
+  /**
+   * Resets the oscillation flag to false and computes the alarm state corresponding to the actual tag value.
+   * It will also updates the Alarm cache and notify the listeners.
+   *
+   * @param alarmCacheObject The current alarm object in the cache
+   * @param tag   The tag update
+   * @return The updated alarm object
+   */
+  public void stopOscillating(final AlarmCacheObject alarmCacheObject, final Tag tag) {
+    alarmCacheObject.setOscillating(false);
+    update(alarmCacheObject, tag, false);
   }
 }

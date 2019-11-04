@@ -16,63 +16,39 @@
  *****************************************************************************/
 package cern.c2mon.cache.actions.alarm;
 
-import cern.c2mon.cache.actions.oscillation.OscillationUpdater;
-import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.actions.tag.CommonTagOperations;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.common.datatag.DataTagConstants;
-import lombok.AccessLevel;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.inject.Inject;
 import java.sql.Timestamp;
 
 /**
  * Contains the routing logic for the alarm cache update. The alarm cache listeners will get informed depending, if it
  * is an oscillating alarm or not.
  *
- * @author Mark Brightwell, Emiliano Piselli, Brice Copy, Matthias Braeger
+ * @author Mark Brightwell, Emiliano Piselli, Brice Copy, Matthias Braeger, Alexandros Papageorgiou
  */
 @Service
 @Slf4j
 public final class AlarmCacheObjectController {
 
-  @Inject
-  @Setter(AccessLevel.PROTECTED)
-  private C2monCache<Alarm> alarmCache;
-
-  @Inject
-  @Setter(AccessLevel.PROTECTED)
-  OscillationUpdater oscillationUpdater;
-
-  public static String evaluateAdditionalInfo(final Alarm alarm, final Tag tag){
+  public static String evaluateAdditionalInfo(final Alarm alarm, final Tag tag) {
     String additionalInfo = "";
 
     if (tag != null) {
       switch (tag.getMode()) {
-      case DataTagConstants.MODE_MAINTENANCE:
-        if (tag.isValid()) {
-          additionalInfo = "[M]";
-        } else {
-          additionalInfo = "[M][?]";
-        }
-        break;
-      case DataTagConstants.MODE_TEST:
-        if (tag.isValid()) {
-          additionalInfo = "[T]";
-        } else {
-          additionalInfo = "[T][?]";
-        }
-        break;
-      default:
-        if (tag.isValid()) {
-          additionalInfo = "";
-        } else {
-          additionalInfo = "[?]";
-        }
+        case DataTagConstants.MODE_MAINTENANCE:
+          additionalInfo = tag.isValid() ? "[M]" : "[M][?]";
+          break;
+        case DataTagConstants.MODE_TEST:
+          additionalInfo = tag.isValid() ? "[T]" : "[T][?]";
+          break;
+        default:
+          additionalInfo = tag.isValid() ? "" : "[?]";
       }
     }
 
@@ -90,146 +66,96 @@ public final class AlarmCacheObjectController {
   }
 
   /**
-     * Computes the alarm state corresponding to the new tag value and updates the Alarm cache, if required.
-     * @param alarm The current alarm object in the cache
-     * @param tag The tag update
-     * @return The updated alarm object
-     */
-  public Alarm update(final Alarm alarm, final Tag tag) {
+   * Computes the alarm state corresponding to the new tag value
+   *
+   * @param alarmCacheObject The current alarm object in the cache
+   * @param tag   The tag update
+   * @return {@link Boolean#TRUE} is the Alarm was changed, false otherwise
+   */
+  public static boolean updateAlarmBasedOnTag(final AlarmCacheObject alarmCacheObject, final Tag tag) {
+    // TODO Is there any case where we want to evaluate despite invalid tag?
+    // TODO If so, readd the tag valid check to updateAlarmState
+    if (!CommonTagOperations.isReadyForEvaluation(tag)) {
+      log.debug("Alarm update called with erroneous Tag - leaving alarm status unchanged for alarm #{}", alarmCacheObject.getId());
+      return false;
+    }
+
+    if (!detectChanges(alarmCacheObject, tag)) {
+      log.debug("Alarm update called but no changes were detected based on the tag - leaving alarm status unchanged for alarm #{}", alarmCacheObject.getId());
+      return false;
+    }
+
+    // If those passed, let's mutate this object
+    updateInfo(alarmCacheObject, tag);
+
+    // TODO Is there any case where we don't want to update timestamps?
+    updateTimestamps(alarmCacheObject, tag);
+
+    updateAlarmState(alarmCacheObject, tag);
+
+    return true;
+  }
+
+  /**
+   * No side effects, True/False response
+   *
+   * @param alarm
+   * @param tag
+   * @return {@link Boolean#TRUE} if the has changes based on the tag
+   */
+  private static boolean detectChanges(final Alarm alarm, final Tag tag) {
     AlarmCacheObject alarmCacheObject = (AlarmCacheObject) alarm;
 
-    // not possible to evaluate alarms with associated null tag; occurs during
-    // normal operation
-    // (may change in future is alarm state depends on quality f.eg.)
-    if (tag.getValue() == null) {
-      log.debug("Alarm update called with null Tag value - leaving alarm status unchanged at {} for #{}", alarm.isActive(), alarm.getId());
+    // If the alarm has not been initialized, we need to update it
+    if (isAlarmUninitialised(alarmCacheObject))
+      return true;
 
-      // change the alarm timestamp, if the alarm has never been initialised
-      if (isAlarmUninitialised(alarmCacheObject)) {
-        changeInfoField(alarmCacheObject, tag);
-        changeTimestamps(alarmCacheObject, tag);
-      }
-      return alarmCacheObject;
-    }
-
-    if (!tag.getDataTagQuality().isInitialised()) {
-      log.debug("Alarm update called with uninitialised Tag - leaving slarm status unchanged for alarm #{}", alarm.getId());
-      return alarm;
-    }
-
-    // timestamp should never be null
-    if (tag.getTimestamp() == null) {
-      log.warn("Tag value or timestamp null -> no update on alarm #{}", alarm.getId());
-      throw new IllegalArgumentException("update method called on Alarm facade with either null tag value or null tag timestamp");
-    }
-
-    return updateAlarmCacheObject(alarmCacheObject, tag, false);
-  }
-
-  /**
-     * Resets the oscillation flag to false and computes the alarm state corresponding to the actual tag value.
-     * It will also updates the Alarm cache and notify the listeners.
-     * @param alarm The current alarm object in the cache
-     * @param tag The tag update
-     * @return The updated alarm object
-     */
-  public void resetOscillationStatus(final AlarmCacheObject alarmCopy, final Tag tag) {
-    alarmCopy.setOscillating(false);
-    updateAlarmCacheObject(alarmCopy, tag, true);
-  }
-
-  /**
-   * Contains all the logical steps to:
-   * <li> compute the new alarm state
-   * <li> changes the oscillation status
-   * <li> update info field and timestamps
-   *
-   * @param alarmCacheObject The current alarm cache object
-   * @param tag the tag update
-   * @param resetOscillationStatus true, if method is triggered byu the Oscillation updater task
-   * @return The updated alarm cache object
-   */
-  private AlarmCacheObject updateAlarmCacheObject(final AlarmCacheObject alarmCacheObject, final Tag tag, boolean resetOscillationStatus) {
-    // Compute the alarm state corresponding to the new tag value
+    // If the new or previous state is active, we need to update
+    // TODO Oscillation check here?
     boolean newState = alarmCacheObject.getCondition().evaluateState(tag.getValue());
-
-    // Return if new state is TERMINATE and old state was also TERMINATE, return
-    // original alarm (no need to save in cache)
-    if ( !resetOscillationStatus && !newState && !alarmCacheObject.isActive() ) {
-      return alarmCacheObject;
+    if (newState || alarmCacheObject.isActive()) {
+      return true;
     }
 
-    boolean alarmStateHasChanged = alarmCacheObject.isInternalActive() != newState;
-
-    // We only allow activating the alarm if the tag is valid.
-    if(tag.isValid()){
-      alarmCacheObject.setActive(newState);
-      alarmCacheObject.setInternalActive(newState);
+    // If the internal state has changed, we should try to update
+    // Oscillation checks might mean that in the end this update could be dropped though
+    boolean internalStateHasChanged = alarmCacheObject.isInternalActive() != newState;
+    if ((tag.isValid() && internalStateHasChanged)) {
+      return true;
     }
 
-    // Default case: change the alarm's state
-    // (1) if the alarm has never been initialised OR
-    // (2) if tag is VALID and the alarm changes from ACTIVE->TERMINATE or TERMINATE->ACTIVE
-    if (isAlarmUninitialised(alarmCacheObject) || (tag.isValid() && alarmStateHasChanged) ) {
-      return commitAlarmStateChange(alarmCacheObject, tag);
-    }
-
-    // Check if INFO field has changed and alarm is active
-    String oldAlarmInfo = alarmCacheObject.getInfo();
-    changeInfoField(alarmCacheObject, tag);
-    if (!alarmCacheObject.getInfo().equals(oldAlarmInfo) && (alarmCacheObject.isActive() || resetOscillationStatus)) {
-      log.trace("Alarm #{} changed INFO to {}", alarmCacheObject.getId(), alarmCacheObject.getInfo());
-      changeTimestamps(alarmCacheObject, tag);
-      alarmCache.put(alarmCacheObject.getId(), alarmCacheObject);
-      return alarmCacheObject;
-    }
-
-    // In all other cases, the value of the alarm related to the DataTag has
-    // not changed. No need to publish an alarm change.
-    log.trace("Alarm #{} has not changed", alarmCacheObject.getId());
-
-    return alarmCacheObject;
+    // Human readable version, will be optimized by the compiler
+    String currentInfo = alarmCacheObject.getInfo();
+    String evaluatedInfo = evaluateAdditionalInfo(alarmCacheObject, tag);
+    return !evaluatedInfo.equals(currentInfo);
   }
 
-  boolean isAlarmUninitialised(final AlarmCacheObject alarmCacheObject) {
+  private static boolean isAlarmUninitialised(final AlarmCacheObject alarmCacheObject) {
     return alarmCacheObject.getTriggerTimestamp() == null || alarmCacheObject.getTriggerTimestamp().getTime() == 0L;
   }
 
-  private void changeTimestamps(final AlarmCacheObject alarmCacheObject, final Tag tag) {
+  private static void updateInfo(AlarmCacheObject alarmCacheObject, Tag tag) {
+    alarmCacheObject.setInfo(evaluateAdditionalInfo(alarmCacheObject, tag));
+  }
+
+  private static void updateTimestamps(final AlarmCacheObject alarmCacheObject, final Tag tag) {
     alarmCacheObject.setTriggerTimestamp(new Timestamp(System.currentTimeMillis()));
     alarmCacheObject.setSourceTimestamp(tag.getTimestamp());
   }
 
-  /**
-   * Build up a prefix according to the tag value's validity and mode
-   */
-  private void changeInfoField(final AlarmCacheObject alarmCacheObject, final Tag tag) {
-    alarmCacheObject.setInfo(AlarmCacheObjectController.evaluateAdditionalInfo(alarmCacheObject, tag));
-  }
+  private static void updateAlarmState(final AlarmCacheObject alarmCacheObject, Tag tag) {
+    boolean newState = alarmCacheObject.getCondition().evaluateState(tag.getValue());
 
-  private AlarmCacheObject commitAlarmStateChange(final AlarmCacheObject alarmCacheObject, final Tag tag) {
-    log.trace("Alarm #{} changed STATE to {}", alarmCacheObject.getId(), alarmCacheObject.isActive());
-
-    changeTimestamps(alarmCacheObject, tag);
-
-    // Check the oscillating status
-    boolean wasAlreadyOscillating = alarmCacheObject.isOscillating();
-    oscillationUpdater.updateOscillationStatus(alarmCacheObject);
-
-    changeInfoField(alarmCacheObject, tag);
+    alarmCacheObject.setInternalActive(newState);
 
     if (alarmCacheObject.isOscillating()) {
-        // When oscillating we force the alarm to *active*
-        // (only the *internalActive* property reflects the true status)
-        alarmCacheObject.setActive(true);
-    }
-    if (wasAlreadyOscillating) {
-        alarmCache.putQuiet(alarmCacheObject.getId(), alarmCacheObject);
+      // When oscillating we force the alarm to *active*
+      // (only the *internalActive* property reflects the true status)
+      alarmCacheObject.setActive(true);
     } else {
-        alarmCache.put(alarmCacheObject.getId(), alarmCacheObject);
+      alarmCacheObject.setActive(newState);
     }
-
-    return alarmCacheObject;
+    log.trace("Alarm #{} changed STATE to {}", alarmCacheObject.getId(), alarmCacheObject.isActive());
   }
 
 }

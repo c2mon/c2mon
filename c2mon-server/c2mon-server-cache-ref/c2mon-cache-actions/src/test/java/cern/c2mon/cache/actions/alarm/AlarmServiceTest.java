@@ -43,9 +43,7 @@ public class AlarmServiceTest {
     TagCacheFacade tagCacheFacade = new TagCacheFacade(ruleTagCache, controlTagCache, dataTagCache);
     UnifiedTagCacheFacade unifiedTagCacheFacade = new UnifiedTagCacheFacade(ruleTagCache, controlTagCache, dataTagCache);
     alarmCacheObjectController = new AlarmCacheObjectController();
-    alarmCacheObjectController.setOscillationUpdater(new OscillationUpdater());
-    alarmCacheObjectController.setAlarmCache(alarmCache);
-    alarmService = new AlarmService(alarmCache, tagCacheFacade, alarmCacheObjectController, unifiedTagCacheFacade);
+    alarmService = new AlarmService(alarmCache, tagCacheFacade, alarmCacheObjectController, unifiedTagCacheFacade, new OscillationUpdater());
   }
 
   @Test
@@ -60,7 +58,7 @@ public class AlarmServiceTest {
     insertAlarmAndDatatagThen((alarm, dataTag) -> {
       Alarm afterCache = alarmService.update(alarm.getId(), dataTag);
 
-      alarmCacheObjectController.update(alarm, dataTag);
+      alarmCacheObjectController.updateAlarmBasedOnTag(alarm, dataTag);
 
       assertEquals(alarm, afterCache);
       assertNotSame(alarm, afterCache);
@@ -75,7 +73,7 @@ public class AlarmServiceTest {
       // Initially the old object should not be evaluated
       assertNotEquals(alarm, afterCache);
 
-      alarmCacheObjectController.update(alarm, dataTag);
+      alarmCacheObjectController.updateAlarmBasedOnTag(alarm, dataTag);
 
       // The effect should be the same as calling the alarmCacheController update method
       assertEquals(alarm, afterCache);
@@ -152,14 +150,15 @@ public class AlarmServiceTest {
   public void updateTerminatesAlarm() {
     insertAlarmAndDatatagThen(
       (alarm, dataTag) -> {
-        Timestamp tagTime = new Timestamp(System.currentTimeMillis() - 1000);
-        dataTag = CacheObjectCreation.createTestDataTag3();
-//        dataTag.setSourceTimestamp(tagTime);
-//        dataTag.setValue("DOWN");
         Timestamp alarmTime = new Timestamp(System.currentTimeMillis() - 50000);
         alarm = CacheObjectCreation.createTestAlarm1();
 //        alarm.setTriggerTimestamp(alarmTime);
 //        alarm.setActive(true);
+
+        Timestamp tagTime = new Timestamp(System.currentTimeMillis() - 1000);
+        dataTag = CacheObjectCreation.createTestDataTag3();
+//        dataTag.setSourceTimestamp(tagTime);
+        dataTag.setValue("DOWN");
 
         assertTrue(alarm.isActive());
         assertFalse(alarm.getCondition().evaluateState(dataTag.getValue()));

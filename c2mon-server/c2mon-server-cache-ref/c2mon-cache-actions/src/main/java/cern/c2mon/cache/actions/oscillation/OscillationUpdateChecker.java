@@ -16,7 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.cache.actions.oscillation;
 
-import cern.c2mon.cache.actions.alarm.AlarmCacheObjectController;
+import cern.c2mon.cache.actions.alarm.AlarmService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.alarm.Alarm;
@@ -79,7 +79,7 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
   private final C2monCache<Alarm> alarmCacheRef;
   private final OscillationService oscillationCheckService;
   private final OscillationUpdater oscillationUpdater;
-  private final AlarmCacheObjectController alarmCacheUpdater;
+  private final AlarmService alarmService;
   private final C2monCache<DataTag> dataTagCacheRef;
   /**
    * Lifecycle flag.
@@ -93,18 +93,18 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
    * @param alarmCacheRef           the alarm cache to retrieve and update alarm cache objects.
    * @param oscillationCheckService the component that manages the oscillation check timer
    * @param oscillationUpdater      the instance that check oscillation statuses.
-   * @param alarmCacheUpdater
+   * @param alarmService
    * @param dataTagCacheRef         the data tag cache to retrieve data tag objects and check their original values.
    */
   @Inject
   public OscillationUpdateChecker(final C2monCache<Alarm> alarmCacheRef, final OscillationService oscillationCheckService,
-                                  final OscillationUpdater oscillationUpdater, final AlarmCacheObjectController alarmCacheUpdater,
+                                  final OscillationUpdater oscillationUpdater, final AlarmService alarmService,
                                   final C2monCache<DataTag> dataTagCacheRef) {
     super();
     this.alarmCacheRef = alarmCacheRef;
     this.oscillationCheckService = oscillationCheckService;
     this.oscillationUpdater = oscillationUpdater;
-    this.alarmCacheUpdater = alarmCacheUpdater;
+    this.alarmService = alarmService;
     this.dataTagCacheRef = dataTagCacheRef;
   }
 
@@ -189,7 +189,7 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
         oscillationUpdater.resetOscillationCounter(alarmCacheObject);
         Tag tag = dataTagCacheRef.get(alarmCacheObject.getDataTagId());
         if (tag != null) {
-          alarmCacheUpdater.resetOscillationStatus(alarmCacheObject, tag);
+          alarmService.stopOscillating(alarmCacheObject, tag);
         } else {
           log.error("Cannot locate data tag #{} - unable to reset oscillation status", alarmCacheObject.getDataTagId());
         }

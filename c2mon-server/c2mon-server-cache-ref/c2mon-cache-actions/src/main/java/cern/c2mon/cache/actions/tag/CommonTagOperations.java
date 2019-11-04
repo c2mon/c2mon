@@ -51,6 +51,16 @@ public interface CommonTagOperations<T extends Tag> {
    */
   void validate(T tag);
 
+  static boolean isReadyForEvaluation(Tag tag) {
+    return (
+      (tag != null)
+        && (tag.getValue() != null)
+        && (tag.isValid())
+        && (tag.getDataTagQuality().isInitialised())
+        && (tag.getTimestamp() != null)
+    );
+  }
+
   /**
    * Adds the quality flag to the current quality code of the DataTag with associated
    * description.

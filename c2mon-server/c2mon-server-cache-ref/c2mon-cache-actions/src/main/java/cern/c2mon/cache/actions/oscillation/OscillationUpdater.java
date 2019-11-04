@@ -56,7 +56,7 @@ public final class OscillationUpdater {
 
     /**
      * Increases the oscillation counter and evaluates if the alarm is oscillating or not.
-     * @param alarmCacheObject an updated alarm cache object with the new state
+     * @param alarmCacheObject a mutated alarm cache object with the new state
      */
     public void updateOscillationStatus(AlarmCacheObject alarmCacheObject) {
 
