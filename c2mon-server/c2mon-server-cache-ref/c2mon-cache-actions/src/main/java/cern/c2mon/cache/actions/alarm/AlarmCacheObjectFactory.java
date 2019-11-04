@@ -4,6 +4,8 @@ import cern.c2mon.cache.api.factory.AbstractCacheObjectFactory;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.AlarmCondition;
+import cern.c2mon.server.common.metadata.Metadata;
+import cern.c2mon.server.common.util.MetadataUtils;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.daq.config.Change;
 import org.springframework.stereotype.Component;
@@ -108,9 +110,8 @@ public class AlarmCacheObjectFactory extends AbstractCacheObjectFactory<Alarm> {
     }
 
     // ALARM metadata
-    // TODO Refactor this
-//    cern.c2mon.server.common.metadata.Metadata newMetadata = MetadataUtils.parseMetadataConfiguration(alarmProperties, alarmCacheObject.getMetadata());
-//    alarmCacheObject.setMetadata(newMetadata);
+    Metadata newMetadata = MetadataUtils.parseMetadataConfiguration(alarmProperties, alarmCacheObject.getMetadata());
+    alarmCacheObject.setMetadata(newMetadata);
 
     // set the JMS topic
     alarmCacheObject.setTopic(alarmService.getTopicForAlarm(alarmCacheObject));

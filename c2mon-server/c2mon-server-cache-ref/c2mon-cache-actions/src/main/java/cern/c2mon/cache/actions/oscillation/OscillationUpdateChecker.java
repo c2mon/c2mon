@@ -189,7 +189,7 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
         oscillationUpdater.resetOscillationCounter(alarmCacheObject);
         Tag tag = dataTagCacheRef.get(alarmCacheObject.getDataTagId());
         if (tag != null) {
-          alarmService.stopOscillating(alarmCacheObject, tag);
+          alarmService.stopOscillatingAndUpdate(alarmCacheObject, tag);
         } else {
           log.error("Cannot locate data tag #{} - unable to reset oscillation status", alarmCacheObject.getDataTagId());
         }

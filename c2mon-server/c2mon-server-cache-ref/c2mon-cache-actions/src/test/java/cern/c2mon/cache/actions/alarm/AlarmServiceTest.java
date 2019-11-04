@@ -32,7 +32,6 @@ public class AlarmServiceTest {
 
   private C2monCache<Alarm> alarmCache;
   private C2monCache<DataTag> dataTagCache;
-  private AlarmCacheObjectController alarmCacheObjectController;
 
   @Before
   public void setup() {
@@ -42,8 +41,7 @@ public class AlarmServiceTest {
     dataTagCache = new SimpleC2monCache<>("data");
     TagCacheFacade tagCacheFacade = new TagCacheFacade(ruleTagCache, controlTagCache, dataTagCache);
     UnifiedTagCacheFacade unifiedTagCacheFacade = new UnifiedTagCacheFacade(ruleTagCache, controlTagCache, dataTagCache);
-    alarmCacheObjectController = new AlarmCacheObjectController();
-    alarmService = new AlarmService(alarmCache, tagCacheFacade, alarmCacheObjectController, unifiedTagCacheFacade, new OscillationUpdater());
+    alarmService = new AlarmService(alarmCache, tagCacheFacade, unifiedTagCacheFacade, new OscillationUpdater());
   }
 
   @Test
@@ -56,9 +54,9 @@ public class AlarmServiceTest {
   @Test
   public void updateReturnsDifferentObject() {
     insertAlarmAndDatatagThen((alarm, dataTag) -> {
-      Alarm afterCache = alarmService.update(alarm.getId(), dataTag);
+      Alarm afterCache = alarmService.update(alarm, dataTag, false);
 
-      alarmCacheObjectController.updateAlarmBasedOnTag(alarm, dataTag);
+      alarmService.updateAlarmBasedOnTag(alarm, dataTag);
 
       assertEquals(alarm, afterCache);
       assertNotSame(alarm, afterCache);
@@ -68,12 +66,12 @@ public class AlarmServiceTest {
   @Test
   public void updateEvaluatesObject() {
     insertAlarmAndDatatagThen((alarm, dataTag) -> {
-      Alarm afterCache = alarmService.update(alarm.getId(), dataTag);
+      Alarm afterCache = alarmService.update(alarm, dataTag, false);
 
       // Initially the old object should not be evaluated
       assertNotEquals(alarm, afterCache);
 
-      alarmCacheObjectController.updateAlarmBasedOnTag(alarm, dataTag);
+      alarmService.updateAlarmBasedOnTag(alarm, dataTag);
 
       // The effect should be the same as calling the alarmCacheController update method
       assertEquals(alarm, afterCache);

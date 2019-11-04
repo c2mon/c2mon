@@ -1,13 +1,12 @@
 package cern.c2mon.server.cache.util;
 
 import cern.c2mon.server.common.metadata.Metadata;
+import cern.c2mon.server.common.util.MetadataUtils;
 import org.junit.Test;
 
 import java.util.Properties;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class MetadataUtilsTest {
 

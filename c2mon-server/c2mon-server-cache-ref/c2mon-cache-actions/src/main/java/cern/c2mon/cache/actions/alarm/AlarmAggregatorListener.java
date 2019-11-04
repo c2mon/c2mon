@@ -16,10 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.cache.actions.alarm;
 
-import cern.c2mon.server.common.alarm.Alarm;
-import cern.c2mon.server.common.tag.Tag;
-
-import java.util.List;
+import cern.c2mon.server.common.alarm.TagWithAlarms;
 
 /**
  * Interface that must be implemented by classes wishing
@@ -27,7 +24,6 @@ import java.util.List;
  * <b>evaluated</b> alarms.
  *
  * @author Mark Brightwell
- *
  */
 @FunctionalInterface
 public interface AlarmAggregatorListener {
@@ -36,10 +32,8 @@ public interface AlarmAggregatorListener {
    * Is called when a Tag update has been received, and associated
    * alarms have been evaluated.
    *
-   * @param tag the updated Tag
-   * @param alarms the new values of the associated alarms;
-   *          this list is <b>null</b> if no alarms are associated to the tag
+   * @param tagWithAlarms the object carrying both the tag and associated alarms
    */
-  void notifyOnUpdate(Tag tag, List<Alarm> alarms);
+  void notifyOnUpdate(TagWithAlarms tagWithAlarms);
 
 }

@@ -1,4 +1,4 @@
-package cern.c2mon.server.cache.util;
+package cern.c2mon.server.common.util;
 
 import cern.c2mon.shared.client.metadata.Metadata;
 

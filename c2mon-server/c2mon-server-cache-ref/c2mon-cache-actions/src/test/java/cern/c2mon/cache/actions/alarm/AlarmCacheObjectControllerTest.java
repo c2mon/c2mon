@@ -6,12 +6,10 @@ import org.junit.Test;
 
 public class AlarmCacheObjectControllerTest {
 
-  private static AlarmCacheObjectController alarmCacheObjectController;
   private static AlarmCacheObjectFactory alarmCacheObjectFactory;
 
   @BeforeClass
   public static void setup() {
-    alarmCacheObjectController = new AlarmCacheObjectController();
     alarmCacheObjectFactory = new AlarmCacheObjectFactory();
   }
 

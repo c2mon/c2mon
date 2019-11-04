@@ -23,28 +23,18 @@ import java.util.Collection;
 
 /**
  * Groups a Tag with the Alarms associated with it.
- * The Alarms should be evaluated for the set Tag
- * value.
+ * The Alarms are evaluated for the bundled Tag.
  *
- * <p>Foreseen usage is for both the Tag and Alarms
- * to be clones of the cache objects, frozen with
- * the corresponding values (for sending to the clients
- * for example)
+ * Both the Tag and Alarms are clones of the cache objects,
+ * frozen with the corresponding values (for sending
+ * to the clients for example)
  *
  * @author Mark Brightwell, Alexander Papageorgiou
  */
 @Data
 public class TagWithAlarms<T extends Tag> {
 
-  /**
-   * Get the Tag.
-   * @return the tag itself (usually not in the cache)
-   */
   private final T tag;
 
-  /**
-   * Get the associated Alarms.
-   * @return a collection of alarms evaluated for this Tag
-   */
   private final Collection<Alarm> alarms;
 }
