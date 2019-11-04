@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2019 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -27,6 +27,7 @@ import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.stereotype.Component;
 
 import cern.c2mon.client.core.config.C2monAutoConfiguration;
+import cern.c2mon.client.core.elasticsearch.ElasticsearchService;
 import cern.c2mon.client.core.service.*;
 
 /**
@@ -73,6 +74,9 @@ public class C2monServiceGateway implements ApplicationContextAware {
   /** Static reference to the <code>SupervisionService</code> singleton instance */
   private static SupervisionService supervisionService = null;
 
+  /** Static reference to the <code>ElasticsearchService</code> singleton instance */
+  private static ElasticsearchService elasticsearchService = null;
+
   /**
    * Protected default constructor
    */
@@ -95,7 +99,6 @@ public class C2monServiceGateway implements ApplicationContextAware {
    */
   public static CommandService getCommandService() {
     startC2monClientSynchronous();
-
     return commandService;
   }
 
@@ -105,7 +108,6 @@ public class C2monServiceGateway implements ApplicationContextAware {
    */
   public static AlarmService getAlarmService() {
     startC2monClientSynchronous();
-
     return alarmService;
   }
 
@@ -115,7 +117,6 @@ public class C2monServiceGateway implements ApplicationContextAware {
    */
   public static StatisticsService getStatisticsService() {
     startC2monClientSynchronous();
-
     return statisticsService;
   }
 
@@ -125,7 +126,6 @@ public class C2monServiceGateway implements ApplicationContextAware {
    */
   public static ConfigurationService getConfigurationService() {
     startC2monClientSynchronous();
-
     return configurationService;
   }
 
@@ -136,7 +136,6 @@ public class C2monServiceGateway implements ApplicationContextAware {
    */
   public static TagService getTagService() {
     startC2monClientSynchronous();
-
     return tagService;
   }
 
@@ -148,8 +147,16 @@ public class C2monServiceGateway implements ApplicationContextAware {
    */
   public static SupervisionService getSupervisionService() {
     startC2monClientSynchronous();
-
     return supervisionService;
+  }
+
+  /**
+   * @return The C2MON Elasticsearch service, which provides
+   *         methods for making advanced tag and alarm searches.
+   */
+  public static ElasticsearchService getElasticsearchService() {
+    startC2monClientSynchronous();
+    return elasticsearchService;
   }
 
   /**
@@ -231,11 +238,11 @@ public class C2monServiceGateway implements ApplicationContextAware {
   private static void initiateGatewayFields(final ApplicationContext context) {
     supervisionService = context.getBean(SupervisionService.class);
     commandService = context.getBean(CommandService.class);
-
     alarmService = context.getBean(AlarmService.class);
     configurationService = context.getBean(ConfigurationService.class);
     statisticsService = context.getBean(StatisticsService.class);
     tagService = context.getBean(TagService.class);
+    elasticsearchService = context.getBean(ElasticsearchService.class);
   }
 
   /**
