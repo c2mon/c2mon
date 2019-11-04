@@ -17,11 +17,14 @@
 package cern.c2mon.client.core.elasticsearch;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
+import java.util.Random;
 
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
-import cern.c2mon.server.common.datatag.DataTag;
+import cern.c2mon.server.common.alarm.AlarmCondition;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.common.metadata.Metadata;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
@@ -36,27 +39,7 @@ import cern.c2mon.shared.common.supervision.SupervisionConstants;
  */
 public class EntityUtils {
 
-  public static Alarm createAlarm() {
-    AlarmCacheObject alarm = new AlarmCacheObject();
-    alarm.setId(1L);
-    alarm.setDataTagId(2L);
-    alarm.setFaultFamily("fault family");
-    alarm.setFaultMember("fault member");
-    alarm.setFaultCode(0);
-    alarm.setTimestamp(new Timestamp(System.currentTimeMillis()));
-    alarm.setSourceTimestamp(new Timestamp(alarm.getTimestamp().getTime()));
-    Metadata metadata = new Metadata();
-    metadata.addMetadata("building", "1");
-    metadata.addMetadata("array", Collections.singletonList("test"));
-    metadata.addMetadata("responsiblePerson", "Fred");
-    alarm.setMetadata(metadata);
-    alarm.setInfo("alarm info");
-    alarm.setActive(false);
-    alarm.setInternalActive(false);
-    return alarm;
-  }
-
-  public static DataTag createDataTag1() {
+  public static DataTagCacheObject createDataTag1() {
     DataTagCacheObject tag = new DataTagCacheObject(1L, "cpu.loadavg", Long.class.getName(), DataTagConstants.MODE_OPERATIONAL);
     tag.setProcessId(50L);
     tag.setEquipmentId(150L);
@@ -77,7 +60,46 @@ public class EntityUtils {
     return tag;
   }
 
-  public static DataTag createDataTag2() {
+  public static List<Alarm> createAlarmsForTag(Long tagId) {
+    List<Alarm> alarmList = new ArrayList<>();
+    Random random = new Random();
+
+    AlarmCacheObject alarm1 = new AlarmCacheObject(random.nextLong());
+    alarm1.setDataTagId(tagId);
+    alarm1.setFaultFamily("fault family");
+    alarm1.setFaultMember("fault member");
+    alarm1.setFaultCode(223);
+    alarm1.setCondition(AlarmCondition
+         .fromConfigXML("<AlarmCondition class=\"cern.c2mon.server.common.alarm.ValueAlarmCondition\"><alarm-value type=\"Boolean\">true</alarm-value></AlarmCondition>"));
+    Metadata metadata1 = new Metadata();
+    metadata1.addMetadata("meta1", 1);
+    metadata1.addMetadata("meta2", "value2");
+    metadata1.addMetadata("meta3", "value3");
+    alarm1.setMetadata(metadata1);
+    alarm1.setTimestamp(new Timestamp(System.currentTimeMillis()));
+    alarm1.setSourceTimestamp(new Timestamp(alarm1.getTimestamp().getTime()));
+    alarmList.add(alarm1);
+
+
+    AlarmCacheObject alarm2 = new AlarmCacheObject(random.nextLong());
+    alarm2.setDataTagId(tagId);
+    alarm2.setFaultFamily("fault family 2");
+    alarm2.setFaultMember("fault member 2");
+    alarm2.setFaultCode(223);
+    alarm2.setCondition(AlarmCondition
+         .fromConfigXML("<AlarmCondition class=\"cern.c2mon.server.common.alarm.ValueAlarmCondition\"><alarm-value type=\"Boolean\">true</alarm-value></AlarmCondition>"));
+    Metadata metadata2 = new Metadata();
+    metadata2.addMetadata("meta4", 4);
+    metadata2.addMetadata("meta5", "value5");
+    metadata2.addMetadata("meta6", "value6");
+    alarm2.setMetadata(metadata2);
+    alarm2.setTimestamp(new Timestamp(System.currentTimeMillis()));
+    alarm2.setSourceTimestamp(new Timestamp(alarm2.getTimestamp().getTime()));
+    alarmList.add(alarm2);
+    return alarmList;
+  }
+
+  public static DataTagCacheObject createDataTag2() {
     DataTagCacheObject tag = new DataTagCacheObject(2L, "cpu.temperature", Long.class.getName(), DataTagConstants.MODE_OPERATIONAL);
     tag.setProcessId(50L);
     tag.setEquipmentId(150L);
