@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2019 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -16,9 +16,10 @@
  *****************************************************************************/
 package cern.c2mon.client.core.config;
 
-import cern.c2mon.shared.client.config.ClientJmsProperties;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+
+import cern.c2mon.shared.client.config.ClientJmsProperties;
 
 /**
  * Contains default values for all configurable properties.
@@ -57,18 +58,13 @@ public class C2monClientProperties {
      */
     private String url = "http://localhost:9200";
 
-    /**
-     * Prefix used for all C2MON indices. The final index format becomes:
-     *
-     * indexPrefix + "-" entity + "_" + bucket
-     *
-     * e.g.: c2mon-tag_2017-01
-     */
-    private String indexPrefix = "c2mon";
+    /** The username for connecting to Elasticsearch via REST */
+    private String username = "";
 
-    /**
-     * Name of the tag configuration index
-     */
-    private String tagConfigIndex = indexPrefix + "-tag-config";
+    /** The password of the given username for connecting to Elasticsearch via REST */
+    private String password = "";
+
+    /** The maximum amount of results that shall be returned from Elasticsearch query */
+    private int maxResults = 10_000;
   }
 }
