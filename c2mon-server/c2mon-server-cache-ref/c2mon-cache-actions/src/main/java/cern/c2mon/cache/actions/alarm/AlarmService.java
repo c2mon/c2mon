@@ -3,6 +3,7 @@ package cern.c2mon.cache.actions.alarm;
 import cern.c2mon.cache.actions.oscillation.OscillationUpdater;
 import cern.c2mon.cache.actions.tag.UnifiedTagCacheFacade;
 import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.cache.api.listener.impl.MultiThreadListener;
 import cern.c2mon.cache.api.listener.impl.SingleThreadListener;
 import cern.c2mon.cache.config.tag.TagCacheFacade;
@@ -17,7 +18,10 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static cern.c2mon.cache.actions.alarm.AlarmEvaluator.*;
@@ -59,6 +63,34 @@ public class AlarmService implements AlarmAggregator {
     this.oscillationUpdater = oscillationUpdater;
   }
 
+  /**
+   * @param alarmCacheObject
+   * @param tag
+   */
+  private static void applyAllUpdates(final AlarmCacheObject alarmCacheObject, Tag tag) {
+    alarmCacheObject.setInfo(evaluateAdditionalInfo(alarmCacheObject, tag));
+
+    boolean newState = alarmCacheObject.getCondition().evaluateState(tag.getValue());
+    if (newState && !alarmCacheObject.isActive()) {
+      // TODO Do we want to set this in another case as well?
+      // Perhaps during preInsertValidate, using the previous Alarm in cache?
+      alarmCacheObject.setTriggerTimestamp(new Timestamp(System.currentTimeMillis()));
+    }
+
+    alarmCacheObject.setSourceTimestamp(tag.getTimestamp());
+
+    alarmCacheObject.setInternalActive(newState);
+
+    if (alarmCacheObject.isOscillating()) {
+      // When oscillating we force the alarm to *active*
+      // (only the *internalActive* property reflects the true status)
+      alarmCacheObject.setActive(true);
+    } else {
+      alarmCacheObject.setActive(newState);
+    }
+    log.trace("Alarm #{} changed STATE to {}", alarmCacheObject.getId(), alarmCacheObject.isActive());
+  }
+
   @PostConstruct
   public void init() {
     unifiedTagCacheFacade.registerListener(new SingleThreadListener<Tag>(tag -> {
@@ -70,7 +102,7 @@ public class AlarmService implements AlarmAggregator {
     unifiedTagCacheFacade.registerListener(new MultiThreadListener<Tag>(8, tag -> {
       log.trace("Evaluating alarm for tag " + tag.getId() + " due to update notification.");
       List<Alarm> alarmList = evaluateAlarms(tag);
-      notifyListeners(tag, alarmList);
+      notifyListeners(new TagWithAlarms(tag.clone(), alarmList));
     }), CacheEvent.UPDATE_ACCEPTED);
   }
 
@@ -78,22 +110,22 @@ public class AlarmService implements AlarmAggregator {
    * Atomically get an alarm, get the connected tag, evaluate them,
    * then put any changes back into the cache if needed
    *
-   * @param alarmId
+   * @param alarmId the id of an alarm in cache
+   * @return the alarm with the given ID, after the update has happened
+   * @throws CacheElementNotFoundException if no alarm exists with the given id
    */
-  public void evaluateAlarm(Long alarmId) {
-    alarmCacheRef.executeTransaction(() -> {
+  public Alarm evaluateAlarm(Long alarmId) {
+    return alarmCacheRef.executeTransaction(() -> {
       Alarm alarm = alarmCacheRef.get(alarmId);
       Tag tag = tagCacheRef.get(alarm.getDataTagId());
-      return update((AlarmCacheObject) alarm, tag, true);
+      update((AlarmCacheObject) alarm, tag, true);
+      return alarm;
     });
   }
 
   /**
    * Atomically evaluate all alarms connected to this tag,
    * then put any changes back into the cache if needed
-   *
-   * Any alarms whose evaluations throw an exception will
-   * not be included in the result list
    *
    * @param tag
    * @return
@@ -104,33 +136,47 @@ public class AlarmService implements AlarmAggregator {
 
       // TODO Should this fail completely so it can rollback on exceptions?
       // TODO This would also allow us to drop the try-catch and simplify here
-      return alarmCacheRef.getAll(keys).values().stream().map(
+      return alarmCacheRef.getAll(keys).values().stream().peek(
         alarm -> {
           try {
-            return update((AlarmCacheObject) alarm, tag, true);
+            update((AlarmCacheObject) alarm, tag, true);
           } catch (Exception e) {
             log.error("Exception caught when attempting to evaluate alarm ID " + alarm.getId() + "  for tag " + tag.getId() + " - publishing to the client with no attached alarms.", e);
-            return null;
           }
-        }).filter(Objects::nonNull).collect(Collectors.toList());
+        }).collect(Collectors.toList());
     });
   }
 
-  public AlarmCacheObject update(final AlarmCacheObject alarmCacheObject, final Tag tag, boolean updateOscillation) {
+  /**
+   * If the alarm started (or restarted now), the timestamp will be set to now.
+   * Otherwise, it will use the timestamp of the previous alarm
+   *
+   * If the alarm was oscillating, listeners will NOT be notified
+   *
+   * The alarm will only be put in the cache if changes would be made to the current one
+   * @param alarmCacheObject
+   * @param tag
+   * @param updateOscillation
+   * @return
+   */
+  public boolean update(final AlarmCacheObject alarmCacheObject, final Tag tag, boolean updateOscillation) {
     if (updateOscillation) {
       oscillationUpdater.updateOscillationStatus(alarmCacheObject);
     }
 
     boolean isOscillating = alarmCacheObject.isOscillating();
 
-    updateAlarmBasedOnTag(alarmCacheObject, tag);
+    boolean shouldBePutInCache = updateAlarmBasedOnTag(alarmCacheObject, tag);
 
-    if (isOscillating) {
-      alarmCacheRef.putQuiet(alarmCacheObject.getId(), alarmCacheObject);
-    } else {
-      alarmCacheRef.put(alarmCacheObject.getId(), alarmCacheObject);
-    }
-    return alarmCacheObject;
+    if (shouldBePutInCache) {
+      if (isOscillating) {
+        alarmCacheRef.putQuiet(alarmCacheObject.getId(), alarmCacheObject);
+      } else {
+        alarmCacheRef.put(alarmCacheObject.getId(), alarmCacheObject);
+      }
+      return true;
+    } else
+      return false;
   }
 
   /**
@@ -138,7 +184,7 @@ public class AlarmService implements AlarmAggregator {
    * alarms (since Alarm evaluation is on the same thread as
    * the Tag cache update, these correspond to the Tag value
    * and cannot be modified during this method).
-   *
+   * <p>
    * Atomically
    */
   public TagWithAlarms getTagWithAlarms(Long id) {
@@ -207,40 +253,11 @@ public class AlarmService implements AlarmAggregator {
   }
 
   /**
-   *
-   * @param alarmCacheObject
-   * @param tag
-   */
-  private static void applyAllUpdates(final AlarmCacheObject alarmCacheObject, Tag tag) {
-    alarmCacheObject.setInfo(evaluateAdditionalInfo(alarmCacheObject, tag));
-
-    // TODO Is there any case where we don't want to update timestamps?
-    alarmCacheObject.setTriggerTimestamp(new Timestamp(System.currentTimeMillis()));
-    alarmCacheObject.setSourceTimestamp(tag.getTimestamp());
-
-    boolean newState = alarmCacheObject.getCondition().evaluateState(tag.getValue());
-
-    alarmCacheObject.setInternalActive(newState);
-
-    if (alarmCacheObject.isOscillating()) {
-      // When oscillating we force the alarm to *active*
-      // (only the *internalActive* property reflects the true status)
-      alarmCacheObject.setActive(true);
-    } else {
-      alarmCacheObject.setActive(newState);
-    }
-    log.trace("Alarm #{} changed STATE to {}", alarmCacheObject.getId(), alarmCacheObject.isActive());
-  }
-
-  /**
    * Notify the listeners of a tag update with associated alarms.
-   *
-   * @param tag       the Tag that has been updated
-   * @param alarmList the associated list of evaluated alarms
    */
-  private void notifyListeners(final Tag tag, final List<Alarm> alarmList) {
+  private void notifyListeners(final TagWithAlarms tagWithAlarms) {
     for (AlarmAggregatorListener listener : alarmUpdateObservable) {
-      listener.notifyOnUpdate(new TagWithAlarms(tag.clone(), alarmList));
+      listener.notifyOnUpdate(tagWithAlarms);
     }
   }
 }

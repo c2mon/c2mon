@@ -44,5 +44,4 @@ public interface AlarmAggregator {
    * @param aggregatorObserver the listener that should be notified
    */
   void registerForTagUpdates(AlarmAggregatorListener aggregatorObserver);
-
 }

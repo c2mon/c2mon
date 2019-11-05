@@ -22,7 +22,7 @@ import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 
 abstract class AbstractTagCacheObjectFactory<T extends AbstractTagCacheObject> extends AbstractCacheObjectFactory<T> {
 
-  DataTagQuality createValidQuality() {
+  public DataTagQuality createValidQuality() {
     DataTagQuality dataTagQuality = new DataTagQualityImpl();
     dataTagQuality.validate();
     return dataTagQuality;

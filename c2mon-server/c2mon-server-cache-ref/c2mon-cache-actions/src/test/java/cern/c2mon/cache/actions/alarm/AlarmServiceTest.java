@@ -12,6 +12,8 @@ import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.test.CacheObjectCreation;
+import cern.c2mon.server.test.cache.AlarmCacheObjectFactory;
+import cern.c2mon.server.test.cache.DataTagCacheObjectFactory;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
 import org.junit.Before;
@@ -51,30 +53,34 @@ public class AlarmServiceTest {
       (alarm, __) -> assertTrue("Alarm should have the same state as before evaluation", alarm.isActive()));
   }
 
+//  @Test
+//  public void updateReturnsDifferentObject() {
+//    insertAlarmAndDatatagThen((alarm, dataTag) -> {
+//      AlarmCacheObject preCache = alarm.clone();
+//
+//      alarmService.update(alarm, dataTag, false);
+//
+//      alarmService.updateAlarmBasedOnTag(alarm, dataTag);
+//
+//      assertEquals(alarm, afterCache);
+//      assertNotSame(alarm, afterCache);
+//    });
+//  }
+
   @Test
-  public void updateReturnsDifferentObject() {
+  public void updateIsConsistent() {
     insertAlarmAndDatatagThen((alarm, dataTag) -> {
-      Alarm afterCache = alarmService.update(alarm, dataTag, false);
+      AlarmCacheObject preCache = alarm.clone();
 
-      alarmService.updateAlarmBasedOnTag(alarm, dataTag);
-
-      assertEquals(alarm, afterCache);
-      assertNotSame(alarm, afterCache);
-    });
-  }
-
-  @Test
-  public void updateEvaluatesObject() {
-    insertAlarmAndDatatagThen((alarm, dataTag) -> {
-      Alarm afterCache = alarmService.update(alarm, dataTag, false);
+      alarmService.update(alarm, dataTag, true);
 
       // Initially the old object should not be evaluated
-      assertNotEquals(alarm, afterCache);
+      assertNotEquals(preCache, alarm);
 
-      alarmService.updateAlarmBasedOnTag(alarm, dataTag);
+      alarmService.update(preCache, dataTag, true);
 
       // The effect should be the same as calling the alarmCacheController update method
-      assertEquals(alarm, afterCache);
+      assertEquals(preCache, alarm);
     });
   }
 
@@ -117,7 +123,7 @@ public class AlarmServiceTest {
 
     alarmCache.put(alarm.getId(), alarm);
     //(1)test update works
-    AlarmCacheObject newAlarm = (AlarmCacheObject) alarmService.update(alarm.getId(), tag);
+    alarmService.update(alarm, tag, true);
 
     assertFalse(alarm.isActive());
     assertFalse(alarm.isActive()); //also update alarm parameter object (usually in cache)
@@ -129,6 +135,7 @@ public class AlarmServiceTest {
       (alarm, dataTag) -> {
         Timestamp tagTime = new Timestamp(System.currentTimeMillis() - 1000);
         dataTag.setSourceTimestamp(tagTime);
+        dataTag.setDataTagQuality(new DataTagCacheObjectFactory().createValidQuality());
         Timestamp alarmTime = new Timestamp(System.currentTimeMillis() - 50000);
         alarm.setTriggerTimestamp(alarmTime);
         alarm.setActive(true);
@@ -137,37 +144,33 @@ public class AlarmServiceTest {
         assertNotEquals(alarm.getSourceTimestamp(), dataTag.getTimestamp());
       },
       (alarmAfterInsert, dataTag) -> {
-        AlarmCacheObject alarmAfterUpdate = (AlarmCacheObject) alarmService.update(alarmAfterInsert.getId(), dataTag);
+        alarmService.update(alarmAfterInsert, dataTag, true);
 
-        assertEquals(alarmAfterUpdate.getSourceTimestamp(), dataTag.getTimestamp());
+        assertEquals(alarmAfterInsert.getSourceTimestamp(), dataTag.getTimestamp());
       }
     );
   }
 
   @Test
   public void updateTerminatesAlarm() {
-    insertAlarmAndDatatagThen(
-      (alarm, dataTag) -> {
-        Timestamp alarmTime = new Timestamp(System.currentTimeMillis() - 50000);
-        alarm = CacheObjectCreation.createTestAlarm1();
-//        alarm.setTriggerTimestamp(alarmTime);
-//        alarm.setActive(true);
+    AlarmCacheObject alarm = new AlarmCacheObjectFactory().alarmActiveWithFalseCondition();
+    Timestamp alarmTime = new Timestamp(System.currentTimeMillis() - 50000);
+    alarm.setTriggerTimestamp(alarmTime);
+    alarm.setActive(true);
+    DataTagCacheObject dataTag = new DataTagCacheObjectFactory().sampleBase();
+    Timestamp tagTime = new Timestamp(System.currentTimeMillis() - 1000);
+    dataTag.setSourceTimestamp(tagTime);
 
-        Timestamp tagTime = new Timestamp(System.currentTimeMillis() - 1000);
-        dataTag = CacheObjectCreation.createTestDataTag3();
-//        dataTag.setSourceTimestamp(tagTime);
-        dataTag.setValue("DOWN");
+    // Alarm is active, but the condition is false
+    assertTrue(alarm.isActive());
+    assertTrue(dataTag.isValid());
+    assertFalse(alarm.getCondition().evaluateState(dataTag.getValue()));
 
-        assertTrue(alarm.isActive());
-        assertFalse(alarm.getCondition().evaluateState(dataTag.getValue()));
-        assertTrue(dataTag.isValid());
-      },
-      (alarmAfterInsert, dataTag) -> {
-        AlarmCacheObject alarmAfterUpdate = (AlarmCacheObject) alarmService.update(alarmAfterInsert.getId(), dataTag);
-        assertFalse(alarmAfterUpdate.isActive());
-        assertTrue(dataTag.isValid());
-      }
-    );
+    // After evaluating, the alarm should be terminated
+    alarmService.update(alarm, dataTag, true);
+    assertFalse(alarm.isActive());
+    assertTrue(dataTag.isValid());
+    assertFalse(alarm.getCondition().evaluateState(dataTag.getValue()));
   }
 
   /**
@@ -192,10 +195,8 @@ public class AlarmServiceTest {
     alarmCache.put(alarm.getId(), alarm);
 
     //(1)test update works
-    AlarmCacheObject newAlarm = (AlarmCacheObject) alarmService.update(alarm.getId(), tag);
+    alarmService.update(alarm, tag, true);
 
-    assertTrue(newAlarm.isActive());
-    assertTrue(newAlarm.getTriggerTimestamp().after(origTime));
     assertTrue(alarm.isActive()); //also update alarm parameter object (usually in cache)
     assertTrue(alarm.getTriggerTimestamp().after(origTime));
 
@@ -212,12 +213,17 @@ public class AlarmServiceTest {
     dataTagCache.put(tag.getId(), tag);
     alarmCache.put(alarm.getId(), alarm);
 
-    AlarmCacheObject newAlarm2 = (AlarmCacheObject) alarmService.update(alarm2.getId(), tag);
+    alarmService.update(alarm2, tag, true);
 
-    assertFalse(newAlarm2.isActive()); //original TERMINATE!
-    assertEquals(newAlarm2.getTriggerTimestamp(), origTime);
     assertFalse(alarm2.isActive()); //original TERMINATE!
     assertEquals(alarm2.getTriggerTimestamp(), origTime);
+  }
+
+  @Test
+  public void olderAlarmGetsRejected() {
+    Timestamp now = new Timestamp(System.currentTimeMillis());
+    Timestamp before = new Timestamp(now.getTime() - 1000);
+//    Alarm
   }
 
   /**

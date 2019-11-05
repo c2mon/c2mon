@@ -35,5 +35,4 @@ public interface AlarmAggregatorListener {
    * @param tagWithAlarms the object carrying both the tag and associated alarms
    */
   void notifyOnUpdate(TagWithAlarms tagWithAlarms);
-
 }
