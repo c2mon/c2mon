@@ -16,7 +16,7 @@ public enum CacheEvent {
    */
   UPDATE_ACCEPTED,
   /**
-   * A {@link Cacheable} failed its {@link Cacheable#preInsertValidate(Cacheable)},
+   * A {@link Cacheable} failed its {@link C2monCacheFlow#preInsertValidate(Cacheable,Cacheable)},
    * causing the Cache to reject it
    */
   UPDATE_REJECTED,

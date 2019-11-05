@@ -61,6 +61,7 @@ public class AlarmService implements AlarmAggregator {
     this.tagCacheRef = tagCacheRef;
     this.unifiedTagCacheFacade = unifiedTagCacheFacade;
     this.oscillationUpdater = oscillationUpdater;
+    alarmCacheRef.setCacheFlow(new AlarmC2monCacheFlow());
   }
 
   /**
@@ -235,7 +236,7 @@ public class AlarmService implements AlarmAggregator {
    */
   public boolean updateAlarmBasedOnTag(final AlarmCacheObject alarmCacheObject, final Tag tag) {
     // TODO Is there any case where we want to evaluate despite invalid tag?
-    // TODO If so, readd the tag valid check to updateAlarmState
+    // TODO If so, re-add the tag valid check to updateAlarmState
     if (!isReadyForEvaluation(tag)) {
       log.debug("Alarm update called with erroneous Tag - leaving alarm status unchanged for alarm #{}", alarmCacheObject.getId());
       return false;

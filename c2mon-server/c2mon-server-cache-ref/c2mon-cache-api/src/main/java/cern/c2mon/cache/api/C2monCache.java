@@ -1,6 +1,7 @@
 package cern.c2mon.cache.api;
 
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
+import cern.c2mon.cache.api.flow.C2monCacheFlow;
 import cern.c2mon.cache.api.listener.ListenerDelegator;
 import cern.c2mon.cache.api.loader.CacheLoader;
 import cern.c2mon.cache.api.spi.CacheQuery;
@@ -28,6 +29,14 @@ import static java.util.Objects.requireNonNull;
  * @author Brice Copy
  */
 public interface C2monCache<V extends Cacheable> extends CacheDelegator<V>, Serializable, ListenerDelegator<V> {
+
+  C2monCacheFlow<V> getCacheFlow();
+
+  /**
+   * Injected by the service, when needed
+   * @param cacheFlow
+   */
+  void setCacheFlow(C2monCacheFlow<V> cacheFlow);
 
   CacheLoader getCacheLoader();
 
@@ -129,12 +138,12 @@ public interface C2monCache<V extends Cacheable> extends CacheDelegator<V>, Seri
       // Using this getter to avoid having to catch CacheElementNotFoundException
       // thrown by our own Cache.get
       V previous = getCache().get(key);
-      if (value.preInsertValidate(previous)) {
+      if (getCacheFlow().preInsertValidate(previous, value)) {
         // We're in a transaction, so this can't have been modified
         getCache().put(key, value);
         if (notifyListeners) {
           notifyListenersOf(UPDATE_ACCEPTED, value);
-          value.postInsertEvents(previous).forEach(event -> notifyListenersOf(event, value));
+          getCacheFlow().postInsertEvents(previous, value).forEach(event -> notifyListenersOf(event, value));
         }
       } else if (notifyListeners) {
         notifyListenersOf(UPDATE_REJECTED, value);

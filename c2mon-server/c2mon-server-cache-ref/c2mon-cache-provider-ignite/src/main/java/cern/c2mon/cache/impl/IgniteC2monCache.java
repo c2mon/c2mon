@@ -1,6 +1,8 @@
 package cern.c2mon.cache.impl;
 
 import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.flow.C2monCacheFlow;
+import cern.c2mon.cache.api.flow.DefaultC2monCacheFlow;
 import cern.c2mon.cache.api.listener.CacheListenerManager;
 import cern.c2mon.cache.api.listener.CacheListenerManagerImpl;
 import cern.c2mon.cache.api.loader.CacheLoader;
@@ -37,6 +39,10 @@ public class IgniteC2monCache<V extends Cacheable> implements C2monCache<V> {
 
   protected final String cacheName;
   private final Ignite igniteInstance;
+
+  @Getter
+  @Setter
+  protected C2monCacheFlow<V> cacheFlow = new DefaultC2monCacheFlow<>();
 
   @Getter
   @Setter

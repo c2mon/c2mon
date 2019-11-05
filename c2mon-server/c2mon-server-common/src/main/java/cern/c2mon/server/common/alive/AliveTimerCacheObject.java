@@ -17,7 +17,6 @@
 package cern.c2mon.server.common.alive;
 
 import cern.c2mon.server.common.AbstractCacheableImpl;
-import cern.c2mon.shared.common.Cacheable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -190,14 +189,5 @@ public class AliveTimerCacheObject extends AbstractCacheableImpl implements Aliv
         boolean different = this.active != active;
         this.active = active;
         return different;
-    }
-
-    @Override
-    public <T extends Cacheable> boolean preInsertValidate(T previous) {
-        return super.preInsertValidate(previous) &&
-          (previous == null ||
-          (this.getClass() == previous.getClass() &&
-            lastUpdate >= (((AliveTimerCacheObject) previous).getLastUpdate())
-          ));
     }
 }

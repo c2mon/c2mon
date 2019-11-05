@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 
 /**
- * @author Szymon Halastra
+ * @author Szymon Halastra, Alexander Papageorgiou
  */
 
 @Slf4j

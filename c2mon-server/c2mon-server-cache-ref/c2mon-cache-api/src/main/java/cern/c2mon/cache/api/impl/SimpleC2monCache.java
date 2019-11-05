@@ -2,6 +2,8 @@ package cern.c2mon.cache.api.impl;
 
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
+import cern.c2mon.cache.api.flow.C2monCacheFlow;
+import cern.c2mon.cache.api.flow.DefaultC2monCacheFlow;
 import cern.c2mon.cache.api.listener.CacheListenerManager;
 import cern.c2mon.cache.api.listener.CacheListenerManagerImpl;
 import cern.c2mon.cache.api.loader.CacheLoader;
@@ -25,6 +27,10 @@ import java.util.stream.Collectors;
  * @author Alexandros Papageorgiou Koufidis
  */
 public class SimpleC2monCache<V extends Cacheable> implements C2monCache<V> {
+
+  @Getter
+  @Setter
+  private C2monCacheFlow<V> cacheFlow = new DefaultC2monCacheFlow<>();
 
   @Getter
   private final MapBasedCache<V> cache = new MapBasedCache<>();

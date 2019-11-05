@@ -1,5 +1,7 @@
-package cern.c2mon.server.common.supervised;
+package cern.c2mon.cache;
 
+import cern.c2mon.cache.actions.supervision.AbstractSupervisedC2monCacheFlow;
+import cern.c2mon.server.common.equipment.EquipmentCacheObject;
 import cern.c2mon.server.common.supervision.Supervised;
 import cern.c2mon.shared.common.CacheEvent;
 import cern.c2mon.shared.common.supervision.SupervisionConstants;
@@ -14,13 +16,17 @@ import java.util.function.Consumer;
 import static cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus.*;
 import static org.junit.Assert.*;
 
-public abstract class AbstractSupervisedCacheObjectTest<T extends Supervised> extends SupervisedTest<T> {
+public class AbstractSupervisedCacheObjectTest {
+
+  private Supervised sample = new EquipmentCacheObject();
+  private AbstractSupervisedC2monCacheFlow cacheFlow = new AbstractSupervisedC2monCacheFlow() {
+  };
 
   @Test
   public void firstInsertionEvents() {
-    assertTrue(sample.postInsertEvents(null).contains(CacheEvent.INSERTED));
-    assertTrue(sample.postInsertEvents(null).contains(CacheEvent.SUPERVISION_UPDATE));
-    assertTrue(sample.postInsertEvents(null).contains(CacheEvent.SUPERVISION_CHANGE));
+    assertTrue(cacheFlow.postInsertEvents(null, sample).contains(CacheEvent.INSERTED));
+    assertTrue(cacheFlow.postInsertEvents(null, sample).contains(CacheEvent.SUPERVISION_UPDATE));
+    assertTrue(cacheFlow.postInsertEvents(null, sample).contains(CacheEvent.SUPERVISION_CHANGE));
   }
 
   @Test
@@ -79,13 +85,13 @@ public abstract class AbstractSupervisedCacheObjectTest<T extends Supervised> ex
     fires(clone -> clone.setSupervisionStatus(finalStatus), events);
   }
 
-  public void fires(Consumer<T> mutater, CacheEvent... events) throws CloneNotSupportedException {
-    T clone = (T) sample.clone();
+  public void fires(Consumer<Supervised> mutater, CacheEvent... events) throws CloneNotSupportedException {
+    Supervised clone = (Supervised) sample.clone();
     mutater.accept(clone);
-    Set<CacheEvent> results = sample.postInsertEvents(clone);
+    Set<CacheEvent> results = cacheFlow.postInsertEvents(clone, sample);
 
     // Running it twice should produce same results
-    assertEquals(results, sample.postInsertEvents(clone));
+    assertEquals(results, cacheFlow.postInsertEvents(clone, sample));
 
     // All events are contained
     for (CacheEvent event : events)

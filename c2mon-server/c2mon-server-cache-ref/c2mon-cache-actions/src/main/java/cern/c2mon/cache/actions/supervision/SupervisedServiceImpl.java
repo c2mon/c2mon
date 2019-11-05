@@ -37,6 +37,7 @@ public class SupervisedServiceImpl<T extends Supervised> implements SupervisedSe
     this.cacheRef = cacheRef;
     this.aliveTimerService = aliveTimerService;
     this.aliveTimerCache = aliveTimerService.getCache();
+    cacheRef.setCacheFlow(new AbstractSupervisedC2monCacheFlow<>());
   }
 
   @Override

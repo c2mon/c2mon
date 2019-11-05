@@ -7,7 +7,7 @@ import cern.c2mon.shared.common.datatag.DataTagConstants;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class AlarmEvaluator {
+class AlarmEvaluator {
 
   private AlarmEvaluator() {
 
