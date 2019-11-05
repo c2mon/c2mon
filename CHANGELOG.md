@@ -10,8 +10,14 @@ For more details on a given release, please check also the [version planning](ht
 ### Added
 
 ### Changed
+- Client API: Added possibility to define credentials for making queries to Elasticsearch (CM-232)
+- Documentation is now build with Jekyll instead of MkDocs
 
 ### Fixed
+- Client API: Fixed Elasticsearch tests for C2MON client API (CM-230)
+
+### Deprecated
+- Client API: Renamed some of the ElasticsearchService methods. Old method names still exist but are marked as deprecated.
 
 
 ## 1.9.2 - 2019-08-28
