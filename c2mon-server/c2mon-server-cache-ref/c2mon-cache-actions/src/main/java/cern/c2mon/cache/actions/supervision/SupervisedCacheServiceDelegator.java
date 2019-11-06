@@ -18,18 +18,13 @@ import java.sql.Timestamp;
  *
  * @param <T> the type of {@link Supervised} objects the cache contains
  */
-public interface SupervisedServiceDelegator<T extends Supervised> extends SupervisedService<T> {
+public interface SupervisedCacheServiceDelegator<T extends Supervised> extends SupervisedCacheService<T> {
 
-  SupervisedService<T> getSupervisedService();
+  SupervisedCacheService<T> getSupervisedService();
 
   @Override
   default SupervisionEvent getSupervisionStatus(long id) {
     return getSupervisedService().getSupervisionStatus(id);
-  }
-
-  @Override
-  default void refreshAndNotifyCurrentSupervisionStatus(long id) {
-    getSupervisedService().refreshAndNotifyCurrentSupervisionStatus(id);
   }
 
   @Override
@@ -69,18 +64,13 @@ public interface SupervisedServiceDelegator<T extends Supervised> extends Superv
   }
 
   @Override
-  default void removeAliveTimer(long id) {
-    getSupervisedService().removeAliveTimer(id);
+  default void removeAliveTimerBySupervisedId(long id) {
+    getSupervisedService().removeAliveTimerBySupervisedId(id);
   }
 
   @Override
   default void loadAndStartAliveTag(long supervisedId) {
     getSupervisedService().loadAndStartAliveTag(supervisedId);
-  }
-
-  @Override
-  default void removeAliveDirectly(long aliveId) {
-    getSupervisedService().removeAliveDirectly(aliveId);
   }
 
   @Override

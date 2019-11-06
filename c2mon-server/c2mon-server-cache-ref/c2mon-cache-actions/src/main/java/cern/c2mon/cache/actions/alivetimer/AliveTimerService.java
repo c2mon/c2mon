@@ -128,6 +128,18 @@ public class AliveTimerService {
     filterAndSetActive(false);
   }
 
+  /**
+   * Stops and removes this alive by alive id. Should only be
+   * used when it is no longer reference by a supervised object
+   * (for instance on reconfiguration error recovery).
+   *
+   * @param aliveId id of the alive
+   */
+  public void removeAliveTimer(long aliveId) {
+    stop(aliveId);
+    aliveTimerCacheRef.remove(aliveId);
+  }
+
   private void filterAndSetActive(boolean active) {
     try {
       for (AliveTimer aliveTimer : aliveTimerCacheRef.query(aliveTimer -> aliveTimer.isActive() != active)) {

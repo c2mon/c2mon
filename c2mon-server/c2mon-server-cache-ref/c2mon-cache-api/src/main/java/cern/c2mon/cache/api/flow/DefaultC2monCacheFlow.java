@@ -5,15 +5,24 @@ import cern.c2mon.shared.common.Cacheable;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.BiPredicate;
 
 /**
  * A simple cache flow that allows all distinct (different than older value) updates through
  */
 public class DefaultC2monCacheFlow<T extends Cacheable> implements C2monCacheFlow<T> {
 
+  private BiPredicate<T, T> olderIsBeforeNewer;
+
+  public DefaultC2monCacheFlow(BiPredicate<T, T> olderIsBeforeNewer) {
+    this.olderIsBeforeNewer = olderIsBeforeNewer;
+  }
+
   @Override
   public boolean preInsertValidate(T older, T newer) {
-    return !newer.equals(older);
+    return
+      older == null // true for first item inserted
+        || (!newer.equals(older) && olderIsBeforeNewer.test(older, newer));
   }
 
   @Override

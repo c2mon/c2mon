@@ -3,8 +3,8 @@ package cern.c2mon.cache.actions.process;
 import cern.c2mon.cache.actions.alivetimer.AliveTimerService;
 import cern.c2mon.cache.actions.equipment.EquipmentService;
 import cern.c2mon.cache.actions.subequipment.SubEquipmentService;
-import cern.c2mon.cache.actions.supervision.SupervisedService;
-import cern.c2mon.cache.actions.supervision.SupervisedServiceDelegator;
+import cern.c2mon.cache.actions.supervision.SupervisedCacheService;
+import cern.c2mon.cache.actions.supervision.SupervisedCacheServiceDelegator;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.alive.AliveTimer;
@@ -27,7 +27,7 @@ import java.util.*;
  */
 @Slf4j
 @Service
-public class ProcessService implements ProcessOperationService, SupervisedServiceDelegator<Process> {
+public class ProcessService implements ProcessOperationService, SupervisedCacheServiceDelegator<Process> {
 
   /**
    * PIK numbers limit (max)
@@ -41,7 +41,7 @@ public class ProcessService implements ProcessOperationService, SupervisedServic
   @Getter
   protected C2monCache<Process> processCacheRef;
   @Getter
-  protected SupervisedService<Process> supervisedService;
+  protected SupervisedCacheService<Process> supervisedService;
   private C2monCache<AliveTimer> aliveTimerCache;
   private EquipmentService equipmentService;
   private SubEquipmentService subEquipmentService;

@@ -17,6 +17,7 @@
 package cern.c2mon.cache.actions.supervision;
 
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
+import cern.c2mon.cache.api.flow.C2monCacheFlow;
 import cern.c2mon.server.common.supervision.Supervised;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.common.Cacheable;
@@ -32,7 +33,7 @@ import java.sql.Timestamp;
  * @param <T> the cache object type
  * @author Mark Brightwell
  */
-public interface SupervisedService<T extends Supervised> {
+public interface SupervisedCacheService<T extends Supervised> {
 
   /**
    * Returns the last supervision event that occured
@@ -43,21 +44,6 @@ public interface SupervisedService<T extends Supervised> {
    * @return the last supervision event
    */
   SupervisionEvent getSupervisionStatus(long id);
-
-  /**
-   * Notifies all registered listeners of the current supervision status
-   * of the cache element with given id. The timestamp of all events is refreshed
-   * to the current time. Is used for example on server startup
-   * to "refresh" all listeners in cache of server failure.
-   *
-   * @param id id of the cache element
-   * @deprecated use {@link SupervisedService#refresh(long)} instead, as any
-   *             supervision update will trigger an event
-   */
-  @Deprecated
-  default void refreshAndNotifyCurrentSupervisionStatus(long id){
-    refresh(id);
-  }
 
   /**
    * Notifies all registered listeners of the current supervision status
@@ -77,7 +63,7 @@ public interface SupervisedService<T extends Supervised> {
    *
    * @param id        The cache id of the supervised object
    * @param timestamp time of the start
-   * @return the cache object, after {@link Cacheable#postInsertEvents(Cacheable)}
+   * @return the cache object, after {@link C2monCacheFlow#postInsertEvents(Cacheable, Cacheable)}
    */
   T start(long id, @NonNull Timestamp timestamp);
 
@@ -89,7 +75,7 @@ public interface SupervisedService<T extends Supervised> {
    *
    * @param id        The cache id of the supervised object
    * @param timestamp time of the stop
-   * @return the cache object, after {@link Cacheable#postInsertEvents(Cacheable)}
+   * @return the cache object, after {@link C2monCacheFlow#postInsertEvents(Cacheable, Cacheable)}
    */
   T stop(long id, @NonNull Timestamp timestamp);
 
@@ -101,7 +87,7 @@ public interface SupervisedService<T extends Supervised> {
    * @param id        The cache id of the supervised object
    * @param timestamp time of the running event
    * @param message   details of the event
-   * @return the cache object, after {@link Cacheable#postInsertEvents(Cacheable)}
+   * @return the cache object, after {@link C2monCacheFlow#postInsertEvents(Cacheable, Cacheable)}
    */
   T resume(long id, @NonNull Timestamp timestamp, @NonNull String message);
 
@@ -113,7 +99,7 @@ public interface SupervisedService<T extends Supervised> {
    * @param id        The cache id of the supervised object
    * @param timestamp time of problem
    * @param message   details
-   * @return the cache object, after {@link Cacheable#postInsertEvents(Cacheable)}
+   * @return the cache object, after {@link C2monCacheFlow#postInsertEvents(Cacheable, Cacheable)}
    */
   T suspend(long id, @NonNull Timestamp timestamp, @NonNull String message);
 
@@ -141,7 +127,7 @@ public interface SupervisedService<T extends Supervised> {
    * @param id of supervised object
    * @throws CacheElementNotFoundException if the supervised object cannot be located in the corresponding cache
    */
-  void removeAliveTimer(long id);
+  void removeAliveTimerBySupervisedId(long id);
 
   /**
    * Loads the alive timer into the cache and starts it.
@@ -150,15 +136,6 @@ public interface SupervisedService<T extends Supervised> {
    * @param supervisedId id of supervised object
    */
   void loadAndStartAliveTag(long supervisedId);
-
-  /**
-   * Stops and removes this alive by alive id. Should only be
-   * used when it is no longer reference by a supervised object
-   * (for instance on reconfiguration error recovery).
-   *
-   * @param aliveId id of the alive
-   */
-  void removeAliveDirectly(long aliveId);
 
   SupervisionConstants.SupervisionEntity getSupervisionEntity();
 }

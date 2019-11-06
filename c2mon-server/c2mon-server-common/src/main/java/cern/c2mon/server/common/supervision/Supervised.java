@@ -32,7 +32,7 @@ import java.sql.Timestamp;
 public interface Supervised extends Cacheable {
 
   /**
-   * Returns the human-readable name of the cache object.
+   * Returns the  name of the cache object.
    *
    * @return the object name
    */

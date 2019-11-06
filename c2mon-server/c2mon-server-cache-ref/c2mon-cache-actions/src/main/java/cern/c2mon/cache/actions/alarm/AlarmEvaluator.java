@@ -6,6 +6,14 @@ import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.common.datatag.DataTagConstants;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Objects;
+
+/**
+ * Strictly business logic related to alarm
+ *
+ * No functions here have side effects. Please don't introduce any!
+ * Write mutating code in the {@link AlarmService} instead
+ */
 @Slf4j
 class AlarmEvaluator {
 
@@ -13,17 +21,44 @@ class AlarmEvaluator {
 
   }
 
-  static boolean isReadyForEvaluation(Tag tag) {
-    return (
-      (tag != null)
-        && (tag.getValue() != null)
-        && (tag.isValid())
-        && (tag.getDataTagQuality().isInitialised())
-        && (tag.getTimestamp() != null)
-    );
+  static boolean isLaterThan(Alarm older, Alarm newer) {
+    return newer.getSourceTimestamp().getTime() >= older.getSourceTimestamp().getTime();
   }
 
-  static String evaluateAdditionalInfo(final Alarm alarm, final Tag tag) {
+  static boolean alarmShouldBeUpdated(Alarm alarm, Tag tag) {
+    if (!isAlarmConnectedToTag(alarm, tag)) {
+      log.warn("Alarm #{} with datatagId #{} will not be updated - the tag passed in the update does not have a matching id: #{}",
+        alarm.getId(), alarm.getDataTagId(),tag.getId());
+      return false;
+    }
+
+    if (isTagMissingCriticalInformation(tag)) {
+      log.debug("Erroneous Tag information - alarm #{} will not be updated", alarm.getId());
+      return false;
+    }
+
+    // TODO Oscillation check? Otherwise the active and internalActive properties on this are pretty useless
+    if (!isAlarmChangedBasedOnTag(alarm, tag)) {
+      log.debug("No changes were detected based on the tag - will not update alarm #{}", alarm.getId());
+      return false;
+    }
+
+    return true;
+  }
+
+  private static boolean isAlarmConnectedToTag(Alarm alarm, Tag tag) {
+    return Objects.equals(alarm.getDataTagId(), tag.getId());
+  }
+
+  private static boolean isTagMissingCriticalInformation(Tag tag) {
+    return tag == null
+      || tag.getValue() == null
+      || !tag.isValid()
+      || !tag.getDataTagQuality().isInitialised()
+      || tag.getTimestamp() == null;
+  }
+
+  static String createAdditionalInfoString(final Alarm alarm, final Tag tag) {
     String additionalInfo = "";
 
     if (tag != null) {
@@ -52,39 +87,21 @@ class AlarmEvaluator {
     return additionalInfo;
   }
 
-  /**
-   * Detects if an alarm has changed based on the tag contents.
-   * <p>
-   * Absolutely no side effects (and please don't introduce any)
-   *
-   * @param alarm
-   * @param tag
-   * @return {@link Boolean#TRUE} if the has changes based on the tag
-   */
-  static boolean detectChanges(final Alarm alarm, final Tag tag) {
+  private static boolean isAlarmChangedBasedOnTag(final Alarm alarm, final Tag tag) {
     AlarmCacheObject alarmCacheObject = (AlarmCacheObject) alarm;
 
     // If the alarm has not been initialized, we need to update it
     if (isAlarmUninitialised(alarmCacheObject))
       return true;
 
-    // If the new or previous state is active, we need to update
-    // TODO Oscillation check here?
     boolean newState = alarmCacheObject.getCondition().evaluateState(tag.getValue());
-    if (newState || alarmCacheObject.isActive()) {
-      return true;
-    }
-
-    // If the internal state has changed, we should try to update
-    // Oscillation checks might mean that in the end this update could be dropped though
-    boolean internalStateHasChanged = alarmCacheObject.isInternalActive() != newState;
-    if ((tag.isValid() && internalStateHasChanged)) {
+    if (newState != alarmCacheObject.isActive() || newState != alarmCacheObject.isInternalActive()) {
       return true;
     }
 
     // Human readable version, will be optimized by the compiler
     String currentInfo = alarmCacheObject.getInfo();
-    String evaluatedInfo = evaluateAdditionalInfo(alarmCacheObject, tag);
+    String evaluatedInfo = createAdditionalInfoString(alarmCacheObject, tag);
     return !evaluatedInfo.equals(currentInfo);
   }
 

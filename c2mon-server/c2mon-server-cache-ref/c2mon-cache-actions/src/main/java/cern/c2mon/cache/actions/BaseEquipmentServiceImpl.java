@@ -2,9 +2,9 @@ package cern.c2mon.cache.actions;
 
 import cern.c2mon.cache.actions.alivetimer.AliveTimerService;
 import cern.c2mon.cache.actions.commfault.CommFaultService;
-import cern.c2mon.cache.actions.supervision.SupervisedService;
-import cern.c2mon.cache.actions.supervision.SupervisedServiceDelegator;
-import cern.c2mon.cache.actions.supervision.SupervisedServiceImpl;
+import cern.c2mon.cache.actions.supervision.AbstractSupervisedService;
+import cern.c2mon.cache.actions.supervision.SupervisedCacheService;
+import cern.c2mon.cache.actions.supervision.SupervisedCacheServiceDelegator;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.service.CommonEquipmentOperations;
 import cern.c2mon.server.common.commfault.CommFaultTag;
@@ -20,7 +20,7 @@ import java.util.Set;
  * @author Szymon Halastra
  * @author Alexandros Papageorgiou Koufidis
  */
-public abstract class BaseEquipmentServiceImpl<T extends AbstractEquipment> implements CommonEquipmentOperations, SupervisedServiceDelegator<T> {
+public abstract class BaseEquipmentServiceImpl<T extends AbstractEquipment> implements CommonEquipmentOperations, SupervisedCacheServiceDelegator<T> {
 
   @Getter
   private C2monCache<T> c2monCache;
@@ -28,14 +28,14 @@ public abstract class BaseEquipmentServiceImpl<T extends AbstractEquipment> impl
   private C2monCache<CommFaultTag> commFaultTagCache;
 
   @Getter
-  private SupervisedService<T> supervisedService;
+  private SupervisedCacheService<T> supervisedService;
 
   protected BaseEquipmentServiceImpl(C2monCache<T> c2monCache, CommFaultService commFaultService,
                                      AliveTimerService aliveTimerService, SupervisionConstants.SupervisionEntity supervisionEntity) {
     this.c2monCache = c2monCache;
     this.commFaultTagCache = commFaultService.getCache();
 
-    supervisedService = new SupervisedServiceImpl<>(supervisionEntity,c2monCache, aliveTimerService);
+    supervisedService = new AbstractSupervisedService<>(supervisionEntity,c2monCache, aliveTimerService);
   }
 
   @Override

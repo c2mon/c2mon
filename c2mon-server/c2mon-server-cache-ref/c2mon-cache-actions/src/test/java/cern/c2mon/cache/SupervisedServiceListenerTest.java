@@ -1,6 +1,6 @@
 package cern.c2mon.cache;
 
-import cern.c2mon.cache.actions.supervision.SupervisedService;
+import cern.c2mon.cache.actions.supervision.SupervisedCacheService;
 import cern.c2mon.server.common.supervision.Supervised;
 import cern.c2mon.shared.common.CacheEvent;
 import org.junit.Before;
@@ -10,9 +10,9 @@ import static org.junit.Assert.assertEquals;
 
 public abstract class SupervisedServiceListenerTest<T extends Supervised> extends MultiThreadCacheListenerTest<T> {
 
-  protected SupervisedService<T> supervisedService;
+  protected SupervisedCacheService<T> supervisedService;
 
-  protected abstract SupervisedService<T> getSupervisedService();
+  protected abstract SupervisedCacheService<T> getSupervisedService();
 
   // TODO Test with other kinds of listeners too?
 

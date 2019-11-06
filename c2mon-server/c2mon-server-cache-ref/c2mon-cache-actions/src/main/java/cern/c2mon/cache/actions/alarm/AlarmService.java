@@ -1,5 +1,6 @@
 package cern.c2mon.cache.actions.alarm;
 
+import cern.c2mon.cache.actions.AbstractCacheService;
 import cern.c2mon.cache.actions.oscillation.OscillationUpdater;
 import cern.c2mon.cache.actions.tag.UnifiedTagCacheFacade;
 import cern.c2mon.cache.api.C2monCache;
@@ -24,7 +25,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static cern.c2mon.cache.actions.alarm.AlarmEvaluator.*;
+import static cern.c2mon.cache.actions.alarm.AlarmEvaluator.createAdditionalInfoString;
 
 /**
  * @author Szymon Halastra
@@ -33,7 +34,7 @@ import static cern.c2mon.cache.actions.alarm.AlarmEvaluator.*;
  */
 @Slf4j
 @Service
-public class AlarmService implements AlarmAggregator {
+public class AlarmService extends AbstractCacheService<Alarm> implements AlarmAggregator {
 
   /**
    * We decided to distribute all alarms on the same topic in order to reduce
@@ -44,8 +45,6 @@ public class AlarmService implements AlarmAggregator {
    */
   public static final String ALARM_TOPIC = "tim.alarm";
 
-  private C2monCache<Alarm> alarmCacheRef;
-
   private TagCacheFacade tagCacheRef;
 
   private List<AlarmAggregatorListener> alarmUpdateObservable = new ArrayList<>();
@@ -55,56 +54,22 @@ public class AlarmService implements AlarmAggregator {
   private OscillationUpdater oscillationUpdater;
 
   @Inject
-  public AlarmService(final C2monCache<Alarm> alarmCacheRef, final TagCacheFacade tagCacheRef,
+  public AlarmService(final C2monCache<Alarm> cache, final TagCacheFacade tagCacheRef,
                       final UnifiedTagCacheFacade unifiedTagCacheFacade, final OscillationUpdater oscillationUpdater) {
-    this.alarmCacheRef = alarmCacheRef;
+    super(cache, AlarmEvaluator::isLaterThan);
     this.tagCacheRef = tagCacheRef;
     this.unifiedTagCacheFacade = unifiedTagCacheFacade;
     this.oscillationUpdater = oscillationUpdater;
-    alarmCacheRef.setCacheFlow(new AlarmC2monCacheFlow());
-  }
-
-  /**
-   * @param alarmCacheObject
-   * @param tag
-   */
-  private static void applyAllUpdates(final AlarmCacheObject alarmCacheObject, Tag tag) {
-    alarmCacheObject.setInfo(evaluateAdditionalInfo(alarmCacheObject, tag));
-
-    boolean newState = alarmCacheObject.getCondition().evaluateState(tag.getValue());
-    if (newState && !alarmCacheObject.isActive()) {
-      // TODO Do we want to set this in another case as well?
-      // Perhaps during preInsertValidate, using the previous Alarm in cache?
-      alarmCacheObject.setTriggerTimestamp(new Timestamp(System.currentTimeMillis()));
-    }
-
-    alarmCacheObject.setSourceTimestamp(tag.getTimestamp());
-
-    alarmCacheObject.setInternalActive(newState);
-
-    if (alarmCacheObject.isOscillating()) {
-      // When oscillating we force the alarm to *active*
-      // (only the *internalActive* property reflects the true status)
-      alarmCacheObject.setActive(true);
-    } else {
-      alarmCacheObject.setActive(newState);
-    }
-    log.trace("Alarm #{} changed STATE to {}", alarmCacheObject.getId(), alarmCacheObject.isActive());
   }
 
   @PostConstruct
   public void init() {
-    unifiedTagCacheFacade.registerListener(new SingleThreadListener<Tag>(tag -> {
-      log.trace("Evaluating alarm for tag " + tag.getId() + " due to supervision status notification.");
-      evaluateAlarms(tag);
-    }), CacheEvent.SUPERVISION_CHANGE);
+    unifiedTagCacheFacade.registerListener(
+      new SingleThreadListener<>(this::supervisionChangeListener), CacheEvent.SUPERVISION_CHANGE);
 
-    // We expect to be getting many of these events
-    unifiedTagCacheFacade.registerListener(new MultiThreadListener<Tag>(8, tag -> {
-      log.trace("Evaluating alarm for tag " + tag.getId() + " due to update notification.");
-      List<Alarm> alarmList = evaluateAlarms(tag);
-      notifyListeners(new TagWithAlarms(tag.clone(), alarmList));
-    }), CacheEvent.UPDATE_ACCEPTED);
+    // Multithread, because we expect to be getting many of these events
+    unifiedTagCacheFacade.registerListener(
+      new MultiThreadListener<>(8, this::updateAcceptedListener), CacheEvent.UPDATE_ACCEPTED);
   }
 
   /**
@@ -116,8 +81,8 @@ public class AlarmService implements AlarmAggregator {
    * @throws CacheElementNotFoundException if no alarm exists with the given id
    */
   public Alarm evaluateAlarm(Long alarmId) {
-    return alarmCacheRef.executeTransaction(() -> {
-      Alarm alarm = alarmCacheRef.get(alarmId);
+    return cache.executeTransaction(() -> {
+      Alarm alarm = cache.get(alarmId);
       Tag tag = tagCacheRef.get(alarm.getDataTagId());
       update((AlarmCacheObject) alarm, tag, true);
       return alarm;
@@ -132,12 +97,12 @@ public class AlarmService implements AlarmAggregator {
    * @return
    */
   public List<Alarm> evaluateAlarms(final Tag tag) {
-    return alarmCacheRef.executeTransaction(() -> {
+    return cache.executeTransaction(() -> {
       Set<Long> keys = new HashSet<>(tag.getAlarmIds());
 
       // TODO Should this fail completely so it can rollback on exceptions?
       // TODO This would also allow us to drop the try-catch and simplify here
-      return alarmCacheRef.getAll(keys).values().stream().peek(
+      return cache.getAll(keys).values().stream().peek(
         alarm -> {
           try {
             update((AlarmCacheObject) alarm, tag, true);
@@ -151,14 +116,10 @@ public class AlarmService implements AlarmAggregator {
   /**
    * If the alarm started (or restarted now), the timestamp will be set to now.
    * Otherwise, it will use the timestamp of the previous alarm
-   *
+   * <p>
    * If the alarm was oscillating, listeners will NOT be notified
-   *
+   * <p>
    * The alarm will only be put in the cache if changes would be made to the current one
-   * @param alarmCacheObject
-   * @param tag
-   * @param updateOscillation
-   * @return
    */
   public boolean update(final AlarmCacheObject alarmCacheObject, final Tag tag, boolean updateOscillation) {
     if (updateOscillation) {
@@ -167,32 +128,28 @@ public class AlarmService implements AlarmAggregator {
 
     boolean isOscillating = alarmCacheObject.isOscillating();
 
-    boolean shouldBePutInCache = updateAlarmBasedOnTag(alarmCacheObject, tag);
+    boolean alarmShouldBeUpdated = AlarmEvaluator.alarmShouldBeUpdated(alarmCacheObject, tag);
 
-    if (shouldBePutInCache) {
+    if (alarmShouldBeUpdated) {
+      // TODO Is there any case where we want to evaluate despite invalid tag?
+      // TODO If so, re-add the tag valid check to updateAlarmState
+      mutateAlarmUsingTag(alarmCacheObject, tag);
+
       if (isOscillating) {
-        alarmCacheRef.putQuiet(alarmCacheObject.getId(), alarmCacheObject);
+        cache.putQuiet(alarmCacheObject.getId(), alarmCacheObject);
       } else {
-        alarmCacheRef.put(alarmCacheObject.getId(), alarmCacheObject);
+        cache.put(alarmCacheObject.getId(), alarmCacheObject);
       }
       return true;
     } else
       return false;
   }
 
-  /**
-   * Accesses Tag in cache, fetches associated
-   * alarms (since Alarm evaluation is on the same thread as
-   * the Tag cache update, these correspond to the Tag value
-   * and cannot be modified during this method).
-   * <p>
-   * Atomically
-   */
-  public TagWithAlarms getTagWithAlarms(Long id) {
-    return alarmCacheRef.executeTransaction(() -> {
+  public TagWithAlarms getTagWithAlarmsAtomically(Long id) {
+    return cache.executeTransaction(() -> {
       Tag tag = tagCacheRef.get(id);
       Set<Long> alarms = new HashSet<>(tag.getAlarmIds());
-      return new TagWithAlarms<>(tag, alarmCacheRef.getAll(alarms).values());
+      return new TagWithAlarms<>(tag, cache.getAll(alarms).values());
     });
   }
 
@@ -227,30 +184,28 @@ public class AlarmService implements AlarmAggregator {
     update(alarmCacheObject, tag, false);
   }
 
-  /**
-   * Computes the alarm state corresponding to the new tag value
-   *
-   * @param alarmCacheObject The current alarm object in the cache
-   * @param tag              The tag update
-   * @return {@link Boolean#TRUE} is the Alarm was changed, false otherwise
-   */
-  public boolean updateAlarmBasedOnTag(final AlarmCacheObject alarmCacheObject, final Tag tag) {
-    // TODO Is there any case where we want to evaluate despite invalid tag?
-    // TODO If so, re-add the tag valid check to updateAlarmState
-    if (!isReadyForEvaluation(tag)) {
-      log.debug("Alarm update called with erroneous Tag - leaving alarm status unchanged for alarm #{}", alarmCacheObject.getId());
-      return false;
+  private void mutateAlarmUsingTag(final AlarmCacheObject alarmCacheObject, Tag tag) {
+    alarmCacheObject.setInfo(createAdditionalInfoString(alarmCacheObject, tag));
+
+    boolean newState = alarmCacheObject.getCondition().evaluateState(tag.getValue());
+    if (newState && !alarmCacheObject.isActive()) {
+      // TODO Do we want to set this in another case as well?
+      // Perhaps during preInsertValidate, using the previous Alarm in cache?
+      alarmCacheObject.setTriggerTimestamp(new Timestamp(System.currentTimeMillis()));
     }
 
-    if (!detectChanges(alarmCacheObject, tag)) {
-      log.debug("Alarm update called but no changes were detected based on the tag - leaving alarm status unchanged for alarm #{}", alarmCacheObject.getId());
-      return false;
+    alarmCacheObject.setSourceTimestamp(tag.getTimestamp());
+
+    alarmCacheObject.setInternalActive(newState);
+
+    if (alarmCacheObject.isOscillating()) {
+      // When oscillating we force the alarm to *active*
+      // (only the *internalActive* property reflects the true status)
+      alarmCacheObject.setActive(true);
+    } else {
+      alarmCacheObject.setActive(newState);
     }
-
-    // If those passed, let's mutate this object
-    applyAllUpdates(alarmCacheObject, tag);
-
-    return true;
+    log.trace("Alarm #{} changed STATE to {}", alarmCacheObject.getId(), alarmCacheObject.isActive());
   }
 
   /**
@@ -260,5 +215,16 @@ public class AlarmService implements AlarmAggregator {
     for (AlarmAggregatorListener listener : alarmUpdateObservable) {
       listener.notifyOnUpdate(tagWithAlarms);
     }
+  }
+
+  private void supervisionChangeListener(Tag tag) {
+    log.trace("Evaluating alarm for tag " + tag.getId() + " due to supervision status notification.");
+    evaluateAlarms(tag);
+  }
+
+  private void updateAcceptedListener(Tag tag) {
+    log.trace("Evaluating alarm for tag " + tag.getId() + " due to update notification.");
+    List<Alarm> alarmList = evaluateAlarms(tag);
+    notifyListeners(new TagWithAlarms<>(tag.clone(), alarmList));
   }
 }
