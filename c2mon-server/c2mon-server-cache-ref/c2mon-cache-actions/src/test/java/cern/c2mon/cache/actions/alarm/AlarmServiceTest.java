@@ -224,7 +224,19 @@ public class AlarmServiceTest {
   public void olderAlarmGetsRejected() {
     Timestamp now = new Timestamp(System.currentTimeMillis());
     Timestamp before = new Timestamp(now.getTime() - 1000);
-//    Alarm
+
+    AlarmCacheObject older = CacheObjectCreation.createTestAlarm1();
+    older.setSourceTimestamp(before);
+
+    AlarmCacheObject newer = CacheObjectCreation.createTestAlarm1();
+    newer.setSourceTimestamp(now);
+
+    alarmCache.put(newer.getId(), newer);
+
+    // newr.getId is not a typo, just making sure they go to the same place
+    alarmCache.put(newer.getId(), older);
+
+    assertEquals(newer, alarmCache.get(newer.getId()));
   }
 
   /**
