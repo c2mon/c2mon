@@ -54,7 +54,7 @@ public class SupervisionAppenderImpl implements SupervisionAppender {
     this.equipmentService = equipmentService;
 
     this.processCacheRef = processService.getProcessCacheRef();
-    this.equipmentCacheRef = equipmentService.getC2monCache();
+    this.equipmentCacheRef = equipmentService.getCache();
   }
 
   @Override

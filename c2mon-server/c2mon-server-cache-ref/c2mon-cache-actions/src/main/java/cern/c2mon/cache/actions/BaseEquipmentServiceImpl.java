@@ -1,16 +1,12 @@
 package cern.c2mon.cache.actions;
 
 import cern.c2mon.cache.actions.alivetimer.AliveTimerService;
-import cern.c2mon.cache.actions.commfault.CommFaultService;
 import cern.c2mon.cache.actions.supervision.AbstractSupervisedService;
-import cern.c2mon.cache.actions.supervision.SupervisedCacheService;
-import cern.c2mon.cache.actions.supervision.SupervisedCacheServiceDelegator;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.service.CommonEquipmentOperations;
 import cern.c2mon.server.common.commfault.CommFaultTag;
 import cern.c2mon.server.common.equipment.AbstractEquipment;
 import cern.c2mon.shared.common.supervision.SupervisionConstants;
-import lombok.Getter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,22 +16,15 @@ import java.util.Set;
  * @author Szymon Halastra
  * @author Alexandros Papageorgiou Koufidis
  */
-public abstract class BaseEquipmentServiceImpl<T extends AbstractEquipment> implements CommonEquipmentOperations, SupervisedCacheServiceDelegator<T> {
-
-  @Getter
-  private C2monCache<T> c2monCache;
+public abstract class BaseEquipmentServiceImpl<T extends AbstractEquipment> extends AbstractSupervisedService<T>
+  implements CommonEquipmentOperations {
 
   private C2monCache<CommFaultTag> commFaultTagCache;
 
-  @Getter
-  private SupervisedCacheService<T> supervisedService;
-
-  protected BaseEquipmentServiceImpl(C2monCache<T> c2monCache, CommFaultService commFaultService,
+  protected BaseEquipmentServiceImpl(C2monCache<T> cache, C2monCache<CommFaultTag> commFaultTagCache,
                                      AliveTimerService aliveTimerService, SupervisionConstants.SupervisionEntity supervisionEntity) {
-    this.c2monCache = c2monCache;
-    this.commFaultTagCache = commFaultService.getCache();
-
-    supervisedService = new AbstractSupervisedService<>(supervisionEntity,c2monCache, aliveTimerService);
+    super(cache, supervisionEntity, aliveTimerService);
+    this.commFaultTagCache = commFaultTagCache;
   }
 
   @Override
@@ -46,7 +35,7 @@ public abstract class BaseEquipmentServiceImpl<T extends AbstractEquipment> impl
 
   @Override
   public void removeCommFault(final Long abstractEquipmentId) {
-    T equipment = c2monCache.get(abstractEquipmentId);
+    T equipment = cache.get(abstractEquipmentId);
     Long commFaultId = equipment.getCommFaultTagId();
     if (commFaultId != null) {
       commFaultTagCache.remove(commFaultId);
@@ -58,7 +47,7 @@ public abstract class BaseEquipmentServiceImpl<T extends AbstractEquipment> impl
     HashMap<Long, Long> returnMap = new HashMap<>();
     Set<Long> equipmentKeys = commFaultTagCache.getKeys();
     for (Long equipmentId : equipmentKeys) {
-      AbstractEquipment equipment = c2monCache.get(equipmentId);
+      AbstractEquipment equipment = cache.get(equipmentId);
       Long aliveId = equipment.getAliveTagId();
       if (aliveId != null) {
         returnMap.put(aliveId, equipmentId);

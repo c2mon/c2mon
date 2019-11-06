@@ -11,7 +11,7 @@ import java.util.Set;
 class AbstractSupervisedC2monCacheFlow<T extends Supervised> extends DefaultC2monCacheFlow<T> {
 
   AbstractSupervisedC2monCacheFlow() {
-    super((t, t2) -> true);
+    super();
   }
 
   @Override

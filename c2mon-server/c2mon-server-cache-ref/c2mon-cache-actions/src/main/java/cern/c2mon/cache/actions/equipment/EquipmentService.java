@@ -24,7 +24,7 @@ public class EquipmentService extends BaseEquipmentServiceImpl<Equipment> implem
   @Inject
   public EquipmentService(final C2monCache<Equipment> equipmentCacheRef,
                           final AliveTimerService aliveTimerService, final CommFaultService commFaultService) {
-    super(equipmentCacheRef,commFaultService,aliveTimerService, SupervisionConstants.SupervisionEntity.EQUIPMENT);
+    super(equipmentCacheRef, commFaultService.getCache(), aliveTimerService, SupervisionConstants.SupervisionEntity.EQUIPMENT);
   }
 
 
@@ -36,7 +36,7 @@ public class EquipmentService extends BaseEquipmentServiceImpl<Equipment> implem
 
   @Override
   public Collection<Long> getEquipmentAlives() {
-    return getC2monCache().query(i -> true).stream().map(Equipment::getAliveTagId).collect(Collectors.toSet());
+    return getCache().query(i -> true).stream().map(Equipment::getAliveTagId).collect(Collectors.toSet());
   }
 
   @Override

@@ -14,6 +14,10 @@ public class DefaultC2monCacheFlow<T extends Cacheable> implements C2monCacheFlo
 
   private BiPredicate<T, T> olderIsBeforeNewer;
 
+  public DefaultC2monCacheFlow() {
+    this((t, t2) -> true);
+  }
+
   public DefaultC2monCacheFlow(BiPredicate<T, T> olderIsBeforeNewer) {
     this.olderIsBeforeNewer = olderIsBeforeNewer;
   }

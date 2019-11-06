@@ -22,7 +22,7 @@ public class SubEquipmentService extends BaseEquipmentServiceImpl<SubEquipment> 
 
   @Inject
   public SubEquipmentService(C2monCache<SubEquipment> subEquipmentCacheRef, CommFaultService commFaultService, AliveTimerService aliveTimerService) {
-    super(subEquipmentCacheRef, commFaultService, aliveTimerService, SupervisionConstants.SupervisionEntity.SUBEQUIPMENT);
+    super(subEquipmentCacheRef, commFaultService.getCache(), aliveTimerService, SupervisionConstants.SupervisionEntity.SUBEQUIPMENT);
   }
 
   @Override

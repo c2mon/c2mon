@@ -160,6 +160,7 @@ public class AlarmServiceTest {
     DataTagCacheObject dataTag = new DataTagCacheObjectFactory().sampleBase();
     Timestamp tagTime = new Timestamp(System.currentTimeMillis() - 1000);
     dataTag.setSourceTimestamp(tagTime);
+    alarm.setDataTagId(dataTag.getId());
 
     // Alarm is active, but the condition is false
     assertTrue(alarm.isActive());
