@@ -14,21 +14,25 @@ public class PropertiesAccessor {
     Objects.requireNonNull(properties);
   }
 
-  public PropertyOptional<String> getString(String propertyName) {
+  public NullableProperty<String> getString(String propertyName) {
     return getAs(propertyName, Function.identity());
   }
 
-  public PropertyOptional<Integer> getInteger(String propertyName) {
+  public NullableProperty<Integer> getInteger(String propertyName) {
     return getAs(propertyName, Integer::parseInt);
   }
 
-  public PropertyOptional<Long> getLong(String propertyName) {
+  public NullableProperty<Short> getShort(String propertyName) {
+    return getAs(propertyName, Short::parseShort);
+  }
+
+  public NullableProperty<Long> getLong(String propertyName) {
     return getAs(propertyName, Long::parseLong);
   }
 
-  public <R> PropertyOptional<R> getAs(String propertyName, Function<String, R> transformer) {
+  public <R> NullableProperty<R> getAs(String propertyName, Function<String, R> transformer) {
     String propertyValue = properties.getProperty(propertyName);
-    return new PropertyOptional<>(transform(transformer, propertyValue));
+    return new NullableProperty<>(transform(transformer, propertyValue));
   }
 
   private <R> R transform(Function<String, R> transformer, String propertyValue) {
@@ -47,10 +51,10 @@ public class PropertiesAccessor {
     }
   }
 
-  public class PropertyOptional<T> {
+  public class NullableProperty<T> {
     private final T value;
 
-    private PropertyOptional(T value) {
+    private NullableProperty(T value) {
       this.value = value;
     }
 
