@@ -22,7 +22,7 @@ public class CommandCacheObjectFactoryTest {
 
   private C2monCache<Equipment> equipmentCache;
 
-  private CommandCacheObjectFactory factory;
+  private CommandTagCacheObjectFactory factory;
 
   @Before
   public void init() {

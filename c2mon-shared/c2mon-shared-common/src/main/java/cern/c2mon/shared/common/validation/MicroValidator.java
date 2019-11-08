@@ -2,38 +2,44 @@ package cern.c2mon.shared.common.validation;
 
 import cern.c2mon.shared.common.Cacheable;
 import cern.c2mon.shared.common.ConfigurationException;
+import cern.c2mon.shared.common.type.TypeConverter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.function.Function;
 
 /**
+ *
  * @param <T> T has been limited to Cacheable but can be extended to Object,
  *            I just wanted to have nicer error messages in the default case
+ * @implNote This could have a simpler API using by reflective accesses, but we opted to avoid
+ *           it because of GraalVM potential and code simplicity.
  */
 @Slf4j
 public class MicroValidator<T extends Cacheable> {
   private final T value;
-  private final ValidationMode mode;
 
-  public MicroValidator(T value, ValidationMode mode) {
+  public MicroValidator(T value) {
     this.value = value;
-    this.mode = mode;
     if (value == null) {
       internalThrow("Argument for validation must be non null itself!");
     }
   }
 
-  public MicroValidator(T value) {
-    this(value, ValidationMode.NULL_POINTER_EXCEPTION);
+  public <R extends Comparable<R>> MicroValidator<T> between(Function<T, R> memberAccessor, R minInclusive, R maxInclusive) {
+    return between(memberAccessor, minInclusive, maxInclusive,
+      "Condition evaluation failed for member of " + value.getClass() + " with id " + value.getId());
   }
 
-  public <R> MicroValidator<T> notNull(Function<T, R> memberAccessor) {
-    return notNull(memberAccessor, "Expected member of " + value.getClass() + " with id " + value.getId() + "  to be non null");
-  }
-
-  public <R> MicroValidator<T> notNull(Function<T, R> memberAccessor, String messageIfFailed) {
-    if (memberAccessor.apply(value) == null) {
+  public <R extends Comparable<R>> MicroValidator<T> between(Function<T, R> memberAccessor, R minInclusive, R maxInclusive, String messageIfFailed) {
+    if (memberAccessor.apply(value).compareTo(minInclusive) < 0 || memberAccessor.apply(value).compareTo(maxInclusive) > 0) {
       internalThrow(messageIfFailed);
+    }
+    return this;
+  }
+
+  public <R> MicroValidator<T> notNull(Function<T, R> memberAccessor, String paramName) {
+    if (memberAccessor.apply(value) == null) {
+      internalThrow("Expected parameter " + paramName + " of " + value.getClass() + " with id " + value.getId() + "  to be non null");
     }
     return this;
   }
@@ -49,11 +55,23 @@ public class MicroValidator<T extends Cacheable> {
     return this;
   }
 
+  public <R> MicroValidator<T> optType(Function<T, R> memberAccessor, String type, String paramName) {
+    try {
+      R member = memberAccessor.apply(value);
+      if (member != null) {
+        Class minValueClass = TypeConverter.getType(type);
+        if (!minValueClass.isInstance(member)) {
+          internalThrow("Parameter " + paramName + " not found as expected type " + type);
+        }
+      }
+    } catch (Exception e) {
+      internalThrow("Error validating parameter " + paramName + "\n" + e.getMessage());
+    }
+    return this;
+  }
+
   private void internalThrow(String message) {
     log.debug(message);
-    if (mode == ValidationMode.CONFIGURATION_EXCEPTION)
-      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, message);
-    else if (mode == ValidationMode.NULL_POINTER_EXCEPTION)
-      throw new NullPointerException(message);
+    throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, message);
   }
 }

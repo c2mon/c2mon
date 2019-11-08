@@ -9,7 +9,6 @@ import cern.c2mon.server.common.util.MetadataUtils;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.PropertiesAccessor;
 import cern.c2mon.shared.common.validation.MicroValidator;
-import cern.c2mon.shared.common.validation.ValidationMode;
 import cern.c2mon.shared.daq.config.Change;
 import org.springframework.stereotype.Component;
 
@@ -95,14 +94,14 @@ public class AlarmCacheObjectFactory extends AbstractCacheObjectFactory<Alarm> {
   @Override
   public void validateConfig(Alarm alarm) throws ConfigurationException {
 
-    new MicroValidator<>(alarm, ValidationMode.CONFIGURATION_EXCEPTION)
-      .notNull(Alarm::getId, "Parameter \"id\" cannot be null")
-      .notNull(Alarm::getDataTagId, "Parameter \"dataTagId\" cannot be null")
-      .notNull(Alarm::getFaultFamily, "Parameter \"faultFamily\" cannot be null")
-      .not(alarmObj -> alarmObj.getFaultFamily().length() == 0 || alarmObj.getFaultFamily().length() > MAX_FAULT_FAMILY_LENGTH,
-        "Parameter \"faultFamily\" must be 1 to 20 characters long")
-      .notNull(Alarm::getFaultMember, "Parameter \"faultMember\" cannot be null")
-      .not(alarmObj -> alarmObj.getFaultCode() < 0, "Parameter \"faultCode\" must be >= 0")
-      .notNull(Alarm::getCondition, "Parameter \"alarmCondition\" cannot be null");
+    new MicroValidator<>(alarm)
+      .notNull(Alarm::getId, "id")
+      .notNull(Alarm::getDataTagId, "dataTagId")
+      .notNull(Alarm::getFaultFamily, "faultFamily")
+      .between(alarmObj -> alarmObj.getFaultFamily().length(), 0, MAX_FAULT_FAMILY_LENGTH,
+        "Parameter \"faultFamily\" must be 1 to " + MAX_FAULT_FAMILY_LENGTH + " characters long")
+      .notNull(Alarm::getFaultMember, "faultMember")
+      .between(Alarm::getFaultCode, 0, Integer.MAX_VALUE, "Parameter \"faultCode\" must be >= 0")
+      .notNull(Alarm::getCondition, "alarmCondition");
   }
 }
