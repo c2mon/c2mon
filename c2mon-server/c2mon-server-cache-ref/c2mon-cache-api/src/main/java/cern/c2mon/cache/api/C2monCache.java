@@ -1,11 +1,10 @@
 package cern.c2mon.cache.api;
 
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
-import cern.c2mon.cache.api.flow.C2monCacheFlow;
+import cern.c2mon.cache.api.flow.C2monCacheUpdateFlow;
 import cern.c2mon.cache.api.listener.ListenerDelegator;
 import cern.c2mon.cache.api.loader.CacheLoader;
 import cern.c2mon.cache.api.spi.CacheQuery;
-import cern.c2mon.cache.api.transactions.TransactionalCallable;
 import cern.c2mon.shared.common.CacheEvent;
 import cern.c2mon.shared.common.Cacheable;
 import lombok.NonNull;
@@ -14,7 +13,9 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static cern.c2mon.shared.common.CacheEvent.UPDATE_ACCEPTED;
@@ -30,13 +31,12 @@ import static java.util.Objects.requireNonNull;
  */
 public interface C2monCache<V extends Cacheable> extends CacheDelegator<V>, Serializable, ListenerDelegator<V> {
 
-  C2monCacheFlow<V> getCacheFlow();
+  C2monCacheUpdateFlow<V> getCacheUpdateFlow();
 
   /**
    * Injected by the service, when needed
-   * @param cacheFlow
    */
-  void setCacheFlow(C2monCacheFlow<V> cacheFlow);
+  void setCacheUpdateFlow(C2monCacheUpdateFlow<V> cacheFlow);
 
   CacheLoader getCacheLoader();
 
@@ -67,15 +67,12 @@ public interface C2monCache<V extends Cacheable> extends CacheDelegator<V>, Seri
    * Executes the {@code callable} provided, in the current thread's transaction, if one exists,
    * otherwise start a new one
    *
-   * @param callable
-   * @param <T>
-   * @return
    * @implNote Make sure that you check for the existence of a transaction before starting a new one!
    */
-  <T> T executeTransaction(TransactionalCallable<T> callable);
+  <T> T executeTransaction(Supplier<T> callable);
 
   /**
-   * Alternative api to {@link C2monCache#executeTransaction(TransactionalCallable)} when you don't need the result
+   * Alternative api to {@link C2monCache#executeTransaction(Supplier)} when you don't need the result
    *
    * @param runnable the {@code Runnable} you want to run
    */
@@ -83,6 +80,21 @@ public interface C2monCache<V extends Cacheable> extends CacheDelegator<V>, Seri
     executeTransaction(() -> {
       runnable.run();
       return 1;
+    });
+  }
+
+  /**
+   * Atomically gets an element from the cache with the given key, applies a transformation on it,
+   * then puts it back in the cache. Will emit events!
+   *
+   * @throws CacheElementNotFoundException if the element with the given key doesn't exist
+   */
+  default V compute(long key, Consumer<V> transformer) {
+    return executeTransaction(() -> {
+      V cachedObj = getCache().get(key);
+      transformer.accept(cachedObj);
+      put(key, cachedObj); // TODO Write tests that verify this doesn't force cause a deadlock, as put will also get the obj
+      return cachedObj;
     });
   }
 
@@ -124,8 +136,6 @@ public interface C2monCache<V extends Cacheable> extends CacheDelegator<V>, Seri
    * <p>
    * Does NOT notify listeners of the event!
    *
-   * @param key
-   * @param value
    * @throws NullPointerException when {@code value} is null
    */
   default void putQuiet(long key, @NonNull V value) throws NullPointerException {
@@ -138,12 +148,12 @@ public interface C2monCache<V extends Cacheable> extends CacheDelegator<V>, Seri
       // Using this getter to avoid having to catch CacheElementNotFoundException
       // thrown by our own Cache.get
       V previous = getCache().get(key);
-      if (getCacheFlow().preInsertValidate(previous, value)) {
+      if (getCacheUpdateFlow().preInsertValidate(previous, value)) {
         // We're in a transaction, so this can't have been modified
         getCache().put(key, value);
         if (notifyListeners) {
           notifyListenersOf(UPDATE_ACCEPTED, value);
-          getCacheFlow().postInsertEvents(previous, value).forEach(event -> notifyListenersOf(event, value));
+          getCacheUpdateFlow().postInsertEvents(previous, value).forEach(event -> notifyListenersOf(event, value));
         }
       } else if (notifyListeners) {
         notifyListenersOf(UPDATE_REJECTED, value);
@@ -155,7 +165,7 @@ public interface C2monCache<V extends Cacheable> extends CacheDelegator<V>, Seri
 
   /**
    * @throws CacheElementNotFoundException when no value was found mapped to this key
-   * @throws NullPointerException when {@code key} is null
+   * @throws NullPointerException          when {@code key} is null
    */
   @Override
   default V get(@NonNull Long key) throws NullPointerException, CacheElementNotFoundException {
@@ -171,8 +181,6 @@ public interface C2monCache<V extends Cacheable> extends CacheDelegator<V>, Seri
    * <p>
    * Will generate {@link CacheEvent#UPDATE_ACCEPTED} events for all registered listeners
    *
-   * @param key
-   * @param value
    * @see C2monCache#putQuiet(long, Cacheable) to put without notifying
    */
   @Override
@@ -182,8 +190,10 @@ public interface C2monCache<V extends Cacheable> extends CacheDelegator<V>, Seri
 
   @Override
   default void close() {
-    // When getting here, it's quite possible that the cache is already closed, so check first!
-    if (!getCache().isClosed())
-      getCache().close();
+    // It's quite possible that the cache is already closed, so check first
+    synchronized (this) {
+      if (!getCache().isClosed())
+        getCache().close();
+    }
   }
 }

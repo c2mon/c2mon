@@ -44,13 +44,7 @@ import static cern.c2mon.shared.common.datatag.DataTagConstants.*;
 @Slf4j
 @Data
 @EqualsAndHashCode(callSuper = true)
-public abstract class AbstractTagCacheObject extends AbstractCacheableImpl implements Serializable {
-
-  // TODO remove UID if not needed
-  /**
-   * UID since serializable
-   */
-  private static final long serialVersionUID = 8210576749860621700L;
+public abstract class AbstractTagCacheObject extends AbstractCacheableImpl implements Serializable, Tag {
 
   /**
    * Maximum length of the value description. If the user tries to send a

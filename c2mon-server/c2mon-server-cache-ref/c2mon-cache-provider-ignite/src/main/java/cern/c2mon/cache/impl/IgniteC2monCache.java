@@ -1,13 +1,12 @@
 package cern.c2mon.cache.impl;
 
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.cache.api.flow.C2monCacheFlow;
+import cern.c2mon.cache.api.flow.C2monCacheUpdateFlow;
 import cern.c2mon.cache.api.flow.DefaultC2monCacheFlow;
 import cern.c2mon.cache.api.listener.CacheListenerManager;
 import cern.c2mon.cache.api.listener.CacheListenerManagerImpl;
 import cern.c2mon.cache.api.loader.CacheLoader;
 import cern.c2mon.cache.api.spi.CacheQuery;
-import cern.c2mon.cache.api.transactions.TransactionalCallable;
 import cern.c2mon.shared.common.Cacheable;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,6 +26,7 @@ import java.util.Set;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -42,7 +42,7 @@ public class IgniteC2monCache<V extends Cacheable> implements C2monCache<V> {
 
   @Getter
   @Setter
-  protected C2monCacheFlow<V> cacheFlow = new DefaultC2monCacheFlow<>();
+  protected C2monCacheUpdateFlow<V> cacheUpdateFlow = new DefaultC2monCacheFlow<>();
 
   @Getter
   @Setter
@@ -104,14 +104,14 @@ public class IgniteC2monCache<V extends Cacheable> implements C2monCache<V> {
   }
 
   @Override
-  public <S> S executeTransaction(TransactionalCallable<S> callable) {
+  public <S> S executeTransaction(Supplier<S> callable) {
     try (Transaction tx = (igniteInstance.transactions().tx() != null ?
       // If there is an existing transaction, use it
       igniteInstance.transactions().tx() :
       // Otherwise start a new one
       igniteInstance.transactions().txStart())) {
 
-      S returnValue = callable.call();
+      S returnValue = callable.get();
 
       tx.commit();
 

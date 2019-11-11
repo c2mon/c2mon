@@ -1,12 +1,12 @@
 package cern.c2mon.cache.actions.process;
 
+import cern.c2mon.cache.actions.AbstractCacheService;
 import cern.c2mon.cache.actions.alivetimer.AliveTimerService;
 import cern.c2mon.cache.actions.equipment.EquipmentService;
 import cern.c2mon.cache.actions.subequipment.SubEquipmentService;
 import cern.c2mon.cache.actions.supervision.SupervisedCacheService;
 import cern.c2mon.cache.actions.supervision.SupervisedCacheServiceDelegator;
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.alive.AliveTimer;
 import cern.c2mon.server.common.config.ServerProperties;
 import cern.c2mon.server.common.process.Process;
@@ -20,7 +20,6 @@ import javax.inject.Inject;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Random;
 
 /**
@@ -29,7 +28,8 @@ import java.util.Random;
  */
 @Slf4j
 @Service
-public class ProcessService implements ProcessOperationService, SupervisedCacheServiceDelegator<Process> {
+public class ProcessService extends AbstractCacheService<Process>
+  implements ProcessOperationService, SupervisedCacheServiceDelegator<Process> {
 
   /**
    * PIK numbers limit (max)
@@ -41,7 +41,7 @@ public class ProcessService implements ProcessOperationService, SupervisedCacheS
   private static final int PIK_MIN = 100000;
 
   @Getter
-  protected C2monCache<Process> processCacheRef;
+  protected C2monCache<Process> cache;
   @Getter
   protected SupervisedCacheService<Process> supervisedService;
   private C2monCache<AliveTimer> aliveTimerCache;
@@ -52,7 +52,7 @@ public class ProcessService implements ProcessOperationService, SupervisedCacheS
   @Inject
   public ProcessService(C2monCache<Process> processCacheRef, EquipmentService equipmentService,
                         AliveTimerService aliveTimerService, SubEquipmentService subEquipmentService, ServerProperties properties) {
-    this.processCacheRef = processCacheRef;
+    super(processCacheRef, new ProcessC2monCacheFlow());
     this.aliveTimerCache = aliveTimerService.getCache();
     this.equipmentService = equipmentService;
     this.subEquipmentService = subEquipmentService;
@@ -63,9 +63,7 @@ public class ProcessService implements ProcessOperationService, SupervisedCacheS
 
   @Override
   public Process start(Long processId, String hostName, Timestamp startupTime) {
-    Optional<Process> returnProcess = processCacheRef.executeTransaction(() -> {
-      Process process = processCacheRef.get(processId);
-
+    return cache.compute(processId, process -> {
       if (properties.isTestMode()) {
         // If the TEST Mode is on
         forceStart(process, hostName, startupTime);
@@ -77,21 +75,12 @@ public class ProcessService implements ProcessOperationService, SupervisedCacheS
         log.trace("start - Process " + process.getName()
           + ", PIK " + process.getProcessPIK());
       }
-      processCacheRef.put(processId, process);
-
-      return Optional.of(process);
     });
-
-    return returnProcess.orElseThrow(CacheElementNotFoundException::new); //TODO: make better return in case of null
   }
 
   @Override
   public void setErrorStatus(Long processId, String errorMessage) {
-    processCacheRef.executeTransaction(() -> {
-      Process process = processCacheRef.get(processId);
-      errorStatus(process, errorMessage);
-      processCacheRef.put(processId, process);
-    });
+    cache.compute(processId, process -> applyErrorStatus(process, errorMessage));
   }
 
   @Override
@@ -122,35 +111,22 @@ public class ProcessService implements ProcessOperationService, SupervisedCacheS
 
   @Override
   public Boolean isRebootRequired(Long processId) {
-    return processCacheRef.get(processId).getRequiresReboot();
+    return cache.get(processId).getRequiresReboot();
   }
 
   @Override
   public void setRequiresReboot(Long processId, Boolean reboot) {
-    processCacheRef.executeTransaction(() -> {
-      ProcessCacheObject process = (ProcessCacheObject) processCacheRef.get(processId);
-      process.setRequiresReboot(reboot);
-      processCacheRef.put(processId, process);
-    });
+    cache.compute(processId, process -> ((ProcessCacheObject) process).setRequiresReboot(reboot));
   }
 
   @Override
   public void setProcessPIK(Long processId, Long processPIK) {
-    processCacheRef.executeTransaction(() -> {
-      final ProcessCacheObject processCacheObject = (ProcessCacheObject) processCacheRef.get(processId);
-      // Set the PIK
-      processCacheObject.setProcessPIK(processPIK);
-      processCacheRef.put(processId, processCacheObject);
-    });
+    cache.compute(processId, process -> ((ProcessCacheObject) process).setProcessPIK(processPIK));
   }
 
   @Override
   public void setLocalConfig(Long processId, ProcessCacheObject.LocalConfig localType) {
-    processCacheRef.executeTransaction(() -> {
-      final ProcessCacheObject processCacheObject = (ProcessCacheObject) processCacheRef.get(processId);
-      processCacheObject.setLocalConfig(localType);
-      processCacheRef.put(processId, processCacheObject);
-    });
+    cache.compute(processId, process -> ((ProcessCacheObject) process).setLocalConfig(localType));
   }
 
   /**
@@ -213,7 +189,7 @@ public class ProcessService implements ProcessOperationService, SupervisedCacheS
     return (long) pik;
   }
 
-  private void errorStatus(final Process process, final String errorMessage) {
+  private void applyErrorStatus(final Process process, final String errorMessage) {
     ProcessCacheObject processCacheObject = (ProcessCacheObject) process;
     processCacheObject.setSupervision(SupervisionConstants.SupervisionStatus.DOWN, errorMessage, Timestamp.from(Instant.now()));
   }

@@ -1,7 +1,6 @@
 package cern.c2mon.cache.api.listener.impl;
 
 import cern.c2mon.cache.api.listener.CacheListener;
-import cern.c2mon.cache.api.transactions.TransactionalCallable;
 import cern.c2mon.shared.common.Cacheable;
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,7 +19,7 @@ import java.util.concurrent.TimeUnit;
  *   <li>All implementations are running in a different thread than the event thread.
  *   <li>A "frozen copy" clone of the original object is always passed. Mutating it will have no effect on others.
  *   <li>Putting the object back in the cache is an unsafe operation, as the object may have changed in the meanwhile.
- *       Ensure that the object you are attempting to update is what you expect. Using {@link cern.c2mon.cache.api.C2monCache#executeTransaction(TransactionalCallable)}
+ *       Ensure that the object you are attempting to update is what you expect. Using {@link cern.c2mon.cache.api.C2monCache#executeTransaction(java.util.function.Supplier)}
  *       is strongly advised, as it will allow you to verify and update the object without it changing in between.
  * </ul>
  *

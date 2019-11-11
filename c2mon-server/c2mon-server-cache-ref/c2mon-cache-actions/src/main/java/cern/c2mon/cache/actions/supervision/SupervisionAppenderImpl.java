@@ -18,10 +18,7 @@ package cern.c2mon.cache.actions.supervision;
 
 import cern.c2mon.cache.actions.equipment.EquipmentService;
 import cern.c2mon.cache.actions.process.ProcessService;
-import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.SupervisionAppender;
-import cern.c2mon.server.common.equipment.Equipment;
-import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
@@ -44,17 +41,12 @@ public class SupervisionAppenderImpl implements SupervisionAppender {
    * Process and Equipment bean interfaces.
    */
   private ProcessService processService;
-  private C2monCache<Process> processCacheRef;
   private EquipmentService equipmentService;
-  private C2monCache<Equipment> equipmentCacheRef;
 
   @Inject
   public SupervisionAppenderImpl(ProcessService processService, EquipmentService equipmentService) {
     this.processService = processService;
     this.equipmentService = equipmentService;
-
-    this.processCacheRef = processService.getProcessCacheRef();
-    this.equipmentCacheRef = equipmentService.getCache();
   }
 
   @Override

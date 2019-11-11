@@ -17,6 +17,8 @@ import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.Map;
 
+// TODO Is this class still useful for anything?
+
 /**
  * Implementation of the common functionality for modifying Tag objects.
  *
@@ -40,10 +42,6 @@ public abstract class AbstractTagService<T extends Tag> implements CommonTagOper
 
   /**
    * Call within synch.
-   *
-   * @param tag
-   * @param value
-   * @param valueDesc
    */
   @Override
   public void updateValue(final T tag, final Object value, final String valueDesc) {

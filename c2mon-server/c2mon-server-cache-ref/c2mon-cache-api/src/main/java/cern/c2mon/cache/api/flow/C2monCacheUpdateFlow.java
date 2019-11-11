@@ -12,7 +12,7 @@ import java.util.Set;
  *
  * @param <T> the type of {@link Cacheable}s this cache is handling
  */
-public interface C2monCacheFlow<T extends Cacheable> {
+public interface C2monCacheUpdateFlow<T extends Cacheable> {
 
   /**
    * Validates that {@code this} object should be inserted.

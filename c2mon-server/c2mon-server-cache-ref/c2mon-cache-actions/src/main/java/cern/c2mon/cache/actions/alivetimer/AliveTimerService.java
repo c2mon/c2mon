@@ -1,5 +1,6 @@
 package cern.c2mon.cache.actions.alivetimer;
 
+import cern.c2mon.cache.actions.AbstractCacheService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.alive.AliveTimer;
@@ -13,44 +14,25 @@ import javax.inject.Inject;
 /**
  * Manages operations on {@link AliveTimerCacheObject}s
  *
- * @author Szymon Halastra
- * @author Alexandros Papageorgiou Koufidis
+ * @author Szymon Halastra, Alexandros Papageorgiou Koufidis
  * @see AliveTimer
  */
 @Slf4j
 @Service
-public class AliveTimerService {
-
-  private C2monCache<AliveTimer> aliveTimerCacheRef;
+public class AliveTimerService extends AbstractCacheService<AliveTimer> {
 
   @Inject
   public AliveTimerService(C2monCache<AliveTimer> aliveTimerCacheRef) {
-    this.aliveTimerCacheRef = aliveTimerCacheRef;
-  }
-
-  public C2monCache<AliveTimer> getCache() {
-    return aliveTimerCacheRef;
+    super(aliveTimerCacheRef, new AliveTimerC2monCacheFlow());
   }
 
   public boolean isRegisteredAliveTimer(final Long id) {
-    return aliveTimerCacheRef.containsKey(id);
+    return cache.containsKey(id);
   }
 
   /**
-   * Find the {@code AliveTimer} object with {@code aliveTimerId} in the cache
-   * and do
-   *
-   * <ul>
-   *   <li>{@code AliveTimer#setActive(true)}
-   *   <li>{@code AliveTimer#setLastUpdate(now)}
-   *   <li>Reinsert into cache
-   * </ul>
-   *
-   * The timestamp will always be updated
-   * The cache object will always be reinserted
-   *
-   * @param aliveTimerId the alive timer id for the object to be force started
-   * @throws NullPointerException when {@code aliveTimerId} is null
+   * Same as {@link AliveTimerService#start(Long)}, but will start the object
+   * regardless of previous state (active or not)
    */
   public void startOrUpdateTimestamp(@NonNull Long aliveTimerId) throws NullPointerException {
     setAliveTimerAsActive(aliveTimerId, true, true);
@@ -65,7 +47,7 @@ public class AliveTimerService {
    *   <li>{@code AliveTimer#setLastUpdate(now)}
    *   <li>Reinsert into cache
    * </ul>
-   *
+   * <p>
    * The timestamp will not be updated, unless there is a change.
    * The cache object will not be reinserted, unless there is a change.
    *
@@ -85,7 +67,7 @@ public class AliveTimerService {
    *   <li>{@code AliveTimer#setLastUpdate(now)}
    *   <li>Reinsert into cache
    * </ul>
-   *
+   * <p>
    * The timestamp will not be updated, unless there is a change.
    * The cache object will not be reinserted, unless there is a change.
    *
@@ -104,7 +86,7 @@ public class AliveTimerService {
    * at least "aliveInterval" milliseconds.
    */
   public boolean hasExpired(final Long aliveTimerId) {
-    AliveTimer aliveTimer = aliveTimerCacheRef.get(aliveTimerId);
+    AliveTimer aliveTimer = cache.get(aliveTimerId);
     return (System.currentTimeMillis() - aliveTimer.getLastUpdate() > aliveTimer.getAliveInterval() + aliveTimer.getAliveInterval() / 3);
   }
 
@@ -137,16 +119,16 @@ public class AliveTimerService {
    */
   public void removeAliveTimer(long aliveId) {
     stop(aliveId);
-    aliveTimerCacheRef.remove(aliveId);
+    cache.remove(aliveId);
   }
 
   private void filterAndSetActive(boolean active) {
     try {
-      for (AliveTimer aliveTimer : aliveTimerCacheRef.query(aliveTimer -> aliveTimer.isActive() != active)) {
+      for (AliveTimer aliveTimer : cache.query(aliveTimer -> aliveTimer.isActive() != active)) {
         log.debug("Attempting to set alive timer " + aliveTimer.getId() + " and dependent alive timers to " + active);
         aliveTimer.setActive(active);
         aliveTimer.setLastUpdate(System.currentTimeMillis());
-        aliveTimerCacheRef.put(aliveTimer.getId(), aliveTimer);
+        cache.put(aliveTimer.getId(), aliveTimer);
       }
     } catch (Exception e) {
       log.error("Unable to retrieve list of alive timers from cache when attempting to set new active status to " + active, e);
@@ -157,11 +139,10 @@ public class AliveTimerService {
     log.debug("Attempting to set alive timer " + aliveTimerId + " and dependent alive timers to " + active);
 
     try {
-      AliveTimer aliveTimer = aliveTimerCacheRef.get(aliveTimerId);
-      if (forceTimestampUpdate || aliveTimer.setActive(active)) {
-        aliveTimer.setLastUpdate(System.currentTimeMillis());
-        aliveTimerCacheRef.put(aliveTimerId, aliveTimer);
-      }
+      cache.compute(aliveTimerId, aliveTimer -> {
+        if (forceTimestampUpdate || aliveTimer.setActive(active))
+          aliveTimer.setLastUpdate(System.currentTimeMillis());
+      });
     } catch (CacheElementNotFoundException cacheEx) {
       log.error("Cannot locate the AliveTimer in the cache (Id is " + aliveTimerId + ") - unable to stop it.");
     } catch (Exception e) {

@@ -1,6 +1,8 @@
 package cern.c2mon.cache.actions.rule;
 
+import cern.c2mon.cache.actions.AbstractCacheService;
 import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.flow.DefaultC2monCacheFlow;
 import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.tag.AbstractTagCacheObject;
 import cern.c2mon.server.common.tag.Tag;
@@ -14,23 +16,20 @@ import javax.inject.Inject;
  */
 @Slf4j
 @Service
-public class RuleDependencyService {
+public class RuleDependencyService extends AbstractCacheService<RuleTag> {
 
-  private C2monCache<RuleTag> tagCacheRef;
+  private C2monCache<RuleTag> cache;
 
   @Inject
   public RuleDependencyService(final C2monCache<RuleTag> tagCacheRef) {
-    this.tagCacheRef = tagCacheRef;
+    super(tagCacheRef, new DefaultC2monCacheFlow<>());
   }
 
   /**
    * Adds the rule to the list of those that need evaluating when
    * this tag is updated.
    * <p>
-   * <p>Note also adjust text field of cache object.
-   *
-   * @param tagId
-   * @param ruleTagId
+   * Note also adjust text field of cache object.
    */
   public void addDependentRuleToTag(final Tag tag, final Long ruleTagId) {
     AbstractTagCacheObject cacheObject = (AbstractTagCacheObject) tag;
@@ -46,24 +45,25 @@ public class RuleDependencyService {
    * Removes this rule from the list of those that need evaluating when
    * this tag is updated.
    * <p>
-   * <p>Note also adjusts text field of cache object.
+   * Note also adjusts text field of cache object.
    *
    * @param tag       the tag used in the rule (directly, not via another rule)
    * @param ruleTagId the id of the rule
    */
   public void removeDependentRuleFromTag(final Tag tag, final Long ruleTagId) {
-    tagCacheRef.executeTransaction(() -> {
-      AbstractTagCacheObject cacheObject = (AbstractTagCacheObject) tag;
-      cacheObject.getRuleIds().remove(ruleTagId);
+    cache.compute(tag.getId(), ruleTag -> {
+      AbstractTagCacheObject cacheRuleTag = (AbstractTagCacheObject) ruleTag;
+      cacheRuleTag.getRuleIds().remove(ruleTagId);
+
       StringBuilder bld = new StringBuilder();
-      for (Long id : cacheObject.getRuleIds()) {
+      for (Long id : cacheRuleTag.getRuleIds()) {
         bld.append(id).append(",");
       }
 
-      cacheObject.setRuleIdsString(bld.toString());
+      cacheRuleTag.setRuleIdsString(bld.toString());
 
       if (bld.length() > 0) {
-        cacheObject.setRuleIdsString(bld.toString().substring(0, bld.length() - 1)); //remove ", "
+        cacheRuleTag.setRuleIdsString(bld.toString().substring(0, bld.length() - 1)); //remove ", "
       }
     });
   }

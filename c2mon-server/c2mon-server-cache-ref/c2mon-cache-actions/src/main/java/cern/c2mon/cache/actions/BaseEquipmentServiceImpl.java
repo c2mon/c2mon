@@ -28,12 +28,6 @@ public abstract class BaseEquipmentServiceImpl<T extends AbstractEquipment> exte
   }
 
   @Override
-  public Long getProcessIdForAbstractEquipment(Long abstractEquipmentId) {
-    //TODO: add missing implementation
-    return null;
-  }
-
-  @Override
   public void removeCommFault(final Long abstractEquipmentId) {
     T equipment = cache.get(abstractEquipmentId);
     Long commFaultId = equipment.getCommFaultTagId();

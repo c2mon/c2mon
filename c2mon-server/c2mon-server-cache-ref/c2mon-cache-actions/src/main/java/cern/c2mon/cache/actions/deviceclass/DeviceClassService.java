@@ -1,37 +1,31 @@
 package cern.c2mon.cache.actions.deviceclass;
 
+import cern.c2mon.cache.actions.AbstractCacheService;
 import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.flow.DefaultC2monCacheFlow;
 import cern.c2mon.server.common.device.DeviceClass;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
- * @author Szymon Halastra
+ * @author Szymon Halastra, Alexandros Papageorgiou
  */
-@Slf4j
 @Service
-public class DeviceClassService {
-
-  private C2monCache<DeviceClass> deviceClassCacheRef;
+public class DeviceClassService extends AbstractCacheService<DeviceClass> {
 
   @Inject
   public DeviceClassService(C2monCache<DeviceClass> deviceClassCacheRef) {
-    this.deviceClassCacheRef = deviceClassCacheRef;
+    super(deviceClassCacheRef, new DefaultC2monCacheFlow<>());
   }
 
   public List<String> getDeviceClassNames() {
-    List<String> classNames = new ArrayList<>();
-
-    for (Long deviceClassId : deviceClassCacheRef.getKeys()) {
-      DeviceClass deviceClass = deviceClassCacheRef.get(deviceClassId);
-      classNames.add(deviceClass.getName());
-    }
-
-    return classNames;
+    return cache.getKeys().stream()
+      .map(cache::get)
+      .map(DeviceClass::getName)
+      .collect(Collectors.toList());
   }
 }
 

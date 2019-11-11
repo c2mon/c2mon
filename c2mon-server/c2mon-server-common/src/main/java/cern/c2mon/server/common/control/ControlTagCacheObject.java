@@ -16,17 +16,11 @@
  *****************************************************************************/
 package cern.c2mon.server.common.control;
 
-import cern.c2mon.server.common.datatag.DataTagCacheObject;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import cern.c2mon.server.common.tag.AbstractInfoTagCacheObject;
 
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
-@NoArgsConstructor
-public class ControlTagCacheObject extends DataTagCacheObject implements ControlTag {
+public class ControlTagCacheObject extends AbstractInfoTagCacheObject implements ControlTag {
 
-  private static final long serialVersionUID = -4100866263977139930L;
+  private static final long serialVersionUID = -410086626397719930L;
 
   /**
    * Used to construct a fake cache object, which is returned when a key cannot
@@ -43,15 +37,5 @@ public class ControlTagCacheObject extends DataTagCacheObject implements Control
 
   public ControlTagCacheObject(Long id) {
     super(id);
-  }
-
-  /**
-   * Clone implementation.
-   *
-   * @throws CloneNotSupportedException
-   */
-  @Override
-  public ControlTagCacheObject clone() {
-    return (ControlTagCacheObject) super.clone();
   }
 }

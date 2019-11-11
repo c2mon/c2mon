@@ -3,8 +3,10 @@ package cern.c2mon.cache.actions.subequipment;
 import cern.c2mon.cache.actions.BaseEquipmentServiceImpl;
 import cern.c2mon.cache.actions.alivetimer.AliveTimerService;
 import cern.c2mon.cache.actions.commfault.CommFaultService;
+import cern.c2mon.cache.actions.equipment.EquipmentService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.subequipment.SubEquipment;
+import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
 import cern.c2mon.shared.common.supervision.SupervisionConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,28 +22,42 @@ import java.util.Collection;
 @Service
 public class SubEquipmentService extends BaseEquipmentServiceImpl<SubEquipment> implements SubEquipmentOperations {
 
+  private final EquipmentService equipmentService;
+
   @Inject
-  public SubEquipmentService(C2monCache<SubEquipment> subEquipmentCacheRef, CommFaultService commFaultService, AliveTimerService aliveTimerService) {
+  public SubEquipmentService(C2monCache<SubEquipment> subEquipmentCacheRef,
+                             EquipmentService equipmentService,
+                             CommFaultService commFaultService,
+                             AliveTimerService aliveTimerService) {
     super(subEquipmentCacheRef, commFaultService.getCache(), aliveTimerService, SupervisionConstants.SupervisionEntity.SUBEQUIPMENT);
+    this.equipmentService = equipmentService;
   }
 
   @Override
   public Long getEquipmentIdForSubEquipment(Long subEquipmentId) {
-    return null;
+    return cache.get(subEquipmentId).getParentId();
   }
 
   @Override
   public void addSubEquipmentToEquipment(Long subEquipmentId, Long equipmentId) {
-    // TODO Fill these in
+    cache.compute(subEquipmentId, subEquipment ->
+      ((SubEquipmentCacheObject) subEquipment).setParentId(equipmentId));
   }
 
   @Override
   public Collection<Long> getDataTagIds(Long subEquipmentId) {
+    // TODO
     return null;
   }
 
   @Override
   public void removeSubEquipmentFromEquipment(Long equipmentId, Long subEquipmentId) {
+    equipmentService.removeSubequipmentFromEquipment(subEquipmentId, equipmentId);
+    cache.remove(subEquipmentId);
+  }
 
+  @Override
+  public Long getProcessIdForAbstractEquipment(Long abstractEquipmentId) {
+    return equipmentService.getProcessIdForAbstractEquipment(cache.get(abstractEquipmentId).getParentId());
   }
 }

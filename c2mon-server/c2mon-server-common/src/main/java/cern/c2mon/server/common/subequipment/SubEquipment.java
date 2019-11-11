@@ -16,8 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.server.common.subequipment;
 
-import java.util.Collection;
-
 import cern.c2mon.server.common.equipment.AbstractEquipment;
 
 /**
@@ -26,13 +24,13 @@ import cern.c2mon.server.common.equipment.AbstractEquipment;
  * object, rather than the specific implementation.
  *
  * @author Mark Brightwell
- *
  */
 public interface SubEquipment extends AbstractEquipment {
 
   /**
    * Returns the id of the parent Equipment of this SubEquipment.
    * Should never be null.
+   *
    * @return the Id of the parent Equipment
    */
   Long getParentId();

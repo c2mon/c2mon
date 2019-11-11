@@ -17,7 +17,7 @@
 package cern.c2mon.cache.actions.supervision;
 
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
-import cern.c2mon.cache.api.flow.C2monCacheFlow;
+import cern.c2mon.cache.api.flow.C2monCacheUpdateFlow;
 import cern.c2mon.server.common.supervision.Supervised;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.common.Cacheable;
@@ -63,7 +63,7 @@ public interface SupervisedCacheService<T extends Supervised> {
    *
    * @param id        The cache id of the supervised object
    * @param timestamp time of the start
-   * @return the cache object, after {@link C2monCacheFlow#postInsertEvents(Cacheable, Cacheable)}
+   * @return the cache object, after {@link C2monCacheUpdateFlow#postInsertEvents(Cacheable, Cacheable)}
    */
   T start(long id, @NonNull Timestamp timestamp);
 
@@ -75,7 +75,7 @@ public interface SupervisedCacheService<T extends Supervised> {
    *
    * @param id        The cache id of the supervised object
    * @param timestamp time of the stop
-   * @return the cache object, after {@link C2monCacheFlow#postInsertEvents(Cacheable, Cacheable)}
+   * @return the cache object, after {@link C2monCacheUpdateFlow#postInsertEvents(Cacheable, Cacheable)}
    */
   T stop(long id, @NonNull Timestamp timestamp);
 
@@ -87,7 +87,7 @@ public interface SupervisedCacheService<T extends Supervised> {
    * @param id        The cache id of the supervised object
    * @param timestamp time of the running event
    * @param message   details of the event
-   * @return the cache object, after {@link C2monCacheFlow#postInsertEvents(Cacheable, Cacheable)}
+   * @return the cache object, after {@link C2monCacheUpdateFlow#postInsertEvents(Cacheable, Cacheable)}
    */
   T resume(long id, @NonNull Timestamp timestamp, @NonNull String message);
 
@@ -99,7 +99,7 @@ public interface SupervisedCacheService<T extends Supervised> {
    * @param id        The cache id of the supervised object
    * @param timestamp time of problem
    * @param message   details
-   * @return the cache object, after {@link C2monCacheFlow#postInsertEvents(Cacheable, Cacheable)}
+   * @return the cache object, after {@link C2monCacheUpdateFlow#postInsertEvents(Cacheable, Cacheable)}
    */
   T suspend(long id, @NonNull Timestamp timestamp, @NonNull String message);
 

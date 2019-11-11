@@ -10,7 +10,7 @@ import java.util.function.BiPredicate;
 /**
  * A simple cache flow that allows all distinct (different than older value) updates through
  */
-public class DefaultC2monCacheFlow<T extends Cacheable> implements C2monCacheFlow<T> {
+public class DefaultC2monCacheFlow<T extends Cacheable> implements C2monCacheUpdateFlow<T> {
 
   private BiPredicate<T, T> olderIsBeforeNewer;
 
