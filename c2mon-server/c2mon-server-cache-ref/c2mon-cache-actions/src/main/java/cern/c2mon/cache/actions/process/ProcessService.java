@@ -22,9 +22,9 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.Random;
 
+// TODO This class should properly inherit from SupervisedService
 /**
- * @author Szymon Halastra
- * @author Alexandros Papageorgiou Koufidis
+ * @author Szymon Halastra, Alexandros Papageorgiou Koufidis
  */
 @Slf4j
 @Service
