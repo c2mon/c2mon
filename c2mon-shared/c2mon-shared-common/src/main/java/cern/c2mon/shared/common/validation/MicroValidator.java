@@ -39,7 +39,7 @@ public class MicroValidator<T extends Cacheable> {
 
   public <R> MicroValidator<T> notNull(Function<T, R> memberAccessor, String paramName) {
     if (memberAccessor.apply(value) == null) {
-      internalThrow("Expected parameter " + paramName + " of " + value.getClass() + " with id " + value.getId() + "  to be non null");
+      internalThrow("Expected parameter \"" + paramName + "\" of " + value.getClass() + " with id " + value.getId() + "  to be non null");
     }
     return this;
   }

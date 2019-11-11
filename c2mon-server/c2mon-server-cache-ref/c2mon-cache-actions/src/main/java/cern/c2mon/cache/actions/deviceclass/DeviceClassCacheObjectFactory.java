@@ -2,12 +2,16 @@ package cern.c2mon.cache.actions.deviceclass;
 
 import cern.c2mon.cache.api.factory.AbstractCacheObjectFactory;
 import cern.c2mon.cache.api.parser.XmlParser;
-import cern.c2mon.server.common.device.*;
+import cern.c2mon.server.common.device.CommandList;
+import cern.c2mon.server.common.device.DeviceClass;
+import cern.c2mon.server.common.device.DeviceClassCacheObject;
+import cern.c2mon.server.common.device.PropertyList;
 import cern.c2mon.shared.common.ConfigurationException;
+import cern.c2mon.shared.common.PropertiesAccessor;
+import cern.c2mon.shared.common.validation.MicroValidator;
 import cern.c2mon.shared.daq.config.Change;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.Properties;
 
 /**
@@ -18,52 +22,31 @@ public class DeviceClassCacheObjectFactory extends AbstractCacheObjectFactory<De
 
   @Override
   public DeviceClass createCacheObject(Long id) {
-    DeviceClassCacheObject deviceClassCacheObject = new DeviceClassCacheObject(id);
-
-    return deviceClassCacheObject;
+    return new DeviceClassCacheObject(id);
   }
 
   @Override
   public Change configureCacheObject(DeviceClass deviceClass, Properties properties) {
     DeviceClassCacheObject deviceClassCacheObject = (DeviceClassCacheObject) deviceClass;
 
-    if (properties.getProperty("name") != null) {
-      deviceClassCacheObject.setName(properties.getProperty("name"));
-    }
-    if (properties.getProperty("description") != null) {
-      deviceClassCacheObject.setDescription(properties.getProperty("description"));
-    }
-
-    // Parse properties and commands from XML representation
-    if (properties.getProperty("properties") != null) {
-      List<Property> propertyNames = XmlParser.parseXmlProperties(properties.getProperty("properties"), PropertyList.class);
-      deviceClassCacheObject.setProperties(propertyNames);
-    }
-
-    if (properties.getProperty("commands") != null) {
-      List<Command> commandNames = XmlParser.parseXmlCommands(properties.getProperty("commands"), CommandList.class);
-      deviceClassCacheObject.setCommands(commandNames);
-    }
+    new PropertiesAccessor(properties)
+      .getString("name").ifPresent(deviceClassCacheObject::setName)
+      .getString("description").ifPresent(deviceClassCacheObject::setDescription)
+      .getAs("properties", prop -> XmlParser.parse(prop, PropertyList.class))
+      .ifPresent(deviceClassCacheObject::setProperties)
+      .getAs("commands", prop -> XmlParser.parse(prop, CommandList.class))
+      .ifPresent(deviceClassCacheObject::setCommands);
 
     return null;
   }
 
   @Override
   public void validateConfig(DeviceClass deviceClass) throws ConfigurationException {
-    if (deviceClass.getId() == null) {
-      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"id\" cannot be null");
-    }
-    if (deviceClass.getName() == null) {
-      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"name\" cannot be null");
-    }
-    if (deviceClass.getName().length() == 0) {
-      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"name\" cannot be empty");
-    }
-    if (deviceClass.getProperties() == null) {
-      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"properties\" cannot be null");
-    }
-    if (deviceClass.getCommands() == null) {
-      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"commands\" cannot be null");
-    }
+    new MicroValidator<>(deviceClass)
+      .notNull(DeviceClass::getId, "id")
+      .notNull(DeviceClass::getName, "name")
+      .not(deviceObj -> deviceObj.getName().isEmpty(), "Parameter \"name\" cannot be empty")
+      .notNull(DeviceClass::getProperties, "properties")
+      .notNull(DeviceClass::getCommands, "commands");
   }
 }

@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * @author Szymon Halastra
  */
-public interface AbstractList {
+public interface AbstractList<T> {
 
-  List getList();
+  List<T> getList();
 }

@@ -38,12 +38,6 @@ import java.util.Set;
 public interface Tag extends RuleInputValue, Cacheable {
 
   /**
-   * Get the unique numeric identifier
-   * @return returns the id
-   **/
-  Long getId();
-
-  /**
    * Get the unique tag name
    * @return the name of the cache object
    */

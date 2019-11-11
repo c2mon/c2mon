@@ -16,11 +16,11 @@
  *****************************************************************************/
 package cern.c2mon.server.common.device;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Simple XML mapper bean representing a list of device class properties. Used
@@ -29,7 +29,7 @@ import org.simpleframework.xml.Root;
  * @author Justin Lewis Salmon
  */
 @Root(name = "Properties")
-public class PropertyList implements AbstractList {
+public class PropertyList implements AbstractList<Property> {
 
   @ElementList(entry = "Property", inline = true, required = false)
   private List<Property> properties = new ArrayList<>();

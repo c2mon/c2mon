@@ -1,7 +1,6 @@
 package cern.c2mon.cache.actions.tag;
 
 import cern.c2mon.cache.actions.BaseEquipmentServiceImpl;
-import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.factory.AbstractCacheObjectFactory;
 import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.datatag.DataTag;
@@ -38,12 +37,9 @@ import static cern.c2mon.shared.common.datatag.DataTagConstants.MODE_TEST;
 @Slf4j
 public abstract class TagCacheObjectFactory<T extends Tag> extends AbstractCacheObjectFactory<T> {
 
-  private final C2monCache<T> tagCacheRef;
-
   private final BaseEquipmentServiceImpl coreAbstractEquipmentService;
 
-  public TagCacheObjectFactory(C2monCache<T> tagCacheRef, BaseEquipmentServiceImpl coreAbstractEquipmentService) {
-    this.tagCacheRef = tagCacheRef;
+  public TagCacheObjectFactory(BaseEquipmentServiceImpl coreAbstractEquipmentService) {
     this.coreAbstractEquipmentService = coreAbstractEquipmentService;
   }
 

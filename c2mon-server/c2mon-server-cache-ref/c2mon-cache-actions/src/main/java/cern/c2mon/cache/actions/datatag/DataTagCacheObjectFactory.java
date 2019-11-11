@@ -2,7 +2,6 @@ package cern.c2mon.cache.actions.datatag;
 
 import cern.c2mon.cache.actions.BaseEquipmentServiceImpl;
 import cern.c2mon.cache.actions.tag.TagCacheObjectFactory;
-import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.shared.common.ConfigurationException;
@@ -21,9 +20,8 @@ import java.util.Properties;
 public class DataTagCacheObjectFactory extends TagCacheObjectFactory<DataTag> {
 
   @Inject
-  public DataTagCacheObjectFactory(C2monCache<DataTag> dataTagCacheRef,
-                                   BaseEquipmentServiceImpl coreAbstractEquipmentService) {
-    super(dataTagCacheRef, coreAbstractEquipmentService);
+  public DataTagCacheObjectFactory(BaseEquipmentServiceImpl coreAbstractEquipmentService) {
+    super(coreAbstractEquipmentService);
   }
 
   @Override

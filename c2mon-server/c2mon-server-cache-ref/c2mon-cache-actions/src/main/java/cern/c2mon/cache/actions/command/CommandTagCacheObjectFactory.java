@@ -20,6 +20,7 @@ import cern.c2mon.shared.daq.config.HardwareAddressUpdate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import javax.inject.Inject;
 import java.lang.reflect.Field;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -36,16 +37,14 @@ public class CommandTagCacheObjectFactory extends AbstractCacheObjectFactory<Com
 
   private C2monCache<Equipment> equipmentCacheRef;
 
-//  @Inject
-//  public CommandCacheObjectFactory(C2monCache<Long, Equipment> equipmentCacheRef) {
-//    this.equipmentCacheRef = equipmentCacheRef;
-//  }
+  @Inject
+  public CommandTagCacheObjectFactory(C2monCache<Equipment> equipmentCacheRef) {
+    this.equipmentCacheRef = equipmentCacheRef;
+  }
 
   @Override
   public CommandTag createCacheObject(Long id) {
-    CommandTagCacheObject commandTagCacheObject = new CommandTagCacheObject(id);
-
-    return commandTagCacheObject;
+    return new CommandTagCacheObject(id);
   }
 
   @Override

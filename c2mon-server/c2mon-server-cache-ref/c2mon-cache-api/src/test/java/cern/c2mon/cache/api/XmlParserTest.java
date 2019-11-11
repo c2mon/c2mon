@@ -27,7 +27,7 @@ public class XmlParserTest {
             "<description>Start of " + "the DAQ process</description> </Command> <Command id = \"70010\" name = " +
             "\"stop\"> <description>Stop of the DAQ process</description> </Command> </Commands>";
 
-    List<Command> commands = XmlParser.parseXmlCommands(xmlString, CommandList.class);
+    List<Command> commands = XmlParser.parse(xmlString, CommandList.class);
 
     assertEquals("List should have 4 elements", 4, commands.size());
     assertTrue("List should have Property elements", commands.get(0) instanceof Command);
@@ -46,7 +46,7 @@ public class XmlParserTest {
             + "name = \"restart\"> <value>213882</value> <category>commandTagId</category> </DeviceCommand> " +
             "</DeviceCommands>\n";
 
-    List<DeviceCommand> commands = XmlParser.parseXmlCommands(xmlString, DeviceCommandList.class);
+    List<DeviceCommand> commands = XmlParser.parse(xmlString, DeviceCommandList.class);
 
     assertEquals("List should have 4 elements", 3, commands.size());
     assertTrue("List should have Property elements", commands.get(0) instanceof DeviceCommand);
@@ -71,7 +71,7 @@ public class XmlParserTest {
             "type</description> " + "</Property> <Property id = \"70005\" name = \"processStatus\"> " +
             "<description>Process state " + "tag</description> </Property> </Properties>";
 
-    List<Property> properties = XmlParser.parseXmlProperties(xmlString, PropertyList.class);
+    List<Property> properties = XmlParser.parse(xmlString, PropertyList.class);
 
     assertEquals("List should have 4 elements", 8, properties.size());
     assertTrue("List should have Property elements", properties.get(0) instanceof Property);
@@ -105,7 +105,7 @@ public class XmlParserTest {
             "" + "'P_ACCESSNORTH'&TAB=true&TITLE=P_ACCESSNORTH%20DataTags&TYPE=TID_VIEW]]></value> " +
             "<category>constantValue</category> </DeviceProperty> </DeviceProperties>\n";
 
-    List<DeviceProperty> deviceProperties = XmlParser.parseXmlProperties(xmlString, DevicePropertyList.class);
+    List<DeviceProperty> deviceProperties = XmlParser.parse(xmlString, DevicePropertyList.class);
 
     assertEquals("List should have 4 elements", 8, deviceProperties.size());
     assertTrue("List should have Property elements", deviceProperties.get(0) instanceof DeviceProperty);

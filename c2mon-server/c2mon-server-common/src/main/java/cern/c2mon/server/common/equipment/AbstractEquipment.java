@@ -33,6 +33,8 @@ public interface AbstractEquipment extends Supervised {
    */
   String getName();
 
+  String getDescription();
+
   /**
    * Returns the id of the associated Communication Fault Tag.
    * @return the id of the CommFaultTag

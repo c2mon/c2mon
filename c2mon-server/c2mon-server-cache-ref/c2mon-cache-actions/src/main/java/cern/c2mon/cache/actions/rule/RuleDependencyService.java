@@ -65,8 +65,6 @@ public class RuleDependencyService {
       if (bld.length() > 0) {
         cacheObject.setRuleIdsString(bld.toString().substring(0, bld.length() - 1)); //remove ", "
       }
-
-      return null;
     });
   }
 }

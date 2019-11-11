@@ -5,7 +5,6 @@ import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.daq.config.Change;
 
 import java.util.Properties;
-import java.util.function.Function;
 
 /**
  * @author Szymon Halastra
@@ -22,7 +21,6 @@ public abstract class AbstractCacheObjectFactory<T extends Cacheable> {
     T cacheable = createCacheObject(id);
     configureCacheObject(cacheable, properties);
     validateConfig(cacheable);
-
     return cacheable;
   }
 
@@ -36,7 +34,6 @@ public abstract class AbstractCacheObjectFactory<T extends Cacheable> {
    * Creates basic object with only id set
    *
    * @param id
-   *
    * @return CacheObject
    */
   public abstract T createCacheObject(Long id);
@@ -46,7 +43,6 @@ public abstract class AbstractCacheObjectFactory<T extends Cacheable> {
    *
    * @param properties the properties object containing the fields
    * @param cacheable  the object to modify (is modified by this method)
-   *
    * @return always returns null, as no CacheObject change needs propagating to the DAQ layer
    * @throws ConfigurationException if cannot configure the CacheObject from the properties
    */
@@ -58,32 +54,9 @@ public abstract class AbstractCacheObjectFactory<T extends Cacheable> {
    * properties.
    *
    * @param cacheable the cache object to validate
-   *
    * @throws ConfigurationException if one of the consistency checks fails
    */
   public abstract void validateConfig(T cacheable) throws ConfigurationException;
-
-  protected Integer parseInt(String integerInString, String paramName) {
-    return safeParse(Integer::parseInt, integerInString, paramName);
-  }
-
-  protected Short parseShort(String shortInString, String paramName) {
-    return safeParse(Short::parseShort, shortInString,paramName);
-  }
-
-  protected Long parseLong(String longInString, String paramName) {
-    return safeParse(Long::parseLong, longInString, paramName);
-  }
-
-  protected <V> V safeParse(Function<String,V> parser, String element, String paramName){
-    try {
-      return parser.apply(element);
-    }
-    catch (NumberFormatException e) {
-      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
-        "NumberFormatException: Unable to convert parameter \"" + paramName + "\" using " + parser.getClass() + " parser : " + element);
-    }
-  }
 
   /**
    * If the String is "null", then set the return value
@@ -93,7 +66,6 @@ public abstract class AbstractCacheObjectFactory<T extends Cacheable> {
    * resetting them to null.
    *
    * @param fieldValue the field value, may be "null"
-   *
    * @return the fieldValue, or null if the fieldValue was "null"
    */
   protected String checkAndSetNull(String fieldValue) {

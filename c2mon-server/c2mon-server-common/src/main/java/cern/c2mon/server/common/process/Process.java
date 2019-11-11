@@ -43,6 +43,8 @@ public interface Process extends Supervised {
   @Override
   String getName();
 
+  String getDescription();
+
   /**
    * Returns the live list of Equipment ids attached to this Process; locking on
    * Process level required if accessing this.
@@ -85,7 +87,7 @@ public interface Process extends Supervised {
   default void resume(final Timestamp timestamp, final String message) {
     Supervised.super.resume(timestamp,message);
     if (getLocalConfig() != null && getLocalConfig().equals(ProcessCacheObject.LocalConfig.Y)) {
-      setSupervisionStatus(SupervisionConstants.SupervisionStatus.RUNNING_LOCAL);
+      setSupervision(SupervisionConstants.SupervisionStatus.RUNNING_LOCAL, message, timestamp);
     }
   }
 }

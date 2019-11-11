@@ -16,11 +16,11 @@
  *****************************************************************************/
 package cern.c2mon.server.common.device;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Simple XML mapper bean representing a list of device class commands. Used
@@ -29,7 +29,7 @@ import org.simpleframework.xml.Root;
  * @author Justin Lewis Salmon
  */
 @Root(name = "Commands")
-public class CommandList implements AbstractList {
+public class CommandList implements AbstractList<Command> {
 
   @ElementList(entry = "Command", inline = true, required = false)
   private List<Command> commands = new ArrayList<>();

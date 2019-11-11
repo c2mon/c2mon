@@ -16,13 +16,12 @@
  *****************************************************************************/
 package cern.c2mon.server.common.device;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import cern.c2mon.shared.client.device.DeviceProperty;
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
 
-import cern.c2mon.shared.client.device.DeviceProperty;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Simple XML mapper bean representing a list of device properties. Used when
@@ -31,7 +30,7 @@ import cern.c2mon.shared.client.device.DeviceProperty;
  * @author Justin Lewis Salmon
  */
 @Root(name = "DeviceProperties")
-public class DevicePropertyList implements AbstractList {
+public class DevicePropertyList implements AbstractList<DeviceProperty> {
 
   @ElementList(entry = "DeviceProperty", inline = true, required = false)
   private List<DeviceProperty> deviceProperties = new ArrayList<>();
@@ -50,7 +49,7 @@ public class DevicePropertyList implements AbstractList {
   }
 
   @Override
-  public List getList() {
+  public List<DeviceProperty> getList() {
     return deviceProperties;
   }
 }

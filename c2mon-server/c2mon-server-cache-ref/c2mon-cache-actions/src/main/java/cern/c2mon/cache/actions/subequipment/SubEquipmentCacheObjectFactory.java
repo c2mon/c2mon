@@ -1,9 +1,11 @@
 package cern.c2mon.cache.actions.subequipment;
 
-import cern.c2mon.cache.actions.AbstractEquipmentCacheObjectFactory;
+import cern.c2mon.cache.actions.equipment.AbstractEquipmentCacheObjectFactory;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
 import cern.c2mon.shared.common.ConfigurationException;
+import cern.c2mon.shared.common.PropertiesAccessor;
+import cern.c2mon.shared.common.validation.MicroValidator;
 import cern.c2mon.shared.daq.config.Change;
 import cern.c2mon.shared.daq.config.EquipmentConfigurationUpdate;
 import org.springframework.stereotype.Component;
@@ -11,13 +13,10 @@ import org.springframework.stereotype.Component;
 import java.util.Properties;
 
 /**
- * @author Szymon Halastra
+ * @author Szymon Halastra, Alexandros Papageorgiou
  */
 @Component
 public class SubEquipmentCacheObjectFactory extends AbstractEquipmentCacheObjectFactory<SubEquipment> {
-
-  public SubEquipmentCacheObjectFactory() {
-  }
 
   @Override
   public SubEquipment createCacheObject(Long id) {
@@ -62,10 +61,8 @@ public class SubEquipmentCacheObjectFactory extends AbstractEquipmentCacheObject
   public void validateConfig(final SubEquipment subEquipment) {
     SubEquipmentCacheObject subEquipmentCacheObject = (SubEquipmentCacheObject) subEquipment;
     super.validateConfig(subEquipmentCacheObject);
-    if (subEquipmentCacheObject.getParentId() == null) {
-      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
-              "Parameter \"parentId\" cannot be null. Each Subequipment MUST be attached to an Equipment.");
-    }
+    new MicroValidator<>(subEquipment)
+      .notNull(SubEquipment::getParentId, "parentId");
   }
 
   /**
@@ -78,21 +75,11 @@ public class SubEquipmentCacheObjectFactory extends AbstractEquipmentCacheObject
   public Change configureCacheObject(SubEquipment subEquipment, Properties properties) {
     SubEquipmentCacheObject subEquipmentCacheObject = (SubEquipmentCacheObject) subEquipment;
     EquipmentConfigurationUpdate update = setCommonProperties(subEquipment, properties);
-    String tmpStr = properties.getProperty("equipmentId");
 
+    new PropertiesAccessor(properties)
+      .getLong("parent_equip_id").ifPresent(subEquipmentCacheObject::setParentId)
+      .getLong("equipmentId").ifPresent(subEquipmentCacheObject::setParentId);
     // TODO: Remove obsolete parent_equip_id property
-    if (tmpStr == null) {
-      tmpStr = properties.getProperty("parent_equip_id");
-    }
-
-    if (tmpStr != null) {
-      try {
-        subEquipmentCacheObject.setParentId(Long.valueOf(tmpStr));
-      }
-      catch (NumberFormatException e) {
-        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "NumberFormatException: Unable to convert parameter \"parentId\" to Long: " + tmpStr);
-      }
-    }
 
     return update;
   }

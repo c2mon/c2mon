@@ -47,7 +47,7 @@ public class EquipmentConfigurationUpdate extends Change {
     private Long aliveTagId;
     /**
      * The changed alive interval or null if unchanged.
-     */
+     */// TODO Why is this long? AliveInterval is Int in EquipmentCacheObject
     private Long aliveInterval;
 
     /**
