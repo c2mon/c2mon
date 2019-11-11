@@ -6,6 +6,7 @@ import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.shared.common.ConfigurationException;
+import cern.c2mon.shared.common.validation.MicroValidator;
 import cern.c2mon.shared.daq.config.Change;
 import cern.c2mon.shared.daq.config.DataTagUpdate;
 import lombok.extern.slf4j.Slf4j;
@@ -13,10 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import javax.inject.Inject;
 import java.util.Properties;
 
-import static cern.c2mon.shared.common.type.TypeConverter.getType;
-
 /**
- * @author Szymon Halastra
+ * @author Szymon Halastra, Alexandros Papageorgiou
  */
 @Slf4j
 public class DataTagCacheObjectFactory extends TagCacheObjectFactory<DataTag> {
@@ -29,58 +28,22 @@ public class DataTagCacheObjectFactory extends TagCacheObjectFactory<DataTag> {
 
   @Override
   public DataTag createCacheObject(Long id) {
-    DataTagCacheObject dataTagCacheObject = new DataTagCacheObject(id);
-    return dataTagCacheObject;
+    return new DataTagCacheObject(id);
   }
 
   @Override
   public void validateConfig(DataTag dataTag) throws ConfigurationException {
-    DataTag dataTagCacheObject = (DataTagCacheObject) dataTag;
-    validateTagConfig(dataTagCacheObject);
-    //DataTag must have equipment or subequipment id set
-    if (dataTagCacheObject.getEquipmentId() == null && dataTagCacheObject.getSubEquipmentId() == null) {
-      throw new ConfigurationException(
-              ConfigurationException.INVALID_PARAMETER_VALUE,
-              "Equipment/SubEquipment id not set for DataTag with id " + dataTag.getId() + " - unable to configure it.");
-    }
-    // Make sure that the minValue is of the right class if not null
-    if (dataTagCacheObject.getMinValue() != null) {
-      try {
-        Class<?> minValueClass = getType(dataTagCacheObject.getDataType());
-        if (!minValueClass.isInstance(dataTagCacheObject.getMinValue())) {
-          throw new ConfigurationException(
-                  ConfigurationException.INVALID_PARAMETER_VALUE,
-                  "Parameter \"minValue\" must be of type " + dataTagCacheObject.getDataType() + " or null");
-        }
-      }
-      catch (Exception e) {
-        throw new ConfigurationException(
-                ConfigurationException.INVALID_PARAMETER_VALUE,
-                "Error validating parameter \"minValue\": " + e.getMessage());
-      }
-    }
-    // Make sure that the maxValue is of the right class if not null
-    if (dataTagCacheObject.getMaxValue() != null) {
-      try {
-        Class<?> maxValueClass = getType(dataTagCacheObject.getDataType());
-        if (!maxValueClass.isInstance(dataTagCacheObject.getMaxValue())) {
-          throw new ConfigurationException(
-                  ConfigurationException.INVALID_PARAMETER_VALUE,
-                  "Parameter \"maxValue\" must be of type " + dataTagCacheObject.getDataType() + " or null.");
-        }
-      }
-      catch (Exception e) {
-        throw new ConfigurationException(
-                ConfigurationException.INVALID_PARAMETER_VALUE,
-                "Error validating parameter \"maxValue\": " + e.getMessage());
-      }
-    }
-    if (dataTagCacheObject.getAddress() != null) {
-      dataTagCacheObject.getAddress().validate();
-    }
-    else {
-      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "No address provided for DataTag - unable to configure it.");
-    }
+    validateTagConfig(dataTag);
+
+    new MicroValidator<>(dataTag)
+      //DataTag must have equipment or subequipment id set
+      .not(dataTagObj -> dataTagObj.getEquipmentId() == null && dataTagObj.getSubEquipmentId() == null,
+        "Equipment/SubEquipment id not set for DataTag with id " + dataTag.getId() + " - unable to configure it.")
+      .optType(DataTag::getMinValue, dataTag.getDataType(), "\"minValue\"")
+      .optType(DataTag::getMaxValue, dataTag.getDataType(), "\"maxValue\"")
+      .notNull(DataTag::getAddress, "address");
+
+    dataTag.getAddress().validate();
   }
 
 
@@ -91,6 +54,7 @@ public class DataTagCacheObjectFactory extends TagCacheObjectFactory<DataTag> {
 
     super.configureCacheObject(tag, properties);
 
+    // TODO This is duplicated and also done in the super.configureCacheObject. Is there a better way?
     if (tag.getEquipmentId() != null)
       dataTagUpdate.setEquipmentId(tag.getEquipmentId());
 

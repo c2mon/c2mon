@@ -28,15 +28,6 @@ import java.util.Collection;
 public interface EquipmentOperations extends CommonEquipmentOperations {
 
   /**
-   * Returns a collection of the ids of all DataTags
-   * registered with this equipment (not control tags).
-   *
-   * @param id of the equipment
-   * @return the ids in a collection
-   */
-  Collection<Long> getDataTagIds(Long equipmentId);
-
-  /**
    * Returns all alive tag ids for all equipment currently configured
    * (not including Process alives).
    *

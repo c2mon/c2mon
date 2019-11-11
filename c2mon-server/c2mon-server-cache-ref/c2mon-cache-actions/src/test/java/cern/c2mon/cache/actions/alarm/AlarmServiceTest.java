@@ -53,20 +53,6 @@ public class AlarmServiceTest {
       (alarm, __) -> assertTrue("Alarm should have the same state as before evaluation", alarm.isActive()));
   }
 
-//  @Test
-//  public void updateReturnsDifferentObject() {
-//    insertAlarmAndDatatagThen((alarm, dataTag) -> {
-//      AlarmCacheObject preCache = alarm.clone();
-//
-//      alarmService.update(alarm, dataTag, false);
-//
-//      alarmService.updateAlarmBasedOnTag(alarm, dataTag);
-//
-//      assertEquals(alarm, afterCache);
-//      assertNotSame(alarm, afterCache);
-//    });
-//  }
-
   @Test
   public void updateIsConsistent() {
     insertAlarmAndDatatagThen((alarm, dataTag) -> {

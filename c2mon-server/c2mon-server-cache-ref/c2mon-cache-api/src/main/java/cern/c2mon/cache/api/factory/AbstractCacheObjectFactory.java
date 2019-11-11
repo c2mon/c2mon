@@ -1,11 +1,11 @@
 package cern.c2mon.cache.api.factory;
 
-import java.util.Properties;
-import java.util.function.Function;
-
 import cern.c2mon.shared.common.Cacheable;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.daq.config.Change;
+
+import java.util.Properties;
+import java.util.function.Function;
 
 /**
  * @author Szymon Halastra
@@ -14,9 +14,6 @@ public abstract class AbstractCacheObjectFactory<T extends Cacheable> {
 
   /**
    * Creates CacheObject wrapped with properties, use this one
-   *
-   * @param id
-   * @param properties
    *
    * @return CacheObject
    * @throws IllegalAccessException

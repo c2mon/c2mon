@@ -25,7 +25,7 @@ public class AlarmCacheObjectFactoryTest {
   public void init() {
     alarmService = EasyMock.createNiceMock(AlarmService.class);
 
-    factory = new AlarmCacheObjectFactory(alarmService);
+    factory = new AlarmCacheObjectFactory();
   }
 
   @Test
@@ -39,8 +39,8 @@ public class AlarmCacheObjectFactoryTest {
     properties.setProperty("faultFamily", "fault-family");
     properties.setProperty("faultMember", "fault-member");
     properties.setProperty("alarmCondition", "<AlarmCondition class=\"cern.c2mon.server.common.alarm.ValueAlarmCondition\">\n" +
-            "  <alarm-value type=\"String\">TERMINATE</alarm-value>\n" +
-            "</AlarmCondition>\n");
+      "  <alarm-value type=\"String\">TERMINATE</alarm-value>\n" +
+      "</AlarmCondition>\n");
 
     AlarmCacheObject alarm = (AlarmCacheObject) factory.createCacheObject(1L, properties);
 
@@ -57,8 +57,7 @@ public class AlarmCacheObjectFactoryTest {
     try {
       factory.createCacheObject(1L, properties);
       fail("exception should be thrown");
-    }
-    catch (ConfigurationException e) {
+    } catch (ConfigurationException e) {
       assertEquals("INVALID_PARAMETER should be thrown", 0, e.getErrorCode());
     }
   }
@@ -71,8 +70,7 @@ public class AlarmCacheObjectFactoryTest {
     try {
       factory.createCacheObject(1L, properties);
       fail("exception should be thrown");
-    }
-    catch (ConfigurationException e) {
+    } catch (ConfigurationException e) {
       assertEquals("INVALID_PARAMETER should be thrown", 0, e.getErrorCode());
     }
   }
@@ -86,8 +84,7 @@ public class AlarmCacheObjectFactoryTest {
     try {
       factory.createCacheObject(1L, properties);
       fail("exception should be thrown");
-    }
-    catch (ConfigurationException e) {
+    } catch (ConfigurationException e) {
       assertEquals("INVALID_PARAMETER should be thrown", 0, e.getErrorCode());
     }
   }
@@ -102,8 +99,7 @@ public class AlarmCacheObjectFactoryTest {
     try {
       factory.createCacheObject(1L, properties);
       fail("exception should be thrown");
-    }
-    catch (ConfigurationException e) {
+    } catch (ConfigurationException e) {
       assertEquals("INVALID_PARAMETER should be thrown", 0, e.getErrorCode());
     }
   }

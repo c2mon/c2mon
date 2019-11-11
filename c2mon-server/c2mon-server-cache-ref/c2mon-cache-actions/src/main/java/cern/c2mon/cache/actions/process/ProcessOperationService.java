@@ -5,7 +5,6 @@ import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.process.ProcessCacheObject;
 
 import java.sql.Timestamp;
-import java.util.Collection;
 
 /**
  * @author Szymon Halastra
@@ -26,14 +25,6 @@ public interface ProcessOperationService {
    * @return A copy of the last modifications that were added to the process cache, or <code>null</code>
    */
   Process start(Long processId, String hostName, Timestamp startupTime);
-
-  /**
-   * Returns a collection of the ids of all DataTags
-   * registered with this DAQ (not control tags).
-   * @param processId the Process id
-   * @return the ids in a collection
-   */
-  Collection<Long> getDataTagIds(Long processId);
 
   /**
    * Sets the status of the process to error AND updates

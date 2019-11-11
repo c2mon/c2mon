@@ -8,29 +8,34 @@ import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.common.tag.AbstractTagCacheObject;
 import cern.c2mon.server.common.tag.Tag;
-import cern.c2mon.shared.client.metadata.Metadata;
+import cern.c2mon.server.common.util.MetadataUtils;
 import cern.c2mon.shared.common.ConfigurationException;
+import cern.c2mon.shared.common.PropertiesAccessor;
 import cern.c2mon.shared.common.SimpleTypeReflectionHandler;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
-import cern.c2mon.shared.common.datatag.DataTagConstants;
 import cern.c2mon.shared.common.datatag.DataTagDeadband;
 import cern.c2mon.shared.common.type.TypeConverter;
+import cern.c2mon.shared.common.validation.MicroValidator;
 import cern.c2mon.shared.daq.config.Change;
 import cern.c2mon.shared.daq.config.DataTagAddressUpdate;
 import cern.c2mon.shared.daq.config.DataTagUpdate;
 import cern.c2mon.shared.daq.config.HardwareAddressUpdate;
+import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Field;
-import java.util.Map;
 import java.util.Properties;
+
+import static cern.c2mon.shared.common.datatag.DataTagConstants.MODE_OPERATIONAL;
+import static cern.c2mon.shared.common.datatag.DataTagConstants.MODE_TEST;
 
 /**
  * Creates {@link DataTag} cache object
  * {@link DataTag} contains common interface for DataTag and ControlTag
  * apparently they are differ only by class name, methods definitions are the same
  *
- * @author Szymon Halastra
+ * @author Szymon Halastra, Alexandros Papageorgiou
  */
+@Slf4j
 public abstract class TagCacheObjectFactory<T extends Tag> extends AbstractCacheObjectFactory<T> {
 
   private final C2monCache<T> tagCacheRef;
@@ -46,67 +51,41 @@ public abstract class TagCacheObjectFactory<T extends Tag> extends AbstractCache
   public Change configureCacheObject(T tag, Properties properties) throws ConfigurationException, IllegalArgumentException, IllegalAccessException {
     DataTagCacheObject dataTagCacheObject = (DataTagCacheObject) tag;
     DataTagUpdate dataTagUpdate = setCommonProperties(dataTagCacheObject, properties);
-    String tmpStr;
 
     // TAG equipment identifier
     // Ignore the equipment id for control tags as control tags are INDIRECTLY
     // referenced via the equipment's aliveTag and commFaultTag fields
     if (coreAbstractEquipmentService != null && !(dataTagCacheObject instanceof ControlTag)) {
-      if ((tmpStr = properties.getProperty("equipmentId")) != null) {
-        try {
-          dataTagCacheObject.setEquipmentId(Long.valueOf(tmpStr));
-          dataTagCacheObject.setProcessId(coreAbstractEquipmentService.getProcessIdForAbstractEquipment(dataTagCacheObject.getEquipmentId()));
-        }
-        catch (NumberFormatException e) {
-          throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "NumberFormatException: "
-                  + "Unable to convert parameter \"equipmentId\" to Long: " + tmpStr);
-        }
-      }
 
-      // TIMS-951: Allow attachment of DataTags to SubEquipments
-      else if ((tmpStr = properties.getProperty("subEquipmentId")) != null) {
-        try {
-          dataTagCacheObject.setSubEquipmentId(Long.valueOf(tmpStr));
-          dataTagCacheObject.setProcessId(coreAbstractEquipmentService.getProcessIdForAbstractEquipment(dataTagCacheObject.getSubEquipmentId()));
-        }
-        catch (NumberFormatException e) {
-          throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "NumberFormatException: "
-                  + "Unable to convert parameter \"subEquipmentId\" to Long: " + tmpStr);
-        }
-      }
+      // Only one of equipment / subequipment Id should be set. But if both are there, we will overwrite the process ID
+      // with the equipment (more important)
+      new PropertiesAccessor(properties)
+        .getLong("subEquipmentId").ifPresent(subEquipmentId -> {
+        dataTagCacheObject.setSubEquipmentId(subEquipmentId);
+        dataTagCacheObject.setProcessId(coreAbstractEquipmentService.getProcessIdForAbstractEquipment(subEquipmentId));
+      }).getLong("equipmentId").ifPresent(equipmentId -> {
+        dataTagCacheObject.setEquipmentId(equipmentId);
+        dataTagCacheObject.setProcessId(coreAbstractEquipmentService.getProcessIdForAbstractEquipment(equipmentId));
+      });
     }
 
-    if ((tmpStr = properties.getProperty("minValue")) != null) {
-      if (tmpStr.equals("null")) {
-        dataTagCacheObject.setMinValue(null);
-        dataTagUpdate.setMinValue(null);
-      }
-      else {
-        Comparable comparableMin = (Comparable) TypeConverter.cast(tmpStr, dataTagCacheObject.getDataType());
-        dataTagCacheObject.setMinValue(comparableMin);
-        dataTagUpdate.setMinValue((Number) comparableMin);
-      }
-    }
-
-    if ((tmpStr = properties.getProperty("maxValue")) != null) {
-      if (tmpStr.equals("null")) {
-        dataTagCacheObject.setMaxValue(null);
-        dataTagUpdate.setMaxValue(null);
-      }
-      else {
-        Comparable comparableMax = (Comparable) TypeConverter.cast(tmpStr, dataTagCacheObject.getDataType());
-        dataTagCacheObject.setMaxValue(comparableMax);
-        dataTagUpdate.setMaxValue((Number) comparableMax);
-      }
-    }
-
-    // TAG address
-    tmpStr = properties.getProperty("address");
-    if (tmpStr != null) {
-      DataTagAddress dataTagAddress = DataTagAddress.fromConfigXML(tmpStr);
+    new PropertiesAccessor(properties)
+      .getAs("minValue", prop -> (Comparable) TypeConverter.cast("null".equals(prop) ? null : prop, dataTagCacheObject.getDataType()))
+      .ifPresent(minValue -> {
+        dataTagCacheObject.setMinValue(minValue);
+        dataTagUpdate.setMinValue((Number) minValue);
+      }).getAs("maxValue", prop -> (Comparable) TypeConverter.cast("null".equals(prop) ? null : prop, dataTagCacheObject.getDataType()))
+      .ifPresent(maxValue -> {
+        dataTagCacheObject.setMaxValue(maxValue);
+        dataTagUpdate.setMaxValue((Number) maxValue);
+      }).getAs("address", DataTagAddress::fromConfigXML).ifPresent(dataTagAddress -> {
       dataTagCacheObject.setAddress(dataTagAddress);
-      setUpdateDataTagAddress(dataTagAddress, dataTagUpdate);
-    }
+      try {
+        setUpdateDataTagAddress(dataTagAddress, dataTagUpdate);
+      } catch (IllegalAccessException e) {
+        log.debug("Failed to update datatag address ", e);
+      }
+    });
 
     if (dataTagCacheObject.getEquipmentId() != null)
       dataTagUpdate.setEquipmentId(dataTagCacheObject.getEquipmentId());
@@ -114,15 +93,11 @@ public abstract class TagCacheObjectFactory<T extends Tag> extends AbstractCache
     return dataTagUpdate;
   }
 
+// TODO (2019) This used to be in a transaction and seems like a hot cache object being edited. Investigate callers and restore/replace that behavior
+
   /**
-   * TODO set JMS client topic still needs doing
-   * <p>
-   * Sets the fields of the AbstractTagCacheObject from the Properties object.
    * Notice only non-null properties are set, the others staying unaffected
    * by this method.
-   *
-   * @param tag
-   * @param properties
    *
    * @return the returned update object with changes that need sending to the
    * DAQ (only used when reconfiguring a Data/ControlTag, not rules)
@@ -131,91 +106,33 @@ public abstract class TagCacheObjectFactory<T extends Tag> extends AbstractCache
    * @throws ConfigurationException
    */
   protected DataTagUpdate setCommonProperties(AbstractTagCacheObject tag, Properties properties)
-          throws ConfigurationException {
+    throws ConfigurationException {
 
-    return tagCacheRef.executeTransaction(() -> {
-      DataTagUpdate innerDataTagUpdate = new DataTagUpdate();
-      innerDataTagUpdate.setDataTagId(tag.getId());
+    DataTagUpdate innerDataTagUpdate = new DataTagUpdate();
+    innerDataTagUpdate.setDataTagId(tag.getId());
 
-      String tmpStr = null;
+    new PropertiesAccessor(properties)
+      .getString("name").ifPresent(name -> {
+      tag.setName(name);
+      innerDataTagUpdate.setName(name);
+    }).getString("description").ifPresent(description -> {
+      tag.setDescription(description);
+      innerDataTagUpdate.setName(description);
+    }).getString("dataType").ifPresent(dataType -> {
+      tag.setDataType(dataType);
+      innerDataTagUpdate.setDataType(dataType);
+    }).getShort("mode").ifPresent(mode -> {
+      tag.setMode(mode);
+      innerDataTagUpdate.setMode(mode);
+    }).getString("isLogged").ifPresent(isLogged -> tag.setLogged(isLogged.equalsIgnoreCase("true")))
+      .getString("unit").ifPresent(unit -> tag.setUnit(checkAndSetNull(unit)))
+      .getString("dipAddress").ifPresent(dipAddress -> tag.setDipAddress(checkAndSetNull(dipAddress)))
+      .getString("japcAddress").ifPresent(japcAddress -> tag.setJapcAddress(checkAndSetNull(japcAddress)));
 
-      // TAG name and topic derived from name
-      if ((tmpStr = properties.getProperty("name")) != null) {
-        tag.setName(tmpStr);
-        innerDataTagUpdate.setName(tmpStr);
-        //this.topic = getTopicForName(this.name);
-      }
+    cern.c2mon.server.common.metadata.Metadata newMetadata = MetadataUtils.parseMetadataConfiguration(properties, tag.getMetadata());
+    tag.setMetadata(newMetadata);
 
-      // TAG description
-      if ((tmpStr = properties.getProperty("description")) != null) {
-        tag.setDescription(tmpStr);
-        innerDataTagUpdate.setName(tmpStr);
-      }
-
-
-      // TAG data type
-      if ((tmpStr = properties.getProperty("dataType")) != null) {
-        tag.setDataType(tmpStr);
-        innerDataTagUpdate.setDataType(tmpStr);
-      }
-
-
-      // TAG mode
-      if ((tmpStr = properties.getProperty("mode")) != null) {
-        try {
-          tag.setMode(Short.parseShort(tmpStr));
-          innerDataTagUpdate.setMode(Short.parseShort(tmpStr));
-        }
-        catch (NumberFormatException e) {
-          throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "NumberFormatException: Unable to convert parameter \"mode\" to short: " + tmpStr);
-        }
-      }
-
-      // TAG log flag
-      if ((tmpStr = properties.getProperty("isLogged")) != null) {
-        tag.setLogged(tmpStr.equalsIgnoreCase("true"));
-      }
-
-      // TAG unit
-      tmpStr = properties.getProperty("unit");
-      if (tmpStr != null) {
-        tag.setUnit(checkAndSetNull(tmpStr));
-      }
-
-      // DIP address
-      if (properties.getProperty("dipAddress") != null) {
-        tag.setDipAddress(checkAndSetNull(properties.getProperty("dipAddress")));
-      }
-
-      // JAPC address
-      if (properties.getProperty("japcAddress") != null) {
-        tag.setJapcAddress(checkAndSetNull(properties.getProperty("japcAddress")));
-      }
-
-      // TAG metadata
-      tmpStr = properties.getProperty("metadata");
-      if (tmpStr != null) {
-        Metadata clientMetadata = Metadata.fromJSON(tmpStr);
-
-        if (clientMetadata.isUpdate()) {
-          if (!clientMetadata.getRemoveList().isEmpty()) {
-            for (String key : clientMetadata.getRemoveList()) {
-              tag.getMetadata().getMetadata().remove(key);
-            }
-          }
-          for (Map.Entry<String, Object> entry : clientMetadata.getMetadata().entrySet()) {
-            tag.getMetadata().addMetadata(entry.getKey(), entry.getValue());
-          }
-        }
-        else {
-          cern.c2mon.server.common.metadata.Metadata metadata = new cern.c2mon.server.common.metadata.Metadata();
-          metadata.setMetadata(clientMetadata.getMetadata());
-          tag.setMetadata(metadata);
-        }
-      }
-
-      return innerDataTagUpdate;
-    });
+    return innerDataTagUpdate;
   }
 
   /**
@@ -223,7 +140,6 @@ public abstract class TagCacheObjectFactory<T extends Tag> extends AbstractCache
    *
    * @param dataTagAddress the new address
    * @param dataTagUpdate  the update object for which the address needs setting
-   *
    * @throws IllegalAccessException
    * @throws IllegalArgumentException
    */
@@ -238,15 +154,13 @@ public abstract class TagCacheObjectFactory<T extends Tag> extends AbstractCache
     if (dataTagAddress.getValueDeadbandType() != DataTagDeadband.DEADBAND_NONE) {
       dataTagAddressUpdate.setValueDeadbandType(dataTagAddress.getValueDeadbandType());
       dataTagAddressUpdate.setValueDeadband(dataTagAddress.getValueDeadband());
-    }
-    else {
+    } else {
       dataTagAddressUpdate.addFieldToRemove("valueDeadbandType");
       dataTagAddressUpdate.addFieldToRemove("valueDeadband");
     }
     if (dataTagAddress.getTimeDeadband() != DataTagDeadband.DEADBAND_NONE) {
       dataTagAddressUpdate.setTimeDeadband(dataTagAddress.getTimeDeadband());
-    }
-    else {
+    } else {
       dataTagAddressUpdate.addFieldToRemove("timeDeadband");
     }
     if (dataTagAddress.getHardwareAddress() != null) {
@@ -268,45 +182,19 @@ public abstract class TagCacheObjectFactory<T extends Tag> extends AbstractCache
    * being included in TIM. This method should be called during runtime
    * reconfigurations for instance.
    * <p>
-   * TODO commented out desc and dictionary null checks below (as test server does not satisfy these) - introduce them again for operation?
+   * TODO Desc and dictionary null checks below have been removed as test server does not satisfy them - introduce them again for operation?
    *
    * @param tag the tag to validate
-   *
    * @throws ConfigurationException if a validation test fails
    */
   protected void validateTagConfig(final T tag) throws ConfigurationException {
-    if (tag.getId() == null) {
-      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"id\" cannot be null");
-    }
-    if (tag.getName() == null) {
-      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"name\" cannot be null");
-    }
-    if (tag.getName().length() == 0) { //|| tag.getName().length() > 60
-      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"name\" cannot be empty");
-    }
-//      if (tag.getDescription() == null) {
-//        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"description\" cannot be null");
-//      }
-//      if (tag.getDescription().length() == 0 || tag.getDescription().length() > 100) {
-//        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"description\" must be 1 to 100 characters long");
-//      }
-    if (tag.getDataType() == null) {
-      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"dataType\" cannot be null");
-    }
-//      if (tag.getValueDictionary() == null) {
-//        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"valueDictionary\" cannot be null");
-//      }
-    if (tag.getMode() != DataTagConstants.MODE_OPERATIONAL && tag.getMode() != DataTagConstants.MODE_TEST && tag.getMode() != DataTagConstants.MODE_MAINTENANCE) {
-      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Invalid value for parameter \"mode\".");
-    }
-    //TODO setting client topic still needs doing...
-//      if (tag.getTopic() == null) {
-//        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"topic\" cannot be null");
-//      }
-    if (tag.getUnit() != null) {
-      if (tag.getUnit().length() > 20) {
-        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"unit\" must be 0 to 20 characters long");
-      }
-    }
+
+    new MicroValidator<>(tag)
+      .notNull(Tag::getId, "id")
+      .notNull(Tag::getName, "name")
+      .not(tagObj -> tagObj.getName().isEmpty(), "Parameter \"name\" cannot be empty") // This had a commented out max check as well, do we want that?
+      .notNull(Tag::getDataType, "dataType")
+      .between(Tag::getMode, MODE_OPERATIONAL, MODE_TEST, "mode")
+      .not(tagObj -> tagObj.getUnit() != null && tag.getUnit().length() > 20, "Parameter \"unit\" must be 0 to 20 characters long");
   }
 }

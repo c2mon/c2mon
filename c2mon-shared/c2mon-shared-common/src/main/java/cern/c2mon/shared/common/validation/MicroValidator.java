@@ -8,11 +8,10 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.function.Function;
 
 /**
- *
  * @param <T> T has been limited to Cacheable but can be extended to Object,
  *            I just wanted to have nicer error messages in the default case
  * @implNote This could have a simpler API using by reflective accesses, but we opted to avoid
- *           it because of GraalVM potential and code simplicity.
+ * it because of GraalVM potential and code simplicity.
  */
 @Slf4j
 public class MicroValidator<T extends Cacheable> {
@@ -30,9 +29,10 @@ public class MicroValidator<T extends Cacheable> {
       "Condition evaluation failed for member of " + value.getClass() + " with id " + value.getId());
   }
 
-  public <R extends Comparable<R>> MicroValidator<T> between(Function<T, R> memberAccessor, R minInclusive, R maxInclusive, String messageIfFailed) {
+  public <R extends Comparable<R>> MicroValidator<T> between(Function<T, R> memberAccessor, R minInclusive, R maxInclusive, String paramName) {
     if (memberAccessor.apply(value).compareTo(minInclusive) < 0 || memberAccessor.apply(value).compareTo(maxInclusive) > 0) {
-      internalThrow(messageIfFailed);
+      internalThrow("Invalid value for parameter " + paramName + " : " + memberAccessor.apply(value) +
+        ". Expected value between " + minInclusive + " and " + maxInclusive);
     }
     return this;
   }

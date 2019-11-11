@@ -19,7 +19,9 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.*;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Random;
 
 /**
  * @author Szymon Halastra
@@ -81,18 +83,6 @@ public class ProcessService implements ProcessOperationService, SupervisedCacheS
     });
 
     return returnProcess.orElseThrow(CacheElementNotFoundException::new); //TODO: make better return in case of null
-  }
-
-  @Override
-  public Collection<Long> getDataTagIds(Long processId) {
-    LinkedList<Long> dataTagIds = new LinkedList<>();
-    processCacheRef.executeTransaction(() -> {
-      ProcessCacheObject process = (ProcessCacheObject) processCacheRef.get(processId);
-      for (long equipmentId : process.getEquipmentIds()) {
-        dataTagIds.addAll(equipmentService.getDataTagIds(equipmentId));
-      }
-    });
-    return dataTagIds;
   }
 
   @Override

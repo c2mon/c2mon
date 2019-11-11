@@ -4,6 +4,7 @@ import cern.c2mon.cache.actions.BaseEquipmentServiceImpl;
 import cern.c2mon.cache.actions.alivetimer.AliveTimerService;
 import cern.c2mon.cache.actions.commfault.CommFaultService;
 import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.shared.common.supervision.SupervisionConstants;
 import lombok.extern.slf4j.Slf4j;
@@ -21,17 +22,17 @@ import java.util.stream.Collectors;
 @Service
 public class EquipmentService extends BaseEquipmentServiceImpl<Equipment> implements EquipmentOperations {
 
+  private final C2monCache<DataTag> dataTagCacheRef;
+  private final CommFaultService commFaultService;
+
   @Inject
   public EquipmentService(final C2monCache<Equipment> equipmentCacheRef,
-                          final AliveTimerService aliveTimerService, final CommFaultService commFaultService) {
+                          final C2monCache<DataTag> dataTagCacheRef,
+                          final AliveTimerService aliveTimerService,
+                          final CommFaultService commFaultService) {
     super(equipmentCacheRef, commFaultService.getCache(), aliveTimerService, SupervisionConstants.SupervisionEntity.EQUIPMENT);
-  }
-
-
-  @Override
-  public Collection<Long> getDataTagIds(Long equipmentId) {
-    // TODO do these with Brice
-    return null;
+    this.dataTagCacheRef = dataTagCacheRef;
+    this.commFaultService = commFaultService;
   }
 
   @Override
@@ -41,6 +42,7 @@ public class EquipmentService extends BaseEquipmentServiceImpl<Equipment> implem
 
   @Override
   public void addEquipmentToProcess(Long equipmentId, Long processId) {
+    // TODO do these with Brice
 
   }
 

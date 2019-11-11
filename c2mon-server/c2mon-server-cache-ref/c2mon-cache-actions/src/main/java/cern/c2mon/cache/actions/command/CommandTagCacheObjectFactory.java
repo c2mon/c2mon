@@ -107,7 +107,7 @@ public class CommandTagCacheObjectFactory extends AbstractCacheObjectFactory<Com
       .between(tag -> tag.getName().length(), 0, 60, "Parameter \"name\" must be 1 to 60 characters long")
       .notNull(CommandTag::getDescription, "description")
       .between(tag -> tag.getDescription().length(), 0, 100, "Parameter \"description\" can be up to 100 characters long")
-      .between(CommandTag::getMode, MODE_OPERATIONAL, MODE_TEST, "Invalid value for parameter \"mode\" : " + commandTag.getMode())
+      .between(CommandTag::getMode, MODE_OPERATIONAL, MODE_TEST, "mode")
       .notNull(CommandTag::getDataType, "dataType")
       .between(CommandTag::getSourceRetries, 0, 3, "Parameter \"sourceRetries\" must be between 0 and 3")
       .between(CommandTag::getSourceTimeout, 100, Integer.MAX_VALUE, "Parameter \"sourceTimeout\" must be >= 100")
