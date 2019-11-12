@@ -8,9 +8,9 @@ import org.springframework.lang.Nullable;
 
 import java.util.Set;
 
-class AbstractSupervisedC2monCacheFlow<T extends Supervised> extends DefaultC2monCacheFlow<T> {
+public class AbstractSupervisedC2monCacheFlow<T extends Supervised> extends DefaultC2monCacheFlow<T> {
 
-  AbstractSupervisedC2monCacheFlow() {
+  public AbstractSupervisedC2monCacheFlow() {
     super((older, newer) -> newer.getStatusTime().getTime() >= older.getStatusTime().getTime());
   }
 
