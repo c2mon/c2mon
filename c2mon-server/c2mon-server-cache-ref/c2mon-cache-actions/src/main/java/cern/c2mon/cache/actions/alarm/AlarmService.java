@@ -28,9 +28,7 @@ import java.util.stream.Collectors;
 import static cern.c2mon.cache.actions.alarm.AlarmEvaluator.createAdditionalInfoString;
 
 /**
- * @author Szymon Halastra
- * @author Alexandros Papageorgiou
- * @author Brice Copy
+ * @author Szymon Halastra, Alexandros Papageorgiou, Brice Copy
  */
 @Slf4j
 @Service
@@ -56,7 +54,7 @@ public class AlarmService extends AbstractCacheService<Alarm> implements AlarmAg
   @Inject
   public AlarmService(final C2monCache<Alarm> cache, final TagCacheFacade tagCacheRef,
                       final UnifiedTagCacheFacade unifiedTagCacheFacade, final OscillationUpdater oscillationUpdater) {
-    super(cache, AlarmEvaluator::isLaterThan);
+    super(cache, new AlarmC2monCacheFlow());
     this.tagCacheRef = tagCacheRef;
     this.unifiedTagCacheFacade = unifiedTagCacheFacade;
     this.oscillationUpdater = oscillationUpdater;

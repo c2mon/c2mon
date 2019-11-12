@@ -21,10 +21,6 @@ class AlarmEvaluator {
 
   }
 
-  static boolean isLaterThan(Alarm older, Alarm newer) {
-    return newer.getSourceTimestamp().getTime() >= older.getSourceTimestamp().getTime();
-  }
-
   static boolean alarmShouldBeUpdated(Alarm alarm, Tag tag) {
     if (!isAlarmConnectedToTag(alarm, tag)) {
       log.warn("Alarm #{} with datatagId #{} will not be updated - the tag passed in the update does not have a matching id: #{}",

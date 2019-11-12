@@ -16,12 +16,10 @@ import javax.inject.Inject;
  */
 @Slf4j
 @Service
-public class RuleDependencyService extends AbstractCacheService<RuleTag> {
-
-  private C2monCache<RuleTag> cache;
+public class RuleTagService extends AbstractCacheService<RuleTag> {
 
   @Inject
-  public RuleDependencyService(final C2monCache<RuleTag> tagCacheRef) {
+  public RuleTagService(final C2monCache<RuleTag> tagCacheRef) {
     super(tagCacheRef, new DefaultC2monCacheFlow<>());
   }
 
