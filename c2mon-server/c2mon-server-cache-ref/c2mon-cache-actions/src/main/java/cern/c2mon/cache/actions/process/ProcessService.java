@@ -22,7 +22,6 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.Random;
 
-// TODO This class should properly inherit from SupervisedService
 /**
  * @author Szymon Halastra, Alexandros Papageorgiou Koufidis
  */
@@ -44,7 +43,7 @@ public class ProcessService extends AbstractCacheService<Process>
   protected C2monCache<Process> cache;
   @Getter
   protected SupervisedCacheService<Process> supervisedService;
-  private C2monCache<AliveTimer> aliveTimerCache;
+  private AliveTimerService aliveTimerService;
   private EquipmentService equipmentService;
   private SubEquipmentService subEquipmentService;
   private ServerProperties properties;
@@ -53,7 +52,7 @@ public class ProcessService extends AbstractCacheService<Process>
   public ProcessService(C2monCache<Process> processCacheRef, EquipmentService equipmentService,
                         AliveTimerService aliveTimerService, SubEquipmentService subEquipmentService, ServerProperties properties) {
     super(processCacheRef, new ProcessC2monCacheFlow());
-    this.aliveTimerCache = aliveTimerService.getCache();
+    this.aliveTimerService = aliveTimerService;
     this.equipmentService = equipmentService;
     this.subEquipmentService = subEquipmentService;
     this.properties = properties;
@@ -85,7 +84,7 @@ public class ProcessService extends AbstractCacheService<Process>
 
   @Override
   public Long getProcessIdFromAlive(Long aliveTimerId) {
-    AliveTimer aliveTimer = aliveTimerCache.get(aliveTimerId);
+    AliveTimer aliveTimer = aliveTimerService.getCache().get(aliveTimerId);
     if (aliveTimer.isProcessAliveType()) {
       return aliveTimer.getRelatedId();
     } else if (aliveTimer.isEquipmentAliveType()) {
@@ -149,16 +148,7 @@ public class ProcessService extends AbstractCacheService<Process>
   /**
    * Records the start up time of the process and the host it is running on,
    * (and sets it's status to STARTUP - may remove this in the future as duplicate
-   * of state tag of the DAQ)
-   * <p>
-   * <p>Also starts the alive timer.
-   * <p>
-   * <p>Please note, that in case of a cache reference to the process it is up to the calling
-   * method to acquire a write lock. In case of a copy it is the calling method that has
-   * to take care of committing the changes made to the process object back to the cache.
-   * <p>
-   * <p>This function does not check if the process is Running and use to be called by the TEST mode
-   * since it will force the DAQ to start
+   * of state tag of the DAQ). Also starts the alive timer.
    *
    * @param process      the Process that is starting
    * @param pHostName    the hostname of the Process

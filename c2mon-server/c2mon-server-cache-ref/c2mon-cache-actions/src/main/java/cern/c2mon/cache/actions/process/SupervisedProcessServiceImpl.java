@@ -6,7 +6,6 @@ import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.shared.common.supervision.SupervisionConstants;
 
-// TODO Is this used for anything?
 class SupervisedProcessServiceImpl extends AbstractSupervisedService<Process> {
 
   SupervisedProcessServiceImpl(C2monCache<Process> c2monCache, AliveTimerService aliveTimerService) {
