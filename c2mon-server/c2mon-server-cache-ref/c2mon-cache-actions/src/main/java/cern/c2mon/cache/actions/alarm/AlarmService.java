@@ -7,10 +7,10 @@ import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.cache.api.listener.impl.MultiThreadListener;
 import cern.c2mon.cache.api.listener.impl.SingleThreadListener;
-import cern.c2mon.cache.config.tag.TagCacheFacade;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.TagWithAlarms;
+import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.common.CacheEvent;
 import lombok.extern.slf4j.Slf4j;
@@ -43,19 +43,18 @@ public class AlarmService extends AbstractCacheService<Alarm> implements AlarmAg
    */
   public static final String ALARM_TOPIC = "tim.alarm";
 
-  private TagCacheFacade tagCacheRef;
-
   private List<AlarmAggregatorListener> alarmUpdateObservable = new ArrayList<>();
 
   private UnifiedTagCacheFacade unifiedTagCacheFacade;
 
   private OscillationUpdater oscillationUpdater;
+  private C2monCache<DataTag> dataTagCacheRef;
 
   @Inject
-  public AlarmService(final C2monCache<Alarm> cache, final TagCacheFacade tagCacheRef,
-                      final UnifiedTagCacheFacade unifiedTagCacheFacade, final OscillationUpdater oscillationUpdater) {
+  public AlarmService(final C2monCache<Alarm> cache, C2monCache<DataTag> dataTagCacheRef, final UnifiedTagCacheFacade unifiedTagCacheFacade,
+                      final OscillationUpdater oscillationUpdater) {
     super(cache, new AlarmC2monCacheFlow());
-    this.tagCacheRef = tagCacheRef;
+    this.dataTagCacheRef = dataTagCacheRef;
     this.unifiedTagCacheFacade = unifiedTagCacheFacade;
     this.oscillationUpdater = oscillationUpdater;
   }
@@ -81,7 +80,7 @@ public class AlarmService extends AbstractCacheService<Alarm> implements AlarmAg
   public Alarm evaluateAlarm(Long alarmId) {
     return cache.executeTransaction(() -> {
       Alarm alarm = cache.get(alarmId);
-      Tag tag = tagCacheRef.get(alarm.getDataTagId());
+      Tag tag = dataTagCacheRef.get(alarm.getDataTagId()); // TODO Should this search across all tag caches? This behaviour existed before
       update((AlarmCacheObject) alarm, tag, true);
       return alarm;
     });
@@ -145,7 +144,7 @@ public class AlarmService extends AbstractCacheService<Alarm> implements AlarmAg
 
   public TagWithAlarms getTagWithAlarmsAtomically(Long id) {
     return cache.executeTransaction(() -> {
-      Tag tag = tagCacheRef.get(id);
+      Tag tag = dataTagCacheRef.get(id); // TODO Should this search across all tag caches? This behaviour existed before
       Set<Long> alarms = new HashSet<>(tag.getAlarmIds());
       return new TagWithAlarms<>(tag, cache.getAll(alarms).values());
     });

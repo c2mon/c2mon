@@ -3,7 +3,6 @@ package cern.c2mon.cache.actions.tag;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.listener.CacheListener;
 import cern.c2mon.cache.api.listener.CacheListenerManager;
-import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.tag.Tag;
@@ -20,9 +19,9 @@ public class UnifiedTagCacheFacade implements CacheListenerManager<Tag> {
   private final List<C2monCache<? extends Tag>> tagCaches;
 
   @Inject
-  public UnifiedTagCacheFacade(final C2monCache<RuleTag> ruleTagCacheRef, final C2monCache<ControlTag> controlTagCacheRef,
+  public UnifiedTagCacheFacade(final C2monCache<RuleTag> ruleTagCacheRef,
                                final C2monCache<DataTag> dataTagCacheRef) {
-    tagCaches = Arrays.asList(ruleTagCacheRef, dataTagCacheRef, controlTagCacheRef);
+    tagCaches = Arrays.asList(ruleTagCacheRef, dataTagCacheRef);
   }
 
   @Override
