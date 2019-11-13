@@ -18,11 +18,12 @@ package cern.c2mon.server.test.cache;
 
 import cern.c2mon.server.common.control.ControlTagCacheObject;
 
-public class ControlTagCacheObjectFactory extends DataTagCacheObjectFactory {
+public class ControlTagCacheObjectFactory extends AbstractInfoTagCacheObjectFactory<ControlTagCacheObject> {
 
   @Override
   public ControlTagCacheObject sampleBase() {
-    ControlTagCacheObject cacheObject = (ControlTagCacheObject) super.sampleBase();
+    ControlTagCacheObject cacheObject = new ControlTagCacheObject();
+
     cacheObject.setId(1001L);  //must be non null in DB
     cacheObject.setName("Junit_test_tag"); //non null
     cacheObject.setDataType("Float"); // non null
@@ -40,7 +41,7 @@ public class ControlTagCacheObjectFactory extends DataTagCacheObjectFactory {
    * @return the ControlTag
    */
   public ControlTagCacheObject createTestProcessAlive() {
-    ControlTagCacheObject cacheObject = (ControlTagCacheObject) super.sampleBase();
+    ControlTagCacheObject cacheObject = sampleBase();
     cacheObject.setId(510L);
     cacheObject.setName("Test process alive tag");
     cacheObject.setDataType("Long");

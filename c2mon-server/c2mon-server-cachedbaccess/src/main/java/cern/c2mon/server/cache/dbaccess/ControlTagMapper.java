@@ -19,7 +19,8 @@ package cern.c2mon.server.cache.dbaccess;
 import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.control.ControlTagCacheObject;
 
-public interface ControlTagMapper extends PersistenceMapper<ControlTag>, LoaderMapper<ControlTag> {
+public interface ControlTagMapper extends PersistenceMapper<ControlTag>, LoaderMapper<ControlTag>,
+                                              BatchLoaderMapper<ControlTag>, ConfigurableMapper<ControlTag> {
   void insertControlTag(ControlTagCacheObject controlTag);
   void deleteControlTag(Long id);
 }

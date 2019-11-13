@@ -17,38 +17,15 @@
 package cern.c2mon.server.test.cache;
 
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
-import cern.c2mon.shared.common.datatag.DataTagAddress;
-import cern.c2mon.shared.common.datatag.DataTagConstants;
+import cern.c2mon.server.common.tag.AbstractInfoTagCacheObject;
 
-import java.sql.Timestamp;
-
-public class DataTagCacheObjectFactory extends AbstractTagCacheObjectFactory<DataTagCacheObject> {
+public class DataTagCacheObjectFactory extends AbstractInfoTagCacheObjectFactory<AbstractInfoTagCacheObject> {
 
   @Override
   public DataTagCacheObject sampleBase() {
     //construct fake DataTagCacheObject, setting all fields
     DataTagCacheObject cacheObject = new DataTagCacheObject();
-    cacheObject.setId(100000L);  //must be non null in DB
-    cacheObject.setName("Junit_test_datatag1"); //non null
-    cacheObject.setDescription("test description");
-    cacheObject.setMode(DataTagConstants.MODE_TEST); //non null
-    cacheObject.setDataType("Boolean"); // non null
-    cacheObject.setLogged(false); //null allowed
-    cacheObject.setUnit("test unit m/sec");
-    cacheObject.setDipAddress("testDIPaddress");
-    cacheObject.setJapcAddress("testJAPCaddress");
-    cacheObject.setValue(Boolean.TRUE);
-    cacheObject.setValueDescription("test value description");
-    cacheObject.setSimulated(false); //null allowed
-    cacheObject.setEquipmentId(100L); //need test equipment inserted
-    cacheObject.setMinValue(23.3f);
-    cacheObject.setMaxValue(12.2f);
-    cacheObject.setAddress(new DataTagAddress());
-    cacheObject.setDataTagQuality(createValidQuality());
-    cacheObject.setCacheTimestamp(new Timestamp(System.currentTimeMillis()));
-    cacheObject.setDaqTimestamp(new Timestamp(System.currentTimeMillis()));
-    cacheObject.setSourceTimestamp(new Timestamp(System.currentTimeMillis()));
-    cacheObject.setRuleIdsString("130");
+    initDefaults(cacheObject);
     return cacheObject;
   }
 

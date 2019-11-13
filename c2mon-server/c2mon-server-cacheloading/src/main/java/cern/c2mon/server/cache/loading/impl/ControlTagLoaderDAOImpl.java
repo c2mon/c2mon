@@ -16,19 +16,14 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.loading.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Service;
-
 import cern.c2mon.server.cache.dbaccess.ControlTagMapper;
 import cern.c2mon.server.cache.dbaccess.DataTagMapper;
 import cern.c2mon.server.cache.loading.ControlTagLoaderDAO;
 import cern.c2mon.server.cache.loading.common.AbstractDefaultLoaderDAO;
 import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.control.ControlTagCacheObject;
-import cern.c2mon.server.common.datatag.DataTag;
-import cern.c2mon.server.common.datatag.DataTagCacheObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * ControlTag loader DAO.
@@ -40,18 +35,15 @@ public class ControlTagLoaderDAOImpl extends AbstractDefaultLoaderDAO<ControlTag
 
   private ControlTagMapper controlTagMapper;
 
-  private DataTagMapper dataTagMapper;
-
   @Autowired
   public ControlTagLoaderDAOImpl(ControlTagMapper controlTagMapper, DataTagMapper dataTagMapper) {
     super(10000, controlTagMapper);
     this.controlTagMapper = controlTagMapper;
-    this.dataTagMapper = dataTagMapper;
   }
 
   @Override
   public void updateConfig(ControlTag controlTag) {
-    dataTagMapper.updateConfig(controlTag);
+    controlTagMapper.updateConfig(controlTag);
   }
 
   @Override

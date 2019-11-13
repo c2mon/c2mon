@@ -93,7 +93,7 @@ public final class CacheObjectCreation {
    * @return the DataTag
    */
   public static DataTagCacheObject createTestDataTag() {
-    return controlTagCacheObjectFactory.sampleBase();
+    return dataTagCacheObjectFactory.sampleBase();
   }
 
   /**

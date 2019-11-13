@@ -18,6 +18,7 @@ package cern.c2mon.server.common.datatag;
 
 import cern.c2mon.server.common.tag.AbstractInfoTagCacheObject;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
+import lombok.NoArgsConstructor;
 
 /**
  * Represents the data tag objects stored in the cache. These contain both the
@@ -30,6 +31,7 @@ import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
  *
  * @author Mark Brightwell
  */
+@NoArgsConstructor
 public class DataTagCacheObject extends AbstractInfoTagCacheObject implements DataTag {
 
   /**

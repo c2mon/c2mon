@@ -13,8 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * @author Szymon Halastra
- * @author Alexandros Papageorgiou Koufidis
+ * @author Szymon Halastra, Alexandros Papageorgiou Koufidis
  */
 public abstract class BaseEquipmentServiceImpl<T extends AbstractEquipment> extends AbstractSupervisedService<T>
   implements CommonEquipmentOperations {
