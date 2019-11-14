@@ -16,19 +16,14 @@
  *****************************************************************************/
 package cern.c2mon.server.common.alarm;
 
-import java.sql.Timestamp;
-import java.util.LinkedList;
-
-import lombok.Data;
 import cern.c2mon.server.common.AbstractCacheableImpl;
+import cern.c2mon.shared.client.alarm.condition.AlarmCondition;
 import cern.c2mon.server.common.metadata.Metadata;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 
-import cern.c2mon.server.common.metadata.Metadata;
-import cern.c2mon.shared.client.alarm.condition.AlarmCondition;
-import cern.c2mon.shared.common.Cacheable;
+import java.sql.Timestamp;
+import java.util.LinkedList;
 
 /**
  * Alarm object held in the cache.
