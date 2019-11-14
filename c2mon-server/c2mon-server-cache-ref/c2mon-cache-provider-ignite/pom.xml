@@ -7,11 +7,10 @@
   <parent>
     <artifactId>c2mon-server-cache-ref</artifactId>
     <groupId>cern.c2mon.server</groupId>
-    <version>1.8.46-SNAPSHOT</version>
+    <version>1.9.3-SNAPSHOT</version>
   </parent>
 
   <artifactId>c2mon-cache-provider-ignite</artifactId>
-  <version>1.8.46-SNAPSHOT</version>
 
   <properties>
     <ignite.version>2.7.5</ignite.version>
@@ -77,6 +76,10 @@
       <artifactId>jmh-generator-annprocess</artifactId>
       <version>${jmh.version}</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.server</groupId>
+      <artifactId>c2mon-cache-api</artifactId>
     </dependency>
   </dependencies>
 </project>
