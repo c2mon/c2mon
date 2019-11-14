@@ -56,7 +56,9 @@ public interface Tag extends RuleInputValue, Cacheable {
   /**
    * @return the JAPC address on which the data tag is published,
    *         or <code>null</code> if not.
+   * @deprecated Use {@link Metadata} instead
    */
+  @Deprecated
   String getJapcAddress();
 
   /** Get the mode of the tag.

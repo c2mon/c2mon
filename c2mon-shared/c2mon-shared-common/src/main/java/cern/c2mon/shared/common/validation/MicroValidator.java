@@ -55,6 +55,10 @@ public class MicroValidator<T extends Cacheable> {
     return this;
   }
 
+  public MicroValidator<T> must(Function<T, Boolean> condition, String messageIfFailed) {
+    return not(condition.andThen(previousResult -> !previousResult), messageIfFailed);
+  }
+
   public <R> MicroValidator<T> optType(Function<T, R> memberAccessor, String type, String paramName) {
     try {
       R member = memberAccessor.apply(value);

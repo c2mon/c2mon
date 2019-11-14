@@ -19,8 +19,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * This is a very simple cache implementation, used for testing.
- *
- * @param <V>
  */
 public class MapBasedCache<V extends Cacheable> implements Cache<Long, V> {
 

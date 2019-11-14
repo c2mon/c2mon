@@ -93,9 +93,13 @@ public class DeviceClassCacheObject extends AbstractCacheableImpl implements Dev
   public DeviceClassCacheObject clone() {
     DeviceClassCacheObject clone = (DeviceClassCacheObject) super.clone();
 
-    clone.properties = (List<Property>) ((ArrayList<Property>) properties).clone();
-    clone.commands = (List<Command>) ((ArrayList<Command>) commands).clone();
-    clone.deviceIds = (List<Long>) ((ArrayList<Long>) deviceIds).clone();
+    clone.properties = properties.stream()
+      .map(property -> new Property(property.getId(), property.getName(), property.getDescription(), property.getFields()))
+      .collect(Collectors.toList());
+    clone.commands = commands.stream()
+      .map(item ->  new Command(item.getId(), item.getName(), item.getDescription()))
+      .collect(Collectors.toList());
+    clone.deviceIds = new ArrayList<>(deviceIds);
 
     return clone;
   }

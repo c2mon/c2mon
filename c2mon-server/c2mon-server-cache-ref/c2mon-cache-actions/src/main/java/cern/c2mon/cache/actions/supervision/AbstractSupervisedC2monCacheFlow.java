@@ -11,7 +11,8 @@ import java.util.Set;
 public class AbstractSupervisedC2monCacheFlow<T extends Supervised> extends DefaultC2monCacheFlow<T> {
 
   public AbstractSupervisedC2monCacheFlow() {
-    super((older, newer) -> newer.getStatusTime().getTime() >= older.getStatusTime().getTime());
+    super((older, newer) -> (older.getStatusTime() == null || newer.getStatusTime() == null)
+      || newer.getStatusTime().getTime() >= older.getStatusTime().getTime());
   }
 
   @Override

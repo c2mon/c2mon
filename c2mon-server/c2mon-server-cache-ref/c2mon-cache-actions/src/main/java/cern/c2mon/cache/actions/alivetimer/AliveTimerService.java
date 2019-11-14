@@ -5,11 +5,15 @@ import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.alive.AliveTimer;
 import cern.c2mon.server.common.alive.AliveTimerCacheObject;
+import cern.c2mon.server.common.supervision.Supervised;
+import cern.c2mon.shared.common.supervision.SupervisionConstants;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+
+import static cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEntity.*;
 
 /**
  * Manages operations on {@link AliveTimerCacheObject}s
@@ -120,6 +124,22 @@ public class AliveTimerService extends AbstractCacheService<AliveTimer> {
   public void removeAliveTimer(long aliveId) {
     stop(aliveId);
     cache.remove(aliveId);
+  }
+
+  public void createAliveTimerFor(Supervised supervised) {
+    AliveTimerCacheObject aliveTimer = new AliveTimerCacheObject(supervised.getAliveTagId(), supervised.getId(), supervised.getName(),
+      supervised.getStateTagId(), "", supervised.getAliveInterval());
+    setAliveTimerType(supervised.getSupervisionEntity(), aliveTimer);
+    cache.put(aliveTimer.getId(), aliveTimer);
+  }
+
+  private void setAliveTimerType(SupervisionConstants.SupervisionEntity supervisionEntity, AliveTimerCacheObject aliveTimer){
+    if (supervisionEntity == PROCESS)
+      aliveTimer.setAliveType(AliveTimer.ALIVE_TYPE_PROCESS);
+    else if (supervisionEntity == EQUIPMENT)
+      aliveTimer.setAliveType(AliveTimer.ALIVE_TYPE_EQUIPMENT);
+    else if (supervisionEntity == SUBEQUIPMENT)
+      aliveTimer.setAliveType(AliveTimer.ALIVE_TYPE_SUBEQUIPMENT);
   }
 
   private void filterAndSetActive(boolean active) {

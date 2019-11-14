@@ -57,13 +57,11 @@ public class DeviceCacheObjectFactory extends AbstractCacheObjectFactory<Device>
       .not(deviceObj -> deviceObj.getName().isEmpty(), "Parameter \"name\" cannot be empty")
       .notNull(Device::getDeviceClassId, "deviceClassId")
       .notNull(Device::getDeviceProperties, "deviceProperties")
+      .must(deviceObj -> deviceClassCacheRef.containsKey(deviceObj.getDeviceClassId()), "Parameter \"deviceClassId\" must refer to an existing DeviceClass")
       .notNull(Device::getDeviceCommands, "deviceCommands");
 
     // Cross-check device class ID
     DeviceClass deviceClass = deviceClassCacheRef.get(device.getDeviceClassId());
-    if (deviceClass == null) {
-      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"deviceClassId\" must refer to an existing DeviceClass");
-    }
 
     // Cross-check properties
     for (DeviceProperty deviceProperty : device.getDeviceProperties()) {

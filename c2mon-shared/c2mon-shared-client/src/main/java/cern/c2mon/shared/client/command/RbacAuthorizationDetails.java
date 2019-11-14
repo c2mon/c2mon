@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.shared.client.command;
 
+import cern.c2mon.shared.client.metadata.Metadata;
 import cern.c2mon.shared.common.command.AuthorizationDetails;
 
 /**
@@ -23,8 +24,9 @@ import cern.c2mon.shared.common.command.AuthorizationDetails;
  * device and property are associated to every command.
  *
  * @author Mark Brightwell
- *
+ * @deprecated CERN Specific code, should become {@link Metadata} when Command metadata support is complete
  */
+@Deprecated
 public class RbacAuthorizationDetails implements AuthorizationDetails, Cloneable {
 
   /**

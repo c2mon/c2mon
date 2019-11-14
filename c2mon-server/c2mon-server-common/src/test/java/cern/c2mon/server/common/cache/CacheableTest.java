@@ -51,7 +51,7 @@ public abstract class CacheableTest<T extends Cacheable> {
   @Test
   public void equalsIsImplemented() {
     try {
-      assertEquals(sample.getClass(),
+      assertNotEquals(Object.class,
         sample.getClass().getMethod("equals", Object.class).getDeclaringClass());
     } catch (NoSuchMethodException e) {
       fail("Equals should be implemented for all cache objects");

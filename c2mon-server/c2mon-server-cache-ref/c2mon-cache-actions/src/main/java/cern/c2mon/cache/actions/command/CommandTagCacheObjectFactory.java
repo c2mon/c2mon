@@ -88,6 +88,7 @@ public class CommandTagCacheObjectFactory extends AbstractCacheObjectFactory<Com
       commandTagCacheObject.setProcessId(equipmentCacheRef.get(equipmentId).getProcessId());
     });
 
+    // This should eventually be removed, once RbacAuth is properly removed and replaced by metadata
     RbacAuthorizationDetails rbacAuthorizationDetails = createRbacAuthorizationDetails(commandTagCacheObject, properties);
 
     if (rbacAuthorizationDetails != null) {
@@ -113,7 +114,6 @@ public class CommandTagCacheObjectFactory extends AbstractCacheObjectFactory<Com
       .between(CommandTag::getClientTimeout, 5000, Integer.MAX_VALUE, "Parameter \"clientTimeout\" must be >= 5000")
       .between(CommandTag::getClientTimeout, commandTag.getExecTimeout(), Integer.MAX_VALUE, "Parameter \"clientTimeout\" must be greater than execTimeout")
       .notNull(CommandTag::getEquipmentId, "equipmentId")
-      .notNull(CommandTag::getAuthorizationDetails, "AuthorizationDetails")
       .between(CommandTag::getExecTimeout, commandTag.getSourceTimeout() * (commandTag.getSourceRetries() + 1), Integer.MAX_VALUE,
         "Parameter \"execTimeout\" must be greater than (sourceRetries + 1) * sourceTimeout")
       .optType(CommandTag::getMinimum, commandTag.getDataType(), "minimum")

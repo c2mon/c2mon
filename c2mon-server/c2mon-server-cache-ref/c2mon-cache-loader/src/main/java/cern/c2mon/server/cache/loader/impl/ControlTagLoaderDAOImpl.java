@@ -48,7 +48,7 @@ public class ControlTagLoaderDAOImpl extends AbstractDefaultLoaderDAO<ControlTag
 
   @Override
   public void updateConfig(ControlTag controlTag) {
-    dataTagMapper.updateConfig(controlTag);
+    controlTagMapper.updateConfig(controlTag);
   }
 
   @Override

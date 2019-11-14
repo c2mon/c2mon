@@ -9,16 +9,15 @@ import cern.c2mon.server.common.process.ProcessCacheObject;
 import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- * @author Szymon Halastra
+ * @author Szymon Halastra, Alexandros Papageorgiou Koufidis
  */
-public class AliveTimerGeneratorTest {
+public class AliveTimerCreationTest {
 
   private static final Long KEY = 1L;
   private static final Long ALIVE_TAG_ID = 10L;
@@ -26,13 +25,13 @@ public class AliveTimerGeneratorTest {
 
   private static final int ALIVE_INTERVAL = 1000;
 
+  private AliveTimerService aliveTimerService;
   private C2monCache<AliveTimer> aliveTimerCache;
-  private AliveTimerGenerator generator;
 
   @Before
   public void init() {
     aliveTimerCache = new SimpleC2monCache<>("aliveTimerCache");
-//    generator = new AliveTimerGenerator(aliveTimerCache);
+    aliveTimerService = new AliveTimerService(aliveTimerCache);
   }
 
   @After
@@ -41,7 +40,6 @@ public class AliveTimerGeneratorTest {
   }
 
   @Test
-  @Ignore
   public void generateFromEquipment() {
     EquipmentCacheObject equipmentCacheObject = new EquipmentCacheObject(KEY);
     equipmentCacheObject.setAliveTagId(ALIVE_TAG_ID);
@@ -49,7 +47,7 @@ public class AliveTimerGeneratorTest {
     equipmentCacheObject.setStateTagId(STATE_TAG_ID);
     equipmentCacheObject.setAliveInterval(ALIVE_INTERVAL);
 
-    generator.generate(equipmentCacheObject);
+    aliveTimerService.createAliveTimerFor(equipmentCacheObject);
 
     AliveTimer cachedAliveTimer = aliveTimerCache.get(ALIVE_TAG_ID);
 
@@ -61,7 +59,6 @@ public class AliveTimerGeneratorTest {
   }
 
   @Test
-  @Ignore
   public void generateFromSubEquipment() {
     SubEquipmentCacheObject subEquipmentCacheObject = new SubEquipmentCacheObject(KEY);
     subEquipmentCacheObject.setAliveTagId(ALIVE_TAG_ID);
@@ -69,7 +66,7 @@ public class AliveTimerGeneratorTest {
     subEquipmentCacheObject.setStateTagId(STATE_TAG_ID);
     subEquipmentCacheObject.setAliveInterval(ALIVE_INTERVAL);
 
-    generator.generate(subEquipmentCacheObject);
+    aliveTimerService.createAliveTimerFor(subEquipmentCacheObject);
 
     AliveTimerCacheObject cachedAliveTimer = (AliveTimerCacheObject) aliveTimerCache.get(ALIVE_TAG_ID);
 
@@ -81,7 +78,6 @@ public class AliveTimerGeneratorTest {
   }
 
   @Test
-  @Ignore
   public void generateFromProcess() {
     ProcessCacheObject processCacheObject = new ProcessCacheObject(KEY);
     processCacheObject.setAliveTagId(ALIVE_TAG_ID);
@@ -89,7 +85,7 @@ public class AliveTimerGeneratorTest {
     processCacheObject.setStateTagId(STATE_TAG_ID);
     processCacheObject.setAliveInterval(ALIVE_INTERVAL);
 
-    generator.generate(processCacheObject);
+    aliveTimerService.createAliveTimerFor(processCacheObject);
 
     AliveTimer cachedAliveTimer = aliveTimerCache.get(ALIVE_TAG_ID);
 
