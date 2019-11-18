@@ -12,7 +12,7 @@ public class ControlTagCacheObjectTest extends CacheableTest<AlarmCacheObject> {
 
   @Override
   protected void mutateObject(AlarmCacheObject cloneObject) {
-      cloneObject.setFirstOscTS(12345);
+      cloneObject.getFifoSourceTimestamps().add(12345L);
       cloneObject.setInternalActive(false);
   }
 }

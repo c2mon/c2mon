@@ -129,13 +129,5 @@ public interface SupervisedCacheService<T extends Supervised> {
    */
   void removeAliveTimerBySupervisedId(long id);
 
-  /**
-   * Loads the alive timer into the cache and starts it.
-   * Used on reconfiguration of a supervised object.
-   *
-   * @param supervisedId id of supervised object
-   */
-  void loadAndStartAliveTag(long supervisedId);
-
   SupervisionConstants.SupervisionEntity getSupervisionEntity();
 }

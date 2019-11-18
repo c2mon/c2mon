@@ -177,8 +177,6 @@ public abstract class TagCacheObjectFactory<T extends Tag> extends AbstractCache
    * Checks that the AbstractTagCacheObject passes all validation tests for
    * being included in TIM. This method should be called during runtime
    * reconfigurations for instance.
-   * <p>
-   * TODO Desc and dictionary null checks below have been removed as test server does not satisfy them - introduce them again for operation?
    *
    * @param tag the tag to validate
    * @throws ConfigurationException if a validation test fails

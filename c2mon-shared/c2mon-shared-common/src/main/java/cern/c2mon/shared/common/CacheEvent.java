@@ -21,6 +21,10 @@ public enum CacheEvent {
    */
   UPDATE_REJECTED,
   /**
+   * A {@link Cacheable} terminated unexpectedly during its update process
+   */
+  UPDATE_FAILED,
+  /**
    * The status of the Supervised value changed from RUNNING to DOWN/STOPPED and vice-versa.
    */
   SUPERVISION_CHANGE,

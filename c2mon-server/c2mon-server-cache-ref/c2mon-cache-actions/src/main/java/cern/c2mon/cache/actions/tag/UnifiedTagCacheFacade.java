@@ -24,6 +24,11 @@ public class UnifiedTagCacheFacade implements CacheListenerManager<Tag> {
     tagCaches = Arrays.asList(ruleTagCacheRef, dataTagCacheRef);
   }
 
+  public Tag get(long id){
+    // TODO Should search across all caches, throw CacheElNotFound when none contains it
+    return null;
+  }
+
   @Override
   public void notifyListenersOf(CacheEvent event, Tag source) {
     // No-op? This should probably not be called directly? The listeners are automatically doing this, if registered

@@ -33,7 +33,6 @@ class AlarmEvaluator {
       return false;
     }
 
-    // TODO Oscillation check? Otherwise the active and internalActive properties on this are pretty useless
     if (!isAlarmChangedBasedOnTag(alarm, tag)) {
       log.debug("No changes were detected based on the tag - will not update alarm #{}", alarm.getId());
       return false;

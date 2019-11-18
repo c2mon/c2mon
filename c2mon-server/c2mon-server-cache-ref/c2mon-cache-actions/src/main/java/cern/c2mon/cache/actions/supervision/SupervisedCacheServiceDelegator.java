@@ -69,11 +69,6 @@ public interface SupervisedCacheServiceDelegator<T extends Supervised> extends S
   }
 
   @Override
-  default void loadAndStartAliveTag(long supervisedId) {
-    getSupervisedService().loadAndStartAliveTag(supervisedId);
-  }
-
-  @Override
   default SupervisionConstants.SupervisionEntity getSupervisionEntity() {
     return getSupervisedService().getSupervisionEntity();
   }

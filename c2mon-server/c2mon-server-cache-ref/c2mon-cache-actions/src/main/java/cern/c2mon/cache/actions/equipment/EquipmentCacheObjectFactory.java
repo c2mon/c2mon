@@ -39,8 +39,6 @@ public class EquipmentCacheObjectFactory extends AbstractEquipmentCacheObjectFac
     new MicroValidator<>(equipmentCacheObject)
       .notNull(EquipmentCacheObject::getHandlerClassName, "handlerClassName")
       .notNull(Equipment::getProcessId, "processId");
-
-    // TODO remove handler class name form subequipment cache object and adapt loading SQL)
   }
 
   @Override

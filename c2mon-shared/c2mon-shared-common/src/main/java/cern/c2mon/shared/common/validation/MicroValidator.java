@@ -59,6 +59,10 @@ public class MicroValidator<T extends Cacheable> {
     return not(condition.andThen(previousResult -> !previousResult), messageIfFailed);
   }
 
+  public MicroValidator<T> must(Function<T, Boolean> condition) {
+    return must(condition, "Condition evaluation failed for member of " + value.getClass() + " with id " + value.getId());
+  }
+
   public <R> MicroValidator<T> optType(Function<T, R> memberAccessor, String type, String paramName) {
     try {
       R member = memberAccessor.apply(value);

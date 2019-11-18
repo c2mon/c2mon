@@ -10,7 +10,6 @@ import cern.c2mon.cache.api.listener.impl.SingleThreadListener;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.TagWithAlarms;
-import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.common.CacheEvent;
 import lombok.extern.slf4j.Slf4j;
@@ -19,10 +18,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static cern.c2mon.cache.actions.alarm.AlarmEvaluator.createAdditionalInfoString;
@@ -48,13 +44,11 @@ public class AlarmService extends AbstractCacheService<Alarm> implements AlarmAg
   private UnifiedTagCacheFacade unifiedTagCacheFacade;
 
   private OscillationUpdater oscillationUpdater;
-  private C2monCache<DataTag> dataTagCacheRef;
 
   @Inject
-  public AlarmService(final C2monCache<Alarm> cache, C2monCache<DataTag> dataTagCacheRef, final UnifiedTagCacheFacade unifiedTagCacheFacade,
+  public AlarmService(final C2monCache<Alarm> cache, final UnifiedTagCacheFacade unifiedTagCacheFacade,
                       final OscillationUpdater oscillationUpdater) {
     super(cache, new AlarmC2monCacheFlow());
-    this.dataTagCacheRef = dataTagCacheRef;
     this.unifiedTagCacheFacade = unifiedTagCacheFacade;
     this.oscillationUpdater = oscillationUpdater;
   }
@@ -80,7 +74,7 @@ public class AlarmService extends AbstractCacheService<Alarm> implements AlarmAg
   public Alarm evaluateAlarm(Long alarmId) {
     return cache.executeTransaction(() -> {
       Alarm alarm = cache.get(alarmId);
-      Tag tag = dataTagCacheRef.get(alarm.getDataTagId()); // TODO Should this search across all tag caches? This behaviour existed before
+      Tag tag = unifiedTagCacheFacade.get(alarm.getDataTagId());
       update((AlarmCacheObject) alarm, tag, true);
       return alarm;
     });
@@ -90,25 +84,26 @@ public class AlarmService extends AbstractCacheService<Alarm> implements AlarmAg
    * Atomically evaluate all alarms connected to this tag,
    * then put any changes back into the cache if needed
    *
-   * @param tag
-   * @return
+   * @return A list of successfully evaluated alarms
    */
   public List<Alarm> evaluateAlarms(final Tag tag) {
     return cache.executeTransaction(() -> {
       Set<Long> keys = new HashSet<>(tag.getAlarmIds());
 
-      // TODO Should this fail completely so it can rollback on exceptions?
-      // TODO This would also allow us to drop the try-catch and simplify here
-      return cache.getAll(keys).values().stream().peek(
+      return cache.getAll(keys).values().stream().map(
         alarm -> {
           try {
             update((AlarmCacheObject) alarm, tag, true);
+            return alarm;
           } catch (Exception e) {
+            cache.notifyListenersOf(CacheEvent.UPDATE_FAILED, alarm);
             log.error("Exception caught when attempting to evaluate alarm ID " + alarm.getId() + "  for tag " + tag.getId() + " - publishing to the client with no attached alarms.", e);
+            return null;
           }
-        }).collect(Collectors.toList());
+        }).filter(Objects::nonNull).collect(Collectors.toList());
     });
   }
+
 
   /**
    * If the alarm started (or restarted now), the timestamp will be set to now.
@@ -120,7 +115,7 @@ public class AlarmService extends AbstractCacheService<Alarm> implements AlarmAg
    */
   public boolean update(final AlarmCacheObject alarmCacheObject, final Tag tag, boolean updateOscillation) {
     if (updateOscillation) {
-      oscillationUpdater.updateOscillationStatus(alarmCacheObject);
+      oscillationUpdater.updateOscillationStatus(alarmCacheObject, tag.getTimestamp().getTime());
     }
 
     boolean isOscillating = alarmCacheObject.isOscillating();
@@ -128,8 +123,6 @@ public class AlarmService extends AbstractCacheService<Alarm> implements AlarmAg
     boolean alarmShouldBeUpdated = AlarmEvaluator.alarmShouldBeUpdated(alarmCacheObject, tag);
 
     if (alarmShouldBeUpdated) {
-      // TODO Is there any case where we want to evaluate despite invalid tag?
-      // TODO If so, re-add the tag valid check to updateAlarmState
       mutateAlarmUsingTag(alarmCacheObject, tag);
 
       if (isOscillating) {
@@ -142,9 +135,9 @@ public class AlarmService extends AbstractCacheService<Alarm> implements AlarmAg
       return false;
   }
 
-  public TagWithAlarms getTagWithAlarmsAtomically(Long id) {
+  public TagWithAlarms getTagWithAlarmsAtomically(Long tagId) {
     return cache.executeTransaction(() -> {
-      Tag tag = dataTagCacheRef.get(id); // TODO Should this search across all tag caches? This behaviour existed before
+      Tag tag = unifiedTagCacheFacade.get(tagId);
       Set<Long> alarms = new HashSet<>(tag.getAlarmIds());
       return new TagWithAlarms<>(tag, cache.getAll(alarms).values());
     });
@@ -186,8 +179,7 @@ public class AlarmService extends AbstractCacheService<Alarm> implements AlarmAg
 
     boolean newState = alarmCacheObject.getCondition().evaluateState(tag.getValue());
     if (newState && !alarmCacheObject.isActive()) {
-      // TODO Do we want to set this in another case as well?
-      // Perhaps during preInsertValidate, using the previous Alarm in cache?
+      // TODO Potentially set this to previous, during preInsertValidate, using the previous Alarm in cache?
       alarmCacheObject.setTriggerTimestamp(new Timestamp(System.currentTimeMillis()));
     }
 

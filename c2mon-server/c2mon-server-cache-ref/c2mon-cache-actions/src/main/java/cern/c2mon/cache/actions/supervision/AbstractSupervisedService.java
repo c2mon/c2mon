@@ -36,51 +36,39 @@ public abstract class AbstractSupervisedService<T extends Supervised> extends Ab
 
   @Override
   public T start(long id, Timestamp timestamp) {
-    return cache.executeTransaction(() -> {
-      T supervised = cache.get(id);
+    return cache.compute(id,supervised -> {
       supervised.start(timestamp);
-      cache.put(id, supervised);
       if (supervised.getAliveTagId() != null) {
         aliveTimerService.start(supervised.getAliveTagId());
       }
-      return supervised;
     });
   }
 
   @Override
   public T stop(long id, Timestamp timestamp) {
-    return cache.executeTransaction(() -> {
-      T supervised = cache.get(id);
+    return cache.compute(id,supervised -> {
       if (supervised.getAliveTagId() != null) {
         aliveTimerService.stop(supervised.getAliveTagId());
       }
       supervised.stop(timestamp);
-      cache.put(id, supervised);
-      return supervised;
     });
   }
 
   @Override
   public T resume(long id, Timestamp timestamp, String message) {
-    return cache.executeTransaction(() -> {
-      T supervised = cache.get(id);
+    return cache.compute(id,supervised -> {
       if (!supervised.getSupervisionStatus().equals(SupervisionStatus.RUNNING)) {
         supervised.resume(timestamp, message);
-        cache.put(id, supervised);
       }
-      return supervised;
     });
   }
 
   @Override
   public T suspend(long id, Timestamp timestamp, String message) {
-    return cache.executeTransaction(() -> {
-      T supervised = cache.get(id);
+    return cache.compute(id,supervised -> {
       if (supervised.isRunning() || supervised.isUncertain()) {
         supervised.suspend(timestamp, message);
-        cache.put(id, supervised);
       }
-      return supervised;
     });
   }
 
@@ -132,13 +120,5 @@ public abstract class AbstractSupervisedService<T extends Supervised> extends Ab
     T supervised = cache.get(supervisedId);
     long aliveId = supervised.getAliveTagId();
     aliveTimerService.removeAliveTimer(aliveId);
-  }
-
-  @Override
-  public void loadAndStartAliveTag(long supervisedId) {
-    T supervised = cache.get(supervisedId);
-    long aliveId = supervised.getAliveTagId();
-    /*aliveTimerCache.loadFromDb(aliveId);*/ //TODO: implement loadFromDB, before that think how it should be implemented and designed
-    aliveTimerService.start(aliveId);
   }
 }

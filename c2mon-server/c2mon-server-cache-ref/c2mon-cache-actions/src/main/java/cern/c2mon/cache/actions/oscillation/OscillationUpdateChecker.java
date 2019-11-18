@@ -32,7 +32,6 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -85,23 +84,22 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
    * Lifecycle flag.
    */
   private volatile boolean running = false;
+
   private Timer timer;
 
   /**
    * Constructor.
    *
-   * @param alarmCacheRef           the alarm cache to retrieve and update alarm cache objects.
    * @param oscillationCheckService the component that manages the oscillation check timer
    * @param oscillationUpdater      the instance that check oscillation statuses.
    * @param alarmService
    * @param dataTagCacheRef         the data tag cache to retrieve data tag objects and check their original values.
    */
   @Inject
-  public OscillationUpdateChecker(final C2monCache<Alarm> alarmCacheRef, final OscillationService oscillationCheckService,
-                                  final OscillationUpdater oscillationUpdater, final AlarmService alarmService,
-                                  final C2monCache<DataTag> dataTagCacheRef) {
+  public OscillationUpdateChecker(final OscillationService oscillationCheckService, final OscillationUpdater oscillationUpdater,
+                                  final AlarmService alarmService, final C2monCache<DataTag> dataTagCacheRef) {
     super();
-    this.alarmCacheRef = alarmCacheRef;
+    this.alarmCacheRef = alarmService.getCache();
     this.oscillationCheckService = oscillationCheckService;
     this.oscillationUpdater = oscillationUpdater;
     this.alarmService = alarmService;
@@ -160,7 +158,7 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
           if (oscillatingAlarms.isEmpty()) {
             log.debug("Currently no oscillating alarms");
           } else {
-            log.warn("Currently {} oscillating alarms", oscillatingAlarms.size());
+            log.info("Currently {} oscillating alarms", oscillatingAlarms.size());
             oscillatingAlarms.forEach(this::updateAlarmOscillationFlag);
           }
         } catch (Exception e) {
@@ -179,16 +177,11 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
     long alarmId = alarmCacheObject.getId();
     try {
       log.trace("Checking oscillation expiry for alarm #{}", alarmId);
-      if (log.isTraceEnabled()) {
-        log.trace(" -> Alarm oscillation details osc {} first osc {} count {} al ts {}", alarmCacheObject.isOscillating(),
-          new Date(alarmCacheObject.getFirstOscTS()).toString(), alarmCacheObject.getCounterFault(),
-          alarmCacheObject.getTriggerTimestamp().toString());
-      }
       if (!oscillationUpdater.checkOscillAlive(alarmCacheObject)) {
         log.trace(" -> ! Alarm #{} is not oscillating anymore, resetting oscillation counter", alarmId);
-        oscillationUpdater.resetOscillationCounter(alarmCacheObject);
-        Tag tag = dataTagCacheRef.get(alarmCacheObject.getDataTagId());
-        if (tag != null) {
+        alarmCacheObject.setOscillating(false);
+        if (dataTagCacheRef.containsKey(alarmCacheObject.getDataTagId())) {
+          Tag tag = dataTagCacheRef.get(alarmCacheObject.getDataTagId());
           alarmService.stopOscillatingAndUpdate(alarmCacheObject, tag);
         } else {
           log.error("Cannot locate data tag #{} - unable to reset oscillation status", alarmCacheObject.getDataTagId());

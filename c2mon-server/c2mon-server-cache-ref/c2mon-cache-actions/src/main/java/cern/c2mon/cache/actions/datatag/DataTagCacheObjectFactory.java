@@ -52,10 +52,6 @@ public class DataTagCacheObjectFactory extends TagCacheObjectFactory<DataTag> {
 
     super.configureCacheObject(tag, properties);
 
-    // TODO This is duplicated and also done in the super.configureCacheObject. Is there a better way?
-    if (tag.getEquipmentId() != null)
-      dataTagUpdate.setEquipmentId(tag.getEquipmentId());
-
     return dataTagUpdate;
   }
 }
