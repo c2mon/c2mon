@@ -15,7 +15,7 @@
   <modules>
     <module>c2mon-server-benchmark</module>
     <module>c2mon-server-cachedbaccess</module>
-    <module>c2mon-server-cacheloading</module>
+    <module>c2mon-server-cache-loading</module>
     <module>c2mon-server-cachepersistence</module>
     <module>c2mon-server-client</module>
     <module>c2mon-server-command</module>
@@ -41,10 +41,31 @@
 
   <dependencyManagement>
     <dependencies>
-      <!-- Internal C2MON dependencies -->
+<!--  TODO Delete this -->
       <dependency>
         <groupId>cern.c2mon.server</groupId>
         <artifactId>c2mon-server-cache</artifactId>
+        <version>${project.parent.version}</version>
+      </dependency>
+      <!-- Internal C2MON dependencies -->
+      <dependency>
+        <groupId>cern.c2mon.server</groupId>
+        <artifactId>c2mon-cache-actions</artifactId>
+        <version>${project.parent.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>cern.c2mon.server</groupId>
+        <artifactId>c2mon-cache-config</artifactId>
+        <version>${project.parent.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>cern.c2mon.server</groupId>
+        <artifactId>c2mon-cache-api</artifactId>
+        <version>${project.parent.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>cern.c2mon.server</groupId>
+        <artifactId>c2mon-cache-provider-ignite</artifactId>
         <version>${project.parent.version}</version>
       </dependency>
       <dependency>
@@ -54,7 +75,7 @@
       </dependency>
       <dependency>
         <groupId>cern.c2mon.server</groupId>
-        <artifactId>c2mon-cache-loader</artifactId>
+        <artifactId>c2mon-server-cache-loading</artifactId>
         <version>${project.parent.version}</version>
       </dependency>
       <dependency>
@@ -64,7 +85,7 @@
       </dependency>
       <dependency>
         <groupId>cern.c2mon.server</groupId>
-        <artifactId>c2mon-server-cacheloading</artifactId>
+        <artifactId>c2mon-server-cache-loading</artifactId>
         <version>${project.parent.version}</version>
       </dependency>
       <dependency>

@@ -4,8 +4,8 @@ import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.factory.AbstractCacheFactory;
 import cern.c2mon.cache.config.CacheName;
 import cern.c2mon.cache.config.config.AbstractBatchCacheConfig;
-import cern.c2mon.server.cache.loader.AlarmLoaderDAO;
-import cern.c2mon.server.cache.loader.config.CacheLoaderProperties;
+import cern.c2mon.server.cache.loading.AlarmLoaderDAO;
+import cern.c2mon.server.cache.loading.config.CacheLoadingProperties;
 import cern.c2mon.server.common.alarm.Alarm;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,7 +21,7 @@ import javax.inject.Inject;
 public class AlarmCacheConfig extends AbstractBatchCacheConfig<Alarm> {
 
   @Inject
-  public AlarmCacheConfig(ThreadPoolTaskExecutor cacheLoaderTaskExecutor, CacheLoaderProperties properties, AbstractCacheFactory cachingFactory, AlarmLoaderDAO alarmLoaderDAORef) {
+  public AlarmCacheConfig(ThreadPoolTaskExecutor cacheLoaderTaskExecutor, CacheLoadingProperties properties, AbstractCacheFactory cachingFactory, AlarmLoaderDAO alarmLoaderDAORef) {
     super(cachingFactory, CacheName.ALARM, Alarm.class, cacheLoaderTaskExecutor, properties, alarmLoaderDAORef);
   }
 

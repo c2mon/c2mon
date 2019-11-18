@@ -6,7 +6,7 @@ import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.config.CacheConfigModuleRef;
 import cern.c2mon.cache.impl.configuration.C2monIgniteConfiguration;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
-import cern.c2mon.server.cache.loader.config.CacheLoaderModuleRef;
+import cern.c2mon.server.cache.loading.config.CacheLoadingModuleRef;
 import cern.c2mon.server.common.config.CommonModule;
 import cern.c2mon.shared.common.Cacheable;
 import org.junit.Before;
@@ -30,7 +30,7 @@ import static org.junit.Assert.assertEquals;
   CommonModule.class,
   CacheConfigModuleRef.class,
   CacheDbAccessModule.class,
-  CacheLoaderModuleRef.class,
+  CacheLoadingModuleRef.class,
   CachePopulationRule.class,
   C2monIgniteConfiguration.class,
   CacheActionsModuleRef.class

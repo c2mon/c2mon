@@ -4,8 +4,8 @@ import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.factory.AbstractCacheFactory;
 import cern.c2mon.cache.config.CacheName;
 import cern.c2mon.cache.config.config.AbstractBatchCacheConfig;
-import cern.c2mon.server.cache.loader.BatchCacheLoaderDAO;
-import cern.c2mon.server.cache.loader.config.CacheLoaderProperties;
+import cern.c2mon.server.cache.loading.BatchCacheLoaderDAO;
+import cern.c2mon.server.cache.loading.config.CacheLoadingProperties;
 import cern.c2mon.server.common.rule.RuleTag;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,7 +21,7 @@ import javax.inject.Inject;
 public class RuleTagCacheConfig extends AbstractBatchCacheConfig<RuleTag> {
 
   @Inject
-  public RuleTagCacheConfig(AbstractCacheFactory cachingFactory, ThreadPoolTaskExecutor cacheLoaderTaskExecutor, CacheLoaderProperties properties, BatchCacheLoaderDAO<RuleTag> batchCacheLoaderDAORef) {
+  public RuleTagCacheConfig(AbstractCacheFactory cachingFactory, ThreadPoolTaskExecutor cacheLoaderTaskExecutor, CacheLoadingProperties properties, BatchCacheLoaderDAO<RuleTag> batchCacheLoaderDAORef) {
     super(cachingFactory, CacheName.RULETAG, RuleTag.class, cacheLoaderTaskExecutor, properties, batchCacheLoaderDAORef);
   }
 

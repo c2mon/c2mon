@@ -16,7 +16,6 @@
     <module>c2mon-cache-api</module>
     <module>c2mon-cache-config</module>
     <module>c2mon-cache-actions</module>
-    <module>c2mon-cache-loader</module>
     <module>c2mon-cache-provider-ignite</module>
   </modules>
 
@@ -35,11 +34,6 @@
       <dependency>
         <groupId>cern.c2mon.server</groupId>
         <artifactId>c2mon-cache-config</artifactId>
-        <version>${project.parent.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>cern.c2mon.server</groupId>
-        <artifactId>c2mon-cache-loader</artifactId>
         <version>${project.parent.version}</version>
       </dependency>
       <dependency>
