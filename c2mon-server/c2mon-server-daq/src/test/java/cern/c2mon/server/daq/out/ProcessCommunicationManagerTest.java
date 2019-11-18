@@ -20,8 +20,9 @@ package cern.c2mon.server.daq.out;
 import cern.c2mon.server.cache.ProcessCache;
 import cern.c2mon.server.cache.config.CacheModule;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
-import cern.c2mon.server.cache.loading.config.CacheLoadingModule;
+import cern.c2mon.server.cache.loading.config.CacheLoadingModuleRef;
 import cern.c2mon.server.common.config.CommonModule;
+import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.daq.config.DaqModule;
 import cern.c2mon.server.daq.junit.DaqCachePopulationRule;
 import cern.c2mon.server.supervision.config.SupervisionModule;
@@ -29,7 +30,6 @@ import cern.c2mon.server.test.broker.EmbeddedBrokerRule;
 import cern.c2mon.server.test.config.TestConfig;
 import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
 import cern.c2mon.shared.daq.serialization.MessageConverter;
-import cern.c2mon.server.common.process.Process;
 import org.apache.activemq.command.ActiveMQQueue;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -59,7 +59,7 @@ import static org.junit.Assert.assertNotNull;
     CommonModule.class,
     CacheModule.class,
     CacheDbAccessModule.class,
-    CacheLoadingModule.class,
+    CacheLoadingModuleRef.class,
     SupervisionModule.class,
     DaqModule.class,
     TestConfig.class,

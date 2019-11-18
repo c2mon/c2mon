@@ -16,9 +16,19 @@
  *****************************************************************************/
 package cern.c2mon.server.rule.listener;
 
-import java.sql.Timestamp;
-import java.util.concurrent.CountDownLatch;
-
+import cern.c2mon.server.cache.C2monCacheListener;
+import cern.c2mon.server.cache.DataTagCache;
+import cern.c2mon.server.cache.DataTagFacade;
+import cern.c2mon.server.cache.RuleTagCache;
+import cern.c2mon.server.cache.config.CacheModule;
+import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
+import cern.c2mon.server.cache.loading.config.CacheLoadingModuleRef;
+import cern.c2mon.server.common.config.CommonModule;
+import cern.c2mon.server.common.datatag.DataTag;
+import cern.c2mon.server.common.rule.RuleTag;
+import cern.c2mon.server.rule.config.RuleModule;
+import cern.c2mon.server.rule.junit.RuleCachePopulationRule;
+import cern.c2mon.server.test.CacheObjectCreation;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,19 +36,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import cern.c2mon.server.cache.C2monCacheListener;
-import cern.c2mon.server.cache.DataTagCache;
-import cern.c2mon.server.cache.DataTagFacade;
-import cern.c2mon.server.cache.RuleTagCache;
-import cern.c2mon.server.cache.config.CacheModule;
-import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
-import cern.c2mon.server.cache.loading.config.CacheLoadingModule;
-import cern.c2mon.server.common.config.CommonModule;
-import cern.c2mon.server.common.datatag.DataTag;
-import cern.c2mon.server.common.rule.RuleTag;
-import cern.c2mon.server.rule.config.RuleModule;
-import cern.c2mon.server.rule.junit.RuleCachePopulationRule;
-import cern.c2mon.server.test.CacheObjectCreation;
+import java.sql.Timestamp;
+import java.util.concurrent.CountDownLatch;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -57,7 +56,7 @@ import static org.junit.Assert.assertTrue;
     CommonModule.class,
     CacheModule.class,
     CacheDbAccessModule.class,
-    CacheLoadingModule.class,
+    CacheLoadingModuleRef.class,
     RuleModule.class
 })
 public class RuleListenerTest {

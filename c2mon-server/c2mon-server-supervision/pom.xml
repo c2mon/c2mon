@@ -23,6 +23,10 @@
       <groupId>cern.c2mon.shared</groupId>
       <artifactId>c2mon-shared-client</artifactId>
     </dependency>
+    <dependency>
+      <groupId>cern.c2mon.shared</groupId>
+      <artifactId>c2mon-shared-daq</artifactId>
+    </dependency>
 
     <!-- 3rd party dependencies -->
     <dependency>

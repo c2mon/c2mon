@@ -19,6 +19,10 @@
     </dependency>
     <dependency>
       <groupId>cern.c2mon.server</groupId>
+      <artifactId>c2mon-server-cache-loading</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.server</groupId>
       <artifactId>c2mon-server-supervision</artifactId>
     </dependency>
 
