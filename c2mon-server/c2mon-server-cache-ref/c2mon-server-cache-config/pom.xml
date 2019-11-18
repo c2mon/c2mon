@@ -9,7 +9,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>c2mon-cache-config</artifactId>
+  <artifactId>c2mon-server-cache-config</artifactId>
 
   <dependencies>
     <dependency>
@@ -18,7 +18,7 @@
     </dependency>
     <dependency>
       <groupId>cern.c2mon.server</groupId>
-      <artifactId>c2mon-cache-api</artifactId>
+      <artifactId>c2mon-server-cache-api</artifactId>
     </dependency>
     <dependency>
       <groupId>cern.c2mon.server</groupId>
@@ -26,7 +26,7 @@
     </dependency>
     <dependency>
       <groupId>cern.c2mon.server</groupId>
-      <artifactId>c2mon-cache-provider-ignite</artifactId>
+      <artifactId>c2mon-server-cache-provider-ignite</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>

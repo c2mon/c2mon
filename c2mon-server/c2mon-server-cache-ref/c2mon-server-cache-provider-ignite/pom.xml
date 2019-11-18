@@ -10,7 +10,7 @@
     <version>1.9.3-SNAPSHOT</version>
   </parent>
 
-  <artifactId>c2mon-cache-provider-ignite</artifactId>
+  <artifactId>c2mon-server-cache-provider-ignite</artifactId>
 
   <properties>
     <ignite.version>2.7.5</ignite.version>
@@ -20,7 +20,7 @@
   <dependencies>
     <dependency>
       <groupId>cern.c2mon.server</groupId>
-      <artifactId>c2mon-cache-api</artifactId>
+      <artifactId>c2mon-server-cache-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.ignite</groupId>

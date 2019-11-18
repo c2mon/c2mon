@@ -13,34 +13,9 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>c2mon-cache-api</module>
-    <module>c2mon-cache-config</module>
-    <module>c2mon-cache-actions</module>
-    <module>c2mon-cache-provider-ignite</module>
+    <module>c2mon-server-cache-api</module>
+    <module>c2mon-server-cache-config</module>
+    <module>c2mon-server-cache-actions</module>
+    <module>c2mon-server-cache-provider-ignite</module>
   </modules>
-
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>cern.c2mon.server</groupId>
-        <artifactId>c2mon-cache-api</artifactId>
-        <version>${project.parent.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>cern.c2mon.server</groupId>
-        <artifactId>c2mon-cache-actions</artifactId>
-        <version>${project.parent.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>cern.c2mon.server</groupId>
-        <artifactId>c2mon-cache-config</artifactId>
-        <version>${project.parent.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>cern.c2mon.server</groupId>
-        <artifactId>c2mon-cache-provider-ignite</artifactId>
-        <version>${project.parent.version}</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
 </project>

@@ -50,22 +50,22 @@
       <!-- Internal C2MON dependencies -->
       <dependency>
         <groupId>cern.c2mon.server</groupId>
-        <artifactId>c2mon-cache-actions</artifactId>
+        <artifactId>c2mon-server-cache-api</artifactId>
         <version>${project.parent.version}</version>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.server</groupId>
-        <artifactId>c2mon-cache-config</artifactId>
+        <artifactId>c2mon-server-cache-actions</artifactId>
         <version>${project.parent.version}</version>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.server</groupId>
-        <artifactId>c2mon-cache-api</artifactId>
+        <artifactId>c2mon-server-cache-config</artifactId>
         <version>${project.parent.version}</version>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.server</groupId>
-        <artifactId>c2mon-cache-provider-ignite</artifactId>
+        <artifactId>c2mon-server-cache-provider-ignite</artifactId>
         <version>${project.parent.version}</version>
       </dependency>
       <dependency>
