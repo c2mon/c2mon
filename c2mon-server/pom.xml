@@ -14,8 +14,8 @@
 
   <modules>
     <module>c2mon-server-benchmark</module>
+    <module>c2mon-server-cache-ref</module>
     <module>c2mon-server-cachedbaccess</module>
-    <module>c2mon-server-cache-loading</module>
     <module>c2mon-server-cachepersistence</module>
     <module>c2mon-server-client</module>
     <module>c2mon-server-command</module>
@@ -29,7 +29,6 @@
     <module>c2mon-server-supervision</module>
     <module>c2mon-server-test</module>
     <module>distribution</module>
-    <module>c2mon-server-cache-ref</module>
   </modules>
 
   <dependencies>
