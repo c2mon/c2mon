@@ -3,7 +3,7 @@ package cern.c2mon.server.cache;
 import cern.c2mon.server.cache.config.CacheModule;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.cache.junit.CachePopulationRule;
-import cern.c2mon.server.cache.loading.config.CacheLoadingModule;
+import cern.c2mon.server.cache.loading.config.CacheLoadingModuleRef;
 import cern.c2mon.server.common.config.CommonModule;
 import org.junit.Rule;
 import org.junit.runner.RunWith;

@@ -20,7 +20,7 @@ import cern.c2mon.server.cache.*;
 import cern.c2mon.server.cache.config.CacheModule;
 import cern.c2mon.server.cache.dbaccess.*;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
-import cern.c2mon.server.cache.loading.config.CacheLoadingModule;
+import cern.c2mon.server.cache.loading.config.CacheLoadingModuleRef;
 import cern.c2mon.server.common.config.CommonModule;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.configuration.config.ConfigurationModule;
@@ -46,7 +46,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.junit.Assert.*;
@@ -63,7 +62,7 @@ import static org.junit.Assert.*;
     CommonModule.class,
     CacheModule.class,
     CacheDbAccessModule.class,
-    CacheLoadingModule.class,
+    CacheLoadingModuleRef.class,
     SupervisionModule.class,
     ConfigurationModule.class,
     DaqModule.class,
