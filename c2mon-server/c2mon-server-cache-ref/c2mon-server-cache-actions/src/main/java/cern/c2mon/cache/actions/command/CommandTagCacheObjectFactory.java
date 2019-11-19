@@ -71,12 +71,7 @@ public class CommandTagCacheObjectFactory extends AbstractCacheObjectFactory<Com
       .getInteger("clientTimeout").ifPresent(commandTagCacheObject::setClientTimeout)
       .getAs("hardwareAddress", HardwareAddressFactory.getInstance()::fromConfigXML).ifPresent(hardwareAddress -> {
       commandTagCacheObject.setHardwareAddress(hardwareAddress);
-      try {
-        setUpdateHardwareAddress(hardwareAddress, commandTagUpdate);
-      } catch (IllegalAccessException e) {
-        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
-          "Exception: Unable to create HardwareAddress from parameter \"hardwareAddress\": " + hardwareAddress);
-      }
+      setUpdateHardwareAddress(hardwareAddress, commandTagUpdate);
     }).getString("minValue").ifPresent(minValue -> {
       Comparable comparableMin = (Comparable) TypeConverter.cast(minValue, commandTagCacheObject.getDataType());
       commandTagCacheObject.setMinimum(comparableMin);
@@ -150,16 +145,20 @@ public class CommandTagCacheObjectFactory extends AbstractCacheObjectFactory<Com
    *
    * @param hardwareAddress  the new {@link HardwareAddress}
    * @param commandTagUpdate the update object that will be sent to the DAQ
-   * @throws IllegalAccessException
-   * @throws
    */
-  private void setUpdateHardwareAddress(HardwareAddress hardwareAddress, CommandTagUpdate commandTagUpdate) throws IllegalAccessException {
-    HardwareAddressUpdate hardwareAddressUpdate = new HardwareAddressUpdate(hardwareAddress.getClass().getName());
-    commandTagUpdate.setHardwareAddressUpdate(hardwareAddressUpdate);
-    SimpleTypeReflectionHandler reflectionHandler = new SimpleTypeReflectionHandler();
-    for (Field field : reflectionHandler.getNonTransientSimpleFields(hardwareAddress.getClass())) {
-      field.setAccessible(true);
-      hardwareAddressUpdate.getChangedValues().put(field.getName(), field.get(hardwareAddress));
+  private void setUpdateHardwareAddress(HardwareAddress hardwareAddress, CommandTagUpdate commandTagUpdate) {
+    try {
+      HardwareAddressUpdate hardwareAddressUpdate = new HardwareAddressUpdate(hardwareAddress.getClass().getName());
+      commandTagUpdate.setHardwareAddressUpdate(hardwareAddressUpdate);
+      SimpleTypeReflectionHandler reflectionHandler = new SimpleTypeReflectionHandler();
+      for (Field field : reflectionHandler.getNonTransientSimpleFields(hardwareAddress.getClass())) {
+        field.setAccessible(true);
+        hardwareAddressUpdate.getChangedValues().put(field.getName(), field.get(hardwareAddress));
+      }
+    }
+    catch (IllegalAccessException e) {
+      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
+        "Exception: Unable to create HardwareAddress from parameter \"hardwareAddress\": " + hardwareAddress);
     }
   }
 }
