@@ -130,7 +130,7 @@ public class RuleTagCacheObject extends AbstractTagCacheObject implements RuleTa
     }
 
     @Override
-    // TODO Kept only because a vast number of consumers call this method, change them to call cacheTimestamp eventually
+    // TODO (Alex) Kept only because a vast number of consumers call this method, change them to call cacheTimestamp eventually
     public Timestamp getTimestamp() {
       return getCacheTimestamp();
     }
@@ -174,17 +174,12 @@ public class RuleTagCacheObject extends AbstractTagCacheObject implements RuleTa
 
     @Override
     public Long getLowestProcessId() {
-        if (!processIds.isEmpty()) {
-            List<Long> sortedList = new ArrayList<Long>(processIds);
-            Collections.sort(sortedList);
-            return sortedList.get(0);
-        } else
-            return 0L;
+      return processIds.stream().sorted().findFirst().orElse(0L);
     }
 
     @Override
     public String toString() {
-      StringBuffer str = new StringBuffer();
+      StringBuilder str = new StringBuilder();
 
       str.append(getId());
       str.append('\t');
