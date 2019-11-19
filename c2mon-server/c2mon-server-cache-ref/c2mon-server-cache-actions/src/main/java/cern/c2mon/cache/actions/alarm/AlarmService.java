@@ -30,13 +30,6 @@ import static cern.c2mon.cache.actions.alarm.AlarmEvaluator.createAdditionalInfo
 @Service
 public class AlarmService extends AbstractCacheServiceImpl<Alarm> implements AlarmAggregator {
 
-  /**
-   * We decided to distribute all alarms on the same topic in order to reduce
-   * the number of topics for SonicMQ, the client has to make the decision if
-   * the received alarm is useful for it, otherwise it will discard the alarm
-   *
-   * @see AlarmService#getTopicForAlarm(Alarm)
-   */
   public static final String ALARM_TOPIC = "tim.alarm";
 
   private List<AlarmAggregatorListener> alarmUpdateObservable = new ArrayList<>();

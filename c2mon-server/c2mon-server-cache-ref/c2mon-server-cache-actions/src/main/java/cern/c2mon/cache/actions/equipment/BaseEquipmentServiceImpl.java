@@ -1,4 +1,4 @@
-package cern.c2mon.cache.actions;
+package cern.c2mon.cache.actions.equipment;
 
 import cern.c2mon.cache.actions.alivetimer.AliveTimerService;
 import cern.c2mon.cache.actions.supervision.AbstractSupervisedService;

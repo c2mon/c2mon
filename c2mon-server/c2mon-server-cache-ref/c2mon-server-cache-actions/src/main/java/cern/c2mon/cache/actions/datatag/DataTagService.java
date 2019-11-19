@@ -1,7 +1,6 @@
 package cern.c2mon.cache.actions.datatag;
 
 import cern.c2mon.cache.actions.AbstractCacheServiceImpl;
-import cern.c2mon.cache.actions.tag.InfoTagC2monCacheFlow;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.tag.Tag;
@@ -23,7 +22,7 @@ public class DataTagService extends AbstractCacheServiceImpl<DataTag> {
 
   @Inject
   public DataTagService(C2monCache<DataTag> cache) {
-    super(cache, new InfoTagC2monCacheFlow<>());
+    super(cache, new DataTagC2monCacheFlow<>());
   }
 
   /**
@@ -47,8 +46,6 @@ public class DataTagService extends AbstractCacheServiceImpl<DataTag> {
   /**
    * Method containing all the logic for filtering out incoming datatag updates before any updates are
    * attempted. Call within synchronized block.
-   * @param dataTag
-   * @param sourceDataTagValue
    * @return true if the update should be filtered out, false if it should be kept
    */
   private boolean filterout(DataTag dataTag, SourceDataTagValue sourceDataTagValue) {

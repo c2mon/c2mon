@@ -4,7 +4,7 @@ import cern.c2mon.cache.actions.AbstractCacheServiceImpl;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.flow.DefaultC2monCacheFlow;
 import cern.c2mon.server.common.rule.RuleTag;
-import cern.c2mon.server.common.tag.AbstractTagCacheObject;
+import cern.c2mon.server.common.rule.RuleTagCacheObject;
 import cern.c2mon.server.common.tag.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -12,15 +12,15 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 
 /**
- * @author Szymon Halastra
+ * @author Szymon Halastra, Alexandros Papageorgiou Koufidis
  */
 @Slf4j
 @Service
 public class RuleTagService extends AbstractCacheServiceImpl<RuleTag> {
 
   @Inject
-  public RuleTagService(final C2monCache<RuleTag> tagCacheRef) {
-    super(tagCacheRef, new DefaultC2monCacheFlow<>());
+  public RuleTagService(final C2monCache<RuleTag> ruleCacheRef) {
+    super(ruleCacheRef, new DefaultC2monCacheFlow<>());
   }
 
   /**
@@ -30,13 +30,11 @@ public class RuleTagService extends AbstractCacheServiceImpl<RuleTag> {
    * Note also adjust text field of cache object.
    */
   public void addDependentRuleToTag(final Tag tag, final Long ruleTagId) {
-    AbstractTagCacheObject cacheObject = (AbstractTagCacheObject) tag;
-    cacheObject.getRuleIds().add(ruleTagId);
-    StringBuilder bld = new StringBuilder();
-    for (Long id : cacheObject.getRuleIds()) {
-      bld.append(id).append(", ");
-    }
-    cacheObject.setRuleIdsString(bld.toString().substring(0, bld.length() - 2)); //remove ", "
+    cache.compute(tag.getId(), ruleTag -> {
+      RuleTagCacheObject cacheRuleTag = (RuleTagCacheObject) ruleTag;
+      cacheRuleTag.getRuleIds().add(ruleTagId);
+      updateRuleIdsString(cacheRuleTag);
+    });
   }
 
   /**
@@ -49,20 +47,25 @@ public class RuleTagService extends AbstractCacheServiceImpl<RuleTag> {
    * @param ruleTagId the id of the rule
    */
   public void removeDependentRuleFromTag(final Tag tag, final Long ruleTagId) {
+    // TODO (Alex) I think the ruleIds will be in the datatag, not the ruletag right?
+    // TODO So we need the other cache here as well
     cache.compute(tag.getId(), ruleTag -> {
-      AbstractTagCacheObject cacheRuleTag = (AbstractTagCacheObject) ruleTag;
+      RuleTagCacheObject cacheRuleTag = (RuleTagCacheObject) ruleTag;
       cacheRuleTag.getRuleIds().remove(ruleTagId);
-
-      StringBuilder bld = new StringBuilder();
-      for (Long id : cacheRuleTag.getRuleIds()) {
-        bld.append(id).append(",");
-      }
-
-      cacheRuleTag.setRuleIdsString(bld.toString());
-
-      if (bld.length() > 0) {
-        cacheRuleTag.setRuleIdsString(bld.toString().substring(0, bld.length() - 1)); //remove ", "
-      }
+      updateRuleIdsString(cacheRuleTag);
     });
+  }
+
+  private void updateRuleIdsString(RuleTagCacheObject cacheRuleTag){
+    StringBuilder bld = new StringBuilder();
+    for (Long id : cacheRuleTag.getRuleIds()) {
+      bld.append(id).append(",");
+    }
+
+    cacheRuleTag.setRuleIdsString(bld.toString());
+
+    if (bld.length() > 0) {
+      cacheRuleTag.setRuleIdsString(bld.toString().substring(0, bld.length() - 1)); //remove ", "
+    }
   }
 }

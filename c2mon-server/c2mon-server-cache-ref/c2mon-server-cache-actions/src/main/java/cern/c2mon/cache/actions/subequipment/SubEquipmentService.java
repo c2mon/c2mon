@@ -1,8 +1,8 @@
 package cern.c2mon.cache.actions.subequipment;
 
-import cern.c2mon.cache.actions.BaseEquipmentServiceImpl;
 import cern.c2mon.cache.actions.alivetimer.AliveTimerService;
 import cern.c2mon.cache.actions.commfault.CommFaultService;
+import cern.c2mon.cache.actions.equipment.BaseEquipmentServiceImpl;
 import cern.c2mon.cache.actions.equipment.EquipmentService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.subequipment.SubEquipment;

@@ -1,5 +1,7 @@
 package cern.c2mon.cache.api.service;
 
+import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
+
 import java.util.Map;
 
 /**

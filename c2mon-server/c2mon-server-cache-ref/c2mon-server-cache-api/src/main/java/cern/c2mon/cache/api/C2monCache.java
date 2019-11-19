@@ -25,9 +25,7 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * @param <V> cache element type
- * @author Szymon Halastra
- * @author Alexandros Papageorgiou Koufidis
- * @author Brice Copy
+ * @author Szymon Halastra, Alexandros Papageorgiou Koufidis, Brice Copy
  */
 public interface C2monCache<V extends Cacheable> extends CacheDelegator<V>, Serializable, ListenerDelegator<V> {
 

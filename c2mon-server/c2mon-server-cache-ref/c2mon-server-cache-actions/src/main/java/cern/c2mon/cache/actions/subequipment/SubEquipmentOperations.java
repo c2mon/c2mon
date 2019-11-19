@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.cache.actions.subequipment;
 
+import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.cache.api.service.CommonEquipmentOperations;
 
 import java.util.Collection;
@@ -52,7 +53,7 @@ public interface SubEquipmentOperations extends CommonEquipmentOperations {
    * Returns a collection of the ids of all DataTags registered with this
    * subequipment (not control tags).
    *
-   * @param id of the subequipment
+   * @param subEquipmentId of the subequipment
    * @return the ids in a collection
    */
   Collection<Long> getDataTagIds(Long subEquipmentId);
