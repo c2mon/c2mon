@@ -1,6 +1,6 @@
 package cern.c2mon.cache.actions.supervision;
 
-import cern.c2mon.cache.actions.AbstractCacheService;
+import cern.c2mon.cache.actions.AbstractCacheServiceImpl;
 import cern.c2mon.cache.actions.alivetimer.AliveTimerService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.supervision.Supervised;
@@ -19,7 +19,7 @@ import static cern.c2mon.shared.common.supervision.SupervisionConstants.Supervis
  * @author Alexandros Papageorgiou Koufidis
  */
 @Slf4j
-public abstract class AbstractSupervisedService<T extends Supervised> extends AbstractCacheService<T> implements SupervisedCacheService<T> {
+public abstract class AbstractSupervisedService<T extends Supervised> extends AbstractCacheServiceImpl<T> implements SupervisedCacheService<T> {
 
   // TODO Most previous supervision notifications were connected to a Tag. Do we want this behaviour?
 

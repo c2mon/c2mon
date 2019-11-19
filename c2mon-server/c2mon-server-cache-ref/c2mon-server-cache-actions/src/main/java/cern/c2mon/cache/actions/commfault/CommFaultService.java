@@ -1,6 +1,6 @@
 package cern.c2mon.cache.actions.commfault;
 
-import cern.c2mon.cache.actions.AbstractCacheService;
+import cern.c2mon.cache.actions.AbstractCacheServiceImpl;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.flow.DefaultC2monCacheFlow;
 import cern.c2mon.server.common.commfault.CommFaultTag;
@@ -16,7 +16,7 @@ import javax.inject.Inject;
  */
 @Slf4j
 @Service
-public class CommFaultService extends AbstractCacheService<CommFaultTag> {
+public class CommFaultService extends AbstractCacheServiceImpl<CommFaultTag> {
 
   @Inject
   public CommFaultService(final C2monCache<CommFaultTag> commFaultTagCacheRef) {

@@ -1,6 +1,6 @@
 package cern.c2mon.cache.actions.alarm;
 
-import cern.c2mon.cache.actions.AbstractCacheService;
+import cern.c2mon.cache.actions.AbstractCacheServiceImpl;
 import cern.c2mon.cache.actions.oscillation.OscillationUpdater;
 import cern.c2mon.cache.actions.tag.UnifiedTagCacheFacade;
 import cern.c2mon.cache.api.C2monCache;
@@ -28,7 +28,7 @@ import static cern.c2mon.cache.actions.alarm.AlarmEvaluator.createAdditionalInfo
  */
 @Slf4j
 @Service
-public class AlarmService extends AbstractCacheService<Alarm> implements AlarmAggregator {
+public class AlarmService extends AbstractCacheServiceImpl<Alarm> implements AlarmAggregator {
 
   /**
    * We decided to distribute all alarms on the same topic in order to reduce

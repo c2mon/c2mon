@@ -1,6 +1,6 @@
 package cern.c2mon.cache.actions.process;
 
-import cern.c2mon.cache.actions.AbstractCacheService;
+import cern.c2mon.cache.actions.AbstractCacheServiceImpl;
 import cern.c2mon.cache.actions.alivetimer.AliveTimerService;
 import cern.c2mon.cache.actions.equipment.EquipmentService;
 import cern.c2mon.cache.actions.subequipment.SubEquipmentService;
@@ -28,7 +28,7 @@ import java.util.Random;
  */
 @Slf4j
 @Service
-public class ProcessService extends AbstractCacheService<Process>
+public class ProcessService extends AbstractCacheServiceImpl<Process>
   implements ProcessOperationService, SupervisedCacheServiceDelegator<Process> {
 
   /**

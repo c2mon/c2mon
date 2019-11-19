@@ -1,6 +1,6 @@
 package cern.c2mon.cache.actions.command;
 
-import cern.c2mon.cache.actions.AbstractCacheService;
+import cern.c2mon.cache.actions.AbstractCacheServiceImpl;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.cache.api.flow.DefaultC2monCacheFlow;
@@ -16,7 +16,7 @@ import javax.inject.Inject;
  */
 @Slf4j
 @Service
-public class CommandTagService extends AbstractCacheService<CommandTag> {
+public class CommandTagService extends AbstractCacheServiceImpl<CommandTag> {
 
   @Inject
   public CommandTagService(C2monCache<CommandTag> commandTagCacheRef) {

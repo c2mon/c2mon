@@ -137,4 +137,81 @@ public abstract class AbstractTagService<T extends Tag> implements CommonTagOper
       throw new IllegalArgumentException("Accessing cache with null key!");
     }
   }
+
+  /**
+   * Checks if the new Tag value should be filtered out or updated.
+   * Is filtered out if value, value description and quality are
+   * the same.
+   *
+   * @param timestamp the new timestamp
+   * @param valueDescription the new description
+   * @param value the new value
+   * @param tag the tag that is updated
+   * @param statusToAdd the tag quality status to add; leave null if the tag is to be validated
+   * @param statusDescription the new status description; leave null if the tag is to be validated
+   * @return true if it should be filtered out
+   * @throws NullPointerException if called with null tag parameter
+   * @throws IllegalArgumentException if status description is not null but statusToAdd is (does not make any sense!) or the same for the value
+   */
+  public boolean filterout(Tag tag, Object value, String valueDescription,
+                           TagQualityStatus statusToAdd, String statusDescription, Timestamp timestamp) {
+    if (statusToAdd == null && statusDescription != null) {
+      throw new IllegalArgumentException("Filterout method called with non-null status description but null status");
+    }
+    if (value == null && valueDescription != null) {
+      throw new IllegalArgumentException("Filterout method called with non-null value description but null value");
+    }
+    boolean sameValue;
+    if (tag.getValue() != null){
+      sameValue = tag.getValue().equals(value);
+    } else {
+      sameValue = (value == null);
+    }
+    if (!sameValue) {
+      return false;
+    }
+
+    boolean sameDescription;
+    if (tag.getValueDescription() != null){
+      sameDescription = tag.getValueDescription().equalsIgnoreCase(valueDescription);
+    } else {
+      sameDescription = (valueDescription == null);
+    }
+    if (!sameDescription) {
+      return false;
+    }
+
+    boolean sameQuality;
+    if (statusToAdd == null){
+      sameQuality = tag.getDataTagQuality().isValid();
+    } else {
+      sameQuality = (tag.getDataTagQuality() != null
+        && tag.getDataTagQuality().isInvalidStatusSetWithSameDescription(statusToAdd, statusDescription));
+    }
+    return sameQuality;
+  }
+
+  /**
+   * As for general filterout method, but for invalidation only.
+   * @param tag the current tag
+   * @param statusToAdd the status to add
+   * @param statusDescription the status description to use
+   * @param timestamp the invalidation time
+   * @return true if should be filtered
+   */
+  public boolean filteroutInvalidation(T tag, TagQualityStatus statusToAdd, String statusDescription, Timestamp timestamp) {
+    return filterout(tag, tag.getValue(), tag.getValueDescription(), statusToAdd, statusDescription, timestamp);
+  }
+
+  /**
+   * As for general filterout method, but for valid updates only.
+   * @param tag the current tag
+   * @param value the new value
+   * @param valueDescription the new value description
+   * @param timestamp the update time
+   * @return true if should be filtered
+   */
+  public boolean filteroutValid(T tag, Object value, String valueDescription, Timestamp timestamp) {
+    return filterout(tag, value, valueDescription, null, null, timestamp);
+  }
 }

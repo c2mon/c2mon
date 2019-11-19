@@ -15,8 +15,7 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 /**
- * @author Szymon Halastra
- * @author Alexandros Papageorgiou Koufidis
+ * @author Szymon Halastra, Alexandros Papageorgiou Koufidis
  */
 @Slf4j
 @Service

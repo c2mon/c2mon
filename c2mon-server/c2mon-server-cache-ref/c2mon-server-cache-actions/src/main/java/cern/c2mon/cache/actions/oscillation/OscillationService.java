@@ -1,6 +1,6 @@
 package cern.c2mon.cache.actions.oscillation;
 
-import cern.c2mon.cache.actions.AbstractCacheService;
+import cern.c2mon.cache.actions.AbstractCacheServiceImpl;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.alarm.OscillationTimestamp;
 import org.springframework.stereotype.Service;
@@ -14,7 +14,7 @@ import javax.inject.Inject;
  * @author Alexandros Papageorgiou Koufidis
  */
 @Service
-public class OscillationService extends AbstractCacheService<OscillationTimestamp> {
+public class OscillationService extends AbstractCacheServiceImpl<OscillationTimestamp> {
 
   @Inject
   public OscillationService(C2monCache<OscillationTimestamp> lastAccessCache) {

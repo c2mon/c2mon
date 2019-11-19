@@ -1,6 +1,6 @@
 package cern.c2mon.cache.actions.device;
 
-import cern.c2mon.cache.actions.AbstractCacheService;
+import cern.c2mon.cache.actions.AbstractCacheServiceImpl;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.flow.DefaultC2monCacheFlow;
 import cern.c2mon.server.common.device.Device;
@@ -12,7 +12,7 @@ import javax.inject.Inject;
  * @author Szymon Halastra, Alexandros Papageorgiou
  */
 @Service
-public class DeviceService extends AbstractCacheService<Device> {
+public class DeviceService extends AbstractCacheServiceImpl<Device> {
 
   @Inject
   public DeviceService(final C2monCache<Device> deviceCacheRef) {

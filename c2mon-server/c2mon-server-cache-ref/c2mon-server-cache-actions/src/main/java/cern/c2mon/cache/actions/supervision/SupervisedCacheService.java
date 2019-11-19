@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.cache.actions.supervision;
 
+import cern.c2mon.cache.actions.AbstractCacheService;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.cache.api.flow.C2monCacheUpdateFlow;
 import cern.c2mon.server.common.supervision.Supervised;
@@ -33,7 +34,7 @@ import java.sql.Timestamp;
  * @param <T> the cache object type
  * @author Mark Brightwell
  */
-public interface SupervisedCacheService<T extends Supervised> {
+public interface SupervisedCacheService<T extends Supervised> extends AbstractCacheService<T> {
 
   /**
    * Returns the last supervision event that occured

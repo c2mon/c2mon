@@ -1,6 +1,6 @@
 package cern.c2mon.cache.actions.alivetimer;
 
-import cern.c2mon.cache.actions.AbstractCacheService;
+import cern.c2mon.cache.actions.AbstractCacheServiceImpl;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.alive.AliveTimer;
@@ -23,7 +23,7 @@ import static cern.c2mon.shared.common.supervision.SupervisionConstants.Supervis
  */
 @Slf4j
 @Service
-public class AliveTimerService extends AbstractCacheService<AliveTimer> {
+public class AliveTimerService extends AbstractCacheServiceImpl<AliveTimer> {
 
   @Inject
   public AliveTimerService(C2monCache<AliveTimer> aliveTimerCacheRef) {
