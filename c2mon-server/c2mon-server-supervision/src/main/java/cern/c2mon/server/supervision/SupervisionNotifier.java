@@ -16,8 +16,8 @@
  *****************************************************************************/
 package cern.c2mon.server.supervision;
 
-import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.server.common.component.Lifecycle;
+import cern.c2mon.shared.client.supervision.SupervisionEvent;
 
 /**
  * Interface to bean responsible for notifying listeners interested
@@ -39,37 +39,18 @@ public interface SupervisionNotifier {
    * 
    * <p><b>Preferably use this method for registering (currently registers 
    * on a single thread, one for each listener so the thread does not need 
-   * releasing rapidly and notifications will be received sequentially).</b> 
+   * releasing rapidly and notifications will be received sequentially).</b>
+   *
+   * Register the listener to received updates about the supervision
+   * status. If registering on several threads, keep in mind that
+   * up/down notifications for the same equipment/process could be
+   * called before a previous one has returned!
    * 
    * @param supervisionListener the listener to register
    * @return a handle on the lifecycle of the threads notifying this listener; call stop/start during
    *  listener lifecycle methods (stop *before* shutting down listener; start *after* listener is ready(
    */
   Lifecycle registerAsListener(SupervisionListener supervisionListener);
-  
-  /**
-   * Register the listener to received updates about the supervision
-   * status. If registering on several threads, keep in mind that
-   * up/down notifications for the same equipment/process could be
-   * called before a previous one has returned!
-   *   
-   * @param supervisionListener the listener to register
-   * @param numberThreads the core=max number of threads invoking the listener  (default max queue size is Integer.MAX)            
-   * @return a handle on the lifecycle of the threads notifying this listener; call stop/start during
-   *  listener lifecycle methods (stop *before* shutting down listener; start *after* listener is ready)
-   */
-  Lifecycle registerAsListener(SupervisionListener supervisionListener, int numberThreads);
-
-  /**
-   * This registration allows a custom executor queue size specification. 
-   * 
-   * @param supervisionListener the listener to register
-   * @param numberThreads the core=max number of threads <b>this</b> listener should be notified on
-   * @param queueSize size of the executor queue
-   * @return a handle on the lifecycle of the threads notifying this listener; call stop/start during
-   *  listener lifecycle methods (stop *before* shutting down listener; start *after* listener is ready(
-   */
-  Lifecycle registerAsListener(SupervisionListener supervisionListener, int numberThreads, int queueSize);  
 
   /**
    * Call this method when a supervision event should be notified to

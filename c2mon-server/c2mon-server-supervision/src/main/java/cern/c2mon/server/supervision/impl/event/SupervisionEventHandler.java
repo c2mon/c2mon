@@ -19,7 +19,15 @@ abstract class SupervisionEventHandler<T extends Supervised> {
     this.cache = service.getCache();
   }
 
-  abstract void onUp(T supervised, Timestamp timestamp, String message);
+  public void onUp(Long id, Timestamp timestamp, String message){
+    logMethodEntry("onUp", id, timestamp, message);
+
+    try {
+      service.resume(id, timestamp, message);
+    } catch (CacheElementNotFoundException cacheEx) {
+      log.error("Cannot locate the Supervised object in the cache - unable to update it.", cacheEx);
+    }
+  }
 
   /**
    * Called when an DAQ alive timer expires.
@@ -30,13 +38,15 @@ abstract class SupervisionEventHandler<T extends Supervised> {
    * <p>
    * Call within block synchronized on this Supervised obj.
    */
-  public void onDown(T supervised, Timestamp timestamp, String message) {
-    logMethodEntry("onDown", supervised.getId(), timestamp, message);
+  public void onDown(Long id, Timestamp timestamp, String message) {
+    logMethodEntry("onDown", id, timestamp, message);
 
-    service.suspend(supervised.getId(), timestamp, message);
+    service.suspend(id, timestamp, message);
+
+    Long stateTagId = supervised.getStateTagId();
 
 
-//    TODO (Alex) Review and execute this flow
+//    TODO (Alex) Review and execute this flow. See also the onUp()
 
 //    try {
 //      Long stateTagId = supervised.getStateTagId();
@@ -45,7 +55,7 @@ abstract class SupervisionEventHandler<T extends Supervised> {
 //      } else {
 //      if (!filterOut) {
 //        tag = dataTagCache.get(...)
-//        tag.getDataTagQuality().validate();
+//        tag.getDataTagQuality().validate(); // Here we want the opposite for onDown?
 //        AbstractTagObjectFacade.updateValue(dataTag, value, valueDesc);
 //        setTimestamps(dataTag, sourceTimestamp, daqTimestamp, cacheTimestamp);
 //      }

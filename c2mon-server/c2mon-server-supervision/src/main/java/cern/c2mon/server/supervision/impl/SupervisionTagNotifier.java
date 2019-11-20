@@ -16,20 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.server.supervision.impl;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.annotation.PostConstruct;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.SmartLifecycle;
-import org.springframework.stereotype.Service;
-
 import cern.c2mon.server.cache.*;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.cache.supervision.SupervisionAppender;
@@ -43,6 +29,18 @@ import cern.c2mon.server.supervision.SupervisionListener;
 import cern.c2mon.server.supervision.SupervisionNotifier;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.SmartLifecycle;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.PostConstruct;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * On supervision status changes, calls listeners of all C2monCacheWithSupervision
@@ -196,7 +194,7 @@ public class SupervisionTagNotifier implements SupervisionListener, SmartLifecyc
    */
   @PostConstruct
   public void init() {
-    listenerContainer = supervisionNotifier.registerAsListener(this, 10);
+    listenerContainer = supervisionNotifier.registerAsListener(this);
     //set initial supervision states from cache
     //lock in case other server is running
     clusterCache.acquireWriteLockOnKey(EVENT_LOCK);

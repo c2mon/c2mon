@@ -26,6 +26,7 @@ import cern.c2mon.shared.common.supervision.SupervisionConstants;
 import lombok.NonNull;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 /**
  * Implemented by beans linked to Supervised cache
@@ -44,7 +45,7 @@ public interface SupervisedCacheService<T extends Supervised> extends AbstractCa
    * @param id id of the supervised cache object
    * @return the last supervision event
    */
-  SupervisionEvent getSupervisionStatus(long id);
+  SupervisionEvent getSupervisionEvent(long id);
 
   /**
    * Notifies all registered listeners of the current supervision status
@@ -131,4 +132,6 @@ public interface SupervisedCacheService<T extends Supervised> extends AbstractCa
   void removeAliveTimerBySupervisedId(long id);
 
   SupervisionConstants.SupervisionEntity getSupervisionEntity();
+
+  List<SupervisionEvent> getAllSupervisionEvents();
 }

@@ -16,35 +16,24 @@
  *****************************************************************************/
 package cern.c2mon.server.supervision.impl;
 
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import cern.c2mon.cache.actions.equipment.EquipmentService;
+import cern.c2mon.cache.actions.process.ProcessService;
+import cern.c2mon.cache.actions.subequipment.SubEquipmentService;
+import cern.c2mon.server.common.supervision.Supervised;
+import cern.c2mon.server.supervision.SupervisionFacade;
+import cern.c2mon.shared.client.supervision.SupervisionEvent;
+import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.jmx.export.annotation.ManagedAttribute;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.shared.client.supervision.SupervisionEvent;
-import cern.c2mon.server.cache.ControlTagCache;
-import cern.c2mon.server.cache.ControlTagFacade;
-import cern.c2mon.server.cache.DataTagFacade;
-import cern.c2mon.server.cache.EquipmentCache;
-import cern.c2mon.server.cache.EquipmentFacade;
-import cern.c2mon.server.cache.ProcessCache;
-import cern.c2mon.server.cache.ProcessFacade;
-import cern.c2mon.server.cache.SubEquipmentCache;
-import cern.c2mon.server.cache.SubEquipmentFacade;
-import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
-import cern.c2mon.server.common.control.ControlTag;
-import cern.c2mon.server.common.supervision.Supervised;
-import cern.c2mon.server.supervision.SupervisionFacade;
-import cern.c2mon.server.supervision.SupervisionNotifier;
-import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
+import javax.inject.Inject;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Implementation of the SupervisionFacade.
@@ -54,128 +43,48 @@ import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStat
  */
 @Service
 @ManagedResource(objectName="cern.c2mon:name=supervisionFacade")
+@Slf4j
 public class SupervisionFacadeImpl implements SupervisionFacade {
-
-  /**
-   * Class logger.
-   */
-  public static final Logger LOGGER = LoggerFactory.getLogger(SupervisionFacadeImpl.class);
   
   /**
    * Delay at server start-up before current supervision status saved to the DB.
    */
   public static final int INITIAL_LOGGING_DELAY = 120;
-  
-  /**
-   * Reference to Process cache.
-   */
-  private ProcessCache processCache; 
-  
-  /**
-   * Reference to Process facade.
-   */
-  private ProcessFacade processFacade;
-  
-  /**
-   * Reference to Equipment cache.
-   */
-  private EquipmentCache equipmentCache;
-  
-  /**
-   * Reference to Equipment facade.
-   */
-  private EquipmentFacade equipmentFacade;
-  
-  /**
-   * Reference to SubEquipment cache.
-   */
-  private SubEquipmentCache subEquipmentCache;
-  
-  /**
-   * Reference to SubEquipment facade.
-   */
-  private SubEquipmentFacade subEquipmentFacade;
-  
-  /**
-   * Ref to bean notifying supervision listeners.
-   */
-  private SupervisionNotifier supervisionNotifier;
-  
-  /**
-   * For accessing state tags.
-   */
-  private ControlTagFacade controlTagFacade;
+
+  private final ProcessService processService;
+  private final EquipmentService equipmentService;
+  private final SubEquipmentService subEquipmentService;
  
   /**
    * Management value tracing the number of requests for the supervision status
    * that are waiting for a response.
    */
   private volatile AtomicInteger pendingRequests = new AtomicInteger(0);
-  
-  /**
-   * Autowired constructor.
-   * @param processCache process cache bean
-   * @param processFacade process facade
-   * @param equipmentCache equipment cache
-   * @param equipmentFacade equipment facade
-   * @param subEquipmentCache subequipment cache
-   * @param subEquipmentFacade subequipment facade
-   * @param dataTagFacade datatag facade
-   * @param controlTagCache controltag cache
-   */
-  @Autowired
-  public SupervisionFacadeImpl(final ProcessCache processCache, final ProcessFacade processFacade, final EquipmentCache equipmentCache,
-      final EquipmentFacade equipmentFacade, final SubEquipmentCache subEquipmentCache, final SubEquipmentFacade subEquipmentFacade,
-      final SupervisionNotifier supervisionNotifier, final ControlTagFacade controlTagFacade) {
-    super();
-    this.processCache = processCache;
-    this.processFacade = processFacade;
-    this.equipmentCache = equipmentCache;
-    this.equipmentFacade = equipmentFacade;
-    this.subEquipmentCache = subEquipmentCache;
-    this.subEquipmentFacade = subEquipmentFacade;
-    this.supervisionNotifier = supervisionNotifier;
-    this.controlTagFacade = controlTagFacade; 
+
+
+  @Inject
+  public SupervisionFacadeImpl(final ProcessService processService, final EquipmentService equipmentService,
+                               final SubEquipmentService subEquipmentService) {
+
+    this.processService = processService;
+    this.equipmentService = equipmentService;
+    this.subEquipmentService = subEquipmentService;
   }
 
   @Override
   public Collection<SupervisionEvent> getAllSupervisionStates() {
     try {
       pendingRequests.getAndIncrement();
-      Collection<SupervisionEvent> supervisionCollection = new ArrayList<SupervisionEvent>();
-      for (Long key : processCache.getKeys()) { //is copy of keys
-        supervisionCollection.add(processFacade.getSupervisionStatus(key));
-      }
-      for (Long key : equipmentCache.getKeys()) {
-        supervisionCollection.add(equipmentFacade.getSupervisionStatus(key));
-      }
-      for (Long key : subEquipmentCache.getKeys()) {
-        supervisionCollection.add(subEquipmentFacade.getSupervisionStatus(key));
-      }
+
+      Collection<SupervisionEvent> supervisionCollection = new ArrayList<>();
+      supervisionCollection.addAll(processService.getAllSupervisionEvents());
+      supervisionCollection.addAll(equipmentService.getAllSupervisionEvents());
+      supervisionCollection.addAll(subEquipmentService.getAllSupervisionEvents());
+
       return supervisionCollection;   
     } finally {
       pendingRequests.getAndDecrement();
     }    
-  }
-
-  /**
-   * Notifies all listeners of all supervised cache objects (so Process, Equipment,
-   * SubEquipments) with the current object. In particular the SupervisionNotifier
-   * is called.
-   * 
-   * <p>This is used to refresh all listeners with the latest values for supervision 
-   * purposes (in case of a previous server failure when some may not have been logged to DB).
-   */
-  private void notifyAllSupervisedCachesOfUpdate() {
-    for (Long key : processCache.getKeys()) {
-      processFacade.refreshAndnotifyCurrentSupervisionStatus(key);
-    }
-    for (Long key : equipmentCache.getKeys()) {
-      equipmentFacade.refreshAndnotifyCurrentSupervisionStatus(key);
-    }
-    for (Long key : subEquipmentCache.getKeys()) {
-      subEquipmentFacade.refreshAndnotifyCurrentSupervisionStatus(key);
-    }
   }
   
   @Override
@@ -224,6 +133,26 @@ public class SupervisionFacadeImpl implements SupervisionFacade {
   @Override
   public void refreshAllSupervisionStatus() {
     notifyAllSupervisedCachesOfUpdate();
+  }
+
+  /**
+   * Notifies all listeners of all supervised cache objects (so Process, Equipment,
+   * SubEquipments) with the current object. In particular the SupervisionNotifier
+   * is called.
+   *
+   * <p>This is used to refresh all listeners with the latest values for supervision
+   * purposes (in case of a previous server failure when some may not have been logged to DB).
+   */
+  private void notifyAllSupervisedCachesOfUpdate() {
+    for (Long key : processCache.getKeys()) {
+      processFacade.refreshAndnotifyCurrentSupervisionStatus(key);
+    }
+    for (Long key : equipmentCache.getKeys()) {
+      equipmentFacade.refreshAndnotifyCurrentSupervisionStatus(key);
+    }
+    for (Long key : subEquipmentCache.getKeys()) {
+      subEquipmentFacade.refreshAndnotifyCurrentSupervisionStatus(key);
+    }
   }
   
   /**

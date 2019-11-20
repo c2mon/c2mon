@@ -16,25 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.server.supervision.impl;
 
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-
-import javax.annotation.PostConstruct;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jmx.export.annotation.ManagedOperation;
-import org.springframework.jmx.export.annotation.ManagedResource;
-import org.springframework.stereotype.Service;
-
 import cern.c2mon.server.cache.C2monCacheListener;
 import cern.c2mon.server.cache.EquipmentCache;
 import cern.c2mon.server.cache.ProcessCache;
@@ -46,6 +27,23 @@ import cern.c2mon.server.supervision.SupervisionListener;
 import cern.c2mon.server.supervision.SupervisionNotifier;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jmx.export.annotation.ManagedOperation;
+import org.springframework.jmx.export.annotation.ManagedResource;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.PostConstruct;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Notifies the all the listeners of changes in the
@@ -139,29 +137,11 @@ public class SupervisionNotifierImpl implements SupervisionNotifier, C2monCacheL
 
   @Override
   public Lifecycle registerAsListener(final SupervisionListener supervisionListener) {
-    return registerAsListener(supervisionListener, DEFAULT_NUMBER_THREADS);
-  }
-
-
-  @Override
-  public Lifecycle registerAsListener(final SupervisionListener supervisionListener, final int numberThreads) {
-   return registerAsListener(supervisionListener, numberThreads, DEFAULT_QUEUE_SIZE);
-  }
-
-  /**
-   * No synchronisation necessary as all added at start up.
-   * @param supervisionListener the listener that should be notified of supervision changes
-   * @param numberThreads the number of threads <b>this</b> listener should be notified on (max = core); core threads also time out
-   * @param queueSize the size of the queue to use for queuing supervision events (should be set according to
-   *  number of DAQs/Equipments and the length of the expected tasks; runtime exception thrown if queue fills up!)
-   */
-  @Override
-  public Lifecycle registerAsListener(final SupervisionListener supervisionListener, final int numberThreads, final int queueSize) {
     listenerLock.writeLock().lock();
     try {
-      ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(numberThreads, numberThreads,
-              DEFAULT_THREAD_TIMEOUT, TimeUnit.SECONDS, new LinkedBlockingQueue<>(queueSize),
-              new ThreadPoolExecutor.AbortPolicy());
+      ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(DEFAULT_NUMBER_THREADS, DEFAULT_NUMBER_THREADS,
+        DEFAULT_THREAD_TIMEOUT, TimeUnit.SECONDS, new LinkedBlockingQueue<>(DEFAULT_QUEUE_SIZE),
+        new ThreadPoolExecutor.AbortPolicy());
       threadPoolExecutor.setThreadFactory(r -> {
         StringBuilder builder = new StringBuilder();
         builder.append("Supervision-").append(executors.size()).append("-").append(threadPoolExecutor.getActiveCount());
@@ -238,7 +218,7 @@ public class SupervisionNotifierImpl implements SupervisionNotifier, C2monCacheL
    */
   @ManagedOperation(description="Get listener active threads.")
   public List<Integer> getNumActiveThreads() {
-    ArrayList<Integer> activeThreads = new ArrayList<Integer>();
+    ArrayList<Integer> activeThreads = new ArrayList<>();
     listenerLock.writeLock().lock();
     try {
       for (SupervisionListener listener : supervisionListeners) {

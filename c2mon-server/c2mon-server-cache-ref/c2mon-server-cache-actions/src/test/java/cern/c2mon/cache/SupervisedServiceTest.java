@@ -18,7 +18,7 @@ public abstract class SupervisedServiceTest<T extends Supervised> extends Superv
 
   @Test(expected = CacheElementNotFoundException.class)
   public void getSupervisionStatusThrowsIfNonexistent() {
-    supervisedService.getSupervisionStatus(sample.getId());
+    supervisedService.getSupervisionEvent(sample.getId());
   }
 
   @Test
@@ -29,14 +29,14 @@ public abstract class SupervisedServiceTest<T extends Supervised> extends Superv
   }
 
   private void verifySupervisionEvent(Supervised supervised, SupervisionStatus expectedStatus) {
-    SupervisionEvent event = supervisedService.getSupervisionStatus(supervised.getId());
+    SupervisionEvent event = supervisedService.getSupervisionEvent(supervised.getId());
 
     assertEquals(supervised.getId(), event.getEntityId());
     assertEquals(event.getEntity(), supervised.getSupervisionEntity());
     assertEquals(expectedStatus, event.getStatus());
 
     // Repeating the attempt yields an equal result
-    assertEquals(event, supervisedService.getSupervisionStatus(supervised.getId()));
+    assertEquals(event, supervisedService.getSupervisionEvent(supervised.getId()));
   }
 
   @Test

@@ -5,6 +5,7 @@ import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.common.supervision.SupervisionConstants;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 /**
  * This interface simply delegates all the {@code SupervisedService} methods to the
@@ -23,8 +24,8 @@ public interface SupervisedCacheServiceDelegator<T extends Supervised> extends S
   SupervisedCacheService<T> getSupervisedService();
 
   @Override
-  default SupervisionEvent getSupervisionStatus(long id) {
-    return getSupervisedService().getSupervisionStatus(id);
+  default SupervisionEvent getSupervisionEvent(long id) {
+    return getSupervisedService().getSupervisionEvent(id);
   }
 
   @Override
@@ -72,4 +73,7 @@ public interface SupervisedCacheServiceDelegator<T extends Supervised> extends S
   default SupervisionConstants.SupervisionEntity getSupervisionEntity() {
     return getSupervisedService().getSupervisionEntity();
   }
+
+  @Override
+  default List<SupervisionEvent> getAllSupervisionEvents() { return getSupervisedService().getAllSupervisionEvents(); }
 }

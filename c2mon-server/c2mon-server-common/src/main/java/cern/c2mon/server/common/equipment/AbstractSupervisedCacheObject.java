@@ -18,11 +18,14 @@ package cern.c2mon.server.common.equipment;
 
 import cern.c2mon.server.common.AbstractCacheableImpl;
 import cern.c2mon.server.common.supervision.Supervised;
+import cern.c2mon.shared.client.supervision.SupervisionEvent;
+import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
 import java.sql.Timestamp;
 
@@ -35,6 +38,7 @@ import java.sql.Timestamp;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
+@Slf4j
 public abstract class AbstractSupervisedCacheObject extends AbstractCacheableImpl implements Supervised {
 
     private static final long serialVersionUID = -7826198425602484249L;
@@ -155,5 +159,23 @@ public abstract class AbstractSupervisedCacheObject extends AbstractCacheableImp
         setSupervisionStatus(supervisionStatus);
         setStatusDescription(statusDescription);
         setStatusTime(statusTime);
+    }
+
+    public SupervisionEvent getSupervisionEvent() {
+        log.trace("Getting supervision status: " + getSupervisionEntity() + " " + getName() + " is " + getSupervisionStatus());
+
+        Timestamp supervisionTime;
+        String supervisionMessage;
+
+        supervisionTime = getStatusTime() != null
+          ? getStatusTime()
+          : new Timestamp(System.currentTimeMillis());
+
+        supervisionMessage = getStatusDescription() != null
+          ? getStatusDescription()
+          : getSupervisionEntity() + " " + getName() + " is " + getSupervisionStatus();
+
+        return new SupervisionEventImpl(getSupervisionEntity(), id, getName(), getSupervisionStatus(),
+          supervisionTime, supervisionMessage);
     }
 }

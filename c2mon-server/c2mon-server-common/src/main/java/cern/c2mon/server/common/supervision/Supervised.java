@@ -16,6 +16,8 @@
  *****************************************************************************/
 package cern.c2mon.server.common.supervision;
 
+import cern.c2mon.shared.client.supervision.SupervisionEvent;
+import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
 import cern.c2mon.shared.common.Cacheable;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEntity;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
@@ -128,6 +130,22 @@ public interface Supervised extends Cacheable {
    * @param statusTime        time of the supervision event
    */
   void setSupervision(SupervisionStatus supervisionStatus, @NonNull String statusDescription, @NonNull Timestamp statusTime);
+
+  default SupervisionEvent getSupervisionEvent() {
+    Timestamp supervisionTime;
+    String supervisionMessage;
+
+    supervisionTime = getStatusTime() != null
+      ? getStatusTime()
+      : new Timestamp(System.currentTimeMillis());
+
+    supervisionMessage = getStatusDescription() != null
+      ? getStatusDescription()
+      : getSupervisionEntity() + " " + getName() + " is " + getSupervisionStatus();
+
+    return new SupervisionEventImpl(getSupervisionEntity(), getId(), getName(), getSupervisionStatus(),
+      supervisionTime, supervisionMessage);
+  }
 
   /**
    * Returns true if the object is either running or in

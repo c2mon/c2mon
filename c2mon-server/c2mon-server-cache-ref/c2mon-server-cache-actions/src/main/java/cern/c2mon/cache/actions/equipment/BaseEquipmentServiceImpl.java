@@ -1,6 +1,7 @@
 package cern.c2mon.cache.actions.equipment;
 
 import cern.c2mon.cache.actions.alivetimer.AliveTimerService;
+import cern.c2mon.cache.actions.datatag.DataTagService;
 import cern.c2mon.cache.actions.supervision.AbstractSupervisedService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.service.CommonEquipmentOperations;
@@ -20,9 +21,12 @@ public abstract class BaseEquipmentServiceImpl<T extends AbstractEquipment> exte
 
   private C2monCache<CommFaultTag> commFaultTagCache;
 
-  protected BaseEquipmentServiceImpl(C2monCache<T> cache, C2monCache<CommFaultTag> commFaultTagCache,
-                                     AliveTimerService aliveTimerService, SupervisionConstants.SupervisionEntity supervisionEntity) {
-    super(cache, supervisionEntity, aliveTimerService);
+  protected BaseEquipmentServiceImpl(final C2monCache<T> cache,
+                                     final C2monCache<CommFaultTag> commFaultTagCache,
+                                     final AliveTimerService aliveTimerService,
+                                     final SupervisionConstants.SupervisionEntity supervisionEntity,
+                                     final DataTagService dataTagService) {
+    super(cache, supervisionEntity, aliveTimerService,dataTagService);
     this.commFaultTagCache = commFaultTagCache;
   }
 

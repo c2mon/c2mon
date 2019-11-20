@@ -20,15 +20,12 @@ import java.util.stream.Collectors;
 @Service
 public class EquipmentService extends BaseEquipmentServiceImpl<Equipment> implements EquipmentOperations {
 
-  private final DataTagService dataTagService;
-
   @Inject
   public EquipmentService(final C2monCache<Equipment> equipmentCacheRef,
                           final DataTagService dataTagService,
                           final AliveTimerService aliveTimerService,
                           final CommFaultService commFaultService) {
-    super(equipmentCacheRef, commFaultService.getCache(), aliveTimerService, SupervisionConstants.SupervisionEntity.EQUIPMENT);
-    this.dataTagService = dataTagService;
+    super(equipmentCacheRef, commFaultService.getCache(), aliveTimerService, SupervisionConstants.SupervisionEntity.EQUIPMENT, dataTagService);
   }
 
   @Override

@@ -43,6 +43,14 @@ public class DataTagService extends AbstractCacheServiceImpl<DataTag> {
       .stream().map(DataTag::getId).collect(Collectors.toSet());
   }
 
+  public void resetQualityToValid(Long id){
+    cache.compute(id, dataTag -> {
+      if (!filterout(dataTag, )) // TODO (Alex) Also check TagService.filterout?
+        dataTag.getDataTagQuality().validate();
+//        setTimestamps(dataTag, sourceTimestamp, daqTimestamp, cacheTimestamp);
+    });
+  }
+
   /**
    * Method containing all the logic for filtering out incoming datatag updates before any updates are
    * attempted. Call within synchronized block.

@@ -2,14 +2,16 @@ package cern.c2mon.cache.actions.supervision;
 
 import cern.c2mon.cache.actions.AbstractCacheServiceImpl;
 import cern.c2mon.cache.actions.alivetimer.AliveTimerService;
+import cern.c2mon.cache.actions.datatag.DataTagService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.supervision.Supervised;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
-import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.sql.Timestamp;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEntity;
 import static cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
@@ -24,14 +26,18 @@ public abstract class AbstractSupervisedService<T extends Supervised> extends Ab
   // TODO Most previous supervision notifications were connected to a Tag. Do we want this behaviour?
 
   private final AliveTimerService aliveTimerService;
+  private final DataTagService dataTagService;
 
   @Getter
   private SupervisionEntity supervisionEntity;
 
-  public AbstractSupervisedService(final C2monCache<T> cache, SupervisionEntity supervisionEntity, final AliveTimerService aliveTimerService) {
+  public AbstractSupervisedService(final C2monCache<T> cache, SupervisionEntity supervisionEntity,
+                                   final AliveTimerService aliveTimerService,
+                                   final DataTagService dataTagService) {
     super(cache, new AbstractSupervisedC2monCacheFlow<>());
     this.supervisionEntity = supervisionEntity;
     this.aliveTimerService = aliveTimerService;
+    this.dataTagService = dataTagService;
   }
 
   @Override
@@ -56,6 +62,8 @@ public abstract class AbstractSupervisedService<T extends Supervised> extends Ab
 
   @Override
   public T resume(long id, Timestamp timestamp, String message) {
+    dataTagService.resetQualityToValid(); // TODO (Alex) Figure out how to get the datatag for a Supervised
+
     return cache.compute(id,supervised -> {
       if (!supervised.getSupervisionStatus().equals(SupervisionStatus.RUNNING)) {
         supervised.resume(timestamp, message);
@@ -83,27 +91,8 @@ public abstract class AbstractSupervisedService<T extends Supervised> extends Ab
   }
 
   @Override
-  public SupervisionEvent getSupervisionStatus(long id) {
-    return cache.executeTransaction(() -> {
-      T supervised = cache.get(id);
-      if (log.isTraceEnabled()) {
-        log.trace("Getting supervision status: " + getSupervisionEntity() + " " + supervised.getName() + " is " + supervised.getSupervisionStatus());
-      }
-      Timestamp supervisionTime;
-      String supervisionMessage;
-      if (supervised.getStatusTime() != null) {
-        supervisionTime = supervised.getStatusTime();
-      } else {
-        supervisionTime = new Timestamp(System.currentTimeMillis());
-      }
-      if (supervised.getStatusDescription() != null) {
-        supervisionMessage = supervised.getStatusDescription();
-      } else {
-        supervisionMessage = getSupervisionEntity() + " " + supervised.getName() + " is " + supervised.getSupervisionStatus();
-      }
-      return new SupervisionEventImpl(getSupervisionEntity(), id, supervised.getName(), supervised.getSupervisionStatus(),
-        supervisionTime, supervisionMessage);
-    });
+  public SupervisionEvent getSupervisionEvent(long id) {
+    return cache.get(id).getSupervisionEvent();
   }
 
   @Override
@@ -120,5 +109,12 @@ public abstract class AbstractSupervisedService<T extends Supervised> extends Ab
     T supervised = cache.get(supervisedId);
     long aliveId = supervised.getAliveTagId();
     aliveTimerService.removeAliveTimer(aliveId);
+  }
+
+  @Override
+  public List<SupervisionEvent> getAllSupervisionEvents() {
+    return cache.getKeys().parallelStream()
+      .map(key -> cache.get(key).getSupervisionEvent())
+      .collect(Collectors.toList());
   }
 }
