@@ -118,7 +118,7 @@ public class SupervisionFacadeImpl implements SupervisionFacade {
        
       controlTagFacade.updateAndValidate(stateTagId, status.toString(), message, refreshTime);
     } catch (Exception e) {
-      LOGGER.error("Error while refreshing state tag for " + supervised.getSupervisionEntity() 
+      log.error("Error while refreshing state tag for " + supervised.getSupervisionEntity()
           + " " + supervised.getId() + " - unable to refresh this tag.", e);
     }    
   }

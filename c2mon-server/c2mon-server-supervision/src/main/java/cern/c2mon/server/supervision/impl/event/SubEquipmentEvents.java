@@ -24,7 +24,6 @@ public class SubEquipmentEvents extends SupervisionEventHandler<SubEquipment> {
    * @param id          Identifer of the subequipment for which the alivetag/commfaulttag
    *                    was received
    * @param timestamp   Timestamp indicating when it was received
-   * @param pStateTagId The id of the state tag that indicates the subequipment state
    * @param message     Message explaining which is the cause for the subequipment to be
    *                    considered as being up.
    */
