@@ -1,19 +1,10 @@
 package cern.c2mon.cache.api.impl;
 
-import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
-import cern.c2mon.cache.api.flow.C2monCacheUpdateFlow;
-import cern.c2mon.cache.api.flow.DefaultC2monCacheFlow;
-import cern.c2mon.cache.api.listener.CacheListenerManager;
-import cern.c2mon.cache.api.listener.CacheListenerManagerImpl;
-import cern.c2mon.cache.api.loader.CacheLoader;
+import cern.c2mon.cache.api.C2monCacheimpl;
 import cern.c2mon.cache.api.spi.CacheQuery;
 import cern.c2mon.shared.common.Cacheable;
 import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
 
-import javax.cache.Cache;
 import java.util.Collection;
 import java.util.Set;
 import java.util.function.Function;
@@ -26,51 +17,30 @@ import java.util.stream.Collectors;
  * @author Szymon Halastra
  * @author Alexandros Papageorgiou Koufidis
  */
-public class SimpleC2monCache<V extends Cacheable> implements C2monCache<V> {
+public class SimpleC2monCache<V extends Cacheable> extends C2monCacheimpl<V> {
 
   @Getter
-  @Setter
-  private C2monCacheUpdateFlow<V> cacheUpdateFlow = new DefaultC2monCacheFlow<>();
-
-  @Getter
-  private final MapBasedCache<V> cache = new MapBasedCache<>();
-  @Getter
-  @Setter
-  protected CacheLoader<V> cacheLoader;
-  @Getter
-  private CacheListenerManager<V> cacheListenerManager = new CacheListenerManagerImpl<>();
-  @Getter
-  private String cacheName;
+  private final MapBasedCache<V> mapBasedCache;
 
   public SimpleC2monCache(String cacheName) {
-    this.cacheName = cacheName;
+    super(cacheName, new MapBasedCache<>());
+    mapBasedCache = (MapBasedCache<V>) cache;
   }
 
   @Override
   public void init() {
-
-  }
-
-  @Override
-  public V get(@NonNull Long key) throws NullPointerException, CacheElementNotFoundException {
-    return (V) C2monCache.super.get(key).clone();
+    // No-op
   }
 
   @Override
   public Set<Long> getKeys() {
-    return cache.getMap().keySet();
-  }
-
-  @Override
-  public Cache<Long, V> getCache() {
-    return cache;
+    return mapBasedCache.getMap().keySet();
   }
 
   @Override
   public <S> S executeTransaction(Supplier<S> callable) {
     return callable.get();
   }
-
 
   @Override
   public Collection<V> query(Function<V, Boolean> filter) {
@@ -80,5 +50,15 @@ public class SimpleC2monCache<V extends Cacheable> implements C2monCache<V> {
   @Override
   public Collection<V> query(CacheQuery<V> providedQuery) {
     return query(providedQuery.filter());
+  }
+
+  @Override
+  public void close() {
+    // It's quite possible that the cache is already closed, so check first
+    synchronized (this) {
+      if (!mapBasedCache.isClosed())
+        mapBasedCache.close();
+      // TODO (Alex) Close listener manager?
+    }
   }
 }

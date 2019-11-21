@@ -19,4 +19,7 @@ public interface CacheListenerManager<CACHEABLE extends Cacheable> extends Close
    * or for operations optimized for {@code Collection}s
    */
   void registerBufferedListener(BufferedCacheListener<CACHEABLE> listener, CacheEvent... events);
+
+  @Override
+  void close();
 }

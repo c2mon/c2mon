@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.*;
 
-
 /**
  * A base implementation of {@link CacheListener} that uses an {@link ExecutorService} to manage incoming events
  * <p>
@@ -24,7 +23,7 @@ import java.util.concurrent.*;
  *       {@link cern.c2mon.cache.api.C2monCache#compute(long, java.util.function.Consumer)} is strongly advised, as
  *       it will allow you to delta the object with your desired changes, regardless of previous state.
  * </ul>
- *
+ * <p>
  * The buffered event handler will be run during a fixed period (by default 10 seconds), or when the pending
  * updates exceed the maximum limit specified (default 100.000)
  *
@@ -35,23 +34,28 @@ import java.util.concurrent.*;
 public class CacheListenerManagerImpl<CACHEABLE extends Cacheable> implements CacheListenerManager<CACHEABLE> {
   private static final long DEFAULT_SHUTDOWN_WAIT = 1;
   private static final TimeUnit DEFAULT_SHUTDOWN_WAIT_UNITS = TimeUnit.SECONDS;
-  private static final long DEFAULT_PERIOD = 10;
+  private static final int DEFAULT_CONCURRENCY = 1000;
+  private static final long DEFAULT_PERIOD = 1000;
 
-  private static final ExecutorService centralizedExecutorService = Executors.newFixedThreadPool(32);
-  private static final ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(4);
+  private final ExecutorService centralizedExecutorService;
+  private final ScheduledExecutorService scheduledExecutorService;
 
   // Is and should remain concurrent both in the map level and the set level!
-  private final Map<CacheEvent, Set<CacheListener<CACHEABLE>>> eventListeners;
+  private final Map<CacheEvent, Set<CacheListener<? super CACHEABLE>>> eventListeners;
 
-  public CacheListenerManagerImpl(int concurrency){
+  public CacheListenerManagerImpl() {
+    this(DEFAULT_CONCURRENCY, DEFAULT_PERIOD);
+  }
+
+  public CacheListenerManagerImpl(int concurrency, long schedulingPeriod) {
     eventListeners = new ConcurrentHashMap<>();
     // Initialize each list using a "ConcurrentSet"
     for (CacheEvent event : CacheEvent.values()) {
       eventListeners.put(event, Collections.newSetFromMap(new ConcurrentHashMap<>()));
     }
+    centralizedExecutorService = Executors.newFixedThreadPool(concurrency);
+    scheduledExecutorService = Executors.newScheduledThreadPool(2);
   }
-
-  //  TODO (Alex) Should this switch to try-catch for safety? We should be ok with Executor threads blowing up
 
   @Override
   public void notifyListenersOf(CacheEvent event, CACHEABLE source) {
@@ -68,15 +72,14 @@ public class CacheListenerManagerImpl<CACHEABLE extends Cacheable> implements Ca
 
   @Override
   public void registerBufferedListener(BufferedCacheListener<CACHEABLE> listener, CacheEvent... events) {
-    BufferedCacheListenerImpl<CACHEABLE> runnableListener = new BufferedCacheListenerImpl<>(centralizedExecutorService, listener);
+    BufferedCacheListenerImpl<CACHEABLE> runnableListener = new BufferedCacheListenerImpl<>(scheduledExecutorService, listener);
 
     // By adding to the normal event listener list, we get the items in the buffered listener list
     for (CacheEvent cacheEvent : events) {
       eventListeners.get(cacheEvent).add(runnableListener);
     }
 
-    // TODO (Alex) Where do we want to run this?
-    scheduledExecutorService.scheduleAtFixedRate(runnableListener, 0, DEFAULT_PERIOD, TimeUnit.SECONDS);
+    scheduledExecutorService.scheduleAtFixedRate(runnableListener, 0, DEFAULT_PERIOD, TimeUnit.MILLISECONDS);
   }
 
   /**
@@ -92,6 +95,7 @@ public class CacheListenerManagerImpl<CACHEABLE extends Cacheable> implements Ca
       // Give the executor a chance to exit gracefully
       scheduledExecutorService.shutdown();
       centralizedExecutorService.shutdown();
+
       scheduledExecutorService.awaitTermination(DEFAULT_SHUTDOWN_WAIT, DEFAULT_SHUTDOWN_WAIT_UNITS);
       centralizedExecutorService.awaitTermination(DEFAULT_SHUTDOWN_WAIT, DEFAULT_SHUTDOWN_WAIT_UNITS);
     } catch (InterruptedException e) {

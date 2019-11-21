@@ -57,6 +57,8 @@ public class IgniteC2monTagCacheQueryProvider implements C2monTagCacheQueryProvi
 
   @Override
   public Collection<Tag> findByNameWildcard(String regex) {
+    // TODO (Alex) Reconsider the translation to actual regex here, or CHANGELOG this for the clients
     return tagCache.query(tag -> tag.getName().matches(regex));
+
   }
 }

@@ -40,18 +40,16 @@ public class AlarmService extends AbstractCacheServiceImpl<Alarm> implements Ala
   public AlarmService(final C2monCache<Alarm> cache, final UnifiedTagCacheFacade unifiedTagCacheFacade,
                       final OscillationUpdater oscillationUpdater) {
     super(cache, new AlarmC2monCacheFlow());
+    // TODO (Alex) We probably want to increase the number of threads in the CacheListenerManager here
     this.unifiedTagCacheFacade = unifiedTagCacheFacade;
     this.oscillationUpdater = oscillationUpdater;
   }
 
   @PostConstruct
   public void init() {
-    unifiedTagCacheFacade.registerListener(
-      new SingleThreadListener<>(this::supervisionChangeListener), CacheEvent.SUPERVISION_CHANGE);
+    unifiedTagCacheFacade.registerListener(this::supervisionChangeListener, CacheEvent.SUPERVISION_CHANGE);
 
-    // Multithread, because we expect to be getting many of these events
-    unifiedTagCacheFacade.registerListener(
-      new MultiThreadListener<>(8, this::updateAcceptedListener), CacheEvent.UPDATE_ACCEPTED);
+    unifiedTagCacheFacade.registerListener(this::updateAcceptedListener, CacheEvent.UPDATE_ACCEPTED);
   }
 
   /**
@@ -87,7 +85,7 @@ public class AlarmService extends AbstractCacheServiceImpl<Alarm> implements Ala
             update((AlarmCacheObject) alarm, tag, true);
             return alarm;
           } catch (Exception e) {
-            cache.notifyListenersOf(CacheEvent.UPDATE_FAILED, alarm);
+            cache.getCacheListenerManager().notifyListenersOf(CacheEvent.UPDATE_FAILED, alarm);
             log.error("Exception caught when attempting to evaluate alarm ID " + alarm.getId() + "  for tag " + tag.getId() + " - publishing to the client with no attached alarms.", e);
             return null;
           }

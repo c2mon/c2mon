@@ -2,6 +2,7 @@ package cern.c2mon.cache.actions.process;
 
 import cern.c2mon.cache.actions.AbstractCacheServiceImpl;
 import cern.c2mon.cache.actions.alivetimer.AliveTimerService;
+import cern.c2mon.cache.actions.datatag.DataTagService;
 import cern.c2mon.cache.actions.equipment.EquipmentService;
 import cern.c2mon.cache.actions.subequipment.SubEquipmentService;
 import cern.c2mon.cache.actions.supervision.AbstractSupervisedC2monCacheFlow;
@@ -51,14 +52,15 @@ public class ProcessService extends AbstractCacheServiceImpl<Process>
 
   @Inject
   public ProcessService(C2monCache<Process> processCacheRef, EquipmentService equipmentService,
-                        AliveTimerService aliveTimerService, SubEquipmentService subEquipmentService, ServerProperties properties) {
+                        AliveTimerService aliveTimerService, SubEquipmentService subEquipmentService,
+                        ServerProperties properties, DataTagService dataTagService) {
     super(processCacheRef, new AbstractSupervisedC2monCacheFlow<>());
     this.aliveTimerService = aliveTimerService;
     this.equipmentService = equipmentService;
     this.subEquipmentService = subEquipmentService;
     this.properties = properties;
 
-    this.supervisedService = new SupervisedProcessServiceImpl(processCacheRef, aliveTimerService);
+    this.supervisedService = new SupervisedProcessServiceImpl(processCacheRef, aliveTimerService, dataTagService);
   }
 
   @Override

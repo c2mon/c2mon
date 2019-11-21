@@ -1,5 +1,6 @@
 package cern.c2mon.cache;
 
+import cern.c2mon.cache.actions.listener.SupervisedServiceListenerTest;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.supervision.Supervised;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
@@ -113,11 +114,5 @@ public abstract class SupervisedServiceTest<T extends Supervised> extends Superv
 
     verifySupervisionEvent(sample, UNCERTAIN);
     assertTrue(supervisedService.isUncertain(sample.getId()));
-  }
-
-  @Override
-  protected void mutateObject(T supervised) {
-    SupervisionStatus nextStatus = values()[(supervised.getSupervisionStatus().ordinal() + 1) % STATUSES_SIZE];
-    supervised.setSupervision(nextStatus, "It's always 42", Timestamp.from(Instant.MIN));
   }
 }

@@ -1,43 +1,46 @@
 package cern.c2mon.cache.api;
 
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
-import cern.c2mon.cache.api.flow.C2monCacheUpdateFlow;
+import cern.c2mon.cache.api.flow.CacheUpdateFlow;
+import cern.c2mon.cache.api.listener.CacheListenerManager;
 import cern.c2mon.cache.api.loader.CacheLoader;
 import cern.c2mon.cache.api.spi.CacheQuery;
-import cern.c2mon.shared.common.CacheEvent;
 import cern.c2mon.shared.common.Cacheable;
 import lombok.NonNull;
 
-import java.io.Serializable;
-import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
-
-import static cern.c2mon.shared.common.CacheEvent.UPDATE_ACCEPTED;
-import static cern.c2mon.shared.common.CacheEvent.UPDATE_REJECTED;
-import static java.util.Objects.requireNonNull;
 
 
 /**
- * @param <V> cache element type
+ * @param <CACHEABLE> cache element type
  * @author Szymon Halastra, Alexandros Papageorgiou Koufidis, Brice Copy
  */
-public interface C2monCache<V extends Cacheable> extends CacheDelegator<V>, Serializable, ListenerDelegator<V> {
+public interface C2monCache<CACHEABLE extends Cacheable> extends CacheDelegator<CACHEABLE> {
 
-  C2monCacheUpdateFlow<V> getCacheUpdateFlow();
+  // === Section: Cache properties ===
+
+  CacheUpdateFlow<CACHEABLE> getCacheUpdateFlow();
 
   /**
    * Injected by the service, when needed
    */
-  void setCacheUpdateFlow(C2monCacheUpdateFlow<V> cacheFlow);
+  void setCacheUpdateFlow(CacheUpdateFlow<CACHEABLE> cacheFlow);
 
   CacheLoader getCacheLoader();
 
-  void setCacheLoader(CacheLoader<V> cacheLoader);
+  void setCacheLoader(CacheLoader<CACHEABLE> cacheLoader);
+
+  CacheListenerManager<CACHEABLE> getCacheListenerManager();
+
+  void setCacheListenerManager(CacheListenerManager<CACHEABLE> CacheListenerManager);
+
+  // === Section: Custom cache methods ===
+
+  void init();
 
   /**
    * Default implementation for a simple getKeys function. Caches may choose to implement a version of this with
@@ -54,11 +57,7 @@ public interface C2monCache<V extends Cacheable> extends CacheDelegator<V>, Seri
    *
    * @return a {@code Set} of the keys contained in the Cache
    */
-  default Set<Long> getKeys() {
-    return query(i -> true).stream().map(Cacheable::getId).collect(Collectors.toSet());
-  }
-
-  void init();
+  Set<Long> getKeys();
 
   /**
    * Executes the {@code callable} provided, in the current thread's transaction, if one exists,
@@ -73,12 +72,7 @@ public interface C2monCache<V extends Cacheable> extends CacheDelegator<V>, Seri
    *
    * @param runnable the {@code Runnable} you want to run
    */
-  default void executeTransaction(Runnable runnable) {
-    executeTransaction(() -> {
-      runnable.run();
-      return 1;
-    });
-  }
+  void executeTransaction(Runnable runnable);
 
   /**
    * Atomically gets an element from the cache with the given key, applies a transformation on it,
@@ -86,14 +80,7 @@ public interface C2monCache<V extends Cacheable> extends CacheDelegator<V>, Seri
    *
    * @throws CacheElementNotFoundException if the element with the given key doesn't exist
    */
-  default V compute(long key, Consumer<V> transformer) {
-    return executeTransaction(() -> {
-      V cachedObj = getCache().get(key);
-      transformer.accept(cachedObj);
-      put(key, cachedObj); // TODO Write tests that verify this doesn't force cause a deadlock, as put will also get the obj
-      return cachedObj;
-    });
-  }
+  CACHEABLE compute(long key, Consumer<CACHEABLE> transformer);
 
   /**
    * Search the cache for objects that satisfy the given filter. More formally, the returned collection
@@ -116,7 +103,7 @@ public interface C2monCache<V extends Cacheable> extends CacheDelegator<V>, Seri
    * @return a {@code Collection} of results, may be empty, never null
    * @throws NullPointerException when {@code filter} is null
    */
-  Collection<V> query(@NonNull Function<V, Boolean> filter) throws NullPointerException;
+  Collection<CACHEABLE> query(@NonNull Function<CACHEABLE, Boolean> filter) throws NullPointerException;
 
   /**
    * Overload of {@link C2monCache#query(Function)} allowing the user to provide additional search parameters
@@ -126,7 +113,7 @@ public interface C2monCache<V extends Cacheable> extends CacheDelegator<V>, Seri
    * @throws NullPointerException when {@code providedQuery} is null
    * @see C2monCache#query(Function)
    */
-  Collection<V> query(@NonNull CacheQuery<V> providedQuery) throws NullPointerException;
+  Collection<CACHEABLE> query(@NonNull CacheQuery<CACHEABLE> providedQuery) throws NullPointerException;
 
   /**
    * Put an element to the cache - inserts or updates if the element existed already
@@ -135,62 +122,5 @@ public interface C2monCache<V extends Cacheable> extends CacheDelegator<V>, Seri
    *
    * @throws NullPointerException when {@code value} is null
    */
-  default void putQuiet(long key, @NonNull V value) throws NullPointerException {
-    put(key, value, false);
-  }
-
-  default void put(long key, @NonNull V value, boolean notifyListeners) {
-    value.setCacheTimestamp(new Timestamp(System.currentTimeMillis()));
-    executeTransaction(() -> {
-      // Using this getter to avoid having to catch CacheElementNotFoundException
-      // thrown by our own Cache.get
-      V previous = getCache().get(key);
-      if (getCacheUpdateFlow().preInsertValidate(previous, value)) {
-        // We're in a transaction, so this can't have been modified
-        getCache().put(key, value);
-        if (notifyListeners) {
-          notifyListenersOf(UPDATE_ACCEPTED, value);
-          getCacheUpdateFlow().postInsertEvents(previous, value).forEach(event -> notifyListenersOf(event, value));
-        }
-      } else if (notifyListeners) {
-        notifyListenersOf(UPDATE_REJECTED, value);
-      }
-    });
-  }
-
-  // === Section: C2MON overrides of javax.cache.Cache methods ===
-
-  /**
-   * @throws CacheElementNotFoundException when no value was found mapped to this key
-   * @throws NullPointerException          when {@code key} is null
-   */
-  @Override
-  default V get(@NonNull Long key) throws NullPointerException, CacheElementNotFoundException {
-    requireNonNull(key);
-    V result = getCache().get(key);
-    if (result == null)
-      throw new CacheElementNotFoundException("Did not find value for key: " + key);
-    return result;
-  }
-
-  /**
-   * Put an element to the cache - inserts or updates if the element existed already
-   * <p>
-   * Will generate {@link CacheEvent#UPDATE_ACCEPTED} events for all registered listeners
-   *
-   * @see C2monCache#putQuiet(long, Cacheable) to put without notifying
-   */
-  @Override
-  default void put(@NonNull Long key, @NonNull V value) throws NullPointerException {
-    put(key, value, true);
-  }
-
-  @Override
-  default void close() {
-    // It's quite possible that the cache is already closed, so check first
-    synchronized (this) {
-      if (!getCache().isClosed())
-        getCache().close();
-    }
-  }
+  void putQuiet(long key, @NonNull CACHEABLE value) throws NullPointerException;
 }

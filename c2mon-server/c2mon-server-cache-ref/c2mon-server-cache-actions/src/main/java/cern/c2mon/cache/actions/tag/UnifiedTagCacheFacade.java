@@ -2,6 +2,7 @@ package cern.c2mon.cache.actions.tag;
 
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
+import cern.c2mon.cache.api.listener.BufferedCacheListener;
 import cern.c2mon.cache.api.listener.CacheListener;
 import cern.c2mon.cache.api.listener.CacheListenerManager;
 import cern.c2mon.server.common.datatag.DataTag;
@@ -48,12 +49,16 @@ public class UnifiedTagCacheFacade implements CacheListenerManager<Tag> {
   }
 
   @Override
-  public void registerListener(CacheListener listener, CacheEvent... events) {
-    tagCaches.forEach(cache -> cache.registerListener(listener, events));
+  public void registerListener(CacheListener<Tag> listener, CacheEvent... events) {
+    tagCaches.forEach(cache -> cache.getCacheListenerManager().registerListener(listener, events));
   }
 
   @Override
-  public void deregisterListener(CacheListener listener) {
-    tagCaches.forEach(cache -> cache.deregisterListener(listener));
+  public void registerBufferedListener(BufferedCacheListener<Tag> listener, CacheEvent... events) {
+  }
+
+  @Override
+  public void close() {
+    tagCaches.forEach(cache -> cache.getCacheListenerManager().close());
   }
 }

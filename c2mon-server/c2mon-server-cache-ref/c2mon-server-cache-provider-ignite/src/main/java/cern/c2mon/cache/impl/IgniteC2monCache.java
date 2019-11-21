@@ -1,15 +1,9 @@
 package cern.c2mon.cache.impl;
 
-import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.cache.api.flow.C2monCacheUpdateFlow;
-import cern.c2mon.cache.api.flow.DefaultC2monCacheFlow;
-import cern.c2mon.cache.api.listener.CacheListenerManager;
-import cern.c2mon.cache.api.listener.CacheListenerManagerImpl;
-import cern.c2mon.cache.api.loader.CacheLoader;
+import cern.c2mon.cache.api.C2monCacheimpl;
 import cern.c2mon.cache.api.spi.CacheQuery;
 import cern.c2mon.shared.common.Cacheable;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ignite.Ignite;
 import org.apache.ignite.IgniteCache;
@@ -31,33 +25,22 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 /**
- * @param <V>
  * @author Alexandros Papageorgiou Koufidis
  */
 @Slf4j
-public class IgniteC2monCache<V extends Cacheable> implements C2monCache<V> {
+public class IgniteC2monCache<V extends Cacheable> extends C2monCacheimpl<V> {
 
   protected final String cacheName;
   private final Ignite igniteInstance;
-
-  @Getter
-  @Setter
-  protected C2monCacheUpdateFlow<V> cacheUpdateFlow = new DefaultC2monCacheFlow<>();
-
-  @Getter
-  @Setter
-  protected CacheLoader<V> cacheLoader;
 
   protected CacheConfiguration<Long, V> cacheCfg;
 
   @Getter
   protected IgniteCache<Long, V> cache;
 
-  @Getter
-  private CacheListenerManager<V> cacheListenerManager = new CacheListenerManagerImpl<>();
-
 
   public IgniteC2monCache(String cacheName, CacheConfiguration<Long, V> cacheCfg, Ignite igniteInstance) {
+    super(cacheName, null); // Cache is not yet ready!
     this.cacheName = cacheName;
     this.cacheCfg = cacheCfg;
     this.igniteInstance = igniteInstance;
@@ -76,8 +59,6 @@ public class IgniteC2monCache<V extends Cacheable> implements C2monCache<V> {
 
   /**
    * Custom implementation to get slightly increased performance and less memory on this query
-   *
-   * @return
    */
   @Override
   public Set<Long> getKeys() {

@@ -1,25 +1,44 @@
-package cern.c2mon.cache;
+package cern.c2mon.cache.actions.listener;
 
 import cern.c2mon.cache.actions.supervision.SupervisedCacheService;
+import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.listener.CacheListener;
+import cern.c2mon.cache.api.listener.CacheListenerManagerImpl;
 import cern.c2mon.server.common.supervision.Supervised;
 import cern.c2mon.shared.common.CacheEvent;
+import lombok.AccessLevel;
+import lombok.Getter;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import static org.junit.Assert.assertEquals;
 
-public abstract class SupervisedServiceListenerTest<T extends Supervised> extends MultiThreadCacheListenerTest<T> {
+public abstract class SupervisedServiceListenerTest<T extends Supervised> {
+
+  private final AtomicInteger eventCounter = new AtomicInteger(0);
+  private final CacheListener<T> paramListener = eq -> eventCounter.incrementAndGet();
 
   protected SupervisedCacheService<T> supervisedService;
 
+  @Getter(AccessLevel.PROTECTED)
+  protected C2monCache<T> cache;
+
+  @Getter(AccessLevel.PROTECTED)
+  protected T sample;
+
   protected abstract SupervisedCacheService<T> getSupervisedService();
 
-  // TODO Test with other kinds of listeners too?
+  protected abstract C2monCache<T> initCache();
+
+  // TODO (Alex) Test with other kinds of listeners too?
 
   @Before
-  @Override
-  public void resetResults() {
-    super.resetResults();
+  public void init() {
+    cache = initCache();
+    cache.setCacheListenerManager(new CacheListenerManagerImpl<>());
+    eventCounter.set(0);
     supervisedService = getSupervisedService();
   }
 
@@ -28,12 +47,12 @@ public abstract class SupervisedServiceListenerTest<T extends Supervised> extend
     // Generates one supervision update event, we don't listen yet
     cache.put(1L, sample);
 
-    cache.registerListener(paramListener, CacheEvent.SUPERVISION_UPDATE);
+    cache.getCacheListenerManager().registerListener(paramListener, CacheEvent.SUPERVISION_UPDATE);
 
     // Should generate exactly one event
     supervisedService.refresh(sample.getId());
 
-    paramListener.close();
+    cache.getCacheListenerManager().close();
 
     assertEquals(1, eventCounter.get());
   }
@@ -54,24 +73,12 @@ public abstract class SupervisedServiceListenerTest<T extends Supervised> extend
   }
 
   @Test
-  public void supervisionChangePassesCloneObject() {
-    registerListenerAndPut(mutatingListener, CacheEvent.SUPERVISION_CHANGE);
-
-    assertEquals(1, eventCounter.get());
-    assertEquals(sample, cache.get(sample.getId()));
-  }
-
-  @Test
   public void supervisionUpdateNotification() {
     registerListenerAndPut(paramListener, CacheEvent.SUPERVISION_UPDATE);
     assertEquals(1, eventCounter.get());
   }
 
-  @Test
-  public void supervisionUpdatePassesCloneObject() {
-    registerListenerAndPut(mutatingListener, CacheEvent.SUPERVISION_UPDATE);
+  private void registerListenerAndPut(CacheListener<T> cacheListener, CacheEvent... cacheEvents) {
 
-    assertEquals(1, eventCounter.get());
-    assertEquals(sample, cache.get(sample.getId()));
   }
 }

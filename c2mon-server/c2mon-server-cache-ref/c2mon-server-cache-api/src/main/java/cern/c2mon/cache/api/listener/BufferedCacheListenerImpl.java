@@ -9,16 +9,22 @@ import java.util.concurrent.ExecutorService;
 
 final class BufferedCacheListenerImpl<CACHEABLE extends Cacheable> implements CacheListener<CACHEABLE>, Runnable {
 
+  private static final int DEFAULT_MAX_SIZE = 100_000;
+  //  TODO (Alex) This could be a set, to eliminate duplicates
   private final List<CACHEABLE> items = Collections.synchronizedList(new ArrayList<>());
   private final ExecutorService centralizedExecutorService;
-  private static final int DEFAULT_MAX_SIZE = 100_000;
   private BufferedCacheListener<CACHEABLE> eventHandler;
 
-  BufferedCacheListenerImpl(ExecutorService centralizedExecutorService, BufferedCacheListener<CACHEABLE> eventHandler) {
-    this.centralizedExecutorService = centralizedExecutorService;
+  BufferedCacheListenerImpl(ExecutorService executorService, BufferedCacheListener<CACHEABLE> eventHandler) {
+    this.centralizedExecutorService = executorService;
     this.eventHandler = eventHandler;
   }
 
+  /**
+   * Accepts an object and adds it to the internal buffer list, to process collectively later
+   *
+   * @param cacheable the item, after whatever event happened that has triggered this action
+   */
   @Override
   public final void apply(CACHEABLE cacheable) {
     items.add(cacheable);
