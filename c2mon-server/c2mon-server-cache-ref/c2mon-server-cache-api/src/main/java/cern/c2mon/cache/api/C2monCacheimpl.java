@@ -13,7 +13,6 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.cache.Cache;
 import java.sql.Timestamp;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -29,9 +28,6 @@ public abstract class C2monCacheimpl<CACHEABLE extends Cacheable> implements C2m
   protected final String cacheName;
 
   @Getter
-  protected final Cache<Long, CACHEABLE> cache;
-
-  @Getter
   @Setter
   protected CacheUpdateFlow<CACHEABLE> cacheUpdateFlow = new DefaultC2monCacheFlow<>();
 
@@ -43,9 +39,8 @@ public abstract class C2monCacheimpl<CACHEABLE extends Cacheable> implements C2m
   @Setter
   protected CacheListenerManager<CACHEABLE> cacheListenerManager = new CacheListenerManagerImpl<>();
 
-  public C2monCacheimpl(String cacheName, Cache<Long, CACHEABLE> cache) {
+  public C2monCacheimpl(String cacheName) {
     this.cacheName = cacheName;
-    this.cache = cache;
   }
 
   @Override
@@ -64,7 +59,7 @@ public abstract class C2monCacheimpl<CACHEABLE extends Cacheable> implements C2m
   @Override
   public CACHEABLE compute(long key, Consumer<CACHEABLE> transformer) {
     return executeTransaction(() -> {
-      CACHEABLE cachedObj = cache.get(key);
+      CACHEABLE cachedObj = getCache().get(key);
       transformer.accept(cachedObj);
       put(key, cachedObj); // TODO Write tests that verify this doesn't force cause a deadlock, as put will also get the obj
       return cachedObj;
@@ -93,10 +88,10 @@ public abstract class C2monCacheimpl<CACHEABLE extends Cacheable> implements C2m
     executeTransaction(() -> {
       // Using this getter to avoid having to catch CacheElementNotFoundException
       // thrown by our own Cache.get
-      CACHEABLE previous = cache.get(key);
+      CACHEABLE previous = getCache().get(key);
       if (getCacheUpdateFlow().preInsertValidate(previous, value)) {
         // We're in a transaction, so this can't have been modified
-        cache.put(key, value);
+        getCache().put(key, value);
         if (notifyListeners) {
           getCacheListenerManager().notifyListenersOf(UPDATE_ACCEPTED, value);
           getCacheUpdateFlow().postInsertEvents(previous, value)
@@ -115,7 +110,7 @@ public abstract class C2monCacheimpl<CACHEABLE extends Cacheable> implements C2m
   @Override
   public CACHEABLE get(@NonNull Long key) throws NullPointerException, CacheElementNotFoundException {
     requireNonNull(key);
-    CACHEABLE result = cache.get(key);
+    CACHEABLE result = getCache().get(key);
     if (result == null)
       throw new CacheElementNotFoundException("Did not find value for key: " + key);
     return result;
@@ -125,8 +120,8 @@ public abstract class C2monCacheimpl<CACHEABLE extends Cacheable> implements C2m
   public void close() {
     // It's quite possible that the cache is already closed, so check first
     synchronized (this) {
-      if (!cache.isClosed())
-        cache.close();
+      if (!getCache().isClosed())
+        getCache().close();
       // TODO (Alex) Close listener manager?
     }
   }

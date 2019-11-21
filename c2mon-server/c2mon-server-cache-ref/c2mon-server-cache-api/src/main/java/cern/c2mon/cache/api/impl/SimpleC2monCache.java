@@ -20,11 +20,11 @@ import java.util.stream.Collectors;
 public class SimpleC2monCache<V extends Cacheable> extends C2monCacheimpl<V> {
 
   @Getter
-  private final MapBasedCache<V> mapBasedCache;
+  private final MapBasedCache<V> cache;
 
   public SimpleC2monCache(String cacheName) {
-    super(cacheName, new MapBasedCache<>());
-    mapBasedCache = (MapBasedCache<V>) cache;
+    super(cacheName);
+    cache = new MapBasedCache<>();
   }
 
   @Override
@@ -34,7 +34,7 @@ public class SimpleC2monCache<V extends Cacheable> extends C2monCacheimpl<V> {
 
   @Override
   public Set<Long> getKeys() {
-    return mapBasedCache.getMap().keySet();
+    return cache.getMap().keySet();
   }
 
   @Override
@@ -56,8 +56,8 @@ public class SimpleC2monCache<V extends Cacheable> extends C2monCacheimpl<V> {
   public void close() {
     // It's quite possible that the cache is already closed, so check first
     synchronized (this) {
-      if (!mapBasedCache.isClosed())
-        mapBasedCache.close();
+      if (!cache.isClosed())
+        cache.close();
       // TODO (Alex) Close listener manager?
     }
   }

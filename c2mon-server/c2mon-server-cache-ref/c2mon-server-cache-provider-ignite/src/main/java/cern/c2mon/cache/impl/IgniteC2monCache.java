@@ -38,16 +38,15 @@ public class IgniteC2monCache<V extends Cacheable> extends C2monCacheimpl<V> {
   @Getter
   protected IgniteCache<Long, V> cache;
 
-
   public IgniteC2monCache(String cacheName, CacheConfiguration<Long, V> cacheCfg, Ignite igniteInstance) {
-    super(cacheName, null); // Cache is not yet ready!
+    super(cacheName); // Cache is not yet ready!
     this.cacheName = cacheName;
     this.cacheCfg = cacheCfg;
     this.igniteInstance = igniteInstance;
   }
 
-  @Override
   @PostConstruct
+  @Override
   public void init() {
     igniteInstance.addCacheConfiguration(cacheCfg);
     cache = igniteInstance.getOrCreateCache(cacheName);
