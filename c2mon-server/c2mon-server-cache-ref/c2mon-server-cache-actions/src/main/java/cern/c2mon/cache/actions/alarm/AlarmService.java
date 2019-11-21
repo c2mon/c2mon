@@ -5,8 +5,6 @@ import cern.c2mon.cache.actions.oscillation.OscillationUpdater;
 import cern.c2mon.cache.actions.tag.UnifiedTagCacheFacade;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
-import cern.c2mon.cache.api.listener.impl.MultiThreadListener;
-import cern.c2mon.cache.api.listener.impl.SingleThreadListener;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.TagWithAlarms;

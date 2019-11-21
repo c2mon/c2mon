@@ -1,7 +1,5 @@
 package cern.c2mon.cache;
 
-import cern.c2mon.cache.api.listener.impl.AbstractCacheListener;
-import cern.c2mon.cache.api.listener.impl.MultiThreadListener;
 import cern.c2mon.shared.common.Cacheable;
 
 public abstract class MultiThreadCacheListenerTest<V extends Cacheable> extends AbstractCacheListenerTest<V> {

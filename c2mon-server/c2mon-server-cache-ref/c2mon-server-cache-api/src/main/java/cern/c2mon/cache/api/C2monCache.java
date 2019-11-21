@@ -2,7 +2,6 @@ package cern.c2mon.cache.api;
 
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.cache.api.flow.C2monCacheUpdateFlow;
-import cern.c2mon.cache.api.listener.ListenerDelegator;
 import cern.c2mon.cache.api.loader.CacheLoader;
 import cern.c2mon.cache.api.spi.CacheQuery;
 import cern.c2mon.shared.common.CacheEvent;

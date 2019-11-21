@@ -3,11 +3,20 @@ package cern.c2mon.cache.api.listener;
 import cern.c2mon.shared.common.CacheEvent;
 import cern.c2mon.shared.common.Cacheable;
 
-public interface CacheListenerManager<V extends Cacheable> {
+import java.io.Closeable;
 
-  void notifyListenersOf(CacheEvent event, V source);
+public interface CacheListenerManager<CACHEABLE extends Cacheable> extends Closeable {
 
-  void registerListener(CacheListener<V> listener, CacheEvent... events);
+  void notifyListenersOf(CacheEvent event, CACHEABLE source);
 
-  void deregisterListener(CacheListener<V> listener);
+  void registerListener(CacheListener<CACHEABLE> listener, CacheEvent... events);
+
+  /**
+   * An alternative cache listener, that collects all incoming updates to a list, then periodically runs an event handler
+   * on that list
+   *
+   * Use buffered listeners to increase performance for very busy caches with loads of updates,
+   * or for operations optimized for {@code Collection}s
+   */
+  void registerBufferedListener(BufferedCacheListener<CACHEABLE> listener, CacheEvent... events);
 }

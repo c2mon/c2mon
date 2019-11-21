@@ -1,7 +1,6 @@
 package cern.c2mon.cache;
 
 import cern.c2mon.cache.api.listener.CacheListener;
-import cern.c2mon.cache.api.listener.impl.AbstractCacheListener;
 import cern.c2mon.shared.common.CacheEvent;
 import cern.c2mon.shared.common.Cacheable;
 import org.junit.After;
