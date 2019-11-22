@@ -16,36 +16,23 @@
  *****************************************************************************/
 package cern.c2mon.server.supervision.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-
-import java.sql.Timestamp;
-
 import cern.c2mon.server.cache.config.CacheModule;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.common.config.CommonModule;
+import cern.c2mon.server.supervision.SupervisionManager;
 import cern.c2mon.server.supervision.config.SupervisionModule;
 import cern.c2mon.server.supervision.junit.SupervisionCachePopulationRule;
+import cern.c2mon.shared.daq.process.*;
+import org.junit.Before;
 import org.junit.Rule;
+import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import cern.c2mon.server.supervision.SupervisionManager;
-import cern.c2mon.shared.daq.process.ProcessConfigurationRequest;
-import cern.c2mon.shared.daq.process.ProcessConfigurationResponse;
-import cern.c2mon.shared.daq.process.ProcessConnectionRequest;
-import cern.c2mon.shared.daq.process.ProcessConnectionResponse;
-import cern.c2mon.shared.daq.process.ProcessDisconnectionRequest;
-import cern.c2mon.shared.daq.process.XMLConverter;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Integration test of supervision module for all Process Messaging (PIK, Connection, Disconnection)
@@ -71,19 +58,8 @@ public class SupervisionManagerProcessTest {
    */
   private static final Logger LOGGER = LoggerFactory.getLogger(SupervisionManagerProcessTest.class);
 
-
   @Autowired
   private SupervisionManager supervisionManager;
-
-  /**
-   * Constant of GOOD_PROCESSNAME
-   */
-  private static final String GOOD_PROCESSNAME = "P_TESTHANDLER03";
-
-  /**
-   * Constant of BAD_PROCESSNAME
-   */
-  private static final String BAD_PROCESSNAME = "P_TESTNACHO";
 
   /**
    * Constant of the NO_PIK as default value
@@ -123,245 +99,24 @@ public class SupervisionManagerProcessTest {
 
   @Before
   public void setUp() {
-    this.processConnectionRequest = null;
-    this.processConnectionResponse = null;
-    this.processConfigurationRequest = null;
-    this.processConfigurationResponse = null;
-    this.processDisconnectionRequest = null;
-//    this.processDisconnectionBC = null;
+    processConnectionRequest = null;
+    processConnectionResponse = null;
+    processConfigurationRequest = null;
+    processConfigurationResponse = null;
+    processDisconnectionRequest = null;
+//    processDisconnectionBC = null;
   }
 
 //  @After
 //  public void disconnection() {
 //    // Disconnection
-//    if((this.processConnectionResponse != null) && (this.processConnectionRequest != null) /*&& (this.processDisconnectionBC == null)*/) {
-//      this.processDisconnectionRequest = new ProcessDisconnectionRequest(GOOD_PROCESSNAME, this.processConnectionResponse.getProcessPIK(),
-//          this.processConnectionRequest.getProcessStartupTime().getTime());
+//    if((processConnectionResponse != null) && (processConnectionRequest != null) /*&& (processDisconnectionBC == null)*/) {
+//      processDisconnectionRequest = new ProcessDisconnectionRequest(GOOD_PROCESSNAME, processConnectionResponse.getProcessPIK(),
+//          processConnectionRequest.getProcessStartupTime().getTime());
 //
 //      onProcessDisconnection();
 //    }
 //  }
-
-  @Test
-  public void testOnProcessConnectionNull() {
-    LOGGER.info("Starting test testOnProcessConnectionNull");
-    this.processConnectionRequest = null;
-
-    onProcessConnection();
-
-    assertEquals(this.processConnectionResponse.getProcessPIK(), ProcessConnectionResponse.PIK_REJECTED);
-  }
-
-  @Test
-  public void testOnProcessConnectionBadProcessName() {
-    LOGGER.info("Starting test testOnProcessConnectionBadProcessName");
-    this.processConnectionRequest = new ProcessConnectionRequest(BAD_PROCESSNAME);
-
-    onProcessConnection();
-
-    assertEquals(this.processConnectionResponse.getProcessPIK(), ProcessConnectionResponse.PIK_REJECTED);
-  }
-
-  @Test
-  public void testOnProcessConnectionRunningProcess() {
-    LOGGER.info("Starting test testOnProcessConnectionRunningProcess");
-    this.processConnectionRequest = new ProcessConnectionRequest(GOOD_PROCESSNAME);
-
-    // Run the process the first time
-    onProcessConnection();
-
-    // PIK not rejected first attempt
-    assertFalse(this.processConnectionResponse.getProcessPIK().equals(ProcessConnectionResponse.PIK_REJECTED));
-
-
-    // Second time the process is still running
-    onProcessConnection();
-
-    // PIK rejected second attempt
-    assertEquals(this.processConnectionResponse.getProcessPIK(), ProcessConnectionResponse.PIK_REJECTED);
-  }
-
-  @Test
-  public void testOnProcessConnection() {
-    LOGGER.info("Starting test testOnProcessConnection");
-    this.processConnectionRequest = new ProcessConnectionRequest(GOOD_PROCESSNAME);
-
-    onProcessConnection();
-
-    assertFalse(this.processConnectionResponse.getProcessName().equals(ProcessConnectionResponse.NO_PROCESS));
-    assertEquals(this.processConnectionRequest.getProcessName(), this.processConnectionResponse.getProcessName());
-    assertFalse(this.processConnectionResponse.getProcessPIK().equals(ProcessConnectionResponse.NO_PIK));
-    assertFalse(this.processConnectionResponse.getProcessPIK().equals(ProcessConnectionResponse.PIK_REJECTED));
-  }
-
-  @Test
-  public void testOnProcessConfigurationNull() {
-    LOGGER.info("Starting test testOnProcessConfigurationNull");
-
-    this.processConfigurationRequest = null;
-
-    onProcessConfiguration();
-
-    assertEquals(processConfigurationResponse.getConfigurationXML(), ProcessConfigurationResponse.CONF_REJECTED);
-  }
-
-  @Test
-  public void testOnProcessConfigurationBadProcessName() {
-    LOGGER.info("Starting test testOnProcessConfigurationBadProcessName");
-    this.processConfigurationRequest = new ProcessConfigurationRequest(BAD_PROCESSNAME);
-    onProcessConfiguration();
-
-    assertEquals(this.processConfigurationResponse.getConfigurationXML(), ProcessConfigurationResponse.CONF_REJECTED);
-  }
-
-  @Test
-  public void testOnProcessConfigurationGoodPIK() {
-    LOGGER.info("Starting test testOnProcessConfigurationGoodPIK");
-    this.processConnectionRequest = new ProcessConnectionRequest(GOOD_PROCESSNAME);
-
-    onProcessConnection();
-
-    assertEquals(this.processConnectionRequest.getProcessName(), this.processConnectionResponse.getProcessName());
-    assertFalse(this.processConnectionResponse.getProcessPIK().equals(ProcessConnectionResponse.PIK_REJECTED));
-
-    // Configuration
-    this.processConfigurationRequest = new ProcessConfigurationRequest(this.processConnectionResponse.getProcessName());
-    onProcessConfiguration();
-
-    assertFalse(this.processConfigurationResponse.getConfigurationXML().equals(ProcessConfigurationResponse.CONF_REJECTED));
-  }
-
-  @Test
-  public void testOnProcessDisconnectionNull() {
-    LOGGER.info("Starting test testOnProcessDisconnectionNull");
-
-    this.processConnectionRequest = new ProcessConnectionRequest(GOOD_PROCESSNAME);
-    onProcessConnection();
-
-    this.processDisconnectionRequest = null;
-    onProcessDisconnection();
-
-    // Save the good PIK for the process running (for farther disconnection)
-    Long goodPIK = this.processConnectionResponse.getProcessPIK();
-
-    // Ignoring disconnection so new Connection will failed
-    onProcessConnection();
-
-    // PIK rejected second attempt
-    assertEquals(this.processConnectionResponse.getProcessPIK(), ProcessConnectionResponse.PIK_REJECTED);
-
-    // Set process PIK for correct disconnection
-    this.processConnectionResponse.setprocessPIK(goodPIK);
-  }
-
-  @Test
-  public void testOnProcessDisconnectionNoProcessNameAndID() {
-    LOGGER.info("Starting test testOnProcessDisconnectionNoProcessNameAndID");
-
-    this.processConnectionRequest = new ProcessConnectionRequest(GOOD_PROCESSNAME);
-    onProcessConnection();
-
-    this.processDisconnectionRequest = new ProcessDisconnectionRequest();
-    onProcessDisconnection();
-
-    // Save the good PIK for the process running (for farther disconnection)
-    Long goodPIK = this.processConnectionResponse.getProcessPIK();
-
-    // CacheElementNotFoundException cause it will not find anything in cache (neither process name nor ID)
-    // New Connection will failed
-    onProcessConnection();
-
-    // PIK rejected second attempt
-    assertEquals(this.processConnectionResponse.getProcessPIK(), ProcessConnectionResponse.PIK_REJECTED);
-
-    // Set process PIK for correct disconnection
-    this.processConnectionResponse.setprocessPIK(goodPIK);
-  }
-
-  @Test
-  public void testOnProcessDisconnectionBadPIK() {
-    LOGGER.info("Starting test testOnProcessDisconnectionBadPIK");
-
-    this.processConnectionRequest = new ProcessConnectionRequest(GOOD_PROCESSNAME);
-    onProcessConnection();
-
-    this.processDisconnectionRequest = new ProcessDisconnectionRequest(GOOD_PROCESSNAME, NO_PIK,
-        this.processConnectionRequest.getProcessStartupTime().getTime());
-
-    onProcessDisconnection();
-
-    // Save the good PIK for the process running (for farther disconnection)
-    Long goodPIK = this.processConnectionResponse.getProcessPIK();
-
-    // Ignoring disconnection so new Connection will failed
-    onProcessConnection();
-
-    // PIK rejected second attempt
-    assertEquals(this.processConnectionResponse.getProcessPIK(), ProcessConnectionResponse.PIK_REJECTED);
-
-    // Set process PIK for correct disconnection
-    this.processConnectionResponse.setprocessPIK(goodPIK);
-  }
-
-  @Test
-  public void testOnProcessDisconnectionBadStartUpTime() {
-    LOGGER.info("Starting test testOnProcessDisconnectionBadStartUpTime");
-
-    this.processConnectionRequest = new ProcessConnectionRequest(GOOD_PROCESSNAME);
-
-    onProcessConnection();
-
-    this.processDisconnectionRequest = new ProcessDisconnectionRequest(GOOD_PROCESSNAME, this.processConnectionResponse.getProcessPIK(),
-        new Timestamp(System.currentTimeMillis()).getTime());
-
-    onProcessDisconnection();
-
-    // Nothing happens
-  }
-
-  @Test
-  public void testOnProcessDisconnectionStoppedProcess() {
-    LOGGER.info("Starting test testOnProcessDisconnectionStoppedProcess");
-
-    this.processConnectionRequest = new ProcessConnectionRequest(GOOD_PROCESSNAME);
-    onProcessConnection();
-
-    this.processDisconnectionRequest = new ProcessDisconnectionRequest(GOOD_PROCESSNAME, this.processConnectionResponse.getProcessPIK(),
-        this.processConnectionRequest.getProcessStartupTime().getTime());
-
-    // First disconnection
-    onProcessDisconnection();
-
-    // Second disconnection
-    onProcessDisconnection();
-
-    // Nothing happens
-  }
-
-  @Test
-  public void testCompleteConnectionProcess() {
-    LOGGER.info("Starting test testCompleteConnectionProcess");
-
-    // Connection
-    this.processConnectionRequest = new ProcessConnectionRequest(GOOD_PROCESSNAME);
-    onProcessConnection();
-
-    assertFalse(this.processConnectionResponse.getProcessName().equals(ProcessConnectionResponse.NO_PROCESS));
-    assertEquals(this.processConnectionRequest.getProcessName(), this.processConnectionResponse.getProcessName());
-    assertFalse(this.processConnectionResponse.getProcessPIK().equals(ProcessConnectionResponse.NO_PIK));
-    assertFalse(this.processConnectionResponse.getProcessPIK().equals(ProcessConnectionResponse.PIK_REJECTED));
-
-    // Configuration
-    this.processConfigurationRequest = new ProcessConfigurationRequest(processConnectionResponse.getProcessName());
-    this.processConfigurationRequest.setprocessPIK(this.processConnectionResponse.getProcessPIK());
-    onProcessConfiguration();
-
-    assertFalse(this.processConfigurationResponse.getProcessName().equals(ProcessConfigurationResponse.NO_PROCESS));
-    assertFalse(this.processConfigurationResponse.getConfigurationXML().equals(ProcessConfigurationResponse.NO_XML));
-    assertFalse(this.processConfigurationResponse.getConfigurationXML().equals(ProcessConfigurationResponse.CONF_REJECTED));
-
-    // Disconnection done automatic for every test
-  }
 
   /**
    * Process Connection call
@@ -369,21 +124,21 @@ public class SupervisionManagerProcessTest {
   public void onProcessConnection() {
     LOGGER.info("onProcessConnection - Connection");
 
-    LOGGER.info("{}", this.processConnectionRequest);
+    LOGGER.info("{}", processConnectionRequest);
 
-    String xmlprocessConnectionResponse = this.supervisionManager.onProcessConnection(this.processConnectionRequest);
+    String xmlprocessConnectionResponse = supervisionManager.onProcessConnection(processConnectionRequest);
     assertNotNull(xmlprocessConnectionResponse);
 
     LOGGER.info(xmlprocessConnectionResponse);
 
     try {
-      this.processConnectionResponse = (ProcessConnectionResponse) this.xmlConverter.fromXml(xmlprocessConnectionResponse);
+      processConnectionResponse = (ProcessConnectionResponse) xmlConverter.fromXml(xmlprocessConnectionResponse);
     }
     catch (Exception e) {
       LOGGER.error(e.toString());
     }
-    assertNotNull(this.processConnectionResponse);
-    LOGGER.info(this.processConnectionResponse.toString());
+    assertNotNull(processConnectionResponse);
+    LOGGER.info(processConnectionResponse.toString());
   }
 
   /**
@@ -392,20 +147,20 @@ public class SupervisionManagerProcessTest {
   public void onProcessConfiguration() {
     LOGGER.info("onProcessConfiguration - Configuration");
 
-    LOGGER.info("{}", this.processConnectionRequest);
+    LOGGER.info("{}", processConnectionRequest);
 
-    String xmlProcessConfigurationResponse = this.supervisionManager.onProcessConfiguration(this.processConfigurationRequest);
+    String xmlProcessConfigurationResponse = supervisionManager.onProcessConfiguration(processConfigurationRequest);
     assertNotNull(xmlProcessConfigurationResponse);
     LOGGER.info(xmlProcessConfigurationResponse);
 
     try {
-      this.processConfigurationResponse = (ProcessConfigurationResponse) this.xmlConverter.fromXml(xmlProcessConfigurationResponse);
+      processConfigurationResponse = (ProcessConfigurationResponse) xmlConverter.fromXml(xmlProcessConfigurationResponse);
     }
     catch (Exception e) {
       LOGGER.error(e.toString());
     }
-    assertNotNull(this.processConfigurationResponse);
-    LOGGER.info(this.processConfigurationResponse.toString());
+    assertNotNull(processConfigurationResponse);
+    LOGGER.info(processConfigurationResponse.toString());
   }
 
   /**
@@ -414,8 +169,8 @@ public class SupervisionManagerProcessTest {
   public void onProcessDisconnection() {
     LOGGER.info("Disconnection");
 
-    LOGGER.info("{}", this.processConnectionRequest);
+    LOGGER.info("{}", processConnectionRequest);
 
-    this.supervisionManager.onProcessDisconnection(this.processDisconnectionRequest);
+    supervisionManager.onProcessDisconnection(processDisconnectionRequest);
   }
 }

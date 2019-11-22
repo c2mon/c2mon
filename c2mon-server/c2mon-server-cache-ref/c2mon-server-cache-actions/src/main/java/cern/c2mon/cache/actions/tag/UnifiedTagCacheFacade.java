@@ -4,7 +4,6 @@ import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.cache.api.listener.BufferedCacheListener;
 import cern.c2mon.cache.api.listener.CacheListener;
-import cern.c2mon.cache.api.listener.CacheListenerManager;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.tag.Tag;
@@ -21,7 +20,7 @@ import java.util.List;
  * @author Alexandros Papageorgiou Koufidis
  */
 @Service
-public class UnifiedTagCacheFacade implements CacheListenerManager<Tag> {
+public class UnifiedTagCacheFacade {
 
   private final List<C2monCache<? extends Tag>> tagCaches;
 
@@ -39,25 +38,15 @@ public class UnifiedTagCacheFacade implements CacheListenerManager<Tag> {
     throw new CacheElementNotFoundException();
   }
 
-  @Override
-  public void notifyListenersOf(CacheEvent event, Tag source) {
-    // This should not be called directly. The listeners are automatically doing this, if registered
-    // Currently leaving this as an exception to see if the control flow gets here
-    throw new UnsupportedOperationException(
-      "Attempting to call listeners on the tag cache facade, instead of the real caches. " +
-        "This operation is not allowed");
-  }
-
-  @Override
-  public void registerListener(CacheListener<Tag> listener, CacheEvent... events) {
+  public void registerListener(CacheListener listener, CacheEvent... events) {
+    // TODO (Alex) Fix the type safety here
     tagCaches.forEach(cache -> cache.getCacheListenerManager().registerListener(listener, events));
   }
 
-  @Override
-  public void registerBufferedListener(BufferedCacheListener<Tag> listener, CacheEvent... events) {
+  public void registerBufferedListener(BufferedCacheListener listener, CacheEvent... events) {
+    tagCaches.forEach(cache -> cache.getCacheListenerManager().registerBufferedListener(listener, events));
   }
 
-  @Override
   public void close() {
     tagCaches.forEach(cache -> cache.getCacheListenerManager().close());
   }

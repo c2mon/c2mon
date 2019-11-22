@@ -62,7 +62,7 @@ public abstract class AbstractSupervisedService<T extends Supervised> extends Ab
 
   @Override
   public T resume(long id, Timestamp timestamp, String message) {
-    dataTagService.resetQualityToValid(); // TODO (Alex) Figure out how to get the datatag for a Supervised
+//    dataTagService.resetQualityToValid(); TODO (Alex) Figure out how to get the datatag for a Supervised
 
     return cache.compute(id,supervised -> {
       if (!supervised.getSupervisionStatus().equals(SupervisionStatus.RUNNING)) {

@@ -47,9 +47,9 @@ public class AlarmService extends AbstractCacheServiceImpl<Alarm> implements Ala
 
   @PostConstruct
   public void init() {
-    unifiedTagCacheFacade.registerListener(this::supervisionChangeListener, CacheEvent.SUPERVISION_CHANGE);
-
-    unifiedTagCacheFacade.registerListener(this::updateAcceptedListener, CacheEvent.UPDATE_ACCEPTED);
+//    TODO (Alex) Reactivate these with type safety
+//    unifiedTagCacheFacade.registerListener(tag -> supervisionChangeListener(tag), CacheEvent.SUPERVISION_CHANGE);
+//    unifiedTagCacheFacade.registerListener(this::updateAcceptedListener, CacheEvent.UPDATE_ACCEPTED);
   }
 
   /**
