@@ -1,6 +1,8 @@
 package cern.c2mon.cache.actions.datatag;
 
 import cern.c2mon.cache.actions.equipment.BaseEquipmentServiceImpl;
+import cern.c2mon.cache.actions.equipment.EquipmentService;
+import cern.c2mon.cache.actions.subequipment.SubEquipmentService;
 import cern.c2mon.cache.api.factory.AbstractCacheObjectFactory;
 import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.datatag.DataTag;
@@ -34,11 +36,13 @@ import static cern.c2mon.shared.common.datatag.DataTagConstants.MODE_TEST;
  */
 @Slf4j
 public class DataTagCacheObjectFactory extends AbstractCacheObjectFactory<DataTag> {
-  private final BaseEquipmentServiceImpl coreAbstractEquipmentService;
+  private final BaseEquipmentServiceImpl equipmentService;
+  private SubEquipmentService subEquipmentService;
 
   @Inject
-  public DataTagCacheObjectFactory(BaseEquipmentServiceImpl coreAbstractEquipmentService) {
-    this.coreAbstractEquipmentService = coreAbstractEquipmentService;
+  public DataTagCacheObjectFactory(EquipmentService equipmentService, SubEquipmentService subEquipmentService) {
+    this.equipmentService = equipmentService;
+    this.subEquipmentService = subEquipmentService;
   }
 
   @Override
@@ -74,17 +78,17 @@ public class DataTagCacheObjectFactory extends AbstractCacheObjectFactory<DataTa
     // TAG equipment identifier
     // Ignore the equipment id for control tags as control tags are INDIRECTLY
     // referenced via the equipment's aliveTag and commFaultTag fields
-    if (coreAbstractEquipmentService != null && !(dataTagCacheObject instanceof ControlTag)) {
+    if (equipmentService != null && !(dataTagCacheObject instanceof ControlTag)) {
 
       // Only one of equipment / subequipment Id should be set. But if both are there, we will overwrite the process ID
       // with the equipment (more important)
       new PropertiesAccessor(properties)
         .getLong("subEquipmentId").ifPresent(subEquipmentId -> {
         dataTagCacheObject.setSubEquipmentId(subEquipmentId);
-        dataTagCacheObject.setProcessId(coreAbstractEquipmentService.getProcessIdForAbstractEquipment(subEquipmentId));
+        dataTagCacheObject.setProcessId(subEquipmentService.getProcessId(subEquipmentId));
       }).getLong("equipmentId").ifPresent(equipmentId -> {
         dataTagCacheObject.setEquipmentId(equipmentId);
-        dataTagCacheObject.setProcessId(coreAbstractEquipmentService.getProcessIdForAbstractEquipment(equipmentId));
+        dataTagCacheObject.setProcessId(equipmentService.getProcessId(equipmentId));
       });
     }
 
