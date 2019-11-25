@@ -1,5 +1,6 @@
 package cern.c2mon.cache.actions.listener;
 
+import cern.c2mon.cache.AbstractCacheTest;
 import cern.c2mon.cache.actions.supervision.SupervisedCacheService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.listener.CacheListener;
@@ -15,7 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.assertEquals;
 
-public abstract class SupervisedServiceListenerTest<T extends Supervised> {
+public abstract class SupervisedServiceListenerTest<T extends Supervised> extends AbstractCacheTest<T> {
 
   private final AtomicInteger eventCounter = new AtomicInteger(0);
   private final CacheListener<T> paramListener = eq -> eventCounter.incrementAndGet();
@@ -40,6 +41,7 @@ public abstract class SupervisedServiceListenerTest<T extends Supervised> {
     cache.setCacheListenerManager(new CacheListenerManagerImpl<>());
     eventCounter.set(0);
     supervisedService = getSupervisedService();
+    sample = getSample();
   }
 
   @Test
@@ -60,7 +62,6 @@ public abstract class SupervisedServiceListenerTest<T extends Supervised> {
   @Test
   public void supervisionChangeNotification() {
     registerListenerAndPut(paramListener, CacheEvent.SUPERVISION_CHANGE);
-
     assertEquals(1, eventCounter.get());
   }
 
@@ -79,6 +80,8 @@ public abstract class SupervisedServiceListenerTest<T extends Supervised> {
   }
 
   private void registerListenerAndPut(CacheListener<T> cacheListener, CacheEvent... cacheEvents) {
-
+    cache.getCacheListenerManager().registerListener(cacheListener, cacheEvents);
+    cache.put(sample.getId(), sample);
+    cache.getCacheListenerManager().close();
   }
 }

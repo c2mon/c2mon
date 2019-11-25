@@ -24,8 +24,7 @@ import java.util.function.BiConsumer;
 import static org.junit.Assert.*;
 
 /**
- * @author Szymon Halastra
- * @author Alexandros Papageorgiou
+ * @author Szymon Halastra, Alexandros Papageorgiou Koufidis
  */
 public class AlarmServiceTest {
 
@@ -53,6 +52,7 @@ public class AlarmServiceTest {
   @Test
   public void updateIsConsistent() {
     insertAlarmAndDatatagThen((alarm, dataTag) -> {
+      dataTag.getDataTagQuality().validate();
       AlarmCacheObject preCache = alarm.clone();
 
       alarmService.update(alarm, dataTag, true);

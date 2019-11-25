@@ -15,7 +15,6 @@ import static cern.c2mon.shared.common.supervision.SupervisionConstants.Supervis
 import static org.junit.Assert.*;
 
 public abstract class SupervisedServiceTest<T extends Supervised> extends SupervisedServiceListenerTest<T> {
-  private static final int STATUSES_SIZE = values().length;
 
   @Test(expected = CacheElementNotFoundException.class)
   public void getSupervisionStatusThrowsIfNonexistent() {
