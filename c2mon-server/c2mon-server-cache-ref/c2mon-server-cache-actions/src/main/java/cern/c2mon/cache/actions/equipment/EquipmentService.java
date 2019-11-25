@@ -54,7 +54,7 @@ public class EquipmentService extends BaseEquipmentServiceImpl<Equipment> implem
   }
 
   @Override
-  public Long getProcessIdForAbstractEquipment(Long abstractEquipmentId) {
+  public Long getProcessId(Long abstractEquipmentId) {
     return cache.get(abstractEquipmentId).getProcessId();
   }
 }

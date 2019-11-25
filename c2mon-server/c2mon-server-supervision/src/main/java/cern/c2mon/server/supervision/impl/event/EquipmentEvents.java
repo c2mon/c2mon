@@ -15,18 +15,17 @@ public class EquipmentEvents extends SupervisionEventHandler<Equipment> {
 
   @Inject
   public EquipmentEvents(EquipmentService equipmentService) {
-    super(equipmentService);
+    super(Equipment.class, equipmentService);
   }
 
   /**
-   * TODO add details explaining synchronization
    * <UL>
    * <LI>either on reception of the equipment's alive tag
    * <LI>or on reception of the equipment's commfault tag (good value).
    * </UL>
    * The state tag of the equipment is updated (value RUNNING).
    *
-   * <p>Must be called within a block synchronized on the process object.
+   * Must be called within a block synchronized on the process object.
    *
    * @param pId id of the equipment concerned
    * @param pTimestamp time when the equipment was detected to be "up"
@@ -34,8 +33,6 @@ public class EquipmentEvents extends SupervisionEventHandler<Equipment> {
    */
   @Override
   public void onUp(Equipment supervised, Timestamp timestamp, String message) {
-    logMethodEntry("equipmentUp", supervised.getId(), timestamp, message);
-
     // Try to obtain a copy of the state tag with its current value
     try {
       equipmentFacade.resume(pId, pTimestamp, pMessage);

@@ -22,7 +22,7 @@ public interface CommonEquipmentOperations {
    *
    * @return The id to the Process object in the cache
    */
-  Long getProcessIdForAbstractEquipment(Long abstractEquipmentId);
+  Long getProcessId(Long abstractEquipmentId);
 
   /**
    * Dynamically creates a Map ControlTag id -> Equipment id.
@@ -35,7 +35,7 @@ public interface CommonEquipmentOperations {
    *
    * @return the map {ControlTag id -> Equipment id}
    */
-  Map<Long, Long> getAbstractEquipmentControlTags();
+  Map<Long, Long> getControlTags();
 
   /**
    * Removes the commfault tag for this equipment from the
@@ -45,6 +45,6 @@ public interface CommonEquipmentOperations {
    *
    * @throws CacheElementNotFoundException if the abstractEquipment cannot be located in the corresponding cache
    */
-  void removeCommFault(Long abstractEquipmentId);
+  void removeCommFaultTag(Long abstractEquipmentId);
 
 }

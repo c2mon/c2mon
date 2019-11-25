@@ -21,7 +21,7 @@ public class ProcessEvents extends SupervisionEventHandler<Process> {
 
   @Inject
   public ProcessEvents(ProcessService processService) {
-    super(processService);
+    super(Process.class, processService);
   }
 
   /**
@@ -45,8 +45,6 @@ public class ProcessEvents extends SupervisionEventHandler<Process> {
    */
   @Override
   public void onUp(Process supervised, Timestamp timestamp, String message) {
-    logMethodEntry("onProcessUp", supervised.getId(), timestamp, message);
-
     service.resume(supervised.getId(), timestamp, message);
 
     // TODO (Alex) Where and how can we "revalidate"? And how can we ask the DAQ for the latest values?

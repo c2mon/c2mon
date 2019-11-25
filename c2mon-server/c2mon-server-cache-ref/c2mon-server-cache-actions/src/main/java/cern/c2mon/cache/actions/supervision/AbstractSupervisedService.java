@@ -17,8 +17,7 @@ import static cern.c2mon.shared.common.supervision.SupervisionConstants.Supervis
 import static cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
 
 /**
- * @author Szymon Halastra
- * @author Alexandros Papageorgiou Koufidis
+ * @author Szymon Halastra, Alexandros Papageorgiou Koufidis
  */
 @Slf4j
 public abstract class AbstractSupervisedService<T extends Supervised> extends AbstractCacheServiceImpl<T> implements SupervisedCacheService<T> {

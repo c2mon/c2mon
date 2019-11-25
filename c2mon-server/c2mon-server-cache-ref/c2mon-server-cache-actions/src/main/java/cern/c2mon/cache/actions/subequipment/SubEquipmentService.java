@@ -59,7 +59,7 @@ public class SubEquipmentService extends BaseEquipmentServiceImpl<SubEquipment> 
   }
 
   @Override
-  public Long getProcessIdForAbstractEquipment(Long abstractEquipmentId) {
-    return equipmentService.getProcessIdForAbstractEquipment(cache.get(abstractEquipmentId).getParentId());
+  public Long getProcessId(Long abstractEquipmentId) {
+    return equipmentService.getProcessId(cache.get(abstractEquipmentId).getParentId());
   }
 }

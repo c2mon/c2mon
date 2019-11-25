@@ -16,18 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.server.supervision.alive;
 
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import javax.annotation.PostConstruct;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.SmartLifecycle;
-import org.springframework.stereotype.Service;
-
 import cern.c2mon.server.cache.AliveTimerCache;
 import cern.c2mon.server.cache.AliveTimerFacade;
 import cern.c2mon.server.cache.ClusterCache;
@@ -35,6 +23,16 @@ import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.alive.AliveTimer;
 import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.supervision.SupervisionManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.SmartLifecycle;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.PostConstruct;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Timer that regularly checks all the active alive timers monitoring
@@ -262,7 +260,7 @@ public class AliveTimerChecker extends TimerTask implements SmartLifecycle {
   /**
    * Notifies the supervision manager.
    *
-   * @param pAliveTimer the alive timer that has expired
+   * @param aliveTimerId the alive timer that has expired
    */
   private void onAliveTimerExpiration(final Long aliveTimerId) {
     supervisionManager.onAliveTimerExpiration(aliveTimerId);

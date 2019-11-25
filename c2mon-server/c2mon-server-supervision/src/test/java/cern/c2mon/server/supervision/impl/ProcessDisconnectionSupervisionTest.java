@@ -1,41 +1,42 @@
 package cern.c2mon.server.supervision.impl;
 
+import cern.c2mon.shared.daq.process.ProcessConfigurationRequest;
 import cern.c2mon.shared.daq.process.ProcessConnectionRequest;
-import cern.c2mon.shared.daq.process.ProcessDisconnectionRequest;
+import cern.c2mon.shared.daq.process.ProcessConnectionResponse;
 import org.junit.Before;
+import org.junit.Test;
 
-public class ProcessDisconnectionSupervisionTest extends AbstractSupervisionManagerProcessTest<ProcessDisconnectionRequest, Void> {
+import static org.junit.Assert.assertEquals;
+
+public class ProcessDisconnectionSupervisionTest extends AbstractSupervisionManagerProcessTest<ProcessConnectionRequest, ProcessConnectionResponse> {
+  private long pik;
 
   public ProcessDisconnectionSupervisionTest() {
-    super(processDisconnectionRequest -> null); // TODO Update this
+    super(processConnectionRequest -> supervisionManager.onProcessConnection(processConnectionRequest));
   }
 
   @Before
   public void connectAndConfigure() throws Exception {
     String xmlResponse = supervisionManager.onProcessConnection(new ProcessConnectionRequest(GOOD_PROCESSNAME));
-    xmlConverter.fromXml(xmlResponse);
+    pik = ((ProcessConnectionResponse) xmlConverter.fromXml(xmlResponse)).getProcessPIK();
 
-    // TODO (Alex) PIK?
+    supervisionManager.onProcessConfiguration(new ProcessConfigurationRequest(GOOD_PROCESSNAME));
   }
 
-//  @Test
-//  public void onNull() {
-//
-//    processDisconnectionRequest = null;
-//    onProcessDisconnection();
-//
-//    // Save the good PIK for the process running (for farther disconnection)
-//    Long goodPIK = processConnectionResponse.getProcessPIK();
-//
-//    // Ignoring disconnection so new Connection will failed
+  @Test
+  public void onNull() throws Exception {
+    supervisionManager.onProcessDisconnection(null);
+
+    doAndVerify(new ProcessConnectionRequest(GOOD_PROCESSNAME),
+      processConnectionResponse ->
+        assertEquals(processConnectionResponse.getProcessPIK(), ProcessConnectionResponse.PIK_REJECTED));
+
+    // Ignoring disconnection so new Connection will failed
 //    onProcessConnection();
-//
-//    // PIK rejected second attempt
+
+    // PIK rejected second attempt
 //    assertEquals(processConnectionResponse.getProcessPIK(), ProcessConnectionResponse.PIK_REJECTED);
-//
-//    // Set process PIK for correct disconnection
-//    processConnectionResponse.setprocessPIK(goodPIK);
-//  }
+  }
 //
 //  @Test
 //  public void testOnProcessDisconnectionNoProcessNameAndID() {

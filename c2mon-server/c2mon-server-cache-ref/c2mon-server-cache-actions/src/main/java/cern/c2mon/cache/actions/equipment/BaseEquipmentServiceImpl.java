@@ -31,7 +31,7 @@ public abstract class BaseEquipmentServiceImpl<T extends AbstractEquipment> exte
   }
 
   @Override
-  public void removeCommFault(final Long abstractEquipmentId) {
+  public void removeCommFaultTag(final Long abstractEquipmentId) {
     T equipment = cache.get(abstractEquipmentId);
     Long commFaultId = equipment.getCommFaultTagId();
     if (commFaultId != null) {
@@ -40,7 +40,7 @@ public abstract class BaseEquipmentServiceImpl<T extends AbstractEquipment> exte
   }
 
   @Override
-  public Map<Long, Long> getAbstractEquipmentControlTags() {
+  public Map<Long, Long> getControlTags() {
     HashMap<Long, Long> returnMap = new HashMap<>();
     Set<Long> equipmentKeys = commFaultTagCache.getKeys();
     for (Long equipmentId : equipmentKeys) {

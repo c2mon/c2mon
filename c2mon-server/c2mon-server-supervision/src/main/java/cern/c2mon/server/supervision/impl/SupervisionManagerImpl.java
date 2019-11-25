@@ -18,16 +18,15 @@ package cern.c2mon.server.supervision.impl;
 
 import cern.c2mon.server.cache.*;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
-import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
 import cern.c2mon.server.common.alive.AliveTimer;
 import cern.c2mon.server.common.commfault.CommFaultTag;
 import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.common.config.ServerProperties;
-import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.supervision.SupervisionManager;
+import cern.c2mon.server.supervision.impl.event.AliveTimerEvents;
 import cern.c2mon.server.supervision.impl.event.EquipmentEvents;
 import cern.c2mon.server.supervision.impl.event.ProcessEvents;
 import cern.c2mon.server.supervision.impl.event.SubEquipmentEvents;
@@ -46,7 +45,6 @@ import java.sql.Timestamp;
 
 
 /**
- *
  * Implementation of the SupervisionManager.
  *
  * <p>The class is designed with 3 layers:
@@ -60,7 +58,6 @@ import java.sql.Timestamp;
  * <p>The lifecycle start() method is called by the server (single one in a clustered environment)
  * in the final start up phase and activates all the alive timers. The timer itself is
  * in the AliveTimerManager and is activated there.
- *
  */
 @Service("supervisionManager")
 @Slf4j
@@ -74,6 +71,11 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
 
   @Inject
   private SubEquipmentEvents subEquipmentEvents;
+
+  @Inject
+  private AliveTimerEvents aliveTimerEvents;
+
+//  ===========================
 
   @Resource
   private ProcessCache processCache;
@@ -115,7 +117,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
   private ClusterCache clusterCache;
 
   @Resource
-  private ServerProperties properties;
+  private ServerProperties properties;;
 
   /**
    * Starts the alive timer mechanisms at server start up.
@@ -160,7 +162,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
                 }
               } else {
                 log.warn("Unable to locate state tag in cache (id = " + process.getStateTagId() + ") " +
-                    "cannot start alive timer for this process.");
+                  "cannot start alive timer for this process.");
               }
             }
           } finally {
@@ -183,7 +185,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
                 }
               } else {
                 log.warn("Unable to locate state tag in cache (id = " + equipment.getStateTagId() + ") " +
-                    "cannot start alive timer for this equipment.");
+                  "cannot start alive timer for this equipment.");
               }
             }
           } finally {
@@ -207,7 +209,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
                 }
               } else {
                 log.warn("Unable to locate state tag in cache (id = " + subEquipment.getStateTagId() + ") cannot " +
-                    "start alive timer for this subequipment.");
+                  "start alive timer for this subequipment.");
               }
             }
           } finally {
@@ -232,11 +234,21 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
     log.info("Finished initializing all alive timers.");
   }
 
+  /**
+   * Synchronized on the Process cache object. Catches all exceptions.
+   *
+   * @param processConnectionRequest the PIK request object
+   * @return the PIK XML as a String or null if there was an exception
+   */
+  @Override
+  public String onProcessConnection(final ProcessConnectionRequest processConnectionRequest) {
+    return processEvents.onConnection(processConnectionRequest);
+  }
+
   @Override
   public void onProcessDisconnection(final ProcessDisconnectionRequest processDisconnectionRequest) {
     processEvents.onDisconnection(processDisconnectionRequest);
   }
-
 
   /**
    * Synchronized on the Process cache object. Catches all exceptions. There is no need to
@@ -252,76 +264,11 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
 
   /**
    * Calls the ProcessDown, EquipmentDown or SubEquipmentDown methods depending
-   * on the type of alive that has expired. The method synchronizes on the containing
-   * Process cache object and catches all cache-related exceptions that can be
-   * thrown by the private methods.
-   * @param aliveTimerId the alive cache id
+   * on the type of alive that has expired.
    */
   @Override
   public void onAliveTimerExpiration(final Long aliveTimerId) {
-    // Protect the method against accidental null parameters
-    if (aliveTimerId == null) {
-      log.warn("onAliveTimerExpiration(null) called - ignoring the call.");
-      return;
-    }
-
-    AliveTimer aliveTimer = aliveTimerCache.getCopy(aliveTimerId);
-
-    // Build up a meaningful invalidation message -- USED TO DECIDE WHETHER TO REQUEST VALUES FROM DAQ WHEN UP AGAIN (SEE onProcessUp)
-    StringBuffer msg = new StringBuffer("Alive of ");
-    msg.append(aliveTimer.getAliveTypeDescription() + " ");
-    msg.append(aliveTimer.getRelatedName());
-    msg.append(" (alive tag: ");
-    msg.append(aliveTimer.getId());
-    msg.append(") has expired.");
-
-    // Log the message
-    log.debug(msg.toString());
-
-    if (aliveTimer.getRelatedId() == null) {
-      log.error("AliveTimer has not relatedId - unable to take any action on alive reception.");
-    } else {
-      try {
-        final Long processId = processFacade.getProcessIdFromAlive(aliveTimer.getId());
-        if (aliveTimer.isProcessAliveType()) {
-          processEvents.onDown(processId, new Timestamp(System.currentTimeMillis()), msg.toString());
-        } else {
-          if (aliveTimer.isEquipmentAliveType()) {
-            Long equipmentId = aliveTimer.getRelatedId();
-            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-            equipmentEvents.onDown(equipmentId, timestamp, msg.toString());
-
-            // Manually set the CommFaultTag (TIMS-972)
-            ControlTag commFaultTag = controlTagCache.getCopy(equipmentCache.getCopy(equipmentId).getCommFaultTagId());
-            setCommFaultTag(commFaultTag.getId(), false, commFaultTag.getValueDescription(), timestamp);
-
-            // Bring down all SubEquipments
-            for (Long subEquipmentId : equipmentCache.get(equipmentId).getSubEquipmentIds()) {
-              String message = "Alive timer for parent Equipment expired: " + msg.toString();
-              equipmentEvents.onDown(subEquipmentId, timestamp, message);
-
-              commFaultTag = controlTagCache.getCopy(subEquipmentCache.getCopy(subEquipmentId).getCommFaultTagId());
-              setCommFaultTag(commFaultTag.getId(), false, commFaultTag.getValueDescription(), timestamp);
-            }
-
-          } else {
-            Long subEquipmentId = aliveTimer.getRelatedId();
-            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-            subEquipmentEvents.onDown(subEquipmentId, timestamp, msg.toString());
-
-            // Manually set the CommFaultTag (TIMS-972)
-            ControlTag commFaultTag = controlTagCache.getCopy(subEquipmentCache.getCopy(subEquipmentId).getCommFaultTagId());
-            setCommFaultTag(commFaultTag.getId(), false, commFaultTag.getValueDescription(), timestamp);
-          }
-        }
-      } catch (CacheElementNotFoundException cacheEx) {
-        log.error("Unable to locate a required element within the cache on Alive Timer expiration.", cacheEx);
-      } catch (NullPointerException nullEx) {
-        log.error("NullPointer exception caught on Alive Timer expiration.", nullEx);
-      } catch (IllegalArgumentException argEx) {
-        log.error("IllegalArgument exception caught on Aliver Timer expiration", argEx);
-      }
-    }
+    aliveTimerEvents.onAliveTimerExpiration(aliveTimerId);
   }
 
   @Override
@@ -372,10 +319,10 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
         }
         Timestamp aliveTimerTimestamp = new Timestamp(System.currentTimeMillis());
         if (aliveTimerTimestamp.getTime() - useTimestamp.getTime()
-                                       > 2 * timerCopy.getAliveInterval()) {
+          > 2 * timerCopy.getAliveInterval()) {
           log.debug("Rejecting alive #{} of {} as delayed arrival at server.", tagId, timerCopy.getRelatedName());
         } else {
-       // The tag is an alive tag -> we rewind the corresponding alive timer
+          // The tag is an alive tag -> we rewind the corresponding alive timer
           //TODO sychronization on alive timers... needed? use id here, so not possible around update
           aliveTimerFacade.update(tagId);
 
@@ -413,7 +360,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
             str.append(commFaultTagCopy.getEquipmentName());
             str.append(" is down.");
             if (!valueDescription.equalsIgnoreCase("")) {
-              str.append(" Reason: " + valueDescription);
+              str.append(" Reason: ").append(valueDescription);
             }
             equipmentEvents.onDown(equipmentId, supervisionTimestamp, str.toString());
           } else {
@@ -439,7 +386,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
             str.append(" is down.");
 
             if (!valueDescription.equalsIgnoreCase("")) {
-              str.append(" Reason: " + valueDescription);
+              str.append(" Reason: ").append(valueDescription);
             }
             subEquipmentEvents.onDown(subEquipmentId, supervisionTimestamp, str.toString());
           } else {
@@ -492,17 +439,6 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
   @Override
   public int getPhase() {
     return ServerConstants.PHASE_START_LAST;
-  }
-
-  /**
-   * Synchronized on the Process cache object. Catches all exceptions.
-   *
-   * @param processConnectionRequest the PIK request object
-   * @return the PIK XML as a String or null if there was an exception
-   */
-  @Override
-  public String onProcessConnection(final ProcessConnectionRequest processConnectionRequest) {
-    return processEvents.onConnection(processConnectionRequest);
   }
 
 }

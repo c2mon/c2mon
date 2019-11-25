@@ -91,20 +91,20 @@ public class ProcessService extends AbstractCacheServiceImpl<Process>
     if (aliveTimer.isProcessAliveType()) {
       return aliveTimer.getRelatedId();
     } else if (aliveTimer.isEquipmentAliveType()) {
-      return equipmentService.getProcessIdForAbstractEquipment(aliveTimer.getRelatedId());
+      return equipmentService.getProcessId(aliveTimer.getRelatedId());
     } else {
       Long equipmentId = subEquipmentService.getEquipmentIdForSubEquipment(aliveTimer.getRelatedId());
-      return equipmentService.getProcessIdForAbstractEquipment(equipmentId);
+      return equipmentService.getProcessId(equipmentId);
     }
   }
 
   @Override
   public Long getProcessIdFromControlTag(Long controlTagId) {
-    Map<Long, Long> equipmentControlTags = equipmentService.getAbstractEquipmentControlTags();
-    Map<Long, Long> subEquipmentControlTags = subEquipmentService.getAbstractEquipmentControlTags();
+    Map<Long, Long> equipmentControlTags = equipmentService.getControlTags();
+    Map<Long, Long> subEquipmentControlTags = subEquipmentService.getControlTags();
     if (equipmentControlTags.containsKey(controlTagId)) {
       Long equipmentId = equipmentControlTags.get(controlTagId);
-      return equipmentService.getProcessIdForAbstractEquipment(equipmentId);
+      return equipmentService.getProcessId(equipmentId);
     } else if (subEquipmentControlTags.containsKey(controlTagId)) {
       Long subEquipmentId = subEquipmentControlTags.get(controlTagId);
       return subEquipmentService.getEquipmentIdForSubEquipment(subEquipmentId);
