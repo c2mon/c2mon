@@ -17,16 +17,16 @@
 
 package cern.c2mon.server.configuration.jmx;
 
-import cern.c2mon.server.cache.ClusterCache;
-import cern.c2mon.server.cache.CommandTagCache;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.loading.CommandTagDAO;
+import cern.c2mon.shared.common.command.CommandTag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * @author Franz Ritter
@@ -39,11 +39,11 @@ public class CommandTagConfigurationManager {
 
   private CommandTagDAO commandTagDAO;
 
-  private CommandTagCache commandTagCache;
+  private C2monCache<CommandTag> commandTagCache;
 
 
   @Autowired
-  public CommandTagConfigurationManager(final CommandTagDAO commandTagDAO, final CommandTagCache commandTagCache) {
+  public CommandTagConfigurationManager(final CommandTagDAO commandTagDAO, final C2monCache<CommandTag> commandTagCache) {
     this.commandTagDAO = commandTagDAO;
     this.commandTagCache = commandTagCache;
   }
@@ -51,12 +51,12 @@ public class CommandTagConfigurationManager {
   @ManagedOperation(description = "Persists the current cache configurations to the DB (cache persistence). Ensures cache object runtime values & DB are synchronized.")
   public void persistAllCacheConfigurationToDatabase() {
     try {
-      List<Long> tagIdList = commandTagCache.getKeys();
+      Set<Long> tagIdList = commandTagCache.getKeys();
 
       log.debug("Persisting " + tagIdList.size() + " configuration of cache object(s) to the database (CommandTag)");
       int counter = 0, overall = 0;
       for (Long id : tagIdList) {
-        commandTagDAO.updateCommandTag(commandTagCache.getCopy(id));
+        commandTagDAO.updateCommandTag(commandTagCache.get(id));
         counter++;
         overall++;
         if (counter >= tagIdList.size() * 0.1) {
@@ -72,8 +72,9 @@ public class CommandTagConfigurationManager {
   @ManagedOperation(description = "Persists the current cache configurations to the DB (cache persistence). Ensures cache object runtime values & DB are synchronized.")
   public void persistAllCacheConfigurationToDatabaseParallel() {
     try {
-      log.debug("Persisting " + commandTagCache.getKeys().size() + " configuration of cache object(s) to the database (CommandTag)");
-      commandTagCache.getKeys().parallelStream().forEach((key) -> commandTagDAO.updateCommandTag(commandTagCache.getCopy(key)));
+      Set<Long> tagIdList = commandTagCache.getKeys();
+      log.debug("Persisting " + tagIdList + " configuration of cache object(s) to the database (CommandTag)");
+      tagIdList.parallelStream().forEach((key) -> commandTagDAO.updateCommandTag(commandTagCache.get(key)));
       log.debug("Persisting commandTags configuration done");
 
     }catch (Exception e){
