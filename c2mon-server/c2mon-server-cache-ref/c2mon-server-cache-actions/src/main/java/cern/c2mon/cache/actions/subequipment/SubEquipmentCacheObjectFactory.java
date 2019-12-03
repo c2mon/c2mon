@@ -34,7 +34,7 @@ public class SubEquipmentCacheObjectFactory extends AbstractEquipmentCacheObject
    */
   @Override
   public EquipmentConfigurationUpdate updateConfig(final SubEquipment subEquipment,
-                                                   final Properties properties) throws IllegalAccessException {
+                                                   final Properties properties) {
     // TODO: Remove obsolete parent_equip_id property
     if ((properties.getProperty("parent_equip_id")) != null) {
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Reconfiguration of "

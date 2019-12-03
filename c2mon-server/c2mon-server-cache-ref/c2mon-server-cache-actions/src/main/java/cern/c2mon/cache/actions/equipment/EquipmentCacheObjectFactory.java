@@ -23,7 +23,7 @@ public class EquipmentCacheObjectFactory extends AbstractEquipmentCacheObjectFac
   }
 
   @Override
-  public Change updateConfig(Equipment equipment, Properties properties) throws IllegalAccessException {
+  public Change updateConfig(Equipment equipment, Properties properties) {
     if ((properties.getProperty("processId")) != null) {
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Reconfiguration of "
               + "Equipment does not currently allow it to be reassigned to a different Process!");
@@ -42,7 +42,7 @@ public class EquipmentCacheObjectFactory extends AbstractEquipmentCacheObjectFac
   }
 
   @Override
-  public Change configureCacheObject(Equipment equipment, Properties properties) throws IllegalAccessException {
+  public Change configureCacheObject(Equipment equipment, Properties properties) {
     EquipmentCacheObject equipmentCacheObject = (EquipmentCacheObject) equipment;
     EquipmentConfigurationUpdate configurationUpdate = setCommonProperties(equipmentCacheObject, properties);
 

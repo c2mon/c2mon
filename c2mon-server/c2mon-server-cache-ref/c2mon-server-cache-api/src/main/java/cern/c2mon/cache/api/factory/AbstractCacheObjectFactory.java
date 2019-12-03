@@ -17,14 +17,14 @@ public abstract class AbstractCacheObjectFactory<T extends Cacheable> {
    * @return CacheObject
    * @throws IllegalAccessException
    */
-  public T createCacheObject(Long id, Properties properties) throws IllegalAccessException {
+  public T createCacheObject(Long id, Properties properties) {
     T cacheable = createCacheObject(id);
     configureCacheObject(cacheable, properties);
     validateConfig(cacheable);
     return cacheable;
   }
 
-  public Change updateConfig(T cacheable, Properties properties) throws IllegalAccessException {
+  public Change updateConfig(T cacheable, Properties properties) {
     Change changeEvent = configureCacheObject(cacheable, properties);
     validateConfig(cacheable);
     return changeEvent;
@@ -46,7 +46,7 @@ public abstract class AbstractCacheObjectFactory<T extends Cacheable> {
    * @return always returns null, as no CacheObject change needs propagating to the DAQ layer
    * @throws ConfigurationException if cannot configure the CacheObject from the properties
    */
-  public abstract Change configureCacheObject(T cacheable, Properties properties) throws IllegalAccessException;
+  public abstract Change configureCacheObject(T cacheable, Properties properties);
 
   /**
    * Perform a series of consistency checks on the CacheObject. This method

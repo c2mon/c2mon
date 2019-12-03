@@ -16,15 +16,14 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import cern.c2mon.server.configuration.ConfigurationUpdate;
+import cern.c2mon.server.configuration.ConfigurationUpdateListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.server.configuration.ConfigurationUpdate;
-import cern.c2mon.server.configuration.ConfigurationUpdateListener;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Implementation of the {@link ConfigurationUpdate} (a singleton bean in the
@@ -48,7 +47,7 @@ public class ConfigurationUpdateImpl implements ConfigurationUpdate {
   /**
    * List of registered listeners.
    */
-  private List<ConfigurationUpdateListener> listeners = new ArrayList<ConfigurationUpdateListener>();
+    private List<ConfigurationUpdateListener> listeners = new ArrayList<ConfigurationUpdateListener>();
 
   @Override
   public void registerForConfigurationUpdates(ConfigurationUpdateListener configurationUpdateListener) {

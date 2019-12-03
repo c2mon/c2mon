@@ -71,7 +71,7 @@ public class DataTagCacheObjectFactory extends AbstractCacheObjectFactory<DataTa
 
 
   @Override
-  public Change configureCacheObject(DataTag tag, Properties properties) throws IllegalAccessException {
+  public Change configureCacheObject(DataTag tag, Properties properties) {
     DataTagCacheObject dataTagCacheObject = (DataTagCacheObject) tag;
     DataTagUpdate dataTagUpdate = setCommonProperties(dataTagCacheObject, properties);
 

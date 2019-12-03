@@ -58,7 +58,6 @@ public class CommFaultTagCacheObject extends AbstractCacheableImpl implements Co
      * Constructor setting all fields.
      *
      * @param id
-     * @param faultValue
      * @param equipmentId
      * @param equipmentName
      * @param aliveTagId
