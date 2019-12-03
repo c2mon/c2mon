@@ -16,63 +16,53 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.handler.impl;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Properties;
-
-import cern.c2mon.server.configuration.config.ConfigurationProperties;
-import cern.c2mon.server.daq.JmsContainerManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.UnexpectedRollbackException;
-
-import cern.c2mon.server.cache.ProcessCache;
-import cern.c2mon.server.cache.ProcessFacade;
+import cern.c2mon.cache.actions.process.ProcessService;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.process.Process;
+import cern.c2mon.server.configuration.config.ConfigurationProperties;
 import cern.c2mon.server.configuration.handler.ControlTagConfigHandler;
 import cern.c2mon.server.configuration.handler.EquipmentConfigHandler;
 import cern.c2mon.server.configuration.handler.ProcessConfigHandler;
 import cern.c2mon.server.configuration.handler.transacted.ProcessConfigTransacted;
 import cern.c2mon.server.configuration.impl.ProcessChange;
+import cern.c2mon.server.daq.JmsContainerManager;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
+import cern.c2mon.shared.common.CacheEvent;
 import cern.c2mon.shared.common.ConfigurationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.UnexpectedRollbackException;
 
 import javax.annotation.PostConstruct;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Properties;
 
 /**
  * See interface documentation.
  *
  * @author Mark Brightwell
- *
  */
 @Component
 public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ProcessConfigHandlerImpl.class);
 
-  /**
-   * Transacted bean.
-   */
-  @Autowired
   private ProcessConfigTransacted processConfigTransacted;
 
   private EquipmentConfigHandler equipmentConfigHandler;
 
   private ControlTagConfigHandler controlTagConfigHandler;
 
-  /**
-   * Cache.
-   */
-  private ProcessCache processCache;
+  private C2monCache<Process> processCache;
 
-  private ProcessFacade processFacade;
+  private ProcessService processService;
 
   /**
    * Flag indicating if Process removal is allowed when the Process
@@ -88,21 +78,22 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
   @Autowired
   public ProcessConfigHandlerImpl(EquipmentConfigHandler equipmentConfigHandler,
                                   ControlTagConfigHandler controlTagConfigHandler,
-                                  ProcessCache processCache,
-                                  ProcessFacade processFacade,
+                                  ProcessService processService,
                                   JmsContainerManager jmsContainerManager,
-                                  ConfigurationProperties properties) {
+                                  ConfigurationProperties properties,
+                                  ProcessConfigTransacted processConfigTransacted) {
     super();
     this.equipmentConfigHandler = equipmentConfigHandler;
     this.controlTagConfigHandler = controlTagConfigHandler;
-    this.processCache = processCache;
-    this.processFacade = processFacade;
+    this.processCache = processService.getCache();
+    this.processService = processService;
     this.jmsContainerManager = jmsContainerManager;
     this.allowRunningProcessRemoval = properties.isAllowRunningProcessRemoval();
+    this.processConfigTransacted = processConfigTransacted;
   }
 
   @PostConstruct
-  public void init(){
+  public void init() {
     equipmentConfigHandler.setProcessConfigHandler(this);
   }
 
@@ -113,9 +104,10 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
    *
    * <p>In the case of a failure, the removal is interrupted and the process
    * remains with whatever child objects remain at the point of failure.
-   * @param processId id of process
+   *
+   * @param processId     id of process
    * @param processReport the element report for the removal of the process, to which
-   *                          subreports can be attached
+   *                      subreports can be attached
    */
   @Override
   public ProcessChange removeProcess(final Long processId, final ConfigurationElementReport processReport) {
@@ -124,8 +116,8 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
     try {
       Process process = processCache.get(processId);
       try {
-        Collection<Long> equipmentIds = new ArrayList<Long>(process.getEquipmentIds());
-        if (processFacade.isRunning(process) && !allowRunningProcessRemoval) {
+        Collection<Long> equipmentIds = new ArrayList<>(process.getEquipmentIds());
+        if (process.isRunning() && !allowRunningProcessRemoval) {
           String message = "Unable to remove Process " + process.getName() + " as currently running - please stop it first.";
           LOGGER.warn(message);
           processReport.setFailure(message);
@@ -139,28 +131,26 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
               equipmentConfigHandler.removeEquipment(equipmentId, childElementReport);
             } catch (RuntimeException ex) {
               LOGGER.error("Exception caught while applying the configuration change (Action, Entity, Entity id) = ("
-                  + Action.REMOVE + "; " + Entity.EQUIPMENT + "; " + equipmentId + ")", ex);
+                + Action.REMOVE + "; " + Entity.EQUIPMENT + "; " + equipmentId + ")", ex);
               childElementReport.setFailure("Exception caught while applying the configuration change.", ex);
               throw new UnexpectedRollbackException("Unexpected exception caught while removing an Equipment.", ex);
             }
           }
-          processCache.acquireWriteLockOnKey(processId);
-          processChange = processConfigTransacted.doRemoveProcess(process, processReport);
-          removeProcessControlTags(process, processReport);
-          processCache.releaseWriteLockOnKey(processId);
+          processChange = processCache.executeTransaction(() -> {
+            ProcessChange processChangeResult = processConfigTransacted.doRemoveProcess(process, processReport);
+            removeProcessControlTags(process, processReport);
+            return processChangeResult;
+          });
+
           //remove alive out of lock (in fact no longer necessary); always after removing control tags, or could be pulled back in from DB to cache
-          processFacade.removeAliveTimer(processId);
+          processService.removeAliveTimerBySupervisedId(processId);
           jmsContainerManager.unsubscribe(process);
           processCache.remove(processId);
-         }
+        }
         return processChange;
       } catch (RuntimeException ex) {
         LOGGER.error("Exception caught when attempting to remove a process - rolling back DB changes: {}", ex.getMessage());
         throw new UnexpectedRollbackException("Unexpected exception caught while removing Process.", ex);
-      } finally {
-        if (processCache.isWriteLockedByCurrentThread(processId)) {
-          processCache.releaseWriteLockOnKey(processId);
-        }
       }
     } catch (CacheElementNotFoundException cacheEx) {
       LOGGER.warn("Process not found in cache - unable to remove it.", cacheEx);
@@ -172,22 +162,22 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
   @Override
   public ProcessChange createProcess(final ConfigurationElement element) throws IllegalAccessException {
     LOGGER.debug("Creating process with id " + element.getEntityId());
-    if (processCache.hasKey(element.getEntityId())) {
+    if (processCache.containsKey(element.getEntityId())) {
       throw new ConfigurationException(ConfigurationException.ENTITY_EXISTS, "Attempting to create a process with an already existing id: "
-          + element.getEntityId());
+        + element.getEntityId());
     }
     Process process = null;
     try {
       ProcessChange change = processConfigTransacted.doCreateProcess(element);
       process = processCache.get(element.getEntityId());
       jmsContainerManager.subscribe(process);
-      processFacade.loadAndStartAliveTag(element.getEntityId());
-      processCache.notifyListenersOfUpdate(element.getEntityId());
+      processService.startAliveTimerBySupervisedId(element.getEntityId());
+      processCache.getCacheListenerManager().notifyListenersOf(CacheEvent.UPDATE_ACCEPTED, process);
       return change;
     } catch (RuntimeException ex) {
       LOGGER.error("Exception caught while creating a new Process - rolling back DB changes and removing from cache.");
       processCache.remove(element.getEntityId());
-      if (process != null){
+      if (process != null) {
         jmsContainerManager.unsubscribe(process);
       }
       throw new UnexpectedRollbackException("Unexpected error while creating a new Process.", ex);
@@ -202,7 +192,7 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
 
   @Override
   public ProcessChange updateProcess(final Long processId,
-                                    final Properties elementProperties) throws IllegalAccessException {
+                                     final Properties elementProperties) throws IllegalAccessException {
 
     if (elementProperties.containsKey("id")) {
       LOGGER.warn("Attempting to change the process id - this is not currently supported!");
@@ -221,14 +211,13 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
 
     ProcessChange processChange = new ProcessChange(processId);
     try {
-      Long oldAliveId = processCache.getCopy(processId).getAliveTagId();
-
       processConfigTransacted.doUpdateProcess(processId, elementProperties);
 
       //stop old, start new - transaction is committed here
       if (aliveConfigure) {
-        processFacade.removeAliveDirectly(oldAliveId);
-        processFacade.loadAndStartAliveTag(processId);
+        processService.startAliveTimerBySupervisedId(processId);
+
+        // TODO (Alex) Is this call correct? Looks like maybe they wanted to setReboot instead?
         processChange.requiresReboot();
       }
 
@@ -245,6 +234,7 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
 
   /**
    * Setter.
+   *
    * @param allowRunningProcessRemoval the allowRunningProcessRemoval to set
    */
   public void setAllowRunningProcessRemoval(final boolean allowRunningProcessRemoval) {
@@ -253,6 +243,7 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
 
   /**
    * Removes process alive and state tags (from DB and cache).
+   *
    * @param process
    * @param processReport
    */
@@ -272,6 +263,7 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
 
   /**
    * Used for testing.
+   *
    * @param processConfigTransacted the processConfigTransacted to set
    */
   public void setProcessConfigTransacted(ProcessConfigTransacted processConfigTransacted) {

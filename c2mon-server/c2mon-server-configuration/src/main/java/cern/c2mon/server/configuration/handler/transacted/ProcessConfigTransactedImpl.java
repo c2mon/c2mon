@@ -16,105 +16,80 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.handler.transacted;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.UnexpectedRollbackException;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
-import cern.c2mon.server.cache.ControlTagCache;
-import cern.c2mon.server.cache.ControlTagFacade;
-import cern.c2mon.server.cache.ProcessCache;
-import cern.c2mon.server.cache.ProcessFacade;
+import cern.c2mon.cache.actions.process.ProcessCacheObjectFactory;
+import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.server.cache.loading.ProcessDAO;
-import cern.c2mon.server.common.control.ControlTag;
-import cern.c2mon.server.common.control.ControlTagCacheObject;
+import cern.c2mon.server.common.alive.AliveTimer;
+import cern.c2mon.server.common.alive.AliveTimerCacheObject;
+import cern.c2mon.server.common.commfault.CommFaultTag;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.configuration.ConfigurationLoader;
 import cern.c2mon.server.configuration.impl.ProcessChange;
-import cern.c2mon.server.daq.JmsContainerManager;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import cern.c2mon.shared.common.ConfigurationException;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Properties;
 
 /**
  * See interface docs.
  *
  * @author Mark Brightwell
- *
  */
 @Slf4j
 @Service
 public class ProcessConfigTransactedImpl implements ProcessConfigTransacted {
 
-  /**
-   * Reference to facade.
-   */
-  private final ProcessFacade processFacade;
+  private final ProcessCacheObjectFactory processCacheObjectFactory;
 
-  /**
-   * Reference to cache.
-   */
-  private final ProcessCache processCache;
+  private final C2monCache<Process> processCache;
 
-  /**
-   * Reference to DAO.
-   */
   private final ProcessDAO processDAO;
+  private final C2monCache<AliveTimer> aliveTimerCache;
+  private final C2monCache<CommFaultTag> commFaultTagCache;
 
-  private final ControlTagCache controlCache;
 
   /**
    * Autowired constructor.
    *
-   * @param processFacade the facade bean
    * @param processCache the cache bean
-   * @param processDAO the DAO bean
-   * @param jmsContainerManager JmsContainerManager bean
-   * @param controlCache the control tag cache
-   * @param controlTagFacade The control tag facade
+   * @param processDAO   the DAO bean
    */
   @Autowired
-  public ProcessConfigTransactedImpl(final ProcessFacade processFacade, final ProcessCache processCache, final ProcessDAO processDAO,
-      final JmsContainerManager jmsContainerManager, ControlTagCache controlCache, ControlTagFacade controlTagFacade) {
+  public ProcessConfigTransactedImpl(final C2monCache<Process> processCache, final ProcessDAO processDAO,
+                                     final C2monCache<AliveTimer> aliveTimerCache, final C2monCache<CommFaultTag> commFaultTagCache,
+                                     final ProcessCacheObjectFactory processCacheObjectFactory) {
     super();
-    this.processFacade = processFacade;
     this.processCache = processCache;
     this.processDAO = processDAO;
-    this.controlCache = controlCache;
+    this.aliveTimerCache = aliveTimerCache;
+    this.commFaultTagCache = commFaultTagCache;
+    this.processCacheObjectFactory = processCacheObjectFactory;
   }
 
   /**
    * Creates the process and inserts it into the cache and DB (DB first).
    *
-   * <p>
    * Changing a process id is not currently allowed.
    *
-   * @param element
-   *          the configuration element
-   * @throws IllegalAccessException
-   *           not thrown (inherited from common facade interface)
+   * @param element the configuration element
    */
   @Override
   @Transactional(value = "cacheTransactionManager")
-  public ProcessChange doCreateProcess(final ConfigurationElement element) throws IllegalAccessException {
-    processCache.acquireWriteLockOnKey(element.getEntityId());
-    try {
-      Process process = processFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
+  public ProcessChange doCreateProcess(final ConfigurationElement element) {
+    return processCache.executeTransaction(() -> {
+      Process process = processCacheObjectFactory.createCacheObject(element.getEntityId(), element.getElementProperties());
       processDAO.insert(process);
-      processCache.putQuiet(process);
-
-      updateControlTagInformation(element, process);
-
+      processCache.putQuiet(process.getId(), process);
+      updateControlTagInformation(process);
       return new ProcessChange(process.getId());
-    } finally {
-      processCache.releaseWriteLockOnKey(element.getEntityId());
-    }
+    });
   }
 
   /**
@@ -122,27 +97,16 @@ public class ProcessConfigTransactedImpl implements ProcessConfigTransacted {
    * layer, but the Configuration object is already build into the logic below
    * (always empty and hence ignored in the {@link ConfigurationLoader}).
    *
-   * @param id
-   * @param properties
    * @return change requiring DAQ reboot, but not to be sent to the DAQ layer
-   *         (not supported)
-   * @throws IllegalAccessException
+   * (not supported)
    */
   @Override
   @Transactional(value = "cacheTransactionManager")
-  public ProcessChange doUpdateProcess(final Long id, final Properties properties) throws IllegalAccessException {
-
-    processCache.acquireWriteLockOnKey(id);
-    try {
-      Process processCopy = processCache.getCopy(id);
-
-      processFacade.updateConfig(processCopy, properties);
-      processDAO.updateConfig(processCopy);
-      processCache.put(id, processCopy);
-    }
-    finally {
-      processCache.releaseWriteLockOnKey(id);
-    }
+  public ProcessChange doUpdateProcess(final Long id, final Properties properties) {
+    processCache.compute(id, process -> {
+      processCacheObjectFactory.updateConfig(process, properties);
+      processDAO.updateConfig(process);
+    });
 
     return new ProcessChange(id);
   }
@@ -156,52 +120,25 @@ public class ProcessConfigTransactedImpl implements ProcessConfigTransacted {
 
   @Override
   public void removeEquipmentFromProcess(Long equipmentId, Long processId) {
-    try {
-      processCache.acquireWriteLockOnKey(processId);
-      try {
-        Process processCopy = processCache.getCopy(processId);
-        log.debug("Removing Process Equipment {} for process {}", equipmentId, processCopy.getName());
-        processCopy.getEquipmentIds().remove(equipmentId);
-        processCache.putQuiet(processCopy);
-      } finally {
-        processCache.releaseWriteLockOnKey(processId);
-      }
-    } catch (RuntimeException e) {
-      throw new UnexpectedRollbackException("Unable to remove equipment reference in process.", e);
-    }
+    log.debug("Removing Process Equipment {} for processId {}", equipmentId, processId);
+    processCache.compute(processId, process -> process.getEquipmentIds().remove(equipmentId));
   }
 
   /**
-   * Ensures that the Alive-, Status- and CommFault Tags have appropriately the Process id set.
+   * Ensures that the Alive-, Status- have appropriately the Process id set.
+   *
    * @param process The equipment to which the control tags are assigned
    */
-  private List<ProcessChange> updateControlTagInformation(final ConfigurationElement element, final Process process) {
-
-      List<ProcessChange> changes = new ArrayList<>(3);
-      Long processId = process.getId();
-
-      ControlTag aliveTagCopy = controlCache.getCopy(process.getAliveTagId());
-      if (aliveTagCopy != null) {
-        setProcessId((ControlTagCacheObject) aliveTagCopy, processId);
-      } else {
-        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
-            String.format("No Alive tag (%s) found for process #%d (%s).", process.getAliveTagId(), process.getId(), process.getName()));
-      }
-
-      ControlTag statusTagCopy = controlCache.getCopy(process.getStateTagId());
-      if (statusTagCopy != null) {
-        setProcessId((ControlTagCacheObject) statusTagCopy, processId);
-      } else {
-        throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
-            String.format("No Status tag (%s) found for process #%d (%s).", process.getStateTagId(), process.getId(), process.getName()));
-      }
-
-      return changes;
-  }
-
-  private void setProcessId(ControlTagCacheObject copy, Long processId) {
-    log.trace("Adding process id #{} to control tag {} (#{})", processId, copy.getName(), copy.getId());
-    copy.setProcessId(processId);
-    controlCache.putQuiet(copy);
+  private void updateControlTagInformation(final Process process) {
+    // TODO (Alex) ComputeQuiet
+    try {
+      aliveTimerCache.compute(process.getAliveTagId(), aliveTimer -> {
+        log.trace("Adding process id #{} to alive timer {} (#{})", process.getId(), aliveTimer.getRelatedName(), aliveTimer.getId());
+        ((AliveTimerCacheObject) aliveTimer).setRelatedId(process.getId());
+      });
+    } catch (CacheElementNotFoundException e) {
+      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
+        String.format("No Alive tag (%s) found for process #%d (%s).", process.getAliveTagId(), process.getId(), process.getName()));
+    }
   }
 }

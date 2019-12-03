@@ -111,6 +111,15 @@ public abstract class AbstractSupervisedService<T extends Supervised> extends Ab
   }
 
   @Override
+  public void startAliveTimerBySupervisedId(long id) {
+    // TODO (Alex) Should this send any extra notifs?
+
+//    Long oldAliveId = processCache.get(processId).getAliveTagId();
+//    processService.removeAliveDirectly(oldAliveId);
+//    processService.loadAndStartAliveTag(processId);
+  }
+
+  @Override
   public List<SupervisionEvent> getAllSupervisionEvents() {
     return cache.getKeys().parallelStream()
       .map(key -> cache.get(key).getSupervisionEvent())

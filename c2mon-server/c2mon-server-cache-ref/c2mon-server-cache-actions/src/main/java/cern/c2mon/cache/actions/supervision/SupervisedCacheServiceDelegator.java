@@ -70,6 +70,11 @@ public interface SupervisedCacheServiceDelegator<T extends Supervised> extends S
   }
 
   @Override
+  default void startAliveTimerBySupervisedId(long id) {
+    getSupervisedService().startAliveTimerBySupervisedId(id);
+  }
+
+  @Override
   default SupervisionConstants.SupervisionEntity getSupervisionEntity() {
     return getSupervisedService().getSupervisionEntity();
   }

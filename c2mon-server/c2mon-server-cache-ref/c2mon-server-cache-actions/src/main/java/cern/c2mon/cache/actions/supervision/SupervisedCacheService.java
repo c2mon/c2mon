@@ -131,6 +131,8 @@ public interface SupervisedCacheService<T extends Supervised> extends AbstractCa
    */
   void removeAliveTimerBySupervisedId(long id);
 
+  void startAliveTimerBySupervisedId(long id);
+
   SupervisionConstants.SupervisionEntity getSupervisionEntity();
 
   List<SupervisionEvent> getAllSupervisionEvents();
