@@ -18,6 +18,8 @@ package cern.c2mon.server.common.commfault;
 
 import cern.c2mon.shared.common.Cacheable;
 
+import java.sql.Timestamp;
+
 public interface CommFaultTag extends Cacheable {
   
   Long getEquipmentId();
@@ -29,5 +31,8 @@ public interface CommFaultTag extends Cacheable {
   Long getStateTagId();
 
   Long getAliveTagId();
-  
+
+  Timestamp getEventTimestamp();
+
+  void setEventTimestamp(Timestamp eventTimestamp);
 }

@@ -22,6 +22,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.sql.Timestamp;
+
 /**
  * Cache object corresponding to entries in the DB CommFaultTag view.
  *
@@ -43,6 +45,8 @@ public class CommFaultTagCacheObject extends AbstractCacheableImpl implements Co
     private Long aliveTagId;
 
     private Long stateTagId;
+
+    private Timestamp eventTimestamp;
 
     /**
      * Constructor setting minimal set of non-null fields.
