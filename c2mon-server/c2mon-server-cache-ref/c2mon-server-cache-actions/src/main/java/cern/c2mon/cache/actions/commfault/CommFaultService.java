@@ -2,7 +2,6 @@ package cern.c2mon.cache.actions.commfault;
 
 import cern.c2mon.cache.actions.AbstractCacheServiceImpl;
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.cache.api.flow.DefaultC2monCacheFlow;
 import cern.c2mon.server.common.commfault.CommFaultTag;
 import cern.c2mon.server.common.commfault.CommFaultTagCacheObject;
 import cern.c2mon.server.common.equipment.AbstractEquipment;
@@ -20,7 +19,7 @@ public class CommFaultService extends AbstractCacheServiceImpl<CommFaultTag> {
 
   @Inject
   public CommFaultService(final C2monCache<CommFaultTag> commFaultTagCacheRef) {
-    super(commFaultTagCacheRef, new DefaultC2monCacheFlow<>());
+    super(commFaultTagCacheRef, new CommFaultCacheFlow());
   }
 
   public void generateFromEquipment(AbstractEquipment abstractEquipment) {
