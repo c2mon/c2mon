@@ -20,7 +20,7 @@ public class DataTagService extends AbstractCacheServiceImpl<DataTag> {
 
   @Inject
   public DataTagService(C2monCache<DataTag> cache) {
-    super(cache, new DataTagC2monCacheFlow());
+    super(cache, new DataTagCacheFlow());
   }
 
   /**

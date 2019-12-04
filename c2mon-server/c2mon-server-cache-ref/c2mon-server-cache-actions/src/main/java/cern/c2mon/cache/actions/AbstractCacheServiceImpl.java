@@ -2,7 +2,7 @@ package cern.c2mon.cache.actions;
 
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.flow.CacheUpdateFlow;
-import cern.c2mon.cache.api.flow.DefaultC2monCacheFlow;
+import cern.c2mon.cache.api.flow.DefaultCacheFlow;
 import cern.c2mon.shared.common.Cacheable;
 import lombok.Getter;
 
@@ -14,7 +14,7 @@ public abstract class AbstractCacheServiceImpl<T extends Cacheable> implements A
   protected C2monCache<T> cache;
 
   public AbstractCacheServiceImpl(C2monCache<T> cache, BiPredicate<T, T> c2monCacheFlow) {
-    this(cache, new DefaultC2monCacheFlow<>(c2monCacheFlow));
+    this(cache, new DefaultCacheFlow<>(c2monCacheFlow));
   }
 
   public AbstractCacheServiceImpl(C2monCache<T> cache, CacheUpdateFlow<T> c2monCacheFlow) {

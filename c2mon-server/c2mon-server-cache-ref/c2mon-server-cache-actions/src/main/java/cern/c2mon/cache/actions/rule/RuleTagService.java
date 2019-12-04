@@ -2,7 +2,7 @@ package cern.c2mon.cache.actions.rule;
 
 import cern.c2mon.cache.actions.AbstractCacheServiceImpl;
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.cache.api.flow.DefaultC2monCacheFlow;
+import cern.c2mon.cache.api.flow.DefaultCacheFlow;
 import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.rule.RuleTagCacheObject;
 import cern.c2mon.server.common.tag.Tag;
@@ -20,7 +20,7 @@ public class RuleTagService extends AbstractCacheServiceImpl<RuleTag> {
 
   @Inject
   public RuleTagService(final C2monCache<RuleTag> ruleCacheRef) {
-    super(ruleCacheRef, new DefaultC2monCacheFlow<>());
+    super(ruleCacheRef, new DefaultCacheFlow<>());
   }
 
   /**

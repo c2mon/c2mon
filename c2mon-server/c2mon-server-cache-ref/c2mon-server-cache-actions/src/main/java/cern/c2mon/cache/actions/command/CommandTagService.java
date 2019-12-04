@@ -3,7 +3,7 @@ package cern.c2mon.cache.actions.command;
 import cern.c2mon.cache.actions.AbstractCacheServiceImpl;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
-import cern.c2mon.cache.api.flow.DefaultC2monCacheFlow;
+import cern.c2mon.cache.api.flow.DefaultCacheFlow;
 import cern.c2mon.shared.common.command.CommandTag;
 import cern.c2mon.shared.common.command.SourceCommandTag;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +20,7 @@ public class CommandTagService extends AbstractCacheServiceImpl<CommandTag> {
 
   @Inject
   public CommandTagService(C2monCache<CommandTag> commandTagCacheRef) {
-    super(commandTagCacheRef, new DefaultC2monCacheFlow<>());
+    super(commandTagCacheRef, new DefaultCacheFlow<>());
   }
 
   /**

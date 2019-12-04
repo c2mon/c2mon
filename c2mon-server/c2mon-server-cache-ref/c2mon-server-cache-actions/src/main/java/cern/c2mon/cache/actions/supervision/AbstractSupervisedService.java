@@ -33,7 +33,7 @@ public abstract class AbstractSupervisedService<T extends Supervised> extends Ab
   public AbstractSupervisedService(final C2monCache<T> cache, SupervisionEntity supervisionEntity,
                                    final AliveTimerService aliveTimerService,
                                    final DataTagService dataTagService) {
-    super(cache, new AbstractSupervisedC2monCacheFlow<>());
+    super(cache, new AbstractSupervisedCacheFlow<>());
     this.supervisionEntity = supervisionEntity;
     this.aliveTimerService = aliveTimerService;
     this.dataTagService = dataTagService;

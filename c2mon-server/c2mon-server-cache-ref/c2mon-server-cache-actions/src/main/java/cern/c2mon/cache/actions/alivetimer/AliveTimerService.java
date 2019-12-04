@@ -27,7 +27,7 @@ public class AliveTimerService extends AbstractCacheServiceImpl<AliveTimer> {
 
   @Inject
   public AliveTimerService(C2monCache<AliveTimer> aliveTimerCacheRef) {
-    super(aliveTimerCacheRef, new AliveTimerC2monCacheFlow());
+    super(aliveTimerCacheRef, new AliveTimerCacheFlow());
   }
 
   public boolean isRegisteredAliveTimer(final Long id) {

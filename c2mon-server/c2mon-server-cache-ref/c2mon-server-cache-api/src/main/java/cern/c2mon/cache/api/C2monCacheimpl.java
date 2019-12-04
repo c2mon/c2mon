@@ -2,7 +2,7 @@ package cern.c2mon.cache.api;
 
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.cache.api.flow.CacheUpdateFlow;
-import cern.c2mon.cache.api.flow.DefaultC2monCacheFlow;
+import cern.c2mon.cache.api.flow.DefaultCacheFlow;
 import cern.c2mon.cache.api.listener.CacheListenerManager;
 import cern.c2mon.cache.api.listener.CacheListenerManagerImpl;
 import cern.c2mon.cache.api.loader.CacheLoader;
@@ -29,7 +29,7 @@ public abstract class C2monCacheimpl<CACHEABLE extends Cacheable> implements C2m
 
   @Getter
   @Setter
-  protected CacheUpdateFlow<CACHEABLE> cacheUpdateFlow = new DefaultC2monCacheFlow<>();
+  protected CacheUpdateFlow<CACHEABLE> cacheUpdateFlow = new DefaultCacheFlow<>();
 
   @Getter
   @Setter

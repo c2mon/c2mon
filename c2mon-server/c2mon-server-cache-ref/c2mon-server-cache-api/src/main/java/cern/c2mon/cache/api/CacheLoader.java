@@ -5,11 +5,11 @@ import cern.c2mon.shared.common.Cacheable;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class C2monCacheLoader<V extends Cacheable> {
+public class CacheLoader<V extends Cacheable> {
 
   private C2monCache<V> cache;
 
-  public C2monCacheLoader(C2monCache<V> cache) {
+  public CacheLoader(C2monCache<V> cache) {
     this.cache = cache;
   }
 

@@ -39,7 +39,7 @@ public class AlarmService extends AbstractCacheServiceImpl<Alarm> implements Ala
   @Inject
   public AlarmService(final C2monCache<Alarm> cache, final UnifiedTagCacheFacade unifiedTagCacheFacade,
                       final OscillationUpdater oscillationUpdater) {
-    super(cache, new AlarmC2monCacheFlow());
+    super(cache, new AlarmCacheFlow());
     // TODO (Alex) We probably want to increase the number of threads in the CacheListenerManager here
     this.unifiedTagCacheFacade = unifiedTagCacheFacade;
     this.oscillationUpdater = oscillationUpdater;

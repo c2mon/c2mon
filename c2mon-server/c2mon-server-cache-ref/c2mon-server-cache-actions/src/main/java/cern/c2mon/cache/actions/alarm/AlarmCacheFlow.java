@@ -1,11 +1,11 @@
 package cern.c2mon.cache.actions.alarm;
 
-import cern.c2mon.cache.api.flow.DefaultC2monCacheFlow;
+import cern.c2mon.cache.api.flow.DefaultCacheFlow;
 import cern.c2mon.server.common.alarm.Alarm;
 
-class AlarmC2monCacheFlow extends DefaultC2monCacheFlow<Alarm> {
+class AlarmCacheFlow extends DefaultCacheFlow<Alarm> {
 
-  AlarmC2monCacheFlow() {
+  AlarmCacheFlow() {
     super((older, newer) -> newer.getSourceTimestamp().getTime() >= older.getSourceTimestamp().getTime());
   }
 }

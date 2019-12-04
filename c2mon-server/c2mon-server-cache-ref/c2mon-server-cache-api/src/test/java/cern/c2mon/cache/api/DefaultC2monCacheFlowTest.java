@@ -1,6 +1,6 @@
 package cern.c2mon.cache.api;
 
-import cern.c2mon.cache.api.flow.DefaultC2monCacheFlow;
+import cern.c2mon.cache.api.flow.DefaultCacheFlow;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.shared.common.CacheEvent;
@@ -9,7 +9,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertTrue;
 
 public class DefaultC2monCacheFlowTest {
-  private DefaultC2monCacheFlow<Alarm> cacheFlow = new DefaultC2monCacheFlow<>();
+  private DefaultCacheFlow<Alarm> cacheFlow = new DefaultCacheFlow<>();
 
   @Test
   public void preInsertValidateAcceptsNull() {

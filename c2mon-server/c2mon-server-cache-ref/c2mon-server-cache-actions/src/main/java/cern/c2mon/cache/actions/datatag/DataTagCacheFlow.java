@@ -1,15 +1,15 @@
 package cern.c2mon.cache.actions.datatag;
 
-import cern.c2mon.cache.api.flow.DefaultC2monCacheFlow;
+import cern.c2mon.cache.api.flow.DefaultCacheFlow;
 import cern.c2mon.server.common.datatag.DataTag;
 import lombok.extern.slf4j.Slf4j;
 
 import java.sql.Timestamp;
 
 @Slf4j
-class DataTagC2monCacheFlow extends DefaultC2monCacheFlow<DataTag> {
+class DataTagCacheFlow extends DefaultCacheFlow<DataTag> {
 
-  DataTagC2monCacheFlow() {
+  DataTagCacheFlow() {
     super((older, newer) -> !filterout(older, newer));
   }
 

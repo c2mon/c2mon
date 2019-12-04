@@ -25,7 +25,7 @@ package cern.c2mon.server.common.config;
  * @author Mark Brightwell
  *
  */
-public enum C2monCacheName {
+public enum CacheName {
 
   /**
    * DataTag cache.

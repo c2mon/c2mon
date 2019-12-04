@@ -2,7 +2,7 @@ package cern.c2mon.cache.actions.deviceclass;
 
 import cern.c2mon.cache.actions.AbstractCacheServiceImpl;
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.cache.api.flow.DefaultC2monCacheFlow;
+import cern.c2mon.cache.api.flow.DefaultCacheFlow;
 import cern.c2mon.server.common.device.DeviceClass;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +18,7 @@ public class DeviceClassService extends AbstractCacheServiceImpl<DeviceClass> {
 
   @Inject
   public DeviceClassService(C2monCache<DeviceClass> deviceClassCacheRef) {
-    super(deviceClassCacheRef, new DefaultC2monCacheFlow<>());
+    super(deviceClassCacheRef, new DefaultCacheFlow<>());
   }
 
   public List<String> getDeviceClassNames() {
