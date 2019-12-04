@@ -16,20 +16,19 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.handler.impl;
 
-import java.util.Properties;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.UnexpectedRollbackException;
-
-import cern.c2mon.server.cache.DeviceCache;
+import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.server.common.device.Device;
 import cern.c2mon.server.configuration.handler.DeviceConfigHandler;
 import cern.c2mon.server.configuration.handler.transacted.DeviceConfigTransacted;
 import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.UnexpectedRollbackException;
+
+import java.util.Properties;
 
 /**
  * Implementation of {@link DeviceConfigHandler}.
@@ -37,23 +36,15 @@ import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
  * @author Justin Lewis Salmon
  */
 @Service
+@Slf4j
 public class DeviceConfigHandlerImpl implements DeviceConfigHandler {
 
-  /**
-   * Class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(DeviceConfigHandlerImpl.class);
-
-  /**
-   * Transacted bean.
-   */
-  @Autowired
   private DeviceConfigTransacted deviceConfigTransacted;
 
   /**
    * Reference to the Device cache.
    */
-  private DeviceCache deviceCache;
+  private C2monCache<Device> deviceCache;
 
   /**
    * Default constructor.
@@ -61,24 +52,23 @@ public class DeviceConfigHandlerImpl implements DeviceConfigHandler {
    * @param deviceCache autowired reference to the Device cache.
    */
   @Autowired
-  public DeviceConfigHandlerImpl(final DeviceCache deviceCache) {
+  public DeviceConfigHandlerImpl(final C2monCache<Device> deviceCache, final DeviceConfigTransacted deviceConfigTransacted) {
     this.deviceCache = deviceCache;
+    this.deviceConfigTransacted = deviceConfigTransacted;
   }
 
   @Override
   public ProcessChange createDevice(ConfigurationElement element) throws IllegalAccessException {
-    ProcessChange change = deviceConfigTransacted.doCreateDevice(element);
-    return change;
+    return deviceConfigTransacted.doCreateDevice(element);
   }
 
   @Override
   public ProcessChange updateDevice(Long id, Properties elementProperties) {
     try {
-      ProcessChange processChange = deviceConfigTransacted.doUpdateDevice(id, elementProperties);
-      return processChange;
+      return deviceConfigTransacted.doUpdateDevice(id, elementProperties);
 
     } catch (UnexpectedRollbackException e) {
-      LOGGER.error("Rolling back update in cache");
+      log.error("Rolling back update in cache");
       // DB transaction is rolled back here: reload the tag
       deviceCache.remove(id);
       deviceCache.loadFromDb(id);

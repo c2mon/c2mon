@@ -22,7 +22,6 @@ import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.server.cache.loading.ProcessDAO;
 import cern.c2mon.server.common.alive.AliveTimer;
 import cern.c2mon.server.common.alive.AliveTimerCacheObject;
-import cern.c2mon.server.common.commfault.CommFaultTag;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.configuration.ConfigurationLoader;
 import cern.c2mon.server.configuration.impl.ProcessChange;
@@ -52,7 +51,6 @@ public class ProcessConfigTransactedImpl implements ProcessConfigTransacted {
 
   private final ProcessDAO processDAO;
   private final C2monCache<AliveTimer> aliveTimerCache;
-  private final C2monCache<CommFaultTag> commFaultTagCache;
 
 
   /**
@@ -63,13 +61,12 @@ public class ProcessConfigTransactedImpl implements ProcessConfigTransacted {
    */
   @Autowired
   public ProcessConfigTransactedImpl(final C2monCache<Process> processCache, final ProcessDAO processDAO,
-                                     final C2monCache<AliveTimer> aliveTimerCache, final C2monCache<CommFaultTag> commFaultTagCache,
+                                     final C2monCache<AliveTimer> aliveTimerCache,
                                      final ProcessCacheObjectFactory processCacheObjectFactory) {
     super();
     this.processCache = processCache;
     this.processDAO = processDAO;
     this.aliveTimerCache = aliveTimerCache;
-    this.commFaultTagCache = commFaultTagCache;
     this.processCacheObjectFactory = processCacheObjectFactory;
   }
 

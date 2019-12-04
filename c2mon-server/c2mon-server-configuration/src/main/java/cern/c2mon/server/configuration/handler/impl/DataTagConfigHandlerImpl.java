@@ -16,17 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.handler.impl;
 
-import java.util.Properties;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.UnexpectedRollbackException;
-
-import cern.c2mon.server.cache.DataTagCache;
-import cern.c2mon.server.cache.EquipmentFacade;
-import cern.c2mon.server.cache.SubEquipmentFacade;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.configuration.handler.DataTagConfigHandler;
@@ -35,6 +25,12 @@ import cern.c2mon.server.configuration.impl.ConfigurationUpdateImpl;
 import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.UnexpectedRollbackException;
+
+import java.util.Properties;
 
 /**
  * See interface documentation also.
@@ -47,17 +43,10 @@ import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
  *
  */
 @Service
+@Slf4j
 public class DataTagConfigHandlerImpl implements DataTagConfigHandler {
 
-  /**
-   * Class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(DataTagConfigHandlerImpl.class);
 
-  /**
-   * Bean with DB transactions on methods.
-   */
-  @Autowired
   private DataTagConfigTransacted dataTagConfigTransacted;
 
   /**
@@ -69,43 +58,36 @@ public class DataTagConfigHandlerImpl implements DataTagConfigHandler {
   /**
    * Cache for final removal.
    */
-  private DataTagCache dataTagCache;
-
-  private EquipmentFacade equipmentFacade;
-  private SubEquipmentFacade subEquipmentFacade;
+  private C2monCache<DataTag> dataTagCache;
 
   /**
    * Constructor.
+   * @param dataTagConfigTransacted
    * @param dataTagCache cache
-   * @param equipmentFacade
-   * @param subEquipmentFacade
    * @param configurationUpdateImpl
    */
   @Autowired
-  public DataTagConfigHandlerImpl(DataTagCache dataTagCache, EquipmentFacade equipmentFacade, SubEquipmentFacade subEquipmentFacade,
-      ConfigurationUpdateImpl configurationUpdateImpl) {
+  public DataTagConfigHandlerImpl(C2monCache<DataTag> dataTagCache, ConfigurationUpdateImpl configurationUpdateImpl,
+                                  DataTagConfigTransacted dataTagConfigTransacted) {
     this.dataTagCache = dataTagCache;
-    this.equipmentFacade = equipmentFacade;
-    this.subEquipmentFacade = subEquipmentFacade;
     this.configurationUpdateImpl = configurationUpdateImpl;
+    this.dataTagConfigTransacted = dataTagConfigTransacted;
   }
 
   @Override
   public ProcessChange createDataTag(ConfigurationElement element) throws IllegalAccessException {
     ProcessChange change = dataTagConfigTransacted.doCreateDataTag(element);
     dataTagCache.notifyListenersOfUpdate(element.getEntityId());
-    if (LOGGER.isTraceEnabled()) {
-    	LOGGER.trace("createDataTag - Notifying Configuration update listeners");
-    }
+    log.trace("createDataTag - Notifying Configuration update listeners");
     this.configurationUpdateImpl.notifyListeners(element.getEntityId());
     return change;
   }
 
   @Override
   public ProcessChange removeDataTag(Long id, ConfigurationElementReport tagReport) {
-    LOGGER.trace("Removing DataTag " + id);
+    log.trace("Removing DataTag " + id);
     try {
-      DataTag tagCopy = dataTagCache.getCopy(id);
+      DataTag tagCopy = dataTagCache.get(id);
       ProcessChange change = dataTagConfigTransacted.doRemoveDataTag(id, tagReport);
       dataTagCache.remove(id); //only removed from cache if no exception is thrown
 
@@ -120,13 +102,11 @@ public class DataTagConfigHandlerImpl implements DataTagConfigHandler {
   public ProcessChange updateDataTag(Long id, Properties elementProperties) {
 	  try {
 		  ProcessChange processChange = dataTagConfigTransacted.doUpdateDataTag(id, elementProperties);
-		  if (LOGGER.isTraceEnabled()) {
-		    	LOGGER.trace("createDataTag - Notifying Configuration update listeners");
-		    }
+      log.trace("createDataTag - Notifying Configuration update listeners");
 		  this.configurationUpdateImpl.notifyListeners(id);
 		  return processChange;
 	  } catch (UnexpectedRollbackException e) {
-		  LOGGER.error("Rolling back update in cache");
+		  log.error("Rolling back update in cache");
 		  dataTagCache.remove(id); //DB transaction is rolled back here: reload the tag
 		  dataTagCache.loadFromDb(id);
 		  throw e;

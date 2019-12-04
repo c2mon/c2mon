@@ -16,14 +16,16 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.handler.impl;
 
-import cern.c2mon.server.cache.AlarmCache;
-import cern.c2mon.server.cache.AlarmFacade;
+import cern.c2mon.cache.actions.alarm.AlarmService;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
+import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.configuration.handler.AlarmConfigHandler;
 import cern.c2mon.server.configuration.handler.transacted.AlarmConfigTransacted;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
+import cern.c2mon.shared.common.CacheEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,31 +38,23 @@ import java.util.Properties;
  * See interface documentation.
  *
  * @author Mark Brightwell
- *
  */
 @Slf4j
 @Service
 public class AlarmConfigHandlerImpl implements AlarmConfigHandler {
 
-  /**
-   * Transacted bean.
-   */
-  @Autowired
   private AlarmConfigTransacted alarmConfigTransacted;
 
-  /**
-   * Cache.
-   */
-  private AlarmCache alarmCache;
+  private C2monCache<Alarm> alarmCache;
 
-  private AlarmFacade alarmFacade;
+  private AlarmService alarmService;
 
   @Autowired
-  public AlarmConfigHandlerImpl(AlarmCache alarmCache,
-                                AlarmFacade alarmFacade) {
+  public AlarmConfigHandlerImpl(AlarmConfigTransacted alarmConfigTransacted, AlarmService alarmService) {
     super();
-    this.alarmCache = alarmCache;
-    this.alarmFacade = alarmFacade;
+    this.alarmConfigTransacted = alarmConfigTransacted;
+    this.alarmCache = alarmService.getCache();
+    this.alarmService = alarmService;
   }
 
   /**
@@ -70,13 +64,13 @@ public class AlarmConfigHandlerImpl implements AlarmConfigHandler {
    * tag, removes the alarm from the DB and removes the alarm form the cache,
    * in that order.
    *
-   * @param alarmId the id of the alarm to remove
+   * @param alarmId     the id of the alarm to remove
    * @param alarmReport the configuration report for the alarm removal
    */
   @Override
   public void removeAlarm(final Long alarmId, final ConfigurationElementReport alarmReport) {
     try {
-      AlarmCacheObject alarm = (AlarmCacheObject) alarmCache.getCopy(alarmId);
+      AlarmCacheObject alarm = (AlarmCacheObject) alarmCache.get(alarmId);
       alarmConfigTransacted.doRemoveAlarm(alarmId, alarmReport);
       alarmCache.remove(alarmId); //will be skipped if rollback exception thrown in do method
 
@@ -84,7 +78,8 @@ public class AlarmConfigHandlerImpl implements AlarmConfigHandler {
       alarm.setInfo("Alarm was removed");
       alarm.setTriggerTimestamp(new Timestamp(System.currentTimeMillis()));
 
-      alarmCache.notifyListenersOfUpdate(alarm);
+      // TODO Could this be switched to some sort of REMOVED event?
+      alarmCache.getCacheListenerManager().notifyListenersOf(CacheEvent.UPDATE_ACCEPTED, alarm);
     } catch (CacheElementNotFoundException e) {
       alarmReport.setWarning("Alarm " + alarmId + " is not know by the system ==> Nothing to be removed from the Alarm cache.");
     }
@@ -93,14 +88,14 @@ public class AlarmConfigHandlerImpl implements AlarmConfigHandler {
   @Override
   public void createAlarm(ConfigurationElement element) throws IllegalAccessException {
     alarmConfigTransacted.doCreateAlarm(element);
-    alarmFacade.evaluateAlarm(element.getEntityId());
+    alarmService.evaluateAlarm(element.getEntityId());
   }
 
   @Override
   public void updateAlarm(Long alarmId, Properties properties) {
     try {
       alarmConfigTransacted.doUpdateAlarm(alarmId, properties);
-      alarmFacade.evaluateAlarm(alarmId);
+      alarmService.evaluateAlarm(alarmId);
     } catch (UnexpectedRollbackException e) {
       log.error("Rolling back Alarm update in cache");
       alarmCache.remove(alarmId);

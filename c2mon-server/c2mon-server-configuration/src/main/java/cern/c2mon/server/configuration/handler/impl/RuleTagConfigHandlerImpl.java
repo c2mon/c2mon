@@ -16,20 +16,20 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.handler.impl;
 
-import java.util.Properties;
-
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.UnexpectedRollbackException;
-
-import cern.c2mon.server.cache.RuleTagCache;
+import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.configuration.handler.RuleTagConfigHandler;
 import cern.c2mon.server.configuration.handler.transacted.RuleTagConfigTransacted;
 import cern.c2mon.server.configuration.impl.ConfigurationUpdateImpl;
 import cern.c2mon.server.rule.RuleEvaluator;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.UnexpectedRollbackException;
+
+import java.util.Properties;
 
 /**
  * See interface documentation.
@@ -47,13 +47,9 @@ public class RuleTagConfigHandlerImpl implements RuleTagConfigHandler {
    */
   private ConfigurationUpdateImpl configurationUpdateImpl;
 
-  /**
-   * Transacted bean.
-   */
-  @Autowired
   private RuleTagConfigTransacted ruleTagConfigTransacted;
 
-  private RuleTagCache ruleTagCache;
+  private C2monCache<RuleTag> ruleTagCache;
 
   private RuleEvaluator ruleEvaluator;
 
@@ -65,10 +61,13 @@ public class RuleTagConfigHandlerImpl implements RuleTagConfigHandler {
    * @param configurationUpdateImpl
    */
   @Autowired
-  public RuleTagConfigHandlerImpl(final RuleTagCache ruleTagCache, final RuleEvaluator ruleEvaluator, final ConfigurationUpdateImpl configurationUpdateImpl) {
+  public RuleTagConfigHandlerImpl(final C2monCache<RuleTag> ruleTagCache, final RuleEvaluator ruleEvaluator,
+                                  final ConfigurationUpdateImpl configurationUpdateImpl,
+                                  RuleTagConfigTransacted ruleTagConfigTransacted) {
     this.ruleTagCache = ruleTagCache;
     this.ruleEvaluator = ruleEvaluator;
     this.configurationUpdateImpl = configurationUpdateImpl;
+    this.ruleTagConfigTransacted = ruleTagConfigTransacted;
   }
 
   @Override

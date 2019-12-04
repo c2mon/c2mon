@@ -16,102 +16,101 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.handler.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import cern.c2mon.server.cache.CommandTagCache;
-import cern.c2mon.server.cache.CommandTagFacade;
-import cern.c2mon.server.cache.EquipmentFacade;
+import cern.c2mon.cache.actions.command.CommandTagCacheObjectFactory;
+import cern.c2mon.cache.actions.command.CommandTagService;
+import cern.c2mon.cache.actions.equipment.EquipmentService;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.cache.loading.CommandTagDAO;
-import cern.c2mon.server.common.command.CommandTagCacheObject;
 import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
+import cern.c2mon.shared.common.CacheEvent;
 import cern.c2mon.shared.common.command.CommandTag;
 import cern.c2mon.shared.daq.config.Change;
 import cern.c2mon.shared.daq.config.CommandTagAdd;
 import cern.c2mon.shared.daq.config.CommandTagRemove;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * See interface documentation.
  *
  * @author Mark Brightwell
- *
  */
 @Slf4j
 @Service
 public class CommandTagConfigHandler {
 
-  @Autowired
-  private CommandTagFacade commandTagFacade;
+  private CommandTagService commandTagService;
 
-  @Autowired
   private CommandTagDAO commandTagDAO;
 
-  @Autowired
-  private CommandTagCache commandTagCache;
+  private CommandTagCacheObjectFactory commandTagCacheObjectFactory;
 
-  @Autowired
-  private EquipmentFacade equipmentFacade;
+  private C2monCache<CommandTag> commandTagCache;
 
-  public List<ProcessChange> createCommandTag(ConfigurationElement element) throws IllegalAccessException {
-    commandTagCache.acquireWriteLockOnKey(element.getEntityId());
-    try {
-      log.trace("Creating CommandTag " + element.getEntityId());
-      CommandTag<?> commandTag = commandTagFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
-      commandTagDAO.insertCommandTag(commandTag);
-      commandTagCache.putQuiet(commandTag);
-      equipmentFacade.addCommandToEquipment(commandTag.getEquipmentId(), commandTag.getId());
+  private EquipmentService equipmentService;
 
-      commandTagCache.notifyListenersOfUpdate(commandTag.getId());
-
-      CommandTagAdd commandTagAdd = new CommandTagAdd(element.getSequenceId(),
-                                                      commandTag.getEquipmentId(),
-                                                      commandTagFacade.generateSourceCommandTag(commandTag));
-      ArrayList<ProcessChange> processChanges = new ArrayList<>();
-      processChanges.add(new ProcessChange(equipmentFacade.getProcessIdForAbstractEquipment(commandTag.getEquipmentId()), commandTagAdd));
-      return processChanges;
-    } finally {
-      commandTagCache.releaseWriteLockOnKey(element.getEntityId());
-    }
+  public CommandTagConfigHandler(CommandTagService commandTagService, CommandTagDAO commandTagDAO,
+                                 CommandTagCacheObjectFactory commandTagCacheObjectFactory, EquipmentService equipmentService) {
+    this.commandTagService = commandTagService;
+    this.commandTagDAO = commandTagDAO;
+    this.commandTagCache = commandTagService.getCache();
+    this.commandTagCacheObjectFactory = commandTagCacheObjectFactory;
+    this.equipmentService = equipmentService;
   }
 
-  public List<ProcessChange> updateCommandTag(Long id, Properties properties) throws IllegalAccessException {
+  public List<ProcessChange> createCommandTag(ConfigurationElement element) {
+    return commandTagCache.executeTransaction(() -> {
+      log.trace("Creating CommandTag " + element.getEntityId());
+      CommandTag<?> commandTag = commandTagCacheObjectFactory.createCacheObject(element.getEntityId(), element.getElementProperties());
+      commandTagDAO.insertCommandTag(commandTag);
+      commandTagCache.putQuiet(commandTag.getId(), commandTag);
+      equipmentService.addCommandToEquipment(commandTag.getEquipmentId(), commandTag.getId());
+
+      commandTagCache.getCacheListenerManager().notifyListenersOf(CacheEvent.UPDATE_ACCEPTED, commandTag);
+
+      CommandTagAdd commandTagAdd = new CommandTagAdd(element.getSequenceId(),
+        commandTag.getEquipmentId(),
+        commandTagService.generateSourceCommandTag(commandTag));
+      ArrayList<ProcessChange> processChanges = new ArrayList<>();
+      processChanges.add(new ProcessChange(equipmentService.getProcessId(commandTag.getEquipmentId()), commandTagAdd));
+      return processChanges;
+    });
+  }
+
+  public List<ProcessChange> updateCommandTag(Long id, Properties properties) {
     log.trace("Updating CommandTag {}", id);
     //reject if trying to change equipment it is attached to - not currently allowed
     if (properties.containsKey("equipmentId")) {
       log.warn("Attempting to change the equipment to which a command is attached - this is not currently supported!");
       properties.remove("equipmentId");
     }
-    Change commandTagUpdate = null;
     Long equipmentId = commandTagCache.get(id).getEquipmentId();
-    commandTagCache.acquireWriteLockOnKey(id);
 
-    try {
+    Change commandTagUpdate = commandTagCache.executeTransaction(() -> {
+      Change commandTagUpdateInternal;
       CommandTag<?> commandTag = commandTagCache.get(id);
-      commandTagUpdate = commandTagFacade.updateConfig(commandTag, properties);
+      commandTagUpdateInternal = commandTagCacheObjectFactory.updateConfig(commandTag, properties);
       commandTagDAO.updateCommandTag(commandTag);
-    } finally {
-      commandTagCache.releaseWriteLockOnKey(id);
-    }
+      return commandTagUpdateInternal;
+    });
 
     List<ProcessChange> processChanges = new ArrayList<>();
 
     if (commandTagUpdate.hasChanged()) {
-      processChanges.add(new ProcessChange(equipmentFacade.getProcessIdForAbstractEquipment(equipmentId), commandTagUpdate));
+      processChanges.add(new ProcessChange(equipmentService.getProcessId(equipmentId), commandTagUpdate));
     }
 
     return processChanges;
   }
 
   /**
-   *
    * @param id
    * @param elementReport
    * @return a ProcessChange event to send to the DAQ if no error occurred
@@ -119,32 +118,29 @@ public class CommandTagConfigHandler {
   public List<ProcessChange> removeCommandTag(final Long id, final ConfigurationElementReport elementReport) {
     log.trace("Removing CommandTag " + id);
     ArrayList<ProcessChange> processChanges = new ArrayList<>();
-    Long equipmentId;
-    commandTagCache.acquireWriteLockOnKey(id);
-    try {
-      CommandTag<?> commandTag = commandTagCache.get(id);
-      equipmentId = commandTag.getEquipmentId();
-      commandTagDAO.deleteCommandTag(commandTag.getId());
-      commandTagCache.remove(commandTag.getId());
-      commandTagCache.releaseWriteLockOnKey(id);
-      //unlock before accessing equipment
-      equipmentFacade.removeCommandFromEquipment(commandTag.getEquipmentId(), commandTag.getId());
-      CommandTagRemove removeEvent = new CommandTagRemove();
-      removeEvent.setCommandTagId(id);
-      removeEvent.setEquipmentId(equipmentId);
-      processChanges.add(new ProcessChange(equipmentFacade.getProcessIdForAbstractEquipment(commandTag.getEquipmentId()), removeEvent));
-    } catch (CacheElementNotFoundException e) {
-      log.warn("Attempting to remove a non-existent Command - no action taken.");
-      elementReport.setWarning("Attempting to remove a non-existent CommandTag");
-    } catch (Exception ex) {
-      elementReport.setFailure("Exception caught while removing a commandtag.", ex);
-      log.error("Exception caught while removing a commandtag (id: " + id + ")", ex);
-      throw new RuntimeException(ex);
-    } finally {
-      if (commandTagCache.isWriteLockedByCurrentThread(id)) {
-        commandTagCache.releaseWriteLockOnKey(id);
+
+    commandTagCache.executeTransaction(() -> {
+      try {
+        CommandTag<?> commandTag = commandTagCache.get(id);
+        commandTagDAO.deleteCommandTag(commandTag.getId());
+        commandTagCache.remove(commandTag.getId());
+        Long equipmentId = commandTag.getEquipmentId();
+
+        //unlock before accessing equipment
+        equipmentService.removeCommandFromEquipment(commandTag.getEquipmentId(), commandTag.getId());
+        CommandTagRemove removeEvent = new CommandTagRemove();
+        removeEvent.setCommandTagId(id);
+        removeEvent.setEquipmentId(equipmentId);
+        processChanges.add(new ProcessChange(equipmentService.getProcessId(commandTag.getEquipmentId()), removeEvent));
+      } catch (CacheElementNotFoundException e) {
+        log.warn("Attempting to remove a non-existent Command - no action taken.");
+        elementReport.setWarning("Attempting to remove a non-existent CommandTag");
+      } catch (Exception ex) {
+        elementReport.setFailure("Exception caught while removing a commandtag.", ex);
+        log.error("Exception caught while removing a commandtag (id: " + id + ")", ex);
+        throw new RuntimeException(ex);
       }
-    }
+    });
     return processChanges;
   }
 

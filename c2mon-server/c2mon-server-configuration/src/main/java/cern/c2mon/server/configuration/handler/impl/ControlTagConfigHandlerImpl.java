@@ -16,22 +16,21 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.handler.impl;
 
-import java.util.Properties;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.server.cache.ControlTagCache;
+import cern.c2mon.server.common.equipment.Equipment;
+import cern.c2mon.server.common.subequipment.SubEquipment;
+import cern.c2mon.server.configuration.handler.ControlTagConfigHandler;
+import cern.c2mon.server.configuration.handler.transacted.ControlTagConfigTransacted;
+import cern.c2mon.server.configuration.impl.ProcessChange;
+import cern.c2mon.shared.client.configuration.ConfigurationElement;
+import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.UnexpectedRollbackException;
 
-import cern.c2mon.server.configuration.handler.ControlTagConfigHandler;
-import cern.c2mon.server.configuration.handler.transacted.ControlTagConfigTransacted;
-import cern.c2mon.server.configuration.impl.ProcessChange;
-import cern.c2mon.server.cache.ControlTagCache;
-import cern.c2mon.server.cache.EquipmentCache;
-import cern.c2mon.server.cache.SubEquipmentCache;
-import cern.c2mon.shared.client.configuration.ConfigurationElement;
-import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
+import java.util.Properties;
 
 /**
  * See interface documentation.
@@ -44,36 +43,29 @@ import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
  *
  */
 @Service
+@Slf4j
 public class ControlTagConfigHandlerImpl implements ControlTagConfigHandler {
-  
-  /**
-   * Class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(ControlTagConfigHandlerImpl.class);  
   
   /** Variable definition in configuration element for equipment ID */
   private static final String EQUIPMENT_ID = "equipmentId";
   
-  private final EquipmentCache equipmentCache;
+  private final C2monCache<Equipment> equipmentCache;
   
-  private final SubEquipmentCache subEquipmentCache;
-  
-  /**
-   * Wrapped bean with transacted methods.
-   */
-  @Autowired
+  private final C2monCache<SubEquipment> subEquipmentCache;
+
   private ControlTagConfigTransacted controlTagConfigTransacted;
   
   private ControlTagCache controlTagCache;
 
 
   @Autowired  
-  public ControlTagConfigHandlerImpl(ControlTagCache controlTagCache, 
-                                     EquipmentCache equipmentCache,
-                                     SubEquipmentCache subEquipmentCache) {    
+  public ControlTagConfigHandlerImpl(ControlTagCache controlTagCache,
+                                     C2monCache<Equipment> equipmentCache,
+                                     C2monCache<SubEquipment> subEquipmentCache, ControlTagConfigTransacted controlTagConfigTransacted) {
     this.controlTagCache = controlTagCache;
     this.equipmentCache = equipmentCache;
     this.subEquipmentCache = subEquipmentCache;
+    this.controlTagConfigTransacted = controlTagConfigTransacted;
   }
   
   /**
@@ -82,7 +74,7 @@ public class ControlTagConfigHandlerImpl implements ControlTagConfigHandler {
    * If it fails, a rollback exception is throw and all *local* changes
    * are rolled back (the calling method needs to handle the thrown 
    * UnexpectedRollbackException appropriately.
-   * 
+   *
    * @param id the id of the tag to remove
    * @param tagReport the report for this removal
    * @return a DAQ configuration event if ControlTag is associated to some Equipment or SubEquipment and DAQ
@@ -115,7 +107,7 @@ public class ControlTagConfigHandlerImpl implements ControlTagConfigHandler {
     try {
       return controlTagConfigTransacted.doUpdateControlTag(id, elementProperties); 
     } catch (UnexpectedRollbackException e) {
-      LOGGER.error("Rolling back ControlTag update in cache");
+      log.error("Rolling back ControlTag update in cache");
       controlTagCache.remove(id);
       controlTagCache.loadFromDb(id);
       throw e;
@@ -162,8 +154,7 @@ public class ControlTagConfigHandlerImpl implements ControlTagConfigHandler {
       subEquipmentCache.acquireWriteLockOnKey(equipmentId);
     }
     else {
-      String msg = "Equipment id " + equipmentId + " unknown in in both equipment and subequipment cache. Do write lock in both caches.";
-      LOGGER.debug(msg);
+      log.debug("Equipment id " + equipmentId + " unknown in in both equipment and subequipment cache. Do write lock in both caches.");
       equipmentCache.acquireWriteLockOnKey(equipmentId);
       subEquipmentCache.acquireWriteLockOnKey(equipmentId);
     }
@@ -172,8 +163,7 @@ public class ControlTagConfigHandlerImpl implements ControlTagConfigHandler {
   private void acquireEquipmentWriteLockForElement(final Long id, Properties elementProperties) {
     String equipmentIdValue = elementProperties.getProperty(EQUIPMENT_ID);
     if (equipmentIdValue == null || equipmentIdValue.equalsIgnoreCase("")) {
-      String msg = "Property '" + EQUIPMENT_ID + "' is not set for Control Tag " + id + " => no write lock on equipment possible.";
-      LOGGER.trace(msg);
+      log.trace("Property '" + EQUIPMENT_ID + "' is not set for Control Tag " + id + " => no write lock on equipment possible.");
     } else{
       Long equipmentId = Long.valueOf(equipmentIdValue);
       acquireEquipmentWriteLock(equipmentId);
@@ -196,8 +186,7 @@ public class ControlTagConfigHandlerImpl implements ControlTagConfigHandler {
   private void releaseEquipmentWriteLockForElement(final Long id, final Properties elementProperties) {
     String equipmentIdValue = elementProperties.getProperty(EQUIPMENT_ID);
     if (equipmentIdValue == null || equipmentIdValue.equalsIgnoreCase("")) {
-      String msg = "Property '" + EQUIPMENT_ID + "' is not set for Control Tag " + id + " => no release of equipment write lock needed.";
-      LOGGER.trace(msg);
+      log.trace("Property '" + EQUIPMENT_ID + "' is not set for Control Tag " + id + " => no release of equipment write lock needed.");
     } else {
       Long equipmentId = Long.valueOf(equipmentIdValue);
       releaseEquimentWriteLock(equipmentId);
