@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2019 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -16,35 +16,38 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch.tag;
 
-import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
-import cern.c2mon.server.common.datatag.DataTagCacheObject;
-import cern.c2mon.server.elasticsearch.Indices;
-import cern.c2mon.server.elasticsearch.config.BaseElasticsearchIntegrationTest;
-import cern.c2mon.server.elasticsearch.junit.CachePopulationRule;
-import cern.c2mon.server.elasticsearch.util.EntityUtils;
-import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
-import org.elasticsearch.action.search.SearchResponse;
+import java.io.IOException;
+import java.util.List;
+
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.TestPropertySource;
 
-import static junit.framework.TestCase.assertEquals;
+import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
+import cern.c2mon.server.common.datatag.DataTagCacheObject;
+import cern.c2mon.server.elasticsearch.ElasticsearchSuiteTest;
+import cern.c2mon.server.elasticsearch.ElasticsearchTestDefinition;
+import cern.c2mon.server.elasticsearch.IndexNameManager;
+import cern.c2mon.server.elasticsearch.junit.CachePopulationRule;
+import cern.c2mon.server.elasticsearch.util.EmbeddedElasticsearchManager;
+import cern.c2mon.server.elasticsearch.util.EntityUtils;
+import cern.c2mon.server.elasticsearch.util.IndexUtils;
+
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
  * @author Alban Marguet
  * @author Justin Lewis Salmon
  */
-@TestPropertySource(properties = {
-    // Setting the number of concurrent requests to 0 causes the flush
-    // operation of the bulk to be executed in a synchronous manner
-    "c2mon.server.elasticsearch.concurrentRequests=0"
-})
-public class TagDocumentIndexerTests extends BaseElasticsearchIntegrationTest {
+public class TagDocumentIndexerTests extends ElasticsearchTestDefinition {
 
   @Autowired
   private TagDocumentIndexer indexer;
+
+  @Autowired
+  private IndexNameManager indexNameManager;
 
   @Rule
   @Autowired
@@ -53,28 +56,45 @@ public class TagDocumentIndexerTests extends BaseElasticsearchIntegrationTest {
   @Autowired
   private TagDocumentConverter converter;
 
-  @Test
-  public void indexTags() throws IDBPersistenceException, InterruptedException {
-    DataTagCacheObject tag = (DataTagCacheObject) EntityUtils.createDataTag();
+  private TagDocument document;
 
-    TagDocument document = converter.convert(tag).orElseThrow(() -> new IllegalArgumentException("TagDocument conversion failed"));
+  @Before
+  public void setUp() {
+    DataTagCacheObject tag = (DataTagCacheObject) EntityUtils.createDataTag();
+    document = converter.convert(tag).orElseThrow(() -> new IllegalArgumentException("TagDocument conversion failed"));
+    indexName = indexNameManager.indexFor(document);
+  }
+
+  @Test
+  public void indexSingleTagTest() throws IDBPersistenceException, InterruptedException, IOException {
     indexer.storeData(document);
 
-    // Refresh the index to make sure the document is searchable
-    String index = Indices.indexFor(document);
-    client.getClient().admin().indices().prepareRefresh(index).get();
-    client.getClient().admin().cluster().prepareHealth().setIndices(index).setWaitForYellowStatus().get();
-    client.waitForYellowStatus();
+    // Bulk flush operation seem to require more time
+    Thread.sleep(1000L);
 
-    // Make sure the index was created
-    assertTrue(Indices.exists(index));
+    EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
 
-    // Make sure the tag exists in the index
-    SearchResponse response = client.getClient().prepareSearch(index).setRouting(tag.getId().toString()).get();
-    assertEquals(1, response.getHits().totalHits());
+    assertTrue("Index should have been created.",
+        IndexUtils.doesIndexExist(indexName, ElasticsearchSuiteTest.getProperties()));
 
-    // Clean up
-    DeleteIndexResponse deleteResponse = client.getClient().admin().indices().prepareDelete(index).get();
-    assertTrue(deleteResponse.isAcknowledged());
+    List<String> indexData = EmbeddedElasticsearchManager.getEmbeddedNode().fetchAllDocuments(indexName);
+    assertEquals("Index should have one document inserted.", 1, indexData.size());
+  }
+
+  @Test
+  public void indexMultipleTagsTest() throws IDBPersistenceException, InterruptedException, IOException {
+    indexer.storeData(document);
+    indexer.storeData(document);
+
+    // Bulk flush operation seem to require more time
+    Thread.sleep(1000l);
+
+    EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
+
+    assertTrue("Index should have been created.",
+        IndexUtils.doesIndexExist(indexName, ElasticsearchSuiteTest.getProperties()));
+
+    List<String> indexData = EmbeddedElasticsearchManager.getEmbeddedNode().fetchAllDocuments(indexName);
+    assertEquals("Index should have two documents inserted.", 2, indexData.size());
   }
 }

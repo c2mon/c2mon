@@ -1,5 +1,5 @@
-/*******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+/******************************************************************************
+ * Copyright (C) 2010-2019 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -13,13 +13,16 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
- ******************************************************************************/
+ *****************************************************************************/
+
 package cern.c2mon.server.elasticsearch.tag.config;
 
 import java.util.HashMap;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import cern.c2mon.server.elasticsearch.exception.ProcessingException;
 
 /**
  * @author Szymon Halastra
@@ -49,7 +52,7 @@ public class TagConfigDocument extends HashMap<String, Object> {
     try {
       return mapper.writeValueAsString(this);
     } catch (JsonProcessingException e) {
-      throw new RuntimeException("Error serializing document", e);
+      throw new ProcessingException("Error serializing document", e);
     }
   }
 }

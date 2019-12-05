@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2019 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -16,23 +16,10 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch.config;
 
-import cern.c2mon.server.common.listener.ConfigurationEventListener;
-import cern.c2mon.server.common.tag.Tag;
-import cern.c2mon.server.elasticsearch.bulk.BulkProcessorProxy;
-import cern.c2mon.server.elasticsearch.bulk.BulkProcessorProxyDummyImpl;
-import cern.c2mon.server.elasticsearch.bulk.BulkProcessorProxyImpl;
-import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
-import cern.c2mon.server.elasticsearch.client.ElasticsearchClientDummyImpl;
-import cern.c2mon.server.elasticsearch.client.ElasticsearchClientImpl;
-import cern.c2mon.server.elasticsearch.tag.config.TagConfigDocumentConverter;
-import cern.c2mon.server.elasticsearch.tag.config.TagConfigDocumentIndexer;
-import cern.c2mon.server.elasticsearch.tag.config.TagConfigDocumentListener;
-import cern.c2mon.shared.client.configuration.ConfigConstants;
-import org.elasticsearch.node.NodeValidationException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 
 /**
  * This class is responsible for configuring the Spring context for the
@@ -42,28 +29,9 @@ import org.springframework.context.annotation.*;
  * @author Alban Marguet
  */
 @Configuration
-@Import({
-    ElasticsearchPersistenceConfig.class
-})
+@Import(ElasticsearchPersistenceConfig.class)
 @EnableConfigurationProperties(ElasticsearchProperties.class)
 @ComponentScan("cern.c2mon.server.elasticsearch")
 public class ElasticsearchModule {
-
-  @Bean
-  ElasticsearchClient getElasticSearchClient(@Autowired ElasticsearchProperties elasticsearchProperties) throws NodeValidationException {
-    if (elasticsearchProperties.isEnabled()) {
-      return new ElasticsearchClientImpl(elasticsearchProperties);
-    } else {
-      return new ElasticsearchClientDummyImpl();
-    }
-  }
-
-  @Bean
-  BulkProcessorProxy getBulkProcessor(@Autowired ElasticsearchClient elasticsearchClient, @Autowired ElasticsearchProperties elasticsearchProperties) {
-    if (elasticsearchProperties.isEnabled()) {
-      return new BulkProcessorProxyImpl(elasticsearchClient, elasticsearchProperties);
-    } else {
-      return new BulkProcessorProxyDummyImpl();
-    }
-  }
+  // Module definition.
 }

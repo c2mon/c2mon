@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2019 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -16,11 +16,12 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch.supervision;
 
-import cern.c2mon.server.elasticsearch.util.EntityUtils;
-import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+
+import cern.c2mon.server.elasticsearch.util.EntityUtils;
+import cern.c2mon.shared.client.supervision.SupervisionEvent;
 
 import static junit.framework.TestCase.assertEquals;
 
@@ -34,7 +35,7 @@ public class SupervisionEventDocumentTests {
 
   @Test
   public void toAndFromJson() {
-    SupervisionEvent event  = EntityUtils.createSupervisionEvent();
+    SupervisionEvent event = EntityUtils.createSupervisionEvent();
     SupervisionEventDocument document = converter.convert(event);
 
     // Serialize

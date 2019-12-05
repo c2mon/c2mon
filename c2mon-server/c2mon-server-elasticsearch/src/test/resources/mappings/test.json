@@ -1,0 +1,18 @@
+{
+  "_routing": {
+    "required": true
+  },
+  "properties": {
+    "id": {
+      "type": "long"
+    },
+    "name": {
+      "type": "keyword",
+      "index": true
+    },
+    "description": {
+      "type": "text",
+      "index": true
+    }
+  }
+}

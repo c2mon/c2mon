@@ -37,10 +37,8 @@
     <org.springframework.version>5.1.2.RELEASE</org.springframework.version>
     <org.springframework.boot.version>2.1.0.RELEASE</org.springframework.boot.version>
     <org.slf4j.version>1.7.5</org.slf4j.version>
-    <org.apache.activemq.version>5.15.6</org.apache.activemq.version>
-    <elasticsearch.version>5.6.0</elasticsearch.version>
-    <!-- Should mostly be the same as above, see https://hub.docker.com/_/elasticsearch?tab=tags -->
-    <elasticsearch.dockertag>5.6</elasticsearch.dockertag>
+    <org.apache.activemq.version>5.15.2</org.apache.activemq.version>
+    <elasticsearch.version>6.4.3</elasticsearch.version>
     <mockito-all.version>1.10.19</mockito-all.version>
     <com.fasterxml.jackson.core>2.9.2</com.fasterxml.jackson.core>
     <!-- Start: Used for K8S distributions -->
@@ -233,65 +231,14 @@
         <version>2.3.2</version>
       </dependency>
       <dependency>
-        <groupId>org.elasticsearch.client</groupId>
-        <artifactId>transport</artifactId>
-        <version>${elasticsearch.version}</version>
-      </dependency>
-      <dependency>
         <groupId>org.elasticsearch</groupId>
         <artifactId>elasticsearch</artifactId>
         <version>${elasticsearch.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.codelibs</groupId>
-        <artifactId>elasticsearch-cluster-runner</artifactId>
-        <version>5.5.2.0</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.elasticsearch</groupId>
-            <artifactId>elasticsearch</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.codelibs.elasticsearch.module</groupId>
-            <artifactId>aggs-matrix-stats</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.codelibs.elasticsearch.module</groupId>
-            <artifactId>ingest-common</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.codelibs.elasticsearch.module</groupId>
-            <artifactId>lang-expression</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.codelibs.elasticsearch.module</groupId>
-            <artifactId>reindex</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.codelibs.elasticsearch.module</groupId>
-            <artifactId>transport-netty3</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.codelibs.elasticsearch.module</groupId>
-            <artifactId>transport-netty4</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.codelibs.elasticsearch.module</groupId>
-            <artifactId>percolator</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.codelibs.elasticsearch.module</groupId>
-            <artifactId>lang-groovy</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.codelibs.elasticsearch.module</groupId>
-            <artifactId>lang-mustache</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.codelibs.elasticsearch.module</groupId>
-            <artifactId>lang-painless</artifactId>
-          </exclusion>
-        </exclusions>
+        <groupId>org.elasticsearch.client</groupId>
+        <artifactId>transport</artifactId>
+        <version>${elasticsearch.version}</version>
       </dependency>
       <dependency>
         <groupId>io.searchbox</groupId>

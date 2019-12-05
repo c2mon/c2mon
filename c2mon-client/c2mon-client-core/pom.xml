@@ -110,7 +110,6 @@
       <groupId>cern.c2mon.server</groupId>
       <artifactId>c2mon-server-elasticsearch</artifactId>
       <version>${project.parent.version}</version>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.powermock</groupId>

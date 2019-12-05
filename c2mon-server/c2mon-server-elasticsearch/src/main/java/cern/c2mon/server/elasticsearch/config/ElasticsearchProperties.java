@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2019 CERN. All rights not expressly granted are reserved.
- * <p/>
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * <p/>
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * <p/>
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -21,6 +21,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
  * @author Justin Lewis Salmon
+ * @author Serhiy Boychenko
  */
 @Data
 @ConfigurationProperties(prefix = "c2mon.server.elasticsearch")
@@ -41,6 +42,8 @@ public class ElasticsearchProperties {
    */
   private int port = 9300;
 
+  private int httpPort = 9200;
+
   /**
    * Name of the Elasticsearch cluster to connect to. Must be the same for all
    * nodes meant to lie inside the same cluster
@@ -51,11 +54,6 @@ public class ElasticsearchProperties {
    * Name of this node
    */
   private String nodeName = "c2mon";
-
-  /**
-   * Enable/disable startup of embedded Elasticsearch node
-   */
-  private boolean embedded = true;
 
   /**
    * Absolute path where Elasticsearch will store its data (only relevant
@@ -71,9 +69,9 @@ public class ElasticsearchProperties {
 
   /**
    * Prefix used for all C2MON indices. The final index format becomes:
-   *
+   * <p>
    * indexPrefix + "-" entity + "_" + bucket
-   *
+   * <p>
    * e.g.: c2mon-tag_2017-01
    */
   private String indexPrefix = "c2mon";
@@ -87,7 +85,7 @@ public class ElasticsearchProperties {
 
   /**
    * Timeseries index bucketing strategy. Possible values:
-   *
+   * <p>
    * - M (or m): monthly indices (YYYY-MM)
    * - D (or d): daily indices (YYYY-MM-DD)
    * - W (or w): weekly indices (YYYY-ww)
@@ -142,4 +140,14 @@ public class ElasticsearchProperties {
    * in the event of Elasticsearch communication failure
    */
   private String supervisionFallbackFile = "/tmp/es-supervision-fallback.txt";
+
+  /**
+   * Enable/Disable Elasticsearch REST Client (if disabled Transport client will be used instead)
+   */
+  private boolean rest = true;
+
+  /**
+   * Defines whether mapping templates are managed by C2MON
+   */
+  private boolean autoTemplateMapping = true;
 }

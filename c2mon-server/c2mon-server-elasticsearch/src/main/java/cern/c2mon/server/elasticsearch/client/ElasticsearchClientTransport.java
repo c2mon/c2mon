@@ -16,7 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch.client;
 
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.concurrent.CompletableFuture;
@@ -26,21 +25,20 @@ import java.util.concurrent.TimeoutException;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.codelibs.elasticsearch.runner.ElasticsearchClusterRunner;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.client.transport.NoNodeAvailableException;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.settings.Settings.Builder;
-import org.elasticsearch.common.transport.InetSocketTransportAddress;
+import org.elasticsearch.common.transport.TransportAddress;
 import org.elasticsearch.common.unit.TimeValue;
-import org.elasticsearch.node.NodeValidationException;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Component;
 
 import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
-
-import static org.codelibs.elasticsearch.runner.ElasticsearchClusterRunner.newConfigs;
 
 /**
  * Wrapper around {@link Client}. Connects asynchronously, but also provides
@@ -49,28 +47,24 @@ import static org.codelibs.elasticsearch.runner.ElasticsearchClusterRunner.newCo
  * @author Alban Marguet
  * @author Justin Lewis Salmon
  * @author James Hamilton
+ * @author Serhiy Boychenko
  */
 @Slf4j
-public class ElasticsearchClientImpl implements ElasticsearchClient {
-
+@Component
+@ConditionalOnProperty(name = "c2mon.server.elasticsearch.rest", havingValue = "false")
+public final class ElasticsearchClientTransport implements ElasticsearchClient<Client> {
   @Getter
-  private ElasticsearchProperties properties;
-
+  private final ElasticsearchProperties properties;
   @Getter
-  private Client client;
+  private final Client client;
 
-  @Getter
-  private static ElasticsearchClusterRunner runner = null;
-
-  public ElasticsearchClientImpl(ElasticsearchProperties properties) throws NodeValidationException {
+  /**
+   * @param properties to initialize Transport client.
+   */
+  @Autowired
+  public ElasticsearchClientTransport(ElasticsearchProperties properties) {
     this.properties = properties;
-
-    if (properties.isEmbedded()) {
-      startEmbeddedNode();
-      this.client = runner.client();
-    } else {
-      this.client = createClient();
-    }
+    this.client = createClient();
 
     connectAsynchronously();
   }
@@ -89,7 +83,7 @@ public class ElasticsearchClientImpl implements ElasticsearchClient {
 
     TransportClient transportClient = new PreBuiltTransportClient(settingsBuilder.build());
     try {
-      transportClient.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(properties.getHost()), properties.getPort()));
+      transportClient.addTransportAddress(new TransportAddress(InetAddress.getByName(properties.getHost()), properties.getPort()));
     } catch (UnknownHostException e) {
       log.error("Error connecting to the Elasticsearch cluster at {}:{}", properties.getHost(), properties.getPort(), e);
       return null;
@@ -108,90 +102,58 @@ public class ElasticsearchClientImpl implements ElasticsearchClient {
     new Thread(() -> {
       log.info("Connected to Elasticsearch cluster {}", properties.getClusterName());
       waitForYellowStatus();
-
     }, "EsClusterFinder").start();
   }
 
-  /**
-   * Block and wait for the cluster to become yellow.
-   */
   @Override
+  @SuppressWarnings("squid:S2142")
   public void waitForYellowStatus() {
     try {
       CompletableFuture<Void> nodeReady = CompletableFuture.runAsync(() -> {
-          while (true) {
-            log.info("Waiting for yellow status of Elasticsearch cluster...");
+            while (true) {
+              log.info("Waiting for yellow status of Elasticsearch cluster...");
 
-            try {
               if (isClusterYellow()) {
                 break;
               }
-            } catch (Exception e) {
-              log.info("Elasticsearch cluster not yet ready: {}", e.getMessage());
-            }
 
-            try {
-              log.info("Waiting 3 sec before retrying to connect to Elasticsearch...");
-              Thread.sleep(3000L);
-            } catch (InterruptedException ignored) {
+              sleep(100L);
             }
+            log.info("Elasticsearch cluster is yellow");
           }
-          log.info("Elasticsearch cluster is yellow");
-        }
       );
       nodeReady.get(120, TimeUnit.SECONDS);
     } catch (InterruptedException | ExecutionException | TimeoutException e) {
       log.error("Exception when waiting for yellow status", e);
-      throw new RuntimeException("Timeout when waiting for Elasticsearch yellow status!");
+      throw new IllegalStateException("Exception when waiting for Elasticsearch yellow status!", e);
     }
   }
 
-  @Override
-  public ClusterHealthResponse getClusterHealth() {
+  @SuppressWarnings("squid:S2142")
+  private void sleep(long time) {
+    try {
+      Thread.sleep(time);
+    } catch (InterruptedException e) {
+      log.debug("Waiting for yellow status interrupted", e);
+    }
+  }
+
+  private ClusterHealthResponse getClusterHealth() {
     return client.admin().cluster().prepareHealth()
         .setWaitForYellowStatus()
         .setTimeout(TimeValue.timeValueMillis(100))
         .get();
   }
 
-  @Override
   public boolean isClusterYellow() {
-    ClusterHealthStatus status = getClusterHealth().getStatus();
-    return status.equals(ClusterHealthStatus.YELLOW) || status.equals(ClusterHealthStatus.GREEN);
-  }
-
-  @Override
-  public void startEmbeddedNode() throws NodeValidationException {
-    if (runner != null) {
-      log.info("Embedded Elasticsearch cluster already running");
-      return;
+    try {
+      ClusterHealthStatus status = getClusterHealth().getStatus();
+      return status.equals(ClusterHealthStatus.YELLOW) || status.equals(ClusterHealthStatus.GREEN);
+    } catch (NoNodeAvailableException e) {
+      log.info("Elasticsearch cluster not yet ready: {}", e.getMessage());
+      log.debug("Elasticsearch cluster not yet ready: ", e);
     }
-    log.info("Launching an embedded Elasticsearch cluster: {}", properties.getClusterName());
-
-    // create runner instance
-    runner = new ElasticsearchClusterRunner();
-    // create ES nodes
-    runner.onBuild(new ElasticsearchClusterRunner.Builder() {
-      @Override
-      public void build(int number, Builder settingsBuilder) {
-        // put elasticsearch settings
-        settingsBuilder
-     .put("path.home", properties.getEmbeddedStoragePath())
-     .put("cluster.name", properties.getClusterName())
-     .put("node.name", properties.getNodeName())
-     .put("transport.type", "netty4")
-     .put("node.data", true)
-     .put("node.master", true)
-     .put("network.host", "0.0.0.0")
-     .put("http.type", "netty4")
-     .put("http.enabled", true)
-     .put("http.cors.enabled", true)
-     .put("http.cors.allow-origin", "/.*/");
-      }
-    }).build(newConfigs().clusterName(properties.getClusterName()).numOfNode(2));
-
-    // wait for yellow status
-    runner.ensureYellow();
+    return false;
   }
 
   @Override
@@ -199,16 +161,6 @@ public class ElasticsearchClientImpl implements ElasticsearchClient {
     if (client != null) {
       client.close();
       log.info("Closed client {}", client.settings().get("node.name"));
-      client = null;
-    }
-  }
-
-  @Override
-  public void closeEmbeddedNode() throws IOException {
-    if(runner != null) {
-      runner.close();
-      runner.clean();
-      this.close();
     }
   }
 }

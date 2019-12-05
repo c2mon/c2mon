@@ -8,6 +8,8 @@ For more details on a given release, please check also the [version planning](ht
 
 ## [Unreleased]
 ### Added
+- Server: Added support for Elasticsearch 6.x
+- Server: Integrated Elasticsearch REST client
 
 ### Changed
 - Client API: Added possibility to define credentials for making queries to Elasticsearch (CM-232)

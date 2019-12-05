@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2019 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -20,15 +20,14 @@ import java.util.Collections;
 import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.rest.RestStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import cern.c2mon.pmanager.IDBPersistenceHandler;
 import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
-import cern.c2mon.server.elasticsearch.Indices;
+import cern.c2mon.server.elasticsearch.IndexManager;
+import cern.c2mon.server.elasticsearch.IndexNameManager;
 import cern.c2mon.server.elasticsearch.MappingFactory;
-import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
 
 /**
  * This class manages the fallback-aware indexing of {@link AlarmDocument}
@@ -36,13 +35,17 @@ import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
  *
  * @author Alban Marguet
  * @author Justin Lewis Salmon
+ * @author Serhiy Boychenko
  */
 @Slf4j
 @Component
 public class AlarmDocumentIndexer implements IDBPersistenceHandler<AlarmDocument> {
 
   @Autowired
-  private ElasticsearchClient client;
+  private IndexNameManager indexNameManager;
+
+  @Autowired
+  private IndexManager indexManager;
 
   @Override
   public void storeData(AlarmDocument alarm) throws IDBPersistenceException {
@@ -66,21 +69,19 @@ public class AlarmDocumentIndexer implements IDBPersistenceHandler<AlarmDocument
     String indexName = getOrCreateIndex(alarm);
 
     log.debug("Indexing alarm #{} to index {}", alarm.getId(), indexName);
-    return client.getClient().prepareIndex().setIndex(indexName)
-        .setType("alarm")
-        .setSource(alarm.toString())
-        .setRouting(alarm.getId())
-        .get().status().equals(RestStatus.CREATED);
+
+    return indexManager.index(indexName, alarm.toString(), alarm.getId());
   }
 
   private String getOrCreateIndex(AlarmDocument alarm) {
-    String index = Indices.indexFor(alarm);
+    String index = indexNameManager.indexFor(alarm);
 
-    if (!Indices.exists(index)) {
-      Indices.create(index, "alarm", MappingFactory.createAlarmMapping());
+    if (!indexManager.exists(index)) {
+      indexManager.create(index, MappingFactory.createAlarmMapping());
     }
 
     return index;
+
   }
 
   @Override

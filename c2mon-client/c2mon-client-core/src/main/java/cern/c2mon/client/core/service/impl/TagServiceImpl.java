@@ -463,7 +463,7 @@ public class TagServiceImpl implements AdvancedTagService {
 
   @Override
   public Collection<Tag> findByMetadata(String key, String value) {
-    return get(elasticsearchService.findByMetadata(key, value));
+    return get(elasticsearchService.findTagsByMetadata(key, value));
   }
 
   /**

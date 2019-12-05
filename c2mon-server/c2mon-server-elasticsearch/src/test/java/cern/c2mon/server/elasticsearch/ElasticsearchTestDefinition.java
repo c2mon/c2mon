@@ -14,49 +14,39 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.client.core.elasticsearch;
+package cern.c2mon.server.elasticsearch;
 
-import org.awaitility.Awaitility;
-import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
-import org.junit.Before;
+import org.junit.After;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.server.cache.config.CacheModule;
+import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
+import cern.c2mon.server.cache.loading.config.CacheLoadingModule;
 import cern.c2mon.server.common.config.CommonModule;
-import cern.c2mon.server.elasticsearch.Indices;
-import cern.c2mon.server.elasticsearch.MappingFactory;
-import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
 import cern.c2mon.server.elasticsearch.config.ElasticsearchModule;
-import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
+import cern.c2mon.server.elasticsearch.junit.CachePopulationRule;
+import cern.c2mon.server.elasticsearch.util.EmbeddedElasticsearchManager;
 import cern.c2mon.server.supervision.config.SupervisionModule;
 
-@RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {
-    ElasticsearchModule.class,
+    CommonModule.class,
     CacheModule.class,
+    CacheDbAccessModule.class,
+    CacheLoadingModule.class,
     SupervisionModule.class,
-    CommonModule.class
+    ElasticsearchModule.class,
+    CachePopulationRule.class
 })
-public abstract class BaseElasticsearchIntegrationTest {
+@RunWith(SpringJUnit4ClassRunner.class)
+public abstract class ElasticsearchTestDefinition {
 
-  private static final ElasticsearchProperties elasticsearchProperties = new ElasticsearchProperties();
+  protected String indexName;
 
-  /**
-   * the embedded ES node will start
-   * when the client is instantiated (magically by Spring)
-   * we don't shutdown the embedded server at the end of each
-   * test because it may be used by other tests.
-   */
-  @Autowired
-  protected ElasticsearchClient client;
-
-  @Before
-  public void setUp() throws Exception {
-    client.getClient().admin().indices().delete(new DeleteIndexRequest(elasticsearchProperties.getIndexPrefix() + "*"));
-    Awaitility.await().until(() -> Indices.create(elasticsearchProperties.getTagConfigIndex(), "tag_config", MappingFactory.createTagConfigMapping()));
-    client.waitForYellowStatus();
+  @After
+  public void tearDown() {
+    EmbeddedElasticsearchManager.getEmbeddedNode().deleteIndex(indexName);
+    EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
   }
 }

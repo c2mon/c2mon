@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2019 CERN. All rights not expressly granted are reserved.
- * <p/>
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * <p/>
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * <p/>
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -34,12 +34,16 @@ import cern.c2mon.server.elasticsearch.tag.config.TagConfigDocument;
  *
  * @author Justin Lewis Salmon
  */
-public class MappingFactory {
+public final class MappingFactory {
 
   private static final String TAG_MAPPING = "mappings/tag.json";
   private static final String TAG_CONFIG_MAPPING = "mappings/tag-config.json";
   private static final String ALARM_MAPPING = "mappings/alarm.json";
   private static final String SUPERVISION_MAPPING = "mappings/supervision.json";
+
+  private MappingFactory() {
+    // only static methods below
+  }
 
   /**
    * Create the Elasticsearch mapping for a {@link TagConfigDocument}.
@@ -80,7 +84,7 @@ public class MappingFactory {
   private static String loadMapping(String location) {
     return new BufferedReader(new InputStreamReader(loadResource(location)))
         .lines()
-        .collect(Collectors.joining("\n"));
+        .collect(Collectors.joining(""));
   }
 
   private static InputStream loadResource(String location) {

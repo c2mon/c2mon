@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2019 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -23,6 +23,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cern.c2mon.pmanager.IFallback;
+import cern.c2mon.server.elasticsearch.exception.ProcessingException;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 
 /**
@@ -55,7 +56,7 @@ public class SupervisionEventDocument extends HashMap<String, Object> implements
     try {
       return mapper.readValue(line, SupervisionEventDocument.class);
     } catch (IOException e) {
-      throw new RuntimeException("Error reading line from fallback", e);
+      throw new ProcessingException("Error reading line from fallback", e);
     }
   }
 
@@ -64,7 +65,7 @@ public class SupervisionEventDocument extends HashMap<String, Object> implements
     try {
       return mapper.writeValueAsString(this);
     } catch (JsonProcessingException e) {
-      throw new RuntimeException("Error serializing document", e);
+      throw new ProcessingException("Error serializing document", e);
     }
   }
 }

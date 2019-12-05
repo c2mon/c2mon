@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2019 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -16,14 +16,16 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch.alarm;
 
-import cern.c2mon.pmanager.IFallback;
-import cern.c2mon.pmanager.fallback.exception.DataFallbackException;
-import cern.c2mon.server.common.alarm.Alarm;
+import java.io.IOException;
+import java.util.HashMap;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.io.IOException;
-import java.util.HashMap;
+import cern.c2mon.pmanager.IFallback;
+import cern.c2mon.pmanager.fallback.exception.DataFallbackException;
+import cern.c2mon.server.common.alarm.Alarm;
+import cern.c2mon.server.elasticsearch.exception.ProcessingException;
 
 /**
  * Intermediate object (created from {@link Alarm} instances) used for direct
@@ -64,7 +66,7 @@ public class AlarmDocument extends HashMap<String, Object> implements IFallback 
     try {
       return mapper.writeValueAsString(this);
     } catch (JsonProcessingException e) {
-      throw new RuntimeException("Error serializing document", e);
+      throw new ProcessingException("Error serializing document", e);
     }
   }
 }

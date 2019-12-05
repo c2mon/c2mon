@@ -93,14 +93,6 @@ public class ElasticsearchService {
     }
   }
 
-  /**
-   * @deprecated Please use {@link #getTagHistory(Long, Long, Long, String)} instead
-   */
-  @Deprecated
-  public List<Object[]> getHistory(Long id, Long min, Long max, String aggregate) {
-    return getTagHistory(id, min, max, aggregate);
-  }
-
   private List<Object[]> getAggregatedHistory(Long id, Long min, Long max, String aggregate) {
     // Figure out the right interval
     String interval = aggregate.equals("auto") ? getInterval(min, max) : aggregate;
@@ -253,14 +245,6 @@ public class ElasticsearchService {
   }
 
   /**
-   * @deprecated Please use {@link #findTagsByQuery(String, Function, String, String)} instead
-   */
-  @Deprecated
-  public <T> T findByQuery(String query, Function<SearchResult, T> outputConverter, String indexName, String errorMessage) {
-    return findTagsByQuery(query, outputConverter, indexName, errorMessage);
-  }
-
-  /**
    * Get the top {@literal size} most active tags.
    *
    * @param size the number of top tags to retrieve
@@ -327,8 +311,7 @@ public class ElasticsearchService {
         "      }, {\n" +
         "        \"match\" : {\n" +
         "          \"metadata.%s\" : {\n" +
-        "            \"query\" : \"%s\",\n" +
-        "            \"type\" : \"boolean\"\n" +
+        "            \"query\" : \"%s\"\n" +
         "          }\n" +
         "        }\n" +
         "      } ]\n" +
@@ -360,14 +343,6 @@ public class ElasticsearchService {
   }
 
   /**
-   * @deprecated Please use {@link #findTagsByName(String)} instead
-   */
-  @Deprecated
-  public Collection<Long> findByName(String regexQuery) {
-    return findTagsByName(regexQuery);
-  }
-
-  /**
    * Find all tags containing the exact metadata key/value pair.
    *
    * @param key   the metadata key
@@ -380,21 +355,12 @@ public class ElasticsearchService {
         "  \"query\" : {\n" +
         "    \"match\" : {\n" +
         "      \"metadata.%s\" : {\n" +
-        "        \"query\" : \"%s\",\n" +
-        "        \"type\" : \"boolean\"\n" +
+        "        \"query\" : \"%s\"\n" +
         "      }\n" +
         "    }\n" +
         "  }\n" +
         "}", key, value);
     return findTagsByQuery(queryString, "Error when collecting tags for given metadata");
-  }
-
-  /**
-   * @deprecated Please use {@link #findTagsByMetadata(String, String)} instead
-   */
-  @Deprecated
-  public Collection<Long> findByMetadata(String key, String value) {
-    return findTagsByMetadata(key, value);
   }
 
   /**
@@ -413,14 +379,6 @@ public class ElasticsearchService {
         "  }\n" +
         "}", key);
     return findTagsByQuery(queryString, "Error when collecting tags for given metadata");
-  }
-
-  /**
-   * @deprecated Please use {@link #findTagsByMetadata(String)} instead
-   */
-  @Deprecated
-  public Collection<Long> findByMetadata(String key) {
-    return findTagsByMetadata(key);
   }
 
   /**
@@ -454,8 +412,7 @@ public class ElasticsearchService {
         "  \"query\" : {\n" +
         "    \"match\" : {\n" +
         "      \"alarms.metadata.%s\" : {\n" +
-        "        \"query\" : \"%s\",\n" +
-        "        \"type\" : \"boolean\"\n" +
+        "        \"query\" : \"%s\"\n" +
         "      }\n" +
         "    }\n" +
         "  }\n" +
@@ -498,14 +455,6 @@ public class ElasticsearchService {
     } catch (IOException e) {
       throw new RuntimeException("Error getting index mapping", e);
     }
-  }
-
-  /**
-   * @deprecated Please use {@link #getDistinctTagMetadataKeys()} instead
-   */
-  @Deprecated
-  public Set<String> getDistinctMetadataKeys() {
-    return getDistinctTagMetadataKeys();
   }
 
   public List<Long> getTopAlarms(Integer size) {

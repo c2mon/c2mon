@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2019 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -14,26 +14,20 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.elasticsearch;
-
-import cern.c2mon.server.elasticsearch.config.BaseElasticsearchIntegrationTest;
-import lombok.extern.slf4j.Slf4j;
-import org.junit.Test;
-
-import java.io.IOException;
+package cern.c2mon.server.elasticsearch.exception;
 
 /**
- * @author Alban Marguet
+ * An exception to be thrown when an error processing ES entity occurs
+ *
+ * @author Serhiy Boychenko
  */
-@Slf4j
-public class ElasticsearchModuleIntegrationTest extends BaseElasticsearchIntegrationTest {
+public class ProcessingException extends RuntimeException {
 
-  @Test
-  public void testModuleStartup() throws IOException {
-    String[] indices = client.getClient().admin().indices().prepareGetIndex().get().indices();
-    log.info("indices in the cluster: ");
-    for (String index : indices) {
-      log.info(index);
-    }
+  /**
+   * @param message to be associated with the exception
+   * @param cause   excetion cause
+   */
+  public ProcessingException(String message, Throwable cause) {
+    super(message, cause);
   }
 }

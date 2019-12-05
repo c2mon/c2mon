@@ -1,4 +1,4 @@
-/*******************************************************************************
+/******************************************************************************
  * Copyright (C) 2010-2019 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
@@ -13,25 +13,28 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
- ******************************************************************************/
-
+ *****************************************************************************/
 package cern.c2mon.server.elasticsearch.tag.config;
 
+import java.util.List;
 import java.util.Map;
 
-import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.index.IndexNotFoundException;
-import org.elasticsearch.search.SearchHit;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
-import cern.c2mon.server.elasticsearch.Indices;
-import cern.c2mon.server.elasticsearch.config.BaseElasticsearchIntegrationTest;
+import cern.c2mon.server.elasticsearch.ElasticsearchSuiteTest;
+import cern.c2mon.server.elasticsearch.ElasticsearchTestDefinition;
+import cern.c2mon.server.elasticsearch.IndexManager;
+import cern.c2mon.server.elasticsearch.IndexNameManager;
 import cern.c2mon.server.elasticsearch.junit.CachePopulationRule;
+import cern.c2mon.server.elasticsearch.util.EmbeddedElasticsearchManager;
 import cern.c2mon.server.elasticsearch.util.EntityUtils;
+import cern.c2mon.server.elasticsearch.util.IndexUtils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -40,7 +43,13 @@ import static org.junit.Assert.assertTrue;
  * @author Szymon Halastra
  * @author Justin Lewis Salmon
  */
-public class TagConfigDocumentIndexerTests extends BaseElasticsearchIntegrationTest {
+public class TagConfigDocumentIndexerTests extends ElasticsearchTestDefinition {
+
+  @Autowired
+  private IndexNameManager indexNameManager;
+
+  @Autowired
+  private IndexManager indexManager;
 
   @Autowired
   private TagConfigDocumentIndexer indexer;
@@ -52,131 +61,67 @@ public class TagConfigDocumentIndexerTests extends BaseElasticsearchIntegrationT
   @Autowired
   public CachePopulationRule cachePopulationRule;
 
-  @Test
-  public void addDataTag() throws Exception {
-    DataTagCacheObject tag = (DataTagCacheObject) EntityUtils.createDataTag();
+  private DataTagCacheObject tag;
+  private TagConfigDocument document;
 
-    TagConfigDocument document = converter.convert(tag)
-            .orElseThrow(()->new Exception("Tag conversion failed"));
-    String index = Indices.indexFor(document);
-
-    indexer.indexTagConfig(document);
-    assertTrue(Indices.exists(index));
-
-    // Refresh the index to make sure the document is searchable
-    client.getClient().admin().indices().prepareRefresh(index).get();
-    client.getClient().admin().cluster().prepareHealth().setIndices(index).setWaitForYellowStatus().get();
-
-    // Make sure the tag exists in the index
-    SearchResponse response = client.getClient().prepareSearch(index).setRouting(tag.getId().toString()).get();
-    assertEquals(1, response.getHits().totalHits());
-
-    // Clean up
-    DeleteIndexResponse deleteResponse = client.getClient().admin().indices().prepareDelete(index).get();
-    assertTrue(deleteResponse.isAcknowledged());
+  @Before
+  public void setUp() throws Exception {
+    tag = (DataTagCacheObject) EntityUtils.createDataTag();
+    document = converter.convert(tag).orElseThrow(() -> new Exception("Tag conversion failed"));
+    indexName = indexNameManager.indexFor(document);
   }
 
   @Test
-  public void reindexTagConfigDocuments() throws Exception {
-    final String index = Indices.indexFor(new TagConfigDocument());
-    if (!Indices.exists(index)) {
-      //Delete the index first
-      DeleteIndexResponse deleteResponse = client.getClient().admin().indices().prepareDelete(index).get();
-      assertTrue("The index could not be deleted", deleteResponse.isAcknowledged());
-    }
-    //reindex everything from the cache
-    this.indexer.reindexAllTagConfigDocuments();
-    // Refresh the index to make sure the document is searchable
-    client.getClient().admin().indices().prepareRefresh(index).get();
-    client.getClient().admin().cluster().prepareHealth().setIndices(index).setWaitForYellowStatus().get();
-    SearchResponse response = client.getClient().prepareSearch(index).get();
-    //53 IDs from c2mon-server-test/src/resources/sql/cache-data-insert.sql
-    assertEquals("There should be 53 tag config documents", 53, response.getHits().totalHits);
+  public void addDataTag() throws Exception {
+    indexer.indexTagConfig(document);
+
+    EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
+
+    assertTrue("Index should have been created.",
+        IndexUtils.doesIndexExist(indexName, ElasticsearchSuiteTest.getProperties()));
+
+    List<String> indexData = EmbeddedElasticsearchManager.getEmbeddedNode().fetchAllDocuments(indexName);
+    assertEquals("Index should have one document inserted.", 1, indexData.size());
   }
 
   @Test
   public void updateDataTag() throws Exception {
-    testUpdate(true);
-  }
-
-  @Test(expected = IndexNotFoundException.class)
-  public void updateMissingDataTag() throws Exception {
-    testUpdate(false);
-  }
-
-  private void testUpdate(boolean doIndexDocument) throws Exception {
-    DataTagCacheObject tag = (DataTagCacheObject) EntityUtils.createDataTag();
-
-    TagConfigDocument document = converter.convert(tag)
-            .orElseThrow(()->new Exception("Tag conversion failed"));
-
-    String index = Indices.indexFor(document);
-
-    Indices.create(index);
-    client.waitForYellowStatus();
-
-    if (doIndexDocument) {
-      // Insert the document
-      indexer.indexTagConfig(document);
-      assertTrue(Indices.exists(index));
-
-      // Refresh the index to make sure the document is searchable
-      client.getClient().admin().indices().prepareRefresh(index).get();
-      client.getClient().admin().cluster().prepareHealth().setIndices(index).setWaitForYellowStatus().get();
-    }
-
-    // Make sure the tag exists in the index
-    SearchResponse response = client.getClient().prepareSearch(index).setRouting(tag.getId().toString()).get();
-    assertEquals(doIndexDocument ? 1 : 0, response.getHits().totalHits());
-
-    // Update the document
-    document.put("description", "A better description");
+    document.put("description", tag.getDescription() + " MODIFIED.");
     ((Map<String, Object>) document.get("metadata")).put("spam", "eggs");
     indexer.updateTagConfig(document);
 
-    // Refresh again
-    client.getClient().admin().indices().prepareRefresh(index).get();
-    client.getClient().admin().cluster().prepareHealth().setIndices(index).setWaitForYellowStatus().get();
+    EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
 
-    // Make sure we still only have one document
-    response = client.getClient().prepareSearch(index).setRouting(tag.getId().toString()).get();
-    assertEquals(1, response.getHits().totalHits());
+    assertTrue("Index should have been created when trying to update non-existing one.",
+        IndexUtils.doesIndexExist(indexName, ElasticsearchSuiteTest.getProperties()));
 
-    SearchHit hit = response.getHits().getAt(0);
-    assertEquals("A better description", hit.getSource().get("description"));
-    assertEquals("eggs", ((Map) hit.getSource().get("metadata")).get("spam"));
+    List<String> indexData = EmbeddedElasticsearchManager.getEmbeddedNode().fetchAllDocuments(indexName);
+    assertEquals("Index should have one document inserted.", 1, indexData.size());
+
+    ObjectMapper objectMapper = new ObjectMapper();
+    JsonNode jsonNode = objectMapper.readTree(indexData.get(0));
+
+    assertEquals(tag.getDescription() + " MODIFIED.", jsonNode.get("description").asText());
+    assertEquals("eggs", jsonNode.get("metadata").get("spam").asText());
   }
 
   @Test
   public void removeDataTag() throws Exception {
-    DataTagCacheObject tag = (DataTagCacheObject) EntityUtils.createDataTag();
+    indexer.indexTagConfig(document);
 
-    TagConfigDocument document = converter.convert(tag)
-            .orElseThrow(()->new Exception("Tag conversion failed"));
+    EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
 
-      String index = Indices.indexFor(document);
+    List<String> indexData = EmbeddedElasticsearchManager.getEmbeddedNode().fetchAllDocuments(indexName);
+    assertEquals("Index should have been created.", 1, indexData.size());
 
-      // Insert the document
-      indexer.indexTagConfig(document);
-      assertTrue(Indices.exists(index));
+    indexer.removeTagConfigById(tag.getId());
 
-    // Refresh the index to make sure the document is searchable
-    client.getClient().admin().indices().prepareRefresh(index).get();
-    client.getClient().admin().cluster().prepareHealth().setIndices(index).setWaitForYellowStatus().get();
+    EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
 
-    // Make sure the tag exists in the index
-    SearchResponse response = client.getClient().prepareSearch(index).setRouting(tag.getId().toString()).get();
-    assertEquals(1, response.getHits().totalHits());
+    assertTrue("Index should exist after tag config deletion.",
+        IndexUtils.doesIndexExist(indexName, ElasticsearchSuiteTest.getProperties()));
 
-    // Delete the document
-    indexer.removeTagConfigById(Long.valueOf(document.getId()));
-
-    // Refresh again
-    client.getClient().admin().indices().prepareRefresh(index).get();
-    client.getClient().admin().cluster().prepareHealth().setIndices(index).setWaitForYellowStatus().get();
-
-    // Make sure we have no documents
-    response = client.getClient().prepareSearch(index).setRouting(tag.getId().toString()).get();
-    assertEquals(0, response.getHits().totalHits());
+    indexData = EmbeddedElasticsearchManager.getEmbeddedNode().fetchAllDocuments(indexName);
+    assertEquals("Index documents should been deleted.", 0, indexData.size());
   }
 }
