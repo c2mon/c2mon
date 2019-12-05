@@ -39,13 +39,12 @@ public class AliveTimerEvents {
     AliveTimer aliveTimer = aliveTimerService.getCache().get(aliveTimerId);
 
     if (aliveTimer.getRelatedId() == null) {
-      log.error("AliveTimer has not relatedId - unable to take any action on alive reception.");
+      log.error("AliveTimer has no relatedId - unable to take any action on alive reception.");
       return;
     }
 
-    String msg = "Alive of " + aliveTimer.getAliveTypeDescription() + " " + aliveTimer.getRelatedName()
-      + " (alive tag: " + aliveTimer.getId() + ") has expired.";
-    log.debug(msg);
+    log.debug("Alive of " + aliveTimer.getAliveTypeDescription() + " " + aliveTimer.getRelatedName()
+      + " (alive tag: " + aliveTimer.getId() + ") has expired.");
 
     Class type = aliveTimer.isProcessAliveType() ? Process.class
       : aliveTimer.isEquipmentAliveType() ? Equipment.class

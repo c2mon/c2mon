@@ -41,7 +41,7 @@ public abstract class AbstractSupervisedService<T extends Supervised> extends Ab
 
   @Override
   public T start(long id, Timestamp timestamp) {
-    return cache.compute(id,supervised -> {
+    return cache.compute(id, supervised -> {
       supervised.start(timestamp);
       if (supervised.getAliveTagId() != null) {
         aliveTimerService.start(supervised.getAliveTagId());
@@ -51,7 +51,7 @@ public abstract class AbstractSupervisedService<T extends Supervised> extends Ab
 
   @Override
   public T stop(long id, Timestamp timestamp) {
-    return cache.compute(id,supervised -> {
+    return cache.compute(id, supervised -> {
       if (supervised.getAliveTagId() != null) {
         aliveTimerService.stop(supervised.getAliveTagId());
       }
@@ -63,7 +63,7 @@ public abstract class AbstractSupervisedService<T extends Supervised> extends Ab
   public T resume(long id, Timestamp timestamp, String message) {
 //    dataTagService.resetQualityToValid(); TODO (Alex) Figure out how to get the datatag for a Supervised
 
-    return cache.compute(id,supervised -> {
+    return cache.compute(id, supervised -> {
       if (!supervised.getSupervisionStatus().equals(SupervisionStatus.RUNNING)) {
         supervised.resume(timestamp, message);
       }
@@ -72,7 +72,7 @@ public abstract class AbstractSupervisedService<T extends Supervised> extends Ab
 
   @Override
   public T suspend(long id, Timestamp timestamp, String message) {
-    return cache.compute(id,supervised -> {
+    return cache.compute(id, supervised -> {
       if (supervised.isRunning() || supervised.isUncertain()) {
         supervised.suspend(timestamp, message);
       }

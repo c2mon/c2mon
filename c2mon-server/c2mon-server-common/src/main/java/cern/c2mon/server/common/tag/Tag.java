@@ -187,9 +187,6 @@ public interface Tag extends RuleInputValue, Cacheable {
    * Returns the ids of the alarms set on this Tag.
    * Never returns null.
    *
-   * <p>Modifications to the Collection during reconfiguration
-   * need locking on the Tag writeLock.
-   *
    * @return a collection of Ids
    */
   Collection<Long> getAlarmIds();
