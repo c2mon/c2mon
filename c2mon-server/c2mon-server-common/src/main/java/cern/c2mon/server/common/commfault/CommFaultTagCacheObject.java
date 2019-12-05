@@ -46,7 +46,7 @@ public class CommFaultTagCacheObject extends AbstractCacheableImpl implements Co
 
     private Long stateTagId;
 
-    private Timestamp eventTimestamp;
+    private Timestamp eventTimestamp = new Timestamp(System.currentTimeMillis());
 
     /**
      * Constructor setting minimal set of non-null fields.

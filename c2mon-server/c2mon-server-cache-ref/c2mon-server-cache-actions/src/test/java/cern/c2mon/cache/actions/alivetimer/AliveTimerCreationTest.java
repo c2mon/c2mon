@@ -1,5 +1,6 @@
 package cern.c2mon.cache.actions.alivetimer;
 
+import cern.c2mon.cache.actions.commfault.CommFaultService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.impl.SimpleC2monCache;
 import cern.c2mon.server.common.alive.AliveTimer;
@@ -31,7 +32,7 @@ public class AliveTimerCreationTest {
   @Before
   public void init() {
     aliveTimerCache = new SimpleC2monCache<>("aliveTimerCache");
-    aliveTimerService = new AliveTimerService(aliveTimerCache);
+    aliveTimerService = new AliveTimerService(aliveTimerCache, new CommFaultService(new SimpleC2monCache<>("cFault")));
   }
 
   @After

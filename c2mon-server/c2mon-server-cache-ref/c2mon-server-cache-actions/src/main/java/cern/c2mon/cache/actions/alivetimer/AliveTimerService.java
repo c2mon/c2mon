@@ -1,16 +1,19 @@
 package cern.c2mon.cache.actions.alivetimer;
 
 import cern.c2mon.cache.actions.AbstractCacheServiceImpl;
+import cern.c2mon.cache.actions.commfault.CommFaultService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.alive.AliveTimer;
 import cern.c2mon.server.common.alive.AliveTimerCacheObject;
 import cern.c2mon.server.common.supervision.Supervised;
+import cern.c2mon.shared.common.CacheEvent;
 import cern.c2mon.shared.common.supervision.SupervisionConstants;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
 import static cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEntity.*;
@@ -25,9 +28,23 @@ import static cern.c2mon.shared.common.supervision.SupervisionConstants.Supervis
 @Service
 public class AliveTimerService extends AbstractCacheServiceImpl<AliveTimer> {
 
+  private CommFaultService commFaultService;
+
   @Inject
-  public AliveTimerService(C2monCache<AliveTimer> aliveTimerCacheRef) {
+  public AliveTimerService(C2monCache<AliveTimer> aliveTimerCacheRef, CommFaultService commFaultService) {
     super(aliveTimerCacheRef, new AliveTimerCacheFlow());
+    this.commFaultService = commFaultService;
+  }
+
+  @PostConstruct
+  public void init() {
+    // After caches have been populated
+    getCache().getCacheListenerManager().registerListener(this::cascadeUpdateToCommFault, CacheEvent.UPDATE_ACCEPTED);
+  }
+
+  private void cascadeUpdateToCommFault(AliveTimer aliveTimer) {
+    if (!aliveTimer.isActive())
+      commFaultService.bringDownBasedOnAliveTimer(aliveTimer);
   }
 
   public boolean isRegisteredAliveTimer(final Long id) {
@@ -133,7 +150,7 @@ public class AliveTimerService extends AbstractCacheServiceImpl<AliveTimer> {
     cache.put(aliveTimer.getId(), aliveTimer);
   }
 
-  private void setAliveTimerType(SupervisionConstants.SupervisionEntity supervisionEntity, AliveTimerCacheObject aliveTimer){
+  private void setAliveTimerType(SupervisionConstants.SupervisionEntity supervisionEntity, AliveTimerCacheObject aliveTimer) {
     if (supervisionEntity == PROCESS)
       aliveTimer.setAliveType(AliveTimer.ALIVE_TYPE_PROCESS);
     else if (supervisionEntity == EQUIPMENT)
