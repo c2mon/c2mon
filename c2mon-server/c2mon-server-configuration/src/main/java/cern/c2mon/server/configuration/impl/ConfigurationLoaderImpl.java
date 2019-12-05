@@ -16,28 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.impl;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
-import lombok.extern.slf4j.Slf4j;
-import org.simpleframework.xml.Serializer;
-import org.simpleframework.xml.convert.AnnotationStrategy;
-import org.simpleframework.xml.core.Persister;
-import org.simpleframework.xml.strategy.Strategy;
-import org.simpleframework.xml.transform.RegistryMatcher;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Component;
-
 import cern.c2mon.server.cache.ClusterCache;
 import cern.c2mon.server.cache.ProcessCache;
 import cern.c2mon.server.cache.ProcessFacade;
@@ -60,6 +38,27 @@ import cern.c2mon.shared.client.configuration.converter.DateFormatConverter;
 import cern.c2mon.shared.daq.config.Change;
 import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
+import lombok.extern.slf4j.Slf4j;
+import org.simpleframework.xml.Serializer;
+import org.simpleframework.xml.convert.AnnotationStrategy;
+import org.simpleframework.xml.core.Persister;
+import org.simpleframework.xml.strategy.Strategy;
+import org.simpleframework.xml.transform.RegistryMatcher;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Implementation of the server ConfigurationLoader bean.
@@ -569,17 +568,17 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
       switch (element.getAction()) {
       case CREATE :
         switch (element.getEntity()) {
-        case DATATAG : daqConfigEvents.add(dataTagConfigHandler.createDataTag(element)); break;
-        case RULETAG : ruleTagConfigHandler.createRuleTag(element); break;
-        case CONTROLTAG: daqConfigEvents.add(controlTagConfigHandler.createControlTag(element)); break;
+        case DATATAG : daqConfigEvents.add(dataTagConfigHandler.create(element)); break;
+        case RULETAG : ruleTagConfigHandler.create(element); break;
+        case CONTROLTAG: daqConfigEvents.add(controlTagConfigHandler.create(element)); break;
         case COMMANDTAG : daqConfigEvents = commandTagConfigHandler.createCommandTag(element); break;
-        case ALARM : alarmConfigHandler.createAlarm(element); break;
-        case PROCESS : daqConfigEvents.add(processConfigHandler.createProcess(element));
+        case ALARM : alarmConfigHandler.create(element); break;
+        case PROCESS : daqConfigEvents.add(processConfigHandler.create(element));
                        element.setDaqStatus(Status.RESTART); break;
-        case EQUIPMENT : daqConfigEvents.addAll(equipmentConfigHandler.createEquipment(element)); break;
-        case SUBEQUIPMENT : daqConfigEvents.addAll(subEquipmentConfigHandler.createSubEquipment(element)); break;
-        case DEVICECLASS : daqConfigEvents.add(deviceClassConfigHandler.createDeviceClass(element)); break;
-        case DEVICE : daqConfigEvents.add(deviceConfigHandler.createDevice(element)); break;
+        case EQUIPMENT : daqConfigEvents.addAll(equipmentConfigHandler.create(element)); break;
+        case SUBEQUIPMENT : daqConfigEvents.addAll(subEquipmentConfigHandler.create(element)); break;
+        case DEVICECLASS : daqConfigEvents.add(deviceClassConfigHandler.create(element)); break;
+        case DEVICE : daqConfigEvents.add(deviceConfigHandler.create(element)); break;
         default : elementReport.setFailure("Unrecognized reconfiguration entity: " + element.getEntity());
           log.warn("Unrecognized reconfiguration entity: {} - see reconfiguration report for details.", element.getEntity());
         }
@@ -587,41 +586,41 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
       case UPDATE :
         switch (element.getEntity()) {
         case DATATAG :
-          daqConfigEvents.add(dataTagConfigHandler.updateDataTag(element.getEntityId(), element.getElementProperties())); break;
+          daqConfigEvents.add(dataTagConfigHandler.update(element.getEntityId(), element.getElementProperties())); break;
         case CONTROLTAG :
-          daqConfigEvents.add(controlTagConfigHandler.updateControlTag(element.getEntityId(), element.getElementProperties())); break;
+          daqConfigEvents.add(controlTagConfigHandler.update(element.getEntityId(), element.getElementProperties())); break;
         case RULETAG :
-          ruleTagConfigHandler.updateRuleTag(element.getEntityId(), element.getElementProperties()); break;
+          ruleTagConfigHandler.update(element.getEntityId(), element.getElementProperties()); break;
         case COMMANDTAG :
           daqConfigEvents.addAll(commandTagConfigHandler.updateCommandTag(element.getEntityId(), element.getElementProperties())); break;
         case ALARM :
-          alarmConfigHandler.updateAlarm(element.getEntityId(), element.getElementProperties()); break;
+          alarmConfigHandler.update(element.getEntityId(), element.getElementProperties()); break;
         case PROCESS :
-          daqConfigEvents.add(processConfigHandler.updateProcess(element.getEntityId(), element.getElementProperties())); break;
+          daqConfigEvents.add(processConfigHandler.update(element.getEntityId(), element.getElementProperties())); break;
         case EQUIPMENT :
-          daqConfigEvents.addAll(equipmentConfigHandler.updateEquipment(element.getEntityId(), element.getElementProperties())); break;
+          daqConfigEvents.addAll(equipmentConfigHandler.update(element.getEntityId(), element.getElementProperties())); break;
         case SUBEQUIPMENT :
-          daqConfigEvents.addAll(subEquipmentConfigHandler.updateSubEquipment(element.getEntityId(), element.getElementProperties())); break;
+          daqConfigEvents.addAll(subEquipmentConfigHandler.update(element.getEntityId(), element.getElementProperties())); break;
         case DEVICECLASS :
-          daqConfigEvents.add(deviceClassConfigHandler.updateDeviceClass(element.getEntityId(), element.getElementProperties())); break;
+          daqConfigEvents.add(deviceClassConfigHandler.update(element.getEntityId(), element.getElementProperties())); break;
         case DEVICE :
-          daqConfigEvents.add(deviceConfigHandler.updateDevice(element.getEntityId(), element.getElementProperties())); break;
+          daqConfigEvents.add(deviceConfigHandler.update(element.getEntityId(), element.getElementProperties())); break;
         default : elementReport.setFailure("Unrecognized reconfiguration entity: " + element.getEntity());
           log.warn("Unrecognized reconfiguration entity: {}  - see reconfiguration report for details.",  element.getEntity());
         }
         break;
       case REMOVE :
         switch (element.getEntity()) {
-        case DATATAG : daqConfigEvents.add(dataTagConfigHandler.removeDataTag(element.getEntityId(), elementReport)); break;
-        case CONTROLTAG : daqConfigEvents.add(controlTagConfigHandler.removeControlTag(element.getEntityId(), elementReport)); break;
-        case RULETAG : ruleTagConfigHandler.removeRuleTag(element.getEntityId(), elementReport); break;
+        case DATATAG : daqConfigEvents.add(dataTagConfigHandler.remove(element.getEntityId(), elementReport)); break;
+        case CONTROLTAG : daqConfigEvents.add(controlTagConfigHandler.remove(element.getEntityId(), elementReport)); break;
+        case RULETAG : ruleTagConfigHandler.remove(element.getEntityId(), elementReport); break;
         case COMMANDTAG : daqConfigEvents.addAll(commandTagConfigHandler.removeCommandTag(element.getEntityId(), elementReport)); break;
-        case ALARM : alarmConfigHandler.removeAlarm(element.getEntityId(), elementReport); break;
-        case PROCESS : daqConfigEvents.add(processConfigHandler.removeProcess(element.getEntityId(), elementReport)); break;
-        case EQUIPMENT : daqConfigEvents.add(equipmentConfigHandler.removeEquipment(element.getEntityId(), elementReport)); break;
-        case SUBEQUIPMENT : daqConfigEvents.addAll(subEquipmentConfigHandler.removeSubEquipment(element.getEntityId(), elementReport)); break;
-        case DEVICECLASS : deviceClassConfigHandler.removeDeviceClass(element.getEntityId(), elementReport); break;
-        case DEVICE : deviceConfigHandler.removeDevice(element.getEntityId(), elementReport); break;
+        case ALARM : alarmConfigHandler.remove(element.getEntityId(), elementReport); break;
+        case PROCESS : daqConfigEvents.add(processConfigHandler.remove(element.getEntityId(), elementReport)); break;
+        case EQUIPMENT : daqConfigEvents.add(equipmentConfigHandler.remove(element.getEntityId(), elementReport)); break;
+        case SUBEQUIPMENT : daqConfigEvents.addAll(subEquipmentConfigHandler.remove(element.getEntityId(), elementReport)); break;
+        case DEVICECLASS : deviceClassConfigHandler.remove(element.getEntityId(), elementReport); break;
+        case DEVICE : deviceConfigHandler.remove(element.getEntityId(), elementReport); break;
         default : elementReport.setFailure("Unrecognized reconfiguration entity: " + element.getEntity());
         log.warn("Unrecognized reconfiguration entity: {} - see reconfiguration report for details.", element.getEntity());
         }

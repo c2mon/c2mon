@@ -211,7 +211,7 @@ public class ControlTagConfigTransactedImpl extends TagConfigTransactedImpl<Cont
         for (Long ruleId : ruleIds) {
           ConfigurationElementReport newReport = new ConfigurationElementReport(Action.REMOVE, Entity.RULETAG, ruleId);
           tagReport.addSubReport(newReport);
-          ruleTagConfigHandler.removeRuleTag(ruleId, newReport);
+          ruleTagConfigHandler.remove(ruleId, newReport);
         }       
       }
       tagCache.acquireWriteLockOnKey(id);      
@@ -222,7 +222,7 @@ public class ControlTagConfigTransactedImpl extends TagConfigTransactedImpl<Cont
           for (Long alarmId : new ArrayList<Long>(controlTag.getAlarmIds())) {
             ConfigurationElementReport alarmReport = new ConfigurationElementReport(Action.REMOVE, Entity.ALARM, alarmId);
             tagReport.addSubReport(alarmReport);
-            alarmConfigHandler.removeAlarm(alarmId, alarmReport);
+            alarmConfigHandler.remove(alarmId, alarmReport);
           } 
         }
 

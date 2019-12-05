@@ -16,11 +16,20 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.handler.transacted;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Properties;
-
+import cern.c2mon.server.cache.RuleTagCache;
+import cern.c2mon.server.cache.RuleTagFacade;
+import cern.c2mon.server.cache.TagLocationService;
+import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
+import cern.c2mon.server.cache.loading.RuleTagLoaderDAO;
 import cern.c2mon.server.common.listener.ConfigurationEventListener;
+import cern.c2mon.server.common.rule.RuleTag;
+import cern.c2mon.server.configuration.handler.AlarmConfigHandler;
+import cern.c2mon.server.configuration.handler.RuleTagConfigHandler;
+import cern.c2mon.server.configuration.handler.impl.TagConfigGateway;
+import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
+import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
+import cern.c2mon.shared.client.configuration.ConfigurationElement;
+import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,19 +40,9 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import cern.c2mon.server.configuration.handler.AlarmConfigHandler;
-import cern.c2mon.server.configuration.handler.RuleTagConfigHandler;
-import cern.c2mon.server.configuration.handler.impl.TagConfigGateway;
-import cern.c2mon.server.cache.RuleTagCache;
-import cern.c2mon.server.cache.RuleTagFacade;
-import cern.c2mon.server.cache.TagLocationService;
-import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
-import cern.c2mon.server.cache.loading.RuleTagLoaderDAO;
-import cern.c2mon.server.common.rule.RuleTag;
-import cern.c2mon.shared.client.configuration.ConfigurationElement;
-import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
-import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
-import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Properties;
 
 /**
  * Implementation of transacted configuration methods.
@@ -246,7 +245,7 @@ public class RuleTagConfigTransactedImpl extends TagConfigTransactedImpl<RuleTag
           if (tagLocationService.isInTagCache(ruleId)) { //may already have been removed if a previous rule in the list was used in this rule!
             ConfigurationElementReport newReport = new ConfigurationElementReport(Action.REMOVE, Entity.RULETAG, ruleId);
             elementReport.addSubReport(newReport);
-            ruleTagConfigHandler.removeRuleTag(ruleId, newReport); //call config handler bean so transaction annotation is noticed
+            ruleTagConfigHandler.remove(ruleId, newReport); //call config handler bean so transaction annotation is noticed
           }         
         }                
       }
@@ -260,7 +259,7 @@ public class RuleTagConfigTransactedImpl extends TagConfigTransactedImpl<RuleTag
           for (Long alarmId : alarmIds) { //need copy as modified concurrently by remove alarm
             ConfigurationElementReport alarmReport = new ConfigurationElementReport(Action.REMOVE, Entity.ALARM, alarmId);
             elementReport.addSubReport(alarmReport);
-            alarmConfigHandler.removeAlarm(alarmId, alarmReport);
+            alarmConfigHandler.remove(alarmId, alarmReport);
           }        
         }
         for (Long inputTagId : ruleInputTagIds) {

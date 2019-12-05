@@ -16,17 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.handler.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-
-import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.UnexpectedRollbackException;
-
 import cern.c2mon.server.cache.AliveTimerCache;
 import cern.c2mon.server.cache.CommFaultTagCache;
 import cern.c2mon.server.cache.SubEquipmentCache;
@@ -42,6 +31,14 @@ import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.UnexpectedRollbackException;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * See interface documentation.
@@ -89,7 +86,7 @@ public class SubEquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandle
    * @param subEquipmentReport to which subreports may be added
    */
   @Override
-  public List<ProcessChange> removeSubEquipment(final Long subEquipmentId, final ConfigurationElementReport subEquipmentReport) {
+  public List<ProcessChange> remove(final Long subEquipmentId, final ConfigurationElementReport subEquipmentReport) {
     log.debug("Removing SubEquipment " + subEquipmentId);
     subEquipmentCache.acquireWriteLockOnKey(subEquipmentId);
     try {
@@ -127,14 +124,14 @@ public class SubEquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandle
   }
 
   @Override
-  public List<ProcessChange> createSubEquipment(ConfigurationElement element) throws IllegalAccessException {
+  public List<ProcessChange> create(ConfigurationElement element) throws IllegalAccessException {
     List<ProcessChange> change = subEquipmentConfigTransacted.doCreateSubEquipment(element);
     subEquipmentCache.notifyListenersOfUpdate(element.getEntityId());
     return change;
   }
 
   @Override
-  public List<ProcessChange> updateSubEquipment(Long subEquipmentId, Properties elementProperties) throws IllegalAccessException {
+  public List<ProcessChange> update(Long subEquipmentId, Properties elementProperties) throws IllegalAccessException {
     // TODO: Remove obsolete parent_equip_id property
     if (elementProperties.containsKey("parent_equip_id")) {
       log.warn("Attempting to change the parent equipment id of a subequipment - this is not currently supported!");
@@ -167,7 +164,7 @@ public class SubEquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandle
       ConfigurationElementReport tagReport = new ConfigurationElementReport(Action.REMOVE, Entity.DATATAG, dataTagId);
       subEquipmentReport.addSubReport(tagReport);
 
-      ProcessChange change = dataTagConfigHandler.removeDataTag(dataTagId, tagReport);
+      ProcessChange change = dataTagConfigHandler.remove(dataTagId, tagReport);
 
       if (change.processActionRequired()) {
         change.setNestedSubReport(tagReport);

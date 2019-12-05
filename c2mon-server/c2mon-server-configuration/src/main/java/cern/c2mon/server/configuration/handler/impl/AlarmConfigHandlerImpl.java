@@ -68,7 +68,7 @@ public class AlarmConfigHandlerImpl implements AlarmConfigHandler {
    * @param alarmReport the configuration report for the alarm removal
    */
   @Override
-  public void removeAlarm(final Long alarmId, final ConfigurationElementReport alarmReport) {
+  public Void remove(final Long alarmId, final ConfigurationElementReport alarmReport) {
     try {
       AlarmCacheObject alarm = (AlarmCacheObject) alarmCache.get(alarmId);
       alarmConfigTransacted.doRemoveAlarm(alarmId, alarmReport);
@@ -83,16 +83,18 @@ public class AlarmConfigHandlerImpl implements AlarmConfigHandler {
     } catch (CacheElementNotFoundException e) {
       alarmReport.setWarning("Alarm " + alarmId + " is not know by the system ==> Nothing to be removed from the Alarm cache.");
     }
+    return null;
   }
 
   @Override
-  public void createAlarm(ConfigurationElement element) throws IllegalAccessException {
+  public Void create(ConfigurationElement element) throws IllegalAccessException {
     alarmConfigTransacted.doCreateAlarm(element);
     alarmService.evaluateAlarm(element.getEntityId());
+    return null;
   }
 
   @Override
-  public void updateAlarm(Long alarmId, Properties properties) {
+  public Void update(Long alarmId, Properties properties) {
     try {
       alarmConfigTransacted.doUpdateAlarm(alarmId, properties);
       alarmService.evaluateAlarm(alarmId);
@@ -102,5 +104,6 @@ public class AlarmConfigHandlerImpl implements AlarmConfigHandler {
       alarmCache.loadFromDb(alarmId);
       throw e;
     }
+    return null;
   }
 }

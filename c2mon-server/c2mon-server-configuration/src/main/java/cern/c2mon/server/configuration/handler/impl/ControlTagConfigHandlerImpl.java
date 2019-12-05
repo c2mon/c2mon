@@ -81,14 +81,14 @@ public class ControlTagConfigHandlerImpl implements ControlTagConfigHandler {
    *          needs informing (i.e. if has Address) , else return null
    */
   @Override
-  public ProcessChange removeControlTag(Long id, ConfigurationElementReport tagReport) {
+  public ProcessChange remove(Long id, ConfigurationElementReport tagReport) {
     ProcessChange change = controlTagConfigTransacted.doRemoveControlTag(id, tagReport);    
     controlTagCache.remove(id); //will be skipped if rollback exception thrown in do method
     return change;
   }
 
   @Override
-  public ProcessChange createControlTag(ConfigurationElement element) throws IllegalAccessException {
+  public ProcessChange create(ConfigurationElement element) throws IllegalAccessException {
     ProcessChange change;
     Long controlTagId = element.getEntityId();
     acquireEquipmentWriteLockForElement(controlTagId, element.getElementProperties());
@@ -102,7 +102,7 @@ public class ControlTagConfigHandlerImpl implements ControlTagConfigHandler {
   }
 
   @Override
-  public ProcessChange updateControlTag(Long id, Properties elementProperties) throws IllegalAccessException {
+  public ProcessChange update(Long id, Properties elementProperties) throws IllegalAccessException {
     acquireEquipmentWriteLockForElement(id, elementProperties);
     try {
       return controlTagConfigTransacted.doUpdateControlTag(id, elementProperties); 

@@ -16,13 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.handler.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import cern.c2mon.server.cache.AliveTimerCache;
 import cern.c2mon.server.cache.C2monCache;
 import cern.c2mon.server.cache.CommFaultTagCache;
@@ -34,6 +27,12 @@ import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * Common part of Equipment-SubEquipment handler.
@@ -98,7 +97,7 @@ public abstract class AbstractEquipmentConfigHandler<T extends AbstractEquipment
     if (aliveTagId != null) {
       ConfigurationElementReport tagReport = new ConfigurationElementReport(Action.REMOVE, Entity.CONTROLTAG, aliveTagId);
 
-      ProcessChange change = controlTagConfigHandler.removeControlTag(aliveTagId, tagReport);
+      ProcessChange change = controlTagConfigHandler.remove(aliveTagId, tagReport);
       if (change.processActionRequired()) {
         change.setNestedSubReport(tagReport);
         changes.add(change);
@@ -112,7 +111,7 @@ public abstract class AbstractEquipmentConfigHandler<T extends AbstractEquipment
     if (commTagId != null) {
       ConfigurationElementReport tagReport = new ConfigurationElementReport(Action.REMOVE, Entity.CONTROLTAG, commTagId);
 
-      ProcessChange change = controlTagConfigHandler.removeControlTag(commTagId, tagReport);
+      ProcessChange change = controlTagConfigHandler.remove(commTagId, tagReport);
       if (change.processActionRequired()) {
         change.setNestedSubReport(tagReport);
         changes.add(change);
@@ -125,7 +124,7 @@ public abstract class AbstractEquipmentConfigHandler<T extends AbstractEquipment
     Long stateTagId = abstractEquipment.getStateTagId();
     ConfigurationElementReport tagReport = new ConfigurationElementReport(Action.REMOVE, Entity.CONTROLTAG, stateTagId);
 
-    ProcessChange change = controlTagConfigHandler.removeControlTag(stateTagId, tagReport);
+    ProcessChange change = controlTagConfigHandler.remove(stateTagId, tagReport);
     if (change.processActionRequired()) {
       change.setNestedSubReport(tagReport);
       changes.add(change);

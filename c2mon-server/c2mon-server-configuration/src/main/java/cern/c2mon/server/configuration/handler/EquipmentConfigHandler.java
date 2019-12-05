@@ -16,18 +16,17 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.handler;
 
-import java.util.List;
-import java.util.Properties;
-
 import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
+
+import java.util.List;
+import java.util.Properties;
 
 /**
  * Bean managing configuration updates to C2MON Equipment.
  *
  * @author Mark Brightwell
- *
  */
 public interface EquipmentConfigHandler {
 
@@ -36,27 +35,29 @@ public interface EquipmentConfigHandler {
    *
    * @param element contains details of the Equipment
    * @return ProcessChange with id of Process that requires restart (not currently
-   *        supported by DAQ layer)
+   * supported by DAQ layer)
    * @throws IllegalAccessException
    */
-  List<ProcessChange> createEquipment(ConfigurationElement element) throws IllegalAccessException;
+  List<ProcessChange> create(ConfigurationElement element) throws IllegalAccessException;
 
   /**
    * Updates an Equipment in the C2MON server.
-   * @param equipmentId the id of the Equipment to update
+   *
+   * @param equipmentId       the id of the Equipment to update
    * @param elementProperties details of the fields to modify
    * @return a list of changes to send to the DAQ layer
    */
-  List<ProcessChange> updateEquipment(Long equipmentId, Properties elementProperties) throws IllegalAccessException;
+  List<ProcessChange> update(Long equipmentId, Properties elementProperties) throws IllegalAccessException;
 
   /**
    * Removes an Equipment from the C2MON server.
-   * @param equipmentId the id of the Equipment to remove
+   *
+   * @param equipmentId     the id of the Equipment to remove
    * @param equipmentReport the report for this event;
-   *         is passed as parameter so cascaded actions can attach subreports
+   *                        is passed as parameter so cascaded actions can attach subreports
    * @return always returns a change object requiring restart (remove not supported on DAQ layer so far)
    */
-  ProcessChange removeEquipment(Long equipmentId, ConfigurationElementReport equipmentReport);
+  ProcessChange remove(Long equipmentId, ConfigurationElementReport equipmentReport);
 
   void setProcessConfigHandler(ProcessConfigHandler processConfigHandler);
 

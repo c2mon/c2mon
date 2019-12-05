@@ -75,7 +75,7 @@ public class DataTagConfigHandlerImpl implements DataTagConfigHandler {
   }
 
   @Override
-  public ProcessChange createDataTag(ConfigurationElement element) throws IllegalAccessException {
+  public ProcessChange create(ConfigurationElement element) throws IllegalAccessException {
     ProcessChange change = dataTagConfigTransacted.doCreateDataTag(element);
     dataTagCache.notifyListenersOfUpdate(element.getEntityId());
     log.trace("createDataTag - Notifying Configuration update listeners");
@@ -84,7 +84,7 @@ public class DataTagConfigHandlerImpl implements DataTagConfigHandler {
   }
 
   @Override
-  public ProcessChange removeDataTag(Long id, ConfigurationElementReport tagReport) {
+  public ProcessChange remove(Long id, ConfigurationElementReport tagReport) {
     log.trace("Removing DataTag " + id);
     try {
       DataTag tagCopy = dataTagCache.get(id);
@@ -99,7 +99,7 @@ public class DataTagConfigHandlerImpl implements DataTagConfigHandler {
   }
 
   @Override
-  public ProcessChange updateDataTag(Long id, Properties elementProperties) {
+  public ProcessChange update(Long id, Properties elementProperties) {
 	  try {
 		  ProcessChange processChange = dataTagConfigTransacted.doUpdateDataTag(id, elementProperties);
       log.trace("createDataTag - Notifying Configuration update listeners");

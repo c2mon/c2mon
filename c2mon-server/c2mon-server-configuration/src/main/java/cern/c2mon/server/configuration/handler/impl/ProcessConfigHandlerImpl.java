@@ -110,7 +110,7 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
    *                      subreports can be attached
    */
   @Override
-  public ProcessChange removeProcess(final Long processId, final ConfigurationElementReport processReport) {
+  public ProcessChange remove(final Long processId, final ConfigurationElementReport processReport) {
     LOGGER.debug("Removing process with id " + processId);
     ProcessChange processChange;
     try {
@@ -128,7 +128,7 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
             ConfigurationElementReport childElementReport = new ConfigurationElementReport(Action.REMOVE, Entity.EQUIPMENT, equipmentId);
             try {
               processReport.addSubReport(childElementReport);
-              equipmentConfigHandler.removeEquipment(equipmentId, childElementReport);
+              equipmentConfigHandler.remove(equipmentId, childElementReport);
             } catch (RuntimeException ex) {
               LOGGER.error("Exception caught while applying the configuration change (Action, Entity, Entity id) = ("
                 + Action.REMOVE + "; " + Entity.EQUIPMENT + "; " + equipmentId + ")", ex);
@@ -160,7 +160,7 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
   }
 
   @Override
-  public ProcessChange createProcess(final ConfigurationElement element) throws IllegalAccessException {
+  public ProcessChange create(final ConfigurationElement element) throws IllegalAccessException {
     LOGGER.debug("Creating process with id " + element.getEntityId());
     if (processCache.containsKey(element.getEntityId())) {
       throw new ConfigurationException(ConfigurationException.ENTITY_EXISTS, "Attempting to create a process with an already existing id: "
@@ -191,8 +191,8 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
   }
 
   @Override
-  public ProcessChange updateProcess(final Long processId,
-                                     final Properties elementProperties) throws IllegalAccessException {
+  public ProcessChange update(final Long processId,
+                              final Properties elementProperties) throws IllegalAccessException {
 
     if (elementProperties.containsKey("id")) {
       LOGGER.warn("Attempting to change the process id - this is not currently supported!");
@@ -253,12 +253,12 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
     if (aliveTagId != null) {
       ConfigurationElementReport tagReport = new ConfigurationElementReport(Action.REMOVE, Entity.CONTROLTAG, aliveTagId);
       processReport.addSubReport(tagReport);
-      controlTagConfigHandler.removeControlTag(aliveTagId, tagReport);
+      controlTagConfigHandler.remove(aliveTagId, tagReport);
     }
     Long stateTagId = process.getStateTagId();
     ConfigurationElementReport tagReport = new ConfigurationElementReport(Action.REMOVE, Entity.CONTROLTAG, stateTagId);
     processReport.addSubReport(tagReport);
-    controlTagConfigHandler.removeControlTag(stateTagId, tagReport);
+    controlTagConfigHandler.remove(stateTagId, tagReport);
   }
 
   /**

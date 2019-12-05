@@ -16,28 +16,13 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.handler.impl;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Properties;
-
-import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import cern.c2mon.server.cache.AliveTimerCache;
 import cern.c2mon.server.cache.CommFaultTagCache;
 import cern.c2mon.server.cache.EquipmentCache;
 import cern.c2mon.server.cache.EquipmentFacade;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.equipment.Equipment;
-import cern.c2mon.server.configuration.handler.ControlTagConfigHandler;
-import cern.c2mon.server.configuration.handler.DataTagConfigHandler;
-import cern.c2mon.server.configuration.handler.EquipmentConfigHandler;
-import cern.c2mon.server.configuration.handler.ProcessConfigHandler;
-import cern.c2mon.server.configuration.handler.SubEquipmentConfigHandler;
+import cern.c2mon.server.configuration.handler.*;
 import cern.c2mon.server.configuration.handler.transacted.EquipmentConfigTransacted;
 import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
@@ -46,6 +31,14 @@ import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import cern.c2mon.shared.daq.config.EquipmentUnitRemove;
 import cern.c2mon.shared.daq.config.IChange;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Properties;
 
 
 /**
@@ -95,7 +88,7 @@ public class EquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<E
   }
 
   @Override
-  public ProcessChange removeEquipment(final Long equipmentid, final ConfigurationElementReport equipmentReport) {
+  public ProcessChange remove(final Long equipmentid, final ConfigurationElementReport equipmentReport) {
     log.debug("Removing Equipment " + equipmentid);
     try {
       Equipment equipmentCopy = equipmentCache.getCopy(equipmentid);
@@ -131,14 +124,14 @@ public class EquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<E
   }
 
   @Override
-  public List<ProcessChange> createEquipment(ConfigurationElement element) throws IllegalAccessException {
+  public List<ProcessChange> create(ConfigurationElement element) throws IllegalAccessException {
     List<ProcessChange> change = equipmentConfigTransacted.doCreateEquipment(element);
     equipmentCache.notifyListenersOfUpdate(element.getEntityId());
     return change;
   }
 
   @Override
-  public List<ProcessChange> updateEquipment(Long equipmentId, Properties elementProperties) throws IllegalAccessException {
+  public List<ProcessChange> update(Long equipmentId, Properties elementProperties) throws IllegalAccessException {
     if (elementProperties.containsKey("processId")) {
       log.warn("Attempting to change the parent process id of an equipment - this is not currently supported!");
       elementProperties.remove("processId");
@@ -161,7 +154,7 @@ public class EquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<E
       ConfigurationElementReport subEquipmentReport = new ConfigurationElementReport(Action.REMOVE, Entity.SUBEQUIPMENT, subEquipmentId);
       equipmentReport.addSubReport(subEquipmentReport);
       try {
-        subEquipmentConfigHandler.removeSubEquipment(subEquipmentId, subEquipmentReport);
+        subEquipmentConfigHandler.remove(subEquipmentId, subEquipmentReport);
       } catch (Exception ex) {
         subEquipmentReport.setFailure("Exception caught - aborting removal of subequipment "
             + subEquipmentId , ex);
@@ -183,7 +176,7 @@ public class EquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<E
     for (Long dataTagId : new ArrayList<>(equipmentFacade.getDataTagIds(equipment.getId()))) { //copy as list is modified by removeDataTag
       ConfigurationElementReport tagReport = new ConfigurationElementReport(Action.REMOVE, Entity.DATATAG, dataTagId);
       equipmentReport.addSubReport(tagReport);
-      dataTagConfigHandler.removeDataTag(dataTagId, tagReport);
+      dataTagConfigHandler.remove(dataTagId, tagReport);
     }
   }
 

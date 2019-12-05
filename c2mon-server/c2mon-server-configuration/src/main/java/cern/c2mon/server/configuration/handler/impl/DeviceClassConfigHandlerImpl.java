@@ -59,12 +59,12 @@ public class DeviceClassConfigHandlerImpl implements DeviceClassConfigHandler {
   }
 
   @Override
-  public ProcessChange createDeviceClass(ConfigurationElement element) throws IllegalAccessException {
+  public ProcessChange create(ConfigurationElement element) throws IllegalAccessException {
     return deviceClassConfigTransacted.doCreateDeviceClass(element);
   }
 
   @Override
-  public ProcessChange updateDeviceClass(Long id, Properties elementProperties) {
+  public ProcessChange update(Long id, Properties elementProperties) {
     try {
       return deviceClassConfigTransacted.doUpdateDeviceClass(id, elementProperties);
 
@@ -91,7 +91,7 @@ public class DeviceClassConfigHandlerImpl implements DeviceClassConfigHandler {
    * 2. Remove all Properties and Commands of the device class
    */
   @Override
-  public ProcessChange removeDeviceClass(Long id, ConfigurationElementReport elementReport) {
+  public ProcessChange remove(Long id, ConfigurationElementReport elementReport) {
     ProcessChange change = deviceClassConfigTransacted.doRemoveDeviceClass(id, elementReport);
 
     // will be skipped if rollback exception thrown in do method

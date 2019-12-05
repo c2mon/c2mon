@@ -58,12 +58,12 @@ public class DeviceConfigHandlerImpl implements DeviceConfigHandler {
   }
 
   @Override
-  public ProcessChange createDevice(ConfigurationElement element) throws IllegalAccessException {
+  public ProcessChange create(ConfigurationElement element) throws IllegalAccessException {
     return deviceConfigTransacted.doCreateDevice(element);
   }
 
   @Override
-  public ProcessChange updateDevice(Long id, Properties elementProperties) {
+  public ProcessChange update(Long id, Properties elementProperties) {
     try {
       return deviceConfigTransacted.doUpdateDevice(id, elementProperties);
 
@@ -86,7 +86,7 @@ public class DeviceConfigHandlerImpl implements DeviceConfigHandler {
    * and commands.
    */
   @Override
-  public ProcessChange removeDevice(Long id, ConfigurationElementReport elementReport) {
+  public ProcessChange remove(Long id, ConfigurationElementReport elementReport) {
     ProcessChange change = deviceConfigTransacted.doRemoveDevice(id, elementReport);
 
     // will be skipped if rollback exception thrown in do method

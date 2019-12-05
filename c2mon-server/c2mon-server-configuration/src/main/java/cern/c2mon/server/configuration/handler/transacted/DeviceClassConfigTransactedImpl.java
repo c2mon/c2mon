@@ -16,17 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.handler.transacted;
 
-import java.util.List;
-import java.util.Properties;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.UnexpectedRollbackException;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
 import cern.c2mon.server.cache.DeviceClassCache;
 import cern.c2mon.server.cache.DeviceClassFacade;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
@@ -40,6 +29,16 @@ import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import cern.c2mon.shared.common.ConfigurationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.UnexpectedRollbackException;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Properties;
 
 /**
  * Implementation of {@link DeviceClassConfigTransacted}.
@@ -182,7 +181,7 @@ public class DeviceClassConfigTransactedImpl implements DeviceClassConfigTransac
         for (Long deviceId : deviceIds) {
           ConfigurationElementReport newReport = new ConfigurationElementReport(Action.REMOVE, Entity.DEVICE, deviceId);
           elementReport.addSubReport(newReport);
-          deviceConfigHandler.removeDevice(deviceId, newReport);
+          deviceConfigHandler.remove(deviceId, newReport);
         }
       }
 

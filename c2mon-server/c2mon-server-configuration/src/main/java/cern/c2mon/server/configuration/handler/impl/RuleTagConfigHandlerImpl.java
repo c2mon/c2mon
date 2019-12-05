@@ -71,23 +71,25 @@ public class RuleTagConfigHandlerImpl implements RuleTagConfigHandler {
   }
 
   @Override
-  public void removeRuleTag(final Long id, final ConfigurationElementReport elementReport) {
+  public Void remove(final Long id, final ConfigurationElementReport elementReport) {
     ruleTagConfigTransacted.doRemoveRuleTag(id, elementReport);
     ruleTagCache.remove(id); //will be skipped if rollback exception thrown in do method
+    return null;
   }
 
   @Override
-  public void createRuleTag(ConfigurationElement element) throws IllegalAccessException {
+  public Void create(ConfigurationElement element) throws IllegalAccessException {
     ruleTagConfigTransacted.doCreateRuleTag(element);
     ruleEvaluator.evaluateRule(element.getEntityId());
     if (log.isTraceEnabled()) {
       log.trace("createRuleTag - Notifying Configuration update listeners");
     }
     this.configurationUpdateImpl.notifyListeners(element.getEntityId());
+    return null;
   }
 
   @Override
-  public void updateRuleTag(Long id, Properties elementProperties) throws IllegalAccessException {
+  public Void update(Long id, Properties elementProperties) throws IllegalAccessException {
 	  try {
 		  ruleTagConfigTransacted.doUpdateRuleTag(id, elementProperties);
 		  ruleEvaluator.evaluateRule(id);
@@ -101,6 +103,7 @@ public class RuleTagConfigHandlerImpl implements RuleTagConfigHandler {
 		  ruleTagCache.loadFromDb(id);
 		  throw e;
 	  }
+    return null;
   }
 
   @Override
