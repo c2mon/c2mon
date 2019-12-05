@@ -17,7 +17,6 @@
 package cern.c2mon.server.configuration.handler;
 
 import cern.c2mon.server.common.datatag.DataTag;
-import cern.c2mon.server.configuration.handler.impl.TagConfigHandler;
 import cern.c2mon.server.configuration.impl.ProcessChange;
 
 /**

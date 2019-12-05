@@ -62,7 +62,7 @@ public class DeviceConfigHandlerImpl implements DeviceConfigHandler {
   }
 
   @Override
-  public ProcessChange update(Long id, Properties elementProperties) {
+  public ProcessChange update(Long id, Properties elementProperties) throws IllegalAccessException {
     try {
       return deviceConfigTransacted.update(id, elementProperties);
 

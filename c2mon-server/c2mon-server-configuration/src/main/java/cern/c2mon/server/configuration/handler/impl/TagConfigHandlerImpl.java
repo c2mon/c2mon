@@ -16,8 +16,9 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.handler.impl;
 
-import cern.c2mon.server.configuration.handler.transacted.TagConfigTransacted;
 import cern.c2mon.server.common.tag.Tag;
+import cern.c2mon.server.configuration.handler.TagConfigHandler;
+import cern.c2mon.server.configuration.handler.transacted.TagConfigTransacted;
 
 /**
  * Public methods in this class should perform the complete
@@ -47,13 +48,13 @@ class TagConfigHandlerImpl<T extends Tag> implements TagConfigHandler<T> {
   /**
    * Ref to transacted bean.
    */
-  private TagConfigTransacted<T> tagConfigTransacted;
+  private TagConfigTransacted tagConfigTransacted;
   
   /**
    * Constructor.
    * @param tagConfigTransacted bean with transacted methods
    */
-  public TagConfigHandlerImpl(TagConfigTransacted<T> tagConfigTransacted) {
+  public TagConfigHandlerImpl(TagConfigTransacted tagConfigTransacted) {
     super();
     this.tagConfigTransacted = tagConfigTransacted;
   }

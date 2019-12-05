@@ -17,7 +17,6 @@
 package cern.c2mon.server.configuration.handler;
 
 import cern.c2mon.server.common.rule.RuleTag;
-import cern.c2mon.server.configuration.handler.impl.TagConfigHandler;
 
 /**
  * Bean managing configuration updates to C2MON RuleTags.

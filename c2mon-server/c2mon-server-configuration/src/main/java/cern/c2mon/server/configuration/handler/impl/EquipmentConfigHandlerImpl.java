@@ -98,7 +98,7 @@ public class EquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<E
 
       equipmentCache.acquireWriteLockOnKey(equipmentid);
       try {
-        equipmentConfigTransacted.remove(equipmentCopy, equipmentReport);
+        equipmentConfigTransacted.remove(equipmentid, equipmentReport);
       } finally {
         equipmentCache.releaseWriteLockOnKey(equipmentid);
       }
