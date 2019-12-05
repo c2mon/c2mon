@@ -24,7 +24,6 @@ import cern.c2mon.server.configuration.config.ConfigurationProperties;
 import cern.c2mon.server.configuration.handler.ControlTagConfigHandler;
 import cern.c2mon.server.configuration.handler.EquipmentConfigHandler;
 import cern.c2mon.server.configuration.handler.ProcessConfigHandler;
-import cern.c2mon.server.configuration.handler.transacted.ProcessConfigTransacted;
 import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.server.daq.JmsContainerManager;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
@@ -54,7 +53,7 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ProcessConfigHandlerImpl.class);
 
-  private ProcessConfigTransacted processConfigTransacted;
+  private ProcessConfigHandler processConfigTransacted;
 
   private EquipmentConfigHandler equipmentConfigHandler;
 
@@ -81,7 +80,7 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
                                   ProcessService processService,
                                   JmsContainerManager jmsContainerManager,
                                   ConfigurationProperties properties,
-                                  ProcessConfigTransacted processConfigTransacted) {
+                                  ProcessConfigHandler processConfigTransacted) {
     super();
     this.equipmentConfigHandler = equipmentConfigHandler;
     this.controlTagConfigHandler = controlTagConfigHandler;
@@ -137,7 +136,7 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
             }
           }
           processChange = processCache.executeTransaction(() -> {
-            ProcessChange processChangeResult = processConfigTransacted.doRemoveProcess(process, processReport);
+            ProcessChange processChangeResult = processConfigTransacted.remove(processId, processReport);
             removeProcessControlTags(process, processReport);
             return processChangeResult;
           });
@@ -168,7 +167,7 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
     }
     Process process = null;
     try {
-      ProcessChange change = processConfigTransacted.doCreateProcess(element);
+      ProcessChange change = processConfigTransacted.create(element);
       process = processCache.get(element.getEntityId());
       jmsContainerManager.subscribe(process);
       processService.startAliveTimerBySupervisedId(element.getEntityId());
@@ -211,7 +210,7 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
 
     ProcessChange processChange = new ProcessChange(processId);
     try {
-      processConfigTransacted.doUpdateProcess(processId, elementProperties);
+      processConfigTransacted.update(processId, elementProperties);
 
       //stop old, start new - transaction is committed here
       if (aliveConfigure) {
@@ -260,14 +259,4 @@ public class ProcessConfigHandlerImpl implements ProcessConfigHandler {
     processReport.addSubReport(tagReport);
     controlTagConfigHandler.remove(stateTagId, tagReport);
   }
-
-  /**
-   * Used for testing.
-   *
-   * @param processConfigTransacted the processConfigTransacted to set
-   */
-  public void setProcessConfigTransacted(ProcessConfigTransacted processConfigTransacted) {
-    this.processConfigTransacted = processConfigTransacted;
-  }
-
 }

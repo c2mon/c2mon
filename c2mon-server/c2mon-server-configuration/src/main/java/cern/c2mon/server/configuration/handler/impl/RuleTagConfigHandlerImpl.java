@@ -19,7 +19,6 @@ package cern.c2mon.server.configuration.handler.impl;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.configuration.handler.RuleTagConfigHandler;
-import cern.c2mon.server.configuration.handler.transacted.RuleTagConfigTransacted;
 import cern.c2mon.server.configuration.impl.ConfigurationUpdateImpl;
 import cern.c2mon.server.rule.RuleEvaluator;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
@@ -47,7 +46,7 @@ public class RuleTagConfigHandlerImpl implements RuleTagConfigHandler {
    */
   private ConfigurationUpdateImpl configurationUpdateImpl;
 
-  private RuleTagConfigTransacted ruleTagConfigTransacted;
+  private RuleTagConfigHandler ruleTagConfigTransacted;
 
   private C2monCache<RuleTag> ruleTagCache;
 
@@ -63,7 +62,7 @@ public class RuleTagConfigHandlerImpl implements RuleTagConfigHandler {
   @Autowired
   public RuleTagConfigHandlerImpl(final C2monCache<RuleTag> ruleTagCache, final RuleEvaluator ruleEvaluator,
                                   final ConfigurationUpdateImpl configurationUpdateImpl,
-                                  RuleTagConfigTransacted ruleTagConfigTransacted) {
+                                  RuleTagConfigHandler ruleTagConfigTransacted) {
     this.ruleTagCache = ruleTagCache;
     this.ruleEvaluator = ruleEvaluator;
     this.configurationUpdateImpl = configurationUpdateImpl;
@@ -72,14 +71,14 @@ public class RuleTagConfigHandlerImpl implements RuleTagConfigHandler {
 
   @Override
   public Void remove(final Long id, final ConfigurationElementReport elementReport) {
-    ruleTagConfigTransacted.doRemoveRuleTag(id, elementReport);
+    ruleTagConfigTransacted.remove(id, elementReport);
     ruleTagCache.remove(id); //will be skipped if rollback exception thrown in do method
     return null;
   }
 
   @Override
   public Void create(ConfigurationElement element) throws IllegalAccessException {
-    ruleTagConfigTransacted.doCreateRuleTag(element);
+    ruleTagConfigTransacted.create(element);
     ruleEvaluator.evaluateRule(element.getEntityId());
     if (log.isTraceEnabled()) {
       log.trace("createRuleTag - Notifying Configuration update listeners");
@@ -91,7 +90,7 @@ public class RuleTagConfigHandlerImpl implements RuleTagConfigHandler {
   @Override
   public Void update(Long id, Properties elementProperties) throws IllegalAccessException {
 	  try {
-		  ruleTagConfigTransacted.doUpdateRuleTag(id, elementProperties);
+		  ruleTagConfigTransacted.update(id, elementProperties);
 		  ruleEvaluator.evaluateRule(id);
 		  if (log.isTraceEnabled()) {
 			  log.trace("updateRuleTag - Notifying Configuration update listeners");

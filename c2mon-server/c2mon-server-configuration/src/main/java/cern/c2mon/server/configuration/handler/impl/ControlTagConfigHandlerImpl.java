@@ -21,7 +21,6 @@ import cern.c2mon.server.cache.ControlTagCache;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.configuration.handler.ControlTagConfigHandler;
-import cern.c2mon.server.configuration.handler.transacted.ControlTagConfigTransacted;
 import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
@@ -53,7 +52,7 @@ public class ControlTagConfigHandlerImpl implements ControlTagConfigHandler {
   
   private final C2monCache<SubEquipment> subEquipmentCache;
 
-  private ControlTagConfigTransacted controlTagConfigTransacted;
+  private ControlTagConfigHandler controlTagConfigTransacted;
   
   private ControlTagCache controlTagCache;
 
@@ -61,7 +60,7 @@ public class ControlTagConfigHandlerImpl implements ControlTagConfigHandler {
   @Autowired  
   public ControlTagConfigHandlerImpl(ControlTagCache controlTagCache,
                                      C2monCache<Equipment> equipmentCache,
-                                     C2monCache<SubEquipment> subEquipmentCache, ControlTagConfigTransacted controlTagConfigTransacted) {
+                                     C2monCache<SubEquipment> subEquipmentCache, ControlTagConfigHandler controlTagConfigTransacted) {
     this.controlTagCache = controlTagCache;
     this.equipmentCache = equipmentCache;
     this.subEquipmentCache = subEquipmentCache;
@@ -82,7 +81,7 @@ public class ControlTagConfigHandlerImpl implements ControlTagConfigHandler {
    */
   @Override
   public ProcessChange remove(Long id, ConfigurationElementReport tagReport) {
-    ProcessChange change = controlTagConfigTransacted.doRemoveControlTag(id, tagReport);    
+    ProcessChange change = controlTagConfigTransacted.remove(id, tagReport);
     controlTagCache.remove(id); //will be skipped if rollback exception thrown in do method
     return change;
   }
@@ -93,7 +92,7 @@ public class ControlTagConfigHandlerImpl implements ControlTagConfigHandler {
     Long controlTagId = element.getEntityId();
     acquireEquipmentWriteLockForElement(controlTagId, element.getElementProperties());
     try {
-      change = controlTagConfigTransacted.doCreateControlTag(element);
+      change = controlTagConfigTransacted.create(element);
     } finally {
       releaseEquipmentWriteLockForElement(controlTagId, element.getElementProperties());
     }
@@ -105,7 +104,7 @@ public class ControlTagConfigHandlerImpl implements ControlTagConfigHandler {
   public ProcessChange update(Long id, Properties elementProperties) throws IllegalAccessException {
     acquireEquipmentWriteLockForElement(id, elementProperties);
     try {
-      return controlTagConfigTransacted.doUpdateControlTag(id, elementProperties); 
+      return controlTagConfigTransacted.update(id, elementProperties);
     } catch (UnexpectedRollbackException e) {
       log.error("Rolling back ControlTag update in cache");
       controlTagCache.remove(id);

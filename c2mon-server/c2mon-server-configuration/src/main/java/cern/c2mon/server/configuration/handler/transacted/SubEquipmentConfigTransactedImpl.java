@@ -16,32 +16,14 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.handler.transacted;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.UnexpectedRollbackException;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
-import cern.c2mon.server.cache.AliveTimerCache;
-import cern.c2mon.server.cache.CommFaultTagCache;
-import cern.c2mon.server.cache.ControlTagCache;
-import cern.c2mon.server.cache.ControlTagFacade;
-import cern.c2mon.server.cache.ProcessCache;
-import cern.c2mon.server.cache.ProcessXMLProvider;
-import cern.c2mon.server.cache.SubEquipmentCache;
-import cern.c2mon.server.cache.SubEquipmentFacade;
+import cern.c2mon.server.cache.*;
 import cern.c2mon.server.cache.loading.SubEquipmentDAO;
 import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.control.ControlTagCacheObject;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
 import cern.c2mon.server.configuration.handler.ControlTagConfigHandler;
+import cern.c2mon.server.configuration.handler.SubEquipmentConfigHandler;
 import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
@@ -52,6 +34,17 @@ import cern.c2mon.shared.daq.config.DataTagAdd;
 import cern.c2mon.shared.daq.config.IChange;
 import cern.c2mon.shared.daq.config.SubEquipmentUnitAdd;
 import cern.c2mon.shared.daq.config.SubEquipmentUnitRemove;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.UnexpectedRollbackException;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * See interface docs.
@@ -60,7 +53,7 @@ import cern.c2mon.shared.daq.config.SubEquipmentUnitRemove;
  *
  */
 @Service
-public class SubEquipmentConfigTransactedImpl extends AbstractEquipmentConfigTransacted<SubEquipment> implements SubEquipmentConfigTransacted {
+public class SubEquipmentConfigTransactedImpl extends AbstractEquipmentConfigTransacted<SubEquipment> implements SubEquipmentConfigHandler {
 
   /**
    * Class logger.
@@ -116,7 +109,7 @@ public class SubEquipmentConfigTransactedImpl extends AbstractEquipmentConfigTra
    */
   @Override
   @Transactional(value = "cacheTransactionManager")
-  public List<ProcessChange> doCreateSubEquipment(final ConfigurationElement element) throws IllegalAccessException {
+  public List<ProcessChange> create(final ConfigurationElement element) throws IllegalAccessException {
     SubEquipment subEquipment = super.createAbstractEquipment(element);
     subEquipmentFacade.addSubEquipmentToEquipment(subEquipment.getId(), subEquipment.getParentId());
     SubEquipmentUnitAdd subEquipmentUnitAdd = new SubEquipmentUnitAdd(element.getSequenceId(), subEquipment.getId(), subEquipment.getParentId(),
@@ -131,13 +124,13 @@ public class SubEquipmentConfigTransactedImpl extends AbstractEquipmentConfigTra
 
   @Override
   @Transactional(value = "cacheTransactionManager", propagation = Propagation.REQUIRES_NEW)
-  public List<ProcessChange> doUpdateAbstractEquipment(final SubEquipment subEquipment, Properties properties) throws IllegalAccessException {
+  public List<ProcessChange> update(final SubEquipment subEquipment, Properties properties) throws IllegalAccessException {
     return super.updateAbstractEquipment(subEquipment, properties);
   }
 
   @Override
   @Transactional(value = "cacheTransactionManager", propagation = Propagation.REQUIRES_NEW)
-  public List<ProcessChange> doRemoveSubEquipment(final SubEquipment subEquipment, final ConfigurationElementReport subEquipmentReport) {
+  public List<ProcessChange> remove(final SubEquipment subEquipment, final ConfigurationElementReport subEquipmentReport) {
     List<ProcessChange> processChanges = new ArrayList<ProcessChange>();
 
     try {

@@ -22,7 +22,6 @@ import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.configuration.handler.AlarmConfigHandler;
-import cern.c2mon.server.configuration.handler.transacted.AlarmConfigTransacted;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import cern.c2mon.shared.common.CacheEvent;
@@ -43,14 +42,14 @@ import java.util.Properties;
 @Service
 public class AlarmConfigHandlerImpl implements AlarmConfigHandler {
 
-  private AlarmConfigTransacted alarmConfigTransacted;
+  private AlarmConfigHandler alarmConfigTransacted;
 
   private C2monCache<Alarm> alarmCache;
 
   private AlarmService alarmService;
 
   @Autowired
-  public AlarmConfigHandlerImpl(AlarmConfigTransacted alarmConfigTransacted, AlarmService alarmService) {
+  public AlarmConfigHandlerImpl(AlarmConfigHandler alarmConfigTransacted, AlarmService alarmService) {
     super();
     this.alarmConfigTransacted = alarmConfigTransacted;
     this.alarmCache = alarmService.getCache();
@@ -71,7 +70,7 @@ public class AlarmConfigHandlerImpl implements AlarmConfigHandler {
   public Void remove(final Long alarmId, final ConfigurationElementReport alarmReport) {
     try {
       AlarmCacheObject alarm = (AlarmCacheObject) alarmCache.get(alarmId);
-      alarmConfigTransacted.doRemoveAlarm(alarmId, alarmReport);
+      alarmConfigTransacted.remove(alarmId, alarmReport);
       alarmCache.remove(alarmId); //will be skipped if rollback exception thrown in do method
 
       alarm.setActive(false);
@@ -88,15 +87,15 @@ public class AlarmConfigHandlerImpl implements AlarmConfigHandler {
 
   @Override
   public Void create(ConfigurationElement element) throws IllegalAccessException {
-    alarmConfigTransacted.doCreateAlarm(element);
+    alarmConfigTransacted.create(element);
     alarmService.evaluateAlarm(element.getEntityId());
     return null;
   }
 
   @Override
-  public Void update(Long alarmId, Properties properties) {
+  public Void update(Long alarmId, Properties properties) throws IllegalAccessException {
     try {
-      alarmConfigTransacted.doUpdateAlarm(alarmId, properties);
+      alarmConfigTransacted.update(alarmId, properties);
       alarmService.evaluateAlarm(alarmId);
     } catch (UnexpectedRollbackException e) {
       log.error("Rolling back Alarm update in cache");

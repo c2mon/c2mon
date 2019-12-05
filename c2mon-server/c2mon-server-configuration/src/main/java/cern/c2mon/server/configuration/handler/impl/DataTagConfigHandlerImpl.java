@@ -20,7 +20,6 @@ import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.configuration.handler.DataTagConfigHandler;
-import cern.c2mon.server.configuration.handler.transacted.DataTagConfigTransacted;
 import cern.c2mon.server.configuration.impl.ConfigurationUpdateImpl;
 import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
@@ -47,7 +46,7 @@ import java.util.Properties;
 public class DataTagConfigHandlerImpl implements DataTagConfigHandler {
 
 
-  private DataTagConfigTransacted dataTagConfigTransacted;
+  private DataTagConfigHandler dataTagConfigTransacted;
 
   /**
    * Helper class for accessing the List of registered listeners
@@ -68,7 +67,7 @@ public class DataTagConfigHandlerImpl implements DataTagConfigHandler {
    */
   @Autowired
   public DataTagConfigHandlerImpl(C2monCache<DataTag> dataTagCache, ConfigurationUpdateImpl configurationUpdateImpl,
-                                  DataTagConfigTransacted dataTagConfigTransacted) {
+                                  DataTagConfigHandler dataTagConfigTransacted) {
     this.dataTagCache = dataTagCache;
     this.configurationUpdateImpl = configurationUpdateImpl;
     this.dataTagConfigTransacted = dataTagConfigTransacted;
@@ -76,7 +75,7 @@ public class DataTagConfigHandlerImpl implements DataTagConfigHandler {
 
   @Override
   public ProcessChange create(ConfigurationElement element) throws IllegalAccessException {
-    ProcessChange change = dataTagConfigTransacted.doCreateDataTag(element);
+    ProcessChange change = dataTagConfigTransacted.create(element);
     dataTagCache.notifyListenersOfUpdate(element.getEntityId());
     log.trace("createDataTag - Notifying Configuration update listeners");
     this.configurationUpdateImpl.notifyListeners(element.getEntityId());
@@ -88,7 +87,7 @@ public class DataTagConfigHandlerImpl implements DataTagConfigHandler {
     log.trace("Removing DataTag " + id);
     try {
       DataTag tagCopy = dataTagCache.get(id);
-      ProcessChange change = dataTagConfigTransacted.doRemoveDataTag(id, tagReport);
+      ProcessChange change = dataTagConfigTransacted.remove(id, tagReport);
       dataTagCache.remove(id); //only removed from cache if no exception is thrown
 
       return change;
@@ -101,7 +100,7 @@ public class DataTagConfigHandlerImpl implements DataTagConfigHandler {
   @Override
   public ProcessChange update(Long id, Properties elementProperties) {
 	  try {
-		  ProcessChange processChange = dataTagConfigTransacted.doUpdateDataTag(id, elementProperties);
+		  ProcessChange processChange = dataTagConfigTransacted.update(id, elementProperties);
       log.trace("createDataTag - Notifying Configuration update listeners");
 		  this.configurationUpdateImpl.notifyListeners(id);
 		  return processChange;

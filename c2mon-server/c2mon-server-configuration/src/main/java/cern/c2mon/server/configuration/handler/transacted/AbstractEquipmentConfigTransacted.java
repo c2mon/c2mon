@@ -16,14 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.handler.transacted;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.transaction.UnexpectedRollbackException;
-
 import cern.c2mon.server.cache.AliveTimerCache;
 import cern.c2mon.server.cache.C2monCache;
 import cern.c2mon.server.cache.CommFaultTagCache;
@@ -37,6 +29,13 @@ import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import cern.c2mon.shared.daq.config.EquipmentConfigurationUpdate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.transaction.UnexpectedRollbackException;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * Common functionalities for configuring Equipment and SubEquipment.
@@ -46,7 +45,7 @@ import cern.c2mon.shared.daq.config.EquipmentConfigurationUpdate;
  * @author Mark Brightwell
  * 
  */
-public abstract class AbstractEquipmentConfigTransacted<T extends AbstractEquipment> implements CommonEquipmentConfigTransacted<T> {
+public abstract class AbstractEquipmentConfigTransacted<T extends AbstractEquipment> {
 
   /**
    * Class logger.
@@ -67,7 +66,7 @@ public abstract class AbstractEquipmentConfigTransacted<T extends AbstractEquipm
   /**
    * The cache.
    */
-  private C2monCache<Long, T> abstractEquipmentCache;
+  protected C2monCache<Long, T> abstractEquipmentCache;
 
   /**
    * The DB acces object.

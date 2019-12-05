@@ -16,20 +16,17 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.handler.transacted;
 
-import cern.c2mon.server.common.listener.ConfigurationEventListener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.context.support.GenericApplicationContext;
-import org.springframework.transaction.UnexpectedRollbackException;
-import org.springframework.transaction.annotation.Transactional;
-
+import cern.c2mon.server.cache.C2monCache;
 import cern.c2mon.server.cache.CommonTagFacade;
 import cern.c2mon.server.cache.DataTagFacade;
 import cern.c2mon.server.cache.TagLocationService;
-import cern.c2mon.server.cache.C2monCache;
 import cern.c2mon.server.cache.loading.ConfigurableDAO;
+import cern.c2mon.server.common.listener.ConfigurationEventListener;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.common.ConfigurationException;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 
@@ -56,12 +53,8 @@ import java.util.Collection;
  * @param <T> the type of Tag
  *
  */
-abstract class TagConfigTransactedImpl<T extends Tag> implements TagConfigTransacted<T> {
-
-  /**
-   * Class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(TagConfigTransactedImpl.class);
+@Slf4j
+abstract class TagConfigTransactedImpl<T extends Tag> implements TagConfigTransacted {
   
   protected C2monCache<Long, T> tagCache;
   
@@ -114,13 +107,13 @@ abstract class TagConfigTransactedImpl<T extends Tag> implements TagConfigTransa
    * If necessary, updates the list of rules that need evaluating for this tag,
    * persisting the change to the database also.
    * 
-   * @param tag the tag object in the cache
+   * @param tagId the tag object in the cache
    * @param ruleId the rule id
    */
   @Override
   @Transactional(value = "cacheTransactionManager")
   public void addRuleToTag(final Long tagId, final Long ruleId) {
-    LOGGER.trace("Adding rule " + ruleId + " reference from Tag " + tagId);
+    log.trace("Adding rule " + ruleId + " reference from Tag " + tagId);
     tagCache.acquireWriteLockOnKey(tagId);    
     try {
       T tag = tagCache.get(tagId);
@@ -137,7 +130,7 @@ abstract class TagConfigTransactedImpl<T extends Tag> implements TagConfigTransa
   @Override
   @Transactional(value = "cacheTransactionManager")
   public void removeRuleFromTag(final Long tagId, final Long ruleId) {
-    LOGGER.trace("Removing rule " + ruleId + " reference from Tag " + tagId);    
+    log.trace("Removing rule " + ruleId + " reference from Tag " + tagId);
     tagCache.acquireWriteLockOnKey(tagId);
     try {      
       T tag = tagCache.get(tagId);
@@ -154,7 +147,7 @@ abstract class TagConfigTransactedImpl<T extends Tag> implements TagConfigTransa
   @Override
   @Transactional(value = "cacheTransactionManager")
   public void addAlarmToTag(final Long tagId, final Long alarmId) {
-    LOGGER.trace("Adding Alarm " + alarmId + " reference from Tag " + tagId);
+    log.trace("Adding Alarm " + alarmId + " reference from Tag " + tagId);
     tagCache.acquireWriteLockOnKey(tagId);
     try {
       T tag = tagCache.get(tagId);
@@ -168,7 +161,7 @@ abstract class TagConfigTransactedImpl<T extends Tag> implements TagConfigTransa
   @Override
   @Transactional(value = "cacheTransactionManager")
   public void removeAlarmFromTag(final Long tagId, final Long alarmId) {
-    LOGGER.trace("Removing Alarm " + alarmId + " reference from Tag " + tagId);        
+    log.trace("Removing Alarm " + alarmId + " reference from Tag " + tagId);
     tagCache.acquireWriteLockOnKey(tagId);
     try {      
       T tag = tagCache.get(tagId);

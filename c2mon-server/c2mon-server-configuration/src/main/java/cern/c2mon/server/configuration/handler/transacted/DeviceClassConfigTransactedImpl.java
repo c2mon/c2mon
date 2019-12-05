@@ -22,6 +22,7 @@ import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.cache.loading.DeviceClassDAO;
 import cern.c2mon.server.common.device.DeviceClass;
 import cern.c2mon.server.common.device.DeviceClassCacheObject;
+import cern.c2mon.server.configuration.handler.DeviceClassConfigHandler;
 import cern.c2mon.server.configuration.handler.DeviceConfigHandler;
 import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
@@ -41,12 +42,10 @@ import java.util.List;
 import java.util.Properties;
 
 /**
- * Implementation of {@link DeviceClassConfigTransacted}.
- *
  * @author Justin Lewis Salmon
  */
 @Service
-public class DeviceClassConfigTransactedImpl implements DeviceClassConfigTransacted {
+public class DeviceClassConfigTransactedImpl implements DeviceClassConfigHandler {
 
   /**
    * Class logger.
@@ -94,7 +93,7 @@ public class DeviceClassConfigTransactedImpl implements DeviceClassConfigTransac
 
   @Override
   @Transactional(value = "cacheTransactionManager")
-  public ProcessChange doCreateDeviceClass(final ConfigurationElement element) throws IllegalAccessException {
+  public ProcessChange create(final ConfigurationElement element) throws IllegalAccessException {
     deviceClassCache.acquireWriteLockOnKey(element.getEntityId());
 
     try {
@@ -139,7 +138,7 @@ public class DeviceClassConfigTransactedImpl implements DeviceClassConfigTransac
 
   @Override
   @Transactional(value = "cacheTransactionManager", propagation = Propagation.REQUIRES_NEW)
-  public ProcessChange doUpdateDeviceClass(Long id, Properties properties) {
+  public ProcessChange update(Long id, Properties properties) {
     deviceClassCache.acquireWriteLockOnKey(id);
 
     try {
@@ -166,7 +165,7 @@ public class DeviceClassConfigTransactedImpl implements DeviceClassConfigTransac
 
   @Override
   @Transactional(value = "cacheTransactionManager", propagation = Propagation.REQUIRES_NEW)
-  public ProcessChange doRemoveDeviceClass(Long id, ConfigurationElementReport elementReport) {
+  public ProcessChange remove(Long id, ConfigurationElementReport elementReport) {
     LOGGER.trace("Removing DeviceClass " + id);
 
     try {

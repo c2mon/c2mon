@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -19,7 +19,6 @@ package cern.c2mon.server.configuration.handler.impl;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.device.DeviceClass;
 import cern.c2mon.server.configuration.handler.DeviceClassConfigHandler;
-import cern.c2mon.server.configuration.handler.transacted.DeviceClassConfigTransacted;
 import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
@@ -39,7 +38,7 @@ import java.util.Properties;
 @Slf4j
 public class DeviceClassConfigHandlerImpl implements DeviceClassConfigHandler {
 
-  private DeviceClassConfigTransacted deviceClassConfigTransacted;
+  private DeviceClassConfigHandler deviceClassConfigTransacted;
 
   /**
    * Reference to the DeviceClass cache.
@@ -50,23 +49,23 @@ public class DeviceClassConfigHandlerImpl implements DeviceClassConfigHandler {
    * Default constructor.
    *
    * @param deviceClassConfigTransacted
-   * @param deviceClassCache autowired reference to the DeviceClass cache.
+   * @param deviceClassCache            autowired reference to the DeviceClass cache.
    */
   @Autowired
-  public DeviceClassConfigHandlerImpl(final C2monCache<DeviceClass> deviceClassCache,DeviceClassConfigTransacted deviceClassConfigTransacted) {
+  public DeviceClassConfigHandlerImpl(final C2monCache<DeviceClass> deviceClassCache, DeviceClassConfigHandler deviceClassConfigTransacted) {
     this.deviceClassCache = deviceClassCache;
     this.deviceClassConfigTransacted = deviceClassConfigTransacted;
   }
 
   @Override
   public ProcessChange create(ConfigurationElement element) throws IllegalAccessException {
-    return deviceClassConfigTransacted.doCreateDeviceClass(element);
+    return deviceClassConfigTransacted.create(element);
   }
 
   @Override
-  public ProcessChange update(Long id, Properties elementProperties) {
+  public ProcessChange update(Long id, Properties elementProperties) throws IllegalAccessException {
     try {
-      return deviceClassConfigTransacted.doUpdateDeviceClass(id, elementProperties);
+      return deviceClassConfigTransacted.update(id, elementProperties);
 
     } catch (UnexpectedRollbackException e) {
       log.error("Rolling back update in cache");
@@ -92,7 +91,7 @@ public class DeviceClassConfigHandlerImpl implements DeviceClassConfigHandler {
    */
   @Override
   public ProcessChange remove(Long id, ConfigurationElementReport elementReport) {
-    ProcessChange change = deviceClassConfigTransacted.doRemoveDeviceClass(id, elementReport);
+    ProcessChange change = deviceClassConfigTransacted.remove(id, elementReport);
 
     // will be skipped if rollback exception thrown in do method
     deviceClassCache.remove(id);

@@ -25,7 +25,6 @@ import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.configuration.handler.ControlTagConfigHandler;
 import cern.c2mon.server.configuration.handler.DataTagConfigHandler;
 import cern.c2mon.server.configuration.handler.SubEquipmentConfigHandler;
-import cern.c2mon.server.configuration.handler.transacted.SubEquipmentConfigTransacted;
 import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
@@ -50,7 +49,7 @@ import java.util.Properties;
 @Service
 public class SubEquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<SubEquipment> implements SubEquipmentConfigHandler {
 
-  private SubEquipmentConfigTransacted subEquipmentConfigTransacted;
+  private SubEquipmentConfigHandler subEquipmentConfigTransacted;
 
   private SubEquipmentCache subEquipmentCache;
 
@@ -67,7 +66,7 @@ public class SubEquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandle
                                        ControlTagConfigHandler controlTagConfigHandler,
                                        AliveTimerCache aliveTimerCache,
                                        CommFaultTagCache commFaultTagCache,
-                                       SubEquipmentConfigTransacted subEquipmentConfigTransacted,
+                                       SubEquipmentConfigHandler subEquipmentConfigTransacted,
                                        DataTagConfigHandler dataTagConfigHandler) {
     super(controlTagConfigHandler, subEquipmentConfigTransacted, subEquipmentCache, aliveTimerCache, commFaultTagCache, subEquipmentFacade);
     this.subEquipmentCache = subEquipmentCache;
@@ -96,7 +95,7 @@ public class SubEquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandle
       List<ProcessChange> changes = removeSubEquipmentTags(subEquipment, subEquipmentReport);
 
       try {
-        changes.addAll(subEquipmentConfigTransacted.doRemoveSubEquipment(subEquipment, subEquipmentReport));
+        changes.addAll(subEquipmentConfigTransacted.remove(subEquipment, subEquipmentReport));
 
         subEquipmentCache.releaseWriteLockOnKey(subEquipmentId);
         changes.addAll(removeEquipmentControlTags(subEquipment, subEquipmentReport)); //must be after removal of subequipment from DB
@@ -125,7 +124,7 @@ public class SubEquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandle
 
   @Override
   public List<ProcessChange> create(ConfigurationElement element) throws IllegalAccessException {
-    List<ProcessChange> change = subEquipmentConfigTransacted.doCreateSubEquipment(element);
+    List<ProcessChange> change = subEquipmentConfigTransacted.create(element);
     subEquipmentCache.notifyListenersOfUpdate(element.getEntityId());
     return change;
   }

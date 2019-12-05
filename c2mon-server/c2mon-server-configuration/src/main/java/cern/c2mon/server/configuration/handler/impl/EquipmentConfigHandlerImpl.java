@@ -23,7 +23,6 @@ import cern.c2mon.server.cache.EquipmentFacade;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.configuration.handler.*;
-import cern.c2mon.server.configuration.handler.transacted.EquipmentConfigTransacted;
 import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
@@ -51,7 +50,7 @@ import java.util.Properties;
 @Service
 public class EquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<Equipment> implements EquipmentConfigHandler {
 
-  private EquipmentConfigTransacted equipmentConfigTransacted;
+  private EquipmentConfigHandler equipmentConfigTransacted;
 
   private SubEquipmentConfigHandler subEquipmentConfigHandler;
 
@@ -71,7 +70,7 @@ public class EquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<E
   @Autowired
   public EquipmentConfigHandlerImpl(SubEquipmentConfigHandler subEquipmentConfigHandler, DataTagConfigHandler dataTagConfigHandler,
       CommandTagConfigHandler commandTagConfigHandler, EquipmentFacade equipmentFacade, EquipmentCache equipmentCache,
-      ControlTagConfigHandler controlTagConfigHandler, EquipmentConfigTransacted equipmentConfigTransacted,
+      ControlTagConfigHandler controlTagConfigHandler, EquipmentConfigHandler equipmentConfigTransacted,
       AliveTimerCache aliveTimerCache, CommFaultTagCache commFaultTagCache) {
     super(controlTagConfigHandler, equipmentConfigTransacted, equipmentCache, aliveTimerCache, commFaultTagCache, equipmentFacade);
     this.subEquipmentConfigHandler = subEquipmentConfigHandler;
@@ -99,7 +98,7 @@ public class EquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<E
 
       equipmentCache.acquireWriteLockOnKey(equipmentid);
       try {
-        equipmentConfigTransacted.doRemoveEquipment(equipmentCopy, equipmentReport);
+        equipmentConfigTransacted.remove(equipmentCopy, equipmentReport);
       } finally {
         equipmentCache.releaseWriteLockOnKey(equipmentid);
       }
@@ -125,7 +124,7 @@ public class EquipmentConfigHandlerImpl extends AbstractEquipmentConfigHandler<E
 
   @Override
   public List<ProcessChange> create(ConfigurationElement element) throws IllegalAccessException {
-    List<ProcessChange> change = equipmentConfigTransacted.doCreateEquipment(element);
+    List<ProcessChange> change = equipmentConfigTransacted.create(element);
     equipmentCache.notifyListenersOfUpdate(element.getEntityId());
     return change;
   }

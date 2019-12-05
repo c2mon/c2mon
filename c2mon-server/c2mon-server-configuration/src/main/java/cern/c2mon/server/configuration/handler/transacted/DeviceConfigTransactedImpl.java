@@ -16,16 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.handler.transacted;
 
-import java.util.Properties;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.UnexpectedRollbackException;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
 import cern.c2mon.server.cache.DeviceCache;
 import cern.c2mon.server.cache.DeviceClassCache;
 import cern.c2mon.server.cache.DeviceFacade;
@@ -33,23 +23,26 @@ import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.cache.loading.DeviceDAO;
 import cern.c2mon.server.common.device.Device;
 import cern.c2mon.server.common.device.DeviceCacheObject;
+import cern.c2mon.server.configuration.handler.DeviceConfigHandler;
 import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import cern.c2mon.shared.common.ConfigurationException;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.UnexpectedRollbackException;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Properties;
 
 /**
- * Implementation of {@link DeviceConfigTransacted}.
- *
  * @author Justin Lewis Salmon
  */
 @Service
-public class DeviceConfigTransactedImpl implements DeviceConfigTransacted {
-
-  /**
-   * Class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(DeviceConfigTransactedImpl.class);
+@Slf4j
+public class DeviceConfigTransactedImpl implements DeviceConfigHandler {
 
   /**
    * Reference to the Device cache.
@@ -92,11 +85,11 @@ public class DeviceConfigTransactedImpl implements DeviceConfigTransacted {
 
   @Override
   @Transactional(value = "cacheTransactionManager")
-  public ProcessChange doCreateDevice(ConfigurationElement element) throws IllegalAccessException {
+  public ProcessChange create(ConfigurationElement element) throws IllegalAccessException {
     deviceCache.acquireWriteLockOnKey(element.getEntityId());
 
     try {
-      LOGGER.trace("Creating Device " + element.getEntityId());
+      log.trace("Creating Device " + element.getEntityId());
 
       // Check if the device class already exists
       if (deviceCache.hasKey(element.getEntityId())) {
@@ -112,7 +105,7 @@ public class DeviceConfigTransactedImpl implements DeviceConfigTransacted {
         deviceDAO.insert(device);
 
       } catch (Exception e) {
-        LOGGER.error("Exception caught while inserting a new Device into the DB - rolling back changes", e);
+        log.error("Exception caught while inserting a new Device into the DB - rolling back changes", e);
         throw new UnexpectedRollbackException("Unexpected exception while creating a Device: rolling back the change", e);
       }
 
@@ -127,7 +120,7 @@ public class DeviceConfigTransactedImpl implements DeviceConfigTransacted {
 
       } catch (Exception e) {
         deviceCache.remove(device.getId());
-        LOGGER.error("Exception caught when attempting to create a Device - rolling back the DB transaction and undoing cache changes.");
+        log.error("Exception caught when attempting to create a Device - rolling back the DB transaction and undoing cache changes.");
         throw new UnexpectedRollbackException("Unexpected exception while creating a Device: rolling back the change", e);
       }
 
@@ -138,11 +131,11 @@ public class DeviceConfigTransactedImpl implements DeviceConfigTransacted {
 
   @Override
   @Transactional(value = "cacheTransactionManager", propagation = Propagation.REQUIRES_NEW)
-  public ProcessChange doUpdateDevice(Long id, Properties properties) {
+  public ProcessChange update(Long id, Properties properties) {
     deviceCache.acquireWriteLockOnKey(id);
 
     try {
-      LOGGER.trace("Updating Device " + id);
+      log.trace("Updating Device " + id);
 
       Device device = deviceCache.get(id);
       deviceDAO.updateConfig(device);
@@ -155,7 +148,7 @@ public class DeviceConfigTransactedImpl implements DeviceConfigTransacted {
       throw e;
 
     } catch (Exception e) {
-      LOGGER.error("Exception caught while updating a Device - rolling back DB transaction", e);
+      log.error("Exception caught while updating a Device - rolling back DB transaction", e);
       throw new UnexpectedRollbackException("Unexpected exception caught while updating a Device configuration", e);
 
     } finally {
@@ -165,8 +158,8 @@ public class DeviceConfigTransactedImpl implements DeviceConfigTransacted {
 
   @Override
   @Transactional(value = "cacheTransactionManager", propagation = Propagation.REQUIRES_NEW)
-  public ProcessChange doRemoveDevice(Long id, ConfigurationElementReport elementReport) {
-    LOGGER.trace("Removing Device " + id);
+  public ProcessChange remove(Long id, ConfigurationElementReport elementReport) {
+    log.trace("Removing Device " + id);
 
     try {
       deviceCache.acquireWriteLockOnKey(id);
@@ -177,13 +170,13 @@ public class DeviceConfigTransactedImpl implements DeviceConfigTransacted {
         return new ProcessChange();
 
       } catch (Exception e) {
-        LOGGER.error("Exception caught while removing a Device.", e);
+        log.error("Exception caught while removing a Device.", e);
         elementReport.setFailure("Unable to remove Device with id " + id);
         throw new UnexpectedRollbackException("Unable to remove Device " + id, e);
       }
 
     } catch (CacheElementNotFoundException e) {
-      LOGGER.warn("Attempting to remove a non-existent Device - no action taken.");
+      log.warn("Attempting to remove a non-existent Device - no action taken.");
       elementReport.setWarning("Attempting to remove a non-existent Device");
       return new ProcessChange();
 

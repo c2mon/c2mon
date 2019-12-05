@@ -24,6 +24,7 @@ import cern.c2mon.server.common.alive.AliveTimer;
 import cern.c2mon.server.common.alive.AliveTimerCacheObject;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.configuration.ConfigurationLoader;
+import cern.c2mon.server.configuration.handler.ProcessConfigHandler;
 import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
@@ -43,7 +44,7 @@ import java.util.Properties;
  */
 @Slf4j
 @Service
-public class ProcessConfigTransactedImpl implements ProcessConfigTransacted {
+public class ProcessConfigTransactedImpl implements ProcessConfigHandler {
 
   private final ProcessCacheObjectFactory processCacheObjectFactory;
 
@@ -79,7 +80,7 @@ public class ProcessConfigTransactedImpl implements ProcessConfigTransacted {
    */
   @Override
   @Transactional(value = "cacheTransactionManager")
-  public ProcessChange doCreateProcess(final ConfigurationElement element) {
+  public ProcessChange create(final ConfigurationElement element) {
     return processCache.executeTransaction(() -> {
       Process process = processCacheObjectFactory.createCacheObject(element.getEntityId(), element.getElementProperties());
       processDAO.insert(process);
@@ -99,7 +100,7 @@ public class ProcessConfigTransactedImpl implements ProcessConfigTransacted {
    */
   @Override
   @Transactional(value = "cacheTransactionManager")
-  public ProcessChange doUpdateProcess(final Long id, final Properties properties) {
+  public ProcessChange update(final Long id, final Properties properties) {
     processCache.compute(id, process -> {
       processCacheObjectFactory.updateConfig(process, properties);
       processDAO.updateConfig(process);
@@ -110,8 +111,8 @@ public class ProcessConfigTransactedImpl implements ProcessConfigTransacted {
 
   @Override
   @Transactional(value = "cacheTransactionManager", propagation = Propagation.REQUIRES_NEW)
-  public ProcessChange doRemoveProcess(final Process process, final ConfigurationElementReport processReport) {
-    processDAO.deleteProcess(process.getId());
+  public ProcessChange remove(final Long id, final ConfigurationElementReport processReport) {
+    processDAO.deleteProcess(id);
     return new ProcessChange();
   }
 

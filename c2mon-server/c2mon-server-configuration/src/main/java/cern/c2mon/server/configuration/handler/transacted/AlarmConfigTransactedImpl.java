@@ -22,6 +22,7 @@ import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.cache.loading.AlarmLoaderDAO;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.listener.ConfigurationEventListener;
+import cern.c2mon.server.configuration.handler.AlarmConfigHandler;
 import cern.c2mon.server.configuration.handler.impl.TagConfigGateway;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
@@ -45,7 +46,7 @@ import java.util.Properties;
  */
 @Slf4j
 @Service
-public class AlarmConfigTransactedImpl implements AlarmConfigTransacted {
+public class AlarmConfigTransactedImpl implements AlarmConfigHandler {
 
   private final Collection<ConfigurationEventListener> configurationEventListeners;
   /**
@@ -96,7 +97,7 @@ public class AlarmConfigTransactedImpl implements AlarmConfigTransacted {
    */
   @Override
   @Transactional(value = "cacheTransactionManager", propagation = Propagation.REQUIRED)
-  public void doCreateAlarm(final ConfigurationElement element) throws IllegalAccessException {
+  public Void create(final ConfigurationElement element) throws IllegalAccessException {
     Alarm alarm;
 
     alarmCache.acquireWriteLockOnKey(element.getEntityId());
@@ -128,6 +129,7 @@ public class AlarmConfigTransactedImpl implements AlarmConfigTransacted {
       tagConfigGateway.removeAlarmFromTag(alarm.getDataTagId(), alarm.getId());
       throw new UnexpectedRollbackException("Unexpected exception while creating a Alarm " + alarm.getId() + ": rolling back the creation", e);
     }
+    return null;
   }
 
   /**
@@ -141,7 +143,7 @@ public class AlarmConfigTransactedImpl implements AlarmConfigTransacted {
    */
   @Override
   @Transactional(value = "cacheTransactionManager", propagation = Propagation.REQUIRES_NEW)
-  public void doUpdateAlarm(final Long alarmId, final Properties properties) {
+  public Void update(final Long alarmId, final Properties properties) {
     //reject if trying to change datatag it is attached to - not currently allowed
     if (properties.containsKey("dataTagId")) {
       log.warn("Attempting to change the tag to which an alarm is attached - this is not currently supported!");
@@ -165,11 +167,12 @@ public class AlarmConfigTransactedImpl implements AlarmConfigTransacted {
     } finally {
       alarmCache.releaseWriteLockOnKey(alarmId);
     }
+    return null;
   }
 
   @Override
   @Transactional(value = "cacheTransactionManager", propagation=Propagation.REQUIRES_NEW)
-  public void doRemoveAlarm(final Long alarmId, final ConfigurationElementReport alarmReport) {
+  public Void remove(final Long alarmId, final ConfigurationElementReport alarmReport) {
     alarmCache.acquireWriteLockOnKey(alarmId);
     try {
       Alarm alarm = alarmCache.get(alarmId);
@@ -192,6 +195,7 @@ public class AlarmConfigTransactedImpl implements AlarmConfigTransacted {
     } finally {
       alarmCache.releaseWriteLockOnKey(alarmId);
     }
+    return null;
   }
 
   /**

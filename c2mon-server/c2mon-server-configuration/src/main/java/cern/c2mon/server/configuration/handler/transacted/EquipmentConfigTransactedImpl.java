@@ -16,10 +16,22 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.handler.transacted;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-
+import cern.c2mon.server.cache.*;
+import cern.c2mon.server.cache.loading.EquipmentDAO;
+import cern.c2mon.server.common.control.ControlTag;
+import cern.c2mon.server.common.control.ControlTagCacheObject;
+import cern.c2mon.server.common.equipment.Equipment;
+import cern.c2mon.server.configuration.handler.ControlTagConfigHandler;
+import cern.c2mon.server.configuration.handler.EquipmentConfigHandler;
+import cern.c2mon.server.configuration.impl.ProcessChange;
+import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
+import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
+import cern.c2mon.shared.client.configuration.ConfigurationElement;
+import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
+import cern.c2mon.shared.common.ConfigurationException;
+import cern.c2mon.shared.daq.config.DataTagAdd;
+import cern.c2mon.shared.daq.config.EquipmentUnitAdd;
+import cern.c2mon.shared.daq.config.IChange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,27 +40,9 @@ import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import cern.c2mon.server.cache.AliveTimerCache;
-import cern.c2mon.server.cache.CommFaultTagCache;
-import cern.c2mon.server.cache.ControlTagCache;
-import cern.c2mon.server.cache.ControlTagFacade;
-import cern.c2mon.server.cache.EquipmentCache;
-import cern.c2mon.server.cache.EquipmentFacade;
-import cern.c2mon.server.cache.ProcessXMLProvider;
-import cern.c2mon.server.cache.loading.EquipmentDAO;
-import cern.c2mon.server.common.control.ControlTag;
-import cern.c2mon.server.common.control.ControlTagCacheObject;
-import cern.c2mon.server.common.equipment.Equipment;
-import cern.c2mon.server.configuration.handler.ControlTagConfigHandler;
-import cern.c2mon.server.configuration.impl.ProcessChange;
-import cern.c2mon.shared.client.configuration.ConfigurationElement;
-import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
-import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
-import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
-import cern.c2mon.shared.common.ConfigurationException;
-import cern.c2mon.shared.daq.config.DataTagAdd;
-import cern.c2mon.shared.daq.config.EquipmentUnitAdd;
-import cern.c2mon.shared.daq.config.IChange;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * Equipment configuration transacted methods.
@@ -57,7 +51,7 @@ import cern.c2mon.shared.daq.config.IChange;
  *
  */
 @Service
-public class EquipmentConfigTransactedImpl extends AbstractEquipmentConfigTransacted<Equipment> implements EquipmentConfigTransacted {
+public class EquipmentConfigTransactedImpl extends AbstractEquipmentConfigTransacted<Equipment> implements EquipmentConfigHandler {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(EquipmentConfigTransactedImpl.class); 
   
@@ -104,7 +98,7 @@ public class EquipmentConfigTransactedImpl extends AbstractEquipmentConfigTransa
    */
   @Override
   @Transactional(value = "cacheTransactionManager")
-  public List<ProcessChange> doCreateEquipment(ConfigurationElement element) throws IllegalAccessException {
+  public List<ProcessChange> create(ConfigurationElement element) throws IllegalAccessException {
     Equipment equipment = super.createAbstractEquipment(element);
     equipmentFacade.addEquipmentToProcess(equipment.getId(), equipment.getProcessId());
     
@@ -123,21 +117,22 @@ public class EquipmentConfigTransactedImpl extends AbstractEquipmentConfigTransa
   
   @Override
   @Transactional(value = "cacheTransactionManager")
-  public List<ProcessChange> doUpdateAbstractEquipment(Equipment equipment, Properties properties) throws IllegalAccessException {   
-    return super.updateAbstractEquipment(equipment, properties);        
+  public List<ProcessChange> update(Long id, Properties properties) throws IllegalAccessException {
+    return super.updateAbstractEquipment(abstractEquipmentCache.get(id), properties);
   }
    
   @Override
   @Transactional(value = "cacheTransactionManager", propagation=Propagation.REQUIRES_NEW)
-  public void doRemoveEquipment(final Equipment equipment, final ConfigurationElementReport equipmentReport) {
-    LOGGER.debug("Removing Equipment " + equipment.getId() + " from DB");
+  public ProcessChange remove(final Long id, final ConfigurationElementReport equipmentReport) {
+    LOGGER.debug("Removing Equipment " + id + " from DB");
     try {
-      equipmentDAO.deleteItem(equipment.getId());                                     
+      equipmentDAO.deleteItem(id);
     } catch (UnexpectedRollbackException ex) {
-      equipmentReport.setFailure("Aborting removal of equipment " + equipment.getId() + " as unable to remove it from DB."); 
+      equipmentReport.setFailure("Aborting removal of equipment " + id + " as unable to remove it from DB.");
         throw new UnexpectedRollbackException("Interrupting removal of Equipment as failed to remove it from DB - " 
             + "control tags will not be removed.", ex);      
-    }              
+    }
+    return null;
   }
   
   /**

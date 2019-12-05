@@ -16,11 +16,11 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.handler.transacted;
 
+import cern.c2mon.server.common.equipment.AbstractEquipment;
+import cern.c2mon.server.configuration.impl.ProcessChange;
+
 import java.util.List;
 import java.util.Properties;
-
-import cern.c2mon.server.configuration.impl.ProcessChange;
-import cern.c2mon.server.common.equipment.AbstractEquipment;
 
 /**
  * Common parts of transacted config bean for Equipment/Sub-equipment. 
@@ -29,6 +29,7 @@ import cern.c2mon.server.common.equipment.AbstractEquipment;
  *
  * @param <T> type of abstract equipment
  */
+// TODO (Alex) Eradicate this!
 public interface CommonEquipmentConfigTransacted<T extends AbstractEquipment> {
 
   /**
@@ -38,6 +39,6 @@ public interface CommonEquipmentConfigTransacted<T extends AbstractEquipment> {
    * @return change event for DAQ
    * @throws IllegalAccessException
    */
-  List<ProcessChange> doUpdateAbstractEquipment(T abstractEquipment, Properties properties) throws IllegalAccessException;
+  List<ProcessChange> update(T abstractEquipment, Properties properties) throws IllegalAccessException;
   
 }

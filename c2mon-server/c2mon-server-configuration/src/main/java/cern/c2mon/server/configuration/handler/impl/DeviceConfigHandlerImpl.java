@@ -19,7 +19,6 @@ package cern.c2mon.server.configuration.handler.impl;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.device.Device;
 import cern.c2mon.server.configuration.handler.DeviceConfigHandler;
-import cern.c2mon.server.configuration.handler.transacted.DeviceConfigTransacted;
 import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
@@ -39,7 +38,7 @@ import java.util.Properties;
 @Slf4j
 public class DeviceConfigHandlerImpl implements DeviceConfigHandler {
 
-  private DeviceConfigTransacted deviceConfigTransacted;
+  private DeviceConfigHandler deviceConfigTransacted;
 
   /**
    * Reference to the Device cache.
@@ -52,20 +51,20 @@ public class DeviceConfigHandlerImpl implements DeviceConfigHandler {
    * @param deviceCache autowired reference to the Device cache.
    */
   @Autowired
-  public DeviceConfigHandlerImpl(final C2monCache<Device> deviceCache, final DeviceConfigTransacted deviceConfigTransacted) {
+  public DeviceConfigHandlerImpl(final C2monCache<Device> deviceCache, final DeviceConfigHandler deviceConfigTransacted) {
     this.deviceCache = deviceCache;
     this.deviceConfigTransacted = deviceConfigTransacted;
   }
 
   @Override
   public ProcessChange create(ConfigurationElement element) throws IllegalAccessException {
-    return deviceConfigTransacted.doCreateDevice(element);
+    return deviceConfigTransacted.create(element);
   }
 
   @Override
   public ProcessChange update(Long id, Properties elementProperties) {
     try {
-      return deviceConfigTransacted.doUpdateDevice(id, elementProperties);
+      return deviceConfigTransacted.update(id, elementProperties);
 
     } catch (UnexpectedRollbackException e) {
       log.error("Rolling back update in cache");
@@ -87,7 +86,7 @@ public class DeviceConfigHandlerImpl implements DeviceConfigHandler {
    */
   @Override
   public ProcessChange remove(Long id, ConfigurationElementReport elementReport) {
-    ProcessChange change = deviceConfigTransacted.doRemoveDevice(id, elementReport);
+    ProcessChange change = deviceConfigTransacted.remove(id, elementReport);
 
     // will be skipped if rollback exception thrown in do method
     deviceCache.remove(id);

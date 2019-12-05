@@ -16,17 +16,13 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.handler.transacted;
 
-import cern.c2mon.server.common.tag.Tag;
-
 /**
  * Common interface of the ConfigHandlers that
  * manages Tag objects.
  * 
  * @author Mark Brightwell
- *
- * @param <T> cache object type
  */
-public interface TagConfigTransacted<T extends Tag> {
+public interface TagConfigTransacted {
 
   /**
    * Adds this Rule to the list of Rules that

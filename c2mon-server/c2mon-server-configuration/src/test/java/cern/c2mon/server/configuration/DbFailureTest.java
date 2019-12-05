@@ -26,7 +26,6 @@ import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.configuration.config.ConfigurationModule;
 import cern.c2mon.server.configuration.config.ProcessCommunicationManagerMock;
 import cern.c2mon.server.configuration.handler.impl.ProcessConfigHandlerImpl;
-import cern.c2mon.server.configuration.handler.transacted.ProcessConfigTransacted;
 import cern.c2mon.server.configuration.junit.ConfigurationCachePopulationRule;
 import cern.c2mon.server.configuration.junit.ConfigurationDatabasePopulationRule;
 import cern.c2mon.server.daq.config.DaqModule;
@@ -170,7 +169,7 @@ public class DbFailureTest {
     //reset ProcessConfigTransacted to mock
     ProcessConfigTransacted processConfigTransacted = mockControl.createMock(ProcessConfigTransacted.class);
     processConfigHandler.setProcessConfigTransacted(processConfigTransacted);
-    processConfigTransacted.doRemoveProcess(EasyMock.isA(Process.class), EasyMock.isA(ConfigurationElementReport.class));
+    processConfigTransacted.remove(EasyMock.isA(Process.class), EasyMock.isA(ConfigurationElementReport.class));
     EasyMock.expectLastCall().andThrow(new RuntimeException("fake exception thrown"));
 
     mockControl.replay();
