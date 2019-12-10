@@ -38,7 +38,6 @@ build:
 
 build_docs:
   stage: build
-  tags: [docker]
   image: jekyll/builder:3.8.5
   script:
     - cd docs
