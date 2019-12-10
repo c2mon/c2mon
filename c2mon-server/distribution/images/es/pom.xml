@@ -13,8 +13,8 @@
   <packaging>jar</packaging>
 
   <properties>
-    <image.base>elasticsearch:${elasticsearch.dockertag}-alpine</image.base>
-    <image.tag>elasticsearch-${elasticsearch.dockertag}-c2mon-${project.version}</image.tag>
+    <image.base>elasticsearch:${elasticsearch.version}-alpine</image.base>
+    <image.tag>elasticsearch-${elasticsearch.version}-c2mon-${project.version}</image.tag>
     <gitlab-repo>c2mon-ext</gitlab-repo>
     <dockerhub-repo>cern/c2mon-ext</dockerhub-repo>
   </properties>
