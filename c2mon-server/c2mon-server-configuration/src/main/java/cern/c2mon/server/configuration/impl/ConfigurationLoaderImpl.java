@@ -16,7 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.impl;
 
-import cern.c2mon.server.cache.ClusterCache;
 import cern.c2mon.server.cache.ProcessCache;
 import cern.c2mon.server.cache.ProcessFacade;
 import cern.c2mon.server.cache.loading.SequenceDAO;
@@ -28,7 +27,6 @@ import cern.c2mon.server.configuration.dao.ConfigurationDAO;
 import cern.c2mon.server.configuration.handler.ControlTagConfigHandler;
 import cern.c2mon.server.configuration.handler.transacted.*;
 import cern.c2mon.server.configuration.parser.ConfigurationParser;
-import cern.c2mon.server.daq.JmsContainerManager;
 import cern.c2mon.server.daq.out.ProcessCommunicationManager;
 import cern.c2mon.shared.client.configuration.*;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
@@ -45,7 +43,6 @@ import org.simpleframework.xml.core.Persister;
 import org.simpleframework.xml.strategy.Strategy;
 import org.simpleframework.xml.transform.RegistryMatcher;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import java.io.BufferedWriter;
@@ -82,17 +79,6 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
 
   //TODO element & element report status always both need updating - redesign this part
 
-  /**
-   * Avoids interfering with running cache persistence jobs.
-   * To avoid a direct dependency to the c2mon-server-cachepersistence module
-   * we decided to create a local constant, but the same String is used by the
-   * <code>cern.c2mon.server.cachepersistence.common.BatchPersistenceManager</code>
-   * to lock on the ClusterCache.
-   */
-  private final String cachePersistenceLock = "c2mon.cachepersistence.cachePersistenceLock";
-
-  private static final long DEFAULT_TIMEOUT = 30_000;
-
   int changeId = 0; //unique id for all generated changes (including those recursive ones during removal)
 
   private final ProcessCommunicationManager processCommunicationManager;
@@ -125,8 +111,6 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
 
   private final DeviceConfigHandler deviceConfigHandler;
 
-  private Environment environment;
-
   /**
    * Flag recording if configuration events should be sent to the DAQ layer (set in XML).
    */
@@ -141,8 +125,6 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
    * Flag indicating if a cancel request has been made.
    */
   private volatile boolean cancelRequested = false;
-
-  private ClusterCache clusterCache;
 
   /**
    * singelton helper-object for parsing POJO Configuration objects into ConfigurationElements
@@ -161,7 +143,6 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
                                  SubEquipmentConfigHandler subEquipmentConfigHandler,
                                  ProcessConfigHandler processConfigHandler,
                                  ProcessFacade processFacade,
-                                 ClusterCache clusterCache,
                                  ProcessCache processCache,
                                  DeviceClassConfigHandler deviceClassConfigHandler,
                                  DeviceConfigHandler deviceConfigHandler,
@@ -182,7 +163,6 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
     this.processConfigHandler = processConfigHandler;
     this.processFacade = processFacade;
     this.processCache = processCache;
-    this.clusterCache = clusterCache;
     this.deviceClassConfigHandler = deviceClassConfigHandler;
     this.deviceConfigHandler = deviceConfigHandler;
     this.configParser = configParser;
@@ -197,32 +177,21 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
     Long configId = -1L;
     ConfigurationReport report = null;
 
-    // Try to acquire the configuration lock.
-    if (clusterCache.tryWriteLockOnKey(JmsContainerManager.CONFIG_LOCK_KEY, DEFAULT_TIMEOUT)) {
-      try {
-        configId = sequenceDAO.getNextConfigId();
-        List<ConfigurationElement> configurationElements = configParser.parse(configuration);
+    try {
+      configId = sequenceDAO.getNextConfigId();
+      List<ConfigurationElement> configurationElements = configParser.parse(configuration);
 
-        report = applyConfiguration(configId.intValue(), configuration.getName(), configurationElements, null, false);
+      report = applyConfiguration(configId.intValue(), configuration.getName(), configurationElements, null, false);
 
-      } catch (Exception ex) {
-        log.error("Exception caught while applying configuration", ex);
-        report = new ConfigurationReport(configId, configuration.getName(), "", Status.FAILURE, "Exception caught when applying configuration");
-        report.setExceptionTrace(ex);
-        throw new ConfigurationException(report, ex);
-      } finally {
-        clusterCache.releaseWriteLockOnKey(JmsContainerManager.CONFIG_LOCK_KEY);
-        if (report != null) {
-          archiveReport(configId.toString(), report.toXML());
-        }
+    } catch (Exception ex) {
+      log.error("Exception caught while applying configuration", ex);
+      report = new ConfigurationReport(configId, configuration.getName(), "", Status.FAILURE, "Exception caught when applying configuration");
+      report.setExceptionTrace(ex);
+      throw new ConfigurationException(report, ex);
+    } finally {
+      if (report != null) {
+        archiveReport(configId.toString(), report.toXML());
       }
-    }
-
-    else {
-      // If we couldn't acquire the configuration lock, reject the request.
-      log.warn("Unable to apply configuration - another configuration is already running.");
-      return new ConfigurationReport(configId, configuration.getName(), configuration.getUser(), Status.FAILURE,
-          "Your configuration request has been rejected since another configuration is still running. Please try again later.");
     }
 
     return report;
@@ -233,54 +202,43 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
     log.info(configId + " Applying configuration");
     ConfigurationReport report = null;
 
-    // Try to acquire the configuration lock.
-    if (clusterCache.tryWriteLockOnKey(JmsContainerManager.CONFIG_LOCK_KEY, DEFAULT_TIMEOUT)) {
-      try {
+    try {
 
-        String configName = configurationDAO.getConfigName(configId);
-        if (configName == null) {
-          log.warn(configId + " Unable to locate configuration - cannot be applied.");
-          return new ConfigurationReport(
-              configId,
-              "UNKNOWN",
-              "", //TODO set user name through RBAC once available
-              Status.FAILURE,
-              "Configuration with id <" + configId + "> not found. Please try again with a valid configuration id"
-            );
-        }
-
-        List<ConfigurationElement> configElements;
-        try {
-          log.debug(configId + " Fetching configuration items from DB...");
-          configElements = configurationDAO.getConfigElements(configId);
-          log.debug(configId + " Got " + configElements.size() + " elements from DB");
-        } catch (Exception e) {
-          String message = "Exception caught while loading the configuration for " + configId + " from the DB: " + e.getMessage();
-          log.error(message, e);
-          throw new RuntimeException(message, e);
-        }
-
-        report = applyConfiguration(configId, configName, configElements, configProgressMonitor, true);
-
-      } catch (Exception ex) {
-        log.error("Exception caught while applying configuration " + configId, ex);
-          report = new ConfigurationReport(configId, "UNKNOWN", "", Status.FAILURE,
-              "Exception caught when applying configuration with id <" + configId + ">.");
-          report.setExceptionTrace(ex);
-        throw new ConfigurationException(report, ex);
-      } finally {
-        clusterCache.releaseWriteLockOnKey(JmsContainerManager.CONFIG_LOCK_KEY);
-        if (report != null) {
-          archiveReport(String.valueOf(configId), report.toXML());
-        }
+      String configName = configurationDAO.getConfigName(configId);
+      if (configName == null) {
+        log.warn(configId + " Unable to locate configuration - cannot be applied.");
+        return new ConfigurationReport(
+            configId,
+            "UNKNOWN",
+            "", //TODO set user name through RBAC once available
+            Status.FAILURE,
+            "Configuration with id <" + configId + "> not found. Please try again with a valid configuration id"
+          );
       }
-    }
 
-    // If we couldn't acquire the configuration lock, reject the request.
-    else {
-      log.warn(configId + " Unable to apply configuration - another configuration is already running.");
-      return new ConfigurationReport(configId, null, null, Status.FAILURE,
-          "Your configuration request has been rejected since another configuration is still running. Please try again later.");
+      List<ConfigurationElement> configElements;
+      try {
+        log.debug(configId + " Fetching configuration items from DB...");
+        configElements = configurationDAO.getConfigElements(configId);
+        log.debug(configId + " Got " + configElements.size() + " elements from DB");
+      } catch (Exception e) {
+        String message = "Exception caught while loading the configuration for " + configId + " from the DB: " + e.getMessage();
+        log.error(message, e);
+        throw new RuntimeException(message, e);
+      }
+
+      report = applyConfiguration(configId, configName, configElements, configProgressMonitor, true);
+
+    } catch (Exception ex) {
+      log.error("Exception caught while applying configuration " + configId, ex);
+        report = new ConfigurationReport(configId, "UNKNOWN", "", Status.FAILURE,
+            "Exception caught when applying configuration with id <" + configId + ">.");
+        report.setExceptionTrace(ex);
+      throw new ConfigurationException(report, ex);
+    } finally {
+      if (report != null) {
+        archiveReport(String.valueOf(configId), report.toXML());
+      }
     }
 
     return report;
@@ -317,36 +275,30 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
       configProgressMonitor.resetCounter();
     }
 
-    // Write lock needed to avoid parallel Batch persistence transactions
-    try {
-      clusterCache.acquireWriteLockOnKey(this.cachePersistenceLock);
-      if (!isDBConfig && runInParallel(configElements)) {
-        log.debug("Enter parallel configuration");
-        ForkJoinPool forkJoinPool = new ForkJoinPool(10);
-        try {
-          //https://blog.krecan.net/2014/03/18/how-to-specify-thread-pool-for-java-8-parallel-streams/
-          forkJoinPool.submit(() ->
-              configElements.parallelStream().forEach(element ->
-                  applyConfigurationElement(element, processLists, elementPlaceholder, daqReportPlaceholder, report, configId, configProgressMonitor))
-          ).get(300, TimeUnit.SECONDS);
-        } catch (TimeoutException e) {
-            String errorMessage = "Error applying configuration elements in parallel, timeout after 5 minutes";
-            log.error(errorMessage, e);
-            report.addStatus(Status.FAILURE);
-            report.setStatusDescription(report.getStatusDescription() + errorMessage + "\n");
-        } catch (InterruptedException | ExecutionException e) {
-            String errorMessage = "Error applying configuration elements in parallel";
-            log.error(errorMessage, e);
-            report.addStatus(Status.FAILURE);
-            report.setStatusDescription(report.getStatusDescription() + errorMessage + "\n");
-        }
-      } else {
-        log.debug("Enter serialized configuration");
-        configElements.stream().forEach(element ->
-            applyConfigurationElement(element, processLists, elementPlaceholder, daqReportPlaceholder, report, configId, configProgressMonitor));
+    if (!isDBConfig && runInParallel(configElements)) {
+      log.debug("Enter parallel configuration");
+      ForkJoinPool forkJoinPool = new ForkJoinPool(10);
+      try {
+        //https://blog.krecan.net/2014/03/18/how-to-specify-thread-pool-for-java-8-parallel-streams/
+        forkJoinPool.submit(() ->
+            configElements.parallelStream().forEach(element ->
+                applyConfigurationElement(element, processLists, elementPlaceholder, daqReportPlaceholder, report, configId, configProgressMonitor))
+        ).get(300, TimeUnit.SECONDS);
+      } catch (TimeoutException e) {
+          String errorMessage = "Error applying configuration elements in parallel, timeout after 5 minutes";
+          log.error(errorMessage, e);
+          report.addStatus(Status.FAILURE);
+          report.setStatusDescription(report.getStatusDescription() + errorMessage + "\n");
+      } catch (InterruptedException | ExecutionException e) {
+          String errorMessage = "Error applying configuration elements in parallel";
+          log.error(errorMessage, e);
+          report.addStatus(Status.FAILURE);
+          report.setStatusDescription(report.getStatusDescription() + errorMessage + "\n");
       }
-    } finally {
-      clusterCache.releaseWriteLockOnKey(this.cachePersistenceLock);
+    } else {
+      log.debug("Enter serialized configuration");
+      configElements.stream().forEach(element ->
+          applyConfigurationElement(element, processLists, elementPlaceholder, daqReportPlaceholder, report, configId, configProgressMonitor));
     }
 
     //send events to Process if enabled, convert the responses and introduce them into the existing report; else set all DAQs to restart
@@ -445,7 +397,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
    * @return True if the configuration can be applied in parallel.
    */
   private boolean runInParallel(List<ConfigurationElement> elements) {
-    return !elements.stream().anyMatch(element ->
+    return elements.stream().noneMatch(element ->
         element.getEntity().equals(ConfigConstants.Entity.SUBEQUIPMENT) ||
         element.getEntity().equals(ConfigConstants.Entity.EQUIPMENT) ||
         element.getEntity().equals(ConfigConstants.Entity.PROCESS) ||
@@ -617,7 +569,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
         case COMMANDTAG : daqConfigEvents.addAll(commandTagConfigHandler.removeCommandTag(element.getEntityId(), elementReport)); break;
         case ALARM : alarmConfigHandler.remove(element.getEntityId(), elementReport); break;
         case PROCESS : daqConfigEvents.add(processConfigHandler.remove(element.getEntityId(), elementReport)); break;
-        case EQUIPMENT : daqConfigEvents.add(equipmentConfigHandler.remove(element.getEntityId(), elementReport)); break;
+        case EQUIPMENT : daqConfigEvents.addAll(equipmentConfigHandler.remove(element.getEntityId(), elementReport)); break;
         case SUBEQUIPMENT : daqConfigEvents.addAll(subEquipmentConfigHandler.remove(element.getEntityId(), elementReport)); break;
         case DEVICECLASS : deviceClassConfigHandler.remove(element.getEntityId(), elementReport); break;
         case DEVICE : deviceConfigHandler.remove(element.getEntityId(), elementReport); break;
