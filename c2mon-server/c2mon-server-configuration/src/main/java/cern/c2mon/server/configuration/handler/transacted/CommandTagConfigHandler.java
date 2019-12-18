@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.configuration.handler.impl;
+package cern.c2mon.server.configuration.handler.transacted;
 
 import cern.c2mon.cache.actions.command.CommandTagCacheObjectFactory;
 import cern.c2mon.cache.actions.command.CommandTagService;

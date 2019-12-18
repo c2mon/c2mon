@@ -20,7 +20,7 @@ public interface BaseConfigHandler<T> {
    * @param id         id of Cacheable to update
    * @param properties reconfiguration details
    */
-  T update(Long id, Properties properties) throws IllegalAccessException;
+  T update(Long id, Properties properties) ;
 
   /**
    * Removes a Cacheable from C2MON server.

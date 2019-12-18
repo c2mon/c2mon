@@ -18,8 +18,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import static cern.c2mon.shared.common.CacheEvent.UPDATE_ACCEPTED;
-import static cern.c2mon.shared.common.CacheEvent.UPDATE_REJECTED;
+import static cern.c2mon.shared.common.CacheEvent.*;
 import static java.util.Objects.requireNonNull;
 
 @Slf4j
@@ -101,6 +100,16 @@ public abstract class C2monCacheimpl<CACHEABLE extends Cacheable> implements C2m
         getCacheListenerManager().notifyListenersOf(UPDATE_REJECTED, value);
       }
     });
+  }
+
+  @Override
+  public boolean remove(@NonNull Long key) {
+    CACHEABLE element = getCache().getAndRemove(key);
+    
+    if (element != null)
+      getCacheListenerManager().notifyListenersOf(REMOVED, element);
+
+    return element != null;
   }
 
   /**

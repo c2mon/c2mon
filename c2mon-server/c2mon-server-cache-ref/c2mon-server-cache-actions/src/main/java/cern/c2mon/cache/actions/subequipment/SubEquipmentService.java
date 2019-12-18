@@ -12,6 +12,7 @@ import cern.c2mon.shared.common.supervision.SupervisionConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import java.util.Collection;
 
@@ -33,6 +34,17 @@ public class SubEquipmentService extends BaseEquipmentServiceImpl<SubEquipment> 
                              final DataTagService dataTagService) {
     super(subEquipmentCacheRef, commFaultService.getCache(), aliveTimerService, SupervisionConstants.SupervisionEntity.SUBEQUIPMENT,dataTagService);
     this.equipmentService = equipmentService;
+  }
+
+  @PostConstruct
+  public void init() {
+    // TODO (Alex) Create INSERTED listener to cascade register this into the equipment cache, if needed
+    // TODO (Alex) Create REMOVED listener to cascade remove the associated aliveTag,CommFault caches, if needed
+
+    // TODO (Alex) Create INSERTED listener to cascade register this aliveTag,CommFault caches, if needed
+//    if (abstractEquipment.getAliveTagId() != null) {
+//      commonEquipmentFacade.loadAndStartAliveTag(abstractEquipment.getId());
+//    }
   }
 
   @Override

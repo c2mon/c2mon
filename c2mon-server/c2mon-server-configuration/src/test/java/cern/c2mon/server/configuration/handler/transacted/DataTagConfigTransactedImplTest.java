@@ -19,8 +19,6 @@ package cern.c2mon.server.configuration.handler.transacted;
 import cern.c2mon.server.cache.*;
 import cern.c2mon.server.cache.loading.DataTagLoaderDAO;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
-import cern.c2mon.server.configuration.handler.AlarmConfigHandler;
-import cern.c2mon.server.configuration.handler.RuleTagConfigHandler;
 import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.server.test.CacheObjectCreation;
 import cern.c2mon.shared.daq.config.DataTagAddressUpdate;
@@ -58,7 +56,7 @@ public class DataTagConfigTransactedImplTest {
   private EquipmentFacade equipmentFacade;
   private SubEquipmentFacade subEquipmentFacade;
   private RuleTagConfigHandler ruleTagConfigHandler;
-  private AlarmConfigHandler alarmConfigHandler;
+  private AlarmConfigTransactedImpl alarmConfigHandler;
   private DataTagLoaderDAO dataTagLoaderDAO;
   private DataTagFacade dataTagFacade;
   private DataTagCache dataTagCache;
@@ -73,7 +71,7 @@ public class DataTagConfigTransactedImplTest {
     equipmentFacade = control.createMock(EquipmentFacade.class);
     subEquipmentFacade = control.createMock(SubEquipmentFacade.class);
     ruleTagConfigHandler = control.createMock(RuleTagConfigHandler.class);
-    alarmConfigHandler = control.createMock(AlarmConfigHandler.class);
+    alarmConfigHandler = control.createMock(AlarmConfigTransactedImpl.class);
     dataTagLoaderDAO = control.createMock(DataTagLoaderDAO.class);
     dataTagFacade = control.createMock(DataTagFacade.class);
     dataTagCache = control.createMock(DataTagCache.class);

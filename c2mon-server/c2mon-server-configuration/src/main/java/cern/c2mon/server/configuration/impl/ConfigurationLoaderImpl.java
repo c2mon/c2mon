@@ -25,8 +25,8 @@ import cern.c2mon.server.configuration.ConfigProgressMonitor;
 import cern.c2mon.server.configuration.ConfigurationLoader;
 import cern.c2mon.server.configuration.config.ConfigurationProperties;
 import cern.c2mon.server.configuration.dao.ConfigurationDAO;
-import cern.c2mon.server.configuration.handler.*;
-import cern.c2mon.server.configuration.handler.impl.CommandTagConfigHandler;
+import cern.c2mon.server.configuration.handler.ControlTagConfigHandler;
+import cern.c2mon.server.configuration.handler.transacted.*;
 import cern.c2mon.server.configuration.parser.ConfigurationParser;
 import cern.c2mon.server.daq.JmsContainerManager;
 import cern.c2mon.server.daq.out.ProcessCommunicationManager;
@@ -101,13 +101,13 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
 
   private final SequenceDAO sequenceDAO;
 
-  private final DataTagConfigHandler dataTagConfigHandler;
+  private final DataTagConfigTransactedImpl dataTagConfigHandler;
 
   private final ControlTagConfigHandler controlTagConfigHandler;
 
   private final CommandTagConfigHandler commandTagConfigHandler;
 
-  private final AlarmConfigHandler alarmConfigHandler;
+  private final AlarmConfigTransactedImpl alarmConfigHandler;
 
   private final RuleTagConfigHandler ruleTagConfigHandler;
 
@@ -115,15 +115,15 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
 
   private final SubEquipmentConfigHandler subEquipmentConfigHandler;
 
-  private final ProcessConfigHandler processConfigHandler;
+  private final ProcessConfigTransactedImpl processConfigHandler;
 
   private final ProcessFacade processFacade;
 
   private final ProcessCache processCache;
 
-  private final DeviceClassConfigHandler deviceClassConfigHandler;
+  private final DeviceClassConfigTransactedImpl deviceClassConfigHandler;
 
-  private final DeviceConfigHandler deviceConfigHandler;
+  private final DeviceConfigTransactedImpl deviceConfigHandler;
 
   private Environment environment;
 
@@ -152,19 +152,19 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
   @Autowired
   public ConfigurationLoaderImpl(ProcessCommunicationManager processCommunicationManager,
                                  ConfigurationDAO configurationDAO,
-                                 DataTagConfigHandler dataTagConfigHandler,
+                                 DataTagConfigTransactedImpl dataTagConfigHandler,
                                  ControlTagConfigHandler controlTagConfigHandler,
                                  CommandTagConfigHandler commandTagConfigHandler,
-                                 AlarmConfigHandler alarmConfigHandler,
+                                 AlarmConfigTransactedImpl alarmConfigHandler,
                                  RuleTagConfigHandler ruleTagConfigHandler,
                                  EquipmentConfigHandler equipmentConfigHandler,
                                  SubEquipmentConfigHandler subEquipmentConfigHandler,
-                                 ProcessConfigHandler processConfigHandler,
+                                 ProcessConfigTransactedImpl processConfigHandler,
                                  ProcessFacade processFacade,
                                  ClusterCache clusterCache,
                                  ProcessCache processCache,
-                                 DeviceClassConfigHandler deviceClassConfigHandler,
-                                 DeviceConfigHandler deviceConfigHandler,
+                                 DeviceClassConfigTransactedImpl deviceClassConfigHandler,
+                                 DeviceConfigTransactedImpl deviceConfigHandler,
                                  ConfigurationParser configParser,
                                  SequenceDAO sequenceDAO,
                                  ConfigurationProperties properties,

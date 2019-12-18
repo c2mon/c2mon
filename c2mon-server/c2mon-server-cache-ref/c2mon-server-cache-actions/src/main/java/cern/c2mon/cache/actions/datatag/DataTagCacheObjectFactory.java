@@ -3,13 +3,11 @@ package cern.c2mon.cache.actions.datatag;
 import cern.c2mon.cache.actions.equipment.BaseEquipmentServiceImpl;
 import cern.c2mon.cache.actions.equipment.EquipmentService;
 import cern.c2mon.cache.actions.subequipment.SubEquipmentService;
-import cern.c2mon.cache.api.factory.AbstractCacheObjectFactory;
+import cern.c2mon.cache.actions.tag.AbstractTagCacheObjectFactory;
 import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.common.tag.AbstractTagCacheObject;
-import cern.c2mon.server.common.tag.Tag;
-import cern.c2mon.server.common.util.MetadataUtils;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.PropertiesAccessor;
 import cern.c2mon.shared.common.SimpleTypeReflectionHandler;
@@ -27,15 +25,12 @@ import javax.inject.Inject;
 import java.lang.reflect.Field;
 import java.util.Properties;
 
-import static cern.c2mon.shared.common.datatag.DataTagConstants.MODE_OPERATIONAL;
-import static cern.c2mon.shared.common.datatag.DataTagConstants.MODE_TEST;
-
 
 /**
  * @author Szymon Halastra, Alexandros Papageorgiou
  */
 @Slf4j
-public class DataTagCacheObjectFactory extends AbstractCacheObjectFactory<DataTag> {
+public class DataTagCacheObjectFactory extends AbstractTagCacheObjectFactory<DataTag> {
   private final BaseEquipmentServiceImpl equipmentService;
   private SubEquipmentService subEquipmentService;
 
@@ -52,13 +47,8 @@ public class DataTagCacheObjectFactory extends AbstractCacheObjectFactory<DataTa
 
   @Override
   public void validateConfig(DataTag dataTag) throws ConfigurationException {
+    super.validateConfig(dataTag);
     new MicroValidator<>(dataTag)
-      .notNull(Tag::getId, "id")
-      .notNull(Tag::getName, "name")
-      .not(tagObj -> tagObj.getName().isEmpty(), "Parameter \"name\" cannot be empty") // This had a commented out max check as well, do we want that?
-      .notNull(Tag::getDataType, "dataType")
-      .between(Tag::getMode, MODE_OPERATIONAL, MODE_TEST, "mode")
-      .not(tagObj -> tagObj.getUnit() != null && tagObj.getUnit().length() > 20, "Parameter \"unit\" must be 0 to 20 characters long")
       //DataTag must have equipment or subequipment id set
       .not(dataTagObj -> dataTagObj.getEquipmentId() == null && dataTagObj.getSubEquipmentId() == null,
         "Equipment/SubEquipment id not set for DataTag with id " + dataTag.getId() + " - unable to configure it.")
@@ -72,6 +62,8 @@ public class DataTagCacheObjectFactory extends AbstractCacheObjectFactory<DataTa
 
   @Override
   public Change configureCacheObject(DataTag tag, Properties properties) {
+    super.configureCacheObject(tag, properties);
+
     DataTagCacheObject dataTagCacheObject = (DataTagCacheObject) tag;
     DataTagUpdate dataTagUpdate = setCommonProperties(dataTagCacheObject, properties);
 
@@ -145,13 +137,7 @@ public class DataTagCacheObjectFactory extends AbstractCacheObjectFactory<DataTa
     }).getShort("mode").ifPresent(mode -> {
       tag.setMode(mode);
       innerDataTagUpdate.setMode(mode);
-    }).getString("isLogged").ifPresent(isLogged -> tag.setLogged(isLogged.equalsIgnoreCase("true")))
-      .getString("unit").ifPresent(unit -> tag.setUnit(checkAndSetNull(unit)))
-      .getString("dipAddress").ifPresent(dipAddress -> tag.setDipAddress(checkAndSetNull(dipAddress)))
-      .getString("japcAddress").ifPresent(japcAddress -> tag.setJapcAddress(checkAndSetNull(japcAddress)));
-
-    cern.c2mon.server.common.metadata.Metadata newMetadata = MetadataUtils.parseMetadataConfiguration(properties, tag.getMetadata());
-    tag.setMetadata(newMetadata);
+    });
 
     return innerDataTagUpdate;
   }

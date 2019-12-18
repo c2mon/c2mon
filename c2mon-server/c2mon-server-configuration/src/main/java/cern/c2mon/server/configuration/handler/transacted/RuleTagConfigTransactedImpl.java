@@ -16,31 +16,24 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.handler.transacted;
 
-import cern.c2mon.server.cache.RuleTagCache;
-import cern.c2mon.server.cache.RuleTagFacade;
-import cern.c2mon.server.cache.TagLocationService;
-import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
+import cern.c2mon.cache.actions.rule.RuleTagCacheObjectFactory;
+import cern.c2mon.cache.actions.rule.RuleTagService;
 import cern.c2mon.server.cache.loading.RuleTagLoaderDAO;
 import cern.c2mon.server.common.listener.ConfigurationEventListener;
 import cern.c2mon.server.common.rule.RuleTag;
-import cern.c2mon.server.configuration.handler.AlarmConfigHandler;
-import cern.c2mon.server.configuration.handler.RuleTagConfigHandler;
-import cern.c2mon.server.configuration.handler.impl.TagConfigGateway;
+import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
-import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.UnexpectedRollbackException;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Properties;
 
 /**
@@ -50,237 +43,91 @@ import java.util.Properties;
  */
 @Service
 @Slf4j
-public class RuleTagConfigTransactedImpl extends TagConfigTransactedImpl<RuleTag> implements RuleTagConfigHandler {
-  
-  /**
-   * Circular dependency between RuleTagConfigHandler
-   * and TagConfigGateway, so autowire field.
-   */
-  @Autowired
-  private TagConfigGateway tagConfigGateway;
-  
-  @Autowired
-  private AlarmConfigHandler alarmConfigHandler;
-  
-  @Autowired
-  private RuleTagConfigHandler ruleTagConfigHandler;
-  
-  private RuleTagFacade ruleTagFacade;
+public class RuleTagConfigTransactedImpl extends TagConfigTransactedImpl<RuleTag>  {
+
+  private AlarmConfigTransactedImpl alarmConfigHandler;
 
   @Autowired
-  public RuleTagConfigTransactedImpl(RuleTagCache ruleTagCache,
-                                     RuleTagFacade ruleTagFacade,
+  public RuleTagConfigTransactedImpl(RuleTagService ruleTagService,
+                                     RuleTagCacheObjectFactory ruleTagCacheObjectFactory,
                                      RuleTagLoaderDAO ruleTagLoaderDAO,
-                                     TagLocationService tagLocationService,
-                                     GenericApplicationContext context) {
-    super(ruleTagLoaderDAO, ruleTagFacade, ruleTagCache, tagLocationService, context);
-    this.ruleTagFacade = ruleTagFacade;
+                                     GenericApplicationContext context, AlarmConfigTransactedImpl alarmConfigTransacted) {
+    super(ruleTagService.getCache(), ruleTagLoaderDAO, ruleTagCacheObjectFactory, ruleTagService, context);
+    this.alarmConfigHandler = alarmConfigTransacted;
   }
-  
-  /**
-   * Creates a rule on existing tags. 
-   * 
-   * <p>The DAQ does not need informing of this change (so no return
-   * type as for DataTags.
-   * 
-   * @param element the details of the new object
-   * @throws IllegalAccessException
-   * @throws {@link UnexpectedRollbackException} if RuntimeException caught; DB transaction is rolled back and Rule & associated
-   *                                                Tags are removed from cache 
-   */
+
   @Override
-  @Transactional(value = "cacheTransactionManager")
-  public Void create(ConfigurationElement element) throws IllegalAccessException {
-
-    // TIMS-1048: Making check before write lock in order to avoid a deadlock situation
-    checkId(element.getEntityId());
-    
-    tagCache.acquireWriteLockOnKey(element.getEntityId());
-    try {
-      log.trace("Creating RuleTag with id " + element.getEntityId());
-      RuleTag ruleTag = commonTagFacade.createCacheObject(element.getEntityId(), element.getElementProperties());
-      Collection<Long> tagIds = ruleTag.getRuleInputTagIds();
-      try {      
-        configurableDAO.insert(ruleTag);
-      } catch (Exception e) {
-        log.error("Exception caught while inserting a new Rule into the DB - rolling back changes", e);
-        throw new UnexpectedRollbackException("Unexpected exception while creating a Rule: rolling back the change", e);
-      }
-      try {
-        for (Long tagId : tagIds) {      
-          tagConfigGateway.addRuleToTag(tagId, ruleTag.getId()); 
-        }
-
-        for (ConfigurationEventListener listener : configurationEventListeners) {
-          listener.onConfigurationEvent(ruleTag, Action.CREATE);
-        }
-
-        tagCache.putQuiet(ruleTag); 
-      } catch (RuntimeException e) {
-        String errMessage = "Exception caught while adding a RuleTag - rolling back DB transaction.";
-        log.error(errMessage, e);
-        tagCache.remove(ruleTag.getId());
-        for (Long tagId : tagIds) {      
-          try {
-            tagConfigGateway.removeRuleFromTag(tagId, ruleTag.getId());
-          } catch (RuntimeException ex) {
-            log.warn("Exception caught while attempting to role back rule creation in cache (removing references from input tags)", ex);
-          }
-        }
-        throw new UnexpectedRollbackException(errMessage, e);
-      }
-    } finally {
-      tagCache.releaseWriteLockOnKey(element.getEntityId());
+  protected void doPostCreate(RuleTag ruleTag) {
+    for (Long tagId : ruleTag.getRuleInputTagIds()) {
+      addRuleToTag(tagId, ruleTag.getId());
     }
-    return null;
+    super.doPostCreate(ruleTag);
   }
-  
-  /**
-   * Takes all the necessary actions when updating
-   * the configuration of a rule tag (updating the cache
-   * object and the database).
-   * 
-   * @param id the id of the rule that is being reconfigured
-   * @param properties the properties of fields that have changed
-   * @throws IllegalAccessException
-   * @throw {@link UnexpectedRollbackException} if failure; 
-   */
+
   @Override
   @Transactional(value = "cacheTransactionManager", propagation = Propagation.REQUIRES_NEW)
-  public Void update(Long id, Properties properties) throws IllegalAccessException {
-    log.trace("Updating RuleTag " + id);
+  public ProcessChange update(Long id, Properties properties) {
+    Collection<Long> oldTagIds = null;
 
-    tagCache.acquireWriteLockOnKey(id);
-    try {
-      RuleTag ruleTagCopy = tagCache.getCopy(id);
-      Collection<Long> oldTagIds = null;
-
-      //first record the old tag Ids before reconfiguring
-      if (properties.containsKey("ruleText")) {
-         oldTagIds = ruleTagCopy.getRuleInputTagIds();
-      }    
-
-      try {
-        commonTagFacade.updateConfig(ruleTagCopy, properties);
-        configurableDAO.updateConfig(ruleTagCopy);
-
-        for (ConfigurationEventListener listener : configurationEventListeners) {
-          listener.onConfigurationEvent(ruleTagCopy, Action.UPDATE);
-        }
-
-        tagCache.putQuiet(ruleTagCopy);
-      } catch (RuntimeException e) {
-        String msg = "Exception caught while updating Rule";
-        log.error(msg, e);
-        throw new UnexpectedRollbackException(msg, e);      
-      }
-
-      try {
-        //if successful so far, adjust associated Tags (remove all old, add all new)
-        if (oldTagIds != null) {
-          for (Long oldTagId : oldTagIds) {
-            tagConfigGateway.removeRuleFromTag(oldTagId, ruleTagCopy.getId());
-          }
-          for (Long newTagId : ruleTagCopy.getRuleInputTagIds()) {
-            tagConfigGateway.addRuleToTag(newTagId, ruleTagCopy.getId());
-          }
-        }
-      } catch (RuntimeException e) {
-        String errMessage = "Exception caught while updating a RuleTag in cache - rolling back DB transaction and removing from cache."; 
-        log.error(errMessage, e);
-        //try to re-assign all references as they were
-        if (oldTagIds != null) {
-          for (Long oldTagId : oldTagIds) {
-            try {
-              tagConfigGateway.addRuleToTag(oldTagId, ruleTagCopy.getId());
-            } catch (Exception ex) {
-              log.warn("Exception caught while rolling back rule update", ex);
-            }            
-          }
-          for (Long newTagId : ruleTagCopy.getRuleInputTagIds()) {
-            try {
-              tagConfigGateway.removeRuleFromTag(newTagId, ruleTagCopy.getId());
-            } catch (Exception ex) {
-              log.warn("Exception caught while rolling back rule update", ex);
-            }
-          }
-        } 
-        throw new UnexpectedRollbackException(errMessage, e);
-      }
-      tagCache.releaseWriteLockOnKey(id);      
-      //reset all parent DAQ/Equipment ids of rules higher up the pile - if fails, no rolling back possible, so rule cache may be left inconsistent
-      try {
-        log.trace("Resetting all relevant Rule parent Process/Equipment ids");
-        for (Long parentRuleId : ruleTagCopy.getRuleIds()) {
-          ruleTagFacade.setParentSupervisionIds(parentRuleId);
-        }
-      } catch (Exception e) {
-        String msg = "Exception while reloading rule parent ids: cache may be left in inconsistent state! - need to remove this rule to try and recover consistency";
-        log.error(msg, e);
-        throw new UnexpectedRollbackException(msg, e);
-      }
-    } finally {
-      if (tagCache.isWriteLockedByCurrentThread(id)) {
-        tagCache.releaseWriteLockOnKey(id);     
-      }      
+    //first record the old tag Ids before reconfiguring
+    if (properties.containsKey("ruleText")) {
+      oldTagIds = cache.get(id).getRuleInputTagIds();
     }
-    return null;
+
+    ProcessChange processChange = super.update(id, properties);
+
+
+    if (oldTagIds != null) {
+      Collection<Long> newTagIds = cache.get(id).getRuleInputTagIds();
+
+      for (Long oldTagId : oldTagIds) {
+        removeRuleFromTag(oldTagId, id);
+      }
+      for (Long newTagId : newTagIds) {
+        addRuleToTag(newTagId, id);
+      }
+    }
+
+    return processChange;
   }
- 
-   
+
   @Override
-  @Transactional(value = "cacheTransactionManager", propagation=Propagation.REQUIRES_NEW, isolation = Isolation.READ_COMMITTED)
-  public Void remove(final Long id, final ConfigurationElementReport elementReport) {
-    log.trace("Removing RuleTag " + id);
+  protected void doPostUpdate(RuleTag cacheable) {
+    super.doPostUpdate(cacheable);
+    //reset all parent DAQ/Equipment ids of rules higher up the pile - if fails, no rolling back possible, so rule cache may be left inconsistent
     try {
-      RuleTag ruleTag = tagCache.get(id);
-      Collection<Long> ruleIds = ruleTag.getCopyRuleIds();  
-      if (!ruleIds.isEmpty()) {
-        log.debug("Removing rules dependent on RuleTag " + id);
-        for (Long ruleId : ruleIds) { //concurrent modifcation as a rule is removed from the list during the remove call!
-          if (tagLocationService.isInTagCache(ruleId)) { //may already have been removed if a previous rule in the list was used in this rule!
-            ConfigurationElementReport newReport = new ConfigurationElementReport(Action.REMOVE, Entity.RULETAG, ruleId);
-            elementReport.addSubReport(newReport);
-            ruleTagConfigHandler.remove(ruleId, newReport); //call config handler bean so transaction annotation is noticed
-          }         
-        }                
+      log.trace("Resetting all relevant Rule parent Process/Equipment ids");
+      for (Long parentRuleId : cacheable.getRuleIds()) {
+        ruleTagFacade.setParentSupervisionIds(parentRuleId);
       }
-      tagCache.acquireWriteLockOnKey(id);      
-      Collection<Long> ruleInputTagIds = Collections.EMPTY_LIST;
-      try {
-        ruleInputTagIds = ruleTag.getCopyRuleInputTagIds();                
-        Collection<Long> alarmIds = ruleTag.getCopyAlarmIds();                  
-        if (!alarmIds.isEmpty()) {
-          log.debug("Removing Alarms dependent on RuleTag " + id);
-          for (Long alarmId : alarmIds) { //need copy as modified concurrently by remove alarm
-            ConfigurationElementReport alarmReport = new ConfigurationElementReport(Action.REMOVE, Entity.ALARM, alarmId);
-            elementReport.addSubReport(alarmReport);
-            alarmConfigHandler.remove(alarmId, alarmReport);
-          }        
-        }
-        for (Long inputTagId : ruleInputTagIds) {
-          tagConfigGateway.removeRuleFromTag(inputTagId, id); //allowed to lock tag below the rule...
-        }
-
-        for (ConfigurationEventListener listener : configurationEventListeners) {
-          listener.onConfigurationEvent(ruleTag, Action.REMOVE);
-        }
-
-        configurableDAO.deleteItem(ruleTag.getId());                                           
-      }
-      catch (RuntimeException rEx) {
-        String errMessage = "Exception caught when removing rule tag with id " + id;
-        log.error(errMessage, rEx);
-        throw new UnexpectedRollbackException(errMessage, rEx);   
-      } finally {
-        if (tagCache.isWriteLockedByCurrentThread(id)) {
-          tagCache.releaseWriteLockOnKey(id);
-        }        
-      }
-    } catch (CacheElementNotFoundException e) {
-      log.debug("Attempting to remove a non-existent RuleTag - no action taken.");
-      elementReport.setWarning("Attempting to removed a non-existent RuleTag");      
+    } catch (Exception e) {
+      String msg = "Exception while reloading rule parent ids: cache may be left in inconsistent state! - need to remove this rule to try and recover consistency";
+      log.error(msg, e);
+      throw new UnexpectedRollbackException(msg, e);
     }
-    return null;
+  }
+
+  @Override
+  protected void doPreRemove(RuleTag ruleTag, ConfigurationElementReport elementReport) {
+    super.doPreRemove(ruleTag, elementReport);
+
+    createConfigRemovalReportsFor(Entity.ALARM, ruleTag.getAlarmIds(), alarmConfigHandler.cache)
+      .forEach(elementReport::addSubReport);
+
+    createConfigRemovalReportsFor(Entity.RULETAG, ruleTag.getRuleIds(), cache)
+      .forEach(elementReport::addSubReport);
+
+    for (Long inputTagId : ruleTag.getCopyRuleInputTagIds()) {
+      removeRuleFromTag(inputTagId, ruleTag.getId());
+    }
+  }
+
+  @Override
+  public ProcessChange remove(Long id, ConfigurationElementReport report) {
+    ProcessChange result = super.remove(id, report);
+
+    for (ConfigurationEventListener listener : configurationEventListeners) {
+      listener.onConfigurationEvent(ruleTag, Action.REMOVE);
+    }
   }
 }

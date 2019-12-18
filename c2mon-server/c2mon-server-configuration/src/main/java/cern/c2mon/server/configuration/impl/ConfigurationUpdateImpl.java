@@ -47,14 +47,14 @@ public class ConfigurationUpdateImpl implements ConfigurationUpdate {
   /**
    * List of registered listeners.
    */
-    private List<ConfigurationUpdateListener> listeners = new ArrayList<ConfigurationUpdateListener>();
+    private List<ConfigurationUpdateListener> listeners = new ArrayList<>();
 
   @Override
   public void registerForConfigurationUpdates(ConfigurationUpdateListener configurationUpdateListener) {
     if (LOGGER.isTraceEnabled()) {
       LOGGER.trace("registerForConfigurationUpdates - new Listener added to the list");
     }
-    this.listeners.add(configurationUpdateListener);
+    listeners.add(configurationUpdateListener);
   }
 
   /**

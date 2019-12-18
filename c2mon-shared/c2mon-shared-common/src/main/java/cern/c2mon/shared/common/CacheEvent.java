@@ -25,6 +25,10 @@ public enum CacheEvent {
    */
   UPDATE_FAILED,
   /**
+   * A {@link Cacheable} was successfully removed
+   */
+  REMOVED,
+  /**
    * The status of the Supervised value changed from RUNNING to DOWN/STOPPED and vice-versa.
    */
   SUPERVISION_CHANGE,
