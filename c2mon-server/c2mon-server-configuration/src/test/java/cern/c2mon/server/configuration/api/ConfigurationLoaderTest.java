@@ -16,35 +16,20 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.api;
 
-import java.io.IOException;
-import java.sql.Timestamp;
-import java.util.Collections;
-import java.util.List;
-import java.util.Properties;
-import java.util.concurrent.CountDownLatch;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-
-import lombok.extern.slf4j.Slf4j;
-import org.easymock.EasyMock;
-import org.easymock.IAnswer;
-import org.junit.*;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import cern.c2mon.server.cache.*;
+import cern.c2mon.cache.actions.datatag.DataTagService;
+import cern.c2mon.cache.actions.equipment.EquipmentService;
+import cern.c2mon.cache.actions.process.ProcessService;
+import cern.c2mon.cache.actions.subequipment.SubEquipmentService;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.config.CacheModule;
 import cern.c2mon.server.cache.dbaccess.*;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.cache.loading.config.CacheLoadingModuleRef;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
+import cern.c2mon.server.common.alive.AliveTimer;
 import cern.c2mon.server.common.alive.AliveTimerCacheObject;
 import cern.c2mon.server.common.command.CommandTagCacheObject;
 import cern.c2mon.server.common.config.CommonModule;
-import cern.c2mon.server.common.control.ControlTagCacheObject;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.common.equipment.EquipmentCacheObject;
 import cern.c2mon.server.common.metadata.Metadata;
@@ -64,11 +49,11 @@ import cern.c2mon.server.daq.out.ProcessCommunicationManager;
 import cern.c2mon.server.daq.update.JmsContainerManagerImpl;
 import cern.c2mon.server.rule.config.RuleModule;
 import cern.c2mon.server.supervision.config.SupervisionModule;
-import cern.c2mon.shared.client.alarm.condition.ValueAlarmCondition;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.api.Configuration;
 import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
+import cern.c2mon.shared.client.configuration.api.alarm.ValueCondition;
 import cern.c2mon.shared.client.configuration.api.equipment.Equipment;
 import cern.c2mon.shared.client.configuration.api.equipment.SubEquipment;
 import cern.c2mon.shared.client.configuration.api.process.Process;
@@ -81,7 +66,6 @@ import cern.c2mon.shared.common.datatag.address.impl.SimpleHardwareAddressImpl;
 import cern.c2mon.shared.daq.config.Change;
 import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
-import junit.framework.Assert;
 import lombok.extern.slf4j.Slf4j;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
@@ -140,70 +124,67 @@ public class ConfigurationLoaderTest {
   private ConfigurationLoader configurationLoader;
 
   @Autowired
-  private DataTagCache dataTagCache;
+  private C2monCache<cern.c2mon.server.common.datatag.DataTag> dataTagCache;
 
   @Autowired
   private DataTagMapper dataTagMapper;
 
   @Autowired
-  private ControlTagCache controlTagCache;
-
-  @Autowired
-  private ControlTagMapper controlTagMapper;
-
-  @Autowired
   private CommandTagMapper commandTagMapper;
 
   @Autowired
-  private CommandTagCache commandTagCache;
+  private C2monCache<cern.c2mon.shared.common.command.CommandTag> commandTagCache;
 
   @Autowired
-  private RuleTagCache ruleTagCache;
+  private C2monCache<cern.c2mon.server.common.rule.RuleTag> ruleTagCache;
 
   @Autowired
   private RuleTagMapper ruleTagMapper;
 
   @Autowired
-  private EquipmentCache equipmentCache;
+  private C2monCache<cern.c2mon.server.common.equipment.Equipment> equipmentCache;
 
   @Autowired
   private EquipmentMapper equipmentMapper;
 
   @Autowired
-  private EquipmentFacade equipmentFacade;
+  private EquipmentService equipmentService;
 
   @Autowired
-  private SubEquipmentCache subEquipmentCache;
+  private C2monCache<cern.c2mon.server.common.subequipment.SubEquipment> subEquipmentCache;
 
   @Autowired
   private SubEquipmentMapper subEquipmentMapper;
 
   @Autowired
-  private SubEquipmentFacade subEquipmentFacade;
+  private SubEquipmentService subEquipmentService;
 
   @Autowired
-  private ProcessCache processCache;
+  private C2monCache<cern.c2mon.server.common.process.Process> processCache;
 
   @Autowired
   private ProcessMapper processMapper;
 
   @Autowired
-  private AliveTimerCache aliveTimerCache;
+  private C2monCache<AliveTimer> aliveTimerCache;
 
   @Autowired
-  private CommFaultTagCache commFaultTagCache;
+  private C2monCache<cern.c2mon.server.common.commfault.CommFaultTag> commFaultTagCache;
 
   @Autowired
-  private AlarmCache alarmCache;
+  private C2monCache<cern.c2mon.server.common.alarm.Alarm> alarmCache;
 
   @Autowired
   private AlarmMapper alarmMapper;
 
   @Autowired
-  private ProcessFacade processFacade;
+  private ProcessService processService;
 
   @Autowired
   private JmsContainerManagerImpl jmsContainerManager;
+
+  @Autowired
+  private DataTagService dataTagService;
 
   @Before
   public void beforeTest() throws IOException {
@@ -239,13 +220,9 @@ public class ConfigurationLoaderTest {
     assertEquals(ConfigConstants.Status.RESTART, report.getStatus());
     assertTrue(report.getElementReports().size() == 3);
 
-    assertTrue(processCache.hasKey(1L));
+    assertTrue(processCache.containsKey(1L));
     assertNotNull(processMapper.getItem(1L));
-    assertTrue(controlTagCache.hasKey(300_000L));
-    assertNotNull(controlTagMapper.getItem(300_000L));
-    assertTrue(aliveTimerCache.hasKey(300_000L));
-    assertTrue(controlTagCache.hasKey(300_001L));
-    assertNotNull(controlTagMapper.getItem(300_001L));
+    assertTrue(aliveTimerCache.containsKey(300_000L));
 
     // Check Process in the cache
     ProcessCacheObject cacheObjectProcess = (ProcessCacheObject) processCache.get(1L);
@@ -263,13 +240,9 @@ public class ConfigurationLoaderTest {
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     assertTrue(report.getStatus() == ConfigConstants.Status.OK);
 
-    assertFalse(processCache.hasKey(1L));
+    assertFalse(processCache.containsKey(1L));
     assertNull(processMapper.getItem(1L));
-    assertFalse(controlTagCache.hasKey(300_000L));
-    assertNull(controlTagMapper.getItem(300_000L));
-    assertFalse(controlTagCache.hasKey(300_001L));
-    assertNull(controlTagMapper.getItem(300_001L));
-    assertFalse(aliveTimerCache.hasKey(300_001L));
+    assertFalse(aliveTimerCache.containsKey(300_001L));
 
     verify(communicationManager);
   }
@@ -282,7 +255,7 @@ public class ConfigurationLoaderTest {
     configurationLoader.applyConfiguration(createProcess);
     Configuration newEquipmentConfig = TestConfigurationProvider.createEquipment();
     configurationLoader.applyConfiguration(newEquipmentConfig);
-    processFacade.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
+    processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
 
     DataTag dataTag = DataTag.create("DataTag", Integer.class, new DataTagAddress())
             .id(1000L)
@@ -339,7 +312,7 @@ public class ConfigurationLoaderTest {
     configurationLoader.applyConfiguration(createProcess);
     Configuration newEquipmentConfig = TestConfigurationProvider.createEquipment();
     configurationLoader.applyConfiguration(newEquipmentConfig);
-    processFacade.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
+    processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
 
     DataTag dataTag = DataTag.create("DataTag", Integer.class, new DataTagAddress())
         .id(1000L)
@@ -400,7 +373,7 @@ public class ConfigurationLoaderTest {
     // SETUP:
     Configuration createProcess = TestConfigurationProvider.createProcess();
     configurationLoader.applyConfiguration(createProcess);
-    processFacade.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
+    processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
 
     // TEST:
     // Build configuration to add the test equipment
@@ -425,17 +398,15 @@ public class ConfigurationLoaderTest {
     verify(communicationManager);
 
     // remove the process and equipments from the server
-    processFacade.stop(5L, new Timestamp(System.currentTimeMillis()));
+    processService.stop(5L, new Timestamp(System.currentTimeMillis()));
     Configuration remove = TestConfigurationProvider.deleteProcess();
     report = configurationLoader.applyConfiguration(remove);
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     assertTrue(report.getStatus() == ConfigConstants.Status.OK);
 
-    assertFalse(processCache.hasKey(5L));
+    assertFalse(processCache.containsKey(5L));
     assertNull(processMapper.getItem(5L));
-    assertFalse(controlTagCache.hasKey(100L));
-    assertNull(controlTagMapper.getItem(100L));
-    assertFalse(aliveTimerCache.hasKey(101L));
+    assertFalse(aliveTimerCache.containsKey(101L));
 
     verify(communicationManager);
   }
@@ -452,7 +423,7 @@ public class ConfigurationLoaderTest {
     configurationLoader.applyConfiguration(createProcess);
     Configuration newEquipmentConfig = TestConfigurationProvider.createEquipment();
     configurationLoader.applyConfiguration(newEquipmentConfig);
-    processFacade.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
+    processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
 
     DataTag dataTag = DataTag.create("DataTag", Integer.class, new DataTagAddress())
         .id(1000L)
@@ -510,7 +481,7 @@ public class ConfigurationLoaderTest {
     // SETUP:First add a process to the server
     Configuration createProcess = TestConfigurationProvider.createProcess();
     configurationLoader.applyConfiguration(createProcess);
-    processFacade.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
+    processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
 
     // TEST:Build configuration to add the test equipment
     Properties expectedProperties = new Properties();
@@ -543,34 +514,25 @@ public class ConfigurationLoaderTest {
     assertNotNull(commFaultTagCache.get(expectedObject.getCommFaultTagId()));
     assertEquals(expectedObject.getId(), commFaultTagCache.get(cacheObject.getCommFaultTagId()).getEquipmentId());
     assertNotNull(equipmentMapper.getItem(10L));
-    assertNotNull(controlTagMapper.getItem(300_000L));
-    assertNotNull(controlTagMapper.getItem(300_001L));
-    assertNotNull(controlTagMapper.getItem(300_002L));
 
     verify(communicationManager);
 
     // remove the process and equipments from the server
-    processFacade.stop(5L, new Timestamp(System.currentTimeMillis()));
+    processService.stop(5L, new Timestamp(System.currentTimeMillis()));
     Configuration remove = TestConfigurationProvider.deleteProcess();
     report = configurationLoader.applyConfiguration(remove);
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     assertTrue(report.getStatus() == ConfigConstants.Status.OK);
 
-    assertFalse(processCache.hasKey(5L));
+    assertFalse(processCache.containsKey(5L));
     assertNull(processMapper.getItem(5L));
-    assertFalse(controlTagCache.hasKey(100L));
-    assertNull(controlTagMapper.getItem(100L));
-    assertFalse(aliveTimerCache.hasKey(101L));
+    assertFalse(aliveTimerCache.containsKey(101L));
 
     // equipment stuff
-    assertFalse(equipmentCache.hasKey(10L));
+    assertFalse(equipmentCache.containsKey(10L));
     assertNull(equipmentMapper.getItem(10L));
-    assertFalse(controlTagCache.hasKey(300_000L));
-    assertNull(controlTagMapper.getItem(300_000L));
-    assertFalse(commFaultTagCache.hasKey(300_001L));
-    assertFalse(controlTagCache.hasKey(300_001L));
-    assertNull(controlTagMapper.getItem(300_002L));
-    assertFalse(aliveTimerCache.hasKey(300_002L));
+    assertFalse(commFaultTagCache.containsKey(300_001L));
+    assertFalse(aliveTimerCache.containsKey(300_002L));
 
     verify(communicationManager);
   }
@@ -601,7 +563,7 @@ public class ConfigurationLoaderTest {
     configurationLoader.applyConfiguration(createProcess);
     Configuration createEquipment = TestConfigurationProvider.createEquipment();
     configurationLoader.applyConfiguration(createEquipment);
-    processFacade.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
+    processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
 
     // TEST:
     // Build configuration to add the test equipment
@@ -627,27 +589,21 @@ public class ConfigurationLoaderTest {
     verify(communicationManager);
 
     // remove the process and equipments from the server
-    processFacade.stop(5L, new Timestamp(System.currentTimeMillis()));
+    processService.stop(5L, new Timestamp(System.currentTimeMillis()));
     Configuration remove = TestConfigurationProvider.deleteProcess();
     report = configurationLoader.applyConfiguration(remove);
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     assertTrue(report.getStatus() == ConfigConstants.Status.OK);
 
-    assertFalse(processCache.hasKey(5L));
+    assertFalse(processCache.containsKey(5L));
     assertNull(processMapper.getItem(5L));
-    assertFalse(controlTagCache.hasKey(100L));
-    assertNull(controlTagMapper.getItem(100L));
-    assertFalse(aliveTimerCache.hasKey(101L));
+    assertFalse(aliveTimerCache.containsKey(101L));
 
     // equipment stuff
-    assertFalse(equipmentCache.hasKey(15L));
+    assertFalse(equipmentCache.containsKey(15L));
     assertNull(equipmentMapper.getItem(15L));
-    assertFalse(controlTagCache.hasKey(200L));
-    assertNull(controlTagMapper.getItem(200L));
-    assertFalse(commFaultTagCache.hasKey(201L));
-    assertFalse(controlTagCache.hasKey(201L));
-    assertNull(controlTagMapper.getItem(202L));
-    assertFalse(aliveTimerCache.hasKey(202L));
+    assertFalse(commFaultTagCache.containsKey(201L));
+    assertFalse(aliveTimerCache.containsKey(202L));
 
     verify(communicationManager);
   }
@@ -677,7 +633,7 @@ public class ConfigurationLoaderTest {
     configurationLoader.applyConfiguration(createProcess);
     Configuration createEquipment = TestConfigurationProvider.createEquipment();
     configurationLoader.applyConfiguration(createEquipment);
-    processFacade.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
+    processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
 
     // TEST:Build configuration to add the test equipment
     Properties expectedProperties = new Properties();
@@ -710,39 +666,30 @@ public class ConfigurationLoaderTest {
     assertNotNull(commFaultTagCache.get(expectedObject.getCommFaultTagId()));
     assertEquals(expectedObject.getId(), commFaultTagCache.get(cacheObject.getCommFaultTagId()).getEquipmentId());
     assertNotNull(subEquipmentMapper.getItem(20L));
-    assertNotNull(controlTagMapper.getItem(300_000L));
-    assertNotNull(controlTagMapper.getItem(300_001L));
-    assertNotNull(controlTagMapper.getItem(300_002L));
 
     verify(communicationManager);
 
     // remove the process and equipments from the server
-    processFacade.stop(5L, new Timestamp(System.currentTimeMillis()));
+    processService.stop(5L, new Timestamp(System.currentTimeMillis()));
     Configuration remove = TestConfigurationProvider.deleteProcess();
     report = configurationLoader.applyConfiguration(remove);
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     assertTrue(report.getStatus() == ConfigConstants.Status.OK);
 
-    assertFalse(processCache.hasKey(5L));
+    assertFalse(processCache.containsKey(5L));
     assertNull(processMapper.getItem(5L));
-    assertFalse(controlTagCache.hasKey(100L));
-    assertNull(controlTagMapper.getItem(100L));
-    assertFalse(aliveTimerCache.hasKey(101L));
+    assertFalse(aliveTimerCache.containsKey(101L));
 
     // equipment stuff
-    assertFalse(equipmentCache.hasKey(15L));
+    assertFalse(equipmentCache.containsKey(15L));
     assertNull(equipmentMapper.getItem(15L));
-    assertFalse(controlTagCache.hasKey(200L));
-    assertNull(controlTagMapper.getItem(200L));
-    assertFalse(commFaultTagCache.hasKey(201L));
-    assertFalse(aliveTimerCache.hasKey(201L));
+    assertFalse(commFaultTagCache.containsKey(201L));
+    assertFalse(aliveTimerCache.containsKey(201L));
 
-    assertFalse(equipmentCache.hasKey(20L));
+    assertFalse(equipmentCache.containsKey(20L));
     assertNull(subEquipmentMapper.getItem(20L));
-    assertFalse(controlTagCache.hasKey(300_000L));
-    assertNull(controlTagMapper.getItem(300_000L));
-    assertFalse(commFaultTagCache.hasKey(300_001L));
-    assertFalse(aliveTimerCache.hasKey(300_002L));
+    assertFalse(commFaultTagCache.containsKey(300_001L));
+    assertFalse(aliveTimerCache.containsKey(300_002L));
 
     verify(communicationManager);
   }
@@ -774,7 +721,7 @@ public class ConfigurationLoaderTest {
     configurationLoader.applyConfiguration(createEquipment);
     Configuration createSubEquipment = TestConfigurationProvider.createSubEquipment();
     configurationLoader.applyConfiguration(createSubEquipment);
-    processFacade.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
+    processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
 
     // TEST:
     // Build configuration to add the test equipment
@@ -800,32 +747,26 @@ public class ConfigurationLoaderTest {
     verify(communicationManager);
 
     // remove the process and equipments from the server
-    processFacade.stop(5L, new Timestamp(System.currentTimeMillis()));
+    processService.stop(5L, new Timestamp(System.currentTimeMillis()));
     Configuration remove = TestConfigurationProvider.deleteProcess();
     report = configurationLoader.applyConfiguration(remove);
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     assertTrue(report.getStatus() == ConfigConstants.Status.OK);
 
-    assertFalse(processCache.hasKey(5L));
+    assertFalse(processCache.containsKey(5L));
     assertNull(processMapper.getItem(5L));
-    assertFalse(controlTagCache.hasKey(100L));
-    assertNull(controlTagMapper.getItem(100L));
-    assertFalse(aliveTimerCache.hasKey(101L));
+    assertFalse(aliveTimerCache.containsKey(101L));
 
     // equipment stuff
-    assertFalse(equipmentCache.hasKey(15L));
+    assertFalse(equipmentCache.containsKey(15L));
     assertNull(equipmentMapper.getItem(15L));
-    assertFalse(controlTagCache.hasKey(200L));
-    assertNull(controlTagMapper.getItem(200L));
-    assertFalse(commFaultTagCache.hasKey(201L));
-    assertFalse(aliveTimerCache.hasKey(201L));
+    assertFalse(commFaultTagCache.containsKey(201L));
+    assertFalse(aliveTimerCache.containsKey(201L));
 
-    assertFalse(equipmentCache.hasKey(25L));
+    assertFalse(equipmentCache.containsKey(25L));
     assertNull(subEquipmentMapper.getItem(25L));
-    assertFalse(controlTagCache.hasKey(300L));
-    assertNull(controlTagMapper.getItem(300L));
-    assertFalse(commFaultTagCache.hasKey(301L));
-    assertFalse(aliveTimerCache.hasKey(302L));
+    assertFalse(commFaultTagCache.containsKey(301L));
+    assertFalse(aliveTimerCache.containsKey(302L));
 
     verify(communicationManager);
   }
@@ -837,7 +778,7 @@ public class ConfigurationLoaderTest {
     // SETUP:
     Configuration createProcess = TestConfigurationProvider.createProcess();
     configurationLoader.applyConfiguration(createProcess);
-    processFacade.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
+    processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
 
     // TEST:
     AliveTag aliveTagUpdate = AliveTag.update(101L).description("new description").mode(TagMode.OPERATIONAL).build();
@@ -856,35 +797,29 @@ public class ConfigurationLoaderTest {
     // check aliveTag in the cache
     AliveTimerCacheObject cacheObjectAlive = (AliveTimerCacheObject) aliveTimerCache.get(101L);
     AliveTimerCacheObject expectedObjectAlive = new AliveTimerCacheObject(101L, 5L, "P_INI_TEST", 100L, "PROC", 60000);
-    ControlTagCacheObject cacheObjectAliveControlCache = (ControlTagCacheObject) controlTagCache.get(101L);
-
-    Assert.assertEquals(cacheObjectAliveControlCache.getDescription(), "new description");
     ObjectEqualityComparison.assertAliveTimerValuesEquals(expectedObjectAlive, cacheObjectAlive);
+
+//    ControlTagCacheObject cacheObjectAliveControlCache = (ControlTagCacheObject) controlTagCache.get(101L);
+//    Assert.assertEquals(cacheObjectAliveControlCache.getDescription(), "new description");
 
     verify(communicationManager);
 
     // remove the process and equipments from the server
-    processFacade.stop(5L, new Timestamp(System.currentTimeMillis()));
+    processService.stop(5L, new Timestamp(System.currentTimeMillis()));
     Configuration remove = TestConfigurationProvider.deleteProcess();
     report = configurationLoader.applyConfiguration(remove);
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     assertTrue(report.getStatus() == ConfigConstants.Status.OK);
 
-    assertFalse(processCache.hasKey(5L));
+    assertFalse(processCache.containsKey(5L));
     assertNull(processMapper.getItem(5L));
-    assertFalse(controlTagCache.hasKey(100L));
-    assertNull(controlTagMapper.getItem(100L));
-    assertFalse(aliveTimerCache.hasKey(101L));
+    assertFalse(aliveTimerCache.containsKey(101L));
 
     // equipment stuff
-    assertFalse(equipmentCache.hasKey(15L));
+    assertFalse(equipmentCache.containsKey(15L));
     assertNull(equipmentMapper.getItem(15L));
-    assertFalse(controlTagCache.hasKey(200L));
-    assertNull(controlTagMapper.getItem(200L));
-    assertFalse(commFaultTagCache.hasKey(201L));
-    assertFalse(controlTagCache.hasKey(201L));
-    assertNull(controlTagMapper.getItem(202L));
-    assertFalse(aliveTimerCache.hasKey(202L));
+    assertFalse(commFaultTagCache.containsKey(201L));
+    assertFalse(aliveTimerCache.containsKey(202L));
 
     verify(communicationManager);
   }
@@ -896,7 +831,7 @@ public class ConfigurationLoaderTest {
     // SETUP:
     Configuration createProcess = TestConfigurationProvider.createProcess();
     configurationLoader.applyConfiguration(createProcess);
-    processFacade.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
+    processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
 
     // TEST:
     StatusTag statusTagUpdate = StatusTag.update(100L).description("new description").mode(TagMode.OPERATIONAL).build();
@@ -912,24 +847,22 @@ public class ConfigurationLoaderTest {
     assertTrue(report.getProcessesToReboot().isEmpty());
     assertTrue(report.getElementReports().size() == 1);
 
-    ControlTagCacheObject cacheObjectStatusControlCache = (ControlTagCacheObject) controlTagCache.get(100L);
-    assertEquals(cacheObjectStatusControlCache.getDescription(), "new description");
-    assertEquals(cacheObjectStatusControlCache.getMode(), TagMode.OPERATIONAL.ordinal());
+//    ControlTagCacheObject cacheObjectStatusControlCache = (ControlTagCacheObject) controlTagCache.get(100L);
+//    assertEquals(cacheObjectStatusControlCache.getDescription(), "new description");
+//    assertEquals(cacheObjectStatusControlCache.getMode(), TagMode.OPERATIONAL.ordinal());
 
     verify(communicationManager);
 
     // remove the process and equipments from the server
-    processFacade.stop(5L, new Timestamp(System.currentTimeMillis()));
+    processService.stop(5L, new Timestamp(System.currentTimeMillis()));
     Configuration remove = TestConfigurationProvider.deleteProcess();
     report = configurationLoader.applyConfiguration(remove);
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     assertTrue(report.getStatus() == ConfigConstants.Status.OK);
 
-    assertFalse(processCache.hasKey(5L));
+    assertFalse(processCache.containsKey(5L));
     assertNull(processMapper.getItem(5L));
-    assertFalse(controlTagCache.hasKey(100L));
-    assertNull(controlTagMapper.getItem(100L));
-    assertFalse(aliveTimerCache.hasKey(101L));
+    assertFalse(aliveTimerCache.containsKey(101L));
 
     verify(communicationManager);
   }
@@ -943,7 +876,7 @@ public class ConfigurationLoaderTest {
     configurationLoader.applyConfiguration(createProcess);
     Configuration createEquipment = TestConfigurationProvider.createEquipment();
     configurationLoader.applyConfiguration(createEquipment);
-    processFacade.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
+    processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
 
     // TEST:
     // Build configuration to update the test equipment
@@ -961,24 +894,22 @@ public class ConfigurationLoaderTest {
     assertTrue(report.getElementReports().size() == 1);
 
     // check aliveTag in the cache
-    ControlTagCacheObject cacheObjectStatusControlCache = (ControlTagCacheObject) controlTagCache.get(201L);
-    assertEquals(cacheObjectStatusControlCache.getDescription(), "new description");
-    assertEquals(cacheObjectStatusControlCache.getMode(), TagMode.OPERATIONAL.ordinal());
+//    ControlTagCacheObject cacheObjectStatusControlCache = (ControlTagCacheObject) controlTagCache.get(201L);
+//    assertEquals(cacheObjectStatusControlCache.getDescription(), "new description");
+//    assertEquals(cacheObjectStatusControlCache.getMode(), TagMode.OPERATIONAL.ordinal());
 
     verify(communicationManager);
 
     // remove the process and equipments from the server
-    processFacade.stop(5L, new Timestamp(System.currentTimeMillis()));
+    processService.stop(5L, new Timestamp(System.currentTimeMillis()));
     Configuration remove = TestConfigurationProvider.deleteProcess();
     report = configurationLoader.applyConfiguration(remove);
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     assertTrue(report.getStatus() == ConfigConstants.Status.OK);
 
-    assertFalse(processCache.hasKey(5L));
+    assertFalse(processCache.containsKey(5L));
     assertNull(processMapper.getItem(5L));
-    assertFalse(controlTagCache.hasKey(100L));
-    assertNull(controlTagMapper.getItem(100L));
-    assertFalse(aliveTimerCache.hasKey(101L));
+    assertFalse(aliveTimerCache.containsKey(101L));
 
     verify(communicationManager);
   }
@@ -995,7 +926,7 @@ public class ConfigurationLoaderTest {
     configurationLoader.applyConfiguration(createProcess);
     Configuration createEquipment = TestConfigurationProvider.createEquipment();
     configurationLoader.applyConfiguration(createEquipment);
-    processFacade.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
+    processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
 
     // TEST:
     // Build configuration to add the test DataTag
@@ -1020,35 +951,27 @@ public class ConfigurationLoaderTest {
 
     ObjectEqualityComparison.assertDataTagConfigEquals(expectedCacheObjectData, cacheObjectData);
     // Check if all caches are updated
-    equipmentCache.acquireWriteLockOnKey(cacheObjectData.getEquipmentId());
-    assertTrue(equipmentFacade.getDataTagIds(cacheObjectData.getEquipmentId()).contains(1000L));
-    equipmentCache.releaseWriteLockOnKey(cacheObjectData.getEquipmentId());
+    assertTrue(dataTagService.getDataTagIdsByEquipmentId(cacheObjectData.getEquipmentId()).contains(1000L));
 
     verify(communicationManager);
 
     // remove the process and equipments from the server
-    processFacade.stop(5L, new Timestamp(System.currentTimeMillis()));
+    processService.stop(5L, new Timestamp(System.currentTimeMillis()));
     Configuration remove = TestConfigurationProvider.deleteProcess();
     report = configurationLoader.applyConfiguration(remove);
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     assertTrue(report.getStatus() == ConfigConstants.Status.OK);
 
-    assertFalse(processCache.hasKey(5L));
+    assertFalse(processCache.containsKey(5L));
     assertNull(processMapper.getItem(5L));
-    assertFalse(controlTagCache.hasKey(100L));
-    assertNull(controlTagMapper.getItem(100L));
-    assertFalse(aliveTimerCache.hasKey(101L));
+    assertFalse(aliveTimerCache.containsKey(101L));
 
     // equipment stuff
-    assertFalse(equipmentCache.hasKey(15L));
+    assertFalse(equipmentCache.containsKey(15L));
     assertNull(equipmentMapper.getItem(15L));
-    assertFalse(controlTagCache.hasKey(200L));
-    assertNull(controlTagMapper.getItem(200L));
-    assertFalse(commFaultTagCache.hasKey(201L));
-    assertFalse(controlTagCache.hasKey(201L));
-    assertNull(controlTagMapper.getItem(202L));
-    assertFalse(aliveTimerCache.hasKey(202L));
-    assertFalse(dataTagCache.hasKey(1000L));
+    assertFalse(commFaultTagCache.containsKey(201L));
+    assertFalse(aliveTimerCache.containsKey(202L));
+    assertFalse(dataTagCache.containsKey(1000L));
     assertNull(dataTagMapper.getItem(1000L));
 
     verify(communicationManager);
@@ -1068,7 +991,7 @@ public class ConfigurationLoaderTest {
     configurationLoader.applyConfiguration(createEquipment);
     Configuration createDataTag = TestConfigurationProvider.createEquipmentDataTag(15L);
     configurationLoader.applyConfiguration(createDataTag);
-    processFacade.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
+    processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
 
     // TEST:
     // Build configuration to update the test DataTag
@@ -1098,28 +1021,22 @@ public class ConfigurationLoaderTest {
     verify(communicationManager);
 
     // remove the process and equipments from the server
-    processFacade.stop(5L, new Timestamp(System.currentTimeMillis()));
+    processService.stop(5L, new Timestamp(System.currentTimeMillis()));
     Configuration remove = TestConfigurationProvider.deleteProcess();
     report = configurationLoader.applyConfiguration(remove);
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     assertTrue(report.getStatus() == ConfigConstants.Status.OK);
 
-    assertFalse(processCache.hasKey(5L));
+    assertFalse(processCache.containsKey(5L));
     assertNull(processMapper.getItem(5L));
-    assertFalse(controlTagCache.hasKey(100L));
-    assertNull(controlTagMapper.getItem(100L));
-    assertFalse(aliveTimerCache.hasKey(101L));
+    assertFalse(aliveTimerCache.containsKey(101L));
 
     // equipment stuff
-    assertFalse(equipmentCache.hasKey(15L));
+    assertFalse(equipmentCache.containsKey(15L));
     assertNull(equipmentMapper.getItem(15L));
-    assertFalse(controlTagCache.hasKey(200L));
-    assertNull(controlTagMapper.getItem(200L));
-    assertFalse(commFaultTagCache.hasKey(201L));
-    assertFalse(controlTagCache.hasKey(201L));
-    assertNull(controlTagMapper.getItem(202L));
-    assertFalse(aliveTimerCache.hasKey(202L));
-    assertFalse(dataTagCache.hasKey(1000L));
+    assertFalse(commFaultTagCache.containsKey(201L));
+    assertFalse(aliveTimerCache.containsKey(202L));
+    assertFalse(dataTagCache.containsKey(1000L));
     assertNull(dataTagMapper.getItem(1000L));
 
     verify(communicationManager);
@@ -1139,7 +1056,7 @@ public class ConfigurationLoaderTest {
     configurationLoader.applyConfiguration(createEquipment);
     Configuration createSubEquipment = TestConfigurationProvider.createSubEquipment();
     configurationLoader.applyConfiguration(createSubEquipment);
-    processFacade.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
+    processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
 
     // TEST:
     // Build configuration to add the test DataTag
@@ -1167,40 +1084,32 @@ public class ConfigurationLoaderTest {
 
     ObjectEqualityComparison.assertDataTagConfigEquals(expectedCacheObjectData, cacheObjectData);
     // Check if all caches are updated
-    subEquipmentCache.acquireWriteLockOnKey(cacheObjectData.getSubEquipmentId());
-    assertTrue(subEquipmentFacade.getDataTagIds(cacheObjectData.getSubEquipmentId()).contains(1000L));
-    subEquipmentCache.releaseWriteLockOnKey(cacheObjectData.getSubEquipmentId());
+    assertTrue(subEquipmentService.getDataTagIds(cacheObjectData.getSubEquipmentId()).contains(1000L));
 
     verify(communicationManager);
 
     // remove the process and equipments from the server
-    processFacade.stop(5L, new Timestamp(System.currentTimeMillis()));
+    processService.stop(5L, new Timestamp(System.currentTimeMillis()));
     Configuration remove = TestConfigurationProvider.deleteProcess();
     report = configurationLoader.applyConfiguration(remove);
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     assertTrue(report.getStatus() == ConfigConstants.Status.OK);
 
-    assertFalse(processCache.hasKey(5L));
+    assertFalse(processCache.containsKey(5L));
     assertNull(processMapper.getItem(5L));
-    assertFalse(controlTagCache.hasKey(100L));
-    assertNull(controlTagMapper.getItem(100L));
-    assertFalse(aliveTimerCache.hasKey(101L));
+    assertFalse(aliveTimerCache.containsKey(101L));
 
     // equipment stuff
-    assertFalse(equipmentCache.hasKey(15L));
+    assertFalse(equipmentCache.containsKey(15L));
     assertNull(equipmentMapper.getItem(15L));
-    assertFalse(controlTagCache.hasKey(200L));
-    assertNull(controlTagMapper.getItem(200L));
-    assertFalse(commFaultTagCache.hasKey(201L));
-    assertFalse(aliveTimerCache.hasKey(201L));
+    assertFalse(commFaultTagCache.containsKey(201L));
+    assertFalse(aliveTimerCache.containsKey(201L));
 
-    assertFalse(equipmentCache.hasKey(25L));
+    assertFalse(equipmentCache.containsKey(25L));
     assertNull(subEquipmentMapper.getItem(25L));
-    assertFalse(controlTagCache.hasKey(300L));
-    assertNull(controlTagMapper.getItem(300L));
-    assertFalse(commFaultTagCache.hasKey(301L));
-    assertFalse(aliveTimerCache.hasKey(302L));
-    assertFalse(dataTagCache.hasKey(1000L));
+    assertFalse(commFaultTagCache.containsKey(301L));
+    assertFalse(aliveTimerCache.containsKey(302L));
+    assertFalse(dataTagCache.containsKey(1000L));
     assertNull(dataTagMapper.getItem(1000L));
 
     verify(communicationManager);
@@ -1222,7 +1131,7 @@ public class ConfigurationLoaderTest {
     configurationLoader.applyConfiguration(createSubEquipment);
     Configuration createDataTag = TestConfigurationProvider.createSubEquipmentDataTag(25L);
     configurationLoader.applyConfiguration(createDataTag);
-    processFacade.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
+    processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
 
     // TEST:
     // Build configuration to update the test DataTag
@@ -1252,35 +1161,27 @@ public class ConfigurationLoaderTest {
     verify(communicationManager);
 
     // remove the process and equipments and dataTag from the server
-    processFacade.stop(5L, new Timestamp(System.currentTimeMillis()));
+    processService.stop(5L, new Timestamp(System.currentTimeMillis()));
     Configuration remove = TestConfigurationProvider.deleteProcess();
     report = configurationLoader.applyConfiguration(remove);
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     assertTrue(report.getStatus() == ConfigConstants.Status.OK);
 
-    assertFalse(processCache.hasKey(5L));
+    assertFalse(processCache.containsKey(5L));
     assertNull(processMapper.getItem(5L));
-    assertFalse(controlTagCache.hasKey(100L));
-    assertNull(controlTagMapper.getItem(100L));
-    assertFalse(aliveTimerCache.hasKey(101L));
+    assertFalse(aliveTimerCache.containsKey(101L));
 
     // equipment stuff
-    assertFalse(equipmentCache.hasKey(15L));
+    assertFalse(equipmentCache.containsKey(15L));
     assertNull(equipmentMapper.getItem(15L));
-    assertFalse(controlTagCache.hasKey(200L));
-    assertNull(controlTagMapper.getItem(200L));
-    assertFalse(commFaultTagCache.hasKey(201L));
-    assertFalse(controlTagCache.hasKey(201L));
-    assertNull(controlTagMapper.getItem(202L));
-    assertFalse(aliveTimerCache.hasKey(202L));
+    assertFalse(commFaultTagCache.containsKey(201L));
+    assertFalse(aliveTimerCache.containsKey(202L));
 
-    assertFalse(equipmentCache.hasKey(25L));
+    assertFalse(equipmentCache.containsKey(25L));
     assertNull(subEquipmentMapper.getItem(25L));
-    assertFalse(controlTagCache.hasKey(300L));
-    assertNull(controlTagMapper.getItem(300L));
-    assertFalse(commFaultTagCache.hasKey(301L));
-    assertFalse(aliveTimerCache.hasKey(302L));
-    assertFalse(dataTagCache.hasKey(1000L));
+    assertFalse(commFaultTagCache.containsKey(301L));
+    assertFalse(aliveTimerCache.containsKey(302L));
+    assertFalse(dataTagCache.containsKey(1000L));
     assertNull(dataTagMapper.getItem(1000L));
 
     verify(communicationManager);
@@ -1301,7 +1202,7 @@ public class ConfigurationLoaderTest {
     configurationLoader.applyConfiguration(createSubEquipment);
     Configuration createDataTag = TestConfigurationProvider.createEquipmentDataTag(15L);
     configurationLoader.applyConfiguration(createDataTag);
-    processFacade.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
+    processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
 
     // TEST:Build configuration to add the test RuleTag
     RuleTag ruleTag = ConfigurationRuleTagUtil.buildCreateAllFieldsRuleTag(1500L, null);
@@ -1317,7 +1218,7 @@ public class ConfigurationLoaderTest {
     assertTrue(report.getElementReports().size() == 1);
 
     // get cacheObject from the cache and compare it with the expected cacheObject
-    RuleTagCacheObject cacheObjectRule = (RuleTagCacheObject) ruleTagCache.getCopy(1500L);
+    RuleTagCacheObject cacheObjectRule = (RuleTagCacheObject) ruleTagCache.get(1500L);
     cacheObjectRule.setDataTagQuality(new DataTagQualityImpl());
     RuleTagCacheObject expectedCacheObjectRule = cacheObjectFactory.buildRuleTagCacheObject(1500L, ruleTag);
 
@@ -1328,27 +1229,21 @@ public class ConfigurationLoaderTest {
     verify(communicationManager);
 
     // remove the process and equipments from the server
-    processFacade.stop(5L, new Timestamp(System.currentTimeMillis()));
+    processService.stop(5L, new Timestamp(System.currentTimeMillis()));
     Configuration remove = TestConfigurationProvider.deleteProcess();
     report = configurationLoader.applyConfiguration(remove);
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     assertTrue(report.getStatus() == ConfigConstants.Status.OK);
 
-    assertFalse(processCache.hasKey(5L));
+    assertFalse(processCache.containsKey(5L));
     assertNull(processMapper.getItem(5L));
-    assertFalse(controlTagCache.hasKey(100L));
-    assertNull(controlTagMapper.getItem(100L));
-    assertFalse(aliveTimerCache.hasKey(101L));
+    assertFalse(aliveTimerCache.containsKey(101L));
 
     // equipment stuff
-    assertFalse(equipmentCache.hasKey(15L));
+    assertFalse(equipmentCache.containsKey(15L));
     assertNull(equipmentMapper.getItem(15L));
-    assertFalse(controlTagCache.hasKey(200L));
-    assertNull(controlTagMapper.getItem(200L));
-    assertFalse(commFaultTagCache.hasKey(201L));
-    assertFalse(controlTagCache.hasKey(201L));
-    assertNull(controlTagMapper.getItem(202L));
-    assertFalse(ruleTagCache.hasKey(1500L));
+    assertFalse(commFaultTagCache.containsKey(201L));
+    assertFalse(ruleTagCache.containsKey(1500L));
     assertNull(ruleTagMapper.getItem(1500L));
 
     verify(communicationManager);
@@ -1368,17 +1263,10 @@ public class ConfigurationLoaderTest {
     configurationLoader.applyConfiguration(createDataTag);
     Configuration createRuleTag = TestConfigurationProvider.createRuleTag();
     configurationLoader.applyConfiguration(createRuleTag);
-    processFacade.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
+    processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
 
     final CountDownLatch latch = new CountDownLatch(1);
-    ruleTagCache.registerSynchronousListener(new C2monCacheListener<cern.c2mon.server.common.rule.RuleTag>() {
-      @Override
-      public void notifyElementUpdated(cern.c2mon.server.common.rule.RuleTag cacheable) {
-        latch.countDown();
-      }
-      @Override
-      public void confirmStatus(cern.c2mon.server.common.rule.RuleTag cacheable) {}
-    });
+    ruleTagCache.getCacheListenerManager().registerListener(cacheable -> latch.countDown());
 
     // TEST:
     // Build configuration to add the test RuleTagUpdate
@@ -1407,7 +1295,7 @@ public class ConfigurationLoaderTest {
     verify(communicationManager);
 
     // remove the process and equipments from the server
-    processFacade.stop(5L, new Timestamp(System.currentTimeMillis()));
+    processService.stop(5L, new Timestamp(System.currentTimeMillis()));
     Configuration remove = TestConfigurationProvider.deleteProcess();
     report = configurationLoader.applyConfiguration(remove);
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
@@ -1417,21 +1305,15 @@ public class ConfigurationLoaderTest {
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     assertTrue(report.getStatus() == ConfigConstants.Status.OK);
 
-    assertFalse(processCache.hasKey(5L));
+    assertFalse(processCache.containsKey(5L));
     assertNull(processMapper.getItem(5L));
-    assertFalse(controlTagCache.hasKey(100L));
-    assertNull(controlTagMapper.getItem(100L));
-    assertFalse(aliveTimerCache.hasKey(101L));
+    assertFalse(aliveTimerCache.containsKey(101L));
 
     // equipment stuff
-    assertFalse(equipmentCache.hasKey(15L));
+    assertFalse(equipmentCache.containsKey(15L));
     assertNull(equipmentMapper.getItem(15L));
-    assertFalse(controlTagCache.hasKey(200L));
-    assertNull(controlTagMapper.getItem(200L));
-    assertFalse(commFaultTagCache.hasKey(201L));
-    assertFalse(controlTagCache.hasKey(201L));
-    assertNull(controlTagMapper.getItem(202L));
-    assertFalse(ruleTagCache.hasKey(1500L));
+    assertFalse(commFaultTagCache.containsKey(201L));
+    assertFalse(ruleTagCache.containsKey(1500L));
     assertNull(ruleTagMapper.getItem(1500L));
 
     verify(communicationManager);
@@ -1451,15 +1333,15 @@ public class ConfigurationLoaderTest {
     configurationLoader.applyConfiguration(createSubEquipment);
     Configuration createDataTag = TestConfigurationProvider.createEquipmentDataTag(15L);
     configurationLoader.applyConfiguration(createDataTag);
-    processFacade.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
+    processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
     Configuration createRuleTag = TestConfigurationProvider.createRuleTag();
     configurationLoader.applyConfiguration(createRuleTag);
 
     // TEST:
     // check if the DataTag and rules are in the cache
-    assertTrue(ruleTagCache.hasKey(1500L));
+    assertTrue(ruleTagCache.containsKey(1500L));
     assertNotNull(ruleTagMapper.getItem(1500L));
-    assertTrue(dataTagCache.hasKey(1000L));
+    assertTrue(dataTagCache.containsKey(1000L));
     assertNotNull(dataTagMapper.getItem(1000L));
 
     // Build configuration to remove the DataTag
@@ -1472,34 +1354,28 @@ public class ConfigurationLoaderTest {
     assertTrue(report.getElementReports().size() == 1);
 
     // Check if all caches are updated
-    assertFalse(ruleTagCache.hasKey(1500L));
+    assertFalse(ruleTagCache.containsKey(1500L));
     assertNull(ruleTagMapper.getItem(1500L));
-    assertFalse(dataTagCache.hasKey(1000L));
+    assertFalse(dataTagCache.containsKey(1000L));
     assertNull(dataTagMapper.getItem(1000L));
 
     verify(communicationManager);
 
     // remove the rest for finishing the test
-    processFacade.stop(5L, new Timestamp(System.currentTimeMillis()));
+    processService.stop(5L, new Timestamp(System.currentTimeMillis()));
     Configuration remove = TestConfigurationProvider.deleteProcess();
     report = configurationLoader.applyConfiguration(remove);
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     assertTrue(report.getStatus() == ConfigConstants.Status.OK);
 
-    assertFalse(processCache.hasKey(5L));
+    assertFalse(processCache.containsKey(5L));
     assertNull(processMapper.getItem(5L));
-    assertFalse(controlTagCache.hasKey(100L));
-    assertNull(controlTagMapper.getItem(100L));
-    assertFalse(aliveTimerCache.hasKey(101L));
+    assertFalse(aliveTimerCache.containsKey(101L));
 
     // equipment stuff
-    assertFalse(equipmentCache.hasKey(15L));
+    assertFalse(equipmentCache.containsKey(15L));
     assertNull(equipmentMapper.getItem(15L));
-    assertFalse(controlTagCache.hasKey(200L));
-    assertNull(controlTagMapper.getItem(200L));
-    assertFalse(commFaultTagCache.hasKey(201L));
-    assertFalse(controlTagCache.hasKey(201L));
-    assertNull(controlTagMapper.getItem(202L));
+    assertFalse(commFaultTagCache.containsKey(201L));
 
     verify(communicationManager);
   }
@@ -1516,7 +1392,7 @@ public class ConfigurationLoaderTest {
     configurationLoader.applyConfiguration(createSubEquipment);
     Configuration createDataTag = TestConfigurationProvider.createEquipmentDataTag(15L);
     configurationLoader.applyConfiguration(createDataTag);
-    processFacade.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
+    processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
 
     // TEST:Build configuration to add the test Alarm
     Alarm alarm = ConfigurationAlarmUtil.buildCreateAllFieldsAlarm(2000L, null);
@@ -1542,27 +1418,21 @@ public class ConfigurationLoaderTest {
     verify(communicationManager);
 
     // remove the process and equipments and dataTag from the server
-    processFacade.stop(5L, new Timestamp(System.currentTimeMillis()));
+    processService.stop(5L, new Timestamp(System.currentTimeMillis()));
     Configuration remove = TestConfigurationProvider.deleteProcess();
     report = configurationLoader.applyConfiguration(remove);
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     assertTrue(report.getStatus() == ConfigConstants.Status.OK);
 
-    assertFalse(processCache.hasKey(5L));
+    assertFalse(processCache.containsKey(5L));
     assertNull(processMapper.getItem(5L));
-    assertFalse(controlTagCache.hasKey(100L));
-    assertNull(controlTagMapper.getItem(100L));
-    assertFalse(aliveTimerCache.hasKey(101L));
+    assertFalse(aliveTimerCache.containsKey(101L));
 
     // equipment stuff
-    assertFalse(equipmentCache.hasKey(15L));
+    assertFalse(equipmentCache.containsKey(15L));
     assertNull(equipmentMapper.getItem(15L));
-    assertFalse(controlTagCache.hasKey(200L));
-    assertNull(controlTagMapper.getItem(200L));
-    assertFalse(commFaultTagCache.hasKey(201L));
-    assertFalse(controlTagCache.hasKey(201L));
-    assertNull(controlTagMapper.getItem(202L));
-    assertFalse(alarmCache.hasKey(2000L));
+    assertFalse(commFaultTagCache.containsKey(201L));
+    assertFalse(alarmCache.containsKey(2000L));
     assertNull(alarmMapper.getItem(2000L));
 
     verify(communicationManager);
@@ -1581,10 +1451,10 @@ public class ConfigurationLoaderTest {
     configurationLoader.applyConfiguration(createDataTag);
     Configuration createAlarm = TestConfigurationProvider.createAlarm();
     configurationLoader.applyConfiguration(createAlarm);
-    processFacade.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
+    processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
 
     // TEST:Build configuration to update the test Alarm
-    Alarm alarmUpdate = Alarm.update(2000L).alarmCondition(new ValueAlarmCondition(5)).build();
+    Alarm alarmUpdate = Alarm.update(2000L).alarmCondition(new ValueCondition(Integer.class, 5)).build();
     Configuration configuration = new Configuration();
     configuration.addEntity(alarmUpdate);
 
@@ -1604,27 +1474,21 @@ public class ConfigurationLoaderTest {
 
     verify(communicationManager);
     // remove the process and equipments and dataTag from the server
-    processFacade.stop(5L, new Timestamp(System.currentTimeMillis()));
+    processService.stop(5L, new Timestamp(System.currentTimeMillis()));
     Configuration remove = TestConfigurationProvider.deleteProcess();
     report = configurationLoader.applyConfiguration(remove);
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     assertTrue(report.getStatus() == ConfigConstants.Status.OK);
 
-    assertFalse(processCache.hasKey(5L));
+    assertFalse(processCache.containsKey(5L));
     assertNull(processMapper.getItem(5L));
-    assertFalse(controlTagCache.hasKey(100L));
-    assertNull(controlTagMapper.getItem(100L));
-    assertFalse(aliveTimerCache.hasKey(101L));
+    assertFalse(aliveTimerCache.containsKey(101L));
 
     // equipment stuff
-    assertFalse(equipmentCache.hasKey(15L));
+    assertFalse(equipmentCache.containsKey(15L));
     assertNull(equipmentMapper.getItem(15L));
-    assertFalse(controlTagCache.hasKey(200L));
-    assertNull(controlTagMapper.getItem(200L));
-    assertFalse(commFaultTagCache.hasKey(201L));
-    assertFalse(controlTagCache.hasKey(201L));
-    assertNull(controlTagMapper.getItem(202L));
-    assertFalse(alarmCache.hasKey(2000L));
+    assertFalse(commFaultTagCache.containsKey(201L));
+    assertFalse(alarmCache.containsKey(2000L));
     assertNull(alarmMapper.getItem(2000L));
 
     verify(communicationManager);
@@ -1644,13 +1508,13 @@ public class ConfigurationLoaderTest {
     configurationLoader.applyConfiguration(createDataTag);
     Configuration createAlarm = TestConfigurationProvider.createAlarm();
     configurationLoader.applyConfiguration(createAlarm);
-    processFacade.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
+    processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
 
     // TEST:
     // check if the DataTag and rules are in the cache
-    assertTrue(alarmCache.hasKey(2000L));
+    assertTrue(alarmCache.containsKey(2000L));
     assertNotNull(alarmMapper.getItem(2000L));
-    assertTrue(dataTagCache.hasKey(1000L));
+    assertTrue(dataTagCache.containsKey(1000L));
     assertNotNull(dataTagMapper.getItem(1000L));
 
     // Build configuration to remove the DataTag
@@ -1663,33 +1527,27 @@ public class ConfigurationLoaderTest {
     assertTrue(report.getElementReports().size() == 1);
 
     // Check if all caches are updated
-    assertFalse(alarmCache.hasKey(2000L));
+    assertFalse(alarmCache.containsKey(2000L));
     assertNull(alarmMapper.getItem(2000L));
-    assertFalse(dataTagCache.hasKey(100L));
+    assertFalse(dataTagCache.containsKey(100L));
     assertNull(dataTagMapper.getItem(100L));
 
     verify(communicationManager);
     // remove the process and equipments and dataTag from the server
-    processFacade.stop(5L, new Timestamp(System.currentTimeMillis()));
+    processService.stop(5L, new Timestamp(System.currentTimeMillis()));
     Configuration remove = TestConfigurationProvider.deleteProcess();
     report = configurationLoader.applyConfiguration(remove);
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     assertTrue(report.getStatus() == ConfigConstants.Status.OK);
 
-    assertFalse(processCache.hasKey(5L));
+    assertFalse(processCache.containsKey(5L));
     assertNull(processMapper.getItem(5L));
-    assertFalse(controlTagCache.hasKey(100L));
-    assertNull(controlTagMapper.getItem(100L));
-    assertFalse(aliveTimerCache.hasKey(101L));
+    assertFalse(aliveTimerCache.containsKey(101L));
 
     // equipment stuff
-    assertFalse(equipmentCache.hasKey(15L));
+    assertFalse(equipmentCache.containsKey(15L));
     assertNull(equipmentMapper.getItem(15L));
-    assertFalse(controlTagCache.hasKey(200L));
-    assertNull(controlTagMapper.getItem(200L));
-    assertFalse(commFaultTagCache.hasKey(201L));
-    assertFalse(controlTagCache.hasKey(201L));
-    assertNull(controlTagMapper.getItem(202L));
+    assertFalse(commFaultTagCache.containsKey(201L));
 
     verify(communicationManager);
   }
@@ -1706,7 +1564,7 @@ public class ConfigurationLoaderTest {
     configurationLoader.applyConfiguration(createProcess);
     Configuration createEquipment = TestConfigurationProvider.createEquipment();
     configurationLoader.applyConfiguration(createEquipment);
-    processFacade.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
+    processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
 
     // TEST:
     // Build configuration to add the test DataTag
@@ -1734,28 +1592,22 @@ public class ConfigurationLoaderTest {
     verify(communicationManager);
 
     // remove the process and equipments from the server
-    processFacade.stop(5L, new Timestamp(System.currentTimeMillis()));
+    processService.stop(5L, new Timestamp(System.currentTimeMillis()));
     Configuration remove = TestConfigurationProvider.deleteProcess();
     report = configurationLoader.applyConfiguration(remove);
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     assertTrue(report.getStatus() == ConfigConstants.Status.OK);
 
-    assertFalse(processCache.hasKey(5L));
+    assertFalse(processCache.containsKey(5L));
     assertNull(processMapper.getItem(5L));
-    assertFalse(controlTagCache.hasKey(100L));
-    assertNull(controlTagMapper.getItem(100L));
-    assertFalse(aliveTimerCache.hasKey(101L));
+    assertFalse(aliveTimerCache.containsKey(101L));
 
     // equipment stuff
-    assertFalse(equipmentCache.hasKey(15L));
+    assertFalse(equipmentCache.containsKey(15L));
     assertNull(equipmentMapper.getItem(15L));
-    assertFalse(controlTagCache.hasKey(200L));
-    assertNull(controlTagMapper.getItem(200L));
-    assertFalse(commFaultTagCache.hasKey(201L));
-    assertFalse(controlTagCache.hasKey(201L));
-    assertNull(controlTagMapper.getItem(202L));
-    assertFalse(aliveTimerCache.hasKey(202L));
-    assertFalse(commandTagCache.hasKey(500L));
+    assertFalse(commFaultTagCache.containsKey(201L));
+    assertFalse(aliveTimerCache.containsKey(202L));
+    assertFalse(commandTagCache.containsKey(500L));
     assertNull(commandTagMapper.getItem(500L));
 
     verify(communicationManager);
@@ -1775,7 +1627,7 @@ public class ConfigurationLoaderTest {
     configurationLoader.applyConfiguration(createEquipment);
     Configuration createCommandTag = TestConfigurationProvider.createCommandTag();
     configurationLoader.applyConfiguration(createCommandTag);
-    processFacade.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
+    processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
 
     // TEST:
     // Build configuration to update the test CommandTag
@@ -1805,28 +1657,22 @@ public class ConfigurationLoaderTest {
     verify(communicationManager);
 
     // remove the process and equipments from the server
-    processFacade.stop(5L, new Timestamp(System.currentTimeMillis()));
+    processService.stop(5L, new Timestamp(System.currentTimeMillis()));
     Configuration remove = TestConfigurationProvider.deleteProcess();
     report = configurationLoader.applyConfiguration(remove);
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     assertTrue(report.getStatus() == ConfigConstants.Status.OK);
 
-    assertFalse(processCache.hasKey(5L));
+    assertFalse(processCache.containsKey(5L));
     assertNull(processMapper.getItem(5L));
-    assertFalse(controlTagCache.hasKey(100L));
-    assertNull(controlTagMapper.getItem(100L));
-    assertFalse(aliveTimerCache.hasKey(101L));
+    assertFalse(aliveTimerCache.containsKey(101L));
 
     // equipment stuff
-    assertFalse(equipmentCache.hasKey(15L));
+    assertFalse(equipmentCache.containsKey(15L));
     assertNull(equipmentMapper.getItem(15L));
-    assertFalse(controlTagCache.hasKey(200L));
-    assertNull(controlTagMapper.getItem(200L));
-    assertFalse(commFaultTagCache.hasKey(201L));
-    assertFalse(controlTagCache.hasKey(201L));
-    assertNull(controlTagMapper.getItem(202L));
-    assertFalse(aliveTimerCache.hasKey(202L));
-    assertFalse(commandTagCache.hasKey(500L));
+    assertFalse(commFaultTagCache.containsKey(201L));
+    assertFalse(aliveTimerCache.containsKey(202L));
+    assertFalse(commandTagCache.containsKey(500L));
     assertNull(commandTagMapper.getItem(500L));
 
     verify(communicationManager);

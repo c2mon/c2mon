@@ -1,6 +1,7 @@
 package cern.c2mon.server.configuration.handler.transacted;
 
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
+import cern.c2mon.server.configuration.config.ConfigurationModule;
 import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.server.test.CacheObjectCreation;
 import cern.c2mon.shared.daq.config.DataTagAddressUpdate;
@@ -11,14 +12,19 @@ import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import javax.inject.Inject;
 import java.util.Properties;
 
 import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = GenericApplicationContext.class)
+@ContextConfiguration(classes = {
+  GenericApplicationContext.class,
+  ConfigurationModule.class
+})
 public class DataTagConfigHandlerTest {
 
+  @Inject private DataTagConfigHandler dataTagConfigTransacted;
 
   @Test
   public void testEmptyUpdateDataTag() {
