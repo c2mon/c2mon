@@ -55,14 +55,26 @@ public abstract class C2monCacheimpl<CACHEABLE extends Cacheable> implements C2m
     });
   }
 
-  @Override
-  public CACHEABLE compute(long key, Consumer<CACHEABLE> transformer) {
+  protected CACHEABLE compute(long key, Consumer<CACHEABLE> transformer, boolean notifyListeners) {
     return executeTransaction(() -> {
       CACHEABLE cachedObj = getCache().get(key);
       transformer.accept(cachedObj);
-      put(key, cachedObj); // TODO Write tests that verify this doesn't force cause a deadlock, as put will also get the obj
+      if (notifyListeners)
+        put(key, cachedObj); // TODO Write tests that verify this doesn't force cause a deadlock, as put will also get the obj
+      else
+        putQuiet(key, cachedObj);
       return cachedObj;
     });
+  }
+
+  @Override
+  public CACHEABLE compute(long key, Consumer<CACHEABLE> transformer) {
+    return compute(key, transformer, true);
+  }
+
+  @Override
+  public CACHEABLE computeQuiet(long key, Consumer<CACHEABLE> transformer) {
+    return compute(key, transformer, false);
   }
 
   @Override
@@ -105,7 +117,7 @@ public abstract class C2monCacheimpl<CACHEABLE extends Cacheable> implements C2m
   @Override
   public boolean remove(@NonNull Long key) {
     CACHEABLE element = getCache().getAndRemove(key);
-    
+
     if (element != null)
       getCacheListenerManager().notifyListenersOf(REMOVED, element);
 

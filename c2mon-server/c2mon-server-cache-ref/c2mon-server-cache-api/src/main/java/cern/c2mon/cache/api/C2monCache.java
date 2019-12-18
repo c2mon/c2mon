@@ -83,6 +83,14 @@ public interface C2monCache<CACHEABLE extends Cacheable> extends CacheDelegator<
   CACHEABLE compute(long key, Consumer<CACHEABLE> transformer);
 
   /**
+   * Atomically gets an element from the cache with the given key, applies a transformation on it,
+   * then puts it back in the cache. Will NOT emit events!
+   *
+   * @throws CacheElementNotFoundException if the element with the given key doesn't exist
+   */
+  CACHEABLE computeQuiet(long key, Consumer<CACHEABLE> transformer);
+
+  /**
    * Search the cache for objects that satisfy the given filter. More formally, the returned collection
    * will contain all cache objects for which:
    * <pre>

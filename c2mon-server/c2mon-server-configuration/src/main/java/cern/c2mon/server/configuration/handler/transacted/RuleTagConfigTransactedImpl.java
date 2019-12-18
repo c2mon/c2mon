@@ -98,6 +98,7 @@ public class RuleTagConfigTransactedImpl extends TagConfigTransactedImpl<RuleTag
     try {
       log.trace("Resetting all relevant Rule parent Process/Equipment ids");
       for (Long parentRuleId : cacheable.getRuleIds()) {
+        // TODO (Alex) What is this?
         ruleTagFacade.setParentSupervisionIds(parentRuleId);
       }
     } catch (Exception e) {
@@ -123,11 +124,11 @@ public class RuleTagConfigTransactedImpl extends TagConfigTransactedImpl<RuleTag
   }
 
   @Override
-  public ProcessChange remove(Long id, ConfigurationElementReport report) {
-    ProcessChange result = super.remove(id, report);
-
+  protected ProcessChange removeReturnValue(RuleTag ruleTag, ConfigurationElementReport report) {
     for (ConfigurationEventListener listener : configurationEventListeners) {
       listener.onConfigurationEvent(ruleTag, Action.REMOVE);
     }
+    return super.removeReturnValue(ruleTag, report);
   }
+
 }

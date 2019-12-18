@@ -36,7 +36,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.UnexpectedRollbackException;
 
-import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Properties;
@@ -53,7 +52,7 @@ public class ProcessConfigTransactedImpl extends BaseConfigHandlerImpl<Process, 
   private final C2monCache<AliveTimer> aliveTimerCache;
   private final ProcessService processService;
   private final JmsContainerManager jmsContainerManager;
-  private final EquipmentConfigHandler equipmentConfigHandler;
+  private final EquipmentConfigTransactedImpl equipmentConfigTransacted;
   private final boolean allowRunningProcessRemoval;
 
   /**
@@ -69,19 +68,14 @@ public class ProcessConfigTransactedImpl extends BaseConfigHandlerImpl<Process, 
                                      final ProcessService processService,
                                      final ConfigurationProperties properties,
                                      final JmsContainerManager jmsContainerManager,
-                                     final EquipmentConfigHandler equipmentConfigHandler
+                                     final EquipmentConfigTransactedImpl equipmentConfigTransacted
                                      ) {
     super(processCache, processDAO, processCacheObjectFactory, ProcessChange::new, ProcessChange::new);
     this.aliveTimerCache = aliveTimerCache;
     this.processService = processService;
     this.allowRunningProcessRemoval = properties.isAllowRunningProcessRemoval();
     this.jmsContainerManager = jmsContainerManager;
-    this.equipmentConfigHandler = equipmentConfigHandler;
-  }
-
-  @PostConstruct
-  public void init() {
-    equipmentConfigHandler.setProcessConfigHandler(this);
+    this.equipmentConfigTransacted = equipmentConfigTransacted;
   }
 
   /**
@@ -101,9 +95,8 @@ public class ProcessConfigTransactedImpl extends BaseConfigHandlerImpl<Process, 
 //      jmsContainerManager.unsubscribe(process);
 //    }
 
-    // TODO (Alex) ComputeQuiet
     try {
-      aliveTimerCache.compute(process.getAliveTagId(), aliveTimer -> {
+      aliveTimerCache.computeQuiet(process.getAliveTagId(), aliveTimer -> {
         log.trace("Adding process id #{} to alive timer {} (#{})", process.getId(), aliveTimer.getRelatedName(), aliveTimer.getId());
         ((AliveTimerCacheObject) aliveTimer).setRelatedId(process.getId());
       });
@@ -165,7 +158,7 @@ public class ProcessConfigTransactedImpl extends BaseConfigHandlerImpl<Process, 
       ConfigurationElementReport childElementReport = new ConfigurationElementReport(ConfigConstants.Action.REMOVE, ConfigConstants.Entity.EQUIPMENT, equipmentId);
       try {
         report.addSubReport(childElementReport);
-        equipmentConfigHandler.remove(equipmentId, childElementReport);
+        equipmentConfigTransacted.remove(equipmentId, childElementReport);
       } catch (RuntimeException ex) {
         log.error("Exception caught while applying the configuration change (Action, Entity, Entity id) = ("
           + ConfigConstants.Action.REMOVE + "; " + ConfigConstants.Entity.EQUIPMENT + "; " + equipmentId + ")", ex);

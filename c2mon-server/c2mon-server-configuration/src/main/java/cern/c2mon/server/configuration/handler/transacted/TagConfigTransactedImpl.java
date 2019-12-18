@@ -71,23 +71,10 @@ abstract class TagConfigTransactedImpl<TAG extends Tag> extends BaseConfigHandle
                                  final AbstractCacheObjectFactory<TAG> tagCacheObjectFactory,
                                  final RuleTagService ruleTagService,
                                  final GenericApplicationContext context) {
-    super(tagCache, configurableDAO, tagCacheObjectFactory, ProcessChange::new, ProcessChange::new);
+    super(tagCache, configurableDAO, tagCacheObjectFactory, ProcessChange::new);
     this.ruleTagService = ruleTagService;
     this.configurationEventListeners = context.getBeansOfType(ConfigurationEventListener.class).values();
   }
-
-//  /**
-//   * Throw a {@link ConfigurationException} if the Tag id already exists in one of the Tag
-//   * caches.
-//   * @param id the id to check
-//   */
-//  protected void checkId(final Long id) {
-//    if (tagLocationService.isInTagCache(id)) {
-//        throw new ConfigurationException(ConfigurationException.ENTITY_EXISTS,
-//            "Attempting to create a Tag with an already existing id: " + id);
-//    }
-//  }
-
 
   @Override
   protected void doPostCreate(TAG cacheable) {
@@ -164,7 +151,7 @@ abstract class TagConfigTransactedImpl<TAG extends Tag> extends BaseConfigHandle
     editTag(tagId, tag -> tag.getAlarmIds().remove(alarmId));
   }
 
-  protected Collection<ConfigurationElementReport> createConfigRemovalReportsFor(ConfigConstants.Entity entity, Collection<Long> ids, C2monCache<?> targetCache) {
+  Collection<ConfigurationElementReport> createConfigRemovalReportsFor(ConfigConstants.Entity entity, Collection<Long> ids, C2monCache<?> targetCache) {
     return ids.stream()
       .filter(targetCache::containsKey)
       .map(id -> new ConfigurationElementReport(ConfigConstants.Action.REMOVE, entity, id))
@@ -172,8 +159,7 @@ abstract class TagConfigTransactedImpl<TAG extends Tag> extends BaseConfigHandle
   }
 
   private void ifConditionEditTag(final Long tagId, Predicate<TAG> condition, Consumer<TAG> mutator) {
-    // TODO (Alex) ComputeQuiet
-    tagCache.compute(tagId, tag -> {
+    cache.computeQuiet(tagId, tag -> {
       if (condition.test(tag)) {
         configurableDAO.updateConfig(tag);
         mutator.accept(tag);
