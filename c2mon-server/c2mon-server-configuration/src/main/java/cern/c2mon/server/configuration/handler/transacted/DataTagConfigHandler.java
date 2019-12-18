@@ -25,6 +25,7 @@ import cern.c2mon.server.cache.loading.DataTagLoaderDAO;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.listener.ConfigurationEventListener;
 import cern.c2mon.server.configuration.handler.BaseConfigHandler;
+import cern.c2mon.server.configuration.handler.TagConfigHandler;
 import cern.c2mon.server.configuration.impl.ConfigurationUpdateImpl;
 import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
@@ -53,7 +54,7 @@ import java.util.function.Supplier;
  */
 @Service
 @Slf4j
-public class DataTagConfigHandler extends TagConfigHandler<DataTag> implements cern.c2mon.server.configuration.handler.TagConfigHandler, BaseConfigHandler<ProcessChange> {
+public class DataTagConfigHandler extends AbstractTagConfigHandler<DataTag> implements TagConfigHandler, BaseConfigHandler<ProcessChange> {
 
   private final DataTagService dataTagService;
   /**

@@ -43,7 +43,7 @@ import java.util.Properties;
  */
 @Service
 @Slf4j
-public class RuleTagConfigHandler extends TagConfigHandler<RuleTag> {
+public class RuleTagConfigHandler extends AbstractTagConfigHandler<RuleTag> {
 
   private AlarmConfigHandler alarmConfigHandler;
 

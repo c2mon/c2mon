@@ -59,18 +59,18 @@ import java.util.stream.Collectors;
  *
  */
 @Slf4j
-abstract class TagConfigHandler<TAG extends Tag> extends BaseConfigHandlerImpl<TAG, ProcessChange> {
+abstract class AbstractTagConfigHandler<TAG extends Tag> extends BaseConfigHandlerImpl<TAG, ProcessChange> {
 
   protected ConfigurableDAO<TAG> configurableDAO;
 
   private final RuleTagService ruleTagService;
   protected final Collection<ConfigurationEventListener> configurationEventListeners;
 
-  public TagConfigHandler(final C2monCache<TAG> tagCache,
-                          final ConfigurableDAO<TAG> configurableDAO,
-                          final AbstractCacheObjectFactory<TAG> tagCacheObjectFactory,
-                          final RuleTagService ruleTagService,
-                          final GenericApplicationContext context) {
+  public AbstractTagConfigHandler(final C2monCache<TAG> tagCache,
+                                  final ConfigurableDAO<TAG> configurableDAO,
+                                  final AbstractCacheObjectFactory<TAG> tagCacheObjectFactory,
+                                  final RuleTagService ruleTagService,
+                                  final GenericApplicationContext context) {
     super(tagCache, configurableDAO, tagCacheObjectFactory, ProcessChange::new);
     this.ruleTagService = ruleTagService;
     this.configurationEventListeners = context.getBeansOfType(ConfigurationEventListener.class).values();
