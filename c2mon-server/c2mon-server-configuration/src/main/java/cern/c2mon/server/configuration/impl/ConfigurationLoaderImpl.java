@@ -16,10 +16,11 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.impl;
 
-import cern.c2mon.server.cache.ProcessCache;
-import cern.c2mon.server.cache.ProcessFacade;
+import cern.c2mon.cache.actions.process.ProcessService;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.loading.SequenceDAO;
 import cern.c2mon.server.common.config.ServerProperties;
+import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.configuration.ConfigProgressMonitor;
 import cern.c2mon.server.configuration.ConfigurationLoader;
 import cern.c2mon.server.configuration.config.ConfigurationProperties;
@@ -42,9 +43,9 @@ import org.simpleframework.xml.convert.AnnotationStrategy;
 import org.simpleframework.xml.core.Persister;
 import org.simpleframework.xml.strategy.Strategy;
 import org.simpleframework.xml.transform.RegistryMatcher;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.inject.Inject;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -103,9 +104,9 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
 
   private final ProcessConfigHandler processConfigHandler;
 
-  private final ProcessFacade processFacade;
+  private final ProcessService processService;
 
-  private final ProcessCache processCache;
+  private final C2monCache<Process> processCache;
 
   private final DeviceClassConfigHandler deviceClassConfigHandler;
 
@@ -131,7 +132,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
    */
   private ConfigurationParser configParser;
 
-  @Autowired
+  @Inject
   public ConfigurationLoaderImpl(ProcessCommunicationManager processCommunicationManager,
                                  ConfigurationDAO configurationDAO,
                                  DataTagConfigHandler dataTagConfigHandler,
@@ -142,8 +143,8 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
                                  EquipmentConfigHandler equipmentConfigHandler,
                                  SubEquipmentConfigHandler subEquipmentConfigHandler,
                                  ProcessConfigHandler processConfigHandler,
-                                 ProcessFacade processFacade,
-                                 ProcessCache processCache,
+                                 ProcessService processService,
+                                 C2monCache<Process> processCache,
                                  DeviceClassConfigHandler deviceClassConfigHandler,
                                  DeviceConfigHandler deviceConfigHandler,
                                  ConfigurationParser configParser,
@@ -161,7 +162,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
     this.equipmentConfigHandler = equipmentConfigHandler;
     this.subEquipmentConfigHandler = subEquipmentConfigHandler;
     this.processConfigHandler = processConfigHandler;
-    this.processFacade = processFacade;
+    this.processService = processService;
     this.processCache = processCache;
     this.deviceClassConfigHandler = deviceClassConfigHandler;
     this.deviceConfigHandler = deviceConfigHandler;
@@ -313,7 +314,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
       for (Long processId : processLists.keySet()) {
         if (!cancelRequested){
           List<Change> processChangeEvents = processLists.get(processId);
-          if (processFacade.isRunning(processId) && !processFacade.isRebootRequired(processId)) {
+          if (processService.isRunning(processId) && !processService.isRebootRequired(processId)) {
             try {
               log.trace(configId + " Sending " + processChangeEvents.size() + " change events to process " + processId + "...");
               ConfigurationChangeEventReport processReport = processCommunicationManager.sendConfiguration(processId, processChangeEvents);
@@ -346,13 +347,13 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
             } catch (Exception e) {
               String errorMessage = "Error during DAQ reconfiguration: unsuccessful application of configuration (possible timeout) to Process " + processCache.get(processId).getName();
               log.error(errorMessage, e);
-              processFacade.requiresReboot(processId, true);
+              processService.setRequiresReboot(processId, true);
               report.addProcessToReboot(processCache.get(processId).getName());
               report.addStatus(Status.FAILURE);
               report.setStatusDescription(report.getStatusDescription() + errorMessage + "\n");
             }
           } else {
-            processFacade.requiresReboot(processId, true);
+            processService.setRequiresReboot(processId, true);
             report.addProcessToReboot(processCache.get(processId).getName());
             report.addStatus(Status.RESTART);
           }
@@ -368,7 +369,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
       if (!processLists.isEmpty()){
         report.addStatus(Status.RESTART);
         for (Long processId : processLists.keySet()) {
-          processFacade.requiresReboot(processId, true);
+          processService.setRequiresReboot(processId, true);
           report.addProcessToReboot(processCache.get(processId).getName());
         }
       }
@@ -470,7 +471,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
                   report.addStatus(Status.RESTART);
                   report.addProcessToReboot(processCache.get(processId).getName());
                   element.setStatus(Status.RESTART);
-                  processFacade.requiresReboot(processId, Boolean.TRUE);
+                  processService.setRequiresReboot(processId, Boolean.TRUE);
                 }
               }
             }
