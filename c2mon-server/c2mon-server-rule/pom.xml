@@ -21,7 +21,7 @@
     </dependency>
     <dependency>
       <groupId>cern.c2mon.server</groupId>
-      <artifactId>c2mon-server-cache</artifactId>
+      <artifactId>c2mon-server-cache-config</artifactId>
     </dependency>
     <dependency>
       <groupId>cern.c2mon.server</groupId>

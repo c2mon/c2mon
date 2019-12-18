@@ -39,12 +39,6 @@
 
   <dependencyManagement>
     <dependencies>
-<!--  TODO Delete this -->
-      <dependency>
-        <groupId>cern.c2mon.server</groupId>
-        <artifactId>c2mon-server-cache</artifactId>
-        <version>${project.parent.version}</version>
-      </dependency>
       <!-- Internal C2MON dependencies -->
       <dependency>
         <groupId>cern.c2mon.server</groupId>
