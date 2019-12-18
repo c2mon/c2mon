@@ -36,7 +36,7 @@ import java.util.List;
  */
 @Service
 @Slf4j
-public class DeviceClassConfigTransactedImpl extends BaseConfigHandlerImpl<DeviceClass, ProcessChange> {
+public class DeviceClassConfigHandler extends BaseConfigHandlerImpl<DeviceClass, ProcessChange> {
 
   /**
    * Default constructor.
@@ -45,9 +45,9 @@ public class DeviceClassConfigTransactedImpl extends BaseConfigHandlerImpl<Devic
    * @param deviceClassDAO   reference to the DeviceClass DAO bean.
    */
   @Autowired
-  public DeviceClassConfigTransactedImpl(final C2monCache<DeviceClass> deviceClassCache,
-                                         final DeviceClassDAO deviceClassDAO,
-                                         final DeviceClassCacheObjectFactory deviceClassCacheObjectFactory) {
+  public DeviceClassConfigHandler(final C2monCache<DeviceClass> deviceClassCache,
+                                  final DeviceClassDAO deviceClassDAO,
+                                  final DeviceClassCacheObjectFactory deviceClassCacheObjectFactory) {
     super(deviceClassCache, deviceClassDAO, deviceClassCacheObjectFactory, __ -> new ProcessChange(), ProcessChange::new);
   }
 

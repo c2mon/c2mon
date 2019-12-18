@@ -41,19 +41,19 @@ import java.util.Properties;
  */
 @Service
 @Slf4j
-public class SubEquipmentConfigTransactedImpl extends AbstractEquipmentConfigTransacted<SubEquipment> {
+public class SubEquipmentConfigHandler extends AbstractEquipmentConfigHandler<SubEquipment> {
 
   private final EquipmentService equipmentService;
 
   @Autowired
-  public SubEquipmentConfigTransactedImpl(final C2monCache<SubEquipment> subEquipmentCache,
-                                          final SubEquipmentDAO subEquipmentDAO,
-                                          final SubEquipmentCacheObjectFactory subEquipmentCacheObjectFactory,
-                                          final ProcessXMLProvider processXMLProvider,
-                                          final AliveTagConfigEventHandler aliveTagConfigEventHandler,
-                                          final DataTagService dataTagService,
-                                          final DataTagConfigTransactedImpl dataTagConfigTransacted,
-                                          final EquipmentService equipmentService) {
+  public SubEquipmentConfigHandler(final C2monCache<SubEquipment> subEquipmentCache,
+                                   final SubEquipmentDAO subEquipmentDAO,
+                                   final SubEquipmentCacheObjectFactory subEquipmentCacheObjectFactory,
+                                   final ProcessXMLProvider processXMLProvider,
+                                   final AliveTagConfigHandler aliveTagConfigEventHandler,
+                                   final DataTagService dataTagService,
+                                   final DataTagConfigHandler dataTagConfigTransacted,
+                                   final EquipmentService equipmentService) {
     super(subEquipmentCache, subEquipmentDAO, subEquipmentCacheObjectFactory,
       processXMLProvider, aliveTagConfigEventHandler, dataTagService, dataTagConfigTransacted);
     this.equipmentService = equipmentService;

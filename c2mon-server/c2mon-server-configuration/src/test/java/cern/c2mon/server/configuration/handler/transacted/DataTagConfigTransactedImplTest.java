@@ -50,13 +50,13 @@ public class DataTagConfigTransactedImplTest {
   IMocksControl control;
 
   // class to test
-  private DataTagConfigTransactedImpl dataTagConfigTransacted;
+  private DataTagConfigHandler dataTagConfigTransacted;
 
   // mocks
   private EquipmentFacade equipmentFacade;
   private SubEquipmentFacade subEquipmentFacade;
   private RuleTagConfigHandler ruleTagConfigHandler;
-  private AlarmConfigTransactedImpl alarmConfigHandler;
+  private AlarmConfigHandler alarmConfigHandler;
   private DataTagLoaderDAO dataTagLoaderDAO;
   private DataTagFacade dataTagFacade;
   private DataTagCache dataTagCache;
@@ -71,12 +71,12 @@ public class DataTagConfigTransactedImplTest {
     equipmentFacade = control.createMock(EquipmentFacade.class);
     subEquipmentFacade = control.createMock(SubEquipmentFacade.class);
     ruleTagConfigHandler = control.createMock(RuleTagConfigHandler.class);
-    alarmConfigHandler = control.createMock(AlarmConfigTransactedImpl.class);
+    alarmConfigHandler = control.createMock(AlarmConfigHandler.class);
     dataTagLoaderDAO = control.createMock(DataTagLoaderDAO.class);
     dataTagFacade = control.createMock(DataTagFacade.class);
     dataTagCache = control.createMock(DataTagCache.class);
     tagLocationService = control.createMock(TagLocationService.class);
-    dataTagConfigTransacted = new DataTagConfigTransactedImpl(dataTagFacade, dataTagLoaderDAO, dataTagCache, equipmentFacade, subEquipmentFacade,
+    dataTagConfigTransacted = new DataTagConfigHandler(dataTagFacade, dataTagLoaderDAO, dataTagCache, equipmentFacade, subEquipmentFacade,
         tagLocationService, context);
   }
 

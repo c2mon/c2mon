@@ -41,17 +41,17 @@ import java.util.Properties;
  */
 @Slf4j
 @Service
-public class AlarmConfigTransactedImpl extends BaseConfigHandlerImpl<Alarm, Void> {
+public class AlarmConfigHandler extends BaseConfigHandlerImpl<Alarm, Void> {
 
   private final Collection<ConfigurationEventListener> configurationEventListeners;
 
   private AlarmService alarmService;
 
   @Autowired
-  public AlarmConfigTransactedImpl(final C2monCache<Alarm> alarmCache, final AlarmLoaderDAO alarmDAO,
-                                   final AlarmCacheObjectFactory alarmCacheObjectFactory,
-                                   final GenericApplicationContext context,
-                                   final AlarmService alarmService) {
+  public AlarmConfigHandler(final C2monCache<Alarm> alarmCache, final AlarmLoaderDAO alarmDAO,
+                            final AlarmCacheObjectFactory alarmCacheObjectFactory,
+                            final GenericApplicationContext context,
+                            final AlarmService alarmService) {
     super(alarmCache, alarmDAO, alarmCacheObjectFactory, __ -> null, __ -> null);
     this.configurationEventListeners = context.getBeansOfType(ConfigurationEventListener.class).values();
     this.alarmService = alarmService;

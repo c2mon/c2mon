@@ -43,15 +43,15 @@ import java.util.Properties;
  */
 @Service
 @Slf4j
-public class RuleTagConfigTransactedImpl extends TagConfigTransactedImpl<RuleTag>  {
+public class RuleTagConfigHandler extends TagConfigHandler<RuleTag> {
 
-  private AlarmConfigTransactedImpl alarmConfigHandler;
+  private AlarmConfigHandler alarmConfigHandler;
 
   @Autowired
-  public RuleTagConfigTransactedImpl(RuleTagService ruleTagService,
-                                     RuleTagCacheObjectFactory ruleTagCacheObjectFactory,
-                                     RuleTagLoaderDAO ruleTagLoaderDAO,
-                                     GenericApplicationContext context, AlarmConfigTransactedImpl alarmConfigTransacted) {
+  public RuleTagConfigHandler(RuleTagService ruleTagService,
+                              RuleTagCacheObjectFactory ruleTagCacheObjectFactory,
+                              RuleTagLoaderDAO ruleTagLoaderDAO,
+                              GenericApplicationContext context, AlarmConfigHandler alarmConfigTransacted) {
     super(ruleTagService.getCache(), ruleTagLoaderDAO, ruleTagCacheObjectFactory, ruleTagService, context);
     this.alarmConfigHandler = alarmConfigTransacted;
   }

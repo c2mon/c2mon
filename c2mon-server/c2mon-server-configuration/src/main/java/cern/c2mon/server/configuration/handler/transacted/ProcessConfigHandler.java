@@ -47,12 +47,12 @@ import java.util.Properties;
  */
 @Slf4j
 @Service
-public class ProcessConfigTransactedImpl extends BaseConfigHandlerImpl<Process, ProcessChange> {
+public class ProcessConfigHandler extends BaseConfigHandlerImpl<Process, ProcessChange> {
 
   private final C2monCache<AliveTimer> aliveTimerCache;
   private final ProcessService processService;
   private final JmsContainerManager jmsContainerManager;
-  private final EquipmentConfigTransactedImpl equipmentConfigTransacted;
+  private final EquipmentConfigHandler equipmentConfigTransacted;
   private final boolean allowRunningProcessRemoval;
 
   /**
@@ -62,13 +62,13 @@ public class ProcessConfigTransactedImpl extends BaseConfigHandlerImpl<Process, 
    * @param processDAO   the DAO bean
    */
   @Autowired
-  public ProcessConfigTransactedImpl(final C2monCache<Process> processCache, final ProcessDAO processDAO,
-                                     final ProcessCacheObjectFactory processCacheObjectFactory,
-                                     final C2monCache<AliveTimer> aliveTimerCache,
-                                     final ProcessService processService,
-                                     final ConfigurationProperties properties,
-                                     final JmsContainerManager jmsContainerManager,
-                                     final EquipmentConfigTransactedImpl equipmentConfigTransacted
+  public ProcessConfigHandler(final C2monCache<Process> processCache, final ProcessDAO processDAO,
+                              final ProcessCacheObjectFactory processCacheObjectFactory,
+                              final C2monCache<AliveTimer> aliveTimerCache,
+                              final ProcessService processService,
+                              final ConfigurationProperties properties,
+                              final JmsContainerManager jmsContainerManager,
+                              final EquipmentConfigHandler equipmentConfigTransacted
                                      ) {
     super(processCache, processDAO, processCacheObjectFactory, ProcessChange::new, ProcessChange::new);
     this.aliveTimerCache = aliveTimerCache;

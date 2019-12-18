@@ -25,7 +25,6 @@ import cern.c2mon.server.cache.loading.DataTagLoaderDAO;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.listener.ConfigurationEventListener;
 import cern.c2mon.server.configuration.handler.BaseConfigHandler;
-import cern.c2mon.server.configuration.handler.TagConfigHandler;
 import cern.c2mon.server.configuration.impl.ConfigurationUpdateImpl;
 import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
@@ -54,7 +53,7 @@ import java.util.function.Supplier;
  */
 @Service
 @Slf4j
-public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag> implements TagConfigHandler<DataTag>, BaseConfigHandler<ProcessChange> {
+public class DataTagConfigHandler extends TagConfigHandler<DataTag> implements cern.c2mon.server.configuration.handler.TagConfigHandler, BaseConfigHandler<ProcessChange> {
 
   private final DataTagService dataTagService;
   /**
@@ -68,12 +67,12 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
   /**
    * For recursive deletion of rules.
    */
-  private RuleTagConfigTransactedImpl ruleTagConfigHandler;
+  private RuleTagConfigHandler ruleTagConfigHandler;
 
   /**
    * For recursive deletion of alarms.
    */
-  private AlarmConfigTransactedImpl alarmConfigHandler;
+  private AlarmConfigHandler alarmConfigHandler;
 
   /**
    * Helper class for accessing the List of registered listeners
@@ -82,16 +81,16 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
   private ConfigurationUpdateImpl configurationUpdateImpl;
 
   @Autowired
-  public DataTagConfigTransactedImpl(final DataTagService dataTagService,
-                                     final DataTagLoaderDAO dataTagLoaderDAO,
-                                     final DataTagCacheObjectFactory dataTagCacheObjectFactory,
-                                     final EquipmentService equipmentService,
-                                     final SubEquipmentService subEquipmentService,
-                                     final RuleTagService ruleTagService,
-                                     final GenericApplicationContext context,
-                                     final RuleTagConfigTransactedImpl ruleTagConfigHandler,
-                                     final AlarmConfigTransactedImpl alarmConfigHandler,
-                                     final ConfigurationUpdateImpl configurationUpdateImpl) {
+  public DataTagConfigHandler(final DataTagService dataTagService,
+                              final DataTagLoaderDAO dataTagLoaderDAO,
+                              final DataTagCacheObjectFactory dataTagCacheObjectFactory,
+                              final EquipmentService equipmentService,
+                              final SubEquipmentService subEquipmentService,
+                              final RuleTagService ruleTagService,
+                              final GenericApplicationContext context,
+                              final RuleTagConfigHandler ruleTagConfigHandler,
+                              final AlarmConfigHandler alarmConfigHandler,
+                              final ConfigurationUpdateImpl configurationUpdateImpl) {
     super(dataTagService.getCache(), dataTagLoaderDAO, dataTagCacheObjectFactory, ruleTagService, context);
     this.equipmentService = equipmentService;
     this.subEquipmentService = subEquipmentService;

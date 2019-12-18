@@ -101,13 +101,13 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
 
   private final SequenceDAO sequenceDAO;
 
-  private final DataTagConfigTransactedImpl dataTagConfigHandler;
+  private final DataTagConfigHandler dataTagConfigHandler;
 
   private final ControlTagConfigHandler controlTagConfigHandler;
 
   private final CommandTagConfigHandler commandTagConfigHandler;
 
-  private final AlarmConfigTransactedImpl alarmConfigHandler;
+  private final AlarmConfigHandler alarmConfigHandler;
 
   private final RuleTagConfigHandler ruleTagConfigHandler;
 
@@ -115,15 +115,15 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
 
   private final SubEquipmentConfigHandler subEquipmentConfigHandler;
 
-  private final ProcessConfigTransactedImpl processConfigHandler;
+  private final ProcessConfigHandler processConfigHandler;
 
   private final ProcessFacade processFacade;
 
   private final ProcessCache processCache;
 
-  private final DeviceClassConfigTransactedImpl deviceClassConfigHandler;
+  private final DeviceClassConfigHandler deviceClassConfigHandler;
 
-  private final DeviceConfigTransactedImpl deviceConfigHandler;
+  private final DeviceConfigHandler deviceConfigHandler;
 
   private Environment environment;
 
@@ -152,19 +152,19 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
   @Autowired
   public ConfigurationLoaderImpl(ProcessCommunicationManager processCommunicationManager,
                                  ConfigurationDAO configurationDAO,
-                                 DataTagConfigTransactedImpl dataTagConfigHandler,
+                                 DataTagConfigHandler dataTagConfigHandler,
                                  ControlTagConfigHandler controlTagConfigHandler,
                                  CommandTagConfigHandler commandTagConfigHandler,
-                                 AlarmConfigTransactedImpl alarmConfigHandler,
+                                 AlarmConfigHandler alarmConfigHandler,
                                  RuleTagConfigHandler ruleTagConfigHandler,
                                  EquipmentConfigHandler equipmentConfigHandler,
                                  SubEquipmentConfigHandler subEquipmentConfigHandler,
-                                 ProcessConfigTransactedImpl processConfigHandler,
+                                 ProcessConfigHandler processConfigHandler,
                                  ProcessFacade processFacade,
                                  ClusterCache clusterCache,
                                  ProcessCache processCache,
-                                 DeviceClassConfigTransactedImpl deviceClassConfigHandler,
-                                 DeviceConfigTransactedImpl deviceConfigHandler,
+                                 DeviceClassConfigHandler deviceClassConfigHandler,
+                                 DeviceConfigHandler deviceConfigHandler,
                                  ConfigurationParser configParser,
                                  SequenceDAO sequenceDAO,
                                  ConfigurationProperties properties,

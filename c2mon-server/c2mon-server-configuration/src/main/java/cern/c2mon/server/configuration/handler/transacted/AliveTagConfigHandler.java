@@ -7,12 +7,12 @@ import cern.c2mon.shared.daq.config.DataTagAdd;
 
 import javax.inject.Inject;
 
-public class AliveTagConfigEventHandler {
+public class AliveTagConfigHandler {
 
   private C2monCache<AliveTimer> aliveTimerCache;
 
   @Inject
-  public AliveTagConfigEventHandler(C2monCache<AliveTimer> aliveTimerCache) {
+  public AliveTagConfigHandler(C2monCache<AliveTimer> aliveTimerCache) {
     this.aliveTimerCache = aliveTimerCache;
   }
 

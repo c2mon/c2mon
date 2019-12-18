@@ -31,7 +31,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @Slf4j
-public class DeviceConfigTransactedImpl extends BaseConfigHandlerImpl<Device, ProcessChange> {
+public class DeviceConfigHandler extends BaseConfigHandlerImpl<Device, ProcessChange> {
 
   private C2monCache<DeviceClass> deviceClassCache;
 
@@ -44,9 +44,9 @@ public class DeviceConfigTransactedImpl extends BaseConfigHandlerImpl<Device, Pr
    * @param deviceClassCache         reference to the DeviceClass cache.
    */
   @Autowired
-  public DeviceConfigTransactedImpl(final C2monCache<Device> deviceCache,
-                                    final DeviceDAO deviceDAO, final DeviceCacheObjectFactory deviceCacheObjectFactory,
-                                    final C2monCache<DeviceClass> deviceClassCache) {
+  public DeviceConfigHandler(final C2monCache<Device> deviceCache,
+                             final DeviceDAO deviceDAO, final DeviceCacheObjectFactory deviceCacheObjectFactory,
+                             final C2monCache<DeviceClass> deviceClassCache) {
     super(deviceCache, deviceDAO, deviceCacheObjectFactory, __ -> new ProcessChange(), ProcessChange::new);
     this.deviceClassCache = deviceClassCache;
   }

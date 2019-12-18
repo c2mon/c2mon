@@ -46,23 +46,23 @@ import java.util.Properties;
  * @author Mark Brightwell
  */
 @Slf4j
-public abstract class AbstractEquipmentConfigTransacted<T extends AbstractEquipment> extends BaseConfigHandlerImpl<T, List<ProcessChange>> {
+public abstract class AbstractEquipmentConfigHandler<T extends AbstractEquipment> extends BaseConfigHandlerImpl<T, List<ProcessChange>> {
 
   protected final ProcessXMLProvider processXMLProvider;
-  private final AliveTagConfigEventHandler aliveTagConfigEventHandler;
+  private final AliveTagConfigHandler aliveTagConfigEventHandler;
   protected final DataTagService dataTagService;
-  protected final DataTagConfigTransactedImpl dataTagConfigTransacted;
+  protected final DataTagConfigHandler dataTagConfigTransacted;
   protected ControlTagConfigHandler controlTagConfigHandler;
 
   @Autowired
-  public AbstractEquipmentConfigTransacted(
+  public AbstractEquipmentConfigHandler(
     final C2monCache<T> subEquipmentCache,
     final ConfigurableDAO<T> subEquipmentDAO,
     final AbstractCacheObjectFactory<T> subEquipmentCacheObjectFactory,
     final ProcessXMLProvider processXMLProvider,
-    final AliveTagConfigEventHandler aliveTagConfigEventHandler,
+    final AliveTagConfigHandler aliveTagConfigEventHandler,
     final DataTagService dataTagService,
-    final DataTagConfigTransactedImpl dataTagConfigTransacted) {
+    final DataTagConfigHandler dataTagConfigTransacted) {
     super(subEquipmentCache, subEquipmentDAO, subEquipmentCacheObjectFactory, ArrayList::new);
     this.processXMLProvider = processXMLProvider;
     this.aliveTagConfigEventHandler = aliveTagConfigEventHandler;
