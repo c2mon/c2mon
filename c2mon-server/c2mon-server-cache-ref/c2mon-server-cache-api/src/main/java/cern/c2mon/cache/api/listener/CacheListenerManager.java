@@ -15,6 +15,8 @@ public interface CacheListenerManager<CACHEABLE extends Cacheable> extends Close
    * An alternative cache listener, that collects all incoming updates to a list, then periodically runs an event handler
    * on that list
    *
+   * TODO Should use the CacheProperties and get the
+   *
    * Use buffered listeners to increase performance for very busy caches with loads of updates,
    * or for operations optimized for {@code Collection}s
    */

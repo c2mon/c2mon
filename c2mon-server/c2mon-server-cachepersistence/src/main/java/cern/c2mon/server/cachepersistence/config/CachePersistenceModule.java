@@ -16,13 +16,12 @@
  *****************************************************************************/
 package cern.c2mon.server.cachepersistence.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-import org.springframework.core.env.Environment;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+
+import javax.inject.Inject;
 
 /**
  * This class is responsible for configuring the Spring context and beans for
@@ -32,21 +31,12 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
  * @author Szymon Halastra
  */
 @Configuration
-@Import({
-    ProcessPersistenceConfig.class,
-    EquipmentPersistenceConfig.class,
-    SubEquipmentPersistenceConfig.class,
-    DataTagPersistenceConfig.class,
-    ControlTagPersistenceConfig.class,
-    RuleTagPersistenceConfig.class,
-    AlarmPersistenceConfig.class
-})
-@ComponentScan("cern.c2mon.server.cachepersistence")
+@ComponentScan(basePackages = "cern.c2mon.server.cachepersistence")
 public class CachePersistenceModule {
 
   private static final String THREAD_NAME_PREFIX = "BatchPersist-";
 
-  @Autowired
+  @Inject
   private CachePersistenceProperties properties;
 
   @Bean

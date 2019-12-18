@@ -16,19 +16,16 @@
  *****************************************************************************/
 package cern.c2mon.server.cachepersistence.impl;
 
-import java.util.List;
-
-import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.transaction.annotation.Transactional;
-
-import cern.c2mon.server.cache.C2monCache;
+import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.server.cache.dbaccess.PersistenceMapper;
-import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.cachepersistence.CachePersistenceDAO;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.common.Cacheable;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * Class that can be used for caches that wish to persist updates
@@ -53,7 +50,7 @@ public class CachePersistenceDAOImpl<T extends Cacheable> implements CachePersis
    * (one of the only references to the cache module from the cache
    * persistence module). Needs setting in constructor.
    */
-  private C2monCache<Long, T> cache;
+  private C2monCache<T> cache;
 
   /**
    * Constructor required cache and the persistence bean for this cache.
@@ -61,7 +58,7 @@ public class CachePersistenceDAOImpl<T extends Cacheable> implements CachePersis
    * @param persistenceMapper the mapper bean for this cache
    * @param cache the cache that is being persisted
    */
-  public CachePersistenceDAOImpl(final PersistenceMapper<T> persistenceMapper, final C2monCache<Long, T> cache) {
+  public CachePersistenceDAOImpl(final PersistenceMapper<T> persistenceMapper, final C2monCache<T> cache) {
     super();
     this.persistenceMapper = persistenceMapper;
     this.cache = cache;
@@ -88,7 +85,7 @@ public class CachePersistenceDAOImpl<T extends Cacheable> implements CachePersis
     T cacheObject;
     for (Long key : keyList) {
       try {
-        cacheObject = cache.getCopy(key);
+        cacheObject = cache.get(key);
         //do not persist unconfigured tags TODO could remove as unconfigured not used
         if (cacheObject != null && (!(cacheObject instanceof Tag) || !((Tag) cacheObject).isInUnconfigured())) {
           persistenceMapper.updateCacheable(cacheObject);

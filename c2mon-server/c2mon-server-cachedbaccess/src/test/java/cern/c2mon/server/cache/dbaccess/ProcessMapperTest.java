@@ -16,9 +16,9 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.dbaccess;
 
+import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.process.ProcessCacheObject;
 import cern.c2mon.server.common.process.ProcessCacheObject.LocalConfig;
-import cern.c2mon.shared.common.Cacheable;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
 import org.junit.Before;
 import org.junit.Test;
@@ -96,7 +96,7 @@ public class ProcessMapperTest extends AbstractMapperTest {
    */
   @Test
   public void testGetAll() {
-    List<Cacheable> returnList = processMapper.getAll();
+    List<Process> returnList = processMapper.getAll();
     assertTrue(returnList.size() > 0);
   }
 

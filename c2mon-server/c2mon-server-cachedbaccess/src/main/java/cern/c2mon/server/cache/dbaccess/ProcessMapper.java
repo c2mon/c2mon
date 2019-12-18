@@ -18,7 +18,7 @@ package cern.c2mon.server.cache.dbaccess;
 
 import cern.c2mon.server.common.process.Process;
 
-public interface ProcessMapper extends LoaderMapper, PersistenceMapper<Process> {
+public interface ProcessMapper extends LoaderMapper<Process>, PersistenceMapper<Process> {
   void insertProcess(Process process);
   void deleteProcess(Long id);
 

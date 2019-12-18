@@ -27,11 +27,6 @@ import java.util.Collection;
  *
  */
 public interface BatchPersistenceManager {
-
-  /**
-   * Avoids having multiple cache persister running at the same time
-   */
-  String cachePersistenceLock = "c2mon.cachepersistence.cachePersistenceLock";
   
   /**
    * Persist this list of updates to the cache. A collection

@@ -16,72 +16,66 @@
  *****************************************************************************/
 package cern.c2mon.server.cachepersistence;
 
-import java.io.IOException;
-import java.sql.Timestamp;
-
-import cern.c2mon.server.cache.config.CacheModule;
+import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.config.CacheConfigModuleRef;
+import cern.c2mon.server.cache.dbaccess.DataTagMapper;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
+import cern.c2mon.server.cachepersistence.common.BatchPersistenceManagerImpl;
 import cern.c2mon.server.cachepersistence.config.CachePersistenceModule;
 import cern.c2mon.server.common.config.CommonModule;
+import cern.c2mon.server.common.datatag.DataTag;
+import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.test.DatabasePopulationRule;
-import org.junit.After;
+import cern.c2mon.shared.common.datatag.DataTagConstants;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import cern.c2mon.server.cache.datatag.DataTagCacheImpl;
-import cern.c2mon.server.cache.dbaccess.DataTagMapper;
-import cern.c2mon.server.cachepersistence.common.BatchPersistenceManagerImpl;
-import cern.c2mon.server.cachepersistence.listener.PersistenceSynchroListener;
-import cern.c2mon.server.common.datatag.DataTag;
-import cern.c2mon.server.common.datatag.DataTagCacheObject;
-import cern.c2mon.shared.common.datatag.DataTagConstants;
+import javax.inject.Inject;
+import java.io.IOException;
+import java.sql.Timestamp;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 /**
  * Integration test of the cache-persistence and cache modules.
- * @author Mark Brightwell
  *
+ * @author Mark Brightwell
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {
-    CommonModule.class,
-    CacheModule.class,
-    CacheDbAccessModule.class,
-    CachePersistenceModule.class,
-    DatabasePopulationRule.class
+  CommonModule.class,
+  CacheConfigModuleRef.class,
+  CacheDbAccessModule.class,
+  CachePersistenceModule.class,
+  DatabasePopulationRule.class
 })
 public class DataTagCachePersistenceTest {
 
   @Rule
-  @Autowired
+  @Inject
   public DatabasePopulationRule databasePopulationRule;
 
-  @Autowired
-  private DataTagCacheImpl dataTagCache;
+  @Inject
+  private C2monCache<DataTag> dataTagCache;
 
-  @Autowired
+  @Inject
   private DataTagMapper dataTagMapper;
 
-  @Autowired
+  @Inject
   private BatchPersistenceManagerImpl dataTagPersistenceManager;
-
-  @Autowired
-  private PersistenceSynchroListener dataTagPersistenceSynchroListener;
 
   private DataTagCacheObject originalObject;
 
   @Before
   public void setUpData() throws IOException {
     originalObject = (DataTagCacheObject) dataTagMapper.getItem(200000L);
-    dataTagPersistenceSynchroListener.start();
+//    dataTagPersistenceSynchroListener.start();
   }
 
   /**
@@ -105,9 +99,6 @@ public class DataTagCachePersistenceTest {
     //now update the cache object
     cacheObject.setValue(0);
 
-    //notify the listeners
-    dataTagCache.notifyListenersOfUpdate(cacheObject);
-
     // trigger the batch persist
     dataTagPersistenceManager.persistAllCacheToDatabase();
 
@@ -118,18 +109,19 @@ public class DataTagCachePersistenceTest {
     //clean up...
     //remove from cache
     dataTagCache.remove(originalObject.getId());
-}
+  }
 
   /**
    * Tests that if 2 updates for the same tag are written to the cache at roughly
    * the same time, that only the most recent one ends up in the DB. This is testing
    * the way the synchrobuffer is integrated into the design.
-   *
+   * <p>
    * We assume that incoming updates for the same tag have different timestamps.
-   *
+   * <p>
    * Is only testing the one-server configuration (each member of the cluster will have a separate buffer).
    */
-  //@Test
+  @Test
+  @Ignore
   public void testLatestUpdatePersistedToDB() {
     //load initial test tag into cache and DB
     DataTagCacheObject floatTag = new DataTagCacheObject();
@@ -149,12 +141,10 @@ public class DataTagCachePersistenceTest {
     DataTagCacheObject cacheObject = (DataTagCacheObject) dataTagCache.get(floatTag.getId());
     cacheObject.setValue(new Float(20));
     cacheObject.setCacheTimestamp(new Timestamp(System.currentTimeMillis() - 1)); // to make sure it is before the second update (and not filtered out at cache level)
-    dataTagCache.notifyListenersOfUpdate(cacheObject);
 
     //update with the second
     cacheObject.setValue(new Float(30));
     cacheObject.setCacheTimestamp(new Timestamp(System.currentTimeMillis()));
-    dataTagCache.notifyListenersOfUpdate(cacheObject);
 
     //check the second is always the one in the cache
     assertEquals(new Float(30), cacheObject.getValue());

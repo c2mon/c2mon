@@ -16,10 +16,10 @@
  *****************************************************************************/
 package cern.c2mon.server.cachepersistence.common;
 
-import java.util.*;
-import java.util.concurrent.*;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-
+import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.server.cachepersistence.CachePersistenceDAO;
+import cern.c2mon.server.common.config.ServerConstants;
+import cern.c2mon.shared.common.Cacheable;
 import org.apache.ibatis.exceptions.PersistenceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,11 +28,9 @@ import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-import cern.c2mon.server.cache.C2monCache;
-import cern.c2mon.server.cache.ClusterCache;
-import cern.c2mon.server.cachepersistence.CachePersistenceDAO;
-import cern.c2mon.server.common.config.ServerConstants;
-import cern.c2mon.shared.common.Cacheable;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Standard implementation of a {@link BatchPersistenceManager}.
@@ -77,7 +75,7 @@ public class BatchPersistenceManagerImpl<T extends Cacheable> implements BatchPe
    * (one of the only references to the cache module from the cache
    * persistence module). Needs setting in constructor.
    */
-  private C2monCache<Long, T> cache;
+  private C2monCache<T> cache;
 
   /**
    * Set of tags that the server failed to persist successfully and
@@ -111,102 +109,94 @@ public class BatchPersistenceManagerImpl<T extends Cacheable> implements BatchPe
    */
   private ThreadPoolTaskExecutor cachePersistenceThreadPoolTaskExecutor;
 
-  private ClusterCache clusterCache;
-
   private boolean started = false;
 
-  public BatchPersistenceManagerImpl(final CachePersistenceDAO<T> cachePersistenceDAO, final C2monCache<Long, T> cache,
-                                     ClusterCache clusterCache, ThreadPoolTaskExecutor threadPoolTaskExecutor) {
+  public BatchPersistenceManagerImpl(final CachePersistenceDAO<T> cachePersistenceDAO, final C2monCache<T> cache,
+                                     ThreadPoolTaskExecutor threadPoolTaskExecutor) {
     super();
     this.cachePersistenceDAO = cachePersistenceDAO;
     this.cache = cache;
-    this.clusterCache = clusterCache;
     this.cachePersistenceThreadPoolTaskExecutor = threadPoolTaskExecutor;
   }
 
   @Override
   public void persistList(final Collection<Long> keyCollection) {
-    clusterCache.acquireWriteLockOnKey(cachePersistenceLock);
+    LOGGER.debug("Submitting new persistence task (currently " + cachePersistenceThreadPoolTaskExecutor.getThreadPoolExecutor().getQueue().size() + " tasks in queue)");
+
+    //local set, no synch needed; removes duplicates from collection (though unnecessary with current SynchroBuffer)
+    Set<Long> localToBePersisted = new HashSet<>(keyCollection);
+
+    toBePersistedLock.writeLock().lock();
     try {
-      LOGGER.debug("Submitting new persistence task (currently " + cachePersistenceThreadPoolTaskExecutor.getThreadPoolExecutor().getQueue().size() + " tasks in queue)");
+      localToBePersisted.addAll(toBePersisted);  //gets rid of all duplicates
+      toBePersisted.clear();
+    } finally {
+      toBePersistedLock.writeLock().unlock();
+    }
 
-      //local set, no synch needed; removes duplicates from collection (though unnecessary with current SynchroBuffer)
-      Set<Long> localToBePersisted = new HashSet<>(keyCollection);
+    int size = localToBePersisted.size();
 
-      toBePersistedLock.writeLock().lock();
+    LOGGER.debug("Persisting " + size + " cache object(s) to the database (" + cache.getClass() + ")");
+
+    LinkedList<Future< ? >> taskResults = new LinkedList<>();
+    Map<Future< ? >, Collection<Long>> submittedSets = new HashMap<>();
+
+    Iterator<Long> it = localToBePersisted.iterator();
+    while (it.hasNext()) {
+      PersistenceTask task = new PersistenceTask();
+      LinkedList<Long> persistedIds = new LinkedList<>();
+      int counter = 0;
+      while (it.hasNext() && counter < RECORDS_PER_BATCH) {
+        Long currentId = it.next();
+        task.put(currentId);
+        counter++;
+        persistedIds.push(currentId);
+      }
+      Future< ? > result = cachePersistenceThreadPoolTaskExecutor.submit(task);
+      taskResults.offerLast(result);
+      submittedSets.put(result, persistedIds);
+    }
+
+    //wait for all to complete; if wait longer than 5s for a single
+    //then all tasks will be rerun
+
+
+    int count = 0;
+    int exceptionCount = 0;
+    for (Future< ? > result : taskResults) {
+      boolean exceptionCaught = false;
+      count++;
       try {
-        localToBePersisted.addAll(toBePersisted);  //gets rid of all duplicates
-        toBePersisted.clear();
+        result.get(timeoutPerBatch, TimeUnit.MILLISECONDS);
+        LOGGER.debug("Persistence batch number " + count + " completed.");
+      } catch (InterruptedException e) {
+        LOGGER.error("Interrupted exception caught when waiting for persistence task " + count + " to complete", e);
+        exceptionCaught = true;
+      } catch (ExecutionException e) {
+        LOGGER.error("ExecutionException thrown when executing cache persistence task " + count + "; original cause is ", e.getCause());
+        exceptionCaught = true;
+      } catch (TimeoutException e) {
+        LOGGER.warn("Timeout while waiting for persistence task " + count + " to "
+            + "complete (timeout per batch of " + RECORDS_PER_BATCH + " is set at " + timeoutPerBatch + " milliseconds; cancelling batch)"
+            + "Cache elements will be persisted during next persistence task.", e);
+        result.cancel(true);
+        exceptionCaught = true;
       } finally {
-        toBePersistedLock.writeLock().unlock();
-      }
-
-      int size = localToBePersisted.size();
-
-      LOGGER.debug("Persisting " + size + " cache object(s) to the database (" + cache.getClass() + ")");
-
-      LinkedList<Future< ? >> taskResults = new LinkedList<>();
-      Map<Future< ? >, Collection<Long>> submittedSets = new HashMap<>();
-
-      Iterator<Long> it = localToBePersisted.iterator();
-      while (it.hasNext()) {
-        PersistenceTask task = new PersistenceTask();
-        LinkedList<Long> persistedIds = new LinkedList<>();
-        int counter = 0;
-        while (it.hasNext() && counter < RECORDS_PER_BATCH) {
-          Long currentId = it.next();
-          task.put(currentId);
-          counter++;
-          persistedIds.push(currentId);
-        }
-        Future< ? > result = cachePersistenceThreadPoolTaskExecutor.submit(task);
-        taskResults.offerLast(result);
-        submittedSets.put(result, persistedIds);
-      }
-
-      //wait for all to complete; if wait longer than 5s for a single
-      //then all tasks will be rerun
-
-
-      int count = 0;
-      int exceptionCount = 0;
-      for (Future< ? > result : taskResults) {
-        boolean exceptionCaught = false;
-        count++;
-        try {
-          result.get(timeoutPerBatch, TimeUnit.MILLISECONDS);
-          LOGGER.debug("Persistence batch number " + count + " completed.");
-        } catch (InterruptedException e) {
-          LOGGER.error("Interrupted exception caught when waiting for persistence task " + count + " to complete", e);
-          exceptionCaught = true;
-        } catch (ExecutionException e) {
-          LOGGER.error("ExecutionException thrown when executing cache persistence task " + count + "; original cause is ", e.getCause());
-          exceptionCaught = true;
-        } catch (TimeoutException e) {
-          LOGGER.warn("Timeout while waiting for persistence task " + count + " to "
-              + "complete (timeout per batch of " + RECORDS_PER_BATCH + " is set at " + timeoutPerBatch + " milliseconds; cancelling batch)"
-              + "Cache elements will be persisted during next persistence task.", e);
-          result.cancel(true);
-          exceptionCaught = true;
-        } finally {
-          if (exceptionCaught) {
-            exceptionCount++;
-            toBePersistedLock.writeLock().lock();
-            try {
-              toBePersisted.addAll(submittedSets.get(result));
-            } finally {
-              toBePersistedLock.writeLock().unlock();
-            }
+        if (exceptionCaught) {
+          exceptionCount++;
+          toBePersistedLock.writeLock().lock();
+          try {
+            toBePersisted.addAll(submittedSets.get(result));
+          } finally {
+            toBePersistedLock.writeLock().unlock();
           }
         }
       }
-      if (exceptionCount == 0) {
-        LOGGER.debug("Completed persistence of all " + count + " batches");
-      } else {
-        LOGGER.debug(exceptionCount + " out of " + count + " persistence batches failed and will be resubmitted.");
-      }
-    } finally {
-      clusterCache.releaseWriteLockOnKey(cachePersistenceLock);
+    }
+    if (exceptionCount == 0) {
+      LOGGER.debug("Completed persistence of all " + count + " batches");
+    } else {
+      LOGGER.debug(exceptionCount + " out of " + count + " persistence batches failed and will be resubmitted.");
     }
   }
 

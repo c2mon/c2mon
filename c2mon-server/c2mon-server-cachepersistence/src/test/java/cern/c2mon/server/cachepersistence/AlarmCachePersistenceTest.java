@@ -16,25 +16,24 @@
  *****************************************************************************/
 package cern.c2mon.server.cachepersistence;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import cern.c2mon.server.cache.AlarmCache;
-import cern.c2mon.server.cache.config.CacheModule;
+import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.config.CacheConfigModuleRef;
 import cern.c2mon.server.cache.dbaccess.AlarmMapper;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.cachepersistence.common.BatchPersistenceManagerImpl;
 import cern.c2mon.server.cachepersistence.config.CachePersistenceModule;
-import cern.c2mon.server.cachepersistence.listener.PersistenceSynchroListener;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.config.CommonModule;
 import cern.c2mon.server.test.DatabasePopulationRule;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import javax.inject.Inject;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -42,41 +41,38 @@ import static org.junit.Assert.assertNotNull;
 /**
  * Tests of persistence mechanisms to the Alarm cache.
  * Integration test with the cache module (including loading module).
- * @author Mark Brightwell
  *
+ * @author Mark Brightwell
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {
-    CommonModule.class,
-    CacheModule.class,
-    CacheDbAccessModule.class,
-    CachePersistenceModule.class,
-    DatabasePopulationRule.class
+  CommonModule.class,
+  CacheConfigModuleRef.class,
+  CacheDbAccessModule.class,
+  CachePersistenceModule.class,
+  DatabasePopulationRule.class
 })
 public class AlarmCachePersistenceTest {
 
   @Rule
-  @Autowired
+  @Inject
   public DatabasePopulationRule databasePopulationRule;
 
-  @Autowired
-  private AlarmCache alarmCache;
+  @Inject
+  private C2monCache<Alarm> alarmCache;
 
-  @Autowired
+  @Inject
   private AlarmMapper alarmMapper;
 
-  @Autowired
+  @Inject
   private BatchPersistenceManagerImpl alarmPersistenceManager;
-
-  @Autowired
-  private PersistenceSynchroListener alarmPersistenceSynchroListener;
 
   private Alarm originalObject;
 
   @Before
   public void before() {
     originalObject = alarmMapper.getItem(350000L);
-    alarmPersistenceSynchroListener.start();
+//    alarmPersistenceSynchroListener.start();
   }
 
   /**
@@ -101,8 +97,6 @@ public class AlarmCachePersistenceTest {
 
     //now update the cache object to new value
     cacheObject.setActive(true);
-    //notify the listeners
-    alarmCache.notifyListenersOfUpdate(cacheObject);
 
     // trigger the persist
     alarmPersistenceManager.persistAllCacheToDatabase();
