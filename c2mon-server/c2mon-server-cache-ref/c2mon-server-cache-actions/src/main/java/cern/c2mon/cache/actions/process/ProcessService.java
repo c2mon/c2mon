@@ -9,6 +9,8 @@ import cern.c2mon.cache.actions.supervision.AbstractSupervisedCacheFlow;
 import cern.c2mon.cache.actions.supervision.SupervisedCacheService;
 import cern.c2mon.cache.actions.supervision.SupervisedCacheServiceDelegator;
 import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
+import cern.c2mon.cache.api.exception.TooManyQueryResultsException;
 import cern.c2mon.server.common.alive.AliveTimer;
 import cern.c2mon.server.common.config.ServerProperties;
 import cern.c2mon.server.common.process.Process;
@@ -21,6 +23,7 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Random;
 
@@ -109,6 +112,17 @@ public class ProcessService extends AbstractCacheServiceImpl<Process>
       Long subEquipmentId = subEquipmentControlTags.get(controlTagId);
       return subEquipmentService.getEquipmentIdForSubEquipment(subEquipmentId);
     } else return null;
+  }
+
+  public Process getProcessIdFromName(String name) {
+    final Collection<Process> queryResults = cache.query(process -> process.getName().matches(name));
+
+    if (queryResults.size() > 1)
+      throw new TooManyQueryResultsException();
+
+    return queryResults.stream()
+      .findFirst()
+      .orElseThrow(CacheElementNotFoundException::new);
   }
 
   @Override

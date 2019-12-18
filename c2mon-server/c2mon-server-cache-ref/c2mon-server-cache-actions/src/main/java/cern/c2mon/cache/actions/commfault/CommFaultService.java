@@ -32,7 +32,7 @@ public class CommFaultService extends AbstractCacheServiceImpl<CommFaultTag> {
   @PostConstruct
   public void init() {
     cache.getCacheListenerManager().registerListener(commFaultTag -> {
-      // TODO This should propagate to supervision status
+      // TODO (Alex) This should propagate to supervision status
     }, CacheEvent.UPDATE_ACCEPTED);
   }
 

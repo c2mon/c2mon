@@ -56,6 +56,19 @@ public interface ProcessOperationService {
   Long getProcessIdFromControlTag(Long controlTagId);
 
   /**
+   * Searches for the Process with the given name
+   *
+   * If there are more than one matches, a random one will be returned
+   *
+   * Will use {@code String.matches()}, so can support full regex
+   *
+   * @param name
+   * @return the process, or throws
+   * @throws CacheElementNotFoundException if the name does n
+   */
+  Process getProcessIdFromName(String name);
+
+  /**
    * Returns true if the DAQ requires a reboot to
    * obtain the latest configuration from the server.
    * @param processId id of the process

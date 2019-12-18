@@ -41,20 +41,11 @@ abstract class SupervisionEventHandler<T extends Supervised> {
 
   /**
    * Called when a DAQ alive timer expires.
-   * <p>
-   * The onDown() method sets the value of the state tag associated with
-   * the supervised object to "DOWN". If the value of the state tag is already "DOWN",
-   * no further action is taken.
-   * <p>
-   * Call within block synchronized on this Supervised obj.
    */
   public void onDown(Long id, Timestamp timestamp, String message) {
     service.suspend(id, timestamp, message);
 
-    Long stateTagId = supervised.getStateTagId();
-
-//  TODO (Alex) This should also propagate to CommFaultTags
-//  TODO (Alex) Review and execute this flow. See also the onUp()
+//  TODO (Alex) Review this flow? See also the onUp()
 
 //    try {
 //      Long stateTagId = supervised.getStateTagId();
@@ -70,22 +61,5 @@ abstract class SupervisionEventHandler<T extends Supervised> {
 //    } catch (CacheElementNotFoundException cacheEx) {
 //      log.error("Cannot locate the Process State tag in the cache - unable to update it.", cacheEx);
 //    }
-  }
-
-  /**
-   * Manually set the value of a CommFaultTag. Used to update a CommFaultTag
-   * when an AliveTimer expires, in order to keep the two tags consistent with
-   * each other.
-   *
-   * @param commFaultTagId the ID of the tag to set
-   * @param value          the value of the tag
-   * @param message        the value description to set for the tag
-   */
-  protected void setCommFaultTag(final Long commFaultTagId, final boolean value, final String message, final Timestamp timestamp) {
-    try {
-      controlTagFacade.updateAndValidate(commFaultTagId, value, message, timestamp);
-    } catch (CacheElementNotFoundException e) {
-      log.error("Could not locate CommFaultTag (id: " + commFaultTagId + ") in cache");
-    }
   }
 }

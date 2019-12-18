@@ -16,9 +16,9 @@
  *****************************************************************************/
 package cern.c2mon.server.supervision;
 
-import java.util.Collection;
-
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
+
+import java.util.Collection;
 
 /**
  * Provides methods for querying the Supervision status of
@@ -45,13 +45,5 @@ public interface SupervisionFacade {
    * SubEquipment caches with the current status of these supervised objects. 
    */
   void refreshAllSupervisionStatus();
- 
-  /**
-   * Refreshes the state tags with new timestamp and the latest value.
-   * Used when trying to make cache consistent after crash.
-   * 
-   * <p>Do not call while holding locks.
-   */
-  void refreshStateTags();
   
 }

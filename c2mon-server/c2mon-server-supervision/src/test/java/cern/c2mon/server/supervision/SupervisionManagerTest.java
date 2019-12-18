@@ -16,20 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.server.supervision;
 
-import java.sql.Timestamp;
-import java.util.concurrent.CountDownLatch;
-
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
 import cern.c2mon.server.cache.*;
 import cern.c2mon.server.cache.config.CacheModule;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
@@ -46,11 +32,21 @@ import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.common.datatag.SourceDataTagQuality;
 import cern.c2mon.shared.common.datatag.SourceDataTagValue;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
+import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import java.sql.Timestamp;
+import java.util.concurrent.CountDownLatch;
+
+import static org.junit.Assert.*;
 
 /**
  * Integration test of supervision module with core cache modules.
@@ -215,7 +211,6 @@ public class SupervisionManagerTest {
 
     processFacade.start(process.getId(), new Timestamp(System.currentTimeMillis()));
     processFacade.resume(process.getId(), new Timestamp(System.currentTimeMillis()), "");
-    supervisionFacade.refreshStateTags();
 
     process = processCache.getCopy(aliveTimer.getRelatedId());
 

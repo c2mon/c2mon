@@ -1,15 +1,18 @@
 package cern.c2mon.server.supervision.impl.event;
 
+import cern.c2mon.cache.actions.equipment.EquipmentService;
 import cern.c2mon.cache.actions.process.ProcessService;
+import cern.c2mon.cache.actions.subequipment.SubEquipmentService;
+import cern.c2mon.server.cache.ProcessXMLProvider;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
+import cern.c2mon.server.common.config.ServerProperties;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.process.ProcessCacheObject;
-import cern.c2mon.server.common.subequipment.SubEquipment;
-import cern.c2mon.shared.common.supervision.SupervisionConstants;
 import cern.c2mon.shared.daq.process.*;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.annotation.Resource;
 import javax.inject.Inject;
 import java.sql.Timestamp;
 import java.util.Collection;
@@ -19,9 +22,19 @@ public class ProcessEvents extends SupervisionEventHandler<Process> {
 
   private XMLConverter xmlConverter = new XMLConverter();
 
+  private SubEquipmentService subEquipmentService;
+  private EquipmentService equipmentService;
+  private ProcessXMLProvider processXMLProvider;
+
+  @Resource
+  private ServerProperties properties;;
+
   @Inject
-  public ProcessEvents(ProcessService processService) {
+  public ProcessEvents(ProcessService processService, SubEquipmentService subEquipmentService, EquipmentService equipmentService, ProcessXMLProvider processXMLProvider) {
     super(Process.class, processService);
+    this.subEquipmentService = subEquipmentService;
+    this.equipmentService = equipmentService;
+    this.processXMLProvider = processXMLProvider;
   }
 
   /**
@@ -44,8 +57,8 @@ public class ProcessEvents extends SupervisionEventHandler<Process> {
    * Notice that the process alive is of course revalidated on reception of a new alive.
    */
   @Override
-  public void onUp(Process supervised, Timestamp timestamp, String message) {
-    service.resume(supervised.getId(), timestamp, message);
+  public void onUp(Long id, Timestamp timestamp, String message) {
+    service.resume(id, timestamp, message);
 
     // TODO (Alex) Where and how can we "revalidate"? And how can we ask the DAQ for the latest values?
 
@@ -90,81 +103,62 @@ public class ProcessEvents extends SupervisionEventHandler<Process> {
     // Process name (NO_PROCESS by default)
     processConnectionResponse.setProcessName(processConnectionRequest.getProcessName());
 
-    // Print some debug information
-    if (log.isDebugEnabled()) {
-      StringBuilder str = new StringBuilder("onProcessConnection([");
-      str.append(processConnectionRequest.getProcessName());
-      str.append(", ");
-      str.append(processConnectionRequest.getProcessHostName());
-      str.append(", ");
-      str.append(processConnectionRequest.getProcessStartupTime());
-      str.append("]) called.");
-      log.debug(str.toString());
-    }
+    log.debug("onProcessConnection([" + processConnectionRequest.getProcessName() + ", " + processConnectionRequest.getProcessHostName() + ", " + processConnectionRequest.getProcessStartupTime() + "]) called.");
 
     // Retrieve the cache object for the process as well
     try {
-      Long processId = processCache.getProcessId(processConnectionRequest.getProcessName());
-      processCache.acquireWriteLockOnKey(processId);
+      Process process = ((ProcessService) service).getProcessIdFromName(processConnectionRequest.getProcessName());
       try {
-        Process process = processCache.get(processId);
-        try {
-          // If process is already currently running
-          if (this.processFacade.isRunning(processId)) {
-            // And TEST mode is on
-            if (properties.isTestMode()) {
-              log.info("onProcessConnection - TEST mode - Connection request for DAQ " + process.getName() + " authorized.");
-
-              // Start Up the process
-              this.controlTagFacade.updateAndValidate(process.getStateTagId(), SupervisionConstants.SupervisionStatus.STARTUP.toString(), "ProcessConnection message received.",
-                processConnectionRequest.getProcessStartupTime());
-              process = this.processFacade.start(processId, processConnectionRequest.getProcessHostName(), processConnectionRequest.getProcessStartupTime());
-
-              // PIK
-              processConnectionResponse.setprocessPIK(process.getProcessPIK());
-
-              log.info("onProcessConnection - TEST Mode - Returning PIKResponse to DAQ " + process.getName()
-                + ", PIK " + process.getProcessPIK());
-
-              // If process is already currently running and TEST mode is off no connection is permitted
-            } else {
-              // Reject Connection
-              processConnectionResponse.setprocessPIK(ProcessConnectionResponse.PIK_REJECTED);
-              log.warn("onProcessConnection - The DAQ process is already running, returning rejected connection : "
-                + processConnectionRequest.getProcessName());
-            }
-            // If process is not currently running the connection is permitted
-          } else {
-            log.info("onProcessConnection - Connection request for DAQ " + process.getName() + " authorized.");
+        // If process is already currently running
+        if (service.isRunning(process.getId())) {
+          // And TEST mode is on
+          if (properties.isTestMode()) {
+            log.info("onProcessConnection - TEST mode - Connection request for DAQ " + process.getName() + " authorized.");
 
             // Start Up the process
-            this.controlTagFacade.updateAndValidate(process.getStateTagId(), SupervisionConstants.SupervisionStatus.STARTUP.toString(), "ProcessConnection message received.",
-              processConnectionRequest.getProcessStartupTime());
-            process = this.processFacade.start(processId, processConnectionRequest.getProcessHostName(), processConnectionRequest.getProcessStartupTime());
+            process = ((ProcessService) service).start(process.getId(), processConnectionRequest.getProcessHostName(), processConnectionRequest.getProcessStartupTime());
 
             // PIK
             processConnectionResponse.setprocessPIK(process.getProcessPIK());
 
-            log.info("onProcessConnection - Returning PIKResponse to DAQ " + process.getName());
-          }
+            log.info("onProcessConnection - TEST Mode - Returning PIKResponse to DAQ " + process.getName()
+              + ", PIK " + process.getProcessPIK());
 
-        } catch (CacheElementNotFoundException cacheEx) {
-          log.error("State tag " + process.getStateTagId() + " or the alive tag for process " + process.getId() +
-            "could not be found in the cache.");
+            // If process is already currently running and TEST mode is off no connection is permitted
+          } else {
+            // Reject Connection
+            processConnectionResponse.setprocessPIK(ProcessConnectionResponse.PIK_REJECTED);
+            log.warn("onProcessConnection - The DAQ process is already running, returning rejected connection : "
+              + processConnectionRequest.getProcessName());
+          }
+          // If process is not currently running the connection is permitted
+        } else {
+          log.info("onProcessConnection - Connection request for DAQ " + process.getName() + " authorized.");
+
+          // Start Up the process
+          process = ((ProcessService) service).start(process.getId(), processConnectionRequest.getProcessHostName(), processConnectionRequest.getProcessStartupTime());
+
+          // PIK
+          processConnectionResponse.setprocessPIK(process.getProcessPIK());
+
+          log.info("onProcessConnection - Returning PIKResponse to DAQ " + process.getName());
         }
-      } finally {
-        processCache.releaseWriteLockOnKey(processId);
+
+      } catch (CacheElementNotFoundException cacheEx) {
+        log.error("State tag " + process.getStateTagId() + " or the alive tag for process " + process.getId() +
+          "could not be found in the cache.");
       }
+
     } catch (CacheElementNotFoundException cacheEx) {
       log.warn("onProcessConnection - process not found in cache (name = "
         + processConnectionRequest.getProcessName() + ") - unable to accept connection request.", cacheEx);
       processConnectionResponse.setprocessPIK(ProcessConnectionResponse.PIK_REJECTED);
     } catch (Exception e) {
-      log.error(new StringBuffer("onProcessConnection - An unexpected Exception occurred.").toString(), e);
+      log.error("onProcessConnection - An unexpected Exception occurred.", e);
       processConnectionResponse.setprocessPIK(ProcessConnectionResponse.PIK_REJECTED);
     }
 
-    return this.xmlConverter.toXml(processConnectionResponse);
+    return xmlConverter.toXml(processConnectionResponse);
   }
 
   /**
@@ -195,14 +189,18 @@ public class ProcessEvents extends SupervisionEventHandler<Process> {
 
     // Retrieve the cache object for the process as well as its state tag
     try {
-      Long processId = processCache.getProcessId(processConfigurationRequest.getProcessName());
-      Process processCopy = processCache.getCopy(processId);
+      Process processCopy = cache
+        .query(process -> process.getName().matches(processConfigurationRequest.getProcessName()))
+        .stream()
+        .findFirst()
+        .get();
+
       log.info("onProcessConfiguration - Configuration request for DAQ " + processCopy.getName() + " authorized.");
 
       // Only If PIK is the same we have in cache we change Y(LOCAL_CONFIG) by N(SERVER_CONFIG) for the current process
       if (processConfigurationRequest.getProcessPIK().equals(processCopy.getProcessPIK())) {
         log.info("onProcessConfiguration - SERVER_CONFIG");
-        this.processFacade.setLocalConfig(processId, ProcessCacheObject.LocalConfig.N);
+        ((ProcessService) service).setLocalConfig(processCopy.getId(), ProcessCacheObject.LocalConfig.N);
       }
 
       // We get the configuration XML file (empty by default)
@@ -213,7 +211,7 @@ public class ProcessEvents extends SupervisionEventHandler<Process> {
         + processConfigurationRequest.getProcessName() + ") - unable to accept connection request.", cacheEx);
       processConfigurationResponse.setConfigurationXML(ProcessConfigurationResponse.CONF_REJECTED);
     } catch (Exception e) {
-      log.error(new StringBuffer("onProcessConfiguration - An unexpected Exception occurred.").toString(), e);
+      log.error("onProcessConfiguration - An unexpected Exception occurred.", e);
       processConfigurationResponse.setConfigurationXML(ProcessConfigurationResponse.CONF_REJECTED);
     }
 
@@ -239,43 +237,38 @@ public class ProcessEvents extends SupervisionEventHandler<Process> {
       str.append("]) called.");
       log.debug(str.toString());
     }
-    //TODO remove inaccessible once fixed on client
-    //int invalidationFlags = DataTagQuality.INACCESSIBLE + DataTagQuality.PROCESS_DOWN;
 
     try {
 
-      Long processId;
+      Process process;
       // (2) Check if the process exists (get methods throw exception otherwise) //check if id was sent - if not use name field
       if (processDisconnectionRequest.getProcessId() != ProcessDisconnectionRequest.NO_ID) {
-        processId = processDisconnectionRequest.getProcessId();
+        process = cache.get(processDisconnectionRequest.getProcessId());
       } else {
-        processId = processCache.getProcessId(processDisconnectionRequest.getProcessName());
+        process = ((ProcessService) service).getProcessIdFromName(processDisconnectionRequest.getProcessName());
       }
 
       // (3) Get the corresponding state and alive tags
       try {
-        Process processCopy = processCache.getCopy(processId);
         try {
           // If the process is stopped the PIK is null
-          if (processCopy.getProcessPIK() == null) {
+          if (process.getProcessPIK() == null) {
             log.warn("onProcessDisconnection - Received Process disconnection message for "
-              + "a process PIK null. Id is " + processCopy.getId() + ". Message ignored.");
+              + "a process PIK null. Id is " + process.getId() + ". Message ignored.");
           } else {
             // Check if PIK is the same we disconnect otherwise we ignore the message
-            if (processDisconnectionRequest.getProcessPIK().equals(processCopy.getProcessPIK())) {
+            if (processDisconnectionRequest.getProcessPIK().equals(process.getProcessPIK())) {
               // (4) Only proceed if the process is actually running
-              if (processFacade.isRunning(processId)) {
+              if (service.isRunning(process.getId())) {
 
-                String processStopMessage = "DAQ process " + processCopy.getName() + " was stopped.";
+                String processStopMessage = "DAQ process " + process.getName() + " was stopped.";
                 log.trace("onProcessDisconnection - " + processStopMessage);
 
                 // (5) LEGACY: TODO what does this comment mean?!
                 Timestamp stopTime = new Timestamp(System.currentTimeMillis());
-                this.processFacade.stop(processId, stopTime); //also stops alive timer
+                service.stop(process.getId(), stopTime); //also stops alive timer
 
-                // (7) Update process state tag
-                stopStateTag(processCopy.getStateTagId(), stopTime, processStopMessage);
-                stopEquipments(processCopy.getEquipmentIds(), stopTime, processStopMessage); //state tags to stopped
+                stopEquipments(process.getEquipmentIds(), stopTime, processStopMessage); //state tags to stopped
                 // (8) Invalidate alive tag (no need to synchronize here as no "if then" update statement
                 //dataTagFacade.setQuality(aliveTag, invalidationFlags, 0, processStopMessage, stopTime);
                 // (9) Invalidate attached equipment (if any) -- keep lock on parent process (TODO config loader should hold lock on process while it runs?)
@@ -284,22 +277,22 @@ public class ProcessEvents extends SupervisionEventHandler<Process> {
                 //                        invalidationFlags, 0);
               } else {
                 log.warn("onProcessDisconnection - Received Process disconnection message for "
-                  + "a process that is not running. Id is " + processCopy.getId() + ". Message ignored.");
+                  + "a process that is not running. Id is " + process.getId() + ". Message ignored.");
               }
             } else {
               log.warn("onProcessDisconnection - Received Process disconnection message for "
                 + "a process with a diferent PIK (" + processDisconnectionRequest.getProcessPIK()
-                + " vs " + processCopy.getProcessPIK() + "). Id is " + processCopy.getId() + ". Message ignored.");
+                + " vs " + process.getProcessPIK() + "). Id is " + process.getId() + ". Message ignored.");
             }
           }
         } catch (CacheElementNotFoundException cacheEx) {
-          log.error("State tag " + processCopy.getStateTagId() + " or the alive tag "
-            + processCopy.getAliveTagId() + " for process " + processCopy.getId() + " could not be found in the "
+          log.error("State tag " + process.getStateTagId() + " or the alive tag "
+            + process.getAliveTagId() + " for process " + process.getId() + " could not be found in the "
             + "cache - disconnection actions could not be completed.", cacheEx);
         }
 
       } catch (CacheElementNotFoundException cacheEx) {
-        log.error("Unable to locate process " + processId + " in cache.", cacheEx);
+        log.error("Unable to locate process " + process.getId() + " in cache.", cacheEx);
       }
     } catch (CacheElementNotFoundException cacheEx) {
       log.error("Process object could not be retrieved from cache - disconnection actions may be incomplete.", cacheEx);
@@ -308,18 +301,6 @@ public class ProcessEvents extends SupervisionEventHandler<Process> {
     } catch (NullPointerException nullEx) {
       log.error("NullPointer exception caught on processing DAQ disconnection - disconnection actions may be incomplete.", nullEx);
     }
-  }
-
-
-  /**
-   * Stops the state tag (for Process disconnection).
-   *
-   * @param stateTagId id of tag
-   * @param pTimestamp time to use
-   * @param message    stop message
-   */
-  private void stopStateTag(final Long stateTagId, final Timestamp pTimestamp, final String message) {
-    controlTagFacade.updateAndValidate(stateTagId, SupervisionConstants.SupervisionStatus.DOWN.toString(), message, pTimestamp);
   }
 
   /**
@@ -335,14 +316,11 @@ public class ProcessEvents extends SupervisionEventHandler<Process> {
     for (Long equipmentId : equipmentIds) {
       try {
         try {
-          currentEquipmentCopy = equipmentCache.getCopy(equipmentId);
-          equipmentFacade.stop(equipmentId, timestamp);
-          stopStateTag(currentEquipmentCopy.getStateTagId(), timestamp, message);
+          currentEquipmentCopy = equipmentService.getCache().get(equipmentId);
+          equipmentService.stop(equipmentId, timestamp);
           for (Long subId : currentEquipmentCopy.getSubEquipmentIds()) {
             try {
-              SubEquipment subEquipmentCopy = subEquipmentCache.getCopy(subId);
-              stopStateTag(subEquipmentCopy.getStateTagId(), timestamp, message);
-              subEquipmentFacade.stop(subId, timestamp);
+              subEquipmentService.stop(subId, timestamp);
             } catch (CacheElementNotFoundException ex) {
               log.error("Subequipment could not be retrieved from cache - unable to update Subequipment state.", ex);
             }

@@ -22,9 +22,6 @@ import cern.c2mon.server.common.alive.AliveTimer;
 import cern.c2mon.server.common.commfault.CommFaultTag;
 import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.common.config.ServerProperties;
-import cern.c2mon.server.common.equipment.Equipment;
-import cern.c2mon.server.common.process.Process;
-import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.supervision.SupervisionManager;
 import cern.c2mon.server.supervision.impl.event.AliveTimerEvents;
 import cern.c2mon.server.supervision.impl.event.EquipmentEvents;
@@ -140,98 +137,98 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
     //hold a distributed read lock on this lock)
     //Once the lock is write-available, only one server wills start the alive
     //timers, although they all start the timer mechanism on their JVM).
-    clusterCache.acquireWriteLockOnKey(C2monCacheLoader.aliveStatusInitialized);
-    try {
-      if (!clusterCache.hasKey(C2monCacheLoader.aliveStatusInitialized) || !(Boolean) clusterCache.getCopy(C2monCacheLoader.aliveStatusInitialized)) {
-        Long aliveTagId;
-
-        //TODO the three sections below unnecessary?
-        Process process;
-        for (Long id : processCache.getKeys()) {
-          processCache.acquireReadLockOnKey(id);
-          try {
-            process = processCache.get(id); //TODO should never be fake, unless config loader removes processes during runtime
-            //TODO add here a check to see if the process is disused - need to add field to process,
-            //     equipment (and use mode in datatag)
-            //     comment: may not need this after all, just remove from cache when disused
-            aliveTagId = process.getAliveTagId();
-            if (aliveTagId != null) {
-              if (controlTagCache.hasKey(process.getStateTagId())) {
-                if (processFacade.isRunning(process)) {
-                  aliveTimerFacade.start(aliveTagId);
-                }
-              } else {
-                log.warn("Unable to locate state tag in cache (id = " + process.getStateTagId() + ") " +
-                  "cannot start alive timer for this process.");
-              }
-            }
-          } finally {
-            processCache.releaseReadLockOnKey(id);
-          }
-        }
-
-        //start equipment alive timers
-        Equipment equipment;
-        for (Long id : equipmentCache.getKeys()) {
-          equipmentCache.acquireReadLockOnKey(id);
-          try {
-            equipment = equipmentCache.get(id); //TODO should never be fake, unless config loader removes processes during runtime
-            //TODO add here a check to see if the equipement is disused - need to add field to process, equipment (and use mode in datatag)
-            aliveTagId = equipment.getAliveTagId();
-            if (aliveTagId != null) {
-              if (controlTagCache.hasKey(equipment.getStateTagId())) {
-                if (equipmentFacade.isRunning(equipment)) {
-                  aliveTimerFacade.start(aliveTagId);
-                }
-              } else {
-                log.warn("Unable to locate state tag in cache (id = " + equipment.getStateTagId() + ") " +
-                  "cannot start alive timer for this equipment.");
-              }
-            }
-          } finally {
-            equipmentCache.releaseReadLockOnKey(id);
-          }
-        }
-
-        //start subequipment alive timers
-        SubEquipment subEquipment;
-        for (Long id : subEquipmentCache.getKeys()) {
-          subEquipmentCache.acquireReadLockOnKey(id);
-          try {
-            subEquipment = subEquipmentCache.get(id); //TODO should never be fake, unless config loader removes processes during runtime
-
-            // TODO add here a check to see if the equipement is disused - need to add field to process, equipment (and use mode in datatag)
-            aliveTagId = subEquipment.getAliveTagId();
-            if (aliveTagId != null) {
-              if (controlTagCache.hasKey(subEquipment.getStateTagId())) {
-                if (subEquipmentFacade.isRunning(subEquipment)) {
-                  aliveTimerFacade.start(aliveTagId);
-                }
-              } else {
-                log.warn("Unable to locate state tag in cache (id = " + subEquipment.getStateTagId() + ") cannot " +
-                  "start alive timer for this subequipment.");
-              }
-            }
-          } finally {
-            subEquipmentCache.releaseReadLockOnKey(id);
-          }
-        }
-
-        aliveTimerFacade.startAllTimers();
-        clusterCache.put(C2monCacheLoader.aliveStatusInitialized, Boolean.TRUE);
-      }
-
-    } catch (Exception e) {
-      log.error("initialise() : Error starting alive timer mechanism.", e);
-    } finally {
-      clusterCache.releaseWriteLockOnKey(C2monCacheLoader.aliveStatusInitialized);
-    }
-
-    //start timer on all servers
-    //aliveTimerManager.start();
-
-    //HeartbeatManager.getInstance().start(); //TODO start heartbeatmanager here
-    log.info("Finished initializing all alive timers.");
+//    clusterCache.acquireWriteLockOnKey(C2monCacheLoader.aliveStatusInitialized);
+//    try {
+//      if (!clusterCache.hasKey(C2monCacheLoader.aliveStatusInitialized) || !(Boolean) clusterCache.getCopy(C2monCacheLoader.aliveStatusInitialized)) {
+//        Long aliveTagId;
+//
+//        //TODO the three sections below unnecessary?
+//        Process process;
+//        for (Long id : processCache.getKeys()) {
+//          processCache.acquireReadLockOnKey(id);
+//          try {
+//            process = processCache.get(id); //TODO should never be fake, unless config loader removes processes during runtime
+//            //TODO add here a check to see if the process is disused - need to add field to process,
+//            //     equipment (and use mode in datatag)
+//            //     comment: may not need this after all, just remove from cache when disused
+//            aliveTagId = process.getAliveTagId();
+//            if (aliveTagId != null) {
+//              if (controlTagCache.hasKey(process.getStateTagId())) {
+//                if (processFacade.isRunning(process)) {
+//                  aliveTimerFacade.start(aliveTagId);
+//                }
+//              } else {
+//                log.warn("Unable to locate state tag in cache (id = " + process.getStateTagId() + ") " +
+//                  "cannot start alive timer for this process.");
+//              }
+//            }
+//          } finally {
+//            processCache.releaseReadLockOnKey(id);
+//          }
+//        }
+//
+//        //start equipment alive timers
+//        Equipment equipment;
+//        for (Long id : equipmentCache.getKeys()) {
+//          equipmentCache.acquireReadLockOnKey(id);
+//          try {
+//            equipment = equipmentCache.get(id); //TODO should never be fake, unless config loader removes processes during runtime
+//            //TODO add here a check to see if the equipement is disused - need to add field to process, equipment (and use mode in datatag)
+//            aliveTagId = equipment.getAliveTagId();
+//            if (aliveTagId != null) {
+//              if (controlTagCache.hasKey(equipment.getStateTagId())) {
+//                if (equipmentFacade.isRunning(equipment)) {
+//                  aliveTimerFacade.start(aliveTagId);
+//                }
+//              } else {
+//                log.warn("Unable to locate state tag in cache (id = " + equipment.getStateTagId() + ") " +
+//                  "cannot start alive timer for this equipment.");
+//              }
+//            }
+//          } finally {
+//            equipmentCache.releaseReadLockOnKey(id);
+//          }
+//        }
+//
+//        //start subequipment alive timers
+//        SubEquipment subEquipment;
+//        for (Long id : subEquipmentCache.getKeys()) {
+//          subEquipmentCache.acquireReadLockOnKey(id);
+//          try {
+//            subEquipment = subEquipmentCache.get(id); //TODO should never be fake, unless config loader removes processes during runtime
+//
+//            // TODO add here a check to see if the equipement is disused - need to add field to process, equipment (and use mode in datatag)
+//            aliveTagId = subEquipment.getAliveTagId();
+//            if (aliveTagId != null) {
+//              if (controlTagCache.hasKey(subEquipment.getStateTagId())) {
+//                if (subEquipmentFacade.isRunning(subEquipment)) {
+//                  aliveTimerFacade.start(aliveTagId);
+//                }
+//              } else {
+//                log.warn("Unable to locate state tag in cache (id = " + subEquipment.getStateTagId() + ") cannot " +
+//                  "start alive timer for this subequipment.");
+//              }
+//            }
+//          } finally {
+//            subEquipmentCache.releaseReadLockOnKey(id);
+//          }
+//        }
+//
+//        aliveTimerFacade.startAllTimers();
+//        clusterCache.put(C2monCacheLoader.aliveStatusInitialized, Boolean.TRUE);
+//      }
+//
+//    } catch (Exception e) {
+//      log.error("initialise() : Error starting alive timer mechanism.", e);
+//    } finally {
+//      clusterCache.releaseWriteLockOnKey(C2monCacheLoader.aliveStatusInitialized);
+//    }
+//
+//    //start timer on all servers
+//    //aliveTimerManager.start();
+//
+//    //HeartbeatManager.getInstance().start(); //TODO start heartbeatmanager here
+//    log.info("Finished initializing all alive timers.");
   }
 
   /**

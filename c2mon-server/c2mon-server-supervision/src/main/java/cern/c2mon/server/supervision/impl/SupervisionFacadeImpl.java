@@ -19,10 +19,11 @@ package cern.c2mon.server.supervision.impl;
 import cern.c2mon.cache.actions.equipment.EquipmentService;
 import cern.c2mon.cache.actions.process.ProcessService;
 import cern.c2mon.cache.actions.subequipment.SubEquipmentService;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.supervision.Supervised;
 import cern.c2mon.server.supervision.SupervisionFacade;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
-import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
+import cern.c2mon.shared.common.CacheEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jmx.export.annotation.ManagedAttribute;
 import org.springframework.jmx.export.annotation.ManagedOperation;
@@ -30,7 +31,6 @@ import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -86,42 +86,6 @@ public class SupervisionFacadeImpl implements SupervisionFacade {
       pendingRequests.getAndDecrement();
     }    
   }
-  
-  @Override
-  public void refreshStateTags() {
-    Timestamp refreshTime = new Timestamp(System.currentTimeMillis());
-    for (Long key : processCache.getKeys()) {
-      refreshStateTag(processCache.get(key), refreshTime);            
-    }
-    for (Long key : equipmentCache.getKeys()) {
-      refreshStateTag(equipmentCache.get(key), refreshTime);
-    }
-    for (Long key : subEquipmentCache.getKeys()) {
-      refreshStateTag(subEquipmentCache.get(key), refreshTime);
-    }    
-  }
-  
-  /**
-   * Refreshes the state tag, using the current supervision status.
-   * Will only update the status tags in the cache if they have actually changed.
-   * @param supervised supervised object
-   */
-  private void refreshStateTag(final Supervised supervised, final Timestamp refreshTime) {
-    try {
-      Long stateTagId;
-      String message;
-      SupervisionStatus status;
-     
-      stateTagId = supervised.getStateTagId();
-      message = supervised.getStatusDescription();
-      status = supervised.getSupervisionStatus();                   
-       
-      controlTagFacade.updateAndValidate(stateTagId, status.toString(), message, refreshTime);
-    } catch (Exception e) {
-      log.error("Error while refreshing state tag for " + supervised.getSupervisionEntity()
-          + " " + supervised.getId() + " - unable to refresh this tag.", e);
-    }    
-  }
 
   /**
    * For management purposes.
@@ -144,14 +108,14 @@ public class SupervisionFacadeImpl implements SupervisionFacade {
    * purposes (in case of a previous server failure when some may not have been logged to DB).
    */
   private void notifyAllSupervisedCachesOfUpdate() {
-    for (Long key : processCache.getKeys()) {
-      processFacade.refreshAndnotifyCurrentSupervisionStatus(key);
-    }
-    for (Long key : equipmentCache.getKeys()) {
-      equipmentFacade.refreshAndnotifyCurrentSupervisionStatus(key);
-    }
-    for (Long key : subEquipmentCache.getKeys()) {
-      subEquipmentFacade.refreshAndnotifyCurrentSupervisionStatus(key);
+    notifyAllCacheListeners(processService.getCache());
+    notifyAllCacheListeners(equipmentService.getCache());
+    notifyAllCacheListeners(subEquipmentService.getCache());
+  }
+
+  private <SUPERVISED extends Supervised> void notifyAllCacheListeners(C2monCache<SUPERVISED> supervisedCache) {
+    for (Long key : supervisedCache.getKeys()) {
+      supervisedCache.getCacheListenerManager().notifyListenersOf(CacheEvent.CONFIRM_STATUS, supervisedCache.get(key));
     }
   }
   
