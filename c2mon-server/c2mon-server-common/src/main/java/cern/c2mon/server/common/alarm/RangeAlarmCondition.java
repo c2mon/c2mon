@@ -16,31 +16,34 @@
  *****************************************************************************/
 package cern.c2mon.server.common.alarm;
 
+import lombok.Getter;
+
 import cern.c2mon.shared.common.type.TypeConverter;
 
 /**
- * <b>NOTE: imported as-is into C2MON</b>
- *
  * Implementation of the AlarmCondition interface.
- *
+ * <p/>
  * A RangeAlarmCondition is defined for alarms that are to be activated if the
  * value of the associated DataTag is in a defined range( min <= value <= max)
- *
+ * <p/>
  * If the parameter passed to the evaluateState() method is greater than or
  * equal to the defined minimum value AND less than or equal to the defined
  * maximum value, the alarm state is supposed to be FaultState.ACTIVE; If the
  * value is outside the defined range, the alarm state is supposed to be
  * FaultState.TERMINATE.
- *
+ * <p/>
  * If either the minimum value or the maximum value are null, the condition is
  * checked for an open range (e.g. value >= min OR value <= max).
- *
+ * <p/>
+ * The logic can be inverted with the {@link #isOutOfRangeAlarm()} flag set to <code>true</code>
+ * <p/>
  * RangeAlarmCondition is Serializable. A serialVersionUID has been defined to
  * ensure that no serialization problems occur after minor modifications to the
  * class.
  *
  * @author Jan Stowisek, Matthias Braeger
  */
+@Getter
 public class RangeAlarmCondition<T extends Number & Comparable<T>> extends AlarmCondition {
 
   /**
@@ -62,6 +65,11 @@ public class RangeAlarmCondition<T extends Number & Comparable<T>> extends Alarm
    * maxValue MUST be of the same type as the associated data tag.
    */
   protected Comparable maxValue;
+
+  /**
+   * Alarm is thrown, if the value is out of range. By default this is disabled.
+   */
+  protected boolean outOfRangeAlarm = false;
 
   /**
    * Default Constructor This constructor should only used when creating an
@@ -96,49 +104,43 @@ public class RangeAlarmCondition<T extends Number & Comparable<T>> extends Alarm
   @Override
   public boolean evaluateState(final Object value) {
     // If the value is null, the alarm will always be terminated
-    boolean result = (value != null);
+    if (value == null) {
+      return false;
+    }
+    boolean result = true;
 
     // Check for the lower boundary
     if (this.minValue != null) {
       Object castValue = TypeConverter.castToType(value, minValue.getClass());
-      result = result && this.minValue.getClass().equals(castValue.getClass()) && minValue.compareTo(castValue) <= 0;
+      if(outOfRangeAlarm) {
+        result = this.minValue.getClass().equals(castValue.getClass()) && minValue.compareTo(castValue) > 0;
+      } else {
+        result = this.minValue.getClass().equals(castValue.getClass()) && minValue.compareTo(castValue) <= 0;
+      }
     }
 
     // Check for the upper boundary
     if (this.maxValue != null) {
       Object castValue = TypeConverter.castToType(value, maxValue.getClass());
-      result = result && this.maxValue.getClass().equals(castValue.getClass()) && maxValue.compareTo(castValue) >= 0;
+      if (outOfRangeAlarm) {
+        boolean maxResult = this.maxValue.getClass().equals(castValue.getClass()) && maxValue.compareTo(castValue) < 0;
+        result = (this.minValue != null) ? (result || maxResult) : maxResult;
+      } else {
+        result = result && this.maxValue.getClass().equals(castValue.getClass()) && maxValue.compareTo(castValue) >= 0;
+      }
+
+
     }
 
     return result;
   }
 
-  /**
-   * Get the lower range limit for the alarm condition. This method will return
-   * null if no lower limit is defined
-   *
-   * @return the lower range limit for the alarm condition.
-   */
-  @SuppressWarnings("unchecked")
-  public Comparable<T> getMinimumValue() {
-    return this.minValue;
-  }
-
-  /**
-   * Get the upper range limit for the alarm condition. This method will return
-   * null if no upper limit is defined
-   *
-   * @return the upper range limit for the alarm condition.
-   */
-  @SuppressWarnings("unchecked")
-  public Comparable<T> getMaximumValue() {
-    return this.maxValue;
-  }
-
   @SuppressWarnings("unchecked")
   @Override
   public Object clone() {
-    return new RangeAlarmCondition<T>(this.minValue, this.maxValue);
+    RangeAlarmCondition clone = new RangeAlarmCondition<T>(this.minValue, this.maxValue);
+    clone.outOfRangeAlarm = this.outOfRangeAlarm;
+    return clone;
   }
 
   /**
@@ -183,11 +185,11 @@ public class RangeAlarmCondition<T extends Number & Comparable<T>> extends Alarm
       } else {
         result = result && this.maxValue.equals(cond.maxValue);
       }
+
+      result = result && this.outOfRangeAlarm == cond.outOfRangeAlarm;
     } else {
       result = false;
     }
     return result;
-
   }
-
 }

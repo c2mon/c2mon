@@ -23,31 +23,43 @@ import lombok.EqualsAndHashCode;
 /**
  * Range condition to a {@link Alarm}.
  * <p/>
- * Attention the getXMLCondition Method returns a hard coded xmml string.
- * The related class path in the xml String is witten in the code itself
+ * A RangeAlarmCondition is defined for alarms that are to be activated if the
+ * value of the associated DataTag is in a defined range( min <= value <= max)
+ * <p/>
+ * If the parameter passed to the evaluateState() method is greater than or
+ * equal to the defined minimum value AND less than or equal to the defined
+ * maximum value, the alarm state is supposed to be FaultState.ACTIVE; If the
+ * value is outside the defined range, the alarm state is supposed to be
+ * FaultState.TERMINATE.
+ * <p/>
+ * If either the minimum value or the maximum value are null, the condition is
+ * checked for an open range (e.g. value >= min OR value <= max).
+ * <p/>
+ * The logic can be inverted with the {@link #isOutOfRangeAlarm()} flag set to <code>true</code>
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class RangeCondition extends AlarmCondition {
+public class RangeCondition<T extends Number> extends AlarmCondition {
 
   /**
    * Lower boundary of the alarm range. May be null. Please note that the
    * maxValue MUST be of the same type as the associated data tag.
    */
-  private Integer minValue;
+  private T minValue;
 
   /**
    * Upper boundary of the alarm range. May be null. Please note that the
    * maxValue MUST be of the same type as the associated data tag.
    */
-  private Integer maxValue;
-
-  public RangeCondition() {
-  }
+  private T maxValue;
+  
+  /**
+   * Alarm is thrown, if the value is out of range. By default this is disabled.
+   */
+  private boolean outOfRangeAlarm = false;
 
   @Builder
-  public RangeCondition(Class<?> dataType, Integer minValue, Integer maxValue) {
-    super(dataType);
+  public RangeCondition(T minValue, T maxValue) {
     this.minValue = minValue;
     this.maxValue = maxValue;
   }
@@ -56,8 +68,9 @@ public class RangeCondition extends AlarmCondition {
   public String getXMLCondition() {
     String result = "";
     result += "<AlarmCondition class=\"cern.c2mon.server.common.alarm.RangeAlarmCondition\">\n";
-    result += minValue != null ? "<min-value type=\"" + getDataType().getName() + "\">" + minValue.toString() + "</min-value>\n" : "";
-    result += minValue != null ? "<max-value type=\"" + getDataType().getName() + "\">" + maxValue.toString() + "</max-value>\n" : "";
+    result += minValue != null ? "  <min-value type=\"" + minValue.getClass().getName() + "\">" + minValue + "</min-value>\n" : "";
+    result += maxValue != null ? "  <max-value type=\"" + maxValue.getClass().getName() + "\">" + maxValue + "</max-value>\n" : "";
+    result += "  <out-of-range-alarm type=\"java.lang.Boolean\">" + outOfRangeAlarm + "</out-of-range-alarm>\n";
     result += "</AlarmCondition>";
     return result;
   }
