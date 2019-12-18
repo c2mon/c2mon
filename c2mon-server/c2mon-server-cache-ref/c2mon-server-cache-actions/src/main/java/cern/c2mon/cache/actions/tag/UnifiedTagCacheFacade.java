@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * NOT a real cache, but an aggregation of [control,datatag,rule] caches
@@ -30,12 +31,15 @@ public class UnifiedTagCacheFacade {
   }
 
   public Tag get(long id) {
-    for (C2monCache<? extends Tag> cache : tagCaches) {
-      if (cache.containsKey(id))
-        return cache.get(id);
-    }
+    return doAcrossCaches(id, cache -> cache.get(id));
+  }
 
-    throw new CacheElementNotFoundException();
+  public void addAlarmToTag(long tagId, long alarmId) {
+    doAcrossCaches(tagId, cache -> cache.computeQuiet(tagId, tag -> tag.getAlarmIds().add(alarmId)));
+  }
+
+  public void removeAlarmFromTag(long tagId, long alarmId) {
+    doAcrossCaches(tagId, cache -> cache.computeQuiet(tagId, tag -> tag.getAlarmIds().remove(alarmId)));
   }
 
   public void registerListener(CacheListener listener, CacheEvent... events) {
@@ -49,5 +53,14 @@ public class UnifiedTagCacheFacade {
 
   public void close() {
     tagCaches.forEach(cache -> cache.getCacheListenerManager().close());
+  }
+
+  private <R> R doAcrossCaches(long id, Function<C2monCache<? extends Tag>, R> cacheAction) {
+    for (C2monCache<? extends Tag> cache : tagCaches) {
+      if (cache.containsKey(id))
+        return cacheAction.apply(cache);
+    }
+
+    throw new CacheElementNotFoundException();
   }
 }

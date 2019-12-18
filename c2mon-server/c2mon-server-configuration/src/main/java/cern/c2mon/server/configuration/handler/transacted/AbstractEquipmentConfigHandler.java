@@ -49,7 +49,7 @@ import java.util.Properties;
 public abstract class AbstractEquipmentConfigHandler<T extends AbstractEquipment> extends BaseConfigHandlerImpl<T, List<ProcessChange>> {
 
   protected final ProcessXMLProvider processXMLProvider;
-  private final AliveTagConfigHandler aliveTagConfigEventHandler;
+  private final AliveTimerConfigHandler aliveTagConfigEventHandler;
   protected final DataTagService dataTagService;
   protected final DataTagConfigHandler dataTagConfigTransacted;
   protected ControlTagConfigHandler controlTagConfigHandler;
@@ -60,7 +60,7 @@ public abstract class AbstractEquipmentConfigHandler<T extends AbstractEquipment
     final ConfigurableDAO<T> subEquipmentDAO,
     final AbstractCacheObjectFactory<T> subEquipmentCacheObjectFactory,
     final ProcessXMLProvider processXMLProvider,
-    final AliveTagConfigHandler aliveTagConfigEventHandler,
+    final AliveTimerConfigHandler aliveTagConfigEventHandler,
     final DataTagService dataTagService,
     final DataTagConfigHandler dataTagConfigTransacted) {
     super(subEquipmentCache, subEquipmentDAO, subEquipmentCacheObjectFactory, ArrayList::new);

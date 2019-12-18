@@ -54,6 +54,7 @@ public class ProcessConfigHandler extends BaseConfigHandlerImpl<Process, Process
   private final JmsContainerManager jmsContainerManager;
   private final EquipmentConfigHandler equipmentConfigTransacted;
   private final boolean allowRunningProcessRemoval;
+  private AliveTimerConfigHandler aliveTimerConfigHandler;
 
   /**
    * Autowired constructor.
@@ -70,7 +71,7 @@ public class ProcessConfigHandler extends BaseConfigHandlerImpl<Process, Process
                               final JmsContainerManager jmsContainerManager,
                               final EquipmentConfigHandler equipmentConfigTransacted
                                      ) {
-    super(processCache, processDAO, processCacheObjectFactory, ProcessChange::new, ProcessChange::new);
+    super(processCache, processDAO, processCacheObjectFactory, ProcessChange::new);
     this.aliveTimerCache = aliveTimerCache;
     this.processService = processService;
     this.allowRunningProcessRemoval = properties.isAllowRunningProcessRemoval();
@@ -172,12 +173,8 @@ public class ProcessConfigHandler extends BaseConfigHandlerImpl<Process, Process
     if (aliveTagId != null) {
       ConfigurationElementReport tagReport = new ConfigurationElementReport(ConfigConstants.Action.REMOVE, ConfigConstants.Entity.CONTROLTAG, aliveTagId);
       report.addSubReport(tagReport);
-      controlTagConfigHandler.remove(aliveTagId, tagReport);
+      aliveTimerConfigHandler.remove(aliveTagId, tagReport);
     }
-    Long stateTagId = process.getStateTagId();
-    ConfigurationElementReport tagReport = new ConfigurationElementReport(ConfigConstants.Action.REMOVE, ConfigConstants.Entity.CONTROLTAG, stateTagId);
-    report.addSubReport(tagReport);
-    controlTagConfigHandler.remove(stateTagId, tagReport);
 
     processService.removeAliveTimerBySupervisedId(process.getId());
     jmsContainerManager.unsubscribe(process);
@@ -190,7 +187,6 @@ public class ProcessConfigHandler extends BaseConfigHandlerImpl<Process, Process
    * @param processId   the process to remove the equipment reference from
    * @throws UnexpectedRollbackException if this operation fails
    */
-  @Override
   public void removeEquipmentFromProcess(Long equipmentId, Long processId) {
     log.debug("Removing Process Equipment {} for processId {}", equipmentId, processId);
     cache.compute(processId, process -> process.getEquipmentIds().remove(equipmentId));

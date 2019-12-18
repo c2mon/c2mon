@@ -1,18 +1,22 @@
 package cern.c2mon.server.configuration.handler.transacted;
 
 import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.server.cache.loading.AliveTimerDAO;
 import cern.c2mon.server.common.alive.AliveTimer;
 import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.shared.daq.config.DataTagAdd;
 
 import javax.inject.Inject;
 
-public class AliveTagConfigHandler {
+public class AliveTimerConfigHandler extends BaseConfigHandlerImpl<AliveTimer, Void> {
 
   private C2monCache<AliveTimer> aliveTimerCache;
 
   @Inject
-  public AliveTagConfigHandler(C2monCache<AliveTimer> aliveTimerCache) {
+  public AliveTimerConfigHandler(C2monCache<AliveTimer> aliveTimerCache,
+                                 AliveTimerDAO aliveTimerDAO,
+                                 AliveTimerCacheObjectFactory alivetimerCacheObjectFactory) {
+    super(aliveTimerCache, aliveTimerDAO, alivetimerCacheObjectFactory, () -> null);
     this.aliveTimerCache = aliveTimerCache;
   }
 
@@ -43,7 +47,7 @@ public class AliveTagConfigHandler {
     if (aliveTimer.getAddress != null) {
       DataTagAdd dataTagAdd = new DataTagAdd(configId, equipmentId, dataTagFacade.generateSourceDataTag(aliveTimer));
       processChange = new ProcessChange(processId, dataTagAdd);
-      return processChange;
     }
+    return processChange;
   }
 }

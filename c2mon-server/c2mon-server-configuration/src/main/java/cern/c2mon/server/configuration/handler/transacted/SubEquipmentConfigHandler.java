@@ -50,7 +50,7 @@ public class SubEquipmentConfigHandler extends AbstractEquipmentConfigHandler<Su
                                    final SubEquipmentDAO subEquipmentDAO,
                                    final SubEquipmentCacheObjectFactory subEquipmentCacheObjectFactory,
                                    final ProcessXMLProvider processXMLProvider,
-                                   final AliveTagConfigHandler aliveTagConfigEventHandler,
+                                   final AliveTimerConfigHandler aliveTagConfigEventHandler,
                                    final DataTagService dataTagService,
                                    final DataTagConfigHandler dataTagConfigTransacted,
                                    final EquipmentService equipmentService) {

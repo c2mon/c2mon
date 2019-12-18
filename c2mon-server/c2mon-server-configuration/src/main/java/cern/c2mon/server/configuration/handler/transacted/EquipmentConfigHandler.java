@@ -60,7 +60,7 @@ public class EquipmentConfigHandler extends AbstractEquipmentConfigHandler<Equip
     final ConfigurableDAO<Equipment> subEquipmentDAO,
     final AbstractCacheObjectFactory<Equipment> subEquipmentCacheObjectFactory,
     final ProcessXMLProvider processXMLProvider,
-    final AliveTagConfigHandler aliveTagConfigEventHandler,
+    final AliveTimerConfigHandler aliveTagConfigEventHandler,
     final DataTagService dataTagService,
     final DataTagConfigHandler dataTagConfigTransacted, CommandTagConfigHandler commandTagConfigHandler, SubEquipmentConfigHandler subEquipmentConfigTransacted) {
     super(equipmentService.getCache(), subEquipmentDAO, subEquipmentCacheObjectFactory, processXMLProvider, aliveTagConfigEventHandler, dataTagService, dataTagConfigTransacted);

@@ -45,6 +45,7 @@ import java.util.Properties;
 @Slf4j
 public class RuleTagConfigHandler extends AbstractTagConfigHandler<RuleTag> {
 
+  private final RuleTagService ruleTagService;
   private AlarmConfigHandler alarmConfigHandler;
 
   @Autowired
@@ -53,6 +54,7 @@ public class RuleTagConfigHandler extends AbstractTagConfigHandler<RuleTag> {
                               RuleTagLoaderDAO ruleTagLoaderDAO,
                               GenericApplicationContext context, AlarmConfigHandler alarmConfigTransacted) {
     super(ruleTagService.getCache(), ruleTagLoaderDAO, ruleTagCacheObjectFactory, ruleTagService, context);
+    this.ruleTagService = ruleTagService;
     this.alarmConfigHandler = alarmConfigTransacted;
   }
 
@@ -98,8 +100,7 @@ public class RuleTagConfigHandler extends AbstractTagConfigHandler<RuleTag> {
     try {
       log.trace("Resetting all relevant Rule parent Process/Equipment ids");
       for (Long parentRuleId : cacheable.getRuleIds()) {
-        // TODO (Alex) What is this?
-        ruleTagFacade.setParentSupervisionIds(parentRuleId);
+        ruleTagService.setParentSupervisionIds(parentRuleId);
       }
     } catch (Exception e) {
       String msg = "Exception while reloading rule parent ids: cache may be left in inconsistent state! - need to remove this rule to try and recover consistency";

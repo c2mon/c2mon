@@ -91,4 +91,8 @@ public class RuleTagService extends AbstractCacheServiceImpl<RuleTag> {
       cacheRuleTag.setRuleIdsString(bld.toString().substring(0, bld.length() - 1)); //remove ", "
     }
   }
+
+  public void setParentSupervisionIds(Long parentRuleId) {
+    // TODO (Alex) Fill this in
+  }
 }

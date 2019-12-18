@@ -18,8 +18,8 @@ package cern.c2mon.server.configuration.handler.transacted;
 
 import cern.c2mon.cache.actions.alarm.AlarmCacheObjectFactory;
 import cern.c2mon.cache.actions.alarm.AlarmService;
+import cern.c2mon.cache.actions.tag.UnifiedTagCacheFacade;
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.cache.loading.AlarmLoaderDAO;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.listener.ConfigurationEventListener;
@@ -29,7 +29,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.UnexpectedRollbackException;
 
 import java.util.Collection;
 import java.util.Properties;
@@ -45,15 +44,18 @@ public class AlarmConfigHandler extends BaseConfigHandlerImpl<Alarm, Void> {
 
   private final Collection<ConfigurationEventListener> configurationEventListeners;
 
+  private final UnifiedTagCacheFacade unifiedTagCacheFacade;
   private AlarmService alarmService;
 
   @Autowired
   public AlarmConfigHandler(final C2monCache<Alarm> alarmCache, final AlarmLoaderDAO alarmDAO,
                             final AlarmCacheObjectFactory alarmCacheObjectFactory,
                             final GenericApplicationContext context,
+                            final UnifiedTagCacheFacade unifiedTagCacheFacade,
                             final AlarmService alarmService) {
-    super(alarmCache, alarmDAO, alarmCacheObjectFactory, __ -> null, __ -> null);
+    super(alarmCache, alarmDAO, alarmCacheObjectFactory, () -> null);
     this.configurationEventListeners = context.getBeansOfType(ConfigurationEventListener.class).values();
+    this.unifiedTagCacheFacade = unifiedTagCacheFacade;
     this.alarmService = alarmService;
   }
 
@@ -63,15 +65,7 @@ public class AlarmConfigHandler extends BaseConfigHandlerImpl<Alarm, Void> {
       listener.onConfigurationEvent(alarm, ConfigConstants.Action.CREATE);
     }
 
-    // TODO (Alex) This is horrible, remove it
-    try {
-      tagConfigGateway.addAlarmToTag(alarm.getDataTagId(), alarm.getId());
-    } catch (Exception e) {
-      log.error("Exception caught while adding new Alarm " + alarm.getId() + " to Tag " + alarm.getId(), e);
-      cache.remove(alarm.getId());
-      tagConfigGateway.removeAlarmFromTag(alarm.getDataTagId(), alarm.getId());
-      throw new UnexpectedRollbackException("Unexpected exception while creating a Alarm " + alarm.getId() + ": rolling back the creation", e);
-    }
+    unifiedTagCacheFacade.addAlarmToTag(alarm.getDataTagId(), alarm.getId());
 
     alarmService.evaluateAlarm(alarm.getId());
   }
@@ -102,19 +96,6 @@ public class AlarmConfigHandler extends BaseConfigHandlerImpl<Alarm, Void> {
       listener.onConfigurationEvent(alarm, ConfigConstants.Action.REMOVE);
     }
 
-    try {
-      removeDataTagReference(alarm);
-    } catch (CacheElementNotFoundException e) {
-      log.warn("Unable to remove Alarm reference from Tag, as could not locate Tag " + alarm.getDataTagId() + " in cache");
-    }
+    unifiedTagCacheFacade.removeAlarmFromTag(alarm.getDataTagId(), alarm.getId());
   }
-
-  /**
-   * Removes the reference to the alarm in the associated Tag object.
-   * @param alarm the alarm for which the tag needs updating
-   */
-  private void removeDataTagReference(final Alarm alarm) {
-    tagConfigGateway.removeAlarmFromTag(alarm.getDataTagId(), alarm.getId());
-  }
-
 }
