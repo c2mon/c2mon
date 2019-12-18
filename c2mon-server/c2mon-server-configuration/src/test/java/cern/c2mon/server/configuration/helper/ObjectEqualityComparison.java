@@ -19,7 +19,6 @@ package cern.c2mon.server.configuration.helper;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alive.AliveTimerCacheObject;
 import cern.c2mon.server.common.command.CommandTagCacheObject;
-import cern.c2mon.server.common.commfault.CommFaultTagCacheObject;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.common.device.Command;
 import cern.c2mon.server.common.device.DeviceCacheObject;
@@ -56,20 +55,6 @@ public class ObjectEqualityComparison {
     assertEquals(expectedObject.getAliveInterval(), object.getAliveInterval());
   }
 
-  public static void assertCommFaultTagValuesEquals(CommFaultTagCacheObject expectedObject, CommFaultTagCacheObject object) {
-    assertEquals(expectedObject.getAliveTagId(), object.getAliveTagId());
-    assertEquals(expectedObject.getEquipmentId(), object.getEquipmentId());
-    assertEquals(expectedObject.getEquipmentName(), object.getEquipmentName());
-    assertEquals(expectedObject.getAliveTagId(), object.getAliveTagId());
-    assertEquals(expectedObject.getStateTagId(), object.getStateTagId());
-  }
-
-  public static void assertDataTagValueEquals(DataTagCacheObject expectedObject, DataTagCacheObject object) {
-    assertDataTagConfigEquals(expectedObject, object);
-    assertEquals(expectedObject.getSourceTimestamp(), object.getSourceTimestamp());
-    assertEquals(expectedObject.getDaqTimestamp(), object.getDaqTimestamp());
-  }
-
   public static void assertDataTagConfigEquals(DataTagCacheObject expectedObject, DataTagCacheObject object) {
     assertTagConfigEquals(expectedObject, object);
     assertEquals(expectedObject.getEquipmentId(), object.getEquipmentId());
@@ -103,13 +88,6 @@ public class ObjectEqualityComparison {
     assertEquals(expectedObject.getRuleIds(), object.getRuleIds());
     assertEquals(((Tag) expectedObject).getProcessIds(), ((Tag) object).getProcessIds());
     assertEquals(((Tag) expectedObject).getEquipmentIds(), ((Tag) object).getEquipmentIds());
-  }
-
-  public static void assertTagValueEquals(AbstractTagCacheObject expectedObject, AbstractTagCacheObject object) {
-    assertTagConfigEquals(expectedObject, object);
-    assertEquals(expectedObject.getCacheTimestamp(), object.getCacheTimestamp());
-    assertEquals(expectedObject.getValue(), object.getValue());
-    assertEquals(expectedObject.getValueDescription(), object.getValueDescription());
   }
 
   public static void assertCommandTagEquals(CommandTagCacheObject expectedObject, CommandTagCacheObject object) {

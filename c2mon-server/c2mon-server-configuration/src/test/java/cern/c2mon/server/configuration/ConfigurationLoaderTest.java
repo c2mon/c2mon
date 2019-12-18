@@ -94,6 +94,7 @@ import static org.junit.Assert.*;
  *
  * @author Mark Brightwell
  */
+@SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {
     CommonModule.class,
@@ -258,7 +259,7 @@ public class ConfigurationLoaderTest {
 
     expectedObject.setDataTagQuality(new DataTagQualityImpl());
 
-    ObjectEqualityComparison.assertDataTagConfigEquals(expectedObject, cacheObject);
+    assertEquals(expectedObject, cacheObject);
     // test update of control tag
     report = configurationLoader.applyConfiguration(6);
 
@@ -272,7 +273,7 @@ public class ConfigurationLoaderTest {
                                       // update
     expectedObject.setMaxValue(null);
     cacheObject = (ControlTagCacheObject) controlTagCache.get(500L);
-    ObjectEqualityComparison.assertDataTagConfigEquals(expectedObject, cacheObject);
+    assertEquals(expectedObject, cacheObject);
 
   }
 
@@ -414,7 +415,7 @@ public class ConfigurationLoaderTest {
     // expectedObject.setRuleIdsString("1234,3456"); //NO: never loaded at
     // reconfiguration of datatag, but only when a new rule is added
 
-    ObjectEqualityComparison.assertDataTagConfigEquals(expectedObject, cacheObject);
+    assertEquals(expectedObject, cacheObject);
 
     equipmentCache.acquireWriteLockOnKey(cacheObject.getEquipmentId());
     Equipment equipment = equipmentCache.get(cacheObject.getEquipmentId());
@@ -435,7 +436,7 @@ public class ConfigurationLoaderTest {
     expectedObject.setMaxValue(new Float(26));
     expectedObject.setAddress(new DataTagAddress(new OPCHardwareAddressImpl("CW_TEMP_IN_COND4")));
 
-    ObjectEqualityComparison.assertDataTagConfigEquals(expectedObject, updatedCacheObject);
+    assertEquals(expectedObject, updatedCacheObject);
     equipment = equipmentCache.get(cacheObject.getEquipmentId());
 
     equipmentCache.acquireWriteLockOnKey(cacheObject.getEquipmentId());

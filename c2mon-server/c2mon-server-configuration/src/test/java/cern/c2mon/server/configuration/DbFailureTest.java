@@ -22,7 +22,6 @@ import cern.c2mon.server.cache.dbaccess.*;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.cache.loading.config.CacheLoadingModuleRef;
 import cern.c2mon.server.common.config.CommonModule;
-import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.configuration.config.ConfigurationModule;
 import cern.c2mon.server.configuration.config.ProcessCommunicationManagerMock;
 import cern.c2mon.server.configuration.handler.transacted.ProcessConfigHandler;
@@ -56,6 +55,7 @@ import static org.junit.Assert.*;
  * @author Mark Brightwell
  *
  */
+@SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {
     CommonModule.class,
@@ -167,9 +167,8 @@ public class DbFailureTest {
   @DirtiesContext
   public void testDBPersistenceFailure() {
     //reset ProcessConfigTransacted to mock
-    ProcessConfigTransacted processConfigTransacted = mockControl.createMock(ProcessConfigTransacted.class);
-    processConfigHandler.setProcessConfigTransacted(processConfigTransacted);
-    processConfigTransacted.remove(EasyMock.isA(Process.class), EasyMock.isA(ConfigurationElementReport.class));
+    ProcessConfigHandler processConfigTransacted = mockControl.createMock(ProcessConfigHandler.class);
+    processConfigTransacted.remove(EasyMock.isA(Long.class), EasyMock.isA(ConfigurationElementReport.class));
     EasyMock.expectLastCall().andThrow(new RuntimeException("fake exception thrown"));
 
     mockControl.replay();
