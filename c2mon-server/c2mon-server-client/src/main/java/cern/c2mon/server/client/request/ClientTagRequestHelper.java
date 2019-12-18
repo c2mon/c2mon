@@ -16,11 +16,10 @@
  *****************************************************************************/
 package cern.c2mon.server.client.request;
 
-import cern.c2mon.server.cache.AliveTimerFacade;
-import cern.c2mon.server.cache.ProcessCache;
-import cern.c2mon.server.cache.TagFacadeGateway;
-import cern.c2mon.server.cache.TagLocationService;
-import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
+import cern.c2mon.cache.actions.alivetimer.AliveTimerService;
+import cern.c2mon.cache.actions.tag.UnifiedTagCacheFacade;
+import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.server.client.config.ClientProperties;
 import cern.c2mon.server.client.publish.TopicProvider;
 import cern.c2mon.server.client.util.TransferObjectFactory;
@@ -60,16 +59,16 @@ class ClientTagRequestHelper {
   private final TagFacadeGateway tagFacadeGateway;
 
   /** Reference to the tag location service to check whether a tag exists */
-  private final TagLocationService tagLocationService;
+  private final UnifiedTagCacheFacade tagLocationService;
 
   /** Used to determine whether a Control Tag is an Alive tag */
-  private final AliveTimerFacade aliveTimerFacade;
+  private final AliveTimerService aliveTimerFacade;
 
   /**
    * Reference to the Process cache that provides a list of all the process
    * names
    */
-  private final ProcessCache processCache;
+  private final C2monCache<Process> processCache;
 
   private final ClientProperties properties;
 
@@ -82,10 +81,10 @@ class ClientTagRequestHelper {
    * @param processCache Reference to the ProcessCache
    */
   @Autowired
-  public ClientTagRequestHelper(final AliveTimerFacade aliveTimerFacade,
-                                final TagLocationService tagLocationService,
+  public ClientTagRequestHelper(final AliveTimerService aliveTimerFacade,
+                                final UnifiedTagCacheFacade tagLocationService,
                                 final TagFacadeGateway tagFacadeGateway,
-                                final ProcessCache processCache,
+                                final C2monCache<Process> processCache,
                                 final ClientProperties properties) {
     this.aliveTimerFacade = aliveTimerFacade;
     this.tagLocationService = tagLocationService;
@@ -123,7 +122,7 @@ class ClientTagRequestHelper {
     final Collection<TagValueUpdate> transferTags = new ArrayList<>(tagRequest.getIds().size());
 
     for (Long tagId : tagRequest.getIds()) {
-      if (tagLocationService.isInTagCache(tagId)) {
+      if (tagLocationService.containsKey(tagId)) {
         final TagWithAlarms tagWithAlarms = tagFacadeGateway.getTagWithAlarms(tagId);
 
         switch (tagRequest.getResultType()) {
@@ -196,7 +195,7 @@ class ClientTagRequestHelper {
 
     for (Long tagId : tagConfigurationRequest.getIds()) {
 
-      if (tagLocationService.isInTagCache(tagId)) {
+      if (tagLocationService.containsKey(tagId)) {
         final TagWithAlarms tagWithAlarms = tagFacadeGateway.getTagWithAlarms(tagId);
         HashSet<Process> tagProcesses = new HashSet<Process>();
         for (Long procId : tagWithAlarms.getTag().getProcessIds()) {

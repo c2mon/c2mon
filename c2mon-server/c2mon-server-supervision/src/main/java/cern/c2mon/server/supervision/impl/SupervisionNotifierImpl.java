@@ -16,7 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.supervision.impl;
 
-import cern.c2mon.server.cache.C2monCacheListener;
+import cern.c2mon.cache.api.listener.CacheListener;
 import cern.c2mon.server.cache.EquipmentCache;
 import cern.c2mon.server.cache.ProcessCache;
 import cern.c2mon.server.cache.SubEquipmentCache;
@@ -68,7 +68,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 @Service("supervisionNotifier")
 @ManagedResource(objectName="cern.c2mon:name=supervisionNotifier")
-public class SupervisionNotifierImpl implements SupervisionNotifier, C2monCacheListener<Supervised> {
+public class SupervisionNotifierImpl implements SupervisionNotifier, CacheListener<Supervised> {
 
   /**
    * Class logger.

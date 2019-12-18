@@ -16,10 +16,10 @@
  *****************************************************************************/
 package cern.c2mon.server.client.publish;
 
-import cern.c2mon.server.cache.AliveTimerFacade;
+import cern.c2mon.cache.actions.alarm.AlarmAggregator;
+import cern.c2mon.cache.actions.alivetimer.AliveTimerService;
+import cern.c2mon.cache.actions.tag.UnifiedTagCacheFacade;
 import cern.c2mon.server.cache.TagFacadeGateway;
-import cern.c2mon.server.cache.TagLocationService;
-import cern.c2mon.server.cache.alarm.AlarmAggregator;
 import cern.c2mon.server.cache.alarm.AlarmAggregatorListener;
 import cern.c2mon.server.client.config.ClientProperties;
 import cern.c2mon.server.client.util.TransferObjectFactory;
@@ -92,10 +92,10 @@ public class TagValuePublisher implements AlarmAggregatorListener, Configuration
   private final TagFacadeGateway tagFacadeGateway;
 
   /** Reference to the tag location service */
-  private TagLocationService tagLocationService;
+  private UnifiedTagCacheFacade tagLocationService;
 
   /** Used to determine, whether a given tag is an AliveTag */
-  private AliveTimerFacade aliveTimerFacade;
+  private AliveTimerService aliveTimerFacade;
 
   private ClientProperties properties;
 
@@ -111,10 +111,10 @@ public class TagValuePublisher implements AlarmAggregatorListener, Configuration
   @Autowired
   public TagValuePublisher(@Qualifier("clientTopicPublisher") final JmsSender jmsSender,
                            final AlarmAggregator alarmAggregator,
-                           final AliveTimerFacade aliveTimerFacade,
+                           final AliveTimerService aliveTimerFacade,
                            final ConfigurationUpdate configurationUpdate,
                            final TagFacadeGateway pTagFacadeGateway,
-                           final TagLocationService tagLocationService,
+                           final UnifiedTagCacheFacade tagLocationService,
                            final ClientProperties properties) {
     this.aliveTimerFacade = aliveTimerFacade;
     this.jmsSender = jmsSender;
@@ -183,23 +183,18 @@ public class TagValuePublisher implements AlarmAggregatorListener, Configuration
 
   @Override
   public void notifyOnConfigurationUpdate(Long tagId) {
-    tagLocationService.acquireReadLockOnKey(tagId);
+    TagWithAlarms tagWithAlarms = tagFacadeGateway.getTagWithAlarms(tagId);
     try {
-      TagWithAlarms tagWithAlarms = this.tagFacadeGateway.getTagWithAlarms(tagId);
-      try {
-        String topic = TopicProvider.topicFor(tagWithAlarms.getTag(), properties);
-        TransferTagImpl tag = TransferObjectFactory.createTransferTag(tagWithAlarms, aliveTimerFacade.isRegisteredAliveTimer(tagId), topic);
+      String topic = TopicProvider.topicFor(tagWithAlarms.getTag(), properties);
+      TransferTagImpl tag = TransferObjectFactory.createTransferTag(tagWithAlarms, aliveTimerFacade.isRegisteredAliveTimer(tagId), topic);
 
-        log.trace("notifyOnConfigurationUpdate - Publishing configuration update to client: " + TransferTagSerializer.toJson(tag));
+      log.trace("notifyOnConfigurationUpdate - Publishing configuration update to client: " + TransferTagSerializer.toJson(tag));
 
-        jmsSender.sendToTopic(TransferTagSerializer.toJson(tag), topic);
-      } catch (JmsException e) {
-        log.error("notifyOnConfigurationUpdate - Error publishing configuration update to topic for tag " + tagWithAlarms.getTag().getId()
-            + " - submitting for republication", e);
-        republisher.publicationFailed(tagWithAlarms);
-      }
-    } finally {
-      tagLocationService.releaseReadLockOnKey(tagId);
+      jmsSender.sendToTopic(TransferTagSerializer.toJson(tag), topic);
+    } catch (JmsException e) {
+      log.error("notifyOnConfigurationUpdate - Error publishing configuration update to topic for tag " + tagWithAlarms.getTag().getId()
+          + " - submitting for republication", e);
+      republisher.publicationFailed(tagWithAlarms);
     }
   }
 

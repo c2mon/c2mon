@@ -22,7 +22,6 @@ import cern.c2mon.server.cache.loading.ConfigurableDAO;
 import cern.c2mon.server.cache.loading.ControlTagLoaderDAO;
 import cern.c2mon.server.cache.loading.DataTagLoaderDAO;
 import cern.c2mon.server.cache.loading.RuleTagLoaderDAO;
-import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.tag.Tag;
@@ -32,7 +31,6 @@ import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -53,18 +51,15 @@ public class TagConfigurationManager {
 
   private C2monCache<DataTag> dataTagCache;
 
-  private ControlTagCache controlTagCache;
-
   private C2monCache<RuleTag> ruleTagCache;
 
   @Autowired
   public TagConfigurationManager(final DataTagLoaderDAO dataTagLoaderDAO, final C2monCache<DataTag> dataTagCache,
-                                 ControlTagLoaderDAO controlTagLoaderDAO, ControlTagCache controlTagCache,
+                                 ControlTagLoaderDAO controlTagLoaderDAO,
                                  RuleTagLoaderDAO ruleTagLoaderDAO, C2monCache<RuleTag> ruleTagCache) {
     this.dataTagLoaderDAO = dataTagLoaderDAO;
     this.dataTagCache = dataTagCache;
     this.controlTagLoaderDAO = controlTagLoaderDAO;
-    this.controlTagCache = controlTagCache;
     this.ruleTagLoaderDAO = ruleTagLoaderDAO;
     this.ruleTagCache = ruleTagCache;
   }
@@ -73,10 +68,10 @@ public class TagConfigurationManager {
   public void persistAllCacheConfigurationToDatabase() {
     try {
       Set<Long> dataTagIdList = dataTagCache.getKeys();
-      List<Long> controlTagIdList = controlTagCache.getKeys();
+//      List<Long> controlTagIdList = controlTagCache.getKeys();
       Set<Long> ruleTagIdList = ruleTagCache.getKeys();
 
-      int numberOfAllData = dataTagIdList.size() + controlTagIdList.size() + ruleTagIdList.size();
+      int numberOfAllData = dataTagIdList.size() + /*controlTagIdList.size()*/ + ruleTagIdList.size();
 
       log.debug("Persisting " + numberOfAllData + " configuration of cache object(s) to the database.");
 
@@ -89,11 +84,11 @@ public class TagConfigurationManager {
         saveConfigToDatabase(tag, dataTagLoaderDAO, counter, overall, numberOfAllData);
       }
 
-      for (Long id : controlTagIdList) { // TODO (Alex) Also, parallelizable?
-        ControlTag tag = controlTagCache.getCopy(id);
-        log.trace("Write Tag [id: {} - minvalue: {} - maxvalue: {}]", tag.getId(), tag.getMaxValue(), tag.getMinValue());
-        saveConfigToDatabase(tag, controlTagLoaderDAO, counter, overall, numberOfAllData);
-      }
+//      for (Long id : controlTagIdList) { TODO (Alex) Also, parallelizable?
+//        ControlTag tag = controlTagCache.getCopy(id);
+//        log.trace("Write Tag [id: {} - minvalue: {} - maxvalue: {}]", tag.getId(), tag.getMaxValue(), tag.getMinValue());
+//        saveConfigToDatabase(tag, controlTagLoaderDAO, counter, overall, numberOfAllData);
+//      }
 
       for (Long id : ruleTagIdList) {
         RuleTag tag = ruleTagCache.get(id);
@@ -120,12 +115,12 @@ public class TagConfigurationManager {
   public void persistAllCacheConfigurationToDatabaseParallel() {
     try {
       Set<Long> dataTagIdList = dataTagCache.getKeys();
-      List<Long> controlTagIdList = controlTagCache.getKeys();
+//      List<Long> controlTagIdList = controlTagCache.getKeys();
       Set<Long> ruleTagIdList = ruleTagCache.getKeys();
 
-      log.debug("Persisting of {} dataTags, {} controlTags and {} ruleTags configuration to the database", dataTagIdList.size(), controlTagIdList.size(), ruleTagIdList.size());
+      log.debug("Persisting of {} dataTags, controlTags and {} ruleTags configuration to the database", dataTagIdList.size(), /*controlTagIdList.size(),*/ ruleTagIdList.size());
 
-      controlTagCache.getKeys().parallelStream().forEach((key) -> controlTagLoaderDAO.updateConfig(controlTagCache.getCopy(key)));
+//      controlTagCache.getKeys().parallelStream().forEach((key) -> controlTagLoaderDAO.updateConfig(controlTagCache.getCopy(key)));
       log.debug("Persisting controlTags configuration done");
 
       ruleTagCache.getKeys().parallelStream().forEach((key) -> ruleTagLoaderDAO.updateConfig(ruleTagCache.get(key)));

@@ -1,40 +1,22 @@
-/******************************************************************************
- * Copyright (C) 2010-2019 CERN. All rights not expressly granted are reserved.
- *
- * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
- * C2MON is free software: you can redistribute it and/or modify it under the
- * terms of the GNU Lesser General Public License as published by the Free
- * Software Foundation, either version 3 of the license.
- *
- * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
- * more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
- *****************************************************************************/
 package cern.c2mon.server.elasticsearch.junit;
 
-import java.sql.SQLException;
-
-import net.sf.ehcache.CacheManager;
-import org.springframework.beans.factory.annotation.Autowired;
+import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.server.common.alarm.Alarm;
+import cern.c2mon.server.common.alive.AliveTimer;
+import cern.c2mon.server.common.commfault.CommFaultTag;
+import cern.c2mon.server.common.datatag.DataTag;
+import cern.c2mon.server.common.device.Device;
+import cern.c2mon.server.common.device.DeviceClass;
+import cern.c2mon.server.common.equipment.Equipment;
+import cern.c2mon.server.common.process.Process;
+import cern.c2mon.server.common.rule.RuleTag;
+import cern.c2mon.server.common.subequipment.SubEquipment;
+import cern.c2mon.server.test.DatabasePopulationRule;
+import cern.c2mon.shared.common.command.CommandTag;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.server.cache.alarm.impl.AlarmCacheImpl;
-import cern.c2mon.server.cache.alive.AliveTimerCacheImpl;
-import cern.c2mon.server.cache.command.CommandTagCacheImpl;
-import cern.c2mon.server.cache.commfault.CommFaultTagCacheImpl;
-import cern.c2mon.server.cache.control.ControlTagCacheImpl;
-import cern.c2mon.server.cache.datatag.DataTagCacheImpl;
-import cern.c2mon.server.cache.device.DeviceCacheImpl;
-import cern.c2mon.server.cache.device.DeviceClassCacheImpl;
-import cern.c2mon.server.cache.equipment.EquipmentCacheImpl;
-import cern.c2mon.server.cache.process.ProcessCacheImpl;
-import cern.c2mon.server.cache.rule.RuleTagCacheImpl;
-import cern.c2mon.server.cache.subequipment.SubEquipmentCacheImpl;
-import cern.c2mon.server.test.DatabasePopulationRule;
+import javax.inject.Inject;
+import java.sql.SQLException;
 
 /**
  * Using this rule in a JUnit test will ensure that all caches are preloaded
@@ -45,47 +27,56 @@ import cern.c2mon.server.test.DatabasePopulationRule;
 @Service
 public class CachePopulationRule extends DatabasePopulationRule {
 
-  @Autowired
-  private ProcessCacheImpl processCache;
+  private C2monCache<Process> processCache;
 
-  @Autowired
-  private EquipmentCacheImpl equipmentCache;
+  private C2monCache<Equipment> equipmentCache;
 
-  @Autowired
-  private SubEquipmentCacheImpl subEquipmentCache;
+  private C2monCache<SubEquipment> subEquipmentCache;
 
-  @Autowired
-  private DataTagCacheImpl dataTagCache;
+  private C2monCache<DataTag> dataTagCache;
 
-  @Autowired
-  private AlarmCacheImpl alarmCache;
+  private C2monCache<Alarm> alarmCache;
 
-  @Autowired
-  private RuleTagCacheImpl ruleTagCache;
+  private C2monCache<RuleTag> ruleTagCache;
 
-  @Autowired
-  private CommandTagCacheImpl commandTagCache;
+  private C2monCache<CommandTag> commandTagCache;
 
-  @Autowired
-  private AliveTimerCacheImpl aliveTimerCache;
+  private C2monCache<AliveTimer> aliveTimerCache;
 
-  @Autowired
-  private CommFaultTagCacheImpl commFaultTagCache;
+  private C2monCache<CommFaultTag> commFaultTagCache;
 
-  @Autowired
-  private ControlTagCacheImpl controlTagCache;
+  private C2monCache<DeviceClass> deviceClassCache;
 
-  @Autowired
-  private DeviceClassCacheImpl deviceClassCache;
+  private C2monCache<Device> deviceCache;
 
-  @Autowired
-  private DeviceCacheImpl deviceCache;
+  @Inject
+  public CachePopulationRule( C2monCache<Process> processCache,
+                              C2monCache<Equipment> equipmentCache,
+                              C2monCache<SubEquipment> subEquipmentCache,
+                              C2monCache<DataTag> dataTagCache,
+                              C2monCache<Alarm> alarmCache,
+                              C2monCache<RuleTag> ruleTagCache,
+                              C2monCache<CommandTag> commandTagCache,
+                              C2monCache<AliveTimer> aliveTimerCache,
+                              C2monCache<CommFaultTag> commFaultTagCache,
+                              C2monCache<DeviceClass> deviceClassCache,
+                              C2monCache<Device> deviceCache) {
+    this.processCache = processCache;
+    this.equipmentCache = equipmentCache;
+    this.subEquipmentCache = subEquipmentCache;
+    this.dataTagCache = dataTagCache;
+    this.alarmCache = alarmCache;
+    this.ruleTagCache = ruleTagCache;
+    this.commandTagCache = commandTagCache;
+    this.aliveTimerCache = aliveTimerCache;
+    this.commFaultTagCache = commFaultTagCache;
+    this.deviceClassCache = deviceClassCache;
+    this.deviceCache = deviceCache;
+  }
 
   @Override
   protected void before() throws SQLException {
     super.before();
-    CacheManager.getInstance().clearAll();
-    controlTagCache.init();
     processCache.init();
     dataTagCache.init();
     equipmentCache.init();

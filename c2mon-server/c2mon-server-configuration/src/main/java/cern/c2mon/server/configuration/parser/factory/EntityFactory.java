@@ -17,19 +17,18 @@
 
 package cern.c2mon.server.configuration.parser.factory;
 
-import java.util.List;
-import java.util.Properties;
-
-import cern.c2mon.server.configuration.parser.exception.EntityDoesNotExistException;
-import lombok.RequiredArgsConstructor;
-
-import cern.c2mon.server.cache.C2monCache;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.configuration.parser.exception.ConfigurationParseException;
+import cern.c2mon.server.configuration.parser.exception.EntityDoesNotExistException;
 import cern.c2mon.server.configuration.parser.util.ReflectionService;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.api.util.ConfigurationEntity;
 import cern.c2mon.shared.common.Cacheable;
+import lombok.RequiredArgsConstructor;
+
+import java.util.List;
+import java.util.Properties;
 
 import static cern.c2mon.server.configuration.parser.util.ReflectionService.extractPropertiesFromField;
 
@@ -43,7 +42,7 @@ import static cern.c2mon.server.configuration.parser.util.ReflectionService.extr
 @RequiredArgsConstructor
 public abstract class EntityFactory<T extends ConfigurationEntity> {
 
-  private final C2monCache<Long, ? extends Cacheable> cache;
+  private final C2monCache<? extends Cacheable> cache;
 
   /**
    * Internal method to get all {@link ConfigurationEntity} information for a create.
@@ -144,7 +143,7 @@ public abstract class EntityFactory<T extends ConfigurationEntity> {
    * @return True if the id is known to the cache.
    */
   boolean hasEntity(Long id) {
-      return id != null ? cache.hasKey(id) : false;
+      return id != null && cache.containsKey(id);
   }
 
   /**

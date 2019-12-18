@@ -16,8 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.client.request;
 
-import cern.c2mon.server.cache.AlarmCache;
-import cern.c2mon.server.cache.TagLocationService;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.client.util.TransferObjectFactory;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.tag.Tag;
@@ -49,10 +48,10 @@ class ClientAlarmRequestHandler {
   private final TagLocationService tagLocationService;
 
   /** Reference to the AlarmCache */
-  private final AlarmCache alarmCache;
+  private final C2monCache<Alarm> alarmCache;
 
   @Autowired
-  protected ClientAlarmRequestHandler(final AlarmCache alarmCache, final TagLocationService tagLocationService) {
+  protected ClientAlarmRequestHandler(final C2monCache<Alarm> alarmCache, final TagLocationService tagLocationService) {
     this.alarmCache = alarmCache;
     this.tagLocationService = tagLocationService;
   }

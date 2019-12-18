@@ -16,16 +16,8 @@
  *****************************************************************************/
 package cern.c2mon.server.client.request;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import cern.c2mon.server.cache.DeviceClassFacade;
-import cern.c2mon.server.cache.DeviceFacade;
+import cern.c2mon.cache.actions.device.DeviceService;
+import cern.c2mon.cache.actions.deviceclass.DeviceClassService;
 import cern.c2mon.server.client.util.TransferObjectFactory;
 import cern.c2mon.server.common.device.Device;
 import cern.c2mon.shared.client.device.DeviceClassNameResponse;
@@ -33,6 +25,13 @@ import cern.c2mon.shared.client.device.DeviceInfo;
 import cern.c2mon.shared.client.device.TransferDevice;
 import cern.c2mon.shared.client.request.ClientRequest;
 import cern.c2mon.shared.client.request.ClientRequestResult;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Helper class for {@link ClientRequestDelegator} to handle
@@ -44,16 +43,16 @@ import cern.c2mon.shared.client.request.ClientRequestResult;
 class ClientDeviceRequestHelper {
   
   /** Reference to the Device facade */
-  private final DeviceFacade deviceFacade;
+  private final DeviceService deviceService;
 
   /** Reference to the DeviceClass facade */
-  private final DeviceClassFacade deviceClassFacade;
+  private final DeviceClassService deviceClassService;
   
   @Autowired
-  protected ClientDeviceRequestHelper(final DeviceClassFacade deviceClassFacade,
-                                final DeviceFacade deviceFacade) {
-    this.deviceClassFacade = deviceClassFacade;
-    this.deviceFacade = deviceFacade;
+  protected ClientDeviceRequestHelper(final DeviceClassService deviceClassService,
+                                final DeviceService deviceService) {
+    this.deviceClassService = deviceClassService;
+    this.deviceService = deviceService;
   }
   
   /**
@@ -65,7 +64,7 @@ class ClientDeviceRequestHelper {
   Collection<? extends ClientRequestResult> handleDeviceClassNamesRequest(final ClientRequest deviceClassNamesRequest) {
     Collection<DeviceClassNameResponse> classNames = new ArrayList<>();
 
-    Collection<String> names = deviceClassFacade.getDeviceClassNames();
+    Collection<String> names = deviceClassService.getDeviceClassNames();
     for (String name : names) {
       classNames.add(TransferObjectFactory.createTransferDeviceName(name));
     }
@@ -86,15 +85,15 @@ class ClientDeviceRequestHelper {
 
     if (deviceRequest.getObjectParameter() != null) {
       Set<DeviceInfo> deviceInfoList = (Set<DeviceInfo>) deviceRequest.getObjectParameter();
-      devices = deviceFacade.getDevices(deviceInfoList);
+      devices = deviceService.getDevices(deviceInfoList);
     }
     else {
       String deviceClassName = deviceRequest.getRequestParameter();
-      devices = deviceFacade.getDevices(deviceClassName);
+      devices = deviceService.getDevices(deviceClassName);
     }
 
     for (Device device : devices) {
-      transferDevices.add(TransferObjectFactory.createTransferDevice(device, deviceFacade.getClassNameForDevice(device.getId())));
+      transferDevices.add(TransferObjectFactory.createTransferDevice(device, deviceService.getClassNameForDevice(device.getId())));
     }
 
     return transferDevices;

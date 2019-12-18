@@ -17,14 +17,11 @@
 
 package cern.c2mon.server.configuration.parser.factory;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import cern.c2mon.server.cache.EquipmentCache;
-import cern.c2mon.server.cache.ProcessCache;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.loading.EquipmentDAO;
 import cern.c2mon.server.cache.loading.ProcessDAO;
 import cern.c2mon.server.cache.loading.SequenceDAO;
+import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.configuration.parser.exception.ConfigurationParseException;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
@@ -34,6 +31,9 @@ import cern.c2mon.shared.client.configuration.api.tag.StatusTag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Franz Ritter
  */
@@ -42,14 +42,14 @@ public class EquipmentFactory extends EntityFactory<Equipment> {
 
   private EquipmentDAO equipmentDAO;
   private SequenceDAO sequenceDAO;
-  private ProcessCache processCache;
+  private C2monCache<Process> processCache;
   private ProcessDAO processDAO;
   private ControlTagFactory controlTagFactory;
 
   @Autowired
-  public EquipmentFactory(EquipmentCache equipmentCache, EquipmentDAO equipmentDAO, SequenceDAO sequenceDAO,
+  public EquipmentFactory(C2monCache<cern.c2mon.server.common.equipment.Equipment> equipmentCache, EquipmentDAO equipmentDAO, SequenceDAO sequenceDAO,
                           ControlTagFactory controlTagFactory,
-                          ProcessCache processCache, ProcessDAO processDAO) {
+                          C2monCache<Process> processCache, ProcessDAO processDAO) {
     super(equipmentCache);
     this.equipmentDAO = equipmentDAO;
     this.sequenceDAO = sequenceDAO;
@@ -67,7 +67,7 @@ public class EquipmentFactory extends EntityFactory<Equipment> {
     equipment.setProcessId(processId);
 
     // check information about the parent id
-    if (processCache.hasKey(processId)) {
+    if (processCache.containsKey(processId)) {
 
       ConfigurationElement createEquipment = doCreateInstance(equipment);
       equipment = setDefaultControlTags(equipment);

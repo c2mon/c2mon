@@ -16,15 +16,17 @@
  *****************************************************************************/
 package cern.c2mon.server.daq.update;
 
-import java.util.Collection;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.Session;
-
+import cern.c2mon.cache.actions.datatag.DataTagService;
+import cern.c2mon.cache.actions.process.ProcessService;
+import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.config.ServerProperties;
-
+import cern.c2mon.server.common.process.Process;
+import cern.c2mon.server.common.thread.Event;
+import cern.c2mon.server.supervision.SupervisionManager;
+import cern.c2mon.shared.common.datatag.DataTagValueUpdate;
+import cern.c2mon.shared.common.datatag.SourceDataTagValue;
+import cern.c2mon.shared.daq.datatag.DataTagValueUpdateConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,17 +37,11 @@ import org.springframework.jmx.export.annotation.ManagedAttribute;
 import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.server.cache.ControlTagFacade;
-import cern.c2mon.server.cache.DataTagFacade;
-import cern.c2mon.server.cache.ProcessCache;
-import cern.c2mon.server.cache.ProcessFacade;
-import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
-import cern.c2mon.server.common.process.Process;
-import cern.c2mon.server.common.thread.Event;
-import cern.c2mon.server.supervision.SupervisionManager;
-import cern.c2mon.shared.common.datatag.DataTagValueUpdate;
-import cern.c2mon.shared.common.datatag.SourceDataTagValue;
-import cern.c2mon.shared.daq.datatag.DataTagValueUpdateConverter;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.Session;
+import java.util.Collection;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Implementation of the bean processing incoming updates from the
@@ -78,12 +74,7 @@ public class SourceUpdateManagerImpl implements SourceUpdateManager, SessionAwar
   /**
    * Reference to DataTagFacade bean (singleton).
    */
-  private final DataTagFacade dataTagFacade;
-
-  /**
-   * Reference to the facade for control tags.
-   */
-  private final ControlTagFacade controlTagFacade;
+  private final DataTagService dataTagService;
 
   /**
    * Reference to the supervision manager.
@@ -93,12 +84,12 @@ public class SourceUpdateManagerImpl implements SourceUpdateManager, SessionAwar
   /**
    * Reference to the Process Facade needed to check the process PIK (we avoid to use the Process Cache)
    */
-  private final ProcessFacade processFacade;
+  private final ProcessService processService;
 
   /**
    * Reference to the Process Cache
    */
-  private final ProcessCache processCache;
+  private final C2monCache<Process> processCache;
 
   private final ServerProperties properties;
 
@@ -129,19 +120,15 @@ public class SourceUpdateManagerImpl implements SourceUpdateManager, SessionAwar
   private static final Boolean ACCEPT_UPDATE = true;
 
   @Autowired
-  public SourceUpdateManagerImpl(final DataTagFacade dataTagFacade,
-                                 final ControlTagFacade controlTagFacade,
-                                 final SupervisionManager supervisionManager,
-                                 final DataTagValueUpdateConverter dataTagValueUpdateConverter,
-                                 final ProcessFacade processFacade,
-                                 final ProcessCache processCache,
-                                 final ServerProperties properties) {
+  public SourceUpdateManagerImpl(
+    final SupervisionManager supervisionManager,
+    final DataTagValueUpdateConverter dataTagValueUpdateConverter,
+    DataTagService dataTagService, ProcessService processService, C2monCache<Process> processCache, final ServerProperties properties) {
     super();
-    this.dataTagFacade = dataTagFacade;
-    this.controlTagFacade = controlTagFacade;
     this.supervisionManager = supervisionManager;
     this.converter = dataTagValueUpdateConverter;
-    this.processFacade = processFacade;
+    this.dataTagService = dataTagService;
+    this.processService = processService;
     this.processCache = processCache;
     this.properties = properties;
   }
@@ -222,7 +209,7 @@ public class SourceUpdateManagerImpl implements SourceUpdateManager, SessionAwar
 
   /**
    * Performs all operations needed on reception of a control tag. Currently very similar to
-   * processDataTag method and uses the {@link DataTagFacade} to update the ControlTagCacheObject as it
+   * processDataTag method and uses the {@link DataTagService} to update the ControlTagCacheObject as it
    * coincides with the underlying DataTagCacheObject. In the future, may with to implement a
    * controlTagFacade if the handling of the Control tags is modified.
    *
@@ -252,7 +239,7 @@ public class SourceUpdateManagerImpl implements SourceUpdateManager, SessionAwar
   private void processDataTag(final SourceDataTagValue sourceDataTagValue) {
     try {
       log.trace("Processing incoming update for datatag #" + sourceDataTagValue.getId());
-      dataTagFacade.updateFromSource(sourceDataTagValue.getId(), sourceDataTagValue);
+      dataTagService.updateFromSource(sourceDataTagValue.getId(), sourceDataTagValue);
 
     } catch (CacheElementNotFoundException cacheEx) {
       log.warn("Received unrecognized data tag #" + sourceDataTagValue.getId() + ": ignoring the update");
@@ -276,55 +263,53 @@ public class SourceUpdateManagerImpl implements SourceUpdateManager, SessionAwar
    *         {@link #ACCEPT_UPDATE} in any other case
    */
   private Boolean checkProcessPIK(final DataTagValueUpdate dataTagValueUpdate) {
-    Process process;
 
-    processCache.acquireWriteLockOnKey(dataTagValueUpdate.getProcessId());
-    try {
-      process = this.processCache.get(dataTagValueUpdate.getProcessId());
+    return processCache.executeTransaction(() -> {
+        try {
+          Process process;
+          process = this.processCache.get(dataTagValueUpdate.getProcessId());
 
-      // if PIK is registered in Server
-      if (process.getProcessPIK() != null) {
-        // If no PIK sent by the DAQ update or wrong PIK is sent by DAQ update ignore message
-        if (dataTagValueUpdate.getProcessPIK() == null) {
-          log.warn(" Processing incoming update for Process " + process.getName() +
-              ": PIK registered (" + process.getProcessPIK() + ") but no PIK received from update: Ignoring the update");
+          // if PIK is registered in Server
+          if (process.getProcessPIK() != null) {
+            // If no PIK sent by the DAQ update or wrong PIK is sent by DAQ update ignore message
+            if (dataTagValueUpdate.getProcessPIK() == null) {
+              log.warn(" Processing incoming update for Process " + process.getName() +
+                ": PIK registered (" + process.getProcessPIK() + ") but no PIK received from update: Ignoring the update");
 
-          // TODO: Send disconnection
-          return IGNORE_UPDATE;
-        } else if (!process.getProcessPIK().equals(dataTagValueUpdate.getProcessPIK())) {
-          log.warn("Processing incoming updates for Process " + process.getName() +
-              ": Received wrong PIK - cache vs update (" + process.getProcessPIK() + " vs " +
-              dataTagValueUpdate.getProcessPIK() + "): Ignoring the update");
+              // TODO: Send disconnection
+              return IGNORE_UPDATE;
+            } else if (!process.getProcessPIK().equals(dataTagValueUpdate.getProcessPIK())) {
+              log.warn("Processing incoming updates for Process " + process.getName() +
+                ": Received wrong PIK - cache vs update (" + process.getProcessPIK() + " vs " +
+                dataTagValueUpdate.getProcessPIK() + "): Ignoring the update");
 
-          // TODO: Send disconnection
-          return IGNORE_UPDATE;
+              // TODO: Send disconnection
+              return IGNORE_UPDATE;
+            }
+          }
+          // If no PIK register in server cache (ie. corrupted) save the PIK and Accept
+          else {
+            // If no PIK sent by the DAQ update ignore message
+            if (dataTagValueUpdate.getProcessPIK() == null) {
+              log.warn("Processing incoming update for Process " + process.getName() + " with no PIK: Ignoring the update");
+
+              return IGNORE_UPDATE;
+            }
+
+            // If the Test Mode is on we don't save the PIK
+            if (properties.isTestMode()) {
+              log.trace("[TEST] Processing incoming update for Process " + process.getName());
+            } else {
+              log.trace("Processing incoming update for Process " + process.getName() + " and saving PIK " + dataTagValueUpdate.getProcessPIK());
+
+              processService.setProcessPIK(process.getId(), dataTagValueUpdate.getProcessPIK());
+            }
+          }
+        } catch (CacheElementNotFoundException cacheEx) {
+          log.warn("Receive updates from unrecognized Process #" + dataTagValueUpdate.getProcessId() + ": Ignoring the updates", cacheEx);
         }
-      }
-      // If no PIK register in server cache (ie. corrupted) save the PIK and Accept
-      else {
-        // If no PIK sent by the DAQ update ignore message
-        if (dataTagValueUpdate.getProcessPIK() == null) {
-          log.warn("Processing incoming update for Process " + process.getName() + " with no PIK: Ignoring the update");
-
-          return IGNORE_UPDATE;
-        }
-
-        // If the Test Mode is on we don't save the PIK
-        if (properties.isTestMode()) {
-          log.trace("[TEST] Processing incoming update for Process " + process.getName());
-        } else {
-          log.trace("Processing incoming update for Process " + process.getName() + " and saving PIK " + dataTagValueUpdate.getProcessPIK());
-
-          this.processFacade.setProcessPIK(process.getId(), dataTagValueUpdate.getProcessPIK());
-        }
-      }
-    } catch (CacheElementNotFoundException cacheEx) {
-      log.warn("Receive updates from unrecognized Process #" + dataTagValueUpdate.getProcessId() +  ": Ignoring the updates", cacheEx);
-    } finally {
-      processCache.releaseWriteLockOnKey(dataTagValueUpdate.getProcessId());
-    }
-
-    // If no problems we accept the update
-    return ACCEPT_UPDATE;
+      // If no problems we accept the update
+        return ACCEPT_UPDATE;
+      });
   }
 }

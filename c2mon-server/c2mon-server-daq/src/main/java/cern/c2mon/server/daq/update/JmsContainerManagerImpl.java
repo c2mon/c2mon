@@ -16,13 +16,10 @@
  *****************************************************************************/
 package cern.c2mon.server.daq.update;
 
-import java.util.*;
-import java.util.concurrent.*;
-
-import javax.annotation.PostConstruct;
-import javax.jms.ConnectionFactory;
-import javax.jms.Message;
-
+import cern.c2mon.cache.actions.process.ProcessService;
+import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.server.common.config.ServerConstants;
+import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.daq.JmsContainerManager;
 import cern.c2mon.server.daq.config.DaqProperties;
 import org.apache.activemq.command.ActiveMQQueue;
@@ -36,12 +33,13 @@ import org.springframework.jms.listener.SessionAwareMessageListener;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-
-import cern.c2mon.server.cache.ClusterCache;
-import cern.c2mon.server.cache.ProcessCache;
-import cern.c2mon.server.common.config.ServerConstants;
-import cern.c2mon.server.common.process.Process;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+import javax.jms.ConnectionFactory;
+import javax.jms.Message;
+import java.util.*;
+import java.util.concurrent.*;
 
 /**
  * Implementation of the JmsContainer bean. Also manages the daq-in update
@@ -72,7 +70,7 @@ public class JmsContainerManagerImpl implements JmsContainerManager, SmartLifecy
   /**
    * Reference to Process cache.
    */
-  private ProcessCache processCache;
+  private C2monCache<Process> processCache;
 
   /**
    * Running containers.
@@ -85,6 +83,7 @@ public class JmsContainerManagerImpl implements JmsContainerManager, SmartLifecy
    */
   private ThreadPoolTaskExecutor daqThreadPoolTaskExecutor;
 
+  private ProcessService processService;
   /**
    * The JMS connection factory used (instantiated in XML).
    */
@@ -102,11 +101,6 @@ public class JmsContainerManagerImpl implements JmsContainerManager, SmartLifecy
   private Timer subscriptionChecker;
 
   /**
-   * For accessing reconfiguration lock.
-   */
-  private ClusterCache clusterCache;
-
-  /**
    * How often does the subscription checker run.
    */
   private static final long SUBSCRIPTION_CHECK_INTERVAL = 120000L;
@@ -117,17 +111,16 @@ public class JmsContainerManagerImpl implements JmsContainerManager, SmartLifecy
    * Constructor.
    */
   @Autowired
-  public JmsContainerManagerImpl(final ProcessCache processCache,
+  public JmsContainerManagerImpl(final ProcessService processService,
                                  final @Qualifier("daqInConnectionFactory") ConnectionFactory updateConnectionFactory,
                                  final @Qualifier("sourceUpdateManager") SessionAwareMessageListener<Message> listener,
-                                 final @Qualifier("clusterCache") ClusterCache clusterCache,
                                  final ThreadPoolTaskExecutor daqThreadPoolTaskExecutor,
                                  final DaqProperties properties) {
     super();
-    this.processCache = processCache;
+    this.processCache = processService.getCache();
+    this.processService = processService;
     this.updateConnectionFactory = updateConnectionFactory;
     this.listener = listener;
-    this.clusterCache = clusterCache;
     this.daqThreadPoolTaskExecutor = daqThreadPoolTaskExecutor;
     this.properties = properties;
   }
@@ -212,7 +205,7 @@ public class JmsContainerManagerImpl implements JmsContainerManager, SmartLifecy
   @ManagedOperation(description="Stop this JMS container")
   public void stopContainer(String processName) {
     LOGGER.info("Stopping JMS container for Process " + processName);
-    jmsContainers.get(processCache.getProcessId(processName)).stop();
+    jmsContainers.get(processService.getProcessIdFromName(processName).getId()).stop();
   }
 
   /**
@@ -222,7 +215,7 @@ public class JmsContainerManagerImpl implements JmsContainerManager, SmartLifecy
   @ManagedOperation(description="Start this JMS container.")
   public void startContainer(String processName) {
     LOGGER.info("Starting JMS container for Process " + processName);
-    jmsContainers.get(processCache.getProcessId(processName)).start();
+    jmsContainers.get(processService.getProcessIdFromName(processName).getId()).start();
   }
 
   /**
@@ -362,27 +355,22 @@ public class JmsContainerManagerImpl implements JmsContainerManager, SmartLifecy
 
     @Override
     public void run() {
-      clusterCache.acquireWriteLockOnKey(CONFIG_LOCK_KEY);
+      LOGGER.debug("Checking JMS subscriptions are up to date.");
       try {
-        LOGGER.debug("Checking JMS subscriptions are up to date.");
-        try {
-          //check no new
-          for (Long id : processCache.getKeys()) {
-            if (!jmsContainers.containsKey(id)) {
-              subscribe(processCache.get(id));
-            }
+        //check no new
+        for (Long id : processCache.getKeys()) {
+          if (!jmsContainers.containsKey(id)) {
+            subscribe(processCache.get(id));
           }
-          //check no old that needs unsubscribing
-          for (Map.Entry<Long, DefaultMessageListenerContainer> entry : jmsContainers.entrySet()) {
-            if (!processCache.getKeys().contains(entry.getKey())) {
-              unsubscribe(entry.getKey());
-            }
-          }
-        } catch (Exception e) {
-          LOGGER.error("Unexpected exception caught while updating Process JMS containers", e);
         }
-      } finally {
-        clusterCache.releaseWriteLockOnKey(CONFIG_LOCK_KEY);
+        //check no old that needs unsubscribing
+        for (Map.Entry<Long, DefaultMessageListenerContainer> entry : jmsContainers.entrySet()) {
+          if (!processCache.getKeys().contains(entry.getKey())) {
+            unsubscribe(entry.getKey());
+          }
+        }
+      } catch (Exception e) {
+        LOGGER.error("Unexpected exception caught while updating Process JMS containers", e);
       }
     }
   }

@@ -16,14 +16,8 @@
  *****************************************************************************/
 package cern.c2mon.server.daq.out;
 
-import java.util.List;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-
-import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
+import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.shared.client.command.CommandReport;
-import cern.c2mon.shared.client.command.CommandTagHandle;
 import cern.c2mon.shared.common.NoSimpleValueParseException;
 import cern.c2mon.shared.common.command.CommandTag;
 import cern.c2mon.shared.daq.config.Change;
@@ -31,6 +25,10 @@ import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
 import cern.c2mon.shared.daq.datatag.SourceDataTagValueRequest;
 import cern.c2mon.shared.daq.datatag.SourceDataTagValueResponse;
 import cern.c2mon.shared.daq.exception.ProcessRequestException;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+import java.util.List;
 
 /**
  * Spring bean managing the sending of requests and commands to the DAQ layer,

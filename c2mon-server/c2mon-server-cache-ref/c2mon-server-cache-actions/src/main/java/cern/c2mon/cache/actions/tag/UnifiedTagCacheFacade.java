@@ -30,6 +30,14 @@ public class UnifiedTagCacheFacade {
     tagCaches = Arrays.asList(ruleTagCacheRef, dataTagCacheRef);
   }
 
+  public boolean containsKey(long id) {
+    try {
+      return doAcrossCaches(id, cache -> cache.containsKey(id));
+    } catch (CacheElementNotFoundException e) {
+      return false;
+    }
+  }
+
   public Tag get(long id) {
     return doAcrossCaches(id, cache -> cache.get(id));
   }

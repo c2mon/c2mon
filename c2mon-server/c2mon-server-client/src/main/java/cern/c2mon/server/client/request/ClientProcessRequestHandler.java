@@ -16,23 +16,22 @@
  *****************************************************************************/
 package cern.c2mon.server.client.request;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import cern.c2mon.server.cache.ProcessCache;
-import cern.c2mon.server.cache.ProcessXMLProvider;
-import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
+import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
+import cern.c2mon.server.common.process.Process;
 import cern.c2mon.shared.client.process.ProcessNameResponse;
 import cern.c2mon.shared.client.process.ProcessNameResponseImpl;
 import cern.c2mon.shared.client.process.ProcessXmlResponse;
 import cern.c2mon.shared.client.process.ProcessXmlResponseImpl;
 import cern.c2mon.shared.client.request.ClientRequest;
 import cern.c2mon.shared.client.request.ClientRequestResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Helper class for {@link ClientRequestDelegator} to handle
@@ -50,14 +49,14 @@ class ClientProcessRequestHandler {
    * Reference to the Process cache that provides a list of all the process
    * names
    */
-  private final ProcessCache processCache;
+  private final C2monCache<Process> processCache;
   
   /** Ref to the the bean providing DAQ XML */
   private final ProcessXMLProvider processXMLProvider;
  
 
   @Autowired
-  public ClientProcessRequestHandler(final ProcessCache processCache,
+  public ClientProcessRequestHandler(final C2monCache<Process> processCache,
                                final ProcessXMLProvider processXMLProvider) {
     this.processCache = processCache;
     this.processXMLProvider = processXMLProvider;

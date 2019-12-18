@@ -1,7 +1,7 @@
 package cern.c2mon.server.config;
 
-import cern.c2mon.server.cache.alarm.config.AlarmModule;
-import cern.c2mon.server.cache.config.CacheModule;
+import cern.c2mon.cache.actions.alarm.AlarmModule;
+import cern.c2mon.cache.config.CacheConfigModuleRef;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.cache.loading.config.CacheLoadingModuleRef;
 import cern.c2mon.server.cachepersistence.config.CachePersistenceModule;
@@ -27,7 +27,7 @@ import org.springframework.context.support.DefaultLifecycleProcessor;
 @Configuration
 @Import({
         CommonModule.class,
-        CacheModule.class,
+        CacheConfigModuleRef.class,
         CacheLoadingModuleRef.class,
         CacheDbAccessModule.class,
         CachePersistenceModule.class,

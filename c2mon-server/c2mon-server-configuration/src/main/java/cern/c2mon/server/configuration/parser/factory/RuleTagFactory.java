@@ -17,31 +17,30 @@
 
 package cern.c2mon.server.configuration.parser.factory;
 
-import java.util.Collections;
-import java.util.List;
-
-import cern.c2mon.server.configuration.parser.exception.ConfigurationParseException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import cern.c2mon.server.cache.RuleTagCache;
-import cern.c2mon.server.cache.TagFacadeGateway;
+import cern.c2mon.cache.actions.tag.UnifiedTagCacheFacade;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.loading.SequenceDAO;
+import cern.c2mon.server.configuration.parser.exception.ConfigurationParseException;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.api.tag.RuleTag;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Franz Ritter
  */
 @Service
 public class RuleTagFactory extends EntityFactory<RuleTag> {
-  private final RuleTagCache ruleTagCache;
-  private final TagFacadeGateway tagFacadeGateway;
+  private final C2monCache<cern.c2mon.server.common.rule.RuleTag> ruleTagCache;
+  private final UnifiedTagCacheFacade tagFacadeGateway;
   private final SequenceDAO sequenceDAO;
 
   @Autowired
-  public RuleTagFactory(RuleTagCache ruleTagCache, TagFacadeGateway tagFacadeGateway, SequenceDAO sequenceDAO) {
+  public RuleTagFactory(C2monCache<cern.c2mon.server.common.rule.RuleTag> ruleTagCache, UnifiedTagCacheFacade tagFacadeGateway, SequenceDAO sequenceDAO) {
     super(ruleTagCache);
     this.ruleTagCache = ruleTagCache;
     this.tagFacadeGateway = tagFacadeGateway;
@@ -70,7 +69,7 @@ public class RuleTagFactory extends EntityFactory<RuleTag> {
 
   @Override
   boolean hasEntity(Long id) {
-    return id != null && tagFacadeGateway.isInTagCache(id);
+    return id != null && tagFacadeGateway.containsKey(id);
   }
 
   @Override

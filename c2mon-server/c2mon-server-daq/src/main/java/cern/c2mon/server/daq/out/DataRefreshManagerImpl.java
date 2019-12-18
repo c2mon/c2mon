@@ -16,19 +16,18 @@
  *****************************************************************************/
 package cern.c2mon.server.daq.out;
 
-import java.util.Collection;
-
+import cern.c2mon.cache.actions.datatag.DataTagService;
+import cern.c2mon.cache.actions.process.ProcessService;
+import cern.c2mon.shared.common.datatag.SourceDataTagValue;
+import cern.c2mon.shared.daq.datatag.SourceDataTagValueRequest;
+import cern.c2mon.shared.daq.datatag.SourceDataTagValueResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.server.cache.DataTagFacade;
-import cern.c2mon.server.cache.ProcessCache;
-import cern.c2mon.shared.common.datatag.SourceDataTagValue;
-import cern.c2mon.shared.daq.datatag.SourceDataTagValueRequest;
-import cern.c2mon.shared.daq.datatag.SourceDataTagValueResponse;
+import java.util.Collection;
 
 /**
  * Implementation of Data refresh service.
@@ -42,21 +41,21 @@ import cern.c2mon.shared.daq.datatag.SourceDataTagValueResponse;
 public class DataRefreshManagerImpl implements DataRefreshManager {
 
   /** For updating the cache */
-  private final DataTagFacade dataTagFacade;
+  private final DataTagService dataTagFacade;
 
   /** For getting the latest value from the DAQ layer */
   private final ProcessCommunicationManager processCommunicationManager;
 
   /** For refreshing all tags. */
-  private final ProcessCache processCache;
+  private final ProcessService processCache;
 
   @Autowired
-  public DataRefreshManagerImpl(DataTagFacade dataTagFacade, ProcessCommunicationManager processCommunicationManager,
-      ProcessCache processCache) {
+  public DataRefreshManagerImpl(DataTagService dataTagFacade, ProcessCommunicationManager processCommunicationManager,
+      ProcessService processService) {
     super();
     this.dataTagFacade = dataTagFacade;
     this.processCommunicationManager = processCommunicationManager;
-    this.processCache = processCache;
+    this.processCache = processService;
   }
 
   @Override
@@ -69,16 +68,16 @@ public class DataRefreshManagerImpl implements DataRefreshManager {
 
   @ManagedOperation(description="Refresh values for a given DAQ from the DAQ cache; provide DAQ name.")
   public void refreshValuesForProcess(final String name) {
-    refreshValuesForProcess(processCache.getProcessId(name));
+    refreshValuesForProcess(processCache.getProcessIdFromName(name).getId());
   }
 
   @Override
   public void refreshTagsForAllProcess() {
-    for (Long key : processCache.getKeys()) {
+    for (Long key : processCache.getCache().getKeys()) {
       try {
         refreshValuesForProcess(key);
       } catch (Exception e) {
-        log.error("Exception caught while refreshing values for process {} (#{})", processCache.get(key).getName(), key, e);
+        log.error("Exception caught while refreshing values for process {} (#{})", processCache.getCache().get(key).getName(), key, e);
       }
     }
   }

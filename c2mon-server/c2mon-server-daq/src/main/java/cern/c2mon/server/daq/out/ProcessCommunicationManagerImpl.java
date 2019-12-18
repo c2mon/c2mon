@@ -16,24 +16,9 @@
  *****************************************************************************/
 package cern.c2mon.server.daq.out;
 
-import java.util.List;
-
-import javax.jms.ConnectionFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.SmartLifecycle;
-import org.springframework.jms.connection.SingleConnectionFactory;
-import org.springframework.stereotype.Service;
-
-import cern.c2mon.server.cache.EquipmentCache;
-import cern.c2mon.server.cache.ProcessCache;
-import cern.c2mon.server.cache.ProcessFacade;
-import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
+import cern.c2mon.cache.actions.process.ProcessService;
+import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.process.Process;
@@ -52,6 +37,18 @@ import cern.c2mon.shared.daq.datatag.SourceDataTagValueRequest;
 import cern.c2mon.shared.daq.datatag.SourceDataTagValueResponse;
 import cern.c2mon.shared.daq.exception.ProcessRequestException;
 import cern.c2mon.shared.daq.serialization.MessageConverter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.SmartLifecycle;
+import org.springframework.jms.connection.SingleConnectionFactory;
+import org.springframework.stereotype.Service;
+
+import javax.jms.ConnectionFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+import java.util.List;
 
 
 /**
@@ -73,17 +70,17 @@ public class ProcessCommunicationManagerImpl implements ProcessCommunicationMana
   /**
    * Reference to the equipment cache.
    */
-  private EquipmentCache equipmentCache;
+  private C2monCache<Equipment> equipmentCache;
 
   /**
    * Reference to process cache.
    */
-  private ProcessCache processCache;
+  private C2monCache<Process> processCache;
 
   /**
    * Reference to process facade.
    */
-  private ProcessFacade processFacade;
+  private ProcessService processService;
 
   /**
    * Reference to the bean managing the JMS
@@ -102,21 +99,19 @@ public class ProcessCommunicationManagerImpl implements ProcessCommunicationMana
    * Autowired constructor.
    *
    * @param equipmentCache
-   * @param processCache
-   * @param processFacade
+   * @param processService
    * @param jmsProcessOut
    */
   @Autowired
-  public ProcessCommunicationManagerImpl(EquipmentCache equipmentCache,
-                                         ProcessCache processCache,
-                                         ProcessFacade processFacade,
+  public ProcessCommunicationManagerImpl(C2monCache<Equipment> equipmentCache,
+                                         ProcessService processService,
                                          JmsProcessOut jmsProcessOut,
                                          @Qualifier("processOutConnectionFactory") ConnectionFactory connectionFactory,
                                          DaqProperties properties) {
     super();
     this.equipmentCache = equipmentCache;
-    this.processCache = processCache;
-    this.processFacade = processFacade;
+    this.processCache = processService.getCache();
+    this.processService = processService;
     this.jmsProcessOut = jmsProcessOut;
     this.processOutConnectionFactory = connectionFactory;
     this.properties = properties;
@@ -166,7 +161,7 @@ public class ProcessCommunicationManagerImpl implements ProcessCommunicationMana
 
         try {
           Process process = processCache.get(processId);
-          if (processFacade.isRunning(process)) {
+          if (processService.isRunning(process.getId())) {
             LOGGER.debug("requestDataTagValues() : associated process is running.");
             String reply = jmsProcessOut.sendTextMessage(MessageConverter.requestToJson(pRequest), getJmsDaqCommandQueue(process), 10000);
 
@@ -212,7 +207,7 @@ public class ProcessCommunicationManagerImpl implements ProcessCommunicationMana
 
     try {
       Process process = processCache.get(commandTag.getProcessId());
-      if (processFacade.isRunning(process)) {
+      if (processService.isRunning(process.getId())) {
         LOGGER.debug("executeCommand() : associated process is running.");
 
         // treat command

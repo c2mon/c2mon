@@ -16,20 +16,30 @@
  *****************************************************************************/
 package cern.c2mon.server.lifecycle;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.server.cache.dbaccess.*;
+import cern.c2mon.server.common.alarm.Alarm;
+import cern.c2mon.server.common.alive.AliveTimer;
+import cern.c2mon.server.common.commfault.CommFaultTag;
+import cern.c2mon.server.common.config.ServerConstants;
+import cern.c2mon.server.common.datatag.DataTag;
+import cern.c2mon.server.common.device.Device;
+import cern.c2mon.server.common.device.DeviceClass;
+import cern.c2mon.server.common.equipment.Equipment;
+import cern.c2mon.server.common.process.Process;
+import cern.c2mon.server.common.rule.RuleTag;
+import cern.c2mon.server.common.subequipment.SubEquipment;
+import cern.c2mon.shared.common.command.CommandTag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.server.cache.*;
-import cern.c2mon.server.cache.dbaccess.*;
-import cern.c2mon.server.common.config.ServerConstants;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This class runs at server startup and performs consistency checks to make
@@ -54,35 +64,35 @@ public class CacheConsistencyChecker implements SmartLifecycle {
   /**
    * Map of cache beans to mapper beans.
    */
-  private Map<C2monCache<?, ?>, SimpleLoaderMapper<?>> map = new HashMap<>();
+  private Map<C2monCache<?>, SimpleLoaderMapper<?>> map = new HashMap<>();
 
   /**
    * Constructor.
    */
   @Autowired
-  public CacheConsistencyChecker(final AlarmCache alarmCache,
+  public CacheConsistencyChecker(final C2monCache<Alarm> alarmCache,
                                  final AlarmMapper alarmMapper,
-                                 final AliveTimerCache aliveTimerCache,
+                                 final C2monCache<AliveTimer> aliveTimerCache,
                                  final AliveTimerMapper aliveTimerMapper,
-                                 final CommandTagCache commandTagCache,
+                                 final C2monCache<CommandTag> commandTagCache,
                                  final CommandTagMapper commandTagMapper,
-                                 final CommFaultTagCache commFaultTagCache,
+                                 final C2monCache<CommFaultTag> commFaultTagCache,
                                  final CommFaultTagMapper commFaultTagMapper,
-                                 final ControlTagCache controlTagCache,
+                                 final C2monCache<Alarm> controlTagCache,
                                  final ControlTagMapper controlTagMapper,
-                                 final DataTagCache dataTagCache,
+                                 final C2monCache<DataTag> dataTagCache,
                                  final DataTagMapper dataTagMapper,
-                                 final DeviceClassCache deviceClassCache,
+                                 final C2monCache<DeviceClass> deviceClassCache,
                                  final DeviceClassMapper deviceClassMapper,
-                                 final DeviceCache deviceCache,
+                                 final C2monCache<Device> deviceCache,
                                  final DeviceMapper deviceMapper,
-                                 final EquipmentCache equipmentCache,
+                                 final C2monCache<Equipment> equipmentCache,
                                  final EquipmentMapper equipmentMapper,
-                                 final ProcessCache processCache,
+                                 final C2monCache<Process> processCache,
                                  final ProcessMapper processMapper,
-                                 final RuleTagCache ruleTagCache,
+                                 final C2monCache<RuleTag> ruleTagCache,
                                  final RuleTagMapper ruleTagMapper,
-                                 final SubEquipmentCache subEquipmentCache,
+                                 final C2monCache<SubEquipment> subEquipmentCache,
                                  final SubEquipmentMapper subEquipmentMapper) {
     super();
     map.put(alarmCache, alarmMapper);

@@ -16,9 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.supervision.impl;
 
-import cern.c2mon.server.cache.*;
-import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
-import cern.c2mon.server.cache.supervision.SupervisionAppender;
+import cern.c2mon.cache.api.SupervisionAppender;
 import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.common.datatag.DataTag;

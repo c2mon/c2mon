@@ -16,12 +16,16 @@
  *****************************************************************************/
 package cern.c2mon.server.supervision.impl;
 
-import cern.c2mon.server.cache.*;
-import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
+import cern.c2mon.cache.actions.alivetimer.AliveTimerService;
+import cern.c2mon.cache.actions.process.ProcessService;
+import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.alive.AliveTimer;
 import cern.c2mon.server.common.commfault.CommFaultTag;
 import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.common.config.ServerProperties;
+import cern.c2mon.server.common.equipment.Equipment;
+import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.supervision.SupervisionManager;
 import cern.c2mon.server.supervision.impl.event.AliveTimerEvents;
 import cern.c2mon.server.supervision.impl.event.EquipmentEvents;
@@ -32,7 +36,6 @@ import cern.c2mon.shared.daq.process.ProcessConfigurationRequest;
 import cern.c2mon.shared.daq.process.ProcessConnectionRequest;
 import cern.c2mon.shared.daq.process.ProcessDisconnectionRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Service;
 
@@ -75,43 +78,22 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
 //  ===========================
 
   @Resource
-  private ProcessCache processCache;
+  private C2monCache<Equipment> equipmentCache;
 
   @Resource
-  private EquipmentCache equipmentCache;
+  private C2monCache<SubEquipment> subEquipmentCache;
 
   @Resource
-  private EquipmentFacade equipmentFacade;
+  private C2monCache<CommFaultTag> commFaultTagCache;
 
   @Resource
-  private SubEquipmentCache subEquipmentCache;
+  private AliveTimerService aliveTimerService;
 
   @Resource
-  private SubEquipmentFacade subEquipmentFacade;
+  private C2monCache<AliveTimer> aliveTimerCache;
 
   @Resource
-  private ControlTagCache controlTagCache;
-
-  @Autowired
-  private ControlTagFacade controlTagFacade;
-
-  @Resource
-  private CommFaultTagCache commFaultTagCache;
-
-  @Resource
-  private AliveTimerFacade aliveTimerFacade;
-
-  @Resource
-  private AliveTimerCache aliveTimerCache;
-
-  @Resource
-  private ProcessFacade processFacade;
-
-  @Resource
-  private ProcessXMLProvider processXMLProvider;
-
-  @Resource
-  private ClusterCache clusterCache;
+  private ProcessService processFacade;
 
   @Resource
   private ServerProperties properties;;
@@ -303,10 +285,10 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
     //notice uses once timestamp for
     try {
 
-      if (aliveTimerFacade.isRegisteredAliveTimer(tagId)) {
+      if (aliveTimerService.isRegisteredAliveTimer(tagId)) {
 
         //reject old alive tag
-        AliveTimer timerCopy = aliveTimerCache.getCopy(tagId);
+        AliveTimer timerCopy = aliveTimerCache.get(tagId);
         //TODO tmp check until all DAQ updates have DAQ t.s. set
         Timestamp useTimestamp;
         if (sourceDataTagValue.getDaqTimestamp() == null) {
@@ -321,7 +303,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
         } else {
           // The tag is an alive tag -> we rewind the corresponding alive timer
           //TODO sychronization on alive timers... needed? use id here, so not possible around update
-          aliveTimerFacade.update(tagId);
+          aliveTimerService.startOrUpdateTimestamp(tagId);
 
           Timestamp supervisionTimestamp = new Timestamp(System.currentTimeMillis());
           if (timerCopy.isProcessAliveType()) {
@@ -339,7 +321,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
       } else {
         // The tag is NOT an alive tag -> we check if it is a communication fault tag
 
-        CommFaultTag commFaultTagCopy = commFaultTagCache.getCopy(tagId);
+        CommFaultTag commFaultTagCopy = commFaultTagCache.get(tagId);
         if (log.isDebugEnabled()) {
           StringBuilder str = new StringBuilder("processControlTag() : tag ");
           str.append(tagId);
@@ -347,7 +329,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
           log.debug(str.toString());
         }
 
-        if (equipmentCache.hasKey(commFaultTagCopy.getEquipmentId())) { //check if equipment
+        if (equipmentCache.containsKey(commFaultTagCopy.getEquipmentId())) { //check if equipment
 
           boolean updateAliveTimer = false; //must be done outside of the process lock as locks the alivetimer!
           Long equipmentId = commFaultTagCopy.getEquipmentId();
@@ -368,11 +350,11 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
           }
           if (updateAliveTimer) {
             if (commFaultTagCopy.getAliveTagId() != null) {
-              aliveTimerFacade.update(commFaultTagCopy.getAliveTagId());
+              aliveTimerService.startOrUpdateTimestamp(commFaultTagCopy.getAliveTagId());
             }
           }
 
-        } else if (subEquipmentCache.hasKey(commFaultTagCopy.getEquipmentId())) {     //check if subequipment
+        } else if (subEquipmentCache.containsKey(commFaultTagCopy.getEquipmentId())) {     //check if subequipment
 
           boolean updateAliveTimer = false;
           Long subEquipmentId = commFaultTagCopy.getEquipmentId();
@@ -395,7 +377,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
           }
           if (updateAliveTimer) {
             if (commFaultTagCopy.getAliveTagId() != null) {
-              aliveTimerFacade.update(commFaultTagCopy.getAliveTagId());
+              aliveTimerService.startOrUpdateTimestamp(commFaultTagCopy.getAliveTagId());
             }
           }
         } else {

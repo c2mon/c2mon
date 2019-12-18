@@ -17,10 +17,10 @@
 
 package cern.c2mon.server.configuration.parser.factory;
 
-import cern.c2mon.server.cache.AlarmCache;
-import cern.c2mon.server.cache.DataTagCache;
-import cern.c2mon.server.cache.TagFacadeGateway;
+import cern.c2mon.cache.actions.tag.UnifiedTagCacheFacade;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.loading.SequenceDAO;
+import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.configuration.parser.exception.ConfigurationParseException;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
@@ -38,11 +38,11 @@ import java.util.List;
 public class AlarmFactory extends EntityFactory<Alarm> {
 
   private SequenceDAO sequenceDAO;
-  private TagFacadeGateway tagFacadeGateway;
-  private DataTagCache dataTagCache;
+  private UnifiedTagCacheFacade tagFacadeGateway;
+  private C2monCache<DataTag> dataTagCache;
 
   @Autowired
-  public AlarmFactory(SequenceDAO sequenceDAO, AlarmCache alarmCache, DataTagCache dataTagCache, TagFacadeGateway tagFacadeGateway) {
+  public AlarmFactory(SequenceDAO sequenceDAO, C2monCache<cern.c2mon.server.common.alarm.Alarm> alarmCache, C2monCache<DataTag> dataTagCache, UnifiedTagCacheFacade tagFacadeGateway) {
     super(alarmCache);
     this.sequenceDAO = sequenceDAO;
     this.dataTagCache = dataTagCache;
@@ -55,7 +55,7 @@ public class AlarmFactory extends EntityFactory<Alarm> {
         ? alarm.getDataTagId() : dataTagCache.get(alarm.getDataTagName()).getId();
 
     // Check if the parent id exists
-    if (tagFacadeGateway.isInTagCache(tagId)) {
+    if (tagFacadeGateway.containsKey(tagId)) {
 
       alarm.setDataTagId(tagId);
       return Collections.singletonList(doCreateInstance(alarm));

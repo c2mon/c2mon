@@ -17,10 +17,7 @@
 
 package cern.c2mon.server.configuration.parser.factory;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import cern.c2mon.server.cache.ProcessCache;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.loading.ProcessDAO;
 import cern.c2mon.server.cache.loading.SequenceDAO;
 import cern.c2mon.server.configuration.parser.exception.ConfigurationParseException;
@@ -31,6 +28,9 @@ import cern.c2mon.shared.client.configuration.api.tag.AliveTag;
 import cern.c2mon.shared.client.configuration.api.tag.StatusTag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Franz Ritter
@@ -43,7 +43,7 @@ public class ProcessFactory extends EntityFactory<Process> {
   private ControlTagFactory controlTagFactory;
 
   @Autowired
-  public ProcessFactory(ProcessCache processCache, SequenceDAO sequenceDAO, ControlTagFactory controlTagFactory,
+  public ProcessFactory(C2monCache<cern.c2mon.server.common.process.Process> processCache, SequenceDAO sequenceDAO, ControlTagFactory controlTagFactory,
                         ProcessDAO processDAO) {
     super(processCache);
     this.sequenceDAO = sequenceDAO;

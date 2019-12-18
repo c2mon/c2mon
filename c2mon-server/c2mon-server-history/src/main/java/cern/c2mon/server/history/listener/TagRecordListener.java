@@ -16,11 +16,10 @@
  *****************************************************************************/
 package cern.c2mon.server.history.listener;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
-import javax.annotation.PostConstruct;
-
+import cern.c2mon.server.common.component.Lifecycle;
+import cern.c2mon.server.common.config.ServerConstants;
+import cern.c2mon.server.common.tag.Tag;
+import cern.c2mon.server.history.logger.BatchLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,12 +27,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.server.cache.C2monBufferedCacheListener;
-import cern.c2mon.server.cache.CacheRegistrationService;
-import cern.c2mon.server.common.component.Lifecycle;
-import cern.c2mon.server.common.config.ServerConstants;
-import cern.c2mon.server.common.tag.Tag;
-import cern.c2mon.server.history.logger.BatchLogger;
+import javax.annotation.PostConstruct;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Listens to updates in the Rule and DataTag caches and calls the DAO

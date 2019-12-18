@@ -16,9 +16,9 @@
  *****************************************************************************/
 package cern.c2mon.server.client.publish;
 
+import cern.c2mon.cache.actions.tag.UnifiedTagCacheFacade;
 import cern.c2mon.server.cache.C2monCacheListener;
 import cern.c2mon.server.cache.CacheRegistrationService;
-import cern.c2mon.server.cache.TagLocationService;
 import cern.c2mon.server.client.util.TransferObjectFactory;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.component.Lifecycle;
@@ -65,7 +65,7 @@ public class AlarmPublisher implements C2monCacheListener<Alarm>, SmartLifecycle
   private CacheRegistrationService cacheRegistrationService;
 
   /** Reference to the tag location service to check whether a tag exists */
-  private final TagLocationService tagLocationService;
+  private final UnifiedTagCacheFacade tagLocationService;
 
   /** Json message serializer/deserializer */
   private static final Gson GSON = GsonFactory.createGson();
@@ -89,7 +89,7 @@ public class AlarmPublisher implements C2monCacheListener<Alarm>, SmartLifecycle
   @Autowired
   public AlarmPublisher(@Qualifier("alarmTopicPublisher") final JmsSender pJmsSender
       , final CacheRegistrationService pCacheRegistrationService
-      , final TagLocationService pTagLocationService) {
+      , final UnifiedTagCacheFacade pTagLocationService) {
 
     jmsSender = pJmsSender;
     cacheRegistrationService = pCacheRegistrationService;
@@ -122,8 +122,8 @@ public class AlarmPublisher implements C2monCacheListener<Alarm>, SmartLifecycle
     Long tagId = alarm.getDataTagId();
     AlarmValue alarmValue = null;
 
-    if (tagLocationService.isInTagCache(tagId)) {
-      Tag tag = tagLocationService.getCopy(tagId);
+    if (tagLocationService.containsKey(tagId)) {
+      Tag tag = tagLocationService.get(tagId);
       alarmValue = (TransferObjectFactory.createAlarmValue(alarm, tag));
     }
     else {
