@@ -39,7 +39,7 @@ build:
 build_docs:
   stage: build
   image: jekyll/builder:3.8.5
-  tags: [docker-privileged]
+  tags: [docker]
   script:
     - cd docs
     - jekyll build --config "_config.yml,_overwrite_url.yml"
