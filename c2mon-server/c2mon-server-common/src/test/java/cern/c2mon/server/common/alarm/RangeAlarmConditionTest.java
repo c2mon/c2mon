@@ -172,6 +172,7 @@ public class RangeAlarmConditionTest {
 
   }
 
+  @Test
   public void testXmlDeserializationBackwardComp() throws ParserConfigurationException {
     String xmlString = "<AlarmCondition class=\"cern.c2mon.server.common.alarm.RangeAlarmCondition\">"
     + "<min-value type=\"Float\">0.0</min-value>"
