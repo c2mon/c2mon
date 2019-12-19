@@ -66,12 +66,11 @@ public class RangeCondition<T extends Number> extends AlarmCondition {
 
   @Override
   public String getXMLCondition() {
-    String result = "";
-    result += "<AlarmCondition class=\"cern.c2mon.server.common.alarm.RangeAlarmCondition\">\n";
-    result += minValue != null ? "  <min-value type=\"" + minValue.getClass().getName() + "\">" + minValue + "</min-value>\n" : "";
-    result += maxValue != null ? "  <max-value type=\"" + maxValue.getClass().getName() + "\">" + maxValue + "</max-value>\n" : "";
-    result += "  <out-of-range-alarm type=\"java.lang.Boolean\">" + outOfRangeAlarm + "</out-of-range-alarm>\n";
-    result += "</AlarmCondition>";
-    return result;
+    StringBuilder builder = new StringBuilder("<AlarmCondition class=\"cern.c2mon.server.common.alarm.RangeAlarmCondition\">\n");
+    builder.append(minValue != null ? "  <min-value type=\"" + minValue.getClass().getName() + "\">" + minValue + "</min-value>\n" : "");
+    builder.append(maxValue != null ? "  <max-value type=\"" + maxValue.getClass().getName() + "\">" + maxValue + "</max-value>\n" : "");
+    builder.append("  <out-of-range-alarm type=\"java.lang.Boolean\">" + outOfRangeAlarm + "</out-of-range-alarm>\n");
+    builder.append("</AlarmCondition>");
+    return builder.toString();
   }
 }
