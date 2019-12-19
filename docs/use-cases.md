@@ -27,7 +27,7 @@ The main application is called "TIM Viewer", a generic Dashboard viewer for anim
 
 __TIM in numbers:__
 
-* ~93'000 data tags, ~40'000 alarms, ~ 1'000 rules
+* ~200'000 data tags, ~170'000 alarms, ~ 1'000 rules
 * Up to 400 million raw data values per day
 * After filtering ~ 2.2 million values are treated and stored by the C2MON server
 
