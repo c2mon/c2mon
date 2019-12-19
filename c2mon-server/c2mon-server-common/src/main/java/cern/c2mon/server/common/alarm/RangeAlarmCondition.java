@@ -16,7 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.common.alarm;
 
-import lombok.Getter;
+import lombok.Data;
 
 import cern.c2mon.shared.common.type.TypeConverter;
 
@@ -43,7 +43,7 @@ import cern.c2mon.shared.common.type.TypeConverter;
  *
  * @author Jan Stowisek, Matthias Braeger
  */
-@Getter
+@Data
 public class RangeAlarmCondition<T extends Number & Comparable<T>> extends AlarmCondition {
 
   /**
@@ -107,32 +107,46 @@ public class RangeAlarmCondition<T extends Number & Comparable<T>> extends Alarm
     if (value == null) {
       return false;
     }
+
     boolean result = true;
 
     // Check for the lower boundary
     if (this.minValue != null) {
-      Object castValue = TypeConverter.castToType(value, minValue.getClass());
-      if(outOfRangeAlarm) {
-        result = this.minValue.getClass().equals(castValue.getClass()) && minValue.compareTo(castValue) > 0;
-      } else {
-        result = this.minValue.getClass().equals(castValue.getClass()) && minValue.compareTo(castValue) <= 0;
-      }
+      result = checkAlarmForLowerBoundary(value);
     }
 
     // Check for the upper boundary
     if (this.maxValue != null) {
-      Object castValue = TypeConverter.castToType(value, maxValue.getClass());
-      if (outOfRangeAlarm) {
-        boolean maxResult = this.maxValue.getClass().equals(castValue.getClass()) && maxValue.compareTo(castValue) < 0;
-        result = (this.minValue != null) ? (result || maxResult) : maxResult;
-      } else {
-        result = result && this.maxValue.getClass().equals(castValue.getClass()) && maxValue.compareTo(castValue) >= 0;
-      }
-
-
+      result = checkAlarmForUpperBoundary(value, result);
     }
 
     return result;
+  }
+
+  @SuppressWarnings("unchecked")
+  private boolean checkAlarmForLowerBoundary(final Object value) {
+    Object castValue = TypeConverter.castToType(value, minValue.getClass());
+    if(outOfRangeAlarm) {
+      return this.minValue.getClass().equals(castValue.getClass()) && minValue.compareTo(castValue) > 0;
+    } else {
+      return this.minValue.getClass().equals(castValue.getClass()) && minValue.compareTo(castValue) <= 0;
+    }
+  }
+
+  /**
+   * @param value the current value of the associated DataTag
+   * @param intermediateResult The intermediate result has to be taken into account for the calculation
+   * @return The final alarm result
+   */
+  @SuppressWarnings("unchecked")
+  private boolean checkAlarmForUpperBoundary(final Object value, boolean intermediateResult) {
+    Object castValue = TypeConverter.castToType(value, maxValue.getClass());
+    if (outOfRangeAlarm) {
+      boolean maxResult = this.maxValue.getClass().equals(castValue.getClass()) && maxValue.compareTo(castValue) < 0;
+      return (this.minValue != null) ? (intermediateResult || maxResult) : maxResult;
+    } else {
+      return intermediateResult && this.maxValue.getClass().equals(castValue.getClass()) && maxValue.compareTo(castValue) >= 0;
+    }
   }
 
   @SuppressWarnings("unchecked")
@@ -148,7 +162,12 @@ public class RangeAlarmCondition<T extends Number & Comparable<T>> extends Alarm
    */
   @Override
   public String toString() {
-    StringBuilder str = new StringBuilder("ACTIVE if the tag value is");
+    String alarm = "ACTIVE";
+    if (outOfRangeAlarm) {
+      alarm = "TERMINATE";
+    }
+
+    StringBuilder str = new StringBuilder(alarm + " if the tag value is");
     if (this.minValue != null) {
       str.append(" >= ");
       str.append(this.minValue);
@@ -164,32 +183,5 @@ public class RangeAlarmCondition<T extends Number & Comparable<T>> extends Alarm
       str.append(".");
     }
     return str.toString();
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public boolean equals(final Object obj) {
-    boolean result = true;
-
-    if (obj instanceof RangeAlarmCondition) {
-      RangeAlarmCondition<T> cond = (RangeAlarmCondition<T>) obj;
-
-      if (this.minValue == null) {
-        result = cond.minValue == null;
-      } else {
-        result = this.minValue.equals(cond.minValue);
-      }
-
-      if (this.maxValue == null) {
-        result = result && (cond.maxValue == null);
-      } else {
-        result = result && this.maxValue.equals(cond.maxValue);
-      }
-
-      result = result && this.outOfRangeAlarm == cond.outOfRangeAlarm;
-    } else {
-      result = false;
-    }
-    return result;
   }
 }
