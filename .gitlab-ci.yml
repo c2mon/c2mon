@@ -69,7 +69,7 @@ deploy_docs:
     - build_docs
   script:
     - echo ${KRB_PASSWORD} | kinit ${KRB_USERNAME}@CERN.CH
-    - scp -o 'StrictHostKeyChecking no' -o 'GSSAPITrustDNS yes' -o 'GSSAPIDelegateCredentials yes' -B -r docs/_site/* ${KRB_USERNAME}@lxplus:/afs/cern.ch/user/c/${KRB_USERNAME}/www/c2mon.web.cern.ch/docs
+    - scp -o 'StrictHostKeyChecking no' -o 'GSSAPITrustDNS yes' -o 'GSSAPIDelegateCredentials yes' -B -r docs/_site/* ${KRB_USERNAME}@lxplus:/afs/cern.ch/user/c/${KRB_USERNAME}/www/c2mon.web.cern.ch
   only:
     - master
 
