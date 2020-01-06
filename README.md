@@ -9,8 +9,7 @@ of monitoring and control system or a full SCADA application.
 See the current [reference docs][].
 
 ## Issue tracking
-All C2MON issues are tracked and maintained within the [CERN JIRA][] system. Unfortunetaly, users from outside are not allowed to create tickets in [CERN JIRA][],
-but you are welcome to open [GitHub issues][] or to send an email to c2mon-support@cern.ch.
+All C2MON issues are tracked and maintained within the [CERN JIRA][] system. Alternatively, you can send an email to c2mon-support@cern.ch.
 
 ## Release notes
 Please have a look into the [CHANGELOG.md][] file.
@@ -20,7 +19,7 @@ Please have a look into the [CHANGELOG.md][] file.
 
 ## Downloading latest stable server tarball 
 
-The C2MON server tarball can be downloaded from [CERN Nexus Repository](https://nexus.web.cern.ch/nexus/#nexus-search;gav~cern.c2mon.server~c2mon-server~~tar.gz~)
+The C2MON server tarball can be downloaded from [CERN Nexus Repository](https://nexus.web.cern.ch/nexus/#nexus-search;gav~cern.c2mon.server~c2mon-server)
 
 Please check also the [CHANGELOG.md] to find out the latest stable release version.
 
