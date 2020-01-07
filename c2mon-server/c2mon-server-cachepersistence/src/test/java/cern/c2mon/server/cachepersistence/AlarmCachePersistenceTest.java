@@ -16,28 +16,25 @@
  *****************************************************************************/
 package cern.c2mon.server.cachepersistence;
 
-import cern.c2mon.server.cache.config.CacheModule;
-import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
-import cern.c2mon.server.cachepersistence.config.CachePersistenceModule;
-import cern.c2mon.server.common.config.CommonModule;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.server.cache.AlarmCache;
+import cern.c2mon.server.cache.config.CacheModule;
 import cern.c2mon.server.cache.dbaccess.AlarmMapper;
+import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.cachepersistence.common.BatchPersistenceManagerImpl;
-import cern.c2mon.server.test.DatabasePopulationRule;
+import cern.c2mon.server.cachepersistence.config.CachePersistenceModule;
 import cern.c2mon.server.cachepersistence.listener.PersistenceSynchroListener;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
-import cern.c2mon.server.common.alarm.AlarmCondition;
+import cern.c2mon.server.common.config.CommonModule;
+import cern.c2mon.server.test.DatabasePopulationRule;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;

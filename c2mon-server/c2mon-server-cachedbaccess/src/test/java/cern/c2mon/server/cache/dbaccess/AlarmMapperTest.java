@@ -24,7 +24,6 @@ import org.junit.Test;
 
 import cern.c2mon.server.cache.dbaccess.structure.DBBatch;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
-import cern.c2mon.server.common.alarm.AlarmCondition;
 import cern.c2mon.server.test.CacheObjectComparison;
 
 import static junit.framework.TestCase.assertEquals;

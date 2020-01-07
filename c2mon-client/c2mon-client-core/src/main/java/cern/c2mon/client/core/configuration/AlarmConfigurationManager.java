@@ -17,13 +17,13 @@
 
 package cern.c2mon.client.core.configuration;
 
-import cern.c2mon.shared.client.configuration.ConfigurationReport;
-import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
-import cern.c2mon.shared.client.configuration.api.alarm.AlarmCondition;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import cern.c2mon.shared.client.alarm.condition.AlarmCondition;
+import cern.c2mon.shared.client.configuration.ConfigurationReport;
+import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
 
 /**
  * The AlarmConfigurationManager allows to apply create, update and delete

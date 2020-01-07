@@ -16,18 +16,20 @@
  *****************************************************************************/
 package cern.c2mon.client.core.configuration.impl;
 
-import cern.c2mon.client.core.configuration.ConfigurationRequestSender;
-import cern.c2mon.client.core.configuration.AlarmConfigurationManager;
-import cern.c2mon.shared.client.configuration.ConfigurationReport;
-import cern.c2mon.shared.client.configuration.api.Configuration;
-import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
-import cern.c2mon.shared.client.configuration.api.alarm.AlarmCondition;
+import java.util.*;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import cern.c2mon.client.core.configuration.AlarmConfigurationManager;
+import cern.c2mon.client.core.configuration.ConfigurationRequestSender;
+import cern.c2mon.shared.client.alarm.condition.AlarmCondition;
+import cern.c2mon.shared.client.configuration.ConfigurationReport;
+import cern.c2mon.shared.client.configuration.api.Configuration;
+import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
 
-import static cern.c2mon.client.core.configuration.util.ConfigurationUtil.*;
+import static cern.c2mon.client.core.configuration.util.ConfigurationUtil.validateIsCreate;
+import static cern.c2mon.client.core.configuration.util.ConfigurationUtil.validateIsUpdate;
 
 /**
  * @author Franz Ritter

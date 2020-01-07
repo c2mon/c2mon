@@ -17,12 +17,11 @@
 
 package cern.c2mon.server.configuration.api.util;
 
-import cern.c2mon.server.configuration.parser.util.ConfigurationDataTagUtil;
 import cern.c2mon.server.configuration.parser.util.ConfigurationProcessUtil;
 import cern.c2mon.server.configuration.parser.util.ConfigurationRuleTagUtil;
+import cern.c2mon.shared.client.alarm.condition.ValueAlarmCondition;
 import cern.c2mon.shared.client.configuration.api.Configuration;
 import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
-import cern.c2mon.shared.client.configuration.api.alarm.ValueCondition;
 import cern.c2mon.shared.client.configuration.api.equipment.Equipment;
 import cern.c2mon.shared.client.configuration.api.equipment.SubEquipment;
 import cern.c2mon.shared.client.configuration.api.process.Process;
@@ -167,7 +166,7 @@ public class TestConfigurationProvider {
    */
   public static Configuration createAlarm(){
     Configuration configuration = new Configuration();
-    Alarm alarm = Alarm.create("faultFamily", "faultMember", 1337, new ValueCondition(Integer.class, 1))
+    Alarm alarm = Alarm.create("faultFamily", "faultMember", 1337, new ValueAlarmCondition(1))
         .id(2000L)
         .dataTagId(1000L).build();
 

@@ -16,11 +16,14 @@
  *****************************************************************************/
 package cern.c2mon.shared.client.configuration.api.alarm;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.util.Assert;
+
+import cern.c2mon.shared.client.alarm.condition.AlarmCondition;
 import cern.c2mon.shared.client.configuration.api.util.ConfigurationEntity;
 import cern.c2mon.shared.client.configuration.api.util.IgnoreProperty;
 import cern.c2mon.shared.client.metadata.Metadata;
-import lombok.Data;
-import org.springframework.util.Assert;
 
 /**
  * Configuration object for a Alarm.
@@ -33,7 +36,7 @@ import org.springframework.util.Assert;
  *
  * @author Franz Ritter
  */
-@Data
+@Data @NoArgsConstructor
 public class Alarm implements ConfigurationEntity {
 
   @IgnoreProperty
@@ -57,17 +60,17 @@ public class Alarm implements ConfigurationEntity {
   private Long id;
 
   /**
-   * LASER fault family of the alarm.
+   * Fault family of the alarm.
    **/
   private String faultFamily;
 
   /**
-   * LASER fault member of the alarm.
+   * Fault member of the alarm.
    **/
   private String faultMember;
 
   /**
-   * LASER fault code of the alarm.
+   * Fault code of the alarm.
    **/
   private Integer faultCode;
 
@@ -76,11 +79,11 @@ public class Alarm implements ConfigurationEntity {
    */
   private Metadata metadata;
 
+  /**
+   * The alarm condition which shall be evaluated every time the associated Tag value changes
+   */
   private AlarmCondition alarmCondition;
 
-
-  public Alarm() {
-  }
 
   public static CreateBuilder create(String faultFamily, String faultMember, Integer faultCode, AlarmCondition alarmCondition) {
     Assert.hasText(faultMember, "Fault member is required!");
@@ -129,8 +132,7 @@ public class Alarm implements ConfigurationEntity {
       return this;
     }
 
-    public Alarm build() {
-
+  public Alarm build() {
       alarmToBuild.setCreated(true);
       return this.alarmToBuild;
     }
@@ -187,13 +189,13 @@ public class Alarm implements ConfigurationEntity {
       return this.alarmToBuild;
     }
   }
-  
+
   @Override
   public String getName() {
     if (faultFamily == null && faultMember == null) {
       return null;
     }
-     
+
     return faultFamily + " : " + faultMember + " : " + faultCode;
   }
 }

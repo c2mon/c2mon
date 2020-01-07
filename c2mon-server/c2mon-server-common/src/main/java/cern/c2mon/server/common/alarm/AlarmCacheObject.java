@@ -22,6 +22,7 @@ import java.util.LinkedList;
 import lombok.Data;
 
 import cern.c2mon.server.common.metadata.Metadata;
+import cern.c2mon.shared.client.alarm.condition.AlarmCondition;
 import cern.c2mon.shared.common.Cacheable;
 
 /**

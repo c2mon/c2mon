@@ -16,11 +16,11 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.parser.util;
 
-import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
-import cern.c2mon.shared.client.configuration.api.alarm.ValueCondition;
-import cern.c2mon.shared.client.metadata.Metadata;
-
 import java.util.Properties;
+
+import cern.c2mon.shared.client.alarm.condition.ValueAlarmCondition;
+import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
+import cern.c2mon.shared.client.metadata.Metadata;
 
 /**
  * Utility class which provides builder methods for different Alarm objects.
@@ -37,12 +37,12 @@ public class ConfigurationAlarmUtil {
       properties = new Properties();
     }
 
-    Alarm alarm = Alarm.create("faultFamily", "faultMember", 1337, new ValueCondition(Integer.class, 1)).dataTagId(100L).build();
+    Alarm alarm = Alarm.create("faultFamily", "faultMember", 1337, new ValueAlarmCondition(1)).dataTagId(100L).build();
 
     properties.setProperty("faultFamily", "faultFamily");
     properties.setProperty("faultMember", "faultMember");
     properties.setProperty("faultCode", "1337");
-    properties.setProperty("alarmCondition", new ValueCondition(Integer.class, 1).getXMLCondition());
+    properties.setProperty("alarmCondition", new ValueAlarmCondition(1).getXMLCondition());
     properties.setProperty("dataTagId", "100");
 
     return alarm;
@@ -57,7 +57,7 @@ public class ConfigurationAlarmUtil {
       properties = new Properties();
     }
 
-    Alarm alarm = Alarm.create("faultFamily", "faultMember", 1337, new ValueCondition(Integer.class, 1))
+    Alarm alarm = Alarm.create("faultFamily", "faultMember", 1337, new ValueAlarmCondition(1))
         .id(id)
         .addMetadata("testMetadata", 11)
         .dataTagId(100L)
@@ -67,7 +67,7 @@ public class ConfigurationAlarmUtil {
     properties.setProperty("faultMember", "faultMember");
     properties.setProperty("faultCode", "1337");
     properties.setProperty("dataTagId", "100");
-    properties.setProperty("alarmCondition", new ValueCondition(Integer.class, 1).getXMLCondition());
+    properties.setProperty("alarmCondition", new ValueAlarmCondition(1).getXMLCondition());
     Metadata metadata = new Metadata();
     metadata.addMetadata("testMetadata",11);
     properties.setProperty("metadata", Metadata.toJSON(metadata));
@@ -81,11 +81,11 @@ public class ConfigurationAlarmUtil {
     }
 
     Alarm alarm = Alarm.update(id)
-        .alarmCondition(new ValueCondition(Integer.class, 2))
+        .alarmCondition(new ValueAlarmCondition(2))
         .updateMetadata("testMetadata", 12)
         .build();
 
-    properties.setProperty("alarmCondition", new ValueCondition(Integer.class, 2).getXMLCondition());
+    properties.setProperty("alarmCondition", new ValueAlarmCondition(2).getXMLCondition());
     Metadata metadata = new Metadata();
     metadata.addMetadata("testMetadata",12);
     metadata.setUpdate(true);

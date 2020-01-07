@@ -30,8 +30,8 @@ import cern.c2mon.server.cache.util.MetadataUtils;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.AlarmCacheUpdater;
-import cern.c2mon.server.common.alarm.AlarmCondition;
 import cern.c2mon.server.common.tag.Tag;
+import cern.c2mon.shared.client.alarm.condition.AlarmCondition;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.daq.config.Change;
 

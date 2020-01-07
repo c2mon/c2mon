@@ -22,11 +22,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
+import cern.c2mon.shared.client.alarm.condition.AlarmCondition;
 import cern.c2mon.shared.util.parser.SimpleXMLParser;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Unit test of Range alarm condition implementation.
@@ -36,141 +35,6 @@ import static org.junit.Assert.assertTrue;
  */
 @Slf4j
 public class RangeAlarmConditionTest {
-
-  @Test
-  public void testRangeInteger() throws ParserConfigurationException {
-    RangeAlarmCondition<Integer> rangeAlarmCondition = new RangeAlarmCondition<>(0, 100);
-    assertEquals(true, rangeAlarmCondition.evaluateState(5));
-    assertEquals(true, rangeAlarmCondition.evaluateState(0));
-    assertEquals(true, rangeAlarmCondition.evaluateState(100));
-
-    assertEquals(true, rangeAlarmCondition.evaluateState(89.5f));
-    assertEquals(false, rangeAlarmCondition.evaluateState(-10));
-    assertEquals(false, rangeAlarmCondition.evaluateState(150));
-  }
-
-  @Test
-  public void testOnlyMinRangeSet() throws ParserConfigurationException {
-    RangeAlarmCondition<Integer> rangeAlarmCondition = new RangeAlarmCondition<>(0, null);
-    assertEquals(true, rangeAlarmCondition.evaluateState(5));
-    assertEquals(true, rangeAlarmCondition.evaluateState(0));
-    assertEquals(true, rangeAlarmCondition.evaluateState(100));
-
-    assertEquals(true, rangeAlarmCondition.evaluateState(89.5f));
-    assertEquals(true, rangeAlarmCondition.evaluateState("89.5"));
-    assertEquals(true, rangeAlarmCondition.evaluateState(true)); // true == 1
-
-    assertEquals(false, rangeAlarmCondition.evaluateState(-10));
-    assertEquals(true, rangeAlarmCondition.evaluateState(150));
-  }
-
-  @Test
-  public void testOnlyMinRangeSetWithOutOfRangeFlag() throws ParserConfigurationException {
-    RangeAlarmCondition<Integer> rangeAlarmCondition = new RangeAlarmCondition<>(0, null);
-    rangeAlarmCondition.outOfRangeAlarm = true;
-
-    assertEquals(false, rangeAlarmCondition.evaluateState(5));
-    assertEquals(false, rangeAlarmCondition.evaluateState(0));
-    assertEquals(false, rangeAlarmCondition.evaluateState(100));
-
-    assertEquals(false, rangeAlarmCondition.evaluateState(89.5f));
-    assertEquals(false, rangeAlarmCondition.evaluateState("89.5"));
-    assertEquals(false, rangeAlarmCondition.evaluateState(true)); // true == 1
-
-    assertEquals(true, rangeAlarmCondition.evaluateState(-10));
-    assertEquals(true, rangeAlarmCondition.evaluateState(-10.4f));
-    assertEquals(true, rangeAlarmCondition.evaluateState("-10"));
-    assertEquals(false, rangeAlarmCondition.evaluateState(150));
-  }
-
-  @Test
-  public void testOnlyMaxRangeSet() throws ParserConfigurationException {
-    RangeAlarmCondition<Integer> rangeAlarmCondition = new RangeAlarmCondition<>(null, 100);
-    assertEquals(true, rangeAlarmCondition.evaluateState(5));
-    assertEquals(true, rangeAlarmCondition.evaluateState(0));
-    assertEquals(true, rangeAlarmCondition.evaluateState(100));
-
-    assertEquals(true, rangeAlarmCondition.evaluateState(89.5f));
-
-    assertEquals(true, rangeAlarmCondition.evaluateState(-10));
-    assertEquals(false, rangeAlarmCondition.evaluateState(150));
-  }
-
-  @Test
-  public void testOnlyMaxRangeSetWithOutOfRangeFlag() throws ParserConfigurationException {
-    RangeAlarmCondition<Integer> rangeAlarmCondition = new RangeAlarmCondition<>(null, 100);
-    rangeAlarmCondition.outOfRangeAlarm = true;
-    assertEquals(false, rangeAlarmCondition.evaluateState(5));
-    assertEquals(false, rangeAlarmCondition.evaluateState(0));
-    assertEquals(false, rangeAlarmCondition.evaluateState(100));
-
-    assertEquals(false, rangeAlarmCondition.evaluateState(89.5f));
-
-    assertEquals(false, rangeAlarmCondition.evaluateState(-10));
-    assertEquals(true, rangeAlarmCondition.evaluateState(150));
-  }
-
-  @Test
-  public void testRangeFloat() throws ParserConfigurationException {
-    RangeAlarmCondition<Float> rangeAlarmCondition = new RangeAlarmCondition<>(0f, 100f);
-    checkFloatConditions(rangeAlarmCondition, rangeAlarmCondition.isOutOfRangeAlarm());
-
-    rangeAlarmCondition.outOfRangeAlarm = true;
-    checkFloatConditions(rangeAlarmCondition, rangeAlarmCondition.isOutOfRangeAlarm());
-  }
-
-  @Test
-  public void testXmlDeserialization() throws ParserConfigurationException {
-    RangeAlarmCondition<Float> rangeAlarmCondition = new RangeAlarmCondition<>(0f, 100f);
-    String xmlString = rangeAlarmCondition.toConfigXML();
-
-    SimpleXMLParser parser = new SimpleXMLParser();
-    Document document = parser.parse(xmlString);
-    AlarmCondition condition = AlarmCondition.fromConfigXML(document.getDocumentElement());
-
-    checkFloatConditions(condition, rangeAlarmCondition.isOutOfRangeAlarm());
-  }
-
-  @Test
-  public void testXmlDeserializationForOutOfRange() throws ParserConfigurationException {
-    RangeAlarmCondition<Float> rangeAlarmCondition = new RangeAlarmCondition<>(0f, 100f);
-    rangeAlarmCondition.outOfRangeAlarm = true;
-    String xmlString = rangeAlarmCondition.toConfigXML();
-
-    SimpleXMLParser parser = new SimpleXMLParser();
-    Document document = parser.parse(xmlString);
-    AlarmCondition condition = AlarmCondition.fromConfigXML(document.getDocumentElement());
-    checkFloatConditions(condition, rangeAlarmCondition.isOutOfRangeAlarm());
-  }
-
-  @Test
-  public void testToString() throws ParserConfigurationException {
-    RangeAlarmCondition<Float> rangeAlarmCondition = new RangeAlarmCondition<>(0f, 100f);
-    assertTrue(rangeAlarmCondition.toString().contains("ACTIVE"));
-    log.trace(rangeAlarmCondition.toString());
-
-    rangeAlarmCondition.outOfRangeAlarm = true;
-    assertTrue(rangeAlarmCondition.toString().contains("TERMINATE"));
-    log.trace(rangeAlarmCondition.toString());
-  }
-
-  @Test
-  public void testEquals() throws ParserConfigurationException {
-    RangeAlarmCondition<Float> rangeAlarmCondition1 = new RangeAlarmCondition<>(0f, 100f);
-    RangeAlarmCondition<Float> rangeAlarmCondition2 = new RangeAlarmCondition<>(0f, 100f);
-    RangeAlarmCondition<Integer> rangeAlarmCondition3 = new RangeAlarmCondition<>(0, 100);
-    assertTrue(rangeAlarmCondition1.equals(rangeAlarmCondition2));
-    assertFalse(rangeAlarmCondition1.equals(rangeAlarmCondition3));
-
-    rangeAlarmCondition1.outOfRangeAlarm = true;
-    assertFalse(rangeAlarmCondition1.equals(rangeAlarmCondition2));
-    assertFalse(rangeAlarmCondition1.equals(rangeAlarmCondition3));
-
-    rangeAlarmCondition2.outOfRangeAlarm = true;
-    assertTrue(rangeAlarmCondition1.equals(rangeAlarmCondition2));
-
-
-  }
 
   @Test
   public void testXmlDeserializationBackwardComp() throws ParserConfigurationException {
@@ -183,6 +47,18 @@ public class RangeAlarmConditionTest {
     Document document = parser.parse(xmlString);
     AlarmCondition condition = AlarmCondition.fromConfigXML(document.getDocumentElement());
     checkFloatConditions(condition, false);
+  }
+
+  @Test
+  public void testXmlDeserializationForOutOfRange() throws ParserConfigurationException {
+    RangeAlarmCondition<Float> rangeAlarmCondition = new RangeAlarmCondition<>(0f, 100f);
+    rangeAlarmCondition.setOutOfRangeAlarm(true);
+    String xmlString = rangeAlarmCondition.toConfigXML();
+
+    SimpleXMLParser parser = new SimpleXMLParser();
+    Document document = parser.parse(xmlString);
+    AlarmCondition condition = AlarmCondition.fromConfigXML(document.getDocumentElement());
+    checkFloatConditions(condition, rangeAlarmCondition.isOutOfRangeAlarm());
   }
 
   private void checkFloatConditions(AlarmCondition rangeAlarmCondition, boolean outOfRangeAlarm) {

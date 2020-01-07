@@ -16,15 +16,24 @@
  ******************************************************************************/
 package cern.c2mon.client.core.service.impl;
 
+import java.util.*;
+
+import javax.jms.JMSException;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+
 import cern.c2mon.client.common.listener.ClientRequestReportListener;
 import cern.c2mon.client.core.configuration.*;
 import cern.c2mon.client.core.jms.RequestHandler;
 import cern.c2mon.client.core.service.ConfigurationService;
+import cern.c2mon.shared.client.alarm.condition.AlarmCondition;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.ConfigurationReportHeader;
 import cern.c2mon.shared.client.configuration.api.Configuration;
 import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
-import cern.c2mon.shared.client.configuration.api.alarm.AlarmCondition;
 import cern.c2mon.shared.client.configuration.api.equipment.Equipment;
 import cern.c2mon.shared.client.configuration.api.equipment.SubEquipment;
 import cern.c2mon.shared.client.configuration.api.process.Process;
@@ -33,13 +42,6 @@ import cern.c2mon.shared.client.process.ProcessNameResponse;
 import cern.c2mon.shared.client.tag.TagConfig;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.address.HardwareAddress;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
-
-import javax.jms.JMSException;
-import java.util.*;
 
 @Service("configurationService")
 @Slf4j
@@ -161,10 +163,12 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     return null;
   }
 
+  @Override
   public ConfigurationReport createProcess(String processName) {
     return processConfigurationManager.createProcess(processName);
   }
 
+  @Override
   public ConfigurationReport createProcess(Process process) {
     return processConfigurationManager.createProcess(process);
   }

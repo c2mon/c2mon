@@ -21,11 +21,11 @@ In essence, an Alarm is a declaration associated with a Tag that contains some k
 
 C2MON supports two Alarm conditions out-of-the-box. These conditions are:
 
-* **ValueCondition:** if the Tag value equals a specific value, the alarm is triggered.
-* **RangeCondition:** if the Tag value falls outside the given range, the alarm is triggered.
+* **ValueAlarmCondition:** if the Tag value equals a specific value, the alarm is triggered.
+* **RangeAlarmCondition:** if the Tag value falls outside (or inside) the given range, the alarm is triggered.
 
-It is possible to define custom Alarm condition types through the configuration, but this requires adding the same alarm condition class to the server classpath.
+It is possible to define custom Alarm condition types through the configuration, but this requires adding the same alarm condition class to the server classpath. The custom Alarm condition class must extend the abstract [AlarmCondition](https://github.com/c2mon/c2mon/blob/master/c2mon-shared/c2mon-shared-client/src/main/java/cern/c2mon/shared/client/alarm/condition/AlarmCondition.java) class
 
-The diagram below shows an example how Alarm condition can be assigned to results of rules or tags.
+The diagram below shows an example how Alarm conditions can be assigned to results of rules or tags.
 
 ![alarm-evaluation-example]({{site.baseurl }}/assets/img/overview/alarm-evaluation-example.png)

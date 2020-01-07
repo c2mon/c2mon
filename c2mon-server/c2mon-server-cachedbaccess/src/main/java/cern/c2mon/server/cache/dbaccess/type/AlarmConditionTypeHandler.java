@@ -27,7 +27,7 @@ import org.apache.ibatis.type.TypeHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cern.c2mon.server.common.alarm.AlarmCondition;
+import cern.c2mon.shared.client.alarm.condition.AlarmCondition;
 
 /**
  * iBatis TypeHandler class for converting AlarmCondition implementations

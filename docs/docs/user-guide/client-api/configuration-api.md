@@ -137,12 +137,19 @@ configurationService.createDataTag("E_EXAMPLE", tagToCreate);
 The following code shows the simplest way to create an `Alarm`:
 
 ```java
-configurationService.createAlarm("TAG_EXAMPLE", new ValueCondition(Integer.class, 1), "faultFamily", "faultMember", 0);
+configurationService.createAlarm("TAG_EXAMPLE", new RangeAlarmCondition(0, 100, true), "MyfaultFamily", "MyfaultMember", 0);
 ```
 
 The first parameter expects the name of an already created `Tag`. An alarm ID will be generated automatically on the server.
 
 `Alarm#create` and `Alarm#update` methods also exist in a similar manner as for the `DataTag`.
+
+As initially explained in the [Alarm Overview section](/c2mon/docs/overview/alarms.html) C2MON currently provides two alarm condition classes, that is [RangeAlarmCondition](https://github.com/c2mon/c2mon/blob/master/c2mon-shared/c2mon-shared-client/src/main/java/cern/c2mon/shared/client/alarm/condition/RangeAlarmCondition.java) and [ValueAlarmCondition](https://github.com/c2mon/c2mon/blob/master/c2mon-shared/c2mon-shared-client/src/main/java/cern/c2mon/shared/client/alarm/condition/ValueAlarmCondition.java).
+
+## Create custom alarm conditions
+To write your own alarm condition class you have to extend the abstract [AlarmCondition](https://github.com/c2mon/c2mon/blob/master/c2mon-shared/c2mon-shared-client/src/main/java/cern/c2mon/shared/client/alarm/condition/AlarmCondition.java) class and implement your custom evaluation logic in `AlarmCondition#evaluateState(Object value)`.
+
+Once you are done you have to add the code in a separate jar to the classpath, both on client and server side. 
 
 # Configuring RuleTags
 

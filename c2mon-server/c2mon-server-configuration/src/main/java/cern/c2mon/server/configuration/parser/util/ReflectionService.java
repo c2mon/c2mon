@@ -17,23 +17,21 @@
 
 package cern.c2mon.server.configuration.parser.util;
 
-import cern.c2mon.server.configuration.parser.exception.ConfigurationParseException;
-import cern.c2mon.shared.client.configuration.api.alarm.AlarmCondition;
-import cern.c2mon.shared.client.configuration.api.util.DefaultValue;
-import cern.c2mon.shared.client.configuration.api.util.ConfigurationEntity;
-import cern.c2mon.shared.client.configuration.api.util.IgnoreProperty;
-import cern.c2mon.shared.client.tag.TagMode;
-import cern.c2mon.shared.common.datatag.DataTagAddress;
-import cern.c2mon.shared.common.datatag.address.HardwareAddress;
-import cern.c2mon.shared.client.metadata.Metadata;
-
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.util.*;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import cern.c2mon.server.configuration.parser.exception.ConfigurationParseException;
+import cern.c2mon.shared.client.alarm.condition.ValueAlarmCondition;
+import cern.c2mon.shared.client.configuration.api.util.ConfigurationEntity;
+import cern.c2mon.shared.client.configuration.api.util.DefaultValue;
+import cern.c2mon.shared.client.configuration.api.util.IgnoreProperty;
+import cern.c2mon.shared.client.metadata.Metadata;
+import cern.c2mon.shared.client.tag.TagMode;
+import cern.c2mon.shared.common.datatag.DataTagAddress;
+import cern.c2mon.shared.common.datatag.address.HardwareAddress;
 
 /**
  * Created by fritter on 31/05/16.
@@ -88,10 +86,10 @@ public class ReflectionService {
               // DataTagAddress.
               tempProp = String.valueOf(((HardwareAddress) pd.getReadMethod().invoke(obj)).toConfigXML());
 
-            } else if (pd.getPropertyType().equals(AlarmCondition.class)) {
+            } else if (pd.getPropertyType().equals(ValueAlarmCondition.class)) {
               // check if the property is a AlarmCondition. If so we have to call the getXMLCondition() method because the server expect the xml string of an
               // AlarmCondition.
-              tempProp = String.valueOf(((AlarmCondition) pd.getReadMethod().invoke(obj)).getXMLCondition());
+              tempProp = String.valueOf(((ValueAlarmCondition) pd.getReadMethod().invoke(obj)).getXMLCondition());
 
             } else if (pd.getPropertyType().equals(Metadata.class)) {
               tempProp = String.valueOf(Metadata.toJSON((Metadata) pd.getReadMethod().invoke(obj)));

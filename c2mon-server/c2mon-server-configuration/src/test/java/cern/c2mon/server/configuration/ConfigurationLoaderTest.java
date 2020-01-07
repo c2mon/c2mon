@@ -16,6 +16,21 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration;
 
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.*;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+
+import org.easymock.EasyMock;
+import org.easymock.IAnswer;
+import org.junit.*;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
 import cern.c2mon.server.cache.*;
 import cern.c2mon.server.cache.common.AbstractCache;
 import cern.c2mon.server.cache.config.CacheModule;
@@ -24,7 +39,6 @@ import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.cache.loading.config.CacheLoadingModule;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
-import cern.c2mon.server.common.alarm.AlarmCondition;
 import cern.c2mon.server.common.command.CommandTagCacheObject;
 import cern.c2mon.server.common.config.CommonModule;
 import cern.c2mon.server.common.control.ControlTagCacheObject;
@@ -40,15 +54,16 @@ import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.configuration.config.ConfigurationModule;
 import cern.c2mon.server.configuration.config.ProcessCommunicationManagerMock;
+import cern.c2mon.server.configuration.helper.ObjectEqualityComparison;
 import cern.c2mon.server.configuration.junit.ConfigurationCachePopulationRule;
 import cern.c2mon.server.configuration.junit.ConfigurationDatabasePopulationRule;
-import cern.c2mon.server.configuration.helper.ObjectEqualityComparison;
 import cern.c2mon.server.daq.JmsContainerManager;
 import cern.c2mon.server.daq.config.DaqModule;
-import cern.c2mon.server.daq.update.JmsContainerManagerImpl;
 import cern.c2mon.server.daq.out.ProcessCommunicationManager;
+import cern.c2mon.server.daq.update.JmsContainerManagerImpl;
 import cern.c2mon.server.rule.config.RuleModule;
 import cern.c2mon.server.supervision.config.SupervisionModule;
+import cern.c2mon.shared.client.alarm.condition.AlarmCondition;
 import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Status;
@@ -69,19 +84,6 @@ import cern.c2mon.shared.daq.config.Change;
 import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
 import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
-import org.easymock.EasyMock;
-import org.easymock.IAnswer;
-import org.junit.*;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-import java.io.IOException;
-import java.sql.Timestamp;
-import java.util.*;
 
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
@@ -504,10 +506,10 @@ public class ConfigurationLoaderTest {
     expectedObject.setDipAddress("testConfigDIPaddress");
     expectedObject.setJapcAddress("testConfigJAPCaddress");
     expectedObject.setRuleText("(#5000000 < 0)|(#5000000 > 200)[1],true[0]");
-    Set<Long> eqIds = new HashSet<Long>();
+    Set<Long> eqIds = new HashSet<>();
     eqIds.add(150L);
     expectedObject.setEquipmentIds(eqIds);
-    Set<Long> procIds = new HashSet<Long>();
+    Set<Long> procIds = new HashSet<>();
     procIds.add(50L);
     expectedObject.setProcessIds(procIds);
 

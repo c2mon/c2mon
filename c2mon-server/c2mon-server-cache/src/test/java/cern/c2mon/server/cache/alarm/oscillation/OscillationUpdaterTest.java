@@ -28,8 +28,8 @@ import cern.c2mon.server.cache.alarm.config.OscillationProperties;
 import cern.c2mon.server.cache.alarm.impl.AlarmCacheUpdaterImpl;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
-import cern.c2mon.server.common.alarm.AlarmCondition;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
+import cern.c2mon.shared.client.alarm.condition.AlarmCondition;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 

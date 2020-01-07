@@ -26,14 +26,10 @@ import java.util.concurrent.CountDownLatch;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import junit.framework.Assert;
 import lombok.extern.slf4j.Slf4j;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -68,11 +64,11 @@ import cern.c2mon.server.daq.out.ProcessCommunicationManager;
 import cern.c2mon.server.daq.update.JmsContainerManagerImpl;
 import cern.c2mon.server.rule.config.RuleModule;
 import cern.c2mon.server.supervision.config.SupervisionModule;
+import cern.c2mon.shared.client.alarm.condition.ValueAlarmCondition;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.api.Configuration;
 import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
-import cern.c2mon.shared.client.configuration.api.alarm.ValueCondition;
 import cern.c2mon.shared.client.configuration.api.equipment.Equipment;
 import cern.c2mon.shared.client.configuration.api.equipment.SubEquipment;
 import cern.c2mon.shared.client.configuration.api.process.Process;
@@ -1566,7 +1562,7 @@ public class ConfigurationLoaderTest {
     processFacade.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
 
     // TEST:Build configuration to update the test Alarm
-    Alarm alarmUpdate = Alarm.update(2000L).alarmCondition(new ValueCondition(Integer.class, 5)).build();
+    Alarm alarmUpdate = Alarm.update(2000L).alarmCondition(new ValueAlarmCondition(5)).build();
     Configuration configuration = new Configuration();
     configuration.addEntity(alarmUpdate);
 

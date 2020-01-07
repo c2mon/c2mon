@@ -19,7 +19,6 @@ package cern.c2mon.server.test;
 import java.sql.Timestamp;
 
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
-import cern.c2mon.server.common.alarm.AlarmCondition;
 import cern.c2mon.server.common.command.CommandTagCacheObject;
 import cern.c2mon.server.common.control.ControlTagCacheObject;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
@@ -29,6 +28,7 @@ import cern.c2mon.server.common.process.ProcessCacheObject;
 import cern.c2mon.server.common.process.ProcessCacheObject.LocalConfig;
 import cern.c2mon.server.common.rule.RuleTagCacheObject;
 import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
+import cern.c2mon.shared.client.alarm.condition.AlarmCondition;
 import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.command.CommandExecutionDetails;

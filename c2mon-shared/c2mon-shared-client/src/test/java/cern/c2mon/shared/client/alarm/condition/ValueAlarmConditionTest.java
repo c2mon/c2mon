@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.common.alarm;
+package cern.c2mon.shared.client.alarm.condition;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -22,7 +22,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
-import cern.c2mon.shared.client.alarm.condition.AlarmCondition;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
 import cern.c2mon.shared.util.parser.SimpleXMLParser;
 
@@ -40,7 +39,7 @@ public class ValueAlarmConditionTest {
    */
   @Test
   public void testEnumHandling() throws ParserConfigurationException {
-    String xmlString = "<AlarmCondition class=\"cern.c2mon.server.common.alarm.ValueAlarmCondition\">"
+    String xmlString = "<AlarmCondition class=\"cern.c2mon.shared.client.alarm.condition.ValueAlarmCondition\">"
       + "<alarm-value type=\"String\">DOWN</alarm-value>"
       + "</AlarmCondition>";
     SimpleXMLParser parser = new SimpleXMLParser();
@@ -54,14 +53,13 @@ public class ValueAlarmConditionTest {
     Assert.assertEquals(false, condition.evaluateState(value2));
   }
 
-
   /**
    * Tests that Enums can be compared to String alarm conditions.
    * @throws ParserConfigurationException
    */
   @Test
   public void testEnumHandling2() throws ParserConfigurationException {
-    String xmlString = "<AlarmCondition class=\"cern.c2mon.server.common.alarm.ValueAlarmCondition\">"
+    String xmlString = "<AlarmCondition class=\"cern.c2mon.shared.client.alarm.condition.ValueAlarmCondition\">"
       + "<alarm-value type=\"String\">RUNNING</alarm-value>"
       + "</AlarmCondition>";
     SimpleXMLParser parser = new SimpleXMLParser();
@@ -95,5 +93,4 @@ public class ValueAlarmConditionTest {
     SupervisionStatus value2 = SupervisionStatus.RUNNING;
     Assert.assertEquals(false, condition.evaluateState(value2));
   }
-
 }
