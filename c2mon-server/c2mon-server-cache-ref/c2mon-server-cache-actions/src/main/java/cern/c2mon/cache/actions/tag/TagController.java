@@ -86,7 +86,7 @@ public class TagController {
    * @param value     the new value
    * @param valueDesc the new value description
    */
-  public static void updateValue(Tag tag, Object value, String valueDesc) {
+  public static void setValue(Tag tag, Object value, String valueDesc) {
     AbstractTagCacheObject abstractTag = (AbstractTagCacheObject) tag;
 
     abstractTag.setValue(value);

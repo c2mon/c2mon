@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.client.request;
 
+import cern.c2mon.cache.actions.process.ProcessXMLProvider;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.process.Process;

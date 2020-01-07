@@ -16,10 +16,12 @@
  *****************************************************************************/
 package cern.c2mon.server.client.request;
 
+import cern.c2mon.cache.actions.alarm.AlarmService;
 import cern.c2mon.cache.actions.alivetimer.AliveTimerService;
-import cern.c2mon.cache.actions.tag.UnifiedTagCacheFacade;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
+import cern.c2mon.cache.config.tag.UnifiedTagCacheFacade;
+import cern.c2mon.server.cache.loading.ProcessDAO;
 import cern.c2mon.server.client.config.ClientProperties;
 import cern.c2mon.server.client.publish.TopicProvider;
 import cern.c2mon.server.client.util.TransferObjectFactory;
@@ -33,12 +35,14 @@ import cern.c2mon.shared.client.statistics.TagStatisticsResponseImpl;
 import cern.c2mon.shared.client.tag.TagConfig;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
 import cern.c2mon.shared.client.tag.TransferTagImpl;
+import cern.c2mon.shared.common.Cacheable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Helper class for {@link ClientRequestDelegator} to handle
@@ -56,10 +60,10 @@ class ClientTagRequestHelper {
    * Reference to the tag facade gateway to retrieve a tag copies with the
    * associated alarms
    */
-  private final TagFacadeGateway tagFacadeGateway;
+  private final AlarmService alarmService;
 
   /** Reference to the tag location service to check whether a tag exists */
-  private final UnifiedTagCacheFacade tagLocationService;
+  private final UnifiedTagCacheFacade unifiedTagCacheFacade;
 
   /** Used to determine whether a Control Tag is an Alive tag */
   private final AliveTimerService aliveTimerFacade;
@@ -70,26 +74,32 @@ class ClientTagRequestHelper {
    */
   private final C2monCache<Process> processCache;
 
+  /**
+   * Used for statistics
+   */
+  private final ProcessDAO processDAO;
+
   private final ClientProperties properties;
 
   /**
    * Default Constructor
-   *
-   * @param aliveTimerFacade Used to determine whether a given tag is an Alive tag
-   * @param tagLocationService Reference to the tag location service singleton
-   * @param tagFacadeGateway Reference to the tag facade gateway singleton
+   *  @param aliveTimerFacade Used to determine whether a given tag is an Alive tag
+   * @param unifiedTagCacheFacade Reference to the tag location service singleton
+   * @param alarmService Reference to the tag facade gateway singleton
    * @param processCache Reference to the ProcessCache
+   * @param processDAO
    */
   @Autowired
   public ClientTagRequestHelper(final AliveTimerService aliveTimerFacade,
-                                final UnifiedTagCacheFacade tagLocationService,
-                                final TagFacadeGateway tagFacadeGateway,
+                                final UnifiedTagCacheFacade unifiedTagCacheFacade,
+                                final AlarmService alarmService,
                                 final C2monCache<Process> processCache,
-                                final ClientProperties properties) {
+                                final ProcessDAO processDAO, final ClientProperties properties) {
     this.aliveTimerFacade = aliveTimerFacade;
-    this.tagLocationService = tagLocationService;
-    this.tagFacadeGateway = tagFacadeGateway;
+    this.unifiedTagCacheFacade = unifiedTagCacheFacade;
+    this.alarmService = alarmService;
     this.processCache = processCache;
+    this.processDAO = processDAO;
     this.properties = properties;
   }
 
@@ -122,8 +132,8 @@ class ClientTagRequestHelper {
     final Collection<TagValueUpdate> transferTags = new ArrayList<>(tagRequest.getIds().size());
 
     for (Long tagId : tagRequest.getIds()) {
-      if (tagLocationService.containsKey(tagId)) {
-        final TagWithAlarms tagWithAlarms = tagFacadeGateway.getTagWithAlarms(tagId);
+      if (unifiedTagCacheFacade.containsKey(tagId)) {
+        final TagWithAlarms tagWithAlarms = alarmService.getTagWithAlarmsAtomically(tagId);
 
         switch (tagRequest.getResultType()) {
         case TRANSFER_TAG_LIST:
@@ -156,7 +166,12 @@ class ClientTagRequestHelper {
     for (String regex : tagRequest.getRegexList()) {
 
       try {
-        final Collection<TagWithAlarms> tagsWithAlarms = tagFacadeGateway.getTagsWithAlarms(regex);
+        final Collection<TagWithAlarms> tagsWithAlarms = unifiedTagCacheFacade
+          .findByNameRegex(regex)
+          .stream()
+          .map(Cacheable::getId)
+          .map(alarmService::getTagWithAlarmsAtomically)
+          .collect(Collectors.toList());
 
         for (TagWithAlarms tagWithAlarms : tagsWithAlarms) {
           switch (tagRequest.getResultType()) {
@@ -195,8 +210,8 @@ class ClientTagRequestHelper {
 
     for (Long tagId : tagConfigurationRequest.getIds()) {
 
-      if (tagLocationService.containsKey(tagId)) {
-        final TagWithAlarms tagWithAlarms = tagFacadeGateway.getTagWithAlarms(tagId);
+      if (unifiedTagCacheFacade.containsKey(tagId)) {
+        final TagWithAlarms tagWithAlarms = alarmService.getTagWithAlarmsAtomically(tagId);
         HashSet<Process> tagProcesses = new HashSet<Process>();
         for (Long procId : tagWithAlarms.getTag().getProcessIds()) {
           tagProcesses.add(processCache.get(procId));
@@ -231,7 +246,7 @@ class ClientTagRequestHelper {
     int invalid = 0;
 
     for (Long processId : processCache.getKeys()) {
-      ProcessTagStatistics processStatistics = new ProcessTagStatistics(processCache.getNumTags(processId), processCache.getNumInvalidTags(processId));
+      ProcessTagStatistics processStatistics = new ProcessTagStatistics(processDAO.getNumTags(processId), processDAO.getNumInvalidTags(processId));
 
       total += processStatistics.getTotal();
       invalid += processStatistics.getInvalid();

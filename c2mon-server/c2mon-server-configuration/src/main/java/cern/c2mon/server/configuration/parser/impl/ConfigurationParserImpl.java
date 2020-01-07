@@ -16,18 +16,11 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.parser.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import cern.c2mon.server.configuration.parser.exception.EntityDoesNotExistException;
-import cern.c2mon.shared.client.configuration.ConfigConstants;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import cern.c2mon.server.configuration.parser.ConfigurationParser;
 import cern.c2mon.server.configuration.parser.exception.ConfigurationParseException;
+import cern.c2mon.server.configuration.parser.exception.EntityDoesNotExistException;
 import cern.c2mon.server.configuration.parser.factory.*;
+import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.api.Configuration;
 import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
@@ -36,6 +29,12 @@ import cern.c2mon.shared.client.configuration.api.equipment.SubEquipment;
 import cern.c2mon.shared.client.configuration.api.process.Process;
 import cern.c2mon.shared.client.configuration.api.tag.*;
 import cern.c2mon.shared.client.configuration.api.util.ConfigurationEntity;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -50,26 +49,28 @@ public class ConfigurationParserImpl implements ConfigurationParser {
 
   private AlarmFactory alarmFactory;
   private CommandTagFactory commandTagFactory;
-  private ControlTagFactory controlTagFactory;
   private DataTagFactory dataTagFactory;
   private EquipmentFactory equipmentFactory;
   private ProcessFactory processFactory;
   private RuleTagFactory ruleTagFactory;
   private SubEquipmentFactory subEquipmentFactory;
+  private AliveTagFactory aliveTagFactory;
+  private CommFaultTagFactory commFaultTagFactory;
 
   @Autowired
   public ConfigurationParserImpl(
-      AlarmFactory alarmFactory, CommandTagFactory commandTagFactory, ControlTagFactory controlTagFactory,
-      DataTagFactory dataTagFactory, EquipmentFactory equipmentFactory, ProcessFactory processFactory, RuleTagFactory ruleTagFactory,
-      SubEquipmentFactory subEquipmentFactory) {
+    AlarmFactory alarmFactory, CommandTagFactory commandTagFactory,
+    DataTagFactory dataTagFactory, EquipmentFactory equipmentFactory, ProcessFactory processFactory, RuleTagFactory ruleTagFactory,
+    SubEquipmentFactory subEquipmentFactory, AliveTagFactory aliveTagFactory, CommFaultTagFactory commFaultTagFactory) {
     this.alarmFactory = alarmFactory;
     this.commandTagFactory = commandTagFactory;
-    this.controlTagFactory = controlTagFactory;
     this.dataTagFactory = dataTagFactory;
     this.equipmentFactory = equipmentFactory;
     this.processFactory = processFactory;
     this.ruleTagFactory = ruleTagFactory;
     this.subEquipmentFactory = subEquipmentFactory;
+    this.aliveTagFactory = aliveTagFactory;
+    this.commFaultTagFactory = commFaultTagFactory;
   }
 
   @Override
@@ -143,8 +144,14 @@ public class ConfigurationParserImpl implements ConfigurationParser {
     if (entity instanceof SubEquipment) {
       return subEquipmentFactory;
     }
-    if (entity instanceof AliveTag || entity instanceof StatusTag || entity instanceof CommFaultTag) {
-      return controlTagFactory;
+    if (entity instanceof AliveTag) {
+      return aliveTagFactory;
+    }
+//    if (entity instanceof StatusTag) {
+//      return statusTagFactory;
+//    }
+    if (entity instanceof CommFaultTag) {
+      return commFaultTagFactory;
     }
     if (entity instanceof DataTag) {
       return dataTagFactory;

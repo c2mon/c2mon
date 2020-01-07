@@ -4,10 +4,12 @@ import cern.c2mon.cache.actions.AbstractCacheServiceImpl;
 import cern.c2mon.cache.actions.commfault.CommFaultService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
-import cern.c2mon.server.common.alive.AliveTimer;
-import cern.c2mon.server.common.alive.AliveTimerCacheObject;
+import cern.c2mon.server.common.alive.AliveTag;
+import cern.c2mon.server.common.alive.AliveTagCacheObject;
 import cern.c2mon.server.common.supervision.Supervised;
+import cern.c2mon.server.common.thread.Event;
 import cern.c2mon.shared.common.CacheEvent;
+import cern.c2mon.shared.common.datatag.SourceDataTagValue;
 import cern.c2mon.shared.common.supervision.SupervisionConstants;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -19,19 +21,19 @@ import javax.inject.Inject;
 import static cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEntity.*;
 
 /**
- * Manages operations on {@link AliveTimerCacheObject}s
+ * Manages operations on {@link AliveTagCacheObject}s
  *
  * @author Szymon Halastra, Alexandros Papageorgiou Koufidis
- * @see AliveTimer
+ * @see AliveTag
  */
 @Slf4j
 @Service
-public class AliveTimerService extends AbstractCacheServiceImpl<AliveTimer> {
+public class AliveTimerService extends AbstractCacheServiceImpl<AliveTag> {
 
   private CommFaultService commFaultService;
 
   @Inject
-  public AliveTimerService(C2monCache<AliveTimer> aliveTimerCacheRef, CommFaultService commFaultService) {
+  public AliveTimerService(C2monCache<AliveTag> aliveTimerCacheRef, CommFaultService commFaultService) {
     super(aliveTimerCacheRef, new AliveTimerCacheFlow());
     this.commFaultService = commFaultService;
   }
@@ -42,7 +44,7 @@ public class AliveTimerService extends AbstractCacheServiceImpl<AliveTimer> {
     getCache().getCacheListenerManager().registerListener(this::cascadeUpdateToCommFault, CacheEvent.UPDATE_ACCEPTED);
   }
 
-  private void cascadeUpdateToCommFault(AliveTimer aliveTimer) {
+  private void cascadeUpdateToCommFault(AliveTag aliveTimer) {
     if (!aliveTimer.isActive())
       commFaultService.bringDownBasedOnAliveTimer(aliveTimer);
   }
@@ -107,12 +109,12 @@ public class AliveTimerService extends AbstractCacheServiceImpl<AliveTimer> {
    * at least "aliveInterval" milliseconds.
    */
   public boolean hasExpired(final Long aliveTimerId) {
-    AliveTimer aliveTimer = cache.get(aliveTimerId);
+    AliveTag aliveTimer = cache.get(aliveTimerId);
     return (System.currentTimeMillis() - aliveTimer.getLastUpdate() > aliveTimer.getAliveInterval() + aliveTimer.getAliveInterval() / 3);
   }
 
   /**
-   * Will set all previously inactive {@link AliveTimer}s as active
+   * Will set all previously inactive {@link AliveTag}s as active
    * <p>
    * Timestamps will not be affected on previously active {@code AliveTimer}s
    */
@@ -122,7 +124,7 @@ public class AliveTimerService extends AbstractCacheServiceImpl<AliveTimer> {
   }
 
   /**
-   * Will set all previously inactive {@link AliveTimer}s as inactive (stopped)
+   * Will set all previously inactive {@link AliveTag}s as inactive (stopped)
    * <p>
    * Timestamps will not be affected on previously inactive {@code AliveTimer}s
    */
@@ -144,24 +146,24 @@ public class AliveTimerService extends AbstractCacheServiceImpl<AliveTimer> {
   }
 
   public void createAliveTimerFor(Supervised supervised) {
-    AliveTimerCacheObject aliveTimer = new AliveTimerCacheObject(supervised.getAliveTagId(), supervised.getId(), supervised.getName(),
+    AliveTagCacheObject aliveTimer = new AliveTagCacheObject(supervised.getAliveTagId(), supervised.getId(), supervised.getName(),
       supervised.getStateTagId(), "", supervised.getAliveInterval());
     setAliveTimerType(supervised.getSupervisionEntity(), aliveTimer);
     cache.put(aliveTimer.getId(), aliveTimer);
   }
 
-  private void setAliveTimerType(SupervisionConstants.SupervisionEntity supervisionEntity, AliveTimerCacheObject aliveTimer) {
+  private void setAliveTimerType(SupervisionConstants.SupervisionEntity supervisionEntity, AliveTagCacheObject aliveTimer) {
     if (supervisionEntity == PROCESS)
-      aliveTimer.setAliveType(AliveTimer.ALIVE_TYPE_PROCESS);
+      aliveTimer.setAliveType(AliveTag.ALIVE_TYPE_PROCESS);
     else if (supervisionEntity == EQUIPMENT)
-      aliveTimer.setAliveType(AliveTimer.ALIVE_TYPE_EQUIPMENT);
+      aliveTimer.setAliveType(AliveTag.ALIVE_TYPE_EQUIPMENT);
     else if (supervisionEntity == SUBEQUIPMENT)
-      aliveTimer.setAliveType(AliveTimer.ALIVE_TYPE_SUBEQUIPMENT);
+      aliveTimer.setAliveType(AliveTag.ALIVE_TYPE_SUBEQUIPMENT);
   }
 
   private void filterAndSetActive(boolean active) {
     try {
-      for (AliveTimer aliveTimer : cache.query(aliveTimer -> aliveTimer.isActive() != active)) {
+      for (AliveTag aliveTimer : cache.query(aliveTimer -> aliveTimer.isActive() != active)) {
         log.debug("Attempting to set alive timer " + aliveTimer.getId() + " and dependent alive timers to " + active);
         aliveTimer.setActive(active);
         aliveTimer.setLastUpdate(System.currentTimeMillis());
@@ -185,5 +187,55 @@ public class AliveTimerService extends AbstractCacheServiceImpl<AliveTimer> {
     } catch (Exception e) {
       log.error("Unable to stop the alive timer " + aliveTimerId, e);
     }
+  }
+
+  public final String generateSourceXML(final AliveTag aliveTag) {
+    StringBuilder str = new StringBuilder("    <DataTag id=\"");
+    str.append(aliveTag.getId());
+    str.append("\" name=\"");
+    str.append(aliveTag.getRelatedName());
+    str.append("\" control=\"true\">\n");
+
+    if (aliveTag.getAddress() != null) {
+      str.append(aliveTag.getAddress().toConfigXML());
+    }
+
+    str.append("    </DataTag>\n");
+    return str.toString();
+  }
+
+  /**
+   * Updates the tag object if the value is not filtered out. Contains the logic on when a
+   * AliveTagCacheObject should be updated with new values and when not (in particular
+   * timestamp restrictions).
+   *
+   * <p>Also notifies the listeners if an update was performed.
+   *
+   * <p>Notice the tag is not put back in the cache here.
+   *
+   * @param sourceDataTagValue the source value received from the DAQ
+   * @return true if an update was performed (i.e. the value was not filtered out)
+   */
+  public Event<Boolean> updateFromSource(final SourceDataTagValue sourceDataTagValue) {
+    return cache.executeTransaction(() -> {
+      final AliveTag aliveTag = cache.get(sourceDataTagValue.getId());
+
+      if (sourceDataTagValue == null) {
+        log.error("Attempting to update a dataTag with a null source value - ignoring update.");
+        return new Event<>(aliveTag.getCacheTimestamp().getTime(), false);
+      }
+
+      // TODO (Alex) This does not properly account for potential filterout as part of cache.put. Should it?
+//      Event<Boolean> returnValue = updateFromSource(aliveTag, sourceDataTagValue);
+
+      if (sourceDataTagValue.isValid()) {
+        cache.putQuiet(sourceDataTagValue.getId(), aliveTag);
+      } else {
+        cache.put(sourceDataTagValue.getId(), aliveTag);
+      }
+
+      // TODO (Alex) Implement this based on the contents of sourceDataTagValue used
+      return new Event<>(System.currentTimeMillis(), false);
+    });
   }
 }

@@ -16,18 +16,17 @@
  *****************************************************************************/
 package cern.c2mon.server.client.publish;
 
-import cern.c2mon.cache.actions.tag.UnifiedTagCacheFacade;
-import cern.c2mon.server.cache.C2monCacheListener;
-import cern.c2mon.server.cache.CacheRegistrationService;
+import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.config.tag.UnifiedTagCacheFacade;
 import cern.c2mon.server.client.util.TransferObjectFactory;
 import cern.c2mon.server.common.alarm.Alarm;
-import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.common.republisher.Publisher;
 import cern.c2mon.server.common.republisher.Republisher;
 import cern.c2mon.server.common.republisher.RepublisherFactory;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.client.alarm.AlarmValue;
+import cern.c2mon.shared.common.CacheEvent;
 import cern.c2mon.shared.util.jms.JmsSender;
 import cern.c2mon.shared.util.json.GsonFactory;
 import com.google.gson.Gson;
@@ -56,22 +55,18 @@ import javax.annotation.PostConstruct;
 @Slf4j
 @Service
 @ManagedResource(description = "Bean publishing Alarm updates to the clients")
-public class AlarmPublisher implements C2monCacheListener<Alarm>, SmartLifecycle, Publisher<AlarmValue>  {
+public class AlarmPublisher implements SmartLifecycle, Publisher<AlarmValue>  {
 
   /** Bean providing for sending JMS messages and waiting for a response */
   private final JmsSender jmsSender;
 
-  /** Used to register to Alarm updates */
-  private CacheRegistrationService cacheRegistrationService;
+  private final C2monCache<Alarm> alarmCache;
 
   /** Reference to the tag location service to check whether a tag exists */
-  private final UnifiedTagCacheFacade tagLocationService;
+  private final UnifiedTagCacheFacade unifiedTagCacheFacade;
 
   /** Json message serializer/deserializer */
   private static final Gson GSON = GsonFactory.createGson();
-
-  /** Listener container lifecycle hook */
-  private Lifecycle listenerContainer;
 
   /** Contains re-publication logic */
   private Republisher<AlarmValue> republisher;
@@ -81,19 +76,19 @@ public class AlarmPublisher implements C2monCacheListener<Alarm>, SmartLifecycle
 
   /**
    * Default Constructor
-   * @param pJmsSender Used for sending JMS messages and waiting for a response.
-   * @param pCacheRegistrationService Used to register to Alarm updates.
-   * @param pTagLocationService Reference to the tag location service singleton.
+   * @param jmsSender Used for sending JMS messages and waiting for a response.
+   * @param alarmCache Used to register to Alarm updates.
+   * @param unifiedTagCacheFacade Reference to the tag location service singleton.
    * Used to add tag information to the AlarmValue object.
    */
   @Autowired
-  public AlarmPublisher(@Qualifier("alarmTopicPublisher") final JmsSender pJmsSender
-      , final CacheRegistrationService pCacheRegistrationService
-      , final UnifiedTagCacheFacade pTagLocationService) {
+  public AlarmPublisher(@Qualifier("alarmTopicPublisher") final JmsSender jmsSender
+      , final C2monCache<Alarm> alarmCache
+      , final UnifiedTagCacheFacade unifiedTagCacheFacade) {
 
-    jmsSender = pJmsSender;
-    cacheRegistrationService = pCacheRegistrationService;
-    tagLocationService = pTagLocationService;
+    this.jmsSender = jmsSender;
+    this.alarmCache = alarmCache;
+    this.unifiedTagCacheFacade = unifiedTagCacheFacade;
     republisher = RepublisherFactory.createRepublisher(this, "Alarm");
   }
 
@@ -102,12 +97,8 @@ public class AlarmPublisher implements C2monCacheListener<Alarm>, SmartLifecycle
    */
   @PostConstruct
   void init() {
-    listenerContainer = cacheRegistrationService.registerToAlarms(this);
-  }
-
-  @Override
-  public void confirmStatus(final Alarm alarm) {
-    notifyElementUpdated(alarm);
+    alarmCache.getCacheListenerManager().registerListener(this::notifyElementUpdated
+    , CacheEvent.UPDATE_ACCEPTED, CacheEvent.CONFIRM_STATUS);
   }
 
   /**
@@ -116,14 +107,13 @@ public class AlarmPublisher implements C2monCacheListener<Alarm>, SmartLifecycle
    * JMS client topic.
    * @param alarm the updated alarm
    */
-  @Override
   public void notifyElementUpdated(final Alarm alarm) {
 
     Long tagId = alarm.getDataTagId();
     AlarmValue alarmValue = null;
 
-    if (tagLocationService.containsKey(tagId)) {
-      Tag tag = tagLocationService.get(tagId);
+    if (unifiedTagCacheFacade.containsKey(tagId)) {
+      Tag tag = unifiedTagCacheFacade.get(tagId);
       alarmValue = (TransferObjectFactory.createAlarmValue(alarm, tag));
     }
     else {
@@ -159,13 +149,11 @@ public class AlarmPublisher implements C2monCacheListener<Alarm>, SmartLifecycle
     log.debug("Starting Alarm publisher");
     running = true;
     republisher.start();
-    listenerContainer.start();
   }
 
   @Override
   public void stop() {
     log.debug("Stopping Alarm publisher");
-    listenerContainer.stop();
     republisher.stop();
     running = false;
   }

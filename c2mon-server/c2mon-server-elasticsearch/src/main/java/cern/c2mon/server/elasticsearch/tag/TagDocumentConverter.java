@@ -23,10 +23,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import cern.c2mon.server.cache.EquipmentCache;
-import cern.c2mon.server.cache.ProcessCache;
-import cern.c2mon.server.cache.SubEquipmentCache;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.datatag.DataTag;
+import cern.c2mon.server.common.equipment.Equipment;
+import cern.c2mon.server.common.process.Process;
+import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
@@ -42,10 +43,11 @@ import cern.c2mon.shared.common.type.TypeConverter;
 @Component
 public class TagDocumentConverter extends BaseTagDocumentConverter<TagDocument> {
 
-  @Autowired
-  public TagDocumentConverter(final ProcessCache processCache, final EquipmentCache equipmentCache, final SubEquipmentCache subEquipmentCache) {
-    super(processCache, equipmentCache, subEquipmentCache, TagDocument::new);
-  }
+    @Autowired
+    public TagDocumentConverter(final C2monCache<Process> processCache, final C2monCache<Equipment> equipmentCache,
+                                final C2monCache<SubEquipment> subEquipmentCache) {
+        super(processCache, equipmentCache, subEquipmentCache, TagDocument::new);
+    }
 
   @Override
   public Optional<TagDocument> convert(final Tag tag) {

@@ -21,19 +21,18 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import cern.c2mon.cache.config.tag.UnifiedTagCacheFacade;
+import cern.c2mon.pmanager.persistence.IPersistenceManager;
+import cern.c2mon.server.common.tag.Tag;
+import cern.c2mon.shared.common.CacheEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Component;
 
-import cern.c2mon.pmanager.persistence.IPersistenceManager;
-import cern.c2mon.server.cache.C2monBufferedCacheListener;
-import cern.c2mon.server.cache.CacheRegistrationService;
-import cern.c2mon.server.common.component.Lifecycle;
-import cern.c2mon.server.common.config.ServerConstants;
-import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
+
+import javax.annotation.PostConstruct;
 
 /**
  * Listens for {@link Tag} updates and converts them to {@link TagDocument}
@@ -44,44 +43,48 @@ import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
  */
 @Component
 @Slf4j
-public class TagDocumentListener implements C2monBufferedCacheListener<Tag>, SmartLifecycle {
+public class TagDocumentListener {
 
   private final ElasticsearchProperties properties;
+
+  private final UnifiedTagCacheFacade unifiedTagCacheFacade;
 
   @Qualifier("tagDocumentPersistenceManager")
   private final IPersistenceManager<TagDocument> persistenceManager;
 
   private final TagDocumentConverter converter;
 
-  private Lifecycle listenerContainer;
-
-  private volatile boolean running = false;
-
   /**
    * @param properties Elasticsearch properties
-   * @param cacheRegistrationService to register respective listener
+   * @param unifiedTagCacheFacade to register respective listener
    * @param persistenceManager to store respective data
    * @param converter to convert the tags
    */
   @Autowired
-  public TagDocumentListener(ElasticsearchProperties properties, CacheRegistrationService cacheRegistrationService, IPersistenceManager<TagDocument> persistenceManager, TagDocumentConverter converter) {
+  public TagDocumentListener(ElasticsearchProperties properties, UnifiedTagCacheFacade unifiedTagCacheFacade, IPersistenceManager<TagDocument> persistenceManager, TagDocumentConverter converter) {
     this.properties = properties;
     this.persistenceManager = persistenceManager;
     this.converter = converter;
+    this.unifiedTagCacheFacade = unifiedTagCacheFacade;
+  }
 
+  @PostConstruct
+  public void init() {
+    // Register to be notified of all tag updates (data, rule and control tags)
     if (properties.isEnabled()) {
-      listenerContainer = cacheRegistrationService.registerBufferedListenerToTags(this);
+      unifiedTagCacheFacade.registerBufferedListener(this::notifyElementUpdated, CacheEvent.UPDATE_ACCEPTED);
     }
   }
 
-  @Override
   public void notifyElementUpdated(final Collection<Tag> tags) {
     if (tags == null) {
       log.warn("Received a null collection of tags");
       return;
     }
 
-    Collection<Tag> loggables = tags.stream().filter(Tag::isLogged).collect(Collectors.toList());
+    Collection<Tag> loggables = tags.stream()
+        .filter(Tag::isLogged)
+        .collect(Collectors.toList());
     log.debug("About to log {} tags", loggables.size());
 
     List<TagDocument> tagDocuments = loggables.stream()
@@ -93,51 +96,4 @@ public class TagDocumentListener implements C2monBufferedCacheListener<Tag>, Sma
     persistenceManager.storeData(tagDocuments);
   }
 
-  @Override
-  public void confirmStatus(Collection<Tag> tagCollection) {
-    // logic not required
-  }
-
-  @Override
-  public String getThreadName() {
-    return "ElasticsearchPersister";
-  }
-
-  @Override
-  public boolean isAutoStartup() {
-    return true;
-  }
-
-  @Override
-  public void stop(Runnable runnable) {
-    stop();
-    runnable.run();
-  }
-
-  @Override
-  public boolean isRunning() {
-    return running;
-  }
-
-  @Override
-  public void start() {
-    if (properties.isEnabled()) {
-      running = true;
-      listenerContainer.start();
-    }
-  }
-
-  @Override
-  public void stop() {
-    if (properties.isEnabled()) {
-      listenerContainer.stop();
-      running = false;
-    }
-
-  }
-
-  @Override
-  public int getPhase() {
-    return ServerConstants.PHASE_START_LAST - 1;
-  }
 }

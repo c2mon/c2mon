@@ -41,7 +41,7 @@ import java.util.Collection;
 public class DataRefreshManagerImpl implements DataRefreshManager {
 
   /** For updating the cache */
-  private final DataTagService dataTagFacade;
+  private final DataTagService dataTagService;
 
   /** For getting the latest value from the DAQ layer */
   private final ProcessCommunicationManager processCommunicationManager;
@@ -50,10 +50,10 @@ public class DataRefreshManagerImpl implements DataRefreshManager {
   private final ProcessService processCache;
 
   @Autowired
-  public DataRefreshManagerImpl(DataTagService dataTagFacade, ProcessCommunicationManager processCommunicationManager,
-      ProcessService processService) {
+  public DataRefreshManagerImpl(DataTagService dataTagService, ProcessCommunicationManager processCommunicationManager,
+                                ProcessService processService) {
     super();
-    this.dataTagFacade = dataTagFacade;
+    this.dataTagService = dataTagService;
     this.processCommunicationManager = processCommunicationManager;
     this.processCache = processService;
   }
@@ -90,7 +90,7 @@ public class DataRefreshManagerImpl implements DataRefreshManager {
     Collection<SourceDataTagValue> updates = latestValues.getAllDataTagValueObjects();
     for (SourceDataTagValue value : updates) {
       try {
-        dataTagFacade.updateFromSource(value.getId(), value);
+        dataTagService.updateFromSource(value.getId(), value);
       } catch (Exception e) {
         log.error("Exception caught while refreshing a Tag with the latest DAQ cache value (id=" + value.getId() + ")", e);
       }

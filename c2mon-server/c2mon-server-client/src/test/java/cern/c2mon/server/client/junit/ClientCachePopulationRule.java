@@ -1,27 +1,21 @@
 package cern.c2mon.server.client.junit;
 
-import cern.c2mon.server.cache.alarm.impl.AlarmCacheImpl;
-import cern.c2mon.server.cache.alive.AliveTimerCacheImpl;
-import cern.c2mon.server.cache.command.CommandTagCacheImpl;
-import cern.c2mon.server.cache.commfault.CommFaultTagCacheImpl;
-import cern.c2mon.server.cache.control.ControlTagCacheImpl;
-import cern.c2mon.server.cache.datatag.DataTagCacheImpl;
-import cern.c2mon.server.cache.device.DeviceCacheImpl;
-import cern.c2mon.server.cache.device.DeviceClassCacheImpl;
-import cern.c2mon.server.cache.equipment.EquipmentCacheImpl;
-import cern.c2mon.server.cache.process.ProcessCacheImpl;
-import cern.c2mon.server.cache.rule.RuleTagCacheImpl;
-import cern.c2mon.server.cache.subequipment.SubEquipmentCacheImpl;
+import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.server.common.alarm.Alarm;
+import cern.c2mon.server.common.alive.AliveTag;
+import cern.c2mon.server.common.commfault.CommFaultTag;
+import cern.c2mon.server.common.datatag.DataTag;
+import cern.c2mon.server.common.device.Device;
+import cern.c2mon.server.common.device.DeviceClass;
+import cern.c2mon.server.common.equipment.Equipment;
+import cern.c2mon.server.common.process.Process;
+import cern.c2mon.server.common.rule.RuleTag;
+import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.test.DatabasePopulationRule;
-import net.sf.ehcache.CacheManager;
-import org.junit.rules.ExternalResource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
-import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
+import cern.c2mon.shared.common.command.CommandTag;
 import org.springframework.stereotype.Service;
 
-import javax.sql.DataSource;
+import javax.inject.Inject;
 import java.sql.SQLException;
 
 /**
@@ -33,47 +27,56 @@ import java.sql.SQLException;
 @Service
 public class ClientCachePopulationRule extends DatabasePopulationRule {
 
-  @Autowired
-  private ProcessCacheImpl processCache;
+  private C2monCache<Process> processCache;
 
-  @Autowired
-  private EquipmentCacheImpl equipmentCache;
+  private C2monCache<Equipment> equipmentCache;
 
-  @Autowired
-  private SubEquipmentCacheImpl subEquipmentCache;
+  private C2monCache<SubEquipment> subEquipmentCache;
 
-  @Autowired
-  private DataTagCacheImpl dataTagCache;
+  private C2monCache<DataTag> dataTagCache;
 
-  @Autowired
-  private AlarmCacheImpl alarmCache;
+  private C2monCache<Alarm> alarmCache;
 
-  @Autowired
-  private RuleTagCacheImpl ruleTagCache;
+  private C2monCache<RuleTag> ruleTagCache;
 
-  @Autowired
-  private CommandTagCacheImpl commandTagCache;
+  private C2monCache<CommandTag> commandTagCache;
 
-  @Autowired
-  private AliveTimerCacheImpl aliveTimerCache;
+  private C2monCache<AliveTag> aliveTimerCache;
 
-  @Autowired
-  private CommFaultTagCacheImpl commFaultTagCache;
+  private C2monCache<CommFaultTag> commFaultTagCache;
 
-  @Autowired
-  private ControlTagCacheImpl controlTagCache;
+  private C2monCache<DeviceClass> deviceClassCache;
 
-  @Autowired
-  private DeviceClassCacheImpl deviceClassCache;
+  private C2monCache<Device> deviceCache;
 
-  @Autowired
-  private DeviceCacheImpl deviceCache;
+  @Inject
+  public ClientCachePopulationRule(C2monCache<Process> processCache,
+                                          C2monCache<Equipment> equipmentCache,
+                                          C2monCache<SubEquipment> subEquipmentCache,
+                                          C2monCache<DataTag> dataTagCache,
+                                          C2monCache<Alarm> alarmCache,
+                                          C2monCache<RuleTag> ruleTagCache,
+                                          C2monCache<CommandTag> commandTagCache,
+                                          C2monCache<AliveTag> aliveTimerCache,
+                                          C2monCache<CommFaultTag> commFaultTagCache,
+                                          C2monCache<DeviceClass> deviceClassCache,
+                                          C2monCache<Device> deviceCache) {
+    this.processCache = processCache;
+    this.equipmentCache = equipmentCache;
+    this.subEquipmentCache = subEquipmentCache;
+    this.dataTagCache = dataTagCache;
+    this.alarmCache = alarmCache;
+    this.ruleTagCache = ruleTagCache;
+    this.commandTagCache = commandTagCache;
+    this.aliveTimerCache = aliveTimerCache;
+    this.commFaultTagCache = commFaultTagCache;
+    this.deviceClassCache = deviceClassCache;
+    this.deviceCache = deviceCache;
+  }
 
   @Override
   protected void before() throws SQLException {
     super.before();
-    CacheManager.getInstance().clearAll();
-    controlTagCache.init();
     processCache.init();
     dataTagCache.init();
     equipmentCache.init();

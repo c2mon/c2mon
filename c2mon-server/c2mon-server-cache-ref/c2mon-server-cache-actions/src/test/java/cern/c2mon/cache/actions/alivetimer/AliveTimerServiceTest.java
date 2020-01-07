@@ -3,8 +3,8 @@ package cern.c2mon.cache.actions.alivetimer;
 import cern.c2mon.cache.actions.commfault.CommFaultService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.impl.SimpleC2monCache;
-import cern.c2mon.server.common.alive.AliveTimer;
-import cern.c2mon.server.common.alive.AliveTimerCacheObject;
+import cern.c2mon.server.common.alive.AliveTag;
+import cern.c2mon.server.common.alive.AliveTagCacheObject;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -19,7 +19,7 @@ import static org.junit.Assert.*;
  */
 public class AliveTimerServiceTest {
 
-  private C2monCache<AliveTimer> aliveTimerCacheRef;
+  private C2monCache<AliveTag> aliveTimerCacheRef;
 
   private AliveTimerService aliveTimerService;
 
@@ -31,10 +31,10 @@ public class AliveTimerServiceTest {
 
   @Test
   public void startAliveTimer() {
-    AliveTimer aliveTimer = new AliveTimerCacheObject(1L);
+    AliveTag aliveTimer = new AliveTagCacheObject(1L);
     aliveTimer.setActive(false);
 
-    AliveTimer startedAliveTimer = new AliveTimerCacheObject(1L);
+    AliveTag startedAliveTimer = new AliveTagCacheObject(1L);
     startedAliveTimer.setActive(true);
     startedAliveTimer.setLastUpdate(System.currentTimeMillis());
 
@@ -48,7 +48,7 @@ public class AliveTimerServiceTest {
 
   @Test
   public void startTest() {
-    AliveTimer aliveTimer = new AliveTimerCacheObject(1L);
+    AliveTag aliveTimer = new AliveTagCacheObject(1L);
     aliveTimer.setActive(false);
 
     aliveTimerCacheRef.put(1L, aliveTimer);
@@ -61,7 +61,7 @@ public class AliveTimerServiceTest {
 
   @Test
   public void startForcedAliveTimer() throws InterruptedException {
-    AliveTimer aliveTimer = new AliveTimerCacheObject(1L);
+    AliveTag aliveTimer = new AliveTagCacheObject(1L);
     aliveTimer.setActive(true);
 
     aliveTimerCacheRef.put(aliveTimer.getId(), aliveTimer);
@@ -80,7 +80,7 @@ public class AliveTimerServiceTest {
 
   @Test
   public void checkExpiredAliveTimer() throws InterruptedException {
-    AliveTimer aliveTimer = new AliveTimerCacheObject(1L, 2L, "test", 0L, AliveTimer.ALIVE_TYPE_EQUIPMENT, 20);
+    AliveTag aliveTimer = new AliveTagCacheObject(1L, 2L, "test", 0L, AliveTag.ALIVE_TYPE_EQUIPMENT, 20);
     aliveTimer.setActive(true);
 
     aliveTimerCacheRef.put(aliveTimer.getId(), aliveTimer);
@@ -96,7 +96,7 @@ public class AliveTimerServiceTest {
 
   @Test
   public void checkActiveAliveTimer() throws InterruptedException {
-    AliveTimer aliveTimer = new AliveTimerCacheObject(1L, 2L, "test", 0L, AliveTimer.ALIVE_TYPE_EQUIPMENT, 0);
+    AliveTag aliveTimer = new AliveTagCacheObject(1L, 2L, "test", 0L, AliveTag.ALIVE_TYPE_EQUIPMENT, 0);
     aliveTimer.setActive(true);
 
     aliveTimerCacheRef.put(aliveTimer.getId(), aliveTimer);
@@ -112,7 +112,7 @@ public class AliveTimerServiceTest {
 
   @Test
   public void stopAliveTimer() {
-    AliveTimer aliveTimer = new AliveTimerCacheObject(1L);
+    AliveTag aliveTimer = new AliveTagCacheObject(1L);
     aliveTimer.setActive(true);
     aliveTimer.setLastUpdate(System.currentTimeMillis());
 
@@ -126,9 +126,9 @@ public class AliveTimerServiceTest {
   @Test
   public void startAllAliveTimers() {
     int size = 10;
-    Map<Long, AliveTimer> aliveTimers = new HashMap<>(size);
+    Map<Long, AliveTag> aliveTimers = new HashMap<>(size);
     IntStream.range(0, size).forEach(i -> {
-      AliveTimer aliveTimer = new AliveTimerCacheObject((long) i);
+      AliveTag aliveTimer = new AliveTagCacheObject((long) i);
       aliveTimer.setActive(false);
       aliveTimers.put(aliveTimer.getId(), aliveTimer);
     });
@@ -137,12 +137,12 @@ public class AliveTimerServiceTest {
 
     aliveTimerService.startAllInactiveTimers();
 
-    Map<Long, AliveTimer> startedAliveTimers = aliveTimerCacheRef.getAll(aliveTimers.keySet());
+    Map<Long, AliveTag> startedAliveTimers = aliveTimerCacheRef.getAll(aliveTimers.keySet());
 
-    List<Boolean> actualActive = startedAliveTimers.values().stream().map(AliveTimer::isActive).collect(Collectors.toList());
+    List<Boolean> actualActive = startedAliveTimers.values().stream().map(AliveTag::isActive).collect(Collectors.toList());
     List<Boolean> expectedTrue = new ArrayList<>(Collections.nCopies(size, Boolean.TRUE));
 
-    List<Long> actualLastUpdates = startedAliveTimers.values().stream().map(AliveTimer::getLastUpdate).collect(Collectors.toList());
+    List<Long> actualLastUpdates = startedAliveTimers.values().stream().map(AliveTag::getLastUpdate).collect(Collectors.toList());
     List<Long> expectedZeros = new ArrayList<>(Collections.nCopies(size, 0L));
 
     assertEquals("All AliveTimers should have active status", expectedTrue, actualActive);
@@ -152,9 +152,9 @@ public class AliveTimerServiceTest {
   @Test
   public void stopAllAliveTimers() {
     int size = 10;
-    Map<Long, AliveTimer> aliveTimers = new HashMap<>(size);
+    Map<Long, AliveTag> aliveTimers = new HashMap<>(size);
     IntStream.range(0, size).forEach(i -> {
-      AliveTimer aliveTimer = new AliveTimerCacheObject((long) i);
+      AliveTag aliveTimer = new AliveTagCacheObject((long) i);
       aliveTimer.setActive(true);
       aliveTimer.setLastUpdate(System.currentTimeMillis());
       aliveTimers.put(aliveTimer.getId(), aliveTimer);
@@ -163,11 +163,11 @@ public class AliveTimerServiceTest {
     aliveTimerCacheRef.putAll(aliveTimers);
     aliveTimerService.stopAllActiveTimers();
 
-    Map<Long, AliveTimer> stoppedAliveTimers = aliveTimerCacheRef.getAll(aliveTimers.keySet());
-    List<Boolean> actualNotActive = stoppedAliveTimers.values().stream().map(AliveTimer::isActive).collect(Collectors.toList());
+    Map<Long, AliveTag> stoppedAliveTimers = aliveTimerCacheRef.getAll(aliveTimers.keySet());
+    List<Boolean> actualNotActive = stoppedAliveTimers.values().stream().map(AliveTag::isActive).collect(Collectors.toList());
     List<Boolean> expectedFalse = new ArrayList<>(Collections.nCopies(size, Boolean.FALSE));
 
-    List<Long> actualLastUpdates = stoppedAliveTimers.values().stream().map(AliveTimer::getLastUpdate).collect(Collectors.toList());
+    List<Long> actualLastUpdates = stoppedAliveTimers.values().stream().map(AliveTag::getLastUpdate).collect(Collectors.toList());
     List<Long> expectedZeros = new ArrayList<>(Collections.nCopies(size, 0L));
 
     assertEquals("All AliveTimers should have active status", expectedFalse, actualNotActive);

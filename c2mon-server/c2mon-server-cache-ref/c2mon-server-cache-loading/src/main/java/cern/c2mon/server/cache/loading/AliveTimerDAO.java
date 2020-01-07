@@ -16,13 +16,13 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.loading;
 
-import cern.c2mon.server.common.alive.AliveTimer;
+import cern.c2mon.server.common.alive.AliveTag;
 
 /**
  * AliveTimer DAO specification.
  *
  * @author Mark Brightwell
  */
-public interface AliveTimerDAO extends CacheLoaderDAO<AliveTimer> {
+public interface AliveTimerDAO extends CacheLoaderDAO<AliveTag> {
 
 }

@@ -1,17 +1,17 @@
 package cern.c2mon.server.configuration.handler.transacted;
 
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.server.common.alive.AliveTimer;
+import cern.c2mon.server.common.alive.AliveTag;
 import cern.c2mon.server.configuration.impl.ProcessChange;
 
 import javax.inject.Inject;
 
-public class AliveTimerConfigHandler extends BaseConfigHandlerImpl<AliveTimer, Void> {
+public class AliveTimerConfigHandler extends BaseConfigHandlerImpl<AliveTag, Void> {
 
-  private C2monCache<AliveTimer> aliveTimerCache;
+  private C2monCache<AliveTag> aliveTimerCache;
 
   @Inject
-  public AliveTimerConfigHandler(C2monCache<AliveTimer> aliveTimerCache) {
+  public AliveTimerConfigHandler(C2monCache<AliveTag> aliveTimerCache) {
     // TODO (Alex) Create DAO and factory
     super(aliveTimerCache, null, null, () -> null);
     this.aliveTimerCache = aliveTimerCache;
@@ -39,7 +39,7 @@ public class AliveTimerConfigHandler extends BaseConfigHandlerImpl<AliveTimer, V
   public ProcessChange getCreateEvent(final Long configId, final Long controlTagId, final Long equipmentId, final Long processId) {
     ProcessChange processChange = null;
 
-    AliveTimer aliveTimer = aliveTimerCache.get(controlTagId);
+    AliveTag aliveTimer = aliveTimerCache.get(controlTagId);
 
 //    TODO (Alex) Turn this on when the AliveTimers can have more data
 //    if (aliveTimer.getAddress != null) {

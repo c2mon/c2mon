@@ -17,9 +17,9 @@
 package cern.c2mon.cache.actions.oscillation;
 
 import cern.c2mon.cache.actions.alarm.AlarmService;
-import cern.c2mon.cache.actions.tag.UnifiedTagCacheFacade;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.impl.SimpleC2monCache;
+import cern.c2mon.cache.config.tag.UnifiedTagCacheFacade;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.ValueAlarmCondition;

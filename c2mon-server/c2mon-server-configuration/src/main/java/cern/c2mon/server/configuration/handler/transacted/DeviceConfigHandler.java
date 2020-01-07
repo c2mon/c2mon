@@ -47,14 +47,15 @@ public class DeviceConfigHandler extends BaseConfigHandlerImpl<Device, ProcessCh
   public DeviceConfigHandler(final C2monCache<Device> deviceCache,
                              final DeviceDAO deviceDAO, final DeviceCacheObjectFactory deviceCacheObjectFactory,
                              final C2monCache<DeviceClass> deviceClassCache) {
-    super(deviceCache, deviceDAO, deviceCacheObjectFactory, __ -> new ProcessChange(), ProcessChange::new);
+    super(deviceCache, deviceDAO, deviceCacheObjectFactory, ProcessChange::new);
     this.deviceClassCache = deviceClassCache;
   }
 
   @Override
   protected void doPostCreate(Device element) {
     // Update the cacheObject class so that it knows about the new cacheObject
-    deviceClassCache.loadFromDb(element.getDeviceClassId());
+    // TODO (Alex) Create loadFromDb
+//    deviceClassCache.loadFromDb(element.getDeviceClassId());
   }
 
 }

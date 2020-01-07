@@ -16,19 +16,17 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch.alarm;
 
+import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.pmanager.persistence.IPersistenceManager;
+import cern.c2mon.server.common.alarm.Alarm;
+import cern.c2mon.shared.common.CacheEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Component;
 
-import cern.c2mon.pmanager.persistence.IPersistenceManager;
-import cern.c2mon.server.cache.C2monCacheListener;
-import cern.c2mon.server.cache.CacheRegistrationService;
-import cern.c2mon.server.common.alarm.Alarm;
-import cern.c2mon.server.common.component.Lifecycle;
-import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
+import javax.annotation.PostConstruct;
 
 /**
  * Listens for {@link Alarm} updates and converts them to {@link AlarmDocument}
@@ -39,79 +37,35 @@ import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
  */
 @Slf4j
 @Component
-public class AlarmDocumentListener implements C2monCacheListener<Alarm>, SmartLifecycle {
+public class AlarmDocumentListener {
 
   private final ElasticsearchProperties properties;
+
+  private final C2monCache<Alarm> alarmCache;
 
   @Qualifier("alarmDocumentPersistenceManager")
   private final IPersistenceManager<AlarmDocument> persistenceManager;
 
   private final AlarmValueDocumentConverter converter;
 
-  private Lifecycle listenerContainer;
-
-  private volatile boolean running = false;
-
   @Autowired
-  public AlarmDocumentListener(ElasticsearchProperties properties, CacheRegistrationService cacheRegistrationService, IPersistenceManager<AlarmDocument> persistenceManager, AlarmValueDocumentConverter converter) {
+  public AlarmDocumentListener(ElasticsearchProperties properties, final C2monCache<Alarm> alarmCache, IPersistenceManager<AlarmDocument> persistenceManager, AlarmValueDocumentConverter converter) {
     this.properties = properties;
+    this.alarmCache = alarmCache;
     this.persistenceManager = persistenceManager;
     this.converter = converter;
+  }
+
+  @PostConstruct
+  public void init() {
     if (properties.isEnabled()) {
-      listenerContainer = cacheRegistrationService.registerToAlarms(this);
+      alarmCache.getCacheListenerManager().registerListener(alarm -> {
+        if (alarm != null) {
+          persistenceManager.storeData(converter.convert(alarm));
+        } else {
+          log.warn("Received a null alarm");
+        }
+      }, CacheEvent.UPDATE_ACCEPTED);
     }
-  }
-
-  @Override
-  public void notifyElementUpdated(final Alarm alarm) {
-    if (alarm == null) {
-      log.warn("Received a null alarm");
-      return;
-    }
-
-    persistenceManager.storeData(converter.convert(alarm));
-  }
-
-  @Override
-  public void confirmStatus(Alarm alarm) {
-    // logic not required
-  }
-
-  @Override
-  public boolean isAutoStartup() {
-    return true;
-  }
-
-  @Override
-  public void stop(Runnable runnable) {
-    stop();
-    runnable.run();
-  }
-
-  @Override
-  public boolean isRunning() {
-    return running;
-  }
-
-  @Override
-  public void start() {
-    if (properties.isEnabled()) {
-      running = true;
-      listenerContainer.start();
-    }
-  }
-
-  @Override
-  public void stop() {
-    if (properties.isEnabled()) {
-      listenerContainer.stop();
-      running = false;
-    }
-
-  }
-
-  @Override
-  public int getPhase() {
-    return ServerConstants.PHASE_STOP_LAST - 1;
   }
 }

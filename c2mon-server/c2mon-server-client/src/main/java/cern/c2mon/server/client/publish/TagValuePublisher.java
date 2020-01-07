@@ -17,18 +17,16 @@
 package cern.c2mon.server.client.publish;
 
 import cern.c2mon.cache.actions.alarm.AlarmAggregator;
+import cern.c2mon.cache.actions.alarm.AlarmAggregatorListener;
+import cern.c2mon.cache.actions.alarm.AlarmService;
 import cern.c2mon.cache.actions.alivetimer.AliveTimerService;
-import cern.c2mon.cache.actions.tag.UnifiedTagCacheFacade;
-import cern.c2mon.server.cache.TagFacadeGateway;
-import cern.c2mon.server.cache.alarm.AlarmAggregatorListener;
+import cern.c2mon.cache.config.tag.UnifiedTagCacheFacade;
 import cern.c2mon.server.client.config.ClientProperties;
 import cern.c2mon.server.client.util.TransferObjectFactory;
-import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.TagWithAlarms;
 import cern.c2mon.server.common.republisher.Publisher;
 import cern.c2mon.server.common.republisher.Republisher;
 import cern.c2mon.server.common.republisher.RepublisherFactory;
-import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.configuration.ConfigurationUpdate;
 import cern.c2mon.server.configuration.ConfigurationUpdateListener;
 import cern.c2mon.shared.client.serializer.TransferTagSerializer;
@@ -46,7 +44,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import java.util.List;
 
 /**
  * This class implements the <code>AlarmAggregatorListener</code>
@@ -89,7 +86,7 @@ public class TagValuePublisher implements AlarmAggregatorListener, Configuration
    * Reference to the tag facade gateway to retrieve a tag copies with the
    * associated alarms
    */
-  private final TagFacadeGateway tagFacadeGateway;
+  private final AlarmService alarmService;
 
   /** Reference to the tag location service */
   private UnifiedTagCacheFacade tagLocationService;
@@ -105,7 +102,7 @@ public class TagValuePublisher implements AlarmAggregatorListener, Configuration
    * @param aliveTimerFacade Used to determine, whether a given tag is an AliveTag
    * @param alarmAggregator Used to register this <code>AlarmAggregatorListener</code>
    * @param configurationUpdate Used to register this <code>ConfigurationUpdateListener</code>
-   * @param pTagFacadeGateway Reference to the tag facade gateway singleton
+   * @param alarmService Reference to the tag facade gateway singleton
    * @param tagLocationService Reference to the tag location service
    */
   @Autowired
@@ -113,14 +110,14 @@ public class TagValuePublisher implements AlarmAggregatorListener, Configuration
                            final AlarmAggregator alarmAggregator,
                            final AliveTimerService aliveTimerFacade,
                            final ConfigurationUpdate configurationUpdate,
-                           final TagFacadeGateway pTagFacadeGateway,
+                           final AlarmService alarmService,
                            final UnifiedTagCacheFacade tagLocationService,
                            final ClientProperties properties) {
     this.aliveTimerFacade = aliveTimerFacade;
     this.jmsSender = jmsSender;
     this.alarmAggregator = alarmAggregator;
     this.configurationUpdate = configurationUpdate;
-    this.tagFacadeGateway = pTagFacadeGateway;
+    this.alarmService = alarmService;
     this.tagLocationService = tagLocationService;
     this.republisher = RepublisherFactory.createRepublisher(this, "Tag");
     this.properties = properties;
@@ -158,13 +155,10 @@ public class TagValuePublisher implements AlarmAggregatorListener, Configuration
    * Generates for every notification a <code>TransferTagValue</code>
    * object which is then sent as serialized GSON message trough the
    * dedicated JMS client tag topic.
-   * @param tag the updated Tag
-   * @param alarms the new values of the associated alarms; this list
-   *               is null if no alarms are associated to the tag
+   * @param tagWithAlarms the tag with attached alarms
    */
   @Override
-  public void notifyOnUpdate(final Tag tag, final List<Alarm> alarms) {
-    TagWithAlarms tagWithAlarms = new TagWithAlarms(tag, alarms);
+  public void notifyOnUpdate(TagWithAlarms tagWithAlarms) {
     try {
       publish(tagWithAlarms);
     } catch (JmsException e) {
@@ -183,7 +177,7 @@ public class TagValuePublisher implements AlarmAggregatorListener, Configuration
 
   @Override
   public void notifyOnConfigurationUpdate(Long tagId) {
-    TagWithAlarms tagWithAlarms = tagFacadeGateway.getTagWithAlarms(tagId);
+    TagWithAlarms tagWithAlarms = alarmService.getTagWithAlarmsAtomically(tagId);
     try {
       String topic = TopicProvider.topicFor(tagWithAlarms.getTag(), properties);
       TransferTagImpl tag = TransferObjectFactory.createTransferTag(tagWithAlarms, aliveTimerFacade.isRegisteredAliveTimer(tagId), topic);

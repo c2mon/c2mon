@@ -26,9 +26,7 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.converter.Converter;
 
-import cern.c2mon.server.cache.EquipmentCache;
-import cern.c2mon.server.cache.ProcessCache;
-import cern.c2mon.server.cache.SubEquipmentCache;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.commfault.CommFaultTag;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.metadata.Metadata;
@@ -42,17 +40,18 @@ import cern.c2mon.server.common.tag.Tag;
 @Slf4j
 public class BaseTagDocumentConverter<T extends Map<String, Object>> implements Converter<Tag, Optional<T>> {
 
-  private final ProcessCache processCache;
-  private final EquipmentCache equipmentCache;
-  private final SubEquipmentCache subEquipmentCache;
-  private final Supplier<T> containerSupplier;
+    private final C2monCache<Process> processCache;
+    private final C2monCache<Equipment> equipmentCache;
+    private final C2monCache<SubEquipment> subEquipmentCache;
+    private final Supplier<T> containerSupplier;
 
-  public BaseTagDocumentConverter(final ProcessCache processCache, final EquipmentCache equipmentCache, final SubEquipmentCache subEquipmentCache, final Supplier<T> containerSupplier) {
-    this.processCache = processCache;
-    this.equipmentCache = equipmentCache;
-    this.subEquipmentCache = subEquipmentCache;
-    this.containerSupplier = containerSupplier;
-  }
+    public BaseTagDocumentConverter(final C2monCache<Process> processCache, final C2monCache<Equipment> equipmentCache,
+                                    final C2monCache<SubEquipment> subEquipmentCache, final Supplier<T> containerSupplier) {
+        this.processCache = processCache;
+        this.equipmentCache = equipmentCache;
+        this.subEquipmentCache = subEquipmentCache;
+        this.containerSupplier = containerSupplier;
+    }
 
   @Override
   public Optional<T> convert(final Tag tag) {

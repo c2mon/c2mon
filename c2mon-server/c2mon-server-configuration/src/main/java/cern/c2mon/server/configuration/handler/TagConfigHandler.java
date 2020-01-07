@@ -16,7 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.handler;
 
-import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
+import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.tag.Tag;
 
 /**

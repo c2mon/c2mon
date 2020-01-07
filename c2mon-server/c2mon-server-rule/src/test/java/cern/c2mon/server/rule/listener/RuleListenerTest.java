@@ -16,11 +16,10 @@
  *****************************************************************************/
 package cern.c2mon.server.rule.listener;
 
-import cern.c2mon.server.cache.C2monCacheListener;
-import cern.c2mon.server.cache.DataTagCache;
-import cern.c2mon.server.cache.DataTagFacade;
-import cern.c2mon.server.cache.RuleTagCache;
-import cern.c2mon.server.cache.config.CacheModule;
+import cern.c2mon.cache.actions.CacheActionsModuleRef;
+import cern.c2mon.cache.actions.datatag.DataTagService;
+import cern.c2mon.cache.actions.tag.TagController;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.cache.loading.config.CacheLoadingModuleRef;
 import cern.c2mon.server.common.config.CommonModule;
@@ -36,7 +35,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.sql.Timestamp;
 import java.util.concurrent.CountDownLatch;
 
 import static org.junit.Assert.assertEquals;
@@ -54,7 +52,7 @@ import static org.junit.Assert.assertTrue;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {
     CommonModule.class,
-    CacheModule.class,
+    CacheActionsModuleRef.class,
     CacheDbAccessModule.class,
     CacheLoadingModuleRef.class,
     RuleModule.class
@@ -72,13 +70,13 @@ public class RuleListenerTest {
   private static final int SLEEP_TIME = 2000;
 
   @Autowired
-  private DataTagFacade dataTagFacade;
+  private DataTagService dataTagService;
 
   @Autowired
-  private DataTagCache dataTagCache;
+  private C2monCache<DataTag> dataTagCache;
 
   @Autowired
-  private RuleTagCache ruleTagCache;
+  private C2monCache<RuleTag> ruleTagCache;
 
   /**
    * Tests that a update to a data tag in the cache results in
@@ -99,49 +97,50 @@ public class RuleListenerTest {
 
     final CountDownLatch latch = new CountDownLatch(1);
     final CountDownLatch latch2 = new CountDownLatch(2);
-    ruleTagCache.registerSynchronousListener(new C2monCacheListener<RuleTag>() {
-      @Override
-      public void notifyElementUpdated(RuleTag cacheable) {
-        latch.countDown();
-        latch2.countDown();
-      }
-      @Override
-      public void confirmStatus(RuleTag cacheable) {}
+    ruleTagCache.getCacheListenerManager().registerListener(cacheable -> {
+      latch.countDown();
+      latch2.countDown();
     });
 
     //check still set as expected in test class
     assertEquals(dataTag1.getValue(), Boolean.TRUE);
     assertEquals(dataTag2.getValue(), Boolean.TRUE);
-    assertEquals(ruleTag.getValue(), Integer.valueOf(1000)); //set manually in cache
+    assertEquals(ruleTag.getValue(), 1000); //set manually in cache
 
     //check are all in cache
-    assertTrue(dataTagCache.hasKey(dataTag1.getId()));
-    assertTrue(dataTagCache.hasKey(dataTag2.getId()));
-    assertTrue(ruleTagCache.hasKey(ruleTag.getId()));
+    assertTrue(dataTagCache.containsKey(dataTag1.getId()));
+    assertTrue(dataTagCache.containsKey(dataTag2.getId()));
+    assertTrue(ruleTagCache.containsKey(ruleTag.getId()));
     //and have correct values
     assertEquals(dataTagCache.get(dataTag1.getId()).getValue(), Boolean.TRUE);
     assertEquals(dataTagCache.get(dataTag2.getId()).getValue(), Boolean.TRUE);
-    assertEquals(ruleTagCache.get(ruleTag.getId()).getValue(), Integer.valueOf(1000));
+    assertEquals(ruleTagCache.get(ruleTag.getId()).getValue(), 1000);
 
     //recall rule is (#1000000 = true)|(#110 = true)[2],true[3]
 
     //(1) first test of rule update
     //update dataTag and check rule was updated after short wait (to account for buffer mainly, and passing to new thread)
-    dataTagFacade.updateAndValidate(dataTag1.getId(), Boolean.FALSE, "now false", new Timestamp(System.currentTimeMillis()));
+    dataTagService.getCache().compute(dataTag1.getId(), dataTag -> {
+      TagController.setValue(dataTag, Boolean.FALSE, "now false");
+      TagController.validate(dataTag);
+    });
     //NOTIFY OF UPDATE! - can remove as moved notification into facade objects
     //dataTagCache.notifyListenersOfUpdate(dataTag1);
 
     //check update was made
     assertEquals(Boolean.FALSE, dataTagCache.get(dataTag1.getId()).getValue());
     latch.await();
-    assertEquals(Integer.valueOf(3), ruleTagCache.get(ruleTag.getId()).getValue());
+    assertEquals(3, ruleTagCache.get(ruleTag.getId()).getValue());
 
     //(2) second test of rule update
     //update dataTag to TRUE, notify listeners and check rule was again updated
-    dataTagFacade.updateAndValidate(dataTag1.getId(), Boolean.TRUE, "now true", new Timestamp(System.currentTimeMillis()));
+    dataTagService.getCache().compute(dataTag1.getId(), dataTag -> {
+      TagController.setValue(dataTag, Boolean.FALSE, "now false");
+      TagController.validate(dataTag);
+    });
     //dataTagCache.notifyListenersOfUpdate(dataTag1);
     assertEquals(Boolean.TRUE, dataTagCache.get(dataTag1.getId()).getValue());
     latch2.await();
-    assertEquals(Integer.valueOf(2), ruleTagCache.get(ruleTag.getId()).getValue());
+    assertEquals(2, ruleTagCache.get(ruleTag.getId()).getValue());
   }
 }

@@ -16,27 +16,24 @@
  *****************************************************************************/
 package cern.c2mon.server.client.heartbeat.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import com.google.gson.Gson;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.SmartLifecycle;
-import org.springframework.stereotype.Component;
-
-import cern.c2mon.server.cache.ClusterCache;
-import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
+import cern.c2mon.cache.actions.oscillation.OscillationService;
 import cern.c2mon.server.client.heartbeat.HeartbeatListener;
 import cern.c2mon.server.client.heartbeat.HeartbeatManager;
 import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.shared.client.supervision.Heartbeat;
 import cern.c2mon.shared.util.jms.JmsSender;
 import cern.c2mon.shared.util.json.GsonFactory;
+import com.google.gson.Gson;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.SmartLifecycle;
+import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * The HeartbeatManager bean generates regular server heartbeats, which
@@ -48,13 +45,9 @@ import cern.c2mon.shared.util.json.GsonFactory;
  *
  * @author Mark Brightwell
  */
+@Slf4j
 @Component
 public class HeartbeatManagerImpl implements HeartbeatManager, SmartLifecycle {
-
-  /**
-   * Log4j Logger for this class.
-   */
-  private static final Logger LOG = LoggerFactory.getLogger(HeartbeatManagerImpl.class);
 
   /**
    * Gson that is reused.
@@ -88,9 +81,9 @@ public class HeartbeatManagerImpl implements HeartbeatManager, SmartLifecycle {
   private List<HeartbeatListener> listeners;
 
   /**
-   * Is only accessed to check Terracotta is working in case of distributed cache.
+   * Is only accessed to check cache connectivity.
    */
-  private ClusterCache clusterCache;
+  private OscillationService oscillationService;
 
   private static final String TIMER_NAME_PREFIX = "Heartbeat";
   /**
@@ -99,12 +92,12 @@ public class HeartbeatManagerImpl implements HeartbeatManager, SmartLifecycle {
    */
   @Autowired
   public HeartbeatManagerImpl(@Qualifier("heartbeatSender") final JmsSender heartbeatSender,
-                              @Qualifier("clusterCache") final ClusterCache clusterCache) {
+                              final OscillationService oscillationService) {
     super();
     this.heartbeatSender = heartbeatSender;
     this.timer = new Timer(TIMER_NAME_PREFIX);
     this.listeners = new ArrayList<>();
-    this.clusterCache = clusterCache;
+    this.oscillationService = oscillationService;
   }
 
   @Override
@@ -167,7 +160,7 @@ public class HeartbeatManagerImpl implements HeartbeatManager, SmartLifecycle {
    */
   @Override
   public synchronized void start() {
-    LOG.info("Starting server heartbeat.");
+    log.info("Starting server heartbeat.");
     this.timer.scheduleAtFixedRate(new HeartbeatTask(), 0, heartbeatInterval);
     running = true;
   }
@@ -177,7 +170,7 @@ public class HeartbeatManagerImpl implements HeartbeatManager, SmartLifecycle {
    */
   @Override
   public synchronized void stop() {
-    LOG.debug("Stopping server heartbeat.");
+    log.debug("Stopping server heartbeat.");
     this.timer.cancel();
     running = false;
   }
@@ -203,18 +196,17 @@ public class HeartbeatManagerImpl implements HeartbeatManager, SmartLifecycle {
      */
     @Override
     public void run() {
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("Sending server heartbeat.");
+      if (log.isDebugEnabled()) {
+        log.debug("Sending server heartbeat.");
       }
       try {
         final Heartbeat heartbeat = new Heartbeat();
         //access cache to check cache process is responding when using distributed cache
-        clusterCache.acquireWriteLockOnKey(C2monCacheLoader.aliveStatusInitialized);
-        clusterCache.releaseWriteLockOnKey(C2monCacheLoader.aliveStatusInitialized);
+        oscillationService.getLastOscillationCheck();
         heartbeatSender.send(gson.toJson(heartbeat));
         notifyListeners(heartbeat);
       } catch (Exception e) {
-        LOG.error("run() : Error sending heartbeat message.", e);
+        log.error("run() : Error sending heartbeat message.", e);
       }
     }
 

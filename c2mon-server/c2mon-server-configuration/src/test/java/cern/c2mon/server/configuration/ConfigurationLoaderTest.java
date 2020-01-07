@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2019 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -31,33 +31,36 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import cern.c2mon.server.cache.*;
-import cern.c2mon.server.cache.common.AbstractCache;
-import cern.c2mon.server.cache.config.CacheModule;
+import cern.c2mon.cache.actions.datatag.DataTagService;
+import cern.c2mon.cache.actions.equipment.EquipmentService;
+import cern.c2mon.cache.actions.process.ProcessService;
+import cern.c2mon.cache.actions.subequipment.SubEquipmentService;
+import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.config.CacheConfigModuleRef;
 import cern.c2mon.server.cache.dbaccess.*;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.cache.loading.config.CacheLoadingModuleRef;
 import cern.c2mon.server.common.alarm.Alarm;
-import cern.c2mon.server.common.alarm.AlarmCacheObject;
+import cern.c2mon.server.common.alive.AliveTag;
 import cern.c2mon.server.common.command.CommandTagCacheObject;
+import cern.c2mon.server.common.commfault.CommFaultTag;
 import cern.c2mon.server.common.config.CommonModule;
-import cern.c2mon.server.common.control.ControlTagCacheObject;
+import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.common.device.*;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.equipment.EquipmentCacheObject;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.process.ProcessCacheObject;
+import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.rule.RuleTagCacheObject;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
-import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.configuration.config.ConfigurationModule;
 import cern.c2mon.server.configuration.config.ProcessCommunicationManagerMock;
 import cern.c2mon.server.configuration.helper.ObjectEqualityComparison;
 import cern.c2mon.server.configuration.junit.ConfigurationCachePopulationRule;
 import cern.c2mon.server.configuration.junit.ConfigurationDatabasePopulationRule;
-import cern.c2mon.server.daq.JmsContainerManager;
 import cern.c2mon.server.daq.config.DaqModule;
 import cern.c2mon.server.daq.out.ProcessCommunicationManager;
 import cern.c2mon.server.daq.update.JmsContainerManagerImpl;
@@ -75,6 +78,7 @@ import cern.c2mon.shared.client.device.DeviceCommand;
 import cern.c2mon.shared.client.device.DeviceProperty;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.NoSimpleValueParseException;
+import cern.c2mon.shared.common.command.CommandTag;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.DataTagConstants;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
@@ -98,7 +102,7 @@ import static org.junit.Assert.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {
     CommonModule.class,
-    CacheModule.class,
+    CacheConfigModuleRef.class,
     CacheDbAccessModule.class,
     CacheLoadingModuleRef.class,
     SupervisionModule.class,
@@ -127,85 +131,79 @@ public class ConfigurationLoaderTest {
   private ConfigurationLoader configurationLoader;
 
   @Autowired
-  private DataTagCache dataTagCache;
+  private C2monCache<DataTag> dataTagCache;
+
+  @Autowired
+  private DataTagService dataTagService;
 
   @Autowired
   private DataTagMapper dataTagMapper;
 
   @Autowired
-  private ControlTagCache controlTagCache;
-
-  @Autowired
   private ControlTagMapper controlTagMapper;
 
   @Autowired
-  private CommandTagCache commandTagCache;
+  private C2monCache<CommandTag> commandTagCache;
 
   @Autowired
   private CommandTagMapper commandTagMapper;
 
   @Autowired
-  private RuleTagCache ruleTagCache;
+  private C2monCache<RuleTag> ruleTagCache;
 
   @Autowired
   private RuleTagMapper ruleTagMapper;
 
   @Autowired
-  private EquipmentCache equipmentCache;
+  private C2monCache<Equipment> equipmentCache;
 
   @Autowired
   private EquipmentMapper equipmentMapper;
 
   @Autowired
-  private EquipmentFacade equipmentFacade;
+  private EquipmentService equipmentService;
 
   @Autowired
-  private SubEquipmentCache subEquipmentCache;
+  private C2monCache<SubEquipment> subEquipmentCache;
 
   @Autowired
   private SubEquipmentMapper subEquipmentMapper;
 
   @Autowired
-  private SubEquipmentFacade subEquipmentFacade;
+  private SubEquipmentService subEquipmentFacade;
 
   @Autowired
-  private ProcessCache processCache;
+  private C2monCache<Process> processCache;
 
   @Autowired
   private ProcessMapper processMapper;
 
   @Autowired
-  private AliveTimerCache aliveTimerCache;
+  private C2monCache<AliveTag> aliveTimerCache;
 
   @Autowired
-  private CommFaultTagCache commFaultTagCache;
+  private C2monCache<CommFaultTag> commFaultTagCache;
 
   @Autowired
-  private AlarmCache alarmCache;
+  private C2monCache<Alarm> alarmCache;
 
   @Autowired
   private AlarmMapper alarmMapper;
 
   @Autowired
-  private TagLocationService tagLocationService;
+  private ProcessService processService;
 
   @Autowired
-  private ProcessFacade processFacade;
-
-  @Autowired
-  private DeviceClassCache deviceClassCache;
+  private C2monCache<DeviceClass> deviceClassCache;
 
   @Autowired
   private DeviceClassMapper deviceClassMapper;
 
   @Autowired
-  private DeviceCache deviceCache;
+  private C2monCache<Device> deviceCache;
 
   @Autowired
   private DeviceMapper deviceMapper;
-
-  @Autowired
-  private ClusterCache clusterCache;
 
   @Autowired
   private JmsContainerManagerImpl jmsContainerManager;
@@ -218,7 +216,7 @@ public class ConfigurationLoaderTest {
   @Before
   public void beforeTest() throws IOException {
     // make sure Process is "running" (o.w. nothing is sent to DAQ)
-    processFacade.start(50L, "hostname", new Timestamp(System.currentTimeMillis()));
+    processService.start(50L, "hostname", new Timestamp(System.currentTimeMillis()));
 
     // reset mock
     reset(mockManager);
@@ -233,54 +231,8 @@ public class ConfigurationLoaderTest {
   }
 
   @Test
-  public void testCreateUpdateRemoveControlTag() {
-    // create
-    ConfigurationReport report = configurationLoader.applyConfiguration(2);
-
-    assertFalse(report.toXML().contains(Status.FAILURE.toString()));
-    assertEquals(Status.OK, report.getStatus());
-    assertTrue(report.getProcessesToReboot().isEmpty()); // empty because no
-                                                         // process/equipment
-                                                         // points to this
-                                                         // control tag
-
-    ControlTagCacheObject cacheObject = (ControlTagCacheObject) controlTagCache.get(500L);
-
-    // corresponds to data inserted using SQL file
-    ControlTagCacheObject expectedObject = new ControlTagCacheObject();
-    expectedObject.setId(new Long(500)); // must be non null in DB
-    expectedObject.setName("Process status"); // non null
-    expectedObject.setMode(DataTagConstants.MODE_TEST); // non null
-    expectedObject.setDataType("Integer"); // non null
-    expectedObject.setDescription("test");
-    expectedObject.setMinValue(new Integer(12));
-    expectedObject.setMaxValue(new Integer(22));
-    expectedObject.setLogged(false); // null allowed
-
-    expectedObject.setDataTagQuality(new DataTagQualityImpl());
-
-    assertEquals(expectedObject, cacheObject);
-    // test update of control tag
-    report = configurationLoader.applyConfiguration(6);
-
-    assertFalse(report.toXML().contains(Status.FAILURE.toString()));
-    assertEquals(Status.OK, report.getStatus());
-    assertTrue(report.getProcessesToReboot().isEmpty());
-    // ControlTagCacheObject updatedCacheObject = (ControlTagCacheObject)
-    // controlTagCache.get(500L);
-    expectedObject.setDescription("modified description");
-    expectedObject.setMinValue(null); // check can reset min & max to null using
-                                      // update
-    expectedObject.setMaxValue(null);
-    cacheObject = (ControlTagCacheObject) controlTagCache.get(500L);
-    assertEquals(expectedObject, cacheObject);
-
-  }
-
-  @Test
   public void testRemoveControlTag() {
     // check as expected before test
-    assertTrue(controlTagCache.hasKey(1250L));
     assertNotNull(controlTagMapper.getItem(1250L));
 
     // run test
@@ -293,7 +245,6 @@ public class ConfigurationLoaderTest {
                                                          // process/equipment
                                                          // points to this
                                                          // control tag
-    assertFalse(controlTagCache.hasKey(1250L));
     assertNull(controlTagMapper.getItem(1250L));
   }
 
@@ -353,7 +304,7 @@ public class ConfigurationLoaderTest {
   public void testRemoveCommand() throws ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException,
       NoSuchFieldException, NoSimpleValueParseException {
     // check as expected
-    assertTrue(commandTagCache.hasKey(11000L));
+    assertTrue(commandTagCache.containsKey(11000L));
     assertNotNull(commandTagMapper.getItem(11000L));
     EasyMock.expect(mockManager.sendConfiguration(EasyMock.isA(Long.class), EasyMock.isA(List.class))).andReturn(new ConfigurationChangeEventReport());
 
@@ -363,7 +314,7 @@ public class ConfigurationLoaderTest {
 
     // check successful
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
-    assertFalse(commandTagCache.hasKey(11000L));
+    assertFalse(commandTagCache.containsKey(11000L));
     assertNull(commandTagMapper.getItem(11000L));
     verify(mockManager);
   }
@@ -417,11 +368,9 @@ public class ConfigurationLoaderTest {
 
     assertEquals(expectedObject, cacheObject);
 
-    equipmentCache.acquireWriteLockOnKey(cacheObject.getEquipmentId());
     Equipment equipment = equipmentCache.get(cacheObject.getEquipmentId());
     // check equipment now has datatag in list
-    assertTrue(equipmentFacade.getDataTagIds(cacheObject.getEquipmentId()).contains(5000000L));
-    equipmentCache.releaseWriteLockOnKey(cacheObject.getEquipmentId());
+    assertTrue(dataTagService.getDataTagIdsByEquipmentId(cacheObject.getEquipmentId()).contains(5000000L));
 
     // test update of this datatag
     report = configurationLoader.applyConfiguration(4);
@@ -433,14 +382,11 @@ public class ConfigurationLoaderTest {
 
     expectedObject.setJapcAddress("testConfigJAPCaddress2");
     expectedObject.setDipAddress(null); // checks can be set to null also
-    expectedObject.setMaxValue(new Float(26));
+    expectedObject.setMaxValue(26f);
     expectedObject.setAddress(new DataTagAddress(new OPCHardwareAddressImpl("CW_TEMP_IN_COND4")));
 
     assertEquals(expectedObject, updatedCacheObject);
     equipment = equipmentCache.get(cacheObject.getEquipmentId());
-
-    equipmentCache.acquireWriteLockOnKey(cacheObject.getEquipmentId());
-    equipmentCache.releaseWriteLockOnKey(cacheObject.getEquipmentId());
   }
 
   @Test
@@ -463,10 +409,10 @@ public class ConfigurationLoaderTest {
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
     assertEquals(Status.OK, report.getStatus());
     assertTrue(report.getProcessesToReboot().isEmpty());
-    assertFalse(dataTagCache.hasKey(tagId));
+    assertFalse(dataTagCache.containsKey(tagId));
     assertNull(dataTagMapper.getItem(tagId));
     // tag id is no longer in equipment
-    assertFalse(equipmentFacade.getDataTagIds(cacheObject.getEquipmentId()).contains(tagId));
+    assertFalse(dataTagService.getDataTagIdsByEquipmentId(cacheObject.getEquipmentId()).contains(tagId));
 
     verify(mockManager);
   }
@@ -542,11 +488,11 @@ public class ConfigurationLoaderTest {
     ConfigurationReport report = configurationLoader.applyConfiguration(12);
 
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
-    assertFalse(ruleTagCache.hasKey(60007L));
+    assertFalse(ruleTagCache.containsKey(60007L));
     assertNull(ruleTagMapper.getItem(60007L));
 
     // dependent rules removed, e.g.
-    assertFalse(ruleTagCache.hasKey(60009L));
+    assertFalse(ruleTagCache.containsKey(60009L));
     assertNull(ruleTagMapper.getItem(60009L));
 
     verify(mockManager);
@@ -562,11 +508,11 @@ public class ConfigurationLoaderTest {
     Long tagId = 200001L;
     Long ruleId1 = 60000L; // two of the rules that should be removed
     Long ruleId2 = 59999L;
-    assertTrue(ruleTagCache.hasKey(ruleId1));
+    assertTrue(ruleTagCache.containsKey(ruleId1));
     assertNotNull(ruleTagMapper.getItem(ruleId1));
-    assertTrue(ruleTagCache.hasKey(ruleId2));
+    assertTrue(ruleTagCache.containsKey(ruleId2));
     assertNotNull(ruleTagMapper.getItem(ruleId2));
-    assertTrue(dataTagCache.hasKey(tagId));
+    assertTrue(dataTagCache.containsKey(tagId));
     assertNotNull(dataTagMapper.getItem(tagId));
 
     // for tag removal
@@ -577,11 +523,11 @@ public class ConfigurationLoaderTest {
     // test removal of tag 20004L removes the rule also
     configurationLoader.applyConfiguration(7);
 
-    assertFalse(ruleTagCache.hasKey(ruleId1));
+    assertFalse(ruleTagCache.containsKey(ruleId1));
     assertNull(ruleTagMapper.getItem(ruleId1));
-    assertFalse(ruleTagCache.hasKey(ruleId2));
+    assertFalse(ruleTagCache.containsKey(ruleId2));
     assertNull(ruleTagMapper.getItem(ruleId2));
-    assertFalse(dataTagCache.hasKey(tagId));
+    assertFalse(dataTagCache.containsKey(tagId));
     assertNull(dataTagMapper.getItem(tagId));
 
     verify(mockManager);
@@ -604,9 +550,9 @@ public class ConfigurationLoaderTest {
 
     // test removal of (rule)tag 60000 removes the alarm also
     configurationLoader.applyConfiguration(27);
-    assertFalse(alarmCache.hasKey(350000L));
+    assertFalse(alarmCache.containsKey(350000L));
     assertNull(alarmMapper.getItem(350000L));
-    assertFalse(ruleTagCache.hasKey(60000L));
+    assertFalse(ruleTagCache.containsKey(60000L));
     assertNull(ruleTagMapper.getItem(60000L));
     verify(mockManager);
   }
@@ -730,8 +676,8 @@ public class ConfigurationLoaderTest {
     Equipment equipment = equipmentCache.get(150L);
     assertNotNull(equipment);
     assertNotNull(equipmentMapper.getItem(150L));
-    assertTrue(aliveTimerCache.hasKey(equipment.getAliveTagId()));
-    assertTrue(commFaultTagCache.hasKey(equipment.getCommFaultTagId()));
+    assertTrue(aliveTimerCache.containsKey(equipment.getAliveTagId()));
+    assertTrue(commFaultTagCache.containsKey(equipment.getCommFaultTagId()));
 
     expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andAnswer(new IAnswer<ConfigurationChangeEventReport>() {
 
@@ -757,11 +703,11 @@ public class ConfigurationLoaderTest {
     assertEquals(Status.OK, report.getStatus()); // DAQ deals with Equipment
                                                  // removal
     assertFalse(report.getProcessesToReboot().contains("P_TESTHANDLER03"));
-    assertFalse(equipmentCache.hasKey(150L));
+    assertFalse(equipmentCache.containsKey(150L));
     assertNull(equipmentMapper.getItem(150L));
     // commfault and alive should no longer be in cache
-    assertFalse(aliveTimerCache.hasKey(equipment.getAliveTagId()));
-    assertFalse(commFaultTagCache.hasKey(equipment.getCommFaultTagId()));
+    assertFalse(aliveTimerCache.containsKey(equipment.getAliveTagId()));
+    assertFalse(commFaultTagCache.containsKey(equipment.getCommFaultTagId()));
     verify(mockManager);
   }
 
@@ -793,7 +739,7 @@ public class ConfigurationLoaderTest {
     report = configurationLoader.applyConfiguration(17);
 
 
-    cacheObject = (ProcessCacheObject) processCache.getCopy(2L);
+    cacheObject = (ProcessCacheObject) processCache.get(2L);
     expectedObject.setDescription("updated description");
     expectedObject.setMaxMessageDelay(4000);
 
@@ -811,7 +757,7 @@ public class ConfigurationLoaderTest {
   @Test
   public void testRemoveProcess() {
     // stop DAQ else remove not allowed
-    processFacade.stop(50L, new Timestamp(System.currentTimeMillis()));
+    processService.stop(50L, new Timestamp(System.currentTimeMillis()));
 
     replay(mockManager);
 
@@ -820,38 +766,34 @@ public class ConfigurationLoaderTest {
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
     verify(mockManager);
     // check process, tag, rules and alarms are gone
-    assertFalse(processCache.hasKey(50L));
+    assertFalse(processCache.containsKey(50L));
     assertNull(processMapper.getItem(50L));
-    assertFalse(equipmentCache.hasKey(150L));
+    assertFalse(equipmentCache.containsKey(150L));
     assertNull(equipmentMapper.getItem(150L));
     // check couple of rules
-    assertFalse(ruleTagCache.hasKey(60010L));
+    assertFalse(ruleTagCache.containsKey(60010L));
     assertNull(ruleTagMapper.getItem(60010L));
-    assertFalse(ruleTagCache.hasKey(60002L));
+    assertFalse(ruleTagCache.containsKey(60002L));
     assertNull(ruleTagMapper.getItem(60002L));
     // tags
-    assertFalse(dataTagCache.hasKey(200002L));
+    assertFalse(dataTagCache.containsKey(200002L));
     assertNull(dataTagMapper.getItem(200002L));
-    assertFalse(dataTagCache.hasKey(200003L));
+    assertFalse(dataTagCache.containsKey(200003L));
     assertNull(dataTagMapper.getItem(200003L));
     // control tags
-    assertFalse(controlTagCache.hasKey(1220L));
     assertNull(controlTagMapper.getItem(1220L));
-    assertFalse(controlTagCache.hasKey(1221L));
     assertNull(controlTagMapper.getItem(1221L));
     // equipment control tags
-    assertFalse(controlTagCache.hasKey(1222L));
     assertNull(controlTagMapper.getItem(1222L));
-    assertFalse(controlTagCache.hasKey(1223L));
     assertNull(controlTagMapper.getItem(1223L));
     // equipment commfault
-    assertFalse(commFaultTagCache.hasKey(1223L));
+    assertFalse(commFaultTagCache.containsKey(1223L));
     // process alive
-    assertFalse(aliveTimerCache.hasKey(1221L));
+    assertFalse(aliveTimerCache.containsKey(1221L));
     // alarms
-    assertFalse(alarmCache.hasKey(350000L));
+    assertFalse(alarmCache.containsKey(350000L));
     assertNull(alarmMapper.getItem(350000L));
-    assertFalse(alarmCache.hasKey(350001L));
+    assertFalse(alarmCache.containsKey(350001L));
     assertNull(alarmMapper.getItem(350001L));
     verify(mockManager);
   }
@@ -893,32 +835,29 @@ public class ConfigurationLoaderTest {
     ConfigurationReport report = configurationLoader.applyConfiguration(29);
     verify(mockManager);
     // check equipment, tag, rules and alarms are gone
-    assertFalse(equipmentCache.hasKey(150L));
+    assertFalse(equipmentCache.containsKey(150L));
     assertNull(equipmentMapper.getItem(150L));
     // check couple of rules
-    assertFalse(ruleTagCache.hasKey(60005L));
+    assertFalse(ruleTagCache.containsKey(60005L));
     assertNull(ruleTagMapper.getItem(60005L));
-    assertFalse(ruleTagCache.hasKey(60004L));
+    assertFalse(ruleTagCache.containsKey(60004L));
     assertNull(ruleTagMapper.getItem(60004L));
     // tags
-    assertFalse(dataTagCache.hasKey(200001L));
+    assertFalse(dataTagCache.containsKey(200001L));
     assertNull(dataTagMapper.getItem(200001L));
-    assertFalse(dataTagCache.hasKey(200004L));
+    assertFalse(dataTagCache.containsKey(200004L));
     assertNull(dataTagMapper.getItem(200004L));
     // control tags
-    assertFalse(controlTagCache.hasKey(1222L));
     assertNull(controlTagMapper.getItem(1222L));
-    assertFalse(controlTagCache.hasKey(1223L));
     assertNull(controlTagMapper.getItem(1223L));
-    assertFalse(controlTagCache.hasKey(1224L));
     assertNull(controlTagMapper.getItem(1224L));
     // alivetimer & commfault
-    assertFalse(aliveTimerCache.hasKey(1224L));
-    assertFalse(commFaultTagCache.hasKey(1223L));
+    assertFalse(aliveTimerCache.containsKey(1224L));
+    assertFalse(commFaultTagCache.containsKey(1223L));
     // alarms
-    assertFalse(alarmCache.hasKey(350000L));
+    assertFalse(alarmCache.containsKey(350000L));
     assertNull(alarmMapper.getItem(350000L));
-    assertFalse(alarmCache.hasKey(350001L));
+    assertFalse(alarmCache.containsKey(350001L));
     assertNull(alarmMapper.getItem(350001L));
 
     verify(mockManager);
@@ -1007,33 +946,27 @@ public class ConfigurationLoaderTest {
 
     SubEquipment subEquipment = subEquipmentCache.get(250L);
     assertNotNull(subEquipment);
-    assertTrue(aliveTimerCache.hasKey(subEquipment.getAliveTagId()));
-    assertTrue(commFaultTagCache.hasKey(subEquipment.getCommFaultTagId()));
-    assertTrue(controlTagCache.hasKey(subEquipment.getAliveTagId()));
-    assertTrue(controlTagCache.hasKey(subEquipment.getStateTagId()));
-    assertTrue(controlTagCache.hasKey(subEquipment.getCommFaultTagId()));
+    assertTrue(aliveTimerCache.containsKey(subEquipment.getAliveTagId()));
+    assertTrue(commFaultTagCache.containsKey(subEquipment.getCommFaultTagId()));
     assertTrue(subEquipmentFacade.getDataTagIds(250L).size() == 3);
     for (Long tagId : subEquipmentFacade.getDataTagIds(250L)) {
-      assertTrue(dataTagCache.hasKey(tagId));
+      assertTrue(dataTagCache.containsKey(tagId));
     }
 
     report = configurationLoader.applyConfiguration(21);
 
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
-    assertFalse(subEquipmentCache.hasKey(250L));
+    assertFalse(subEquipmentCache.containsKey(250L));
     assertNull(equipmentMapper.getItem(250L));
 
-    assertFalse(aliveTimerCache.hasKey(subEquipment.getAliveTagId()));
-    assertFalse(commFaultTagCache.hasKey(subEquipment.getCommFaultTagId()));
+    assertFalse(aliveTimerCache.containsKey(subEquipment.getAliveTagId()));
+    assertFalse(commFaultTagCache.containsKey(subEquipment.getCommFaultTagId()));
 
-    assertFalse(controlTagCache.hasKey(subEquipment.getAliveTagId()));
     assertNull(controlTagMapper.getItem(subEquipment.getAliveTagId()));
-    assertFalse(controlTagCache.hasKey(subEquipment.getStateTagId()));
     assertNull(controlTagMapper.getItem(subEquipment.getStateTagId()));
-    assertFalse(controlTagCache.hasKey(subEquipment.getCommFaultTagId()));
     assertNull(controlTagMapper.getItem(subEquipment.getCommFaultTagId()));
     for (Long tagId : subEquipmentFacade.getDataTagIds(250L)) {
-      assertFalse(dataTagCache.hasKey(tagId));
+      assertFalse(dataTagCache.containsKey(tagId));
     }
 
     verify(mockManager);
@@ -1053,11 +986,8 @@ public class ConfigurationLoaderTest {
 
     SubEquipment subEquipment = subEquipmentCache.get(200L);
     assertNotNull(subEquipment);
-    assertTrue(aliveTimerCache.hasKey(subEquipment.getAliveTagId()));
-    assertTrue(commFaultTagCache.hasKey(subEquipment.getCommFaultTagId()));
-    assertTrue(controlTagCache.hasKey(subEquipment.getAliveTagId()));
-    assertTrue(controlTagCache.hasKey(subEquipment.getStateTagId()));
-    assertTrue(controlTagCache.hasKey(subEquipment.getCommFaultTagId()));
+    assertTrue(aliveTimerCache.containsKey(subEquipment.getAliveTagId()));
+    assertTrue(commFaultTagCache.containsKey(subEquipment.getCommFaultTagId()));
 
     reset(mockManager);
     expect(mockManager.sendConfiguration(EasyMock.anyLong(), EasyMock.<List<Change>> anyObject())).andReturn(new ConfigurationChangeEventReport());
@@ -1066,17 +996,14 @@ public class ConfigurationLoaderTest {
     report = configurationLoader.applyConfiguration(98);
 
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
-    assertFalse(subEquipmentCache.hasKey(200L));
+    assertFalse(subEquipmentCache.containsKey(200L));
     assertNull(equipmentMapper.getItem(200L));
 
-    assertFalse(aliveTimerCache.hasKey(subEquipment.getAliveTagId()));
-    assertFalse(commFaultTagCache.hasKey(subEquipment.getCommFaultTagId()));
+    assertFalse(aliveTimerCache.containsKey(subEquipment.getAliveTagId()));
+    assertFalse(commFaultTagCache.containsKey(subEquipment.getCommFaultTagId()));
 
-    assertFalse(controlTagCache.hasKey(subEquipment.getAliveTagId()));
     assertNull(controlTagMapper.getItem(subEquipment.getAliveTagId()));
-    assertFalse(controlTagCache.hasKey(subEquipment.getStateTagId()));
     assertNull(controlTagMapper.getItem(subEquipment.getStateTagId()));
-    assertFalse(controlTagCache.hasKey(subEquipment.getCommFaultTagId()));
     assertNull(controlTagMapper.getItem(subEquipment.getCommFaultTagId()));
 
     Equipment parentEquipment = equipmentCache.get(150L);
@@ -1091,104 +1018,104 @@ public class ConfigurationLoaderTest {
    * Test the creation, update and removal of alarm.
    */
 
-  @Test
-  public void testCreateAlarmWithExistingDatatag() {
-    replay(mockManager);
-
-    // we  expect to send the alarm as the datatag is initialized.
-    C2monCacheListener<Alarm> checker = EasyMock.createMock(C2monCacheListener.class);
-    checker.notifyElementUpdated(EasyMock.isA(Alarm.class));
-    EasyMock.expectLastCall().once();
-    EasyMock.replay(checker);
-
-    alarmCache.registerSynchronousListener(checker);
-
-    DataTagCacheObject toInit = (DataTagCacheObject)dataTagCache.getCopy(200003L);
-    toInit.setValue(Boolean.TRUE);
-    toInit.getDataTagQuality().validate();
-    dataTagCache.putQuiet(toInit);
-
-    ConfigurationReport report = configurationLoader.applyConfiguration(22);
-    verify(checker);
-    ((AbstractCache) alarmCache).getCacheListeners().remove(checker);
-  }
+//  @Test
+//  public void testCreateAlarmWithExistingDatatag() {
+//    replay(mockManager);
+//
+//    // we  expect to send the alarm as the datatag is initialized.
+//    C2monCacheListener<Alarm> checker = EasyMock.createMock(C2monCacheListener.class);
+//    checker.notifyElementUpdated(EasyMock.isA(Alarm.class));
+//    EasyMock.expectLastCall().once();
+//    EasyMock.replay(checker);
+//
+//    alarmCache.registerSynchronousListener(checker);
+//
+//    DataTagCacheObject toInit = (DataTagCacheObject)dataTagCache.get(200003L);
+//    toInit.setValue(Boolean.TRUE);
+//    toInit.getDataTagQuality().validate();
+//    dataTagCache.putQuiet(toInit);
+//
+//    ConfigurationReport report = configurationLoader.applyConfiguration(22);
+//    verify(checker);
+//    ((AbstractCache) alarmCache).getCacheListeners().remove(checker);
+//  }
 
 
   /**
    * Test the creation, update and removal of alarm.
    */
 
-  @Test
-  public void testCreateUpdateAlarm() {
-    replay(mockManager);
-
-
-    // we do not expect to send the alarm as the datatag is unitialized.
-    C2monCacheListener<Alarm> checker = EasyMock.createMock(C2monCacheListener.class);
-    EasyMock.replay(checker);
-
-    alarmCache.registerSynchronousListener(checker);
-
-    ConfigurationReport report = configurationLoader.applyConfiguration(22);
-
-    assertFalse(report.toXML().contains(Status.FAILURE.toString()));
-
-    AlarmCacheObject cacheObject = (AlarmCacheObject) alarmCache.get(300000L);
-    AlarmCacheObject expectedObject = new AlarmCacheObject(300000L);
-    expectedObject.setDataTagId(200003L);
-    expectedObject.setFaultFamily("fault family");
-    expectedObject.setFaultMember("fault member");
-    expectedObject.setFaultCode(223);
-    expectedObject
-        .setCondition(AlarmCondition
-            .fromConfigXML("<AlarmCondition class=\"cern.c2mon.server.common.alarm.ValueAlarmCondition\"><alarm-value type=\"Boolean\">true</alarm-value></AlarmCondition>"));
-
-    ObjectEqualityComparison.assertAlarmEquals(expectedObject, cacheObject);
-
-    // also check that the Tag was updated
-    Tag tag = tagLocationService.get(expectedObject.getDataTagId());
-    assertTrue(tag.getAlarmIds().contains(expectedObject.getId()));
-
-    // update should succeed
-    report = configurationLoader.applyConfiguration(23);
-
-    assertFalse(report.toXML().contains(Status.FAILURE.toString()));
-    cacheObject = (AlarmCacheObject) alarmCache.get(300000L);
-    expectedObject.setFaultFamily("updated fault family");
-    ObjectEqualityComparison.assertAlarmEquals(expectedObject, cacheObject);
-
-    verify(mockManager);
-    verify(checker);
-    ((AbstractCache) alarmCache).getCacheListeners().remove(checker);
-  }
-
-  @Test
-  public void testRemoveAlarm() {
-    Alarm alarm = alarmCache.get(350000L);
-    assertNotNull(alarm);
-    assertTrue(alarmCache.hasKey(350000L));
-    assertNotNull(alarmMapper.getItem(350000L));
-
-    replay(mockManager);
-
-    // we  expect to notify the cache listeners about a TERM alarm.
-    C2monCacheListener<Alarm> checker = EasyMock.createMock(C2monCacheListener.class);
-    checker.notifyElementUpdated(EasyMock.isA(Alarm.class));
-    EasyMock.expectLastCall().once();
-    EasyMock.replay(checker);
-    alarmCache.registerSynchronousListener(checker);
-
-    ConfigurationReport report = configurationLoader.applyConfiguration(24);
-
-    assertFalse(report.toXML().contains(Status.FAILURE.toString()));
-    assertFalse(alarmCache.hasKey(350000L));
-    assertNull(alarmMapper.getItem(350000L));
-    Tag tag = tagLocationService.get(alarm.getDataTagId());
-    assertFalse(tag.getAlarmIds().contains(alarm.getId()));
-    verify(mockManager);
-    verify(checker);
-    ((AbstractCache) alarmCache).getCacheListeners().remove(checker);
-  }
+//  @Test
+//  public void testCreateUpdateAlarm() {
+//    replay(mockManager);
+//
+//
+//    // we do not expect to send the alarm as the datatag is unitialized.
+//    C2monCacheListener<Alarm> checker = EasyMock.createMock(C2monCacheListener.class);
+//    EasyMock.replay(checker);
+//
+//    alarmCache.registerSynchronousListener(checker);
+//
+//    ConfigurationReport report = configurationLoader.applyConfiguration(22);
+//
+//    assertFalse(report.toXML().contains(Status.FAILURE.toString()));
+//
+//    AlarmCacheObject cacheObject = (AlarmCacheObject) alarmCache.get(300000L);
+//    AlarmCacheObject expectedObject = new AlarmCacheObject(300000L);
+//    expectedObject.setDataTagId(200003L);
+//    expectedObject.setFaultFamily("fault family");
+//    expectedObject.setFaultMember("fault member");
+//    expectedObject.setFaultCode(223);
+//    expectedObject
+//        .setCondition(AlarmCondition
+//            .fromConfigXML("<AlarmCondition class=\"cern.c2mon.server.common.alarm.ValueAlarmCondition\"><alarm-value type=\"Boolean\">true</alarm-value></AlarmCondition>"));
+//
+//    ObjectEqualityComparison.assertAlarmEquals(expectedObject, cacheObject);
+//
+//    // also check that the Tag was updated
+//    Tag tag = tagLocationService.get(expectedObject.getDataTagId());
+//    assertTrue(tag.getAlarmIds().contains(expectedObject.getId()));
+//
+//    // update should succeed
+//    report = configurationLoader.applyConfiguration(23);
+//
+//    assertFalse(report.toXML().contains(Status.FAILURE.toString()));
+//    cacheObject = (AlarmCacheObject) alarmCache.get(300000L);
+//    expectedObject.setFaultFamily("updated fault family");
+//    ObjectEqualityComparison.assertAlarmEquals(expectedObject, cacheObject);
+//
+//    verify(mockManager);
+//    verify(checker);
+//    ((AbstractCache) alarmCache).getCacheListeners().remove(checker);
+//  }
+//
+//  @Test
+//  public void testRemoveAlarm() {
+//    Alarm alarm = alarmCache.get(350000L);
+//    assertNotNull(alarm);
+//    assertTrue(alarmCache.containsKey(350000L));
+//    assertNotNull(alarmMapper.getItem(350000L));
+//
+//    replay(mockManager);
+//
+//    // we  expect to notify the cache listeners about a TERM alarm.
+//    C2monCacheListener<Alarm> checker = EasyMock.createMock(C2monCacheListener.class);
+//    checker.notifyElementUpdated(EasyMock.isA(Alarm.class));
+//    EasyMock.expectLastCall().once();
+//    EasyMock.replay(checker);
+//    alarmCache.registerSynchronousListener(checker);
+//
+//    ConfigurationReport report = configurationLoader.applyConfiguration(24);
+//
+//    assertFalse(report.toXML().contains(Status.FAILURE.toString()));
+//    assertFalse(alarmCache.containsKey(350000L));
+//    assertNull(alarmMapper.getItem(350000L));
+//    Tag tag = tagLocationService.get(alarm.getDataTagId());
+//    assertFalse(tag.getAlarmIds().contains(alarm.getId()));
+//    verify(mockManager);
+//    verify(checker);
+//    ((AbstractCache) alarmCache).getCacheListeners().remove(checker);
+//  }
 
   @Test
   public void testCreateUpdateDeviceClass() throws ClassNotFoundException {
@@ -1247,7 +1174,7 @@ public class ConfigurationLoaderTest {
   public void testRemoveDeviceClass() {
     DeviceClass deviceClass = deviceClassCache.get(400L);
     assertNotNull(deviceClass);
-    assertTrue(deviceClassCache.hasKey(400L));
+    assertTrue(deviceClassCache.containsKey(400L));
     assertNotNull(deviceClassMapper.getItem(400L));
 
     replay(mockManager);
@@ -1265,7 +1192,7 @@ public class ConfigurationLoaderTest {
     report = configurationLoader.applyConfiguration(32);
 
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
-    assertFalse(deviceClassCache.hasKey(400L));
+    assertFalse(deviceClassCache.containsKey(400L));
     DeviceClass cacheObject = deviceClassMapper.getItem(400L);
     assertNull(cacheObject);
 
@@ -1320,7 +1247,7 @@ public class ConfigurationLoaderTest {
   public void testRemoveDevice() {
     Device device = deviceCache.get(300L);
     assertNotNull(device);
-    assertTrue(deviceCache.hasKey(300L));
+    assertTrue(deviceCache.containsKey(300L));
     assertNotNull(deviceMapper.getItem(300L));
 
     replay(mockManager);
@@ -1328,7 +1255,7 @@ public class ConfigurationLoaderTest {
     ConfigurationReport report = configurationLoader.applyConfiguration(35);
 
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
-    assertFalse(deviceCache.hasKey(300L));
+    assertFalse(deviceCache.containsKey(300L));
     assertNull(deviceMapper.getItem(300L));
 
     verify(mockManager);
@@ -1336,12 +1263,11 @@ public class ConfigurationLoaderTest {
 
   @Test
   @Ignore
-  public void testConcurrentConfigRequestRejected() throws InterruptedException, IllegalAccessException, InstantiationException, NoSuchFieldException,
-      ParserConfigurationException, TransformerException, NoSimpleValueParseException {
+  public void testConcurrentConfigRequestRejected() throws InterruptedException {
 
     final ConfigurationReport report;
 
-    clusterCache.acquireWriteLockOnKey(JmsContainerManager.CONFIG_LOCK_KEY);
+//    clusterCache.acquireWriteLockOnKey(JmsContainerManager.CONFIG_LOCK_KEY);
     try {
       ConcurrentConfigRequestor ccr = new ConcurrentConfigRequestor();
       Thread t = new Thread(ccr);
@@ -1354,7 +1280,7 @@ public class ConfigurationLoaderTest {
       assertTrue(report.toXML().contains("rejected since another configuration is still running"));
 
     } finally {
-      clusterCache.releaseWriteLockOnKey(JmsContainerManager.CONFIG_LOCK_KEY);
+//      clusterCache.releaseWriteLockOnKey(JmsContainerManager.CONFIG_LOCK_KEY);
     }
   }
 

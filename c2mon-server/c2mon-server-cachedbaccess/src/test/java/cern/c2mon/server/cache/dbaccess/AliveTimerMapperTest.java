@@ -16,8 +16,8 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.dbaccess;
 
-import cern.c2mon.server.common.alive.AliveTimer;
-import cern.c2mon.server.common.alive.AliveTimerCacheObject;
+import cern.c2mon.server.common.alive.AliveTag;
+import cern.c2mon.server.common.alive.AliveTagCacheObject;
 import cern.c2mon.shared.common.Cacheable;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +43,7 @@ public class AliveTimerMapperTest extends AbstractMapperTest {
 //    ControlTag aliveTag = CacheObjectCreation.createTestProcessAlive();
 //    Equipment equipment = CacheObjectCreation.createTestEquipment();
     //id in control tag cache is the same as in alivetimer cache
-    AliveTimerCacheObject retrievedCacheObject = (AliveTimerCacheObject) aliveTimerMapper.getItem(1221L);
+    AliveTagCacheObject retrievedCacheObject = (AliveTagCacheObject) aliveTimerMapper.getItem(1221L);
 //    assertEquals(aliveTag.getId(), retrievedCacheObject.getId());
     assertTrue(60000L == retrievedCacheObject.getAliveInterval());
     assertEquals("PROC", retrievedCacheObject.getAliveType());
@@ -60,7 +60,7 @@ public class AliveTimerMapperTest extends AbstractMapperTest {
    */
   @Test
   public void testGetAll() {
-    List<AliveTimer> returnList = aliveTimerMapper.getAll();
+    List<AliveTag> returnList = aliveTimerMapper.getAll();
     assertTrue(returnList.size() > 0);
   }
 
@@ -70,10 +70,10 @@ public class AliveTimerMapperTest extends AbstractMapperTest {
     assertNotNull(item);
   }
 
-  private AliveTimerCacheObject createTestAliveTimerOld() {
-    AliveTimerCacheObject aliveTimer = new AliveTimerCacheObject(TEST_ALIVE_ID);
+  private AliveTagCacheObject createTestAliveTimerOld() {
+    AliveTagCacheObject aliveTimer = new AliveTagCacheObject(TEST_ALIVE_ID);
 //    aliveTimer.setAliveTagId(TEST_ALIVE_ID);
-    aliveTimer.setAliveType(AliveTimer.ALIVE_TYPE_PROCESS);
+    aliveTimer.setAliveType(AliveTag.ALIVE_TYPE_PROCESS);
     aliveTimer.setAliveInterval(60000);
     aliveTimer.setRelatedId(Long.valueOf(1000000));
     aliveTimer.setRelatedName("test related name");

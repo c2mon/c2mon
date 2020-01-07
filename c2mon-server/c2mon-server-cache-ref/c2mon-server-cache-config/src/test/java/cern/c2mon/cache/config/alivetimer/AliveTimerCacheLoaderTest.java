@@ -3,8 +3,8 @@ package cern.c2mon.cache.config.alivetimer;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.config.AbstractCacheLoaderTest;
 import cern.c2mon.server.cache.dbaccess.AliveTimerMapper;
-import cern.c2mon.server.common.alive.AliveTimer;
-import cern.c2mon.server.common.alive.AliveTimerCacheObject;
+import cern.c2mon.server.common.alive.AliveTag;
+import cern.c2mon.server.common.alive.AliveTagCacheObject;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -15,10 +15,10 @@ import static org.springframework.test.util.AssertionErrors.assertEquals;
 /**
  * @author Alexandros Papageorgiou
  */
-public class AliveTimerCacheLoaderTest extends AbstractCacheLoaderTest<AliveTimer> {
+public class AliveTimerCacheLoaderTest extends AbstractCacheLoaderTest<AliveTag> {
 
   @Inject
-  private C2monCache<AliveTimer> aliveTimerCacheRef;
+  private C2monCache<AliveTag> aliveTimerCacheRef;
 
   @Inject
   private AliveTimerMapper aliveTimerMapper;
@@ -29,9 +29,9 @@ public class AliveTimerCacheLoaderTest extends AbstractCacheLoaderTest<AliveTime
   }
 
   @Override
-  protected void customCompare(List<AliveTimer> mapperList, Map<Long, AliveTimer> cacheList) {
-    for (AliveTimer anAliveList : mapperList) {
-      AliveTimerCacheObject currentTimer = (AliveTimerCacheObject) anAliveList;
+  protected void customCompare(List<AliveTag> mapperList, Map<Long, AliveTag> cacheList) {
+    for (AliveTag anAliveList : mapperList) {
+      AliveTagCacheObject currentTimer = (AliveTagCacheObject) anAliveList;
       //only compares one field so far
       assertEquals("Cached AliveTimer should have the same name as AliveTimer in DB", currentTimer.getRelatedName(), ((aliveTimerCacheRef.get(currentTimer.getId())).getRelatedName()));
     }
@@ -43,12 +43,12 @@ public class AliveTimerCacheLoaderTest extends AbstractCacheLoaderTest<AliveTime
   }
 
   @Override
-  protected C2monCache<AliveTimer> getCache() {
+  protected C2monCache<AliveTag> getCache() {
     return aliveTimerCacheRef;
   }
 
   @Override
-  protected AliveTimer getSample() {
-    return new AliveTimerCacheObject(0L);
+  protected AliveTag getSample() {
+    return new AliveTagCacheObject(0L);
   }
 }

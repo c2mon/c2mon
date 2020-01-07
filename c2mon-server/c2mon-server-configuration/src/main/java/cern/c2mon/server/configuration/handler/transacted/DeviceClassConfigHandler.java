@@ -19,8 +19,8 @@ package cern.c2mon.server.configuration.handler.transacted;
 import cern.c2mon.cache.actions.deviceclass.DeviceClassCacheObjectFactory;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.loading.DeviceClassDAO;
+import cern.c2mon.server.common.device.Device;
 import cern.c2mon.server.common.device.DeviceClass;
-import cern.c2mon.server.common.device.DeviceClassCacheObject;
 import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
@@ -29,14 +29,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 /**
  * @author Alexandros Papageorgiou
  */
 @Service
 @Slf4j
 public class DeviceClassConfigHandler extends BaseConfigHandlerImpl<DeviceClass, ProcessChange> {
+
+  private final C2monCache<Device> deviceCache;
+  private final DeviceConfigHandler deviceConfigHandler;
 
   /**
    * Default constructor.
@@ -47,23 +48,21 @@ public class DeviceClassConfigHandler extends BaseConfigHandlerImpl<DeviceClass,
   @Autowired
   public DeviceClassConfigHandler(final C2monCache<DeviceClass> deviceClassCache,
                                   final DeviceClassDAO deviceClassDAO,
-                                  final DeviceClassCacheObjectFactory deviceClassCacheObjectFactory) {
-    super(deviceClassCache, deviceClassDAO, deviceClassCacheObjectFactory, __ -> new ProcessChange(), ProcessChange::new);
+                                  final DeviceClassCacheObjectFactory deviceClassCacheObjectFactory,
+                                  final C2monCache<Device> deviceCache, final DeviceConfigHandler deviceConfigHandler) {
+    super(deviceClassCache, deviceClassDAO, deviceClassCacheObjectFactory, ProcessChange::new);
+    this.deviceCache = deviceCache;
+    this.deviceConfigHandler = deviceConfigHandler;
   }
 
   @Override
   protected void doPreRemove(DeviceClass deviceClass, ConfigurationElementReport report) {
-
-    List<Long> deviceIds = ((DeviceClassCacheObject) deviceClass).getDeviceIds();
-    if (!deviceIds.isEmpty()) {
-      log.trace("Removing Devices dependent on DeviceClass " + deviceClass.getId());
-
-      for (Long deviceId : deviceIds) {
-        ConfigurationElementReport newReport = new ConfigurationElementReport(Action.REMOVE, Entity.DEVICE, deviceId);
+    deviceCache.query(device -> device.getDeviceClassId().equals(deviceClass.getId()))
+      .forEach(device -> {
+        ConfigurationElementReport newReport = new ConfigurationElementReport(Action.REMOVE, Entity.DEVICE, device.getId());
         report.addSubReport(newReport);
         // TODO (Alex) Do we want to keep this bidirectional?
-        deviceConfigHandler.remove(deviceId, newReport);
-      }
-    }
+        deviceConfigHandler.remove(device.getId(), newReport);
+      });
   }
 }

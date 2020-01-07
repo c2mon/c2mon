@@ -3,8 +3,8 @@ package cern.c2mon.cache.actions.alivetimer;
 import cern.c2mon.cache.actions.commfault.CommFaultService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.impl.SimpleC2monCache;
-import cern.c2mon.server.common.alive.AliveTimer;
-import cern.c2mon.server.common.alive.AliveTimerCacheObject;
+import cern.c2mon.server.common.alive.AliveTag;
+import cern.c2mon.server.common.alive.AliveTagCacheObject;
 import cern.c2mon.server.common.equipment.EquipmentCacheObject;
 import cern.c2mon.server.common.process.ProcessCacheObject;
 import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
@@ -27,7 +27,7 @@ public class AliveTimerCreationTest {
   private static final int ALIVE_INTERVAL = 1000;
 
   private AliveTimerService aliveTimerService;
-  private C2monCache<AliveTimer> aliveTimerCache;
+  private C2monCache<AliveTag> aliveTimerCache;
 
   @Before
   public void init() {
@@ -50,7 +50,7 @@ public class AliveTimerCreationTest {
 
     aliveTimerService.createAliveTimerFor(equipmentCacheObject);
 
-    AliveTimer cachedAliveTimer = aliveTimerCache.get(ALIVE_TAG_ID);
+    AliveTag cachedAliveTimer = aliveTimerCache.get(ALIVE_TAG_ID);
 
     assertTrue("AliveTimer should have Equipment type set", cachedAliveTimer.isEquipmentAliveType());
     assertEquals("AliveTimer should have interval set", equipmentCacheObject.getAliveInterval(), cachedAliveTimer.getAliveInterval());
@@ -69,9 +69,9 @@ public class AliveTimerCreationTest {
 
     aliveTimerService.createAliveTimerFor(subEquipmentCacheObject);
 
-    AliveTimerCacheObject cachedAliveTimer = (AliveTimerCacheObject) aliveTimerCache.get(ALIVE_TAG_ID);
+    AliveTagCacheObject cachedAliveTimer = (AliveTagCacheObject) aliveTimerCache.get(ALIVE_TAG_ID);
 
-    assertEquals("AliveTimer should have SubEquipment type set", AliveTimer.ALIVE_TYPE_SUBEQUIPMENT, cachedAliveTimer.getAliveType());
+    assertEquals("AliveTimer should have SubEquipment type set", AliveTag.ALIVE_TYPE_SUBEQUIPMENT, cachedAliveTimer.getAliveType());
     assertEquals("AliveTimer should have interval set", subEquipmentCacheObject.getAliveInterval(), cachedAliveTimer.getAliveInterval());
     assertEquals("AliveTimer should have relatedId set", subEquipmentCacheObject.getId(), cachedAliveTimer.getRelatedId());
     assertEquals("AliveTimer should have relatedName set", subEquipmentCacheObject.getName(), cachedAliveTimer.getRelatedName());
@@ -88,7 +88,7 @@ public class AliveTimerCreationTest {
 
     aliveTimerService.createAliveTimerFor(processCacheObject);
 
-    AliveTimer cachedAliveTimer = aliveTimerCache.get(ALIVE_TAG_ID);
+    AliveTag cachedAliveTimer = aliveTimerCache.get(ALIVE_TAG_ID);
 
     assertTrue("AliveTimer should have Process type set", cachedAliveTimer.isProcessAliveType());
     assertEquals("AliveTimer should have interval set", processCacheObject.getAliveInterval(), cachedAliveTimer.getAliveInterval());

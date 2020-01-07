@@ -17,9 +17,10 @@
 
 package cern.c2mon.server.configuration.parser.factory;
 
-import cern.c2mon.cache.actions.tag.UnifiedTagCacheFacade;
 import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.config.tag.UnifiedTagCacheFacade;
 import cern.c2mon.server.cache.loading.SequenceDAO;
+import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.configuration.parser.exception.ConfigurationParseException;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
@@ -29,6 +30,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
+
+import static cern.c2mon.cache.config.ClientQueryProvider.queryByClientInput;
 
 /**
  * @author Franz Ritter
@@ -54,9 +57,10 @@ public class RuleTagFactory extends EntityFactory<RuleTag> {
 
   @Override
   Long createId(RuleTag configurationEntity) {
-    if (configurationEntity.getName() != null && ruleTagCache.get(configurationEntity.getName()) != null) {
-      throw new ConfigurationParseException("Error creating rule tag " + configurationEntity.getName() + ": " +
-          "Name already exists!");
+    if (configurationEntity.getName() != null
+      && !queryByClientInput(ruleTagCache, Tag::getName, configurationEntity.getName()).isEmpty()) {
+        throw new ConfigurationParseException("Error creating rule tag " + configurationEntity.getName() + ": " +
+            "Name already exists!");
     } else {
       return configurationEntity.getId() != null ? configurationEntity.getId() : sequenceDAO.getNextTagId();
     }
@@ -64,7 +68,12 @@ public class RuleTagFactory extends EntityFactory<RuleTag> {
 
   @Override
   Long getId(RuleTag configurationEntity) {
-    return configurationEntity.getId() != null ? configurationEntity.getId() : ruleTagCache.get(configurationEntity.getName()).getId();
+    return configurationEntity.getId() != null
+      ? configurationEntity.getId()
+      : queryByClientInput(ruleTagCache, Tag::getName, configurationEntity.getName())
+        .stream().findAny()
+        .orElseThrow(() -> new ConfigurationParseException("Data tag " + configurationEntity.getName() + " does not exist!"))
+        .getId();
   }
 
   @Override

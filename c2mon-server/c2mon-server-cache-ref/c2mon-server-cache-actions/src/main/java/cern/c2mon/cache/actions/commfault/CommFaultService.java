@@ -4,11 +4,13 @@ import cern.c2mon.cache.actions.AbstractCacheServiceImpl;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.cache.api.exception.TooManyQueryResultsException;
-import cern.c2mon.server.common.alive.AliveTimer;
+import cern.c2mon.server.common.alive.AliveTag;
 import cern.c2mon.server.common.commfault.CommFaultTag;
 import cern.c2mon.server.common.commfault.CommFaultTagCacheObject;
 import cern.c2mon.server.common.equipment.AbstractEquipment;
+import cern.c2mon.server.common.thread.Event;
 import cern.c2mon.shared.common.CacheEvent;
+import cern.c2mon.shared.common.datatag.SourceDataTagValue;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -36,13 +38,17 @@ public class CommFaultService extends AbstractCacheServiceImpl<CommFaultTag> {
     }, CacheEvent.UPDATE_ACCEPTED);
   }
 
+  public boolean isRegisteredCommFaultTag(Long id) {
+    return cache.containsKey(id);
+  }
+
   public CommFaultTag generateFromEquipment(AbstractEquipment abstractEquipment) {
     return new CommFaultTagCacheObject(abstractEquipment.getCommFaultTagId(), abstractEquipment.getId(),
             abstractEquipment.getName(), abstractEquipment.getAliveTagId(), abstractEquipment.getStateTagId());
     // TODO This used to also put, so remember to do that when calling!
   }
 
-  public void bringDownBasedOnAliveTimer(AliveTimer aliveTimer) {
+  public void bringDownBasedOnAliveTimer(AliveTag aliveTimer) {
     final Collection<CommFaultTag> commFaultTags =
       cache.query(tag -> Objects.equals(tag.getAliveTagId(), aliveTimer.getId()));
 
@@ -60,5 +66,22 @@ public class CommFaultService extends AbstractCacheServiceImpl<CommFaultTag> {
 //        ((CommFaultTagCacheObject) commFaultTag).set
       }
     });
+  }
+
+  /**
+   * Updates the tag object if the value is not filtered out. Contains the logic on when a
+   * CommFaultCacheObject should be updated with new values and when not (in particular
+   * timestamp restrictions).
+   *
+   * <p>Also notifies the listeners if an update was performed.
+   *
+   * <p>Notice the tag is not put back in the cache here.
+   *
+   * @param sourceDataTagValue the source value received from the DAQ
+   * @return true if an update was performed (i.e. the value was not filtered out)
+   */
+  public Event<Boolean> updateFromSource(final SourceDataTagValue sourceDataTagValue) {
+    // TODO (Alex) Implement this based on the contents of sourceDataTagValue used
+    return new Event<>(System.currentTimeMillis(), false);
   }
 }

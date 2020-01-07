@@ -18,9 +18,9 @@ package cern.c2mon.server.configuration.handler.transacted;
 
 import cern.c2mon.cache.actions.datatag.DataTagService;
 import cern.c2mon.cache.actions.equipment.EquipmentService;
+import cern.c2mon.cache.actions.process.ProcessXMLProvider;
 import cern.c2mon.cache.actions.subequipment.SubEquipmentCacheObjectFactory;
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.server.cache.ProcessXMLProvider;
 import cern.c2mon.server.cache.loading.SubEquipmentDAO;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;

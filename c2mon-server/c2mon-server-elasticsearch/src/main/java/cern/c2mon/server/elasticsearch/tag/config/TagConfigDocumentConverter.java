@@ -16,21 +16,21 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch.tag.config;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
+import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.server.common.alarm.Alarm;
+import cern.c2mon.server.common.equipment.Equipment;
+import cern.c2mon.server.common.process.Process;
+import cern.c2mon.server.common.subequipment.SubEquipment;
+import cern.c2mon.server.common.tag.Tag;
+import cern.c2mon.server.elasticsearch.alarm.BaseAlarmDocumentConverter;
+import cern.c2mon.server.elasticsearch.tag.BaseTagDocumentConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import cern.c2mon.server.cache.EquipmentCache;
-import cern.c2mon.server.cache.ProcessCache;
-import cern.c2mon.server.cache.SubEquipmentCache;
-import cern.c2mon.server.common.alarm.Alarm;
-import cern.c2mon.server.common.tag.Tag;
-import cern.c2mon.server.elasticsearch.alarm.BaseAlarmDocumentConverter;
-import cern.c2mon.server.elasticsearch.tag.BaseTagDocumentConverter;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
 
@@ -42,7 +42,8 @@ import static java.util.stream.Collectors.toList;
 public class TagConfigDocumentConverter extends BaseTagDocumentConverter<TagConfigDocument> {
 
   @Autowired
-  public TagConfigDocumentConverter(final ProcessCache processCache, final EquipmentCache equipmentCache, final SubEquipmentCache subEquipmentCache) {
+  public TagConfigDocumentConverter(final C2monCache<Process> processCache, final C2monCache<Equipment> equipmentCache,
+                                    final C2monCache<SubEquipment> subEquipmentCache) {
     super(processCache, equipmentCache, subEquipmentCache, TagConfigDocument::new);
   }
 
@@ -53,9 +54,10 @@ public class TagConfigDocumentConverter extends BaseTagDocumentConverter<TagConf
    * @param alarms the alarms
    * @return the tag config document
    */
-  public Optional<TagConfigDocument> convert(final Tag tag, final List<Alarm> alarms) {
-    Optional<TagConfigDocument> document = this.convert(tag);
-    document.ifPresent(doc -> doc.put("alarms", alarms.stream().map((new BaseAlarmDocumentConverter())::convert).collect(toList())));
+  public Optional<TagConfigDocument> convert(final Tag tag, final Collection<Alarm> alarms) {
+    Optional<TagConfigDocument> document = convert(tag);
+    document.ifPresent(doc ->
+      doc.put("alarms", alarms.stream().map((new BaseAlarmDocumentConverter())::convert).collect(toList())));
     return document;
   }
 

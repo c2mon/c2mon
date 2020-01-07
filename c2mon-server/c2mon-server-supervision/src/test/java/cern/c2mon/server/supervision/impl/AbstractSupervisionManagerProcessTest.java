@@ -1,6 +1,6 @@
 package cern.c2mon.server.supervision.impl;
 
-import cern.c2mon.server.cache.config.CacheModule;
+import cern.c2mon.cache.config.CacheConfigModuleRef;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.common.config.CommonModule;
 import cern.c2mon.server.supervision.SupervisionManager;
@@ -23,7 +23,7 @@ import static org.junit.Assert.assertNotNull;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {
   CommonModule.class,
-  CacheModule.class,
+  CacheConfigModuleRef.class,
   CacheDbAccessModule.class,
   SupervisionModule.class
 })

@@ -2,9 +2,9 @@ package cern.c2mon.server.supervision.impl.event;
 
 import cern.c2mon.cache.actions.equipment.EquipmentService;
 import cern.c2mon.cache.actions.process.ProcessService;
+import cern.c2mon.cache.actions.process.ProcessXMLProvider;
 import cern.c2mon.cache.actions.subequipment.SubEquipmentService;
-import cern.c2mon.server.cache.ProcessXMLProvider;
-import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
+import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.config.ServerProperties;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.process.Process;
@@ -30,7 +30,10 @@ public class ProcessEvents extends SupervisionEventHandler<Process> {
   private ServerProperties properties;;
 
   @Inject
-  public ProcessEvents(ProcessService processService, SubEquipmentService subEquipmentService, EquipmentService equipmentService, ProcessXMLProvider processXMLProvider) {
+  public ProcessEvents(ProcessService processService,
+                       SubEquipmentService subEquipmentService,
+                       EquipmentService equipmentService,
+                       ProcessXMLProvider processXMLProvider) {
     super(Process.class, processService);
     this.subEquipmentService = subEquipmentService;
     this.equipmentService = equipmentService;
@@ -97,7 +100,7 @@ public class ProcessEvents extends SupervisionEventHandler<Process> {
     if (processConnectionRequest == null) {
       log.error("onProcessConfiguration(null) called - rejecting the request.");
       processConnectionResponse.setprocessPIK(ProcessConnectionResponse.PIK_REJECTED);
-      return this.xmlConverter.toXml(processConnectionResponse);
+      return xmlConverter.toXml(processConnectionResponse);
     }
 
     // Process name (NO_PROCESS by default)
@@ -228,14 +231,11 @@ public class ProcessEvents extends SupervisionEventHandler<Process> {
     // (1) Print some debug output
 
     if (log.isDebugEnabled()) {
-      StringBuffer str = new StringBuffer("onProcessDisconnection([");
-      str.append(processDisconnectionRequest.getProcessName());
-      str.append(", ");
-      str.append(processDisconnectionRequest.getProcessPIK());
-      str.append(", ");
-      str.append(processDisconnectionRequest.getProcessStartupTime());
-      str.append("]) called.");
-      log.debug(str.toString());
+      String str = "onProcessDisconnection([" + processDisconnectionRequest.getProcessName() +
+        ", " + processDisconnectionRequest.getProcessPIK() +
+        ", " + processDisconnectionRequest.getProcessStartupTime() +
+        "]) called.";
+      log.debug(str);
     }
 
     try {

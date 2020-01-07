@@ -16,41 +16,27 @@
  *****************************************************************************/
 package cern.c2mon.server.history.listener;
 
-import java.util.ArrayList;
+import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.server.common.alarm.Alarm;
+import cern.c2mon.server.history.logger.BatchLogger;
+import cern.c2mon.shared.common.CacheEvent;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.SmartLifecycle;
-import org.springframework.stereotype.Component;
-
-import cern.c2mon.server.cache.C2monCacheListener;
-import cern.c2mon.server.cache.CacheRegistrationService;
-import cern.c2mon.server.common.alarm.Alarm;
-import cern.c2mon.server.common.component.Lifecycle;
-import cern.c2mon.server.common.config.ServerConstants;
-import cern.c2mon.server.history.logger.BatchLogger;
+import static cern.c2mon.server.common.util.Java9Collections.listOf;
 
 /**
  * Listens to updates in the Alarm cache and calls the DAO
  * for logging these to the history database.
  *
- * @author Felix Ehm
+ * @author Alexandros Papageorgiou, Felix Ehm
  */
 @Component
-public class AlarmRecordListener implements C2monCacheListener<Alarm>, SmartLifecycle {
+public class AlarmRecordListener {
 
-  /**
-   * Class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(AlarmRecordListener.class);
-
-  /**
-   * Reference to registration service.
-   */
-  private CacheRegistrationService cacheRegistrationService;
+  private C2monCache<Alarm> alarmCache;
 
   /**
    * Bean that logs Tags into the history.
@@ -58,24 +44,14 @@ public class AlarmRecordListener implements C2monCacheListener<Alarm>, SmartLife
   private BatchLogger<Alarm> alarmLogger;
 
   /**
-   * Listener container lifecycle hook.
-   */
-  private Lifecycle listenerContainer;
-
-  /**
-   * Lifecycle flag.
-   */
-  private volatile boolean running = false;
-
-  /**
    * Autowired constructor.
    *
-   * @param cacheRegistrationService for registering cache listeners
+   * @param alarmCache  for registering cache listeners
    * @param alarmLogger for logging cache objects to the history
    */
   @Autowired
-  public AlarmRecordListener(final CacheRegistrationService cacheRegistrationService, final BatchLogger<Alarm> alarmLogger) {
-    this.cacheRegistrationService = cacheRegistrationService;
+  public AlarmRecordListener(final C2monCache<Alarm> alarmCache, final BatchLogger<Alarm> alarmLogger) {
+    this.alarmCache = alarmCache;
     this.alarmLogger = alarmLogger;
   }
 
@@ -84,53 +60,8 @@ public class AlarmRecordListener implements C2monCacheListener<Alarm>, SmartLife
    */
   @PostConstruct
   public void init() {
-    listenerContainer = cacheRegistrationService.registerToAlarms(this);
-  }
-
-  @Override
-  public void notifyElementUpdated(Alarm cacheable) {
-    ArrayList<Alarm> toSave = new ArrayList<>();
-    toSave.add(cacheable);
-    alarmLogger.log(toSave);
-  }
-
-  @Override
-  public void confirmStatus(Alarm cacheable) {
-      // no confirmation required
-  }
-
-  @Override
-  public boolean isAutoStartup() {
-    return true;
-  }
-
-  @Override
-  public void stop(Runnable runnable) {
-    stop();
-    runnable.run();
-  }
-
-  @Override
-  public boolean isRunning() {
-    return running;
-  }
-
-  @Override
-  public void start() {
-    LOGGER.debug("Starting Alarm logger (history)");
-    running = true;
-    listenerContainer.start();
-  }
-
-  @Override
-  public void stop() {
-    LOGGER.debug("Stopping Alarm logger (history)");
-    listenerContainer.stop();
-    running = false;
-  }
-
-  @Override
-  public int getPhase() {
-    return ServerConstants.PHASE_STOP_LAST - 1;
+    alarmCache.getCacheListenerManager().registerListener(alarm ->
+        alarmLogger.log(listOf(alarm))
+      , CacheEvent.UPDATE_ACCEPTED);
   }
 }

@@ -17,10 +17,11 @@
 package cern.c2mon.server.common.alive;
 
 import cern.c2mon.shared.common.Cacheable;
+import cern.c2mon.shared.common.datatag.DataTagAddress;
 
 import java.util.Collection;
 
-public interface AliveTimer extends Cacheable {
+public interface AliveTag extends Cacheable {
 //---------------------------------------------------------------------------
   // CONSTANT DEFINITIONS
   //---------------------------------------------------------------------------
@@ -101,4 +102,6 @@ public interface AliveTimer extends Cacheable {
    * @return
    */
   Collection<Long> getDependentAliveTimerIds();
+
+  DataTagAddress getAddress();
 }

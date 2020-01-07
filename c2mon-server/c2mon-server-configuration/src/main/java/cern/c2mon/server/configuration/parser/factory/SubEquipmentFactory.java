@@ -17,14 +17,11 @@
 
 package cern.c2mon.server.configuration.parser.factory;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import cern.c2mon.server.cache.EquipmentCache;
-import cern.c2mon.server.cache.SubEquipmentCache;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.loading.EquipmentDAO;
 import cern.c2mon.server.cache.loading.SequenceDAO;
 import cern.c2mon.server.cache.loading.SubEquipmentDAO;
+import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.configuration.parser.exception.ConfigurationParseException;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
@@ -34,6 +31,9 @@ import cern.c2mon.shared.client.configuration.api.tag.StatusTag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Franz Ritter
  */
@@ -41,21 +41,23 @@ import org.springframework.stereotype.Service;
 public class SubEquipmentFactory extends EntityFactory<SubEquipment> {
 
   private SubEquipmentDAO subEquipmentDAO;
-  private EquipmentCache equipmentCache;
+  private C2monCache<cern.c2mon.server.common.equipment.Equipment> equipmentCache;
   private EquipmentDAO equipmentDAO;
   private SequenceDAO sequenceDAO;
-  private ControlTagFactory controlTagFactory;
+  private final AliveTagFactory aliveTagFactory;
+  private final CommFaultTagFactory commFaultTagFactory;
 
   @Autowired
-  public SubEquipmentFactory(SubEquipmentCache subEquipmentCache, SubEquipmentDAO subEquipmentDAO,
-                             SequenceDAO sequenceDAO, ControlTagFactory controlTagFactory,
-                             EquipmentCache equipmentCache, EquipmentDAO equipmentDAO) {
+  public SubEquipmentFactory(C2monCache<cern.c2mon.server.common.subequipment.SubEquipment> subEquipmentCache, SubEquipmentDAO subEquipmentDAO,
+                             SequenceDAO sequenceDAO, C2monCache<Equipment> equipmentCache, EquipmentDAO equipmentDAO,
+                             AliveTagFactory aliveTagFactory, CommFaultTagFactory commFaultTagFactory) {
     super(subEquipmentCache);
     this.subEquipmentDAO = subEquipmentDAO;
     this.sequenceDAO = sequenceDAO;
-    this.controlTagFactory = controlTagFactory;
     this.equipmentCache = equipmentCache;
     this.equipmentDAO = equipmentDAO;
+    this.aliveTagFactory = aliveTagFactory;
+    this.commFaultTagFactory = commFaultTagFactory;
   }
 
   @Override
@@ -67,14 +69,14 @@ public class SubEquipmentFactory extends EntityFactory<SubEquipment> {
     subEquipment.setEquipmentId(equipmentId);
 
     // check information about the parent id
-    if (equipmentCache.hasKey(equipmentId)) {
+    if (equipmentCache.containsKey(equipmentId)) {
 
       ConfigurationElement createSubEquipment = doCreateInstance(subEquipment);
       subEquipment = setDefaultControlTags(subEquipment);
 
-      configurationElements.addAll(controlTagFactory.createInstance(subEquipment.getCommFaultTag()));
-      configurationElements.addAll(controlTagFactory.createInstance(subEquipment.getStatusTag()));
-      configurationElements.addAll(controlTagFactory.createInstance(subEquipment.getAliveTag()));
+      configurationElements.addAll(commFaultTagFactory.createInstance(subEquipment.getCommFaultTag()));
+//      configurationElements.addAll(controlTagFactory.createInstance(subEquipment.getStatusTag()));
+      configurationElements.addAll(aliveTagFactory.createInstance(subEquipment.getAliveTag()));
 
       createSubEquipment.getElementProperties().setProperty("statusTagId", subEquipment.getStatusTag().getId().toString());
       createSubEquipment.getElementProperties().setProperty("commFaultTagId", subEquipment.getCommFaultTag().getId().toString());

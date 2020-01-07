@@ -17,13 +17,14 @@
 
 package cern.c2mon.server.configuration.parser.factory;
 
-import cern.c2mon.server.cache.DataTagCache;
-import cern.c2mon.server.cache.EquipmentCache;
-import cern.c2mon.server.cache.SubEquipmentCache;
-import cern.c2mon.server.cache.TagFacadeGateway;
+import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.config.tag.UnifiedTagCacheFacade;
 import cern.c2mon.server.cache.loading.EquipmentDAO;
 import cern.c2mon.server.cache.loading.SequenceDAO;
 import cern.c2mon.server.cache.loading.SubEquipmentDAO;
+import cern.c2mon.server.common.equipment.Equipment;
+import cern.c2mon.server.common.subequipment.SubEquipment;
+import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.configuration.parser.exception.ConfigurationParseException;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
@@ -34,6 +35,8 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.List;
 
+import static cern.c2mon.cache.config.ClientQueryProvider.queryByClientInput;
+
 /**
  * @author Franz Ritter
  */
@@ -41,21 +44,21 @@ import java.util.List;
 public class DataTagFactory extends EntityFactory<DataTag> {
 
   private EquipmentDAO equipmentDAO;
-  private EquipmentCache equipmentCache;
+  private C2monCache<Equipment> equipmentCache;
   private SubEquipmentDAO subEquipmentDAO;
-  private SubEquipmentCache subEquipmentCache;
+  private C2monCache<SubEquipment> subEquipmentCache;
 
-  private DataTagCache dataTagCache;
-  private TagFacadeGateway tagFacadeGateway;
+  private C2monCache<cern.c2mon.server.common.datatag.DataTag> dataTagCache;
+  private UnifiedTagCacheFacade unifiedTagCacheFacade;
   private SequenceDAO sequenceDAO;
 
   @Autowired
-  public DataTagFactory(DataTagCache dataTagCache, TagFacadeGateway tagFacadeGateway, SequenceDAO sequenceDAO,
-                        EquipmentDAO equipmentDAO, EquipmentCache equipmentCache, SubEquipmentDAO subEquipmentDAO,
-                        SubEquipmentCache subEquipmentCache) {
+  public DataTagFactory(C2monCache<cern.c2mon.server.common.datatag.DataTag> dataTagCache, UnifiedTagCacheFacade unifiedTagCacheFacade, SequenceDAO sequenceDAO,
+                        EquipmentDAO equipmentDAO, C2monCache<Equipment> equipmentCache, SubEquipmentDAO subEquipmentDAO,
+                        C2monCache<SubEquipment> subEquipmentCache) {
     super(dataTagCache);
     this.dataTagCache = dataTagCache;
-    this.tagFacadeGateway = tagFacadeGateway;
+    this.unifiedTagCacheFacade = unifiedTagCacheFacade;
     this.sequenceDAO = sequenceDAO;
     this.equipmentDAO = equipmentDAO;
     this.equipmentCache = equipmentCache;
@@ -79,7 +82,7 @@ public class DataTagFactory extends EntityFactory<DataTag> {
         parentId = dataTag.getEquipmentId() != null ? dataTag.getEquipmentId() : equipmentDAO.getIdByName(dataTag
             .getEquipmentName());
 
-        if (parentId == null || !equipmentCache.hasKey(parentId)) {
+        if (parentId == null || !equipmentCache.containsKey(parentId)) {
           throw new ConfigurationParseException("Error creating data tag #" + dataTag.getId() + ": " +
               "Specified parent equipment does not exist!");
         }
@@ -94,7 +97,7 @@ public class DataTagFactory extends EntityFactory<DataTag> {
       parentId = dataTag.getSubEquipmentId() != null ? dataTag.getSubEquipmentId() : subEquipmentDAO.getIdByName
           (dataTag.getSubEquipmentName());
 
-      if (parentId == null || !subEquipmentCache.hasKey(parentId)) {
+      if (parentId == null || !subEquipmentCache.containsKey(parentId)) {
         throw new ConfigurationParseException("Error creating data tag #" + dataTag.getId() + ": " +
             "Specified parent sub equipment does not exist!");
       }
@@ -110,9 +113,10 @@ public class DataTagFactory extends EntityFactory<DataTag> {
 
   @Override
   Long createId(DataTag configurationEntity) {
-    if (configurationEntity.getName() != null && dataTagCache.get(configurationEntity.getName()) != null) {
-      throw new ConfigurationParseException("Error creating data tag " + configurationEntity.getName() + ": " +
-          "Name already exists!");
+    if (configurationEntity.getName() != null
+      && !queryByClientInput(dataTagCache, Tag::getName, configurationEntity.getName()).isEmpty()) {
+        throw new ConfigurationParseException("Error creating data tag " + configurationEntity.getName() + ": " +
+            "Name already exists!");
     } else {
       return configurationEntity.getId() != null ? configurationEntity.getId() : sequenceDAO.getNextTagId();
     }
@@ -120,23 +124,17 @@ public class DataTagFactory extends EntityFactory<DataTag> {
 
   @Override
   Long getId(DataTag entity) {
-    Long id;
-
-    if (entity.getId() != null) {
-      id = entity.getId();
-    } else {
-      if (dataTagCache.get(entity.getName()) != null) {
-        id = dataTagCache.get(entity.getName()).getId();
-      } else {
-        throw new ConfigurationParseException("Data tag " + entity.getName() + " does not exist!");
-      }
-    }
-    return id;
+    return entity.getId() != null
+      ? entity.getId()
+      : queryByClientInput(dataTagCache, Tag::getName, entity.getName())
+        .stream().findAny()
+        .orElseThrow(() -> new ConfigurationParseException("Data tag " + entity.getName() + " does not exist!"))
+        .getId();
   }
 
   @Override
   boolean hasEntity(Long id) {
-    return id != null && tagFacadeGateway.isInTagCache(id);
+    return id != null && unifiedTagCacheFacade.containsKey(id);
   }
 
   @Override

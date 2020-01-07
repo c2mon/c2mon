@@ -16,9 +16,8 @@
  *****************************************************************************/
 package cern.c2mon.server.daq.update;
 
-import cern.c2mon.server.cache.ControlTagCache;
-import cern.c2mon.server.cache.DataTagCache;
-import cern.c2mon.server.cache.config.CacheModule;
+import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.config.CacheConfigModuleRef;
 import cern.c2mon.server.cache.dbaccess.ControlTagMapper;
 import cern.c2mon.server.cache.dbaccess.DataTagMapper;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
@@ -30,10 +29,7 @@ import cern.c2mon.server.daq.config.DaqModule;
 import cern.c2mon.server.daq.junit.DaqCachePopulationRule;
 import cern.c2mon.server.supervision.config.SupervisionModule;
 import cern.c2mon.shared.common.datatag.*;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -53,7 +49,7 @@ import static org.junit.Assert.assertTrue;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {
     CommonModule.class,
-    CacheModule.class,
+    CacheConfigModuleRef.class,
     CacheDbAccessModule.class,
     CacheLoadingModuleRef.class,
     SupervisionModule.class,
@@ -75,9 +71,7 @@ public class TagUpdateTest {
    * Used to load the test datatag into the cache.
    */
   @Autowired
-  private DataTagCache dataTagCache;
-  @Autowired
-  private ControlTagCache controlTagCache;
+  private C2monCache<DataTag> dataTagCache;
 
   /**
    * Used to access DB values.
@@ -182,8 +176,9 @@ public class TagUpdateTest {
    * Tests that an incoming control tag is correctly saved in the cache and database.
    */
   @Test
+  @Ignore("Control tags are being phased out in favour of individual tags")
   public void testIncomingControlTag() throws InterruptedException {
-    controlTagCache.put(controlTag.getId(), controlTag);
+//    controlTagCache.put(controlTag.getId(), controlTag);
 
     //check controltag value is not set to 2000
 //    assertFalse(controlTag.getValue().equals(2000L));
@@ -207,10 +202,10 @@ public class TagUpdateTest {
     sourceUpdateManager.processUpdates(dataTagValueUpdate);
 
     //check update is both in cache and DB
-    ControlTag cacheObject = (ControlTag) controlTagCache.get(controlTag.getId());
-    assertEquals(sourceDataTagValue.getValue(), cacheObject.getValue());
-    assertEquals(sourceDataTagValue.getTimestamp(), cacheObject.getTimestamp());
-    assertEquals(sourceDataTagValue.getDaqTimestamp(), cacheObject.getDaqTimestamp());
-    assertEquals(sourceDataTagValue.getTimestamp(), cacheObject.getSourceTimestamp());
+//    ControlTag cacheObject = (ControlTag) controlTagCache.get(controlTag.getId());
+//    assertEquals(sourceDataTagValue.getValue(), cacheObject.getValue());
+//    assertEquals(sourceDataTagValue.getTimestamp(), cacheObject.getTimestamp());
+//    assertEquals(sourceDataTagValue.getDaqTimestamp(), cacheObject.getDaqTimestamp());
+//    assertEquals(sourceDataTagValue.getTimestamp(), cacheObject.getSourceTimestamp());
   }
 }

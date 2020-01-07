@@ -11,8 +11,9 @@ import java.util.Set;
 public class AbstractSupervisedCacheFlow<T extends Supervised> extends DefaultCacheFlow<T> {
 
   public AbstractSupervisedCacheFlow() {
-    super((older, newer) -> (older.getStatusTime() == null || newer.getStatusTime() == null)
-      || newer.getStatusTime().getTime() >= older.getStatusTime().getTime());
+    super((older, newer) ->
+      (older.getStatusTime() == null || newer.getStatusTime() == null)
+        || newer.getStatusTime().getTime() >= older.getStatusTime().getTime());
   }
 
   @Override

@@ -16,22 +16,19 @@
  *****************************************************************************/
 package cern.c2mon.server.lifecycle;
 
+import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.server.common.alarm.Alarm;
+import cern.c2mon.server.common.config.ServerConstants;
+import cern.c2mon.server.common.datatag.DataTag;
+import cern.c2mon.server.daq.out.DataRefreshManager;
+import cern.c2mon.server.supervision.SupervisionFacade;
+import cern.c2mon.shared.common.CacheEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Service;
-
-import cern.c2mon.server.cache.AlarmCache;
-import cern.c2mon.server.cache.ControlTagCache;
-import cern.c2mon.server.cache.DataTagCache;
-import cern.c2mon.server.common.alarm.Alarm;
-import cern.c2mon.server.common.config.ServerConstants;
-import cern.c2mon.server.common.control.ControlTag;
-import cern.c2mon.server.common.datatag.DataTag;
-import cern.c2mon.server.daq.out.DataRefreshManager;
-import cern.c2mon.server.supervision.SupervisionFacade;
 
 /**
  * Runs when the server is started with the c2mon.recovery
@@ -76,10 +73,9 @@ public class RecoveryManager implements SmartLifecycle {
   /**
    * Caches for notifying listeners.
    */
-  private DataTagCache dataTagCache;
-  private ControlTagCache controlTagCache;
+  private C2monCache<DataTag> dataTagCache;
 
-  private AlarmCache alarmCache;
+  private C2monCache<Alarm> alarmCache;
 
 
   /**
@@ -87,19 +83,16 @@ public class RecoveryManager implements SmartLifecycle {
    * @param supervisionFacade facade
    * @param dataRefreshManager refresh manager
    * @param dataTagCache datatag cache
-   * @param controlTagCache controltag cache
    */
   @Autowired
   public RecoveryManager(final SupervisionFacade supervisionFacade,
                           final DataRefreshManager dataRefreshManager,
-                          final DataTagCache dataTagCache,
-                          final ControlTagCache controlTagCache,
-                          final AlarmCache alarmCache) {
+                          final C2monCache<DataTag> dataTagCache,
+                          final C2monCache<Alarm> alarmCache) {
     super();
     this.supervisionFacade = supervisionFacade;
     this.dataRefreshManager = dataRefreshManager;
     this.dataTagCache = dataTagCache;
-    this.controlTagCache = controlTagCache;
     this.alarmCache = alarmCache;
   }
 
@@ -158,7 +151,7 @@ public class RecoveryManager implements SmartLifecycle {
       refreshDataTags(); //gets latest values from DAQ cache
     }
     if (!stopRequested) {
-      notifyAllTagCacheListeners(); //also refreshes rules but not alarms (done with supervision)
+      notifyAllDataTagCacheListeners(); //also refreshes rules but not alarms (done with supervision)
     }
     //IMPORTANT: MUST BE CALLED LAST AS UPDATES TO RULES OR TAGS MAY HAVE OVERWRITTEN CURRENT SUPERVISION STATUS IF CACHE LISTENER
     //TAKES ACTION ON STATUS CONFIRMATION (ALTHOUGH THIS IS NOT RECOMMENDED - SEE TimCacheListener INTERFACE FOR DETAILS)
@@ -193,7 +186,7 @@ public class RecoveryManager implements SmartLifecycle {
   @ManagedOperation(description = "Refreshes all state tags (new timestamp).")
   public void refreshStateTags() {
     log.info("Recovery task: refreshing state tags.");
-    supervisionFacade.refreshStateTags();
+    supervisionFacade.refreshAllSupervisionStatus();
     log.info("Recovery task: finished refreshing state tags.");
   }
 
@@ -217,28 +210,18 @@ public class RecoveryManager implements SmartLifecycle {
    * status confirmations).
    */
   @ManagedOperation(description = "Notifies all Tag cache listeners (status confirmation). Refresh supervision status after this call!")
-  public void notifyAllTagCacheListeners() {
+  public void notifyAllDataTagCacheListeners() {
     log.info("Recovery task: notifying all tag listeners.");
-    for (Long key : controlTagCache.getKeys()) {
-      controlTagCache.acquireWriteLockOnKey(key);
-      try {
-        ControlTag controlTag = controlTagCache.getCopy(key);
-        long eventTime = System.currentTimeMillis();
-        controlTagCache.notifyListenerStatusConfirmation(controlTag, eventTime);
-      } finally {
-        controlTagCache.releaseWriteLockOnKey(key);
-      }
-    }
-    for (Long key : dataTagCache.getKeys()) {
-      dataTagCache.acquireWriteLockOnKey(key);
-      try {
-        DataTag dataTag = dataTagCache.getCopy(key);
-        long eventTime = System.currentTimeMillis();
-        dataTagCache.notifyListenerStatusConfirmation(dataTag, eventTime);
-      } finally {
-        dataTagCache.releaseWriteLockOnKey(key);
-      }
-    }
+//    for (Long key : controlTagCache.getKeys()) {
+//      controlTagCache.acquireWriteLockOnKey(key);
+//      ControlTag controlTag = controlTagCache.get(key);
+//      long eventTime = System.currentTimeMillis();
+//      controlTagCache.notifyListenerStatusConfirmation(controlTag, eventTime);
+//    }
+
+    dataTagCache.getAll(dataTagCache.getKeys()).values().forEach( dataTag ->
+      // TODO (Alex) Maybe override with current time?
+      dataTagCache.getCacheListenerManager().notifyListenersOf(CacheEvent.CONFIRM_STATUS, dataTag));
     log.info("Recovery task: finished notifying all tag listeners.");
   }
 
@@ -255,16 +238,9 @@ public class RecoveryManager implements SmartLifecycle {
   @ManagedOperation(description = "Notifies all Alarm cache listeners (status confirmation).")
   public void notifyAllAlarmCacheListeners() {
     log.info("Recovery task: notifying all alarm cache listeners (cache persistence to DB, re-publication to clients, publication to LASER if not already done)");
-    for (Long key : alarmCache.getKeys()) {
-      alarmCache.acquireWriteLockOnKey(key);
-      try {
-        Alarm alarm = alarmCache.getCopy(key);
-        long eventTime = System.currentTimeMillis();
-        alarmCache.notifyListenerStatusConfirmation(alarm, eventTime);
-      } finally {
-        alarmCache.releaseWriteLockOnKey(key);
-      }
-    }
+    alarmCache.getAll(alarmCache.getKeys()).values().forEach( alarm ->
+      // TODO (Alex) Maybe override with current time?
+      alarmCache.getCacheListenerManager().notifyListenersOf(CacheEvent.CONFIRM_STATUS, alarm));
     log.info("Recovery task: finished notifying all alarm cache listeners.");
   }
 
@@ -282,17 +258,9 @@ public class RecoveryManager implements SmartLifecycle {
   @ManagedOperation(description="Republish all non-published alarms (use if alarm publication thread did not shutdown correctly)")
   public void publishUnpublishedAlarms() {
     log.info("Publishing all unpublished alarms to LASER and re-publishing to clients.");
-    for (Long key : alarmCache.getKeys()) {
-      alarmCache.acquireWriteLockOnKey(key);
-      try {
-        Alarm alarm = alarmCache.get(key);
-        alarmCache.notifyListenersOfUpdate(alarm);
-      } catch (Exception e) {
-        log.error("Exception caught while checking for unpublished alarms", e);
-      } finally {
-        alarmCache.releaseWriteLockOnKey(key);
-      }
-    }
+    alarmCache.getAll(alarmCache.getKeys()).values().forEach( alarm ->
+      // TODO (Alex) Maybe override with current time?
+      alarmCache.getCacheListenerManager().notifyListenersOf(CacheEvent.UPDATE_ACCEPTED, alarm));
   }
 
   @Override

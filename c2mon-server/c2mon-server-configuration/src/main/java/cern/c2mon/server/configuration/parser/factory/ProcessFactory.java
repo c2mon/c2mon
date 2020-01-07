@@ -40,15 +40,15 @@ public class ProcessFactory extends EntityFactory<Process> {
 
   private ProcessDAO processDAO;
   private SequenceDAO sequenceDAO;
-  private ControlTagFactory controlTagFactory;
+  private final AliveTagFactory aliveTagFactory;
 
   @Autowired
-  public ProcessFactory(C2monCache<cern.c2mon.server.common.process.Process> processCache, SequenceDAO sequenceDAO, ControlTagFactory controlTagFactory,
-                        ProcessDAO processDAO) {
+  public ProcessFactory(C2monCache<cern.c2mon.server.common.process.Process> processCache, SequenceDAO sequenceDAO,
+                        ProcessDAO processDAO, AliveTagFactory aliveTagFactory) {
     super(processCache);
     this.sequenceDAO = sequenceDAO;
-    this.controlTagFactory = controlTagFactory;
     this.processDAO = processDAO;
+    this.aliveTagFactory = aliveTagFactory;
   }
 
 
@@ -63,8 +63,8 @@ public class ProcessFactory extends EntityFactory<Process> {
     // This need to be done after the process id is create (see above)
     entity = setDefaultControlTags(entity);
 
-    configurationElements.addAll(controlTagFactory.createInstance(entity.getAliveTag()));
-    configurationElements.addAll(controlTagFactory.createInstance(entity.getStatusTag()));
+    configurationElements.addAll(aliveTagFactory.createInstance(entity.getAliveTag()));
+//    configurationElements.addAll(controlTagFactory.createInstance(entity.getStatusTag()));
 
     createProcess.getElementProperties().setProperty("aliveTagId", entity.getAliveTag().getId().toString());
     createProcess.getElementProperties().setProperty("statusTagId", entity.getStatusTag().getId().toString());

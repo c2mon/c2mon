@@ -55,6 +55,8 @@ public interface RuleTag extends Tag {
   @Override
   Timestamp getTimestamp();
 
+  Timestamp getEvalTimestamp();
+
   /**
    * Returns the text form of the rule expression.
    *

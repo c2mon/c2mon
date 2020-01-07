@@ -22,7 +22,6 @@ import cern.c2mon.server.client.util.TransferObjectFactory;
 import cern.c2mon.server.common.device.Device;
 import cern.c2mon.shared.client.device.DeviceClassNameResponse;
 import cern.c2mon.shared.client.device.DeviceInfo;
-import cern.c2mon.shared.client.device.TransferDevice;
 import cern.c2mon.shared.client.request.ClientRequest;
 import cern.c2mon.shared.client.request.ClientRequestResult;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +29,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Helper class for {@link ClientRequestDelegator} to handle
@@ -80,8 +79,7 @@ class ClientDeviceRequestHelper {
    */
   @SuppressWarnings("unchecked")
   Collection<? extends ClientRequestResult> handleDeviceRequest(final ClientRequest deviceRequest) {
-    Collection<TransferDevice> transferDevices = new ArrayList<>();
-    List<Device> devices;
+    Collection<Device> devices;
 
     if (deviceRequest.getObjectParameter() != null) {
       Set<DeviceInfo> deviceInfoList = (Set<DeviceInfo>) deviceRequest.getObjectParameter();
@@ -92,10 +90,11 @@ class ClientDeviceRequestHelper {
       devices = deviceService.getDevices(deviceClassName);
     }
 
-    for (Device device : devices) {
-      transferDevices.add(TransferObjectFactory.createTransferDevice(device, deviceService.getClassNameForDevice(device.getId())));
-    }
-
-    return transferDevices;
+    return devices
+      .stream()
+      .map(device ->
+        TransferObjectFactory.createTransferDevice(
+          device, deviceClassService.getCache().get(device.getDeviceClassId()).getName())
+      ).collect(Collectors.toList());
   }
 }

@@ -16,7 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.supervision;
 
-import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
+import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.shared.common.datatag.SourceDataTagValue;
 import cern.c2mon.shared.daq.process.ProcessConfigurationRequest;
 import cern.c2mon.shared.daq.process.ProcessConnectionRequest;
@@ -31,7 +31,7 @@ import cern.c2mon.shared.daq.process.ProcessDisconnectionRequest;
  * SubEquipment) is synchronized on the Process cache object.
  * 
  * <p>The public methods will catch and log all exceptions of type 
- * {@link CacheElementNotFoundException}, {@link NullPointerException} and 
+ * {@link CacheElementNotFoundException}, {@link NullPointerException} and
  * {@link IllegalArgumentException} - these may be thrown by private methods
  * if cache objects are not found, their Ids are set to null or cache methods
  * are called with a null parameter as key.
@@ -48,7 +48,7 @@ public interface SupervisionManager {
    * <p>Implements the synchronization and exception handling described
    * in the class documentation.
    * 
-   * @param ProcessDisconnectionRequest the disconnection message
+   * @param processDisconnectionRequest the disconnection message
    */
   void onProcessDisconnection(ProcessDisconnectionRequest processDisconnectionRequest);
   

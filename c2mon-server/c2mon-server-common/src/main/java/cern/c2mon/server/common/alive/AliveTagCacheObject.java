@@ -17,6 +17,7 @@
 package cern.c2mon.server.common.alive;
 
 import cern.c2mon.server.common.AbstractCacheableImpl;
+import cern.c2mon.shared.common.datatag.DataTagAddress;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -28,7 +29,7 @@ import java.util.Collection;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class AliveTimerCacheObject extends AbstractCacheableImpl implements AliveTimer {
+public class AliveTagCacheObject extends AbstractCacheableImpl implements AliveTag {
 
     private static final long serialVersionUID = 2151886747282763819L;
 
@@ -86,6 +87,8 @@ public class AliveTimerCacheObject extends AbstractCacheableImpl implements Aliv
      */
     private boolean active = false;
 
+    private DataTagAddress address;
+
     // ---------------------------------------------------------------------------
     // CONSTRUCTORS
     // ---------------------------------------------------------------------------
@@ -93,7 +96,7 @@ public class AliveTimerCacheObject extends AbstractCacheableImpl implements Aliv
     /**
      * Constructor setting minimal set of non-null fields.
      */
-    public AliveTimerCacheObject(Long id) {
+    public AliveTagCacheObject(Long id) {
         this.id = id;
     }
 
@@ -107,8 +110,8 @@ public class AliveTimerCacheObject extends AbstractCacheableImpl implements Aliv
      * @param aliveType
      * @param aliveInterval
      */
-    public AliveTimerCacheObject(final Long aliveTagId, final Long relatedId, final String relatedName,
-            final Long relatedStateTagId, final String aliveType, final Integer aliveInterval) {
+    public AliveTagCacheObject(final Long aliveTagId, final Long relatedId, final String relatedName,
+                               final Long relatedStateTagId, final String aliveType, final Integer aliveInterval) {
         this(aliveTagId);
         this.relatedId = relatedId;
         this.relatedName = relatedName;
@@ -118,8 +121,8 @@ public class AliveTimerCacheObject extends AbstractCacheableImpl implements Aliv
     }
 
     @Override
-    public AliveTimerCacheObject clone() {
-        AliveTimerCacheObject aliveTimer = (AliveTimerCacheObject) super.clone();
+    public AliveTagCacheObject clone() {
+        AliveTagCacheObject aliveTimer = (AliveTagCacheObject) super.clone();
         if (this.dependentAliveTimerIds != null)
             aliveTimer.dependentAliveTimerIds = new ArrayList<>(this.dependentAliveTimerIds);
 
@@ -137,7 +140,7 @@ public class AliveTimerCacheObject extends AbstractCacheableImpl implements Aliv
      */
     @Override
     public synchronized boolean isProcessAliveType() {
-        return (getAliveType().equals(AliveTimer.ALIVE_TYPE_PROCESS));
+        return (getAliveType().equals(AliveTag.ALIVE_TYPE_PROCESS));
     }
 
     /**
@@ -147,7 +150,7 @@ public class AliveTimerCacheObject extends AbstractCacheableImpl implements Aliv
      */
     @Override
     public synchronized boolean isEquipmentAliveType() {
-        return (getAliveType().equals(AliveTimer.ALIVE_TYPE_EQUIPMENT));
+        return (getAliveType().equals(AliveTag.ALIVE_TYPE_EQUIPMENT));
     }
 
     /**
@@ -156,7 +159,7 @@ public class AliveTimerCacheObject extends AbstractCacheableImpl implements Aliv
      * @return true if this alive timer is related to an subequipent alive tag.
      */
     public synchronized boolean isSubEquipmentAliveType() {
-        return (getAliveType().equals(AliveTimer.ALIVE_TYPE_SUBEQUIPMENT));
+        return (getAliveType().equals(AliveTag.ALIVE_TYPE_SUBEQUIPMENT));
     }
 
     /**
@@ -166,13 +169,13 @@ public class AliveTimerCacheObject extends AbstractCacheableImpl implements Aliv
      */
     public void setAliveType(String aliveType) {
         this.aliveType = aliveType.trim();
-        if (getAliveType().equals(AliveTimer.ALIVE_TYPE_PROCESS)) {
-            this.aliveTypeDescription = AliveTimer.PROCESS_MSG;
+        if (getAliveType().equals(AliveTag.ALIVE_TYPE_PROCESS)) {
+            this.aliveTypeDescription = AliveTag.PROCESS_MSG;
         } else {
-            if (getAliveType().equals(AliveTimer.ALIVE_TYPE_EQUIPMENT)) {
-                this.aliveTypeDescription = AliveTimer.EQUIPMENT_MSG;
+            if (getAliveType().equals(AliveTag.ALIVE_TYPE_EQUIPMENT)) {
+                this.aliveTypeDescription = AliveTag.EQUIPMENT_MSG;
             } else {
-                this.aliveTypeDescription = AliveTimer.SUBEQUIPMENT_MSG;
+                this.aliveTypeDescription = AliveTag.SUBEQUIPMENT_MSG;
             }
         }
     }

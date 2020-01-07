@@ -42,18 +42,20 @@ public class EquipmentFactory extends EntityFactory<Equipment> {
 
   private EquipmentDAO equipmentDAO;
   private SequenceDAO sequenceDAO;
+  private final AliveTagFactory aliveTagFactory;
+  private final CommFaultTagFactory commFaultTagFactory;
   private C2monCache<Process> processCache;
   private ProcessDAO processDAO;
-  private ControlTagFactory controlTagFactory;
 
   @Autowired
   public EquipmentFactory(C2monCache<cern.c2mon.server.common.equipment.Equipment> equipmentCache, EquipmentDAO equipmentDAO, SequenceDAO sequenceDAO,
-                          ControlTagFactory controlTagFactory,
+                          AliveTagFactory aliveTagFactory, CommFaultTagFactory commFaultTagFactory,
                           C2monCache<Process> processCache, ProcessDAO processDAO) {
     super(equipmentCache);
     this.equipmentDAO = equipmentDAO;
     this.sequenceDAO = sequenceDAO;
-    this.controlTagFactory = controlTagFactory;
+    this.aliveTagFactory = aliveTagFactory;
+    this.commFaultTagFactory = commFaultTagFactory;
     this.processCache = processCache;
     this.processDAO = processDAO;
   }
@@ -72,11 +74,11 @@ public class EquipmentFactory extends EntityFactory<Equipment> {
       ConfigurationElement createEquipment = doCreateInstance(equipment);
       equipment = setDefaultControlTags(equipment);
 
-      configurationElements.addAll(controlTagFactory.createInstance(equipment.getCommFaultTag()));
-      configurationElements.addAll(controlTagFactory.createInstance(equipment.getStatusTag()));
+      configurationElements.addAll(commFaultTagFactory.createInstance(equipment.getCommFaultTag()));
+//      configurationElements.addAll(controlTagFactory.createInstance(equipment.getStatusTag()));
 
       if (equipment.getAliveTag() != null) {
-        configurationElements.addAll(controlTagFactory.createInstance(equipment.getAliveTag()));
+        configurationElements.addAll(aliveTagFactory.createInstance(equipment.getAliveTag()));
         createEquipment.getElementProperties().setProperty("aliveTagId", equipment.getAliveTag().getId().toString());
       }
 

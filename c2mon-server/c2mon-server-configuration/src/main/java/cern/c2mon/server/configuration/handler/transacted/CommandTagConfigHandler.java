@@ -20,7 +20,7 @@ import cern.c2mon.cache.actions.command.CommandTagCacheObjectFactory;
 import cern.c2mon.cache.actions.command.CommandTagService;
 import cern.c2mon.cache.actions.equipment.EquipmentService;
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
+import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.server.cache.loading.CommandTagDAO;
 import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;

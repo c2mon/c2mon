@@ -2,7 +2,7 @@ package cern.c2mon.server.supervision.impl.event;
 
 import cern.c2mon.cache.actions.supervision.SupervisedCacheService;
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
+import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.supervision.Supervised;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;

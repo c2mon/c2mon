@@ -16,19 +16,18 @@
  *****************************************************************************/
 package cern.c2mon.server.supervision.impl;
 
-import cern.c2mon.cache.api.listener.CacheListener;
-import cern.c2mon.server.cache.EquipmentCache;
-import cern.c2mon.server.cache.ProcessCache;
-import cern.c2mon.server.cache.SubEquipmentCache;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.component.ExecutorLifecycleHandle;
 import cern.c2mon.server.common.component.Lifecycle;
+import cern.c2mon.server.common.equipment.Equipment;
+import cern.c2mon.server.common.process.Process;
+import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.common.supervision.Supervised;
 import cern.c2mon.server.supervision.SupervisionListener;
 import cern.c2mon.server.supervision.SupervisionNotifier;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
@@ -44,6 +43,10 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import static cern.c2mon.server.common.util.Java9Collections.listOf;
+import static cern.c2mon.shared.common.CacheEvent.CONFIRM_STATUS;
+import static cern.c2mon.shared.common.CacheEvent.SUPERVISION_CHANGE;
 
 /**
  * Notifies the all the listeners of changes in the
@@ -66,14 +69,10 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @author Mark Brightwell
  *
  */
+@Slf4j
 @Service("supervisionNotifier")
 @ManagedResource(objectName="cern.c2mon:name=supervisionNotifier")
-public class SupervisionNotifierImpl implements SupervisionNotifier, CacheListener<Supervised> {
-
-  /**
-   * Class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(SupervisionNotifierImpl.class);
+public class SupervisionNotifierImpl implements SupervisionNotifier {
 
   /**
    * Default size of task queue for a listener executor.
@@ -90,13 +89,7 @@ public class SupervisionNotifierImpl implements SupervisionNotifier, CacheListen
    * Each listener gets his own thread.
    */
   private static final int DEFAULT_NUMBER_THREADS = 1;
-
-  /**
-   * Caches for getting supervision status changes.
-   */
-  private ProcessCache processCache;
-  private EquipmentCache equipmentCache;
-  private SubEquipmentCache subEquipmentCache;
+  private final List<C2monCache<? extends Supervised>> supervisedCaches;
 
 
   /**
@@ -118,22 +111,39 @@ public class SupervisionNotifierImpl implements SupervisionNotifier, CacheListen
    * @param subEquipmentCache subequipment cache
    */
   @Autowired
-  public SupervisionNotifierImpl(final ProcessCache processCache,
-                                final EquipmentCache equipmentCache,
-                                final SubEquipmentCache subEquipmentCache) {
+  public SupervisionNotifierImpl(final C2monCache<Process> processCache,
+                                final C2monCache<Equipment> equipmentCache,
+                                final C2monCache<SubEquipment> subEquipmentCache) {
     super();
-    this.processCache = processCache;
-    this.equipmentCache = equipmentCache;
-    this.subEquipmentCache = subEquipmentCache;
+    supervisedCaches = listOf(processCache, equipmentCache, subEquipmentCache);
   }
 
   @PostConstruct
   public void init() {
-    processCache.registerSynchronousListener(this);
-    equipmentCache.registerSynchronousListener(this);
-    subEquipmentCache.registerSynchronousListener(this);
+    supervisedCaches.forEach(cache ->
+      cache.getCacheListenerManager().registerListener(this::notifyElementUpdated
+      , SUPERVISION_CHANGE, CONFIRM_STATUS));
   }
 
+
+  private void notifyElementUpdated(Supervised supervised) {
+    Timestamp supervisionTime;
+    String supervisionMessage;
+    if (supervised.getStatusTime() != null) {
+      supervisionTime = supervised.getStatusTime();
+    } else {
+      supervisionTime = new Timestamp(System.currentTimeMillis());
+    }
+    if (supervised.getStatusDescription() != null) {
+      supervisionMessage = supervised.getStatusDescription();
+    } else {
+      supervisionMessage = supervised.getSupervisionEntity() + " " + supervised.getName() + " is " + supervised.getSupervisionStatus();
+    }
+    notifySupervisionEvent(new SupervisionEventImpl(supervised.getSupervisionEntity(),
+      supervised.getId(), supervised.getName(), supervised.getSupervisionStatus(),
+      supervisionTime,
+      supervisionMessage));
+  }
 
   @Override
   public Lifecycle registerAsListener(final SupervisionListener supervisionListener) {
@@ -158,40 +168,11 @@ public class SupervisionNotifierImpl implements SupervisionNotifier, CacheListen
 
   @Override
   public void notifySupervisionEvent(final SupervisionEvent supervisionEvent) {
-    LOGGER.debug("Notifying listeners of Supervision Event: " + supervisionEvent.getEntity() + " " + supervisionEvent.getEntityId() + " is " + supervisionEvent.getStatus());
-    listenerLock.writeLock().lock();
-    try {
-      for (SupervisionListener listener : supervisionListeners) {
-        executors.get(listener).execute(new SupervisionNotifyTask(supervisionEvent, listener));
-      }
-    } finally {
-      listenerLock.writeLock().unlock();
-    }
-  }
+    log.debug("Notifying listeners of Supervision Event: " + supervisionEvent.getEntity() + " " + supervisionEvent.getEntityId() + " is " + supervisionEvent.getStatus());
 
-  @Override
-  public void notifyElementUpdated(Supervised supervised) {
-    Timestamp supervisionTime;
-    String supervisionMessage;
-    if (supervised.getStatusTime() != null) {
-      supervisionTime = supervised.getStatusTime();
-    } else {
-      supervisionTime = new Timestamp(System.currentTimeMillis());
+    for (SupervisionListener listener : supervisionListeners) {
+      executors.get(listener).execute(new SupervisionNotifyTask(supervisionEvent, listener));
     }
-    if (supervised.getStatusDescription() != null) {
-      supervisionMessage = supervised.getStatusDescription();
-    } else {
-      supervisionMessage = supervised.getSupervisionEntity() + " " + supervised.getName() + " is " + supervised.getSupervisionStatus();
-    }
-    notifySupervisionEvent(new SupervisionEventImpl(supervised.getSupervisionEntity(),
-                                                    supervised.getId(), supervised.getName(), supervised.getSupervisionStatus(),
-                                                    supervisionTime,
-                                                    supervisionMessage));
-  }
-
-  @Override
-  public void confirmStatus(Supervised supervised) {
-    notifyElementUpdated(supervised);
   }
 
   /**
@@ -267,7 +248,7 @@ public class SupervisionNotifierImpl implements SupervisionNotifier, CacheListen
       try {
         listener.notifySupervisionEvent(event);
       } catch (RuntimeException e) {
-        LOGGER.error("Exception caught while notifying supervision event: the supervision status will no longer be correct and needs refreshing!", e);
+        log.error("Exception caught while notifying supervision event: the supervision status will no longer be correct and needs refreshing!", e);
       }
     }
 

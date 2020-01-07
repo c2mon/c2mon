@@ -16,7 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.dbaccess;
 
-import cern.c2mon.server.common.alive.AliveTimer;
+import cern.c2mon.server.common.alive.AliveTag;
 
 
 /**
@@ -25,6 +25,6 @@ import cern.c2mon.server.common.alive.AliveTimer;
  * @author Mark Brightwell
  *
  */
-public interface AliveTimerMapper extends LoaderMapper<AliveTimer> {
+public interface AliveTimerMapper extends LoaderMapper<AliveTag> {
   
 }

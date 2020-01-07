@@ -173,7 +173,7 @@ public class CacheObjectFactory {
 
   public DataTagCacheObject buildDataTagUpdateCacheObject(DataTagCacheObject originalObject, DataTag configObject) {
     DataTagCacheObject result = null;
-    result = originalObject.clone();
+    result = (DataTagCacheObject) originalObject.clone();
     setCacheDataTagCacheObjectFields(result, configObject);
 
     return result;

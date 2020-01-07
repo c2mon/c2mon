@@ -21,8 +21,8 @@ import cern.c2mon.cache.actions.process.ProcessService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.server.cache.loading.ProcessDAO;
-import cern.c2mon.server.common.alive.AliveTimer;
-import cern.c2mon.server.common.alive.AliveTimerCacheObject;
+import cern.c2mon.server.common.alive.AliveTag;
+import cern.c2mon.server.common.alive.AliveTagCacheObject;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.configuration.config.ConfigurationProperties;
 import cern.c2mon.server.configuration.impl.ProcessChange;
@@ -49,7 +49,7 @@ import java.util.Properties;
 @Service
 public class ProcessConfigHandler extends BaseConfigHandlerImpl<Process, ProcessChange> {
 
-  private final C2monCache<AliveTimer> aliveTimerCache;
+  private final C2monCache<AliveTag> aliveTimerCache;
   private final ProcessService processService;
   private final JmsContainerManager jmsContainerManager;
   private final EquipmentConfigHandler equipmentConfigTransacted;
@@ -65,7 +65,7 @@ public class ProcessConfigHandler extends BaseConfigHandlerImpl<Process, Process
   @Autowired
   public ProcessConfigHandler(final C2monCache<Process> processCache, final ProcessDAO processDAO,
                               final ProcessCacheObjectFactory processCacheObjectFactory,
-                              final C2monCache<AliveTimer> aliveTimerCache,
+                              final C2monCache<AliveTag> aliveTimerCache,
                               final ProcessService processService,
                               final ConfigurationProperties properties,
                               final JmsContainerManager jmsContainerManager,
@@ -99,7 +99,7 @@ public class ProcessConfigHandler extends BaseConfigHandlerImpl<Process, Process
     try {
       aliveTimerCache.computeQuiet(process.getAliveTagId(), aliveTimer -> {
         log.trace("Adding process id #{} to alive timer {} (#{})", process.getId(), aliveTimer.getRelatedName(), aliveTimer.getId());
-        ((AliveTimerCacheObject) aliveTimer).setRelatedId(process.getId());
+        ((AliveTagCacheObject) aliveTimer).setRelatedId(process.getId());
       });
     } catch (CacheElementNotFoundException e) {
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,

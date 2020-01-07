@@ -38,8 +38,5 @@ public interface SupervisionAppender {
    * @param tag for which to add the Supervision info
    * @param <T> the type of the Tag
    */
-  <T extends Tag>void addSupervisionQuality(T tagCopy, SupervisionEvent event);   
-
-  
-
+  <T extends Tag>void addSupervisionQuality(T tagCopy, SupervisionEvent event);
 }

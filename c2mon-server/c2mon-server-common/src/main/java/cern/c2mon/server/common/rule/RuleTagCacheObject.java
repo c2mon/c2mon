@@ -38,173 +38,176 @@ import java.util.*;
 @EqualsAndHashCode(callSuper = true)
 public class RuleTagCacheObject extends AbstractTagCacheObject implements RuleTag {
 
-    private static final long serialVersionUID = -3382383610136394447L;
+  private static final long serialVersionUID = -3382383610136394447L;
 
-    /**
-     * The rule as a String. Should never be null for a RuleTag (set as empty String if necessary).
-     */
-    private String ruleText;
+  /**
+   * The rule as a String. Should never be null for a RuleTag (set as empty String if necessary).
+   */
+  private String ruleText;
 
-    /**
-     * The rule as a RuleExpression.
-     */
-    private RuleExpression ruleExpression;
+  /**
+   * The rule as a RuleExpression.
+   */
+  private RuleExpression ruleExpression;
 
-    /**
-     * Reference to all the parent Equipments providing tags for this rule.
-     */
-    private Set<Long> equipmentIds = new HashSet<>();
+  /**
+   * Reference to all the parent Equipments providing tags for this rule.
+   */
+  private Set<Long> equipmentIds = new HashSet<>();
 
-    /**
-     * Reference to all the parent SubEquipments providing tags for this rule.
-     */
-    private Set<Long> subEquipmentIds = new HashSet<>();
+  /**
+   * Reference to all the parent SubEquipments providing tags for this rule.
+   */
+  private Set<Long> subEquipmentIds = new HashSet<>();
 
-    /**
-     * Reference to all the parent Processes providing tags for this rule.
-     */
-    private Set<Long> processIds = new HashSet<>();
+  /**
+   * Reference to all the parent Processes providing tags for this rule.
+   */
+  private Set<Long> processIds = new HashSet<>();
 
-    /**
-     * Constructor used to return a cache object when the object cannot be found in the cache.
-     *
-     * @param id id of the Tag
-     * @param name name of the Tag
-     * @param datatype the datatype of the Tag value
-     * @param mode the mode (TEST/OPER) the tag is configured in
-     * @param ruleText the String with the rule specification
-     */
-    public RuleTagCacheObject(final Long id, final String name, final String datatype, final short mode,
-            final String ruleText) {
-        setId(id);
-        setName(name);
-        setDataType(datatype);
-        setMode(mode);
-        // TODO add quality init
-        setRuleText(ruleText);
-    }
+  private Timestamp evalTimestamp;
 
-    /**
-     * Used for config loader.
-     *
-     * @param id
-     */
-    public RuleTagCacheObject(Long id) {
-        super(id);
-    }
+  /**
+   * Constructor used to return a cache object when the object cannot be found in the cache.
+   *
+   * @param id       id of the Tag
+   * @param name     name of the Tag
+   * @param datatype the datatype of the Tag value
+   * @param mode     the mode (TEST/OPER) the tag is configured in
+   * @param ruleText the String with the rule specification
+   */
+  public RuleTagCacheObject(final Long id, final String name, final String datatype, final short mode,
+                            final String ruleText) {
+    setId(id);
+    setName(name);
+    setDataType(datatype);
+    setMode(mode);
+    // TODO add quality init
+    setRuleText(ruleText);
+  }
 
-    /**
-     * Clone implementation.
-     *
-     * @throws CloneNotSupportedException
-     */
-    @Override
-    public RuleTagCacheObject clone() {
-        RuleTagCacheObject ruleTagCacheObject = (RuleTagCacheObject) super.clone();
-        if (this.equipmentIds != null) {
-            ruleTagCacheObject.equipmentIds = new HashSet<Long>();
-            for (Long eqId : this.equipmentIds) {
-                ruleTagCacheObject.equipmentIds.add(eqId);
-            }
-        }
-        if (this.subEquipmentIds != null) {
-          ruleTagCacheObject.subEquipmentIds = new HashSet<Long>();
-          for (Long subEqId : this.subEquipmentIds) {
-              ruleTagCacheObject.subEquipmentIds.add(subEqId);
-          }
+  /**
+   * Used for config loader.
+   *
+   * @param id
+   */
+  public RuleTagCacheObject(Long id) {
+    super(id);
+  }
+
+  /**
+   * Clone implementation.
+   *
+   * @throws CloneNotSupportedException
+   */
+  @Override
+  public RuleTagCacheObject clone() {
+    RuleTagCacheObject ruleTagCacheObject = (RuleTagCacheObject) super.clone();
+    if (this.equipmentIds != null) {
+      ruleTagCacheObject.equipmentIds = new HashSet<Long>();
+      for (Long eqId : this.equipmentIds) {
+        ruleTagCacheObject.equipmentIds.add(eqId);
       }
-        if (this.processIds != null) {
-            ruleTagCacheObject.processIds = new HashSet<Long>();
-            for (Long procId : this.processIds) {
-                ruleTagCacheObject.processIds.add(procId);
-            }
-        }
-        ruleTagCacheObject.ruleExpression = null;
-        if (this.ruleExpression != null && ruleText != null) {
-          // TODO: Test correct clone support to all rule objects and replace then again the statement
+    }
+    if (this.subEquipmentIds != null) {
+      ruleTagCacheObject.subEquipmentIds = new HashSet<Long>();
+      for (Long subEqId : this.subEquipmentIds) {
+        ruleTagCacheObject.subEquipmentIds.add(subEqId);
+      }
+    }
+    if (this.processIds != null) {
+      ruleTagCacheObject.processIds = new HashSet<Long>();
+      for (Long procId : this.processIds) {
+        ruleTagCacheObject.processIds.add(procId);
+      }
+    }
+    ruleTagCacheObject.ruleExpression = null;
+    if (this.ruleExpression != null && ruleText != null) {
+      // TODO: Test correct clone support to all rule objects and replace then again the statement
 //         ruleTagCacheObject.ruleExpression = (RuleExpression) this.ruleExpression.clone();
-          ruleTagCacheObject.setRuleText(ruleText);
-        }
-
-        return ruleTagCacheObject;
+      ruleTagCacheObject.setRuleText(ruleText);
     }
 
-    @Override
-    // TODO (Alex) Kept only because a vast number of consumers call this method, change them to call cacheTimestamp eventually
-    public Timestamp getTimestamp() {
-      return getCacheTimestamp();
+    return ruleTagCacheObject;
+  }
+
+  @Override
+  // TODO (Alex) Kept only because a vast number of consumers call this method, change them to call eval/cacheTimestamp eventually
+  public Timestamp getTimestamp() {
+    return evalTimestamp != null
+      ? evalTimestamp
+      : getCacheTimestamp();
+  }
+
+  @Override
+  public final Collection<Long> getRuleInputTagIds() {
+    Collection<Long> ruleCollection;
+    if (ruleExpression != null) {
+      ruleCollection = ruleExpression.getInputTagIds();
+    } else {
+      ruleCollection = Collections.emptyList();
     }
+    return ruleCollection;
+  }
 
-    @Override
-    public final Collection<Long> getRuleInputTagIds() {
-        Collection<Long> ruleCollection;
-        if (ruleExpression != null) {
-            ruleCollection = ruleExpression.getInputTagIds();
-        } else {
-            ruleCollection = Collections.emptyList();
-        }
-        return ruleCollection;
-    }
+  @Override
+  public final Collection<Long> getCopyRuleInputTagIds() {
+    return (ruleExpression != null)
+      ? new ArrayList<>(ruleExpression.getInputTagIds())
+      : Collections.emptyList();
+  }
 
-    @Override
-    public final Collection<Long> getCopyRuleInputTagIds() {
-      return (ruleExpression != null)
-        ? new ArrayList<>(ruleExpression.getInputTagIds())
-        : Collections.emptyList();
-    }
+  /**
+   * Also attempts to set the rule expression field (stays null if fails and logs an error).
+   *
+   * @param ruleText the ruleText to set
+   */
+  public void setRuleText(String ruleText) {
+    this.ruleText = ruleText;
 
-    /**
-     * Also attempts to set the rule expression field (stays null if fails and logs an error).
-     *
-     * @param ruleText the ruleText to set
-     */
-    public void setRuleText(String ruleText) {
-        this.ruleText = ruleText;
-
-        if (this.ruleText != null) {
-            try {
-                this.ruleExpression = RuleExpression.createExpression(this.ruleText);
-            } catch (RuleFormatException formatEx) {
-                log.error("Exception caught in setting rule expression: unable to parse rule text: ", formatEx);
-            }
-        } else {
-            throw new NullPointerException("Attempting to set RuleTag ruleText field to null!");
-        }
-    }
-
-    @Override
-    public Long getLowestProcessId() {
-      return processIds.stream().sorted().findFirst().orElse(0L);
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder str = new StringBuilder();
-
-      str.append(getId());
-      str.append('\t');
-      str.append(getName());
-      str.append('\t');
-      str.append(getTimestamp());
-      str.append('\t');
-      str.append(getValue());
-      str.append('\t');
-      str.append(getDataType());
-
-      if (!isValid()) {
-        str.append('\t');
-        str.append(getDataTagQuality().getInvalidQualityStates());
+    if (this.ruleText != null) {
+      try {
+        this.ruleExpression = RuleExpression.createExpression(this.ruleText);
+      } catch (RuleFormatException formatEx) {
+        log.error("Exception caught in setting rule expression: unable to parse rule text: ", formatEx);
       }
-      else {
-        str.append("\t0\tOK");
-      }
-
-      if (getValueDescription() != null) {
-        str.append('\t');
-        // remove all \n and replace all \t characters of the value description string
-        str.append(getValueDescription().replace("\n", "").replace("\t", "  ") );
-      }
-
-      return str.toString();
+    } else {
+      throw new NullPointerException("Attempting to set RuleTag ruleText field to null!");
     }
+  }
+
+  @Override
+  public Long getLowestProcessId() {
+    return processIds.stream().sorted().findFirst().orElse(0L);
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder str = new StringBuilder();
+
+    str.append(getId());
+    str.append('\t');
+    str.append(getName());
+    str.append('\t');
+    str.append(getTimestamp());
+    str.append('\t');
+    str.append(getValue());
+    str.append('\t');
+    str.append(getDataType());
+
+    if (!isValid()) {
+      str.append('\t');
+      str.append(getDataTagQuality().getInvalidQualityStates());
+    } else {
+      str.append("\t0\tOK");
+    }
+
+    if (getValueDescription() != null) {
+      str.append('\t');
+      // remove all \n and replace all \t characters of the value description string
+      str.append(getValueDescription().replace("\n", "").replace("\t", "  "));
+    }
+
+    return str.toString();
+  }
 }

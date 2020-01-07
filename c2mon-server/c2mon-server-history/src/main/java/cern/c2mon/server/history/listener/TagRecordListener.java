@@ -16,66 +16,44 @@
  *****************************************************************************/
 package cern.c2mon.server.history.listener;
 
-import cern.c2mon.server.common.component.Lifecycle;
-import cern.c2mon.server.common.config.ServerConstants;
+import cern.c2mon.cache.config.tag.UnifiedTagCacheFacade;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.history.logger.BatchLogger;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import cern.c2mon.shared.common.CacheEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Listens to updates in the Rule and DataTag caches and calls the DAO
  * for logging these to the history database.
  *
- * @author Mark Brightwell
- *
+ * @author Alexandros Papageorgiou, Mark Brightwell
  */
 @Service
-public class TagRecordListener implements C2monBufferedCacheListener<Tag>, SmartLifecycle {
-
-  /**
-   * Class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(TagRecordListener.class);
-
-  /**
-   * Reference to registration service.
-   */
-  private CacheRegistrationService cacheRegistrationService;
+public class TagRecordListener {
 
   /**
    * Bean that logs Tags into the history.
    */
   private BatchLogger<Tag> tagLogger;
-
-  /**
-   * Listener container lifecycle hook.
-   */
-  private Lifecycle listenerContainer;
-
-  /**
-   * Lifecycle flag.
-   */
-  private volatile boolean running = false;
+  private UnifiedTagCacheFacade unifiedTagCacheFacade;
 
   /**
    * Autowired constructor.
    *
-   * @param cacheRegistrationService for registering cache listeners
-   * @param tagLogger for logging cache objects to the STL
+   * @param unifiedTagCacheFacade for registering cache listeners
+   * @param tagLogger                for logging cache objects to the STL
    */
   @Autowired
-  public TagRecordListener(final CacheRegistrationService cacheRegistrationService, @Qualifier("tagLogger") final BatchLogger<Tag> tagLogger) {
+  public TagRecordListener(final UnifiedTagCacheFacade unifiedTagCacheFacade,
+                           @Qualifier("tagLogger") final BatchLogger<Tag> tagLogger) {
     super();
-    this.cacheRegistrationService = cacheRegistrationService;
+    this.unifiedTagCacheFacade = unifiedTagCacheFacade;
     this.tagLogger = tagLogger;
   }
 
@@ -84,63 +62,8 @@ public class TagRecordListener implements C2monBufferedCacheListener<Tag>, Smart
    */
   @PostConstruct
   public void init() {
-    listenerContainer = cacheRegistrationService.registerBufferedListenerToTags(this);
+    unifiedTagCacheFacade.registerBufferedListener( tags ->
+      tagLogger.log(((List<Tag>) tags).stream().filter(tag -> !tag.isLogged()).collect(Collectors.toList()))
+    , CacheEvent.UPDATE_ACCEPTED);
   }
-
-  @Override
-  public void confirmStatus(Collection<Tag> tagCollection) {
-    //do not log confirm callbacks (STL data not essential)
-  }
-
-  @Override
-  public String getThreadName() {
-    return "DbPersister";
-  }
-
-  @Override
-  public void notifyElementUpdated(Collection<Tag> tagCollection) {
-    ArrayList<Tag> tagsToLog = new ArrayList<>(tagCollection.size());
-    for (Tag tag : tagCollection) {
-      if (tag.isLogged())
-        tagsToLog.add(tag);
-    }
-    tagLogger.log(tagsToLog);
-  }
-
-  @Override
-  public boolean isAutoStartup() {
-    return true;
-  }
-
-  @Override
-  public void stop(Runnable runnable) {
-    stop();
-    runnable.run();
-  }
-
-  @Override
-  public boolean isRunning() {
-    return running;
-  }
-
-  @Override
-  public void start() {
-    LOGGER.debug("Starting Tag logger (history)");
-    running = true;
-    listenerContainer.start();
-  }
-
-  @Override
-  public void stop() {
-    LOGGER.debug("Stopping Tag logger (history)");
-    listenerContainer.stop();
-    running = false;
-  }
-
-  @Override
-  public int getPhase() {
-    return ServerConstants.PHASE_STOP_LAST - 1;
-  }
-
-
 }

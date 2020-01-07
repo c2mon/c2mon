@@ -17,21 +17,21 @@
 
 package cern.c2mon.server.configuration.parser.factory;
 
-import java.util.Collections;
-import java.util.List;
-
-import cern.c2mon.shared.client.configuration.api.tag.DataTag;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import cern.c2mon.server.cache.CommandTagCache;
-import cern.c2mon.server.cache.EquipmentCache;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.loading.EquipmentDAO;
 import cern.c2mon.server.cache.loading.SequenceDAO;
+import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.configuration.parser.exception.ConfigurationParseException;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.api.tag.CommandTag;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.Collections;
+import java.util.List;
+
+import static cern.c2mon.cache.config.ClientQueryProvider.queryByClientInput;
 
 /**
  * @author Franz Ritter
@@ -41,11 +41,14 @@ public class CommandTagFactory extends EntityFactory<CommandTag> {
 
   private final SequenceDAO sequenceDAO;
   private final EquipmentDAO equipmentDAO;
-  private final EquipmentCache equipmentCache;
-  private final CommandTagCache commandTagCache;
+  private final C2monCache<Equipment> equipmentCache;
+  private final C2monCache<cern.c2mon.shared.common.command.CommandTag> commandTagCache;
 
   @Autowired
-  public CommandTagFactory(CommandTagCache commandTagCache, EquipmentCache equipmentCache, SequenceDAO sequenceDAO, EquipmentDAO equipmentDAO) {
+  public CommandTagFactory(C2monCache<cern.c2mon.shared.common.command.CommandTag> commandTagCache,
+                           C2monCache<Equipment> equipmentCache,
+                           SequenceDAO sequenceDAO,
+                           EquipmentDAO equipmentDAO) {
     super(commandTagCache);
     this.sequenceDAO = sequenceDAO;
     this.equipmentCache = equipmentCache;
@@ -60,7 +63,7 @@ public class CommandTagFactory extends EntityFactory<CommandTag> {
         ? commandTag.getEquipmentId() : equipmentDAO.getIdByName(commandTag.getEquipmentName());
 
     // Check if the parent id exists
-    if (equipmentCache.hasKey(equipmentId)) {
+    if (equipmentCache.containsKey(equipmentId)) {
 
       commandTag.setEquipmentId(equipmentId);
       return Collections.singletonList(doCreateInstance(commandTag));
@@ -73,9 +76,10 @@ public class CommandTagFactory extends EntityFactory<CommandTag> {
 
   @Override
   Long createId(CommandTag configurationEntity) {
-    if (configurationEntity.getName() != null && commandTagCache.getCommandTagId(configurationEntity.getName()) != null) {
-      throw new ConfigurationParseException("Error creating command tag " + configurationEntity.getName() + ": " +
-          "Name already exists!");
+    if (configurationEntity.getName() != null
+      && !queryByClientInput(commandTagCache, commandTag -> commandTag.getName(), configurationEntity.getName()).isEmpty()) {
+        throw new ConfigurationParseException("Error creating command tag " + configurationEntity.getName() + ": " +
+            "Name already exists!");
     } else {
       return configurationEntity.getId() != null ? configurationEntity.getId() : sequenceDAO.getNextTagId();
     }
@@ -83,18 +87,12 @@ public class CommandTagFactory extends EntityFactory<CommandTag> {
 
   @Override
   Long getId(CommandTag entity) {
-    Long id;
-
-    if (entity.getId() != null) {
-      id = entity.getId();
-    } else {
-      if (commandTagCache.getCommandTagId(entity.getName()) != null) {
-        id = commandTagCache.getCommandTagId(entity.getName());
-      } else {
-        throw new ConfigurationParseException("Command tag " + entity.getName() + " does not exist!");
-      }
-    }
-    return id;
+    return entity.getId() != null
+      ? entity.getId()
+      : queryByClientInput(commandTagCache, commandTag -> commandTag.getName(), entity.getName())
+        .stream().findAny()
+        .orElseThrow(() -> new ConfigurationParseException("Command tag " + entity.getName() + " does not exist!"))
+        .getId();
   }
 
   @Override

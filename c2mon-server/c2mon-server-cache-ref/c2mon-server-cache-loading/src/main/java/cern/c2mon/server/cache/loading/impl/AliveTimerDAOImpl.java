@@ -20,7 +20,7 @@ import cern.c2mon.server.cache.dbaccess.AliveTimerMapper;
 import cern.c2mon.server.cache.loading.AliveTimerDAO;
 import cern.c2mon.server.cache.loading.CacheLoaderName;
 import cern.c2mon.server.cache.loading.common.AbstractDefaultLoaderDAO;
-import cern.c2mon.server.common.alive.AliveTimer;
+import cern.c2mon.server.common.alive.AliveTag;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -31,7 +31,7 @@ import javax.inject.Inject;
  * @author Mark Brightwell
  */
 @Service(CacheLoaderName.Names.ALIVETIMER)
-public class AliveTimerDAOImpl extends AbstractDefaultLoaderDAO<AliveTimer> implements AliveTimerDAO {
+public class AliveTimerDAOImpl extends AbstractDefaultLoaderDAO<AliveTag> implements AliveTimerDAO {
 
   /**
    * Reference to mapper.
@@ -45,7 +45,7 @@ public class AliveTimerDAOImpl extends AbstractDefaultLoaderDAO<AliveTimer> impl
   }
 
   @Override
-  protected AliveTimer doPostDbLoading(AliveTimer item) {
+  protected AliveTag doPostDbLoading(AliveTag item) {
     //do nothing for this cache
     return item;
   }

@@ -2,7 +2,7 @@ package cern.c2mon.server.configuration.junit;
 
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.alarm.Alarm;
-import cern.c2mon.server.common.alive.AliveTimer;
+import cern.c2mon.server.common.alive.AliveTag;
 import cern.c2mon.server.common.commfault.CommFaultTag;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.device.Device;
@@ -41,7 +41,7 @@ public class ConfigurationCachePopulationRule extends DatabasePopulationRule {
   
   private C2monCache<CommandTag> commandTagCache;
   
-  private C2monCache<AliveTimer> aliveTimerCache;
+  private C2monCache<AliveTag> aliveTimerCache;
   
   private C2monCache<CommFaultTag> commFaultTagCache;
   
@@ -57,7 +57,7 @@ public class ConfigurationCachePopulationRule extends DatabasePopulationRule {
                                           C2monCache<Alarm> alarmCache,
                                           C2monCache<RuleTag> ruleTagCache,
                                           C2monCache<CommandTag> commandTagCache,
-                                          C2monCache<AliveTimer> aliveTimerCache,
+                                          C2monCache<AliveTag> aliveTimerCache,
                                           C2monCache<CommFaultTag> commFaultTagCache,
                                           C2monCache<DeviceClass> deviceClassCache,
                                           C2monCache<Device> deviceCache) {

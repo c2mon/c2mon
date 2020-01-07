@@ -17,8 +17,8 @@
 package cern.c2mon.server.daq.out;
 
 
-import cern.c2mon.server.cache.ProcessCache;
-import cern.c2mon.server.cache.config.CacheModule;
+import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.config.CacheConfigModuleRef;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.cache.loading.config.CacheLoadingModuleRef;
 import cern.c2mon.server.common.config.CommonModule;
@@ -57,7 +57,7 @@ import static org.junit.Assert.assertNotNull;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {
     CommonModule.class,
-    CacheModule.class,
+    CacheConfigModuleRef.class,
     CacheDbAccessModule.class,
     CacheLoadingModuleRef.class,
     SupervisionModule.class,
@@ -85,7 +85,7 @@ public class ProcessCommunicationManagerTest {
   private ProcessCommunicationManager processCommunicationManager;
 
   @Autowired
-  private ProcessCache processCache;
+  private C2monCache<Process> processCache;
 
   /**
    * Tests request is sent and response is processed. Connects to in-memory

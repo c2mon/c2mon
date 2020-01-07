@@ -16,10 +16,9 @@
  *****************************************************************************/
 package cern.c2mon.server.client.publish;
 
-import cern.c2mon.server.cache.TagFacadeGateway;
-import cern.c2mon.server.cache.TagLocationService;
-import cern.c2mon.server.cache.alarm.config.AlarmModule;
-import cern.c2mon.server.cache.config.CacheModule;
+import cern.c2mon.cache.actions.CacheActionsModuleRef;
+import cern.c2mon.cache.actions.alarm.AlarmModule;
+import cern.c2mon.cache.config.tag.UnifiedTagCacheFacade;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.client.config.ClientModule;
 import cern.c2mon.server.client.junit.ClientCachePopulationRule;
@@ -71,7 +70,7 @@ import static org.junit.Assert.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {
     CommonModule.class,
-    CacheModule.class,
+    CacheActionsModuleRef.class,
     CacheDbAccessModule.class,
     SupervisionModule.class,
     ConfigurationModule.class,
@@ -99,10 +98,7 @@ public class TagValuePublisherTest {
   private TagValuePublisher tagValuePublisher;
 
   @Autowired
-  private TagLocationService tagLocationService;
-
-  @Autowired
-  private TagFacadeGateway tagFacadeGateway;
+  private UnifiedTagCacheFacade unifiedTagCacheFacade;
 
   @Autowired
   @Qualifier("clientActiveMQConnectionFactory")
@@ -137,7 +133,7 @@ public class TagValuePublisherTest {
     synchronized (updateLock) {
       this.update = null; //make sure update is null before testing
     }
-    final DataTag tag = (DataTag) tagLocationService.get(200000L);
+    final DataTag tag = (DataTag) unifiedTagCacheFacade.get(200000L);
     List<Alarm> alarms = new ArrayList<Alarm>();
     alarms.add(CacheObjectCreation.createTestAlarm1()); //attached to this tag
     alarms.add(CacheObjectCreation.createTestAlarm3()); //attached to this tag
@@ -146,7 +142,7 @@ public class TagValuePublisherTest {
 
     EasyMock.replay();
     Thread.sleep(500);
-    this.tagValuePublisher.notifyOnUpdate(tag, alarms);
+    this.tagValuePublisher.notifyOnUpdate(new TagWithAlarms<>(tag, alarms));
 
     listenerThread.join(1000);
 
@@ -162,7 +158,7 @@ public class TagValuePublisherTest {
     synchronized (updateLock) {
       this.updateFromConfig = null; //make sure update is null before testing
     }
-    final DataTag tag = (DataTag) tagLocationService.get(200000L);
+    final DataTag tag = (DataTag) unifiedTagCacheFacade.get(200000L);
     List<Alarm> alarms = new ArrayList<Alarm>();
     alarms.add(CacheObjectCreation.createTestAlarm1()); //attached to this tag
     alarms.add(CacheObjectCreation.createTestAlarm3()); //attached to this tag
@@ -286,7 +282,7 @@ public class TagValuePublisherTest {
     Thread listenerThread = startListenerThread(tag); //will throw exception
 
     EasyMock.replay();
-    tagValuePublisher.notifyOnUpdate(tag, alarms);
+    tagValuePublisher.notifyOnUpdate(new TagWithAlarms<>(tag, alarms));
     listenerThread.join(1000); //will fail after 100ms (failover timeout)
     synchronized (updateLock) {
       assertTrue(this.update == null); //update failed as broker stopped
@@ -321,8 +317,8 @@ public class TagValuePublisherTest {
     alarms.add(alarm1); //attached to this tag
     alarms.add(alarm2); //attached to this tag
 
-    TagWithAlarms tagWithAlarms = new TagWithAlarms(tag, alarms);
-    EasyMock.expect(this.tagFacadeGateway.getTagWithAlarms(tag.getId())).andReturn(tagWithAlarms);
+    TagWithAlarms<DataTag> tagWithAlarms = new TagWithAlarms<>(tag, alarms);
+//    EasyMock.expect(tagFacadeGateway.getTagWithAlarms(tag.getId())).andReturn(tagWithAlarms);
 
     Thread listenerThread = startListenerThreadForTransferTag(tag); //will throw exception
 

@@ -16,9 +16,9 @@
  *****************************************************************************/
 package cern.c2mon.server.daq;
 
-import cern.c2mon.server.cache.ClusterCache;
-import cern.c2mon.server.cache.ProcessCache;
-import cern.c2mon.server.cache.config.CacheModule;
+import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.impl.SimpleC2monCache;
+import cern.c2mon.cache.config.CacheConfigModuleRef;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.common.config.CommonModule;
 import cern.c2mon.server.common.process.Process;
@@ -26,6 +26,7 @@ import cern.c2mon.server.daq.config.DaqModule;
 import cern.c2mon.server.daq.update.JmsContainerManagerImpl;
 import cern.c2mon.shared.util.jms.ActiveJmsSender;
 import org.easymock.EasyMock;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -37,7 +38,6 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.listener.SessionAwareMessageListener;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.jms.ConnectionFactory;
@@ -45,7 +45,6 @@ import javax.jms.JMSException;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -57,7 +56,7 @@ import java.util.concurrent.CountDownLatch;
 @DirtiesContext
 @ContextConfiguration(classes = {
     CommonModule.class,
-    CacheModule.class,
+    CacheConfigModuleRef.class,
     CacheDbAccessModule.class,
     DaqModule.class,
     DaqModule.class,
@@ -73,9 +72,8 @@ public class JmsContainerManagerTest {
   /*
    * Mocks
    */
-  private ProcessCache mockProcessCache;
+  private C2monCache<Process> mockProcessCache;
   private SessionAwareMessageListener mockListener;
-  private ClusterCache mockClusterCache;
   //for tests that share a process and queue name
   private Process mockProcess;
   private String tmpQueueName;
@@ -96,9 +94,8 @@ public class JmsContainerManagerTest {
 
   @Before
   public void setUp() throws Exception {
-    mockProcessCache = EasyMock.createMock(ProcessCache.class);
+    mockProcessCache = new SimpleC2monCache<>("process");
     mockListener = EasyMock.createMock(SessionAwareMessageListener.class);
-    mockClusterCache = EasyMock.createMock(ClusterCache.class);
 
     jmsSender = new ActiveJmsSender();
     JmsTemplate template = new JmsTemplate();
@@ -123,9 +120,8 @@ public class JmsContainerManagerTest {
    */
   private void startContainerManager() {
     //init with no processes in cache; use mock cache to start correctly
-    EasyMock.expect(mockProcessCache.getKeys()).andReturn(Collections.EMPTY_LIST);
-    EasyMock.replay(mockProcessCache);
-    ((JmsContainerManagerImpl) jmsContainerManager).init();
+    Assert.assertEquals(0, mockProcessCache.getKeys().size());
+    jmsContainerManager.init();
     ((SmartLifecycle) jmsContainerManager).start();
     EasyMock.reset(mockProcessCache);
   }
@@ -143,7 +139,7 @@ public class JmsContainerManagerTest {
     keys.add(1, 2L);
     Process mockProcess1 = EasyMock.createMock(Process.class);
     Process mockProcess2 = EasyMock.createMock(Process.class);
-    EasyMock.expect(mockProcessCache.getKeys()).andReturn(keys);
+//    EasyMock.expect(mockProcessCache.getKeys()).andReturn(keys);
     EasyMock.expect(mockProcessCache.get(1L)).andReturn(mockProcess1);
     EasyMock.expect(mockProcessCache.get(2L)).andReturn(mockProcess2);
     long millis = System.currentTimeMillis();

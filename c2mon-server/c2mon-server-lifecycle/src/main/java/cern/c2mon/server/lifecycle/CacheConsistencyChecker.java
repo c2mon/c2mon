@@ -19,7 +19,7 @@ package cern.c2mon.server.lifecycle;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.dbaccess.*;
 import cern.c2mon.server.common.alarm.Alarm;
-import cern.c2mon.server.common.alive.AliveTimer;
+import cern.c2mon.server.common.alive.AliveTag;
 import cern.c2mon.server.common.commfault.CommFaultTag;
 import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.common.datatag.DataTag;
@@ -46,7 +46,7 @@ import java.util.Map;
  * sure the number of cache items is the same as in the DB. If not, a warning
  * email is sent to the administrators.
  *
- * @see https://issues.cern.ch/browse/TIMS-985
+ * @see <a href=https://issues.cern.ch/browse/TIMS-985>TMS-985</a>
  *
  * @author Justin Lewis Salmon
  */
@@ -72,7 +72,7 @@ public class CacheConsistencyChecker implements SmartLifecycle {
   @Autowired
   public CacheConsistencyChecker(final C2monCache<Alarm> alarmCache,
                                  final AlarmMapper alarmMapper,
-                                 final C2monCache<AliveTimer> aliveTimerCache,
+                                 final C2monCache<AliveTag> aliveTimerCache,
                                  final AliveTimerMapper aliveTimerMapper,
                                  final C2monCache<CommandTag> commandTagCache,
                                  final CommandTagMapper commandTagMapper,
@@ -118,8 +118,8 @@ public class CacheConsistencyChecker implements SmartLifecycle {
       List<String> messages = new ArrayList<>();
 
       // Compare the server cache sizes against the operational database
-      for (Map.Entry<C2monCache<?, ?>, SimpleLoaderMapper<?>> entry : map.entrySet()) {
-        C2monCache<?, ?> cache = entry.getKey();
+      for (Map.Entry<C2monCache<?>, SimpleLoaderMapper<?>> entry : map.entrySet()) {
+        C2monCache<?> cache = entry.getKey();
         SimpleLoaderMapper<?> mapper = entry.getValue();
 
         int cacheSize = cache.getKeys().size();

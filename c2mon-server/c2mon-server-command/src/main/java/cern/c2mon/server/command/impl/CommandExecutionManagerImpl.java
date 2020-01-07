@@ -16,31 +16,24 @@
  *****************************************************************************/
 package cern.c2mon.server.command.impl;
 
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-
+import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
+import cern.c2mon.server.command.CommandExecutionManager;
+import cern.c2mon.server.command.CommandPersistenceListener;
 import cern.c2mon.server.daq.out.ProcessCommunicationManager;
+import cern.c2mon.shared.client.command.*;
+import cern.c2mon.shared.client.command.CommandTagHandleImpl.Builder;
+import cern.c2mon.shared.common.command.CommandExecutionDetails;
+import cern.c2mon.shared.common.command.CommandTag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.server.cache.CommandTagCache;
-import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
-import cern.c2mon.server.command.CommandExecutionManager;
-import cern.c2mon.server.command.CommandPersistenceListener;
-import cern.c2mon.shared.client.command.CommandExecuteRequest;
-import cern.c2mon.shared.client.command.CommandExecutionStatus;
-import cern.c2mon.shared.client.command.CommandReport;
-import cern.c2mon.shared.client.command.CommandReportImpl;
-import cern.c2mon.shared.client.command.CommandTagHandle;
-import cern.c2mon.shared.client.command.CommandTagHandleImpl;
-import cern.c2mon.shared.client.command.CommandTagHandleImpl.Builder;
-import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
-import cern.c2mon.shared.common.command.CommandExecutionDetails;
-import cern.c2mon.shared.common.command.CommandTag;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * Implementation of the CommandExecutionManager for TIM.
@@ -64,7 +57,7 @@ public class CommandExecutionManagerImpl implements CommandExecutionManager {
   /**
    * Reference to the CommandTag cache.
    */
-  private CommandTagCache commandTagCache;
+  private C2monCache<CommandTag> commandTagCache;
 
   /**
    * Reference to a listener responsible for persisting the command
@@ -80,7 +73,7 @@ public class CommandExecutionManagerImpl implements CommandExecutionManager {
    */
   @Autowired
   public CommandExecutionManagerImpl(final ProcessCommunicationManager processCommunicationManager,
-                                     final CommandTagCache commandTagCache) {
+                                     final C2monCache<CommandTag> commandTagCache) {
     super();
     this.processCommunicationManager = processCommunicationManager;
     this.commandTagCache = commandTagCache;
@@ -100,7 +93,7 @@ public class CommandExecutionManagerImpl implements CommandExecutionManager {
 
     /* Try to execute the command */
     try {
-      CommandTag<T> commandTag = commandTagCache.getCopy(request.getId());
+      CommandTag<T> commandTag = commandTagCache.get(request.getId());
       CommandExecutionDetails<T> details = new CommandExecutionDetails<T>();
       details.setExecutionStartTime(new Timestamp(System.currentTimeMillis()));
       details.setValue(request.getValue());
@@ -167,7 +160,7 @@ public class CommandExecutionManagerImpl implements CommandExecutionManager {
         LOGGER.warn("Received request for command with null id - ignoring this request. Check your client code!");
       } else {
         try {
-          commandTagCopy = commandTagCache.getCopy(id);
+          commandTagCopy = commandTagCache.get(id);
           Builder<T> builder = new Builder<>(id);
           builder.name(commandTagCopy.getName())
                  .description(commandTagCopy.getDescription())

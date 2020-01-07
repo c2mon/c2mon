@@ -11,7 +11,7 @@ import cern.c2mon.cache.actions.supervision.SupervisedCacheServiceDelegator;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.cache.api.exception.TooManyQueryResultsException;
-import cern.c2mon.server.common.alive.AliveTimer;
+import cern.c2mon.server.common.alive.AliveTag;
 import cern.c2mon.server.common.config.ServerProperties;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.process.ProcessCacheObject;
@@ -90,7 +90,7 @@ public class ProcessService extends AbstractCacheServiceImpl<Process>
 
   @Override
   public Long getProcessIdFromAlive(Long aliveTimerId) {
-    AliveTimer aliveTimer = aliveTimerService.getCache().get(aliveTimerId);
+    AliveTag aliveTimer = aliveTimerService.getCache().get(aliveTimerId);
     if (aliveTimer.isProcessAliveType()) {
       return aliveTimer.getRelatedId();
     } else if (aliveTimer.isEquipmentAliveType()) {

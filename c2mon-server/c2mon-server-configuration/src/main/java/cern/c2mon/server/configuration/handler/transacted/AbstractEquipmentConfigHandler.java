@@ -17,9 +17,9 @@
 package cern.c2mon.server.configuration.handler.transacted;
 
 import cern.c2mon.cache.actions.datatag.DataTagService;
+import cern.c2mon.cache.actions.process.ProcessXMLProvider;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.factory.AbstractCacheObjectFactory;
-import cern.c2mon.server.cache.ProcessXMLProvider;
 import cern.c2mon.server.cache.loading.ConfigurableDAO;
 import cern.c2mon.server.common.equipment.AbstractEquipment;
 import cern.c2mon.server.configuration.handler.ControlTagConfigHandler;

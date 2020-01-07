@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch.tag;
 
+
 import java.util.Map;
 
 import org.junit.Ignore;
@@ -24,10 +25,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import cern.c2mon.server.cache.EquipmentCache;
-import cern.c2mon.server.cache.ProcessCache;
-import cern.c2mon.server.cache.SubEquipmentCache;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.datatag.DataTag;
+import cern.c2mon.server.common.equipment.Equipment;
+import cern.c2mon.server.common.process.Process;
+import cern.c2mon.server.common.subequipment.SubEquipment;
 
 import static org.junit.Assert.assertEquals;
 
@@ -42,13 +44,13 @@ public class BaseTagDocumentConverterTest {
   BaseTagDocumentConverter baseConverter;
 
   @Mock
-  protected ProcessCache processCache;
+  protected C2monCache<Process> processCache;
 
   @Mock
-  protected EquipmentCache equipmentCache;
+  protected C2monCache<Equipment> equipmentCache;
 
   @Mock
-  protected SubEquipmentCache subEquipmentCache;
+  protected C2monCache<SubEquipment> subEquipmentCache;
 
   protected void assertBaseFieldsMatch(DataTag tag, Map<String, Object> document) {
     assertEquals(tag.getId().intValue(), document.get("id"));

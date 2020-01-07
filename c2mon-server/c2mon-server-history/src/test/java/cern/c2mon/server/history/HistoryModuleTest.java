@@ -16,39 +16,36 @@
  *****************************************************************************/
 package cern.c2mon.server.history;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-import java.sql.Timestamp;
-import java.util.List;
-import java.util.TimeZone;
-
-import cern.c2mon.server.cache.config.CacheModule;
+import cern.c2mon.cache.config.CacheConfigModuleRef;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
-import cern.c2mon.server.cache.loading.config.CacheLoadingModule;
+import cern.c2mon.server.cache.loading.config.CacheLoadingModuleRef;
 import cern.c2mon.server.command.config.CommandModule;
 import cern.c2mon.server.common.config.CommonModule;
 import cern.c2mon.server.daq.config.DaqModule;
 import cern.c2mon.server.history.config.HistoryModule;
+import cern.c2mon.server.history.listener.CommandRecordListener;
+import cern.c2mon.server.history.mapper.CommandRecordMapper;
 import cern.c2mon.server.supervision.config.SupervisionModule;
+import cern.c2mon.server.test.CacheObjectCreation;
+import cern.c2mon.shared.client.command.CommandExecutionStatus;
 import cern.c2mon.shared.client.command.CommandRecord;
+import cern.c2mon.shared.client.command.CommandReport;
+import cern.c2mon.shared.client.command.CommandReportImpl;
+import cern.c2mon.shared.common.command.CommandTag;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import cern.c2mon.server.history.listener.CommandRecordListener;
-import cern.c2mon.server.history.mapper.CommandRecordMapper;
-import cern.c2mon.server.test.CacheObjectCreation;
-import cern.c2mon.shared.client.command.CommandExecutionStatus;
-import cern.c2mon.shared.client.command.CommandReport;
-import cern.c2mon.shared.client.command.CommandReportImpl;
-import cern.c2mon.shared.common.command.CommandTag;
+import java.sql.Timestamp;
+import java.util.List;
+import java.util.TimeZone;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Tests the module works correctly, mocking all other
@@ -59,9 +56,9 @@ import cern.c2mon.shared.common.command.CommandTag;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {
     CommonModule.class,
-    CacheModule.class,
+    CacheConfigModuleRef.class,
     CacheDbAccessModule.class,
-    CacheLoadingModule.class,
+    CacheLoadingModuleRef.class,
     SupervisionModule.class,
     CommandModule.class,
     DaqModule.class,
@@ -92,7 +89,7 @@ public class HistoryModuleTest {
   public void testCommandLogging() {
     CommandTag commandTag = CacheObjectCreation.createTestCommandTag();
     CommandReport report = new CommandReportImpl(commandTag.getId(), CommandExecutionStatus.STATUS_AUTHORISATION_FAILED,
-        "report text", new Timestamp(System.currentTimeMillis()), new Short((short) 2));
+        "report text", new Timestamp(System.currentTimeMillis()), (short) 2);
     commandRecordListener.log(commandTag, report);
 
     List<CommandRecord> retrievedLogList = commandTagMapper.getCommandTagLog(commandTag.getId());

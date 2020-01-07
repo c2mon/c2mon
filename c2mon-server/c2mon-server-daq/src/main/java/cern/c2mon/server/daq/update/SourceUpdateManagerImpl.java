@@ -16,6 +16,8 @@
  *****************************************************************************/
 package cern.c2mon.server.daq.update;
 
+import cern.c2mon.cache.actions.alivetimer.AliveTimerService;
+import cern.c2mon.cache.actions.commfault.CommFaultService;
 import cern.c2mon.cache.actions.datatag.DataTagService;
 import cern.c2mon.cache.actions.process.ProcessService;
 import cern.c2mon.cache.api.C2monCache;
@@ -76,6 +78,10 @@ public class SourceUpdateManagerImpl implements SourceUpdateManager, SessionAwar
    */
   private final DataTagService dataTagService;
 
+  private final AliveTimerService aliveTagService;
+
+  private final CommFaultService commFaultService;
+
   /**
    * Reference to the supervision manager.
    */
@@ -123,11 +129,13 @@ public class SourceUpdateManagerImpl implements SourceUpdateManager, SessionAwar
   public SourceUpdateManagerImpl(
     final SupervisionManager supervisionManager,
     final DataTagValueUpdateConverter dataTagValueUpdateConverter,
-    DataTagService dataTagService, ProcessService processService, C2monCache<Process> processCache, final ServerProperties properties) {
+    DataTagService dataTagService, AliveTimerService aliveTagService, CommFaultService commFaultService, ProcessService processService, C2monCache<Process> processCache, final ServerProperties properties) {
     super();
     this.supervisionManager = supervisionManager;
     this.converter = dataTagValueUpdateConverter;
     this.dataTagService = dataTagService;
+    this.aliveTagService = aliveTagService;
+    this.commFaultService = commFaultService;
     this.processService = processService;
     this.processCache = processCache;
     this.properties = properties;
@@ -219,15 +227,18 @@ public class SourceUpdateManagerImpl implements SourceUpdateManager, SessionAwar
    * @param sourceDataTagValue the incoming control tag
    */
   private void processControl(final SourceDataTagValue sourceDataTagValue) {
-    try {
-      log.trace("Processing incoming update for control tag #" + sourceDataTagValue.getId());
+    log.trace("Processing incoming update for control tag #" + sourceDataTagValue.getId());
 
-      Event<Boolean> updatedInCache = controlTagFacade.updateFromSource(sourceDataTagValue.getId(), sourceDataTagValue);
-      if (updatedInCache.getReturnValue()) {
-        supervisionManager.processControlTag(sourceDataTagValue); //filter out events that were updated later in the cache
-      }
-    } catch (CacheElementNotFoundException cacheEx) {
+    Event<Boolean> updatedInCache = new Event<>(0L, false);
+    if (aliveTagService.isRegisteredAliveTimer(sourceDataTagValue.getId())) {
+      updatedInCache = aliveTagService.updateFromSource(sourceDataTagValue);
+    } else if (commFaultService.isRegisteredCommFaultTag(sourceDataTagValue.getId())) {
+      updatedInCache = commFaultService.updateFromSource(sourceDataTagValue);
+    } else {
       log.warn("Received unrecognized control tag #" + sourceDataTagValue.getId() + ": ignoring the update");
+    }
+    if (updatedInCache.getReturnValue()) {
+      supervisionManager.processControlTag(sourceDataTagValue); //filter out events that were updated later in the cache
     }
   }
 

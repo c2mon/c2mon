@@ -4,7 +4,7 @@
 
   <mapper namespace="cern.c2mon.server.cache.dbaccess.AliveTimerMapper">
 
-    <resultMap id="aliveTimerResultMap" type="cern.c2mon.server.common.alive.AliveTimerCacheObject">
+    <resultMap id="aliveTimerResultMap" type="cern.c2mon.server.common.alive.AliveTagCacheObject">
       <constructor>
         <idArg column="alive_aliveid" javaType="Long"/>
         <arg column="alive_relatedid" javaType="Long"/>

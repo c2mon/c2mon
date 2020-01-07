@@ -16,21 +16,30 @@
  *****************************************************************************/
 package cern.c2mon.server.supervision.impl;
 
+import cern.c2mon.cache.actions.datatag.DataTagService;
+import cern.c2mon.cache.actions.equipment.EquipmentService;
+import cern.c2mon.cache.actions.process.ProcessService;
+import cern.c2mon.cache.actions.subequipment.SubEquipmentService;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.SupervisionAppender;
+import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
+import cern.c2mon.cache.config.tag.UnifiedTagCacheFacade;
 import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.common.datatag.DataTag;
+import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.rule.RuleTag;
+import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.supervision.SupervisionListener;
 import cern.c2mon.server.supervision.SupervisionNotifier;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
+import cern.c2mon.shared.common.CacheEvent;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Service;
 
@@ -88,23 +97,24 @@ public class SupervisionTagNotifier implements SupervisionListener, SmartLifecyc
   /**
    * Caches used for accessing supervision states.
    */
-  private ProcessCache processCache;
-  private EquipmentCache equipmentCache;
-  private SubEquipmentCache subEquipmentCache;
-  private ProcessFacade processFacade;
-  private EquipmentFacade equipmentFacade;
-  private SubEquipmentFacade subEquipmentFacade;
+  private C2monCache<Process> processCache;
+  private C2monCache<Equipment> equipmentCache;
+  private C2monCache<SubEquipment> subEquipmentCache;
+  private DataTagService dataTagService;
+  private ProcessService processService;
+  private EquipmentService equipmentService;
+  private SubEquipmentService subEquipmentService;
 
   /**
    * Used for locating a Tag in the appropriate Tag cache.
    */
-  private TagLocationService tagLocationService;
+  private UnifiedTagCacheFacade unifiedTagCacheFacade;
 
   /**
    * Caches with listeners notified of supervision information (Tag caches).
    */
-  private DataTagCache dataTagCache;
-  private RuleTagCache ruleTagCache;
+  private C2monCache<DataTag> dataTagCache;
+  private C2monCache<RuleTag> ruleTagCache;
 
   /**
    * Caches used to filter out older supervision events, to prevent overtaking of DOWN and
@@ -116,9 +126,6 @@ public class SupervisionTagNotifier implements SupervisionListener, SmartLifecyc
    *
    * <p>All elements are shared through the cluster
    */
-   private final C2monCache<Long, SupervisionEvent> processEventCache;
-   private final C2monCache<Long, SupervisionEvent> equipmentEventCache;
-   private final C2monCache<Long, SupervisionEvent> subEquipmentEventCache;
 
   /** Cluster cache key lock */
   protected static final String EVENT_LOCK = "c2mon.supervision.SupervisionTagNotifier.eventLock";
@@ -133,58 +140,33 @@ public class SupervisionTagNotifier implements SupervisionListener, SmartLifecyc
    */
   private volatile boolean running = false;
 
-  /** For distributed locking on the cluster */
-  private final ClusterCache clusterCache;
-
   /**
-   * Constructor.
-   * @param supervisionNotifier notifier bean
-   * @param cacheProvider Reference to the cache provider service
-   * @param tagLocationService tag location service
    * @param supervisionAppender
    *        Reference to helper bean for adding the current supervision status of Processes
    *        and Equipments to Tags
-   * @param processFacade process facade bean
-   * @param equipmentFacade equipment facade bean
-   * @param subEquipmentFacade sub equipment facade bean
-   * @param processEventCache
-   *        Reference to a {@link C2monCache} instance for managing process SuperVisionEvents
-   *        also across multiple servers
-   * @param equipmentEventCache
-   *        Reference to a {@link C2monCache} instance for managing equipment SuperVisionEvents
-   *        also across multiple servers
-   * @param subEquipmentEventCache
-   *        Reference to a {@link C2monCache} instance for managing sub equipment supervision events
-   *        also across multiple servers
    */
   @Autowired
   public SupervisionTagNotifier(final SupervisionNotifier supervisionNotifier,
-                                final CacheProvider cacheProvider,
-                                final TagLocationService tagLocationService,
+                                final UnifiedTagCacheFacade unifiedTagCacheFacade,
                                 final SupervisionAppender supervisionAppender,
-                                final ProcessFacade processFacade,
-                                final EquipmentFacade equipmentFacade,
-                                final SubEquipmentFacade subEquipmentFacade,
-                                @Qualifier("processEventCache") final C2monCache<Long, SupervisionEvent> processEventCache,
-                                @Qualifier("equipmentEventCache") final C2monCache<Long, SupervisionEvent> equipmentEventCache,
-                                @Qualifier("subEquipmentEventCache") final C2monCache<Long, SupervisionEvent> subEquipmentEventCache) {
+                                DataTagService dataTagService, final ProcessService processService,
+                                final EquipmentService equipmentService,
+                                final SubEquipmentService subEquipmentService,
+                                final C2monCache<RuleTag> ruleTagCache) {
     super();
     this.supervisionNotifier = supervisionNotifier;
-    this.tagLocationService = tagLocationService;
+    this.unifiedTagCacheFacade = unifiedTagCacheFacade;
     this.supervisionAppender = supervisionAppender;
-    this.processFacade = processFacade;
-    this.equipmentFacade = equipmentFacade;
-    this.subEquipmentFacade = subEquipmentFacade;
-    this.processEventCache = processEventCache;
-    this.equipmentEventCache = equipmentEventCache;
-    this.subEquipmentEventCache = subEquipmentEventCache;
+    this.dataTagService = dataTagService;
+    this.processService = processService;
+    this.equipmentService = equipmentService;
+    this.subEquipmentService = subEquipmentService;
+    this.dataTagCache = dataTagService.getCache();
+    this.ruleTagCache = ruleTagCache;
 
-    this.processCache = cacheProvider.getProcessCache();
-    this.equipmentCache = cacheProvider.getEquipmentCache();
-    this.subEquipmentCache = cacheProvider.getSubEquipmentCache();
-    this.dataTagCache = cacheProvider.getDataTagCache();
-    this.ruleTagCache = cacheProvider.getRuleTagCache();
-    this.clusterCache = cacheProvider.getClusterCache();
+    this.processCache = processService.getCache();
+    this.equipmentCache = equipmentService.getCache();
+    this.subEquipmentCache = subEquipmentService.getCache();
   }
 
   /**
@@ -193,72 +175,28 @@ public class SupervisionTagNotifier implements SupervisionListener, SmartLifecyc
   @PostConstruct
   public void init() {
     listenerContainer = supervisionNotifier.registerAsListener(this);
-    //set initial supervision states from cache
-    //lock in case other server is running
-    clusterCache.acquireWriteLockOnKey(EVENT_LOCK);
-    try {
-      for (Long key : processCache.getKeys()) {
-        if (!processEventCache.hasKey(key)) {
-          processEventCache.put(key, processFacade.getSupervisionStatus(key));
-        }
-      }
-      for (Long key : equipmentCache.getKeys()) {
-        if (!equipmentEventCache.hasKey(key)) {
-          equipmentEventCache.put(key, equipmentFacade.getSupervisionStatus(key));
-        }
-      }
-      for (Long key : subEquipmentCache.getKeys()) {
-        if (!subEquipmentEventCache.hasKey(key)) {
-          subEquipmentEventCache.put(key, subEquipmentFacade.getSupervisionStatus(key));
-        }
-      }
-    } finally {
-      clusterCache.releaseWriteLockOnKey(EVENT_LOCK);
-    }
   }
 
   @Override
   public void notifySupervisionEvent(final SupervisionEvent event) {
     SupervisionStatus status = event.getStatus();
     Long entityId = event.getEntityId();
-    if (status.equals(SupervisionStatus.RUNNING) || status.equals(SupervisionStatus.DOWN) || status.equals(SupervisionStatus.STOPPED)
-        || status.equals(SupervisionStatus.RUNNING_LOCAL)) {
+    if (status.equals(SupervisionStatus.RUNNING) || status.equals(SupervisionStatus.RUNNING_LOCAL)
+      || status.equals(SupervisionStatus.STOPPED) || status.equals(SupervisionStatus.DOWN)) {
 
-      //lock for if-else logic only
-      clusterCache.acquireWriteLockOnKey(EVENT_LOCK);
-      try {
-        switch (event.getEntity()) {
+
+      switch (event.getEntity()) {
         case PROCESS:
-          if (!processEventCache.hasKey(entityId) || !processEventCache.get(entityId).getEventTime().after(event.getEventTime()))
-            processEventCache.put(entityId, event);
+          notifyProcessTags(entityId);
           break;
         case EQUIPMENT:
-          if (!equipmentEventCache.hasKey(entityId) || !equipmentEventCache.get(entityId).getEventTime().after(event.getEventTime()))
-            equipmentEventCache.put(event.getEntityId(), event);
+          notifyEquipmentTags(entityId);
           break;
         case SUBEQUIPMENT:
-          if (!subEquipmentEventCache.hasKey(entityId) || !subEquipmentEventCache.get(entityId).getEventTime().after(event.getEventTime()))
-            subEquipmentEventCache.put(event.getEntityId(), event);
+          notifySubEquipmentTags(entityId);
           break;
         default:
           break;
-        }
-      } finally {
-        clusterCache.releaseWriteLockOnKey(EVENT_LOCK);
-      }
-
-      switch (event.getEntity()) {
-      case PROCESS :
-        notifyProcessTags(entityId);
-        break;
-      case EQUIPMENT:
-        notifyEquipmentTags(entityId);
-        break;
-      case SUBEQUIPMENT:
-        notifySubEquipmentTags(entityId);
-        break;
-      default:
-        break;
       }
     }
   }
@@ -268,7 +206,7 @@ public class SupervisionTagNotifier implements SupervisionListener, SmartLifecyc
    * @param processId process id
    */
   private void notifyProcessTags(final Long processId) {
-    Process process = processCache.getCopy(processId);
+    Process process = processCache.get(processId);
     for (Long equipmentId : process.getEquipmentIds()) { //no lock required as get copy
       notifyEquipmentTags(equipmentId);
     }
@@ -282,7 +220,7 @@ public class SupervisionTagNotifier implements SupervisionListener, SmartLifecyc
     try {
       //local map so as not to notify rules twice; lock on map when modifying
       Map<Long, Boolean> notifiedRules = new HashMap<>();
-      Collection<Long> tagIds = equipmentFacade.getDataTagIds(equipementId);
+      Collection<Long> tagIds = dataTagService.getDataTagIdsByEquipmentId(equipementId);
       for (Long id : tagIds) {
        try {
          callCacheNotification(id, notifiedRules); //recursively notifies all dependent rules also, once only
@@ -306,7 +244,7 @@ public class SupervisionTagNotifier implements SupervisionListener, SmartLifecyc
     try {
       //local map so as not to notify rules twice; lock on map when modifying
       Map<Long, Boolean> notifiedRules = new HashMap<>();
-      Collection<Long> tagIds = subEquipmentFacade.getDataTagIds(subEquipmentId);
+      Collection<Long> tagIds = subEquipmentService.getDataTagIds(subEquipmentId);
       for (Long id : tagIds) {
        try {
          callCacheNotification(id, notifiedRules); //recursively notifies all dependent rules also, once only
@@ -329,35 +267,35 @@ public class SupervisionTagNotifier implements SupervisionListener, SmartLifecyc
    */
   private void callCacheNotification(final Long id, final Map<Long, Boolean> notifiedRules) {
     synchronized (notifiedRules) {
-      Tag tagCopy = tagLocationService.getCopy(id);
+      Tag tagCopy = unifiedTagCacheFacade.get(id);
       if (!notifiedRules.containsKey(tagCopy.getId())) {
         LOGGER.trace("Performing supervision notification for tag " + id);
         boolean dirtyTagContext = false;
 
         for (Long procId : tagCopy.getProcessIds()) {
-          if (processEventCache.hasKey(procId)) { //null never override a value, so if statement ok out of lock
-            supervisionAppender.addSupervisionQuality(tagCopy, processEventCache.getCopy(procId));
+          if (processCache.containsKey(procId)) { //null never override a value, so if statement ok out of lock
+            supervisionAppender.addSupervisionQuality(tagCopy, processCache.get(procId).getSupervisionEvent());
             dirtyTagContext = true;
           }
         }
         for (Long eqId : tagCopy.getEquipmentIds()) {
-          if (equipmentEventCache.hasKey(eqId)) {
-            supervisionAppender.addSupervisionQuality(tagCopy, equipmentEventCache.getCopy(eqId));
+          if (equipmentCache.containsKey(eqId)) {
+            supervisionAppender.addSupervisionQuality(tagCopy, equipmentCache.get(eqId).getSupervisionEvent());
             dirtyTagContext = true;
           }
         }
         for (Long subEqId : tagCopy.getSubEquipmentIds()) {
-          if (subEquipmentEventCache.hasKey(subEqId)) {
-            supervisionAppender.addSupervisionQuality(tagCopy, subEquipmentEventCache.getCopy(subEqId));
+          if (subEquipmentCache.containsKey(subEqId)) {
+            supervisionAppender.addSupervisionQuality(tagCopy, subEquipmentCache.get(subEqId).getSupervisionEvent());
             dirtyTagContext = true;
           }
         }
 
         if (dirtyTagContext) {
           if (tagCopy instanceof DataTag) {
-            dataTagCache.notifyListenersOfSupervisionChange((DataTag) tagCopy);
+            dataTagCache.getCacheListenerManager().notifyListenersOf(CacheEvent.SUPERVISION_CHANGE,(DataTag) tagCopy);
           } else if (tagCopy instanceof RuleTag) {
-            ruleTagCache.notifyListenersOfSupervisionChange((RuleTag) tagCopy);
+            ruleTagCache.getCacheListenerManager().notifyListenersOf(CacheEvent.SUPERVISION_CHANGE,(RuleTag) tagCopy);
           } else {
             throw new IllegalArgumentException("Unexpected call with Tag parameter that is neither DataTag or RuleTag; "
                 + "type is " + tagCopy.getClass().getSimpleName());

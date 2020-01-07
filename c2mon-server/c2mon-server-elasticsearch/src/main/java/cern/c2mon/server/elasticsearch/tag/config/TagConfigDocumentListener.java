@@ -17,13 +17,14 @@
 package cern.c2mon.server.elasticsearch.tag.config;
 
 import java.util.Collections;
-import java.util.List;
+import java.util.Collection;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import cern.c2mon.server.cache.TagFacadeGateway;
+import cern.c2mon.cache.actions.alarm.AlarmService;
+import cern.c2mon.cache.config.tag.UnifiedTagCacheFacade;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.listener.ConfigurationEventListener;
 import cern.c2mon.server.common.tag.Tag;
@@ -47,23 +48,28 @@ public class TagConfigDocumentListener implements ConfigurationEventListener {
 
   private final TagConfigDocumentConverter converter;
 
-  private final TagFacadeGateway tagFacadeGateway;
+  private final UnifiedTagCacheFacade unifiedTagCacheFacade;
+
+  private final AlarmService alarmService;
 
   @Autowired
-  public TagConfigDocumentListener(ElasticsearchProperties properties, TagConfigDocumentIndexer indexer, TagConfigDocumentConverter converter, TagFacadeGateway tagFacadeGateway) {
+  public TagConfigDocumentListener(ElasticsearchProperties properties, TagConfigDocumentIndexer indexer, TagConfigDocumentConverter converter,
+                                   final UnifiedTagCacheFacade unifiedTagCacheFacade,
+                                   final AlarmService alarmService) {
     this.properties = properties;
     this.indexer = indexer;
     this.converter = converter;
-    this.tagFacadeGateway = tagFacadeGateway;
+    this.unifiedTagCacheFacade = unifiedTagCacheFacade;
+    this.alarmService = alarmService;
   }
 
   @Override
   public void onConfigurationEvent(Tag tag, Action action) {
     if (properties.isEnabled()) {
       if (action == Action.REMOVE) {
-        this.updateConfiguration(tag, Collections.emptyList(), action);
+        updateConfiguration(tag, Collections.emptyList(), action);
       } else {
-        this.updateConfiguration(tag, tagFacadeGateway.getAlarms(tag), action);
+        updateConfiguration(tag, alarmService.getTagWithAlarmsAtomically(tag.getId()).getAlarms(), action);
       }
     }
   }
@@ -71,11 +77,11 @@ public class TagConfigDocumentListener implements ConfigurationEventListener {
   @Override
   public void onConfigurationEvent(Alarm alarm, Action action) {
     if (properties.isEnabled()) {
-      this.updateConfiguration(tagFacadeGateway.getTag(alarm.getTagId()), Collections.singletonList(alarm), action);
+      this.updateConfiguration(unifiedTagCacheFacade.get(alarm.getDataTagId()), Collections.singletonList(alarm), action);
     }
   }
 
-  private void updateConfiguration(Tag tag, List<Alarm> alarms, Action action) {
+  private void updateConfiguration(Tag tag, Collection<Alarm> alarms, Action action) {
     try {
       switch (action) {
         case CREATE:

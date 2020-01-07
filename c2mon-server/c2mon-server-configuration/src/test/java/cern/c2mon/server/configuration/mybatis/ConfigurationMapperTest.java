@@ -16,7 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.mybatis;
 
-import cern.c2mon.server.cache.config.CacheModule;
+import cern.c2mon.cache.config.CacheConfigModuleRef;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.cache.loading.config.CacheLoadingModuleRef;
 import cern.c2mon.server.common.config.CommonModule;
@@ -55,7 +55,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {
     CommonModule.class,
-    CacheModule.class,
+    CacheConfigModuleRef.class,
     CacheDbAccessModule.class,
     CacheLoadingModuleRef.class,
     SupervisionModule.class,

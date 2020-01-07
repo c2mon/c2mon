@@ -21,13 +21,13 @@ import cern.c2mon.cache.actions.equipment.EquipmentService;
 import cern.c2mon.cache.actions.process.ProcessService;
 import cern.c2mon.cache.actions.subequipment.SubEquipmentService;
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.server.cache.config.CacheModule;
+import cern.c2mon.cache.config.CacheConfigModuleRef;
 import cern.c2mon.server.cache.dbaccess.*;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.cache.loading.config.CacheLoadingModuleRef;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
-import cern.c2mon.server.common.alive.AliveTimer;
-import cern.c2mon.server.common.alive.AliveTimerCacheObject;
+import cern.c2mon.server.common.alive.AliveTag;
+import cern.c2mon.server.common.alive.AliveTagCacheObject;
 import cern.c2mon.server.common.command.CommandTagCacheObject;
 import cern.c2mon.server.common.config.CommonModule;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
@@ -99,7 +99,7 @@ import static org.junit.Assert.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {
     CommonModule.class,
-    CacheModule.class,
+    CacheConfigModuleRef.class,
     CacheDbAccessModule.class,
     CacheLoadingModuleRef.class,
     SupervisionModule.class,
@@ -166,7 +166,7 @@ public class ConfigurationLoaderTest {
   private ProcessMapper processMapper;
 
   @Autowired
-  private C2monCache<AliveTimer> aliveTimerCache;
+  private C2monCache<AliveTag> aliveTimerCache;
 
   @Autowired
   private C2monCache<cern.c2mon.server.common.commfault.CommFaultTag> commFaultTagCache;
@@ -781,7 +781,7 @@ public class ConfigurationLoaderTest {
     processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
 
     // TEST:
-    AliveTag aliveTagUpdate = AliveTag.update(101L).description("new description").mode(TagMode.OPERATIONAL).build();
+    cern.c2mon.shared.client.configuration.api.tag.AliveTag aliveTagUpdate = cern.c2mon.shared.client.configuration.api.tag.AliveTag.update(101L).description("new description").mode(TagMode.OPERATIONAL).build();
     Configuration configuration = new Configuration();
     configuration.addEntity(aliveTagUpdate);
 
@@ -795,8 +795,8 @@ public class ConfigurationLoaderTest {
     assertTrue(report.getElementReports().size() == 1);
 
     // check aliveTag in the cache
-    AliveTimerCacheObject cacheObjectAlive = (AliveTimerCacheObject) aliveTimerCache.get(101L);
-    AliveTimerCacheObject expectedObjectAlive = new AliveTimerCacheObject(101L, 5L, "P_INI_TEST", 100L, "PROC", 60000);
+    AliveTagCacheObject cacheObjectAlive = (AliveTagCacheObject) aliveTimerCache.get(101L);
+    AliveTagCacheObject expectedObjectAlive = new AliveTagCacheObject(101L, 5L, "P_INI_TEST", 100L, "PROC", 60000);
     ObjectEqualityComparison.assertAliveTimerValuesEquals(expectedObjectAlive, cacheObjectAlive);
 
 //    ControlTagCacheObject cacheObjectAliveControlCache = (ControlTagCacheObject) controlTagCache.get(101L);

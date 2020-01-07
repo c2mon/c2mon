@@ -1,7 +1,7 @@
 package cern.c2mon.server.supervision.impl.event;
 
 import cern.c2mon.cache.actions.alivetimer.AliveTimerService;
-import cern.c2mon.server.common.alive.AliveTimer;
+import cern.c2mon.server.common.alive.AliveTag;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.subequipment.SubEquipment;
@@ -36,7 +36,7 @@ public class AliveTimerEvents {
       return;
     }
 
-    AliveTimer aliveTimer = aliveTimerService.getCache().get(aliveTimerId);
+    AliveTag aliveTimer = aliveTimerService.getCache().get(aliveTimerId);
 
     if (aliveTimer.getRelatedId() == null) {
       log.error("AliveTimer has no relatedId - unable to take any action on alive reception.");

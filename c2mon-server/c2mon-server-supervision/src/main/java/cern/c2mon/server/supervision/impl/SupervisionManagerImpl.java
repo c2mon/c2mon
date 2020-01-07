@@ -20,7 +20,7 @@ import cern.c2mon.cache.actions.alivetimer.AliveTimerService;
 import cern.c2mon.cache.actions.process.ProcessService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
-import cern.c2mon.server.common.alive.AliveTimer;
+import cern.c2mon.server.common.alive.AliveTag;
 import cern.c2mon.server.common.commfault.CommFaultTag;
 import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.common.config.ServerProperties;
@@ -90,7 +90,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
   private AliveTimerService aliveTimerService;
 
   @Resource
-  private C2monCache<AliveTimer> aliveTimerCache;
+  private C2monCache<AliveTag> aliveTimerCache;
 
   @Resource
   private ProcessService processFacade;
@@ -288,7 +288,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
       if (aliveTimerService.isRegisteredAliveTimer(tagId)) {
 
         //reject old alive tag
-        AliveTimer timerCopy = aliveTimerCache.get(tagId);
+        AliveTag timerCopy = aliveTimerCache.get(tagId);
         //TODO tmp check until all DAQ updates have DAQ t.s. set
         Timestamp useTimestamp;
         if (sourceDataTagValue.getDaqTimestamp() == null) {

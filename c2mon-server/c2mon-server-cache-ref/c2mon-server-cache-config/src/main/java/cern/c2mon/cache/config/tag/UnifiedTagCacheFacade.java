@@ -1,9 +1,10 @@
-package cern.c2mon.cache.actions.tag;
+package cern.c2mon.cache.config.tag;
 
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.cache.api.listener.BufferedCacheListener;
 import cern.c2mon.cache.api.listener.CacheListener;
+import cern.c2mon.cache.config.ClientQueryProvider;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.tag.Tag;
@@ -12,8 +13,11 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * NOT a real cache, but an aggregation of [control,datatag,rule] caches
@@ -40,6 +44,16 @@ public class UnifiedTagCacheFacade {
 
   public Tag get(long id) {
     return doAcrossCaches(id, cache -> cache.get(id));
+  }
+
+  public Set<Long> getKeys() {
+    return tagCaches.stream().flatMap(cache -> cache.getKeys().stream()).collect(Collectors.toSet());
+  }
+
+  public Collection<Tag> findByNameRegex(String regex) {
+    return tagCaches.stream()
+      .flatMap(cache -> ClientQueryProvider.queryByClientInput(cache, Tag::getName, regex).stream())
+      .collect(Collectors.toSet());
   }
 
   public void addAlarmToTag(long tagId, long alarmId) {

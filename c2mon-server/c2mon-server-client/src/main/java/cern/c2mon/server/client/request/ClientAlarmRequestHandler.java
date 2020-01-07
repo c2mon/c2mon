@@ -17,10 +17,10 @@
 package cern.c2mon.server.client.request;
 
 import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.config.tag.UnifiedTagCacheFacade;
 import cern.c2mon.server.client.util.TransferObjectFactory;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.tag.Tag;
-import cern.c2mon.shared.client.alarm.AlarmQuery;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.request.ClientRequest;
 import cern.c2mon.shared.client.request.ClientRequestResult;
@@ -45,15 +45,15 @@ class ClientAlarmRequestHandler {
   private static final Logger LOG = LoggerFactory.getLogger(ClientAlarmRequestHandler.class);
 
   /** Reference to the tag location service to check whether a tag exists */
-  private final TagLocationService tagLocationService;
+  private final UnifiedTagCacheFacade unifiedTagCacheFacade;
 
   /** Reference to the AlarmCache */
   private final C2monCache<Alarm> alarmCache;
 
   @Autowired
-  protected ClientAlarmRequestHandler(final C2monCache<Alarm> alarmCache, final TagLocationService tagLocationService) {
+  protected ClientAlarmRequestHandler(final C2monCache<Alarm> alarmCache, final UnifiedTagCacheFacade unifiedTagCacheFacade) {
     this.alarmCache = alarmCache;
-    this.tagLocationService = tagLocationService;
+    this.unifiedTagCacheFacade = unifiedTagCacheFacade;
   }
 
   /**
@@ -69,13 +69,10 @@ class ClientAlarmRequestHandler {
 
     final Collection<AlarmValue> activeAlarms = new ArrayList<>();
 
-    AlarmQuery query = AlarmQuery.builder().active(true).build();
+    Collection<Alarm> result = alarmCache.query(Alarm::isActive);
 
-    Collection<Long> result = alarmCache.findAlarm(query);
-
-    for (Long alarmId : result) {
-        Alarm alarm = alarmCache.getCopy(alarmId);
-        Tag tag = tagLocationService.getCopy(alarm.getDataTagId());
+    for (Alarm alarm : result) {
+        Tag tag = unifiedTagCacheFacade.get(alarm.getDataTagId());
         if (tag == null) {
             LOG.warn("No tag found for TagID = " + alarm.getDataTagId() + ". This may be a configuration issue for alarm " + alarm.getId());
         } else {
@@ -102,22 +99,18 @@ class ClientAlarmRequestHandler {
     // !!! TagId field is also used for Alarm Ids
     for (Long alarmId : alarmRequest.getTagIds()) {
 
-      if (alarmCache.hasKey(alarmId)) {
-        final Alarm alarm = alarmCache.getCopy(alarmId);
-        switch (alarmRequest.getResultType()) {
-        case TRANSFER_ALARM_LIST:
-
+      if (alarmCache.containsKey(alarmId)) {
+        final Alarm alarm = alarmCache.get(alarmId);
+        if (alarmRequest.getResultType() == ClientRequest.ResultType.TRANSFER_ALARM_LIST) {
           Long tagId = alarm.getDataTagId();
-          if (tagLocationService.isInTagCache(tagId)) {
-            Tag tag = tagLocationService.getCopy(tagId);
+          if (unifiedTagCacheFacade.containsKey(tagId)) {
+            Tag tag = unifiedTagCacheFacade.get(tagId);
             alarms.add(TransferObjectFactory.createAlarmValue(alarm, tag));
           } else {
             LOG.warn("handleAlarmRequest() - unrecognized Tag with id " + tagId);
             alarms.add(TransferObjectFactory.createAlarmValue(alarm));
           }
-
-          break;
-        default:
+        } else {
           LOG.error("handleAlarmRequest() - Could not generate response message. Unknown enum ResultType " + alarmRequest.getResultType());
         }
       } else {

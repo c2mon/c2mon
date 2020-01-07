@@ -16,16 +16,15 @@
  *****************************************************************************/
 package cern.c2mon.server.rule.evaluation;
 
-import java.sql.Timestamp;
-import java.util.*;
-
+import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
+import cern.c2mon.server.rule.RuleTagService;
+import cern.c2mon.shared.common.datatag.TagQualityStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.server.cache.RuleTagFacade;
-import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
-import cern.c2mon.shared.common.datatag.TagQualityStatus;
+import java.sql.Timestamp;
+import java.util.*;
 
 /**
  * This temporary buffer is used to filter out intermediate rule evaluation results.
@@ -61,7 +60,7 @@ public final class RuleUpdateBuffer {
    * Reference to the local home interface of the
    * <code>DataTagFacade</code> session bean.
    */
-  private static RuleTagFacade ruleTagFacade;
+  private static RuleTagService ruleTagService;
   
   /** The internal buffer used for the */
   private static final Map<Long, RuleBufferObject> RULE_OBJECT_BUF = new Hashtable<Long, RuleBufferObject>(INITIAL_BUFFER_SIZE);
@@ -89,9 +88,9 @@ public final class RuleUpdateBuffer {
    * Constructor 
    */
   @Autowired
-  private RuleUpdateBuffer(RuleTagFacade ruleTagFacade) {
+  private RuleUpdateBuffer(RuleTagService ruleTagService) {
     this.timer = new Timer("RuleUpdater");
-    RuleUpdateBuffer.ruleTagFacade = ruleTagFacade;
+    this.ruleTagService = ruleTagService;
   }
 
   /**
@@ -212,7 +211,7 @@ public final class RuleUpdateBuffer {
      * Constructor
      * @param pId rule data tag id
      * @param pValue rule result
-     * @param pQuality error quality flag
+     * @param pStatus error quality flag
      * @param pValueDesc description
      * @param pTimestamp rule evaluation timestamp
      */
@@ -317,10 +316,10 @@ public final class RuleUpdateBuffer {
               // Set the flag to FALSE in order indicate a cache update at the next check
               UPDATE_RECEIVED_FLAGS.put(actTagId, Boolean.FALSE);
               if (actCounter == null) {
-                CYCLE_COUNTERS.put(actTagId, new Integer(1));
+                CYCLE_COUNTERS.put(actTagId, 1);
               }
               else { // Increasing the counter
-                CYCLE_COUNTERS.put(actTagId, new Integer(actCounter.intValue() + 1));
+                CYCLE_COUNTERS.put(actTagId, actCounter + 1);
               }
             }
           }
@@ -350,7 +349,7 @@ public final class RuleUpdateBuffer {
                   + ", description=" + rbo.valueDesc
                   + ", timestamp=" + rbo.timestamp);
               try {
-                ruleTagFacade.updateAndValidate(rbo.id, rbo.value, rbo.valueDesc, rbo.timestamp);            
+                ruleTagService.updateAndValidate(rbo.id, rbo.value, rbo.valueDesc, rbo.timestamp);
               } catch (CacheElementNotFoundException cacheEx) {
                 log.warn("Unable to update rule (can happen during rule reconfiguration)", cacheEx);
               } catch (Exception exception) {
@@ -362,7 +361,7 @@ public final class RuleUpdateBuffer {
                   + ", descriptions=" + rbo.qualityDescriptions
                   + ", timestamp=" + rbo.timestamp);
               try {                
-                ruleTagFacade.setQuality(rbo.id, rbo.qualityCollection, null, rbo.qualityDescriptions, rbo.timestamp);
+                ruleTagService.setQuality(rbo.id, rbo.qualityCollection, null, rbo.qualityDescriptions, rbo.timestamp);
               } catch (CacheElementNotFoundException cacheEx) {
                 log.warn("Unable to update rule as could not be located in cache (normal during rule reconfiguration)", cacheEx);
               }                          
@@ -373,5 +372,5 @@ public final class RuleUpdateBuffer {
         log.error("Exception caught during rule update - should not be ignored!", ex);
       }
     }
-  } // end of CacheUpdaterTask class
+  }
 }
