@@ -8,12 +8,14 @@ For more details on a given release, please check also the [version planning](ht
 
 ## [Unreleased]
 ### Added
-- Server: Added support for Elasticsearch 6.x
+- Server: Added support for Elasticsearch 6.x (CM-144)
 - Server: Integrated Elasticsearch REST client
+- Alarm: Added support for alarms activation outside of a given range (CM-237)
 
 ### Changed
 - Client API: Added possibility to define credentials for making queries to Elasticsearch (CM-232)
 - Documentation is now build with Jekyll instead of MkDocs
+- Alarm: Code refactoring to allow creating custom alarm conditions (CM-239). More info in the [documentation](https://c2mon.web.cern.ch/c2mon/docs/user-guide/client-api/configuration-api.html)
 
 ### Fixed
 - Client API: Fixed Elasticsearch tests for C2MON client API (CM-230)
