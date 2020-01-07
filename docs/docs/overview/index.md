@@ -39,15 +39,15 @@ The technology stack is based on Java Spring container and is designed to run in
 
 **Client Layer**
 
-Communication with the client layer is done via a provided C2MON Client API,  documented here: [Client API](doc/user-guide/client-api).
+Communication with the client layer is done via a provided C2MON Client API,  documented here: [Client API](/user-guide/client-api/).
 
 ## Core Concepts
 
 To learn more about the core concepts of the C2MON platform you should continue as follows:
 
-To get started, take a look at the concept of [process/equipment](process-equipment) and [tags](tags).
+To get started, take a look at the concept of [process/equipment](process-equipment.html) and [tags](tags.html).
 
-More advanced topics include [alarms](alarms) and [class/device/property](class-device-property).
+More advanced topics include [alarms](alarms.html) and [class/device/property](class-device-property.html).
 
 > **Please note!** <br>
 These sections describe C2MON data configuration only from a conceptual point of view.
