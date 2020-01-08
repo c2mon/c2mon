@@ -42,13 +42,13 @@ import cern.c2mon.server.configuration.api.util.TestConfigurationProvider;
 import cern.c2mon.server.configuration.config.ConfigurationModule;
 import cern.c2mon.server.configuration.config.ProcessCommunicationManagerMock;
 import cern.c2mon.server.configuration.helper.ObjectEqualityComparison;
-import cern.c2mon.server.configuration.junit.ConfigurationCachePopulationRule;
 import cern.c2mon.server.configuration.parser.util.*;
 import cern.c2mon.server.daq.config.DaqModule;
 import cern.c2mon.server.daq.out.ProcessCommunicationManager;
 import cern.c2mon.server.daq.update.JmsContainerManagerImpl;
 import cern.c2mon.server.rule.config.RuleModule;
 import cern.c2mon.server.supervision.config.SupervisionModule;
+import cern.c2mon.server.test.CachePopulationRule;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.api.Configuration;
@@ -112,7 +112,7 @@ public class ConfigurationLoaderTest {
 
   @Rule
   @Autowired
-  public ConfigurationCachePopulationRule configurationCachePopulationRule;
+  public CachePopulationRule configurationCachePopulationRule;
 
   @Autowired
   private CacheObjectFactory cacheObjectFactory;

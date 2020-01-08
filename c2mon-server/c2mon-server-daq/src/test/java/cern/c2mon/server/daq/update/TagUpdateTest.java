@@ -26,8 +26,8 @@ import cern.c2mon.server.common.config.CommonModule;
 import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.daq.config.DaqModule;
-import cern.c2mon.server.daq.junit.DaqCachePopulationRule;
 import cern.c2mon.server.supervision.config.SupervisionModule;
+import cern.c2mon.server.test.CachePopulationRule;
 import cern.c2mon.shared.common.datatag.*;
 import org.junit.*;
 import org.junit.runner.RunWith;
@@ -59,7 +59,7 @@ public class TagUpdateTest {
 
   @Rule
   @Autowired
-  public DaqCachePopulationRule daqCachePopulationRule;
+  public CachePopulationRule daqCachePopulationRule;
 
   /**
    * The interface to the module that needs testing.

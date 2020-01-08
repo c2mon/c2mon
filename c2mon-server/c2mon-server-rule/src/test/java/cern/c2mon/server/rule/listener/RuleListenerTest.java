@@ -26,8 +26,8 @@ import cern.c2mon.server.common.config.CommonModule;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.rule.config.RuleModule;
-import cern.c2mon.server.rule.junit.RuleCachePopulationRule;
 import cern.c2mon.server.test.CacheObjectCreation;
+import cern.c2mon.server.test.CachePopulationRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -61,7 +61,7 @@ public class RuleListenerTest {
 
   @Rule
   @Autowired
-  public RuleCachePopulationRule ruleCachePopulationRule;
+  public CachePopulationRule ruleCachePopulationRule;
 
   /**
    * The time the main thread sleeps to allow listeners to act on

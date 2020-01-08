@@ -59,7 +59,6 @@ import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
 import cern.c2mon.server.configuration.config.ConfigurationModule;
 import cern.c2mon.server.configuration.config.ProcessCommunicationManagerMock;
 import cern.c2mon.server.configuration.helper.ObjectEqualityComparison;
-import cern.c2mon.server.configuration.junit.ConfigurationCachePopulationRule;
 import cern.c2mon.server.configuration.junit.ConfigurationDatabasePopulationRule;
 import cern.c2mon.server.daq.config.DaqModule;
 import cern.c2mon.server.daq.out.ProcessCommunicationManager;
@@ -67,6 +66,7 @@ import cern.c2mon.server.daq.update.JmsContainerManagerImpl;
 import cern.c2mon.server.rule.config.RuleModule;
 import cern.c2mon.server.supervision.config.SupervisionModule;
 import cern.c2mon.shared.client.alarm.condition.AlarmCondition;
+import cern.c2mon.server.test.CachePopulationRule;
 import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Status;
@@ -119,7 +119,7 @@ public class ConfigurationLoaderTest {
 
   @Rule
   @Autowired
-  public ConfigurationCachePopulationRule configurationCachePopulationRule;
+  public CachePopulationRule configurationCachePopulationRule;
 
   /**
    * Mocked daqcommunication-out module.

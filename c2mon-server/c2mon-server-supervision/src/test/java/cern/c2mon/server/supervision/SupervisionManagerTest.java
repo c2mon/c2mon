@@ -27,7 +27,7 @@ import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.supervision.config.SupervisionModule;
 import cern.c2mon.server.supervision.impl.SupervisionTagNotifier;
-import cern.c2mon.server.supervision.junit.SupervisionCachePopulationRule;
+import cern.c2mon.server.test.CachePopulationRule;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.common.datatag.SourceDataTagQuality;
 import cern.c2mon.shared.common.datatag.SourceDataTagValue;
@@ -65,7 +65,7 @@ public class SupervisionManagerTest {
 
   @Rule
   @Autowired
-  public SupervisionCachePopulationRule supervisionCachePopulationRule;
+  public CachePopulationRule supervisionCachePopulationRule;
 
   @Autowired
   private SupervisionManager supervisionManager;

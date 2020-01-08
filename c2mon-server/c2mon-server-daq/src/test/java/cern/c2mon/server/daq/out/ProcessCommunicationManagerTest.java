@@ -24,8 +24,8 @@ import cern.c2mon.server.cache.loading.config.CacheLoadingModuleRef;
 import cern.c2mon.server.common.config.CommonModule;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.daq.config.DaqModule;
-import cern.c2mon.server.daq.junit.DaqCachePopulationRule;
 import cern.c2mon.server.supervision.config.SupervisionModule;
+import cern.c2mon.server.test.CachePopulationRule;
 import cern.c2mon.server.test.broker.EmbeddedBrokerRule;
 import cern.c2mon.server.test.config.TestConfig;
 import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
@@ -68,7 +68,7 @@ public class ProcessCommunicationManagerTest {
 
   @Rule
   @Autowired
-  public DaqCachePopulationRule daqCachePopulationRule;
+  public CachePopulationRule daqCachePopulationRule;
 
   @Rule
   @Autowired

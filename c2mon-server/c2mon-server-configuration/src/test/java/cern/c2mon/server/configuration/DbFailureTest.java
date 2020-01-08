@@ -33,12 +33,12 @@ import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.configuration.config.ConfigurationModule;
 import cern.c2mon.server.configuration.config.ProcessCommunicationManagerMock;
 import cern.c2mon.server.configuration.handler.transacted.ProcessConfigHandler;
-import cern.c2mon.server.configuration.junit.ConfigurationCachePopulationRule;
 import cern.c2mon.server.configuration.junit.ConfigurationDatabasePopulationRule;
 import cern.c2mon.server.daq.config.DaqModule;
 import cern.c2mon.server.daq.update.JmsContainerManagerImpl;
 import cern.c2mon.server.rule.config.RuleModule;
 import cern.c2mon.server.supervision.config.SupervisionModule;
+import cern.c2mon.server.test.CachePopulationRule;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
@@ -85,7 +85,7 @@ public class DbFailureTest {
 
   @Rule
   @Autowired
-  public ConfigurationCachePopulationRule configurationCachePopulationRule;
+  public CachePopulationRule configurationCachePopulationRule;
 
   private IMocksControl mockControl = EasyMock.createNiceControl();
 

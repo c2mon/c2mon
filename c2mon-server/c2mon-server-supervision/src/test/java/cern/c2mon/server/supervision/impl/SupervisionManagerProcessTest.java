@@ -21,7 +21,7 @@ import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.common.config.CommonModule;
 import cern.c2mon.server.supervision.SupervisionManager;
 import cern.c2mon.server.supervision.config.SupervisionModule;
-import cern.c2mon.server.supervision.junit.SupervisionCachePopulationRule;
+import cern.c2mon.server.test.CachePopulationRule;
 import cern.c2mon.shared.daq.process.*;
 import org.junit.Before;
 import org.junit.Rule;
@@ -51,7 +51,7 @@ public class SupervisionManagerProcessTest {
 
   @Rule
   @Autowired
-  public SupervisionCachePopulationRule supervisionCachePopulationRule;
+  public CachePopulationRule supervisionCachePopulationRule;
 
   /**
    * The system's logger

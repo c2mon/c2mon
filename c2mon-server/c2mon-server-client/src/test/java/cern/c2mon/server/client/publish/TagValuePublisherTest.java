@@ -21,7 +21,6 @@ import cern.c2mon.cache.actions.alarm.AlarmModule;
 import cern.c2mon.cache.config.tag.UnifiedTagCacheFacade;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.client.config.ClientModule;
-import cern.c2mon.server.client.junit.ClientCachePopulationRule;
 import cern.c2mon.server.command.config.CommandModule;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.TagWithAlarms;
@@ -34,6 +33,7 @@ import cern.c2mon.server.daq.update.JmsContainerManagerImpl;
 import cern.c2mon.server.rule.config.RuleModule;
 import cern.c2mon.server.supervision.config.SupervisionModule;
 import cern.c2mon.server.test.CacheObjectCreation;
+import cern.c2mon.server.test.CachePopulationRule;
 import cern.c2mon.server.test.broker.EmbeddedBrokerRule;
 import cern.c2mon.server.test.config.TestConfig;
 import cern.c2mon.shared.client.serializer.TransferTagSerializer;
@@ -85,7 +85,7 @@ public class TagValuePublisherTest {
 
   @Rule
   @Autowired
-  public ClientCachePopulationRule clientCachePopulationRule;
+  public CachePopulationRule clientCachePopulationRule;
 
   @Rule
   @Autowired
