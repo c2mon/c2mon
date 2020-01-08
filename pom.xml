@@ -260,18 +260,6 @@
         <artifactId>jackson-databind</artifactId>
         <version>${com.fasterxml.jackson.core}</version>
       </dependency>
-      <!-- The following dependencies are required for using Ehcache & BigMemory.
-           ehcache-ee-2.7.5 is shipped together with bigmemory-4.0.5 -->
-      <dependency>
-        <groupId>net.sf.ehcache</groupId>
-        <artifactId>ehcache-ee</artifactId>
-        <version>2.7.5</version>
-      </dependency>
-      <dependency>
-        <groupId>net.sf.ehcache</groupId>
-        <artifactId>ehcache-core</artifactId>
-        <version>2.6.6</version>
-      </dependency>
       <dependency>
         <groupId>org.terracotta.bigmemory</groupId>
         <artifactId>bigmemory</artifactId>

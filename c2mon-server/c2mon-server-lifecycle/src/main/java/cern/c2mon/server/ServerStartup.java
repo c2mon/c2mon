@@ -16,16 +16,15 @@
  *****************************************************************************/
 package cern.c2mon.server;
 
-import java.io.IOException;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.autoconfigure.jms.JmsAutoConfiguration;
 import org.springframework.boot.autoconfigure.jms.activemq.ActiveMQAutoConfiguration;
+
+import java.io.IOException;
 
 /**
  * This class is responsible for bootstrapping the C2MON application server.
@@ -38,12 +37,11 @@ import org.springframework.boot.autoconfigure.jms.activemq.ActiveMQAutoConfigura
  *
  * @author Justin Lewis Salmon
  */
-@SpringBootApplication
-@EnableAutoConfiguration(exclude = {
-    JmsAutoConfiguration.class,
-    ActiveMQAutoConfiguration.class,
-    DataSourceAutoConfiguration.class,
-    DataSourceTransactionManagerAutoConfiguration.class
+@SpringBootApplication(exclude = {
+  JmsAutoConfiguration.class,
+  ActiveMQAutoConfiguration.class,
+  DataSourceAutoConfiguration.class,
+  DataSourceTransactionManagerAutoConfiguration.class
 })
 @Slf4j
 public class ServerStartup {

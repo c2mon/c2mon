@@ -73,11 +73,6 @@
 
     <!-- Test dependencies -->
     <dependency>
-      <groupId>net.sf.ehcache</groupId>
-      <artifactId>ehcache-core</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>cern.c2mon.server</groupId>
       <artifactId>c2mon-server-test</artifactId>
     </dependency>
