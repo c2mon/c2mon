@@ -64,6 +64,7 @@ trigger_build:
 
 deploy_docs:
   stage: deploy
+  image: gitlab-registry.cern.ch/ci-tools/ci-worker:cc7
   dependencies:
     - build_docs
   script:
