@@ -17,7 +17,9 @@
 package cern.c2mon.server.client.heartbeat;
 
 import cern.c2mon.cache.actions.oscillation.OscillationService;
+import cern.c2mon.cache.api.impl.SimpleC2monCache;
 import cern.c2mon.server.client.heartbeat.impl.HeartbeatManagerImpl;
+import cern.c2mon.server.common.alarm.OscillationTimestamp;
 import cern.c2mon.shared.client.supervision.Heartbeat;
 import cern.c2mon.shared.util.jms.JmsSender;
 import org.easymock.EasyMock;
@@ -54,7 +56,10 @@ public class HeartbeatManagerImplTest {
   @Before
   public void init() {
     mockJmsSender = EasyMock.createMock(JmsSender.class);
-    OscillationService oscillationService = EasyMock.createNiceMock(OscillationService.class);
+
+    OscillationService oscillationService = new OscillationService(new SimpleC2monCache<>("oscill"));
+    oscillationService.getCache().put(OscillationTimestamp.DEFAULT_ID, new OscillationTimestamp(0));
+
     heartbeatManagerImpl = new HeartbeatManagerImpl(mockJmsSender, oscillationService);
     heartbeatManagerImpl.setHeartbeatInterval(INTERVAL);
   }
