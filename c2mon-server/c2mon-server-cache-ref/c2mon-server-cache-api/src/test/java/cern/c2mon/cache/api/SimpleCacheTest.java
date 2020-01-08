@@ -57,7 +57,7 @@ public class SimpleCacheTest {
     c2monCache.putAll(map);
 
     Map<Long, DataTag> selectedMap = c2monCache.getAll(keys);
-    assertEquals("Selected map should have " + GENERATOR_SIZE + " entries", GENERATOR_SIZE, selectedMap.size());
+    assertEquals("Selected map should have " + keys.size() + " entries", keys.size(), selectedMap.size());
 
     for (Long key : keys) {
       assertNotNull(key + " key should return valid object", c2monCache.get(key));
@@ -82,6 +82,6 @@ public class SimpleCacheTest {
   }
 
   private static Long getRandom() {
-    return ThreadLocalRandom.current().nextLong(0L, MAP_SIZE + 1);
+    return ThreadLocalRandom.current().nextLong(0L, MAP_SIZE);
   }
 }
