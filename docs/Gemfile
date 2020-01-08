@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 
 # Set to 3.7.3 for github-pages compat
-gem "jekyll", "~> 4.0.0"
+gem "jekyll", "~> 3.8.5"
 
 # If you have any plugins, put them here!
 group :jekyll_plugins do
