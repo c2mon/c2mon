@@ -33,6 +33,4 @@ public interface CommFaultTag extends Cacheable {
   Long getAliveTagId();
 
   Timestamp getEventTimestamp();
-
-  void setEventTimestamp(Timestamp eventTimestamp);
 }
