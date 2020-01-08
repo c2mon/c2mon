@@ -39,7 +39,7 @@ The technology stack is based on Java Spring container and is designed to run in
 
 **Client Layer**
 
-Communication with the client layer is done via a provided C2MON Client API,  documented here: [Client API](/user-guide/client-api/).
+Communication with the client layer is done via a provided C2MON Client API,  documented here: [Client API]({{site.baseurl }}/docs/user-guide/client-api/).
 
 ## Core Concepts
 
