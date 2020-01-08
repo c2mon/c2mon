@@ -48,7 +48,7 @@ This expression specifies how the Rule value is derived from the value of the Ta
 Changes to these Tags will result in an update of the Rule, based on the Rule expression.
 
 > **Please note!** <br>
-For more information about how to create rule expressions for RuleTags, please read the chapter about the [Rule Engine]({{ site.baseurl }}{% link docs/user-guide/server/rule-engine.md %}}).
+For more information about how to create rule expressions for RuleTags, please read the chapter about the [Rule Engine]({{ site.baseurl }}{% link docs/user-guide/server/rule-engine.md %}).
 
 
 # The ControlTag
@@ -64,7 +64,7 @@ There are three types of ControlTag:
 * The CommFaultTag.
 
 For a detailed description of these three tags and the role they play in monitoring the status of Processes and Equipments, read the section about
-[supervision]({{ site.baseurl }}{% link docs/overview/supervision.md %}).
+[Supervision]({{ site.baseurl }}{% link docs/overview/supervision.md %}).
 
 Equipment AliveTags are a good example of a ControlTag, since they are used to monitor the status of a supervised Equipment.
 In a similar way, an Equipment StatusTag is used to publish the current status (running or down) of an Equipment.
