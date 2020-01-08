@@ -85,7 +85,13 @@ public class MapBasedCache<V extends Cacheable> implements Cache<Long, V> {
 
   @Override
   public V getAndRemove(Long key) {
-    return null;
+    if (map.containsKey(key)) {
+      V oldValue = map.get(key);
+      map.remove(key);
+      return oldValue;
+    } else {
+      return null;
+    }
   }
 
   @Override
