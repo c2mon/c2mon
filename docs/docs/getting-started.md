@@ -32,11 +32,11 @@ Alternatively to HSQLDB you can also use [MySQL v5.1.38](https://www.mysql.com/)
 
 To run the C2MON tarball distribution you need at least Java 1.8 installed on your machine.
 
-The [C2MON server distribution tarball](https://nexus.web.cern.ch/nexus/#nexus-search;gav%7Ecern.c2mon.server%7Ec2mon-server%7E%7Etar.gz%7E) can be downloaded from [here](https://nexus.web.cern.ch/nexus/content/groups/public/cern/c2mon/server/c2mon-server/).
+Download from here the latest [C2MON server distribution tarball](https://nexus.web.cern.ch/nexus/service/local/artifact/maven/redirect?r=cern-nexus&g=cern.c2mon.server&a=c2mon-server&v=latest&e=tar.gz).
 
 We recommend to always use the latest stable version listed in the [CHANGELOG](https://github.com/c2mon/c2mon/blob/master/CHANGELOG.md) file.
 
-Extract the tarball on your local file system and change into the `c2mon-server-1.8.xx/bin/` directory.
+Extract the tarball on your local file system and change into the `c2mon-server-1.x.y/bin/` directory.
 
 > **Please note!** <br>
 The scripts provided with the tarball are Linux bash scripts. We recommend this environment also for production usage. Windows users should use [Docker](#using-the-docker-image) instead.
