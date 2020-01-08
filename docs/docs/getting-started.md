@@ -7,11 +7,13 @@ summary:  A Hello World guide to get C2MON up and running with some sample data.
 
 ## Using Kubernetes
 
-Are you a Kubernetes user? You can quickly create the full C2MON stack described below using the [K8S Quickstart](user-guide/kubernetes-configuration). Alternatively, read on to learn how to create a C2MON stack step by step!
+Are you a Kubernetes user? You can quickly create the full C2MON stack described below using the [K8S Quickstart](user-guide/kubernetes-configuration.html). 
+Alternatively, read on to learn how to create a C2MON stack step by step!
 
 ## Running the server
 
-The first thing to do is to get a C2MON server up and running. The server is a standalone application that receives data from acquisition processes (DAQs) and pushes it to client applications.
+The first thing to do is to get a C2MON server up and running. 
+The server is a standalone application that receives data from acquisition processes (DAQs) and pushes it to client applications.
 
 You can run a server by downloading and executing a tarball distribution, or by running a Docker image.
 
@@ -32,7 +34,7 @@ To run the C2MON tarball distribution you need at least Java 1.8 installed on yo
 
 The [C2MON server distribution tarball](https://nexus.web.cern.ch/nexus/#nexus-search;gav%7Ecern.c2mon.server%7Ec2mon-server%7E%7Etar.gz%7E) can be downloaded from [here](https://nexus.web.cern.ch/nexus/content/groups/public/cern/c2mon/server/c2mon-server/).
 
-We recommend to always use the latest stable version listed in the [CHANGELOG](/about/CHANGELOG/) file.
+We recommend to always use the latest stable version listed in the [CHANGELOG](https://github.com/c2mon/c2mon/blob/master/CHANGELOG.md) file.
 
 Extract the tarball on your local file system and change into the `c2mon-server-1.8.xx/bin/` directory.
 
@@ -111,7 +113,8 @@ docker run --rm --name c2mon -it -p 0.0.0.0:1099:1099 -p 0.0.0.0:9001:9001 -p 0.
 
 Once the server is running it's time to send some metrics to it!
 
-You can use one of several [pre-provided acquisition processes (DAQs)](https://github.com/c2mon?utf8=%E2%9C%93&q=c2mon-daq) and configure them to grab data from your equipments and services. Alternatively, you can of course write your own DAQ to publish any type of metric using the [DAQ API](/user-guide/daq-api).
+You can use one of several [pre-provided acquisition processes (DAQs)](https://github.com/c2mon?utf8=%E2%9C%93&q=c2mon-daq) and configure them to grab data from your equipments and services.
+Alternatively, you can of course write your own DAQ to publish any type of metric using the [DAQ API](user-guide/daq-api/).
 
 The easiest way to get a first _Hello World_ scenario with C2MON is to make use of the [hostmetrics DAQ](https://github.com/c2mon/c2mon-daq-hostmetrics), which uses a simple library to monitor and publish metrics about the host machine on which the DAQ runs. This will help you to quickly explore the core features of the system.
 
@@ -169,7 +172,7 @@ You can now consult the C2MON Web User Interface on http://localhost:8080/c2mon-
  -->
 
 # What's next?
-What you achieved with this tutorial is a Hello World demonstration of C2MON to understand the [core concepts](/core-concepts) of the framework.
+What you achieved with this tutorial is a Hello World demonstration of C2MON to understand the [core concepts](core-concepts/) of the framework.
 
 However, in order to use C2MON for your own use case you have now work on connecting to your data sources. This will require to get more familiar with the C2MON Data Acquisition (DAQ) layer.
-Maybe you can use some of the existing [Open Source DAQs](https://github.com/c2mon?utf8=%E2%9C%93&q=c2mon-daq), but most probably you want to write your own DAQ process. Therefore, you should read as next about the [DAQ API](/user-guide/daq-api).
+Maybe you can use some of the existing [Open Source DAQs](https://github.com/c2mon?utf8=%E2%9C%93&q=c2mon-daq), but most probably you want to write your own DAQ process. Therefore, you should read as next about the [DAQ API](user-guide/daq-api/).
