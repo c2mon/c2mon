@@ -1,11 +1,11 @@
 package cern.c2mon.cache.config;
 
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.cache.config.junit.CachePopulationRule;
 import cern.c2mon.cache.impl.configuration.C2monIgniteConfiguration;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.cache.loading.config.CacheLoadingModuleRef;
 import cern.c2mon.server.common.config.CommonModule;
+import cern.c2mon.server.test.DatabasePopulationRule;
 import cern.c2mon.shared.common.Cacheable;
 import org.junit.Before;
 import org.junit.Rule;
@@ -29,7 +29,7 @@ import static org.junit.Assert.assertEquals;
   CacheConfigModuleRef.class,
   CacheDbAccessModule.class,
   CacheLoadingModuleRef.class,
-  CachePopulationRule.class,
+  DatabasePopulationRule.class,
   C2monIgniteConfiguration.class
 })
 public abstract class AbstractCacheTest<V extends Cacheable> {
@@ -38,7 +38,7 @@ public abstract class AbstractCacheTest<V extends Cacheable> {
 
   @Rule
   @Inject
-  public CachePopulationRule cachePopulationRule;
+  public DatabasePopulationRule databasePopulationRule;
 
   protected C2monCache<V> cache;
 
