@@ -141,7 +141,7 @@ C2MON comes with a web-based application called [c2mon-web-ui](http://github.com
 
 ## Running the tarball distribution (Linux only)
 
-The C2MON Web UI distribution tarball can be downloaded from [CERN Nexus repository](https://nexus.web.cern.ch/nexus/content/groups/public/cern/c2mon/web/c2mon-web-ui/).
+The C2MON Web UI distribution tarball can be downloaded from [CERN Nexus repository](https://nexus.web.cern.ch/nexus/service/local/artifact/maven/redirect?r=cern-nexus&g=cern.c2mon.web&a=c2mon-web-ui&v=LATEST&e=tar.gz).
 
 Extract the tarball on your local file system and change into the `c2mon-web-ui-0.0.xx/bin/` directory.
 
@@ -172,7 +172,7 @@ You can now consult the C2MON Web User Interface on http://localhost:8080/c2mon-
  -->
 
 # What's next?
-What you achieved with this tutorial is a Hello World demonstration of C2MON to understand the [core concepts](core-concepts/) of the framework.
+What you achieved with this tutorial is a Hello World demonstration of C2MON to understand the [core concepts](overview/) of the framework.
 
 However, in order to use C2MON for your own use case you have now work on connecting to your data sources. This will require to get more familiar with the C2MON Data Acquisition (DAQ) layer.
 Maybe you can use some of the existing [Open Source DAQs](https://github.com/c2mon?utf8=%E2%9C%93&q=c2mon-daq), but most probably you want to write your own DAQ process. Therefore, you should read as next about the [DAQ API](user-guide/daq-api/).
