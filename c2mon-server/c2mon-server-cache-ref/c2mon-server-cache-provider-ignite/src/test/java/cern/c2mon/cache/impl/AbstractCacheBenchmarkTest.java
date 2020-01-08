@@ -2,6 +2,7 @@ package cern.c2mon.cache.impl;
 
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
@@ -24,6 +25,7 @@ public abstract class AbstractCacheBenchmarkTest {
   private Map<Long, Alarm> map;
 
   @Test
+  @Ignore("Turn this on if you want to get some benchmarking on Ignite config")
   public void launchBenchmark() throws RunnerException {
     Options opt = new OptionsBuilder()
       .include("\\." + this.getClass().getSimpleName() + "\\.")
