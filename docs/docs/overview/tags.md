@@ -21,7 +21,7 @@ The cause for a Tag being marked as invalid can have multiple reasons which is f
 Recall that each Equipment/Subequipment can have a set of associated Tags.
 On the other hand, Tags always belong to one and only one Equipment/SubEquipment.
 
-Tags can also have Alarms attached. to understand Alarms, please read the section about [Alarms]({% link /docs/overview/alarms.md %}).
+Tags can also have Alarms attached. to understand Alarms, please read the section about [Alarms]({{ site.baseurl }}{% link /docs/overview/alarms.md %}).
 
 
 # The DataTag
@@ -32,7 +32,7 @@ It is attached to an Equipment, which embodies the type of data source it origin
 
 Every DataTag has to provide a so-called "hardware address", which contains the information needed for subscribing to this data point.
 C2MON leaves it completely free how that hardware address is formatted.
-More information about that topic is provided in [Creating a new DAQ module from scratch]({% link  /docs/user-guide/daq-api/daq-module-developer-guide.md %}).
+More information about that topic is provided in [Creating a new DAQ module from scratch]({{ site.baseurl }}{% link  /docs/user-guide/daq-api/daq-module-developer-guide.md %}).
 
 
 > **Please note!** <br>
@@ -48,7 +48,7 @@ This expression specifies how the Rule value is derived from the value of the Ta
 Changes to these Tags will result in an update of the Rule, based on the Rule expression.
 
 > **Please note!** <br>
-For more information about how to create rule expressions for RuleTags, please read the chapter about the [Rule Engine]({% link /docs/user-guide/server/rule-engine.md %}}).
+For more information about how to create rule expressions for RuleTags, please read the chapter about the [Rule Engine]({{ site.baseurl }}{% link /docs/user-guide/server/rule-engine.md %}}).
 
 
 # The ControlTag
@@ -63,7 +63,7 @@ There are three types of ControlTag:
 * The CommFaultTag.
 
 For a detailed description of these three tags and the role they play in monitoring the status of Processes and Equipments, read the section about
-[supervision]({% link /docs/overview/supervision.md %}).
+[supervision]({{ site.baseurl }}{% link /docs/overview/supervision.md %}).
 
 Equipment AliveTags are a good example of a ControlTag, since they are used to monitor the status of a supervised Equipment.
 In a similar way, an Equipment StatusTag is used to publish the current status (running or down) of an Equipment.
@@ -84,7 +84,7 @@ In case of communication problems between the source and C2MON the Tag quality i
 
 Another reason why the Tag quality is absolutely needed comes from the fact that C2MON is filtering out all redundant value updates coming from the source.
 But many systems do exactly that and keep on sending over and over again in regular intervals their data like heartbeats.
-C2MON replaces this by the Equipment and Sub-Equipment heartbeat (see also [Supervision]({% link /docs/overview/supervision.md %})).
+C2MON replaces this by the Equipment and Sub-Equipment heartbeat (see also [Supervision]({{ site.baseurl }}{% link /docs/overview/supervision.md %})).
 
 A Tag update notification can hence be triggered by a change of the quality state.
 It is therefore absolutely necessary to always check the validity of the received Tag update.
