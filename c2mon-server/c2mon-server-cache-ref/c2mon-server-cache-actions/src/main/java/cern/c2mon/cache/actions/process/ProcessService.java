@@ -45,8 +45,6 @@ public class ProcessService extends AbstractCacheServiceImpl<Process>
   private static final int PIK_MIN = 100000;
 
   @Getter
-  protected C2monCache<Process> cache;
-  @Getter
   protected SupervisedCacheService<Process> supervisedService;
   private AliveTimerService aliveTimerService;
   private EquipmentService equipmentService;
