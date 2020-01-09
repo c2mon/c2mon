@@ -26,6 +26,8 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import cern.c2mon.cache.actions.CacheActionsModuleRef;
+import cern.c2mon.cache.impl.configuration.C2monIgniteConfiguration;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.cache.loading.config.CacheLoadingModuleRef;
 import cern.c2mon.server.common.config.CommonModule;
@@ -42,12 +44,13 @@ import static org.junit.Assert.assertEquals;
 @Slf4j
 @ContextConfiguration(classes = {
     CommonModule.class,
+    CacheActionsModuleRef.class,
     CacheConfigModuleRef.class,
     CacheDbAccessModule.class,
+    C2monIgniteConfiguration.class,
     CacheLoadingModuleRef.class,
     SupervisionModule.class,
-    ElasticsearchModule.class,
-    CachePopulationRule.class
+    ElasticsearchModule.class
 })
 @RunWith(SpringJUnit4ClassRunner.class)
 public class ElasticsearchModuleIntegrationTests {
