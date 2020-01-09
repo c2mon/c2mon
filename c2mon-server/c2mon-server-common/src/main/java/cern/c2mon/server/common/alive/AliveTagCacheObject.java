@@ -169,15 +169,10 @@ public class AliveTagCacheObject extends AbstractCacheableImpl implements AliveT
      */
     public void setAliveType(String aliveType) {
         this.aliveType = aliveType.trim();
-        if (getAliveType().equals(AliveTag.ALIVE_TYPE_PROCESS)) {
-            this.aliveTypeDescription = AliveTag.PROCESS_MSG;
-        } else {
-            if (getAliveType().equals(AliveTag.ALIVE_TYPE_EQUIPMENT)) {
-                this.aliveTypeDescription = AliveTag.EQUIPMENT_MSG;
-            } else {
-                this.aliveTypeDescription = AliveTag.SUBEQUIPMENT_MSG;
-            }
-        }
+        this.aliveTypeDescription =
+          getAliveType().equals(AliveTag.ALIVE_TYPE_PROCESS) ? AliveTag.PROCESS_MSG
+            : getAliveType().equals(AliveTag.ALIVE_TYPE_EQUIPMENT) ? AliveTag.EQUIPMENT_MSG
+            : AliveTag.SUBEQUIPMENT_MSG;
     }
 
     /**
