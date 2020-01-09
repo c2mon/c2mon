@@ -14,10 +14,14 @@ import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.Resource;
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.sql.Timestamp;
 import java.util.Collection;
 
 @Slf4j
+@Named
+@Singleton
 public class ProcessEvents extends SupervisionEventHandler<Process> {
 
   private XMLConverter xmlConverter = new XMLConverter();

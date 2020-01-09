@@ -8,10 +8,12 @@ import cern.c2mon.server.common.subequipment.SubEquipment;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
-@Singleton
 @Slf4j
+@Named
+@Singleton
 public class AliveTimerEvents {
 
   private final AliveTimerService aliveTimerService;

@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.sql.Timestamp;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
@@ -16,7 +16,7 @@ abstract class SupervisionEventHandler<T extends Supervised> {
 
   // You can technically modify this, but don't - the self registration in Ctor is all that's needed
   @Getter
-  private static Map<Class<? extends Supervised>, SupervisionEventHandler<? extends Supervised>> eventHandlers = Collections.emptyMap();
+  private static Map<Class<? extends Supervised>, SupervisionEventHandler<? extends Supervised>> eventHandlers = new HashMap<>();
   protected SupervisedCacheService<T> service;
   protected C2monCache<T> cache;
 
