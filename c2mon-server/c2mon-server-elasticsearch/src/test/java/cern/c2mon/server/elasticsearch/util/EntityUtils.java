@@ -47,7 +47,7 @@ public class EntityUtils {
     alarm.setFaultFamily("fault family");
     alarm.setFaultMember("fault member");
     alarm.setFaultCode(0);
-    alarm.setTriggerTimestamp(new Timestamp(System.currentTimeMillis()));
+    alarm.setTriggerTimestamp(new Timestamp(0L));
     alarm.setSourceTimestamp(new Timestamp(alarm.getTriggerTimestamp().getTime()));
     Metadata metadata = new Metadata();
     metadata.addMetadata("building", "1");
