@@ -24,7 +24,7 @@ C2MON comes with a modern looking web interface that provides many core function
 
 The C2MON platform uses a 3-tier architecture, as displayed in the diagram below.
 
-![c2mon-layer-overview]({{site.baseurl }}/assets/img/overview/c2mon-layer-overview.png)
+![c2mon-layer-overview]({{ site.baseurl }}{% link assets/img/overview/c2mon-layer-overview.png %})
 
 **Data Acquisition (DAQ) Layer**
 
@@ -39,15 +39,15 @@ The technology stack is based on Java Spring container and is designed to run in
 
 **Client Layer**
 
-Communication with the client layer is done via a provided C2MON Client API,  documented here: [Client API]({{site.baseurl }}/docs/user-guide/client-api/).
+Communication with the client layer is done via a provided C2MON Client API,  documented here: [Client API]({{ site.baseurl }}{% link docs/user-guide/client-api/index.md %}).
 
 ## Core Concepts
 
 To learn more about the core concepts of the C2MON platform you should continue as follows:
 
-To get started, take a look at the concept of [process/equipment](process-equipment.html) and [tags](tags.html).
+To get started, take a look at the concept of [process/equipment]({{ site.baseurl }}{% link docs/overview/process-equipment.md %}) and [tags]({{ site.baseurl }}{% link docs/overview/tags.html %}).
 
-More advanced topics include [alarms](alarms.html) and [class/device/property](class-device-property.html).
+More advanced topics include [alarms]({{ site.baseurl }}{% link docs/overview/alarms.md %}) and [class/device/property]({{ site.baseurl }}{% link docs/overview/class-device-property.md %}).
 
 > **Please note!** <br>
 These sections describe C2MON data configuration only from a conceptual point of view.
