@@ -45,7 +45,7 @@ Communication with the client layer is done via a provided C2MON Client API,  do
 
 To learn more about the core concepts of the C2MON platform you should continue as follows:
 
-To get started, take a look at the concept of [process/equipment]({{ site.baseurl }}{% link docs/overview/process-equipment.md %}) and [tags]({{ site.baseurl }}{% link docs/overview/tags.html %}).
+To get started, take a look at the concept of [process/equipment]({{ site.baseurl }}{% link docs/overview/process-equipment.md %}) and [tags]({{ site.baseurl }}{% link docs/overview/tags.md %}).
 
 More advanced topics include [alarms]({{ site.baseurl }}{% link docs/overview/alarms.md %}) and [class/device/property]({{ site.baseurl }}{% link docs/overview/class-device-property.md %}).
 
