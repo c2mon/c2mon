@@ -114,7 +114,7 @@ docker run --rm --name c2mon -it -p 0.0.0.0:1099:1099 -p 0.0.0.0:9001:9001 -p 0.
 Once the server is running it's time to send some metrics to it!
 
 You can use one of several [pre-provided acquisition processes (DAQs)](https://github.com/c2mon?utf8=%E2%9C%93&q=c2mon-daq) and configure them to grab data from your equipments and services.
-Alternatively, you can of course write your own DAQ to publish any type of metric using the [DAQ API](user-guide/daq-api/).
+Alternatively, you can of course write your own DAQ to publish any type of metric using the [DAQ API]({{ site.baseurl }}{% link docs/user-guide/daq-api/index.md %}).
 
 The easiest way to get a first _Hello World_ scenario with C2MON is to make use of the [hostmetrics DAQ](https://github.com/c2mon/c2mon-daq-hostmetrics), which uses a simple library to monitor and publish metrics about the host machine on which the DAQ runs. This will help you to quickly explore the core features of the system.
 
@@ -172,7 +172,7 @@ You can now consult the C2MON Web User Interface on http://localhost:8080/c2mon-
  -->
 
 # What's next?
-What you achieved with this tutorial is a Hello World demonstration of C2MON to understand the [core concepts](overview/) of the framework.
+What you achieved with this tutorial is a Hello World demonstration of C2MON to understand the [core concepts]({{ site.baseurl }}{% link docs/overview/index.md &}) of the framework.
 
 However, in order to use C2MON for your own use case you have now work on connecting to your data sources. This will require to get more familiar with the C2MON Data Acquisition (DAQ) layer.
 Maybe you can use some of the existing [Open Source DAQs](https://github.com/c2mon?utf8=%E2%9C%93&q=c2mon-daq), but most probably you want to write your own DAQ process. Therefore, you should read as next about the [DAQ API](user-guide/daq-api/).
