@@ -5,7 +5,14 @@ import org.apache.ignite.Ignite;
 import org.apache.ignite.IgniteException;
 import org.apache.ignite.Ignition;
 import org.apache.ignite.configuration.IgniteConfiguration;
+import org.apache.ignite.logger.slf4j.Slf4jLogger;
 import org.springframework.beans.factory.DisposableBean;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import static cern.c2mon.cache.impl.C2monCacheProperties.METRICS_LOG_FREQUENCY;
 
 /**
  * Made as a copy of {@link org.apache.ignite.IgniteSpringBean}, to work around the limitation it imposes:
@@ -19,6 +26,8 @@ import org.springframework.beans.factory.DisposableBean;
  *
  * @author Alexandros Papageorgiou Koufidis
  */
+@Named("C2monIgnite")
+@Singleton
 public class IgniteC2monBean implements Ignite, DisposableBean {
 
   // Delegate is lombok experimental - https://projectlombok.org/features/experimental/Delegate
@@ -26,9 +35,9 @@ public class IgniteC2monBean implements Ignite, DisposableBean {
   @Delegate(types = Ignite.class)
   private Ignite igniteInstance;
 
-  public IgniteC2monBean(IgniteConfiguration igniteConfiguration) {
+  public IgniteC2monBean() {
     // Not in a try because we want to fail-fast if there's a problem here
-    igniteInstance = Ignition.start(igniteConfiguration);
+    igniteInstance = Ignition.start(defaultConfiguration());
   }
 
   @Override
@@ -39,5 +48,17 @@ public class IgniteC2monBean implements Ignite, DisposableBean {
       // This can also just log a warning and fail quietly
       throw new Exception(exception);
     }
+  }
+
+  private IgniteConfiguration defaultConfiguration() {
+    ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("ignite-config.xml");
+
+    IgniteConfiguration config = (IgniteConfiguration) context.getBean("base-ignite.cfg");
+
+    config.setGridLogger(new Slf4jLogger());
+
+    config.setMetricsLogFrequency(METRICS_LOG_FREQUENCY);
+
+    return config;
   }
 }
