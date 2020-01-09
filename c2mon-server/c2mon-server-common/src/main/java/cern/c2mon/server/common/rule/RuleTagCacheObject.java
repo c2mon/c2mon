@@ -102,33 +102,27 @@ public class RuleTagCacheObject extends AbstractTagCacheObject implements RuleTa
    */
   @Override
   public RuleTagCacheObject clone() {
-    RuleTagCacheObject ruleTagCacheObject = (RuleTagCacheObject) super.clone();
-    if (this.equipmentIds != null) {
-      ruleTagCacheObject.equipmentIds = new HashSet<Long>();
-      for (Long eqId : this.equipmentIds) {
-        ruleTagCacheObject.equipmentIds.add(eqId);
-      }
+    RuleTagCacheObject otherObjeect = (RuleTagCacheObject) super.clone();
+    if (equipmentIds != null) {
+      otherObjeect.equipmentIds = new HashSet<>();
+      otherObjeect.equipmentIds.addAll(this.equipmentIds);
     }
-    if (this.subEquipmentIds != null) {
-      ruleTagCacheObject.subEquipmentIds = new HashSet<Long>();
-      for (Long subEqId : this.subEquipmentIds) {
-        ruleTagCacheObject.subEquipmentIds.add(subEqId);
-      }
+    if (subEquipmentIds != null) {
+      otherObjeect.subEquipmentIds = new HashSet<>();
+      otherObjeect.subEquipmentIds.addAll(this.subEquipmentIds);
     }
-    if (this.processIds != null) {
-      ruleTagCacheObject.processIds = new HashSet<Long>();
-      for (Long procId : this.processIds) {
-        ruleTagCacheObject.processIds.add(procId);
-      }
+    if (processIds != null) {
+      otherObjeect.processIds = new HashSet<>();
+      otherObjeect.processIds.addAll(this.processIds);
     }
-    ruleTagCacheObject.ruleExpression = null;
-    if (this.ruleExpression != null && ruleText != null) {
+    otherObjeect.ruleExpression = null;
+    if (ruleExpression != null && ruleText != null) {
       // TODO: Test correct clone support to all rule objects and replace then again the statement
-//         ruleTagCacheObject.ruleExpression = (RuleExpression) this.ruleExpression.clone();
-      ruleTagCacheObject.setRuleText(ruleText);
+//         otherObjeect.ruleExpression = (RuleExpression) this.ruleExpression.clone();
+      otherObjeect.setRuleText(ruleText);
     }
 
-    return ruleTagCacheObject;
+    return otherObjeect;
   }
 
   @Override
@@ -141,13 +135,9 @@ public class RuleTagCacheObject extends AbstractTagCacheObject implements RuleTa
 
   @Override
   public final Collection<Long> getRuleInputTagIds() {
-    Collection<Long> ruleCollection;
-    if (ruleExpression != null) {
-      ruleCollection = ruleExpression.getInputTagIds();
-    } else {
-      ruleCollection = Collections.emptyList();
-    }
-    return ruleCollection;
+    return ruleExpression != null
+      ? ruleExpression.getInputTagIds()
+      : Collections.emptyList();
   }
 
   @Override
@@ -167,7 +157,7 @@ public class RuleTagCacheObject extends AbstractTagCacheObject implements RuleTa
 
     if (this.ruleText != null) {
       try {
-        this.ruleExpression = RuleExpression.createExpression(this.ruleText);
+        ruleExpression = RuleExpression.createExpression(this.ruleText);
       } catch (RuleFormatException formatEx) {
         log.error("Exception caught in setting rule expression: unable to parse rule text: ", formatEx);
       }

@@ -1,6 +1,7 @@
 package cern.c2mon.server.common.cache;
 
 import cern.c2mon.server.common.rule.RuleTagCacheObject;
+import cern.c2mon.server.common.util.Java9Collections;
 
 public class RuleTagCacheObjectTest extends CacheableTest<RuleTagCacheObject> {
 
@@ -12,6 +13,6 @@ public class RuleTagCacheObjectTest extends CacheableTest<RuleTagCacheObject> {
 
   @Override
   protected void mutateObject(RuleTagCacheObject cloneObject) {
-      cloneObject.setRuleText("Working software over comprehensive documentation");
+    cloneObject.setSubEquipmentIds(Java9Collections.setOf(1L, 2L, 3L));
   }
 }
