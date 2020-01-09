@@ -16,23 +16,13 @@
  *****************************************************************************/
 package cern.c2mon.server.history.mapper;
 
-import cern.c2mon.cache.config.CacheConfigModuleRef;
-import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
-import cern.c2mon.server.cache.loading.config.CacheLoadingModuleRef;
-import cern.c2mon.server.command.config.CommandModule;
-import cern.c2mon.server.common.config.CommonModule;
-import cern.c2mon.server.daq.config.DaqModule;
-import cern.c2mon.server.history.config.HistoryModule;
-import cern.c2mon.server.supervision.config.SupervisionModule;
+import cern.c2mon.server.history.MapperTest;
 import cern.c2mon.shared.client.command.CommandExecutionStatus;
 import cern.c2mon.shared.client.command.CommandRecord;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -47,18 +37,7 @@ import static org.junit.Assert.assertNotNull;
  * @author Mark Brightwell
  *
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {
-    CommonModule.class,
-    CacheConfigModuleRef.class,
-    CacheDbAccessModule.class,
-    CacheLoadingModuleRef.class,
-    SupervisionModule.class,
-    CommandModule.class,
-    DaqModule.class,
-    HistoryModule.class
-})
-public class CommandRecordMapperTest {
+public class CommandRecordMapperTest extends MapperTest {
 
   private static final Long COMMAND_ID = 1111L;
 

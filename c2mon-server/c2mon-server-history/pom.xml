@@ -15,7 +15,7 @@
     <!-- Internal C2MON dependencies -->
     <dependency>
       <groupId>cern.c2mon.server</groupId>
-      <artifactId>c2mon-server-cache-config</artifactId>
+      <artifactId>c2mon-server-cache-actions</artifactId>
     </dependency>
     <dependency>
       <groupId>cern.c2mon.server</groupId>
@@ -84,8 +84,13 @@
     </dependency>
     <dependency>
       <groupId>cern.c2mon.server</groupId>
+      <artifactId>c2mon-server-cache-provider-ignite</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.server</groupId>
       <artifactId>c2mon-server-test</artifactId>
-      <scope>provided</scope>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>
