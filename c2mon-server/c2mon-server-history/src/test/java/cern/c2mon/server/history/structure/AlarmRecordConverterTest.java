@@ -70,9 +70,7 @@ public class AlarmRecordConverterTest {
     al.setFaultMember("FM");
     al.setFaultCode(1234);
 
-    String encoded = al.toString();
-    System.out.println(encoded);
-    AlarmRecord decoded = (AlarmRecord) al.getObject(encoded);
+    AlarmRecord decoded = (AlarmRecord) al.getObject(al.toString());
 
     assertEquals(al, decoded);
   }

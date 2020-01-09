@@ -84,7 +84,6 @@ public class AlarmRecordMapperTest extends MapperTest {
     alarmToLog.setAlarmId(ALARM_ID);
     alarmToLog.setServerTimestamp(new Timestamp(System.currentTimeMillis()));
     alarmToLog.setSourceTimestamp(new Timestamp(System.currentTimeMillis()));
-    System.out.println(alarmToLog);
     alarmRecordMapper.insertLog(alarmToLog);
   }
 
@@ -106,7 +105,6 @@ public class AlarmRecordMapperTest extends MapperTest {
     alarmToLog.setServerTimestamp(new Timestamp(System.currentTimeMillis()));
     alarmToLog.setSourceTimestamp(new Timestamp(System.currentTimeMillis()));
     alarmToLog.setOscillating(false);
-    System.out.println(alarmToLog);
 
     // additional the log date to indicate that it came from the fallback file
     alarmToLog.setLogDate(new Timestamp(System.currentTimeMillis()));
