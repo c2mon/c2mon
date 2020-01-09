@@ -37,7 +37,7 @@ public class IgniteC2monBean implements Ignite, DisposableBean {
 
   public IgniteC2monBean() {
     // Not in a try because we want to fail-fast if there's a problem here
-    igniteInstance = Ignition.start(defaultConfiguration());
+    igniteInstance = Ignition.getOrStart(defaultConfiguration());
   }
 
   @Override
