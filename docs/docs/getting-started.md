@@ -7,7 +7,7 @@ summary:  A Hello World guide to get C2MON up and running with some sample data.
 
 ## Using Kubernetes
 
-Are you a Kubernetes user? You can quickly create the full C2MON stack described below using the [K8S Quickstart](user-guide/kubernetes-configuration.html). 
+Are you a Kubernetes user? You can quickly create the full C2MON stack described below using the [K8S Quickstart]({{ site.baseurl }}{% link docs/user-guide/kubernetes-configuration.md %}). 
 Alternatively, read on to learn how to create a C2MON stack step by step!
 
 ## Running the server
