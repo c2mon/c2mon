@@ -20,15 +20,19 @@ import cern.c2mon.cache.actions.CacheActionsModuleRef;
 import cern.c2mon.cache.actions.datatag.DataTagService;
 import cern.c2mon.cache.actions.tag.TagController;
 import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.config.CacheConfigModuleRef;
+import cern.c2mon.cache.impl.configuration.C2monIgniteConfiguration;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.cache.loading.config.CacheLoadingModuleRef;
 import cern.c2mon.server.common.config.CommonModule;
 import cern.c2mon.server.common.datatag.DataTag;
+import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.common.rule.RuleTag;
+import cern.c2mon.server.common.rule.RuleTagCacheObject;
 import cern.c2mon.server.rule.config.RuleModule;
 import cern.c2mon.server.test.CacheObjectCreation;
-import cern.c2mon.server.test.CachePopulationRule;
-import org.junit.Rule;
+import cern.c2mon.shared.common.CacheEvent;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,21 +57,13 @@ import static org.junit.Assert.assertTrue;
 @ContextConfiguration(classes = {
     CommonModule.class,
     CacheActionsModuleRef.class,
+    CacheConfigModuleRef.class,
     CacheDbAccessModule.class,
+    C2monIgniteConfiguration.class,
     CacheLoadingModuleRef.class,
     RuleModule.class
 })
 public class RuleListenerTest {
-
-  @Rule
-  @Autowired
-  public CachePopulationRule ruleCachePopulationRule;
-
-  /**
-   * The time the main thread sleeps to allow listeners to act on
-   * notifications.
-   */
-  private static final int SLEEP_TIME = 2000;
 
   @Autowired
   private DataTagService dataTagService;
@@ -77,30 +73,18 @@ public class RuleListenerTest {
 
   @Autowired
   private C2monCache<RuleTag> ruleTagCache;
+  private DataTagCacheObject dataTag1;
+  private RuleTagCacheObject ruleTag;
 
-  /**
-   * Tests that a update to a data tag in the cache results in
-   * an update to a rule depending on it.
-   *
-   * Uses the test data created in the cache modules.
-   * @throws InterruptedException
-   */
-  @Test
-  public void testRuleEvaluation() throws InterruptedException {
-    DataTag dataTag1 = CacheObjectCreation.createTestDataTag();
+  @Before
+  public void populateCaches() {
+    dataTag1 = CacheObjectCreation.createTestDataTag();
     DataTag dataTag2 = CacheObjectCreation.createTestDataTag2();
-    RuleTag ruleTag = CacheObjectCreation.createTestRuleTag();
+    ruleTag = CacheObjectCreation.createTestRuleTag();
 
+    ruleTagCache.put(ruleTag.getId(), ruleTag);
     dataTagCache.put(dataTag1.getId(), dataTag1);
     dataTagCache.put(dataTag2.getId(), dataTag2);
-    ruleTagCache.put(ruleTag.getId(), ruleTag);
-
-    final CountDownLatch latch = new CountDownLatch(1);
-    final CountDownLatch latch2 = new CountDownLatch(2);
-    ruleTagCache.getCacheListenerManager().registerListener(cacheable -> {
-      latch.countDown();
-      latch2.countDown();
-    });
 
     //check still set as expected in test class
     assertEquals(dataTag1.getValue(), Boolean.TRUE);
@@ -115,8 +99,22 @@ public class RuleListenerTest {
     assertEquals(dataTagCache.get(dataTag1.getId()).getValue(), Boolean.TRUE);
     assertEquals(dataTagCache.get(dataTag2.getId()).getValue(), Boolean.TRUE);
     assertEquals(ruleTagCache.get(ruleTag.getId()).getValue(), 1000);
+  }
 
-    //recall rule is (#1000000 = true)|(#110 = true)[2],true[3]
+  /**
+   * Tests that a update to a data tag in the cache results in
+   * an update to a rule depending on it.
+   *
+   * Uses the test data created in the cache modules.
+   * @throws InterruptedException
+   */
+  @Test
+  public void testRuleEvaluation() throws InterruptedException {
+    final CountDownLatch latch = new CountDownLatch(1);
+
+    ruleTagCache.getCacheListenerManager().registerListener(cacheable -> {
+      latch.countDown();
+    }, CacheEvent.UPDATE_ACCEPTED);
 
     //(1) first test of rule update
     //update dataTag and check rule was updated after short wait (to account for buffer mainly, and passing to new thread)
@@ -124,23 +122,35 @@ public class RuleListenerTest {
       TagController.setValue(dataTag, Boolean.FALSE, "now false");
       TagController.validate(dataTag);
     });
-    //NOTIFY OF UPDATE! - can remove as moved notification into facade objects
-    //dataTagCache.notifyListenersOfUpdate(dataTag1);
 
     //check update was made
     assertEquals(Boolean.FALSE, dataTagCache.get(dataTag1.getId()).getValue());
     latch.await();
     assertEquals(3, ruleTagCache.get(ruleTag.getId()).getValue());
+  }
+
+  /**
+   * Tests that a update to a data tag in the cache results in
+   * an update to a rule depending on it.
+   *
+   * Uses the test data created in the cache modules.
+   */
+  @Test
+  public void testRuleTrue() throws InterruptedException {
+    final CountDownLatch latch = new CountDownLatch(1);
+
+    ruleTagCache.getCacheListenerManager().registerListener(cacheable -> {
+      latch.countDown();
+    }, CacheEvent.UPDATE_ACCEPTED);
 
     //(2) second test of rule update
     //update dataTag to TRUE, notify listeners and check rule was again updated
     dataTagService.getCache().compute(dataTag1.getId(), dataTag -> {
-      TagController.setValue(dataTag, Boolean.FALSE, "now false");
+      TagController.setValue(dataTag, Boolean.TRUE, "now true");
       TagController.validate(dataTag);
     });
-    //dataTagCache.notifyListenersOfUpdate(dataTag1);
     assertEquals(Boolean.TRUE, dataTagCache.get(dataTag1.getId()).getValue());
-    latch2.await();
+    latch.await();
     assertEquals(2, ruleTagCache.get(ruleTag.getId()).getValue());
   }
 }
