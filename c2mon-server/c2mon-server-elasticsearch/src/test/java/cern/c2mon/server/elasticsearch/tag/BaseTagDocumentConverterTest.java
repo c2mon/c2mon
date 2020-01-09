@@ -19,38 +19,34 @@ package cern.c2mon.server.elasticsearch.tag;
 
 import java.util.Map;
 
-import org.junit.Ignore;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.impl.SimpleC2monCache;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.subequipment.SubEquipment;
+import cern.c2mon.server.elasticsearch.util.EntityUtils;
 
 import static org.junit.Assert.assertEquals;
 
 /**
  * @author Justin Lewis Salmon
  */
-@Ignore
 @RunWith(MockitoJUnitRunner.class)
-public class BaseTagDocumentConverterTest {
+public abstract class BaseTagDocumentConverterTest {
 
-  @InjectMocks
-  BaseTagDocumentConverter baseConverter;
+  protected C2monCache<Process> processCache = new SimpleC2monCache<>("proc");
 
-  @Mock
-  protected C2monCache<Process> processCache;
+  protected C2monCache<Equipment> equipmentCache = new SimpleC2monCache<>("eq");
 
-  @Mock
-  protected C2monCache<Equipment> equipmentCache;
+  protected C2monCache<SubEquipment> subEquipmentCache = new SimpleC2monCache<>("subEq");
 
-  @Mock
-  protected C2monCache<SubEquipment> subEquipmentCache;
+  protected TagDocumentConverter converter = new TagDocumentConverter(processCache, equipmentCache, subEquipmentCache);
+
+  protected DataTag tag = EntityUtils.createDataTag();
 
   protected void assertBaseFieldsMatch(DataTag tag, Map<String, Object> document) {
     assertEquals(tag.getId().intValue(), document.get("id"));

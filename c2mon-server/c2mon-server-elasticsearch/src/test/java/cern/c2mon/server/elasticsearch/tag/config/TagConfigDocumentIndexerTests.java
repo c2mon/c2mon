@@ -25,6 +25,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
 
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.elasticsearch.ElasticsearchSuiteTest;
@@ -43,6 +44,7 @@ import static org.junit.Assert.assertTrue;
  * @author Szymon Halastra
  * @author Justin Lewis Salmon
  */
+@ContextConfiguration(classes = CachePopulationRule.class)
 public class TagConfigDocumentIndexerTests extends ElasticsearchTestDefinition {
 
   @Autowired

@@ -29,8 +29,6 @@ import cern.c2mon.server.elasticsearch.tag.BaseTagDocumentConverterTest;
 import cern.c2mon.server.elasticsearch.util.EntityUtils;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.when;
 
 
 /**
@@ -52,8 +50,6 @@ public class TagConfigDocumentConverterTests extends BaseTagDocumentConverterTes
     EquipmentCacheObject equipment = new EquipmentCacheObject(1L);
     equipment.setName("E_TEST");
 
-    when(processCache.get(any())).thenReturn(process);
-    when(equipmentCache.get(any())).thenReturn(equipment);
     TagConfigDocument document = converter.convert(tag)
         .orElseThrow(() -> new Exception("Tag conversion failed"));
 

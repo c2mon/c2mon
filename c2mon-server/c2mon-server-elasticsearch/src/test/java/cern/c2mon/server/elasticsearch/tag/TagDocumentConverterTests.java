@@ -21,9 +21,6 @@ import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.runners.MockitoJUnitRunner;
 
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.equipment.EquipmentCacheObject;
@@ -32,35 +29,29 @@ import cern.c2mon.server.elasticsearch.util.EntityUtils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.when;
 
 /**
  * @author Alban Marguet
  * @author Matthias Braeger
  * @author Justin Lewis Salmon
  */
-@RunWith(MockitoJUnitRunner.class)
-public class TagDocumentConverterTests extends BaseTagDocumentConverterTest {
-
-  @InjectMocks
-  private TagDocumentConverter converter;
+public class TagDocumentConverterTests extends BaseTagDocumentConverterTest{
 
   @Before
   public void setup() {
-    ProcessCacheObject process = new ProcessCacheObject(1L);
+
+    ProcessCacheObject process = new ProcessCacheObject(tag.getProcessId());
     process.setName("P_TEST");
 
-    EquipmentCacheObject equipment = new EquipmentCacheObject(1L);
+    EquipmentCacheObject equipment = new EquipmentCacheObject(tag.getEquipmentId());
     equipment.setName("E_TEST");
 
-    when(processCache.get(any())).thenReturn(process);
-    when(equipmentCache.get(any())).thenReturn(equipment);
+    processCache.put(process.getId(), process);
+    equipmentCache.put(equipment.getId(), equipment);
   }
 
   @Test
   public void toAndFromJson() {
-    DataTag tag = EntityUtils.createDataTag();
 
     TagDocument document = converter.convert(tag).orElseThrow(() -> new IllegalArgumentException("TagDocument conversion failed"));
 
