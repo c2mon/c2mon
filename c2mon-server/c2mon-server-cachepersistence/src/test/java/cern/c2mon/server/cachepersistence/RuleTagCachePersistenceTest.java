@@ -18,10 +18,12 @@ package cern.c2mon.server.cachepersistence;
 
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.config.CacheConfigModuleRef;
+import cern.c2mon.cache.impl.configuration.C2monIgniteConfiguration;
 import cern.c2mon.server.cache.dbaccess.RuleTagMapper;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
-import cern.c2mon.server.cachepersistence.common.BatchPersistenceManagerImpl;
+import cern.c2mon.server.cache.loading.config.CacheLoadingModuleRef;
 import cern.c2mon.server.cachepersistence.config.CachePersistenceModule;
+import cern.c2mon.server.cachepersistence.config.RuleTagPersistenceConfig;
 import cern.c2mon.server.common.config.CommonModule;
 import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.rule.RuleTagCacheObject;
@@ -52,8 +54,10 @@ import static org.junit.Assert.assertNotNull;
   CommonModule.class,
   CacheConfigModuleRef.class,
   CacheDbAccessModule.class,
-  CachePersistenceModule.class,
-  DatabasePopulationRule.class
+  C2monIgniteConfiguration.class,
+  DatabasePopulationRule.class,
+  CacheLoadingModuleRef.class,
+  CachePersistenceModule.class
 })
 public class RuleTagCachePersistenceTest {
 
@@ -68,7 +72,7 @@ public class RuleTagCachePersistenceTest {
   private C2monCache<RuleTag> ruleTagCache;
 
   @Inject
-  private BatchPersistenceManagerImpl ruleTagPersistenceManager;
+  private RuleTagPersistenceConfig ruleTagPersistenceConfig;
 
   private RuleTag originalObject;
 
@@ -76,7 +80,6 @@ public class RuleTagCachePersistenceTest {
   public void insertTestTag() throws IOException {
     originalObject = CacheObjectCreation.createTestRuleTag();
     ruleTagMapper.insertRuleTag((RuleTagCacheObject) originalObject);
-//    ruleTagPersistenceSynchroListener.start();
   }
 
   /**
@@ -95,22 +98,17 @@ public class RuleTagCachePersistenceTest {
     RuleTagCacheObject objectInDB = (RuleTagCacheObject) ruleTagMapper.getItem(originalObject.getId());
     assertNotNull(objectInDB);
     assertEquals(objectInDB.getValue(), originalObject.getValue());
-    assertEquals(new Integer(1000), objectInDB.getValue()); //value is 1000 for test rule tag
+    assertEquals(1000, objectInDB.getValue()); //value is 1000 for test rule tag
 
     //now update the cache object to new value
-    cacheObject.setValue(new Integer(2000));
-    //notify the listeners
+    cacheObject.setValue(2000);
+    ruleTagCache.put(cacheObject.getId(), cacheObject);
 
     // trigger the persist
-    ruleTagPersistenceManager.persistAllCacheToDatabase();
+    ruleTagPersistenceConfig.getBatchPersistenceManager().persistAllCacheToDatabase();
 
     objectInDB = (RuleTagCacheObject) ruleTagMapper.getItem(originalObject.getId());
     assertNotNull(objectInDB);
-    assertEquals(Integer.valueOf(2000), objectInDB.getValue());
-
-    //clean up...
-    //remove from cache
-    ruleTagCache.remove(originalObject.getId());
-
+    assertEquals(2000, objectInDB.getValue());
   }
 }

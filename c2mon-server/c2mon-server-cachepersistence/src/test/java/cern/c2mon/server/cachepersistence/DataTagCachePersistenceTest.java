@@ -18,10 +18,12 @@ package cern.c2mon.server.cachepersistence;
 
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.config.CacheConfigModuleRef;
+import cern.c2mon.cache.impl.configuration.C2monIgniteConfiguration;
 import cern.c2mon.server.cache.dbaccess.DataTagMapper;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
-import cern.c2mon.server.cachepersistence.common.BatchPersistenceManagerImpl;
+import cern.c2mon.server.cache.loading.config.CacheLoadingModuleRef;
 import cern.c2mon.server.cachepersistence.config.CachePersistenceModule;
+import cern.c2mon.server.cachepersistence.config.DataTagPersistenceConfig;
 import cern.c2mon.server.common.config.CommonModule;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
@@ -36,7 +38,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.inject.Inject;
-import java.io.IOException;
 import java.sql.Timestamp;
 
 import static org.junit.Assert.assertEquals;
@@ -52,8 +53,10 @@ import static org.junit.Assert.assertNotNull;
   CommonModule.class,
   CacheConfigModuleRef.class,
   CacheDbAccessModule.class,
-  CachePersistenceModule.class,
-  DatabasePopulationRule.class
+  C2monIgniteConfiguration.class,
+  DatabasePopulationRule.class,
+  CacheLoadingModuleRef.class,
+  CachePersistenceModule.class
 })
 public class DataTagCachePersistenceTest {
 
@@ -68,47 +71,40 @@ public class DataTagCachePersistenceTest {
   private DataTagMapper dataTagMapper;
 
   @Inject
-  private BatchPersistenceManagerImpl dataTagPersistenceManager;
+  private DataTagPersistenceConfig dataTagPersistenceConfig;
 
   private DataTagCacheObject originalObject;
 
   @Before
-  public void setUpData() throws IOException {
+  public void setUpData() {
     originalObject = (DataTagCacheObject) dataTagMapper.getItem(200000L);
-//    dataTagPersistenceSynchroListener.start();
   }
 
   /**
    * Tests the functionality: put value in cache -> persist to DB.
    */
   @Test
-  public void testTagPersistence() throws InterruptedException {
-
+  public void testTagPersistence() {
     //create a test cache object, put in the cache
     dataTagCache.put(originalObject.getId(), originalObject);
 
     //check it is in cache (only values so far...)
 
     DataTagCacheObject cacheObject = (DataTagCacheObject) dataTagCache.get(originalObject.getId());
-    assertEquals(dataTagCache.get(originalObject.getId()).getValue(), originalObject.getValue());
+    assertEquals(cacheObject, originalObject);
     //check it is in database (only values so far...)
     DataTagCacheObject objectInDB = (DataTagCacheObject) dataTagMapper.getItem(originalObject.getId());
-    assertNotNull(objectInDB);
-    assertEquals(objectInDB.getValue(), originalObject.getValue());
+    assertEquals(objectInDB, originalObject);
 
     //now update the cache object
     cacheObject.setValue(0);
+    dataTagCache.put(cacheObject.getId(), cacheObject);
 
     // trigger the batch persist
-    dataTagPersistenceManager.persistAllCacheToDatabase();
+    dataTagPersistenceConfig.getBatchPersistenceManager().persistAllCacheToDatabase();
 
     objectInDB = (DataTagCacheObject) dataTagMapper.getItem(originalObject.getId());
-    assertNotNull(objectInDB);
-    assertEquals(0, objectInDB.getValue());
-
-    //clean up...
-    //remove from cache
-    dataTagCache.remove(originalObject.getId());
+    assertEquals(cacheObject, objectInDB);
   }
 
   /**
@@ -125,12 +121,12 @@ public class DataTagCachePersistenceTest {
   public void testLatestUpdatePersistedToDB() {
     //load initial test tag into cache and DB
     DataTagCacheObject floatTag = new DataTagCacheObject();
-    floatTag.setId(new Long(1000100));  //must be non null in DB
+    floatTag.setId(1000100L);  //must be non null in DB
     floatTag.setName("Test float tag"); //non null
     floatTag.setMode(DataTagConstants.MODE_TEST); //non null
     floatTag.setDataType("Float"); // non null
     //floatTag.setEquipmentId(new Long(300000)); //need test equipment inserted - using test equipment
-    floatTag.setValue(new Float(10));
+    floatTag.setValue(10f);
     floatTag.setCacheTimestamp(new Timestamp(System.currentTimeMillis() - 10)); //before both updates
 
     dataTagMapper.insertDataTag(floatTag);
@@ -139,15 +135,16 @@ public class DataTagCachePersistenceTest {
 
     //update the cache with the first value
     DataTagCacheObject cacheObject = (DataTagCacheObject) dataTagCache.get(floatTag.getId());
-    cacheObject.setValue(new Float(20));
+    cacheObject.setValue(20f);
     cacheObject.setCacheTimestamp(new Timestamp(System.currentTimeMillis() - 1)); // to make sure it is before the second update (and not filtered out at cache level)
+    dataTagCache.put(cacheObject.getId(), cacheObject);
 
     //update with the second
-    cacheObject.setValue(new Float(30));
-    cacheObject.setCacheTimestamp(new Timestamp(System.currentTimeMillis()));
+    cacheObject.setValue(30f);
+    dataTagCache.put(cacheObject.getId(), cacheObject);
 
     //check the second is always the one in the cache
-    assertEquals(new Float(30), cacheObject.getValue());
+    assertEquals(30f, cacheObject.getValue());
 
     //wait and check that the final one is the one persisted to DB
     try {
@@ -156,12 +153,6 @@ public class DataTagCachePersistenceTest {
       e.printStackTrace();
     }
     DataTag objectInDB = dataTagMapper.getItem(floatTag.getId());
-    assertNotNull(objectInDB);
-    assertEquals(new Float(30), objectInDB.getValue());
-
-    //remove from cache
-    dataTagCache.remove(floatTag.getId());
-    //remove from DB (in After)
-
+    assertEquals(cacheObject, objectInDB);
   }
 }

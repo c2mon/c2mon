@@ -18,9 +18,11 @@ package cern.c2mon.server.cachepersistence;
 
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.config.CacheConfigModuleRef;
+import cern.c2mon.cache.impl.configuration.C2monIgniteConfiguration;
 import cern.c2mon.server.cache.dbaccess.AlarmMapper;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
-import cern.c2mon.server.cachepersistence.common.BatchPersistenceManagerImpl;
+import cern.c2mon.server.cache.loading.config.CacheLoadingModuleRef;
+import cern.c2mon.server.cachepersistence.config.AlarmPersistenceConfig;
 import cern.c2mon.server.cachepersistence.config.CachePersistenceModule;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
@@ -35,8 +37,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.inject.Inject;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
+
 
 /**
  * Tests of persistence mechanisms to the Alarm cache.
@@ -49,8 +51,10 @@ import static org.junit.Assert.assertNotNull;
   CommonModule.class,
   CacheConfigModuleRef.class,
   CacheDbAccessModule.class,
-  CachePersistenceModule.class,
-  DatabasePopulationRule.class
+  C2monIgniteConfiguration.class,
+  DatabasePopulationRule.class,
+  CacheLoadingModuleRef.class,
+  CachePersistenceModule.class
 })
 public class AlarmCachePersistenceTest {
 
@@ -65,14 +69,13 @@ public class AlarmCachePersistenceTest {
   private AlarmMapper alarmMapper;
 
   @Inject
-  private BatchPersistenceManagerImpl alarmPersistenceManager;
+  private AlarmPersistenceConfig alarmPersistenceConfig;
 
   private Alarm originalObject;
 
   @Before
   public void before() {
     originalObject = alarmMapper.getItem(350000L);
-//    alarmPersistenceSynchroListener.start();
   }
 
   /**
@@ -80,34 +83,30 @@ public class AlarmCachePersistenceTest {
    */
   @Test
   public void testAlarmPersistence() {
-
     alarmCache.put(originalObject.getId(), originalObject);
 
     //check state is as expected
-    assertEquals(false, originalObject.isActive());
+    assertFalse(originalObject.isActive());
 
     //check it is in cache (only compares states so far)
     AlarmCacheObject cacheObject = (AlarmCacheObject) alarmCache.get(originalObject.getId());
-    assertEquals(alarmCache.get(originalObject.getId()).isActive(), originalObject.isActive());
+    assertEquals(cacheObject, originalObject);
+
     //check it is in database (only values so far...)
     AlarmCacheObject objectInDB = (AlarmCacheObject) alarmMapper.getItem(originalObject.getId());
     assertNotNull(objectInDB);
-    assertEquals(objectInDB.isActive(), originalObject.isActive());
-    assertEquals(false, objectInDB.isActive()); //state is TERMINATE in test alarm 1
+    assertEquals(cacheObject, objectInDB);
 
     //now update the cache object to new value
     cacheObject.setActive(true);
+    alarmCache.put(cacheObject.getId(), cacheObject);
 
     // trigger the persist
-    alarmPersistenceManager.persistAllCacheToDatabase();
+    alarmPersistenceConfig.getBatchPersistenceManager().persistAllCacheToDatabase();
 
     objectInDB = (AlarmCacheObject) alarmMapper.getItem(originalObject.getId());
     assertNotNull(objectInDB);
-    assertEquals(true, objectInDB.isActive());
-    assertEquals(objectInDB.isActive(), objectInDB.isInternalActive());
-
-    //clean up...
-    //remove from cache
-    alarmCache.remove(originalObject.getId());
+    assertTrue(objectInDB.isActive());
+    assertTrue(objectInDB.isInternalActive());
   }
 }
