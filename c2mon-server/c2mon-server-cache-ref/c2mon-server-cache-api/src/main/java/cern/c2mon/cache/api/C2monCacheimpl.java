@@ -15,6 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.sql.Timestamp;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -57,7 +59,7 @@ public abstract class C2monCacheimpl<CACHEABLE extends Cacheable> implements C2m
 
   protected CACHEABLE compute(long key, Consumer<CACHEABLE> transformer, boolean notifyListeners) {
     return executeTransaction(() -> {
-      CACHEABLE cachedObj = getCache().get(key);
+      CACHEABLE cachedObj = get(key);
       transformer.accept(cachedObj);
       if (notifyListeners)
         put(key, cachedObj); // TODO Write tests that verify this doesn't force cause a deadlock, as put will also get the obj
@@ -96,22 +98,29 @@ public abstract class C2monCacheimpl<CACHEABLE extends Cacheable> implements C2m
 
   protected void put(long key, CACHEABLE value, boolean notifyListeners) {
     value.setCacheTimestamp(new Timestamp(System.currentTimeMillis()));
+    final AtomicBoolean inserted = new AtomicBoolean(false);
+    final AtomicReference<CACHEABLE> previous = new AtomicReference<>();
     executeTransaction(() -> {
       // Using this getter to avoid having to catch CacheElementNotFoundException
       // thrown by our own Cache.get
-      CACHEABLE previous = getCache().get(key);
-      if (getCacheUpdateFlow().preInsertValidate(previous, value)) {
+      previous.set(getCache().get(key));
+      if (getCacheUpdateFlow().preInsertValidate(previous.get(), value)) {
         // We're in a transaction, so this can't have been modified
         getCache().put(key, value);
-        if (notifyListeners) {
-          getCacheListenerManager().notifyListenersOf(UPDATE_ACCEPTED, value);
-          getCacheUpdateFlow().postInsertEvents(previous, value)
-            .forEach(event -> getCacheListenerManager().notifyListenersOf(event, value));
-        }
-      } else if (notifyListeners) {
-        getCacheListenerManager().notifyListenersOf(UPDATE_REJECTED, value);
+        inserted.set(true);
       }
     });
+    if (notifyListeners)
+      emitEvents(inserted.get(), previous.get(), value);
+  }
+
+  private void emitEvents(boolean success, CACHEABLE previousValue, CACHEABLE newValue) {
+    if (success) {
+      getCacheListenerManager().notifyListenersOf(UPDATE_ACCEPTED, newValue);
+      getCacheUpdateFlow().postInsertEvents(previousValue, newValue)
+        .forEach(event -> getCacheListenerManager().notifyListenersOf(event, newValue));
+    } else
+      getCacheListenerManager().notifyListenersOf(UPDATE_REJECTED, newValue);
   }
 
   @Override
