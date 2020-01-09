@@ -16,8 +16,10 @@
  *****************************************************************************/
 package cern.c2mon.server.daq.update;
 
+import cern.c2mon.cache.actions.CacheActionsModuleRef;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.config.CacheConfigModuleRef;
+import cern.c2mon.cache.impl.configuration.C2monIgniteConfiguration;
 import cern.c2mon.server.cache.dbaccess.ControlTagMapper;
 import cern.c2mon.server.cache.dbaccess.DataTagMapper;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
@@ -49,11 +51,14 @@ import static org.junit.Assert.assertTrue;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {
     CommonModule.class,
+    CacheActionsModuleRef.class,
     CacheConfigModuleRef.class,
+    C2monIgniteConfiguration.class,
     CacheDbAccessModule.class,
     CacheLoadingModuleRef.class,
     SupervisionModule.class,
     DaqModule.class,
+    CachePopulationRule.class
 })
 public class TagUpdateTest {
 
