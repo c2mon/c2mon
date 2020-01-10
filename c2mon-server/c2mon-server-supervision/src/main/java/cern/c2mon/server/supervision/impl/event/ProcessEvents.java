@@ -233,14 +233,9 @@ public class ProcessEvents extends SupervisionEventHandler<Process> {
     }
 
     // (1) Print some debug output
-
-    if (log.isDebugEnabled()) {
-      String str = "onProcessDisconnection([" + processDisconnectionRequest.getProcessName() +
-        ", " + processDisconnectionRequest.getProcessPIK() +
-        ", " + processDisconnectionRequest.getProcessStartupTime() +
-        "]) called.";
-      log.debug(str);
-    }
+    log.debug( "onProcessDisconnection: " + processDisconnectionRequest.getProcessName() +
+      ", " + processDisconnectionRequest.getProcessPIK() +
+      ", " + processDisconnectionRequest.getProcessStartupTime());
 
     try {
 
