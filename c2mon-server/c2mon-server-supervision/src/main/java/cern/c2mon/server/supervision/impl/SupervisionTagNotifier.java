@@ -244,7 +244,7 @@ public class SupervisionTagNotifier implements SupervisionListener, SmartLifecyc
     try {
       //local map so as not to notify rules twice; lock on map when modifying
       Map<Long, Boolean> notifiedRules = new HashMap<>();
-      Collection<Long> tagIds = subEquipmentService.getDataTagIds(subEquipmentId);
+      Collection<Long> tagIds = dataTagService.getDataTagIdsBySubEquipmentId(subEquipmentId);
       for (Long id : tagIds) {
        try {
          callCacheNotification(id, notifiedRules); //recursively notifies all dependent rules also, once only

@@ -1084,7 +1084,7 @@ public class ConfigurationLoaderTest {
 
     ObjectEqualityComparison.assertDataTagConfigEquals(expectedCacheObjectData, cacheObjectData);
     // Check if all caches are updated
-    assertTrue(subEquipmentService.getDataTagIds(cacheObjectData.getSubEquipmentId()).contains(1000L));
+    assertTrue(dataTagService.getDataTagIdsBySubEquipmentId(cacheObjectData.getSubEquipmentId()).contains(1000L));
 
     verify(communicationManager);
 

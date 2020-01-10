@@ -11,8 +11,9 @@ import static org.junit.Assert.assertEquals;
 public class ProcessDisconnectionSupervisionTest extends AbstractSupervisionManagerProcessTest<ProcessConnectionRequest, ProcessConnectionResponse> {
   private long pik;
 
-  public ProcessDisconnectionSupervisionTest() {
-    super(processConnectionRequest -> supervisionManager.onProcessConnection(processConnectionRequest));
+  @Override
+  protected String action(ProcessConnectionRequest request) {
+    return supervisionManager.onProcessConnection(request);
   }
 
   @Before

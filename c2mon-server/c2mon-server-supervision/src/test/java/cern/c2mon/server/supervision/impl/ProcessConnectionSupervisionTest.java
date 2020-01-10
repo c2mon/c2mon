@@ -10,8 +10,9 @@ import static org.junit.Assert.assertNotEquals;
 
 public class ProcessConnectionSupervisionTest extends AbstractSupervisionManagerProcessTest<ProcessConnectionRequest, ProcessConnectionResponse> {
 
-  public ProcessConnectionSupervisionTest() {
-    super(request -> supervisionManager.onProcessConnection(request));
+  @Override
+  protected String action(ProcessConnectionRequest request) {
+    return supervisionManager.onProcessConnection(request);
   }
 
   @Test
@@ -45,10 +46,10 @@ public class ProcessConnectionSupervisionTest extends AbstractSupervisionManager
   public void onValid() throws Exception {
     doAndVerify(new ProcessConnectionRequest(GOOD_PROCESSNAME),
       response -> {
-        assertNotEquals(response.getProcessName(), ProcessConnectionResponse.NO_PROCESS);
-        assertEquals(response.getProcessName(), response.getProcessName());
-        assertNotEquals(response.getProcessPIK(), ProcessConnectionResponse.NO_PIK);
-        assertNotEquals(response.getProcessPIK(), ProcessConnectionResponse.PIK_REJECTED);
+        assertEquals(GOOD_PROCESSNAME, response.getProcessName());
+        assertNotEquals(ProcessConnectionResponse.NO_PROCESS, response.getProcessName());
+        assertNotEquals(ProcessConnectionResponse.NO_PIK, response.getProcessPIK());
+        assertNotEquals(ProcessConnectionResponse.PIK_REJECTED, response.getProcessPIK());
       });
   }
 }

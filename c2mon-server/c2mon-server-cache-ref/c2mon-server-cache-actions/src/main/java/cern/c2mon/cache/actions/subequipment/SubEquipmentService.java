@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
-import java.util.Collection;
 
 /**
  * @author Szymon Halastra
@@ -56,12 +55,6 @@ public class SubEquipmentService extends BaseEquipmentServiceImpl<SubEquipment> 
   public void addSubEquipmentToEquipment(Long subEquipmentId, Long equipmentId) {
     cache.compute(subEquipmentId, subEquipment ->
       ((SubEquipmentCacheObject) subEquipment).setParentId(equipmentId));
-  }
-
-  @Override
-  public Collection<Long> getDataTagIds(Long subEquipmentId) {
-    // TODO
-    return null;
   }
 
   @Override

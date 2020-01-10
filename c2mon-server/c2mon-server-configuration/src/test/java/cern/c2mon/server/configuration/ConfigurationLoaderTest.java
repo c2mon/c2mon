@@ -925,7 +925,7 @@ public class ConfigurationLoaderTest {
 
     SubEquipment subEquipment = subEquipmentCache.get(250L);
     assertNotNull(subEquipment);
-    assertTrue(subEquipmentFacade.getDataTagIds(250L).size() == 3);
+    assertTrue(dataTagService.getDataTagIdsBySubEquipmentId(250L).size() == 3);
 
     DataTagCacheObject cacheObject = (DataTagCacheObject) dataTagCache.get(new Long(7000000));
     assertTrue(cacheObject.getSubEquipmentId() == 250L);
@@ -948,8 +948,8 @@ public class ConfigurationLoaderTest {
     assertNotNull(subEquipment);
     assertTrue(aliveTimerCache.containsKey(subEquipment.getAliveTagId()));
     assertTrue(commFaultTagCache.containsKey(subEquipment.getCommFaultTagId()));
-    assertTrue(subEquipmentFacade.getDataTagIds(250L).size() == 3);
-    for (Long tagId : subEquipmentFacade.getDataTagIds(250L)) {
+    assertTrue(dataTagService.getDataTagIdsBySubEquipmentId(250L).size() == 3);
+    for (Long tagId : dataTagService.getDataTagIdsBySubEquipmentId(250L)) {
       assertTrue(dataTagCache.containsKey(tagId));
     }
 
@@ -965,7 +965,7 @@ public class ConfigurationLoaderTest {
     assertNull(controlTagMapper.getItem(subEquipment.getAliveTagId()));
     assertNull(controlTagMapper.getItem(subEquipment.getStateTagId()));
     assertNull(controlTagMapper.getItem(subEquipment.getCommFaultTagId()));
-    for (Long tagId : subEquipmentFacade.getDataTagIds(250L)) {
+    for (Long tagId : dataTagService.getDataTagIdsBySubEquipmentId(250L)) {
       assertFalse(dataTagCache.containsKey(tagId));
     }
 

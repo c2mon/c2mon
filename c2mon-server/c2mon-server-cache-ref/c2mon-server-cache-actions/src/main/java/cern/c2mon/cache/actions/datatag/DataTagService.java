@@ -53,7 +53,19 @@ public class DataTagService extends AbstractCacheServiceImpl<DataTag> {
    * registered with this equipment
    */
   public Collection<Long> getDataTagIdsByEquipmentId(Long equipmentId) {
-    return cache.query(dataTag -> dataTag.getEquipmentId().equals(equipmentId))
+    return cache.query(dataTag -> dataTag.getEquipmentIds().contains(equipmentId))
+      .stream().map(Tag::getId).collect(Collectors.toSet());
+  }
+
+  /**
+   * Returns a collection of the ids of all DataTags registered with this
+   * subequipment (not control tags).
+   *
+   * @param subEquipmentId of the subequipment
+   * @return the ids in a collection
+   */
+  public Collection<Long> getDataTagIdsBySubEquipmentId(Long subEquipmentId) {
+    return cache.query(dataTag -> dataTag.getSubEquipmentIds().contains(subEquipmentId))
       .stream().map(Tag::getId).collect(Collectors.toSet());
   }
 
@@ -115,7 +127,7 @@ public class DataTagService extends AbstractCacheServiceImpl<DataTag> {
    *
    * <p>Notice the tag is not put back in the cache here.
    *
-   * @param dataTag            is modified by the method
+   * @param id                 the id of a DataTag to find
    * @param sourceDataTagValue the source value received from the DAQ
    * @return true if an update was performed (i.e. the value was not filtered out)
    */

@@ -19,8 +19,6 @@ package cern.c2mon.cache.actions.subequipment;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.cache.api.service.CommonEquipmentOperations;
 
-import java.util.Collection;
-
 /**
  * Facade object with business methods for the SubEquipment
  * cache object.
@@ -48,15 +46,6 @@ public interface SubEquipmentOperations extends CommonEquipmentOperations {
    * @param equipmentId    id of the parent Equipment
    */
   void addSubEquipmentToEquipment(Long subEquipmentId, Long equipmentId);
-
-  /**
-   * Returns a collection of the ids of all DataTags registered with this
-   * subequipment (not control tags).
-   *
-   * @param subEquipmentId of the subequipment
-   * @return the ids in a collection
-   */
-  Collection<Long> getDataTagIds(Long subEquipmentId);
 
   /**
    * Removes the SubEquipment from the list of SubEquipments of the Equipment.

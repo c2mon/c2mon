@@ -45,6 +45,7 @@ import static org.junit.Assert.assertNotNull;
     CommonModule.class,
     CacheConfigModuleRef.class,
     CacheDbAccessModule.class,
+    CachePopulationRule.class,
     SupervisionModule.class
 })
 public class SupervisionManagerProcessTest {
