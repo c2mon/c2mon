@@ -16,17 +16,16 @@
  *****************************************************************************/
 package cern.c2mon.server.supervision.impl;
 
-import java.util.concurrent.CountDownLatch;
-
-import org.easymock.EasyMock;
-import org.junit.Test;
-
 import cern.c2mon.server.supervision.SupervisionListener;
 import cern.c2mon.server.supervision.SupervisionNotifier;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEntity;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
+import org.easymock.EasyMock;
+import org.junit.Test;
+
+import java.util.concurrent.CountDownLatch;
 
 /**
  * Unit test of the SupervisionNotifier implementation.
@@ -60,7 +59,7 @@ public class SupervisionNotifierTest {
     supervisionNotifier.registerAsListener(supervisionListener);
   }
 
-  @Test
+  @Test(timeout = 500)
   public void testNotifications() throws InterruptedException {
     SupervisionListener supervisionListener = EasyMock.createMock(SupervisionListener.class);
     SupervisionEvent event = new SupervisionEventImpl(ENTITY, ID, NAME, STATUS, DATE, MESSAGE);
