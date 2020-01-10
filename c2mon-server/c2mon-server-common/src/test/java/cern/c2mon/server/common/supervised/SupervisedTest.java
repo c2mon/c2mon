@@ -111,7 +111,7 @@ public abstract class SupervisedTest<T extends Supervised> {
     Timestamp timestamp = Timestamp.from(Instant.now());
     action.accept(timestamp, message);
     assertEquals(expected, sample.getSupervisionStatus());
-    // Unitialized objects don't have time or description
+    // Uninitialized objects don't have time or description
     if (sample.hasNoEvents())
       return;
     assertEquals(timestamp, sample.getStatusTime());

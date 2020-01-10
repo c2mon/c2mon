@@ -16,15 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.client.core.tag;
 
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import org.easymock.EasyMock;
-import org.junit.Test;
-
 import cern.c2mon.client.common.listener.BaseTagListener;
 import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.common.tag.TypeNumeric;
@@ -38,6 +29,14 @@ import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
 import cern.c2mon.shared.rule.RuleFormatException;
+import org.easymock.EasyMock;
+import org.junit.Test;
+
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import static org.junit.Assert.*;
 
@@ -229,7 +228,7 @@ public class TagImplTest {
   }
 
   @Test
-  public void testUpdateListenerIntialUpdate() throws CloneNotSupportedException, RuleFormatException {
+  public void testUpdateListenerInitialUpdate() throws CloneNotSupportedException, RuleFormatException {
     //test setup
     TagController tagController = new TagController(1234L);
     TagUpdate tagUpdate = createValidTransferTag(1234L);

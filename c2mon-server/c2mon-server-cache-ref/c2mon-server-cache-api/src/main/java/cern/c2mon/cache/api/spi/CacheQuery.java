@@ -29,7 +29,7 @@ public class CacheQuery<V extends Cacheable> implements Function<V, Boolean> {
   private final Function<V, Boolean> filter;
 
   /**
-   * Kept to maintain compatibility with previous default, but this could definitely be reducted
+   * Kept to maintain compatibility with previous default, but this could definitely be reduced
    */
   private int maxResults = DEFAULT_MAX_RESULTS;
 
