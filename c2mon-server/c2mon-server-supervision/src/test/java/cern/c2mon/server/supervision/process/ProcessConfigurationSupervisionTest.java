@@ -5,15 +5,12 @@ import cern.c2mon.shared.daq.process.ProcessConfigurationResponse;
 import cern.c2mon.shared.daq.process.ProcessConnectionRequest;
 import org.junit.Test;
 
+import java.util.function.Consumer;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
 public class ProcessConfigurationSupervisionTest extends AbstractSupervisionManagerProcessTest<ProcessConfigurationRequest, ProcessConfigurationResponse> {
-
-  @Override
-  protected String action(ProcessConfigurationRequest request) {
-    return supervisionManager.onProcessConfiguration(request);
-  }
 
   @Test
   public void onNull() throws Exception {
@@ -30,7 +27,14 @@ public class ProcessConfigurationSupervisionTest extends AbstractSupervisionMana
   @Test
   public void onGoodPIK() throws Exception {
     supervisionManager.onProcessConnection(new ProcessConnectionRequest(GOOD_PROCESSNAME));
-    doAndVerify(new ProcessConfigurationRequest(GOOD_PROCESSNAME),
-      response -> assertNotEquals(response.getConfigurationXML(), ProcessConfigurationResponse.CONF_REJECTED));
+
+    doAndVerify(
+      new ProcessConfigurationRequest(GOOD_PROCESSNAME),
+      response -> assertNotEquals(response.getConfigurationXML(), ProcessConfigurationResponse.CONF_REJECTED)
+    );
+  }
+
+  private void doAndVerify(ProcessConfigurationRequest request, Consumer<ProcessConfigurationResponse> tests) throws Exception {
+    doAndVerify(request, supervisionManager::onProcessConfiguration, tests);
   }
 }

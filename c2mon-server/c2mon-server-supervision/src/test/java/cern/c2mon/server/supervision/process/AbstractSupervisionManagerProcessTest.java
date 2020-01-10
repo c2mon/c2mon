@@ -18,6 +18,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.inject.Inject;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static org.junit.Assert.assertNotNull;
 
@@ -50,8 +51,8 @@ public abstract class AbstractSupervisionManagerProcessTest<REQ extends ProcessR
 
   protected XMLConverter xmlConverter = new XMLConverter();
 
-  protected void doAndVerify(REQ request, Consumer<RES> tests) throws Exception {
-    String xmlProcessConfigurationResponse = action(request);
+  protected void doAndVerify(REQ request, Function<REQ,String> action, Consumer<RES> tests) throws Exception {
+    String xmlProcessConfigurationResponse = action.apply(request);
     assertNotNull(xmlProcessConfigurationResponse);
 
     Object resultObj = xmlConverter.fromXml(xmlProcessConfigurationResponse);
@@ -60,6 +61,4 @@ public abstract class AbstractSupervisionManagerProcessTest<REQ extends ProcessR
 
     tests.accept((RES) resultObj);
   }
-
-  protected abstract String action(REQ request);
 }

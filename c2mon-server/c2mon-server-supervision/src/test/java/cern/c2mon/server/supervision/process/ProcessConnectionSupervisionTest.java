@@ -4,16 +4,13 @@ import cern.c2mon.shared.daq.process.ProcessConnectionRequest;
 import cern.c2mon.shared.daq.process.ProcessConnectionResponse;
 import org.junit.Test;
 
+import java.util.function.Consumer;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
 
 public class ProcessConnectionSupervisionTest extends AbstractSupervisionManagerProcessTest<ProcessConnectionRequest, ProcessConnectionResponse> {
-
-  @Override
-  protected String action(ProcessConnectionRequest request) {
-    return supervisionManager.onProcessConnection(request);
-  }
 
   @Test
   public void onNull() throws Exception {
@@ -51,5 +48,9 @@ public class ProcessConnectionSupervisionTest extends AbstractSupervisionManager
         assertNotEquals(ProcessConnectionResponse.NO_PIK, response.getProcessPIK());
         assertNotEquals(ProcessConnectionResponse.PIK_REJECTED, response.getProcessPIK());
       });
+  }
+
+  private void doAndVerify(ProcessConnectionRequest request, Consumer<ProcessConnectionResponse> tests) throws Exception {
+    doAndVerify(request, supervisionManager::onProcessConnection, tests);
   }
 }

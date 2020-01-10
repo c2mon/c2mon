@@ -6,15 +6,12 @@ import cern.c2mon.shared.daq.process.ProcessConnectionResponse;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.function.Consumer;
+
 import static org.junit.Assert.assertEquals;
 
 public class ProcessDisconnectionSupervisionTest extends AbstractSupervisionManagerProcessTest<ProcessConnectionRequest, ProcessConnectionResponse> {
   private long pik;
-
-  @Override
-  protected String action(ProcessConnectionRequest request) {
-    return supervisionManager.onProcessConnection(request);
-  }
 
   @Before
   public void connectAndConfigure() throws Exception {
@@ -38,7 +35,12 @@ public class ProcessDisconnectionSupervisionTest extends AbstractSupervisionMana
     // PIK rejected second attempt
 //    assertEquals(processConnectionResponse.getProcessPIK(), ProcessConnectionResponse.PIK_REJECTED);
   }
-//
+
+  private void doAndVerify(ProcessConnectionRequest request, Consumer<ProcessConnectionResponse> tests) throws Exception {
+    doAndVerify(request, supervisionManager::onProcessConnection, tests);
+  }
+
+  //
 //  @Test
 //  public void testOnProcessDisconnectionNoProcessNameAndID() {
 //
