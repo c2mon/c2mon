@@ -28,50 +28,32 @@ public abstract class SupervisedServiceTest<T extends Supervised> extends Superv
     verifySupervisionEvent(sample, DOWN);
   }
 
-  private void verifySupervisionEvent(Supervised supervised, SupervisionStatus expectedStatus) {
-    SupervisionEvent event = supervisedService.getSupervisionEvent(supervised.getId());
-
-    assertEquals(supervised.getId(), event.getEntityId());
-    assertEquals(event.getEntity(), supervised.getSupervisionEntity());
-    assertEquals(expectedStatus, event.getStatus());
-
-    // Repeating the attempt yields an equal result
-    assertEquals(event, supervisedService.getSupervisionEvent(supervised.getId()));
-  }
-
   @Test
   public void start() {
-    cacheSupervision(() -> supervisedService.start(sample.getId(), Timestamp.from(Instant.now())),
+    cacheSupervision(
+      () -> supervisedService.start(sample.getId(), Timestamp.from(Instant.now())),
       STARTUP);
   }
 
   @Test
   public void stop() {
-    cacheSupervision(() -> supervisedService.stop(sample.getId(), Timestamp.from(Instant.now())),
+    cacheSupervision(
+      () -> supervisedService.stop(sample.getId(), Timestamp.from(Instant.now())),
       DOWN);
   }
 
   @Test
   public void suspend() {
-    cacheSupervision(() -> supervisedService.suspend(sample.getId(), Timestamp.from(Instant.now()), ""),
+    cacheSupervision(
+      () -> supervisedService.suspend(sample.getId(), Timestamp.from(Instant.now()), ""),
       DOWN);
   }
 
   @Test
   public void resume() {
-    cacheSupervision(() -> supervisedService.resume(sample.getId(), Timestamp.from(Instant.now()), ""),
+    cacheSupervision(
+      () -> supervisedService.resume(sample.getId(), Timestamp.from(Instant.now()), ""),
       RUNNING);
-  }
-
-  private void cacheSupervision(Supplier<T> cacheAction, SupervisionStatus expected) {
-    cache.put(sample.getId(), sample);
-
-    T cacheObj = cacheAction.get();
-
-    // Cache object has achieved expected status
-    verifySupervisionEvent(cacheObj, expected);
-    // Source object has not been affected
-    assertEquals(DOWN, sample.getSupervisionStatus());
   }
 
   @Test
@@ -113,5 +95,27 @@ public abstract class SupervisedServiceTest<T extends Supervised> extends Superv
 
     verifySupervisionEvent(sample, UNCERTAIN);
     assertTrue(supervisedService.isUncertain(sample.getId()));
+  }
+
+  private void verifySupervisionEvent(Supervised supervised, SupervisionStatus expectedStatus) {
+    SupervisionEvent event = supervisedService.getSupervisionEvent(supervised.getId());
+
+    assertEquals(supervised.getId(), event.getEntityId());
+    assertEquals(event.getEntity(), supervised.getSupervisionEntity());
+    assertEquals(expectedStatus, event.getStatus());
+
+    // Repeating the attempt yields an equal result
+    assertEquals(event, supervisedService.getSupervisionEvent(supervised.getId()));
+  }
+
+  private void cacheSupervision(Supplier<T> cacheAction, SupervisionStatus expected) {
+    cache.put(sample.getId(), sample);
+
+    T cacheObj = cacheAction.get();
+
+    // Cache object has achieved expected status
+    verifySupervisionEvent(cacheObj, expected);
+    // Source object has not been affected
+    assertEquals(DOWN, sample.getSupervisionStatus());
   }
 }

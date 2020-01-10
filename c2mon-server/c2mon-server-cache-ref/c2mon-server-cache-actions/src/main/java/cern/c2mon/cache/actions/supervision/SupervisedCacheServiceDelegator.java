@@ -34,7 +34,6 @@ public interface SupervisedCacheServiceDelegator<T extends Supervised> extends S
   }
 
   @Override
-  @Deprecated
   default T start(long id, Timestamp timestamp) {
     return getSupervisedService().start(id, timestamp);
   }
