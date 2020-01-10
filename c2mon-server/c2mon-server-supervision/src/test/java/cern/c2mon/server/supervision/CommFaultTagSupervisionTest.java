@@ -16,17 +16,9 @@
  *****************************************************************************/
 package cern.c2mon.server.supervision;
 
-import cern.c2mon.cache.actions.CacheActionsModuleRef;
-import cern.c2mon.cache.actions.process.ProcessService;
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
-import cern.c2mon.server.common.alive.AliveTag;
-import cern.c2mon.server.common.config.CommonModule;
 import cern.c2mon.server.common.equipment.Equipment;
-import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.subequipment.SubEquipment;
-import cern.c2mon.server.supervision.config.SupervisionModule;
-import cern.c2mon.server.supervision.impl.SupervisionTagNotifier;
 import cern.c2mon.server.test.CachePopulationRule;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.common.datatag.SourceDataTagQuality;
@@ -38,30 +30,21 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.sql.Timestamp;
 import java.util.concurrent.CountDownLatch;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 /**
  * Integration test of supervision module with core cache modules.
  *
- * @author Mark Brightwell
+ * @author Alexandros Papageorgiou, Mark Brightwell
  *
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {
-    CommonModule.class,
-    CacheActionsModuleRef.class,
-    CacheDbAccessModule.class,
-    SupervisionModule.class
-})
-public class SupervisionManagerTest {
+public class CommFaultTagSupervisionTest extends SupervisionCacheTest {
 
   @Rule
   @Autowired
@@ -71,18 +54,6 @@ public class SupervisionManagerTest {
   private SupervisionManager supervisionManager;
 
   @Autowired
-  private SupervisionFacade supervisionFacade;
-
-  @Autowired
-  private C2monCache<AliveTag> aliveTimerCache;
-
-  @Autowired
-  private C2monCache<Process> processCache;
-
-  @Autowired
-  private ProcessService processService;
-
-  @Autowired
   private C2monCache<Equipment> equipmentCache;
 
   @Autowired
@@ -90,9 +61,6 @@ public class SupervisionManagerTest {
 
   @Autowired
   private SupervisionNotifier supervisionNotifier;
-
-  @Autowired
-  private SupervisionTagNotifier supervisionTagNotifier;
 
   /**
    * Mock listeners registered for supervision events &
@@ -108,130 +76,6 @@ public class SupervisionManagerTest {
     controller = EasyMock.createNiceControl();
     supervisionListener = controller.createMock(SupervisionListener.class);
     supervisionNotifier.registerAsListener(supervisionListener);
-  }
-
-  /**
-   * Tests a process alive tag is correctly processed by the SupervisionManager
-   * (alive timer updated; supervision listeners notified, etc).
-   *
-   * Process is down at start of test, then alive is received.
-   *
-   * @throws InterruptedException
-   */
-  @Test
-  public void testProcessAliveTag() throws InterruptedException {
-    CountDownLatch latch = new CountDownLatch(6);
-    supervisionListener.notifySupervisionEvent(EasyMock.isA(SupervisionEvent.class));
-    EasyMock.expectLastCall().andAnswer(() -> { latch.countDown(); return null; }).times(6);
-
-    controller.replay();
-
-    //check initial status is correct
-    AliveTag aliveTimer = aliveTimerCache.get(1221L);
-    assertNotNull(aliveTimer);
-    assertEquals(0, aliveTimer.getLastUpdate());
-    Process process = processCache.get(aliveTimer.getRelatedId());
-    assertEquals(SupervisionStatus.DOWN, process.getSupervisionStatus());
-    assertEquals(null, process.getStatusTime());
-    assertEquals(null, process.getStatusDescription());
-//    Tag stateTag = controlTagCache.get(1220L);
-//    assertEquals(null, stateTag.getValue());
-
-    long updateTime = System.currentTimeMillis();
-    //process control tag
-    supervisionManager.processControlTag(new SourceDataTagValue(1221L,
-        "test alive", true, 0L, new SourceDataTagQuality(), new Timestamp(updateTime), 4, false, "description", 10000));
-
-    //check alive is updated
-    aliveTimer = aliveTimerCache.get(1221L);
-    assertNotNull(aliveTimer.getLastUpdate());
-    assertTrue(aliveTimer.getLastUpdate() > System.currentTimeMillis() - 10000); //account for non-synchronized
-
-    //check process status is changed
-    process = processCache.get(aliveTimer.getRelatedId());
-    assertEquals(SupervisionStatus.RUNNING, process.getSupervisionStatus());
-    Timestamp processTime = process.getStatusTime();
-    assertTrue(processTime.after(new Timestamp(updateTime - 1)));
-    assertNotNull(process.getStatusDescription());
-
-    //check tags are updated (note alive tag is not updated; this is done in SourceUpdateManager)
-//    stateTag = controlTagCache.get(1220L);
-//    assertEquals(SupervisionStatus.RUNNING.toString(), stateTag.getValue());
-//    assertEquals(processTime, stateTag.getCacheTimestamp());
-
-    latch.await(); //wait for notification on listener thread
-    controller.verify();
-  }
-
-  /**
-   * Alives older than 2 minutes are rejected.
-   */
-  @Test
-  public void testRejectOldAlive() {
-    //check alive timer is defined & set last update
-    AliveTag aliveTimer = aliveTimerCache.get(1221L);
-    assertNotNull(aliveTimer);
-    aliveTimer.setLastUpdate(System.currentTimeMillis()-1000);
-    long aliveTime = aliveTimer.getLastUpdate();
-    //send alive 2 minutes old (should be rejected)
-    SourceDataTagValue value = new SourceDataTagValue(1221L,
-        "test alive", true, 0L, new SourceDataTagQuality(), new Timestamp(System.currentTimeMillis()), 4, false, "description", 10000);
-    value.setDaqTimestamp(new Timestamp(System.currentTimeMillis() - 130000));
-    supervisionManager.processControlTag(value);
-
-    //no update
-    assertEquals(aliveTime, aliveTimer.getLastUpdate());
-  }
-
-  /**
-   * Checks a new process alive has no affect on the state tag or on the process
-   * status, since it is already down as running. Only the alive is updated.
-   * @throws InterruptedException
-   */
-  @Test
-  public void testProcessAliveNoAffect() throws InterruptedException {
-    controller.reset();
-    controller.replay(); //no listener call this time
-
-    //check initial status is correct
-    AliveTag aliveTimer = aliveTimerCache.get(1221L);
-    assertNotNull(aliveTimer);
-    long aliveTime = aliveTimer.getLastUpdate();
-    Process process = processCache.get(aliveTimer.getRelatedId());
-
-    processService.start(process.getId(), new Timestamp(System.currentTimeMillis()));
-    processService.resume(process.getId(), new Timestamp(System.currentTimeMillis()), "");
-
-    process = processCache.get(aliveTimer.getRelatedId());
-
-    assertEquals(SupervisionStatus.RUNNING, process.getSupervisionStatus());
-    Timestamp originalProcessTime = process.getStatusTime();
-    assertNotNull(originalProcessTime);
-    assertNotNull(process.getStatusDescription());
-//    Tag stateTag = controlTagCache.get(1220L);
-//    assertEquals(SupervisionStatus.RUNNING.toString(), stateTag.getValue());
-
-    long updateTime = System.currentTimeMillis();
-    //process control tag
-    supervisionManager.processControlTag(new SourceDataTagValue(1221L,
-        "test alive", true, 0L, new SourceDataTagQuality(), new Timestamp(updateTime), 4, false, "description", 10000));
-
-    //check alive is updated
-    assertNotNull(aliveTimer.getLastUpdate());
-    assertTrue(aliveTimer.getLastUpdate() > aliveTime - 1);
-
-    //check process status is not changed & time also
-    assertEquals(SupervisionStatus.RUNNING, process.getSupervisionStatus());
-    Timestamp processTime = process.getStatusTime();
-    assertEquals(originalProcessTime, processTime);
-    assertNotNull(process.getStatusDescription());
-
-    //check tags are updated (note alive tag is not updated; this is done in SourceUpdateManager)
-//    assertEquals(SupervisionStatus.RUNNING.toString(), stateTag.getValue());
-//    assertEquals(originalProcessTime, stateTag.getCacheTimestamp());
-
-//    Thread.sleep(2000); //wait for notification on listener thread
-    controller.verify(); //expect one call on the supervision listener
   }
 
   /**
