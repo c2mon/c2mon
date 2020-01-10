@@ -1,4 +1,4 @@
-package cern.c2mon.server.supervision.impl;
+package cern.c2mon.server.supervision.process;
 
 import cern.c2mon.cache.actions.CacheActionsModuleRef;
 import cern.c2mon.cache.config.CacheConfigModuleRef;
