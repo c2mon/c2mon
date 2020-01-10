@@ -5,6 +5,7 @@ import cern.c2mon.cache.actions.process.ProcessService;
 import cern.c2mon.cache.actions.process.ProcessXMLProvider;
 import cern.c2mon.cache.actions.subequipment.SubEquipmentService;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
+import cern.c2mon.cache.api.exception.TooManyQueryResultsException;
 import cern.c2mon.server.common.config.ServerProperties;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.process.Process;
@@ -293,6 +294,8 @@ public class ProcessEvents extends SupervisionEventHandler<Process> {
       } catch (CacheElementNotFoundException cacheEx) {
         log.error("Unable to locate process " + process.getId() + " in cache.", cacheEx);
       }
+    } catch (TooManyQueryResultsException cacheEx) {
+      log.error("Found more than one processes with the given name. Please clean up the database!", cacheEx);
     } catch (CacheElementNotFoundException cacheEx) {
       log.error("Process object could not be retrieved from cache - disconnection actions may be incomplete.", cacheEx);
     } catch (IllegalArgumentException argEx) {
