@@ -57,6 +57,23 @@ public abstract class SupervisedServiceTest<T extends Supervised> extends Superv
   }
 
   @Test
+  public void resumingStartedObjectResultsInNoEffect() {
+    cache.put(sample.getId(), sample);
+
+    long initialTimeMillis = System.currentTimeMillis() - 1;
+    supervisedService.start(sample.getId(), new Timestamp(initialTimeMillis));
+    assertEquals(initialTimeMillis, supervisedService.getSupervisionEvent(sample.getId()).getEventTime().getTime());
+
+    long timeOfRunningNotStartupStatus = initialTimeMillis + 1;
+    supervisedService.resume(sample.getId(), new Timestamp(timeOfRunningNotStartupStatus), "");
+    supervisedService.resume(sample.getId(), new Timestamp(initialTimeMillis + 2), "");
+
+    SupervisionEvent supervisionEvent = supervisedService.getSupervisionEvent(sample.getId());
+    assertEquals(timeOfRunningNotStartupStatus, supervisionEvent.getEventTime().getTime());
+    assertEquals(RUNNING, supervisionEvent.getStatus());
+  }
+
+  @Test
   public void isRunning() {
     cache.put(sample.getId(), sample);
     // Default
