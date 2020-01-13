@@ -46,7 +46,7 @@ public class SupervisionStateTag extends AbstractCacheableImpl {
      */
     final String statusDescription;
 
-    /**STOPPED
+    /**
      * Time when this supervision status was last confirmed
      */
     final Timestamp statusTime;
@@ -62,6 +62,6 @@ public class SupervisionStateTag extends AbstractCacheableImpl {
     final Long commFaultTagId;
 
     public SupervisionStateTag() {
-        this(0L, SupervisionEntity.EQUIPMENT, SupervisionStatus.DOWN, "", new Timestamp(0L), null, null);
+        this(0L, null, null, null, null, null, null);
     }
 }
