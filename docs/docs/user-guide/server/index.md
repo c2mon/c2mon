@@ -5,7 +5,7 @@ summary:  How to configure and start the C2MON server.
 ---
 
 
-How to deploy and start C2MON server with Docker or the distribution tarball is described in the [Getting Started](/getting-started) Guide
+How to deploy and start C2MON server with Docker or the distribution tarball is described in the [Getting Started]({{ site.baseurl }}{% link docs/getting-started/index.md %}) Guide
 
 However, it is also possible to run C2MON from within your favourite IDE. For this you have to:
 
@@ -17,7 +17,7 @@ All you need is at least **Java 1.8** installed on your machine.
 
 Here, an example how the _run configuration_ looks in Eclipse:
 
-![eclipse-server-config]({{site.baseurl }}/assets/img/user-guide/server/eclipse-server-config.png)
+![eclipse-server-config]({{ site.baseurl }}{% link assets/img/user-guide/server/eclipse-server-config.png %})
 
 ## Changing default configuration
 
