@@ -10,6 +10,7 @@ import cern.c2mon.server.common.device.DeviceClass;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.rule.RuleTag;
+import cern.c2mon.server.common.status.SupervisionStateTag;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.shared.common.command.CommandTag;
 import org.springframework.stereotype.Service;
@@ -36,13 +37,14 @@ public class CachePopulationRule extends DatabasePopulationRule {
   private C2monCache<Process> processCache;
   private C2monCache<RuleTag> ruleTagCache;
   private C2monCache<SubEquipment> subEquipmentCache;
+  private C2monCache<SupervisionStateTag> stateTagCache;
 
   public CachePopulationRule(C2monCache<Alarm> alarmCache, C2monCache<AliveTag> aliveTimerCache,
                              C2monCache<CommandTag> commandTagCache, C2monCache<CommFaultTag> commFaultTagCache,
                              C2monCache<DataTag> dataTagCache, C2monCache<Device> deviceCache,
                              C2monCache<DeviceClass> deviceClassCache, C2monCache<Equipment> equipmentCache,
                              C2monCache<Process> processCache, C2monCache<RuleTag> ruleTagCache,
-                             C2monCache<SubEquipment> subEquipmentCache) {
+                             C2monCache<SubEquipment> subEquipmentCache, C2monCache<SupervisionStateTag> stateTagCache) {
     this.alarmCache = alarmCache;
     this.aliveTimerCache = aliveTimerCache;
     this.commandTagCache = commandTagCache;
@@ -54,6 +56,7 @@ public class CachePopulationRule extends DatabasePopulationRule {
     this.processCache = processCache;
     this.ruleTagCache = ruleTagCache;
     this.subEquipmentCache = subEquipmentCache;
+    this.stateTagCache = stateTagCache;
   }
 
 
@@ -71,5 +74,6 @@ public class CachePopulationRule extends DatabasePopulationRule {
     commandTagCache.init();
     deviceClassCache.init();
     deviceCache.init();
+    stateTagCache.init();
   }
 }
