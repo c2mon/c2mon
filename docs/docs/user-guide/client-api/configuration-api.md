@@ -144,7 +144,7 @@ The first parameter expects the name of an already created `Tag`. An alarm ID wi
 
 `Alarm#create` and `Alarm#update` methods also exist in a similar manner as for the `DataTag`.
 
-As initially explained in the [Alarm Overview section](/c2mon/docs/overview/alarms.html) C2MON currently provides two alarm condition classes, that is [RangeAlarmCondition](https://github.com/c2mon/c2mon/blob/master/c2mon-shared/c2mon-shared-client/src/main/java/cern/c2mon/shared/client/alarm/condition/RangeAlarmCondition.java) and [ValueAlarmCondition](https://github.com/c2mon/c2mon/blob/master/c2mon-shared/c2mon-shared-client/src/main/java/cern/c2mon/shared/client/alarm/condition/ValueAlarmCondition.java).
+As initially explained in the [Alarm Overview section]({{ site.baseurl }}{% link docs/overview/alarms.md %}) C2MON currently provides two alarm condition classes, that is [RangeAlarmCondition](https://github.com/c2mon/c2mon/blob/master/c2mon-shared/c2mon-shared-client/src/main/java/cern/c2mon/shared/client/alarm/condition/RangeAlarmCondition.java) and [ValueAlarmCondition](https://github.com/c2mon/c2mon/blob/master/c2mon-shared/c2mon-shared-client/src/main/java/cern/c2mon/shared/client/alarm/condition/ValueAlarmCondition.java).
 
 ## Create custom alarm conditions
 To write your own alarm condition class you have to extend the abstract [AlarmCondition](https://github.com/c2mon/c2mon/blob/master/c2mon-shared/c2mon-shared-client/src/main/java/cern/c2mon/shared/client/alarm/condition/AlarmCondition.java) class and implement your custom evaluation logic in `AlarmCondition#evaluateState(Object value)`.
