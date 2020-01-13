@@ -23,7 +23,7 @@ To find out how to get up and running with your own C2MON instance, check out th
 
 ## Source Code
 
-The source code of C2MON is provided under [GNU LGPL Version 3]({{ site.baseurl }}{% link docs/about/license/index.md %}) on [GitHub](http://github.com/c2mon/c2mon) and on [CERN GitLab](https://gitlab.cern.ch/c2mon/c2mon).
+The source code of C2MON is provided under [GNU LGPL Version 3]({{ site.baseurl }}{% link docs/c2mon-license.md %}) on [GitHub](http://github.com/c2mon/c2mon) and on [CERN GitLab](https://gitlab.cern.ch/c2mon/c2mon).
 
 
 ## Download and Install
