@@ -19,7 +19,7 @@ search for and subscribe to tags.
 
 To use the API, you need to add a dependency on `c2mon-client-core`.
 
-Remember to replace "__insert_version_here__" with a real version number, such as "1.8.30"
+Remember to replace "__insert_version_here__" with a real version number, such as "1.9.3"
 
 ## Maven configuration
 If you make use of Maven include the following dependency in you C2MON client project:
@@ -65,7 +65,7 @@ repositories {
 C2MON comes with reasonable defaults for most settings.
 Before you get out to tweak and tune the configuration, make sure you understand what are you trying to accomplish and the consequences.
 
-The primary way of configuring a C2MON client application is via the [c2mon-client.properties] configuration file, which is delivered as example with the [c2mon-web-ui](https://github.com/c2mon/c2mon-web-ui) tarball.
+The primary way of configuring a C2MON client application is via the [c2mon-client.properties](https://github.com/c2mon/c2mon-web-ui/blob/master/src/dist/tar/conf/c2mon-client.properties) configuration file, which is delivered as example with the [c2mon-web-ui tarball](https://nexus.web.cern.ch/nexus/service/local/artifact/maven/redirect?r=cern-nexus&g=cern.c2mon.web&a=c2mon-web-ui&v=LATEST&e=tar.gz).
 It contains the most important settings and their default values you may want to change for your environment.
 
 To inject a customised properties file to your C2MON client application use this Java system property: `-Dc2mon.client.conf.url`
@@ -122,4 +122,4 @@ TagService tagService = C2monServiceGateway.getTagService();
 # Getting data
 
 Once you have access to the `TagService`, you can start to retrieve data from C2MON. To find and subscribe your data you can either use the unique tag ID,
-or the unique tag name. Read more on the [Data Subscription documentation page](data-subscription)
+or the unique tag name. Read more on the [Data Subscription documentation page]({{ site.baseurl }}{% link docs/user-guide/client-api/data-subscription.md %})
