@@ -34,7 +34,7 @@ c2mon.client.history.jdbc.url=jdbc:hsqldb:hsql://localhost/c2mondb;sql.syntax_or
 c2mon.client.history.jdbc.username=sa
 c2mon.client.history.jdbc.password=
 ```
-See also [C2MON properties](/user-guide/server/database).
+See also [C2MON properties]({{ site.baseurl }}{% link docs/user-guide/server/database.md %}).
 
 !!! info "Note"
     C2MON currently only supports Oracle, HSQL and MySQL as backing stores.
