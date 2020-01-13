@@ -60,4 +60,4 @@ are determined using the default Elasticsearch type analysis strategy.
 
 # Advanced customisation
 
-Other aspects of the Elasticsearch integration can be customised. See Elasticsearch section in the [c2mon-server.properties](https://github.com/c2mon/c2mon/blob/master/c2mon-server/distribution/tar/conf/c2mon-server.properties#L340) file for details.
+Other aspects of the Elasticsearch integration can be customised. See Elasticsearch section in the [c2mon-server.properties](https://github.com/c2mon/c2mon/blob/f60242ed250843bbf217e1767d742664ecb6ef38/c2mon-server/distribution/tar/conf/c2mon-server.properties#L357) file for details.
