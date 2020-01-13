@@ -26,7 +26,7 @@ Deploying C2MON on a cloud infrastructure involves the following architectural l
 |Publishing Layer|C2MON can in turn republish tag updates, validity status or aggregation results through standard protocols (DIP, AQMP, HTTP, WebSockets).|
 |Presentation Layer|This layer formats data updates into graphical operation panels and offers historical data access. This layer represents the data's intended destination.|
  
-![Screenshot]({{ site.baseurl }}{% link docs/assets/img/user-guide/c2mon-layers-overview.png %})
+![Screenshot]({{ site.baseurl }}{% link assets/img/user-guide/c2mon-layers-overview.png %})
 
 ## Running the server
 
