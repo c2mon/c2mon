@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+  <mapper namespace="cern.c2mon.server.cache.dbaccess.StateTagMapper">
+
+    <resultMap id="stateTagResultMap" type="cern.c2mon.server.common.status.SupervisionStateTag">
+      <constructor>
+        <idArg column="STATETAGID" javaType="Long"/>
+        <arg column="SUP_ID" javaType="Long"/>
+        <arg column="SUP_TYPE" javaType="String"/>
+        <arg column="ALIVETAGID" javaType="Long"/>
+        <arg column="COMMFAULTID" javaType="Long"/>
+      </constructor>
+    </resultMap>
+
+
+    <!-- getAll needed for persistent caches -->
+    <select id="getAll" resultMap="stateTagResultMap">
+      SELECT STATETAGID, SUP_ID, SUP_TYPE, ALIVETAGID, COMMFAULTID
+        FROM STATETAG
+    </select>
+
+    <!-- getItem needed for persistence caches -->
+    <select id="getItem" resultMap="stateTagResultMap" parameterType="Long">
+      SELECT STATETAGID, SUP_ID, SUP_TYPE, ALIVETAGID, COMMFAULTID
+        FROM STATETAG
+       WHERE STATETAGID = #{id}
+    </select>
+
+    <select id="isInDb" resultType="boolean" parameterType="Long">
+      SELECT count(*)
+        FROM STATETAG
+       WHERE STATETAGID = #{id}
+    </select>
+
+    <select id="getNumberItems" resultType="Integer">
+      SELECT COUNT(DISTINCT STATETAGID)
+        FROM STATETAG
+    </select>
+  </mapper>

@@ -14,10 +14,48 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
+
 package cern.c2mon.server.cache.dbaccess;
 
 import cern.c2mon.server.common.status.SupervisionStateTag;
+import cern.c2mon.server.test.DatabasePopulationRule;
+import cern.c2mon.shared.common.Cacheable;
+import org.junit.Rule;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
-public interface StateTagMapper extends LoaderMapper<SupervisionStateTag> {
+import java.util.List;
 
+import static org.junit.Assert.*;
+
+public class StateTagMapperTest extends AbstractMapperTest {
+
+  @Rule
+  @Autowired
+  public DatabasePopulationRule databasePopulationRule;
+
+  @Autowired
+  private StateTagMapper stateTagMapper;
+
+  @Test
+  public void testGetAll() {
+    List<SupervisionStateTag> stateTags = stateTagMapper.getAll();
+    assertEquals(6, stateTags.size());
+  }
+
+  @Test
+  public void testGetOne() {
+    Cacheable item = stateTagMapper.getItem(1220L); //needs to correspond to one in DB
+    assertNotNull(item);
+  }
+
+  @Test
+  public void testIsInDB() {
+    assertTrue(stateTagMapper.isInDb(1220L));
+  }
+
+  @Test
+  public void testNotInDB() {
+    assertFalse(stateTagMapper.isInDb(12345L));
+  }
 }
