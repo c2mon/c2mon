@@ -18,7 +18,7 @@ We do a constant effort to complete our documentation. If you are missing some i
 
 For an introduction to the architecture and concepts behind C2MON, see [the overview]({{ site.baseurl }}{% link docs/overview/index.md %}).
 
-To find out how to get up and running with your own C2MON instance, check out the [Getting Started]({{ site.baseurl }}{% link docs/getting-started/index.md %}) guide.
+To find out how to get up and running with your own C2MON instance, check out the [Getting Started]({{ site.baseurl }}{% link docs/getting-started.md %}) guide.
 
 
 ## Source Code
