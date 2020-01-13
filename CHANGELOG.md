@@ -19,6 +19,7 @@ For more details on a given release, please check also the [version planning](ht
 
 ### Fixed
 - Client API: Fixed Elasticsearch tests for C2MON client API (CM-230)
+- Docs: Fixed all cross-reference links in the C2MON documentation
 
 ### Deprecated
 - Client API: Renamed some of the ElasticsearchService methods. Old method names still exist but are marked as deprecated.
