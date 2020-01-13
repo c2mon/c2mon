@@ -26,7 +26,7 @@ Deploying C2MON on a cloud infrastructure involves the following architectural l
 |Publishing Layer|C2MON can in turn republish tag updates, validity status or aggregation results through standard protocols (DIP, AQMP, HTTP, WebSockets).|
 |Presentation Layer|This layer formats data updates into graphical operation panels and offers historical data access. This layer represents the data's intended destination.|
  
-![Screenshot]({{site.baseurl }}/assets/img/user-guide/c2mon-layers-overview.png)
+![Screenshot]({{ site.baseurl }}{% link docs/assets/img/user-guide/c2mon-layers-overview.png %})
 
 ## Running the server
 
@@ -118,7 +118,8 @@ To perform any changes visit http://your_cluster_ip:31323/login, use `admin/admi
 
 
 ## What's next?
-What you achieved with this tutorial is a Hello World demonstration of C2MON to understand the [core concepts](/core-concepts) of the framework.
+What you achieved with this tutorial is a Hello World demonstration of C2MON to understand the [core concepts]({{ site.baseurl }}{% link docs/overview/index.md %}) of the framework.
 
 However, in order to use C2MON for your own use case you have now work on connecting to your data sources. This will require to get more familiar with the C2MON Data Acquisition (DAQ) layer.
-Maybe you can use some of the existing [Open Source DAQs](https://github.com/c2mon?utf8=%E2%9C%93&q=c2mon-daq), but most probably you want to write your own DAQ process. Therefore, you should next read about the [DAQ API](/user-guide/daq-api).
+Maybe you can use some of the existing [Open Source DAQs](https://github.com/c2mon?utf8=%E2%9C%93&q=c2mon-daq), but most probably you want to write your own DAQ process.
+Therefore, you should next read about the [DAQ API]({{ site.baseurl }}{% link docs/user-guide/daq-api/index.md %}).
