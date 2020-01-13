@@ -33,7 +33,7 @@ It comes with a simple and intuitive data subscription API with integrated histo
 * Use your data with [Elasticsearch](https://www.elastic.co/), [Oracle DB](https://www.oracle.com/database/), [MySQL](https://www.mysql.com/), [HSQL](http://hsqldb.org/) or anything else you choose
 * Deliver value to your end users with intuitive [Grafana dashboards](https://grafana.com/)
 * Tweak a server based on Java and [Spring](http://projects.spring.io/spring-framework/)
-* Write your own [Data Acquisition Modules](docs/user-guide/daq-api/daq-module-developer-guide.md)
+* Write your own [Data Acquisition Modules]({{ site.baseurl }}{% link docs/user-guide/daq-api/daq-module-developer-guide.md %})
 * Extendable Java and REST client API available (check a sample below)
 
 {% include video.html url="hxo8K0lbqos" %}
