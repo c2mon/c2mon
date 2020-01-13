@@ -71,6 +71,6 @@ A few DAQ modules are provided on [GitHub](https://github.com/c2mon?utf8=%E2%9C%
 
 ## DAQ module configuration
 
-To configure a new a DAQ Processes or just Tags on a given DAQ module make use of the [C2MON Configuration API]({{ site.baseurl }}{% link docs/user-guide/client-api/configuration.md %}).
+To configure a new a DAQ Processes or just Tags on a given DAQ module make use of the [C2MON Configuration API]({{ site.baseurl }}{% link docs/user-guide/client-api/configuration-api.md %}).
 
 Every tarball contains a [c2mon-daq.properties](https://github.com/c2mon/c2mon/blob/master/c2mon-daq/distribution/src/main/resources/tar/conf/c2mon-daq.properties) file in the `/conf` directory for changing the default setup to your needs. The properties listed in the file can just as well be set as Java system properties with the `-D` option.
