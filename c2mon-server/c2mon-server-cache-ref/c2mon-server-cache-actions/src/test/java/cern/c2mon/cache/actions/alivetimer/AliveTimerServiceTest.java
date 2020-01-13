@@ -40,7 +40,7 @@ public class AliveTimerServiceTest {
 
     aliveTimerCacheRef.put(1L, aliveTimer);
 
-    aliveTimerService.start(1L);
+    aliveTimerService.start(1L, System.currentTimeMillis());
 
     assertTrue("Test if AliveTimer is started, set as active", aliveTimerCacheRef.get(1L).isActive());
     assertTrue("Test if last update is set up", aliveTimerCacheRef.get(1L).getLastUpdate() != 0);
@@ -53,7 +53,7 @@ public class AliveTimerServiceTest {
 
     aliveTimerCacheRef.put(1L, aliveTimer);
 
-    aliveTimerService.start(1L);
+    aliveTimerService.start(1L, System.currentTimeMillis());
 
     assertTrue("Test if AliveTimer is started, set as active", aliveTimerCacheRef.get(1L).isActive());
     assertTrue("Test if last update is set up", aliveTimerCacheRef.get(1L).getLastUpdate() != 0);
@@ -66,13 +66,13 @@ public class AliveTimerServiceTest {
 
     aliveTimerCacheRef.put(aliveTimer.getId(), aliveTimer);
 
-    aliveTimerService.start(1L);
+    aliveTimerService.start(1L, System.currentTimeMillis());
 
     long firstUpdate = aliveTimerCacheRef.get(1L).getLastUpdate();
 
     Thread.sleep(100);
 
-    aliveTimerService.startOrUpdateTimestamp(1L);
+    aliveTimerService.startOrUpdateTimestamp(1L, System.currentTimeMillis());
 
     assertTrue("Test if AliveTimer is active", aliveTimerCacheRef.get(1L).isActive());
     assertTrue("Test if AliveTimer is updated", aliveTimerCacheRef.get(1L).getLastUpdate() != firstUpdate);
@@ -85,7 +85,7 @@ public class AliveTimerServiceTest {
 
     aliveTimerCacheRef.put(aliveTimer.getId(), aliveTimer);
 
-    aliveTimerService.startOrUpdateTimestamp(aliveTimer.getId());
+    aliveTimerService.startOrUpdateTimestamp(aliveTimer.getId(), System.currentTimeMillis());
 
     Thread.sleep(70L);
 
@@ -101,7 +101,7 @@ public class AliveTimerServiceTest {
 
     aliveTimerCacheRef.put(aliveTimer.getId(), aliveTimer);
 
-    aliveTimerService.startOrUpdateTimestamp(aliveTimer.getId());
+    aliveTimerService.startOrUpdateTimestamp(aliveTimer.getId(), System.currentTimeMillis());
 
     Thread.sleep(10L);
 
@@ -118,7 +118,7 @@ public class AliveTimerServiceTest {
 
     aliveTimerCacheRef.put(aliveTimer.getId(), aliveTimer);
 
-    aliveTimerService.stop(1L);
+    aliveTimerService.stop(1L, System.currentTimeMillis());
 
     assertFalse("Test if AliveTimer is active", aliveTimerCacheRef.get(1L).isActive());
   }

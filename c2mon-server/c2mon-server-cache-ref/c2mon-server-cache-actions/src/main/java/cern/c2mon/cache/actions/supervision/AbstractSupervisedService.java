@@ -44,7 +44,7 @@ public abstract class AbstractSupervisedService<T extends Supervised> extends Ab
     return cache.compute(id, supervised -> {
       supervised.start(timestamp);
       if (supervised.getAliveTagId() != null) {
-        aliveTimerService.start(supervised.getAliveTagId());
+        aliveTimerService.start(supervised.getAliveTagId(), timestamp.getTime());
       }
     });
   }
@@ -53,7 +53,7 @@ public abstract class AbstractSupervisedService<T extends Supervised> extends Ab
   public T stop(long id, Timestamp timestamp) {
     return cache.compute(id, supervised -> {
       if (supervised.getAliveTagId() != null) {
-        aliveTimerService.stop(supervised.getAliveTagId());
+        aliveTimerService.stop(supervised.getAliveTagId(), timestamp.getTime());
       }
       supervised.stop(timestamp);
     });

@@ -195,8 +195,8 @@ public class AliveTimerChecker extends TimerTask implements SmartLifecycle {
   @Override
   public void run() {
 //    Long lastCheck = (Long) clusterCache.getCopy(LAST_ALIVE_TIMER_CHECK_LONG);
-    Long lastCheck = 0L;
-    if (System.currentTimeMillis() - lastCheck.longValue() < 9000) { //results in check on a single server
+    long lastCheck = 0L;
+    if (System.currentTimeMillis() - lastCheck < 9000) { //results in check on a single server
       LOGGER.debug("Skipping alive check as already performed.");
     } else {
       if (LOGGER.isDebugEnabled()) {
@@ -211,7 +211,7 @@ public class AliveTimerChecker extends TimerTask implements SmartLifecycle {
 
           if (aliveTimerCopy.isActive()) {
             if (aliveTimerService.hasExpired(currentId)) {
-              aliveTimerService.stop(currentId);
+              aliveTimerService.stop(currentId, System.currentTimeMillis());
               aliveExpiration = true;
               aliveDownCount++;
             }

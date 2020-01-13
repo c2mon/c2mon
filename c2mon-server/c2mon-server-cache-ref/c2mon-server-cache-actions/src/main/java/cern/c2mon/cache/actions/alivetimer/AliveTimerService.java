@@ -11,7 +11,6 @@ import cern.c2mon.server.common.thread.Event;
 import cern.c2mon.shared.common.CacheEvent;
 import cern.c2mon.shared.common.datatag.SourceDataTagValue;
 import cern.c2mon.shared.common.supervision.SupervisionConstants;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -54,11 +53,11 @@ public class AliveTimerService extends AbstractCacheServiceImpl<AliveTag> {
   }
 
   /**
-   * Same as {@link AliveTimerService#start(Long)}, but will start the object
+   * Same as {@link AliveTimerService#start(long,long)}, but will start the object
    * regardless of previous state (active or not)
    */
-  public void startOrUpdateTimestamp(@NonNull Long aliveTimerId) throws NullPointerException {
-    setAliveTimerAsActive(aliveTimerId, true, true);
+  public void startOrUpdateTimestamp(long aliveTimerId, long timestamp) throws NullPointerException {
+    setAliveTimerAsActive(aliveTimerId, true, timestamp);
   }
 
   /**
@@ -77,8 +76,8 @@ public class AliveTimerService extends AbstractCacheServiceImpl<AliveTag> {
    * @param aliveTimerId the alive timer id for the object to be force started
    * @throws NullPointerException when {@code aliveTimerId} is null
    */
-  public void start(@NonNull Long aliveTimerId) throws NullPointerException {
-    setAliveTimerAsActive(aliveTimerId, true, false);
+  public void start(long aliveTimerId, long timestamp) throws NullPointerException {
+    setAliveTimerAsActive(aliveTimerId, true, timestamp);
   }
 
   /**
@@ -97,8 +96,8 @@ public class AliveTimerService extends AbstractCacheServiceImpl<AliveTag> {
    * @param aliveTimerId the alive timer id for the object to be force started
    * @throws NullPointerException when {@code aliveTimerId} is null
    */
-  public void stop(@NonNull Long aliveTimerId) throws NullPointerException {
-    setAliveTimerAsActive(aliveTimerId, false, false);
+  public void stop(long aliveTimerId, long timestamp) throws NullPointerException {
+    setAliveTimerAsActive(aliveTimerId, false, timestamp);
   }
 
   /**
@@ -135,13 +134,13 @@ public class AliveTimerService extends AbstractCacheServiceImpl<AliveTag> {
 
   /**
    * Stops and removes this alive by alive id. Should only be
-   * used when it is no longer reference by a supervised object
+   * used when it is no longer referenced by a supervised object
    * (for instance on reconfiguration error recovery).
    *
    * @param aliveId id of the alive
    */
   public void removeAliveTimer(long aliveId) {
-    stop(aliveId);
+    stop(aliveId, System.currentTimeMillis());
     cache.remove(aliveId);
   }
 
@@ -174,13 +173,13 @@ public class AliveTimerService extends AbstractCacheServiceImpl<AliveTag> {
     }
   }
 
-  private void setAliveTimerAsActive(long aliveTimerId, boolean active, boolean forceTimestampUpdate) {
+  private void setAliveTimerAsActive(long aliveTimerId, boolean active, long timestamp) {
     log.debug("Attempting to set alive timer " + aliveTimerId + " and dependent alive timers to " + active);
 
     try {
       cache.compute(aliveTimerId, aliveTimer -> {
-        if (forceTimestampUpdate || aliveTimer.setActive(active))
-          aliveTimer.setLastUpdate(System.currentTimeMillis());
+        if (aliveTimer.setActive(active) || timestamp > aliveTimer.getLastUpdate())
+          aliveTimer.setLastUpdate(timestamp);
       });
     } catch (CacheElementNotFoundException cacheEx) {
       log.error("Cannot locate the AliveTimer in the cache (Id is " + aliveTimerId + ") - unable to stop it.");

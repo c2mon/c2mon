@@ -4,6 +4,7 @@ import cern.c2mon.cache.actions.process.ProcessService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.alive.AliveTag;
 import cern.c2mon.server.common.process.Process;
+import cern.c2mon.shared.common.CacheEvent;
 import cern.c2mon.shared.common.datatag.SourceDataTagQuality;
 import cern.c2mon.shared.common.datatag.SourceDataTagValue;
 import cern.c2mon.shared.common.supervision.SupervisionConstants;
@@ -14,6 +15,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import javax.inject.Inject;
 import java.sql.Timestamp;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.*;
 
@@ -79,6 +81,18 @@ public class AliveTagSupervisionTest extends SupervisionCacheTest {
     latch.await(); //wait for notification on listener thread
   }
 
+  @Test
+  @DirtiesContext
+  public void timerCascadesProperly() {
+    AliveTag aliveTimer = aliveTimerCache.get(1221L);
+
+    long startTimer = 1;
+
+    // Start the process
+    processService.start(aliveTimer.getRelatedId(), new Timestamp(startTimer));
+    assertEquals(startTimer, aliveTimerCache.get(1221L).getLastUpdate());
+  }
+
   /**
    * Alives older than 2 minutes are rejected.
    */
@@ -107,26 +121,34 @@ public class AliveTagSupervisionTest extends SupervisionCacheTest {
    */
   @Test
   @DirtiesContext
-  public void testProcessAliveNoEffect() {
+  public void testProcessAliveNoEffect() throws InterruptedException {
     AliveTag aliveTimer = aliveTimerCache.get(1221L);
 
+    long startTimer = System.currentTimeMillis();
+
     // Start the process
-    processService.start(aliveTimer.getRelatedId(), new Timestamp(0));
+    processService.start(aliveTimer.getRelatedId(), new Timestamp(startTimer));
     // Resume so that the status goes to RUNNING
     Process process = processService.resume(aliveTimer.getRelatedId(), new Timestamp(System.currentTimeMillis()), "");
     assertEquals(SupervisionConstants.SupervisionStatus.RUNNING, process.getSupervisionStatus());
     Timestamp originalProcessTime = process.getStatusTime();
     assertNotNull(originalProcessTime);
 
-    long startTimer = aliveTimerCache.get(1221L).getLastUpdate();
-    // Parse the control tag
+    // Create the next alive tag
     SourceDataTagValue newerAliveTag = createSampleAliveTag();
     long updatedTimer = startTimer + 1;
     newerAliveTag.setDaqTimestamp(new Timestamp(updatedTimer));
+
+    // Set up a latch
+    CountDownLatch latch = new CountDownLatch(1);
+    aliveTimerCache.getCacheListenerManager().registerListener(at -> latch.countDown(), CacheEvent.UPDATE_ACCEPTED);
+
     supervisionManager.processControlTag(newerAliveTag);
 
-    // check alive is updated
-    assertTrue(updatedTimer <= aliveTimerCache.get(1221L).getLastUpdate());
+    assertTrue("Alive tag cache value should be updated", latch.await(100, TimeUnit.MILLISECONDS));
+
+    // check alive is updated with the correct timestamp
+    assertEquals(updatedTimer, aliveTimerCache.get(1221L).getLastUpdate());
 
     //check process status is not changed & time also
     assertEquals(SupervisionConstants.SupervisionStatus.RUNNING, process.getSupervisionStatus());
