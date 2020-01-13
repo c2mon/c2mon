@@ -64,13 +64,12 @@ public class UnifiedTagCacheFacade {
     doAcrossCaches(tagId, cache -> cache.computeQuiet(tagId, tag -> tag.getAlarmIds().remove(alarmId)));
   }
 
-  public void registerListener(CacheListener listener, CacheEvent... events) {
-    // TODO (Alex) Fix the type safety here
-    tagCaches.forEach(cache -> cache.getCacheListenerManager().registerListener(listener, events));
+  public void registerListener(CacheListener<Tag> listener, CacheEvent... events) {
+    tagCaches.forEach(cache -> cache.getCacheListenerManager().registerListener(listener::apply, events));
   }
 
-  public void registerBufferedListener(BufferedCacheListener listener, CacheEvent... events) {
-    tagCaches.forEach(cache -> cache.getCacheListenerManager().registerBufferedListener(listener, events));
+  public void registerBufferedListener(BufferedCacheListener<Tag> listener, CacheEvent... events) {
+    tagCaches.forEach(cache -> cache.getCacheListenerManager().registerBufferedListener(tags -> listener.apply((List<Tag>) tags), events));
   }
 
   public void close() {
