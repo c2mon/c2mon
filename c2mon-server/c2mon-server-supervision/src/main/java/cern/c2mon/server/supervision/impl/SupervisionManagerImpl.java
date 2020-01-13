@@ -297,15 +297,15 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
           useTimestamp = sourceDataTagValue.getDaqTimestamp();
         }
         Timestamp aliveTimerTimestamp = new Timestamp(System.currentTimeMillis());
-        if (aliveTimerTimestamp.getTime() - useTimestamp.getTime()
-          > 2 * timerCopy.getAliveInterval()) {
+        if (aliveTimerTimestamp.getTime() - useTimestamp.getTime() > 2 * timerCopy.getAliveInterval()) {
           log.debug("Rejecting alive #{} of {} as delayed arrival at server.", tagId, timerCopy.getRelatedName());
         } else {
           // The tag is an alive tag -> we rewind the corresponding alive timer
           //TODO sychronization on alive timers... needed? use id here, so not possible around update
-          aliveTimerService.startOrUpdateTimestamp(tagId);
+          aliveTimerService.startOrUpdateTimestamp(tagId, useTimestamp.getTime());
 
           Timestamp supervisionTimestamp = new Timestamp(System.currentTimeMillis());
+          // TODO (Alex) Is this the timer we want to use?
           if (timerCopy.isProcessAliveType()) {
             Long processId = processFacade.getProcessIdFromAlive(tagId);
             processEvents.onUp(processId, supervisionTimestamp, "Process Alive tag received.");
@@ -349,8 +349,14 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
             equipmentEvents.onUp(equipmentId, supervisionTimestamp, str);
           }
           if (updateAliveTimer) {
+            Timestamp useTimestamp;
+            if (sourceDataTagValue.getDaqTimestamp() == null) {
+              useTimestamp = sourceDataTagValue.getTimestamp();
+            } else {
+              useTimestamp = sourceDataTagValue.getDaqTimestamp();
+            }
             if (commFaultTagCopy.getAliveTagId() != null) {
-              aliveTimerService.startOrUpdateTimestamp(commFaultTagCopy.getAliveTagId());
+              aliveTimerService.startOrUpdateTimestamp(commFaultTagCopy.getAliveTagId(), useTimestamp.getTime());
             }
           }
 
@@ -376,8 +382,14 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
             subEquipmentEvents.onUp(commFaultTagCopy.getEquipmentId(), supervisionTimestamp, str.toString());
           }
           if (updateAliveTimer) {
+            Timestamp useTimestamp;
+            if (sourceDataTagValue.getDaqTimestamp() == null) {
+              useTimestamp = sourceDataTagValue.getTimestamp();
+            } else {
+              useTimestamp = sourceDataTagValue.getDaqTimestamp();
+            }
             if (commFaultTagCopy.getAliveTagId() != null) {
-              aliveTimerService.startOrUpdateTimestamp(commFaultTagCopy.getAliveTagId());
+              aliveTimerService.startOrUpdateTimestamp(commFaultTagCopy.getAliveTagId(), useTimestamp.getTime());
             }
           }
         } else {
