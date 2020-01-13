@@ -7,7 +7,7 @@ summary:  Explains how to make use of the DAQ testing framework.
 
 Before starting reading this guide please make sure that you are at least familiar with the following guide:
 
-* [Creating a new DAQ module from scratch](DAQ_module_developer_guide.md)
+* [Creating a new DAQ module from scratch]({{ site.baseurl }}{% link docs/user-guide/daq-api/daq-module-developer-guide.md %})
 
 At the end of this guide you should be able to write JUnit tests for your DAQs.
 
