@@ -74,6 +74,11 @@ public enum CacheName {
   SUBEQUIPMENT(Names.SUBEQUIPMENT),
 
   /**
+   * Supervision State cache
+   */
+  STATETAG(Names.STATETAG),
+
+  /**
    * Tag cache - stores DataTag, RuleTag and ControlTag
    */
   TAG(Names.TAG),
@@ -103,6 +108,7 @@ public enum CacheName {
     public static final String PROCESS = "processCacheRef";
     public static final String RULETAG = "ruleTagCacheRef";
     public static final String SUBEQUIPMENT = "subEquipmentCacheRef";
+    public static final String STATETAG = "stateTagCacheRef";
     public static final String TAG= "tagCacheRef"; // ATTENTION: Not a real cache!
     public static final String ALARM_OSCILLATION = "oscillationCacheRef";
   }
