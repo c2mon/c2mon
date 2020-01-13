@@ -6,7 +6,7 @@ summary:  An introduction to the C2MON RuleTag grammar.
 
 
 C2MON provides a simple Domain Specific Language (DSL) that allows expressing complex rules on top of the acquired data.
-The rules are stored as simple Strings and loaded as [RuleTags](/overview/tags), which are then interpreted at runtime.
+The rules are stored as simple Strings and loaded as [RuleTags]({{ site.baseurl }}{% link docs/overview/tags.md %}), which are then interpreted at runtime.
 
 The rule evaluation on the C2MON server layer is fully supported within a clustered setup.
 Thanks to its rich rule grammar the C2MON Rule Engine can play a central role for real time analytics.
@@ -173,4 +173,4 @@ Common problems are:
 
 # Configuration of a RuleTags
 
-Configuring a `RuleTag` is very similar to the configuration of a `DataTag`, which is described in the [Configuration API](/user-guide/client-api/configuration/#configuring-ruletags) section.
+Configuring a `RuleTag` is very similar to the configuration of a `DataTag`, which is described in the [Configuration API]({{ site.baseurl }}{% link docs/user-guide/client-api/configuration-api.md#configuring-ruletags %}) section.
