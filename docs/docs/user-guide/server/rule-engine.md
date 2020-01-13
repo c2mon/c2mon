@@ -173,4 +173,4 @@ Common problems are:
 
 # Configuration of a RuleTags
 
-Configuring a `RuleTag` is very similar to the configuration of a `DataTag`, which is described in the [Configuration API]({{ site.baseurl }}{% link docs/user-guide/client-api/configuration-api.md#configuring-ruletags %}) section.
+Configuring a `RuleTag` is very similar to the configuration of a `DataTag`, which is described in the [Configuration API]({{ site.baseurl }}{% link docs/user-guide/client-api/configuration-api.md %}#configuring-ruletags) section.
