@@ -46,7 +46,7 @@ c2mon.server.jdbc.url=jdbc:hsqldb:hsql://localhost/c2mondb;sql.syntax_ora=true
 ```
 These settings can also be set as Java VM options with the ```-D``` parameter or as [Spring Boot environment variables](https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-external-config.html).
 
-See also [Configuring the module](/user-guide/client-api/history/#configuring-the-module).
+See also [Configuring the module]({{ site.baseurl }}{% link docs/user-guide/client-api/accessing-historical-data.md %}#configuring-the-module).
 
 !!! warning "Be careful!"
     If the URL contains ``hsql://``, C2MON uses an in-memory HSQL with a hardcoded path at ``/tmp/c2mondb``.
