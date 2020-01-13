@@ -6,7 +6,7 @@ import cern.c2mon.server.common.commfault.CommFaultTag;
 import cern.c2mon.server.common.supervision.Supervised;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
+import lombok.NonNull;
 
 import java.sql.Timestamp;
 
@@ -19,7 +19,6 @@ import static cern.c2mon.shared.common.supervision.SupervisionConstants.Supervis
  * @author Alexandros Papageorgiou, Brice Copy
  * @apiNote <a href=https://stackoverflow.com/questions/1162816/naming-conventions-state-versus-status>State vs Status discussion for technical jargon naming</a>
  */
-@Slf4j
 @Getter
 @EqualsAndHashCode(callSuper = true)
 public class SupervisionStateTag extends AbstractCacheableImpl {
@@ -48,11 +47,11 @@ public class SupervisionStateTag extends AbstractCacheableImpl {
   /**
    * Reason/description of the current status, or empty
    */
-  String statusDescription;
+  String statusDescription = "";
   /**
    * Time when this supervision status was last confirmed
    */
-  Timestamp statusTime;
+  Timestamp statusTime = new Timestamp(0);
 
   public SupervisionStateTag(Long id, Long supervisedId, String supervisedEntity, Long aliveTagId, Long commFaultTagId) {
     this.id = id;
@@ -60,5 +59,28 @@ public class SupervisionStateTag extends AbstractCacheableImpl {
     this.supervisedEntity = SupervisionEntity.parse(supervisedEntity);
     this.aliveTagId = aliveTagId;
     this.commFaultTagId = commFaultTagId;
+  }
+
+  /**
+   * Sets the supervision information for the supervised object, including
+   * status, description and time
+   *
+   * @param supervisionStatus the new status
+   * @param statusDescription a reason for the current status
+   * @param statusTime        time of the supervision event
+   */
+  public void setSupervision(@NonNull SupervisionStatus supervisionStatus,
+                             @NonNull String statusDescription,
+                             @NonNull Timestamp statusTime) {
+    this.supervisionStatus = supervisionStatus;
+    this.statusDescription = statusDescription;
+    this.statusTime = new Timestamp(statusTime.getTime());
+  }
+
+  @Override
+  public SupervisionStateTag clone() {
+    SupervisionStateTag clone = (SupervisionStateTag) super.clone();
+    clone.statusTime = new Timestamp(statusTime.getTime());
+    return clone;
   }
 }
