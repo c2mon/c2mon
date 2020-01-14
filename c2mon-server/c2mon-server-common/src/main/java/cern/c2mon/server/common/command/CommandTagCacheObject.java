@@ -28,10 +28,6 @@ import lombok.Setter;
 import lombok.ToString;
 import org.simpleframework.xml.Transient;
 
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
-
 /**
  * Note: does not keep the latest value of the command. Commands are logged
  * to the history database.
@@ -130,25 +126,6 @@ public final class CommandTagCacheObject<T> extends AbstractCacheableImpl implem
      */
     @Transient
     private CommandExecutionDetails<T> commandExecutionDetails;
-
-    /**
-     * Synchronization lock
-     *
-     * These are excluded from the equals and hashcode methods, {@code ReentrantReadWriteLock}
-     * does NOT provide an equals and hashcode implementation by itself, which causes the
-     * {@code CommandTagCacheObject#equals} to always return false
-     * The reasoning seems to be similar to this
-     * <a href=https://stackoverflow.com/questions/7567502/why-are-two-atomicintegers-never-equal>SO Discussion
-     * on why AtomicInteger has no equals</a>
-     */
-    @EqualsAndHashCode.Exclude
-    private ReentrantReadWriteLock aliveLock = new ReentrantReadWriteLock();
-
-    @EqualsAndHashCode.Exclude
-    private ReadLock readLock = aliveLock.readLock();
-
-    @EqualsAndHashCode.Exclude
-    private WriteLock writeLock = aliveLock.writeLock();
 
     /**
      * Constructor with the minimal fields excepted to be non-null in all cache objects circulating in the server.
@@ -256,10 +233,6 @@ public final class CommandTagCacheObject<T> extends AbstractCacheableImpl implem
     public CommandTagCacheObject<T> clone() {
       @SuppressWarnings("unchecked")
       CommandTagCacheObject<T> clone = (CommandTagCacheObject<T>) super.clone();
-
-      clone.aliveLock = new ReentrantReadWriteLock();
-      clone.readLock = clone.aliveLock.readLock();
-      clone.writeLock = clone.aliveLock.writeLock();
 
       if (authorizationDetails != null) {
         clone.authorizationDetails = this.authorizationDetails.clone();

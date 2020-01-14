@@ -31,9 +31,6 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import static cern.c2mon.shared.common.datatag.DataTagConstants.*;
 
@@ -170,22 +167,6 @@ public abstract class AbstractTagCacheObject extends AbstractCacheableImpl imple
   public static final short CHANGE_INVALIDATE = 2;
   public static final short CHANGE_CONFIGURATION = 3;
 
-
-  /**
-   * Synchronization locks
-   *
-   * These are excluded from the equals and hashcode methods, {@code ReentrantReadWriteLock}
-   * does NOT provide an equals and hashcode implementation by itself, which causes the
-   * {@code CommandTagCacheObject#equals} to always return false
-   * The reasoning seems to be similar to this
-   * <a href=https://stackoverflow.com/questions/7567502/why-are-two-atomicintegers-never-equal>SO Discussion
-   * on why AtomicInteger has no equals</a>
-   */
-  @EqualsAndHashCode.Exclude
-  private ReadLock readLock;
-  @EqualsAndHashCode.Exclude
-  private WriteLock writeLock;
-
   /**
    * Default public constructor.
    *
@@ -195,11 +176,6 @@ public abstract class AbstractTagCacheObject extends AbstractCacheableImpl imple
    */
   protected AbstractTagCacheObject(long id) {
     super(id);
-    //TODO check this - done by config loader
-    ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-    readLock = lock.readLock();
-    writeLock = lock.writeLock();
-
     dataTagQuality = new DataTagQualityImpl();
     alarmIds = new ArrayList<>();
     ruleIds = new ArrayList<>();
@@ -215,30 +191,12 @@ public abstract class AbstractTagCacheObject extends AbstractCacheableImpl imple
   @Override
   public AbstractTagCacheObject clone() {
     AbstractTagCacheObject cacheObject = (AbstractTagCacheObject) super.clone();
-    ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-    cacheObject.readLock = lock.readLock();
-    cacheObject.writeLock = lock.writeLock();
     if (dataTagQuality != null) {
       cacheObject.dataTagQuality = dataTagQuality.clone();
     }
     cacheObject.alarmIds = (ArrayList<Long>) ((ArrayList<Long>) alarmIds).clone();
     cacheObject.ruleIds = (ArrayList<Long>) ((ArrayList<Long>) ruleIds).clone();
     return cacheObject;
-  }
-
-  /**
-   * Returns an own copy of the list of rules that need evaluating when
-   * this tag changes.
-   *
-   * @return list of rule ids
-   */
-  public final Collection<Long> getCopyRuleIds() {
-    readLock.lock();
-    try {
-      return new ArrayList<>(ruleIds);
-    } finally {
-      readLock.unlock();
-    }
   }
 
   /**
@@ -275,15 +233,6 @@ public abstract class AbstractTagCacheObject extends AbstractCacheableImpl imple
 
   public final boolean isExistingTag() {
     return dataTagQuality.isExistingTag();
-  }
-
-  public final Collection<Long> getCopyAlarmIds() {
-    readLock.lock();
-    try {
-      return new ArrayList<>(this.alarmIds);
-    } finally {
-      readLock.unlock();
-    }
   }
 
   /**

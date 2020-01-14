@@ -31,9 +31,7 @@ import java.util.Collection;
 public interface Equipment extends AbstractEquipment {
 
   /**
-   * Returns the live list of SubEquipment ids attached to this
-   * Equipment; locking on Equipment level required if accessing
-   * this.
+   * Returns the list of SubEquipment ids attached to this Equipment
    * @return list of ids
    */
   Collection<Long> getSubEquipmentIds();
@@ -46,9 +44,7 @@ public interface Equipment extends AbstractEquipment {
   Long getProcessId();
 
   /**
-   * Returns the live list of CommandTag ids attached to this
-   * Equipment; locking on Equipment level required if accessing
-   * this.
+   * Returns the list of CommandTag ids attached to this Equipment
    * @return list of CommandTag ids
    */
   Collection<Long> getCommandTagIds();
