@@ -5,9 +5,11 @@
 <mapper namespace="cern.c2mon.server.cache.dbaccess.DeviceMapper">
 
   <resultMap id="deviceResultMap" type="cern.c2mon.server.common.device.DeviceCacheObject">
-    <id property="id" column="device_id" jdbcType="NUMERIC" javaType="java.lang.Long"/>
-    <result property="name" column="device_name"/>
-    <result property="deviceClassId" column="device_class_id"/>
+    <constructor>
+      <idArg column="device_id" javaType="Long"/>
+      <arg column="device_name" javaType="String"/>
+      <arg column="device_class_id" javaType="Long"/>
+    </constructor>
 
     <collection property="deviceProperties" ofType="cern.c2mon.shared.client.device.DeviceProperty">
       <id property="id" column="property_id" jdbcType="NUMERIC" javaType="java.lang.Long"/>

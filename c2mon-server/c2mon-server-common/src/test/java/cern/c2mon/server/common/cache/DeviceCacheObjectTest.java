@@ -4,7 +4,7 @@ import cern.c2mon.server.common.device.DeviceCacheObject;
 
 public class DeviceCacheObjectTest extends CacheableTest<DeviceCacheObject> {
 
-  private static DeviceCacheObject sample = new DeviceCacheObject(1L);
+  private static DeviceCacheObject sample = new DeviceCacheObject(1L,"", 2L);
 
   public DeviceCacheObjectTest() {
     super(sample);

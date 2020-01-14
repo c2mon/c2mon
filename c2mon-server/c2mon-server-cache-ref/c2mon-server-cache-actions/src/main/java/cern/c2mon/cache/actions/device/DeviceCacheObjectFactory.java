@@ -31,7 +31,7 @@ public class DeviceCacheObjectFactory extends AbstractCacheObjectFactory<Device>
 
   @Override
   public Device createCacheObject(Long id) {
-    return new DeviceCacheObject(id);
+    return new DeviceCacheObject(id, null, null);
   }
 
   @Override

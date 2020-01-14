@@ -64,10 +64,6 @@ public class DeviceCacheObject extends AbstractCacheableImpl implements Device {
    */
   private List<DeviceCommand> deviceCommands = new ArrayList<>();
 
-  public DeviceCacheObject(long id) {
-    super(id);
-  }
-
   /**
    * Default constructor.
    *
