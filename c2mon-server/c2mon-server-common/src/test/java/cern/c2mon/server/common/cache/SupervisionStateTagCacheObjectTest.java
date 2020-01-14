@@ -13,11 +13,6 @@ public class SupervisionStateTagCacheObjectTest extends CacheableTest<Supervisio
   }
 
   @Override
-  public void hasDefaultEmptyCtor() {
-    // Do nothing,
-  }
-
-  @Override
   protected void mutateObject(SupervisionStateTag cloneObject) {
     cloneObject.setSupervision(cloneObject.getSupervisionStatus(), cloneObject.getStatusDescription(), new Timestamp(12));
   }

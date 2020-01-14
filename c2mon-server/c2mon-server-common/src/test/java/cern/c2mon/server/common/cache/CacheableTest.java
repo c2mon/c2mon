@@ -2,7 +2,6 @@ package cern.c2mon.server.common.cache;
 
 import cern.c2mon.shared.common.Cacheable;
 import org.hamcrest.CoreMatchers;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.sql.Timestamp;
@@ -25,26 +24,10 @@ public abstract class CacheableTest<T extends Cacheable> {
     assertNotNull("Id should not be initialized to null", id);
   }
 
-  /**
-   * @see <a href=https://docs.oracle.com/javase/tutorial/reflect/member/ctorInstance.html>Class.newInstance()
-   * doc</a>
-   */
-  @Test
-  public void hasDefaultEmptyCtor() {
-    try {
-      Object newInstance = sample.getClass().newInstance();
-      assertNotNull(newInstance);
-      // This also verifies we didn't go to a parent Ctor
-      assertEquals(newInstance.getClass(), sample.getClass());
-    } catch (InstantiationException | IllegalAccessException e) {
-      fail("An empty default Ctor should be implemented for all cache objects");
-    }
-  }
-
   @Test
   public void cloneIsImplemented() {
     // This should be verified in compile time due to Generics limitation above, but let's test anyway
-    Assert.assertThat(sample, CoreMatchers.instanceOf(Cloneable.class));
+    assertThat(sample, CoreMatchers.instanceOf(Cloneable.class));
     assertEquals(sample, sample.clone());
   }
 
