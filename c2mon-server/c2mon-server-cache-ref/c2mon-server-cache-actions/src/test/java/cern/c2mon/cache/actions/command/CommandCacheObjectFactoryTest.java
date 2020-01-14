@@ -23,12 +23,14 @@ public class CommandCacheObjectFactoryTest {
   private C2monCache<Equipment> equipmentCache;
 
   private CommandTagCacheObjectFactory factory;
+  private long eqid;
 
   @Before
   public void init() {
     equipmentCache = new SimpleC2monCache<>("equipmentCache");
     EquipmentCacheObject equipment = new EquipmentCacheObjectFactory().sampleBase();
     equipmentCache.put(equipment.getId(), equipment);
+    eqid = equipment.getId();
 
     factory = new CommandTagCacheObjectFactory(equipmentCache);
   }
@@ -43,9 +45,7 @@ public class CommandCacheObjectFactoryTest {
     properties.setProperty("sourceRetries", "2");
     properties.setProperty("execTimeout", "21000");
     properties.setProperty("clientTimeout", "22001");
-
-    //TODO: write missing test
-    properties.setProperty("equipmentId", "1");
+    properties.setProperty("equipmentId", eqid + "");
 
     CommandTagCacheObject command = (CommandTagCacheObject) factory.createCacheObject(1L, properties);
 
