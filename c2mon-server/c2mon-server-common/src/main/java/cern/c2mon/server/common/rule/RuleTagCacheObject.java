@@ -78,7 +78,7 @@ public class RuleTagCacheObject extends AbstractTagCacheObject implements RuleTa
    */
   public RuleTagCacheObject(final Long id, final String name, final String datatype, final short mode,
                             final String ruleText) {
-    setId(id);
+    this(id);
     setName(name);
     setDataType(datatype);
     setMode(mode);

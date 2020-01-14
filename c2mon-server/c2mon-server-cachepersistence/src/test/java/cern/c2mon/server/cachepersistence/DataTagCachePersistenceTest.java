@@ -120,8 +120,7 @@ public class DataTagCachePersistenceTest {
   @Ignore
   public void testLatestUpdatePersistedToDB() {
     //load initial test tag into cache and DB
-    DataTagCacheObject floatTag = new DataTagCacheObject();
-    floatTag.setId(1000100L);  //must be non null in DB
+    DataTagCacheObject floatTag = new DataTagCacheObject(1000100L);
     floatTag.setName("Test float tag"); //non null
     floatTag.setMode(DataTagConstants.MODE_TEST); //non null
     floatTag.setDataType("Float"); // non null

@@ -1,10 +1,7 @@
 package cern.c2mon.server.common;
 
 import cern.c2mon.shared.common.Cacheable;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import lombok.*;
 
 import java.sql.Timestamp;
 
@@ -17,6 +14,7 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 public abstract class AbstractCacheableImpl implements Cacheable {
 
+  @Setter(AccessLevel.NONE)
   protected Long id;
 
   @EqualsAndHashCode.Exclude

@@ -16,19 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.dbaccess;
 
-import java.sql.Timestamp;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.Builder;
-import lombok.Data;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import cern.c2mon.server.cache.dbaccess.structure.DBBatch;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
@@ -37,6 +24,18 @@ import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.DataTagConstants;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Builder;
+import lombok.Data;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.sql.Timestamp;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 
@@ -162,8 +161,7 @@ public class DataTagMapperTest extends AbstractMapperTest {
   @Test
   public void testUpdateDataTag() {
     // construct fake DataTagCacheObject
-    DataTagCacheObject cacheObject = new DataTagCacheObject();
-    cacheObject.setId(150000L); // must be non null in DB
+    DataTagCacheObject cacheObject = new DataTagCacheObject(150000L);
     cacheObject.setName("Junit_test_tag"); // non null
     cacheObject.setMode(DataTagConstants.MODE_TEST); // non null
     cacheObject.setDataType("Boolean"); // non null
@@ -186,7 +184,7 @@ public class DataTagMapperTest extends AbstractMapperTest {
 
     dataTagMapper.updateCacheable(cacheObject);
 
-    DataTagCacheObject retrievedObject = (DataTagCacheObject) dataTagMapper.getItem(new Long(150000));
+    DataTagCacheObject retrievedObject = (DataTagCacheObject) dataTagMapper.getItem(150000L);
 
     // updated values are changed
     assertEquals(cacheObject.getValue(), retrievedObject.getValue());
@@ -298,8 +296,7 @@ public class DataTagMapperTest extends AbstractMapperTest {
   }
 
   private DataTagCacheObject createCacheObject(long id, Object value) {
-    DataTagCacheObject cacheObject = new DataTagCacheObject();
-    cacheObject.setId(Long.valueOf(id)); // must be non null in DB
+    DataTagCacheObject cacheObject = new DataTagCacheObject(id);
     cacheObject.setName("Junit_test_datatag5"); // non null
     cacheObject.setDescription("test description");
     cacheObject.setMode(DataTagConstants.MODE_TEST); // non null

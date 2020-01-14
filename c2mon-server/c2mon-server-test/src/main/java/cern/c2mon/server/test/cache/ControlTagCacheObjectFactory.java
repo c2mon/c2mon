@@ -18,7 +18,7 @@ package cern.c2mon.server.test.cache;
 
 import cern.c2mon.server.common.control.ControlTagCacheObject;
 
-public class ControlTagCacheObjectFactory extends AbstractInfoTagCacheObjectFactory<ControlTagCacheObject> {
+public class ControlTagCacheObjectFactory extends AbstractTagCacheObjectFactory<ControlTagCacheObject> {
 
   @Override
   public ControlTagCacheObject sampleBase() {

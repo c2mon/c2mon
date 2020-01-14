@@ -31,7 +31,6 @@ public class RuleTagCacheObjectFactory extends AbstractTagCacheObjectFactory<Rul
         "Integer",
         DataTagConstants.MODE_TEST,
         "(#100000 = true)&(#100001 = true)[2],true[3]"); //rule text set here - only extra field on top of abstract class
-    cacheObject.setId(130L);  //must be non null in DB
     cacheObject.setName("Junit_test_rule_tag"); //non null
     cacheObject.setDescription("test rule description");
     cacheObject.setMode(DataTagConstants.MODE_TEST); //non null

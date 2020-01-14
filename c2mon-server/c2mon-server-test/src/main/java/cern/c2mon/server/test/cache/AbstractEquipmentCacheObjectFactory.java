@@ -24,7 +24,6 @@ import java.sql.Timestamp;
 abstract class AbstractEquipmentCacheObjectFactory<T extends AbstractEquipmentCacheObject> extends AbstractCacheObjectFactory<T> {
 
   void initDefaults(T base){
-    base.setId(100L);
     base.setName("Test equipment");
     base.setDescription("Test desc");
     base.setHandlerClassName("Test class name");

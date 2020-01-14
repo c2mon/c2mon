@@ -125,15 +125,6 @@ public final class CacheObjectCreation {
   }
 
   /**
-   * Creates an AliveTimer for a Process
-   *
-   * @return the ControlTag
-   */
-  public static ControlTagCacheObject createTestProcessAlive() {
-    return controlTagCacheObjectFactory.createTestProcessAlive();
-  }
-
-  /**
    * Creates a test CommandTag
    *
    * @return the test CommandTag

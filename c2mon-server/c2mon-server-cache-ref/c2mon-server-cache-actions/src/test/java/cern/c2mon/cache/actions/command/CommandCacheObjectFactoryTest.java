@@ -28,7 +28,6 @@ public class CommandCacheObjectFactoryTest {
   public void init() {
     equipmentCache = new SimpleC2monCache<>("equipmentCache");
     EquipmentCacheObject equipment = new EquipmentCacheObjectFactory().sampleBase();
-    equipment.setId(1L);
     equipmentCache.put(equipment.getId(), equipment);
 
     factory = new CommandTagCacheObjectFactory(equipmentCache);

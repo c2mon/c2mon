@@ -335,11 +335,10 @@ public class ConfigurationLoaderTest {
     assertEquals(Status.OK, report.getStatus());
     assertTrue(report.getProcessesToReboot().isEmpty());
 
-    DataTagCacheObject cacheObject = (DataTagCacheObject) dataTagCache.get(new Long(5000000));
+    DataTagCacheObject cacheObject = (DataTagCacheObject) dataTagCache.get(5000000L);
 
     // corresponds to data inserted using SQL file
-    DataTagCacheObject expectedObject = new DataTagCacheObject();
-    expectedObject.setId(new Long(5000000)); // must be non null in DB
+    DataTagCacheObject expectedObject = new DataTagCacheObject(5000000L);
     expectedObject.setName("Config_test_datatag"); // non null
     expectedObject.setDescription("test description config datatag");
     expectedObject.setMode(DataTagConstants.MODE_TEST); // non null
@@ -351,11 +350,11 @@ public class ConfigurationLoaderTest {
     // expectedObject.setValue(Boolean.TRUE);
     // expectedObject.setValueDescription("test config value description");
     expectedObject.setSimulated(false); // null allowed
-    expectedObject.setEquipmentId(new Long(150)); // need test equipment
+    expectedObject.setEquipmentId(150L); // need test equipment
                                                   // inserted
     expectedObject.setProcessId(50L);
-    expectedObject.setMinValue(new Float(12.2));
-    expectedObject.setMaxValue(new Float(23.3));
+    expectedObject.setMinValue(12.2f);
+    expectedObject.setMaxValue(23.3f);
     expectedObject.setAddress(new DataTagAddress(new OPCHardwareAddressImpl("CW_TEMP_IN_COND3")));
     expectedObject.setDataTagQuality(new DataTagQualityImpl());
     // expectedObject.setCacheTimestamp(new
@@ -927,7 +926,7 @@ public class ConfigurationLoaderTest {
     assertNotNull(subEquipment);
     assertTrue(dataTagService.getDataTagIdsBySubEquipmentId(250L).size() == 3);
 
-    DataTagCacheObject cacheObject = (DataTagCacheObject) dataTagCache.get(new Long(7000000));
+    DataTagCacheObject cacheObject = (DataTagCacheObject) dataTagCache.get(7000000L);
     assertTrue(cacheObject.getSubEquipmentId() == 250L);
   }
 

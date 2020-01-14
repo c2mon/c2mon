@@ -25,25 +25,11 @@ public class AlarmCacheObjectFactory extends AbstractCacheObjectFactory<AlarmCac
 
   @Override
   public AlarmCacheObject sampleBase() {
-    AlarmCacheObject alarm1 = new AlarmCacheObject();
-    AlarmCondition condition = AlarmCondition.fromConfigXML("<AlarmCondition class=\"cern.c2mon.server.common.alarm.ValueAlarmCondition\">"
-      + "<alarm-value type=\"String\">DOWN</alarm-value></AlarmCondition>");
-    alarm1.setId(1L);
-    alarm1.setFaultFamily("fault family");
-    alarm1.setFaultMember("fault member");
-    alarm1.setFaultCode(0);
-    alarm1.setCondition(condition);
-    alarm1.setInfo("alarm info");
-    alarm1.setActive(false);
-    alarm1.setInternalActive(false);
-    alarm1.setTriggerTimestamp(new Timestamp(0L));
-    alarm1.setDataTagId(100003L);
-    return alarm1;
+    return createSample(1L);
   }
 
   public AlarmCacheObject alarmActiveWithFalseCondition() {
-    AlarmCacheObject alarm1 = sampleBase();
-    alarm1.setId(2L);
+    AlarmCacheObject alarm1 = createSample(2L);
     alarm1.setFaultFamily("fault family 2");
     alarm1.setFaultMember("fault member 2");
     alarm1.setFaultCode(2);
@@ -56,8 +42,22 @@ public class AlarmCacheObjectFactory extends AbstractCacheObjectFactory<AlarmCac
   }
 
   public AlarmCacheObject alarmWithOtherId() {
-    AlarmCacheObject alarm3 = sampleBase();
-    alarm3.setId(3L);
-    return alarm3;
+    return createSample(3L);
+  }
+
+  private AlarmCacheObject createSample(long id) {
+    AlarmCacheObject alarm1 = new AlarmCacheObject(id);
+    AlarmCondition condition = AlarmCondition.fromConfigXML("<AlarmCondition class=\"cern.c2mon.server.common.alarm.ValueAlarmCondition\">"
+      + "<alarm-value type=\"String\">DOWN</alarm-value></AlarmCondition>");
+    alarm1.setFaultFamily("fault family");
+    alarm1.setFaultMember("fault member");
+    alarm1.setFaultCode(0);
+    alarm1.setCondition(condition);
+    alarm1.setInfo("alarm info");
+    alarm1.setActive(false);
+    alarm1.setInternalActive(false);
+    alarm1.setTriggerTimestamp(new Timestamp(0L));
+    alarm1.setDataTagId(100003L);
+    return alarm1;
   }
 }

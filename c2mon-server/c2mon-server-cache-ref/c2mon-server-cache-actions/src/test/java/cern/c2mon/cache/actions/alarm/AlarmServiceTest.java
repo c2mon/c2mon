@@ -72,10 +72,9 @@ public class AlarmServiceTest {
     insertAlarmAndDatatagThen(
       (alarm, dataTag) -> {
         alarm.setActive(false);
-        alarm.setDataTagId(1L);
+        alarm.setDataTagId(dataTag.getId());
 
         dataTag.setDataTagQuality(new DataTagQualityImpl(TagQualityStatus.UNINITIALISED));
-        dataTag.setId(1L);
         dataTag.setValue("value");
       },
       (alarm, __) -> {
