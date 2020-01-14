@@ -73,6 +73,8 @@ public enum CacheLoaderName {
    */
   SUBEQUIPMENT(Names.SUBEQUIPMENT),
 
+  STATETAG(Names.STATETAG),
+
   /**
    * Tag cache - stores DataTag, RuleTag and ControlTag
    */
@@ -103,6 +105,7 @@ public enum CacheLoaderName {
     public static final String PROCESS = "processLoaderDAORef";
     public static final String RULETAG = "ruleTagLoaderDAORef";
     public static final String SUBEQUIPMENT = "subEquipmentLoaderDAORef";
+    public static final String STATETAG = "stateTagLoaderDAORef";
     public static final String TAG= "tagLoaderDAORef";
     public static final String ALARM_TIMESTAMP = "timestampLoaderDAORef";
   }
