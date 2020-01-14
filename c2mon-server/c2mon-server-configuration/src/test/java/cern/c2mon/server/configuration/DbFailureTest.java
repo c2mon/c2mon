@@ -101,12 +101,6 @@ public class DbFailureTest {
   @Autowired
   private DataTagMapper dataTagMapper;
 
-//  @Autowired
-//  private ControlTagCache controlTagCache;
-
-  @Autowired
-  private ControlTagMapper controlTagMapper;
-
   @Autowired
   private C2monCache<CommandTag> commandTagCache;
 
@@ -198,16 +192,6 @@ public class DbFailureTest {
     assertNull(dataTagMapper.getItem(200002L));
     assertFalse(dataTagCache.containsKey(200003L));
     assertNull(dataTagMapper.getItem(200003L));
-    //process control tags are still here!
-//    assertTrue(controlTagCache.containsKey(1220L));
-    assertNotNull(controlTagMapper.getItem(1220L));
-//    assertTrue(controlTagCache.containsKey(1221L));
-    assertNotNull(controlTagMapper.getItem(1221L));
-    //equipment control tags are gone
-//    assertFalse(controlTagCache.containsKey(1222L));
-    assertNull(controlTagMapper.getItem(1222L));
-//    assertFalse(controlTagCache.containsKey(1223L));
-    assertNull(controlTagMapper.getItem(1223L));
     //equipment commfault is gone
     assertFalse(commFaultTagCache.containsKey(1223L));
     //process alive is still here (may be active or not, depending on status when removed)

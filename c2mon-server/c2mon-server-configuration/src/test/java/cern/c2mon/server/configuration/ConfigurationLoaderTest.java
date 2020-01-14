@@ -140,9 +140,6 @@ public class ConfigurationLoaderTest {
   private DataTagMapper dataTagMapper;
 
   @Autowired
-  private ControlTagMapper controlTagMapper;
-
-  @Autowired
   private C2monCache<CommandTag> commandTagCache;
 
   @Autowired
@@ -228,24 +225,6 @@ public class ConfigurationLoaderTest {
     // DefaultMessageListenerContainers inside will keep trying to connect to
     // a JMS broker (which will not be running)
     jmsContainerManager.stop();
-  }
-
-  @Test
-  public void testRemoveControlTag() {
-    // check as expected before test
-    assertNotNull(controlTagMapper.getItem(1250L));
-
-    // run test
-    ConfigurationReport report = configurationLoader.applyConfiguration(8);
-
-    // check outcome
-
-    assertEquals(Status.OK, report.getStatus());
-    assertTrue(report.getProcessesToReboot().isEmpty()); // empty because no
-                                                         // process/equipment
-                                                         // points to this
-                                                         // control tag
-    assertNull(controlTagMapper.getItem(1250L));
   }
 
   @Test
@@ -780,11 +759,11 @@ public class ConfigurationLoaderTest {
     assertFalse(dataTagCache.containsKey(200003L));
     assertNull(dataTagMapper.getItem(200003L));
     // control tags
-    assertNull(controlTagMapper.getItem(1220L));
-    assertNull(controlTagMapper.getItem(1221L));
+//    assertNull(controlTagMapper.getItem(1220L));
+//    assertNull(controlTagMapper.getItem(1221L));
     // equipment control tags
-    assertNull(controlTagMapper.getItem(1222L));
-    assertNull(controlTagMapper.getItem(1223L));
+//    assertNull(controlTagMapper.getItem(1222L));
+//    assertNull(controlTagMapper.getItem(1223L));
     // equipment commfault
     assertFalse(commFaultTagCache.containsKey(1223L));
     // process alive
@@ -847,9 +826,9 @@ public class ConfigurationLoaderTest {
     assertFalse(dataTagCache.containsKey(200004L));
     assertNull(dataTagMapper.getItem(200004L));
     // control tags
-    assertNull(controlTagMapper.getItem(1222L));
-    assertNull(controlTagMapper.getItem(1223L));
-    assertNull(controlTagMapper.getItem(1224L));
+//    assertNull(controlTagMapper.getItem(1222L));
+//    assertNull(controlTagMapper.getItem(1223L));
+//    assertNull(controlTagMapper.getItem(1224L));
     // alivetimer & commfault
     assertFalse(aliveTimerCache.containsKey(1224L));
     assertFalse(commFaultTagCache.containsKey(1223L));
@@ -961,9 +940,9 @@ public class ConfigurationLoaderTest {
     assertFalse(aliveTimerCache.containsKey(subEquipment.getAliveTagId()));
     assertFalse(commFaultTagCache.containsKey(subEquipment.getCommFaultTagId()));
 
-    assertNull(controlTagMapper.getItem(subEquipment.getAliveTagId()));
-    assertNull(controlTagMapper.getItem(subEquipment.getStateTagId()));
-    assertNull(controlTagMapper.getItem(subEquipment.getCommFaultTagId()));
+//    assertNull(controlTagMapper.getItem(subEquipment.getAliveTagId()));
+//    assertNull(controlTagMapper.getItem(subEquipment.getStateTagId()));
+//    assertNull(controlTagMapper.getItem(subEquipment.getCommFaultTagId()));
     for (Long tagId : dataTagService.getDataTagIdsBySubEquipmentId(250L)) {
       assertFalse(dataTagCache.containsKey(tagId));
     }
@@ -1001,9 +980,9 @@ public class ConfigurationLoaderTest {
     assertFalse(aliveTimerCache.containsKey(subEquipment.getAliveTagId()));
     assertFalse(commFaultTagCache.containsKey(subEquipment.getCommFaultTagId()));
 
-    assertNull(controlTagMapper.getItem(subEquipment.getAliveTagId()));
-    assertNull(controlTagMapper.getItem(subEquipment.getStateTagId()));
-    assertNull(controlTagMapper.getItem(subEquipment.getCommFaultTagId()));
+//    assertNull(controlTagMapper.getItem(subEquipment.getAliveTagId()));
+//    assertNull(controlTagMapper.getItem(subEquipment.getStateTagId()));
+//    assertNull(controlTagMapper.getItem(subEquipment.getCommFaultTagId()));
 
     Equipment parentEquipment = equipmentCache.get(150L);
     for (Long id : parentEquipment.getSubEquipmentIds()) {

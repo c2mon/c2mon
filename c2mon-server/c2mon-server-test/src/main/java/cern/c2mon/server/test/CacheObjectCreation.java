@@ -18,7 +18,6 @@ package cern.c2mon.server.test;
 
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.command.CommandTagCacheObject;
-import cern.c2mon.server.common.control.ControlTagCacheObject;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.common.rule.RuleTagCacheObject;
 import cern.c2mon.server.test.cache.*;
@@ -31,14 +30,12 @@ import cern.c2mon.server.test.cache.*;
  */
 public final class CacheObjectCreation {
   private static final AlarmCacheObjectFactory alarmCacheObjectFactory;
-  private static final ControlTagCacheObjectFactory controlTagCacheObjectFactory;
   private static final DataTagCacheObjectFactory dataTagCacheObjectFactory;
   private static final CommandTagCacheObjectFactory commandTagCacheObjectFactory;
   private static final RuleTagCacheObjectFactory ruleTagCacheObjectFactory;
 
   static {
     alarmCacheObjectFactory = new AlarmCacheObjectFactory();
-    controlTagCacheObjectFactory = new ControlTagCacheObjectFactory();
     dataTagCacheObjectFactory = new DataTagCacheObjectFactory();
     commandTagCacheObjectFactory = new CommandTagCacheObjectFactory();
     ruleTagCacheObjectFactory = new RuleTagCacheObjectFactory();
@@ -76,15 +73,6 @@ public final class CacheObjectCreation {
    */
   public static AlarmCacheObject createTestAlarm2() {
     return alarmCacheObjectFactory.alarmActiveWithFalseCondition();
-  }
-
-  /**
-   * Constructs a test ControlTag.
-   *
-   * @return the ControlTag
-   */
-  public static ControlTagCacheObject createTestControlTag() {
-    return controlTagCacheObjectFactory.sampleBase();
   }
 
   /**

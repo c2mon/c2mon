@@ -16,7 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.loading.impl;
 
-import cern.c2mon.server.cache.dbaccess.StateTagMapper;
+import cern.c2mon.server.cache.dbaccess.SupervisionStateTagMapper;
 import cern.c2mon.server.cache.loading.CacheLoaderName;
 import cern.c2mon.server.cache.loading.SupervisionStateTagDAO;
 import cern.c2mon.server.cache.loading.common.AbstractDefaultLoaderDAO;
@@ -36,10 +36,10 @@ public class SupervisionStateTagDAOImpl extends AbstractDefaultLoaderDAO<Supervi
   /**
    * Reference to mapper.
    */
-  private StateTagMapper stateTagMapper;
+  private SupervisionStateTagMapper stateTagMapper;
 
   @Inject
-  public SupervisionStateTagDAOImpl(StateTagMapper stateTagMapper) {
+  public SupervisionStateTagDAOImpl(SupervisionStateTagMapper stateTagMapper) {
     super(1000, stateTagMapper); //initial buffer size
     this.stateTagMapper = stateTagMapper;
   }

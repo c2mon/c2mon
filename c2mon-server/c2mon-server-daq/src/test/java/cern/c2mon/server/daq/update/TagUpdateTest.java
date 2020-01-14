@@ -20,12 +20,10 @@ import cern.c2mon.cache.actions.CacheActionsModuleRef;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.config.CacheConfigModuleRef;
 import cern.c2mon.cache.impl.configuration.C2monIgniteConfiguration;
-import cern.c2mon.server.cache.dbaccess.ControlTagMapper;
 import cern.c2mon.server.cache.dbaccess.DataTagMapper;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.cache.loading.config.CacheLoadingModuleRef;
 import cern.c2mon.server.common.config.CommonModule;
-import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.daq.config.DaqModule;
 import cern.c2mon.server.supervision.config.SupervisionModule;
@@ -85,19 +83,13 @@ public class TagUpdateTest {
   private DataTagMapper dataTagMapper;
 
   @Autowired
-  private ControlTagMapper controlTagMapper;
-
-  @Autowired
   private JmsContainerManagerImpl jmsContainerManager;
 
   private DataTag dataTag;
 
-  private ControlTag controlTag;
-
   @Before
   public void setUp() throws Exception {
     dataTag = dataTagMapper.getItem(200000L);
-    controlTag = controlTagMapper.getItem(1221L);
   }
 
   @After
@@ -189,22 +181,22 @@ public class TagUpdateTest {
 //    assertFalse(controlTag.getValue().equals(2000L));
 
     //create a source update for this tag
-    Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-    Timestamp daqTimestamp = new Timestamp(System.currentTimeMillis() + 1);
-    SourceDataTagValue sourceDataTagValue = new SourceDataTagValue(controlTag.getId(),
-        controlTag.getName(),
-        true, new Long(2000),   //CONTROL TAG WITH VALUE 2000
-        new SourceDataTagQuality(),
-        timestamp,
-        DataTagConstants.PRIORITY_LOW,
-        false,
-        "test description",
-        DataTagAddress.TTL_FOREVER);
-    sourceDataTagValue.setDaqTimestamp(daqTimestamp);
-    ArrayList<SourceDataTagValue> tagList = new ArrayList<SourceDataTagValue>();
-    tagList.add(sourceDataTagValue);
-    DataTagValueUpdate dataTagValueUpdate = new DataTagValueUpdate(new Long(90L), tagList); //1000 is invented processId
-    sourceUpdateManager.processUpdates(dataTagValueUpdate);
+//    Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+//    Timestamp daqTimestamp = new Timestamp(System.currentTimeMillis() + 1);
+//    SourceDataTagValue sourceDataTagValue = new SourceDataTagValue(controlTag.getId(),
+//        controlTag.getName(),
+//        true, 2000L,   //CONTROL TAG WITH VALUE 2000
+//        new SourceDataTagQuality(),
+//        timestamp,
+//        DataTagConstants.PRIORITY_LOW,
+//        false,
+//        "test description",
+//        DataTagAddress.TTL_FOREVER);
+//    sourceDataTagValue.setDaqTimestamp(daqTimestamp);
+//    ArrayList<SourceDataTagValue> tagList = new ArrayList<SourceDataTagValue>();
+//    tagList.add(sourceDataTagValue);
+//    DataTagValueUpdate dataTagValueUpdate = new DataTagValueUpdate(90L, tagList); //1000 is invented processId
+//    sourceUpdateManager.processUpdates(dataTagValueUpdate);
 
     //check update is both in cache and DB
 //    ControlTag cacheObject = (ControlTag) controlTagCache.get(controlTag.getId());

@@ -28,6 +28,7 @@ import cern.c2mon.server.common.device.DeviceClass;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.rule.RuleTag;
+import cern.c2mon.server.common.status.SupervisionStateTag;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.shared.common.command.CommandTag;
 import org.slf4j.Logger;
@@ -78,8 +79,6 @@ public class CacheConsistencyChecker implements SmartLifecycle {
                                  final CommandTagMapper commandTagMapper,
                                  final C2monCache<CommFaultTag> commFaultTagCache,
                                  final CommFaultTagMapper commFaultTagMapper,
-                                 final C2monCache<Alarm> controlTagCache, // TODO (Alex) Review this cache usage
-                                 final ControlTagMapper controlTagMapper,
                                  final C2monCache<DataTag> dataTagCache,
                                  final DataTagMapper dataTagMapper,
                                  final C2monCache<DeviceClass> deviceClassCache,
@@ -93,13 +92,14 @@ public class CacheConsistencyChecker implements SmartLifecycle {
                                  final C2monCache<RuleTag> ruleTagCache,
                                  final RuleTagMapper ruleTagMapper,
                                  final C2monCache<SubEquipment> subEquipmentCache,
-                                 final SubEquipmentMapper subEquipmentMapper) {
+                                 final SubEquipmentMapper subEquipmentMapper,
+                                 final C2monCache<SupervisionStateTag> supervisionStateTagCache,
+                                 final SupervisionStateTagMapper stateTagMapper) {
     super();
     map.put(alarmCache, alarmMapper);
     map.put(aliveTimerCache, aliveTimerMapper);
     map.put(commandTagCache, commandTagMapper);
     map.put(commFaultTagCache, commFaultTagMapper);
-    map.put(controlTagCache, controlTagMapper);
     map.put(dataTagCache, dataTagMapper);
     map.put(deviceClassCache, deviceClassMapper);
     map.put(deviceCache, deviceMapper);
@@ -107,6 +107,7 @@ public class CacheConsistencyChecker implements SmartLifecycle {
     map.put(processCache, processMapper);
     map.put(ruleTagCache, ruleTagMapper);
     map.put(subEquipmentCache, subEquipmentMapper);
+    map.put(supervisionStateTagCache, stateTagMapper);
   }
 
   @Override

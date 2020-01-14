@@ -19,7 +19,6 @@ package cern.c2mon.server.configuration.jmx;
 
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.loading.ConfigurableDAO;
-import cern.c2mon.server.cache.loading.ControlTagLoaderDAO;
 import cern.c2mon.server.cache.loading.DataTagLoaderDAO;
 import cern.c2mon.server.cache.loading.RuleTagLoaderDAO;
 import cern.c2mon.server.common.datatag.DataTag;
@@ -45,8 +44,6 @@ public class TagConfigurationManager {
 
   private DataTagLoaderDAO dataTagLoaderDAO;
 
-  private ControlTagLoaderDAO controlTagLoaderDAO;
-
   private RuleTagLoaderDAO ruleTagLoaderDAO;
 
   private C2monCache<DataTag> dataTagCache;
@@ -55,11 +52,9 @@ public class TagConfigurationManager {
 
   @Autowired
   public TagConfigurationManager(final DataTagLoaderDAO dataTagLoaderDAO, final C2monCache<DataTag> dataTagCache,
-                                 ControlTagLoaderDAO controlTagLoaderDAO,
                                  RuleTagLoaderDAO ruleTagLoaderDAO, C2monCache<RuleTag> ruleTagCache) {
     this.dataTagLoaderDAO = dataTagLoaderDAO;
     this.dataTagCache = dataTagCache;
-    this.controlTagLoaderDAO = controlTagLoaderDAO;
     this.ruleTagLoaderDAO = ruleTagLoaderDAO;
     this.ruleTagCache = ruleTagCache;
   }

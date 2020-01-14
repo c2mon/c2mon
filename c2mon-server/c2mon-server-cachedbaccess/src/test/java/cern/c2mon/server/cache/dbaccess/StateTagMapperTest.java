@@ -35,7 +35,7 @@ public class StateTagMapperTest extends AbstractMapperTest {
   public DatabasePopulationRule databasePopulationRule;
 
   @Autowired
-  private StateTagMapper stateTagMapper;
+  private SupervisionStateTagMapper stateTagMapper;
 
   @Test
   public void testGetAll() {
