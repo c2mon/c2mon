@@ -17,8 +17,8 @@
 
 package cern.c2mon.server.history.structure;
 
-import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.datatag.DataTag;
+import cern.c2mon.server.common.tag.InfoTag;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
 import cern.c2mon.shared.common.type.TypeConverter;
@@ -88,7 +88,7 @@ public final class TagRecordConverter implements LoggerConverter<Tag> {
       tagRecord.setTagValueDesc(tag.getValueDescription());
       tagRecord.setTagDataType(tag.getDataType());
 
-      if (tag instanceof DataTag || tag instanceof ControlTag) {
+      if (tag instanceof InfoTag) {
         tagRecord.setSourceTimestamp(((DataTag) tag).getSourceTimestamp());
         tagRecord.setDaqTimestamp(((DataTag) tag).getDaqTimestamp());
       }
