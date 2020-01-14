@@ -1,8 +1,8 @@
 package cern.c2mon.server.common.supervision;
 
-import cern.c2mon.server.common.AbstractCacheableImpl;
 import cern.c2mon.server.common.alive.AliveTag;
 import cern.c2mon.server.common.commfault.CommFaultTag;
+import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.shared.common.supervision.SupervisionEntity;
 import cern.c2mon.shared.common.supervision.SupervisionStatus;
 import lombok.EqualsAndHashCode;
@@ -19,17 +19,7 @@ import java.sql.Timestamp;
  */
 @Getter
 @EqualsAndHashCode(callSuper = true)
-public class SupervisionStateTag extends AbstractCacheableImpl {
-
-  /**
-   * Id of the {@link Supervised} object
-   */
-  final long supervisedId;
-
-  /**
-   * Type of the {@link Supervised} object
-   */
-  final SupervisionEntity supervisedEntity;
+public class SupervisionStateTag extends ControlTag {
   /**
    * Id of the associated {@link AliveTag} used for supervision, or null
    */
@@ -55,9 +45,7 @@ public class SupervisionStateTag extends AbstractCacheableImpl {
    * Primary Ctor, also used by MyBatis (hence the Long instead of long)
    */
   public SupervisionStateTag(@NonNull Long id, @NonNull Long supervisedId, String supervisedEntity, Long aliveTagId, Long commFaultTagId) {
-    super(id);
-    this.supervisedId = supervisedId;
-    this.supervisedEntity = SupervisionEntity.parse(supervisedEntity);
+    super(id, supervisedId, SupervisionEntity.parse(supervisedEntity));
     this.aliveTagId = aliveTagId;
     this.commFaultTagId = commFaultTagId;
   }
