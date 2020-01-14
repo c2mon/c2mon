@@ -25,7 +25,6 @@ import cern.c2mon.server.configuration.ConfigProgressMonitor;
 import cern.c2mon.server.configuration.ConfigurationLoader;
 import cern.c2mon.server.configuration.config.ConfigurationProperties;
 import cern.c2mon.server.configuration.dao.ConfigurationDAO;
-import cern.c2mon.server.configuration.handler.ControlTagConfigHandler;
 import cern.c2mon.server.configuration.handler.transacted.*;
 import cern.c2mon.server.configuration.parser.ConfigurationParser;
 import cern.c2mon.server.daq.out.ProcessCommunicationManager;
@@ -90,8 +89,6 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
 
   private final DataTagConfigHandler dataTagConfigHandler;
 
-  private final ControlTagConfigHandler controlTagConfigHandler;
-
   private final CommandTagConfigHandler commandTagConfigHandler;
 
   private final AlarmConfigHandler alarmConfigHandler;
@@ -136,7 +133,6 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
   public ConfigurationLoaderImpl(ProcessCommunicationManager processCommunicationManager,
                                  ConfigurationDAO configurationDAO,
                                  DataTagConfigHandler dataTagConfigHandler,
-                                 ControlTagConfigHandler controlTagConfigHandler,
                                  CommandTagConfigHandler commandTagConfigHandler,
                                  AlarmConfigHandler alarmConfigHandler,
                                  RuleTagConfigHandler ruleTagConfigHandler,
@@ -155,7 +151,6 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
     this.processCommunicationManager = processCommunicationManager;
     this.configurationDAO = configurationDAO;
     this.dataTagConfigHandler = dataTagConfigHandler;
-    this.controlTagConfigHandler = controlTagConfigHandler;
     this.commandTagConfigHandler = commandTagConfigHandler;
     this.alarmConfigHandler = alarmConfigHandler;
     this.ruleTagConfigHandler = ruleTagConfigHandler;

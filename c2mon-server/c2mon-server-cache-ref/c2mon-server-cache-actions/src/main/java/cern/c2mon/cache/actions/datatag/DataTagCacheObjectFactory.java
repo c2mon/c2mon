@@ -4,7 +4,6 @@ import cern.c2mon.cache.actions.equipment.BaseEquipmentServiceImpl;
 import cern.c2mon.cache.actions.equipment.EquipmentService;
 import cern.c2mon.cache.actions.subequipment.SubEquipmentService;
 import cern.c2mon.cache.actions.tag.AbstractTagCacheObjectFactory;
-import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.common.tag.AbstractTagCacheObject;
@@ -70,7 +69,7 @@ public class DataTagCacheObjectFactory extends AbstractTagCacheObjectFactory<Dat
     // TAG equipment identifier
     // Ignore the equipment id for control tags as control tags are INDIRECTLY
     // referenced via the equipment's aliveTag and commFaultTag fields
-    if (equipmentService != null && !(dataTagCacheObject instanceof ControlTag)) {
+    if (equipmentService != null) {
 
       // Only one of equipment / subequipment Id should be set. But if both are there, we will overwrite the process ID
       // with the equipment (more important)

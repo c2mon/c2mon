@@ -22,7 +22,6 @@ import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.factory.AbstractCacheObjectFactory;
 import cern.c2mon.server.cache.loading.ConfigurableDAO;
 import cern.c2mon.server.common.equipment.AbstractEquipment;
-import cern.c2mon.server.configuration.handler.ControlTagConfigHandler;
 import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
@@ -52,7 +51,6 @@ public abstract class AbstractEquipmentConfigHandler<T extends AbstractEquipment
   private final AliveTimerConfigHandler aliveTagConfigEventHandler;
   protected final DataTagService dataTagService;
   protected final DataTagConfigHandler dataTagConfigTransacted;
-  protected ControlTagConfigHandler controlTagConfigHandler;
 
   @Autowired
   public AbstractEquipmentConfigHandler(

@@ -200,6 +200,16 @@ public abstract class AbstractTagCacheObject extends AbstractCacheableImpl imple
   }
 
   /**
+   * Returns an own copy of the list of rules that need evaluating when
+   * this tag changes.
+   *
+   * @return list of rule ids
+   */
+  public final Collection<Long> getCopyRuleIds() {
+    return new ArrayList<>(ruleIds);
+  }
+
+  /**
    * Add a new rule to the collection of rules that need to be evaluated when
    * THIS tags changes.
    */
@@ -233,6 +243,10 @@ public abstract class AbstractTagCacheObject extends AbstractCacheableImpl imple
 
   public final boolean isExistingTag() {
     return dataTagQuality.isExistingTag();
+  }
+
+  public final Collection<Long> getCopyAlarmIds() {
+    return new ArrayList<>(this.alarmIds);
   }
 
   /**
