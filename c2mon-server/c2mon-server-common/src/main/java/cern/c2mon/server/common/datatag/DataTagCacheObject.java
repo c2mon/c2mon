@@ -48,7 +48,7 @@ public class DataTagCacheObject extends AbstractInfoTagCacheObject implements Da
     setDataTagQuality(new DataTagQualityImpl());
   }
 
-  public DataTagCacheObject(long id) {
+  public DataTagCacheObject(Long id) {
     super(id);
   }
 }

@@ -4,7 +4,9 @@
 
   <mapper namespace="cern.c2mon.server.cache.dbaccess.AlarmMapper">
     <resultMap id="alarmResultMap" type="cern.c2mon.server.common.alarm.AlarmCacheObject">
-      <id property="id" column="ALARMID" jdbcType="NUMERIC" javaType="java.lang.Long"/>
+      <constructor>
+        <idArg column="ALARMID" javaType="Long"/>
+      </constructor>
       <result property="faultFamily" column="ALARMFFAMILY" jdbcType="VARCHAR"/>
       <result property="faultMember" column="ALARMFMEMBER" jdbcType="VARCHAR"/>
       <result property="faultCode" column="ALARMFCODE" jdbcType="NUMERIC"/>

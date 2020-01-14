@@ -47,7 +47,9 @@ public class SubEquipmentCacheObject extends AbstractEquipmentCacheObject implem
 
     private final SupervisionEntity supervisionEntity = SupervisionEntity.SUBEQUIPMENT;
 
-
+    public SubEquipmentCacheObject(Long pId, String pName, String pDescription, String pHandlerClassName, Long pStateTagId, Long pAliveTagId, Integer pAliveInterval, Long pCommfaultTagId) {
+        super(pId, pName, pDescription, pHandlerClassName, pStateTagId, pAliveTagId, pAliveInterval, pCommfaultTagId);
+    }
 
     public SubEquipmentCacheObject(final Long id, final String name, final Long stateTagId) {
         super(id, name, "-", stateTagId);

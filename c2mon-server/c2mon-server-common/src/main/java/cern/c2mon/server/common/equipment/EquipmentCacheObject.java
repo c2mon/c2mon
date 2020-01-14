@@ -96,12 +96,7 @@ public class EquipmentCacheObject extends AbstractEquipmentCacheObject implement
         super(id, name, handlerClass, stateTagId);
     }
 
-    public EquipmentCacheObject(final Long pId, final String pName, final String pDescription,
-            final String pHandlerClassName, final String pEquipmentAddress, final Long pStateTagId,
-            final Long pAliveTagId, final int pAliveInterval, final Long pCommfaultTagId, final Long pProcessId) {
+    public EquipmentCacheObject(Long pId, String pName, String pDescription, String pHandlerClassName, Long pStateTagId, Long pAliveTagId, Integer pAliveInterval, Long pCommfaultTagId) {
         super(pId, pName, pDescription, pHandlerClassName, pStateTagId, pAliveTagId, pAliveInterval, pCommfaultTagId);
-        this.address = pEquipmentAddress;
-        this.processId = pProcessId;
     }
-
 }

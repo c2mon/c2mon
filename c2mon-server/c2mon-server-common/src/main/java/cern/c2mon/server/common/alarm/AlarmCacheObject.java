@@ -125,7 +125,7 @@ public class AlarmCacheObject extends AbstractCacheableImpl implements Alarm {
   /**
    * Default constructor.
    */
-  public AlarmCacheObject(long id) {
+  public AlarmCacheObject(Long id) {
     super(id);
     this.timestamp = new Timestamp(0);
     this.sourceTimestamp = timestamp;

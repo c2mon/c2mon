@@ -85,7 +85,7 @@ public abstract class AbstractEquipmentCacheObject extends AbstractSupervisedCac
      * @param pCommfaultTagId Tag indicating the state of the communication with the equipment
      */
     public AbstractEquipmentCacheObject(final Long pId, final String pName, final String pDescription,
-            final String pHandlerClassName, final Long pStateTagId, final Long pAliveTagId, final int pAliveInterval,
+            final String pHandlerClassName, final Long pStateTagId, final Long pAliveTagId, final Integer pAliveInterval,
             final Long pCommfaultTagId) {
         super(pId, pName, pStateTagId, pAliveTagId, pAliveInterval);
         this.description = pDescription;

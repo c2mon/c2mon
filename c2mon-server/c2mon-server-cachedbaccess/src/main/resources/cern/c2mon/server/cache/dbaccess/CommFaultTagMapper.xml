@@ -5,11 +5,13 @@
   <mapper namespace="cern.c2mon.server.cache.dbaccess.CommFaultTagMapper">
 
     <resultMap id="commFaultTagResultMap" type="cern.c2mon.server.common.commfault.CommFaultTagCacheObject">
-      <id property="id" column="COMMFAULTID" jdbcType="NUMERIC" javaType="java.lang.Long"/>
-      <result property="equipmentId" column="EQID" jdbcType="NUMERIC"/>
-      <result property="equipmentName" column="EQNAME" jdbcType="VARCHAR"/>
-      <result property="stateTagId" column="EQSTATETAG" jdbcType="NUMERIC"/>
-      <result property="aliveTagId" column="EQALIVETAG" jdbcType="NUMERIC"/>   <!-- JDBC type required for nullable columns!! -->
+      <constructor>
+        <idArg column="COMMFAULTID" javaType="Long"/>
+        <arg column="EQID" javaType="Long"/>
+        <arg column="EQNAME" javaType="String"/>
+        <arg column="EQSTATETAG" javaType="Long"/>
+        <arg column="EQALIVETAG" javaType="Long"/>
+      </constructor>
     </resultMap>
 
 

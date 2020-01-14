@@ -57,7 +57,7 @@ public class CommFaultTagCacheObject extends AbstractCacheableImpl implements Co
      * @param aliveTagId
      * @param stateTagId
      */
-    public CommFaultTagCacheObject(long id, long equipmentId, String equipmentName, Long aliveTagId, Long stateTagId) {
+    public CommFaultTagCacheObject(Long id, Long equipmentId, String equipmentName, Long aliveTagId, Long stateTagId) {
         super(id);
         this.equipmentId = equipmentId;
         this.equipmentName = equipmentName;
@@ -65,11 +65,7 @@ public class CommFaultTagCacheObject extends AbstractCacheableImpl implements Co
         this.stateTagId = stateTagId;
     }
 
-  public CommFaultTagCacheObject(long id) {
-    super(id);
-  }
-
-  /**
+    /**
      * Clone not supported so far.
      */
     @Override

@@ -105,7 +105,7 @@ public class AliveTagCacheObject extends AbstractCacheableImpl implements AliveT
      * @param aliveType
      * @param aliveInterval
      */
-    public AliveTagCacheObject(final Long aliveTagId, final long relatedId, final String relatedName,
+    public AliveTagCacheObject(final Long aliveTagId, final Long relatedId, final String relatedName,
                                final Long relatedStateTagId, final String aliveType, final Integer aliveInterval) {
         super(aliveTagId);
         this.relatedId = relatedId;

@@ -6,7 +6,9 @@
   <mapper namespace="cern.c2mon.server.cache.dbaccess.DataTagMapper">
 
     <resultMap id="abstractCacheableMap" type="cern.c2mon.server.common.AbstractCacheableImpl">
-      <id property="id" column="TAGID" jdbcType="NUMERIC" javaType="java.lang.Long"/>
+      <constructor>
+        <idArg column="TAGID" javaType="Long"/>
+      </constructor>
       <result property="cacheTimestamp" column="TAGSRVTIMESTAMP" jdbcType="TIMESTAMP"/>
     </resultMap>
 

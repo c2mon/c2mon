@@ -5,14 +5,16 @@
   <mapper namespace="cern.c2mon.server.cache.dbaccess.EquipmentMapper">
 
     <resultMap id="abstractEquipmentResultMap" type="cern.c2mon.server.common.equipment.AbstractEquipmentCacheObject">
-      <id property="id" column="equipment_id" jdbcType="NUMERIC" javaType="java.lang.Long"/>
-      <result property="name" column="equipment_name" />
-      <result property="description" column="equipment_description"/>
-      <result property="handlerClassName" column="equipment_handlerclass"/>
-      <result property="stateTagId" column="equipment_statetagid"/>
-      <result property="aliveTagId" column="equipment_alivetagid"/>
-      <result property="aliveInterval" column="equipment_aliveinterval" />
-      <result property="commFaultTagId" column="equipment_commfaulttagid" />
+      <constructor>
+        <idArg column="equipment_id" javaType="Long"/>
+        <arg column="equipment_name" javaType="String" />
+        <arg column="equipment_description" javaType="String"/>
+        <arg column="equipment_handlerclass" javaType="String"/>
+        <arg column="equipment_statetagid" javaType="Long"/>
+        <arg column="equipment_alivetagid" javaType="Long"/>
+        <arg column="equipment_aliveinterval" javaType="Integer"/>
+        <arg column="equipment_commfaulttagid" javaType="Long"/>
+      </constructor>
       <result property="supervisionStatus" column="equipment_state" />
       <result property="statusDescription" column="equipment_status_desc"/>
       <result property="statusTime" column="equipment_status_time"/>

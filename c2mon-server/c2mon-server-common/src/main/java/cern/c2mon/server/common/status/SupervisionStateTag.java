@@ -53,7 +53,7 @@ public class SupervisionStateTag extends AbstractCacheableImpl {
    */
   Timestamp statusTime = new Timestamp(0);
 
-  public SupervisionStateTag(long id, long supervisedId, String supervisedEntity, Long aliveTagId, Long commFaultTagId) {
+  public SupervisionStateTag(Long id, Long supervisedId, String supervisedEntity, Long aliveTagId, Long commFaultTagId) {
     super(id);
     this.supervisedId = supervisedId;
     this.supervisedEntity = SupervisionEntity.parse(supervisedEntity);
