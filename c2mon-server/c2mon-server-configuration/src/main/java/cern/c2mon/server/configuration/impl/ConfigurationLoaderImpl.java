@@ -518,7 +518,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
         switch (element.getEntity()) {
         case DATATAG : daqConfigEvents.add(dataTagConfigHandler.create(element)); break;
         case RULETAG : ruleTagConfigHandler.create(element); break;
-        case CONTROLTAG: daqConfigEvents.add(controlTagConfigHandler.create(element)); break;
+//        case CONTROLTAG: daqConfigEvents.add(controlTagConfigHandler.create(element)); break; TODO (Alex) Review this
         case COMMANDTAG : daqConfigEvents = commandTagConfigHandler.createCommandTag(element); break;
         case ALARM : alarmConfigHandler.create(element); break;
         case PROCESS : daqConfigEvents.add(processConfigHandler.create(element));
@@ -535,8 +535,8 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
         switch (element.getEntity()) {
         case DATATAG :
           daqConfigEvents.add(dataTagConfigHandler.update(element.getEntityId(), element.getElementProperties())); break;
-        case CONTROLTAG :
-          daqConfigEvents.add(controlTagConfigHandler.update(element.getEntityId(), element.getElementProperties())); break;
+//        case CONTROLTAG : TODO (Alex) Review this
+//          daqConfigEvents.add(controlTagConfigHandler.update(element.getEntityId(), element.getElementProperties())); break;
         case RULETAG :
           ruleTagConfigHandler.update(element.getEntityId(), element.getElementProperties()); break;
         case COMMANDTAG :
@@ -560,7 +560,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
       case REMOVE :
         switch (element.getEntity()) {
         case DATATAG : daqConfigEvents.add(dataTagConfigHandler.remove(element.getEntityId(), elementReport)); break;
-        case CONTROLTAG : daqConfigEvents.add(controlTagConfigHandler.remove(element.getEntityId(), elementReport)); break;
+//        case CONTROLTAG : daqConfigEvents.add(controlTagConfigHandler.remove(element.getEntityId(), elementReport)); break; TODO (Alex) Review this
         case RULETAG : ruleTagConfigHandler.remove(element.getEntityId(), elementReport); break;
         case COMMANDTAG : daqConfigEvents.addAll(commandTagConfigHandler.removeCommandTag(element.getEntityId(), elementReport)); break;
         case ALARM : alarmConfigHandler.remove(element.getEntityId(), elementReport); break;
