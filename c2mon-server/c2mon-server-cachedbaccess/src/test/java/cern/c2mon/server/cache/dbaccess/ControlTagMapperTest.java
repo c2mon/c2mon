@@ -16,24 +16,19 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.dbaccess;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertTrue;
-
-import java.sql.Timestamp;
-import java.util.List;
-
-import org.junit.After;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.control.ControlTagCacheObject;
 import cern.c2mon.server.test.CacheObjectCreation;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
+import org.junit.After;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.sql.Timestamp;
+import java.util.List;
+
+import static org.junit.Assert.*;
 
 public class ControlTagMapperTest extends AbstractMapperTest {
 
@@ -45,7 +40,7 @@ public class ControlTagMapperTest extends AbstractMapperTest {
 
   @After
   public void deleteTestTag() {
-    controlTagMapper.deleteControlTag(new Long(1001));
+    controlTagMapper.deleteControlTag(1001L);
   }
 
   @Test
@@ -57,12 +52,12 @@ public class ControlTagMapperTest extends AbstractMapperTest {
 
   @Test
   public void testInsertControlTagAndGetItem() {
-    ControlTagCacheObject cacheObject = (ControlTagCacheObject) CacheObjectCreation.createTestControlTag();
+    ControlTagCacheObject cacheObject = CacheObjectCreation.createTestControlTag();
     controlTagMapper.insertControlTag(cacheObject); //insert into DB
     ControlTagCacheObject retrievedObject = (ControlTagCacheObject) controlTagMapper.getItem(cacheObject.getId()); //retrieve from DB
 
     assertNotNull(retrievedObject);
-    cacheObject.setValue(Float.valueOf(1000f));
+    cacheObject.setValue(1000f);
 
     //check the persistence was correct
     assertEquals(cacheObject.getId(), retrievedObject.getId());
@@ -93,8 +88,8 @@ public class ControlTagMapperTest extends AbstractMapperTest {
     ControlTagCacheObject cacheObject = CacheObjectCreation.createTestControlTag();
     controlTagMapper.insertControlTag(cacheObject);
 
-    assertTrue(cacheObject.getDataType().equals("Float"));
-    cacheObject.setValue(Float.valueOf(1999f));
+    assertEquals("Float", cacheObject.getDataType());
+    cacheObject.setValue(1999f);
     cacheObject.setCacheTimestamp(new Timestamp(System.currentTimeMillis()));
     cacheObject.setSourceTimestamp(new Timestamp(System.currentTimeMillis()));
     cacheObject.setValueDescription("new control value");

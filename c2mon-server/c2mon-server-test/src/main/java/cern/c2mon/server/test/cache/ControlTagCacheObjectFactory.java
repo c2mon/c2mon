@@ -22,9 +22,8 @@ public class ControlTagCacheObjectFactory extends AbstractInfoTagCacheObjectFact
 
   @Override
   public ControlTagCacheObject sampleBase() {
-    ControlTagCacheObject cacheObject = new ControlTagCacheObject();
+    ControlTagCacheObject cacheObject = new ControlTagCacheObject(1001L);
 
-    cacheObject.setId(1001L);  //must be non null in DB
     cacheObject.setName("Junit_test_tag"); //non null
     cacheObject.setDataType("Float"); // non null
     cacheObject.setValue(1000f);
@@ -32,31 +31,6 @@ public class ControlTagCacheObjectFactory extends AbstractInfoTagCacheObjectFact
     cacheObject.setMinValue(100f);
     cacheObject.setMaxValue(2000f);
     cacheObject.setRuleIdsString(""); //same as setting to null
-    return cacheObject;
-  }
-
-  /**
-   * Creates an AliveTimer for a Process
-   *
-   * @return the ControlTag
-   */
-  public ControlTagCacheObject createTestProcessAlive() {
-    ControlTagCacheObject cacheObject = sampleBase();
-    cacheObject.setId(510L);
-    cacheObject.setName("Test process alive tag");
-    cacheObject.setDataType("Long");
-
-    //cacheObject.setId(Long.valueOf(5000100));  //must be non null in DB
-    //cacheObject.setName("Test process alive tag"); //non null
-    cacheObject.setDescription("test alive description");
-    //cacheObject.setMode(DataTagConstants.MODE_TEST); //non null
-    //cacheObject.setDataType("Long"); // non null
-    //cacheObject.setTopic("tim.testdatatag.XADDRESS");
-    cacheObject.setUnit("seconds since 1970");
-    cacheObject.setValue(System.currentTimeMillis());
-    //cacheObject.setEquipmentId(Long.valueOf(300000)); //null for alive tags!
-    cacheObject.setMinValue(Long.MIN_VALUE);
-    cacheObject.setMaxValue(Long.MAX_VALUE);
     return cacheObject;
   }
 }
