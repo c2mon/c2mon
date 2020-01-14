@@ -53,13 +53,6 @@ public interface Alarm extends Cacheable {
   String getInfo();
 
   /**
-   * Get the alarm's unique identifier
-   * @return the alarm's unique identifier
-   */
-  @Override
-  Long getId();
-
-  /**
    * Get the alarm's LASER fault family
    * @return the alarm's LASER fault family
    */

@@ -16,15 +16,15 @@
  *****************************************************************************/
 package cern.c2mon.client.common.tag;
 
-import java.sql.Timestamp;
-import java.util.Collection;
-import java.util.Map;
-
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.rule.RuleInputValue;
 import cern.c2mon.shared.rule.RuleExpression;
+
+import java.sql.Timestamp;
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * The <code>Tag</code> interface is the immutable interface
@@ -37,12 +37,6 @@ import cern.c2mon.shared.rule.RuleExpression;
  * @TODO: Remove ClientDataTagValue inheritence
  */
 public interface Tag extends RuleInputValue {
-  /**
-   * Returns the tag identifier
-   * @return the tag identifier
-   */
-  @Override
-  Long getId();
 
   /**
    * Returns DataTagQuality object

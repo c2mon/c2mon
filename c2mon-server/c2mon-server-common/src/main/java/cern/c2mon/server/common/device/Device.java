@@ -31,13 +31,6 @@ import java.util.List;
 public interface Device extends Cacheable {
 
   /**
-   * Retrieve the unique ID of this device.
-   *
-   * @return the device ID
-   */
-  Long getId();
-
-  /**
    * Retrieve the name of this device.
    *
    * @return the device name

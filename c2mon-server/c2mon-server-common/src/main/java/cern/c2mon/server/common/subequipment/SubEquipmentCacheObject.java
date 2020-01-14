@@ -18,8 +18,10 @@ package cern.c2mon.server.common.subequipment;
 
 import cern.c2mon.server.common.equipment.AbstractEquipmentCacheObject;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEntity;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 // TODO move out all logic to facade bean (configXML, validation)
 
@@ -31,7 +33,9 @@ import lombok.EqualsAndHashCode;
  *
  * @author mruizgar
  */
-@Data
+@Getter
+@Setter
+@ToString
 @EqualsAndHashCode(callSuper = true)
 public class SubEquipmentCacheObject extends AbstractEquipmentCacheObject implements SubEquipment {
 
@@ -43,18 +47,14 @@ public class SubEquipmentCacheObject extends AbstractEquipmentCacheObject implem
 
     private final SupervisionEntity supervisionEntity = SupervisionEntity.SUBEQUIPMENT;
 
-    /**
-     * Public default constructor (needed by iBatis).
-     */
-    public SubEquipmentCacheObject() {
-        super();
-        this.setHandlerClassName("-"); // TODO remove handlerclassname from abstractequipment (unless new design ideas
-                                       // of using handler on subequipment level...)
+
+
+    public SubEquipmentCacheObject(final Long id, final String name, final Long stateTagId) {
+        super(id, name, "-", stateTagId);
     }
 
-    public SubEquipmentCacheObject(Long id) {
+    public SubEquipmentCacheObject(long id) {
         super(id);
-        this.setHandlerClassName("-");
     }
 
     /**

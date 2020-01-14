@@ -16,12 +16,12 @@
  *****************************************************************************/
 package cern.c2mon.shared.client.supervision;
 
-import java.io.Serializable;
-import java.sql.Timestamp;
-
 import cern.c2mon.shared.client.request.ClientRequestResult;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEntity;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
 
 /**
  * A SupervisionEvent marks a change or confirmation of the status
@@ -50,7 +50,7 @@ public interface SupervisionEvent extends ClientRequestResult, Cloneable, Serial
    * Returns the id of the entity to which the status applies.
    * @return the unique id; never returns null
    */
-  Long getEntityId();
+  long getEntityId();
   
   /**
    * @return The name of the entity 

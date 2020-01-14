@@ -16,9 +16,10 @@
  *****************************************************************************/
 package cern.c2mon.server.common.equipment;
 
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * Abstract class representing an equipment to be monitored. It contains all the common fields for the
@@ -26,8 +27,9 @@ import lombok.NoArgsConstructor;
  *
  * @author Mark Brightwell
  */
-@Data
-@NoArgsConstructor
+@Getter
+@Setter
+@ToString
 @EqualsAndHashCode(callSuper = true)
 public abstract class AbstractEquipmentCacheObject extends AbstractSupervisedCacheObject implements AbstractEquipment {
 
@@ -54,14 +56,7 @@ public abstract class AbstractEquipmentCacheObject extends AbstractSupervisedCac
      */
     private static final Boolean COMM_FAULT_TAG_VALUE = Boolean.FALSE;
 
-    /**
-     * Constructor. Used during runtime (re-)configuration.
-     *
-     * @param id the unique id of the equipment
-     */
-    protected AbstractEquipmentCacheObject(final Long id) {
-        super(id);
-    }
+
 
     /**
      * Constructor setting the minimal set of fields that can be expected to be non-null for all (sub-)equipment cache
@@ -72,8 +67,7 @@ public abstract class AbstractEquipmentCacheObject extends AbstractSupervisedCac
      * @param handlerClass class name
      * @param stateTagId state tag id
      */
-    public AbstractEquipmentCacheObject(final Long id, final String name, final String handlerClass,
-            final Long stateTagId) {
+    public AbstractEquipmentCacheObject(final Long id, final String name, final String handlerClass, final Long stateTagId) {
         super(id, name, stateTagId);
         this.setHandlerClassName(handlerClass);
     }
@@ -97,6 +91,10 @@ public abstract class AbstractEquipmentCacheObject extends AbstractSupervisedCac
         this.description = pDescription;
         this.handlerClassName = pHandlerClassName;
         this.commFaultTagId = pCommfaultTagId;
+    }
+
+    public AbstractEquipmentCacheObject(long id) {
+        super(id);
     }
 
     /**

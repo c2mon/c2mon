@@ -19,8 +19,10 @@ package cern.c2mon.server.common.alarm;
 import cern.c2mon.server.common.AbstractCacheableImpl;
 import cern.c2mon.shared.client.alarm.condition.AlarmCondition;
 import cern.c2mon.server.common.metadata.Metadata;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.sql.Timestamp;
 import java.util.LinkedList;
@@ -34,7 +36,9 @@ import java.util.LinkedList;
  * @author Mark Brightwell
  *
  */
-@Data
+@Getter
+@Setter
+@ToString
 @EqualsAndHashCode(callSuper = true)
 public class AlarmCacheObject extends AbstractCacheableImpl implements Alarm {
 
@@ -121,21 +125,11 @@ public class AlarmCacheObject extends AbstractCacheableImpl implements Alarm {
   /**
    * Default constructor.
    */
-  public AlarmCacheObject() {
+  public AlarmCacheObject(long id) {
+    super(id);
     this.timestamp = new Timestamp(0);
     this.sourceTimestamp = timestamp;
     this.info = "";
-  }
-
-  /**
-   * Constructor setting Alarm id.
-   *
-   * @param id
-   *          the id of the Alarm
-   */
-  public AlarmCacheObject(final Long id) {
-    this();
-    this.id = id;
   }
 
   /**

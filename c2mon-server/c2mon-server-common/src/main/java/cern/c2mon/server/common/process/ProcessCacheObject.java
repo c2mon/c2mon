@@ -18,9 +18,10 @@ package cern.c2mon.server.common.process;
 
 import cern.c2mon.server.common.equipment.AbstractSupervisedCacheObject;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEntity;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 import java.sql.Timestamp;
@@ -41,8 +42,9 @@ import java.util.regex.Pattern;
  * outside the cache.
  */
 @Slf4j
-@Data
-@NoArgsConstructor
+@Getter
+@Setter
+@ToString
 @EqualsAndHashCode(callSuper = true)
 public class ProcessCacheObject extends AbstractSupervisedCacheObject implements Process {
 
@@ -124,6 +126,10 @@ public class ProcessCacheObject extends AbstractSupervisedCacheObject implements
    */
   private LocalConfig localConfig;
 
+  public ProcessCacheObject(long id) {
+    super(id);
+  }
+
   /**
    * Constructor with minimal number of non-null fields. Used when loading from
    * the DB at start up.
@@ -140,15 +146,6 @@ public class ProcessCacheObject extends AbstractSupervisedCacheObject implements
     setName(name);
     this.maxMessageSize = maxMessageSize;
     this.maxMessageDelay = maxMessageDelay;
-  }
-
-  /**
-   * Constructor only setting id.
-   *
-   * @param id process id
-   */
-  public ProcessCacheObject(final Long id) {
-    super(id);
   }
 
   @SuppressWarnings("unchecked")

@@ -19,9 +19,10 @@ package cern.c2mon.server.common.device;
 import cern.c2mon.server.common.AbstractCacheableImpl;
 import cern.c2mon.shared.client.device.DeviceCommand;
 import cern.c2mon.shared.client.device.DeviceProperty;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,8 +33,9 @@ import java.util.List;
  *
  * @author Justin Lewis Salmon
  */
-@Data
-@NoArgsConstructor
+@Getter
+@Setter
+@ToString
 @EqualsAndHashCode(callSuper = true)
 public class DeviceCacheObject extends AbstractCacheableImpl implements Device {
 
@@ -62,6 +64,10 @@ public class DeviceCacheObject extends AbstractCacheableImpl implements Device {
    */
   private List<DeviceCommand> deviceCommands = new ArrayList<>();
 
+  public DeviceCacheObject(long id) {
+    super(id);
+  }
+
   /**
    * Default constructor.
    *
@@ -70,18 +76,9 @@ public class DeviceCacheObject extends AbstractCacheableImpl implements Device {
    * @param deviceClassId the ID of the class to which this device belongs
    */
   public DeviceCacheObject(final Long id, final String name, final Long deviceClassId) {
-    this.id = id;
+    super(id);
     this.name = name;
     this.deviceClassId = deviceClassId;
-  }
-
-  /**
-   * Constructor used when creating a cache object during configuration.
-   *
-   * @param id the unique ID of this device
-   */
-  public DeviceCacheObject(final Long id) {
-    this.id = id;
   }
 
   @SuppressWarnings("unchecked")

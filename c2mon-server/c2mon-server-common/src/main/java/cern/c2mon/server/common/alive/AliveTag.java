@@ -91,7 +91,7 @@ public interface AliveTag extends Cacheable {
    * Returns the identifier of the equipment or process linked to the alive tag.
    * @return id of cache object
    */
-  Long getRelatedId();
+  long getRelatedId();
 
   boolean isEquipmentAliveType();
 

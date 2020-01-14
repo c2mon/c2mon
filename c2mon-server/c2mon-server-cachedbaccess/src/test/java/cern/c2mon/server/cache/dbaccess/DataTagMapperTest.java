@@ -161,10 +161,7 @@ public class DataTagMapperTest extends AbstractMapperTest {
   @Test
   public void testUpdateDataTag() {
     // construct fake DataTagCacheObject
-    DataTagCacheObject cacheObject = new DataTagCacheObject(150000L);
-    cacheObject.setName("Junit_test_tag"); // non null
-    cacheObject.setMode(DataTagConstants.MODE_TEST); // non null
-    cacheObject.setDataType("Boolean"); // non null
+    DataTagCacheObject cacheObject = new DataTagCacheObject(150000L, "Junit_test_tag", "Boolean", DataTagConstants.MODE_TEST);
     cacheObject.setEquipmentId(150L); // need test equipment inserted
     Metadata metadata = new Metadata();
     metadata.addMetadata("metadata", 11);

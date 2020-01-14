@@ -18,9 +18,9 @@ package cern.c2mon.server.common.commfault;
 
 
 import cern.c2mon.server.common.AbstractCacheableImpl;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.sql.Timestamp;
 
@@ -29,8 +29,8 @@ import java.sql.Timestamp;
  *
  * @author Mark Brightwell
  */
-@Data
-@NoArgsConstructor
+@Getter
+@Setter
 @EqualsAndHashCode(callSuper = true)
 public class CommFaultTagCacheObject extends AbstractCacheableImpl implements CommFaultTag {
 
@@ -38,7 +38,7 @@ public class CommFaultTagCacheObject extends AbstractCacheableImpl implements Co
 
     private final Boolean faultValue = Boolean.FALSE; // always FALSE in TIM; TRUE not supported
 
-    private Long equipmentId;
+    private long equipmentId;
 
     private String equipmentName;
 
@@ -49,16 +49,6 @@ public class CommFaultTagCacheObject extends AbstractCacheableImpl implements Co
     private Timestamp eventTimestamp;
 
     /**
-     * Constructor setting minimal set of non-null fields.
-     *
-     * @param id
-     */
-    public CommFaultTagCacheObject(Long id) {
-        this();
-        this.id = id;
-    }
-
-    /**
      * Constructor setting all fields.
      *
      * @param id
@@ -67,8 +57,8 @@ public class CommFaultTagCacheObject extends AbstractCacheableImpl implements Co
      * @param aliveTagId
      * @param stateTagId
      */
-    public CommFaultTagCacheObject(Long id, Long equipmentId, String equipmentName, Long aliveTagId, Long stateTagId) {
-        this(id);
+    public CommFaultTagCacheObject(long id, long equipmentId, String equipmentName, Long aliveTagId, Long stateTagId) {
+        super(id);
         this.equipmentId = equipmentId;
         this.equipmentName = equipmentName;
         this.aliveTagId = aliveTagId;

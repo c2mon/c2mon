@@ -2,9 +2,9 @@ package cern.c2mon.server.common.tag;
 
 import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 import java.sql.Timestamp;
@@ -12,10 +12,10 @@ import java.util.Set;
 
 import static cern.c2mon.server.common.util.Java9Collections.setOfNonNulls;
 
-@Data
+@Getter
+@Setter
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-@NoArgsConstructor
 public abstract class AbstractInfoTagCacheObject extends AbstractTagCacheObject {
   /**
    * Minimum value for range checks. If the system receives a tag value that is
@@ -72,10 +72,7 @@ public abstract class AbstractInfoTagCacheObject extends AbstractTagCacheObject 
     setDataTagQuality(new DataTagQualityImpl());
   }
 
-  /**
-   * For testing only so far
-   */
-  public AbstractInfoTagCacheObject(final Long id) {
+  public AbstractInfoTagCacheObject(long id) {
     super(id);
   }
 

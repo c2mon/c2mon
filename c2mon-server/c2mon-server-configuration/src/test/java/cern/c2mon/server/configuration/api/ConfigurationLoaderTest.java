@@ -352,7 +352,7 @@ public class ConfigurationLoaderTest {
     assertTrue(report.getElementReports().get(0).getAction().equals(ConfigConstants.Action.UPDATE));
     assertTrue(report.getElementReports().get(0).getEntity().equals(ConfigConstants.Entity.DATATAG));
 
-    DataTagCacheObject expectedCacheObjectData = new DataTagCacheObject();
+    DataTagCacheObject expectedCacheObjectData = new DataTagCacheObject(0L);
     Metadata metadata = new Metadata();
     metadata.addMetadata("testMetadata1", 11);
     expectedCacheObjectData.setMetadata(metadata);
@@ -452,7 +452,7 @@ public class ConfigurationLoaderTest {
 
     // get cacheObject from the cache and compare to the an expected cacheObject
     DataTagCacheObject cacheObjectData = (DataTagCacheObject) dataTagCache.get(1000L);
-    DataTagCacheObject expectedCacheObjectData = new DataTagCacheObject();
+    DataTagCacheObject expectedCacheObjectData = new DataTagCacheObject(0L);
     Metadata metadata = new Metadata();
     metadata.addMetadata("testMetadata", 11);
     expectedCacheObjectData.setMetadata(metadata);

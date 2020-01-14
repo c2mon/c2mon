@@ -31,11 +31,11 @@ import java.sql.Timestamp;
 public interface Cacheable extends Serializable, Cloneable {
 
   /**
-   * All objects have a Long id.
+   * All objects have a long id.
    *
    * @return the id of the cache object
    */
-  Long getId();
+  long getId();
 
   /**
    * Needed for cache listeners, which always clone the object before

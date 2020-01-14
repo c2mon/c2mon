@@ -21,8 +21,10 @@ import cern.c2mon.server.common.metadata.Metadata;
 import cern.c2mon.shared.common.datatag.DataTagConstants;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.Serializable;
@@ -42,7 +44,9 @@ import static cern.c2mon.shared.common.datatag.DataTagConstants.*;
  * @author Mark Brightwell
  */
 @Slf4j
-@Data
+@Getter
+@Setter
+@ToString
 @EqualsAndHashCode(callSuper = true)
 public abstract class AbstractTagCacheObject extends AbstractCacheableImpl implements Serializable, Tag {
 
@@ -189,8 +193,8 @@ public abstract class AbstractTagCacheObject extends AbstractCacheableImpl imple
    * description; the description should be added at a later stage
    * with information about this tag creation.
    */
-  protected AbstractTagCacheObject() {
-    super();
+  protected AbstractTagCacheObject(long id) {
+    super(id);
     //TODO check this - done by config loader
     ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     readLock = lock.readLock();
@@ -201,16 +205,6 @@ public abstract class AbstractTagCacheObject extends AbstractCacheableImpl imple
     ruleIds = new ArrayList<>();
     cacheTimestamp = new Timestamp(System.currentTimeMillis());
     metadata = new Metadata();
-  }
-
-  /**
-   * Constructor used in implementations of the class.
-   *
-   * @param id
-   */
-  protected AbstractTagCacheObject(final Long id) {
-    this();
-    this.id = id;
   }
 
   /**

@@ -18,7 +18,6 @@ package cern.c2mon.server.common.datatag;
 
 import cern.c2mon.server.common.tag.AbstractInfoTagCacheObject;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
-import lombok.NoArgsConstructor;
 
 /**
  * Represents the data tag objects stored in the cache. These contain both the
@@ -31,7 +30,6 @@ import lombok.NoArgsConstructor;
  *
  * @author Mark Brightwell
  */
-@NoArgsConstructor
 public class DataTagCacheObject extends AbstractInfoTagCacheObject implements DataTag {
 
   /**
@@ -43,15 +41,14 @@ public class DataTagCacheObject extends AbstractInfoTagCacheObject implements Da
   private static final long serialVersionUID = -12345679L;
 
   public DataTagCacheObject(Long id, String name, String datatype, short mode) {
-    super(id);
+    super(id, name, datatype, mode);
     setName(name);
     setDataType(datatype);
     setMode(mode);
     setDataTagQuality(new DataTagQualityImpl());
   }
 
-  //for testing only so far
-  public DataTagCacheObject(final Long id) {
+  public DataTagCacheObject(long id) {
     super(id);
   }
 }

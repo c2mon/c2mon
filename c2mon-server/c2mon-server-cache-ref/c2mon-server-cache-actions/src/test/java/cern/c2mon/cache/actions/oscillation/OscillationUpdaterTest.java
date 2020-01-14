@@ -25,6 +25,7 @@ import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.AlarmCondition;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
+import cern.c2mon.server.test.cache.DataTagCacheObjectFactory;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -54,7 +55,7 @@ public class OscillationUpdaterTest {
     oscillationProperties.setTimeRange(50);
 
     oscUpdater = new OscillationUpdater(oscillationProperties);
-    dataTagCacheObject = new DataTagCacheObject();
+    dataTagCacheObject = new DataTagCacheObjectFactory().sampleBase();
 
 
     dataTagCacheObject.setSourceTimestamp(new Timestamp(System.currentTimeMillis() - 60000));

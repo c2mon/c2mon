@@ -49,11 +49,8 @@ public class DataTagCacheObjectFactory extends AbstractTagCacheObjectFactory<Abs
   }
 
   private DataTagCacheObject createSample(long id) {
-    DataTagCacheObject base = new DataTagCacheObject(id);
-    base.setName("Junit_test_datatag1"); //non null
+    DataTagCacheObject base = new DataTagCacheObject(id, "Junit_test_datatag1", "Boolean", DataTagConstants.MODE_TEST);
     base.setDescription("test description");
-    base.setMode(DataTagConstants.MODE_TEST); //non null
-    base.setDataType("Boolean"); // non null
     base.setLogged(false); //null allowed
     base.setUnit("test unit m/sec");
     base.setDipAddress("testDIPaddress");

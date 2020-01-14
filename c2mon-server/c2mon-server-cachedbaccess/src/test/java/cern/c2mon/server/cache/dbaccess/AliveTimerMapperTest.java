@@ -28,7 +28,7 @@ import static org.junit.Assert.*;
 
 public class AliveTimerMapperTest extends AbstractMapperTest {
 
-  private static final Long TEST_ALIVE_ID = new Long(500000);
+  private static final Long TEST_ALIVE_ID = 500000L;
 
   /**
    * Class to test.
@@ -45,12 +45,12 @@ public class AliveTimerMapperTest extends AbstractMapperTest {
     //id in control tag cache is the same as in alivetimer cache
     AliveTagCacheObject retrievedCacheObject = (AliveTagCacheObject) aliveTimerMapper.getItem(1221L);
 //    assertEquals(aliveTag.getId(), retrievedCacheObject.getId());
-    assertTrue(60000L == retrievedCacheObject.getAliveInterval());
+    assertEquals(60000L, (int) retrievedCacheObject.getAliveInterval());
     assertEquals("PROC", retrievedCacheObject.getAliveType());
-    assertTrue(50L == retrievedCacheObject.getRelatedId());
+    assertEquals(50L, (long) retrievedCacheObject.getRelatedId());
     assertEquals("P_TESTHANDLER03", retrievedCacheObject.getRelatedName());
-    assertTrue(1220L == retrievedCacheObject.getRelatedStateTagId());
-    assertTrue(retrievedCacheObject.getDependentAliveTimerIds().size() == 1); //2 dependent alive timers (eq and subeq)
+    assertEquals(1220L, (long) retrievedCacheObject.getRelatedStateTagId());
+    assertEquals(1, retrievedCacheObject.getDependentAliveTimerIds().size()); //2 dependent alive timers (eq and subeq)
     assertTrue(retrievedCacheObject.getDependentAliveTimerIds().contains(1224L));
     //assertTrue(retrievedCacheObject.getDependentAliveTimerIds().contains(testDataHelper.getSubEquipment().getAliveTagId())); only contains equipment alives!
   }
@@ -68,17 +68,6 @@ public class AliveTimerMapperTest extends AbstractMapperTest {
   public void testGetOne() {
     Cacheable item = aliveTimerMapper.getItem(1221L);
     assertNotNull(item);
-  }
-
-  private AliveTagCacheObject createTestAliveTimerOld() {
-    AliveTagCacheObject aliveTimer = new AliveTagCacheObject(TEST_ALIVE_ID);
-//    aliveTimer.setAliveTagId(TEST_ALIVE_ID);
-    aliveTimer.setAliveType(AliveTag.ALIVE_TYPE_PROCESS);
-    aliveTimer.setAliveInterval(60000);
-    aliveTimer.setRelatedId(Long.valueOf(1000000));
-    aliveTimer.setRelatedName("test related name");
-    aliveTimer.setRelatedStateTagId(Long.valueOf(400000));
-    return aliveTimer;
   }
 
   @Test

@@ -18,16 +18,18 @@ package cern.c2mon.server.common.alive;
 
 import cern.c2mon.server.common.AbstractCacheableImpl;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 
-@Data
-@NoArgsConstructor
+@Getter
+@Setter
+@ToString
 @EqualsAndHashCode(callSuper = true)
 public class AliveTagCacheObject extends AbstractCacheableImpl implements AliveTag {
 
@@ -55,7 +57,7 @@ public class AliveTagCacheObject extends AbstractCacheableImpl implements AliveT
      * Identifier of the equipment or process represented by the alive tag. The relatedId, in combination with the
      * aliveType allows BigBrother to determine what action to take if the alive expires.
      */
-    private Long relatedId;
+    private long relatedId;
 
     /**
      * Name of the equipment or process represented by the alive tag. This information is used by BigBrother to generate
@@ -94,13 +96,6 @@ public class AliveTagCacheObject extends AbstractCacheableImpl implements AliveT
     // ---------------------------------------------------------------------------
 
     /**
-     * Constructor setting minimal set of non-null fields.
-     */
-    public AliveTagCacheObject(Long id) {
-        this.id = id;
-    }
-
-    /**
      * Constructor used in iBatis sqlmap.
      *
      * @param aliveTagId
@@ -110,9 +105,9 @@ public class AliveTagCacheObject extends AbstractCacheableImpl implements AliveT
      * @param aliveType
      * @param aliveInterval
      */
-    public AliveTagCacheObject(final Long aliveTagId, final Long relatedId, final String relatedName,
+    public AliveTagCacheObject(final Long aliveTagId, final long relatedId, final String relatedName,
                                final Long relatedStateTagId, final String aliveType, final Integer aliveInterval) {
-        this(aliveTagId);
+        super(aliveTagId);
         this.relatedId = relatedId;
         this.relatedName = relatedName;
         this.relatedStateTagId = relatedStateTagId;
@@ -120,7 +115,11 @@ public class AliveTagCacheObject extends AbstractCacheableImpl implements AliveT
         this.aliveInterval = aliveInterval;
     }
 
-    @Override
+  public AliveTagCacheObject(long id) {
+    super(id);
+  }
+
+  @Override
     public AliveTagCacheObject clone() {
         AliveTagCacheObject aliveTimer = (AliveTagCacheObject) super.clone();
         if (this.dependentAliveTimerIds != null)

@@ -16,15 +16,13 @@
  *****************************************************************************/
 package cern.c2mon.shared.client.supervision;
 
-import java.sql.Timestamp;
-
-import com.google.gson.Gson;
-
-import lombok.Data;
-
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEntity;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
 import cern.c2mon.shared.util.json.GsonFactory;
+import com.google.gson.Gson;
+import lombok.Data;
+
+import java.sql.Timestamp;
 
 /**
  * <p>Implementation of the SupervisionEvent. Corresponds to the
@@ -55,7 +53,7 @@ public class SupervisionEventImpl implements SupervisionEvent {
   /**
    * The id of the entity (unique for the entity).
    */
-  private Long entityId;
+  private long entityId;
 
   /** The name of the entity */
   private String name;
@@ -145,7 +143,7 @@ public class SupervisionEventImpl implements SupervisionEvent {
     final int prime = 31;
     int result = 1;
     result = prime * result + ((entity == null) ? 0 : entity.hashCode());
-    result = prime * result + ((entityId == null) ? 0 : entityId.hashCode());
+    result = prime * result + Long.hashCode(entityId);
     result = prime * result + ((status == null) ? 0 : status.hashCode());
     return result;
   }
@@ -170,10 +168,7 @@ public class SupervisionEventImpl implements SupervisionEvent {
         return false;
     } else if (!entity.equals(other.entity))
       return false;
-    if (entityId == null) {
-      if (other.entityId != null)
-        return false;
-    } else if (!entityId.equals(other.entityId))
+    if (entityId != other.entityId)
       return false;
     if (status == null) {
       if (other.status != null)

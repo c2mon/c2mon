@@ -17,9 +17,10 @@
 package cern.c2mon.server.common.equipment;
 
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEntity;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.io.Serializable;
 import java.util.LinkedList;
@@ -29,9 +30,10 @@ import java.util.LinkedList;
  *
  * @author Mark Brightwell
  */
-@Data
+@Getter
+@Setter
+@ToString
 @EqualsAndHashCode(callSuper = true)
-@NoArgsConstructor
 public class EquipmentCacheObject extends AbstractEquipmentCacheObject implements Equipment, Serializable {
 
     private static final long serialVersionUID = -7917360710791608270L;
@@ -75,12 +77,7 @@ public class EquipmentCacheObject extends AbstractEquipmentCacheObject implement
         return equipmentCacheObject;
     }
 
-    /**
-     * Constructor (used in reconfiguration module).
-     *
-     * @param id the equipment id
-     */
-    public EquipmentCacheObject(final Long id) {
+    public EquipmentCacheObject(long id) {
         super(id);
     }
 

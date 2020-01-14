@@ -22,7 +22,7 @@ import java.sql.Timestamp;
 
 public interface CommFaultTag extends Cacheable {
   
-  Long getEquipmentId();
+  long getEquipmentId();
 
   Boolean getFaultValue();
 

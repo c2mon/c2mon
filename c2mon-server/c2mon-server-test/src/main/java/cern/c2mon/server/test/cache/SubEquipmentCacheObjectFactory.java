@@ -22,9 +22,8 @@ public class SubEquipmentCacheObjectFactory extends AbstractEquipmentCacheObject
 
   @Override
   public SubEquipmentCacheObject sampleBase() {
-    SubEquipmentCacheObject subEquipmentCacheObject = new SubEquipmentCacheObject(101L);
+    SubEquipmentCacheObject subEquipmentCacheObject = new SubEquipmentCacheObject(101L, "Test SubEquipment", 1222L);
     initDefaults(subEquipmentCacheObject);
-    subEquipmentCacheObject.setName("Test SubEquipment");
     subEquipmentCacheObject.setAliveTagId(5000300L);
     subEquipmentCacheObject.setParentId(100L);
 

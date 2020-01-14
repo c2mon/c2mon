@@ -17,15 +17,14 @@
 package cern.c2mon.server.test.cache;
 
 import cern.c2mon.server.common.control.ControlTagCacheObject;
+import cern.c2mon.shared.common.datatag.DataTagConstants;
 
 public class ControlTagCacheObjectFactory extends AbstractTagCacheObjectFactory<ControlTagCacheObject> {
 
   @Override
   public ControlTagCacheObject sampleBase() {
-    ControlTagCacheObject cacheObject = new ControlTagCacheObject(1001L);
+    ControlTagCacheObject cacheObject = new ControlTagCacheObject(1001L,"Junit_test_tag", "Float", DataTagConstants.MODE_TEST);
 
-    cacheObject.setName("Junit_test_tag"); //non null
-    cacheObject.setDataType("Float"); // non null
     cacheObject.setValue(1000f);
     cacheObject.setEquipmentId(150L); //need test equipment inserted
     cacheObject.setMinValue(100f);

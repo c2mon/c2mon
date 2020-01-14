@@ -21,10 +21,7 @@ import cern.c2mon.server.common.supervision.Supervised;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 import java.sql.Timestamp;
@@ -35,8 +32,9 @@ import java.sql.Timestamp;
  *
  * @author Mark Brightwell
  */
-@Data
-@NoArgsConstructor
+@Getter
+@Setter
+@ToString
 @EqualsAndHashCode(callSuper = true)
 @Slf4j
 public abstract class AbstractSupervisedCacheObject extends AbstractCacheableImpl implements Supervised {
@@ -95,18 +93,8 @@ public abstract class AbstractSupervisedCacheObject extends AbstractCacheableImp
      * @param stateTagId2
      */
     protected AbstractSupervisedCacheObject(Long id2, Long stateTagId2) {
-        this(id2);
+        super(id2);
         this.stateTagId = stateTagId2;
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param id
-     */
-    protected AbstractSupervisedCacheObject(final Long id) {
-        this();
-        this.id = id;
     }
 
     /**
@@ -124,20 +112,18 @@ public abstract class AbstractSupervisedCacheObject extends AbstractCacheableImp
         this.aliveInterval = aliveInterval;
     }
 
-    /**
-     * Constructor.
-     *
-     * @param id
-     * @param name
-     * @param stateTagId
-     */
+
     public AbstractSupervisedCacheObject(Long id, String name, Long stateTagId) {
-        this(id);
+        super(id);
         this.name = name;
         this.stateTagId = stateTagId;
     }
 
-    /**
+  public AbstractSupervisedCacheObject(long id) {
+    super(id);
+  }
+
+  /**
      * Clone implementation. All runtime information is frozen in clone, that no longer resides in cache (such as
      * SupervisionStatus).
      *

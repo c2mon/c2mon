@@ -17,8 +17,9 @@
 package cern.c2mon.server.common.device;
 
 import cern.c2mon.server.common.AbstractCacheableImpl;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,8 +33,9 @@ import java.util.stream.Collectors;
  *
  * @author Justin Lewis Salmon
  */
-@Data
-@NoArgsConstructor
+@Getter
+@Setter
+@EqualsAndHashCode(callSuper = true)
 public class DeviceClassCacheObject extends AbstractCacheableImpl implements DeviceClass {
 
   /**
@@ -74,7 +76,7 @@ public class DeviceClassCacheObject extends AbstractCacheableImpl implements Dev
    * @param description the textual description of the device class
    */
   public DeviceClassCacheObject(final Long id, final String name, final String description) {
-    this.id = id;
+    super(id);
     this.name = name;
     this.description = description;
   }

@@ -17,9 +17,7 @@
 package cern.c2mon.server.common.control;
 
 import cern.c2mon.server.common.tag.AbstractInfoTagCacheObject;
-import lombok.NoArgsConstructor;
 
-@NoArgsConstructor
 public class ControlTagCacheObject extends AbstractInfoTagCacheObject implements ControlTag {
 
   private static final long serialVersionUID = -410086626397719930L;
@@ -35,9 +33,5 @@ public class ControlTagCacheObject extends AbstractInfoTagCacheObject implements
    */
   public ControlTagCacheObject(Long id, String name, String datatype, short mode) {
     super(id, name, datatype, mode);
-  }
-
-  public ControlTagCacheObject(Long id) {
-    super(id);
   }
 }

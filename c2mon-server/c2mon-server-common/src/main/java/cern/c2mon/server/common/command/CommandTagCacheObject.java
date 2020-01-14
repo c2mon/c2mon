@@ -22,9 +22,10 @@ import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
 import cern.c2mon.shared.common.command.CommandExecutionDetails;
 import cern.c2mon.shared.common.command.CommandTag;
 import cern.c2mon.shared.common.datatag.address.HardwareAddress;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import org.simpleframework.xml.Transient;
 
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -37,8 +38,9 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
  *
  * @param <T> the type of the values that can be set for this command
  */
-@Data
-@NoArgsConstructor
+@Getter
+@Setter
+@ToString
 @EqualsAndHashCode(callSuper = true)
 public final class CommandTagCacheObject<T> extends AbstractCacheableImpl implements CommandTag<T> {
 
@@ -161,7 +163,7 @@ public final class CommandTagCacheObject<T> extends AbstractCacheableImpl implem
      */
     public CommandTagCacheObject(final Long id, final String name, final String description, final String dataType,
             final Short mode) {
-        this.id = id;
+        super(id);
         this.name = name;
         this.description = description;
         this.dataType = dataType;
@@ -181,7 +183,7 @@ public final class CommandTagCacheObject<T> extends AbstractCacheableImpl implem
             final short pMode, final Long pEquipmentId, final Long pProcessId, final HardwareAddress pHwAddress,
             final int pSourceTimeout, final int pSourceRetries, final int pExecTimeout, final int pClientTimeout,
             final Comparable<T> pMinimum, final Comparable<T> pMaximum) {
-        this.id = pId;
+        super(pId);
         this.name = pName;
         this.description = pDescription;
 
