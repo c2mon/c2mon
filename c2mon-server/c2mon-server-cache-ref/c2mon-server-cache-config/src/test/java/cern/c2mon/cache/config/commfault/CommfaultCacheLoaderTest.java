@@ -5,7 +5,6 @@ import cern.c2mon.cache.config.AbstractCacheLoaderTest;
 import cern.c2mon.server.cache.dbaccess.CommFaultTagMapper;
 import cern.c2mon.server.cache.dbaccess.LoaderMapper;
 import cern.c2mon.server.common.commfault.CommFaultTag;
-import cern.c2mon.server.common.commfault.CommFaultTagCacheObject;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -32,7 +31,7 @@ public class CommfaultCacheLoaderTest extends AbstractCacheLoaderTest<CommFaultT
   @Override
   protected void customCompare(List<CommFaultTag> mapperList, Map<Long, CommFaultTag> cacheList) {
     for (CommFaultTag aCommFaultList : mapperList) {
-      CommFaultTagCacheObject currentTag = (CommFaultTagCacheObject) aCommFaultList;
+      CommFaultTag currentTag = (CommFaultTag) aCommFaultList;
       //equality of DataTagCacheObjects => currently only compares names
       assertEquals("Cached CommfaultTag should have the same name as in DB",
         currentTag.getEquipmentId(), ((cacheList.get(currentTag.getId())).getEquipmentId()));
@@ -41,7 +40,7 @@ public class CommfaultCacheLoaderTest extends AbstractCacheLoaderTest<CommFaultT
 
   @Override
   protected CommFaultTag getSample() {
-    return new CommFaultTagCacheObject(1L, 2L, null, null, null);
+    return new CommFaultTag(1L, 2L, null, null, null);
   }
 
   @Override

@@ -19,7 +19,7 @@ package cern.c2mon.server.cache.commfault;
 import cern.c2mon.server.cache.AbstractCacheIntegrationTest;
 import cern.c2mon.server.cache.dbaccess.CommFaultTagMapper;
 import cern.c2mon.server.common.commfault.CommFaultTag;
-import cern.c2mon.server.common.commfault.CommFaultTagCacheObject;
+import cern.c2mon.server.common.commfault.CommFaultTag;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -55,9 +55,9 @@ public class CommFaultTagCacheTest extends AbstractCacheIntegrationTest {
     //compare all the objects from the cache and buffer
     Iterator<CommFaultTag> it = commFaultList.iterator();
     while (it.hasNext()) {
-      CommFaultTagCacheObject currentTag = (CommFaultTagCacheObject) it.next();
+      CommFaultTag currentTag = (CommFaultTag) it.next();
       //equality of DataTagCacheObjects => currently only compares names
-      assertEquals(currentTag.getEquipmentId(), (((CommFaultTagCacheObject) commFaultTagCache.getCopy(currentTag.getId())).getEquipmentId()));
+      assertEquals(currentTag.getEquipmentId(), (((CommFaultTag) commFaultTagCache.getCopy(currentTag.getId())).getEquipmentId()));
     }
   }
 }

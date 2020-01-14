@@ -105,7 +105,6 @@ public final class CacheObjectComparison {
     assertEquals(tag1.getTimestamp(), tag2.getTimestamp());
     assertEquals(tag1.getDataTagQuality(), tag2.getDataTagQuality());
     assertEquals(tag1.getDipAddress(), tag2.getDipAddress());
-    assertEquals(tag1.getJapcAddress(), tag2.getJapcAddress());
     assertEquals(tag1.getValue(), tag2.getValue());
     assertEquals(tag1.getUnit(), tag2.getUnit());
     assertEquals(tag1.getValueDescription(), tag2.getValueDescription());

@@ -4,7 +4,7 @@
 
   <mapper namespace="cern.c2mon.server.cache.dbaccess.CommFaultTagMapper">
 
-    <resultMap id="commFaultTagResultMap" type="cern.c2mon.server.common.commfault.CommFaultTagCacheObject">
+    <resultMap id="commFaultTagResultMap" type="cern.c2mon.server.common.commfault.CommFaultTag">
       <constructor>
         <idArg column="COMMFAULTID" javaType="Long"/>
         <arg column="EQID" javaType="Long"/>
