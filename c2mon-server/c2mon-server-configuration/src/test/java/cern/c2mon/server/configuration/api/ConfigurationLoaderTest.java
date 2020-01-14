@@ -27,7 +27,6 @@ import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.cache.loading.config.CacheLoadingModuleRef;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alive.AliveTag;
-import cern.c2mon.server.common.alive.AliveTagCacheObject;
 import cern.c2mon.server.common.command.CommandTagCacheObject;
 import cern.c2mon.server.common.config.CommonModule;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
@@ -795,8 +794,8 @@ public class ConfigurationLoaderTest {
     assertTrue(report.getElementReports().size() == 1);
 
     // check aliveTag in the cache
-    AliveTagCacheObject cacheObjectAlive = (AliveTagCacheObject) aliveTimerCache.get(101L);
-    AliveTagCacheObject expectedObjectAlive = new AliveTagCacheObject(101L, 5L, "P_INI_TEST", 100L, "PROC", 60000);
+    AliveTag cacheObjectAlive = (AliveTag) aliveTimerCache.get(101L);
+    AliveTag expectedObjectAlive = new AliveTag(101L, 5L, "P_INI_TEST", 100L, "PROC", 60000);
     ObjectEqualityComparison.assertAliveTimerValuesEquals(expectedObjectAlive, cacheObjectAlive);
 
 //    ControlTagCacheObject cacheObjectAliveControlCache = (ControlTagCacheObject) controlTagCache.get(101L);

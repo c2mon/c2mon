@@ -22,7 +22,6 @@ import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.server.cache.loading.ProcessDAO;
 import cern.c2mon.server.common.alive.AliveTag;
-import cern.c2mon.server.common.alive.AliveTagCacheObject;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.configuration.config.ConfigurationProperties;
 import cern.c2mon.server.configuration.impl.ProcessChange;
@@ -99,7 +98,7 @@ public class ProcessConfigHandler extends BaseConfigHandlerImpl<Process, Process
     try {
       aliveTimerCache.computeQuiet(process.getAliveTagId(), aliveTimer -> {
         log.trace("Adding process id #{} to alive timer {} (#{})", process.getId(), aliveTimer.getRelatedName(), aliveTimer.getId());
-        ((AliveTagCacheObject) aliveTimer).setRelatedId(process.getId());
+        ((AliveTag) aliveTimer).setRelatedId(process.getId());
       });
     } catch (CacheElementNotFoundException e) {
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,

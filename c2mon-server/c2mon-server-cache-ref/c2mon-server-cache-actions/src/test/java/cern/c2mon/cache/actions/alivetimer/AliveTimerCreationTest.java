@@ -4,10 +4,10 @@ import cern.c2mon.cache.actions.commfault.CommFaultService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.impl.SimpleC2monCache;
 import cern.c2mon.server.common.alive.AliveTag;
-import cern.c2mon.server.common.alive.AliveTagCacheObject;
 import cern.c2mon.server.common.equipment.EquipmentCacheObject;
 import cern.c2mon.server.common.process.ProcessCacheObject;
 import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
+import cern.c2mon.shared.common.supervision.SupervisionEntity;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -69,9 +69,9 @@ public class AliveTimerCreationTest {
 
     aliveTimerService.createAliveTimerFor(subEquipmentCacheObject);
 
-    AliveTagCacheObject cachedAliveTimer = (AliveTagCacheObject) aliveTimerCache.get(ALIVE_TAG_ID);
+    AliveTag cachedAliveTimer = (AliveTag) aliveTimerCache.get(ALIVE_TAG_ID);
 
-    assertEquals("AliveTimer should have SubEquipment type set", AliveTag.ALIVE_TYPE_SUBEQUIPMENT, cachedAliveTimer.getAliveType());
+    assertEquals("AliveTimer should have SubEquipment type set", SupervisionEntity.SUBEQUIPMENT.toString(), cachedAliveTimer.getAliveType());
     assertEquals("AliveTimer should have interval set", subEquipmentCacheObject.getAliveInterval(), cachedAliveTimer.getAliveInterval());
     assertEquals("AliveTimer should have relatedId set", subEquipmentCacheObject.getId(), cachedAliveTimer.getRelatedId());
     assertEquals("AliveTimer should have relatedName set", subEquipmentCacheObject.getName(), cachedAliveTimer.getRelatedName());

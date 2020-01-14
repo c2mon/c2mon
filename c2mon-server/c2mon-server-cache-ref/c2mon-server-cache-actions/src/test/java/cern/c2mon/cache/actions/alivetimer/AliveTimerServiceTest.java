@@ -4,7 +4,7 @@ import cern.c2mon.cache.actions.commfault.CommFaultService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.impl.SimpleC2monCache;
 import cern.c2mon.server.common.alive.AliveTag;
-import cern.c2mon.server.common.alive.AliveTagCacheObject;
+import cern.c2mon.shared.common.supervision.SupervisionEntity;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -31,10 +31,10 @@ public class AliveTimerServiceTest {
 
   @Test
   public void startAliveTimer() {
-    AliveTag aliveTimer = new AliveTagCacheObject(1L);
+    AliveTag aliveTimer = new AliveTag(1L);
     aliveTimer.setActive(false);
 
-    AliveTag startedAliveTimer = new AliveTagCacheObject(1L);
+    AliveTag startedAliveTimer = new AliveTag(1L);
     startedAliveTimer.setActive(true);
     startedAliveTimer.setLastUpdate(System.currentTimeMillis());
 
@@ -48,7 +48,7 @@ public class AliveTimerServiceTest {
 
   @Test
   public void startTest() {
-    AliveTag aliveTimer = new AliveTagCacheObject(1L);
+    AliveTag aliveTimer = new AliveTag(1L);
     aliveTimer.setActive(false);
 
     aliveTimerCacheRef.put(1L, aliveTimer);
@@ -61,7 +61,7 @@ public class AliveTimerServiceTest {
 
   @Test
   public void startForcedAliveTimer() throws InterruptedException {
-    AliveTag aliveTimer = new AliveTagCacheObject(1L);
+    AliveTag aliveTimer = new AliveTag(1L);
     aliveTimer.setActive(true);
 
     aliveTimerCacheRef.put(aliveTimer.getId(), aliveTimer);
@@ -80,7 +80,7 @@ public class AliveTimerServiceTest {
 
   @Test
   public void checkExpiredAliveTimer() throws InterruptedException {
-    AliveTag aliveTimer = new AliveTagCacheObject(1L, 2L, "test", 0L, AliveTag.ALIVE_TYPE_EQUIPMENT, 20);
+    AliveTag aliveTimer = new AliveTag(1L, 2L, "test", 0L, SupervisionEntity.EQUIPMENT.toString(), 20);
     aliveTimer.setActive(true);
 
     aliveTimerCacheRef.put(aliveTimer.getId(), aliveTimer);
@@ -96,7 +96,7 @@ public class AliveTimerServiceTest {
 
   @Test
   public void checkActiveAliveTimer() throws InterruptedException {
-    AliveTag aliveTimer = new AliveTagCacheObject(1L, 2L, "test", 0L, AliveTag.ALIVE_TYPE_EQUIPMENT, 0);
+    AliveTag aliveTimer = new AliveTag(1L, 2L, "test", 0L, SupervisionEntity.EQUIPMENT.toString(), 0);
     aliveTimer.setActive(true);
 
     aliveTimerCacheRef.put(aliveTimer.getId(), aliveTimer);
@@ -112,7 +112,7 @@ public class AliveTimerServiceTest {
 
   @Test
   public void stopAliveTimer() {
-    AliveTag aliveTimer = new AliveTagCacheObject(1L);
+    AliveTag aliveTimer = new AliveTag(1L);
     aliveTimer.setActive(true);
     aliveTimer.setLastUpdate(System.currentTimeMillis());
 
@@ -128,7 +128,7 @@ public class AliveTimerServiceTest {
     int size = 10;
     Map<Long, AliveTag> aliveTimers = new HashMap<>(size);
     IntStream.range(0, size).forEach(i -> {
-      AliveTag aliveTimer = new AliveTagCacheObject((long) i);
+      AliveTag aliveTimer = new AliveTag((long) i);
       aliveTimer.setActive(false);
       aliveTimers.put(aliveTimer.getId(), aliveTimer);
     });
@@ -154,7 +154,7 @@ public class AliveTimerServiceTest {
     int size = 10;
     Map<Long, AliveTag> aliveTimers = new HashMap<>(size);
     IntStream.range(0, size).forEach(i -> {
-      AliveTag aliveTimer = new AliveTagCacheObject((long) i);
+      AliveTag aliveTimer = new AliveTag((long) i);
       aliveTimer.setActive(true);
       aliveTimer.setLastUpdate(System.currentTimeMillis());
       aliveTimers.put(aliveTimer.getId(), aliveTimer);

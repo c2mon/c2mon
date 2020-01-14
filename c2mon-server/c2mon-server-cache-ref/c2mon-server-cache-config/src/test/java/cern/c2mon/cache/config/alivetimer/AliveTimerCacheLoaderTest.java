@@ -4,7 +4,6 @@ import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.config.AbstractCacheLoaderTest;
 import cern.c2mon.server.cache.dbaccess.AliveTimerMapper;
 import cern.c2mon.server.common.alive.AliveTag;
-import cern.c2mon.server.common.alive.AliveTagCacheObject;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -31,7 +30,7 @@ public class AliveTimerCacheLoaderTest extends AbstractCacheLoaderTest<AliveTag>
   @Override
   protected void customCompare(List<AliveTag> mapperList, Map<Long, AliveTag> cacheList) {
     for (AliveTag anAliveList : mapperList) {
-      AliveTagCacheObject currentTimer = (AliveTagCacheObject) anAliveList;
+      AliveTag currentTimer = (AliveTag) anAliveList;
       //only compares one field so far
       assertEquals("Cached AliveTimer should have the same name as AliveTimer in DB", currentTimer.getRelatedName(), ((aliveTimerCacheRef.get(currentTimer.getId())).getRelatedName()));
     }
@@ -49,6 +48,6 @@ public class AliveTimerCacheLoaderTest extends AbstractCacheLoaderTest<AliveTag>
 
   @Override
   protected AliveTag getSample() {
-    return new AliveTagCacheObject(0L);
+    return new AliveTag(0L);
   }
 }

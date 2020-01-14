@@ -17,7 +17,6 @@
 package cern.c2mon.server.cache.dbaccess;
 
 import cern.c2mon.server.common.alive.AliveTag;
-import cern.c2mon.server.common.alive.AliveTagCacheObject;
 import cern.c2mon.shared.common.Cacheable;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +42,7 @@ public class AliveTimerMapperTest extends AbstractMapperTest {
 //    ControlTag aliveTag = CacheObjectCreation.createTestProcessAlive();
 //    Equipment equipment = CacheObjectCreation.createTestEquipment();
     //id in control tag cache is the same as in alivetimer cache
-    AliveTagCacheObject retrievedCacheObject = (AliveTagCacheObject) aliveTimerMapper.getItem(1221L);
+    AliveTag retrievedCacheObject = (AliveTag) aliveTimerMapper.getItem(1221L);
 //    assertEquals(aliveTag.getId(), retrievedCacheObject.getId());
     assertEquals(60000L, (int) retrievedCacheObject.getAliveInterval());
     assertEquals("PROC", retrievedCacheObject.getAliveType());

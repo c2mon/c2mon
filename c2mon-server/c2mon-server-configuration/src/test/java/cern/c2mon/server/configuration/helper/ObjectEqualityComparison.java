@@ -17,7 +17,7 @@
 package cern.c2mon.server.configuration.helper;
 
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
-import cern.c2mon.server.common.alive.AliveTagCacheObject;
+import cern.c2mon.server.common.alive.AliveTag;
 import cern.c2mon.server.common.command.CommandTagCacheObject;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.common.device.Command;
@@ -46,7 +46,7 @@ import static org.junit.Assert.assertTrue;
 public class ObjectEqualityComparison {
 
 
-  public static void assertAliveTimerValuesEquals(AliveTagCacheObject expectedObject, AliveTagCacheObject object) {
+  public static void assertAliveTimerValuesEquals(AliveTag expectedObject, AliveTag object) {
     assertEquals(expectedObject.getId(), object.getId());
     assertEquals(expectedObject.getRelatedId(), object.getRelatedId());
     assertEquals(expectedObject.getRelatedName(), object.getRelatedName());

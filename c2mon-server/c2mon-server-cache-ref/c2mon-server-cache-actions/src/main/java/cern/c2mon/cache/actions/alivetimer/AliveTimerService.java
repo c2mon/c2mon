@@ -5,7 +5,6 @@ import cern.c2mon.cache.actions.commfault.CommFaultService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.alive.AliveTag;
-import cern.c2mon.server.common.alive.AliveTagCacheObject;
 import cern.c2mon.server.common.supervision.Supervised;
 import cern.c2mon.server.common.thread.Event;
 import cern.c2mon.shared.common.CacheEvent;
@@ -17,10 +16,8 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
-import static cern.c2mon.shared.common.supervision.SupervisionEntity.*;
-
 /**
- * Manages operations on {@link AliveTagCacheObject}s
+ * Manages operations on {@link AliveTag}s
  *
  * @author Szymon Halastra, Alexandros Papageorgiou Koufidis
  * @see AliveTag
@@ -145,19 +142,20 @@ public class AliveTimerService extends AbstractCacheServiceImpl<AliveTag> {
   }
 
   public void createAliveTimerFor(Supervised supervised) {
-    AliveTagCacheObject aliveTimer = new AliveTagCacheObject(supervised.getAliveTagId(), supervised.getId(), supervised.getName(),
+    AliveTag aliveTimer = new AliveTag(supervised.getAliveTagId(), supervised.getId(), supervised.getName(),
       supervised.getStateTagId(), "", supervised.getAliveInterval());
     setAliveTimerType(supervised.getSupervisionEntity(), aliveTimer);
     cache.put(aliveTimer.getId(), aliveTimer);
   }
 
-  private void setAliveTimerType(SupervisionEntity supervisionEntity, AliveTagCacheObject aliveTimer) {
-    if (supervisionEntity == PROCESS)
-      aliveTimer.setAliveType(AliveTag.ALIVE_TYPE_PROCESS);
-    else if (supervisionEntity == EQUIPMENT)
-      aliveTimer.setAliveType(AliveTag.ALIVE_TYPE_EQUIPMENT);
-    else if (supervisionEntity == SUBEQUIPMENT)
-      aliveTimer.setAliveType(AliveTag.ALIVE_TYPE_SUBEQUIPMENT);
+  private void setAliveTimerType(SupervisionEntity supervisionEntity, AliveTag aliveTimer) {
+//    if (supervisionEntity == PROCESS)
+//      aliveTimer.setAliveType(ALIVE_TYPE_PROCESS);
+//    else if (supervisionEntity == EQUIPMENT)
+//      aliveTimer.setAliveType(AliveTag.ALIVE_TYPE_EQUIPMENT);
+//    else if (supervisionEntity == SUBEQUIPMENT)
+//      aliveTimer.setAliveType(AliveTag.ALIVE_TYPE_SUBEQUIPMENT);
+//    TODO (Alex) Update this when AliveTag is a proper ControlTag
   }
 
   private void filterAndSetActive(boolean active) {

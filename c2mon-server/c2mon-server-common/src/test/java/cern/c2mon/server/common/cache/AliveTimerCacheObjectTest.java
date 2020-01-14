@@ -1,21 +1,21 @@
 package cern.c2mon.server.common.cache;
 
-import cern.c2mon.server.common.alive.AliveTagCacheObject;
+import cern.c2mon.server.common.alive.AliveTag;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class AliveTimerCacheObjectTest extends CacheableTest<AliveTagCacheObject> {
+public class AliveTimerCacheObjectTest extends CacheableTest<AliveTag> {
 
-  private static AliveTagCacheObject sample = new AliveTagCacheObject(1L);
+  private static AliveTag sample = new AliveTag(1L);
 
   public AliveTimerCacheObjectTest() {
     super(sample);
   }
 
   @Override
-  protected void mutateObject(AliveTagCacheObject cloneObject) {
+  protected void mutateObject(AliveTag cloneObject) {
     cloneObject.setAliveInterval(420);
     cloneObject.setLastUpdate(1337);
   }
