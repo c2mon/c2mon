@@ -4,7 +4,7 @@
 
   <mapper namespace="cern.c2mon.server.cache.dbaccess.SupervisionStateTagMapper">
 
-    <resultMap id="stateTagResultMap" type="cern.c2mon.server.common.status.SupervisionStateTag">
+    <resultMap id="stateTagResultMap" type="cern.c2mon.server.common.supervision.SupervisionStateTag">
       <constructor>
         <idArg column="STATETAGID" javaType="Long"/>
         <arg column="SUP_ID" javaType="Long"/>

@@ -1,6 +1,6 @@
 package cern.c2mon.server.test.cache;
 
-import cern.c2mon.server.common.status.SupervisionStateTag;
+import cern.c2mon.server.common.supervision.SupervisionStateTag;
 
 public class SupervisionStateTagFactory extends AbstractCacheObjectFactory<SupervisionStateTag> {
 

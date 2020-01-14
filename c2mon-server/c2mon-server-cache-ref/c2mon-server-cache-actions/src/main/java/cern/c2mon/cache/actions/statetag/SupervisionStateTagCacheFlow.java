@@ -1,7 +1,7 @@
 package cern.c2mon.cache.actions.statetag;
 
 import cern.c2mon.cache.api.flow.DefaultCacheFlow;
-import cern.c2mon.server.common.status.SupervisionStateTag;
+import cern.c2mon.server.common.supervision.SupervisionStateTag;
 
 class SupervisionStateTagCacheFlow extends DefaultCacheFlow<SupervisionStateTag> {
 

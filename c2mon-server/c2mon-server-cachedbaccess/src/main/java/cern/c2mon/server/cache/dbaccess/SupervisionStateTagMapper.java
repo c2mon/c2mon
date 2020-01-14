@@ -16,7 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.dbaccess;
 
-import cern.c2mon.server.common.status.SupervisionStateTag;
+import cern.c2mon.server.common.supervision.SupervisionStateTag;
 
 public interface SupervisionStateTagMapper extends LoaderMapper<SupervisionStateTag> {
 

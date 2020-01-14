@@ -1,9 +1,8 @@
-package cern.c2mon.server.common.status;
+package cern.c2mon.server.common.supervision;
 
 import cern.c2mon.server.common.AbstractCacheableImpl;
 import cern.c2mon.server.common.alive.AliveTag;
 import cern.c2mon.server.common.commfault.CommFaultTag;
-import cern.c2mon.server.common.supervision.Supervised;
 import cern.c2mon.shared.common.supervision.SupervisionEntity;
 import cern.c2mon.shared.common.supervision.SupervisionStatus;
 import lombok.EqualsAndHashCode;

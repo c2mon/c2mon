@@ -5,7 +5,7 @@ import cern.c2mon.cache.api.DbLoadable;
 import cern.c2mon.server.common.alive.AliveTag;
 import cern.c2mon.server.common.commfault.CommFaultTag;
 import cern.c2mon.server.common.equipment.Equipment;
-import cern.c2mon.server.common.status.SupervisionStateTag;
+import cern.c2mon.server.common.supervision.SupervisionStateTag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

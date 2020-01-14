@@ -2,7 +2,7 @@ package cern.c2mon.cache.actions.statetag;
 
 import cern.c2mon.cache.actions.AbstractCacheServiceImpl;
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.server.common.status.SupervisionStateTag;
+import cern.c2mon.server.common.supervision.SupervisionStateTag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

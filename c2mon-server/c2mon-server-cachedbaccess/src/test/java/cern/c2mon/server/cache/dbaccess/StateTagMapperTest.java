@@ -17,7 +17,7 @@
 
 package cern.c2mon.server.cache.dbaccess;
 
-import cern.c2mon.server.common.status.SupervisionStateTag;
+import cern.c2mon.server.common.supervision.SupervisionStateTag;
 import cern.c2mon.server.test.DatabasePopulationRule;
 import cern.c2mon.shared.common.Cacheable;
 import org.junit.Rule;

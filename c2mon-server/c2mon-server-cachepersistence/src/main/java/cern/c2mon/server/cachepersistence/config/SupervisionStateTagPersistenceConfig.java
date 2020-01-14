@@ -1,8 +1,7 @@
 package cern.c2mon.server.cachepersistence.config;
 
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.server.common.alive.AliveTag;
-import cern.c2mon.server.common.status.SupervisionStateTag;
+import cern.c2mon.server.common.supervision.SupervisionStateTag;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;

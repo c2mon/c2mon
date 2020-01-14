@@ -20,7 +20,7 @@ import cern.c2mon.server.cache.dbaccess.SupervisionStateTagMapper;
 import cern.c2mon.server.cache.loading.CacheLoaderName;
 import cern.c2mon.server.cache.loading.SupervisionStateTagDAO;
 import cern.c2mon.server.cache.loading.common.AbstractDefaultLoaderDAO;
-import cern.c2mon.server.common.status.SupervisionStateTag;
+import cern.c2mon.server.common.supervision.SupervisionStateTag;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;

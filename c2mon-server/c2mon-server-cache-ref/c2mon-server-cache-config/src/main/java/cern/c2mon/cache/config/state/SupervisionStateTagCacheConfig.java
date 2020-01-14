@@ -5,7 +5,7 @@ import cern.c2mon.cache.api.factory.AbstractCacheFactory;
 import cern.c2mon.cache.config.CacheName;
 import cern.c2mon.cache.config.config.AbstractSimpleCacheConfig;
 import cern.c2mon.server.cache.loading.CacheLoaderDAO;
-import cern.c2mon.server.common.status.SupervisionStateTag;
+import cern.c2mon.server.common.supervision.SupervisionStateTag;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

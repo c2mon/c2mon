@@ -10,8 +10,8 @@ import cern.c2mon.server.common.device.DeviceClass;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.rule.RuleTag;
-import cern.c2mon.server.common.status.SupervisionStateTag;
 import cern.c2mon.server.common.subequipment.SubEquipment;
+import cern.c2mon.server.common.supervision.SupervisionStateTag;
 import cern.c2mon.shared.common.command.CommandTag;
 import org.springframework.stereotype.Service;
 
