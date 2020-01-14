@@ -34,13 +34,13 @@ public class CommfaultCacheLoaderTest extends AbstractCacheLoaderTest<CommFaultT
       CommFaultTag currentTag = (CommFaultTag) aCommFaultList;
       //equality of DataTagCacheObjects => currently only compares names
       assertEquals("Cached CommfaultTag should have the same name as in DB",
-        currentTag.getEquipmentId(), ((cacheList.get(currentTag.getId())).getEquipmentId()));
+        currentTag.getSupervisedId(), ((cacheList.get(currentTag.getId())).getSupervisedId()));
     }
   }
 
   @Override
   protected CommFaultTag getSample() {
-    return new CommFaultTag(1L, 2L, null, null, null);
+    return new CommFaultTag(1L, 2L, null, "EQ",null, null);
   }
 
   @Override

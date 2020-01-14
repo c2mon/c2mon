@@ -106,6 +106,7 @@ public abstract class AbstractTagCacheObject extends AbstractCacheableImpl imple
   /**
    * JAPC address for tags published on JAPC
    */
+  @Deprecated
   private String japcAddress;
 
   /**

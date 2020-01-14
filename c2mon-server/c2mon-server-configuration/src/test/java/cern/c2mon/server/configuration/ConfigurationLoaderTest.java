@@ -596,7 +596,7 @@ public class ConfigurationLoaderTest {
     // the alivetimer and commfault have overriden those already in the cache
     // (check reference to the equipment has changed)
     assertNotNull(commFaultTagCache.get(expectedObject.getCommFaultTagId()));
-    assertEquals(expectedObject.getId(), commFaultTagCache.get(cacheObject.getCommFaultTagId()).getEquipmentId());
+    assertEquals(expectedObject.getId(), commFaultTagCache.get(cacheObject.getCommFaultTagId()).getSupervisedId());
 
     // update (creates controltag and updates equipment) - should succeed
     report = configurationLoader.applyConfiguration(25);
@@ -879,7 +879,7 @@ public class ConfigurationLoaderTest {
     assertNotNull(aliveTimerCache.get(expectedObject.getAliveTagId()));
     assertEquals(expectedObject.getId(), aliveTimerCache.get(cacheObject.getAliveTagId()).getRelatedId());
     assertNotNull(commFaultTagCache.get(expectedObject.getCommFaultTagId()));
-    assertEquals(expectedObject.getId(), commFaultTagCache.get(cacheObject.getCommFaultTagId()).getEquipmentId());
+    assertEquals(expectedObject.getId(), commFaultTagCache.get(cacheObject.getCommFaultTagId()).getSupervisedId());
 
     report = configurationLoader.applyConfiguration(20);
 

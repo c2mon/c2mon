@@ -10,6 +10,7 @@ import cern.c2mon.server.common.equipment.AbstractEquipment;
 import cern.c2mon.server.common.thread.Event;
 import cern.c2mon.shared.common.CacheEvent;
 import cern.c2mon.shared.common.datatag.SourceDataTagValue;
+import cern.c2mon.shared.common.supervision.SupervisionEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -43,7 +44,8 @@ public class CommFaultService extends AbstractCacheServiceImpl<CommFaultTag> {
 
   public CommFaultTag generateFromEquipment(AbstractEquipment abstractEquipment) {
     return new CommFaultTag(abstractEquipment.getCommFaultTagId(), abstractEquipment.getId(),
-            abstractEquipment.getName(), abstractEquipment.getAliveTagId(), abstractEquipment.getStateTagId());
+            abstractEquipment.getName(), SupervisionEntity.EQUIPMENT.toString(),
+      abstractEquipment.getAliveTagId(), abstractEquipment.getStateTagId());
     // TODO This used to also put, so remember to do that when calling!
   }
 
@@ -61,7 +63,7 @@ public class CommFaultService extends AbstractCacheServiceImpl<CommFaultTag> {
 
     // TODO What's going on here? Looks like this logic is flawed? How do you set a CommFaultTag to down?
     cache.compute(commFaultTagId, commFaultTag -> {
-      if (aliveTimer.getLastUpdate() >= commFaultTag.getEventTimestamp().getTime()) {
+      if (aliveTimer.getLastUpdate() >= commFaultTag.getSourceTimestamp().getTime()) {
 //        ((CommFaultTag) commFaultTag).set
       }
     });

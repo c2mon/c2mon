@@ -329,10 +329,10 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
           log.debug(str.toString());
         }
 
-        if (equipmentCache.containsKey(commFaultTagCopy.getEquipmentId())) { //check if equipment
+        if (equipmentCache.containsKey(commFaultTagCopy.getSupervisedId())) { //check if equipment
 
           boolean updateAliveTimer = false; //must be done outside of the process lock as locks the alivetimer!
-          Long equipmentId = commFaultTagCopy.getEquipmentId();
+          Long equipmentId = commFaultTagCopy.getSupervisedId();
           Timestamp supervisionTimestamp = new Timestamp(System.currentTimeMillis());
           if (tagValue.equals(commFaultTagCopy.getFaultValue())) {
             StringBuffer str = new StringBuffer("Communication fault tag indicates that equipment ");
@@ -360,10 +360,10 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
             }
           }
 
-        } else if (subEquipmentCache.containsKey(commFaultTagCopy.getEquipmentId())) {     //check if subequipment
+        } else if (subEquipmentCache.containsKey(commFaultTagCopy.getSupervisedId())) {     //check if subequipment
 
           boolean updateAliveTimer = false;
-          Long subEquipmentId = commFaultTagCopy.getEquipmentId();
+          Long subEquipmentId = commFaultTagCopy.getSupervisedId();
           Timestamp supervisionTimestamp = new Timestamp(System.currentTimeMillis());
           if (tagValue.equals(commFaultTagCopy.getFaultValue())) {
             StringBuffer str = new StringBuffer("Communication fault tag indicates that subequipment ");
@@ -379,7 +379,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
             StringBuffer str = new StringBuffer("Communication fault tag indicates that subequipment ");
             str.append(commFaultTagCopy.getEquipmentName());
             str.append(" is up.");
-            subEquipmentEvents.onUp(commFaultTagCopy.getEquipmentId(), supervisionTimestamp, str.toString());
+            subEquipmentEvents.onUp(commFaultTagCopy.getSupervisedId(), supervisionTimestamp, str.toString());
           }
           if (updateAliveTimer) {
             Timestamp useTimestamp;
@@ -393,7 +393,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
             }
           }
         } else {
-          log.error("Unable to locate equipment/subequipment in cache (id = " + commFaultTagCopy.getEquipmentId() + ") - key could not be located.");
+          log.error("Unable to locate equipment/subequipment in cache (id = " + commFaultTagCopy.getSupervisedId() + ") - key could not be located.");
         }
       }
     } catch (CacheElementNotFoundException cacheEx) {

@@ -512,7 +512,7 @@ public class ConfigurationLoaderTest {
     cern.c2mon.server.common.process.Process processObj = processCache.get(expectedObject.getProcessId());
     assertTrue(processObj.getEquipmentIds().contains(expectedObject.getId()));
     assertNotNull(commFaultTagCache.get(expectedObject.getCommFaultTagId()));
-    assertEquals(expectedObject.getId(), commFaultTagCache.get(cacheObject.getCommFaultTagId()).getEquipmentId());
+    assertEquals(expectedObject.getId(), commFaultTagCache.get(cacheObject.getCommFaultTagId()).getSupervisedId());
     assertNotNull(equipmentMapper.getItem(10L));
 
     verify(communicationManager);
@@ -664,7 +664,7 @@ public class ConfigurationLoaderTest {
     cern.c2mon.server.common.equipment.Equipment equip = equipmentCache.get(expectedObject.getParentId());
     assertTrue(equip.getSubEquipmentIds().contains(expectedObject.getId()));
     assertNotNull(commFaultTagCache.get(expectedObject.getCommFaultTagId()));
-    assertEquals(expectedObject.getId(), commFaultTagCache.get(cacheObject.getCommFaultTagId()).getEquipmentId());
+    assertEquals(expectedObject.getId(), commFaultTagCache.get(cacheObject.getCommFaultTagId()).getSupervisedId());
     assertNotNull(subEquipmentMapper.getItem(20L));
 
     verify(communicationManager);

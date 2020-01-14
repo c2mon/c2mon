@@ -9,6 +9,7 @@
         <idArg column="COMMFAULTID" javaType="Long"/>
         <arg column="EQID" javaType="Long"/>
         <arg column="EQNAME" javaType="String"/>
+        <arg column="EQTYPE" javaType="String"/>
         <arg column="EQSTATETAG" javaType="Long"/>
         <arg column="EQALIVETAG" javaType="Long"/>
       </constructor>
@@ -17,13 +18,13 @@
 
     <!-- getAll needed for persistent caches -->
     <select id="getAll" resultMap="commFaultTagResultMap">
-      SELECT COMMFAULTID, EQID, EQNAME, EQSTATETAG, EQALIVETAG
+      SELECT COMMFAULTID, EQID, EQNAME, EQTYPE,EQSTATETAG, EQALIVETAG
         FROM COMMFAULTTAG
     </select>
 
     <!-- getItem needed for persistence caches -->
     <select id="getItem" resultMap="commFaultTagResultMap" parameterType="Long">
-      SELECT COMMFAULTID, EQID, EQNAME, EQSTATETAG, EQALIVETAG
+      SELECT COMMFAULTID, EQID, EQNAME, EQTYPE, EQSTATETAG, EQALIVETAG
         FROM COMMFAULTTAG
        WHERE COMMFAULTID = #{id}
     </select>

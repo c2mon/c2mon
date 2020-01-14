@@ -17,13 +17,12 @@
 package cern.c2mon.server.common.commfault;
 
 
-import cern.c2mon.server.common.AbstractCacheableImpl;
+import cern.c2mon.server.common.control.ControlTag;
+import cern.c2mon.shared.common.supervision.SupervisionEntity;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
-
-import java.sql.Timestamp;
 
 /**
  * Cache object corresponding to entries in the DB CommFaultTag view.
@@ -33,21 +32,17 @@ import java.sql.Timestamp;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
-public class CommFaultTag extends AbstractCacheableImpl {
+public class CommFaultTag extends ControlTag {
 
     private static final long serialVersionUID = 8760759761176480601L;
 
     private final Boolean faultValue = Boolean.FALSE; // always FALSE in TIM; TRUE not supported
-
-    private long equipmentId;
 
     private String equipmentName;
 
     private Long aliveTagId;
 
     private Long stateTagId;
-
-    private Timestamp eventTimestamp;
 
     /**
      * Constructor setting all fields.
@@ -58,9 +53,8 @@ public class CommFaultTag extends AbstractCacheableImpl {
      * @param aliveTagId
      * @param stateTagId
      */
-    public CommFaultTag(@NonNull Long id, @NonNull Long equipmentId, String equipmentName, Long aliveTagId, Long stateTagId) {
-        super(id);
-        this.equipmentId = equipmentId;
+    public CommFaultTag(@NonNull Long id, @NonNull Long equipmentId, String equipmentName, String equipmentType, Long aliveTagId, Long stateTagId) {
+        super(id, equipmentId, SupervisionEntity.parse(equipmentType));
         this.equipmentName = equipmentName;
         this.aliveTagId = aliveTagId;
         this.stateTagId = stateTagId;
@@ -72,10 +66,6 @@ public class CommFaultTag extends AbstractCacheableImpl {
     @Override
     public CommFaultTag clone() {
         return (CommFaultTag) super.clone();
-    }
-
-    public boolean hasAliveTag() {
-        return this.aliveTagId != null;
     }
 
     public Boolean getOkValue() {

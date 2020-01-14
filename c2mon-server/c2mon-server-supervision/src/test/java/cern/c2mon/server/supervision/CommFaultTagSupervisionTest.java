@@ -119,7 +119,7 @@ public class CommFaultTagSupervisionTest extends SupervisionCacheTest {
   public void processCommFaultTagListeners() throws InterruptedException {
     CountDownLatch expectingOneUpdate = new CountDownLatch(1);
     commFaultTagCache.getCacheListenerManager().registerListener(eq -> {
-      if (EQ_ID == eq.getEquipmentId())
+      if (EQ_ID == eq.getSupervisedId())
         expectingOneUpdate.countDown();
     }, CacheEvent.UPDATE_ACCEPTED);
 
