@@ -41,7 +41,7 @@ public class RuleCacheLoaderTest extends AbstractCacheLoaderTest<RuleTag> {
 
   @Override
   protected RuleTag getSample() {
-    return new RuleTagCacheObject();
+    return new RuleTagCacheObject(0L);
   }
 
   @Override

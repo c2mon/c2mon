@@ -53,7 +53,10 @@ public class SupervisionStateTag extends AbstractCacheableImpl {
    */
   Timestamp statusTime = new Timestamp(0);
 
-  public SupervisionStateTag(Long id, Long supervisedId, String supervisedEntity, Long aliveTagId, Long commFaultTagId) {
+  /**
+   * Primary Ctor, also used by MyBatis (hence the Long instead of long)
+   */
+  public SupervisionStateTag(@NonNull Long id, @NonNull Long supervisedId, String supervisedEntity, Long aliveTagId, Long commFaultTagId) {
     super(id);
     this.supervisedId = supervisedId;
     this.supervisedEntity = SupervisionEntity.parse(supervisedEntity);

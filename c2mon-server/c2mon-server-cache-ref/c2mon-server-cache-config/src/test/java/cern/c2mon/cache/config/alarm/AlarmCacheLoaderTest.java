@@ -49,6 +49,6 @@ public class AlarmCacheLoaderTest extends AbstractCacheLoaderTest<Alarm> {
 
   @Override
   protected Alarm getSample() {
-    return new AlarmCacheObject();
+    return new AlarmCacheObject(0L);
   }
 }

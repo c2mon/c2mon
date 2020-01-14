@@ -53,7 +53,7 @@ public class DeviceCacheLoaderTest extends AbstractCacheLoaderTest<Device> {
 
   @Override
   protected Device getSample() {
-    return new DeviceCacheObject();
+    return new DeviceCacheObject(0L, "", null);
   }
 
   @Override

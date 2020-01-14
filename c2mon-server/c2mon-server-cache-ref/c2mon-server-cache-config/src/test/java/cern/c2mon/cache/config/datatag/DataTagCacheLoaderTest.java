@@ -40,7 +40,7 @@ public class DataTagCacheLoaderTest extends AbstractCacheLoaderTest<DataTag> {
 
   @Override
   protected DataTag getSample() {
-    return new DataTagCacheObject();
+    return new DataTagCacheObject(0L);
   }
 
   @Override

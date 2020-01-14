@@ -6,7 +6,7 @@ import java.sql.Timestamp;
 
 public class SupervisionStateTagCacheObjectTest extends CacheableTest<SupervisionStateTag> {
 
-  private static SupervisionStateTag sample = new SupervisionStateTag(0L, null, "EQ", null, null);
+  private static SupervisionStateTag sample = new SupervisionStateTag(0L, 1L, "EQ", null, null);
 
   public SupervisionStateTagCacheObjectTest() {
     super(sample);

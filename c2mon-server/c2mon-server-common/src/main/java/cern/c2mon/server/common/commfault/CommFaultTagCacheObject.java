@@ -20,6 +20,7 @@ package cern.c2mon.server.common.commfault;
 import cern.c2mon.server.common.AbstractCacheableImpl;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 
 import java.sql.Timestamp;
@@ -57,7 +58,7 @@ public class CommFaultTagCacheObject extends AbstractCacheableImpl implements Co
      * @param aliveTagId
      * @param stateTagId
      */
-    public CommFaultTagCacheObject(Long id, Long equipmentId, String equipmentName, Long aliveTagId, Long stateTagId) {
+    public CommFaultTagCacheObject(@NonNull Long id, @NonNull Long equipmentId, String equipmentName, Long aliveTagId, Long stateTagId) {
         super(id);
         this.equipmentId = equipmentId;
         this.equipmentName = equipmentName;

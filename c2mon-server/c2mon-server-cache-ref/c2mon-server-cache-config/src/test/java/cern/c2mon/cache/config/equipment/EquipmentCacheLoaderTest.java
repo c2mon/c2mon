@@ -41,7 +41,7 @@ public class EquipmentCacheLoaderTest extends AbstractCacheLoaderTest<Equipment>
 
   @Override
   protected Equipment getSample() {
-    return new EquipmentCacheObject();
+    return new EquipmentCacheObject(0L);
   }
 
   @Override

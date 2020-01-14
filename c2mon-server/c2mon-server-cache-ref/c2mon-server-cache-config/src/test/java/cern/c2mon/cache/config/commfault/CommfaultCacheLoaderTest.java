@@ -41,7 +41,7 @@ public class CommfaultCacheLoaderTest extends AbstractCacheLoaderTest<CommFaultT
 
   @Override
   protected CommFaultTag getSample() {
-    return new CommFaultTagCacheObject();
+    return new CommFaultTagCacheObject(1L, 2L, null, null, null);
   }
 
   @Override
