@@ -53,14 +53,6 @@ public interface Tag extends RuleInputValue, Cacheable {
    */
   String getDataType();
 
-  /**
-   * @return the JAPC address on which the data tag is published,
-   *         or <code>null</code> if not.
-   * @deprecated Use {@link Metadata} instead
-   */
-  @Deprecated
-  String getJapcAddress();
-
   /** Get the mode of the tag.
    * Possible modes are
    * <UL>
@@ -133,19 +125,6 @@ public interface Tag extends RuleInputValue, Cacheable {
   Collection<Long> getRuleIds();
 
   /**
-   * Returns an own copy of the list of rules that need evaluating when
-   * this tag changes.
-   * @return list of rule ids
-   */
-  Collection<Long> getCopyRuleIds();
-
-  /**
-   * The server cache timestamp indicates when the change message passed the server
-   * @return The server cache timestamp
-   */
-  Timestamp getCacheTimestamp();
-
-  /**
    * Current implementation returns the "lowest" level timestamp that
    * is set in this Tag object (from lowest: source, daq, cache timestamp).
    * <b>Should never return null.</b>
@@ -190,14 +169,6 @@ public interface Tag extends RuleInputValue, Cacheable {
    * @return a collection of Ids
    */
   Collection<Long> getAlarmIds();
-
-  /**
-   * Returns an own copy of the list of alarm set on this Tag.
-   *
-   * <p>Never returns null
-   * @return copy of list of alarm ids
-   */
-  Collection<Long> getCopyAlarmIds();
 
   /**
    * Returns the optional address on which this tag is published to DIP.
