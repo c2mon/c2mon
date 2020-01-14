@@ -43,7 +43,7 @@ public class SupervisionStateTag extends AbstractCacheableImpl {
   /**
    * Supervision status of this object when it was recovered from cache
    */
-  SupervisionStatus supervisionStatus;
+  SupervisionStatus supervisionStatus = SupervisionStatus.UNCERTAIN;
   /**
    * Reason/description of the current status, or empty
    */
@@ -53,7 +53,7 @@ public class SupervisionStateTag extends AbstractCacheableImpl {
    */
   Timestamp statusTime = new Timestamp(0);
 
-  public SupervisionStateTag(Long id, Long supervisedId, String supervisedEntity, Long aliveTagId, Long commFaultTagId) {
+  public SupervisionStateTag(long id, long supervisedId, String supervisedEntity, Long aliveTagId, Long commFaultTagId) {
     this.id = id;
     this.supervisedId = supervisedId;
     this.supervisedEntity = SupervisionEntity.parse(supervisedEntity);
