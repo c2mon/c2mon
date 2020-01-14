@@ -24,18 +24,6 @@ public interface InfoTag extends Tag {
    */
   Timestamp getDaqTimestamp();
 
-  Long getEquipmentId();
-
-  Long getSubEquipmentId();
-
   DataTagAddress getAddress();
 
-  Comparable getMinValue();
-
-  Comparable getMaxValue();
-
-  /**
-   * Returns the unique Process id to which a DataTag is attached.
-   */
-  Long getProcessId();
 }

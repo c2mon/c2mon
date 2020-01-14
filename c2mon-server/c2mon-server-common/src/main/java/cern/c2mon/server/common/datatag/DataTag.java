@@ -20,4 +20,16 @@ import cern.c2mon.server.common.tag.InfoTag;
 
 public interface DataTag extends InfoTag {
 
+  Comparable getMinValue();
+
+  Comparable getMaxValue();
+
+  Long getEquipmentId();
+
+  Long getSubEquipmentId();
+
+  /**
+   * Returns the unique Process id to which a DataTag is attached.
+   */
+  Long getProcessId();
 }

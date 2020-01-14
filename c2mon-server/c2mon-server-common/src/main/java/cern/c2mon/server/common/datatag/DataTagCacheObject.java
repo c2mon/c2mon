@@ -18,6 +18,13 @@ package cern.c2mon.server.common.datatag;
 
 import cern.c2mon.server.common.tag.AbstractInfoTagCacheObject;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.Set;
+
+import static cern.c2mon.server.common.util.Java9Collections.setOfNonNulls;
 
 /**
  * Represents the data tag objects stored in the cache. These contain both the
@@ -30,7 +37,36 @@ import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
  *
  * @author Mark Brightwell
  */
+@Getter
+@Setter
+@EqualsAndHashCode(callSuper = true)
 public class DataTagCacheObject extends AbstractInfoTagCacheObject implements DataTag {
+
+  /**
+   * Minimum value for range checks. If the system receives a tag value that is
+   * less than the authorized minimum value, it will flag the new tag value as
+   * invalid.
+   */
+  private Comparable minValue = null;
+  /**
+   * Maximum value for range checks. If the system receives a tag value that is
+   * less than the authorized minimum value, it will flag the new tag value as
+   * invalid.
+   */
+  private Comparable maxValue = null;
+
+  /**
+   * Reference to equipment the Datatag is attached to.
+   */
+  private Long equipmentId = null;
+  /**
+   * Reference to sub equipment the DataTag is attached to.
+   */
+  private Long subEquipmentId = null;
+  /**
+   * Id of the Process this DataTag is attached to (loaded from DB also during cache loading).
+   */
+  private Long processId;
 
   /**
    * Version number of the class used during serialization/deserialization. This
@@ -50,5 +86,19 @@ public class DataTagCacheObject extends AbstractInfoTagCacheObject implements Da
 
   public DataTagCacheObject(Long id) {
     super(id);
+  }  @Override
+
+  public Set<Long> getEquipmentIds() {
+    return setOfNonNulls(equipmentId);
+  }
+
+  @Override
+  public Set<Long> getProcessIds() {
+    return setOfNonNulls(processId);
+  }
+
+  @Override
+  public Set<Long> getSubEquipmentIds() {
+    return setOfNonNulls(subEquipmentId);
   }
 }

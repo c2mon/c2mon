@@ -8,27 +8,13 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.sql.Timestamp;
-import java.util.Set;
-
-import static cern.c2mon.server.common.util.Java9Collections.setOfNonNulls;
 
 @Getter
 @Setter
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public abstract class AbstractInfoTagCacheObject extends AbstractTagCacheObject {
-  /**
-   * Minimum value for range checks. If the system receives a tag value that is
-   * less than the authorized minimum value, it will flag the new tag value as
-   * invalid.
-   */
-  private Comparable minValue = null;
-  /**
-   * Maximum value for range checks. If the system receives a tag value that is
-   * less than the authorized minimum value, it will flag the new tag value as
-   * invalid.
-   */
-  private Comparable maxValue = null;
+
   /**
    * Address configuration of the datatag (if any)
    */
@@ -42,18 +28,6 @@ public abstract class AbstractInfoTagCacheObject extends AbstractTagCacheObject 
    * Is set when the value is updated or invalidated in the DAQ core map.
    */
   private Timestamp daqTimestamp;
-  /**
-   * Reference to equipment the Datatag is attached to.
-   */
-  private Long equipmentId = null;
-  /**
-   * Reference to sub equipment the DataTag is attached to.
-   */
-  private Long subEquipmentId = null;
-  /**
-   * Id of the Process this DataTag is attached to (loaded from DB also during cache loading).
-   */
-  private Long processId;
 
   /**
    * Constructor used to return a cache object when the object cannot be found
@@ -102,10 +76,6 @@ public abstract class AbstractInfoTagCacheObject extends AbstractTagCacheObject 
     }
   }
 
-  public final boolean hasAddress() {
-    return this.address != null;
-  }
-
   @Override
   public final Timestamp getTimestamp() {
     return (sourceTimestamp != null) ? sourceTimestamp
@@ -122,20 +92,5 @@ public abstract class AbstractInfoTagCacheObject extends AbstractTagCacheObject 
     } else {
       this.daqTimestamp.setTime(daqTimestamp.getTime());
     }
-  }
-
-  @Override
-  public Set<Long> getEquipmentIds() {
-    return setOfNonNulls(equipmentId);
-  }
-
-  @Override
-  public Set<Long> getProcessIds() {
-    return setOfNonNulls(processId);
-  }
-
-  @Override
-  public Set<Long> getSubEquipmentIds() {
-    return setOfNonNulls(subEquipmentId);
   }
 }
