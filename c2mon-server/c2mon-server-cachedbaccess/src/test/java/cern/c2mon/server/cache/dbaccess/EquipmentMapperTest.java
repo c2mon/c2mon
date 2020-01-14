@@ -16,19 +16,19 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.dbaccess;
 
-import java.sql.Timestamp;
-import java.util.LinkedList;
-import java.util.List;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.equipment.EquipmentCacheObject;
 import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
 import cern.c2mon.shared.common.command.CommandTag;
-import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
+import cern.c2mon.shared.common.supervision.SupervisionStatus;
+import org.junit.Before;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.sql.Timestamp;
+import java.util.LinkedList;
+import java.util.List;
 
 import static org.junit.Assert.*;
 

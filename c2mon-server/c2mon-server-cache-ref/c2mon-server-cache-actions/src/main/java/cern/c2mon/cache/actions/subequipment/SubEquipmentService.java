@@ -8,7 +8,7 @@ import cern.c2mon.cache.actions.equipment.EquipmentService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
-import cern.c2mon.shared.common.supervision.SupervisionConstants;
+import cern.c2mon.shared.common.supervision.SupervisionEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +31,7 @@ public class SubEquipmentService extends BaseEquipmentServiceImpl<SubEquipment> 
                              final CommFaultService commFaultService,
                              final AliveTimerService aliveTimerService,
                              final DataTagService dataTagService) {
-    super(subEquipmentCacheRef, commFaultService.getCache(), aliveTimerService, SupervisionConstants.SupervisionEntity.SUBEQUIPMENT,dataTagService);
+    super(subEquipmentCacheRef, commFaultService.getCache(), aliveTimerService, SupervisionEntity.SUBEQUIPMENT,dataTagService);
     this.equipmentService = equipmentService;
   }
 

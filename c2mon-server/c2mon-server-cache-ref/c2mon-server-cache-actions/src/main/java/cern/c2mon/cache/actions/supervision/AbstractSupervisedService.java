@@ -6,15 +6,14 @@ import cern.c2mon.cache.actions.datatag.DataTagService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.supervision.Supervised;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
+import cern.c2mon.shared.common.supervision.SupervisionEntity;
+import cern.c2mon.shared.common.supervision.SupervisionStatus;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEntity;
-import static cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
 
 /**
  * @author Szymon Halastra, Alexandros Papageorgiou Koufidis

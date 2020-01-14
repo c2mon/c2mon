@@ -7,7 +7,7 @@ import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.service.CommonEquipmentOperations;
 import cern.c2mon.server.common.commfault.CommFaultTag;
 import cern.c2mon.server.common.equipment.AbstractEquipment;
-import cern.c2mon.shared.common.supervision.SupervisionConstants;
+import cern.c2mon.shared.common.supervision.SupervisionEntity;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,7 +24,7 @@ public abstract class BaseEquipmentServiceImpl<T extends AbstractEquipment> exte
   protected BaseEquipmentServiceImpl(final C2monCache<T> cache,
                                      final C2monCache<CommFaultTag> commFaultTagCache,
                                      final AliveTimerService aliveTimerService,
-                                     final SupervisionConstants.SupervisionEntity supervisionEntity,
+                                     final SupervisionEntity supervisionEntity,
                                      final DataTagService dataTagService) {
     super(cache, supervisionEntity, aliveTimerService,dataTagService);
     this.commFaultTagCache = commFaultTagCache;

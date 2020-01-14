@@ -52,12 +52,7 @@ class TagComparator {
     else if (!tag1.getDaqTimestamp().equals(tag2.getDaqTimestamp())) {
       return false;
     }
-    if (tag1.getId() == null) {
-      if (tag2.getId() != null) {
-        return false;
-      }
-    }
-    else if (!tag1.getId().equals(tag2.getId())) {
+    else if (tag1.getId() != tag2.getId()) {
       return false;
     }
     

@@ -21,8 +21,8 @@ import cern.c2mon.server.supervision.SupervisionNotifier;
 import cern.c2mon.server.supervision.impl.SupervisionNotifierImpl;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
-import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEntity;
-import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
+import cern.c2mon.shared.common.supervision.SupervisionEntity;
+import cern.c2mon.shared.common.supervision.SupervisionStatus;
 import org.easymock.EasyMock;
 import org.junit.Test;
 

@@ -15,7 +15,7 @@ import cern.c2mon.server.common.alive.AliveTag;
 import cern.c2mon.server.common.config.ServerProperties;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.process.ProcessCacheObject;
-import cern.c2mon.shared.common.supervision.SupervisionConstants;
+import cern.c2mon.shared.common.supervision.SupervisionStatus;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -196,6 +196,6 @@ public class ProcessService extends AbstractCacheServiceImpl<Process>
 
   private void applyErrorStatus(final Process process, final String errorMessage) {
     ProcessCacheObject processCacheObject = (ProcessCacheObject) process;
-    processCacheObject.setSupervision(SupervisionConstants.SupervisionStatus.DOWN, errorMessage, Timestamp.from(Instant.now()));
+    processCacheObject.setSupervision(SupervisionStatus.DOWN, errorMessage, Timestamp.from(Instant.now()));
   }
 }

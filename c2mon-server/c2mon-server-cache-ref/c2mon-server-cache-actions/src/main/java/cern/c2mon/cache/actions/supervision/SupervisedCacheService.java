@@ -22,7 +22,7 @@ import cern.c2mon.cache.api.flow.CacheUpdateFlow;
 import cern.c2mon.server.common.supervision.Supervised;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.common.Cacheable;
-import cern.c2mon.shared.common.supervision.SupervisionConstants;
+import cern.c2mon.shared.common.supervision.SupervisionEntity;
 import lombok.NonNull;
 
 import java.sql.Timestamp;
@@ -133,7 +133,7 @@ public interface SupervisedCacheService<T extends Supervised> extends AbstractCa
 
   void startAliveTimerBySupervisedId(long id);
 
-  SupervisionConstants.SupervisionEntity getSupervisionEntity();
+  SupervisionEntity getSupervisionEntity();
 
   List<SupervisionEvent> getAllSupervisionEvents();
 }

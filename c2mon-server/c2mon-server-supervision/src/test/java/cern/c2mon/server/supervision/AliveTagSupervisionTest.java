@@ -7,7 +7,7 @@ import cern.c2mon.server.common.process.Process;
 import cern.c2mon.shared.common.CacheEvent;
 import cern.c2mon.shared.common.datatag.SourceDataTagQuality;
 import cern.c2mon.shared.common.datatag.SourceDataTagValue;
-import cern.c2mon.shared.common.supervision.SupervisionConstants;
+import cern.c2mon.shared.common.supervision.SupervisionStatus;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.test.annotation.DirtiesContext;
@@ -42,7 +42,7 @@ public class AliveTagSupervisionTest extends SupervisionCacheTest {
     assertEquals(0, aliveTimer.getLastUpdate());
 
     Process process = processCache.get(aliveTimer.getRelatedId());
-    assertEquals(SupervisionConstants.SupervisionStatus.DOWN, process.getSupervisionStatus());
+    assertEquals(SupervisionStatus.DOWN, process.getSupervisionStatus());
     assertNull(process.getStatusTime());
     assertNull(process.getStatusDescription());
   }
@@ -73,7 +73,7 @@ public class AliveTagSupervisionTest extends SupervisionCacheTest {
 
     //check process status is changed
     Process process = processCache.get(aliveTimer.getRelatedId());
-    assertEquals(SupervisionConstants.SupervisionStatus.RUNNING, process.getSupervisionStatus());
+    assertEquals(SupervisionStatus.RUNNING, process.getSupervisionStatus());
     Timestamp processTime = process.getStatusTime();
     assertTrue(processTime.after(new Timestamp(updateTime - 1)));
     assertNotNull(process.getStatusDescription());
@@ -130,7 +130,7 @@ public class AliveTagSupervisionTest extends SupervisionCacheTest {
     processService.start(aliveTimer.getRelatedId(), new Timestamp(startTimer));
     // Resume so that the status goes to RUNNING
     Process process = processService.resume(aliveTimer.getRelatedId(), new Timestamp(System.currentTimeMillis()), "");
-    assertEquals(SupervisionConstants.SupervisionStatus.RUNNING, process.getSupervisionStatus());
+    assertEquals(SupervisionStatus.RUNNING, process.getSupervisionStatus());
     Timestamp originalProcessTime = process.getStatusTime();
     assertNotNull(originalProcessTime);
 
@@ -151,7 +151,7 @@ public class AliveTagSupervisionTest extends SupervisionCacheTest {
     assertEquals(updatedTimer, aliveTimerCache.get(1221L).getLastUpdate());
 
     //check process status is not changed & time also
-    assertEquals(SupervisionConstants.SupervisionStatus.RUNNING, process.getSupervisionStatus());
+    assertEquals(SupervisionStatus.RUNNING, process.getSupervisionStatus());
     assertEquals(originalProcessTime, process.getStatusTime());
   }
 

@@ -4,14 +4,13 @@ import cern.c2mon.server.common.AbstractCacheableImpl;
 import cern.c2mon.server.common.alive.AliveTag;
 import cern.c2mon.server.common.commfault.CommFaultTag;
 import cern.c2mon.server.common.supervision.Supervised;
+import cern.c2mon.shared.common.supervision.SupervisionEntity;
+import cern.c2mon.shared.common.supervision.SupervisionStatus;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 
 import java.sql.Timestamp;
-
-import static cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEntity;
-import static cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
 
 /**
  * Expresses the current situation of a {@link Supervised} object

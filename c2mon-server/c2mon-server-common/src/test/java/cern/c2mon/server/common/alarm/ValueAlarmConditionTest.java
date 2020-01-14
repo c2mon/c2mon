@@ -23,7 +23,7 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 
 import cern.c2mon.shared.client.alarm.condition.AlarmCondition;
-import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
+import cern.c2mon.shared.common.supervision.SupervisionStatus;
 import cern.c2mon.shared.util.parser.SimpleXMLParser;
 
 /**

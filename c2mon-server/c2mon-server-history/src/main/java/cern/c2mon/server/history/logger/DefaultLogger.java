@@ -16,13 +16,13 @@
  *****************************************************************************/
 package cern.c2mon.server.history.logger;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import cern.c2mon.pmanager.persistence.IPersistenceManager;
 import cern.c2mon.server.history.structure.Loggable;
 import cern.c2mon.server.history.structure.LoggerConverter;
 import cern.c2mon.shared.common.Cacheable;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Default implementation of a BatchLogger for C2MON that
@@ -68,7 +68,7 @@ public class DefaultLogger<T extends Cacheable> implements BatchLogger<T> {
 
     // Convert the list of DataTagCacheObjects to TagRecord objects (IFallback objects)
     for (T tag : tags) {
-        if (tag != null && tag.getId() != null) {
+        if (tag != null) {
           loggables.add(converter.convertToLogged(tag));
         }
     }

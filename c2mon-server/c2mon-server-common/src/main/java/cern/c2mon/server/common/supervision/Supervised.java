@@ -19,8 +19,8 @@ package cern.c2mon.server.common.supervision;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
 import cern.c2mon.shared.common.Cacheable;
-import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEntity;
-import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
+import cern.c2mon.shared.common.supervision.SupervisionEntity;
+import cern.c2mon.shared.common.supervision.SupervisionStatus;
 import lombok.NonNull;
 
 import java.sql.Timestamp;

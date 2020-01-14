@@ -17,24 +17,6 @@
 
 package cern.c2mon.client.core.tag;
 
-import java.io.*;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.stream.Collectors;
-
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
-import org.simpleframework.xml.Attribute;
-import org.simpleframework.xml.Element;
-import org.simpleframework.xml.ElementList;
-import org.simpleframework.xml.Root;
-
 import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.common.tag.TypeNumeric;
 import cern.c2mon.client.core.jms.TopicRegistrationDetails;
@@ -45,6 +27,23 @@ import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
 import cern.c2mon.shared.rule.RuleExpression;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import org.simpleframework.xml.Attribute;
+import org.simpleframework.xml.Element;
+import org.simpleframework.xml.ElementList;
+import org.simpleframework.xml.Root;
+
+import java.io.*;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.stream.Collectors;
 
 /**
  * @author Szymon Halastra
@@ -89,7 +88,7 @@ public class TagImpl implements Tag, TopicRegistrationDetails, Cloneable {
    * Unique identifier for a DataTag
    */
   @Attribute
-  protected Long id;
+  protected long id;
 
   /**
    * Containing all process id's which are relevant to compute the
@@ -248,11 +247,6 @@ public class TagImpl implements Tag, TopicRegistrationDetails, Cloneable {
 
   protected void setUnknown() {
     getDataTagQuality().setInvalidStatus(TagQualityStatus.UNDEFINED_TAG, "Tag is not known by the system");
-  }
-
-  @Override
-  public Long getId() {
-    return this.id;
   }
 
   @Override
@@ -578,13 +572,13 @@ public class TagImpl implements Tag, TopicRegistrationDetails, Cloneable {
 
   @Override
   public int hashCode() {
-    return this.id.hashCode();
+    return Long.hashCode(id);
   }
 
   @Override
   public boolean equals(Object pRight) {
     if (pRight instanceof TagImpl) {
-      if (this.id.equals(((TagImpl) pRight).id)) {
+      if (this.id == ((TagImpl) pRight).id) {
         return true;
       }
     }

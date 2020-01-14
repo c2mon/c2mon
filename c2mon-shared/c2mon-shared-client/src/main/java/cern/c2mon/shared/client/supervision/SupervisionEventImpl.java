@@ -16,8 +16,8 @@
  *****************************************************************************/
 package cern.c2mon.shared.client.supervision;
 
-import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEntity;
-import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
+import cern.c2mon.shared.common.supervision.SupervisionEntity;
+import cern.c2mon.shared.common.supervision.SupervisionStatus;
 import cern.c2mon.shared.util.json.GsonFactory;
 import com.google.gson.Gson;
 import lombok.Data;

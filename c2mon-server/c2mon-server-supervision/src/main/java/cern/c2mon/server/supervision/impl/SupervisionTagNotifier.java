@@ -36,7 +36,7 @@ import cern.c2mon.server.supervision.SupervisionListener;
 import cern.c2mon.server.supervision.SupervisionNotifier;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.common.CacheEvent;
-import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
+import cern.c2mon.shared.common.supervision.SupervisionStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

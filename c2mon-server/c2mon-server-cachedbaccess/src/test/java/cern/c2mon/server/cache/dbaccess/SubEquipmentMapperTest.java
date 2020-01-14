@@ -18,7 +18,7 @@ package cern.c2mon.server.cache.dbaccess;
 
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
-import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
+import cern.c2mon.shared.common.supervision.SupervisionStatus;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;

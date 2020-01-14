@@ -1,19 +1,19 @@
 package cern.c2mon.client.core.tag;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import java.sql.Timestamp;
-import java.util.Arrays;
-
-import org.junit.Test;
-
 import cern.c2mon.client.core.tag.utils.TestTagUpdate;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
-import cern.c2mon.shared.common.supervision.SupervisionConstants;
+import cern.c2mon.shared.common.supervision.SupervisionEntity;
+import cern.c2mon.shared.common.supervision.SupervisionStatus;
 import cern.c2mon.shared.rule.RuleFormatException;
+import org.junit.Test;
+
+import java.sql.Timestamp;
+import java.util.Arrays;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests for the TagController.
@@ -43,10 +43,10 @@ public class TagControllerTest {
     assertTrue("The data tag should be valid", tagController.getTagImpl().getDataTagQuality().isValid());
     
     SupervisionEvent processDownEvent = new SupervisionEventImpl(
-        SupervisionConstants.SupervisionEntity.PROCESS,
+        SupervisionEntity.PROCESS,
         processId,
         "",
-        SupervisionConstants.SupervisionStatus.DOWN,
+        SupervisionStatus.DOWN,
         CURRENT_TIME,
         "Process down!");
     
@@ -73,10 +73,10 @@ public class TagControllerTest {
     assertTrue("The data tag should be valid", tagController.getTagImpl().getDataTagQuality().isValid());
     
     SupervisionEvent processDownEvent = new SupervisionEventImpl(
-        SupervisionConstants.SupervisionEntity.EQUIPMENT,
+        SupervisionEntity.EQUIPMENT,
         equipmentId,
         "",
-        SupervisionConstants.SupervisionStatus.DOWN,
+        SupervisionStatus.DOWN,
         CURRENT_TIME,
         "Equipment down!");
     
@@ -103,10 +103,10 @@ public class TagControllerTest {
     assertTrue("The data tag should be valid", tagController.getTagImpl().getDataTagQuality().isValid());
     
     SupervisionEvent processDownEvent = new SupervisionEventImpl(
-        SupervisionConstants.SupervisionEntity.SUBEQUIPMENT,
+        SupervisionEntity.SUBEQUIPMENT,
         subEquipmentId,
         "",
-        SupervisionConstants.SupervisionStatus.DOWN,
+        SupervisionStatus.DOWN,
         CURRENT_TIME,
         "Equipment down!");
     

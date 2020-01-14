@@ -16,13 +16,12 @@
  *****************************************************************************/
 package cern.c2mon.shared.client.supervision;
 
-import java.sql.Timestamp;
-
+import cern.c2mon.shared.common.supervision.SupervisionEntity;
+import cern.c2mon.shared.common.supervision.SupervisionStatus;
 import org.junit.Before;
 import org.junit.Test;
 
-import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEntity;
-import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
+import java.sql.Timestamp;
 
 import static junit.framework.TestCase.assertEquals;
 

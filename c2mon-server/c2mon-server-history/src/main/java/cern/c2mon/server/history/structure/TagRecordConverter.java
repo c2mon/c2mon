@@ -22,7 +22,6 @@ import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
 import cern.c2mon.shared.common.type.TypeConverter;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -70,7 +69,7 @@ public final class TagRecordConverter implements LoggerConverter<Tag> {
       // create an empty TagRecord object
       TagRecord tagRecord = new TagRecord();
       // Populate its fields with data from the object received as a parameter
-      tagRecord.setTagId(tag.getId().longValue());
+      tagRecord.setTagId(tag.getId());
       tagRecord.setTagName(tag.getName());
 
       if (tag.getValue() != null) {

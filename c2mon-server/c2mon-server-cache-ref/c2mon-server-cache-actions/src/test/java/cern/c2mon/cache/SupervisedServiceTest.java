@@ -4,14 +4,14 @@ import cern.c2mon.cache.actions.listener.SupervisedServiceListenerTest;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.supervision.Supervised;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
+import cern.c2mon.shared.common.supervision.SupervisionStatus;
 import org.junit.Test;
 
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.function.Supplier;
 
-import static cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
-import static cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus.*;
+import static cern.c2mon.shared.common.supervision.SupervisionStatus.*;
 import static org.junit.Assert.*;
 
 public abstract class SupervisedServiceTest<T extends Supervised> extends SupervisedServiceListenerTest<T> {

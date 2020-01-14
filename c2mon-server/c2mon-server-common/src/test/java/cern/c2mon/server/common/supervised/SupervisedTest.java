@@ -1,7 +1,7 @@
 package cern.c2mon.server.common.supervised;
 
 import cern.c2mon.server.common.supervision.Supervised;
-import cern.c2mon.shared.common.supervision.SupervisionConstants;
+import cern.c2mon.shared.common.supervision.SupervisionStatus;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -25,27 +25,27 @@ public abstract class SupervisedTest<T extends Supervised> {
   @Test
   public void defaultState() {
     doAndExpect((a, b) -> {
-    }, null, SupervisionConstants.SupervisionStatus.DOWN);
+    }, null, SupervisionStatus.DOWN);
   }
 
   @Test
   public void start() {
-    doAndExpect((timestamp, msg) -> sample.start(timestamp), null, SupervisionConstants.SupervisionStatus.STARTUP);
+    doAndExpect((timestamp, msg) -> sample.start(timestamp), null, SupervisionStatus.STARTUP);
   }
 
   @Test
   public void stop() {
-    doAndExpect((timestamp, msg) -> sample.stop(timestamp), null, SupervisionConstants.SupervisionStatus.DOWN);
+    doAndExpect((timestamp, msg) -> sample.stop(timestamp), null, SupervisionStatus.DOWN);
   }
 
   @Test
   public void suspend() {
-    doAndExpect((timestamp, msg) -> sample.suspend(timestamp, msg), "", SupervisionConstants.SupervisionStatus.DOWN);
+    doAndExpect((timestamp, msg) -> sample.suspend(timestamp, msg), "", SupervisionStatus.DOWN);
   }
 
   @Test
   public void resume() {
-    doAndExpect((timestamp, msg) -> sample.resume(timestamp, msg), "", SupervisionConstants.SupervisionStatus.RUNNING);
+    doAndExpect((timestamp, msg) -> sample.resume(timestamp, msg), "", SupervisionStatus.RUNNING);
   }
 
   @Test(expected = NullPointerException.class)
@@ -68,22 +68,22 @@ public abstract class SupervisedTest<T extends Supervised> {
     // Default
     assertFalse(sample.isRunning());
 
-    sample.setSupervision(SupervisionConstants.SupervisionStatus.STARTUP, "", Timestamp.from(Instant.now()));
+    sample.setSupervision(SupervisionStatus.STARTUP, "", Timestamp.from(Instant.now()));
     assertTrue(sample.isRunning());
 
-    sample.setSupervision(SupervisionConstants.SupervisionStatus.RUNNING_LOCAL, "", Timestamp.from(Instant.now()));
+    sample.setSupervision(SupervisionStatus.RUNNING_LOCAL, "", Timestamp.from(Instant.now()));
     assertTrue(sample.isRunning());
 
-    sample.setSupervision(SupervisionConstants.SupervisionStatus.RUNNING, "", Timestamp.from(Instant.now()));
+    sample.setSupervision(SupervisionStatus.RUNNING, "", Timestamp.from(Instant.now()));
     assertTrue(sample.isRunning());
 
-    sample.setSupervision(SupervisionConstants.SupervisionStatus.STOPPED, "", Timestamp.from(Instant.now()));
+    sample.setSupervision(SupervisionStatus.STOPPED, "", Timestamp.from(Instant.now()));
     assertFalse(sample.isRunning());
 
-    sample.setSupervision(SupervisionConstants.SupervisionStatus.DOWN, "", Timestamp.from(Instant.now()));
+    sample.setSupervision(SupervisionStatus.DOWN, "", Timestamp.from(Instant.now()));
     assertFalse(sample.isRunning());
 
-    sample.setSupervision(SupervisionConstants.SupervisionStatus.UNCERTAIN, "", Timestamp.from(Instant.now()));
+    sample.setSupervision(SupervisionStatus.UNCERTAIN, "", Timestamp.from(Instant.now()));
     assertFalse(sample.isRunning());
   }
 
@@ -91,9 +91,9 @@ public abstract class SupervisedTest<T extends Supervised> {
   public void isUncertain() {
     assertFalse(sample.isUncertain());
 
-    for (SupervisionConstants.SupervisionStatus status : SupervisionConstants.SupervisionStatus.values()) {
+    for (SupervisionStatus status : SupervisionStatus.values()) {
       sample.setSupervision(status, "", Timestamp.from(Instant.now()));
-      assertEquals(status == SupervisionConstants.SupervisionStatus.UNCERTAIN ,sample.isUncertain());
+      assertEquals(status == SupervisionStatus.UNCERTAIN ,sample.isUncertain());
     }
   }
 
@@ -101,13 +101,13 @@ public abstract class SupervisedTest<T extends Supervised> {
   public void hasNoEvents() {
     assertTrue(sample.hasNoEvents());
 
-    for (SupervisionConstants.SupervisionStatus status : SupervisionConstants.SupervisionStatus.values()) {
+    for (SupervisionStatus status : SupervisionStatus.values()) {
       sample.setSupervision(status, "", Timestamp.from(Instant.now()));
       assertFalse(sample.hasNoEvents());
     }
   }
 
-  private void doAndExpect(BiConsumer<Timestamp, String> action, String message, SupervisionConstants.SupervisionStatus expected) {
+  private void doAndExpect(BiConsumer<Timestamp, String> action, String message, SupervisionStatus expected) {
     Timestamp timestamp = Timestamp.from(Instant.now());
     action.accept(timestamp, message);
     assertEquals(expected, sample.getSupervisionStatus());

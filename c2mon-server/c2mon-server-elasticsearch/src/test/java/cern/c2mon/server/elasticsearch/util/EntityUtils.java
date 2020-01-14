@@ -29,7 +29,8 @@ import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.DataTagConstants;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
-import cern.c2mon.shared.common.supervision.SupervisionConstants;
+import cern.c2mon.shared.common.supervision.SupervisionEntity;
+import cern.c2mon.shared.common.supervision.SupervisionStatus;
 
 /**
  * @author Justin Lewis Salmon
@@ -81,7 +82,7 @@ public class EntityUtils {
   }
 
   public static SupervisionEvent createSupervisionEvent() {
-    return new SupervisionEventImpl(SupervisionConstants.SupervisionEntity.PROCESS, 50L,
-        "P_TEST01", SupervisionConstants.SupervisionStatus.DOWN, new Timestamp(System.currentTimeMillis()), "");
+    return new SupervisionEventImpl(SupervisionEntity.PROCESS, 50L,
+        "P_TEST01", SupervisionStatus.DOWN, new Timestamp(System.currentTimeMillis()), "");
   }
 }

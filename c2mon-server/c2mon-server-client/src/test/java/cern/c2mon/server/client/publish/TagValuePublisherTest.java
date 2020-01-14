@@ -190,7 +190,7 @@ public class TagValuePublisherTest {
     synchronized (updateLock) {
       assertNotNull(update); //message or update were null
       assertEquals(tag.getValue(), update.getValue());
-      assertEquals(tag.getId(), update.getId());
+      assertEquals(tag.getId(), update.getId().longValue());
 //      assertEquals(alarms.size(), update.getAlarms().size());
       assertEquals(tag.getDescription(), update.getDescription());
       assertEquals(tag.getValueDescription(), update.getValueDescription());

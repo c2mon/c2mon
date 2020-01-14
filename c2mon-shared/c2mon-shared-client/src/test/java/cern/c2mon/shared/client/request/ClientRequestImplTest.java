@@ -16,15 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.shared.client.request;
 
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-
-import com.google.gson.Gson;
-import org.junit.Test;
-
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.alarm.AlarmValueImpl;
 import cern.c2mon.shared.client.command.*;
@@ -42,13 +33,19 @@ import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
 import cern.c2mon.shared.client.tag.*;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
-import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEntity;
-import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
+import cern.c2mon.shared.common.supervision.SupervisionEntity;
+import cern.c2mon.shared.common.supervision.SupervisionStatus;
 import cern.c2mon.shared.util.json.GsonFactory;
+import com.google.gson.Gson;
+import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+
+import static org.junit.Assert.*;
 
 public class ClientRequestImplTest {
 

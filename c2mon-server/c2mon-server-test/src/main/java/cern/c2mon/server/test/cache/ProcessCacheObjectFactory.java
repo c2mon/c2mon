@@ -17,7 +17,7 @@
 package cern.c2mon.server.test.cache;
 
 import cern.c2mon.server.common.process.ProcessCacheObject;
-import cern.c2mon.shared.common.supervision.SupervisionConstants;
+import cern.c2mon.shared.common.supervision.SupervisionStatus;
 
 import java.sql.Timestamp;
 
@@ -30,7 +30,7 @@ public class ProcessCacheObjectFactory extends AbstractCacheObjectFactory<Proces
     processCacheObject.setAliveInterval(60);
     processCacheObject.setAliveTagId(510L); //FK ref
     processCacheObject.setStateTagId(510L);
-    processCacheObject.setSupervision(SupervisionConstants.SupervisionStatus.DOWN, "Status description", new Timestamp(System.currentTimeMillis()));
+    processCacheObject.setSupervision(SupervisionStatus.DOWN, "Status description", new Timestamp(System.currentTimeMillis()));
     processCacheObject.setStartupTime(new Timestamp(0));
     processCacheObject.setCurrentHost("test host");
     processCacheObject.setRequiresReboot(false);

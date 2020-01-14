@@ -2,7 +2,7 @@ package cern.c2mon.cache.actions.supervision;
 
 import cern.c2mon.server.common.supervision.Supervised;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
-import cern.c2mon.shared.common.supervision.SupervisionConstants;
+import cern.c2mon.shared.common.supervision.SupervisionEntity;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -74,7 +74,7 @@ public interface SupervisedCacheServiceDelegator<T extends Supervised> extends S
   }
 
   @Override
-  default SupervisionConstants.SupervisionEntity getSupervisionEntity() {
+  default SupervisionEntity getSupervisionEntity() {
     return getSupervisedService().getSupervisionEntity();
   }
 

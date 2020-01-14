@@ -16,14 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.client.core.tag;
 
-import java.sql.Timestamp;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import cern.c2mon.client.common.listener.BaseTagListener;
 import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.common.tag.TypeNumeric;
@@ -34,6 +26,13 @@ import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
 import cern.c2mon.shared.rule.RuleEvaluationException;
 import cern.c2mon.shared.rule.RuleExpression;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.sql.Timestamp;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * This class represents a client rule object which subscribes itself to the
@@ -149,7 +148,7 @@ public class ClientRuleTag<T> implements Tag, BaseTagListener {
    * to differentiate between RuleTags.
    */
   @Override
-  public Long getId() {
+  public long getId() {
     return id;
   }
 

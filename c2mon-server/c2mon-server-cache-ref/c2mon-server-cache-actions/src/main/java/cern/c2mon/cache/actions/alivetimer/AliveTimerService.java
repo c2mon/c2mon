@@ -10,14 +10,14 @@ import cern.c2mon.server.common.supervision.Supervised;
 import cern.c2mon.server.common.thread.Event;
 import cern.c2mon.shared.common.CacheEvent;
 import cern.c2mon.shared.common.datatag.SourceDataTagValue;
-import cern.c2mon.shared.common.supervision.SupervisionConstants;
+import cern.c2mon.shared.common.supervision.SupervisionEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
-import static cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEntity.*;
+import static cern.c2mon.shared.common.supervision.SupervisionEntity.*;
 
 /**
  * Manages operations on {@link AliveTagCacheObject}s
@@ -151,7 +151,7 @@ public class AliveTimerService extends AbstractCacheServiceImpl<AliveTag> {
     cache.put(aliveTimer.getId(), aliveTimer);
   }
 
-  private void setAliveTimerType(SupervisionConstants.SupervisionEntity supervisionEntity, AliveTagCacheObject aliveTimer) {
+  private void setAliveTimerType(SupervisionEntity supervisionEntity, AliveTagCacheObject aliveTimer) {
     if (supervisionEntity == PROCESS)
       aliveTimer.setAliveType(AliveTag.ALIVE_TYPE_PROCESS);
     else if (supervisionEntity == EQUIPMENT)

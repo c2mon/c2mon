@@ -17,13 +17,6 @@
 
 package cern.c2mon.client.core.tag;
 
-import java.sql.Timestamp;
-import java.util.*;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-
-import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
-
 import cern.c2mon.client.common.listener.BaseTagListener;
 import cern.c2mon.client.common.listener.TagListener;
 import cern.c2mon.client.common.tag.Tag;
@@ -35,11 +28,16 @@ import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
-import cern.c2mon.shared.common.supervision.SupervisionConstants;
-import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
+import cern.c2mon.shared.common.supervision.SupervisionStatus;
 import cern.c2mon.shared.common.type.TypeConverter;
 import cern.c2mon.shared.rule.RuleExpression;
 import cern.c2mon.shared.rule.RuleFormatException;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+
+import java.sql.Timestamp;
+import java.util.*;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * @author Szymon Halastra
@@ -221,8 +219,8 @@ public class TagController implements TagUpdateListener, SupervisionListener {
   private StringBuilder invalidateMessage(StringBuilder stringBuilder, SupervisionEvent event) {
     if (event != null) {
       boolean isDown = false;
-      isDown |= event.getStatus().equals(SupervisionConstants.SupervisionStatus.DOWN);
-      isDown |= event.getStatus().equals(SupervisionConstants.SupervisionStatus.STOPPED);
+      isDown |= event.getStatus().equals(SupervisionStatus.DOWN);
+      isDown |= event.getStatus().equals(SupervisionStatus.STOPPED);
       if (isDown) {
         if (stringBuilder.length() > 0) {
           stringBuilder.append("; ");

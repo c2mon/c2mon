@@ -17,7 +17,7 @@
 package cern.c2mon.server.common.process;
 
 import cern.c2mon.server.common.equipment.AbstractSupervisedCacheObject;
-import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEntity;
+import cern.c2mon.shared.common.supervision.SupervisionEntity;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;

@@ -40,11 +40,6 @@ public class AliveTimerEvents {
 
     AliveTag aliveTimer = aliveTimerService.getCache().get(aliveTimerId);
 
-    if (aliveTimer.getRelatedId() == null) {
-      log.error("AliveTimer has no relatedId - unable to take any action on alive reception.");
-      return;
-    }
-
     log.debug("Alive of " + aliveTimer.getAliveTypeDescription() + " " + aliveTimer.getRelatedName()
       + " (alive tag: " + aliveTimer.getId() + ") has expired.");
 

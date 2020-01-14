@@ -16,16 +16,15 @@
  *****************************************************************************/
 package cern.c2mon.client.core.jms.impl;
 
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
+import cern.c2mon.client.core.jms.SupervisionListener;
+import cern.c2mon.shared.client.supervision.SupervisionEvent;
+import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.TextMessage;
-
-import cern.c2mon.client.core.jms.SupervisionListener;
-import cern.c2mon.shared.client.supervision.SupervisionEvent;
-import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
 
 /**
  * Wrapper JMS listener to register to the supervision topic.
@@ -71,7 +70,7 @@ class SupervisionListenerWrapper extends AbstractListenerWrapper<SupervisionList
 
   @Override
   protected boolean filterout(SupervisionEvent event) {
-    String eventKey = event.getEntity().toString() + event.getEntityId().toString();
+    String eventKey = event.getEntity().toString() + event.getEntityId()+"";
     Long oldTime = eventTimes.get(eventKey);
     Long newTime = event.getEventTime().getTime();
     if (oldTime == null || oldTime <= newTime) {

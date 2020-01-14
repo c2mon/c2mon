@@ -16,30 +16,12 @@
  *****************************************************************************/
 package cern.c2mon.client.core.jms;
 
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.concurrent.CountDownLatch;
-
-import javax.jms.*;
-
-import cern.c2mon.client.core.config.C2monAutoConfiguration;
-import org.apache.activemq.command.ActiveMQQueue;
-import org.easymock.EasyMock;
-import org.junit.*;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jms.core.JmsTemplate;
-import org.springframework.jms.core.SessionCallback;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
 import cern.c2mon.client.common.listener.ClientRequestReportListener;
-import cern.c2mon.client.core.listener.TagUpdateListener;
+import cern.c2mon.client.core.config.C2monAutoConfiguration;
 import cern.c2mon.client.core.config.C2monClientProperties;
 import cern.c2mon.client.core.config.mock.MockServerConfig;
 import cern.c2mon.client.core.jms.impl.JmsProxyImpl;
+import cern.c2mon.client.core.listener.TagUpdateListener;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.request.*;
 import cern.c2mon.shared.client.serializer.TransferTagSerializer;
@@ -48,10 +30,27 @@ import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.client.tag.TransferTagValueImpl;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
-import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEntity;
-import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
+import cern.c2mon.shared.common.supervision.SupervisionEntity;
+import cern.c2mon.shared.common.supervision.SupervisionStatus;
 import cern.c2mon.shared.util.jms.ActiveJmsSender;
 import cern.c2mon.shared.util.json.GsonFactory;
+import org.apache.activemq.command.ActiveMQQueue;
+import org.easymock.EasyMock;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jms.core.JmsTemplate;
+import org.springframework.jms.core.SessionCallback;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import javax.jms.*;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.concurrent.CountDownLatch;
 
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -99,7 +98,7 @@ public class JmsProxyTest {
     }
 
     @Override
-    public Long getId() {
+    public long getId() {
       return 1L;
     }
   };
