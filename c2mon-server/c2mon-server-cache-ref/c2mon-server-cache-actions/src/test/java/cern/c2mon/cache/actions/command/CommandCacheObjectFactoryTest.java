@@ -35,7 +35,7 @@ public class CommandCacheObjectFactoryTest {
   }
 
   @Test
-  public void createCommandCacheObject() throws IllegalAccessException {
+  public void createCommandCacheObject() {
     Properties properties = new Properties();
     properties.setProperty("name", "command");
     properties.setProperty("description", "command description");
@@ -60,13 +60,13 @@ public class CommandCacheObjectFactoryTest {
   }
 
   @Test(expected = ConfigurationException.class)
-  public void throwExceptionWhenNameIsMissing() throws IllegalAccessException {
+  public void throwExceptionWhenNameIsMissing() {
     Properties properties = new Properties();
     factory.createCacheObject(1L, properties);
   }
 
   @Test
-  public void throwExceptionWhenDescriptionIsMissing() throws IllegalAccessException {
+  public void throwExceptionWhenDescriptionIsMissing() {
     Properties properties = new Properties();
     properties.setProperty("name", "command");
     try {
@@ -79,7 +79,7 @@ public class CommandCacheObjectFactoryTest {
   }
 
   @Test
-  public void throwExceptionWhenDataTypeIsMissing() throws IllegalAccessException {
+  public void throwExceptionWhenDataTypeIsMissing() {
     Properties properties = new Properties();
     properties.setProperty("name", "command");
     properties.setProperty("description", "command description");
@@ -94,7 +94,7 @@ public class CommandCacheObjectFactoryTest {
   }
 
   @Test
-  public void throwExceptionWhenSourceTimeoutIsUnder100() throws IllegalAccessException {
+  public void throwExceptionWhenSourceTimeoutIsUnder100() {
     Properties properties = new Properties();
     properties.setProperty("name", "command");
     properties.setProperty("description", "command description");
@@ -111,7 +111,7 @@ public class CommandCacheObjectFactoryTest {
   }
 
   @Test
-  public void throwExceptionWhenClientTimeoutISUnder5000() throws IllegalAccessException {
+  public void throwExceptionWhenClientTimeoutISUnder5000() {
     Properties properties = new Properties();
     properties.setProperty("name", "command");
     properties.setProperty("description", "command description");
@@ -129,7 +129,7 @@ public class CommandCacheObjectFactoryTest {
   }
 
   @Test
-  public void throwExceptionWhenExecTimeoutIsGreaterThanClientTimeout() throws IllegalAccessException {
+  public void throwExceptionWhenExecTimeoutIsGreaterThanClientTimeout() {
     Properties properties = new Properties();
     properties.setProperty("name", "command");
     properties.setProperty("description", "command description");
@@ -148,7 +148,7 @@ public class CommandCacheObjectFactoryTest {
   }
 
   @Test
-  public void throwExceptionWhenExecTimeoutIsSmaller() throws IllegalAccessException {
+  public void throwExceptionWhenExecTimeoutIsSmaller() {
     Properties properties = new Properties();
     properties.setProperty("name", "command");
     properties.setProperty("description", "command description");
@@ -168,7 +168,7 @@ public class CommandCacheObjectFactoryTest {
   }
 
   @Test
-  public void throwExceptionWhenClientTimeoutIsSmallerThanExecTimeout() throws IllegalAccessException {
+  public void throwExceptionWhenClientTimeoutIsSmallerThanExecTimeout() {
     Properties properties = new Properties();
     properties.setProperty("name", "command");
     properties.setProperty("description", "command description");
