@@ -6,6 +6,6 @@ import cern.c2mon.server.common.process.ProcessCacheObject;
 public class ProcessSupervisedTest extends SupervisedTest<Process> {
   @Override
   protected Process generateSample() {
-    return new ProcessCacheObject();
+    return new ProcessCacheObject(0L);
   }
 }

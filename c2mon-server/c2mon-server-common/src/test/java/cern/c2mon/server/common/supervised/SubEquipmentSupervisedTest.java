@@ -6,6 +6,6 @@ import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
 public class SubEquipmentSupervisedTest extends SupervisedTest<SubEquipment> {
   @Override
   protected SubEquipment generateSample() {
-    return new SubEquipmentCacheObject();
+    return new SubEquipmentCacheObject(0L);
   }
 }
