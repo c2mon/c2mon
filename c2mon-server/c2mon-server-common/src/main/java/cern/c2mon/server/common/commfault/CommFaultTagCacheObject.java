@@ -65,7 +65,11 @@ public class CommFaultTagCacheObject extends AbstractCacheableImpl implements Co
         this.stateTagId = stateTagId;
     }
 
-    /**
+  public CommFaultTagCacheObject(long id) {
+    super(id);
+  }
+
+  /**
      * Clone not supported so far.
      */
     @Override
