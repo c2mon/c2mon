@@ -82,9 +82,14 @@ public class SupervisionConstants {
    public static SupervisionEntity parse(String input) {
      requireNonNull(input, "Can not parse null input into Supervision entity");
      input = input.trim();
-     if (TYPE_PROCESS.equalsIgnoreCase(input)) return PROCESS;
-     if (TYPE_EQUIPMENT.equalsIgnoreCase(input)) return EQUIPMENT;
-     if (TYPE_SUBEQUIPMENT.equalsIgnoreCase(input)) return SUBEQUIPMENT;
+
+     if (TYPE_PROCESS.equalsIgnoreCase(input))
+       return PROCESS;
+     if (TYPE_EQUIPMENT.equalsIgnoreCase(input))
+       return EQUIPMENT;
+     if (TYPE_SUBEQUIPMENT.equalsIgnoreCase(input))
+       return SUBEQUIPMENT;
+
      throw new IllegalArgumentException(input + " is not any of " + TYPE_PROCESS + ", " + TYPE_EQUIPMENT + ", " + TYPE_SUBEQUIPMENT);
    }
  }
