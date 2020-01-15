@@ -2,9 +2,7 @@ package cern.c2mon.server.supervision.impl.event;
 
 import cern.c2mon.cache.actions.alivetimer.AliveTimerService;
 import cern.c2mon.server.common.alive.AliveTag;
-import cern.c2mon.server.common.equipment.Equipment;
-import cern.c2mon.server.common.process.Process;
-import cern.c2mon.server.common.subequipment.SubEquipment;
+import cern.c2mon.shared.common.supervision.SupervisionEntity;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Inject;
@@ -40,15 +38,13 @@ public class AliveTimerEvents {
 
     AliveTag aliveTimer = aliveTimerService.getCache().get(aliveTimerId);
 
-    log.debug("Alive of " + aliveTimer.getAliveTypeDescription() + " " + aliveTimer.getRelatedName()
+    log.debug("Alive of " + aliveTimer.getSupervisedEntity().toString() + " " + aliveTimer.getSupervisedName()
       + " (alive tag: " + aliveTimer.getId() + ") has expired.");
 
-    Class type = aliveTimer.isProcessAliveType() ? Process.class
-      : aliveTimer.isEquipmentAliveType() ? Equipment.class
-      : SubEquipment.class;
+    SupervisionEntity supervisedEntity = aliveTimer.getSupervisedEntity();
 
     // TODO (Alex) Consider try-catching this?
-    SupervisionEventHandler.getEventHandlers().get(type).onAliveTimerDown(aliveTimer.getRelatedId());
+    SupervisionEventHandler.getEventHandlers().get(supervisedEntity).onAliveTimerDown(aliveTimer.getSupervisedId());
 
 //    try {
 //      final Long processId = processFacade.getProcessIdFromAlive(aliveTimer.getId());

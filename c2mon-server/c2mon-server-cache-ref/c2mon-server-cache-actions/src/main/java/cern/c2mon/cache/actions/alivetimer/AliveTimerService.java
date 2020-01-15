@@ -9,7 +9,6 @@ import cern.c2mon.server.common.supervision.Supervised;
 import cern.c2mon.server.common.thread.Event;
 import cern.c2mon.shared.common.CacheEvent;
 import cern.c2mon.shared.common.datatag.SourceDataTagValue;
-import cern.c2mon.shared.common.supervision.SupervisionEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -41,7 +40,7 @@ public class AliveTimerService extends AbstractCacheServiceImpl<AliveTag> {
   }
 
   private void cascadeUpdateToCommFault(AliveTag aliveTimer) {
-    if (!aliveTimer.isActive())
+    if (!aliveTimer.getValue())
       commFaultService.bringDownBasedOnAliveTimer(aliveTimer);
   }
 
@@ -143,26 +142,15 @@ public class AliveTimerService extends AbstractCacheServiceImpl<AliveTag> {
 
   public void createAliveTimerFor(Supervised supervised) {
     AliveTag aliveTimer = new AliveTag(supervised.getAliveTagId(), supervised.getId(), supervised.getName(),
-      supervised.getStateTagId(), "", supervised.getAliveInterval());
-    setAliveTimerType(supervised.getSupervisionEntity(), aliveTimer);
+      supervised.getSupervisionEntity(), null, supervised.getStateTagId(), supervised.getAliveInterval());
     cache.put(aliveTimer.getId(), aliveTimer);
-  }
-
-  private void setAliveTimerType(SupervisionEntity supervisionEntity, AliveTag aliveTimer) {
-//    if (supervisionEntity == PROCESS)
-//      aliveTimer.setAliveType(ALIVE_TYPE_PROCESS);
-//    else if (supervisionEntity == EQUIPMENT)
-//      aliveTimer.setAliveType(AliveTag.ALIVE_TYPE_EQUIPMENT);
-//    else if (supervisionEntity == SUBEQUIPMENT)
-//      aliveTimer.setAliveType(AliveTag.ALIVE_TYPE_SUBEQUIPMENT);
-//    TODO (Alex) Update this when AliveTag is a proper ControlTag
   }
 
   private void filterAndSetActive(boolean active) {
     try {
-      for (AliveTag aliveTimer : cache.query(aliveTimer -> aliveTimer.isActive() != active)) {
+      for (AliveTag aliveTimer : cache.query(aliveTimer -> aliveTimer.getValue() != active)) {
         log.debug("Attempting to set alive timer " + aliveTimer.getId() + " and dependent alive timers to " + active);
-        aliveTimer.setActive(active);
+        aliveTimer.setValue(active);
         aliveTimer.setLastUpdate(System.currentTimeMillis());
         cache.put(aliveTimer.getId(), aliveTimer);
       }
@@ -176,7 +164,7 @@ public class AliveTimerService extends AbstractCacheServiceImpl<AliveTag> {
 
     try {
       cache.compute(aliveTimerId, aliveTimer -> {
-        if (aliveTimer.setActive(active) || timestamp > aliveTimer.getLastUpdate())
+        if (aliveTimer.setValueAndGetDifferent(active) || timestamp > aliveTimer.getLastUpdate())
           aliveTimer.setLastUpdate(timestamp);
       });
     } catch (CacheElementNotFoundException cacheEx) {
@@ -190,7 +178,7 @@ public class AliveTimerService extends AbstractCacheServiceImpl<AliveTag> {
     StringBuilder str = new StringBuilder("    <DataTag id=\"");
     str.append(aliveTag.getId());
     str.append("\" name=\"");
-    str.append(aliveTag.getRelatedName());
+    str.append(aliveTag.getSupervisedName());
     str.append("\" control=\"true\">\n");
 
     if (aliveTag.getAddress() != null) {

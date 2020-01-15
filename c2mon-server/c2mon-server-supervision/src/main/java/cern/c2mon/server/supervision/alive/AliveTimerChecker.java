@@ -209,7 +209,7 @@ public class AliveTimerChecker extends TimerTask implements SmartLifecycle {
           boolean aliveExpiration = false;
           aliveTimerCopy = aliveTimerCache.get(currentId);
 
-          if (aliveTimerCopy.isActive()) {
+          if (aliveTimerCopy.getValue()) {
             if (aliveTimerService.hasExpired(currentId)) {
               aliveTimerService.stop(currentId, System.currentTimeMillis());
               aliveExpiration = true;

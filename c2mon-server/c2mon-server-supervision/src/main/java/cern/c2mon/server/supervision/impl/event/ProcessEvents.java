@@ -10,6 +10,7 @@ import cern.c2mon.server.common.config.ServerProperties;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.process.ProcessCacheObject;
+import cern.c2mon.shared.common.supervision.SupervisionEntity;
 import cern.c2mon.shared.daq.process.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -39,7 +40,7 @@ public class ProcessEvents extends SupervisionEventHandler<Process> {
                        SubEquipmentService subEquipmentService,
                        EquipmentService equipmentService,
                        ProcessXMLProvider processXMLProvider) {
-    super(Process.class, processService);
+    super(SupervisionEntity.PROCESS, processService);
     this.subEquipmentService = subEquipmentService;
     this.equipmentService = equipmentService;
     this.processXMLProvider = processXMLProvider;

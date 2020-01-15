@@ -18,6 +18,7 @@ package cern.c2mon.server.cache.dbaccess;
 
 import cern.c2mon.server.common.alive.AliveTag;
 import cern.c2mon.shared.common.Cacheable;
+import cern.c2mon.shared.common.supervision.SupervisionEntity;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -45,10 +46,10 @@ public class AliveTimerMapperTest extends AbstractMapperTest {
     AliveTag retrievedCacheObject = (AliveTag) aliveTimerMapper.getItem(1221L);
 //    assertEquals(aliveTag.getId(), retrievedCacheObject.getId());
     assertEquals(60000L, (int) retrievedCacheObject.getAliveInterval());
-    assertEquals("PROC", retrievedCacheObject.getAliveType());
-    assertEquals(50L, (long) retrievedCacheObject.getRelatedId());
-    assertEquals("P_TESTHANDLER03", retrievedCacheObject.getRelatedName());
-    assertEquals(1220L, (long) retrievedCacheObject.getRelatedStateTagId());
+    assertEquals(SupervisionEntity.PROCESS, retrievedCacheObject.getSupervisedEntity());
+    assertEquals(50L, (long) retrievedCacheObject.getSupervisedId());
+    assertEquals("P_TESTHANDLER03", retrievedCacheObject.getSupervisedName());
+    assertEquals(1220L, (long) retrievedCacheObject.getStateTagId());
     assertEquals(1, retrievedCacheObject.getDependentAliveTimerIds().size()); //2 dependent alive timers (eq and subeq)
     assertTrue(retrievedCacheObject.getDependentAliveTimerIds().contains(1224L));
     //assertTrue(retrievedCacheObject.getDependentAliveTimerIds().contains(testDataHelper.getSubEquipment().getAliveTagId())); only contains equipment alives!

@@ -32,6 +32,7 @@ import cern.c2mon.server.supervision.impl.event.EquipmentEvents;
 import cern.c2mon.server.supervision.impl.event.ProcessEvents;
 import cern.c2mon.server.supervision.impl.event.SubEquipmentEvents;
 import cern.c2mon.shared.common.datatag.SourceDataTagValue;
+import cern.c2mon.shared.common.supervision.SupervisionEntity;
 import cern.c2mon.shared.daq.process.ProcessConfigurationRequest;
 import cern.c2mon.shared.daq.process.ProcessConnectionRequest;
 import cern.c2mon.shared.daq.process.ProcessDisconnectionRequest;
@@ -298,7 +299,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
         }
         Timestamp aliveTimerTimestamp = new Timestamp(System.currentTimeMillis());
         if (aliveTimerTimestamp.getTime() - useTimestamp.getTime() > 2 * timerCopy.getAliveInterval()) {
-          log.debug("Rejecting alive #{} of {} as delayed arrival at server.", tagId, timerCopy.getRelatedName());
+          log.debug("Rejecting alive #{} of {} as delayed arrival at server.", tagId, timerCopy.getSupervisedName());
         } else {
           // The tag is an alive tag -> we rewind the corresponding alive timer
           //TODO sychronization on alive timers... needed? use id here, so not possible around update
@@ -306,15 +307,15 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
 
           Timestamp supervisionTimestamp = new Timestamp(System.currentTimeMillis());
           // TODO (Alex) Is this the timer we want to use?
-          if (timerCopy.isProcessAliveType()) {
+          if (timerCopy.getSupervisedEntity() == SupervisionEntity.PROCESS) {
             Long processId = processFacade.getProcessIdFromAlive(tagId);
             processEvents.onUp(processId, supervisionTimestamp, "Process Alive tag received.");
           } else {
-            if (timerCopy.isEquipmentAliveType()) {
-              equipmentEvents.onUp(timerCopy.getRelatedId(), supervisionTimestamp, "Equipment Alive tag received.");
+            if (timerCopy.getSupervisedEntity() == SupervisionEntity.EQUIPMENT) {
+              equipmentEvents.onUp(timerCopy.getSupervisedId(), supervisionTimestamp, "Equipment Alive tag received.");
             } else {
               // It is a subequipment
-              subEquipmentEvents.onUp(timerCopy.getRelatedId(), supervisionTimestamp, "Subequipment Alive tag received.");
+              subEquipmentEvents.onUp(timerCopy.getSupervisedId(), supervisionTimestamp, "Subequipment Alive tag received.");
             }
           }
         }

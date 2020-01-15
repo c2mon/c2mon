@@ -48,10 +48,10 @@ public class ObjectEqualityComparison {
 
   public static void assertAliveTimerValuesEquals(AliveTag expectedObject, AliveTag object) {
     assertEquals(expectedObject.getId(), object.getId());
-    assertEquals(expectedObject.getRelatedId(), object.getRelatedId());
-    assertEquals(expectedObject.getRelatedName(), object.getRelatedName());
-    assertEquals(expectedObject.getRelatedStateTagId(), object.getRelatedStateTagId());
-    assertEquals(expectedObject.getAliveType(), object.getAliveType());
+    assertEquals(expectedObject.getSupervisedId(), object.getSupervisedId());
+    assertEquals(expectedObject.getSupervisedName(), object.getSupervisedName());
+    assertEquals(expectedObject.getStateTagId(), object.getStateTagId());
+    assertEquals(expectedObject.getSupervisedEntity(), object.getSupervisedEntity());
     assertEquals(expectedObject.getAliveInterval(), object.getAliveInterval());
   }
 

@@ -13,7 +13,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Szymon Halastra, Alexandros Papageorgiou Koufidis
@@ -52,11 +51,11 @@ public class AliveTimerCreationTest {
 
     AliveTag cachedAliveTimer = aliveTimerCache.get(ALIVE_TAG_ID);
 
-    assertTrue("AliveTimer should have Equipment type set", cachedAliveTimer.isEquipmentAliveType());
+    assertEquals("AliveTimer should have Equipment type set", SupervisionEntity.EQUIPMENT, cachedAliveTimer.getSupervisedEntity());
     assertEquals("AliveTimer should have interval set", equipmentCacheObject.getAliveInterval(), cachedAliveTimer.getAliveInterval());
-    assertEquals("AliveTimer should have relatedId set", equipmentCacheObject.getId(), cachedAliveTimer.getRelatedId());
-    assertEquals("AliveTimer should have relatedName set", equipmentCacheObject.getName(), cachedAliveTimer.getRelatedName());
-    assertEquals("AliveTimer should have stateTagId set", equipmentCacheObject.getStateTagId(), cachedAliveTimer.getRelatedStateTagId());
+    assertEquals("AliveTimer should have relatedId set", equipmentCacheObject.getId(), cachedAliveTimer.getSupervisedId());
+    assertEquals("AliveTimer should have relatedName set", equipmentCacheObject.getName(), cachedAliveTimer.getSupervisedName());
+    assertEquals("AliveTimer should have stateTagId set", equipmentCacheObject.getStateTagId(), cachedAliveTimer.getStateTagId());
   }
 
   @Test
@@ -71,11 +70,11 @@ public class AliveTimerCreationTest {
 
     AliveTag cachedAliveTimer = (AliveTag) aliveTimerCache.get(ALIVE_TAG_ID);
 
-    assertEquals("AliveTimer should have SubEquipment type set", SupervisionEntity.SUBEQUIPMENT.toString(), cachedAliveTimer.getAliveType());
+    assertEquals("AliveTimer should have SubEquipment type set", SupervisionEntity.SUBEQUIPMENT, cachedAliveTimer.getSupervisedEntity());
     assertEquals("AliveTimer should have interval set", subEquipmentCacheObject.getAliveInterval(), cachedAliveTimer.getAliveInterval());
-    assertEquals("AliveTimer should have relatedId set", subEquipmentCacheObject.getId(), cachedAliveTimer.getRelatedId());
-    assertEquals("AliveTimer should have relatedName set", subEquipmentCacheObject.getName(), cachedAliveTimer.getRelatedName());
-    assertEquals("AliveTimer should have stateTagId set", subEquipmentCacheObject.getStateTagId(), cachedAliveTimer.getRelatedStateTagId());
+    assertEquals("AliveTimer should have relatedId set", subEquipmentCacheObject.getId(), cachedAliveTimer.getSupervisedId());
+    assertEquals("AliveTimer should have relatedName set", subEquipmentCacheObject.getName(), cachedAliveTimer.getSupervisedName());
+    assertEquals("AliveTimer should have stateTagId set", subEquipmentCacheObject.getStateTagId(), cachedAliveTimer.getStateTagId());
   }
 
   @Test
@@ -90,10 +89,10 @@ public class AliveTimerCreationTest {
 
     AliveTag cachedAliveTimer = aliveTimerCache.get(ALIVE_TAG_ID);
 
-    assertTrue("AliveTimer should have Process type set", cachedAliveTimer.isProcessAliveType());
+    assertEquals("AliveTimer should have Process type set", SupervisionEntity.PROCESS, cachedAliveTimer.getSupervisedEntity());
     assertEquals("AliveTimer should have interval set", processCacheObject.getAliveInterval(), cachedAliveTimer.getAliveInterval());
-    assertEquals("AliveTimer should have relatedId set", processCacheObject.getId(), cachedAliveTimer.getRelatedId());
-    assertEquals("AliveTimer should have relatedName set", processCacheObject.getName(), cachedAliveTimer.getRelatedName());
-    assertEquals("AliveTimer should have stateTagId set", processCacheObject.getStateTagId(), cachedAliveTimer.getRelatedStateTagId());
+    assertEquals("AliveTimer should have relatedId set", processCacheObject.getId(), cachedAliveTimer.getSupervisedId());
+    assertEquals("AliveTimer should have relatedName set", processCacheObject.getName(), cachedAliveTimer.getSupervisedName());
+    assertEquals("AliveTimer should have stateTagId set", processCacheObject.getStateTagId(), cachedAliveTimer.getStateTagId());
   }
 }

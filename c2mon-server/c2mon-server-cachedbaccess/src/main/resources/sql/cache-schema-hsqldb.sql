@@ -136,33 +136,35 @@ CREATE INDEX IDX_CMDEQID ON COMMANDTAG (CMD_EQID);
 
 
 DROP VIEW IF EXISTS ALIVETIMER;
-CREATE VIEW ALIVETIMER (ALIVEID, ALIVETYPE, ALIVEINTERVAL, RELATEDID, RELATEDNAME, RELATEDSTATETAG, PARENTALIVEID, PARENTID, PARENTNAME, PARENTTYPE) AS
+CREATE VIEW ALIVETIMER (ALIVEID, ALIVETYPE, ALIVEINTERVAL, RELATEDID, RELATEDNAME, RELATEDCOMMTAG, RELATEDSTATETAG, PARENTALIVEID, PARENTID, PARENTNAME, PARENTTYPE) AS
 SELECT
-    procalive_tagid AS ALIVEID,
-    'PROC' AS ALIVETYPE,
-    procaliveinterval AS ALIVEINTERVAL,
-    procid AS RELATEDID,
-    procname AS RELATEDNAME,
-    procstate_tagid AS RELATEDSTATETAG,
-    null AS PARENTALIVEID,
-    null AS PARENTID,
-    null AS PARENTNAME,
-    null AS PARENTTYPE
-  FROM process p
+    procalive_tagid ALIVEID,
+    'PROC' ALIVETYPE,
+    procaliveinterval ALIVEINTERVAL,
+    procid RELATEDID,
+    procname RELATEDNAME,
+    null RELATEDCOMMTAG,
+    procstate_tagid RELATEDSTATETAG,
+    null PARENTALIVEID,
+    null PARENTID,
+    null PARENTNAME,
+    null PARENTTYPE
+  FROM PROCESS
   WHERE
     procalive_tagid IS NOT NULL
 UNION
   SELECT
     eqalive_tagid ALIVEID,
-    'EQ' AS ALIVETYPE,
+    'EQ' ALIVETYPE,
     eqaliveinterval ALIVEINTERVAL,
     eqid RELATEDID,
     eqname RELATEDNAME,
+    eqcommfault_tagid RELATEDCOMMTAG,
     eqstate_tagid RELATEDSTATETAG,
     procalive_tagid PARENTALIVEID,
     procid PARENTID,
     procname PARENTNAME,
-    'PROC' AS PARENTTYPE
+    'PROC' PARENTTYPE
   FROM process p, equipment e
   WHERE
     eqalive_tagid IS NOT NULL AND
@@ -170,15 +172,16 @@ UNION
 UNION
   SELECT
     a.eqalive_tagid ALIVEID,
-    'SUBEQ' AS ALIVETYPE,
+    'SUBEQ' ALIVETYPE,
     a.eqaliveinterval ALIVEINTERVAL,
     a.eqid RELATEDID,
     a.eqname RELATEDNAME,
+    a.eqcommfault_tagid RELATEDCOMMTAG,
     a.eqstate_tagid RELATEDSTATETAG,
     b.eqalive_tagid PARENTALIVEID,
     b.eqid PARENTID,
     b.eqname PARENTNAME,
-    'EQ' AS PARENTTYPE
+    'EQ' PARENTTYPE
 FROM equipment a, equipment b
 WHERE
      a.eqalive_tagid IS NOT NULL AND

@@ -795,7 +795,7 @@ public class ConfigurationLoaderTest {
 
     // check aliveTag in the cache
     AliveTag cacheObjectAlive = (AliveTag) aliveTimerCache.get(101L);
-    AliveTag expectedObjectAlive = new AliveTag(101L, 5L, "P_INI_TEST", 100L, "PROC", 60000);
+    AliveTag expectedObjectAlive = new AliveTag(101L, 5L, "P_INI_TEST", "PROC", null, 100L, 60000);
     ObjectEqualityComparison.assertAliveTimerValuesEquals(expectedObjectAlive, cacheObjectAlive);
 
 //    ControlTagCacheObject cacheObjectAliveControlCache = (ControlTagCacheObject) controlTagCache.get(101L);

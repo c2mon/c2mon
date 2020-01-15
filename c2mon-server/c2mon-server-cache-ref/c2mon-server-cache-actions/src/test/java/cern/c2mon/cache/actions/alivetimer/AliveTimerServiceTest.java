@@ -4,7 +4,7 @@ import cern.c2mon.cache.actions.commfault.CommFaultService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.impl.SimpleC2monCache;
 import cern.c2mon.server.common.alive.AliveTag;
-import cern.c2mon.shared.common.supervision.SupervisionEntity;
+import cern.c2mon.server.test.cache.AliveTagCacheObjectFactory;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -23,6 +23,8 @@ public class AliveTimerServiceTest {
 
   private AliveTimerService aliveTimerService;
 
+  private AliveTagCacheObjectFactory factory = new AliveTagCacheObjectFactory();
+
   @Before
   public void init() {
     aliveTimerCacheRef = new SimpleC2monCache<>("alive-timer-cache");
@@ -31,57 +33,54 @@ public class AliveTimerServiceTest {
 
   @Test
   public void startAliveTimer() {
-    AliveTag aliveTimer = new AliveTag(1L);
-    aliveTimer.setActive(false);
+    AliveTag aliveTimer = factory.sampleBase();
+    aliveTimer.setValue(false);
 
-    AliveTag startedAliveTimer = new AliveTag(1L);
-    startedAliveTimer.setActive(true);
-    startedAliveTimer.setLastUpdate(System.currentTimeMillis());
+    aliveTimerCacheRef.put(aliveTimer.getId(), aliveTimer);
 
-    aliveTimerCacheRef.put(1L, aliveTimer);
+    aliveTimerService.start(aliveTimer.getId(), System.currentTimeMillis());
 
-    aliveTimerService.start(1L, System.currentTimeMillis());
-
-    assertTrue("Test if AliveTimer is started, set as active", aliveTimerCacheRef.get(1L).isActive());
-    assertTrue("Test if last update is set up", aliveTimerCacheRef.get(1L).getLastUpdate() != 0);
+    assertTrue("Test if AliveTimer is started, set as active", aliveTimerCacheRef.get(aliveTimer.getId()).getValue());
+    assertTrue("Test if last update is set up", aliveTimerCacheRef.get(aliveTimer.getId()).getLastUpdate() != 0);
   }
 
   @Test
   public void startTest() {
-    AliveTag aliveTimer = new AliveTag(1L);
-    aliveTimer.setActive(false);
+    AliveTag aliveTimer = factory.sampleBase();
+    aliveTimer.setValue(false);
 
-    aliveTimerCacheRef.put(1L, aliveTimer);
+    aliveTimerCacheRef.put(aliveTimer.getId(), aliveTimer);
 
-    aliveTimerService.start(1L, System.currentTimeMillis());
+    aliveTimerService.start(aliveTimer.getId(), System.currentTimeMillis());
 
-    assertTrue("Test if AliveTimer is started, set as active", aliveTimerCacheRef.get(1L).isActive());
-    assertTrue("Test if last update is set up", aliveTimerCacheRef.get(1L).getLastUpdate() != 0);
+    assertTrue("Test if AliveTimer is started, set as active", aliveTimerCacheRef.get(aliveTimer.getId()).getValue());
+    assertTrue("Test if last update is set up", aliveTimerCacheRef.get(aliveTimer.getId()).getLastUpdate() != 0);
   }
 
   @Test
   public void startForcedAliveTimer() throws InterruptedException {
-    AliveTag aliveTimer = new AliveTag(1L);
-    aliveTimer.setActive(true);
+    AliveTag aliveTimer = factory.sampleBase();
+    aliveTimer.setValue(true);
 
     aliveTimerCacheRef.put(aliveTimer.getId(), aliveTimer);
 
-    aliveTimerService.start(1L, System.currentTimeMillis());
+    aliveTimerService.start(aliveTimer.getId(), System.currentTimeMillis());
 
-    long firstUpdate = aliveTimerCacheRef.get(1L).getLastUpdate();
+    long firstUpdate = aliveTimerCacheRef.get(aliveTimer.getId()).getLastUpdate();
 
     Thread.sleep(100);
 
-    aliveTimerService.startOrUpdateTimestamp(1L, System.currentTimeMillis());
+    aliveTimerService.startOrUpdateTimestamp(aliveTimer.getId(), System.currentTimeMillis());
 
-    assertTrue("Test if AliveTimer is active", aliveTimerCacheRef.get(1L).isActive());
-    assertTrue("Test if AliveTimer is updated", aliveTimerCacheRef.get(1L).getLastUpdate() != firstUpdate);
+    assertTrue("Test if AliveTimer is active", aliveTimerCacheRef.get(aliveTimer.getId()).getValue());
+    assertTrue("Test if AliveTimer is updated", aliveTimerCacheRef.get(aliveTimer.getId()).getLastUpdate() != firstUpdate);
   }
 
   @Test
   public void checkExpiredAliveTimer() throws InterruptedException {
-    AliveTag aliveTimer = new AliveTag(1L, 2L, "test", 0L, SupervisionEntity.EQUIPMENT.toString(), 20);
-    aliveTimer.setActive(true);
+    AliveTag aliveTimer = factory.sampleBase();
+    aliveTimer.setAliveInterval(20);
+    aliveTimer.setValue(true);
 
     aliveTimerCacheRef.put(aliveTimer.getId(), aliveTimer);
 
@@ -96,8 +95,9 @@ public class AliveTimerServiceTest {
 
   @Test
   public void checkActiveAliveTimer() throws InterruptedException {
-    AliveTag aliveTimer = new AliveTag(1L, 2L, "test", 0L, SupervisionEntity.EQUIPMENT.toString(), 0);
-    aliveTimer.setActive(true);
+    AliveTag aliveTimer = factory.sampleBase();
+    aliveTimer.setAliveInterval(0);
+    aliveTimer.setValue(true);
 
     aliveTimerCacheRef.put(aliveTimer.getId(), aliveTimer);
 
@@ -112,15 +112,15 @@ public class AliveTimerServiceTest {
 
   @Test
   public void stopAliveTimer() {
-    AliveTag aliveTimer = new AliveTag(1L);
-    aliveTimer.setActive(true);
+    AliveTag aliveTimer = factory.sampleBase();
+    aliveTimer.setValue(true);
     aliveTimer.setLastUpdate(System.currentTimeMillis());
 
     aliveTimerCacheRef.put(aliveTimer.getId(), aliveTimer);
 
-    aliveTimerService.stop(1L, System.currentTimeMillis());
+    aliveTimerService.stop(aliveTimer.getId(), System.currentTimeMillis());
 
-    assertFalse("Test if AliveTimer is active", aliveTimerCacheRef.get(1L).isActive());
+    assertFalse("Test if AliveTimer is active", aliveTimerCacheRef.get(aliveTimer.getId()).getValue());
   }
 
   @Test
@@ -128,8 +128,8 @@ public class AliveTimerServiceTest {
     int size = 10;
     Map<Long, AliveTag> aliveTimers = new HashMap<>(size);
     IntStream.range(0, size).forEach(i -> {
-      AliveTag aliveTimer = new AliveTag((long) i);
-      aliveTimer.setActive(false);
+      AliveTag aliveTimer = factory.withCustomId(i);
+      aliveTimer.setValue(false);
       aliveTimers.put(aliveTimer.getId(), aliveTimer);
     });
 
@@ -139,7 +139,7 @@ public class AliveTimerServiceTest {
 
     Map<Long, AliveTag> startedAliveTimers = aliveTimerCacheRef.getAll(aliveTimers.keySet());
 
-    List<Boolean> actualActive = startedAliveTimers.values().stream().map(AliveTag::isActive).collect(Collectors.toList());
+    List<Boolean> actualActive = startedAliveTimers.values().stream().map(AliveTag::getValue).collect(Collectors.toList());
     List<Boolean> expectedTrue = new ArrayList<>(Collections.nCopies(size, Boolean.TRUE));
 
     List<Long> actualLastUpdates = startedAliveTimers.values().stream().map(AliveTag::getLastUpdate).collect(Collectors.toList());
@@ -154,8 +154,8 @@ public class AliveTimerServiceTest {
     int size = 10;
     Map<Long, AliveTag> aliveTimers = new HashMap<>(size);
     IntStream.range(0, size).forEach(i -> {
-      AliveTag aliveTimer = new AliveTag((long) i);
-      aliveTimer.setActive(true);
+      AliveTag aliveTimer = factory.withCustomId(i);
+      aliveTimer.setValue(true);
       aliveTimer.setLastUpdate(System.currentTimeMillis());
       aliveTimers.put(aliveTimer.getId(), aliveTimer);
     });
@@ -164,7 +164,7 @@ public class AliveTimerServiceTest {
     aliveTimerService.stopAllActiveTimers();
 
     Map<Long, AliveTag> stoppedAliveTimers = aliveTimerCacheRef.getAll(aliveTimers.keySet());
-    List<Boolean> actualNotActive = stoppedAliveTimers.values().stream().map(AliveTag::isActive).collect(Collectors.toList());
+    List<Boolean> actualNotActive = stoppedAliveTimers.values().stream().map(AliveTag::getValue).collect(Collectors.toList());
     List<Boolean> expectedFalse = new ArrayList<>(Collections.nCopies(size, Boolean.FALSE));
 
     List<Long> actualLastUpdates = stoppedAliveTimers.values().stream().map(AliveTag::getLastUpdate).collect(Collectors.toList());

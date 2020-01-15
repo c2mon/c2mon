@@ -15,6 +15,7 @@ import cern.c2mon.server.common.alive.AliveTag;
 import cern.c2mon.server.common.config.ServerProperties;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.process.ProcessCacheObject;
+import cern.c2mon.shared.common.supervision.SupervisionEntity;
 import cern.c2mon.shared.common.supervision.SupervisionStatus;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -89,12 +90,12 @@ public class ProcessService extends AbstractCacheServiceImpl<Process>
   @Override
   public Long getProcessIdFromAlive(Long aliveTimerId) {
     AliveTag aliveTimer = aliveTimerService.getCache().get(aliveTimerId);
-    if (aliveTimer.isProcessAliveType()) {
-      return aliveTimer.getRelatedId();
-    } else if (aliveTimer.isEquipmentAliveType()) {
-      return equipmentService.getProcessId(aliveTimer.getRelatedId());
+    if (aliveTimer.getSupervisedEntity() == SupervisionEntity.PROCESS) {
+      return aliveTimer.getSupervisedId();
+    } else if (aliveTimer.getSupervisedEntity() == SupervisionEntity.EQUIPMENT) {
+      return equipmentService.getProcessId(aliveTimer.getSupervisedId());
     } else {
-      Long equipmentId = subEquipmentService.getEquipmentIdForSubEquipment(aliveTimer.getRelatedId());
+      Long equipmentId = subEquipmentService.getEquipmentIdForSubEquipment(aliveTimer.getSupervisedId());
       return equipmentService.getProcessId(equipmentId);
     }
   }

@@ -81,7 +81,7 @@ public class ProcessConfigHandler extends BaseConfigHandlerImpl<Process, Process
   /**
    * Ensures that the Alive-, Status- have appropriately the Process id set.
    *
-   * @param process The equipment to which the control tags are assigned
+   * @param process The process to which the control tags are assigned
    */
   @Override
   protected void doPostCreate(Process process) {
@@ -97,8 +97,9 @@ public class ProcessConfigHandler extends BaseConfigHandlerImpl<Process, Process
 
     try {
       aliveTimerCache.computeQuiet(process.getAliveTagId(), aliveTimer -> {
-        log.trace("Adding process id #{} to alive timer {} (#{})", process.getId(), aliveTimer.getRelatedName(), aliveTimer.getId());
-        ((AliveTag) aliveTimer).setRelatedId(process.getId());
+        log.trace("Adding process id #{} to alive timer {} (#{})", process.getId(), aliveTimer.getSupervisedName(), aliveTimer.getId());
+//        aliveTimer.setSupervisedId(process.getId());
+        // TODO (Alex) Copy constructor here? Is it even possible that we would want to change a supervised id?
       });
     } catch (CacheElementNotFoundException e) {
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,

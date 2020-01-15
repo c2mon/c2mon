@@ -32,7 +32,7 @@ public class AliveTimerCacheLoaderTest extends AbstractCacheLoaderTest<AliveTag>
     for (AliveTag anAliveList : mapperList) {
       AliveTag currentTimer = (AliveTag) anAliveList;
       //only compares one field so far
-      assertEquals("Cached AliveTimer should have the same name as AliveTimer in DB", currentTimer.getRelatedName(), ((aliveTimerCacheRef.get(currentTimer.getId())).getRelatedName()));
+      assertEquals("Cached AliveTimer should have the same name as AliveTimer in DB", currentTimer.getSupervisedName(), ((aliveTimerCacheRef.get(currentTimer.getId())).getSupervisedName()));
     }
   }
 
@@ -48,6 +48,6 @@ public class AliveTimerCacheLoaderTest extends AbstractCacheLoaderTest<AliveTag>
 
   @Override
   protected AliveTag getSample() {
-    return new AliveTag(0L);
+    return new AliveTag(0L, 100L, "Abc", "PROC", null, null, 10);
   }
 }

@@ -877,7 +877,7 @@ public class ConfigurationLoaderTest {
     assertTrue(equipment.getSubEquipmentIds().contains(expectedObject.getId()));
     // the alivetimer and commfault caches should reflect the changes
     assertNotNull(aliveTimerCache.get(expectedObject.getAliveTagId()));
-    assertEquals(expectedObject.getId(), aliveTimerCache.get(cacheObject.getAliveTagId()).getRelatedId());
+    assertEquals(expectedObject.getId(), aliveTimerCache.get(cacheObject.getAliveTagId()).getSupervisedId());
     assertNotNull(commFaultTagCache.get(expectedObject.getCommFaultTagId()));
     assertEquals(expectedObject.getId(), commFaultTagCache.get(cacheObject.getCommFaultTagId()).getSupervisedId());
 

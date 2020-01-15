@@ -8,7 +8,7 @@ import static org.junit.Assert.assertTrue;
 
 public class AliveTimerCacheObjectTest extends CacheableTest<AliveTag> {
 
-  private static AliveTag sample = new AliveTag(1L);
+  private static AliveTag sample = new AliveTag(0L, 100L, "Abc", "PROC", null, null, 10);
 
   public AliveTimerCacheObjectTest() {
     super(sample);
@@ -27,10 +27,10 @@ public class AliveTimerCacheObjectTest extends CacheableTest<AliveTag> {
    */
   @Test
   public void setActiveReturnsDifferent() {
-    assertTrue(sample.setActive(true));
-    assertTrue(sample.setActive(false));
-    assertFalse(sample.setActive(false));
-    assertTrue(sample.setActive(true));
-    assertFalse(sample.setActive(true));
+    assertTrue(sample.setValueAndGetDifferent(true));
+    assertTrue(sample.setValueAndGetDifferent(false));
+    assertFalse(sample.setValueAndGetDifferent(false));
+    assertTrue(sample.setValueAndGetDifferent(true));
+    assertFalse(sample.setValueAndGetDifferent(true));
   }
 }

@@ -2,8 +2,6 @@ package cern.c2mon.cache.actions.commfault;
 
 import cern.c2mon.cache.actions.AbstractCacheServiceImpl;
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
-import cern.c2mon.cache.api.exception.TooManyQueryResultsException;
 import cern.c2mon.server.common.alive.AliveTag;
 import cern.c2mon.server.common.commfault.CommFaultTag;
 import cern.c2mon.server.common.equipment.AbstractEquipment;
@@ -16,8 +14,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
-import java.util.Collection;
-import java.util.Objects;
 
 /**
  * @author Szymon Halastra, Alexandros Papageorgiou
@@ -50,21 +46,10 @@ public class CommFaultService extends AbstractCacheServiceImpl<CommFaultTag> {
   }
 
   public void bringDownBasedOnAliveTimer(AliveTag aliveTimer) {
-    final Collection<CommFaultTag> commFaultTags =
-      cache.query(tag -> Objects.equals(tag.getAliveTagId(), aliveTimer.getId()));
-
-    if (commFaultTags.isEmpty())
-      throw new CacheElementNotFoundException();
-
-    if (commFaultTags.size() > 1)
-      throw new TooManyQueryResultsException();
-
-    long commFaultTagId = commFaultTags.stream().findFirst().get().getId();
-
-    // TODO What's going on here? Looks like this logic is flawed? How do you set a CommFaultTag to down?
-    cache.compute(commFaultTagId, commFaultTag -> {
+    cache.compute(aliveTimer.getCommFaultTagId(), commFaultTag -> {
       if (aliveTimer.getLastUpdate() >= commFaultTag.getSourceTimestamp().getTime()) {
-//        ((CommFaultTag) commFaultTag).set
+        commFaultTag.setValue(false);
+        // TODO (Alex) SetServerTimestamp
       }
     });
   }

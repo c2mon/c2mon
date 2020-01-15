@@ -4,6 +4,7 @@ import cern.c2mon.cache.actions.supervision.SupervisedCacheService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.supervision.Supervised;
+import cern.c2mon.shared.common.supervision.SupervisionEntity;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -16,14 +17,14 @@ abstract class SupervisionEventHandler<T extends Supervised> {
 
   // You can technically modify this, but don't - the self registration in Ctor is all that's needed
   @Getter
-  private static Map<Class<? extends Supervised>, SupervisionEventHandler<? extends Supervised>> eventHandlers = new HashMap<>();
+  private static Map<SupervisionEntity, SupervisionEventHandler<? extends Supervised>> eventHandlers = new HashMap<>();
   protected SupervisedCacheService<T> service;
   protected C2monCache<T> cache;
 
-  SupervisionEventHandler(Class<T> clazz, SupervisedCacheService<T> service) {
+  SupervisionEventHandler(SupervisionEntity supervisedEntity, SupervisedCacheService<T> service) {
     this.service = service;
     this.cache = service.getCache();
-    eventHandlers.putIfAbsent(clazz, this);
+    eventHandlers.putIfAbsent(supervisedEntity, this);
   }
 
   public void onUp(Long id, Timestamp timestamp, String message) {

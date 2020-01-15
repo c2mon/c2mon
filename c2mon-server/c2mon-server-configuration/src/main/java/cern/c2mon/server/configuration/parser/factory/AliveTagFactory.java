@@ -35,7 +35,7 @@ public class AliveTagFactory extends EntityFactory<AliveTag> {
   Long createId(AliveTag configurationEntity) {
 
     if (configurationEntity.getName() != null
-      && !queryByClientInput(cache, aTag -> aTag.getRelatedName(), configurationEntity.getName()).isEmpty()) {
+      && !queryByClientInput(cache, aTag -> aTag.getSupervisedName(), configurationEntity.getName()).isEmpty()) {
       throw new ConfigurationParseException("Error creating aliveTag " + configurationEntity.getName() + ": " +
         "Name already exists");
     } else {
@@ -47,7 +47,7 @@ public class AliveTagFactory extends EntityFactory<AliveTag> {
   Long getId(AliveTag configurationEntity) {
     return configurationEntity.getId() != null
       ? configurationEntity.getId()
-      : queryByClientInput(cache, aTag -> aTag.getRelatedName(), configurationEntity.getName())
+      : queryByClientInput(cache, aTag -> aTag.getSupervisedName(), configurationEntity.getName())
         .stream().findFirst()
         .orElseThrow(CacheElementNotFoundException::new)
         .getId();

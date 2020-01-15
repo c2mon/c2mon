@@ -41,7 +41,7 @@ public class AliveTagSupervisionTest extends SupervisionCacheTest {
     assertNotNull(aliveTimer);
     assertEquals(0, aliveTimer.getLastUpdate());
 
-    Process process = processCache.get(aliveTimer.getRelatedId());
+    Process process = processCache.get(aliveTimer.getSupervisedId());
     assertEquals(SupervisionStatus.DOWN, process.getSupervisionStatus());
     assertNull(process.getStatusTime());
     assertNull(process.getStatusDescription());
@@ -55,7 +55,7 @@ public class AliveTagSupervisionTest extends SupervisionCacheTest {
    *
    * @throws InterruptedException
    */
-  @Test(timeout = 1000)
+  @Test
   @DirtiesContext
   public void testProcessAliveTag() throws InterruptedException {
     CountDownLatch latch = new CountDownLatch(1);
@@ -72,13 +72,13 @@ public class AliveTagSupervisionTest extends SupervisionCacheTest {
     assertTrue(aliveTimer.getLastUpdate() > System.currentTimeMillis() - 10000); //account for non-synchronized
 
     //check process status is changed
-    Process process = processCache.get(aliveTimer.getRelatedId());
+    Process process = processCache.get(aliveTimer.getSupervisedId());
     assertEquals(SupervisionStatus.RUNNING, process.getSupervisionStatus());
     Timestamp processTime = process.getStatusTime();
     assertTrue(processTime.after(new Timestamp(updateTime - 1)));
     assertNotNull(process.getStatusDescription());
 
-    latch.await(); //wait for notification on listener thread
+    assertTrue(latch.await(1, TimeUnit.SECONDS)); //wait for notification on listener thread
   }
 
   @Test
@@ -89,7 +89,7 @@ public class AliveTagSupervisionTest extends SupervisionCacheTest {
     long startTimer = 1;
 
     // Start the process
-    processService.start(aliveTimer.getRelatedId(), new Timestamp(startTimer));
+    processService.start(aliveTimer.getSupervisedId(), new Timestamp(startTimer));
     assertEquals(startTimer, aliveTimerCache.get(1221L).getLastUpdate());
   }
 
@@ -127,9 +127,9 @@ public class AliveTagSupervisionTest extends SupervisionCacheTest {
     long startTimer = System.currentTimeMillis();
 
     // Start the process
-    processService.start(aliveTimer.getRelatedId(), new Timestamp(startTimer));
+    processService.start(aliveTimer.getSupervisedId(), new Timestamp(startTimer));
     // Resume so that the status goes to RUNNING
-    Process process = processService.resume(aliveTimer.getRelatedId(), new Timestamp(System.currentTimeMillis()), "");
+    Process process = processService.resume(aliveTimer.getSupervisedId(), new Timestamp(System.currentTimeMillis()), "");
     assertEquals(SupervisionStatus.RUNNING, process.getSupervisionStatus());
     Timestamp originalProcessTime = process.getStatusTime();
     assertNotNull(originalProcessTime);

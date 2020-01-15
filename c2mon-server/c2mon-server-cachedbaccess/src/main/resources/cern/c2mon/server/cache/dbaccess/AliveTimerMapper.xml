@@ -9,8 +9,9 @@
         <idArg column="alive_aliveid" javaType="Long"/>
         <arg column="alive_relatedid" javaType="Long"/>
         <arg column="alive_relatedname" javaType="String"/>
-        <arg column="alive_relatedstatetag" javaType="Long"/>
         <arg column="alive_alivetype" javaType="String"/>
+        <arg column="alive_alivecommtag" javaType="Long"/>
+        <arg column="alive_relatedstatetag" javaType="Long"/>
         <arg column="alive_aliveinterval" javaType="Integer"/>
       </constructor>
       <collection property="dependentAliveTimerIds" ofType="Long" javaType="ArrayList" resultMap="dependentAliveTimersResultMap"/>
@@ -23,7 +24,8 @@
     <!-- getAll needed for persistent caches -->
     <select id="getAll" resultMap="aliveTimerResultMap">
       SELECT T1.ALIVEID as alive_aliveid, T1.ALIVETYPE as alive_alivetype, T1.ALIVEINTERVAL as alive_aliveinterval,
-             T1.RELATEDID as alive_relatedid, T1.RELATEDNAME as alive_relatedname, T1.RELATEDSTATETAG as alive_relatedstatetag,
+             T1.RELATEDID as alive_relatedid, T1.RELATEDNAME as alive_relatedname,
+             T1.RELATEDCOMMTAG as alive_alivecommtag, T1.RELATEDSTATETAG as alive_relatedstatetag,
              T1.PARENTALIVEID as alive_parentaliveid, T2.ALIVEID as dependent_aliveid
         FROM ALIVETIMER T1 LEFT OUTER JOIN ALIVETIMER T2
           ON T1.ALIVEID = T2.PARENTALIVEID
@@ -32,7 +34,8 @@
     <!-- getItem needed for persistence caches -->
     <select id="getItem" resultMap="aliveTimerResultMap" parameterType="Long">
       SELECT T1.ALIVEID as alive_aliveid, T1.ALIVETYPE as alive_alivetype, T1.ALIVEINTERVAL as alive_aliveinterval,
-             T1.RELATEDID as alive_relatedid, T1.RELATEDNAME as alive_relatedname, T1.RELATEDSTATETAG as alive_relatedstatetag,
+             T1.RELATEDID as alive_relatedid, T1.RELATEDNAME as alive_relatedname,
+             T1.RELATEDCOMMTAG as alive_alivecommtag, T1.RELATEDSTATETAG as alive_relatedstatetag,
              T1.PARENTALIVEID as alive_parentaliveid, T2.ALIVEID as dependent_aliveid
         FROM ALIVETIMER T1 LEFT OUTER JOIN ALIVETIMER T2
           ON T1.ALIVEID = T2.PARENTALIVEID
