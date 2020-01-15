@@ -26,6 +26,8 @@ public abstract class ControlTag extends AbstractInfoTagCacheObject implements I
    */
   final SupervisionEntity supervisedEntity;
 
+  private final Boolean faultValue = Boolean.FALSE; // always FALSE in TIM; TRUE not supported
+
   public ControlTag(@NonNull Long id, @NonNull Long supervisedId, SupervisionEntity supervisedEntity) {
     super(id);
     setDataType("Boolean");

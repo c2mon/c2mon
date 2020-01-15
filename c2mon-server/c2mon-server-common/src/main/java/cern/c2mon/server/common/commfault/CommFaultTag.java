@@ -36,8 +36,6 @@ public class CommFaultTag extends ControlTag {
 
     private static final long serialVersionUID = 876075976116480601L;
 
-    private final Boolean faultValue = Boolean.FALSE; // always FALSE in TIM; TRUE not supported
-
     private String equipmentName;
 
     private Long aliveTagId;
@@ -66,10 +64,6 @@ public class CommFaultTag extends ControlTag {
     @Override
     public CommFaultTag clone() {
         return (CommFaultTag) super.clone();
-    }
-
-    public Boolean getOkValue() {
-        return this.faultValue ? Boolean.FALSE : Boolean.TRUE;
     }
 
 }

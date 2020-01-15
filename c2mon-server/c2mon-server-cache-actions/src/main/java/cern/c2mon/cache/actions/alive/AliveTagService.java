@@ -2,6 +2,7 @@ package cern.c2mon.cache.actions.alive;
 
 import cern.c2mon.cache.actions.AbstractCacheServiceImpl;
 import cern.c2mon.cache.actions.commfault.CommFaultService;
+import cern.c2mon.cache.actions.state.SupervisionStateTagService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.alive.AliveTag;
@@ -9,6 +10,8 @@ import cern.c2mon.server.common.supervision.Supervised;
 import cern.c2mon.server.common.thread.Event;
 import cern.c2mon.shared.common.CacheEvent;
 import cern.c2mon.shared.common.datatag.SourceDataTagValue;
+import cern.c2mon.shared.common.supervision.SupervisionEntity;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -26,22 +29,32 @@ import javax.inject.Inject;
 public class AliveTagService extends AbstractCacheServiceImpl<AliveTag> {
 
   private CommFaultService commFaultService;
+  private final SupervisionStateTagService stateTagService;
 
   @Inject
-  public AliveTagService(C2monCache<AliveTag> aliveTimerCacheRef, CommFaultService commFaultService) {
+  public AliveTagService(C2monCache<AliveTag> aliveTimerCacheRef, CommFaultService commFaultService,
+                         SupervisionStateTagService stateTagService) {
     super(aliveTimerCacheRef, new AliveTagCacheFlow());
     this.commFaultService = commFaultService;
+    this.stateTagService = stateTagService;
   }
 
   @PostConstruct
   public void init() {
     // After caches have been populated
-    getCache().getCacheListenerManager().registerListener(this::cascadeUpdateToCommFault, CacheEvent.UPDATE_ACCEPTED);
+    getCache().getCacheListenerManager().registerListener(this::cascadeUpdate, CacheEvent.UPDATE_ACCEPTED);
+    // TODO (Alex) Should we also listen to events from CommFaultTags that change AliveTags? Is this something that happens?
   }
 
-  private void cascadeUpdateToCommFault(AliveTag aliveTimer) {
-    if (!aliveTimer.getValue())
-      commFaultService.bringDownBasedOnAliveTimer(aliveTimer);
+  private void cascadeUpdate(@NonNull AliveTag aliveTag) {
+    if (aliveTag.getSupervisedEntity() == null) {
+      throw new IllegalArgumentException("AliveTag " +aliveTag.getName() +" does not have a valid SupervisedEntity assigned ");
+    }
+
+    if (aliveTag.getSupervisedEntity() == SupervisionEntity.PROCESS) {
+      stateTagService.updateBasedOnControl(aliveTag.getStateTagId(), aliveTag);
+    } else
+      commFaultService.updateBasedOnAliveTimer(aliveTag);
   }
 
   public boolean isRegisteredAliveTimer(final Long id) {

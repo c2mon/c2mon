@@ -1,6 +1,7 @@
 package cern.c2mon.cache.actions.commfault;
 
 import cern.c2mon.cache.actions.AbstractCacheServiceImpl;
+import cern.c2mon.cache.actions.state.SupervisionStateTagService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.alive.AliveTag;
 import cern.c2mon.server.common.commfault.CommFaultTag;
@@ -9,11 +10,14 @@ import cern.c2mon.server.common.thread.Event;
 import cern.c2mon.shared.common.CacheEvent;
 import cern.c2mon.shared.common.datatag.SourceDataTagValue;
 import cern.c2mon.shared.common.supervision.SupervisionEntity;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+
+import static cern.c2mon.cache.actions.commfault.CommFaultTagEvaluator.aliveTagCanUpdateCommFault;
 
 /**
  * @author Szymon Halastra, Alexandros Papageorgiou
@@ -22,36 +26,45 @@ import javax.inject.Inject;
 @Service
 public class CommFaultService extends AbstractCacheServiceImpl<CommFaultTag> {
 
+  private final SupervisionStateTagService stateTagService;
+
   @Inject
-  public CommFaultService(final C2monCache<CommFaultTag> commFaultTagCacheRef) {
+  public CommFaultService(final C2monCache<CommFaultTag> commFaultTagCacheRef, SupervisionStateTagService stateTagService) {
     super(commFaultTagCacheRef, new CommFaultCacheFlow());
+    this.stateTagService = stateTagService;
   }
 
   @PostConstruct
   public void init() {
-    cache.getCacheListenerManager().registerListener(commFaultTag -> {
-      // TODO (Alex) This should propagate to supervision status
-    }, CacheEvent.UPDATE_ACCEPTED);
+    cache.getCacheListenerManager().registerListener(this::cascadeUpdate, CacheEvent.UPDATE_ACCEPTED);
+  }
+
+  private void cascadeUpdate(@NonNull CommFaultTag commFaultTag) {
+    if (commFaultTag.getStateTagId() != null)
+      stateTagService.updateBasedOnControl(commFaultTag.getStateTagId(), commFaultTag);
   }
 
   public boolean isRegisteredCommFaultTag(Long id) {
     return cache.containsKey(id);
   }
 
-  public CommFaultTag generateFromEquipment(AbstractEquipment abstractEquipment) {
-    return new CommFaultTag(abstractEquipment.getCommFaultTagId(), abstractEquipment.getId(),
-            abstractEquipment.getName(), SupervisionEntity.EQUIPMENT.toString(),
-      abstractEquipment.getAliveTagId(), abstractEquipment.getStateTagId());
-    // TODO This used to also put, so remember to do that when calling!
-  }
+  public void updateBasedOnAliveTimer(AliveTag aliveTimer) {
+    if (!aliveTagCanUpdateCommFault(aliveTimer))
+      return;
 
-  public void bringDownBasedOnAliveTimer(AliveTag aliveTimer) {
     cache.compute(aliveTimer.getCommFaultTagId(), commFaultTag -> {
-      if (aliveTimer.getLastUpdate() >= commFaultTag.getSourceTimestamp().getTime()) {
-        commFaultTag.setValue(false);
+      if (aliveTimer.getTimestamp().after(commFaultTag.getTimestamp())) {
+        commFaultTag.setValue(aliveTimer.getValue());
         // TODO (Alex) SetServerTimestamp
       }
     });
+  }
+
+  public CommFaultTag generateFromEquipment(AbstractEquipment abstractEquipment) {
+    return new CommFaultTag(abstractEquipment.getCommFaultTagId(), abstractEquipment.getId(),
+      abstractEquipment.getName(), SupervisionEntity.EQUIPMENT.toString(),
+      abstractEquipment.getAliveTagId(), abstractEquipment.getStateTagId());
+    // TODO This used to also put, so remember to do that when calling!
   }
 
   /**
