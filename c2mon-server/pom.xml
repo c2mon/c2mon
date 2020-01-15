@@ -13,7 +13,11 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>c2mon-server-cache-ref</module>
+    <module>c2mon-server-cache-actions</module>
+    <module>c2mon-server-cache-config</module>
+    <module>c2mon-server-cache-api</module>
+    <module>c2mon-server-cache-loading</module>
+    <module>c2mon-server-cache-provider-ignite</module>
     <module>c2mon-server-cachedbaccess</module>
     <module>c2mon-server-cachepersistence</module>
     <module>c2mon-server-client</module>
