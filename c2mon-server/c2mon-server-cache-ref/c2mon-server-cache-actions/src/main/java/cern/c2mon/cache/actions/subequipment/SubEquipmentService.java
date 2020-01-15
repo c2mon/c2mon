@@ -1,6 +1,6 @@
 package cern.c2mon.cache.actions.subequipment;
 
-import cern.c2mon.cache.actions.alivetimer.AliveTimerService;
+import cern.c2mon.cache.actions.alive.AliveTagService;
 import cern.c2mon.cache.actions.commfault.CommFaultService;
 import cern.c2mon.cache.actions.datatag.DataTagService;
 import cern.c2mon.cache.actions.equipment.BaseEquipmentServiceImpl;
@@ -29,7 +29,7 @@ public class SubEquipmentService extends BaseEquipmentServiceImpl<SubEquipment> 
   public SubEquipmentService(final C2monCache<SubEquipment> subEquipmentCacheRef,
                              final EquipmentService equipmentService,
                              final CommFaultService commFaultService,
-                             final AliveTimerService aliveTimerService,
+                             final AliveTagService aliveTimerService,
                              final DataTagService dataTagService) {
     super(subEquipmentCacheRef, commFaultService.getCache(), aliveTimerService, SupervisionEntity.SUBEQUIPMENT,dataTagService);
     this.equipmentService = equipmentService;

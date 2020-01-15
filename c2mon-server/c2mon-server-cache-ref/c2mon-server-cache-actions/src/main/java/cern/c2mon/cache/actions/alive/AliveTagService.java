@@ -1,4 +1,4 @@
-package cern.c2mon.cache.actions.alivetimer;
+package cern.c2mon.cache.actions.alive;
 
 import cern.c2mon.cache.actions.AbstractCacheServiceImpl;
 import cern.c2mon.cache.actions.commfault.CommFaultService;
@@ -23,13 +23,13 @@ import javax.inject.Inject;
  */
 @Slf4j
 @Service
-public class AliveTimerService extends AbstractCacheServiceImpl<AliveTag> {
+public class AliveTagService extends AbstractCacheServiceImpl<AliveTag> {
 
   private CommFaultService commFaultService;
 
   @Inject
-  public AliveTimerService(C2monCache<AliveTag> aliveTimerCacheRef, CommFaultService commFaultService) {
-    super(aliveTimerCacheRef, new AliveTimerCacheFlow());
+  public AliveTagService(C2monCache<AliveTag> aliveTimerCacheRef, CommFaultService commFaultService) {
+    super(aliveTimerCacheRef, new AliveTagCacheFlow());
     this.commFaultService = commFaultService;
   }
 
@@ -49,7 +49,7 @@ public class AliveTimerService extends AbstractCacheServiceImpl<AliveTag> {
   }
 
   /**
-   * Same as {@link AliveTimerService#start(long,long)}, but will start the object
+   * Same as {@link AliveTagService#start(long,long)}, but will start the object
    * regardless of previous state (active or not)
    */
   public void startOrUpdateTimestamp(long aliveTimerId, long timestamp) throws NullPointerException {

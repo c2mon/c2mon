@@ -2,7 +2,7 @@ package cern.c2mon.cache.config.alivetimer;
 
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.config.AbstractCacheLoaderTest;
-import cern.c2mon.server.cache.dbaccess.AliveTimerMapper;
+import cern.c2mon.server.cache.dbaccess.AliveTagMapper;
 import cern.c2mon.server.common.alive.AliveTag;
 
 import javax.inject.Inject;
@@ -14,16 +14,16 @@ import static org.springframework.test.util.AssertionErrors.assertEquals;
 /**
  * @author Alexandros Papageorgiou
  */
-public class AliveTimerCacheLoaderTest extends AbstractCacheLoaderTest<AliveTag> {
+public class AliveTagCacheLoaderTest extends AbstractCacheLoaderTest<AliveTag> {
 
   @Inject
   private C2monCache<AliveTag> aliveTimerCacheRef;
 
   @Inject
-  private AliveTimerMapper aliveTimerMapper;
+  private AliveTagMapper aliveTimerMapper;
 
   @Override
-  protected AliveTimerMapper getMapper() {
+  protected AliveTagMapper getMapper() {
     return aliveTimerMapper;
   }
 

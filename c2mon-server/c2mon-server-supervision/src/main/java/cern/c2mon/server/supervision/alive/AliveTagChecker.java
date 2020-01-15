@@ -16,7 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.supervision.alive;
 
-import cern.c2mon.cache.actions.alivetimer.AliveTimerService;
+import cern.c2mon.cache.actions.alive.AliveTagService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.alive.AliveTag;
@@ -40,18 +40,18 @@ import java.util.concurrent.atomic.AtomicInteger;
  * <p>Notice that an alive timer is considered expired when alive-interval
  *  + alive-interval/3 milliseconds have expired since the last alive
  *  message arrived, where alive-interval is specific to the AliveTimer
- *  object (see <code>hasExpired</code> in {@link AliveTimerService}).
+ *  object (see <code>hasExpired</code> in {@link AliveTagService}).
  *
  * @author Mark Brightwell
  *
  */
 @Service
-public class AliveTimerChecker extends TimerTask implements SmartLifecycle {
+public class AliveTagChecker extends TimerTask implements SmartLifecycle {
 
   /**
    * Log4j Logger for this class.
    */
-  private static final Logger LOGGER = LoggerFactory.getLogger(AliveTimerChecker.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(AliveTagChecker.class);
 
   /**
    * SMS logger for warnings.
@@ -100,7 +100,7 @@ public class AliveTimerChecker extends TimerTask implements SmartLifecycle {
   /**
    * Reference to alive timer facade.
    */
-  private AliveTimerService aliveTimerService;
+  private AliveTagService aliveTimerService;
 
   /**
    * Reference to alive timer cache.
@@ -134,8 +134,8 @@ public class AliveTimerChecker extends TimerTask implements SmartLifecycle {
    * @param supervisionManager the supervision manager bean
    */
   @Autowired
-  public AliveTimerChecker(final AliveTimerService aliveTimerService,
-                           final SupervisionManager supervisionManager) {
+  public AliveTagChecker(final AliveTagService aliveTimerService,
+                         final SupervisionManager supervisionManager) {
     super();
     this.aliveTimerService = aliveTimerService;
     this.aliveTimerCache = aliveTimerService.getCache();

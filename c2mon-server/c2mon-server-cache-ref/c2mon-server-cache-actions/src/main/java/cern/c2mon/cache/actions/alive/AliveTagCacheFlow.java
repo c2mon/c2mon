@@ -1,11 +1,11 @@
-package cern.c2mon.cache.actions.alivetimer;
+package cern.c2mon.cache.actions.alive;
 
 import cern.c2mon.cache.api.flow.DefaultCacheFlow;
 import cern.c2mon.server.common.alive.AliveTag;
 
-class AliveTimerCacheFlow extends DefaultCacheFlow<AliveTag> {
+class AliveTagCacheFlow extends DefaultCacheFlow<AliveTag> {
 
-  AliveTimerCacheFlow() {
+  AliveTagCacheFlow() {
     super((older, newer) -> newer.getLastUpdate() >= older.getLastUpdate());
   }
 }

@@ -25,6 +25,6 @@ import cern.c2mon.server.common.alive.AliveTag;
  * @author Mark Brightwell
  *
  */
-public interface AliveTimerMapper extends LoaderMapper<AliveTag> {
+public interface AliveTagMapper extends LoaderMapper<AliveTag> {
   
 }

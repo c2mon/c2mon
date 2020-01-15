@@ -1,7 +1,7 @@
 package cern.c2mon.cache.actions.supervision;
 
 import cern.c2mon.cache.actions.AbstractCacheServiceImpl;
-import cern.c2mon.cache.actions.alivetimer.AliveTimerService;
+import cern.c2mon.cache.actions.alive.AliveTagService;
 import cern.c2mon.cache.actions.datatag.DataTagService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.supervision.Supervised;
@@ -23,14 +23,14 @@ public abstract class AbstractSupervisedService<T extends Supervised> extends Ab
 
   // TODO Most previous supervision notifications were connected to a Tag. Do we want this behaviour?
 
-  private final AliveTimerService aliveTimerService;
+  private final AliveTagService aliveTimerService;
   private final DataTagService dataTagService;
 
   @Getter
   private SupervisionEntity supervisionEntity;
 
   public AbstractSupervisedService(final C2monCache<T> cache, SupervisionEntity supervisionEntity,
-                                   final AliveTimerService aliveTimerService,
+                                   final AliveTagService aliveTimerService,
                                    final DataTagService dataTagService) {
     super(cache, new AbstractSupervisedCacheFlow<>());
     this.supervisionEntity = supervisionEntity;

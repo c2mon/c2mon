@@ -19,7 +19,7 @@ package cern.c2mon.server.client.publish;
 import cern.c2mon.cache.actions.alarm.AlarmAggregator;
 import cern.c2mon.cache.actions.alarm.AlarmAggregatorListener;
 import cern.c2mon.cache.actions.alarm.AlarmService;
-import cern.c2mon.cache.actions.alivetimer.AliveTimerService;
+import cern.c2mon.cache.actions.alive.AliveTagService;
 import cern.c2mon.cache.config.tag.UnifiedTagCacheFacade;
 import cern.c2mon.server.client.config.ClientProperties;
 import cern.c2mon.server.client.util.TransferObjectFactory;
@@ -92,7 +92,7 @@ public class TagValuePublisher implements AlarmAggregatorListener, Configuration
   private UnifiedTagCacheFacade tagLocationService;
 
   /** Used to determine, whether a given tag is an AliveTag */
-  private AliveTimerService aliveTimerFacade;
+  private AliveTagService aliveTimerFacade;
 
   private ClientProperties properties;
 
@@ -108,7 +108,7 @@ public class TagValuePublisher implements AlarmAggregatorListener, Configuration
   @Autowired
   public TagValuePublisher(@Qualifier("clientTopicPublisher") final JmsSender jmsSender,
                            final AlarmAggregator alarmAggregator,
-                           final AliveTimerService aliveTimerFacade,
+                           final AliveTagService aliveTimerFacade,
                            final ConfigurationUpdate configurationUpdate,
                            final AlarmService alarmService,
                            final UnifiedTagCacheFacade tagLocationService,

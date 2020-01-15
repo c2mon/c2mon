@@ -16,7 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.daq.update;
 
-import cern.c2mon.cache.actions.alivetimer.AliveTimerService;
+import cern.c2mon.cache.actions.alive.AliveTagService;
 import cern.c2mon.cache.actions.commfault.CommFaultService;
 import cern.c2mon.cache.actions.datatag.DataTagService;
 import cern.c2mon.cache.actions.process.ProcessService;
@@ -78,7 +78,7 @@ public class SourceUpdateManagerImpl implements SourceUpdateManager, SessionAwar
    */
   private final DataTagService dataTagService;
 
-  private final AliveTimerService aliveTagService;
+  private final AliveTagService aliveTagService;
 
   private final CommFaultService commFaultService;
 
@@ -129,7 +129,7 @@ public class SourceUpdateManagerImpl implements SourceUpdateManager, SessionAwar
   public SourceUpdateManagerImpl(
     final SupervisionManager supervisionManager,
     final DataTagValueUpdateConverter dataTagValueUpdateConverter,
-    DataTagService dataTagService, AliveTimerService aliveTagService, CommFaultService commFaultService, ProcessService processService, C2monCache<Process> processCache, final ServerProperties properties) {
+    DataTagService dataTagService, AliveTagService aliveTagService, CommFaultService commFaultService, ProcessService processService, C2monCache<Process> processCache, final ServerProperties properties) {
     super();
     this.supervisionManager = supervisionManager;
     this.converter = dataTagValueUpdateConverter;

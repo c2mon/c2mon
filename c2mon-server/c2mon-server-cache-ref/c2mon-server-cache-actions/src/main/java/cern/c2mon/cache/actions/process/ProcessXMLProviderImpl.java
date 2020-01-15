@@ -16,7 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.cache.actions.process;
 
-import cern.c2mon.cache.actions.alivetimer.AliveTimerService;
+import cern.c2mon.cache.actions.alive.AliveTagService;
 import cern.c2mon.cache.actions.command.CommandTagService;
 import cern.c2mon.cache.actions.datatag.DataTagService;
 import cern.c2mon.cache.actions.subequipment.SubEquipmentService;
@@ -59,13 +59,13 @@ public class ProcessXMLProviderImpl implements ProcessXMLProvider {
   private DataTagService dataTagService;
   private C2monCache<AliveTag> aliveTimerCache;
   private CommandTagService commandTagService;
-  private AliveTimerService aliveTimerService;
+  private AliveTagService aliveTimerService;
 
   public ProcessXMLProviderImpl(C2monCache<Equipment> equipmentCache, C2monCache<SubEquipment> subEquipmentCache,
                                 C2monCache<Process> processCache, SubEquipmentDAO subEquipmentDAO,
                                 SubEquipmentService subEquipmentService, DataTagService dataTagService,
                                 C2monCache<AliveTag> aliveTimerCache, CommandTagService commandTagService,
-                                AliveTimerService aliveTimerService) {
+                                AliveTagService aliveTimerService) {
     this.equipmentCache = equipmentCache;
     this.subEquipmentCache = subEquipmentCache;
     this.processCache = processCache;

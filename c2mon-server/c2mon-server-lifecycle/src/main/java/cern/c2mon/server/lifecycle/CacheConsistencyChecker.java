@@ -74,7 +74,7 @@ public class CacheConsistencyChecker implements SmartLifecycle {
   public CacheConsistencyChecker(final C2monCache<Alarm> alarmCache,
                                  final AlarmMapper alarmMapper,
                                  final C2monCache<AliveTag> aliveTimerCache,
-                                 final AliveTimerMapper aliveTimerMapper,
+                                 final AliveTagMapper aliveTimerMapper,
                                  final C2monCache<CommandTag> commandTagCache,
                                  final CommandTagMapper commandTagMapper,
                                  final C2monCache<CommFaultTag> commFaultTagCache,

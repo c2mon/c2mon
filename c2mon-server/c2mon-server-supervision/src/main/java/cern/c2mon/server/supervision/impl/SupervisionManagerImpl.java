@@ -16,7 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.supervision.impl;
 
-import cern.c2mon.cache.actions.alivetimer.AliveTimerService;
+import cern.c2mon.cache.actions.alive.AliveTagService;
 import cern.c2mon.cache.actions.process.ProcessService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
@@ -27,7 +27,7 @@ import cern.c2mon.server.common.config.ServerProperties;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.supervision.SupervisionManager;
-import cern.c2mon.server.supervision.impl.event.AliveTimerEvents;
+import cern.c2mon.server.supervision.impl.event.AliveTagEvents;
 import cern.c2mon.server.supervision.impl.event.EquipmentEvents;
 import cern.c2mon.server.supervision.impl.event.ProcessEvents;
 import cern.c2mon.server.supervision.impl.event.SubEquipmentEvents;
@@ -74,7 +74,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
   private SubEquipmentEvents subEquipmentEvents;
 
   @Inject
-  private AliveTimerEvents aliveTimerEvents;
+  private AliveTagEvents aliveTimerEvents;
 
 //  ===========================
 
@@ -88,7 +88,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
   private C2monCache<CommFaultTag> commFaultTagCache;
 
   @Resource
-  private AliveTimerService aliveTimerService;
+  private AliveTagService aliveTimerService;
 
   @Resource
   private C2monCache<AliveTag> aliveTimerCache;

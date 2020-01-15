@@ -26,7 +26,7 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-public class AliveTimerMapperTest extends AbstractMapperTest {
+public class AliveTagMapperTest extends AbstractMapperTest {
 
   private static final Long TEST_ALIVE_ID = 500000L;
 
@@ -34,7 +34,7 @@ public class AliveTimerMapperTest extends AbstractMapperTest {
    * Class to test.
    */
   @Autowired
-  private AliveTimerMapper aliveTimerMapper;
+  private AliveTagMapper aliveTimerMapper;
 
   //need tests inserting process, equipment and check appear in retrieved view
   @Test

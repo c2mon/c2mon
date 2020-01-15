@@ -16,7 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.loading.impl;
 
-import cern.c2mon.server.cache.dbaccess.AliveTimerMapper;
+import cern.c2mon.server.cache.dbaccess.AliveTagMapper;
 import cern.c2mon.server.cache.loading.AliveTimerDAO;
 import cern.c2mon.server.cache.loading.CacheLoaderName;
 import cern.c2mon.server.cache.loading.common.AbstractDefaultLoaderDAO;
@@ -36,10 +36,10 @@ public class AliveTimerDAOImpl extends AbstractDefaultLoaderDAO<AliveTag> implem
   /**
    * Reference to mapper.
    */
-  private AliveTimerMapper aliveTimerMapper;
+  private AliveTagMapper aliveTimerMapper;
 
   @Inject
-  public AliveTimerDAOImpl(AliveTimerMapper aliveTimerMapper) {
+  public AliveTimerDAOImpl(AliveTagMapper aliveTimerMapper) {
     super(1000, aliveTimerMapper);
     this.aliveTimerMapper = aliveTimerMapper;
   }

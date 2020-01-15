@@ -17,7 +17,7 @@
 package cern.c2mon.server.client.request;
 
 import cern.c2mon.cache.actions.alarm.AlarmService;
-import cern.c2mon.cache.actions.alivetimer.AliveTimerService;
+import cern.c2mon.cache.actions.alive.AliveTagService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.cache.config.tag.UnifiedTagCacheFacade;
@@ -66,7 +66,7 @@ class ClientTagRequestHelper {
   private final UnifiedTagCacheFacade unifiedTagCacheFacade;
 
   /** Used to determine whether a Control Tag is an Alive tag */
-  private final AliveTimerService aliveTimerFacade;
+  private final AliveTagService aliveTimerFacade;
 
   /**
    * Reference to the Process cache that provides a list of all the process
@@ -90,7 +90,7 @@ class ClientTagRequestHelper {
    * @param processDAO
    */
   @Autowired
-  public ClientTagRequestHelper(final AliveTimerService aliveTimerFacade,
+  public ClientTagRequestHelper(final AliveTagService aliveTimerFacade,
                                 final UnifiedTagCacheFacade unifiedTagCacheFacade,
                                 final AlarmService alarmService,
                                 final C2monCache<Process> processCache,

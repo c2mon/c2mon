@@ -1,4 +1,4 @@
-package cern.c2mon.cache.actions.alivetimer;
+package cern.c2mon.cache.actions.alive;
 
 import cern.c2mon.cache.actions.commfault.CommFaultService;
 import cern.c2mon.cache.api.C2monCache;
@@ -17,18 +17,18 @@ import static org.junit.Assert.*;
 /**
  * @author Szymon Halastra
  */
-public class AliveTimerServiceTest {
+public class AliveTagServiceTest {
 
   private C2monCache<AliveTag> aliveTimerCacheRef;
 
-  private AliveTimerService aliveTimerService;
+  private AliveTagService aliveTimerService;
 
   private AliveTagCacheObjectFactory factory = new AliveTagCacheObjectFactory();
 
   @Before
   public void init() {
     aliveTimerCacheRef = new SimpleC2monCache<>("alive-timer-cache");
-    aliveTimerService = new AliveTimerService(aliveTimerCacheRef, new CommFaultService(new SimpleC2monCache<>("cFault")));
+    aliveTimerService = new AliveTagService(aliveTimerCacheRef, new CommFaultService(new SimpleC2monCache<>("cFault")));
   }
 
   @Test
