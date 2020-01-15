@@ -235,9 +235,6 @@ public abstract class TransferObjectFactory {
       if (tag.getDipAddress() != null) {
         tagConfig.addPublication(Publisher.DIP, tag.getDipAddress());
       }
-      if (tag.getJapcAddress() != null) {
-        tagConfig.addPublication(Publisher.JAPC, tag.getJapcAddress());
-      }
       if (tag.isLogged()) {
         tagConfig.setLogged(Boolean.TRUE);
       } else {
