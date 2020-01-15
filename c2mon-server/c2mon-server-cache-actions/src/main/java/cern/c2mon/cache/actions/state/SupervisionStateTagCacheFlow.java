@@ -1,4 +1,4 @@
-package cern.c2mon.cache.actions.statetag;
+package cern.c2mon.cache.actions.state;
 
 import cern.c2mon.cache.api.flow.DefaultCacheFlow;
 import cern.c2mon.server.common.supervision.SupervisionStateTag;

@@ -1,4 +1,4 @@
-package cern.c2mon.cache.actions.statetag;
+package cern.c2mon.cache.actions.state;
 
 import cern.c2mon.cache.actions.AbstractCacheServiceImpl;
 import cern.c2mon.cache.api.C2monCache;
@@ -10,10 +10,10 @@ import javax.inject.Inject;
 
 @Slf4j
 @Service
-public class SupervisionStateTagCacheService extends AbstractCacheServiceImpl<SupervisionStateTag> {
+public class SupervisionStateTagService extends AbstractCacheServiceImpl<SupervisionStateTag> {
 
   @Inject
-  public SupervisionStateTagCacheService(C2monCache<SupervisionStateTag> cache) {
+  public SupervisionStateTagService(C2monCache<SupervisionStateTag> cache) {
     super(cache, new SupervisionStateTagCacheFlow());
   }
 }
