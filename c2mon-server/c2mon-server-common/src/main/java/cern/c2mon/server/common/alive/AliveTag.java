@@ -31,7 +31,7 @@ import java.util.Collection;
 @EqualsAndHashCode(callSuper = true)
 public class AliveTag extends ControlTag {
 
-    private static final long serialVersionUID = 2151886747282763819L;
+    private static final long serialVersionUID = 215188677282763819L;
 
     /**
      * Interval at which the alive tag must be updated. This interval includes the ALIVE_TOLERANCE_FACTOR in order to

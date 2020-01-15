@@ -34,7 +34,7 @@ import lombok.Setter;
 @EqualsAndHashCode(callSuper = true)
 public class CommFaultTag extends ControlTag {
 
-    private static final long serialVersionUID = 8760759761176480601L;
+    private static final long serialVersionUID = 876075976116480601L;
 
     private final Boolean faultValue = Boolean.FALSE; // always FALSE in TIM; TRUE not supported
 
