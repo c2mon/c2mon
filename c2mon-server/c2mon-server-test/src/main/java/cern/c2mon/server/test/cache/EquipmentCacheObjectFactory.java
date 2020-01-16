@@ -27,6 +27,7 @@ public class EquipmentCacheObjectFactory extends AbstractEquipmentCacheObjectFac
 
     equipmentCacheObject.setAddress("Test address");
     equipmentCacheObject.setProcessId(90L);
+    equipmentCacheObject.setStateTagId(1222L);
     return equipmentCacheObject;
   }
 }

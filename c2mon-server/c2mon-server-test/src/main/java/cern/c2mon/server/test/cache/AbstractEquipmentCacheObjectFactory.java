@@ -29,7 +29,6 @@ abstract class AbstractEquipmentCacheObjectFactory<T extends AbstractEquipmentCa
     base.setAliveTagId(1224L);
     base.setAliveInterval(10);
     base.setCommFaultTagId(1223L);
-    base.setStateTagId(1222L);
     base.setSupervision(SupervisionStatus.DOWN, "Status description", new Timestamp(System.currentTimeMillis()));
   }
 }

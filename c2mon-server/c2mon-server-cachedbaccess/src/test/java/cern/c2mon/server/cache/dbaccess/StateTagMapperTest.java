@@ -20,6 +20,7 @@ package cern.c2mon.server.cache.dbaccess;
 import cern.c2mon.server.common.supervision.SupervisionStateTag;
 import cern.c2mon.server.test.DatabasePopulationRule;
 import cern.c2mon.shared.common.Cacheable;
+import cern.c2mon.shared.common.supervision.SupervisionEntity;
 import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +48,21 @@ public class StateTagMapperTest extends AbstractMapperTest {
   public void testGetOne() {
     Cacheable item = stateTagMapper.getItem(1220L); //needs to correspond to one in DB
     assertNotNull(item);
+  }
+
+  @Test
+  public void loadProcess() {
+    assertEquals(SupervisionEntity.PROCESS, stateTagMapper.getItem(1220L).getSupervisedEntity());
+  }
+
+  @Test
+  public void loadEquipment() {
+    assertEquals(SupervisionEntity.EQUIPMENT, stateTagMapper.getItem(1222L).getSupervisedEntity());
+  }
+
+  @Test
+  public void loadSubEquipment() {
+    assertEquals(SupervisionEntity.SUBEQUIPMENT, stateTagMapper.getItem(1230L).getSupervisedEntity());
   }
 
   @Test
