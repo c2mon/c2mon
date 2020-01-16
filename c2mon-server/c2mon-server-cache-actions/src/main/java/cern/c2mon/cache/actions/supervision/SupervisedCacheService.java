@@ -44,7 +44,7 @@ public interface SupervisedCacheService<T extends Supervised> extends AbstractCa
    * @param timestamp time of the start
    * @return the cache object, after {@link CacheUpdateFlow#postInsertEvents(Cacheable, Cacheable)}
    */
-  T start(long id, @NonNull Timestamp timestamp);
+  void start(long id, @NonNull Timestamp timestamp);
 
   /**
    * Sets the status of the Supervised object to DOWN,

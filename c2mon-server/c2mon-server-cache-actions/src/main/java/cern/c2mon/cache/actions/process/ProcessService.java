@@ -65,7 +65,7 @@ public class ProcessService extends AbstractCacheServiceImpl<Process>
     this.properties = properties;
     this.stateTagService = stateTagService;
 
-    this.supervisedService = new SupervisedProcessServiceImpl(processCacheRef, aliveTimerService, dataTagService);
+    this.supervisedService = new SupervisedProcessServiceImpl(processCacheRef, aliveTimerService, dataTagService, stateTagService);
   }
 
   @Override

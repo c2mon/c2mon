@@ -22,8 +22,8 @@ public interface SupervisedCacheServiceDelegator<T extends Supervised> extends S
   SupervisedCacheService<T> getSupervisedService();
 
   @Override
-  default T start(long id, Timestamp timestamp) {
-    return getSupervisedService().start(id, timestamp);
+  default void start(long id, Timestamp timestamp) {
+    getSupervisedService().start(id, timestamp);
   }
 
   @Override

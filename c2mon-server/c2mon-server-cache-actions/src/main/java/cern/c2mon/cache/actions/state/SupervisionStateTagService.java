@@ -19,6 +19,8 @@ import java.util.stream.Collectors;
 import static cern.c2mon.cache.actions.commfault.CommFaultTagEvaluator.inferSupervisionStatus;
 import static cern.c2mon.cache.actions.state.SupervisionStateTagEvaluator.controlTagCanUpdateState;
 import static cern.c2mon.cache.actions.state.SupervisionStateTagEvaluator.hasIdDiscrepancy;
+import static cern.c2mon.shared.common.supervision.SupervisionStatus.DOWN;
+import static cern.c2mon.shared.common.supervision.SupervisionStatus.RUNNING;
 
 @Slf4j
 @Service
@@ -117,5 +119,64 @@ public class SupervisionStateTagService extends AbstractCacheServiceImpl<Supervi
     return cache.getKeys().parallelStream()
       .map(key -> SupervisionStateTagController.createSupervisionEvent(cache.get(key)))
       .collect(Collectors.toList());
+  }
+
+  /**
+   * Find the {@code SupervisionStateTag} object with {@code stateTagId} in the cache
+   * and if it is stopped (not active), then do
+   *
+   * <ul>
+   *   <li>{@code SupervisionStateTag#setValue(true)}
+   *   <li>{@code SupervisionStateTag#setLastUpdate(now)}
+   *   <li>Reinsert into cache
+   * </ul>
+   * <p>
+   * The timestamp will not be updated, unless there is a change.
+   * The cache object will not be reinserted, unless there is a change.
+   *
+   * @param stateTagId the stateTag id for the object to be force started
+   */
+  public void start(long stateTagId, long timestamp) throws NullPointerException {
+    setStateTagAsActive(stateTagId, true, timestamp);
+  }
+
+  /**
+   * Find the {@code SupervisionStateTag} object with {@code stateTagId} in the cache
+   * and if it is started (active), then do
+   *
+   * <ul>
+   *   <li>{@code SupervisionStateTag#setValue(false)}
+   *   <li>{@code SupervisionStateTag#setLastUpdate(now)}
+   *   <li>Reinsert into cache
+   * </ul>
+   * <p>
+   * The timestamp will not be updated, unless there is a change.
+   * The cache object will not be reinserted, unless there is a change.
+   *
+   * @param stateTagId the stateTag id for the object to be force started
+   */
+  public void stop(long stateTagId, long timestamp) throws NullPointerException {
+    setStateTagAsActive(stateTagId, false, timestamp);
+  }
+
+  private void setStateTagAsActive(long stateTagId, boolean active, long timestamp) {
+    log.debug("Attempting to set State tag " + stateTagId + " and dependent alive timers to " + active);
+
+    if (!cache.containsKey(stateTagId)) {
+      log.error("Cannot locate the StateTag in the cache (Id is " + stateTagId + ") - unable to stop it.");
+      return;
+    }
+
+    try {
+      cache.compute(stateTagId, stateTag -> {
+        if (stateTag.getValue() != active) {
+          stateTag.setValue(active);
+          stateTag.setSupervision(active ? RUNNING : DOWN, "", new Timestamp(timestamp));
+          stateTag.setSourceTimestamp(new Timestamp(timestamp)); // TODO (Alex) EventTimeStamp? StatusTime?
+        }
+      });
+    } catch (Exception e) {
+      log.error("Unable to stop the alive timer " + stateTagId, e);
+    }
   }
 }

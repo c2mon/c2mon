@@ -4,7 +4,6 @@ import cern.c2mon.cache.actions.AbstractCacheServiceImpl;
 import cern.c2mon.cache.actions.commfault.CommFaultService;
 import cern.c2mon.cache.actions.state.SupervisionStateTagService;
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.alive.AliveTag;
 import cern.c2mon.server.common.supervision.Supervised;
 import cern.c2mon.server.common.thread.Event;
@@ -175,13 +174,16 @@ public class AliveTagService extends AbstractCacheServiceImpl<AliveTag> {
   private void setAliveTimerAsActive(long aliveTimerId, boolean active, long timestamp) {
     log.debug("Attempting to set alive timer " + aliveTimerId + " and dependent alive timers to " + active);
 
+    if (!cache.containsKey(aliveTimerId)) {
+      log.error("Cannot locate the AliveTimer in the cache (Id is " + aliveTimerId + ") - unable to stop it.");
+      return;
+    }
+
     try {
       cache.compute(aliveTimerId, aliveTimer -> {
         if (aliveTimer.setValueAndGetDifferent(active) || timestamp > aliveTimer.getLastUpdate())
           aliveTimer.setLastUpdate(timestamp);
       });
-    } catch (CacheElementNotFoundException cacheEx) {
-      log.error("Cannot locate the AliveTimer in the cache (Id is " + aliveTimerId + ") - unable to stop it.");
     } catch (Exception e) {
       log.error("Unable to stop the alive timer " + aliveTimerId, e);
     }

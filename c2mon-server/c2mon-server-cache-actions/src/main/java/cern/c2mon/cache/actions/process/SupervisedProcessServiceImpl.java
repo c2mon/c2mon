@@ -2,6 +2,7 @@ package cern.c2mon.cache.actions.process;
 
 import cern.c2mon.cache.actions.alive.AliveTagService;
 import cern.c2mon.cache.actions.datatag.DataTagService;
+import cern.c2mon.cache.actions.state.SupervisionStateTagService;
 import cern.c2mon.cache.actions.supervision.AbstractSupervisedService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.process.Process;
@@ -11,7 +12,8 @@ class SupervisedProcessServiceImpl extends AbstractSupervisedService<Process> {
 
   SupervisedProcessServiceImpl(final C2monCache<Process> c2monCache,
                                final AliveTagService aliveTimerService,
-                               final DataTagService dataTagService) {
-    super(c2monCache, SupervisionEntity.PROCESS, aliveTimerService, dataTagService);
+                               final DataTagService dataTagService,
+                               final SupervisionStateTagService stateTagService) {
+    super(c2monCache, SupervisionEntity.PROCESS, aliveTimerService, dataTagService, stateTagService);
   }
 }
