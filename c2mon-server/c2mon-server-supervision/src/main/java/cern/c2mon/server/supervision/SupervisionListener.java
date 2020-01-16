@@ -16,8 +16,9 @@
  *****************************************************************************/
 package cern.c2mon.server.supervision;
 
+import cern.c2mon.cache.actions.state.SupervisionStateTagController;
 import cern.c2mon.cache.api.listener.CacheListener;
-import cern.c2mon.server.common.supervision.Supervised;
+import cern.c2mon.server.common.supervision.SupervisionStateTag;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 
 /**
@@ -30,7 +31,7 @@ import cern.c2mon.shared.client.supervision.SupervisionEvent;
  * @author Mark Brightwell
  *
  */
-public interface SupervisionListener extends CacheListener<Supervised> {
+public interface SupervisionListener extends CacheListener<SupervisionStateTag> {
 
   /**
    * Called when the C2MON server detects a change in the supervision
@@ -43,7 +44,7 @@ public interface SupervisionListener extends CacheListener<Supervised> {
   void notifySupervisionEvent(SupervisionEvent supervisionEvent);
 
   @Override
-  default void apply(Supervised cacheable) {
-    notifySupervisionEvent(cacheable.getSupervisionEvent());
+  default void apply(SupervisionStateTag stateTag) {
+    notifySupervisionEvent(SupervisionStateTagController.createSupervisionEvent(stateTag));
   }
 }

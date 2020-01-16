@@ -19,6 +19,7 @@ package cern.c2mon.server.supervision.impl;
 import cern.c2mon.cache.actions.datatag.DataTagService;
 import cern.c2mon.cache.actions.equipment.EquipmentService;
 import cern.c2mon.cache.actions.process.ProcessService;
+import cern.c2mon.cache.actions.state.SupervisionStateTagService;
 import cern.c2mon.cache.actions.subequipment.SubEquipmentService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.SupervisionAppender;
@@ -100,6 +101,7 @@ public class SupervisionTagNotifier implements SupervisionListener, SmartLifecyc
   private C2monCache<Process> processCache;
   private C2monCache<Equipment> equipmentCache;
   private C2monCache<SubEquipment> subEquipmentCache;
+  private SupervisionStateTagService stateTagService;
   private DataTagService dataTagService;
   private ProcessService processService;
   private EquipmentService equipmentService;
@@ -152,7 +154,8 @@ public class SupervisionTagNotifier implements SupervisionListener, SmartLifecyc
                                 DataTagService dataTagService, final ProcessService processService,
                                 final EquipmentService equipmentService,
                                 final SubEquipmentService subEquipmentService,
-                                final C2monCache<RuleTag> ruleTagCache) {
+                                final C2monCache<RuleTag> ruleTagCache,
+                                final SupervisionStateTagService stateTagService) {
     super();
     this.supervisionNotifier = supervisionNotifier;
     this.unifiedTagCacheFacade = unifiedTagCacheFacade;
@@ -167,6 +170,7 @@ public class SupervisionTagNotifier implements SupervisionListener, SmartLifecyc
     this.processCache = processService.getCache();
     this.equipmentCache = equipmentService.getCache();
     this.subEquipmentCache = subEquipmentService.getCache();
+    this.stateTagService = stateTagService;
   }
 
   /**
@@ -274,19 +278,23 @@ public class SupervisionTagNotifier implements SupervisionListener, SmartLifecyc
 
         for (Long procId : tagCopy.getProcessIds()) {
           if (processCache.containsKey(procId)) { //null never override a value, so if statement ok out of lock
-            supervisionAppender.addSupervisionQuality(tagCopy, processCache.get(procId).getSupervisionEvent());
+
+            supervisionAppender.addSupervisionQuality(tagCopy,
+              stateTagService.getSupervisionEvent(processCache.get(procId).getStateTagId()));
             dirtyTagContext = true;
           }
         }
         for (Long eqId : tagCopy.getEquipmentIds()) {
           if (equipmentCache.containsKey(eqId)) {
-            supervisionAppender.addSupervisionQuality(tagCopy, equipmentCache.get(eqId).getSupervisionEvent());
+            supervisionAppender.addSupervisionQuality(tagCopy,
+              stateTagService.getSupervisionEvent(equipmentCache.get(eqId).getStateTagId()));
             dirtyTagContext = true;
           }
         }
         for (Long subEqId : tagCopy.getSubEquipmentIds()) {
           if (subEquipmentCache.containsKey(subEqId)) {
-            supervisionAppender.addSupervisionQuality(tagCopy, subEquipmentCache.get(subEqId).getSupervisionEvent());
+            supervisionAppender.addSupervisionQuality(tagCopy,
+              stateTagService.getSupervisionEvent(subEquipmentCache.get(subEqId).getStateTagId()));
             dirtyTagContext = true;
           }
         }
