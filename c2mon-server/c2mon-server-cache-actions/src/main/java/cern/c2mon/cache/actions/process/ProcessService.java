@@ -163,7 +163,7 @@ public class ProcessService extends AbstractCacheServiceImpl<Process>
    * @param pStartupTime the start up time
    */
   private void start(final Process process, final String pHostName, final Timestamp pStartupTime) {
-    if (!process.isRunning()) {
+    if (!stateTagService.isRunning(process.getStateTagId())) {
       forceStart(process, pHostName, pStartupTime);
     }
   }

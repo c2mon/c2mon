@@ -103,30 +103,6 @@ public interface Supervised extends Cacheable {
   void setSupervision(SupervisionStatus supervisionStatus, @NonNull String statusDescription, @NonNull Timestamp statusTime);
 
   /**
-   * Returns true if the object is either running or in
-   * the start up phase. And false if either DOWN or STOPPED, or
-   * if the status is UNCERTAIN.
-   *
-   * @return true if it is running (or starting up)
-   */
-  default boolean isRunning() {
-    // Assigning it here keeps us safe from concurrent modifications
-    SupervisionStatus status = getSupervisionStatus();
-    return status.equals(SupervisionStatus.STARTUP)
-      || status.equals(SupervisionStatus.RUNNING)
-      || status.equals(SupervisionStatus.RUNNING_LOCAL);
-  }
-
-  /**
-   * Returns true only if the object is in UNCERTAIN status.
-   *
-   * @return true if the status is uncertain
-   */
-  default boolean isUncertain() {
-    return getSupervisionStatus().equals(SupervisionStatus.UNCERTAIN);
-  }
-
-  /**
    * Sets the status of this Supervised object to STARTUP,
    * with associated message.
    * <p>

@@ -19,6 +19,7 @@ package cern.c2mon.server.configuration.handler.transacted;
 import cern.c2mon.cache.actions.alive.AliveTagService;
 import cern.c2mon.cache.actions.process.ProcessCacheObjectFactory;
 import cern.c2mon.cache.actions.process.ProcessService;
+import cern.c2mon.cache.actions.state.SupervisionStateTagService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.server.cache.loading.ProcessDAO;
@@ -53,6 +54,7 @@ public class ProcessConfigHandler extends BaseConfigHandlerImpl<Process, Process
   private final ProcessService processService;
   private final JmsContainerManager jmsContainerManager;
   private final EquipmentConfigHandler equipmentConfigTransacted;
+  private final SupervisionStateTagService stateTagService;
   private final boolean allowRunningProcessRemoval;
   private final AliveTagService aliveTagService;
   private AliveTimerConfigHandler aliveTimerConfigHandler;
@@ -68,6 +70,7 @@ public class ProcessConfigHandler extends BaseConfigHandlerImpl<Process, Process
                               final ProcessCacheObjectFactory processCacheObjectFactory,
                               final AliveTagService aliveTagService,
                               final ProcessService processService,
+                              final SupervisionStateTagService stateTagService,
                               final ConfigurationProperties properties,
                               final JmsContainerManager jmsContainerManager,
                               final EquipmentConfigHandler equipmentConfigTransacted
@@ -76,6 +79,7 @@ public class ProcessConfigHandler extends BaseConfigHandlerImpl<Process, Process
     this.aliveTagService = aliveTagService;
     this.aliveTimerCache = aliveTagService.getCache();
     this.processService = processService;
+    this.stateTagService = stateTagService;
     this.allowRunningProcessRemoval = properties.isAllowRunningProcessRemoval();
     this.jmsContainerManager = jmsContainerManager;
     this.equipmentConfigTransacted = equipmentConfigTransacted;
@@ -147,7 +151,9 @@ public class ProcessConfigHandler extends BaseConfigHandlerImpl<Process, Process
   public ProcessChange remove(Long id, ConfigurationElementReport report) {
     Process process = cache.get(id);
 
-    if (process.isRunning() && !allowRunningProcessRemoval) {
+    boolean isRunning = process.getStateTagId() != null && stateTagService.isRunning(process.getStateTagId());
+
+    if (isRunning && !allowRunningProcessRemoval) {
       String message = "Unable to remove Process " + process.getName() + " as currently running - please stop it first.";
       log.warn(message);
       report.setFailure(message);
