@@ -56,7 +56,7 @@ public interface SupervisedCacheService<T extends Supervised> extends AbstractCa
    * @param timestamp time of the stop
    * @return the cache object, after {@link CacheUpdateFlow#postInsertEvents(Cacheable, Cacheable)}
    */
-  T stop(long id, @NonNull Timestamp timestamp);
+  void stop(long id, @NonNull Timestamp timestamp);
 
   /**
    * Sets the status to running, then returns the updated object.
@@ -68,7 +68,7 @@ public interface SupervisedCacheService<T extends Supervised> extends AbstractCa
    * @param message   details of the event
    * @return the cache object, after {@link CacheUpdateFlow#postInsertEvents(Cacheable, Cacheable)}
    */
-  T resume(long id, @NonNull Timestamp timestamp, @NonNull String message);
+  void resume(long id, @NonNull Timestamp timestamp, @NonNull String message);
 
   /**
    * Called when an alive expires or a commfault tag is received.
@@ -80,7 +80,7 @@ public interface SupervisedCacheService<T extends Supervised> extends AbstractCa
    * @param message   details
    * @return the cache object, after {@link CacheUpdateFlow#postInsertEvents(Cacheable, Cacheable)}
    */
-  T suspend(long id, @NonNull Timestamp timestamp, @NonNull String message);
+  void suspend(long id, @NonNull Timestamp timestamp, @NonNull String message);
 
   SupervisionEntity getSupervisionEntity();
 }

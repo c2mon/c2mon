@@ -27,18 +27,18 @@ public interface SupervisedCacheServiceDelegator<T extends Supervised> extends S
   }
 
   @Override
-  default T stop(long id, Timestamp timestamp) {
-    return getSupervisedService().stop(id, timestamp);
+  default void stop(long id, Timestamp timestamp) {
+    getSupervisedService().stop(id, timestamp);
   }
 
   @Override
-  default T resume(long id, Timestamp timestamp, String message) {
-    return getSupervisedService().resume(id, timestamp, message);
+  default void resume(long id, Timestamp timestamp, String message) {
+    getSupervisedService().resume(id, timestamp, message);
   }
 
   @Override
-  default T suspend(long id, Timestamp timestamp, String message) {
-    return getSupervisedService().suspend(id, timestamp, message);
+  default void suspend(long id, Timestamp timestamp, String message) {
+    getSupervisedService().suspend(id, timestamp, message);
   }
 
   @Override

@@ -9,7 +9,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.function.BiConsumer;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public abstract class SupervisedTest<T extends Supervised> {
 
@@ -46,45 +46,6 @@ public abstract class SupervisedTest<T extends Supervised> {
   @Test
   public void resume() {
     doAndExpect((timestamp, msg) -> sample.resume(timestamp, msg), "", SupervisionStatus.RUNNING);
-  }
-
-  @Test(expected = NullPointerException.class)
-  public void setNullTimestamp() {
-    sample.setCacheTimestamp(null);
-  }
-
-  @Test
-  public void isRunning() {
-    // Default
-    assertFalse(sample.isRunning());
-
-    sample.setSupervision(SupervisionStatus.STARTUP, "", Timestamp.from(Instant.now()));
-    assertTrue(sample.isRunning());
-
-    sample.setSupervision(SupervisionStatus.RUNNING_LOCAL, "", Timestamp.from(Instant.now()));
-    assertTrue(sample.isRunning());
-
-    sample.setSupervision(SupervisionStatus.RUNNING, "", Timestamp.from(Instant.now()));
-    assertTrue(sample.isRunning());
-
-    sample.setSupervision(SupervisionStatus.STOPPED, "", Timestamp.from(Instant.now()));
-    assertFalse(sample.isRunning());
-
-    sample.setSupervision(SupervisionStatus.DOWN, "", Timestamp.from(Instant.now()));
-    assertFalse(sample.isRunning());
-
-    sample.setSupervision(SupervisionStatus.UNCERTAIN, "", Timestamp.from(Instant.now()));
-    assertFalse(sample.isRunning());
-  }
-
-  @Test
-  public void isUncertain() {
-    assertFalse(sample.isUncertain());
-
-    for (SupervisionStatus status : SupervisionStatus.values()) {
-      sample.setSupervision(status, "", Timestamp.from(Instant.now()));
-      assertEquals(status == SupervisionStatus.UNCERTAIN ,sample.isUncertain());
-    }
   }
 
   private void doAndExpect(BiConsumer<Timestamp, String> action, String message, SupervisionStatus expected) {

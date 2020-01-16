@@ -159,6 +159,14 @@ public class SupervisionStateTagService extends AbstractCacheServiceImpl<Supervi
     setStateTagAsActive(stateTagId, false, timestamp);
   }
 
+  public void resume(long stateTagId, long timestamp) throws NullPointerException {
+    start(stateTagId, timestamp);
+  }
+
+  public void suspend(long stateTagId, long timestamp) throws NullPointerException {
+    stop(stateTagId, timestamp);
+  }
+
   private void setStateTagAsActive(long stateTagId, boolean active, long timestamp) {
     log.debug("Attempting to set State tag " + stateTagId + " and dependent alive timers to " + active);
 

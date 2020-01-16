@@ -8,7 +8,6 @@ import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.supervision.Supervised;
 import cern.c2mon.shared.common.supervision.SupervisionEntity;
-import cern.c2mon.shared.common.supervision.SupervisionStatus;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -55,36 +54,45 @@ public abstract class AbstractSupervisedService<T extends Supervised> extends Ab
   }
 
   @Override
-  public T stop(long id, Timestamp timestamp) {
-    return cache.compute(id, supervised -> {
-      supervised.stop(timestamp);
+  public void stop(long id, Timestamp timestamp) {
+    try {
+      T supervised = cache.get(id);
       if (supervised.getAliveTagId() != null) {
         aliveTimerService.stop(supervised.getAliveTagId(), timestamp.getTime());
-      }
-      if (supervised.getStateTagId() != null) {
+      } else if (supervised.getStateTagId() != null) {
         stateTagService.stop(supervised.getStateTagId(), timestamp.getTime());
       }
-    });
+    } catch (CacheElementNotFoundException e) {
+      log.error("Could not find supervised object with id " + id + " to start. Taking no action", e);
+    }
   }
 
   @Override
-  public T resume(long id, Timestamp timestamp, String message) {
+  public void resume(long id, Timestamp timestamp, String message) {
 //    dataTagService.resetQualityToValid(); TODO (Alex) Figure out how to get the datatag for a Supervised
-
-    return cache.compute(id, supervised -> {
-      if (!supervised.getSupervisionStatus().equals(SupervisionStatus.RUNNING)) {
-        // TODO (Alex) Propagate this to alive, state tag?
-        supervised.resume(timestamp, message);
+    try {
+      T supervised = cache.get(id);
+      if (supervised.getAliveTagId() != null) {
+        aliveTimerService.resume(supervised.getAliveTagId(), timestamp.getTime());
+      } else if (supervised.getStateTagId() != null) {
+        stateTagService.resume(supervised.getStateTagId(), timestamp.getTime());
       }
-    });
+    } catch (CacheElementNotFoundException e) {
+      log.error("Could not find supervised object with id " + id + " to start. Taking no action", e);
+    }
   }
 
   @Override
-  public T suspend(long id, Timestamp timestamp, String message) {
-    return cache.compute(id, supervised -> {
-      if (supervised.isRunning() || supervised.isUncertain()) {
-        supervised.suspend(timestamp, message);
+  public void suspend(long id, Timestamp timestamp, String message) {
+    try {
+      T supervised = cache.get(id);
+      if (supervised.getAliveTagId() != null) {
+        aliveTimerService.suspend(supervised.getAliveTagId(), timestamp.getTime());
+      } else if (supervised.getStateTagId() != null) {
+        stateTagService.suspend(supervised.getStateTagId(), timestamp.getTime());
       }
-    });
+    } catch (CacheElementNotFoundException e) {
+      log.error("Could not find supervised object with id " + id + " to start. Taking no action", e);
+    }
   }
 }

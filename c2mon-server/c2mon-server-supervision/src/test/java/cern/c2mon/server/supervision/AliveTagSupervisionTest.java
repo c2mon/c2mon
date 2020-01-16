@@ -129,7 +129,8 @@ public class AliveTagSupervisionTest extends SupervisionCacheTest {
     // Start the process
     processService.start(aliveTimer.getSupervisedId(), new Timestamp(startTimer));
     // Resume so that the status goes to RUNNING
-    Process process = processService.resume(aliveTimer.getSupervisedId(), new Timestamp(System.currentTimeMillis()), "");
+    processService.resume(aliveTimer.getSupervisedId(), new Timestamp(System.currentTimeMillis()), "");
+    Process process = processCache.get(aliveTimer.getSupervisedId());
     assertEquals(SupervisionStatus.RUNNING, process.getSupervisionStatus());
     Timestamp originalProcessTime = process.getStatusTime();
     assertNotNull(originalProcessTime);

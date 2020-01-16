@@ -108,6 +108,14 @@ public class AliveTagService extends AbstractCacheServiceImpl<AliveTag> {
     setAliveTimerAsActive(aliveTimerId, false, timestamp);
   }
 
+  public void resume(long aliveTimerId, long timestamp) throws NullPointerException {
+    start(aliveTimerId, timestamp);
+  }
+
+  public void suspend(long aliveTimerId, long timestamp) throws NullPointerException {
+    stop(aliveTimerId, timestamp);
+  }
+
   /**
    * Check whether this alive timer has expired. Adds an additional time buffer
    * as some clocks may be slightly out of sync.
