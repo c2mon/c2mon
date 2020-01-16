@@ -5,15 +5,12 @@ import cern.c2mon.cache.actions.alive.AliveTagService;
 import cern.c2mon.cache.actions.datatag.DataTagService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.supervision.Supervised;
-import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.common.supervision.SupervisionEntity;
 import cern.c2mon.shared.common.supervision.SupervisionStatus;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.sql.Timestamp;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author Szymon Halastra, Alexandros Papageorgiou Koufidis
@@ -76,52 +73,5 @@ public abstract class AbstractSupervisedService<T extends Supervised> extends Ab
         supervised.suspend(timestamp, message);
       }
     });
-  }
-
-  @Override
-  public boolean isRunning(long id) {
-    return cache.get(id).isRunning();
-  }
-
-  @Override
-  public boolean isUncertain(long id) {
-    return cache.get(id).isUncertain();
-  }
-
-  @Override
-  public SupervisionEvent getSupervisionEvent(long id) {
-    return cache.get(id).getSupervisionEvent();
-  }
-
-  @Override
-  public void refresh(long id) {
-    cache.executeTransaction(() -> {
-      T supervised = cache.get(id);
-      supervised.setStatusTime(new Timestamp(System.currentTimeMillis()));
-      cache.put(supervised.getId(), supervised);
-    });
-  }
-
-  @Override
-  public void removeAliveTimerBySupervisedId(long supervisedId) {
-    T supervised = cache.get(supervisedId);
-    long aliveId = supervised.getAliveTagId();
-    aliveTimerService.removeAliveTimer(aliveId);
-  }
-
-  @Override
-  public void startAliveTimerBySupervisedId(long id) {
-    // TODO (Alex) Should this send any extra notifs?
-
-//    Long oldAliveId = processCache.get(processId).getAliveTagId();
-//    processService.removeAliveDirectly(oldAliveId);
-//    processService.loadAndStartAliveTag(processId);
-  }
-
-  @Override
-  public List<SupervisionEvent> getAllSupervisionEvents() {
-    return cache.getKeys().parallelStream()
-      .map(key -> cache.get(key).getSupervisionEvent())
-      .collect(Collectors.toList());
   }
 }

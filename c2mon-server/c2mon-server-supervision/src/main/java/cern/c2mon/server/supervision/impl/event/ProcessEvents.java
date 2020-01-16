@@ -3,6 +3,7 @@ package cern.c2mon.server.supervision.impl.event;
 import cern.c2mon.cache.actions.equipment.EquipmentService;
 import cern.c2mon.cache.actions.process.ProcessService;
 import cern.c2mon.cache.actions.process.ProcessXMLProvider;
+import cern.c2mon.cache.actions.state.SupervisionStateTagService;
 import cern.c2mon.cache.actions.subequipment.SubEquipmentService;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.cache.api.exception.TooManyQueryResultsException;
@@ -30,6 +31,7 @@ public class ProcessEvents extends SupervisionEventHandler<Process> {
 
   private SubEquipmentService subEquipmentService;
   private EquipmentService equipmentService;
+  private final SupervisionStateTagService stateTagService;
   private ProcessXMLProvider processXMLProvider;
 
   @Resource
@@ -39,10 +41,12 @@ public class ProcessEvents extends SupervisionEventHandler<Process> {
   public ProcessEvents(ProcessService processService,
                        SubEquipmentService subEquipmentService,
                        EquipmentService equipmentService,
+                       SupervisionStateTagService stateTagService,
                        ProcessXMLProvider processXMLProvider) {
     super(SupervisionEntity.PROCESS, processService);
     this.subEquipmentService = subEquipmentService;
     this.equipmentService = equipmentService;
+    this.stateTagService = stateTagService;
     this.processXMLProvider = processXMLProvider;
   }
 
@@ -119,7 +123,7 @@ public class ProcessEvents extends SupervisionEventHandler<Process> {
       Process process = ((ProcessService) service).getProcessIdFromName(processConnectionRequest.getProcessName());
       try {
         // If process is already currently running
-        if (service.isRunning(process.getId())) {
+        if (((ProcessService) service).isRunning(process.getId())) {
           // And TEST mode is on
           if (properties.isTestMode()) {
             log.info("onProcessConnection - TEST mode - Connection request for DAQ " + process.getName() + " authorized.");
@@ -260,7 +264,7 @@ public class ProcessEvents extends SupervisionEventHandler<Process> {
             // Check if PIK is the same we disconnect otherwise we ignore the message
             if (processDisconnectionRequest.getProcessPIK().equals(process.getProcessPIK())) {
               // (4) Only proceed if the process is actually running
-              if (service.isRunning(process.getId())) {
+              if (((ProcessService) service).isRunning(process.getId())) {
 
                 String processStopMessage = "DAQ process " + process.getName() + " was stopped.";
                 log.trace("onProcessDisconnection - " + processStopMessage);

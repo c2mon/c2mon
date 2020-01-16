@@ -1,11 +1,9 @@
 package cern.c2mon.cache.actions.supervision;
 
 import cern.c2mon.server.common.supervision.Supervised;
-import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.common.supervision.SupervisionEntity;
 
 import java.sql.Timestamp;
-import java.util.List;
 
 /**
  * This interface simply delegates all the {@code SupervisedService} methods to the
@@ -22,16 +20,6 @@ import java.util.List;
 public interface SupervisedCacheServiceDelegator<T extends Supervised> extends SupervisedCacheService<T> {
 
   SupervisedCacheService<T> getSupervisedService();
-
-  @Override
-  default SupervisionEvent getSupervisionEvent(long id) {
-    return getSupervisedService().getSupervisionEvent(id);
-  }
-
-  @Override
-  default void refresh(long id) {
-    getSupervisedService().refresh(id);
-  }
 
   @Override
   default T start(long id, Timestamp timestamp) {
@@ -54,30 +42,7 @@ public interface SupervisedCacheServiceDelegator<T extends Supervised> extends S
   }
 
   @Override
-  default boolean isRunning(long id) {
-    return getSupervisedService().isRunning(id);
-  }
-
-  @Override
-  default boolean isUncertain(long id) {
-    return getSupervisedService().isUncertain(id);
-  }
-
-  @Override
-  default void removeAliveTimerBySupervisedId(long id) {
-    getSupervisedService().removeAliveTimerBySupervisedId(id);
-  }
-
-  @Override
-  default void startAliveTimerBySupervisedId(long id) {
-    getSupervisedService().startAliveTimerBySupervisedId(id);
-  }
-
-  @Override
   default SupervisionEntity getSupervisionEntity() {
     return getSupervisedService().getSupervisionEntity();
   }
-
-  @Override
-  default List<SupervisionEvent> getAllSupervisionEvents() { return getSupervisedService().getAllSupervisionEvents(); }
 }

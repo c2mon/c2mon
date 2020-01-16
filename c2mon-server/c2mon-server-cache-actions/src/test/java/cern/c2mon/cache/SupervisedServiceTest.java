@@ -1,25 +1,24 @@
 package cern.c2mon.cache;
 
 import cern.c2mon.cache.actions.listener.SupervisedServiceListenerTest;
-import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
+import cern.c2mon.cache.actions.state.SupervisionStateTagService;
 import cern.c2mon.server.common.supervision.Supervised;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.common.supervision.SupervisionStatus;
 import org.junit.Test;
 
+import javax.inject.Inject;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.function.Supplier;
 
 import static cern.c2mon.shared.common.supervision.SupervisionStatus.*;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public abstract class SupervisedServiceTest<T extends Supervised> extends SupervisedServiceListenerTest<T> {
 
-  @Test(expected = CacheElementNotFoundException.class)
-  public void getSupervisionStatusThrowsIfNonexistent() {
-    supervisedService.getSupervisionEvent(sample.getId());
-  }
+  @Inject
+  SupervisionStateTagService stateTagService;
 
   @Test
   public void getSupervisionStatus() {
@@ -62,71 +61,30 @@ public abstract class SupervisedServiceTest<T extends Supervised> extends Superv
 
     long initialTimeMillis = System.currentTimeMillis() - 1;
     supervisedService.start(sample.getId(), new Timestamp(initialTimeMillis));
-    assertEquals(initialTimeMillis, supervisedService.getSupervisionEvent(sample.getId()).getEventTime().getTime());
+    assertEquals(initialTimeMillis, stateTagService.getSupervisionEvent(sample.getStateTagId()).getEventTime().getTime());
 
     long timeOfRunningNotStartupStatus = initialTimeMillis + 1;
     supervisedService.resume(sample.getId(), new Timestamp(timeOfRunningNotStartupStatus), "");
-    SupervisionEvent supervisionEvent = supervisedService.getSupervisionEvent(sample.getId());
+    SupervisionEvent supervisionEvent = stateTagService.getSupervisionEvent(sample.getStateTagId());
     assertEquals(timeOfRunningNotStartupStatus, supervisionEvent.getEventTime().getTime());
     assertEquals(RUNNING, supervisionEvent.getStatus());
 
     // This should have no change
     supervisedService.resume(sample.getId(), new Timestamp(initialTimeMillis + 2), "");
-    supervisionEvent = supervisedService.getSupervisionEvent(sample.getId());
+    supervisionEvent = stateTagService.getSupervisionEvent(sample.getStateTagId());
     assertEquals(timeOfRunningNotStartupStatus, supervisionEvent.getEventTime().getTime());
     assertEquals(RUNNING, supervisionEvent.getStatus());
   }
 
-  @Test
-  public void isRunning() {
-    cache.put(sample.getId(), sample);
-    // Default
-    assertFalse(supervisedService.isRunning(sample.getId()));
-
-    sample.setSupervision(STARTUP, "", Timestamp.from(Instant.now()));
-    cache.put(sample.getId(), sample);
-    assertTrue(supervisedService.isRunning(sample.getId()));
-
-    sample.setSupervision(RUNNING_LOCAL, "", Timestamp.from(Instant.now()));
-    cache.put(sample.getId(), sample);
-    assertTrue(supervisedService.isRunning(sample.getId()));
-
-    sample.setSupervision(RUNNING, "", Timestamp.from(Instant.now()));
-    cache.put(sample.getId(), sample);
-    assertTrue(supervisedService.isRunning(sample.getId()));
-
-    sample.setSupervision(STOPPED, "", Timestamp.from(Instant.now()));
-    cache.put(sample.getId(), sample);
-    assertFalse(supervisedService.isRunning(sample.getId()));
-
-    sample.setSupervision(DOWN, "", Timestamp.from(Instant.now()));
-    cache.put(sample.getId(), sample);
-    assertFalse(supervisedService.isRunning(sample.getId()));
-
-    sample.setSupervision(UNCERTAIN, "", Timestamp.from(Instant.now()));
-    cache.put(sample.getId(), sample);
-    assertFalse(supervisedService.isRunning(sample.getId()));
-  }
-
-  @Test
-  public void isUncertain() {
-    sample.setSupervision(UNCERTAIN, "", new Timestamp(0));
-
-    cache.put(sample.getId(), sample);
-
-    verifySupervisionEvent(sample, UNCERTAIN);
-    assertTrue(supervisedService.isUncertain(sample.getId()));
-  }
-
   private void verifySupervisionEvent(Supervised supervised, SupervisionStatus expectedStatus) {
-    SupervisionEvent event = supervisedService.getSupervisionEvent(supervised.getId());
+    SupervisionEvent event = stateTagService.getSupervisionEvent(supervised.getStateTagId());
 
     assertEquals(supervised.getId(), event.getEntityId());
     assertEquals(event.getEntity(), supervised.getSupervisionEntity());
     assertEquals(expectedStatus, event.getStatus());
 
     // Repeating the attempt yields an equal result
-    assertEquals(event, supervisedService.getSupervisionEvent(supervised.getId()));
+    assertEquals(event, stateTagService.getSupervisionEvent(supervised.getStateTagId()));
   }
 
   private void cacheSupervision(Supplier<T> cacheAction, SupervisionStatus expected) {

@@ -18,6 +18,7 @@ package cern.c2mon.server.supervision.impl;
 
 import cern.c2mon.cache.actions.equipment.EquipmentService;
 import cern.c2mon.cache.actions.process.ProcessService;
+import cern.c2mon.cache.actions.state.SupervisionStateTagService;
 import cern.c2mon.cache.actions.subequipment.SubEquipmentService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.supervision.Supervised;
@@ -54,7 +55,8 @@ public class SupervisionFacadeImpl implements SupervisionFacade {
   private final ProcessService processService;
   private final EquipmentService equipmentService;
   private final SubEquipmentService subEquipmentService;
- 
+  private SupervisionStateTagService stateTagService;
+
   /**
    * Management value tracing the number of requests for the supervision status
    * that are waiting for a response.
@@ -64,11 +66,13 @@ public class SupervisionFacadeImpl implements SupervisionFacade {
 
   @Inject
   public SupervisionFacadeImpl(final ProcessService processService, final EquipmentService equipmentService,
-                               final SubEquipmentService subEquipmentService) {
+                               final SubEquipmentService subEquipmentService,
+                               final SupervisionStateTagService stateTagService) {
 
     this.processService = processService;
     this.equipmentService = equipmentService;
     this.subEquipmentService = subEquipmentService;
+    this.stateTagService = stateTagService;
   }
 
   @Override
@@ -76,12 +80,7 @@ public class SupervisionFacadeImpl implements SupervisionFacade {
     try {
       pendingRequests.getAndIncrement();
 
-      Collection<SupervisionEvent> supervisionCollection = new ArrayList<>();
-      supervisionCollection.addAll(processService.getAllSupervisionEvents());
-      supervisionCollection.addAll(equipmentService.getAllSupervisionEvents());
-      supervisionCollection.addAll(subEquipmentService.getAllSupervisionEvents());
-
-      return supervisionCollection;   
+      return new ArrayList<>(stateTagService.getAllSupervisionEvents());
     } finally {
       pendingRequests.getAndDecrement();
     }    

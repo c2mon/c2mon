@@ -72,4 +72,6 @@ public class SupervisionStateTag extends ControlTag {
     clone.statusTime = new Timestamp(statusTime.getTime());
     return clone;
   }
+
+
 }

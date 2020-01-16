@@ -45,21 +45,6 @@ public abstract class SupervisedServiceListenerTest<T extends Supervised> extend
   }
 
   @Test
-  public void refreshAndNotifyCurrentSupervisionStatus() {
-    // Generates one supervision update event, we don't listen yet
-    cache.put(1L, sample);
-
-    cache.getCacheListenerManager().registerListener(paramListener, CacheEvent.SUPERVISION_UPDATE);
-
-    // Should generate exactly one event
-    supervisedService.refresh(sample.getId());
-
-    cache.getCacheListenerManager().close();
-
-    assertEquals(1, eventCounter.get());
-  }
-
-  @Test
   public void supervisionChangeNotification() {
     registerListenerAndPut(paramListener, CacheEvent.SUPERVISION_CHANGE);
     assertEquals(1, eventCounter.get());

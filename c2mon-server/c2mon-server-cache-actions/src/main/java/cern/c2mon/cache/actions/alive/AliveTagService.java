@@ -236,4 +236,12 @@ public class AliveTagService extends AbstractCacheServiceImpl<AliveTag> {
       return new Event<>(System.currentTimeMillis(), false);
     });
   }
+
+  /**
+   * Updates the AliveTag based on new supervised properties, e.g after a reconfiguration
+   * @param supervised
+   */
+  public void updateBasedOnSupervised(Supervised supervised) {
+    // TODO (Alex)
+  }
 }

@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.handler.transacted;
 
+import cern.c2mon.cache.actions.alive.AliveTagService;
 import cern.c2mon.cache.actions.process.ProcessCacheObjectFactory;
 import cern.c2mon.cache.actions.process.ProcessService;
 import cern.c2mon.cache.api.C2monCache;
@@ -53,6 +54,7 @@ public class ProcessConfigHandler extends BaseConfigHandlerImpl<Process, Process
   private final JmsContainerManager jmsContainerManager;
   private final EquipmentConfigHandler equipmentConfigTransacted;
   private final boolean allowRunningProcessRemoval;
+  private final AliveTagService aliveTagService;
   private AliveTimerConfigHandler aliveTimerConfigHandler;
 
   /**
@@ -64,14 +66,15 @@ public class ProcessConfigHandler extends BaseConfigHandlerImpl<Process, Process
   @Autowired
   public ProcessConfigHandler(final C2monCache<Process> processCache, final ProcessDAO processDAO,
                               final ProcessCacheObjectFactory processCacheObjectFactory,
-                              final C2monCache<AliveTag> aliveTimerCache,
+                              final AliveTagService aliveTagService,
                               final ProcessService processService,
                               final ConfigurationProperties properties,
                               final JmsContainerManager jmsContainerManager,
                               final EquipmentConfigHandler equipmentConfigTransacted
                                      ) {
     super(processCache, processDAO, processCacheObjectFactory, ProcessChange::new);
-    this.aliveTimerCache = aliveTimerCache;
+    this.aliveTagService = aliveTagService;
+    this.aliveTimerCache = aliveTagService.getCache();
     this.processService = processService;
     this.allowRunningProcessRemoval = properties.isAllowRunningProcessRemoval();
     this.jmsContainerManager = jmsContainerManager;
@@ -87,7 +90,10 @@ public class ProcessConfigHandler extends BaseConfigHandlerImpl<Process, Process
   protected void doPostCreate(Process process) {
     // TODO (Alex) Switch to CacheEvent.INSERTED ?
     jmsContainerManager.subscribe(process);
-    processService.startAliveTimerBySupervisedId(process.getId());
+
+    if (process.getAliveTagId() != null)
+      aliveTagService.startOrUpdateTimestamp(process.getAliveTagId(), System.currentTimeMillis());
+
     cache.getCacheListenerManager().notifyListenersOf(CacheEvent.UPDATE_ACCEPTED, process);
 
     // TODO (Alex) unsubscribe on failures?
@@ -115,7 +121,8 @@ public class ProcessConfigHandler extends BaseConfigHandlerImpl<Process, Process
     ProcessChange processChange = super.update(id, properties);
 
     if (properties.containsKey("aliveInterval") || properties.containsKey("aliveTagId")) {
-      processService.startAliveTimerBySupervisedId(id);
+      Process process = processService.getCache().get(id);
+      aliveTagService.updateBasedOnSupervised(process);
 
       // TODO (Alex) Is this call correct? Looks like maybe they wanted to setReboot instead?
       processChange.requiresReboot();
@@ -174,9 +181,10 @@ public class ProcessConfigHandler extends BaseConfigHandlerImpl<Process, Process
       ConfigurationElementReport tagReport = new ConfigurationElementReport(ConfigConstants.Action.REMOVE, ConfigConstants.Entity.CONTROLTAG, aliveTagId);
       report.addSubReport(tagReport);
       aliveTimerConfigHandler.remove(aliveTagId, tagReport);
+      aliveTagService.removeAliveTimer(aliveTagId);
+      // TODO (Alex) Do we want to also remove it from process cache?
     }
 
-    processService.removeAliveTimerBySupervisedId(process.getId());
     jmsContainerManager.unsubscribe(process);
   }
 

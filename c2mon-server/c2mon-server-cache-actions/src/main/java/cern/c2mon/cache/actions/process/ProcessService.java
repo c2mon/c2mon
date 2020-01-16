@@ -4,6 +4,7 @@ import cern.c2mon.cache.actions.AbstractCacheServiceImpl;
 import cern.c2mon.cache.actions.alive.AliveTagService;
 import cern.c2mon.cache.actions.datatag.DataTagService;
 import cern.c2mon.cache.actions.equipment.EquipmentService;
+import cern.c2mon.cache.actions.state.SupervisionStateTagService;
 import cern.c2mon.cache.actions.subequipment.SubEquipmentService;
 import cern.c2mon.cache.actions.supervision.AbstractSupervisedCacheFlow;
 import cern.c2mon.cache.actions.supervision.SupervisedCacheService;
@@ -51,16 +52,18 @@ public class ProcessService extends AbstractCacheServiceImpl<Process>
   private EquipmentService equipmentService;
   private SubEquipmentService subEquipmentService;
   private ServerProperties properties;
+  private SupervisionStateTagService stateTagService;
 
   @Inject
   public ProcessService(C2monCache<Process> processCacheRef, EquipmentService equipmentService,
                         AliveTagService aliveTimerService, SubEquipmentService subEquipmentService,
-                        ServerProperties properties, DataTagService dataTagService) {
+                        ServerProperties properties, DataTagService dataTagService, SupervisionStateTagService stateTagService) {
     super(processCacheRef, new AbstractSupervisedCacheFlow<>());
     this.aliveTimerService = aliveTimerService;
     this.equipmentService = equipmentService;
     this.subEquipmentService = subEquipmentService;
     this.properties = properties;
+    this.stateTagService = stateTagService;
 
     this.supervisedService = new SupervisedProcessServiceImpl(processCacheRef, aliveTimerService, dataTagService);
   }
@@ -142,6 +145,10 @@ public class ProcessService extends AbstractCacheServiceImpl<Process>
   @Override
   public void setLocalConfig(Long processId, ProcessCacheObject.LocalConfig localType) {
     cache.compute(processId, process -> ((ProcessCacheObject) process).setLocalConfig(localType));
+  }
+
+  public boolean isRunning(long processId) {
+    return stateTagService.isRunning(cache.get(processId).getStateTagId());
   }
 
   /**
