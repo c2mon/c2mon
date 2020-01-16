@@ -70,8 +70,6 @@ public abstract class AbstractSupervisedCacheObject extends AbstractCacheableImp
 
     /**
      * The time of the last update of the supervision status.
-     *
-     * If you add a default value here, make sure to update {@link Supervised#hasNoEvents()}
      */
     @NonNull
     private Timestamp statusTime;

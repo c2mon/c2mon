@@ -6,6 +6,8 @@ import cern.c2mon.shared.common.supervision.SupervisionStatus;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
+import static cern.c2mon.shared.common.supervision.SupervisionStatus.*;
+
 @Slf4j
 public class SupervisionStateTagEvaluator {
 
@@ -47,9 +49,9 @@ public class SupervisionStateTagEvaluator {
   public static boolean isRunning(@NonNull SupervisionStateTag supervisionStateTag) {
     // Assigning it here keeps us safe from concurrent modifications
     SupervisionStatus status = supervisionStateTag.getSupervisionStatus();
-    return status.equals(SupervisionStatus.STARTUP)
-      || status.equals(SupervisionStatus.RUNNING)
-      || status.equals(SupervisionStatus.RUNNING_LOCAL);
+    return status.equals(STARTUP)
+      || status.equals(RUNNING)
+      || status.equals(RUNNING_LOCAL);
   }
 
   /**
@@ -58,6 +60,10 @@ public class SupervisionStateTagEvaluator {
    * @return true if the status is uncertain
    */
   public static boolean isUncertain(@NonNull SupervisionStateTag supervisionStateTag) {
-    return supervisionStateTag.getSupervisionStatus().equals(SupervisionStatus.UNCERTAIN);
+    return supervisionStateTag.getSupervisionStatus().equals(UNCERTAIN);
+  }
+
+  public static boolean hasNoEvents(@NonNull SupervisionStateTag supervisionStateTag) {
+    return supervisionStateTag.getSupervisionStatus() == DOWN && supervisionStateTag.getStatusTime() == null;
   }
 }

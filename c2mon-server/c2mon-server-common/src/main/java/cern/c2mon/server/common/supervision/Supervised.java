@@ -154,15 +154,6 @@ public interface Supervised extends Cacheable {
   }
 
   /**
-   * Returns true only if the object has not yet received any supervision event
-   *
-   * @return true if the object has not received supervision
-   */
-  default boolean hasNoEvents() {
-    return getSupervisionStatus() == SupervisionStatus.DOWN && getStatusTime() == null;
-  }
-
-  /**
    * Sets the status of this Supervised object to STARTUP,
    * with associated message.
    * <p>

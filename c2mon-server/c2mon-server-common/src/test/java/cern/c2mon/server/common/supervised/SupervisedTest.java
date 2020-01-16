@@ -97,22 +97,12 @@ public abstract class SupervisedTest<T extends Supervised> {
     }
   }
 
-  @Test
-  public void hasNoEvents() {
-    assertTrue(sample.hasNoEvents());
-
-    for (SupervisionStatus status : SupervisionStatus.values()) {
-      sample.setSupervision(status, "", Timestamp.from(Instant.now()));
-      assertFalse(sample.hasNoEvents());
-    }
-  }
-
   private void doAndExpect(BiConsumer<Timestamp, String> action, String message, SupervisionStatus expected) {
     Timestamp timestamp = Timestamp.from(Instant.now());
     action.accept(timestamp, message);
     assertEquals(expected, sample.getSupervisionStatus());
     // Uninitialized objects don't have time or description
-    if (sample.hasNoEvents())
+    if (sample.getStatusTime() == null)
       return;
     assertEquals(timestamp, sample.getStatusTime());
     if (message != null)
