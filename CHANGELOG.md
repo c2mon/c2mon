@@ -13,6 +13,7 @@ For more details on a given release, please check also the [version planning](ht
 - Alarm: Added support for alarms activation outside of a given range (CM-237)
 
 ### Changed
+- ElasticSearch support: Fix the issue causing C2MON to choose incorrectly the ElasticSearch client for communicating with the ES server.
 - Client API: Added possibility to define credentials for making queries to Elasticsearch (CM-232)
 - Documentation is now build with Jekyll instead of MkDocs
 - Alarm: Code refactoring to allow creating custom alarm conditions (CM-239). More info in the [documentation](https://c2mon.web.cern.ch/c2mon/docs/user-guide/client-api/configuration-api.html)
