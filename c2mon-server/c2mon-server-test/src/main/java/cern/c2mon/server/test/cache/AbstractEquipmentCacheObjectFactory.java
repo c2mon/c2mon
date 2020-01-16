@@ -26,7 +26,7 @@ abstract class AbstractEquipmentCacheObjectFactory<T extends AbstractEquipmentCa
   void initDefaults(T base){
     base.setDescription("Test desc");
     base.setHandlerClassName("Test class name");
-    base.setAliveTagId(5000200L);
+    base.setAliveTagId(1224L);
     base.setAliveInterval(10);
     base.setCommFaultTagId(1223L);
     base.setStateTagId(1222L);

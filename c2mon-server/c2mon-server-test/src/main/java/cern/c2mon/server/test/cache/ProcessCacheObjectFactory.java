@@ -25,11 +25,10 @@ public class ProcessCacheObjectFactory extends AbstractCacheObjectFactory<Proces
 
   @Override
   public ProcessCacheObject sampleBase() {
-    ProcessCacheObject processCacheObject = new ProcessCacheObject(90L, "Test Process", 1200L, 100, 100);
+    ProcessCacheObject processCacheObject = new ProcessCacheObject(51L, "P_TESTHANDLER04", 1260L, 100, 100);
     processCacheObject.setDescription("Test process description");
     processCacheObject.setAliveInterval(60);
-    processCacheObject.setAliveTagId(510L); //FK ref
-    processCacheObject.setStateTagId(510L);
+    processCacheObject.setAliveTagId(1261L); //FK ref
     processCacheObject.setSupervision(SupervisionStatus.DOWN, "Status description", new Timestamp(System.currentTimeMillis()));
     processCacheObject.setStartupTime(new Timestamp(0));
     processCacheObject.setCurrentHost("test host");
