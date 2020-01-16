@@ -14,7 +14,7 @@ import static org.junit.Assert.*;
 
 public class SupervisionStateTagEvaluatorTest {
 
-  private final SupervisionStateTag sample = new SupervisionStateTag(0L, 1L, "", null, null);
+  private final SupervisionStateTag sample = new SupervisionStateTag(0L, 1L, "EQ", null, null);
   
 
   @Test
