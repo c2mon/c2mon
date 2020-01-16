@@ -4,11 +4,13 @@ import cern.c2mon.cache.SupervisedServiceTest;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.equipment.EquipmentCacheObject;
+import cern.c2mon.server.test.cache.AbstractCacheObjectFactory;
+import cern.c2mon.server.test.cache.EquipmentCacheObjectFactory;
 import lombok.Getter;
 
 import javax.inject.Inject;
 
-public class EquipmentSupervisedServiceTest extends SupervisedServiceTest<Equipment> {
+public class EquipmentSupervisedServiceTest extends SupervisedServiceTest<Equipment, EquipmentCacheObject> {
 
   @Inject
   private C2monCache<Equipment> equipmentCacheRef;
@@ -18,12 +20,12 @@ public class EquipmentSupervisedServiceTest extends SupervisedServiceTest<Equipm
   private EquipmentService supervisedService;
 
   @Override
-  protected Equipment getSample() {
-    return new EquipmentCacheObject(1L);
+  protected C2monCache<Equipment> initCache() {
+    return equipmentCacheRef;
   }
 
   @Override
-  protected C2monCache<Equipment> initCache() {
-    return equipmentCacheRef;
+  protected AbstractCacheObjectFactory<EquipmentCacheObject> initFactory() {
+    return new EquipmentCacheObjectFactory();
   }
 }

@@ -5,6 +5,7 @@ import cern.c2mon.cache.actions.supervision.SupervisedCacheService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.listener.CacheListener;
 import cern.c2mon.cache.api.listener.CacheListenerManagerImpl;
+import cern.c2mon.server.common.equipment.AbstractSupervisedCacheObject;
 import cern.c2mon.server.common.supervision.Supervised;
 import cern.c2mon.shared.common.CacheEvent;
 import lombok.AccessLevel;
@@ -16,7 +17,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.assertEquals;
 
-public abstract class SupervisedServiceListenerTest<T extends Supervised> extends AbstractCacheTest<T> {
+public abstract class SupervisedServiceListenerTest<T extends Supervised, T_IMPL extends AbstractSupervisedCacheObject>
+  extends AbstractCacheTest<T, T_IMPL> {
 
   private final AtomicInteger eventCounter = new AtomicInteger(0);
   private final CacheListener<T> paramListener = eq -> eventCounter.incrementAndGet();
@@ -26,7 +28,6 @@ public abstract class SupervisedServiceListenerTest<T extends Supervised> extend
   @Getter(AccessLevel.PROTECTED)
   protected C2monCache<T> cache;
 
-  @Getter(AccessLevel.PROTECTED)
   protected T sample;
 
   protected abstract SupervisedCacheService<T> getSupervisedService();

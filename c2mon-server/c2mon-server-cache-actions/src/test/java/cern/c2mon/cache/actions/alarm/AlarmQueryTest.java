@@ -4,6 +4,7 @@ import cern.c2mon.cache.AbstractCacheTest;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
+import cern.c2mon.server.test.cache.AbstractCacheObjectFactory;
 import org.junit.Test;
 
 import javax.inject.Inject;
@@ -16,7 +17,7 @@ import static org.junit.Assert.assertNotNull;
  * @author Szymon Halastra
  * @author Alexandros Papageorgiou Koufidis
  */
-public class AlarmQueryTest extends AbstractCacheTest<Alarm> {
+public class AlarmQueryTest extends AbstractCacheTest<Alarm, AlarmCacheObject> {
 
   @Inject
   private C2monCache<Alarm> alarmCacheRef;
@@ -55,12 +56,12 @@ public class AlarmQueryTest extends AbstractCacheTest<Alarm> {
   }
 
   @Override
-  protected Alarm getSample() {
-    return null;
+  protected C2monCache<Alarm> initCache() {
+    return alarmCacheRef;
   }
 
   @Override
-  protected C2monCache<Alarm> initCache() {
-    return alarmCacheRef;
+  protected AbstractCacheObjectFactory<AlarmCacheObject> initFactory() {
+    return null;
   }
 }

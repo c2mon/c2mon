@@ -2,6 +2,7 @@ package cern.c2mon.cache;
 
 import cern.c2mon.cache.actions.listener.SupervisedServiceListenerTest;
 import cern.c2mon.cache.actions.state.SupervisionStateTagService;
+import cern.c2mon.server.common.equipment.AbstractSupervisedCacheObject;
 import cern.c2mon.server.common.supervision.Supervised;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.common.supervision.SupervisionStatus;
@@ -15,7 +16,8 @@ import java.util.function.Supplier;
 import static cern.c2mon.shared.common.supervision.SupervisionStatus.*;
 import static org.junit.Assert.assertEquals;
 
-public abstract class SupervisedServiceTest<T extends Supervised> extends SupervisedServiceListenerTest<T> {
+public abstract class SupervisedServiceTest<T extends Supervised, T_IMPL extends AbstractSupervisedCacheObject>
+  extends SupervisedServiceListenerTest<T, T_IMPL> {
 
   @Inject
   SupervisionStateTagService stateTagService;
@@ -79,7 +81,7 @@ public abstract class SupervisedServiceTest<T extends Supervised> extends Superv
   private void verifySupervisionEvent(Supervised supervised, SupervisionStatus expectedStatus) {
     SupervisionEvent event = stateTagService.getSupervisionEvent(supervised.getStateTagId());
 
-    assertEquals(supervised.getId(), event.getEntityId());
+    assertEquals(supervised.getStateTagId().longValue(), event.getEntityId());
     assertEquals(event.getEntity(), supervised.getSupervisionEntity());
     assertEquals(expectedStatus, event.getStatus());
 

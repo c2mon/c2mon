@@ -5,6 +5,7 @@ import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.cache.api.listener.CacheListener;
 import cern.c2mon.server.common.supervision.SupervisionStateTag;
+import cern.c2mon.server.test.cache.AbstractCacheObjectFactory;
 import cern.c2mon.server.test.cache.SupervisionStateTagFactory;
 import cern.c2mon.shared.common.CacheEvent;
 import org.junit.Test;
@@ -17,7 +18,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static cern.c2mon.shared.common.supervision.SupervisionStatus.*;
 import static org.junit.Assert.*;
 
-public class StateTagServiceTest extends AbstractCacheListenerTest<SupervisionStateTag> {
+public class StateTagServiceTest extends AbstractCacheListenerTest<SupervisionStateTag, SupervisionStateTag> {
 
   @Inject
   SupervisionStateTagService stateTagService;
@@ -25,22 +26,27 @@ public class StateTagServiceTest extends AbstractCacheListenerTest<SupervisionSt
   @Inject
   C2monCache<SupervisionStateTag> supervisionStateTagCache;
 
-  private final SupervisionStateTagFactory stateTagFactory = new SupervisionStateTagFactory();
-  private final SupervisionStateTag sample = getSample();
-
-  @Override
-  protected SupervisionStateTag getSample() {
-    return stateTagFactory.sampleBase();
-  }
+  private SupervisionStateTag sample;
 
   @Override
   protected C2monCache<SupervisionStateTag> initCache() {
     return supervisionStateTagCache;
   }
 
+  @Override
+  protected AbstractCacheObjectFactory<SupervisionStateTag> initFactory() {
+    return new SupervisionStateTagFactory();
+  }
+
   @Test(expected = CacheElementNotFoundException.class)
   public void getSupervisionStatusThrowsIfNonexistent() {
     stateTagService.getSupervisionEvent(-1L);
+  }
+
+  @Override
+  public void reload() {
+    super.reload();
+    sample = getSample();
   }
 
   @Test
