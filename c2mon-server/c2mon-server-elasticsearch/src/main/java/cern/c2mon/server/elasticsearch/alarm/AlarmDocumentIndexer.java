@@ -28,6 +28,7 @@ import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
 import cern.c2mon.server.elasticsearch.IndexManager;
 import cern.c2mon.server.elasticsearch.IndexNameManager;
 import cern.c2mon.server.elasticsearch.MappingFactory;
+import cern.c2mon.server.elasticsearch.domain.IndexMetadata;
 
 /**
  * This class manages the fallback-aware indexing of {@link AlarmDocument}
@@ -70,17 +71,19 @@ public class AlarmDocumentIndexer implements IDBPersistenceHandler<AlarmDocument
 
     log.debug("Indexing alarm #{} to index {}", alarm.getId(), indexName);
 
-    return indexManager.index(indexName, alarm.toString(), alarm.getId());
+    IndexMetadata indexMetadata = IndexMetadata.builder().name(indexName).routing(alarm.getId()).build();
+
+    return indexManager.index(indexMetadata, alarm.toString());
   }
 
   private String getOrCreateIndex(AlarmDocument alarm) {
-    String index = indexNameManager.indexFor(alarm);
+    IndexMetadata indexMetadata = IndexMetadata.builder().name(indexNameManager.indexFor(alarm)).build();
 
-    if (!indexManager.exists(index)) {
-      indexManager.create(index, MappingFactory.createAlarmMapping());
+    if (!indexManager.exists(indexMetadata)) {
+      indexManager.create(indexMetadata, MappingFactory.createAlarmMapping());
     }
 
-    return index;
+    return indexMetadata.getName();
 
   }
 

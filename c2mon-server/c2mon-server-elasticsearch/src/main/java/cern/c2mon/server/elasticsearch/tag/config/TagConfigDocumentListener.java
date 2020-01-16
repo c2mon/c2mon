@@ -27,7 +27,7 @@ import cern.c2mon.server.cache.TagFacadeGateway;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.listener.ConfigurationEventListener;
 import cern.c2mon.server.common.tag.Tag;
-import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
+import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 import cern.c2mon.server.elasticsearch.exception.IndexingException;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
 
@@ -41,7 +41,7 @@ import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
 @Component
 public class TagConfigDocumentListener implements ConfigurationEventListener {
 
-  private final ElasticsearchClient elasticsearchClient;
+  private final ElasticsearchProperties properties;
 
   private final TagConfigDocumentIndexer indexer;
 
@@ -50,8 +50,8 @@ public class TagConfigDocumentListener implements ConfigurationEventListener {
   private final TagFacadeGateway tagFacadeGateway;
 
   @Autowired
-  public TagConfigDocumentListener(final ElasticsearchClient elasticsearchClient, final TagConfigDocumentIndexer indexer, final TagConfigDocumentConverter converter, final TagFacadeGateway tagFacadeGateway) {
-    this.elasticsearchClient = elasticsearchClient;
+  public TagConfigDocumentListener(ElasticsearchProperties properties, TagConfigDocumentIndexer indexer, TagConfigDocumentConverter converter, TagFacadeGateway tagFacadeGateway) {
+    this.properties = properties;
     this.indexer = indexer;
     this.converter = converter;
     this.tagFacadeGateway = tagFacadeGateway;
@@ -59,19 +59,19 @@ public class TagConfigDocumentListener implements ConfigurationEventListener {
 
   @Override
   public void onConfigurationEvent(Tag tag, Action action) {
-    if (this.elasticsearchClient.getProperties().isEnabled()) {
+    if (properties.isEnabled()) {
       if (action == Action.REMOVE) {
         this.updateConfiguration(tag, Collections.emptyList(), action);
       } else {
-        this.updateConfiguration(tag, this.tagFacadeGateway.getAlarms(tag), action);
+        this.updateConfiguration(tag, tagFacadeGateway.getAlarms(tag), action);
       }
     }
   }
 
   @Override
   public void onConfigurationEvent(Alarm alarm, Action action) {
-    if (this.elasticsearchClient.getProperties().isEnabled()) {
-      this.updateConfiguration(this.tagFacadeGateway.getTag(alarm.getTagId()), Collections.singletonList(alarm), action);
+    if (properties.isEnabled()) {
+      this.updateConfiguration(tagFacadeGateway.getTag(alarm.getTagId()), Collections.singletonList(alarm), action);
     }
   }
 

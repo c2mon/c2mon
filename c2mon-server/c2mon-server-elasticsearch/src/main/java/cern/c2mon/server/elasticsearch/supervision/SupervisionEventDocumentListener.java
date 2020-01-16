@@ -28,7 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import cern.c2mon.pmanager.persistence.IPersistenceManager;
 import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.server.common.config.ServerConstants;
-import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
+import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 import cern.c2mon.server.supervision.SupervisionListener;
 import cern.c2mon.server.supervision.SupervisionNotifier;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
@@ -44,7 +44,7 @@ import cern.c2mon.shared.client.supervision.SupervisionEvent;
 @Service
 public class SupervisionEventDocumentListener implements SupervisionListener, SmartLifecycle {
 
-  private final ElasticsearchClient elasticsearchClient;
+  private final ElasticsearchProperties properties;
 
   @Qualifier("supervisionEventDocumentPersistenceManager")
   private final IPersistenceManager<SupervisionEventDocument> persistenceManager;
@@ -56,11 +56,11 @@ public class SupervisionEventDocumentListener implements SupervisionListener, Sm
   private volatile boolean running = false;
 
   @Autowired
-  public SupervisionEventDocumentListener(final ElasticsearchClient elasticsearchClient, final SupervisionNotifier supervisionNotifier, final IPersistenceManager<SupervisionEventDocument> persistenceManager, final SupervisionEventDocumentConverter converter) {
-    this.elasticsearchClient = elasticsearchClient;
+  public SupervisionEventDocumentListener(ElasticsearchProperties properties, SupervisionNotifier supervisionNotifier, IPersistenceManager<SupervisionEventDocument> persistenceManager, SupervisionEventDocumentConverter converter) {
+    this.properties = properties;
     this.persistenceManager = persistenceManager;
     this.converter = converter;
-    if (this.elasticsearchClient.getProperties().isEnabled()) {
+    if (properties.isEnabled()) {
       listenerContainer = supervisionNotifier.registerAsListener(this);
     }
   }
@@ -97,7 +97,7 @@ public class SupervisionEventDocumentListener implements SupervisionListener, Sm
 
   @Override
   public void start() {
-    if (this.elasticsearchClient.getProperties().isEnabled()) {
+    if (properties.isEnabled()) {
       running = true;
       listenerContainer.start();
     }
@@ -105,7 +105,7 @@ public class SupervisionEventDocumentListener implements SupervisionListener, Sm
 
   @Override
   public void stop() {
-    if (this.elasticsearchClient.getProperties().isEnabled()) {
+    if (properties.isEnabled()) {
       listenerContainer.stop();
       running = false;
     }

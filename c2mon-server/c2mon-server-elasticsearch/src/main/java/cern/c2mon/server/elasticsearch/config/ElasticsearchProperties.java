@@ -28,6 +28,13 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class ElasticsearchProperties {
 
   /**
+   * Type is being removed in Elasticsearch 6.x (check
+   * <a href="https://www.elastic.co/guide/en/elasticsearch/reference/master/removal-of-types.html">Elasticsearch
+   * documentation</a> for more details).
+   */
+  public static final String TYPE = "doc";
+
+  /**
    * Enable/Disable writing to Elasticsearch
    */
   private boolean enabled = true;
@@ -142,9 +149,9 @@ public class ElasticsearchProperties {
   private String supervisionFallbackFile = "/tmp/es-supervision-fallback.txt";
 
   /**
-   * Enable/Disable Elasticsearch REST Client (if disabled Transport client will be used instead)
+   * Defines the client to be used to communicate with Elasticsearch (possible values: [rest, transport])
    */
-  private boolean rest = true;
+  private String client = "rest";
 
   /**
    * Defines whether mapping templates are managed by C2MON

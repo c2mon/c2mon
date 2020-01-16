@@ -16,15 +16,66 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch.client;
 
-import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
+import org.elasticsearch.action.bulk.BulkProcessor;
+
+import cern.c2mon.server.elasticsearch.domain.IndexMetadata;
 
 /**
  * Defines an interface for Elasticsearch client-cluster communication.
  *
- * @param <T> type of the client to communicate with Elasticsearch cluster.
  * @author Serhiy Boychenko
  */
-public interface ElasticsearchClient<T> {
+public interface ElasticsearchClient {
+  /**
+   * Set up the {@link BulkProcessor} for provided {@link BulkProcessor.Listener}.
+   *
+   * @param listener to be associated with {@link BulkProcessor}
+   * @return BulkProcessor instance
+   */
+  BulkProcessor getBulkProcessor(BulkProcessor.Listener listener);
+
+  /**
+   * Creates an index
+   *
+   * @param indexMetadata with details for index to be created
+   * @param mapping to be associated with index
+   * @return true if index was created, false otherwise
+   */
+  boolean createIndex(IndexMetadata indexMetadata, String mapping);
+
+  /**
+   * Write data to the provided index
+   *
+   * @param indexMetadata with details for index to write the data
+   * @param data to be written to the index
+   * @return true if index was written, false otherwise
+   */
+  boolean indexData(IndexMetadata indexMetadata, String data);
+
+  /**
+   * Check if index exists
+   *
+   * @param indexMetadata with details for index to check if it exists
+   * @return true if index exists, false otherwise
+   */
+  boolean isIndexExisting(IndexMetadata indexMetadata);
+
+  /**
+   * Update an index
+   *
+   * @param indexMetadata with details for index to be updated
+   * @param data to be written to the index
+   * @return true if index was updated, false otherwise
+   */
+  boolean updateIndex(IndexMetadata indexMetadata, String data);
+
+  /**
+   * Delete an index
+   *
+   * @param indexMetadata with details for index to be deleted
+   * @return true if index was deleted, false otherwise
+   */
+  boolean deleteIndex(IndexMetadata indexMetadata);
 
   /**
    * Block and wait for the cluster to become yellow.
@@ -32,22 +83,12 @@ public interface ElasticsearchClient<T> {
   void waitForYellowStatus();
 
   /**
-   * Closes client connection.
-   */
-  void close();
-
-  /**
-   * @return properties used by client to communicate with Elasticsearch cluster.
-   */
-  ElasticsearchProperties getProperties();
-
-  /**
-   * @return client used to communicate with Elasticsearch cluster.
-   */
-  T getClient();
-
-  /**
    * @return true if Elasticsearch cluster is healthy.
    */
   boolean isClusterYellow();
+
+  /**
+   * Closes client connection.
+   */
+  void close();
 }

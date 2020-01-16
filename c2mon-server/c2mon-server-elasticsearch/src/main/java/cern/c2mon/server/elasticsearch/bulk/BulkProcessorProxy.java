@@ -16,24 +16,63 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch.bulk;
 
+import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.action.bulk.BulkProcessor;
+import org.elasticsearch.action.bulk.BulkRequest;
+import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
+import org.springframework.util.Assert;
+
+import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
 
 /**
- * Defines an interface for communicating with Elasticsearch luster using bulk data operations.
+ * Wrapper around {@link BulkProcessor}. If a bulk operation fails, this class
+ * will throw a {@link RuntimeException}.
  *
  * @author Serhiy Boychenko
  */
-public interface BulkProcessorProxy {
+@Slf4j
+public class BulkProcessorProxy implements BulkProcessor.Listener {
+
+  private final BulkProcessor bulkProcessor;
+
+  /**
+   * @param client to be used to communicate with Elasticsearch cluster.
+   */
+  public BulkProcessorProxy(ElasticsearchClient client) {
+    this.bulkProcessor = client.getBulkProcessor(this);
+  }
 
   /**
    * Allows to perform bulk {@link IndexRequest}s.
    *
    * @param request to be executed in bulk action.
    */
-  void add(IndexRequest request);
+  public void add(IndexRequest request) {
+    Assert.notNull(request, "IndexRequest must not be null!");
+    bulkProcessor.add(request);
+  }
 
   /**
-   * @return true in case bulk operation concluded successfully, false otherwise.
+   * flushes the data to server
    */
-  boolean flush();
+  public void flush() {
+    bulkProcessor.flush();
+  }
+
+  @Override
+  public void beforeBulk(long executionId, BulkRequest request) {
+    log.debug("Going to execute new bulk operation composed of {} actions", request.numberOfActions());
+  }
+
+  @Override
+  public void afterBulk(long executionId, BulkRequest request, BulkResponse response) {
+    log.debug("Executed bulk operation composed of {} actions", request.numberOfActions());
+  }
+
+  @Override
+  public void afterBulk(long executionId, BulkRequest request, Throwable failure) {
+    log.warn("Error executing bulk operation", failure);
+    throw new IllegalStateException(failure);
+  }
 }

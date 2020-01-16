@@ -6,10 +6,11 @@ import cern.c2mon.server.cache.ProcessCache;
 import cern.c2mon.server.cache.SubEquipmentCache;
 import cern.c2mon.server.cache.TagFacadeGateway;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
-import cern.c2mon.server.elasticsearch.IndexManagerRest;
+import cern.c2mon.server.elasticsearch.IndexManager;
 import cern.c2mon.server.elasticsearch.MappingFactory;
 import cern.c2mon.server.elasticsearch.client.ElasticsearchClientRest;
 import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
+import cern.c2mon.server.elasticsearch.domain.IndexMetadata;
 import cern.c2mon.server.elasticsearch.tag.config.TagConfigDocumentConverter;
 import cern.c2mon.server.elasticsearch.tag.config.TagConfigDocumentIndexer;
 import cern.c2mon.server.elasticsearch.tag.config.TagConfigDocumentListener;
@@ -22,9 +23,7 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.springframework.util.FileSystemUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
@@ -45,21 +44,21 @@ public class ElasticsearchServiceTest {
   private TagConfigDocumentListener tagDocumentListener;
   private C2monClientProperties properties = new C2monClientProperties();
   private ElasticsearchClientRest client;
-  private IndexManagerRest indexManagerRest;
+  private IndexManager indexManager;
 
   @Mock
   private TagFacadeGateway tagFacadeGateway;
 
-  public ElasticsearchServiceTest() throws NodeValidationException {
+  public ElasticsearchServiceTest() {
     client = new ElasticsearchClientRest(elasticsearchProperties);
-    indexManagerRest = new IndexManagerRest(client);
-    TagConfigDocumentIndexer indexer = new TagConfigDocumentIndexer(elasticsearchProperties, indexManagerRest);
+    indexManager = new IndexManager(client);
+    TagConfigDocumentIndexer indexer = new TagConfigDocumentIndexer(elasticsearchProperties, indexManager);
     ProcessCache processCache = createNiceMock(ProcessCache.class);
     EquipmentCache equipmentCache = createNiceMock(EquipmentCache.class);
     SubEquipmentCache subequipmentCache = createNiceMock(SubEquipmentCache.class);
     TagConfigDocumentConverter converter = new TagConfigDocumentConverter(processCache, equipmentCache, subequipmentCache);
     tagFacadeGateway = createNiceMock(TagFacadeGateway.class);
-    tagDocumentListener = new TagConfigDocumentListener(client, indexer, converter, tagFacadeGateway);
+    tagDocumentListener = new TagConfigDocumentListener(elasticsearchProperties, indexer, converter, tagFacadeGateway);
   }
 
   @BeforeClass
@@ -77,7 +76,8 @@ public class ElasticsearchServiceTest {
     try {
       CompletableFuture<Void> nodeReady = CompletableFuture.runAsync(() -> {
         EmbeddedElasticsearchManager.getEmbeddedNode().deleteIndex(elasticsearchProperties.getTagConfigIndex());
-        indexManagerRest.create(elasticsearchProperties.getTagConfigIndex(), MappingFactory.createTagConfigMapping());
+        indexManager.create(IndexMetadata.builder().name(elasticsearchProperties.getTagConfigIndex()).build(),
+            MappingFactory.createTagConfigMapping());
         try {
           Thread.sleep(1000); //it takes some time for the index to be recreated
         } catch (InterruptedException e) {

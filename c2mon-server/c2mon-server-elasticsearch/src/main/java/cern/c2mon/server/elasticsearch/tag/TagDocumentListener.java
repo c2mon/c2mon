@@ -21,8 +21,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.annotation.PostConstruct;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -35,7 +33,7 @@ import cern.c2mon.server.cache.CacheRegistrationService;
 import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.common.tag.Tag;
-import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
+import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 
 /**
  * Listens for {@link Tag} updates and converts them to {@link TagDocument}
@@ -48,27 +46,30 @@ import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
 @Slf4j
 public class TagDocumentListener implements C2monBufferedCacheListener<Tag>, SmartLifecycle {
 
-  @Autowired
-  private ElasticsearchClient elasticsearchClient;
+  private final ElasticsearchProperties properties;
 
-  @Autowired
-  private CacheRegistrationService cacheRegistrationService;
-
-  @Autowired
   @Qualifier("tagDocumentPersistenceManager")
-  private IPersistenceManager<TagDocument> persistenceManager;
+  private final IPersistenceManager<TagDocument> persistenceManager;
 
-  @Autowired
-  private TagDocumentConverter converter;
+  private final TagDocumentConverter converter;
 
   private Lifecycle listenerContainer;
 
   private volatile boolean running = false;
 
-  @PostConstruct
-  public void init() {
-    // Register to be notified of all tag updates (data, rule and control tags)
-    if (this.elasticsearchClient.getProperties().isEnabled()) {
+  /**
+   * @param properties Elasticsearch properties
+   * @param cacheRegistrationService to register respective listener
+   * @param persistenceManager to store respective data
+   * @param converter to convert the tags
+   */
+  @Autowired
+  public TagDocumentListener(ElasticsearchProperties properties, CacheRegistrationService cacheRegistrationService, IPersistenceManager<TagDocument> persistenceManager, TagDocumentConverter converter) {
+    this.properties = properties;
+    this.persistenceManager = persistenceManager;
+    this.converter = converter;
+
+    if (properties.isEnabled()) {
       listenerContainer = cacheRegistrationService.registerBufferedListenerToTags(this);
     }
   }
@@ -120,7 +121,7 @@ public class TagDocumentListener implements C2monBufferedCacheListener<Tag>, Sma
 
   @Override
   public void start() {
-    if (this.elasticsearchClient.getProperties().isEnabled()) {
+    if (properties.isEnabled()) {
       running = true;
       listenerContainer.start();
     }
@@ -128,7 +129,7 @@ public class TagDocumentListener implements C2monBufferedCacheListener<Tag>, Sma
 
   @Override
   public void stop() {
-    if (this.elasticsearchClient.getProperties().isEnabled()) {
+    if (properties.isEnabled()) {
       listenerContainer.stop();
       running = false;
     }

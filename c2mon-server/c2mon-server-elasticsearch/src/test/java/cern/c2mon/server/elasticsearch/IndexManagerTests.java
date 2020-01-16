@@ -37,6 +37,7 @@ import org.springframework.core.io.ClassPathResource;
 
 import cern.c2mon.server.elasticsearch.client.ElasticsearchClientRest;
 import cern.c2mon.server.elasticsearch.client.ElasticsearchClientTransport;
+import cern.c2mon.server.elasticsearch.domain.IndexMetadata;
 import cern.c2mon.server.elasticsearch.util.EmbeddedElasticsearchManager;
 import cern.c2mon.server.elasticsearch.util.IndexUtils;
 
@@ -63,8 +64,8 @@ public class IndexManagerTests {
   @Parameters
   public static Collection<IndexManager> getIndexManagerClass() {
     return Arrays.asList(
-        new IndexManagerRest(new ElasticsearchClientRest(ElasticsearchSuiteTest.getProperties())),
-        new IndexManagerTransport(new ElasticsearchClientTransport(ElasticsearchSuiteTest.getProperties())));
+        new IndexManager(new ElasticsearchClientRest(ElasticsearchSuiteTest.getProperties())),
+        new IndexManager(new ElasticsearchClientTransport(ElasticsearchSuiteTest.getProperties())));
   }
 
   private String indexName;
@@ -98,7 +99,7 @@ public class IndexManagerTests {
   public void createTest() throws IOException {
     String mapping = loadMapping(MAPPINGS_FILE);
 
-    indexManager.create(indexName, mapping);
+    indexManager.create(IndexMetadata.builder().name(indexName).build(), mapping);
 
     assertTrue("Index should have been created.",
         IndexUtils.doesIndexExist(indexName, ElasticsearchSuiteTest.getProperties()));
@@ -108,11 +109,11 @@ public class IndexManagerTests {
   public void indexTestWithoutId() throws IOException {
     String mapping = loadMapping(MAPPINGS_FILE);
 
-    indexManager.create(indexName, mapping);
+    indexManager.create(IndexMetadata.builder().name(indexName).build(), mapping);
 
     EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
 
-    indexManager.index(indexName, TEST_JSON, "1");
+    indexManager.index(IndexMetadata.builder().name(indexName).routing("1").build(), TEST_JSON);
 
     EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
 
@@ -124,11 +125,11 @@ public class IndexManagerTests {
   public void indexTestWithId() throws IOException {
     String mapping = loadMapping(MAPPINGS_FILE);
 
-    indexManager.create(indexName, mapping);
+    indexManager.create(IndexMetadata.builder().name(indexName).build(), mapping);
 
     EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
 
-    indexManager.index(indexName, TEST_JSON, "1", "1");
+    indexManager.index(IndexMetadata.builder().name(indexName).id("1").routing("1").build(), TEST_JSON);
 
     EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
 
@@ -140,48 +141,49 @@ public class IndexManagerTests {
   public void existsTestWithoutRouting() throws IOException {
     String mapping = loadMapping(MAPPINGS_FILE);
 
-    indexManager.create(indexName, mapping);
+    indexManager.create(IndexMetadata.builder().name(indexName).build(), mapping);
 
     EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
 
-    assertTrue("'exists()' method should report index as exiting.", indexManager.exists(indexName));
+    assertTrue("'exists()' method should report index as exiting.",
+        indexManager.exists(IndexMetadata.builder().name(indexName).build()));
   }
 
   @Test
   public void existsTestWithCachePurging() throws IOException {
     String mapping = loadMapping(MAPPINGS_FILE);
 
-    indexManager.create(indexName, mapping);
+    indexManager.create(IndexMetadata.builder().name(indexName).build(), mapping);
 
     EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
 
     indexManager.purgeIndexCache();
 
     assertTrue("'exists()' method should check index existence on the server once cache is purged.",
-        indexManager.exists(indexName));
+        indexManager.exists(IndexMetadata.builder().name(indexName).build()));
   }
 
   @Test
   public void existsTestWithRouting() throws IOException {
     String mapping = loadMapping(MAPPINGS_FILE);
 
-    indexManager.create(indexName, mapping);
+    indexManager.create(IndexMetadata.builder().name(indexName).build(), mapping);
 
     EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
 
     assertTrue("'exists()' method should report index as exiting.",
-        indexManager.exists(indexName, "1"));
+        indexManager.exists(IndexMetadata.builder().name(indexName).routing("1").build()));
   }
 
   @Test
   public void updateExistingIndexNonExistingDocument() throws IOException {
     String mapping = loadMapping(MAPPINGS_FILE);
 
-    indexManager.create(indexName, mapping);
+    indexManager.create(IndexMetadata.builder().name(indexName).build(), mapping);
 
     EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
 
-    indexManager.update(indexName, TEST_JSON_2, "1");
+    indexManager.update(IndexMetadata.builder().name(indexName).id("1").build(), TEST_JSON_2);
 
     EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
 
@@ -198,15 +200,15 @@ public class IndexManagerTests {
   public void updateExistingIndexExistingDocument() throws IOException {
     String mapping = loadMapping(MAPPINGS_FILE);
 
-    indexManager.create(indexName, mapping);
+    indexManager.create(IndexMetadata.builder().name(indexName).build(), mapping);
 
     EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
 
-    indexManager.index(indexName, TEST_JSON, "1", "1");
+    indexManager.index(IndexMetadata.builder().name(indexName).id("1").routing("1").build(), TEST_JSON);
 
     EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
 
-    indexManager.update(indexName, TEST_JSON_2, "1");
+    indexManager.update(IndexMetadata.builder().name(indexName).id("1").build(), TEST_JSON_2);
 
     EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
 
@@ -220,7 +222,7 @@ public class IndexManagerTests {
 
   @Test
   public void updateNonExistingIndex() throws UnknownHostException {
-    indexManager.update(indexName, TEST_JSON_2, "1");
+    indexManager.update(IndexMetadata.builder().name(indexName).id("1").build(), TEST_JSON_2);
 
     EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
 

@@ -16,49 +16,81 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch;
 
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
+import cern.c2mon.server.elasticsearch.domain.IndexMetadata;
+
 /**
- * Defines all supported Elasticsearch index-related operations.
+ * Rest-based (check
+ * <a href="https://www.elastic.co/guide/en/elasticsearch/client/java-rest/current/index.html>
+ * Elasticsearch Documentation</a> for more details) supported index-related operations manager.
  *
+ * @author James Hamilton
  * @author Serhiy Boychenko
  */
-public interface IndexManager {
+@Slf4j
+@Component
+public class IndexManager {
+
+  private final List<String> indexCache = new CopyOnWriteArrayList<>();
+
+  private final ElasticsearchClient client;
 
   /**
-   * Type is being removed in Elasticsearch 6.x (check
-   * <a href="https://www.elastic.co/guide/en/elasticsearch/reference/master/removal-of-types.html">Elasticsearch
-   * documentation</a> for more details).
+   * @param client {@link ElasticsearchClient} client instance.
    */
-  String TYPE = "doc";
+  @Autowired
+  public IndexManager(ElasticsearchClient client) {
+    this.client = client;
+  }
 
   /**
    * Create a new index with an initial mapping.
    *
-   * @param indexName the name of the index to create.
-   * @param mapping   the mapping source.
+   * @param indexMetadata with details of index to be created
+   * @param mapping the mapping source.
    * @return true if the index was successfully created, false otherwise.
    */
-  boolean create(String indexName, String mapping);
+  public boolean create(IndexMetadata indexMetadata, String mapping) {
+    synchronized (IndexManager.class) {
+      if (exists(indexMetadata)) {
+        return true;
+      }
+
+      boolean created = client.createIndex(indexMetadata, mapping);
+
+      client.waitForYellowStatus();
+
+      if (created) {
+        indexCache.add(indexMetadata.getName());
+      }
+
+      return created;
+    }
+  }
 
   /**
    * Store document with relation to specific index.
    *
-   * @param indexName to relate the document with.
-   * @param source    of the document.
-   * @param routing   representing particular shard.
+   * @param indexMetadata with details of index to write the data
+   * @param data data to be written into the index
    * @return true if the document was successfully indexed, false otherwise.
    */
-  boolean index(String indexName, String source, String routing);
+  public boolean index(IndexMetadata indexMetadata, String data) {
+    synchronized (IndexManager.class) {
+      boolean indexed = client.indexData(indexMetadata, data);
 
-  /**
-   * Store document with relation to specific index.
-   *
-   * @param indexName to relate the document with.
-   * @param source    of the document.
-   * @param id        of the document.
-   * @param routing   representing particular shard.
-   * @return true if the document was successfully indexed, false otherwise.
-   */
-  boolean index(String indexName, String source, String id, String routing);
+      client.waitForYellowStatus();
+
+      return indexed;
+    }
+  }
 
   /**
    * Check if a given index exists.
@@ -66,45 +98,64 @@ public interface IndexManager {
    * The node-local index cache will be searched first before querying
    * Elasticsearch directly.
    *
-   * @param indexName the name of the index
+   * @param indexMetadata index metadata to check if it exists
    * @return true if the index exists, false otherwise.
    */
-  boolean exists(String indexName);
+  public boolean exists(IndexMetadata indexMetadata) {
+    synchronized (IndexManager.class) {
+      if (indexCache.contains(indexMetadata.getName())) {
+        return true;
+      }
 
-  /**
-   * Check if a given index exists.
-   * <p>
-   * The node-local index cache will be searched first before querying
-   * Elasticsearch directly.
-   *
-   * @param indexName to check if it exists.
-   * @param routing   representing particular shard.
-   * @return true if the index exists, false otherwise.
-   */
-  boolean exists(String indexName, String routing);
+      IndexMetadata.builder().name(indexMetadata.getName()).routing(indexMetadata.getRouting()).build();
+
+      if (client.isIndexExisting(indexMetadata)) {
+        indexCache.add(indexMetadata.getName());
+        return true;
+      }
+
+      return false;
+    }
+  }
 
   /**
    * Update indexed document (document will be created if not existing).
    *
-   * @param indexName to update its document.
-   * @param source    of the new document.
-   * @param id        of the old (existing) document.
+   * @param indexMetadata to be updated
+   * @param data of the new document to be written
    * @return true if index was successfully updated, false otherwise.
    */
-  boolean update(String indexName, String source, String id);
+  public boolean update(IndexMetadata indexMetadata, String data) {
+    synchronized (IndexManager.class) {
+      boolean updated = client.updateIndex(indexMetadata, data);
+
+      client.waitForYellowStatus();
+
+      return updated;
+    }
+  }
 
   /**
    * Delete an index in Elasticsearch.
    *
-   * @param indexName to be deleted.
-   * @param id        of existing document.
-   * @param routing   representing particular shard.
+   * @param indexMetadata to be deleted
    * @return true if index was successfully deleted, false otherwise.
    */
-  boolean delete(String indexName, String id, String routing);
+  public boolean delete(IndexMetadata indexMetadata) {
+    synchronized (IndexManager.class) {
+      indexCache.remove(indexMetadata.getName());
+      boolean deleted = client.deleteIndex(indexMetadata);
+      client.waitForYellowStatus();
+      return deleted;
+    }
+  }
 
   /**
    * Removes all cached components from index cache.
    */
-  void purgeIndexCache();
+  void purgeIndexCache() {
+    synchronized (IndexManager.class) {
+      indexCache.clear();
+    }
+  }
 }

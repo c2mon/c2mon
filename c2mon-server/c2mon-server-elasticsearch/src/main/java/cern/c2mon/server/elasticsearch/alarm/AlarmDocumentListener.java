@@ -28,7 +28,7 @@ import cern.c2mon.server.cache.CacheRegistrationService;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.server.common.config.ServerConstants;
-import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
+import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 
 /**
  * Listens for {@link Alarm} updates and converts them to {@link AlarmDocument}
@@ -41,7 +41,7 @@ import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
 @Component
 public class AlarmDocumentListener implements C2monCacheListener<Alarm>, SmartLifecycle {
 
-  private final ElasticsearchClient elasticsearchClient;
+  private final ElasticsearchProperties properties;
 
   @Qualifier("alarmDocumentPersistenceManager")
   private final IPersistenceManager<AlarmDocument> persistenceManager;
@@ -53,11 +53,11 @@ public class AlarmDocumentListener implements C2monCacheListener<Alarm>, SmartLi
   private volatile boolean running = false;
 
   @Autowired
-  public AlarmDocumentListener(final ElasticsearchClient elasticsearchClient, final CacheRegistrationService cacheRegistrationService, final IPersistenceManager<AlarmDocument> persistenceManager, final AlarmValueDocumentConverter converter) {
-    this.elasticsearchClient = elasticsearchClient;
+  public AlarmDocumentListener(ElasticsearchProperties properties, CacheRegistrationService cacheRegistrationService, IPersistenceManager<AlarmDocument> persistenceManager, AlarmValueDocumentConverter converter) {
+    this.properties = properties;
     this.persistenceManager = persistenceManager;
     this.converter = converter;
-    if (this.elasticsearchClient.getProperties().isEnabled()) {
+    if (properties.isEnabled()) {
       listenerContainer = cacheRegistrationService.registerToAlarms(this);
     }
   }
@@ -95,7 +95,7 @@ public class AlarmDocumentListener implements C2monCacheListener<Alarm>, SmartLi
 
   @Override
   public void start() {
-    if (this.elasticsearchClient.getProperties().isEnabled()) {
+    if (properties.isEnabled()) {
       running = true;
       listenerContainer.start();
     }
@@ -103,7 +103,7 @@ public class AlarmDocumentListener implements C2monCacheListener<Alarm>, SmartLi
 
   @Override
   public void stop() {
-    if (this.elasticsearchClient.getProperties().isEnabled()) {
+    if (properties.isEnabled()) {
       listenerContainer.stop();
       running = false;
     }

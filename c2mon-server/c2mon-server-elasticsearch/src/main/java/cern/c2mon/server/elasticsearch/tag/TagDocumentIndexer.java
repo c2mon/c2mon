@@ -31,6 +31,9 @@ import cern.c2mon.server.elasticsearch.IndexManager;
 import cern.c2mon.server.elasticsearch.IndexNameManager;
 import cern.c2mon.server.elasticsearch.MappingFactory;
 import cern.c2mon.server.elasticsearch.bulk.BulkProcessorProxy;
+import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
+import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
+import cern.c2mon.server.elasticsearch.domain.IndexMetadata;
 
 /**
  * This class manages the fallback-aware indexing of {@link TagDocument}
@@ -46,18 +49,22 @@ public class TagDocumentIndexer implements IDBPersistenceHandler<TagDocument> {
 
   private final IndexManager indexManager;
   private final IndexNameManager indexNameManager;
-  private final BulkProcessorProxy bulkProcessor;
+
+  private BulkProcessorProxy bulkProcessor;
 
   /**
+   * @param client Elasticsearch client instance
+   * @param properties Elasticsearch properties
    * @param indexNameManager to determine index names.
-   * @param indexManager     to execute index-related operations.
-   * @param bulkProcessor    to execute bulk index-related operations.
+   * @param indexManager to execute index-related operations.
    */
   @Autowired
-  public TagDocumentIndexer(IndexNameManager indexNameManager, IndexManager indexManager, BulkProcessorProxy bulkProcessor) {
+  public TagDocumentIndexer(ElasticsearchClient client, ElasticsearchProperties properties, IndexNameManager indexNameManager, IndexManager indexManager) {
     this.indexNameManager = indexNameManager;
     this.indexManager = indexManager;
-    this.bulkProcessor = bulkProcessor;
+    if (properties.isEnabled()) {
+      bulkProcessor = new BulkProcessorProxy(client);
+    }
   }
 
   @Override
@@ -81,9 +88,9 @@ public class TagDocumentIndexer implements IDBPersistenceHandler<TagDocument> {
   private void indexTag(TagDocument tag) {
     String index = getOrCreateIndex(tag);
 
-    log.trace("Indexing tag (#{}, index={}, type={})", tag.getId(), index, IndexManager.TYPE);
+    log.trace("Indexing tag (#{}, index={}, type={})", tag.getId(), index, ElasticsearchProperties.TYPE);
 
-    IndexRequest indexNewTag = new IndexRequest(index, IndexManager.TYPE)
+    IndexRequest indexNewTag = new IndexRequest(index, ElasticsearchProperties.TYPE)
         .source(tag.toString(), XContentType.JSON)
         .routing(tag.getId());
 
@@ -91,13 +98,13 @@ public class TagDocumentIndexer implements IDBPersistenceHandler<TagDocument> {
   }
 
   private String getOrCreateIndex(TagDocument tag) {
-    String index = indexNameManager.indexFor(tag);
+    IndexMetadata indexMetadata = IndexMetadata.builder().name(indexNameManager.indexFor(tag)).build();
 
-    if (!indexManager.exists(index)) {
-      indexManager.create(index, MappingFactory.createTagMapping());
+    if (!indexManager.exists(indexMetadata)) {
+      indexManager.create(indexMetadata, MappingFactory.createTagMapping());
     }
 
-    return index;
+    return indexMetadata.getName();
 
   }
 

@@ -20,10 +20,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import cern.c2mon.server.cache.TagFacadeGateway;
 import cern.c2mon.server.elasticsearch.IndexManager;
 import cern.c2mon.server.elasticsearch.MappingFactory;
 import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
+import cern.c2mon.server.elasticsearch.domain.IndexMetadata;
 
 /**
  * This class manages the indexing of {@link TagConfigDocument} instances to
@@ -38,20 +38,14 @@ import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 public class TagConfigDocumentIndexer {
 
   private final String configIndex;
-
   private final IndexManager indexManager;
-
-  @Autowired
-  private TagFacadeGateway tagFacadeGateway;
-  @Autowired
-  private TagConfigDocumentConverter converter;
 
   /**
    * @param properties   of Elasticsearch server the application is communicating with.
    * @param indexManager to perform index-related operations.
    */
   @Autowired
-  public TagConfigDocumentIndexer(final ElasticsearchProperties properties, final IndexManager indexManager) {
+  public TagConfigDocumentIndexer(ElasticsearchProperties properties, IndexManager indexManager) {
     this.indexManager = indexManager;
     this.configIndex = properties.getTagConfigIndex();
   }
@@ -62,11 +56,13 @@ public class TagConfigDocumentIndexer {
    * @param tag to be indexed.
    */
   public void indexTagConfig(final TagConfigDocument tag) {
-    if (!indexManager.exists(configIndex)) {
-      indexManager.create(configIndex, MappingFactory.createTagConfigMapping());
+    IndexMetadata indexMetadata = IndexMetadata.builder().name(configIndex).id(tag.getId()).routing(tag.getId()).build();
+
+    if (!indexManager.exists(indexMetadata)) {
+      indexManager.create(indexMetadata, MappingFactory.createTagConfigMapping());
     }
 
-    if (!indexManager.index(configIndex, tag.toString(), tag.getId(), tag.getId())) {
+    if (!indexManager.index(indexMetadata, tag.toString())) {
       log.error("Could not index '#{}' to index '{}'.", tag.getId(), configIndex);
     }
   }
@@ -77,11 +73,13 @@ public class TagConfigDocumentIndexer {
    * @param tag to be updated.
    */
   public void updateTagConfig(TagConfigDocument tag) {
-    if (!indexManager.exists(configIndex)) {
-      indexManager.create(configIndex, MappingFactory.createTagConfigMapping());
+    IndexMetadata indexMetadata = IndexMetadata.builder().name(configIndex).id(tag.getId()).build();
+
+    if (!indexManager.exists(indexMetadata)) {
+      indexManager.create(indexMetadata, MappingFactory.createTagConfigMapping());
     }
 
-    indexManager.update(configIndex, tag.toString(), tag.getId());
+    indexManager.update(indexMetadata, tag.toString());
   }
 
   /**
@@ -90,10 +88,13 @@ public class TagConfigDocumentIndexer {
    * @param tagId of the document to be deleted.
    */
   public void removeTagConfigById(final Long tagId) {
-    if (!indexManager.exists(configIndex)) {
+    IndexMetadata indexMetadata =
+        IndexMetadata.builder().name(configIndex).id(String.valueOf(tagId)).routing(String.valueOf(tagId)).build();
+
+    if (!indexManager.exists(indexMetadata)) {
       return;
     }
 
-    indexManager.delete(configIndex, String.valueOf(tagId), String.valueOf(tagId));
+    indexManager.delete(indexMetadata);
   }
 }

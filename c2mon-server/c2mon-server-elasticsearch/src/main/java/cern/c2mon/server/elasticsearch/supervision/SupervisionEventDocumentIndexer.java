@@ -28,6 +28,7 @@ import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
 import cern.c2mon.server.elasticsearch.IndexManager;
 import cern.c2mon.server.elasticsearch.IndexNameManager;
 import cern.c2mon.server.elasticsearch.MappingFactory;
+import cern.c2mon.server.elasticsearch.domain.IndexMetadata;
 
 /**
  * This class manages the fallback-aware indexing of {@link SupervisionEventDocument}
@@ -70,17 +71,18 @@ public class SupervisionEventDocumentIndexer implements IDBPersistenceHandler<Su
 
     log.debug("Adding new supervision event to index {}", indexName);
 
-    return indexManager.index(indexName, supervisionEvent.toString(), supervisionEvent.getId());
+    return indexManager.index(IndexMetadata.builder().name(indexName).routing( supervisionEvent.getId()).build(),
+        supervisionEvent.toString());
   }
 
   private String getOrCreateIndex(SupervisionEventDocument supervisionEvent) {
-    String index = indexNameManager.indexFor(supervisionEvent);
+    IndexMetadata indexMetadata = IndexMetadata.builder().name(indexNameManager.indexFor(supervisionEvent)).build();
 
-    if (!indexManager.exists(index)) {
-      indexManager.create(index, MappingFactory.createSupervisionMapping());
+    if (!indexManager.exists(indexMetadata)) {
+      indexManager.create(indexMetadata, MappingFactory.createSupervisionMapping());
     }
 
-    return index;
+    return indexMetadata.getName();
   }
 
   @Override

@@ -17,17 +17,17 @@
 package cern.c2mon.server.elasticsearch.exception;
 
 /**
- * An exception to be thrown when an error indexing ES entity occurs
+ * An exception to be thrown when an error loading index mapping occurs
  *
  * @author Serhiy Boychenko
  */
-public class IndexingException extends RuntimeException {
+public class IndexMappingNotFoundException extends RuntimeException {
 
   /**
    * @param message to be associated with the exception
    * @param cause   exception cause
    */
-  public IndexingException(String message, Throwable cause) {
+  public IndexMappingNotFoundException(String message, Throwable cause) {
     super(message, cause);
   }
 }

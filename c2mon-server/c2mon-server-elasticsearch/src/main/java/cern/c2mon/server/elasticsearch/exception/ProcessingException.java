@@ -25,7 +25,7 @@ public class ProcessingException extends RuntimeException {
 
   /**
    * @param message to be associated with the exception
-   * @param cause   excetion cause
+   * @param cause   exception cause
    */
   public ProcessingException(String message, Throwable cause) {
     super(message, cause);

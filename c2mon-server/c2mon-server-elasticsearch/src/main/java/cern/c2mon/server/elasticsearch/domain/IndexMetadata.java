@@ -14,20 +14,22 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.elasticsearch.exception;
+package cern.c2mon.server.elasticsearch.domain;
+
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NonNull;
 
 /**
- * An exception to be thrown when an error indexing ES entity occurs
+ * Allows to defined index metadata
  *
  * @author Serhiy Boychenko
  */
-public class IndexingException extends RuntimeException {
-
-  /**
-   * @param message to be associated with the exception
-   * @param cause   exception cause
-   */
-  public IndexingException(String message, Throwable cause) {
-    super(message, cause);
-  }
+@Getter
+@Builder
+public class IndexMetadata {
+  @NonNull
+  private String name;
+  private String id;
+  private String routing;
 }

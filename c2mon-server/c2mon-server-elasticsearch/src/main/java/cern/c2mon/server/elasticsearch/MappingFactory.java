@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 import org.springframework.core.io.ClassPathResource;
 
 import cern.c2mon.server.elasticsearch.alarm.AlarmDocument;
+import cern.c2mon.server.elasticsearch.exception.IndexMappingNotFoundException;
 import cern.c2mon.server.elasticsearch.supervision.SupervisionEventDocument;
 import cern.c2mon.server.elasticsearch.tag.TagDocument;
 import cern.c2mon.server.elasticsearch.tag.config.TagConfigDocument;
@@ -91,7 +92,7 @@ public final class MappingFactory {
     try {
       return new ClassPathResource(location).getInputStream();
     } catch (IOException e) {
-      throw new RuntimeException("Error loading resource", e);
+      throw new IndexMappingNotFoundException("Error loading index mapping", e);
     }
   }
 }
