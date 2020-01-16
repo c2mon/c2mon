@@ -1,6 +1,6 @@
 package cern.c2mon.cache.actions.state;
 
-import cern.c2mon.cache.AbstractCacheTest;
+import cern.c2mon.cache.actions.AbstractCacheListenerTest;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.cache.api.listener.CacheListener;
@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static cern.c2mon.shared.common.supervision.SupervisionStatus.*;
 import static org.junit.Assert.*;
 
-public class StateTagServiceTest extends AbstractCacheTest<SupervisionStateTag> {
+public class StateTagServiceTest extends AbstractCacheListenerTest<SupervisionStateTag> {
 
   @Inject
   SupervisionStateTagService stateTagService;
@@ -26,6 +26,7 @@ public class StateTagServiceTest extends AbstractCacheTest<SupervisionStateTag> 
   C2monCache<SupervisionStateTag> supervisionStateTagCache;
 
   private final SupervisionStateTagFactory stateTagFactory = new SupervisionStateTagFactory();
+  private final SupervisionStateTag sample = getSample();
 
   @Override
   protected SupervisionStateTag getSample() {
@@ -39,60 +40,60 @@ public class StateTagServiceTest extends AbstractCacheTest<SupervisionStateTag> 
 
   @Test(expected = CacheElementNotFoundException.class)
   public void getSupervisionStatusThrowsIfNonexistent() {
-    stateTagService.getSupervisionEvent(getSample().getId());
+    stateTagService.getSupervisionEvent(-1L);
   }
 
   @Test
   public void isRunning() {
-    cache.put(getSample().getId(), getSample());
+    cache.put(sample.getId(), sample);
     // Default
-    assertFalse(stateTagService.isRunning(getSample().getId()));
+    assertFalse(stateTagService.isRunning(sample.getId()));
 
-    getSample().setSupervision(STARTUP, "", Timestamp.from(Instant.now()));
-    cache.put(getSample().getId(), getSample());
-    assertTrue(stateTagService.isRunning(getSample().getId()));
+    sample.setSupervision(STARTUP, "", Timestamp.from(Instant.now()));
+    cache.put(sample.getId(), sample);
+    assertTrue(stateTagService.isRunning(sample.getId()));
 
-    getSample().setSupervision(RUNNING_LOCAL, "", Timestamp.from(Instant.now()));
-    cache.put(getSample().getId(), getSample());
-    assertTrue(stateTagService.isRunning(getSample().getId()));
+    sample.setSupervision(RUNNING_LOCAL, "", Timestamp.from(Instant.now()));
+    cache.put(sample.getId(), sample);
+    assertTrue(stateTagService.isRunning(sample.getId()));
 
-    getSample().setSupervision(RUNNING, "", Timestamp.from(Instant.now()));
-    cache.put(getSample().getId(), getSample());
-    assertTrue(stateTagService.isRunning(getSample().getId()));
+    sample.setSupervision(RUNNING, "", Timestamp.from(Instant.now()));
+    cache.put(sample.getId(), sample);
+    assertTrue(stateTagService.isRunning(sample.getId()));
 
-    getSample().setSupervision(STOPPED, "", Timestamp.from(Instant.now()));
-    cache.put(getSample().getId(), getSample());
-    assertFalse(stateTagService.isRunning(getSample().getId()));
+    sample.setSupervision(STOPPED, "", Timestamp.from(Instant.now()));
+    cache.put(sample.getId(), sample);
+    assertFalse(stateTagService.isRunning(sample.getId()));
 
-    getSample().setSupervision(DOWN, "", Timestamp.from(Instant.now()));
-    cache.put(getSample().getId(), getSample());
-    assertFalse(stateTagService.isRunning(getSample().getId()));
+    sample.setSupervision(DOWN, "", Timestamp.from(Instant.now()));
+    cache.put(sample.getId(), sample);
+    assertFalse(stateTagService.isRunning(sample.getId()));
 
-    getSample().setSupervision(UNCERTAIN, "", Timestamp.from(Instant.now()));
-    cache.put(getSample().getId(), getSample());
-    assertFalse(stateTagService.isRunning(getSample().getId()));
+    sample.setSupervision(UNCERTAIN, "", Timestamp.from(Instant.now()));
+    cache.put(sample.getId(), sample);
+    assertFalse(stateTagService.isRunning(sample.getId()));
   }
 
   @Test
   public void isUncertain() {
-    getSample().setSupervision(UNCERTAIN, "", new Timestamp(0));
+    sample.setSupervision(UNCERTAIN, "", new Timestamp(0));
 
-    cache.put(getSample().getId(), getSample());
+    cache.put(sample.getId(), sample);
 
-    assertTrue(SupervisionStateTagEvaluator.isUncertain(stateTagService.getCache().get(getSample().getId())));
+    assertTrue(SupervisionStateTagEvaluator.isUncertain(stateTagService.getCache().get(sample.getId())));
   }
 
   @Test
   public void refreshAndNotifyCurrentSupervisionStatus() {
     // Generates one supervision update event, we don't listen yet
-    cache.put(getSample().getId(), getSample());
+    cache.put(sample.getId(), sample);
 
     final AtomicInteger eventCounter = new AtomicInteger(0);
     final CacheListener<SupervisionStateTag> paramListener = eq -> eventCounter.incrementAndGet();
     cache.getCacheListenerManager().registerListener(paramListener, CacheEvent.SUPERVISION_UPDATE);
 
     // Should generate exactly one event
-    stateTagService.refresh(getSample().getId());
+    stateTagService.refresh(sample.getId());
 
     cache.getCacheListenerManager().close();
 
