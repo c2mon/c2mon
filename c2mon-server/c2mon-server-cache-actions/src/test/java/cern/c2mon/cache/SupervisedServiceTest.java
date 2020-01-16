@@ -37,7 +37,6 @@ public abstract class SupervisedServiceTest<T extends Supervised, T_IMPL extends
   }
 
   @Test
-  @Ignore
   public void getSupervisionStatus() {
     cache.put(sample.getId(), sample);
 

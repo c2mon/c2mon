@@ -31,7 +31,7 @@ public class SupervisionStateTag extends ControlTag {
   /**
    * Supervision status of this object when it was recovered from cache
    */
-  SupervisionStatus supervisionStatus = SupervisionStatus.UNCERTAIN;
+  SupervisionStatus supervisionStatus = SupervisionStatus.DOWN;
   /**
    * Reason/description of the current status, or empty
    */
