@@ -140,9 +140,9 @@ public abstract class AbstractSupervisedCacheObject extends AbstractCacheableImp
 
     @Override
     public void setSupervision(SupervisionStatus supervisionStatus, String statusDescription, Timestamp statusTime) {
-        setSupervisionStatus(supervisionStatus);
-        setStatusDescription(statusDescription);
-        setStatusTime(statusTime);
+        this.supervisionStatus = supervisionStatus;
+        this.statusDescription = statusDescription;
+        this.statusTime = statusTime;
     }
 
     public SupervisionEvent getSupervisionEvent() {

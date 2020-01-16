@@ -49,18 +49,8 @@ public abstract class SupervisedTest<T extends Supervised> {
   }
 
   @Test(expected = NullPointerException.class)
-  public void setNullStatus() {
-    sample.setSupervisionStatus(null);
-  }
-
-  @Test(expected = NullPointerException.class)
   public void setNullTimestamp() {
     sample.setCacheTimestamp(null);
-  }
-
-  @Test(expected = NullPointerException.class)
-  public void setNullDescription() {
-    sample.setStatusDescription(null);
   }
 
   @Test

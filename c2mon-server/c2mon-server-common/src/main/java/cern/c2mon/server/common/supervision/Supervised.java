@@ -47,15 +47,6 @@ public interface Supervised extends Cacheable {
   SupervisionStatus getSupervisionStatus();
 
   /**
-   * Sets the status of this supervised object.
-   *
-   * @param supervisionStatus new status
-   * @deprecated use {@link Supervised#setSupervision(SupervisionStatus, String, Timestamp)} instead
-   */
-  @Deprecated
-  void setSupervisionStatus(@NonNull SupervisionStatus supervisionStatus);
-
-  /**
    * Returns the id of the state tag used to publish the
    * status to clients.
    *
@@ -95,29 +86,11 @@ public interface Supervised extends Cacheable {
   String getStatusDescription();
 
   /**
-   * Sets the description of the status.
-   *
-   * @param statusDescription a reason for the current status
-   * @deprecated use {@link Supervised#setSupervision(SupervisionStatus, String, Timestamp)} instead
-   */
-  @Deprecated
-  void setStatusDescription(@NonNull String statusDescription);
-
-  /**
    * Getter.
    *
    * @return the time of the last change in the supervision status, or null
    */
   Timestamp getStatusTime();
-
-  /**
-   * Setter.
-   *
-   * @param supervisionTime time of the supervision event
-   * @deprecated use {@link Supervised#setSupervision(SupervisionStatus, String, Timestamp)} instead
-   */
-  @Deprecated
-  void setStatusTime(@NonNull Timestamp supervisionTime);
 
   /**
    * Sets the supervision information for the supervised object, including
