@@ -15,7 +15,7 @@ import java.sql.Timestamp;
 @EqualsAndHashCode(callSuper = true)
 public abstract class AbstractInfoTagCacheObject extends AbstractTagCacheObject {
 
-  private static final Timestamp DEFAULT_TIMESTAMP = new Timestamp(0L);
+  public static final Timestamp DEFAULT_TIMESTAMP = new Timestamp(0L);
   /**
    * Address configuration of the datatag (if any)
    */

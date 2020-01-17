@@ -11,6 +11,8 @@ import lombok.NonNull;
 
 import java.sql.Timestamp;
 
+import static cern.c2mon.server.common.util.KotlinAPIs.orElse;
+
 /**
  * Expresses the current situation of a {@link Supervised} object
  *
@@ -35,11 +37,11 @@ public class SupervisionStateTag extends ControlTag {
   /**
    * Reason/description of the current status, or empty
    */
-  String statusDescription;
+  String statusDescription = "";
   /**
    * Time when this supervision status was last confirmed
    */
-  Timestamp statusTime;
+  Timestamp statusTime = DEFAULT_TIMESTAMP;
 
   /**
    * Primary Ctor, also used by MyBatis (hence the Long instead of long)
@@ -59,10 +61,10 @@ public class SupervisionStateTag extends ControlTag {
    * @param statusTime        time of the supervision event
    */
   public void setSupervision(@NonNull SupervisionStatus supervisionStatus,
-                             @NonNull String statusDescription,
+                             String statusDescription,
                              @NonNull Timestamp statusTime) {
     this.supervisionStatus = supervisionStatus;
-    this.statusDescription = statusDescription;
+    this.statusDescription = orElse(statusDescription, "");
     this.statusTime = new Timestamp(statusTime.getTime());
   }
 

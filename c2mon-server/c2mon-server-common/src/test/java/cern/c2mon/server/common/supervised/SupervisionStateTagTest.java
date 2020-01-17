@@ -1,6 +1,7 @@
 package cern.c2mon.server.common.supervised;
 
 import cern.c2mon.server.common.supervision.SupervisionStateTag;
+import cern.c2mon.server.common.tag.AbstractInfoTagCacheObject;
 import cern.c2mon.shared.common.supervision.SupervisionStatus;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,9 +26,10 @@ public class SupervisionStateTagTest {
     sample.setSupervision(null, "", new Timestamp(1L));
   }
 
-  @Test(expected = NullPointerException.class)
+  @Test
   public void setNullDescription() {
     sample.setSupervision(SupervisionStatus.RUNNING, null, new Timestamp(1L));
+    assertEquals(sample.getStatusDescription(), "");
   }
 
   @Test(expected = NullPointerException.class)
@@ -66,7 +68,7 @@ public class SupervisionStateTagTest {
     action.accept(timestamp, message);
     assertEquals(expected, sample.getSupervisionStatus());
     // Uninitialized objects don't have time or description
-    if (sample.getStatusTime() == null)
+    if (sample.getStatusTime() == AbstractInfoTagCacheObject.DEFAULT_TIMESTAMP)
       return;
     assertEquals(timestamp, sample.getStatusTime());
     if (message != null)

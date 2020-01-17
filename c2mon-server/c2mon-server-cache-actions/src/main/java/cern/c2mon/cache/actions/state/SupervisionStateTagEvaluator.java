@@ -6,6 +6,7 @@ import cern.c2mon.shared.common.supervision.SupervisionStatus;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
+import static cern.c2mon.server.common.util.KotlinAPIs.apply;
 import static cern.c2mon.shared.common.supervision.SupervisionStatus.*;
 
 @Slf4j
@@ -28,22 +29,29 @@ public class SupervisionStateTagEvaluator {
       return false;
     }
     if (controlTag.getValue() == null) {
-      log.warn("Tag " + controlTag.getName() +" has no value - no state tag will be updated.");
+      log.warn("Tag {} has no value - no state tag will be updated.", controlTag.getName());
       return false;
     }
     return true;
   }
 
-  public static boolean hasIdDiscrepancy(@NonNull ControlTag controlTag, @NonNull SupervisionStateTag stateTag) {
-    if (stateTag.getCommFaultTagId() != controlTag.getId()) {
-      log.error(
-        "CommFaultTag cache object" + controlTag.getName() +"(" + controlTag.getId() +")" +
-          " has StateTag "+ stateTag.getName() + "(" +stateTag.getId() +") listed," +
-          " but StateTag cache object has a different CommFaultTag id listed (" + stateTag.getCommFaultTagId()
-      );
-      return true;
-    }
-    return false;
+  public static boolean machesAnyTagId(@NonNull ControlTag controlTag, @NonNull SupervisionStateTag stateTag) {
+    return apply(
+      matchesAnyTagId(controlTag.getId(), stateTag.getCommFaultTagId(), stateTag.getAliveTagId()),
+      anyMatched -> {
+        if (!anyMatched)
+          log.error(
+            "ControlTag cache object {} #{} has StateTag {} #{} listed, but StateTag cache object does not know this id." +
+              "In StateTag, AliveTag Id #{} - CommFaultTag id listed: #{}",
+            controlTag.getName(), controlTag.getId(), stateTag.getName(), stateTag.getId(),
+            stateTag.getAliveTagId(), stateTag.getCommFaultTagId());
+      }
+    );
+  }
+
+  private static boolean matchesAnyTagId(long controlTagId, Long stateCommFaultId, Long stateAliveId) {
+    return stateCommFaultId != null && stateCommFaultId == controlTagId
+      || stateAliveId != null && stateAliveId == controlTagId;
   }
 
   /**

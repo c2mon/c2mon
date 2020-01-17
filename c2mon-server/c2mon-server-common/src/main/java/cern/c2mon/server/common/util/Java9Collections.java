@@ -42,6 +42,4 @@ public final class Java9Collections {
   public static <T> List<T> listOfNonNulls(T... args) {
     return Stream.of(args).filter(Objects::nonNull).collect(Collectors.toList());
   }
-
-  // TODO firstNonNull
 }

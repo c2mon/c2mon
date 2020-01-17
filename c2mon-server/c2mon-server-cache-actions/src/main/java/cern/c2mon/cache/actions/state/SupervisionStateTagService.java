@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 
 import static cern.c2mon.cache.actions.commfault.CommFaultTagEvaluator.inferSupervisionStatus;
 import static cern.c2mon.cache.actions.state.SupervisionStateTagEvaluator.controlTagCanUpdateState;
-import static cern.c2mon.cache.actions.state.SupervisionStateTagEvaluator.hasIdDiscrepancy;
+import static cern.c2mon.cache.actions.state.SupervisionStateTagEvaluator.machesAnyTagId;
 import static cern.c2mon.shared.common.supervision.SupervisionStatus.DOWN;
 import static cern.c2mon.shared.common.supervision.SupervisionStatus.RUNNING;
 
@@ -45,7 +45,7 @@ public class SupervisionStateTagService extends AbstractCacheServiceImpl<Supervi
       return;
 
     cache.compute(stateTagId, stateTag -> {
-      if (hasIdDiscrepancy(controlTag, stateTag)) {
+      if (!machesAnyTagId(controlTag, stateTag)) {
         // TODO (Alex) Should this throw? Or just fix?
         return;
       }
@@ -56,8 +56,11 @@ public class SupervisionStateTagService extends AbstractCacheServiceImpl<Supervi
         SupervisionStatus oldStatus = stateTag.getSupervisionStatus();
         SupervisionStatus newStatus = inferSupervisionStatus(controlTag);
         // If the status changes, set the time to now
-        stateTag.setSupervision(newStatus, controlTag.getValueDescription(),
-          newStatus.equals(oldStatus) ? stateTag.getStatusTime() : new Timestamp(System.currentTimeMillis()));
+        Timestamp updatedTimestamp = newStatus.equals(oldStatus)
+          ? stateTag.getStatusTime()
+          : new Timestamp(System.currentTimeMillis());
+
+        stateTag.setSupervision(newStatus, controlTag.getValueDescription(), updatedTimestamp);
       }
     });
   }
@@ -100,7 +103,7 @@ public class SupervisionStateTagService extends AbstractCacheServiceImpl<Supervi
    * @return the last supervision event
    * @throws CacheElementNotFoundException if the StateTag with the given id does not exist
    */
-  public SupervisionEvent getSupervisionEvent(long stateTagId){
+  public SupervisionEvent getSupervisionEvent(long stateTagId) {
     return SupervisionStateTagController.createSupervisionEvent(cache.get(stateTagId));
   }
 
@@ -109,12 +112,12 @@ public class SupervisionStateTagService extends AbstractCacheServiceImpl<Supervi
    * for this supervised cache object (or a generated
    * one if none have yet occured for this cache object).
    *
-   * @param supervisedId id of the supervised object
+   * @param supervisedId      id of the supervised object
    * @param supervisionEntity type of the supervised object
    * @return the last supervision event
    * @throws CacheElementNotFoundException if the supervised or the state tag doesn't exist
    */
-  public SupervisionEvent getSupervisionEventBySupervisedId(long supervisedId, SupervisionEntity supervisionEntity){
+  public SupervisionEvent getSupervisionEventBySupervisedId(long supervisedId, SupervisionEntity supervisionEntity) {
     // TODO (Alex)
     return null;
   }

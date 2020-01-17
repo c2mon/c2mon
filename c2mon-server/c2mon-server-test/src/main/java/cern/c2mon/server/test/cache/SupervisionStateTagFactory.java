@@ -14,4 +14,14 @@ public class SupervisionStateTagFactory extends AbstractCacheObjectFactory<Super
       1223L
     );
   }
+
+  public SupervisionStateTag ofProcess() {
+    return new SupervisionStateTag(
+      1260L,
+      51L,
+      "PROC",
+      1224L,
+      null
+    );
+  }
 }

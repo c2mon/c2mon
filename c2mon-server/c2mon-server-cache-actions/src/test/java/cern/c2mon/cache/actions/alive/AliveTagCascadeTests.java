@@ -38,6 +38,11 @@ public class AliveTagCascadeTests {
 
   private void populateWithData() {
     apply(commFaultFactory.sampleBase(), it -> commFaultService.getCache().put(it.getId(), it));
+    
+    apply(stateTagService.getCache(), cache -> {
+      apply(stateTagFactory.sampleBase(), it -> cache.put(it.getId(), it));
+      apply(stateTagFactory.ofProcess(), it -> cache.put(it.getId(), it));
+    });
   }
 
   @Test(expected = NullPointerException.class)
@@ -89,10 +94,26 @@ public class AliveTagCascadeTests {
     CountDownLatch commFaultUpdate = new CountDownLatch(1);
     registerLatchListener(commFaultService.getCache(), commFaultUpdate);
 
-    updateCascader.apply(apply(factory.sampleBase(),
-      aliveTag -> aliveTag.setSourceTimestamp(Timestamp.from(Instant.now()))));
+    updateCascader.apply(
+      apply(factory.sampleBase(),
+        aliveTag -> aliveTag.setSourceTimestamp(Timestamp.from(Instant.now())))
+    );
 
     assertTrue(commFaultUpdate.await(100, TimeUnit.MILLISECONDS));
+  }
+
+  @Test
+  public void validProcessTag() throws InterruptedException {
+    populateWithData();
+    CountDownLatch stateTagUpdate = new CountDownLatch(1);
+    registerLatchListener(stateTagService.getCache(), stateTagUpdate);
+
+    updateCascader.apply(
+      apply(factory.ofProcess(),
+        aliveTag -> aliveTag.setSourceTimestamp(Timestamp.from(Instant.now())))
+    );
+
+    assertTrue(stateTagUpdate.await(100, TimeUnit.MILLISECONDS));
   }
 
   private void registerLatchListener(C2monCache<?> cache, CountDownLatch latch) {
