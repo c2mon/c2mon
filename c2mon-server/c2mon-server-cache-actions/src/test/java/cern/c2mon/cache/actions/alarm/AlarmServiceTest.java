@@ -38,7 +38,7 @@ public class AlarmServiceTest {
     alarmCache = new SimpleC2monCache<>("alarm");
     C2monCache<RuleTag> ruleTagCache = new SimpleC2monCache<>("rules");
     dataTagCache = new SimpleC2monCache<>("data");
-    UnifiedTagCacheFacade unifiedTagCacheFacade = new UnifiedTagCacheFacade(ruleTagCache, dataTagCache);
+    UnifiedTagCacheFacade unifiedTagCacheFacade = new UnifiedTagCacheFacade(ruleTagCache, dataTagCache, null, null, null);
     alarmService = new AlarmService(alarmCache, unifiedTagCacheFacade, new OscillationUpdater(new OscillationProperties()));
   }
 

@@ -117,7 +117,7 @@ public class OscillationUpdaterTest {
    * we test if the oscillation is detected. For loop will generate a sequence
    * of alarm ACTIVE/INACTIVE and the test should give a true assertion in case
    * the oscillation is detected.
-   *
+   * <p>
    * 5 oscillation in 180 seconds are the trigger and we are just in
    */
   @Test
@@ -244,8 +244,8 @@ public class OscillationUpdaterTest {
   public void testOscillationInfo() throws Exception {
     C2monCache<DataTag> dataTagCache = new SimpleC2monCache<>("dataTagCache");
     UnifiedTagCacheFacade unifiedTagCacheFacade = new UnifiedTagCacheFacade(
-      new SimpleC2monCache<>("ruleTagCache"), dataTagCache);
-    AlarmService myAlarmCacheUpdater = new AlarmService(alarmCache, unifiedTagCacheFacade,oscUpdater);
+      new SimpleC2monCache<>("ruleTagCache"), dataTagCache, null, null, null);
+    AlarmService myAlarmCacheUpdater = new AlarmService(alarmCache, unifiedTagCacheFacade, oscUpdater);
 
     alarmCacheObject.setOscillating(false);
     for (int i = 1; i <= oscillationProperties.getOscNumbers(); i++) {
@@ -264,7 +264,7 @@ public class OscillationUpdaterTest {
       myAlarmCacheUpdater.update(alarmCacheObject, dataTagCacheObject, true);
       log.info("ALARM ACTIVE: {} - INTERNAL ACTIVE: {} OSCILLATION: {} INFO: {} firstOscTS {} counter {} ", alarmCacheObject.isActive(), alarmCacheObject.isInternalActive(), alarmCacheObject.isOscillating(), alarmCacheObject.getInfo(), alarmCacheObject.getFifoSourceTimestamps().getFirst(), alarmCacheObject.getFifoSourceTimestamps().size());
       assertEquals(alarmCacheObject.isOscillating(), alarmCacheObject.getInfo().contains(Alarm.ALARM_INFO_OSC));
-      if(alarmCacheObject.isOscillating()) {
+      if (alarmCacheObject.isOscillating()) {
         assertTrue("If an alarm is oscillating, it must be active", alarmCacheObject.isActive());
       }
 //      EasyMock.verify(alarmCache);

@@ -5,8 +5,11 @@ import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.cache.api.listener.BufferedCacheListener;
 import cern.c2mon.cache.api.listener.CacheListener;
 import cern.c2mon.cache.config.ClientQueryProvider;
+import cern.c2mon.server.common.alive.AliveTag;
+import cern.c2mon.server.common.commfault.CommFaultTag;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.rule.RuleTag;
+import cern.c2mon.server.common.supervision.SupervisionStateTag;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.common.CacheEvent;
 import org.springframework.stereotype.Service;
@@ -30,8 +33,12 @@ public class UnifiedTagCacheFacade {
   private final List<C2monCache<? extends Tag>> tagCaches;
 
   @Inject
-  public UnifiedTagCacheFacade(final C2monCache<RuleTag> ruleTagCacheRef, final C2monCache<DataTag> dataTagCacheRef) {
-    tagCaches = Arrays.asList(ruleTagCacheRef, dataTagCacheRef);
+  public UnifiedTagCacheFacade(final C2monCache<RuleTag> ruleTagCacheRef,
+                               final C2monCache<DataTag> dataTagCacheRef,
+                               final C2monCache<AliveTag> aliveTagCacheRef,
+                               final C2monCache<CommFaultTag> commFaultTagCacheRef,
+                               final C2monCache<SupervisionStateTag> stateTagCacheRef) {
+    tagCaches = Arrays.asList(ruleTagCacheRef, dataTagCacheRef, aliveTagCacheRef, commFaultTagCacheRef, stateTagCacheRef);
   }
 
   public boolean containsKey(long id) {

@@ -45,7 +45,7 @@ public class OscillationUpdateCheckerTest {
   public void setup() {
     // Tag caches
     dataTagCache = new SimpleC2monCache<>("dataTag");
-    UnifiedTagCacheFacade unifiedTagCacheFacade = new UnifiedTagCacheFacade(new SimpleC2monCache<>("ruleTag"), dataTagCache);
+    UnifiedTagCacheFacade unifiedTagCacheFacade = new UnifiedTagCacheFacade(new SimpleC2monCache<>("ruleTag"), dataTagCache, null, null, null);
     dataTagCacheObject = new DataTagCacheObjectFactory().sampleBase();
     dataTagCacheObject.setValue(Boolean.FALSE);
     dataTagCacheObject.setSourceTimestamp(new Timestamp(System.currentTimeMillis() - 100000L));
