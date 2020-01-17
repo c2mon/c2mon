@@ -39,7 +39,7 @@ public class SupervisionNotifierTest {
   /**
    * Class to test.
    */
-  private static SupervisionNotifier supervisionNotifier = new SupervisionNotifierImpl(null, null, null);
+  private static SupervisionNotifier supervisionNotifier = new SupervisionNotifierImpl(null);
 
   /**
    * Test event.
