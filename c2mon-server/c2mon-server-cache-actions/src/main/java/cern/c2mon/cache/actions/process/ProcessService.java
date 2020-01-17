@@ -172,6 +172,16 @@ public class ProcessService extends AbstractCacheServiceImpl<Process>
 //    } TODO (Alex) Review this
   }
 
+  @Override
+  public void stop(long id, Timestamp timestamp) {
+//    TODO (Alex) Make sure to also set these on the process
+//    setCurrentHost(null);
+//    setStartupTime(null);
+//    setRequiresReboot(Boolean.FALSE);
+//    setProcessPIK(null);
+//    setLocalConfig(null);
+  }
+
   /**
    * Records the start up time of the process and the host it is running on,
    * (and sets it's status to STARTUP - may remove this in the future as duplicate
@@ -189,7 +199,8 @@ public class ProcessService extends AbstractCacheServiceImpl<Process>
     processCacheObject.setRequiresReboot(Boolean.FALSE);
     processCacheObject.setProcessPIK(newPIK);
     processCacheObject.setLocalConfig(ProcessCacheObject.LocalConfig.Y);
-    processCacheObject.start(pStartupTime);
+
+    stateTagService.getCache().compute(process.getStateTagId(), state -> state.start(pStartupTime));
   }
 
   /**

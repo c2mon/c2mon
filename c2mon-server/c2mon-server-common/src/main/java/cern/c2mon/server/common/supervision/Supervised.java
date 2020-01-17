@@ -91,28 +91,4 @@ public interface Supervised extends Cacheable {
    */
   Timestamp getStatusTime();
 
-  /**
-   * Sets the status of this Supervised object to STARTUP,
-   * with associated message.
-   * <p>
-   * Starts the alive timer if not already running.
-   * <p>
-   * Careful, this does NOT update the cache entry. You need to explicitly {@code put} for that
-   */
-  default void start(final Timestamp timestamp) {
-//    setSupervision(SupervisionStatus.STARTUP, getSupervisionEntity() + " " + getName() + " was started", timestamp);
-  }
-
-  default void stop(final Timestamp timestamp) {
-//    setSupervision(SupervisionStatus.DOWN, getSupervisionEntity() + " " + getName() + " was stopped", timestamp);
-  }
-
-  default void resume(final Timestamp timestamp, final String message) {
-//    setSupervision(SupervisionStatus.RUNNING, message, timestamp);
-  }
-
-  default void suspend(final Timestamp timestamp, final String message) {
-//    setSupervision(SupervisionStatus.DOWN, message, timestamp);
-  }
-
 }

@@ -160,16 +160,6 @@ public class ProcessCacheObject extends AbstractSupervisedCacheObject implements
     return clone;
   }
 
-  @Override
-  public void stop(Timestamp timestamp) {
-    super.stop(timestamp);
-    setCurrentHost(null);
-    setStartupTime(null);
-    setRequiresReboot(Boolean.FALSE);
-    setProcessPIK(null);
-    setLocalConfig(null);
-  }
-
   /**
    * Enum for describing configuration type
    * <p>

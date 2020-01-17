@@ -73,5 +73,27 @@ public class SupervisionStateTag extends ControlTag {
     return clone;
   }
 
+  /**
+   * Sets the status of this Supervised object to STARTUP,
+   * with associated message.
+   * <p>
+   * Starts the alive timer if not already running.
+   * <p>
+   * Careful, this does NOT update the cache entry. You need to explicitly {@code put} for that
+   */
+  public void start(final Timestamp timestamp) {
+    setSupervision(SupervisionStatus.STARTUP, getSupervisedEntity() + " " + getName() + " was started", timestamp);
+  }
 
+  public void stop(final Timestamp timestamp) {
+    setSupervision(SupervisionStatus.DOWN, getSupervisedEntity() + " " + getName() + " was stopped", timestamp);
+  }
+
+  public void resume(final Timestamp timestamp, final String message) {
+    setSupervision(SupervisionStatus.RUNNING, message, timestamp);
+  }
+
+  public void suspend(final Timestamp timestamp, final String message) {
+    setSupervision(SupervisionStatus.DOWN, message, timestamp);
+  }
 }

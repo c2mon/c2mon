@@ -19,10 +19,7 @@ package cern.c2mon.server.supervision.impl;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.component.ExecutorLifecycleHandle;
 import cern.c2mon.server.common.component.Lifecycle;
-import cern.c2mon.server.common.equipment.Equipment;
-import cern.c2mon.server.common.process.Process;
-import cern.c2mon.server.common.subequipment.SubEquipment;
-import cern.c2mon.server.common.supervision.Supervised;
+import cern.c2mon.server.common.supervision.SupervisionStateTag;
 import cern.c2mon.server.supervision.SupervisionListener;
 import cern.c2mon.server.supervision.SupervisionNotifier;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
@@ -44,7 +41,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import static cern.c2mon.server.common.util.Java9Collections.listOf;
 import static cern.c2mon.shared.common.CacheEvent.CONFIRM_STATUS;
 import static cern.c2mon.shared.common.CacheEvent.SUPERVISION_CHANGE;
 
@@ -59,19 +55,11 @@ import static cern.c2mon.shared.common.CacheEvent.SUPERVISION_CHANGE;
  * be tuned using the queue size and thread number. In particular,
  * the listener does not need to start multiple threads itself.
  *
- * <p>Each listener can specify on how many threads it
- * wishes to be notified, using the following property.
- * <ul>
- *  <li>supervision.notification.threads.max NOT IMPLEMENTED YET
- * </ul>
- *
- *
  * @author Mark Brightwell
- *
  */
 @Slf4j
 @Service("supervisionNotifier")
-@ManagedResource(objectName="cern.c2mon:name=supervisionNotifier")
+@ManagedResource(objectName = "cern.c2mon:name=supervisionNotifier")
 public class SupervisionNotifierImpl implements SupervisionNotifier {
 
   /**
@@ -89,7 +77,6 @@ public class SupervisionNotifierImpl implements SupervisionNotifier {
    * Each listener gets his own thread.
    */
   private static final int DEFAULT_NUMBER_THREADS = 1;
-  private final List<C2monCache<? extends Supervised>> supervisedCaches;
 
 
   /**
@@ -102,45 +89,41 @@ public class SupervisionNotifierImpl implements SupervisionNotifier {
    * Map of executors. one for each listener.
    */
   private Map<SupervisionListener, ThreadPoolExecutor> executors = new HashMap<SupervisionListener, ThreadPoolExecutor>();
+  private C2monCache<SupervisionStateTag> stateTagCache;
 
 
   /**
    * Constructor.
-   * @param processCache process cache
-   * @param equipmentCache equipment cache
-   * @param subEquipmentCache subequipment cache
    */
   @Autowired
-  public SupervisionNotifierImpl(final C2monCache<Process> processCache,
-                                final C2monCache<Equipment> equipmentCache,
-                                final C2monCache<SubEquipment> subEquipmentCache) {
+  public SupervisionNotifierImpl(final C2monCache<SupervisionStateTag> stateTagCache) {
     super();
-    supervisedCaches = listOf(processCache, equipmentCache, subEquipmentCache);
+    this.stateTagCache = stateTagCache;
   }
 
   @PostConstruct
   public void init() {
-    supervisedCaches.forEach(cache ->
-      cache.getCacheListenerManager().registerListener(this::notifyElementUpdated
-      , SUPERVISION_CHANGE, CONFIRM_STATUS));
+    stateTagCache.getCacheListenerManager()
+      .registerListener(this::notifyElementUpdated
+        , SUPERVISION_CHANGE, CONFIRM_STATUS);
   }
 
 
-  private void notifyElementUpdated(Supervised supervised) {
+  private void notifyElementUpdated(SupervisionStateTag stateTag) {
     Timestamp supervisionTime;
     String supervisionMessage;
-    if (supervised.getStatusTime() != null) {
-      supervisionTime = supervised.getStatusTime();
+    if (stateTag.getStatusTime() != null) {
+      supervisionTime = stateTag.getStatusTime();
     } else {
       supervisionTime = new Timestamp(System.currentTimeMillis());
     }
-    if (supervised.getStatusDescription() != null) {
-      supervisionMessage = supervised.getStatusDescription();
+    if (stateTag.getStatusDescription() != null) {
+      supervisionMessage = stateTag.getStatusDescription();
     } else {
-      supervisionMessage = supervised.getSupervisionEntity() + " " + supervised.getName() + " is " + supervised.getSupervisionStatus();
+      supervisionMessage = stateTag.getSupervisedEntity() + " " + stateTag.getName() + " is " + stateTag.getSupervisionStatus();
     }
-    notifySupervisionEvent(new SupervisionEventImpl(supervised.getSupervisionEntity(),
-      supervised.getId(), supervised.getName(), supervised.getSupervisionStatus(),
+    notifySupervisionEvent(new SupervisionEventImpl(stateTag.getSupervisedEntity(),
+      stateTag.getId(), stateTag.getName(), stateTag.getSupervisionStatus(),
       supervisionTime,
       supervisionMessage));
   }
@@ -177,9 +160,10 @@ public class SupervisionNotifierImpl implements SupervisionNotifier {
 
   /**
    * For management purposes.
+   *
    * @return the size of the queues of the various supervison listeners.
    */
-  @ManagedOperation(description="Get listener queue sizes.")
+  @ManagedOperation(description = "Get listener queue sizes.")
   public List<Integer> getQueueSizes() {
     ArrayList<Integer> queueSizes = new ArrayList<Integer>();
     listenerLock.writeLock().lock();
@@ -195,9 +179,10 @@ public class SupervisionNotifierImpl implements SupervisionNotifier {
 
   /**
    * For management purposes.
+   *
    * @return the number of active threads for each listener
    */
-  @ManagedOperation(description="Get listener active threads.")
+  @ManagedOperation(description = "Get listener active threads.")
   public List<Integer> getNumActiveThreads() {
     ArrayList<Integer> activeThreads = new ArrayList<>();
     listenerLock.writeLock().lock();
@@ -215,7 +200,6 @@ public class SupervisionNotifierImpl implements SupervisionNotifier {
    * Notifies a listener of a given event.
    *
    * @author Mark Brightwell
-   *
    */
   private class SupervisionNotifyTask implements Runnable {
 
@@ -231,7 +215,8 @@ public class SupervisionNotifierImpl implements SupervisionNotifier {
 
     /**
      * Constructor.
-     * @param event the event
+     *
+     * @param event    the event
      * @param listener the listener
      */
     public SupervisionNotifyTask(final SupervisionEvent event, final SupervisionListener listener) {
