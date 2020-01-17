@@ -6,6 +6,6 @@ import cern.c2mon.server.common.commfault.CommFaultTag;
 class CommFaultCacheFlow extends DefaultCacheFlow<CommFaultTag> {
 
   CommFaultCacheFlow() {
-    super((older, newer) -> newer.getSourceTimestamp().getTime() >= older.getSourceTimestamp().getTime());
+    super((older, newer) -> newer.getTimestamp().getTime() >= older.getTimestamp().getTime());
   }
 }

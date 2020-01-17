@@ -15,6 +15,7 @@ import java.sql.Timestamp;
 @EqualsAndHashCode(callSuper = true)
 public abstract class AbstractInfoTagCacheObject extends AbstractTagCacheObject {
 
+  private static final Timestamp DEFAULT_TIMESTAMP = new Timestamp(0L);
   /**
    * Address configuration of the datatag (if any)
    */
@@ -62,6 +63,9 @@ public abstract class AbstractInfoTagCacheObject extends AbstractTagCacheObject 
     if (sourceTimestamp != null) {
       valueTagCacheObject.sourceTimestamp = (Timestamp) this.sourceTimestamp.clone();
     }
+    if (daqTimestamp != null) {
+      valueTagCacheObject.daqTimestamp = (Timestamp) this.daqTimestamp.clone();
+    }
     return valueTagCacheObject;
   }
 
@@ -69,28 +73,20 @@ public abstract class AbstractInfoTagCacheObject extends AbstractTagCacheObject 
    * @param serverTimestamp the serverTimestamp to set
    */
   public void setSourceTimestamp(Timestamp serverTimestamp) {
-    if (this.sourceTimestamp == null || serverTimestamp == null) {
-      this.sourceTimestamp = serverTimestamp;
-    } else {
-      this.sourceTimestamp.setTime(serverTimestamp.getTime());
-    }
+    sourceTimestamp = serverTimestamp != null ? new Timestamp(serverTimestamp.getTime()) : null;
   }
 
   @Override
   public final Timestamp getTimestamp() {
     return (sourceTimestamp != null) ? sourceTimestamp
       : (daqTimestamp != null) ? daqTimestamp
-      : getCacheTimestamp();
+      : DEFAULT_TIMESTAMP;
   }
 
   /**
    * @param daqTimestamp the daqTimestamp to set
    */
   public void setDaqTimestamp(Timestamp daqTimestamp) {
-    if (this.daqTimestamp == null || daqTimestamp == null) {
-      this.daqTimestamp = daqTimestamp;
-    } else {
-      this.daqTimestamp.setTime(daqTimestamp.getTime());
-    }
+    this.daqTimestamp = daqTimestamp != null ? new Timestamp(daqTimestamp.getTime()) : null;
   }
 }

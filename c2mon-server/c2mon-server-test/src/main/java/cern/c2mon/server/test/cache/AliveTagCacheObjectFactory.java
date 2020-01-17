@@ -2,6 +2,8 @@ package cern.c2mon.server.test.cache;
 
 import cern.c2mon.server.common.alive.AliveTag;
 
+import static cern.c2mon.server.common.util.KotlinAPIs.let;
+
 public class AliveTagCacheObjectFactory extends AbstractCacheObjectFactory<AliveTag> {
 
   @Override
@@ -20,4 +22,17 @@ public class AliveTagCacheObjectFactory extends AbstractCacheObjectFactory<Alive
       60000
     );
   }
+
+  public AliveTag ofProcess() {
+    return let(sampleBase(), it -> new AliveTag(
+      it.getId(),
+      it.getSupervisedId(),
+      it.getSupervisedName(),
+      "PROC",
+      it.getCommFaultTagId(),
+      it.getStateTagId(),
+      it.getAliveInterval())
+    );
+  }
+
 }

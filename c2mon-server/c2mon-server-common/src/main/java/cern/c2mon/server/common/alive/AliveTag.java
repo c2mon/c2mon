@@ -49,7 +49,7 @@ public class AliveTag extends ControlTag {
     /**
      * CommFaultTag of the equipment/process to which the aliveTag is attached.
      */
-    private final Long commFaultTagId;
+    private Long commFaultTagId;
 
     /**
      * Identifier of the state tag of the equipment/process to which the alive tag is attached.

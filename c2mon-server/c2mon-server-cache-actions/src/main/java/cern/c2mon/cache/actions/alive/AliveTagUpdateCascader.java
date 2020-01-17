@@ -43,7 +43,7 @@ public class AliveTagUpdateCascader implements CacheListener<AliveTag> {
       return false;
     }
     if (aliveTag.getValue() == null) {
-      log.warn("Tag {} has no value - no CommFaultTag will be updated.", aliveTag.getName());
+      log.debug("Tag {} has no value - no CommFaultTag will be updated.", aliveTag.getName());
       return false;
     }
     return true;
@@ -58,9 +58,8 @@ public class AliveTagUpdateCascader implements CacheListener<AliveTag> {
   public void apply(AliveTag aliveTag) {
     Objects.requireNonNull(aliveTag, "Alive Tag received in cascading should never be null!");
 
-    if (aliveTag.getSupervisedEntity() == null) {
-      log.warn("AliveTag {} does not have a valid SupervisedEntity assigned ", aliveTag.getName());
-      return;
+    if (aliveTag.getStateTagId() == null) {
+      log.warn("Alive tag {} #{} does not have a State Tag registered", aliveTag.getName(), aliveTag.getId());
     }
 
     if (aliveTag.getSupervisedEntity() == SupervisionEntity.PROCESS
