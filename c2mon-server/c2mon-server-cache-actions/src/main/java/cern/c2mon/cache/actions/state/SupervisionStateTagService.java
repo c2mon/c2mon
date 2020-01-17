@@ -7,6 +7,7 @@ import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.supervision.SupervisionStateTag;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.common.supervision.SupervisionEntity;
+import cern.c2mon.shared.common.supervision.SupervisionStatus;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -50,8 +51,13 @@ public class SupervisionStateTagService extends AbstractCacheServiceImpl<Supervi
       }
 
       if (controlTag.getTimestamp().after(stateTag.getStatusTime())) {
-        stateTag.setSupervision(inferSupervisionStatus(controlTag), controlTag.getValueDescription(), controlTag.getTimestamp());
         stateTag.setTimeStampsFrom(controlTag);
+
+        SupervisionStatus oldStatus = stateTag.getSupervisionStatus();
+        SupervisionStatus newStatus = inferSupervisionStatus(controlTag);
+        // If the status changes, set the time to now
+        stateTag.setSupervision(newStatus, controlTag.getValueDescription(),
+          newStatus.equals(oldStatus) ? stateTag.getStatusTime() : new Timestamp(System.currentTimeMillis()));
       }
     });
   }
