@@ -166,6 +166,10 @@ public class ProcessService extends AbstractCacheServiceImpl<Process>
     if (!stateTagService.isRunning(process.getStateTagId())) {
       forceStart(process, pHostName, pStartupTime);
     }
+//    Supervised.super.resume(timestamp,message);
+//    if (getLocalConfig() != null && getLocalConfig().equals(ProcessCacheObject.LocalConfig.Y)) {
+//      setSupervision(SupervisionStatus.RUNNING_LOCAL, message, timestamp);
+//    } TODO (Alex) Review this
   }
 
   /**
@@ -203,7 +207,13 @@ public class ProcessService extends AbstractCacheServiceImpl<Process>
   }
 
   private void applyErrorStatus(final Process process, final String errorMessage) {
-    ProcessCacheObject processCacheObject = (ProcessCacheObject) process;
-    processCacheObject.setSupervision(SupervisionStatus.DOWN, errorMessage, Timestamp.from(Instant.now()));
+    if (process.getStateTagId() == null || !stateTagService.getCache().containsKey(process.getStateTagId())) {
+      log.error("Unable to find State tag id (" + process.getStateTagId() + ") for process " + process.getName()
+        + " taking no action...");
+      return;
+    }
+
+    stateTagService.getCache().compute(process.getStateTagId(), state ->
+      state.setSupervision(SupervisionStatus.DOWN, errorMessage, Timestamp.from(Instant.now())));
   }
 }

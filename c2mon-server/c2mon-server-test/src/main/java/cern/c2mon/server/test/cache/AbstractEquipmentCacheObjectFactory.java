@@ -17,9 +17,6 @@
 package cern.c2mon.server.test.cache;
 
 import cern.c2mon.server.common.equipment.AbstractEquipmentCacheObject;
-import cern.c2mon.shared.common.supervision.SupervisionStatus;
-
-import java.sql.Timestamp;
 
 abstract class AbstractEquipmentCacheObjectFactory<T extends AbstractEquipmentCacheObject> extends AbstractCacheObjectFactory<T> {
 
@@ -29,6 +26,5 @@ abstract class AbstractEquipmentCacheObjectFactory<T extends AbstractEquipmentCa
     base.setAliveTagId(1224L);
     base.setAliveInterval(10);
     base.setCommFaultTagId(1223L);
-    base.setSupervision(SupervisionStatus.DOWN, "Status description", new Timestamp(System.currentTimeMillis()));
   }
 }

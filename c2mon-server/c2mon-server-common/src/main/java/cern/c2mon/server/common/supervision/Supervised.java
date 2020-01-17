@@ -19,7 +19,6 @@ package cern.c2mon.server.common.supervision;
 import cern.c2mon.shared.common.Cacheable;
 import cern.c2mon.shared.common.supervision.SupervisionEntity;
 import cern.c2mon.shared.common.supervision.SupervisionStatus;
-import lombok.NonNull;
 
 import java.sql.Timestamp;
 
@@ -93,16 +92,6 @@ public interface Supervised extends Cacheable {
   Timestamp getStatusTime();
 
   /**
-   * Sets the supervision information for the supervised object, including
-   * status, description and time
-   *
-   * @param supervisionStatus the new status
-   * @param statusDescription a reason for the current status
-   * @param statusTime        time of the supervision event
-   */
-  void setSupervision(SupervisionStatus supervisionStatus, @NonNull String statusDescription, @NonNull Timestamp statusTime);
-
-  /**
    * Sets the status of this Supervised object to STARTUP,
    * with associated message.
    * <p>
@@ -111,19 +100,19 @@ public interface Supervised extends Cacheable {
    * Careful, this does NOT update the cache entry. You need to explicitly {@code put} for that
    */
   default void start(final Timestamp timestamp) {
-    setSupervision(SupervisionStatus.STARTUP, getSupervisionEntity() + " " + getName() + " was started", timestamp);
+//    setSupervision(SupervisionStatus.STARTUP, getSupervisionEntity() + " " + getName() + " was started", timestamp);
   }
 
   default void stop(final Timestamp timestamp) {
-    setSupervision(SupervisionStatus.DOWN, getSupervisionEntity() + " " + getName() + " was stopped", timestamp);
+//    setSupervision(SupervisionStatus.DOWN, getSupervisionEntity() + " " + getName() + " was stopped", timestamp);
   }
 
   default void resume(final Timestamp timestamp, final String message) {
-    setSupervision(SupervisionStatus.RUNNING, message, timestamp);
+//    setSupervision(SupervisionStatus.RUNNING, message, timestamp);
   }
 
   default void suspend(final Timestamp timestamp, final String message) {
-    setSupervision(SupervisionStatus.DOWN, message, timestamp);
+//    setSupervision(SupervisionStatus.DOWN, message, timestamp);
   }
 
 }

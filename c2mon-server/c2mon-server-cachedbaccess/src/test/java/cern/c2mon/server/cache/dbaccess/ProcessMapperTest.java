@@ -109,7 +109,7 @@ public class ProcessMapperTest extends AbstractMapperTest {
     Timestamp ts = new Timestamp(System.currentTimeMillis() + 1000);
     originalProcess.setStartupTime(ts);
     originalProcess.setRequiresReboot(true);
-    originalProcess.setSupervision(SupervisionStatus.RUNNING,"New status description.", ts);
+//    originalProcess.setSupervision(SupervisionStatus.RUNNING,"New status description.", ts);
     originalProcess.setProcessPIK(67890L);
     originalProcess.setLocalConfig(LocalConfig.N);
 

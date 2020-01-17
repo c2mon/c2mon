@@ -202,7 +202,7 @@ public class EquipmentMapperTest extends AbstractMapperTest {
   public void testUpdate() {
     assertFalse(equipmentCacheObject.getSupervisionStatus().equals(SupervisionStatus.RUNNING));
     Timestamp ts = new Timestamp(System.currentTimeMillis() + 1000);
-    equipmentCacheObject.setSupervision(SupervisionStatus.RUNNING,"New status description.", ts);
+//    equipmentCacheObject.setSupervision(SupervisionStatus.RUNNING,"New status description.", ts);
     equipmentMapper.updateCacheable(equipmentCacheObject);
 
     EquipmentCacheObject retrievedEquipment = (EquipmentCacheObject) equipmentMapper.getItem(equipmentCacheObject.getId());

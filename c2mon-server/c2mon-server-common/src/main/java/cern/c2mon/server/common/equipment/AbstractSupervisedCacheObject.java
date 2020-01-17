@@ -18,8 +18,6 @@ package cern.c2mon.server.common.equipment;
 
 import cern.c2mon.server.common.AbstractCacheableImpl;
 import cern.c2mon.server.common.supervision.Supervised;
-import cern.c2mon.shared.client.supervision.SupervisionEvent;
-import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
 import cern.c2mon.shared.common.supervision.SupervisionStatus;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
@@ -136,30 +134,5 @@ public abstract class AbstractSupervisedCacheObject extends AbstractCacheableImp
         }
 
         return cacheObject;
-    }
-
-    @Override
-    public void setSupervision(SupervisionStatus supervisionStatus, String statusDescription, Timestamp statusTime) {
-        this.supervisionStatus = supervisionStatus;
-        this.statusDescription = statusDescription;
-        this.statusTime = statusTime;
-    }
-
-    public SupervisionEvent getSupervisionEvent() {
-        log.trace("Getting supervision status: " + getSupervisionEntity() + " " + getName() + " is " + getSupervisionStatus());
-
-        Timestamp supervisionTime;
-        String supervisionMessage;
-
-        supervisionTime = getStatusTime() != null
-          ? getStatusTime()
-          : new Timestamp(System.currentTimeMillis());
-
-        supervisionMessage = getStatusDescription() != null
-          ? getStatusDescription()
-          : getSupervisionEntity() + " " + getName() + " is " + getSupervisionStatus();
-
-        return new SupervisionEventImpl(getSupervisionEntity(), id, getName(), getSupervisionStatus(),
-          supervisionTime, supervisionMessage);
     }
 }
