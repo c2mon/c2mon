@@ -37,6 +37,7 @@ import cern.c2mon.cache.actions.process.ProcessService;
 import cern.c2mon.cache.actions.subequipment.SubEquipmentService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.config.CacheConfigModuleRef;
+import cern.c2mon.cache.impl.configuration.C2monIgniteConfiguration;
 import cern.c2mon.server.cache.dbaccess.*;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.cache.loading.config.CacheLoadingModuleRef;
@@ -109,7 +110,8 @@ import static org.junit.Assert.*;
     ConfigurationModule.class,
     DaqModule.class,
     RuleModule.class,
-    ProcessCommunicationManagerMock.class
+    ProcessCommunicationManagerMock.class,
+    C2monIgniteConfiguration.class
 })
 public class ConfigurationLoaderTest {
 
