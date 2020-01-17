@@ -17,6 +17,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static cern.c2mon.server.common.util.KotlinAPIs.letNotNull;
+
 /**
  * This is a very simple cache implementation, used for testing.
  */
@@ -27,7 +29,7 @@ public class MapBasedCache<V extends Cacheable> implements Cache<Long, V> {
 
   @Override
   public V get(Long key) {
-    return map.get(key);
+    return (V) letNotNull(map.get(key), Cacheable::clone);
   }
 
   @Override
