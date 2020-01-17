@@ -14,6 +14,6 @@ public class SupervisionStateTagCacheObjectTest extends CacheableTest<Supervisio
 
   @Override
   protected void mutateObject(SupervisionStateTag cloneObject) {
-    cloneObject.setSupervision(cloneObject.getSupervisionStatus(), cloneObject.getStatusDescription(), new Timestamp(12));
+    cloneObject.setSupervision(cloneObject.getSupervisionStatus(), "Going dowwwn!", new Timestamp(12));
   }
 }

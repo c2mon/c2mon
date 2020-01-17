@@ -35,11 +35,11 @@ public class SupervisionStateTag extends ControlTag {
   /**
    * Reason/description of the current status, or empty
    */
-  String statusDescription = "";
+  String statusDescription;
   /**
    * Time when this supervision status was last confirmed
    */
-  Timestamp statusTime = new Timestamp(0);
+  Timestamp statusTime;
 
   /**
    * Primary Ctor, also used by MyBatis (hence the Long instead of long)
@@ -69,7 +69,8 @@ public class SupervisionStateTag extends ControlTag {
   @Override
   public SupervisionStateTag clone() {
     SupervisionStateTag clone = (SupervisionStateTag) super.clone();
-    clone.statusTime = new Timestamp(statusTime.getTime());
+    if (statusTime != null)
+      clone.statusTime = new Timestamp(statusTime.getTime());
     return clone;
   }
 
