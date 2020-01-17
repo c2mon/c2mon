@@ -139,6 +139,8 @@ public interface Tag extends RuleInputValue, Cacheable {
    * Should never return a null list.
    *
    * @return list of Equipment ids; can be empty; never null
+   * @implNote Only the RuleTag may have multiple eqIds in
+   *           the list but this is a good api point
    */
   Set<Long> getEquipmentIds();
 
@@ -149,6 +151,8 @@ public interface Tag extends RuleInputValue, Cacheable {
    * Should never return a null list.
    *
    * @return list of Process ids; can be empty; never null
+   * @implNote Only the RuleTag may have multiple procIds in
+   *           the list but this is a good api point
    */
   Set<Long> getProcessIds();
 
@@ -159,6 +163,8 @@ public interface Tag extends RuleInputValue, Cacheable {
    * Should never return a null list.
    *
    * @return list of SubEquipment ids; can be empty; never null
+   * @implNote Only the RuleTag may have multiple subEqIds in
+   *           the list but this is a good api point
    */
   Set<Long> getSubEquipmentIds();
 
