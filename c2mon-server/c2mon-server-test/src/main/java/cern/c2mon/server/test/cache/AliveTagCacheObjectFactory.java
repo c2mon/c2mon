@@ -12,12 +12,12 @@ public class AliveTagCacheObjectFactory extends AbstractCacheObjectFactory<Alive
   public AliveTag withCustomId(long id) {
     return new AliveTag(
       id,
-      100L,
-      "TEST_EQ",
+      1224L,
+      "E_TESTHANDLER_TESTHANDLER03",
       "EQ",
-      null,
-      null,
-      100
+      1223L,
+      1222L,
+      60000
     );
   }
 }
