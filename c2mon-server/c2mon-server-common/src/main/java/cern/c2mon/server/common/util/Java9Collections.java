@@ -8,8 +8,10 @@ import java.util.stream.Stream;
  * This class provides some of the APIs that become available in Java > 8 for quality of life
  *
  * When C2MON updates to such a Java version, these APIs can be hopefully dropped
+ *
+ * @author Alexandros Papageorgiou
  */
-public class Java9Collections {
+public final class Java9Collections {
 
   private Java9Collections(){}
 
