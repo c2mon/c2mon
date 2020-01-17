@@ -18,9 +18,6 @@ package cern.c2mon.server.common.supervision;
 
 import cern.c2mon.shared.common.Cacheable;
 import cern.c2mon.shared.common.supervision.SupervisionEntity;
-import cern.c2mon.shared.common.supervision.SupervisionStatus;
-
-import java.sql.Timestamp;
 
 /**
  * Implemented by cache objects that are supervised by the
@@ -38,12 +35,11 @@ public interface Supervised extends Cacheable {
   String getName();
 
   /**
-   * Returns the supervision status of this item at
-   * the current time.
+   * Returns the entity name of this supervised object.
    *
-   * @return the supervision status
+   * @return the supervision entity name
    */
-  SupervisionStatus getSupervisionStatus();
+  SupervisionEntity getSupervisionEntity();
 
   /**
    * Returns the id of the state tag used to publish the
@@ -69,26 +65,5 @@ public interface Supervised extends Cacheable {
    * @return the interval in milliseconds
    */
   Integer getAliveInterval();
-
-  /**
-   * Returns the entity name of this supervised object.
-   *
-   * @return the supervision entity name
-   */
-  SupervisionEntity getSupervisionEntity();
-
-  /**
-   * Returns a reason/description of the current status.
-   *
-   * @return a description of the status, or null
-   */
-  String getStatusDescription();
-
-  /**
-   * Getter.
-   *
-   * @return the time of the last change in the supervision status, or null
-   */
-  Timestamp getStatusTime();
 
 }

@@ -120,7 +120,5 @@ public abstract class SupervisedServiceTest<T extends Supervised, T_IMPL extends
 
     // Cache object has achieved expected status
     verifySupervisionEvent(expected);
-    // Source object has not been affected
-    assertEquals(DOWN, sample.getSupervisionStatus());
   }
 }

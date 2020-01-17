@@ -6,6 +6,7 @@ import cern.c2mon.cache.actions.datatag.DataTagService;
 import cern.c2mon.cache.actions.state.SupervisionStateTagService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
+import cern.c2mon.cache.api.flow.DefaultCacheFlow;
 import cern.c2mon.server.common.supervision.Supervised;
 import cern.c2mon.shared.common.supervision.SupervisionEntity;
 import lombok.Getter;
@@ -32,7 +33,7 @@ public abstract class AbstractSupervisedService<T extends Supervised> extends Ab
                                    final AliveTagService aliveTimerService,
                                    final DataTagService dataTagService,
                                    final SupervisionStateTagService stateTagService) {
-    super(cache, new AbstractSupervisedCacheFlow<>());
+    super(cache, new DefaultCacheFlow<>());
     this.supervisionEntity = supervisionEntity;
     this.aliveTimerService = aliveTimerService;
     this.dataTagService = dataTagService;

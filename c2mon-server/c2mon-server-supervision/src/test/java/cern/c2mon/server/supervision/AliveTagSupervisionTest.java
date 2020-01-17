@@ -4,6 +4,7 @@ import cern.c2mon.cache.actions.process.ProcessService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.alive.AliveTag;
 import cern.c2mon.server.common.process.Process;
+import cern.c2mon.server.common.supervision.SupervisionStateTag;
 import cern.c2mon.shared.common.CacheEvent;
 import cern.c2mon.shared.common.datatag.SourceDataTagQuality;
 import cern.c2mon.shared.common.datatag.SourceDataTagValue;
@@ -33,6 +34,9 @@ public class AliveTagSupervisionTest extends SupervisionCacheTest {
   private C2monCache<Process> processCache;
 
   @Inject
+  private C2monCache<SupervisionStateTag> stateTagCache;
+
+  @Inject
   private ProcessService processService;
 
   @Before
@@ -41,7 +45,7 @@ public class AliveTagSupervisionTest extends SupervisionCacheTest {
     assertNotNull(aliveTimer);
     assertEquals(0, aliveTimer.getLastUpdate());
 
-    Process process = processCache.get(aliveTimer.getSupervisedId());
+    SupervisionStateTag process = stateTagCache.get(aliveTimer.getStateTagId());
     assertEquals(SupervisionStatus.DOWN, process.getSupervisionStatus());
     assertNull(process.getStatusTime());
     assertNull(process.getStatusDescription());
@@ -72,7 +76,7 @@ public class AliveTagSupervisionTest extends SupervisionCacheTest {
     assertTrue(aliveTimer.getLastUpdate() > System.currentTimeMillis() - 10000); //account for non-synchronized
 
     //check process status is changed
-    Process process = processCache.get(aliveTimer.getSupervisedId());
+    SupervisionStateTag process = stateTagCache.get(aliveTimer.getStateTagId());
     assertEquals(SupervisionStatus.RUNNING, process.getSupervisionStatus());
     Timestamp processTime = process.getStatusTime();
     assertTrue(processTime.after(new Timestamp(updateTime - 1)));
@@ -130,7 +134,7 @@ public class AliveTagSupervisionTest extends SupervisionCacheTest {
     processService.start(aliveTimer.getSupervisedId(), new Timestamp(startTimer));
     // Resume so that the status goes to RUNNING
     processService.resume(aliveTimer.getSupervisedId(), new Timestamp(System.currentTimeMillis()), "");
-    Process process = processCache.get(aliveTimer.getSupervisedId());
+    SupervisionStateTag process = stateTagCache.get(aliveTimer.getStateTagId());
     assertEquals(SupervisionStatus.RUNNING, process.getSupervisionStatus());
     Timestamp originalProcessTime = process.getStatusTime();
     assertNotNull(originalProcessTime);

@@ -6,12 +6,12 @@ import cern.c2mon.cache.actions.datatag.DataTagService;
 import cern.c2mon.cache.actions.equipment.EquipmentService;
 import cern.c2mon.cache.actions.state.SupervisionStateTagService;
 import cern.c2mon.cache.actions.subequipment.SubEquipmentService;
-import cern.c2mon.cache.actions.supervision.AbstractSupervisedCacheFlow;
 import cern.c2mon.cache.actions.supervision.SupervisedCacheService;
 import cern.c2mon.cache.actions.supervision.SupervisedCacheServiceDelegator;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.cache.api.exception.TooManyQueryResultsException;
+import cern.c2mon.cache.api.flow.DefaultCacheFlow;
 import cern.c2mon.server.common.alive.AliveTag;
 import cern.c2mon.server.common.config.ServerProperties;
 import cern.c2mon.server.common.process.Process;
@@ -58,7 +58,7 @@ public class ProcessService extends AbstractCacheServiceImpl<Process>
   public ProcessService(C2monCache<Process> processCacheRef, EquipmentService equipmentService,
                         AliveTagService aliveTimerService, SubEquipmentService subEquipmentService,
                         ServerProperties properties, DataTagService dataTagService, SupervisionStateTagService stateTagService) {
-    super(processCacheRef, new AbstractSupervisedCacheFlow<>());
+    super(processCacheRef, new DefaultCacheFlow<>());
     this.aliveTimerService = aliveTimerService;
     this.equipmentService = equipmentService;
     this.subEquipmentService = subEquipmentService;
