@@ -1,7 +1,5 @@
 package cern.c2mon.cache.actions.alive;
 
-import cern.c2mon.cache.actions.commfault.CommFaultService;
-import cern.c2mon.cache.actions.state.SupervisionStateTagService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.impl.SimpleC2monCache;
 import cern.c2mon.server.common.alive.AliveTag;
@@ -29,10 +27,7 @@ public class AliveTagServiceTest {
   @Before
   public void init() {
     aliveTimerCacheRef = new SimpleC2monCache<>("alive-timer-cache");
-    SupervisionStateTagService stateTagService = new SupervisionStateTagService(new SimpleC2monCache<>("stateTag"));
-    aliveTimerService = new AliveTagService(aliveTimerCacheRef,
-      new CommFaultService(new SimpleC2monCache<>("cFault"), stateTagService),
-      stateTagService);
+    aliveTimerService = new AliveTagService(aliveTimerCacheRef);
   }
 
   @Test

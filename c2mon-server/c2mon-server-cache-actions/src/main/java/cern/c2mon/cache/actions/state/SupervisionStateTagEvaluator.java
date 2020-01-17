@@ -15,6 +15,13 @@ public class SupervisionStateTagEvaluator {
 
   }
 
+  /**
+   * Verifies that the given control tag, can update SupervisionState tag cache
+   *
+   * @param stateTagId possible null, the id of the SupervisionState to update
+   * @param controlTag
+   * @return
+   */
   public static boolean controlTagCanUpdateState(Long stateTagId, @NonNull ControlTag controlTag) {
     if (stateTagId == null) {
       log.warn("Null state tag Id provided - no state tag will be updated.");
@@ -29,7 +36,7 @@ public class SupervisionStateTagEvaluator {
 
   public static boolean hasIdDiscrepancy(@NonNull ControlTag controlTag, @NonNull SupervisionStateTag stateTag) {
     if (stateTag.getCommFaultTagId() != controlTag.getId()) {
-      log.warn(
+      log.error(
         "CommFaultTag cache object" + controlTag.getName() +"(" + controlTag.getId() +")" +
           " has StateTag "+ stateTag.getName() + "(" +stateTag.getId() +") listed," +
           " but StateTag cache object has a different CommFaultTag id listed (" + stateTag.getCommFaultTagId()

@@ -36,6 +36,14 @@ public abstract class ControlTag extends AbstractInfoTagCacheObject implements I
     this.supervisedEntity = supervisedEntity;
   }
 
+  /**
+   * Will set to this object the source and DAQ timestamps of the given other Control tag
+   */
+  public void setTimeStampsFrom(ControlTag other) {
+    setSourceTimestamp(other.getSourceTimestamp());
+    setDaqTimestamp(other.getDaqTimestamp());
+  }
+
   @Override
   public Boolean getValue() {
     return (Boolean) super.getValue();

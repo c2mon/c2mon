@@ -46,14 +46,12 @@ public class SupervisionStateTagService extends AbstractCacheServiceImpl<Supervi
     cache.compute(stateTagId, stateTag -> {
       if (hasIdDiscrepancy(controlTag, stateTag)) {
         // TODO (Alex) Should this throw? Or just fix?
+        return;
       }
 
       if (controlTag.getTimestamp().after(stateTag.getStatusTime())) {
-        stateTag.setSupervision(
-          inferSupervisionStatus(controlTag),
-          controlTag.getValueDescription(),
-          controlTag.getTimestamp()
-        );
+        stateTag.setSupervision(inferSupervisionStatus(controlTag), controlTag.getValueDescription(), controlTag.getTimestamp());
+        stateTag.setTimeStampsFrom(controlTag);
       }
     });
   }

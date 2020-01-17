@@ -1,23 +1,18 @@
 package cern.c2mon.cache.actions.commfault;
 
 import cern.c2mon.cache.actions.AbstractCacheServiceImpl;
-import cern.c2mon.cache.actions.state.SupervisionStateTagService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.alive.AliveTag;
 import cern.c2mon.server.common.commfault.CommFaultTag;
 import cern.c2mon.server.common.equipment.AbstractEquipment;
 import cern.c2mon.server.common.thread.Event;
-import cern.c2mon.shared.common.CacheEvent;
 import cern.c2mon.shared.common.datatag.SourceDataTagValue;
 import cern.c2mon.shared.common.supervision.SupervisionEntity;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
-import static cern.c2mon.cache.actions.commfault.CommFaultTagEvaluator.aliveTagCanUpdateCommFault;
 
 /**
  * @author Szymon Halastra, Alexandros Papageorgiou
@@ -26,22 +21,9 @@ import static cern.c2mon.cache.actions.commfault.CommFaultTagEvaluator.aliveTagC
 @Service
 public class CommFaultService extends AbstractCacheServiceImpl<CommFaultTag> {
 
-  private final SupervisionStateTagService stateTagService;
-
   @Inject
-  public CommFaultService(final C2monCache<CommFaultTag> commFaultTagCacheRef, SupervisionStateTagService stateTagService) {
+  public CommFaultService(final C2monCache<CommFaultTag> commFaultTagCacheRef) {
     super(commFaultTagCacheRef, new CommFaultCacheFlow());
-    this.stateTagService = stateTagService;
-  }
-
-  @PostConstruct
-  public void init() {
-    cache.getCacheListenerManager().registerListener(this::cascadeUpdate, CacheEvent.UPDATE_ACCEPTED);
-  }
-
-  private void cascadeUpdate(@NonNull CommFaultTag commFaultTag) {
-    if (commFaultTag.getStateTagId() != null)
-      stateTagService.updateBasedOnControl(commFaultTag.getStateTagId(), commFaultTag);
   }
 
   public boolean isRegisteredCommFaultTag(Long id) {
@@ -49,13 +31,10 @@ public class CommFaultService extends AbstractCacheServiceImpl<CommFaultTag> {
   }
 
   public void updateBasedOnAliveTimer(AliveTag aliveTimer) {
-    if (!aliveTagCanUpdateCommFault(aliveTimer))
-      return;
-
     cache.compute(aliveTimer.getCommFaultTagId(), commFaultTag -> {
       if (aliveTimer.getTimestamp().after(commFaultTag.getTimestamp())) {
         commFaultTag.setValue(aliveTimer.getValue());
-        // TODO (Alex) SetServerTimestamp
+        commFaultTag.setTimeStampsFrom(aliveTimer);
       }
     });
   }
