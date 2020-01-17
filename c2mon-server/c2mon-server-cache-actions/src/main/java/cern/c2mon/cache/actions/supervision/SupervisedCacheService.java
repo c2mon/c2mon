@@ -36,7 +36,7 @@ public interface SupervisedCacheService<T extends Supervised> extends AbstractCa
 
   /**
    * Sets the status of the Supervised object to STARTUP,
-   * with associated message, then returns the updated object
+   * with associated message
    * <p>
    * <p>Starts the alive timer if not already running.
    *
@@ -48,7 +48,7 @@ public interface SupervisedCacheService<T extends Supervised> extends AbstractCa
 
   /**
    * Sets the status of the Supervised object to DOWN,
-   * with stop message, then returns the updated object
+   * with stop message
    * <p>
    * <p>Stops the alive timer for this object is running.
    *
@@ -59,7 +59,7 @@ public interface SupervisedCacheService<T extends Supervised> extends AbstractCa
   void stop(long id, @NonNull Timestamp timestamp);
 
   /**
-   * Sets the status to running, then returns the updated object.
+   * Sets the status to running
    * Used when an alive comes back in after an alive
    * expiration, or when a first alive arrives at Process startup.
    *
@@ -72,8 +72,6 @@ public interface SupervisedCacheService<T extends Supervised> extends AbstractCa
 
   /**
    * Called when an alive expires or a commfault tag is received.
-   *
-   * Returns the updated object.
    *
    * @param id        The cache id of the supervised object
    * @param timestamp time of problem
