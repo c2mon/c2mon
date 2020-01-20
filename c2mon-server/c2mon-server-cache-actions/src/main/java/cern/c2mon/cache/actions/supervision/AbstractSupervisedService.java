@@ -38,7 +38,9 @@ public abstract class AbstractSupervisedService<T extends Supervised> extends Ab
 
   @Override
   public void start(long id, long timestamp) {
-    cascadeOnControlTagCaches(id, (controlTagId, service) -> service.start(controlTagId, timestamp));
+    if (!isRunning(id)) {
+      cascadeOnControlTagCaches(id, (controlTagId, service) -> service.start(controlTagId, timestamp));
+    }
   }
 
   @Override
@@ -64,13 +66,17 @@ public abstract class AbstractSupervisedService<T extends Supervised> extends Ab
   private void cascadeOnControlTagCaches(long supervisedId, BiConsumer<Long, SupervisedCacheService<? extends ControlTag>> action) {
     try {
       T supervised = cache.get(supervisedId);
-      if (supervised.getAliveTagId() != null) {
-        action.accept(supervised.getAliveTagId(), aliveTimerService);
-      } else if (supervised instanceof AbstractEquipment && ((AbstractEquipment) supervised).getCommFaultTagId() != null) {
-        action.accept(((AbstractEquipment) supervised).getCommFaultTagId(), commFaultService);
-      } else if (supervised.getStateTagId() != null) {
-        action.accept(supervised.getStateTagId(), stateTagService);
-      }
+      cache.executeTransaction(() -> {
+        if (supervised.getAliveTagId() != null) {
+          action.accept(supervised.getAliveTagId(), aliveTimerService);
+        }
+        if (supervised instanceof AbstractEquipment && ((AbstractEquipment) supervised).getCommFaultTagId() != null) {
+          action.accept(((AbstractEquipment) supervised).getCommFaultTagId(), commFaultService);
+        }
+        if (supervised.getStateTagId() != null) {
+          action.accept(supervised.getStateTagId(), stateTagService);
+        }
+      });
     } catch (CacheElementNotFoundException e) {
       log.error("Could not find supervised object with id " + supervisedId + " to start. Taking no action", e);
     }

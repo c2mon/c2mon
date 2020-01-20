@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 
 
-
 /**
  * @author Szymon Halastra, Alexandros Papageorgiou
  */
@@ -34,7 +33,7 @@ public class CommFaultService extends AbstractBooleanControlTagService<CommFault
 
   public void updateBasedOnAliveTimer(AliveTag aliveTimer) {
     cache.compute(aliveTimer.getCommFaultTagId(), commFaultTag -> {
-      if (aliveTimer.getTimestamp().getTime() >= commFaultTag.getTimestamp().getTime()) {
+      if (aliveTimer.getTimestamp().getTime() > commFaultTag.getTimestamp().getTime()) {
         commFaultTag.setValue(aliveTimer.getValue());
         commFaultTag.setTimeStampsFrom(aliveTimer);
       }

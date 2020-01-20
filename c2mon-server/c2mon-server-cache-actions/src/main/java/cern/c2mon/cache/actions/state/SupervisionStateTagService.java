@@ -45,11 +45,11 @@ public class SupervisionStateTagService extends AbstractCacheServiceImpl<Supervi
     if (!controlTagCanUpdateState(stateTagId, controlTag))
       return;
 
-//    if (!cache.containsKey(stateTagId)) {
-//      log.warn("StateTag not found in cache - Unable to update state tag #{} using {} {} #{}",
-//        stateTagId, controlTag.getClass().getSimpleName(), controlTag.getName(), controlTag.getId());
-//      return;
-//    }
+    if (!cache.containsKey(stateTagId)) {
+      log.warn("StateTag not found in cache - Unable to update state tag #{} using {} {} #{}",
+        stateTagId, controlTag.getClass().getSimpleName(), controlTag.getName(), controlTag.getId());
+      throw new CacheElementNotFoundException("StateTag not found in cache - " + stateTagId);
+    }
 
     cache.compute(stateTagId, stateTag -> {
       if (!matchesAnyTagId(controlTag, stateTag)) {
@@ -57,7 +57,7 @@ public class SupervisionStateTagService extends AbstractCacheServiceImpl<Supervi
         return;
       }
 
-      if (controlTag.getTimestamp().getTime() >= stateTag.getTimestamp().getTime()) {
+      if (controlTag.getTimestamp().getTime() > stateTag.getTimestamp().getTime()) {
         stateTag.setTimeStampsFrom(controlTag);
 
         SupervisionStatus oldStatus = stateTag.getSupervisionStatus();
@@ -199,9 +199,6 @@ public class SupervisionStateTagService extends AbstractCacheServiceImpl<Supervi
     try {
       cache.compute(stateTagId, stateTag -> {
         if (stateTag.getSupervisionStatus() != newStatus) {
-          // Set SupervisionStatus time to now. This happens because alternatively we would be "lying" about
-          // when this effect started in the server. If you want the source event information, the
-          // source and daq timestamps should reflect it accurately (use getTimestamp)
           stateTag.setSupervision(newStatus, "", new Timestamp(timestamp));
           stateTag.setValue(SupervisionStateTagEvaluator.isRunning(stateTag));
         }
