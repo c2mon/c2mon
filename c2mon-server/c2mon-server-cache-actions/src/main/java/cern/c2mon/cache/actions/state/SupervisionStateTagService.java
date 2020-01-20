@@ -50,7 +50,7 @@ public class SupervisionStateTagService extends AbstractCacheServiceImpl<Supervi
         return;
       }
 
-      if (controlTag.getTimestamp().after(stateTag.getStatusTime())) {
+      if (controlTag.getTimestamp().after(stateTag.getTimestamp())) {
         stateTag.setTimeStampsFrom(controlTag);
 
         SupervisionStatus oldStatus = stateTag.getSupervisionStatus();

@@ -116,7 +116,7 @@ public class AliveTagCascadeTests {
     assertTrue(stateTagUpdate.await(100, TimeUnit.MILLISECONDS));
   }
 
-  private void registerLatchListener(C2monCache<?> cache, CountDownLatch latch) {
+  public static void registerLatchListener(C2monCache<?> cache, CountDownLatch latch) {
     cache.getCacheListenerManager().registerListener(item -> latch.countDown(), CacheEvent.UPDATE_ACCEPTED);
   }
 }

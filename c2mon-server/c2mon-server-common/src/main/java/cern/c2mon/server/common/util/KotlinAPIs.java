@@ -55,11 +55,10 @@ public final class KotlinAPIs {
     return object == null ? null : transformer.apply(object);
   }
 
-
   /**
    * Returns the object if not null, or the default value otherwise
    */
-  public static <T> T orElse(T object, T defaultValue){
+  public static <T> T orElse(T object, T defaultValue) {
     return object == null ? defaultValue : object;
   }
 }
