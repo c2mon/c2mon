@@ -1,7 +1,6 @@
 package cern.c2mon.cache.actions.supervision;
 
 import cern.c2mon.server.common.supervision.Supervised;
-import cern.c2mon.shared.common.supervision.SupervisionEntity;
 
 import java.sql.Timestamp;
 
@@ -39,10 +38,5 @@ public interface SupervisedCacheServiceDelegator<T extends Supervised> extends S
   @Override
   default void suspend(long id, Timestamp timestamp, String message) {
     getSupervisedService().suspend(id, timestamp, message);
-  }
-
-  @Override
-  default SupervisionEntity getSupervisionEntity() {
-    return getSupervisedService().getSupervisionEntity();
   }
 }

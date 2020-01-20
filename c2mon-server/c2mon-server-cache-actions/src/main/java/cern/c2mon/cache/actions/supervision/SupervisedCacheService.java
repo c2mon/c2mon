@@ -20,7 +20,6 @@ import cern.c2mon.cache.actions.AbstractCacheService;
 import cern.c2mon.cache.api.flow.CacheUpdateFlow;
 import cern.c2mon.server.common.supervision.Supervised;
 import cern.c2mon.shared.common.Cacheable;
-import cern.c2mon.shared.common.supervision.SupervisionEntity;
 import lombok.NonNull;
 
 import java.sql.Timestamp;
@@ -39,6 +38,8 @@ public interface SupervisedCacheService<T extends Supervised> extends AbstractCa
    * with associated message
    * <p>
    * <p>Starts the alive timer if not already running.
+   *
+   * For Processes, use {@link cern.c2mon.cache.actions.process.ProcessOperationService#start(Long, String, Timestamp)}
    *
    * @param id        The cache id of the supervised object
    * @param timestamp time of the start
@@ -79,6 +80,4 @@ public interface SupervisedCacheService<T extends Supervised> extends AbstractCa
    * @return the cache object, after {@link CacheUpdateFlow#postInsertEvents(Cacheable, Cacheable)}
    */
   void suspend(long id, @NonNull Timestamp timestamp, @NonNull String message);
-
-  SupervisionEntity getSupervisionEntity();
 }
