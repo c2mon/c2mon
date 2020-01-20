@@ -93,7 +93,7 @@ public class AliveTagSupervisionTest extends SupervisionCacheTest {
     long startTimer = 1;
 
     // Start the process
-    processService.start(aliveTimer.getSupervisedId(), new Timestamp(startTimer));
+    processService.start(aliveTimer.getSupervisedId(), startTimer);
     assertEquals(startTimer, aliveTimerCache.get(1221L).getLastUpdate());
   }
 
@@ -131,9 +131,9 @@ public class AliveTagSupervisionTest extends SupervisionCacheTest {
     long startTimer = System.currentTimeMillis();
 
     // Start the process
-    processService.start(aliveTimer.getSupervisedId(), new Timestamp(startTimer));
+    processService.start(aliveTimer.getSupervisedId(), startTimer);
     // Resume so that the status goes to RUNNING
-    processService.resume(aliveTimer.getSupervisedId(), new Timestamp(System.currentTimeMillis()), "");
+    processService.resume(aliveTimer.getSupervisedId(), System.currentTimeMillis(), "");
     SupervisionStateTag process = stateTagCache.get(aliveTimer.getStateTagId());
     assertEquals(SupervisionStatus.RUNNING, process.getSupervisionStatus());
     Timestamp originalProcessTime = process.getStatusTime();

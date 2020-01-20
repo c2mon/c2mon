@@ -399,7 +399,7 @@ public class ConfigurationLoaderTest {
     verify(communicationManager);
 
     // remove the process and equipments from the server
-    processService.stop(5L, new Timestamp(System.currentTimeMillis()));
+    processService.stop(5L, System.currentTimeMillis());
     Configuration remove = TestConfigurationProvider.deleteProcess();
     report = configurationLoader.applyConfiguration(remove);
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
@@ -519,7 +519,7 @@ public class ConfigurationLoaderTest {
     verify(communicationManager);
 
     // remove the process and equipments from the server
-    processService.stop(5L, new Timestamp(System.currentTimeMillis()));
+    processService.stop(5L, System.currentTimeMillis());
     Configuration remove = TestConfigurationProvider.deleteProcess();
     report = configurationLoader.applyConfiguration(remove);
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
@@ -590,7 +590,7 @@ public class ConfigurationLoaderTest {
     verify(communicationManager);
 
     // remove the process and equipments from the server
-    processService.stop(5L, new Timestamp(System.currentTimeMillis()));
+    processService.stop(5L, System.currentTimeMillis());
     Configuration remove = TestConfigurationProvider.deleteProcess();
     report = configurationLoader.applyConfiguration(remove);
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
@@ -671,7 +671,7 @@ public class ConfigurationLoaderTest {
     verify(communicationManager);
 
     // remove the process and equipments from the server
-    processService.stop(5L, new Timestamp(System.currentTimeMillis()));
+    processService.stop(5L, System.currentTimeMillis());
     Configuration remove = TestConfigurationProvider.deleteProcess();
     report = configurationLoader.applyConfiguration(remove);
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
@@ -748,7 +748,7 @@ public class ConfigurationLoaderTest {
     verify(communicationManager);
 
     // remove the process and equipments from the server
-    processService.stop(5L, new Timestamp(System.currentTimeMillis()));
+    processService.stop(5L, System.currentTimeMillis());
     Configuration remove = TestConfigurationProvider.deleteProcess();
     report = configurationLoader.applyConfiguration(remove);
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
@@ -806,7 +806,7 @@ public class ConfigurationLoaderTest {
     verify(communicationManager);
 
     // remove the process and equipments from the server
-    processService.stop(5L, new Timestamp(System.currentTimeMillis()));
+    processService.stop(5L, System.currentTimeMillis());
     Configuration remove = TestConfigurationProvider.deleteProcess();
     report = configurationLoader.applyConfiguration(remove);
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
@@ -855,7 +855,7 @@ public class ConfigurationLoaderTest {
     verify(communicationManager);
 
     // remove the process and equipments from the server
-    processService.stop(5L, new Timestamp(System.currentTimeMillis()));
+    processService.stop(5L, System.currentTimeMillis());
     Configuration remove = TestConfigurationProvider.deleteProcess();
     report = configurationLoader.applyConfiguration(remove);
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
@@ -902,7 +902,7 @@ public class ConfigurationLoaderTest {
     verify(communicationManager);
 
     // remove the process and equipments from the server
-    processService.stop(5L, new Timestamp(System.currentTimeMillis()));
+    processService.stop(5L, System.currentTimeMillis());
     Configuration remove = TestConfigurationProvider.deleteProcess();
     report = configurationLoader.applyConfiguration(remove);
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
@@ -957,7 +957,7 @@ public class ConfigurationLoaderTest {
     verify(communicationManager);
 
     // remove the process and equipments from the server
-    processService.stop(5L, new Timestamp(System.currentTimeMillis()));
+    processService.stop(5L, System.currentTimeMillis());
     Configuration remove = TestConfigurationProvider.deleteProcess();
     report = configurationLoader.applyConfiguration(remove);
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
@@ -1022,7 +1022,7 @@ public class ConfigurationLoaderTest {
     verify(communicationManager);
 
     // remove the process and equipments from the server
-    processService.stop(5L, new Timestamp(System.currentTimeMillis()));
+    processService.stop(5L, System.currentTimeMillis());
     Configuration remove = TestConfigurationProvider.deleteProcess();
     report = configurationLoader.applyConfiguration(remove);
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
@@ -1090,7 +1090,7 @@ public class ConfigurationLoaderTest {
     verify(communicationManager);
 
     // remove the process and equipments from the server
-    processService.stop(5L, new Timestamp(System.currentTimeMillis()));
+    processService.stop(5L, System.currentTimeMillis());
     Configuration remove = TestConfigurationProvider.deleteProcess();
     report = configurationLoader.applyConfiguration(remove);
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
@@ -1162,7 +1162,7 @@ public class ConfigurationLoaderTest {
     verify(communicationManager);
 
     // remove the process and equipments and dataTag from the server
-    processService.stop(5L, new Timestamp(System.currentTimeMillis()));
+    processService.stop(5L, System.currentTimeMillis());
     Configuration remove = TestConfigurationProvider.deleteProcess();
     report = configurationLoader.applyConfiguration(remove);
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
@@ -1230,7 +1230,7 @@ public class ConfigurationLoaderTest {
     verify(communicationManager);
 
     // remove the process and equipments from the server
-    processService.stop(5L, new Timestamp(System.currentTimeMillis()));
+    processService.stop(5L, System.currentTimeMillis());
     Configuration remove = TestConfigurationProvider.deleteProcess();
     report = configurationLoader.applyConfiguration(remove);
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
@@ -1296,7 +1296,7 @@ public class ConfigurationLoaderTest {
     verify(communicationManager);
 
     // remove the process and equipments from the server
-    processService.stop(5L, new Timestamp(System.currentTimeMillis()));
+    processService.stop(5L, System.currentTimeMillis());
     Configuration remove = TestConfigurationProvider.deleteProcess();
     report = configurationLoader.applyConfiguration(remove);
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
@@ -1363,7 +1363,7 @@ public class ConfigurationLoaderTest {
     verify(communicationManager);
 
     // remove the rest for finishing the test
-    processService.stop(5L, new Timestamp(System.currentTimeMillis()));
+    processService.stop(5L, System.currentTimeMillis());
     Configuration remove = TestConfigurationProvider.deleteProcess();
     report = configurationLoader.applyConfiguration(remove);
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
@@ -1419,7 +1419,7 @@ public class ConfigurationLoaderTest {
     verify(communicationManager);
 
     // remove the process and equipments and dataTag from the server
-    processService.stop(5L, new Timestamp(System.currentTimeMillis()));
+    processService.stop(5L, System.currentTimeMillis());
     Configuration remove = TestConfigurationProvider.deleteProcess();
     report = configurationLoader.applyConfiguration(remove);
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
@@ -1475,7 +1475,7 @@ public class ConfigurationLoaderTest {
 
     verify(communicationManager);
     // remove the process and equipments and dataTag from the server
-    processService.stop(5L, new Timestamp(System.currentTimeMillis()));
+    processService.stop(5L, System.currentTimeMillis());
     Configuration remove = TestConfigurationProvider.deleteProcess();
     report = configurationLoader.applyConfiguration(remove);
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
@@ -1535,7 +1535,7 @@ public class ConfigurationLoaderTest {
 
     verify(communicationManager);
     // remove the process and equipments and dataTag from the server
-    processService.stop(5L, new Timestamp(System.currentTimeMillis()));
+    processService.stop(5L, System.currentTimeMillis());
     Configuration remove = TestConfigurationProvider.deleteProcess();
     report = configurationLoader.applyConfiguration(remove);
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
@@ -1593,7 +1593,7 @@ public class ConfigurationLoaderTest {
     verify(communicationManager);
 
     // remove the process and equipments from the server
-    processService.stop(5L, new Timestamp(System.currentTimeMillis()));
+    processService.stop(5L, System.currentTimeMillis());
     Configuration remove = TestConfigurationProvider.deleteProcess();
     report = configurationLoader.applyConfiguration(remove);
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
@@ -1658,7 +1658,7 @@ public class ConfigurationLoaderTest {
     verify(communicationManager);
 
     // remove the process and equipments from the server
-    processService.stop(5L, new Timestamp(System.currentTimeMillis()));
+    processService.stop(5L, System.currentTimeMillis());
     Configuration remove = TestConfigurationProvider.deleteProcess();
     report = configurationLoader.applyConfiguration(remove);
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));

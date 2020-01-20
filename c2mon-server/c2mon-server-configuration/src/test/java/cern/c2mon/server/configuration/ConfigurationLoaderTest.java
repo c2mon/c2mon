@@ -737,7 +737,7 @@ public class ConfigurationLoaderTest {
   @Test
   public void testRemoveProcess() {
     // stop DAQ else remove not allowed
-    processService.stop(50L, new Timestamp(System.currentTimeMillis()));
+    processService.stop(50L, System.currentTimeMillis());
 
     replay(mockManager);
 
