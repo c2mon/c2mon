@@ -34,7 +34,7 @@ public abstract class SupervisedServiceTest<T extends Supervised, T_IMPL extends
   C2monCache<AliveTag> aliveTagCache;
 
   @Before
-  public void preloadStateTags() {
+  public void preloadCaches() {
     aliveTagCache.init();
     commFaultTagCache.init();
     stateTagService.getCache().init();

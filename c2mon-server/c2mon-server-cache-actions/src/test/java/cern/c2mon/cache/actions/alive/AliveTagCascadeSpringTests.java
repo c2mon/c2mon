@@ -18,9 +18,11 @@ import java.util.concurrent.TimeUnit;
 
 import static cern.c2mon.server.common.util.KotlinAPIs.apply;
 import static cern.c2mon.shared.common.CacheEvent.UPDATE_ACCEPTED;
+import static cern.c2mon.shared.common.supervision.SupervisionStatus.RUNNING;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class AliveTagCascadeSpringTests extends AbstractCacheTest<AliveTag,AliveTag> {
+public class AliveTagCascadeSpringTests extends AbstractCacheTest<AliveTag, AliveTag> {
 
   @Inject
   private C2monCache<AliveTag> aliveTagCache;
@@ -33,8 +35,9 @@ public class AliveTagCascadeSpringTests extends AbstractCacheTest<AliveTag,Alive
 
   @Before
   public void resetCaches() {
-    commFaultCache.init();
     stateTagCache.init();
+    commFaultCache.init();
+    aliveTagCache.init();
   }
 
   @Override
@@ -56,10 +59,12 @@ public class AliveTagCascadeSpringTests extends AbstractCacheTest<AliveTag,Alive
     apply(factory.sampleBase(),
       aliveTag -> {
         aliveTag.setSourceTimestamp(Timestamp.from(Instant.now()));
+        aliveTag.setValue(true);
         aliveTagCache.put(aliveTag.getId(), aliveTag);
       });
 
     assertTrue(commFaultUpdate.await(100, TimeUnit.MILLISECONDS));
+    assertTrue(commFaultCache.get(getSample().getCommFaultTagId()).getValue());
   }
 
   @Test
@@ -68,12 +73,34 @@ public class AliveTagCascadeSpringTests extends AbstractCacheTest<AliveTag,Alive
 
     stateTagCache.getCacheListenerManager().registerListener(__ -> stateTagUpdate.countDown(), UPDATE_ACCEPTED);
 
-    apply(((AliveTagCacheObjectFactory) factory).ofProcess(),
+    AliveTag processTag = apply(((AliveTagCacheObjectFactory) factory).ofProcess(),
       aliveTag -> {
         aliveTag.setSourceTimestamp(Timestamp.from(Instant.now()));
+        aliveTag.setValue(true);
         aliveTagCache.put(aliveTag.getId(), aliveTag);
       });
 
     assertTrue(stateTagUpdate.await(100, TimeUnit.MILLISECONDS));
+    assertEquals(RUNNING, stateTagCache.get(processTag.getStateTagId()).getSupervisionStatus());
+  }
+
+  @Test
+  public void aliveTagUpdateCascadeThroughCommFault() throws InterruptedException {
+    CountDownLatch stateTagUpdate = new CountDownLatch(1);
+    CountDownLatch commFaultUpdate = new CountDownLatch(1);
+    commFaultCache.getCacheListenerManager().registerListener(__ -> commFaultUpdate.countDown(), UPDATE_ACCEPTED);
+    stateTagCache.getCacheListenerManager().registerListener(__ -> stateTagUpdate.countDown(), UPDATE_ACCEPTED);
+
+    apply(factory.sampleBase(),
+      aliveTag -> {
+        aliveTag.setSourceTimestamp(Timestamp.from(Instant.now()));
+        aliveTag.setValue(true);
+        aliveTagCache.put(aliveTag.getId(), aliveTag);
+      });
+
+    assertTrue(commFaultUpdate.await(100, TimeUnit.MILLISECONDS));
+    assertTrue(stateTagUpdate.await(250, TimeUnit.MILLISECONDS));
+    assertTrue(commFaultCache.get(getSample().getCommFaultTagId()).getValue());
+    assertEquals(RUNNING, stateTagCache.get(getSample().getStateTagId()).getSupervisionStatus());
   }
 }

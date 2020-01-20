@@ -45,6 +45,12 @@ public class SupervisionStateTagService extends AbstractCacheServiceImpl<Supervi
     if (!controlTagCanUpdateState(stateTagId, controlTag))
       return;
 
+//    if (!cache.containsKey(stateTagId)) {
+//      log.warn("StateTag not found in cache - Unable to update state tag #{} using {} {} #{}",
+//        stateTagId, controlTag.getClass().getSimpleName(), controlTag.getName(), controlTag.getId());
+//      return;
+//    }
+
     cache.compute(stateTagId, stateTag -> {
       if (!matchesAnyTagId(controlTag, stateTag)) {
         // TODO (Alex) Should this throw? Or just fix?
