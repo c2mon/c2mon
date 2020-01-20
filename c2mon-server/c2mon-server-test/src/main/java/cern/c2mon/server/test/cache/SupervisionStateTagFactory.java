@@ -20,7 +20,7 @@ public class SupervisionStateTagFactory extends AbstractCacheObjectFactory<Super
       1260L,
       51L,
       "PROC",
-      1224L,
+      1261L,
       null
     );
   }

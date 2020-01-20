@@ -4,6 +4,7 @@ import cern.c2mon.cache.AbstractCacheTest;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.alive.AliveTag;
 import cern.c2mon.server.common.commfault.CommFaultTag;
+import cern.c2mon.server.common.supervision.SupervisionStateTag;
 import cern.c2mon.server.test.cache.AbstractCacheObjectFactory;
 import cern.c2mon.server.test.cache.AliveTagCacheObjectFactory;
 import org.junit.Before;
@@ -27,9 +28,13 @@ public class AliveTagCascadeSpringTests extends AbstractCacheTest<AliveTag,Alive
   @Inject
   private C2monCache<CommFaultTag> commFaultCache;
 
+  @Inject
+  private C2monCache<SupervisionStateTag> stateTagCache;
+
   @Before
-  public void resetCommFault() {
+  public void resetCaches() {
     commFaultCache.init();
+    stateTagCache.init();
   }
 
   @Override
@@ -58,7 +63,17 @@ public class AliveTagCascadeSpringTests extends AbstractCacheTest<AliveTag,Alive
   }
 
   @Test
-  public void aliveTagUpdateCascadeToState() {
+  public void aliveTagUpdateCascadeToState() throws InterruptedException {
+    CountDownLatch stateTagUpdate = new CountDownLatch(1);
 
+    stateTagCache.getCacheListenerManager().registerListener(__ -> stateTagUpdate.countDown(), UPDATE_ACCEPTED);
+
+    apply(((AliveTagCacheObjectFactory) factory).ofProcess(),
+      aliveTag -> {
+        aliveTag.setSourceTimestamp(Timestamp.from(Instant.now()));
+        aliveTagCache.put(aliveTag.getId(), aliveTag);
+      });
+
+    assertTrue(stateTagUpdate.await(100, TimeUnit.MILLISECONDS));
   }
 }
