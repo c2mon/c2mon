@@ -51,7 +51,7 @@ public class CommFaultTag extends ControlTag {
      * @param aliveTagId
      * @param stateTagId
      */
-    public CommFaultTag(@NonNull Long id, @NonNull Long equipmentId, String equipmentName, String equipmentType, Long aliveTagId, Long stateTagId) {
+    public CommFaultTag(@NonNull Long id, @NonNull Long equipmentId, String equipmentName, String equipmentType, Long stateTagId, Long aliveTagId) {
         super(id, equipmentId, SupervisionEntity.parse(equipmentType));
         this.equipmentName = equipmentName;
         this.aliveTagId = aliveTagId;

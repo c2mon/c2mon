@@ -44,7 +44,7 @@ public class CommFaultService extends AbstractBooleanControlTagService<CommFault
   public CommFaultTag generateFromEquipment(AbstractEquipment abstractEquipment) {
     return new CommFaultTag(abstractEquipment.getCommFaultTagId(), abstractEquipment.getId(),
       abstractEquipment.getName(), SupervisionEntity.EQUIPMENT.toString(),
-      abstractEquipment.getAliveTagId(), abstractEquipment.getStateTagId());
+      abstractEquipment.getStateTagId(), abstractEquipment.getAliveTagId());
     // TODO This used to also put, so remember to do that when calling!
   }
 

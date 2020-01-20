@@ -11,8 +11,8 @@ public class CommFaultTagCacheObjectFactory extends AbstractCacheObjectFactory<C
       150L,
       "E_TESTHANDLER_TESTHANDLER03",
       "EQ",
-      1224L,
-      1222L
+      1222L,
+      1224L
     );
   }
 }
