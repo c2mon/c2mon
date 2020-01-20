@@ -1,6 +1,7 @@
 package cern.c2mon.cache.actions.commfault;
 
-import cern.c2mon.cache.actions.AbstractCacheServiceImpl;
+import cern.c2mon.cache.actions.AbstractBooleanControlTagService;
+import cern.c2mon.cache.actions.supervision.SupervisedCacheService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.alive.AliveTag;
 import cern.c2mon.server.common.commfault.CommFaultTag;
@@ -14,12 +15,13 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 
 
+
 /**
  * @author Szymon Halastra, Alexandros Papageorgiou
  */
 @Slf4j
 @Service
-public class CommFaultService extends AbstractCacheServiceImpl<CommFaultTag> {
+public class CommFaultService extends AbstractBooleanControlTagService<CommFaultTag> implements SupervisedCacheService<CommFaultTag> {
 
   @Inject
   public CommFaultService(final C2monCache<CommFaultTag> commFaultTagCacheRef) {
@@ -32,7 +34,7 @@ public class CommFaultService extends AbstractCacheServiceImpl<CommFaultTag> {
 
   public void updateBasedOnAliveTimer(AliveTag aliveTimer) {
     cache.compute(aliveTimer.getCommFaultTagId(), commFaultTag -> {
-      if (aliveTimer.getTimestamp().after(commFaultTag.getTimestamp())) {
+      if (aliveTimer.getTimestamp().getTime() >= commFaultTag.getTimestamp().getTime()) {
         commFaultTag.setValue(aliveTimer.getValue());
         commFaultTag.setTimeStampsFrom(aliveTimer);
       }
@@ -62,4 +64,5 @@ public class CommFaultService extends AbstractCacheServiceImpl<CommFaultTag> {
     // TODO (Alex) Implement this based on the contents of sourceDataTagValue used
     return new Event<>(System.currentTimeMillis(), false);
   }
+
 }

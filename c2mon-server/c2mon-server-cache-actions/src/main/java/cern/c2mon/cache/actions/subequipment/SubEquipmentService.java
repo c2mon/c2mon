@@ -2,14 +2,12 @@ package cern.c2mon.cache.actions.subequipment;
 
 import cern.c2mon.cache.actions.alive.AliveTagService;
 import cern.c2mon.cache.actions.commfault.CommFaultService;
-import cern.c2mon.cache.actions.datatag.DataTagService;
 import cern.c2mon.cache.actions.equipment.BaseEquipmentServiceImpl;
 import cern.c2mon.cache.actions.equipment.EquipmentService;
 import cern.c2mon.cache.actions.state.SupervisionStateTagService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
-import cern.c2mon.shared.common.supervision.SupervisionEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -31,9 +29,8 @@ public class SubEquipmentService extends BaseEquipmentServiceImpl<SubEquipment> 
                              final EquipmentService equipmentService,
                              final CommFaultService commFaultService,
                              final AliveTagService aliveTimerService,
-                             final DataTagService dataTagService,
                              final SupervisionStateTagService stateTagService) {
-    super(subEquipmentCacheRef, commFaultService.getCache(), aliveTimerService, SupervisionEntity.SUBEQUIPMENT,dataTagService,stateTagService);
+    super(subEquipmentCacheRef, commFaultService, aliveTimerService, stateTagService);
     this.equipmentService = equipmentService;
   }
 

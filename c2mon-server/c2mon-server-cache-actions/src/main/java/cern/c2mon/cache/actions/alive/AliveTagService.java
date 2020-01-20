@@ -1,6 +1,7 @@
 package cern.c2mon.cache.actions.alive;
 
-import cern.c2mon.cache.actions.AbstractCacheServiceImpl;
+import cern.c2mon.cache.actions.AbstractBooleanControlTagService;
+import cern.c2mon.cache.actions.supervision.SupervisedCacheService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.alive.AliveTag;
 import cern.c2mon.server.common.supervision.Supervised;
@@ -19,7 +20,7 @@ import javax.inject.Inject;
  */
 @Slf4j
 @Service
-public class AliveTagService extends AbstractCacheServiceImpl<AliveTag> {
+public class AliveTagService extends AbstractBooleanControlTagService<AliveTag> implements SupervisedCacheService<AliveTag> {
 
   @Inject
   public AliveTagService(C2monCache<AliveTag> aliveTimerCacheRef) {
@@ -35,55 +36,7 @@ public class AliveTagService extends AbstractCacheServiceImpl<AliveTag> {
    * regardless of previous state (active or not)
    */
   public void startOrUpdateTimestamp(long aliveTimerId, long timestamp) throws NullPointerException {
-    setAliveTimerAsActive(aliveTimerId, true, timestamp);
-  }
-
-  /**
-   * Find the {@code AliveTimer} object with {@code aliveTimerId} in the cache
-   * and if it is stopped (not active), then do
-   *
-   * <ul>
-   *   <li>{@code AliveTimer#setActive(true)}
-   *   <li>{@code AliveTimer#setLastUpdate(now)}
-   *   <li>Reinsert into cache
-   * </ul>
-   * <p>
-   * The timestamp will not be updated, unless there is a change.
-   * The cache object will not be reinserted, unless there is a change.
-   *
-   * @param aliveTimerId the alive timer id for the object to be force started
-   * @throws NullPointerException when {@code aliveTimerId} is null
-   */
-  public void start(long aliveTimerId, long timestamp) throws NullPointerException {
-    setAliveTimerAsActive(aliveTimerId, true, timestamp);
-  }
-
-  /**
-   * Find the {@code AliveTimer} object with {@code aliveTimerId} in the cache
-   * and if it is started (active), then do
-   *
-   * <ul>
-   *   <li>{@code AliveTimer#setActive(false)}
-   *   <li>{@code AliveTimer#setLastUpdate(now)}
-   *   <li>Reinsert into cache
-   * </ul>
-   * <p>
-   * The timestamp will not be updated, unless there is a change.
-   * The cache object will not be reinserted, unless there is a change.
-   *
-   * @param aliveTimerId the alive timer id for the object to be force started
-   * @throws NullPointerException when {@code aliveTimerId} is null
-   */
-  public void stop(long aliveTimerId, long timestamp) throws NullPointerException {
-    setAliveTimerAsActive(aliveTimerId, false, timestamp);
-  }
-
-  public void resume(long aliveTimerId, long timestamp) throws NullPointerException {
-    start(aliveTimerId, timestamp);
-  }
-
-  public void suspend(long aliveTimerId, long timestamp) throws NullPointerException {
-    stop(aliveTimerId, timestamp);
+    setTagAsActive(aliveTimerId, true, timestamp);
   }
 
   /**
@@ -149,24 +102,6 @@ public class AliveTagService extends AbstractCacheServiceImpl<AliveTag> {
     }
   }
 
-  private void setAliveTimerAsActive(long aliveTimerId, boolean active, long timestamp) {
-    log.debug("Attempting to set alive timer " + aliveTimerId + " and dependent alive timers to " + active);
-
-    if (!cache.containsKey(aliveTimerId)) {
-      log.error("Cannot locate the AliveTimer in the cache (Id is " + aliveTimerId + ") - unable to stop it.");
-      return;
-    }
-
-    try {
-      cache.compute(aliveTimerId, aliveTimer -> {
-        if (aliveTimer.setValueAndGetDifferent(active) || timestamp > aliveTimer.getLastUpdate())
-          aliveTimer.setLastUpdate(timestamp);
-      });
-    } catch (Exception e) {
-      log.error("Unable to stop the alive timer " + aliveTimerId, e);
-    }
-  }
-
   public final String generateSourceXML(final AliveTag aliveTag) {
     StringBuilder str = new StringBuilder("    <DataTag id=\"");
     str.append(aliveTag.getId());
@@ -224,5 +159,13 @@ public class AliveTagService extends AbstractCacheServiceImpl<AliveTag> {
    */
   public void updateBasedOnSupervised(Supervised supervised) {
     // TODO (Alex)
+  }
+
+  @Override
+  protected void compareAndSetNewValues(AliveTag controlTag, boolean active, long timestamp) {
+    if (controlTag.getValue() != active || timestamp >= controlTag.getTimestamp().getTime()) {
+      controlTag.setValue(active);
+      controlTag.setLastUpdate(timestamp);
+    }
   }
 }

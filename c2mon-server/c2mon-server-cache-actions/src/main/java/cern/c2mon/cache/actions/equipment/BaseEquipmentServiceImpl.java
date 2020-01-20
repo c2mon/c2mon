@@ -1,14 +1,13 @@
 package cern.c2mon.cache.actions.equipment;
 
 import cern.c2mon.cache.actions.alive.AliveTagService;
-import cern.c2mon.cache.actions.datatag.DataTagService;
+import cern.c2mon.cache.actions.commfault.CommFaultService;
 import cern.c2mon.cache.actions.state.SupervisionStateTagService;
 import cern.c2mon.cache.actions.supervision.AbstractSupervisedService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.service.CommonEquipmentOperations;
 import cern.c2mon.server.common.commfault.CommFaultTag;
 import cern.c2mon.server.common.equipment.AbstractEquipment;
-import cern.c2mon.shared.common.supervision.SupervisionEntity;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,13 +22,11 @@ public abstract class BaseEquipmentServiceImpl<T extends AbstractEquipment> exte
   private C2monCache<CommFaultTag> commFaultTagCache;
 
   protected BaseEquipmentServiceImpl(final C2monCache<T> cache,
-                                     final C2monCache<CommFaultTag> commFaultTagCache,
+                                     final CommFaultService commFaultTagService,
                                      final AliveTagService aliveTimerService,
-                                     final SupervisionEntity supervisionEntity,
-                                     final DataTagService dataTagService,
                                      final SupervisionStateTagService stateTagService) {
-    super(cache, supervisionEntity, aliveTimerService,dataTagService, stateTagService);
-    this.commFaultTagCache = commFaultTagCache;
+    super(cache, aliveTimerService, commFaultTagService, stateTagService);
+    this.commFaultTagCache = commFaultTagService.getCache();
   }
 
   @Override

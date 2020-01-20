@@ -1,6 +1,7 @@
 package cern.c2mon.cache.actions.state;
 
 import cern.c2mon.cache.actions.AbstractCacheServiceImpl;
+import cern.c2mon.cache.actions.supervision.SupervisedCacheService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.control.ControlTag;
@@ -19,13 +20,13 @@ import java.util.stream.Collectors;
 
 import static cern.c2mon.cache.actions.commfault.CommFaultTagEvaluator.inferSupervisionStatus;
 import static cern.c2mon.cache.actions.state.SupervisionStateTagEvaluator.controlTagCanUpdateState;
-import static cern.c2mon.cache.actions.state.SupervisionStateTagEvaluator.machesAnyTagId;
-import static cern.c2mon.shared.common.supervision.SupervisionStatus.DOWN;
-import static cern.c2mon.shared.common.supervision.SupervisionStatus.RUNNING;
+import static cern.c2mon.cache.actions.state.SupervisionStateTagEvaluator.matchesAnyTagId;
+import static cern.c2mon.shared.common.supervision.SupervisionStatus.*;
 
 @Slf4j
 @Service
-public class SupervisionStateTagService extends AbstractCacheServiceImpl<SupervisionStateTag> {
+public class SupervisionStateTagService extends AbstractCacheServiceImpl<SupervisionStateTag>
+  implements SupervisedCacheService<SupervisionStateTag> {
 
   @Inject
   public SupervisionStateTagService(C2monCache<SupervisionStateTag> cache) {
@@ -45,12 +46,12 @@ public class SupervisionStateTagService extends AbstractCacheServiceImpl<Supervi
       return;
 
     cache.compute(stateTagId, stateTag -> {
-      if (!machesAnyTagId(controlTag, stateTag)) {
+      if (!matchesAnyTagId(controlTag, stateTag)) {
         // TODO (Alex) Should this throw? Or just fix?
         return;
       }
 
-      if (controlTag.getTimestamp().after(stateTag.getTimestamp())) {
+      if (controlTag.getTimestamp().getTime() >= stateTag.getTimestamp().getTime()) {
         stateTag.setTimeStampsFrom(controlTag);
 
         SupervisionStatus oldStatus = stateTag.getSupervisionStatus();
@@ -144,7 +145,7 @@ public class SupervisionStateTagService extends AbstractCacheServiceImpl<Supervi
    * @param stateTagId the stateTag id for the object to be force started
    */
   public void start(long stateTagId, long timestamp) throws NullPointerException {
-    setStateTagAsActive(stateTagId, true, timestamp);
+    setStateTagAsActive(stateTagId, STARTUP, timestamp);
   }
 
   /**
@@ -163,19 +164,26 @@ public class SupervisionStateTagService extends AbstractCacheServiceImpl<Supervi
    * @param stateTagId the stateTag id for the object to be force started
    */
   public void stop(long stateTagId, long timestamp) throws NullPointerException {
-    setStateTagAsActive(stateTagId, false, timestamp);
+    setStateTagAsActive(stateTagId, DOWN, timestamp);
   }
 
-  public void resume(long stateTagId, long timestamp) throws NullPointerException {
-    start(stateTagId, timestamp);
+  public void resume(long stateTagId, long timestamp, @NonNull String message) throws NullPointerException {
+    setStateTagAsActive(stateTagId, RUNNING, timestamp);
   }
 
-  public void suspend(long stateTagId, long timestamp) throws NullPointerException {
-    stop(stateTagId, timestamp);
+  public void suspend(long stateTagId, long timestamp, @NonNull String message) throws NullPointerException {
+    setStateTagAsActive(stateTagId, DOWN, timestamp);
   }
 
-  private void setStateTagAsActive(long stateTagId, boolean active, long timestamp) {
-    log.debug("Attempting to set State tag " + stateTagId + " and dependent alive timers to " + active);
+  /**
+   * Sets the status of the SupervisionState to newStatus
+   *
+   * @param stateTagId
+   * @param newStatus
+   * @param timestamp
+   */
+  private void setStateTagAsActive(long stateTagId, SupervisionStatus newStatus, long timestamp) {
+    log.debug("Attempting to set State tag to " + newStatus);
 
     if (!cache.containsKey(stateTagId)) {
       log.error("Cannot locate the StateTag in the cache (Id is " + stateTagId + ") - unable to stop it.");
@@ -184,10 +192,12 @@ public class SupervisionStateTagService extends AbstractCacheServiceImpl<Supervi
 
     try {
       cache.compute(stateTagId, stateTag -> {
-        if (stateTag.getValue() != active) {
-          stateTag.setValue(active);
-          stateTag.setSupervision(active ? RUNNING : DOWN, "", new Timestamp(timestamp));
-          stateTag.setSourceTimestamp(new Timestamp(timestamp)); // TODO (Alex) EventTimeStamp? StatusTime?
+        if (stateTag.getSupervisionStatus() != newStatus) {
+          // Set SupervisionStatus time to now. This happens because alternatively we would be "lying" about
+          // when this effect started in the server. If you want the source event information, the
+          // source and daq timestamps should reflect it accurately (use getTimestamp)
+          stateTag.setSupervision(newStatus, "", new Timestamp(timestamp));
+          stateTag.setValue(SupervisionStateTagEvaluator.isRunning(stateTag));
         }
       });
     } catch (Exception e) {

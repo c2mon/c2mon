@@ -18,7 +18,6 @@ package cern.c2mon.cache.actions.supervision;
 
 import cern.c2mon.cache.actions.AbstractCacheService;
 import cern.c2mon.cache.api.flow.CacheUpdateFlow;
-import cern.c2mon.server.common.supervision.Supervised;
 import cern.c2mon.shared.common.Cacheable;
 import lombok.NonNull;
 
@@ -28,10 +27,17 @@ import java.sql.Timestamp;
  * Implemented by beans linked to Supervised cache
  * objects (so Process, Equipment and SubEquipment).
  *
+ * Also implemented by the ControlTag services (so
+ * AliveTag, CommFaultTag and SupervisionStateTag).
+ *
+ * You can call the ControlTag services directly, but
+ * prefer to call the Supervised object ones, and let
+ * them cascade the event through the others
+ *
  * @param <T> the cache object type
  * @author Mark Brightwell
  */
-public interface SupervisedCacheService<T extends Supervised> extends AbstractCacheService<T> {
+public interface SupervisedCacheService<T extends Cacheable> extends AbstractCacheService<T> {
 
   /**
    * Sets the status of the Supervised object to STARTUP,
@@ -45,19 +51,19 @@ public interface SupervisedCacheService<T extends Supervised> extends AbstractCa
    * @param timestamp time of the start
    * @return the cache object, after {@link CacheUpdateFlow#postInsertEvents(Cacheable, Cacheable)}
    */
-  void start(long id, @NonNull Timestamp timestamp);
+  void start(long id, long timestamp);
 
   /**
    * Sets the status of the Supervised object to DOWN,
    * with stop message
    * <p>
-   * <p>Stops the alive timer for this object is running.
+   * <p>Stops the alive timer for this object if running.
    *
    * @param id        The cache id of the supervised object
    * @param timestamp time of the stop
    * @return the cache object, after {@link CacheUpdateFlow#postInsertEvents(Cacheable, Cacheable)}
    */
-  void stop(long id, @NonNull Timestamp timestamp);
+  void stop(long id, long timestamp);
 
   /**
    * Sets the status to running
@@ -69,7 +75,7 @@ public interface SupervisedCacheService<T extends Supervised> extends AbstractCa
    * @param message   details of the event
    * @return the cache object, after {@link CacheUpdateFlow#postInsertEvents(Cacheable, Cacheable)}
    */
-  void resume(long id, @NonNull Timestamp timestamp, @NonNull String message);
+  void resume(long id,long timestamp, @NonNull String message);
 
   /**
    * Called when an alive expires or a commfault tag is received.
@@ -79,5 +85,5 @@ public interface SupervisedCacheService<T extends Supervised> extends AbstractCa
    * @param message   details
    * @return the cache object, after {@link CacheUpdateFlow#postInsertEvents(Cacheable, Cacheable)}
    */
-  void suspend(long id, @NonNull Timestamp timestamp, @NonNull String message);
+  void suspend(long id, long timestamp, @NonNull String message);
 }

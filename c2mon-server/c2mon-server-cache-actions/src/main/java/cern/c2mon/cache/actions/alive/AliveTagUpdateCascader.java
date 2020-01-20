@@ -62,6 +62,7 @@ public class AliveTagUpdateCascader implements CacheListener<AliveTag> {
       log.warn("Alive tag {} #{} does not have a State Tag registered", aliveTag.getName(), aliveTag.getId());
     }
 
+    // Processes don't have a commFaultTag id
     if (aliveTag.getSupervisedEntity() == SupervisionEntity.PROCESS
       && SupervisionStateTagEvaluator.controlTagCanUpdateState(aliveTag.getStateTagId(), aliveTag)) {
       stateTagService.updateBasedOnControl(aliveTag.getStateTagId(), aliveTag);

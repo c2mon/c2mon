@@ -4,22 +4,22 @@ import cern.c2mon.cache.actions.listener.SupervisedServiceListenerTest;
 import cern.c2mon.cache.actions.state.SupervisionStateTagService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.alive.AliveTag;
+import cern.c2mon.server.common.commfault.CommFaultTag;
 import cern.c2mon.server.common.equipment.AbstractSupervisedCacheObject;
 import cern.c2mon.server.common.supervision.Supervised;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.common.CacheEvent;
 import cern.c2mon.shared.common.supervision.SupervisionStatus;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.inject.Inject;
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import static cern.c2mon.shared.common.supervision.SupervisionStatus.*;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public abstract class SupervisedServiceTest<T extends Supervised, T_IMPL extends AbstractSupervisedCacheObject>
   extends SupervisedServiceListenerTest<T, T_IMPL> {
@@ -28,11 +28,15 @@ public abstract class SupervisedServiceTest<T extends Supervised, T_IMPL extends
   SupervisionStateTagService stateTagService;
 
   @Inject
+  C2monCache<CommFaultTag> commFaultTagCache;
+
+  @Inject
   C2monCache<AliveTag> aliveTagCache;
 
   @Before
   public void preloadStateTags() {
     aliveTagCache.init();
+    commFaultTagCache.init();
     stateTagService.getCache().init();
   }
 
@@ -44,54 +48,49 @@ public abstract class SupervisedServiceTest<T extends Supervised, T_IMPL extends
   }
 
   @Test
-  @Ignore
   public void start() throws InterruptedException {
     cacheSupervision(
-      () -> supervisedService.start(sample.getId(), Timestamp.from(Instant.now())),
+      () -> supervisedService.start(sample.getId(), System.currentTimeMillis()),
       STARTUP);
   }
 
   @Test
-  @Ignore
   public void stop() throws InterruptedException {
     cacheSupervision(
-      () -> supervisedService.stop(sample.getId(), Timestamp.from(Instant.now())),
+      () -> supervisedService.stop(sample.getId(), System.currentTimeMillis()),
       DOWN);
   }
 
   @Test
-  @Ignore
   public void suspend() throws InterruptedException {
     cacheSupervision(
-      () -> supervisedService.suspend(sample.getId(), Timestamp.from(Instant.now()), ""),
+      () -> supervisedService.suspend(sample.getId(), System.currentTimeMillis(), ""),
       DOWN);
   }
 
   @Test
-  @Ignore
   public void resume() throws InterruptedException {
     cacheSupervision(
-      () -> supervisedService.resume(sample.getId(), Timestamp.from(Instant.now()), ""),
+      () -> supervisedService.resume(sample.getId(), System.currentTimeMillis(), ""),
       RUNNING);
   }
 
   @Test
-  @Ignore
   public void resumingStartedObjectResultsInNoEffect() {
     cache.put(sample.getId(), sample);
 
     long initialTimeMillis = System.currentTimeMillis() - 1;
-    supervisedService.start(sample.getId(), new Timestamp(initialTimeMillis));
+    supervisedService.start(sample.getId(), initialTimeMillis);
     assertEquals(initialTimeMillis, stateTagService.getSupervisionEvent(sample.getStateTagId()).getEventTime().getTime());
 
     long timeOfRunningNotStartupStatus = initialTimeMillis + 1;
-    supervisedService.resume(sample.getId(), new Timestamp(timeOfRunningNotStartupStatus), "");
+    supervisedService.resume(sample.getId(), timeOfRunningNotStartupStatus, "");
     SupervisionEvent supervisionEvent = stateTagService.getSupervisionEvent(sample.getStateTagId());
     assertEquals(timeOfRunningNotStartupStatus, supervisionEvent.getEventTime().getTime());
     assertEquals(RUNNING, supervisionEvent.getStatus());
 
     // This should have no change
-    supervisedService.resume(sample.getId(), new Timestamp(initialTimeMillis + 2), "");
+    supervisedService.resume(sample.getId(), initialTimeMillis + 2, "");
     supervisionEvent = stateTagService.getSupervisionEvent(sample.getStateTagId());
     assertEquals(timeOfRunningNotStartupStatus, supervisionEvent.getEventTime().getTime());
     assertEquals(RUNNING, supervisionEvent.getStatus());
@@ -115,8 +114,7 @@ public abstract class SupervisedServiceTest<T extends Supervised, T_IMPL extends
 
     cacheAction.run();
 
-//    assertTrue(latch.await(100, TimeUnit.MILLISECONDS));
-    Thread.sleep(100);
+    assertTrue(latch.await(100, TimeUnit.MILLISECONDS));
 
     // Cache object has achieved expected status
     verifySupervisionEvent(expected);

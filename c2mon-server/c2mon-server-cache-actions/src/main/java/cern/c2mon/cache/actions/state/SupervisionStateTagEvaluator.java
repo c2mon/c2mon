@@ -35,16 +35,12 @@ public class SupervisionStateTagEvaluator {
     return true;
   }
 
-  public static boolean machesAnyTagId(@NonNull ControlTag controlTag, @NonNull SupervisionStateTag stateTag) {
+  public static boolean matchesAnyTagId(@NonNull ControlTag controlTag, @NonNull SupervisionStateTag stateTag) {
     return apply(
       matchesAnyTagId(controlTag.getId(), stateTag.getCommFaultTagId(), stateTag.getAliveTagId()),
       anyMatched -> {
         if (!anyMatched)
-          log.error(
-            "ControlTag cache object {} #{} has StateTag {} #{} listed, but StateTag cache object does not know this id." +
-              "In StateTag, AliveTag Id #{} - CommFaultTag id listed: #{}",
-            controlTag.getName(), controlTag.getId(), stateTag.getName(), stateTag.getId(),
-            stateTag.getAliveTagId(), stateTag.getCommFaultTagId());
+          logIdMatchingError(controlTag, stateTag);
       }
     );
   }
@@ -52,6 +48,14 @@ public class SupervisionStateTagEvaluator {
   private static boolean matchesAnyTagId(long controlTagId, Long stateCommFaultId, Long stateAliveId) {
     return stateCommFaultId != null && stateCommFaultId == controlTagId
       || stateAliveId != null && stateAliveId == controlTagId;
+  }
+
+  private static void logIdMatchingError(ControlTag controlTag,SupervisionStateTag stateTag) {
+    log.error(
+      "ControlTag cache object {} #{} has StateTag {} #{} listed, but StateTag cache object does not know this id." +
+        "In StateTag, AliveTag Id #{} - CommFaultTag id listed: #{}",
+      controlTag.getName(), controlTag.getId(), stateTag.getName(), stateTag.getId(),
+      stateTag.getAliveTagId(), stateTag.getCommFaultTagId());
   }
 
   /**
