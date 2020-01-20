@@ -23,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import pl.allegro.tech.embeddedelasticsearch.EmbeddedElastic;
 import pl.allegro.tech.embeddedelasticsearch.PopularProperties;
 
+import cern.c2mon.server.elasticsearch.client.ElasticsearchClientType;
 import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 
 /**
@@ -54,8 +55,8 @@ public final class EmbeddedElasticsearchManager {
 
         embeddedNode = EmbeddedElastic.builder()
             .withElasticVersion(ELASTICSEARCH_VERSION)
-            .withSetting(PopularProperties.TRANSPORT_TCP_PORT, properties.getPort())
-            .withSetting(PopularProperties.HTTP_PORT, properties.getHttpPort())
+            .withSetting(PopularProperties.HTTP_PORT, ElasticsearchClientType.REST.getDefaultPort())
+            .withSetting(PopularProperties.TRANSPORT_TCP_PORT, ElasticsearchClientType.TRANSPORT.getDefaultPort())
             .withSetting(PopularProperties.CLUSTER_NAME, properties.getClusterName())
             .withStartTimeout(2, TimeUnit.MINUTES)
             .build();

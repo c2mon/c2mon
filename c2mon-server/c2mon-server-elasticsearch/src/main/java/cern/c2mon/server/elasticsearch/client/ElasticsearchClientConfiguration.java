@@ -30,8 +30,6 @@ import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 @Configuration
 public class ElasticsearchClientConfiguration {
 
-  private static final String TRANSPORT_CLIENT = "transport";
-
   private final ElasticsearchProperties properties;
 
   /**
@@ -51,7 +49,7 @@ public class ElasticsearchClientConfiguration {
       return new ElasticsearchClientStub();
     }
 
-    if (TRANSPORT_CLIENT.equalsIgnoreCase(properties.getClient())) {
+    if (ElasticsearchClientType.TRANSPORT.name().equalsIgnoreCase(properties.getClient())) {
       return new ElasticsearchClientTransport(properties);
     } else {
       return new ElasticsearchClientRest(properties);

@@ -14,28 +14,27 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.elasticsearch.util;
+package cern.c2mon.server.elasticsearch.client;
 
-import java.io.IOException;
+/**
+ * Defines available clients to communicate with Elasticsearch server
+ *
+ * @author Serhiy Boychenko
+ */
+public enum ElasticsearchClientType {
+  REST(9200),
+  TRANSPORT(9300);
 
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpHead;
-import org.apache.http.impl.client.HttpClientBuilder;
+  private final int defaultPort;
 
-import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
-
-public class IndexUtils {
-
-  private IndexUtils() {
-    // only static methods below
+  ElasticsearchClientType(int defaultPort) {
+    this.defaultPort = defaultPort;
   }
 
-  public static boolean doesIndexExist(String indexName, ElasticsearchProperties properties) throws IOException {
-    HttpHead httpRequest = new HttpHead(("http://" + properties.getHost() + ":" + properties.getPort() + "/" + indexName));
-    HttpClient httpClient = HttpClientBuilder.create().build();
-    HttpResponse httpResponse = httpClient.execute(httpRequest);
-    return httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK;
+  /**
+   * @return default port used by this client to communicate with Elasticsearch server
+   */
+  public int getDefaultPort() {
+    return defaultPort;
   }
 }

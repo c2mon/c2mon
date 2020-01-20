@@ -81,7 +81,7 @@ public final class ElasticsearchClientRest implements ElasticsearchClient {
     this.properties = properties;
 
     RestClientBuilder restClientBuilder =
-        RestClient.builder(new HttpHost(properties.getHost(), properties.getHttpPort(), "http"));
+        RestClient.builder(new HttpHost(properties.getHost(), properties.getPort(), "http"));
 
     client = new RestHighLevelClient(restClientBuilder);
 
