@@ -19,10 +19,7 @@ package cern.c2mon.server.common.commfault;
 
 import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.shared.common.supervision.SupervisionEntity;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
+import lombok.*;
 
 /**
  * Cache object corresponding to entries in the DB CommFaultTag view.
@@ -32,6 +29,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 public class CommFaultTag extends ControlTag {
 
     private static final long serialVersionUID = 876075976116480601L;

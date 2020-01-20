@@ -8,6 +8,7 @@ import cern.c2mon.shared.common.supervision.SupervisionStatus;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.ToString;
 
 import java.sql.Timestamp;
 
@@ -21,6 +22,7 @@ import static cern.c2mon.server.common.util.KotlinAPIs.orElse;
  */
 @Getter
 @EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 public class SupervisionStateTag extends ControlTag {
   /**
    * Id of the associated {@link AliveTag} used for supervision, or null

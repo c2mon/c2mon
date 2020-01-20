@@ -27,7 +27,7 @@ import java.util.Collection;
 
 @Getter
 @Setter
-@ToString
+@ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class AliveTag extends ControlTag {
 

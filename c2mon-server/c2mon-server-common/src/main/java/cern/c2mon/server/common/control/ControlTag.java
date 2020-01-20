@@ -7,6 +7,7 @@ import cern.c2mon.shared.common.supervision.SupervisionEntity;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.ToString;
 
 import java.util.Collections;
 import java.util.Set;
@@ -15,6 +16,7 @@ import static cern.c2mon.server.common.util.Java9Collections.setOf;
 
 @Getter
 @EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 public abstract class ControlTag extends AbstractInfoTagCacheObject implements InfoTag {
   /**
    * Id of the {@link Supervised} object
