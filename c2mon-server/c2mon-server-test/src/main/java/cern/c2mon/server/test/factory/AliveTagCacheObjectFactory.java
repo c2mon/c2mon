@@ -1,4 +1,4 @@
-package cern.c2mon.server.test.cache;
+package cern.c2mon.server.test.factory;
 
 import cern.c2mon.server.common.alive.AliveTag;
 

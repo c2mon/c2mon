@@ -14,17 +14,11 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.test.cache;
+package cern.c2mon.server.test.factory;
 
-import cern.c2mon.server.common.equipment.AbstractEquipmentCacheObject;
+import cern.c2mon.server.common.AbstractCacheableImpl;
 
-abstract class AbstractEquipmentCacheObjectFactory<T extends AbstractEquipmentCacheObject> extends AbstractCacheObjectFactory<T> {
+public abstract class AbstractCacheObjectFactory<T extends AbstractCacheableImpl> {
 
-  void initDefaults(T base){
-    base.setDescription("Test desc");
-    base.setHandlerClassName("Test class name");
-    base.setAliveTagId(1224L);
-    base.setAliveInterval(10);
-    base.setCommFaultTagId(1223L);
-  }
+  public abstract T sampleBase();
 }

@@ -4,7 +4,7 @@ import cern.c2mon.cache.AbstractCacheTest;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
-import cern.c2mon.server.test.cache.AbstractCacheObjectFactory;
+import cern.c2mon.server.test.factory.AbstractCacheObjectFactory;
 import org.junit.Test;
 
 import javax.inject.Inject;

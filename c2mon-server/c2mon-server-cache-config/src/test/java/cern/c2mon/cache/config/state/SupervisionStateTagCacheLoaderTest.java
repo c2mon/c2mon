@@ -5,7 +5,7 @@ import cern.c2mon.cache.config.AbstractCacheLoaderTest;
 import cern.c2mon.server.cache.dbaccess.LoaderMapper;
 import cern.c2mon.server.cache.dbaccess.SupervisionStateTagMapper;
 import cern.c2mon.server.common.supervision.SupervisionStateTag;
-import cern.c2mon.server.test.cache.SupervisionStateTagFactory;
+import cern.c2mon.server.test.factory.SupervisionStateTagFactory;
 
 import javax.inject.Inject;
 import java.util.List;

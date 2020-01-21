@@ -25,7 +25,7 @@ import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.ValueAlarmCondition;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
-import cern.c2mon.server.test.cache.DataTagCacheObjectFactory;
+import cern.c2mon.server.test.factory.DataTagCacheObjectFactory;
 import org.junit.Before;
 import org.junit.Test;
 

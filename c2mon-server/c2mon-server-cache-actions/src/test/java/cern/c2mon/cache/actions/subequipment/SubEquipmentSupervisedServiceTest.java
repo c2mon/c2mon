@@ -4,8 +4,8 @@ import cern.c2mon.cache.SupervisedServiceTest;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
-import cern.c2mon.server.test.cache.AbstractCacheObjectFactory;
-import cern.c2mon.server.test.cache.SubEquipmentCacheObjectFactory;
+import cern.c2mon.server.test.factory.AbstractCacheObjectFactory;
+import cern.c2mon.server.test.factory.SubEquipmentCacheObjectFactory;
 import lombok.Getter;
 
 import javax.inject.Inject;

@@ -20,7 +20,7 @@ import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.command.CommandTagCacheObject;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.common.rule.RuleTagCacheObject;
-import cern.c2mon.server.test.cache.*;
+import cern.c2mon.server.test.factory.*;
 
 /**
  * Contains static methods for creating test cache objects.

@@ -9,7 +9,7 @@ import cern.c2mon.server.cache.loading.config.CacheLoadingModuleRef;
 import cern.c2mon.server.common.AbstractCacheableImpl;
 import cern.c2mon.server.common.config.CommonModule;
 import cern.c2mon.server.test.DatabasePopulationRule;
-import cern.c2mon.server.test.cache.AbstractCacheObjectFactory;
+import cern.c2mon.server.test.factory.AbstractCacheObjectFactory;
 import cern.c2mon.shared.common.Cacheable;
 import org.junit.Before;
 import org.junit.Rule;

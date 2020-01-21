@@ -14,26 +14,17 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.test.cache;
+package cern.c2mon.server.test.factory;
 
-import cern.c2mon.server.common.process.ProcessCacheObject;
+import cern.c2mon.server.common.equipment.AbstractEquipmentCacheObject;
 
-import java.sql.Timestamp;
+abstract class AbstractEquipmentCacheObjectFactory<T extends AbstractEquipmentCacheObject> extends AbstractCacheObjectFactory<T> {
 
-public class ProcessCacheObjectFactory extends AbstractCacheObjectFactory<ProcessCacheObject> {
-
-  @Override
-  public ProcessCacheObject sampleBase() {
-    ProcessCacheObject processCacheObject = new ProcessCacheObject(51L, "P_TESTHANDLER04", 1260L, 100, 100);
-    processCacheObject.setDescription("Test process description");
-    processCacheObject.setAliveInterval(60);
-    processCacheObject.setAliveTagId(1261L); //FK ref
-    processCacheObject.setStartupTime(new Timestamp(0));
-    processCacheObject.setCurrentHost("test host");
-    processCacheObject.setRequiresReboot(false);
-    processCacheObject.setProcessPIK(12345L);
-    processCacheObject.setLocalConfig(ProcessCacheObject.LocalConfig.Y);
-
-    return processCacheObject;
+  void initDefaults(T base){
+    base.setDescription("Test desc");
+    base.setHandlerClassName("Test class name");
+    base.setAliveTagId(1224L);
+    base.setAliveInterval(10);
+    base.setCommFaultTagId(1223L);
   }
 }

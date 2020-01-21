@@ -5,8 +5,8 @@ import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.cache.api.impl.SimpleC2monCache;
 import cern.c2mon.server.common.commfault.CommFaultTag;
 import cern.c2mon.server.common.supervision.SupervisionStateTag;
-import cern.c2mon.server.test.cache.CommFaultTagCacheObjectFactory;
-import cern.c2mon.server.test.cache.SupervisionStateTagFactory;
+import cern.c2mon.server.test.factory.CommFaultTagCacheObjectFactory;
+import cern.c2mon.server.test.factory.SupervisionStateTagFactory;
 import org.junit.Before;
 import org.junit.Test;
 

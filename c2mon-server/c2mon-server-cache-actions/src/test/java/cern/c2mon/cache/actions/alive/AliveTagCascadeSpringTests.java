@@ -5,8 +5,8 @@ import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.alive.AliveTag;
 import cern.c2mon.server.common.commfault.CommFaultTag;
 import cern.c2mon.server.common.supervision.SupervisionStateTag;
-import cern.c2mon.server.test.cache.AbstractCacheObjectFactory;
-import cern.c2mon.server.test.cache.AliveTagCacheObjectFactory;
+import cern.c2mon.server.test.factory.AbstractCacheObjectFactory;
+import cern.c2mon.server.test.factory.AliveTagCacheObjectFactory;
 import org.junit.Before;
 import org.junit.Test;
 
