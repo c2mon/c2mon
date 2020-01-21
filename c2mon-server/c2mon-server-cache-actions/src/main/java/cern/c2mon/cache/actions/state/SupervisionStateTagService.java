@@ -192,7 +192,7 @@ public class SupervisionStateTagService extends AbstractCacheServiceImpl<Supervi
     log.debug("Attempting to set State tag to " + newStatus);
 
     if (!cache.containsKey(stateTagId)) {
-      log.error("Cannot locate the StateTag in the cache (Id is " + stateTagId + ") - unable to stop it.");
+      log.error("Cannot locate the StateTag in the cache (Id is " + stateTagId + ") - unable to set its status to {}", newStatus);
       return;
     }
 

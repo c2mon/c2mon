@@ -7,7 +7,7 @@ import lombok.NonNull;
 
 import java.sql.Timestamp;
 
-public class SupervisionStateTagController {
+public final class SupervisionStateTagController {
 
   private SupervisionStateTagController() {
 
@@ -25,7 +25,7 @@ public class SupervisionStateTagController {
       ? stateTag.getStatusDescription()
       : stateTag.getSupervisedEntity() + " " + stateTag.getName() + " is " + stateTag.getSupervisionStatus();
 
-    return new SupervisionEventImpl(stateTag.getSupervisedEntity(), stateTag.getId(), stateTag.getName(),
+    return new SupervisionEventImpl(stateTag.getSupervisedEntity(), stateTag.getSupervisedId(), stateTag.getName(),
       stateTag.getSupervisionStatus(), supervisionTime, supervisionMessage);
   }
 }

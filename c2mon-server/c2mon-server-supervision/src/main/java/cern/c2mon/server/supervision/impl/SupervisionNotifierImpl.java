@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.supervision.impl;
 
+import cern.c2mon.cache.actions.state.SupervisionStateTagController;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.component.ExecutorLifecycleHandle;
 import cern.c2mon.server.common.component.Lifecycle;
@@ -23,7 +24,6 @@ import cern.c2mon.server.common.supervision.SupervisionStateTag;
 import cern.c2mon.server.supervision.SupervisionListener;
 import cern.c2mon.server.supervision.SupervisionNotifier;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
-import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jmx.export.annotation.ManagedOperation;
@@ -31,7 +31,6 @@ import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -104,28 +103,9 @@ public class SupervisionNotifierImpl implements SupervisionNotifier {
   @PostConstruct
   public void init() {
     stateTagCache.getCacheListenerManager()
-      .registerListener(this::notifyElementUpdated
+      .registerListener(stateTag ->
+          notifySupervisionEvent(SupervisionStateTagController.createSupervisionEvent(stateTag))
         , SUPERVISION_CHANGE, CONFIRM_STATUS);
-  }
-
-
-  private void notifyElementUpdated(SupervisionStateTag stateTag) {
-    Timestamp supervisionTime;
-    String supervisionMessage;
-    if (stateTag.getStatusTime() != null) {
-      supervisionTime = stateTag.getStatusTime();
-    } else {
-      supervisionTime = new Timestamp(System.currentTimeMillis());
-    }
-    if (stateTag.getStatusDescription() != null) {
-      supervisionMessage = stateTag.getStatusDescription();
-    } else {
-      supervisionMessage = stateTag.getSupervisedEntity() + " " + stateTag.getName() + " is " + stateTag.getSupervisionStatus();
-    }
-    notifySupervisionEvent(new SupervisionEventImpl(stateTag.getSupervisedEntity(),
-      stateTag.getId(), stateTag.getName(), stateTag.getSupervisionStatus(),
-      supervisionTime,
-      supervisionMessage));
   }
 
   @Override
