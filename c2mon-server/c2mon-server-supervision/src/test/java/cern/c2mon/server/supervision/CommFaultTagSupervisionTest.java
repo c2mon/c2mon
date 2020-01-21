@@ -22,20 +22,17 @@ import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.common.supervision.SupervisionStateTag;
 import cern.c2mon.shared.common.CacheEvent;
-import cern.c2mon.shared.common.datatag.SourceDataTagQuality;
 import cern.c2mon.shared.common.datatag.SourceDataTagValue;
-import org.easymock.EasyMock;
-import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.DirtiesContext;
 
 import javax.inject.Inject;
-import java.sql.Timestamp;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import static cern.c2mon.server.common.util.Java9Collections.listOf;
+import static cern.c2mon.server.test.cache.SourceDataTagValueFactory.sampleCommFault;
 import static cern.c2mon.shared.common.supervision.SupervisionStatus.DOWN;
 import static cern.c2mon.shared.common.supervision.SupervisionStatus.RUNNING;
 import static org.junit.Assert.assertEquals;
@@ -62,12 +59,14 @@ public class CommFaultTagSupervisionTest extends SupervisionCacheTest {
   @Inject
   private C2monCache<SupervisionStateTag> stateTagCache;
 
-  private IMocksControl controller;
-
   @SuppressWarnings("unchecked")
   @Before
   public void setUp() {
-    controller = EasyMock.createNiceControl();
+    listOf(stateTagCache, commFaultTagCache).forEach(cache -> {
+      cache.clear();
+      cache.init();
+    });
+
     assertEquals(stateTagCache.get(equipmentCache.get(EQ_ID).getStateTagId()).getSupervisionStatus(), DOWN);
     assertEquals(stateTagCache.get(subEquipmentCache.get(SUBEQ_ID).getStateTagId()).getSupervisionStatus(), DOWN);
   }
@@ -77,15 +76,13 @@ public class CommFaultTagSupervisionTest extends SupervisionCacheTest {
    * Equipment status and registered listeners.
    */
   @Test
-  @DirtiesContext
   public void processCommFaultTagStatus() {
-    supervisionManager.processControlTag(createSampleCommFaultTag(System.currentTimeMillis()));
+    supervisionManager.processControlTag(sampleCommFault(System.currentTimeMillis()));
 
     assertEquals(RUNNING, stateTagCache.get(equipmentCache.get(EQ_ID).getStateTagId()).getSupervisionStatus());
   }
 
   @Test
-  @DirtiesContext
   public void processCommFaultTagStatusSubEqCascade() throws InterruptedException {
     CountDownLatch expectingOneUpdate = new CountDownLatch(1);
     subEquipmentCache.getCacheListenerManager().registerListener(subEq -> {
@@ -93,34 +90,21 @@ public class CommFaultTagSupervisionTest extends SupervisionCacheTest {
         expectingOneUpdate.countDown();
     });
 
-    supervisionManager.processControlTag(createSampleCommFaultTag(System.currentTimeMillis()));
+    supervisionManager.processControlTag(sampleCommFault(System.currentTimeMillis()));
 
     assertTrue("Subequipment should be updated", expectingOneUpdate.await(100, TimeUnit.MILLISECONDS));
     assertEquals(RUNNING, stateTagCache.get(equipmentCache.get(EQ_ID).getStateTagId()).getSupervisionStatus());
   }
 
   @Test
-  @DirtiesContext
   public void processCommFaultTagTime() {
     long time = System.currentTimeMillis();
-    supervisionManager.processControlTag(createSampleCommFaultTag(time));
+    supervisionManager.processControlTag(sampleCommFault(time));
 
     assertEquals(time, stateTagCache.get(equipmentCache.get(EQ_ID).getStateTagId()).getStatusTime().getTime());
   }
 
   @Test
-  @DirtiesContext
-  public void processCommFaultTagDescription() {
-    SourceDataTagValue commFaultTag = createSampleCommFaultTag(System.currentTimeMillis());
-    String exampleValue = "exampleValue";
-    commFaultTag.setValueDescription(exampleValue);
-    supervisionManager.processControlTag(commFaultTag);
-
-    assertEquals(exampleValue, stateTagCache.get(equipmentCache.get(EQ_ID).getStateTagId()).getStatusDescription());
-  }
-
-  @Test
-  @DirtiesContext
   public void processCommFaultTagListeners() throws InterruptedException {
     CountDownLatch expectingOneUpdate = new CountDownLatch(1);
     commFaultTagCache.getCacheListenerManager().registerListener(eq -> {
@@ -128,7 +112,7 @@ public class CommFaultTagSupervisionTest extends SupervisionCacheTest {
         expectingOneUpdate.countDown();
     }, CacheEvent.UPDATE_ACCEPTED);
 
-    supervisionManager.processControlTag(createSampleCommFaultTag(System.currentTimeMillis()));
+    supervisionManager.processControlTag(sampleCommFault(System.currentTimeMillis()));
 
     assertTrue("Comm Fault tag should be updated", expectingOneUpdate.await(100, TimeUnit.MILLISECONDS));
   }
@@ -140,28 +124,14 @@ public class CommFaultTagSupervisionTest extends SupervisionCacheTest {
 
     // CFTag1, switch to running
     long initialUpdateTime = System.currentTimeMillis();
-    supervisionManager.processControlTag(createSampleCommFaultTag(initialUpdateTime));
+    supervisionManager.processControlTag(sampleCommFault(initialUpdateTime));
     assertEquals(RUNNING, stateTagCache.get(equipmentCache.get(EQ_ID).getStateTagId()).getSupervisionStatus());
 
     // CFTag2, switch to stopped, but with older timestamp
-    SourceDataTagValue commFaultDown = createSampleCommFaultTag(initialUpdateTime - 1);
+    SourceDataTagValue commFaultDown = sampleCommFault(initialUpdateTime - 1);
     commFaultDown.setValue(Boolean.FALSE);
     supervisionManager.processControlTag(commFaultDown);
 
     assertEquals(RUNNING, stateTagCache.get(equipmentCache.get(EQ_ID).getStateTagId()).getSupervisionStatus());
-  }
-
-  private SourceDataTagValue createSampleCommFaultTag(long updateTime) {
-    return new SourceDataTagValue(
-      1223L,
-      "test commfault",
-      true,
-      Boolean.TRUE,
-      new SourceDataTagQuality(),
-      new Timestamp(updateTime),
-      4,
-      false,
-      "description",
-      10000);
   }
 }

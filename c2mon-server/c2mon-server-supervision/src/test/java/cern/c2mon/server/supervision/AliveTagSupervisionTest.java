@@ -6,7 +6,6 @@ import cern.c2mon.server.common.alive.AliveTag;
 import cern.c2mon.server.common.supervision.SupervisionStateTag;
 import cern.c2mon.server.common.tag.AbstractInfoTagCacheObject;
 import cern.c2mon.shared.common.CacheEvent;
-import cern.c2mon.shared.common.datatag.SourceDataTagQuality;
 import cern.c2mon.shared.common.datatag.SourceDataTagValue;
 import cern.c2mon.shared.common.supervision.SupervisionStatus;
 import org.junit.Before;
@@ -18,6 +17,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import static cern.c2mon.server.common.util.Java9Collections.listOf;
+import static cern.c2mon.server.test.cache.SourceDataTagValueFactory.sampleAlive;
 import static org.junit.Assert.*;
 
 /**
@@ -70,7 +70,7 @@ public class AliveTagSupervisionTest extends SupervisionCacheTest {
     supervisionNotifier.registerAsListener(supervisionEvent -> latch.countDown());
 
     long updateTime = System.currentTimeMillis();
-    SourceDataTagValue aliveTag = createSampleAliveTag();
+    SourceDataTagValue aliveTag = sampleAlive();
     aliveTag.setTimestamp(new Timestamp(updateTime));
     //process control tag
     supervisionManager.processControlTag(aliveTag);
@@ -112,7 +112,7 @@ public class AliveTagSupervisionTest extends SupervisionCacheTest {
     aliveTimerCache.put(aliveTimer.getId(), aliveTimer);
 
     //send alive 2 minutes old (should be rejected)
-    SourceDataTagValue value = createSampleAliveTag();
+    SourceDataTagValue value = sampleAlive();
     value.setDaqTimestamp(new Timestamp(System.currentTimeMillis() - 130000));
 
     supervisionManager.processControlTag(value);
@@ -134,21 +134,20 @@ public class AliveTagSupervisionTest extends SupervisionCacheTest {
     // Start the process
     processService.start(aliveTimer.getSupervisedId(), startTimer);
     // Resume so that the status goes to RUNNING
-    processService.resume(aliveTimer.getSupervisedId(), System.currentTimeMillis(), "");
+    processService.resume(aliveTimer.getSupervisedId(), startTimer + 1, "");
     SupervisionStateTag process = stateTagCache.get(aliveTimer.getStateTagId());
     assertEquals(SupervisionStatus.RUNNING, process.getSupervisionStatus());
     Timestamp originalProcessTime = process.getStatusTime();
     assertNotNull(originalProcessTime);
 
     // Create the next alive tag
-    SourceDataTagValue newerAliveTag = createSampleAliveTag();
-    long updatedTimer = startTimer + 1;
+    SourceDataTagValue newerAliveTag = sampleAlive();
+    long updatedTimer = startTimer + 2;
     newerAliveTag.setDaqTimestamp(new Timestamp(updatedTimer));
 
     // Set up a latch
     CountDownLatch latch = new CountDownLatch(1);
     aliveTimerCache.getCacheListenerManager().registerListener(at -> latch.countDown(), CacheEvent.UPDATE_ACCEPTED);
-    aliveTimerCache.getCacheListenerManager().registerListener(System.out::println, CacheEvent.UPDATE_ACCEPTED);
 
     supervisionManager.processControlTag(newerAliveTag);
 
@@ -160,18 +159,5 @@ public class AliveTagSupervisionTest extends SupervisionCacheTest {
     //check process status is not changed & time also
     assertEquals(SupervisionStatus.RUNNING, process.getSupervisionStatus());
     assertEquals(originalProcessTime, process.getStatusTime());
-  }
-
-  private SourceDataTagValue createSampleAliveTag() {
-    return new SourceDataTagValue(1221L,
-      "test alive",
-      true,
-      0L,
-      new SourceDataTagQuality(),
-      new Timestamp(System.currentTimeMillis()),
-      4,
-      false,
-      "description",
-      10000);
   }
 }
