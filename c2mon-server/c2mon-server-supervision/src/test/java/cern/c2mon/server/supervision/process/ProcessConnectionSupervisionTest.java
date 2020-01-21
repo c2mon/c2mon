@@ -10,7 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
 
-public class ProcessConnectionSupervisionTest extends AbstractSupervisionManagerProcessTest<ProcessConnectionRequest, ProcessConnectionResponse> {
+public class ProcessConnectionSupervisionTest extends AbstractProcessEventsTest<ProcessConnectionRequest, ProcessConnectionResponse> {
 
   @Test
   public void onNull() throws Exception {
@@ -51,6 +51,6 @@ public class ProcessConnectionSupervisionTest extends AbstractSupervisionManager
   }
 
   private void doAndVerify(ProcessConnectionRequest request, Consumer<ProcessConnectionResponse> tests) throws Exception {
-    doAndVerify(request, supervisionManager::onProcessConnection, tests);
+    doAndVerify(request, processEvents::onConnection, tests);
   }
 }

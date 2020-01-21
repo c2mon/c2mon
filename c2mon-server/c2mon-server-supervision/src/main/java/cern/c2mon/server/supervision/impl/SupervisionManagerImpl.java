@@ -31,9 +31,6 @@ import cern.c2mon.server.supervision.SupervisionManager;
 import cern.c2mon.server.supervision.impl.event.*;
 import cern.c2mon.shared.common.datatag.SourceDataTagValue;
 import cern.c2mon.shared.common.supervision.SupervisionEntity;
-import cern.c2mon.shared.daq.process.ProcessConfigurationRequest;
-import cern.c2mon.shared.daq.process.ProcessConnectionRequest;
-import cern.c2mon.shared.daq.process.ProcessDisconnectionRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Service;
@@ -215,34 +212,6 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
 //
 //    //HeartbeatManager.getInstance().start(); //TODO start heartbeatmanager here
 //    log.info("Finished initializing all alive timers.");
-  }
-
-  /**
-   * Synchronized on the Process cache object. Catches all exceptions.
-   *
-   * @param processConnectionRequest the PIK request object
-   * @return the PIK XML as a String or null if there was an exception
-   */
-  @Override
-  public String onProcessConnection(final ProcessConnectionRequest processConnectionRequest) {
-    return processEvents.onConnection(processConnectionRequest);
-  }
-
-  @Override
-  public void onProcessDisconnection(final ProcessDisconnectionRequest processDisconnectionRequest) {
-    processEvents.onDisconnection(processDisconnectionRequest);
-  }
-
-  /**
-   * Synchronized on the Process cache object. Catches all exceptions. There is no need to
-   * send Process PIK to get the configuration file (Test mode can access it then)
-   *
-   * @param processConfigurationRequest the configuration request object
-   * @return the configuration XML as a String or null if there was an exception
-   */
-  @Override
-  public String onProcessConfiguration(final ProcessConfigurationRequest processConfigurationRequest) {
-    return processEvents.onConfiguration(processConfigurationRequest);
   }
 
   /**

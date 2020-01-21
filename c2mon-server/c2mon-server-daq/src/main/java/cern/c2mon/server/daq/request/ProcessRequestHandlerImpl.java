@@ -16,12 +16,8 @@
  *****************************************************************************/
 package cern.c2mon.server.daq.request;
 
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageProducer;
-import javax.jms.Session;
-import javax.jms.TextMessage;
-
+import cern.c2mon.server.supervision.impl.event.ProcessEvents;
+import cern.c2mon.shared.daq.process.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,12 +25,7 @@ import org.springframework.jms.listener.SessionAwareMessageListener;
 import org.springframework.jms.support.converter.MessageConversionException;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.server.supervision.SupervisionManager;
-import cern.c2mon.shared.daq.process.ProcessConfigurationRequest;
-import cern.c2mon.shared.daq.process.ProcessConnectionRequest;
-import cern.c2mon.shared.daq.process.ProcessDisconnectionRequest;
-import cern.c2mon.shared.daq.process.ProcessMessageConverter;
-import cern.c2mon.shared.daq.process.ProcessRequest;
+import javax.jms.*;
 
 
 /**
@@ -53,9 +44,9 @@ public class ProcessRequestHandlerImpl implements SessionAwareMessageListener<Me
   private static final Logger LOGGER = LoggerFactory.getLogger(ProcessRequestHandlerImpl.class);
 
   /**
-   * Reference to the {@link SupervisionManager} bean.
+   * Reference to the {@link ProcessEvents} bean.
    */
-  private SupervisionManager supervisionManager;
+  private ProcessEvents processEvents;
 
   /**
    * ProcessMessageConverter helper class (fromMessage/ToMessage)
@@ -64,12 +55,12 @@ public class ProcessRequestHandlerImpl implements SessionAwareMessageListener<Me
 
   /**
    * Constructor used to instantiate the bean.
-   * @param supervisionManager the supervision manager to wire in
+   * @param processEvents the supervision manager to wire in
    */
   @Autowired
-  public ProcessRequestHandlerImpl(final SupervisionManager supervisionManager) {
+  public ProcessRequestHandlerImpl(final ProcessEvents processEvents) {
     super();
-    this.supervisionManager = supervisionManager;
+    this.processEvents = processEvents;
     this.processMessageConverter = new ProcessMessageConverter();
   }
 
@@ -94,7 +85,7 @@ public class ProcessRequestHandlerImpl implements SessionAwareMessageListener<Me
 
       // ProcessDisconnectionRequest
       if (processRequest instanceof ProcessDisconnectionRequest) {
-        this.supervisionManager.onProcessDisconnection((ProcessDisconnectionRequest) processRequest);
+        processEvents.onDisconnection((ProcessDisconnectionRequest) processRequest);
         if (LOGGER.isDebugEnabled()) {
 
           LOGGER.debug("onMessage() - Process disconnection completed for DAQ " + ((ProcessDisconnectionRequest) processRequest).getProcessName());
@@ -106,7 +97,7 @@ public class ProcessRequestHandlerImpl implements SessionAwareMessageListener<Me
         LOGGER.info("onMessage - DAQ Connection request received from DAQ " + processConnectionRequest.getProcessName());
 
         // Create the processConnectionResponse
-        String processConnectionResponse = this.supervisionManager.onProcessConnection(processConnectionRequest);
+        String processConnectionResponse = processEvents.onConnection(processConnectionRequest);
 
         // Send reply to DAQ on reply queue
         if (LOGGER.isDebugEnabled()) {
@@ -127,7 +118,7 @@ public class ProcessRequestHandlerImpl implements SessionAwareMessageListener<Me
         LOGGER.info("onMessage - DAQ configuration request received from DAQ " + processConfigurationRequest.getProcessName());
 
         // Create the processConfigurationResponse
-        String processConfiguration = this.supervisionManager.onProcessConfiguration(processConfigurationRequest);
+        String processConfiguration = processEvents.onConfiguration(processConfigurationRequest);
 
         //send reply to DAQ on reply queue
         if (LOGGER.isDebugEnabled()) {

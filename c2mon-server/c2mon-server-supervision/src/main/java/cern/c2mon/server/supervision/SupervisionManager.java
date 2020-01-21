@@ -18,9 +18,6 @@ package cern.c2mon.server.supervision;
 
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.shared.common.datatag.SourceDataTagValue;
-import cern.c2mon.shared.daq.process.ProcessConfigurationRequest;
-import cern.c2mon.shared.daq.process.ProcessConnectionRequest;
-import cern.c2mon.shared.daq.process.ProcessDisconnectionRequest;
 
 /**
  * Module interface of the bean in charge of the overall supervision
@@ -40,48 +37,6 @@ import cern.c2mon.shared.daq.process.ProcessDisconnectionRequest;
  *
  */
 public interface SupervisionManager {
-
-  /**
-   * Take the necessary action on the reception of a {@link ProcessDisconnectionRequest}
-   * message sent by a DAQ.
-   * 
-   * <p>Implements the synchronization and exception handling described
-   * in the class documentation.
-   * 
-   * @param processDisconnectionRequest the disconnection message
-   */
-  void onProcessDisconnection(ProcessDisconnectionRequest processDisconnectionRequest);
-  
-  /**
-   * Takes the necessary steps when a DAQ requests for configuration after connection, 
-   * such as starting the alive timers, adjusting the state tag, and recording
-   * the start up time. Returns the configuration XML to send to the
-   * DAQ.
-   * 
-   * <p>Synchronizes on the Process object.
-   * 
-   * <p>This method catches ALL unexpected exceptions and rejects
-   * the connection request in these cases.
-   * 
-   * @param processConfigurationRequest the configuration message
-   * @return a reply XML string to send to the DAQ (is never null)
-   */
-  String onProcessConfiguration(ProcessConfigurationRequest processConfigurationRequest);
-  
-  /**
-   * Takes the necessary steps when a DAQ requests to connect, 
-   * such us retrieving the PIK. 
-   * Returns the PIK XML to send to the DAQ.
-   * 
-   * <p>Synchronizes on the Process object.
-   * 
-   * <p>This method catches ALL unexpected exceptions and rejects
-   * the connection request in these cases.
-   * 
-   * @param processConnectionRequest the PIK message
-   * @return a reply XML string to send to the DAQ (is never null)
-   */
-  String onProcessConnection(ProcessConnectionRequest processConnectionRequest);
 
   /**
    * Take the required supervision action when an alive timer expires.

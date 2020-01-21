@@ -3,7 +3,6 @@ package cern.c2mon.server.supervision.impl.event;
 import cern.c2mon.cache.actions.equipment.EquipmentService;
 import cern.c2mon.cache.actions.process.ProcessService;
 import cern.c2mon.cache.actions.process.ProcessXMLProvider;
-import cern.c2mon.cache.actions.state.SupervisionStateTagService;
 import cern.c2mon.cache.actions.subequipment.SubEquipmentService;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.cache.api.exception.TooManyQueryResultsException;
@@ -30,7 +29,6 @@ public class ProcessEvents extends SupervisionEventHandler<Process> {
 
   private SubEquipmentService subEquipmentService;
   private EquipmentService equipmentService;
-  private final SupervisionStateTagService stateTagService;
   private ProcessXMLProvider processXMLProvider;
 
   @Resource
@@ -40,12 +38,10 @@ public class ProcessEvents extends SupervisionEventHandler<Process> {
   public ProcessEvents(ProcessService processService,
                        SubEquipmentService subEquipmentService,
                        EquipmentService equipmentService,
-                       SupervisionStateTagService stateTagService,
                        ProcessXMLProvider processXMLProvider) {
     super(SupervisionEntity.PROCESS, processService);
     this.subEquipmentService = subEquipmentService;
     this.equipmentService = equipmentService;
-    this.stateTagService = stateTagService;
     this.processXMLProvider = processXMLProvider;
   }
 
@@ -101,7 +97,17 @@ public class ProcessEvents extends SupervisionEventHandler<Process> {
 //    }
   }
 
-
+  /**
+   * Takes the necessary steps when a DAQ requests to connect,
+   * such us retrieving the PIK.
+   * Returns the PIK XML to send to the DAQ.
+   *
+   * <p>This method catches ALL unexpected exceptions and rejects
+   * the connection request in these cases.
+   *
+   * @param processConnectionRequest the PIK message
+   * @return a reply XML string to send to the DAQ (is never null)
+   */
   public String onConnection(final ProcessConnectionRequest processConnectionRequest) {
     ProcessConnectionResponse processConnectionResponse = new ProcessConnectionResponse();
 
@@ -174,11 +180,16 @@ public class ProcessEvents extends SupervisionEventHandler<Process> {
   }
 
   /**
-   * Synchronized on the Process cache object. Catches all exceptions. There is no need to
-   * send Process PIK to get the configuration file (Test mode can access it then)
+   * Takes the necessary steps when a DAQ requests for configuration after connection,
+   * such as starting the alive timers, adjusting the state tag, and recording
+   * the start up time. Returns the configuration XML to send to the
+   * DAQ.
    *
-   * @param processConfigurationRequest the configuration request object
-   * @return the configuration XML as a String or null if there was an exception
+   * <p>This method catches ALL unexpected exceptions and rejects
+   * the connection request in these cases.
+   *
+   * @param processConfigurationRequest the configuration message
+   * @return a reply XML string to send to the DAQ (is never null)
    */
   public String onConfiguration(final ProcessConfigurationRequest processConfigurationRequest) {
     ProcessConfigurationResponse processConfigurationResponse = new ProcessConfigurationResponse();
@@ -230,6 +241,15 @@ public class ProcessEvents extends SupervisionEventHandler<Process> {
     return this.xmlConverter.toXml(processConfigurationResponse);
   }
 
+  /**
+   * Take the necessary action on the reception of a {@link ProcessDisconnectionRequest}
+   * message sent by a DAQ.
+   *
+   * <p>Implements the synchronization and exception handling described
+   * in the class documentation.
+   *
+   * @param processDisconnectionRequest the disconnection message
+   */
   public void onDisconnection(final ProcessDisconnectionRequest processDisconnectionRequest) {
     // Protect the method against accidental null parameters
     if (processDisconnectionRequest == null) {
@@ -238,9 +258,8 @@ public class ProcessEvents extends SupervisionEventHandler<Process> {
     }
 
     // (1) Print some debug output
-    log.debug( "onProcessDisconnection: " + processDisconnectionRequest.getProcessName() +
-      ", " + processDisconnectionRequest.getProcessPIK() +
-      ", " + processDisconnectionRequest.getProcessStartupTime());
+    log.debug( "onProcessDisconnection: {}, {}, {}", processDisconnectionRequest.getProcessName(),
+      processDisconnectionRequest.getProcessPIK(), processDisconnectionRequest.getProcessStartupTime());
 
     try {
 

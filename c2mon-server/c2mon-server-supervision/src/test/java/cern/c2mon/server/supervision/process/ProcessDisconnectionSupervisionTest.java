@@ -13,20 +13,20 @@ import static cern.c2mon.shared.daq.process.ProcessConnectionResponse.PIK_REJECT
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
-public class ProcessDisconnectionSupervisionTest extends AbstractSupervisionManagerProcessTest<ProcessConnectionRequest, ProcessConnectionResponse> {
+public class ProcessDisconnectionSupervisionTest extends AbstractProcessEventsTest<ProcessConnectionRequest, ProcessConnectionResponse> {
   private long pik;
   private Timestamp startupTime;
 
   @Before
   public void connectAndConfigure() throws Exception {
     startupTime = new Timestamp(System.currentTimeMillis());
-    String xmlResponse = supervisionManager.onProcessConnection(new ProcessConnectionRequest(GOOD_PROCESSNAME, startupTime));
+    String xmlResponse = processEvents.onConnection(new ProcessConnectionRequest(GOOD_PROCESSNAME, startupTime));
     pik = ((ProcessConnectionResponse) xmlConverter.fromXml(xmlResponse)).getProcessPIK();
   }
 
   @Test
   public void onNull() throws Exception {
-    supervisionManager.onProcessDisconnection(null);
+    processEvents.onDisconnection(null);
 
     doAndVerify(new ProcessConnectionRequest(GOOD_PROCESSNAME),
       processConnectionResponse ->
@@ -35,7 +35,7 @@ public class ProcessDisconnectionSupervisionTest extends AbstractSupervisionMana
 
   @Test
   public void testOnProcessDisconnectionNoProcessNameAndID() throws Exception {
-    supervisionManager.onProcessDisconnection(new ProcessDisconnectionRequest());
+    processEvents.onDisconnection(new ProcessDisconnectionRequest());
 
     doAndVerify(new ProcessConnectionRequest(GOOD_PROCESSNAME),
       processConnectionResponse ->
@@ -43,12 +43,12 @@ public class ProcessDisconnectionSupervisionTest extends AbstractSupervisionMana
   }
 
   private void doAndVerify(ProcessConnectionRequest request, Consumer<ProcessConnectionResponse> tests) throws Exception {
-    doAndVerify(request, supervisionManager::onProcessConnection, tests);
+    doAndVerify(request, processEvents::onConnection, tests);
   }
 
   @Test
   public void testOnProcessDisconnectionBadPIK() throws Exception {
-    supervisionManager.onProcessDisconnection(new ProcessDisconnectionRequest(GOOD_PROCESSNAME, ProcessDisconnectionRequest.NO_PIK, startupTime.getTime()));
+    processEvents.onDisconnection(new ProcessDisconnectionRequest(GOOD_PROCESSNAME, ProcessDisconnectionRequest.NO_PIK, startupTime.getTime()));
 
     doAndVerify(new ProcessConnectionRequest(GOOD_PROCESSNAME),
       processConnectionResponse ->
@@ -57,7 +57,7 @@ public class ProcessDisconnectionSupervisionTest extends AbstractSupervisionMana
 
   @Test
   public void testOnProcessDisconnectionBadStartUpTime() throws Exception {
-    supervisionManager.onProcessDisconnection(new ProcessDisconnectionRequest(GOOD_PROCESSNAME, ProcessDisconnectionRequest.NO_PIK, startupTime.getTime() + 1));
+    processEvents.onDisconnection(new ProcessDisconnectionRequest(GOOD_PROCESSNAME, ProcessDisconnectionRequest.NO_PIK, startupTime.getTime() + 1));
 
     doAndVerify(new ProcessConnectionRequest(GOOD_PROCESSNAME),
       processConnectionResponse ->
@@ -66,7 +66,7 @@ public class ProcessDisconnectionSupervisionTest extends AbstractSupervisionMana
 
   @Test
   public void testOnValidProcessDisconnection() throws Exception {
-    supervisionManager.onProcessDisconnection(new ProcessDisconnectionRequest(GOOD_PROCESSNAME, pik, startupTime.getTime() + 1));
+    processEvents.onDisconnection(new ProcessDisconnectionRequest(GOOD_PROCESSNAME, pik, startupTime.getTime() + 1));
 
     doAndVerify(new ProcessConnectionRequest(GOOD_PROCESSNAME),
       response -> {

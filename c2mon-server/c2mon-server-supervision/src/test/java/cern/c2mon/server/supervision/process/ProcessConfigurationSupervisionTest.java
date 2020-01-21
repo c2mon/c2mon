@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
-public class ProcessConfigurationSupervisionTest extends AbstractSupervisionManagerProcessTest<ProcessConfigurationRequest, ProcessConfigurationResponse> {
+public class ProcessConfigurationSupervisionTest extends AbstractProcessEventsTest<ProcessConfigurationRequest, ProcessConfigurationResponse> {
 
   @Test
   public void onNull() throws Exception {
@@ -26,7 +26,7 @@ public class ProcessConfigurationSupervisionTest extends AbstractSupervisionMana
 
   @Test
   public void onGoodPIK() throws Exception {
-    supervisionManager.onProcessConnection(new ProcessConnectionRequest(GOOD_PROCESSNAME));
+    processEvents.onConnection(new ProcessConnectionRequest(GOOD_PROCESSNAME));
 
     doAndVerify(
       new ProcessConfigurationRequest(GOOD_PROCESSNAME),
@@ -35,6 +35,6 @@ public class ProcessConfigurationSupervisionTest extends AbstractSupervisionMana
   }
 
   private void doAndVerify(ProcessConfigurationRequest request, Consumer<ProcessConfigurationResponse> tests) throws Exception {
-    doAndVerify(request, supervisionManager::onProcessConfiguration, tests);
+    doAndVerify(request, processEvents::onConfiguration, tests);
   }
 }

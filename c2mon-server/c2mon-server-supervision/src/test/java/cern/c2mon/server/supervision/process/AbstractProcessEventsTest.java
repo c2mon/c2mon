@@ -6,8 +6,8 @@ import cern.c2mon.cache.impl.configuration.C2monIgniteConfiguration;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.cache.loading.config.CacheLoadingModuleRef;
 import cern.c2mon.server.common.config.CommonModule;
-import cern.c2mon.server.supervision.SupervisionManager;
 import cern.c2mon.server.supervision.config.SupervisionModule;
+import cern.c2mon.server.supervision.impl.event.ProcessEvents;
 import cern.c2mon.server.test.CachePopulationRule;
 import cern.c2mon.shared.daq.process.ProcessRequest;
 import cern.c2mon.shared.daq.process.XMLConverter;
@@ -36,14 +36,14 @@ import static org.junit.Assert.assertNotNull;
   CachePopulationRule.class,
   C2monIgniteConfiguration.class
 })
-public abstract class AbstractSupervisionManagerProcessTest<REQ extends ProcessRequest, RES> {
+public abstract class AbstractProcessEventsTest<REQ extends ProcessRequest, RES> {
 
   protected static final String GOOD_PROCESSNAME = "P_TESTHANDLER03";
 
   protected static final String BAD_PROCESSNAME = "P_TESTNACHO";
 
   @Inject
-  protected SupervisionManager supervisionManager;
+  protected ProcessEvents processEvents;
 
   @Rule
   @Inject
