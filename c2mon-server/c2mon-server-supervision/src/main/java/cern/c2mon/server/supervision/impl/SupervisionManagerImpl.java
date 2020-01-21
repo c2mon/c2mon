@@ -261,7 +261,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
   }
 
   private <T extends AbstractEquipment> void handleCommFault(SourceDataTagValue sourceDataTagValue, CommFaultTag commFault, SupervisionEntity type) {
-    boolean updateAliveTimer = false; //must be done outside of the process lock as locks the alivetimer!
+    boolean updateAliveTimer = false;
     Long equipmentId = commFault.getSupervisedId();
     long supervisionTimestamp = System.currentTimeMillis();
     SupervisionEventHandler eventHandler = (type == EQUIPMENT ? equipmentEvents : subEquipmentEvents);

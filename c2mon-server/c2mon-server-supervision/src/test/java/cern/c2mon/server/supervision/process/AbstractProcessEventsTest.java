@@ -1,16 +1,21 @@
 package cern.c2mon.server.supervision.process;
 
 import cern.c2mon.cache.actions.CacheActionsModuleRef;
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.config.CacheConfigModuleRef;
 import cern.c2mon.cache.impl.configuration.C2monIgniteConfiguration;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.cache.loading.config.CacheLoadingModuleRef;
 import cern.c2mon.server.common.config.CommonModule;
+import cern.c2mon.server.common.process.Process;
+import cern.c2mon.server.common.supervision.SupervisionStateTag;
 import cern.c2mon.server.supervision.config.SupervisionModule;
 import cern.c2mon.server.supervision.impl.event.ProcessEvents;
 import cern.c2mon.server.test.CachePopulationRule;
+import cern.c2mon.server.test.DatabasePopulationRule;
 import cern.c2mon.shared.daq.process.ProcessRequest;
 import cern.c2mon.shared.daq.process.XMLConverter;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -20,6 +25,7 @@ import javax.inject.Inject;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import static cern.c2mon.server.common.util.Java9Collections.listOf;
 import static org.junit.Assert.assertNotNull;
 
 /**
@@ -47,7 +53,21 @@ public abstract class AbstractProcessEventsTest<REQ extends ProcessRequest, RES>
 
   @Rule
   @Inject
-  public CachePopulationRule cachePopulationRule;
+  public DatabasePopulationRule cachePopulationRule;
+
+  @Inject
+  private C2monCache<Process> processCache;
+
+  @Inject
+  private C2monCache<SupervisionStateTag> stateTagCache;
+
+  @Before
+  public void resetCaches() {
+    listOf(stateTagCache, processCache).forEach(cache -> {
+      cache.clear();
+      cache.init();
+    });
+  }
 
   protected XMLConverter xmlConverter = new XMLConverter();
 
