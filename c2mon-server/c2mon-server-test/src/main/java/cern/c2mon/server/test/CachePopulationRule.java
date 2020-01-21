@@ -13,9 +13,11 @@ import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.common.supervision.SupervisionStateTag;
 import cern.c2mon.shared.common.command.CommandTag;
-import org.springframework.stereotype.Service;
 
+import javax.inject.Named;
 import java.sql.SQLException;
+
+import static cern.c2mon.server.common.util.Java9Collections.listOf;
 
 /**
  * Using this rule in a JUnit test will ensure that all caches are preloaded
@@ -23,7 +25,7 @@ import java.sql.SQLException;
  *
  * @author Justin Lewis Salmon
  */
-@Service
+@Named
 public class CachePopulationRule extends DatabasePopulationRule {
 
   private C2monCache<Alarm> alarmCache;
@@ -63,17 +65,13 @@ public class CachePopulationRule extends DatabasePopulationRule {
   @Override
   protected void before() throws SQLException {
     super.before();
-    processCache.init();
-    dataTagCache.init();
-    equipmentCache.init();
-    aliveTimerCache.init();
-    commFaultTagCache.init();
-    subEquipmentCache.init();
-    alarmCache.init();
-    ruleTagCache.init();
-    commandTagCache.init();
-    deviceClassCache.init();
-    deviceCache.init();
-    stateTagCache.init();
+    //      cache.clear();
+    listOf(
+      deviceCache, deviceClassCache,
+      subEquipmentCache, equipmentCache, processCache,
+      commFaultTagCache, aliveTimerCache, stateTagCache,
+      alarmCache,
+      dataTagCache, ruleTagCache, commandTagCache
+    ).forEach(C2monCache::init);
   }
 }
