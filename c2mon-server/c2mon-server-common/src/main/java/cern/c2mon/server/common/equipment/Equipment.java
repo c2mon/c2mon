@@ -17,6 +17,7 @@
 package cern.c2mon.server.common.equipment;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Interface to Equipment objects residing in cache. The methods exposed
@@ -34,7 +35,7 @@ public interface Equipment extends AbstractEquipment {
    * Returns the list of SubEquipment ids attached to this Equipment
    * @return list of ids
    */
-  Collection<Long> getSubEquipmentIds();
+  List<Long> getSubEquipmentIds();
 
 
   /**

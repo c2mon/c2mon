@@ -8,11 +8,14 @@ import cern.c2mon.cache.actions.state.SupervisionStateTagService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
+import cern.c2mon.shared.common.Cacheable;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Szymon Halastra
@@ -65,5 +68,12 @@ public class SubEquipmentService extends BaseEquipmentServiceImpl<SubEquipment> 
   @Override
   public Long getProcessId(Long abstractEquipmentId) {
     return equipmentService.getProcessId(cache.get(abstractEquipmentId).getParentId());
+  }
+
+  public List<Long> getSubEquipmentIdsFor(long supervisedId) {
+    return cache.query(subEq -> subEq.getParentId() == supervisedId)
+      .stream()
+      .map(Cacheable::getId)
+      .collect(Collectors.toList());
   }
 }
