@@ -24,13 +24,11 @@ import cern.c2mon.server.common.alive.AliveTag;
 import cern.c2mon.server.common.commfault.CommFaultTag;
 import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.common.config.ServerProperties;
+import cern.c2mon.server.common.equipment.AbstractEquipment;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.supervision.SupervisionManager;
-import cern.c2mon.server.supervision.impl.event.AliveTagEvents;
-import cern.c2mon.server.supervision.impl.event.EquipmentEvents;
-import cern.c2mon.server.supervision.impl.event.ProcessEvents;
-import cern.c2mon.server.supervision.impl.event.SubEquipmentEvents;
+import cern.c2mon.server.supervision.impl.event.*;
 import cern.c2mon.shared.common.datatag.SourceDataTagValue;
 import cern.c2mon.shared.common.supervision.SupervisionEntity;
 import cern.c2mon.shared.daq.process.ProcessConfigurationRequest;
@@ -43,6 +41,11 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import javax.inject.Inject;
 import java.sql.Timestamp;
+
+import static cern.c2mon.server.common.util.KotlinAPIs.orElse;
+import static cern.c2mon.server.supervision.log.SupervisionLogMessages.eqCommFault;
+import static cern.c2mon.shared.common.supervision.SupervisionEntity.EQUIPMENT;
+import static cern.c2mon.shared.common.supervision.SupervisionEntity.SUBEQUIPMENT;
 
 
 /**
@@ -97,7 +100,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
   private ProcessService processFacade;
 
   @Resource
-  private ServerProperties properties;;
+  private ServerProperties properties;
 
   /**
    * Starts the alive timer mechanisms at server start up.
@@ -253,154 +256,92 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
 
   @Override
   public void processControlTag(final SourceDataTagValue sourceDataTagValue) {
-    // Theoretically it is possible that commfault events might be treated in the wrong order,
-    // if sent very shortly after each other. In reality this is not really happening, except if there
-    // is a huge backlog on the JMS queue. However, this is not a real problem as the incoming alive
-    // always revalidates even if 2 commfault tags overtook each other (see TIMS-281). To keep the
-    // code simple we accept this and do not take any further precautions.
-
-    if (log.isDebugEnabled()) {
-      log.debug("Incoming update for ControlTag " + sourceDataTagValue.getId() + " (value " + sourceDataTagValue.getValue() + ")");
-    }
+    log.debug("Incoming update for ControlTag {} (value {})",sourceDataTagValue.getId(),sourceDataTagValue.getValue());
     Long tagId = sourceDataTagValue.getId();
-    Object tagValue = sourceDataTagValue.getValue();
-    String valueDescription = sourceDataTagValue.getValueDescription();
-    if (valueDescription == null) {
-      valueDescription = "";
-    }
-
-
-    /*
-     * At this point we do not yet know whether the control tag we received is
-     * (1) an alive tag, (2) a commfault tag or (3) a wrongly configured tag.
-     * Therefore, we first try whether it is an alive tag by calling the
-     * isRegisteredAliveTimer() method of the AliveTimerManager.
-     */
 
     //first lock the process concerned, so no reconfiguration occurs during the processing?? no - slows the all data acquisition down
     //instead: reconfiguration must lock all tags it modifies (must adapt to reconfiguring DAQ while receiving updates for tags, as
     // it is impossible to lock the process every time we receive a tag update for that process...)
 
-    //catch all cache-related exceptions
-
-    //notice uses once timestamp for
     try {
-
       if (aliveTimerService.isRegisteredAliveTimer(tagId)) {
-
-        //reject old alive tag
-        AliveTag timerCopy = aliveTimerCache.get(tagId);
-        //TODO tmp check until all DAQ updates have DAQ t.s. set
-        Timestamp useTimestamp;
-        if (sourceDataTagValue.getDaqTimestamp() == null) {
-          useTimestamp = sourceDataTagValue.getTimestamp();
-        } else {
-          useTimestamp = sourceDataTagValue.getDaqTimestamp();
-        }
-        Timestamp aliveTimerTimestamp = new Timestamp(System.currentTimeMillis());
-        if (aliveTimerTimestamp.getTime() - useTimestamp.getTime() > 2 * timerCopy.getAliveInterval()) {
-          log.debug("Rejecting alive #{} of {} as delayed arrival at server.", tagId, timerCopy.getSupervisedName());
-        } else {
-          // The tag is an alive tag -> we rewind the corresponding alive timer
-          //TODO sychronization on alive timers... needed? use id here, so not possible around update
-          aliveTimerService.startOrUpdateTimestamp(tagId, useTimestamp.getTime());
-
-          long supervisionTimestamp = System.currentTimeMillis();
-          // TODO (Alex) Is this the timer we want to use?
-          if (timerCopy.getSupervisedEntity() == SupervisionEntity.PROCESS) {
-            Long processId = processFacade.getProcessIdFromAlive(tagId);
-            processEvents.onUp(processId, supervisionTimestamp, "Process Alive tag received.");
-          } else {
-            if (timerCopy.getSupervisedEntity() == SupervisionEntity.EQUIPMENT) {
-              equipmentEvents.onUp(timerCopy.getSupervisedId(), supervisionTimestamp, "Equipment Alive tag received.");
-            } else {
-              // It is a subequipment
-              subEquipmentEvents.onUp(timerCopy.getSupervisedId(), supervisionTimestamp, "Subequipment Alive tag received.");
-            }
-          }
-        }
+        // The tag is an alive tag -> we update the corresponding alive timer
+        handleAliveTimer(sourceDataTagValue, tagId);
       } else {
-        // The tag is NOT an alive tag -> we check if it is a communication fault tag
-
-        CommFaultTag commFaultTagCopy = commFaultTagCache.get(tagId);
-        if (log.isDebugEnabled()) {
-          StringBuilder str = new StringBuilder("processControlTag() : tag ");
-          str.append(tagId);
-          str.append(" is a commfault tag.");
-          log.debug(str.toString());
-        }
-
-        if (equipmentCache.containsKey(commFaultTagCopy.getSupervisedId())) { //check if equipment
-
-          boolean updateAliveTimer = false; //must be done outside of the process lock as locks the alivetimer!
-          Long equipmentId = commFaultTagCopy.getSupervisedId();
-          long supervisionTimestamp = System.currentTimeMillis();
-          if (tagValue.equals(commFaultTagCopy.getFaultValue())) {
-            StringBuffer str = new StringBuffer("Communication fault tag indicates that equipment ");
-            str.append(commFaultTagCopy.getEquipmentName());
-            str.append(" is down.");
-            if (!valueDescription.equalsIgnoreCase("")) {
-              str.append(" Reason: ").append(valueDescription);
-            }
-            equipmentEvents.onDown(equipmentId, supervisionTimestamp, str.toString());
-          } else {
-            updateAliveTimer = true;
-            String str = "Communication fault tag indicates that equipment "
-              + commFaultTagCopy.getEquipmentName() + " is up.";
-            equipmentEvents.onUp(equipmentId, supervisionTimestamp, str);
-          }
-          if (updateAliveTimer) {
-            Timestamp useTimestamp;
-            if (sourceDataTagValue.getDaqTimestamp() == null) {
-              useTimestamp = sourceDataTagValue.getTimestamp();
-            } else {
-              useTimestamp = sourceDataTagValue.getDaqTimestamp();
-            }
-            if (commFaultTagCopy.getAliveTagId() != null) {
-              aliveTimerService.startOrUpdateTimestamp(commFaultTagCopy.getAliveTagId(), useTimestamp.getTime());
-            }
-          }
-
-        } else if (subEquipmentCache.containsKey(commFaultTagCopy.getSupervisedId())) {     //check if subequipment
-
-          boolean updateAliveTimer = false;
-          Long subEquipmentId = commFaultTagCopy.getSupervisedId();
-          long supervisionTimestamp = System.currentTimeMillis();
-          if (tagValue.equals(commFaultTagCopy.getFaultValue())) {
-            StringBuffer str = new StringBuffer("Communication fault tag indicates that subequipment ");
-            str.append(commFaultTagCopy.getEquipmentName());
-            str.append(" is down.");
-
-            if (!valueDescription.equalsIgnoreCase("")) {
-              str.append(" Reason: ").append(valueDescription);
-            }
-            subEquipmentEvents.onDown(subEquipmentId, supervisionTimestamp, str.toString());
-          } else {
-            updateAliveTimer = true;
-            StringBuffer str = new StringBuffer("Communication fault tag indicates that subequipment ");
-            str.append(commFaultTagCopy.getEquipmentName());
-            str.append(" is up.");
-            subEquipmentEvents.onUp(commFaultTagCopy.getSupervisedId(), supervisionTimestamp, str.toString());
-          }
-          if (updateAliveTimer) {
-            Timestamp useTimestamp;
-            if (sourceDataTagValue.getDaqTimestamp() == null) {
-              useTimestamp = sourceDataTagValue.getTimestamp();
-            } else {
-              useTimestamp = sourceDataTagValue.getDaqTimestamp();
-            }
-            if (commFaultTagCopy.getAliveTagId() != null) {
-              aliveTimerService.startOrUpdateTimestamp(commFaultTagCopy.getAliveTagId(), useTimestamp.getTime());
-            }
-          }
-        } else {
-          log.error("Unable to locate equipment/subequipment in cache (id = " + commFaultTagCopy.getSupervisedId() + ") - key could not be located.");
-        }
+        // The tag is NOT an alive tag -> is it a commFault?
+        handleCommFault(sourceDataTagValue, tagId);
       }
     } catch (CacheElementNotFoundException cacheEx) {
       log.error("Unable to locate a required element within the cache while processing control tag " + tagId + ".", cacheEx);
     } catch (Exception ex) {
       log.error("Unexpected exception caught on Alive Timer expiration for tag " + tagId + ".", ex);
+    }
+  }
+
+  private void handleCommFault(SourceDataTagValue sourceDataTagValue, Long tagId) {
+    CommFaultTag commFault = commFaultTagCache.get(tagId);
+    log.debug("processControlTag() : tag {} is a commfault tag.", commFault.getName());
+
+    if (equipmentCache.containsKey(commFault.getSupervisedId())) {
+      handleCommFault(sourceDataTagValue, commFault, EQUIPMENT);
+    } else if (subEquipmentCache.containsKey(commFault.getSupervisedId())) {
+      handleCommFault(sourceDataTagValue, commFault, SUBEQUIPMENT);
+    } else {
+      log.error("Unable to locate equipment/subequipment in cache (id = {}) - key could not be located.", commFault.getSupervisedId());
+    }
+  }
+
+  private <T extends AbstractEquipment> void handleCommFault(SourceDataTagValue sourceDataTagValue, CommFaultTag commFault, SupervisionEntity type) {
+    boolean updateAliveTimer = false; //must be done outside of the process lock as locks the alivetimer!
+    Long equipmentId = commFault.getSupervisedId();
+    long supervisionTimestamp = System.currentTimeMillis();
+    SupervisionEventHandler eventHandler = (type == EQUIPMENT ? equipmentEvents : subEquipmentEvents);
+    if (sourceDataTagValue.getValue().equals(commFault.getFaultValue())) {
+      eventHandler.onDown(equipmentId, supervisionTimestamp, eqCommFault(sourceDataTagValue, type, commFault, false));
+    } else {
+      updateAliveTimer = true;
+      eventHandler.onUp(equipmentId, supervisionTimestamp, eqCommFault(sourceDataTagValue, type, commFault, true));
+    }
+    updateAliveTimer(sourceDataTagValue, commFault, updateAliveTimer);
+  }
+
+  private void updateAliveTimer(SourceDataTagValue sourceDataTagValue, CommFaultTag commFaultTagCopy, boolean updateAliveTimer) {
+    if (updateAliveTimer) {
+      Timestamp useTimestamp;
+      if (sourceDataTagValue.getDaqTimestamp() == null) {
+        useTimestamp = sourceDataTagValue.getTimestamp();
+      } else {
+        useTimestamp = sourceDataTagValue.getDaqTimestamp();
+      }
+      if (commFaultTagCopy.getAliveTagId() != null) {
+        aliveTimerService.startOrUpdateTimestamp(commFaultTagCopy.getAliveTagId(), useTimestamp.getTime());
+      }
+    }
+  }
+
+  private void handleAliveTimer(SourceDataTagValue sourceDataTagValue, Long tagId) {
+    AliveTag timerCopy = aliveTimerCache.get(tagId);
+    Timestamp useTimestamp = orElse(sourceDataTagValue.getDaqTimestamp(), sourceDataTagValue.getTimestamp());
+
+    // Reject expired alive tags
+    if (System.currentTimeMillis() - useTimestamp.getTime() > 2 * timerCopy.getAliveInterval()) {
+      log.debug("Rejecting alive #{} of {} as delayed arrival at server.", tagId, timerCopy.getSupervisedName());
+      return;
+    }
+
+    aliveTimerService.startOrUpdateTimestamp(tagId, useTimestamp.getTime());
+
+    // TODO (Alex) Is this the timer we want to use?
+    if (timerCopy.getSupervisedEntity() == SupervisionEntity.PROCESS) {
+      Long processId = processFacade.getProcessIdFromAlive(tagId);
+      processEvents.onUp(processId, useTimestamp.getTime(), "Process Alive tag received.");
+    } else {
+      if (timerCopy.getSupervisedEntity() == EQUIPMENT) {
+        equipmentEvents.onUp(timerCopy.getSupervisedId(), useTimestamp.getTime(), "Equipment Alive tag received.");
+      } else {
+        // It is a subequipment
+        subEquipmentEvents.onUp(timerCopy.getSupervisedId(), useTimestamp.getTime(), "Subequipment Alive tag received.");
+      }
     }
   }
 

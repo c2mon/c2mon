@@ -3,21 +3,21 @@ package cern.c2mon.server.supervision;
 import cern.c2mon.cache.actions.process.ProcessService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.alive.AliveTag;
-import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.supervision.SupervisionStateTag;
+import cern.c2mon.server.common.tag.AbstractInfoTagCacheObject;
 import cern.c2mon.shared.common.CacheEvent;
 import cern.c2mon.shared.common.datatag.SourceDataTagQuality;
 import cern.c2mon.shared.common.datatag.SourceDataTagValue;
 import cern.c2mon.shared.common.supervision.SupervisionStatus;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.test.annotation.DirtiesContext;
 
 import javax.inject.Inject;
 import java.sql.Timestamp;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import static cern.c2mon.server.common.util.Java9Collections.listOf;
 import static org.junit.Assert.*;
 
 /**
@@ -31,9 +31,6 @@ public class AliveTagSupervisionTest extends SupervisionCacheTest {
   private C2monCache<AliveTag> aliveTimerCache;
 
   @Inject
-  private C2monCache<Process> processCache;
-
-  @Inject
   private C2monCache<SupervisionStateTag> stateTagCache;
 
   @Inject
@@ -41,26 +38,33 @@ public class AliveTagSupervisionTest extends SupervisionCacheTest {
 
   @Before
   public void initialStatusIsCorrect() {
+    resetCaches();
+
     AliveTag aliveTimer = aliveTimerCache.get(1221L);
     assertNotNull(aliveTimer);
     assertEquals(0, aliveTimer.getLastUpdate());
 
-    SupervisionStateTag process = stateTagCache.get(aliveTimer.getStateTagId());
-    assertEquals(SupervisionStatus.DOWN, process.getSupervisionStatus());
-    assertNull(process.getStatusTime());
-    assertNull(process.getStatusDescription());
+    SupervisionStateTag stateTag = stateTagCache.get(aliveTimer.getStateTagId());
+    assertEquals(SupervisionStatus.DOWN, stateTag.getSupervisionStatus());
+    assertEquals(AbstractInfoTagCacheObject.DEFAULT_TIMESTAMP, stateTag.getStatusTime());
+  }
+
+  private void resetCaches() {
+    listOf(stateTagCache, aliveTimerCache).forEach(cache -> {
+      cache.clear();
+      cache.init();
+    });
   }
 
   /**
    * Tests a process alive tag is correctly processed by the SupervisionManager
    * (alive timer updated; supervision listeners notified, etc).
-   *
+   * <p>
    * Process is down at start of test, then alive is received.
    *
    * @throws InterruptedException
    */
   @Test
-  @DirtiesContext
   public void testProcessAliveTag() throws InterruptedException {
     CountDownLatch latch = new CountDownLatch(1);
     supervisionNotifier.registerAsListener(supervisionEvent -> latch.countDown());
@@ -86,7 +90,6 @@ public class AliveTagSupervisionTest extends SupervisionCacheTest {
   }
 
   @Test
-  @DirtiesContext
   public void timerCascadesProperly() {
     AliveTag aliveTimer = aliveTimerCache.get(1221L);
 
@@ -101,11 +104,10 @@ public class AliveTagSupervisionTest extends SupervisionCacheTest {
    * Alives older than 2 minutes are rejected.
    */
   @Test
-  @DirtiesContext
   public void testRejectOldAlive() {
     //check alive timer is defined & set last update
     AliveTag aliveTimer = aliveTimerCache.get(1221L);
-    aliveTimer.setLastUpdate(System.currentTimeMillis()-1000);
+    aliveTimer.setLastUpdate(System.currentTimeMillis() - 1000);
     long aliveTime = aliveTimer.getLastUpdate();
     aliveTimerCache.put(aliveTimer.getId(), aliveTimer);
 
@@ -124,7 +126,6 @@ public class AliveTagSupervisionTest extends SupervisionCacheTest {
    * status, since it is already up as running. Only the alive is updated.
    */
   @Test
-  @DirtiesContext
   public void testProcessAliveNoEffect() throws InterruptedException {
     AliveTag aliveTimer = aliveTimerCache.get(1221L);
 
@@ -147,6 +148,7 @@ public class AliveTagSupervisionTest extends SupervisionCacheTest {
     // Set up a latch
     CountDownLatch latch = new CountDownLatch(1);
     aliveTimerCache.getCacheListenerManager().registerListener(at -> latch.countDown(), CacheEvent.UPDATE_ACCEPTED);
+    aliveTimerCache.getCacheListenerManager().registerListener(System.out::println, CacheEvent.UPDATE_ACCEPTED);
 
     supervisionManager.processControlTag(newerAliveTag);
 

@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
-abstract class SupervisionEventHandler<T extends Supervised> {
+public abstract class SupervisionEventHandler<T extends Supervised> {
 
   // You can technically modify this, but don't - the self registration in Ctor is all that's needed
   @Getter
