@@ -98,7 +98,8 @@ public class CommFaultTagSupervisionTest extends SupervisionCacheTest {
 
   @Test
   public void processCommFaultTagTime() {
-    long time = System.currentTimeMillis();
+    // Choose an earlier time to avoid accidentally matching any other System.currentTimeMillis()
+    long time = System.currentTimeMillis() - 1;
     supervisionManager.processControlTag(sampleCommFault(time));
 
     assertEquals(time, stateTagCache.get(equipmentCache.get(EQ_ID).getStateTagId()).getStatusTime().getTime());

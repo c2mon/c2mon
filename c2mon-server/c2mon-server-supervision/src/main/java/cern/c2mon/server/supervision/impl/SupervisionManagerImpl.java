@@ -99,6 +99,9 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
   @Resource
   private ServerProperties properties;
 
+  // https://stackoverflow.com/questions/4195027/when-will-the-java-date-collapse
+  private static final Timestamp ALMOST_MAX_TIMESTAMP = new Timestamp(Long.MAX_VALUE - 100000);
+
   /**
    * Starts the alive timer mechanisms at server start up.
    */
@@ -228,10 +231,6 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
     log.debug("Incoming update for ControlTag {} (value {})",sourceDataTagValue.getId(),sourceDataTagValue.getValue());
     Long tagId = sourceDataTagValue.getId();
 
-    //first lock the process concerned, so no reconfiguration occurs during the processing?? no - slows the all data acquisition down
-    //instead: reconfiguration must lock all tags it modifies (must adapt to reconfiguring DAQ while receiving updates for tags, as
-    // it is impossible to lock the process every time we receive a tag update for that process...)
-
     try {
       if (aliveTimerService.isRegisteredAliveTimer(tagId)) {
         // The tag is an alive tag -> we update the corresponding alive timer
@@ -251,6 +250,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
     CommFaultTag commFault = commFaultTagCache.get(tagId);
     log.debug("processControlTag() : tag {} is a commfault tag.", commFault.getName());
 
+    // TODO (Alex) Can we also check SupervisedEntity?
     if (equipmentCache.containsKey(commFault.getSupervisedId())) {
       handleCommFault(sourceDataTagValue, commFault, EQUIPMENT);
     } else if (subEquipmentCache.containsKey(commFault.getSupervisedId())) {
@@ -261,55 +261,47 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
   }
 
   private <T extends AbstractEquipment> void handleCommFault(SourceDataTagValue sourceDataTagValue, CommFaultTag commFault, SupervisionEntity type) {
-    boolean updateAliveTimer = false;
     Long equipmentId = commFault.getSupervisedId();
-    long supervisionTimestamp = System.currentTimeMillis();
+    long supervisionTimestamp = chooseEarliestNonNullTime(sourceDataTagValue);
     SupervisionEventHandler eventHandler = (type == EQUIPMENT ? equipmentEvents : subEquipmentEvents);
+
     if (sourceDataTagValue.getValue().equals(commFault.getFaultValue())) {
       eventHandler.onDown(equipmentId, supervisionTimestamp, eqCommFault(sourceDataTagValue, type, commFault, false));
     } else {
-      updateAliveTimer = true;
       eventHandler.onUp(equipmentId, supervisionTimestamp, eqCommFault(sourceDataTagValue, type, commFault, true));
     }
-    updateAliveTimer(sourceDataTagValue, commFault, updateAliveTimer);
   }
 
-  private void updateAliveTimer(SourceDataTagValue sourceDataTagValue, CommFaultTag commFaultTagCopy, boolean updateAliveTimer) {
-    if (updateAliveTimer) {
-      Timestamp useTimestamp;
-      if (sourceDataTagValue.getDaqTimestamp() == null) {
-        useTimestamp = sourceDataTagValue.getTimestamp();
-      } else {
-        useTimestamp = sourceDataTagValue.getDaqTimestamp();
-      }
-      if (commFaultTagCopy.getAliveTagId() != null) {
-        aliveTimerService.startOrUpdateTimestamp(commFaultTagCopy.getAliveTagId(), useTimestamp.getTime());
-      }
-    }
+
+  private long chooseEarliestNonNullTime(SourceDataTagValue sourceDataTagValue) {
+    return Math.min(
+      orElse(sourceDataTagValue.getDaqTimestamp(), ALMOST_MAX_TIMESTAMP).getTime(),
+      orElse(sourceDataTagValue.getTimestamp(), ALMOST_MAX_TIMESTAMP).getTime()
+    );
   }
 
   private void handleAliveTimer(SourceDataTagValue sourceDataTagValue, Long tagId) {
     AliveTag timerCopy = aliveTimerCache.get(tagId);
-    Timestamp useTimestamp = orElse(sourceDataTagValue.getDaqTimestamp(), sourceDataTagValue.getTimestamp());
+    long useTimestamp = chooseEarliestNonNullTime(sourceDataTagValue);
 
     // Reject expired alive tags
-    if (System.currentTimeMillis() - useTimestamp.getTime() > 2 * timerCopy.getAliveInterval()) {
+    if (System.currentTimeMillis() - useTimestamp > 2 * timerCopy.getAliveInterval()) {
       log.debug("Rejecting alive #{} of {} as delayed arrival at server.", tagId, timerCopy.getSupervisedName());
       return;
     }
 
-    aliveTimerService.startOrUpdateTimestamp(tagId, useTimestamp.getTime());
+    aliveTimerService.startOrUpdateTimestamp(tagId, useTimestamp);
 
     // TODO (Alex) Is this the timer we want to use?
     if (timerCopy.getSupervisedEntity() == SupervisionEntity.PROCESS) {
       Long processId = processFacade.getProcessIdFromAlive(tagId);
-      processEvents.onUp(processId, useTimestamp.getTime(), "Process Alive tag received.");
+      processEvents.onUp(processId, useTimestamp, "Process Alive tag received.");
     } else {
       if (timerCopy.getSupervisedEntity() == EQUIPMENT) {
-        equipmentEvents.onUp(timerCopy.getSupervisedId(), useTimestamp.getTime(), "Equipment Alive tag received.");
+        equipmentEvents.onUp(timerCopy.getSupervisedId(), useTimestamp, "Equipment Alive tag received.");
       } else {
         // It is a subequipment
-        subEquipmentEvents.onUp(timerCopy.getSupervisedId(), useTimestamp.getTime(), "Subequipment Alive tag received.");
+        subEquipmentEvents.onUp(timerCopy.getSupervisedId(), useTimestamp, "Subequipment Alive tag received.");
       }
     }
   }
