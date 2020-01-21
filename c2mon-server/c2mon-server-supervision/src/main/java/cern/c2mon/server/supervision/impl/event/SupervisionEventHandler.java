@@ -8,7 +8,6 @@ import cern.c2mon.shared.common.supervision.SupervisionEntity;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
-import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,7 +26,7 @@ abstract class SupervisionEventHandler<T extends Supervised> {
     eventHandlers.putIfAbsent(supervisedEntity, this);
   }
 
-  public void onUp(Long id, Timestamp timestamp, String message) {
+  public void onUp(Long id, long timestamp, String message) {
     try {
       service.resume(id, timestamp, message);
     } catch (CacheElementNotFoundException cacheEx) {
@@ -36,14 +35,13 @@ abstract class SupervisionEventHandler<T extends Supervised> {
   }
 
   public void onAliveTimerDown(long supervisedId) {
-    Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-    onDown(supervisedId, timestamp, "Alive timer has expired for Supervised with id: " + supervisedId);
+    onDown(supervisedId, System.currentTimeMillis(), "Alive timer has expired for Supervised with id: " + supervisedId);
   }
 
   /**
    * Called when a DAQ alive timer expires.
    */
-  public void onDown(Long id, Timestamp timestamp, String message) {
+  public void onDown(Long id, long timestamp, String message) {
     service.suspend(id, timestamp, message);
 
 //  TODO (Alex) Review this flow? See also the onUp()

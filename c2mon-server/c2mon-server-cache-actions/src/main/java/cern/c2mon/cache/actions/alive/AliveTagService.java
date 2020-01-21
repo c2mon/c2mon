@@ -162,10 +162,10 @@ public class AliveTagService extends AbstractBooleanControlTagService<AliveTag> 
   }
 
   @Override
-  protected void compareAndSetNewValues(AliveTag controlTag, boolean active, long timestamp) {
-    if (controlTag.getValue() != active || timestamp >= controlTag.getTimestamp().getTime()) {
-      controlTag.setValue(active);
-      controlTag.setLastUpdate(timestamp);
+  protected void compareAndSetNewValues(AliveTag aliveTag, boolean active, long timestamp) {
+    if (aliveTag.getValue() != active || timestamp >= aliveTag.getTimestamp().getTime()) {
+      aliveTag.setValue(active);
+      aliveTag.setLastUpdate(timestamp);
     }
   }
 }

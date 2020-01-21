@@ -305,7 +305,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
           //TODO sychronization on alive timers... needed? use id here, so not possible around update
           aliveTimerService.startOrUpdateTimestamp(tagId, useTimestamp.getTime());
 
-          Timestamp supervisionTimestamp = new Timestamp(System.currentTimeMillis());
+          long supervisionTimestamp = System.currentTimeMillis();
           // TODO (Alex) Is this the timer we want to use?
           if (timerCopy.getSupervisedEntity() == SupervisionEntity.PROCESS) {
             Long processId = processFacade.getProcessIdFromAlive(tagId);
@@ -334,7 +334,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
 
           boolean updateAliveTimer = false; //must be done outside of the process lock as locks the alivetimer!
           Long equipmentId = commFaultTagCopy.getSupervisedId();
-          Timestamp supervisionTimestamp = new Timestamp(System.currentTimeMillis());
+          long supervisionTimestamp = System.currentTimeMillis();
           if (tagValue.equals(commFaultTagCopy.getFaultValue())) {
             StringBuffer str = new StringBuffer("Communication fault tag indicates that equipment ");
             str.append(commFaultTagCopy.getEquipmentName());
@@ -365,7 +365,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
 
           boolean updateAliveTimer = false;
           Long subEquipmentId = commFaultTagCopy.getSupervisedId();
-          Timestamp supervisionTimestamp = new Timestamp(System.currentTimeMillis());
+          long supervisionTimestamp = System.currentTimeMillis();
           if (tagValue.equals(commFaultTagCopy.getFaultValue())) {
             StringBuffer str = new StringBuffer("Communication fault tag indicates that subequipment ");
             str.append(commFaultTagCopy.getEquipmentName());

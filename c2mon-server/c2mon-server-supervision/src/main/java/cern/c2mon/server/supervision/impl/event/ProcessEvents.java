@@ -19,7 +19,6 @@ import javax.annotation.Resource;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import java.sql.Timestamp;
 import java.util.Collection;
 
 @Slf4j
@@ -70,7 +69,7 @@ public class ProcessEvents extends SupervisionEventHandler<Process> {
    * Notice that the process alive is of course revalidated on reception of a new alive.
    */
   @Override
-  public void onUp(Long id, Timestamp timestamp, String message) {
+  public void onUp(Long id, long timestamp, String message) {
     service.resume(id, timestamp, message);
 
     // TODO (Alex) Where and how can we "revalidate"? And how can we ask the DAQ for the latest values?
@@ -270,7 +269,7 @@ public class ProcessEvents extends SupervisionEventHandler<Process> {
                 log.trace("onProcessDisconnection - " + processStopMessage);
 
                 // (5) LEGACY: TODO what does this comment mean?!
-                Timestamp stopTime = new Timestamp(System.currentTimeMillis());
+                long stopTime = System.currentTimeMillis();
                 service.stop(process.getId(), stopTime); //also stops alive timer
 
                 stopEquipments(process.getEquipmentIds(), stopTime, processStopMessage); //state tags to stopped
@@ -318,7 +317,7 @@ public class ProcessEvents extends SupervisionEventHandler<Process> {
    * @param timestamp    time of stop
    * @param message      stop message
    */
-  private void stopEquipments(final Collection<Long> equipmentIds, final Timestamp timestamp, final String message) {
+  private void stopEquipments(final Collection<Long> equipmentIds, long timestamp, final String message) {
     Equipment currentEquipmentCopy;
     for (Long equipmentId : equipmentIds) {
       try {
