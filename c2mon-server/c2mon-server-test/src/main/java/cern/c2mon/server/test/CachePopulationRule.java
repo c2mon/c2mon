@@ -65,7 +65,6 @@ public class CachePopulationRule extends DatabasePopulationRule {
   @Override
   protected void before() throws SQLException {
     super.before();
-    //      cache.clear();
     listOf(
       deviceCache, deviceClassCache,
       subEquipmentCache, equipmentCache, processCache,

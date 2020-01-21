@@ -61,7 +61,7 @@ public class AbstractBooleanControlTagService<T extends ControlTag> extends Abst
     log.debug("Attempting to set control tag " + controlTagId + " to " + active);
 
     if (!cache.containsKey(controlTagId)) {
-      log.error("Cannot locate the Control tag in the cache (Id is " + controlTagId + ") - unable to stop it.");
+      log.error("Cannot locate the Control tag in the cache (Id is #{}) - unable to stop it.", controlTagId);
       return;
     }
 

@@ -4,12 +4,14 @@ import cern.c2mon.cache.AbstractCacheTest;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.commfault.CommFaultTag;
 import cern.c2mon.server.common.supervision.SupervisionStateTag;
+import cern.c2mon.server.test.SupervisionCacheResetRule;
 import cern.c2mon.server.test.factory.AbstractCacheObjectFactory;
 import cern.c2mon.server.test.factory.CommFaultTagCacheObjectFactory;
 import cern.c2mon.shared.common.supervision.SupervisionStatus;
-import org.junit.Before;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.springframework.test.context.ContextConfiguration;
 
 import javax.inject.Inject;
 import java.sql.Timestamp;
@@ -22,6 +24,7 @@ import static cern.c2mon.shared.common.CacheEvent.UPDATE_ACCEPTED;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+@ContextConfiguration(classes = SupervisionCacheResetRule.class)
 public class CommFaultCascadeSpringTest extends AbstractCacheTest<CommFaultTag, CommFaultTag> {
 
   @Inject
@@ -30,13 +33,9 @@ public class CommFaultCascadeSpringTest extends AbstractCacheTest<CommFaultTag, 
   @Inject
   private C2monCache<SupervisionStateTag> stateTagCache;
 
-  @Before
-  public void resetCaches() {
-    commFaultCache.clear();
-    commFaultCache.init();
-    stateTagCache.clear();
-    stateTagCache.init();
-  }
+  @Rule
+  @Inject
+  public SupervisionCacheResetRule supervisionCacheResetRule;
 
   @Override
   protected C2monCache<CommFaultTag> initCache() {

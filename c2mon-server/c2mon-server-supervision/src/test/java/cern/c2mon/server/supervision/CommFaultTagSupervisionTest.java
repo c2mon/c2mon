@@ -23,16 +23,13 @@ import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.common.supervision.SupervisionStateTag;
 import cern.c2mon.shared.common.datatag.SourceDataTagValue;
-import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
 import javax.inject.Inject;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import static cern.c2mon.server.common.util.Java9Collections.listOf;
 import static cern.c2mon.server.test.factory.SourceDataTagValueFactory.sampleCommFault;
 import static cern.c2mon.shared.common.CacheEvent.UPDATE_ACCEPTED;
 import static cern.c2mon.shared.common.supervision.SupervisionStatus.DOWN;
@@ -51,27 +48,20 @@ public class CommFaultTagSupervisionTest extends SupervisionCacheTest {
   public static final long EQ_ID = 150L;
   public static final long SUBEQ_ID = 250L;
 
-  @Autowired
+  @Inject
   private C2monCache<Equipment> equipmentCache;
 
-  @Autowired
+  @Inject
   private C2monCache<CommFaultTag> commFaultTagCache;
 
-  @Autowired
+  @Inject
   private C2monCache<SubEquipment> subEquipmentCache;
 
   @Inject
   private C2monCache<SupervisionStateTag> stateTagCache;
 
-  @SuppressWarnings("unchecked")
-  @Before
-  public void setUp() {
-    stateTagCache.getCacheListenerManager().registerListener(System.out::println, UPDATE_ACCEPTED);
-    listOf(stateTagCache, commFaultTagCache).forEach(cache -> {
-      cache.clear();
-      cache.init();
-    });
-
+  @Test
+  public void initCorrectly() {
     assertEquals(stateTagCache.get(equipmentCache.get(EQ_ID).getStateTagId()).getSupervisionStatus(), DOWN);
     assertEquals(stateTagCache.get(subEquipmentCache.get(SUBEQ_ID).getStateTagId()).getSupervisionStatus(), DOWN);
   }

@@ -60,7 +60,13 @@ public class CacheListenerManagerImpl<CACHEABLE extends Cacheable> implements Ca
   @Override
   public void notifyListenersOf(CacheEvent event, CACHEABLE source) {
     eventListeners.get(event) // TODO (Alex) Do we want this many clones?
-      .forEach(listener -> centralizedExecutorService.submit(() -> listener.apply((CACHEABLE) source.clone())));
+      .forEach(listener -> {
+        try {
+          centralizedExecutorService.submit(() -> listener.apply((CACHEABLE) source.clone()));
+        } catch (RejectedExecutionException rejected) {
+          log.info("Rejected execution of {} #{} for source event {}", source.getClass(), source.getId(), event);
+        }
+      });
   }
 
   @Override

@@ -8,6 +8,7 @@ import cern.c2mon.server.cache.loading.config.CacheLoadingModuleRef;
 import cern.c2mon.server.common.config.CommonModule;
 import cern.c2mon.server.supervision.config.SupervisionModule;
 import cern.c2mon.server.test.CachePopulationRule;
+import cern.c2mon.server.test.SupervisionCacheResetRule;
 import org.junit.Rule;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -24,13 +25,14 @@ import javax.inject.Inject;
   CacheLoadingModuleRef.class,
   C2monIgniteConfiguration.class,
   CachePopulationRule.class,
+  SupervisionCacheResetRule.class,
   SupervisionModule.class
 })
 public abstract class SupervisionCacheTest {
 
   @Rule
   @Inject
-  public CachePopulationRule supervisionCachePopulationRule;
+  public SupervisionCacheResetRule supervisionCacheResetRule;
 
   @Inject
   protected SupervisionManager supervisionManager;

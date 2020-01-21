@@ -16,7 +16,6 @@ import java.sql.Timestamp;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import static cern.c2mon.server.common.util.Java9Collections.listOf;
 import static cern.c2mon.server.test.factory.SourceDataTagValueFactory.sampleAlive;
 import static org.junit.Assert.*;
 
@@ -38,8 +37,6 @@ public class AliveTagSupervisionTest extends SupervisionCacheTest {
 
   @Before
   public void initialStatusIsCorrect() {
-    resetCaches();
-
     AliveTag aliveTimer = aliveTimerCache.get(1221L);
     assertNotNull(aliveTimer);
     assertEquals(0, aliveTimer.getLastUpdate());
@@ -47,13 +44,6 @@ public class AliveTagSupervisionTest extends SupervisionCacheTest {
     SupervisionStateTag stateTag = stateTagCache.get(aliveTimer.getStateTagId());
     assertEquals(SupervisionStatus.DOWN, stateTag.getSupervisionStatus());
     assertEquals(AbstractInfoTagCacheObject.DEFAULT_TIMESTAMP, stateTag.getStatusTime());
-  }
-
-  private void resetCaches() {
-    listOf(stateTagCache, aliveTimerCache).forEach(cache -> {
-      cache.clear();
-      cache.init();
-    });
   }
 
   /**

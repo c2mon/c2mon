@@ -5,10 +5,11 @@ import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.alive.AliveTag;
 import cern.c2mon.server.common.commfault.CommFaultTag;
 import cern.c2mon.server.common.supervision.SupervisionStateTag;
+import cern.c2mon.server.test.SupervisionCacheResetRule;
 import cern.c2mon.server.test.factory.AbstractCacheObjectFactory;
 import cern.c2mon.server.test.factory.AliveTagCacheObjectFactory;
-import org.junit.Before;
 import org.junit.Test;
+import org.springframework.test.context.ContextConfiguration;
 
 import javax.inject.Inject;
 import java.sql.Timestamp;
@@ -22,6 +23,7 @@ import static cern.c2mon.shared.common.supervision.SupervisionStatus.RUNNING;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+@ContextConfiguration(classes = SupervisionCacheResetRule.class)
 public class AliveTagCascadeSpringTests extends AbstractCacheTest<AliveTag, AliveTag> {
 
   @Inject
@@ -32,13 +34,6 @@ public class AliveTagCascadeSpringTests extends AbstractCacheTest<AliveTag, Aliv
 
   @Inject
   private C2monCache<SupervisionStateTag> stateTagCache;
-
-  @Before
-  public void resetCaches() {
-    stateTagCache.init();
-    commFaultCache.init();
-    aliveTagCache.init();
-  }
 
   @Override
   protected C2monCache<AliveTag> initCache() {
