@@ -9,7 +9,7 @@ public interface CacheListenerManager<CACHEABLE extends Cacheable> extends Close
 
   void notifyListenersOf(CacheEvent event, CACHEABLE source);
 
-  void registerListener(CacheListener<CACHEABLE> listener, CacheEvent... events);
+  void registerListener(CacheListener<CACHEABLE> listener, CacheEvent baseEvent, CacheEvent... events);
 
   /**
    * An alternative cache listener, that collects all incoming updates to a list, then periodically runs an event handler

@@ -71,8 +71,8 @@ public class UnifiedTagCacheFacade {
     doAcrossCaches(tagId, cache -> cache.computeQuiet(tagId, tag -> tag.getAlarmIds().remove(alarmId)));
   }
 
-  public void registerListener(CacheListener<Tag> listener, CacheEvent... events) {
-    tagCaches.forEach(cache -> cache.getCacheListenerManager().registerListener(listener::apply, events));
+  public void registerListener(CacheListener<Tag> listener, CacheEvent baseEvent, CacheEvent... events) {
+    tagCaches.forEach(cache -> cache.getCacheListenerManager().registerListener(listener::apply, baseEvent, events));
   }
 
   public void registerBufferedListener(BufferedCacheListener<Tag> listener, CacheEvent... events) {

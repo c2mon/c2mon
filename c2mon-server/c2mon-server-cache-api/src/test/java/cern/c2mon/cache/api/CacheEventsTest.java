@@ -66,7 +66,7 @@ public class CacheEventsTest {
   }
 
   private void doAndListenToEvents(Runnable runnable, CacheEvent... cacheEvents) {
-    cache.getCacheListenerManager().registerListener(listenerAction, cacheEvents);
+    cache.getCacheListenerManager().registerListener(listenerAction, cacheEvents[0], cacheEvents);
 
     runnable.run();
 

@@ -64,7 +64,8 @@ public class CacheListenerManagerImpl<CACHEABLE extends Cacheable> implements Ca
   }
 
   @Override
-  public void registerListener(CacheListener<CACHEABLE> listener, CacheEvent... events) {
+  public void registerListener(CacheListener<CACHEABLE> listener, CacheEvent baseEvent, CacheEvent... events) {
+    eventListeners.get(baseEvent).add(listener);
     for (CacheEvent cacheEvent : events) {
       eventListeners.get(cacheEvent).add(listener);
     }

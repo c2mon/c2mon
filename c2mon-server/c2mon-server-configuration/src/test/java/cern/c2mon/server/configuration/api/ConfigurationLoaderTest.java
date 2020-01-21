@@ -59,6 +59,7 @@ import cern.c2mon.shared.client.configuration.api.equipment.SubEquipment;
 import cern.c2mon.shared.client.configuration.api.process.Process;
 import cern.c2mon.shared.client.configuration.api.tag.*;
 import cern.c2mon.shared.client.tag.TagMode;
+import cern.c2mon.shared.common.CacheEvent;
 import cern.c2mon.shared.common.NoSimpleValueParseException;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
@@ -1267,7 +1268,7 @@ public class ConfigurationLoaderTest {
     processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
 
     final CountDownLatch latch = new CountDownLatch(1);
-    ruleTagCache.getCacheListenerManager().registerListener(cacheable -> latch.countDown());
+    ruleTagCache.getCacheListenerManager().registerListener(cacheable -> latch.countDown(), CacheEvent.UPDATE_ACCEPTED);
 
     // TEST:
     // Build configuration to add the test RuleTagUpdate

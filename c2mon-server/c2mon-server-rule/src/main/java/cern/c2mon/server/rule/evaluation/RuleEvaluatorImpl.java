@@ -78,8 +78,7 @@ public class RuleEvaluatorImpl implements RuleEvaluator {
    */
   @PostConstruct
   public void init() {
-    unifiedTagCacheFacade.registerListener(cacheable -> {
-      Tag tag = (Tag) cacheable;
+    unifiedTagCacheFacade.registerListener(tag -> {
       try {
         evaluateRules(tag);
       } catch (Exception e) {
