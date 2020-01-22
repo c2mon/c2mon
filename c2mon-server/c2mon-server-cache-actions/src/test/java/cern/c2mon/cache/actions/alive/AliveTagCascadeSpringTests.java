@@ -5,6 +5,7 @@ import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.alive.AliveTag;
 import cern.c2mon.server.common.commfault.CommFaultTag;
 import cern.c2mon.server.common.supervision.SupervisionStateTag;
+import cern.c2mon.server.test.CachePopulationRule;
 import cern.c2mon.server.test.SupervisionCacheResetRule;
 import cern.c2mon.server.test.factory.AbstractCacheObjectFactory;
 import cern.c2mon.server.test.factory.AliveTagCacheObjectFactory;
@@ -23,7 +24,10 @@ import static cern.c2mon.shared.common.supervision.SupervisionStatus.RUNNING;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-@ContextConfiguration(classes = SupervisionCacheResetRule.class)
+@ContextConfiguration(classes = {
+  SupervisionCacheResetRule.class,
+  CachePopulationRule.class
+})
 public class AliveTagCascadeSpringTests extends AbstractCacheTest<AliveTag, AliveTag> {
 
   @Inject

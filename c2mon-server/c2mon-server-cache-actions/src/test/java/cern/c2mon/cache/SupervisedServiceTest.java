@@ -3,27 +3,33 @@ package cern.c2mon.cache;
 import cern.c2mon.cache.actions.state.SupervisionStateTagService;
 import cern.c2mon.cache.actions.supervision.SupervisedCacheService;
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.cache.api.listener.CacheListenerManagerImpl;
 import cern.c2mon.server.common.alive.AliveTag;
 import cern.c2mon.server.common.commfault.CommFaultTag;
 import cern.c2mon.server.common.equipment.AbstractEquipment;
 import cern.c2mon.server.common.equipment.AbstractSupervisedCacheObject;
 import cern.c2mon.server.common.supervision.Supervised;
+import cern.c2mon.server.test.CachePopulationRule;
+import cern.c2mon.server.test.SupervisionCacheResetRule;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.common.CacheEvent;
 import cern.c2mon.shared.common.supervision.SupervisionStatus;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.springframework.test.context.ContextConfiguration;
 
 import javax.inject.Inject;
 import java.sql.Timestamp;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import static cern.c2mon.server.common.util.Java9Collections.listOf;
 import static cern.c2mon.shared.common.supervision.SupervisionStatus.*;
 import static org.junit.Assert.*;
 
+@ContextConfiguration(classes = {
+  SupervisionCacheResetRule.class,
+  CachePopulationRule.class
+})
 public abstract class SupervisedServiceTest<T extends Supervised, T_IMPL extends AbstractSupervisedCacheObject>
   extends AbstractCacheTest<T, T_IMPL> {
 
@@ -36,6 +42,10 @@ public abstract class SupervisedServiceTest<T extends Supervised, T_IMPL extends
   @Inject
   C2monCache<AliveTag> aliveTagCache;
 
+  @Inject
+  @Rule
+  public SupervisionCacheResetRule supervisionCacheResetRule;
+
   private SupervisedCacheService<T> supervisedService;
   private T sample;
 
@@ -44,15 +54,9 @@ public abstract class SupervisedServiceTest<T extends Supervised, T_IMPL extends
   @Before
   public void preloadCaches() {
     cache = initCache();
-    cache.setCacheListenerManager(new CacheListenerManagerImpl<>());
+//    cache.setCacheListenerManager(new CacheListenerManagerImpl<>());
     supervisedService = getSupervisedService();
     sample = getSample();
-
-    listOf(stateTagService.getCache(), commFaultTagCache, aliveTagCache).forEach(c2monCache -> {
-      c2monCache.clear();
-      c2monCache.setCacheListenerManager(new CacheListenerManagerImpl<>());
-      c2monCache.init();
-    });
   }
 
   @Test
@@ -124,7 +128,7 @@ public abstract class SupervisedServiceTest<T extends Supervised, T_IMPL extends
   private void verifySupervisionEvent(SupervisionStatus expectedStatus) {
     SupervisionEvent event = stateTagService.getSupervisionEvent(sample.getStateTagId());
 
-    assertEquals(sample.getStateTagId().longValue(), event.getEntityId());
+    assertEquals(sample.getId(), event.getEntityId());
     assertEquals(event.getEntity(), sample.getSupervisionEntity());
     assertEquals(expectedStatus, event.getStatus());
 
