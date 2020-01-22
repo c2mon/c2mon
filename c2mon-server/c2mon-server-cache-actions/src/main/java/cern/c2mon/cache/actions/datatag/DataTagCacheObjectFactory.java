@@ -21,6 +21,7 @@ import cern.c2mon.shared.daq.config.HardwareAddressUpdate;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.lang.reflect.Field;
 import java.util.Properties;
 
@@ -29,6 +30,7 @@ import java.util.Properties;
  * @author Szymon Halastra, Alexandros Papageorgiou
  */
 @Slf4j
+@Named
 public class DataTagCacheObjectFactory extends AbstractTagCacheObjectFactory<DataTag> {
   private final BaseEquipmentServiceImpl equipmentService;
   private SubEquipmentService subEquipmentService;

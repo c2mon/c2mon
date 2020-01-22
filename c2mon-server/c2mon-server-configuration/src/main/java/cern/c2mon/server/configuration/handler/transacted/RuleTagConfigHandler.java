@@ -26,36 +26,39 @@ import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.GenericApplicationContext;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.UnexpectedRollbackException;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.Collection;
 import java.util.Properties;
 
 /**
  * Implementation of transacted configuration methods.
- * @author Mark Brightwell
  *
+ * @author Mark Brightwell
  */
-@Service
+@Named
 @Slf4j
+@EnableTransactionManagement(proxyTargetClass = true)
 public class RuleTagConfigHandler extends AbstractTagConfigHandler<RuleTag> {
 
   private final RuleTagService ruleTagService;
   private AlarmConfigHandler alarmConfigHandler;
 
-  @Autowired
+  @Inject
   public RuleTagConfigHandler(RuleTagService ruleTagService,
                               RuleTagCacheObjectFactory ruleTagCacheObjectFactory,
                               RuleTagLoaderDAO ruleTagLoaderDAO,
-                              GenericApplicationContext context, AlarmConfigHandler alarmConfigTransacted) {
+                              GenericApplicationContext context,
+                              AlarmConfigHandler alarmConfigHandler) {
     super(ruleTagService.getCache(), ruleTagLoaderDAO, ruleTagCacheObjectFactory, ruleTagService, context);
     this.ruleTagService = ruleTagService;
-    this.alarmConfigHandler = alarmConfigTransacted;
+    this.alarmConfigHandler = alarmConfigHandler;
   }
 
   @Override

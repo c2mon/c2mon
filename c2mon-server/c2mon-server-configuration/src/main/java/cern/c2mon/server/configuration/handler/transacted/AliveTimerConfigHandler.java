@@ -5,7 +5,9 @@ import cern.c2mon.server.common.alive.AliveTag;
 import cern.c2mon.server.configuration.impl.ProcessChange;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
+@Named
 public class AliveTimerConfigHandler extends BaseConfigHandlerImpl<AliveTag, Void> {
 
   private C2monCache<AliveTag> aliveTimerCache;

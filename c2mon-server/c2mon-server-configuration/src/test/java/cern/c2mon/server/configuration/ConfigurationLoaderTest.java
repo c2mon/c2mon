@@ -36,16 +36,11 @@ import cern.c2mon.cache.actions.equipment.EquipmentService;
 import cern.c2mon.cache.actions.process.ProcessService;
 import cern.c2mon.cache.actions.subequipment.SubEquipmentService;
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.cache.config.CacheConfigModuleRef;
-import cern.c2mon.cache.impl.configuration.C2monIgniteConfiguration;
 import cern.c2mon.server.cache.dbaccess.*;
-import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
-import cern.c2mon.server.cache.loading.config.CacheLoadingModuleRef;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alive.AliveTag;
 import cern.c2mon.server.common.command.CommandTagCacheObject;
 import cern.c2mon.server.common.commfault.CommFaultTag;
-import cern.c2mon.server.common.config.CommonModule;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.common.device.*;
@@ -57,11 +52,9 @@ import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.rule.RuleTagCacheObject;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
-import cern.c2mon.server.configuration.config.ConfigurationModule;
 import cern.c2mon.server.configuration.config.ProcessCommunicationManagerMock;
 import cern.c2mon.server.configuration.helper.ObjectEqualityComparison;
 import cern.c2mon.server.configuration.junit.ConfigurationDatabasePopulationRule;
-import cern.c2mon.server.daq.config.DaqModule;
 import cern.c2mon.server.daq.out.ProcessCommunicationManager;
 import cern.c2mon.server.daq.update.JmsContainerManagerImpl;
 import cern.c2mon.server.rule.config.RuleModule;
@@ -99,29 +92,12 @@ import static org.junit.Assert.*;
  *
  * @author Mark Brightwell
  */
-@SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {
-    CommonModule.class,
-    CacheConfigModuleRef.class,
-    CacheDbAccessModule.class,
-    CacheLoadingModuleRef.class,
-    SupervisionModule.class,
-    ConfigurationModule.class,
-    DaqModule.class,
-    RuleModule.class,
-    ProcessCommunicationManagerMock.class,
-    C2monIgniteConfiguration.class
-})
-public class ConfigurationLoaderTest {
+@ContextConfiguration(classes = ProcessCommunicationManagerMock.class)
+public class ConfigurationLoaderTest extends ConfigurationCacheTest {
 
   @Rule
   @Autowired
   public ConfigurationDatabasePopulationRule populationRule;
-
-  @Rule
-  @Autowired
-  public CachePopulationRule configurationCachePopulationRule;
 
   /**
    * Mocked daqcommunication-out module.
@@ -1150,7 +1126,6 @@ public class ConfigurationLoaderTest {
   }
 
   @Test
-
   public void testRemoveDeviceClass() {
     DeviceClass deviceClass = deviceClassCache.get(400L);
     assertNotNull(deviceClass);

@@ -17,43 +17,30 @@
 package cern.c2mon.server.configuration;
 
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.cache.config.CacheConfigModuleRef;
 import cern.c2mon.server.cache.dbaccess.*;
-import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
-import cern.c2mon.server.cache.loading.config.CacheLoadingModuleRef;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alive.AliveTag;
 import cern.c2mon.server.common.commfault.CommFaultTag;
-import cern.c2mon.server.common.config.CommonModule;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.subequipment.SubEquipment;
-import cern.c2mon.server.configuration.config.ConfigurationModule;
 import cern.c2mon.server.configuration.config.ProcessCommunicationManagerMock;
 import cern.c2mon.server.configuration.handler.transacted.ProcessConfigHandler;
 import cern.c2mon.server.configuration.junit.ConfigurationDatabasePopulationRule;
-import cern.c2mon.server.daq.config.DaqModule;
-import cern.c2mon.server.daq.update.JmsContainerManagerImpl;
-import cern.c2mon.server.rule.config.RuleModule;
-import cern.c2mon.server.supervision.config.SupervisionModule;
-import cern.c2mon.server.test.CachePopulationRule;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.common.command.CommandTag;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.junit.Assert.*;
 
@@ -65,27 +52,12 @@ import static org.junit.Assert.*;
  *
  */
 @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {
-    CommonModule.class,
-    CacheConfigModuleRef.class,
-    CacheDbAccessModule.class,
-    CacheLoadingModuleRef.class,
-    SupervisionModule.class,
-    ConfigurationModule.class,
-    DaqModule.class,
-    RuleModule.class,
-    ProcessCommunicationManagerMock.class
-})
-public class DbFailureTest {
+@ContextConfiguration(classes = ProcessCommunicationManagerMock.class)
+public class DbFailureTest extends ConfigurationCacheTest {
 
   @Rule
   @Autowired
   public ConfigurationDatabasePopulationRule populationRule;
-
-  @Rule
-  @Autowired
-  public CachePopulationRule configurationCachePopulationRule;
 
   private IMocksControl mockControl = EasyMock.createNiceControl();
 
@@ -143,20 +115,9 @@ public class DbFailureTest {
   @Autowired
   private AlarmMapper alarmMapper;
 
-  @Autowired
-  private JmsContainerManagerImpl jmsContainerManager;
-
   @Before
   public void init() {
     mockControl.reset();
-  }
-
-  @After
-  public void cleanUp() {
-    // Make sure the JmsContainerManager is stopped, otherwise the
-    // DefaultMessageListenerContainers inside will keep trying to connect to
-    // a JMS broker (which will not be running)
-    jmsContainerManager.stop();
   }
 
   /**

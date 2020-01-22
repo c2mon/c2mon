@@ -7,19 +7,21 @@ import cern.c2mon.server.configuration.parser.exception.ConfigurationParseExcept
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.api.tag.CommFaultTag;
-import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.Collections;
 import java.util.List;
 
 import static cern.c2mon.cache.config.ClientQueryProvider.queryByClientInput;
 
+@Named
 public class CommFaultTagFactory extends EntityFactory<CommFaultTag> {
 
   private final C2monCache<cern.c2mon.server.common.commfault.CommFaultTag> cache;
   private SequenceDAO sequenceDAO;
 
-  @Autowired
+  @Inject
   public CommFaultTagFactory(C2monCache<cern.c2mon.server.common.commfault.CommFaultTag> aliveTagCache, SequenceDAO sequenceDAO) {
     super(aliveTagCache);
     cache = aliveTagCache;

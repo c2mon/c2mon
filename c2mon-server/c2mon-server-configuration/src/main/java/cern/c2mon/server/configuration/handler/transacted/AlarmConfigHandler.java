@@ -26,10 +26,10 @@ import cern.c2mon.server.common.listener.ConfigurationEventListener;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.GenericApplicationContext;
-import org.springframework.stereotype.Service;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.Collection;
 import java.util.Properties;
 
@@ -38,8 +38,8 @@ import java.util.Properties;
  *
  * @author Alexandros Papageorgiou
  */
+@Named
 @Slf4j
-@Service
 public class AlarmConfigHandler extends BaseConfigHandlerImpl<Alarm, Void> {
 
   private final Collection<ConfigurationEventListener> configurationEventListeners;
@@ -47,7 +47,7 @@ public class AlarmConfigHandler extends BaseConfigHandlerImpl<Alarm, Void> {
   private final UnifiedTagCacheFacade unifiedTagCacheFacade;
   private AlarmService alarmService;
 
-  @Autowired
+  @Inject
   public AlarmConfigHandler(final C2monCache<Alarm> alarmCache, final AlarmLoaderDAO alarmDAO,
                             final AlarmCacheObjectFactory alarmCacheObjectFactory,
                             final GenericApplicationContext context,

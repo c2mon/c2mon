@@ -16,18 +16,11 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.mybatis;
 
-import cern.c2mon.cache.config.CacheConfigModuleRef;
-import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
-import cern.c2mon.server.cache.loading.config.CacheLoadingModuleRef;
-import cern.c2mon.server.common.config.CommonModule;
-import cern.c2mon.server.configuration.config.ConfigurationModule;
+import cern.c2mon.server.configuration.ConfigurationCacheTest;
 import cern.c2mon.server.configuration.config.ProcessCommunicationManagerMock;
 import cern.c2mon.server.configuration.dao.ConfigurationDAO;
 import cern.c2mon.server.configuration.junit.ConfigurationDatabasePopulationRule;
-import cern.c2mon.server.daq.config.DaqModule;
 import cern.c2mon.server.daq.update.JmsContainerManagerImpl;
-import cern.c2mon.server.rule.config.RuleModule;
-import cern.c2mon.server.supervision.config.SupervisionModule;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Status;
@@ -35,10 +28,8 @@ import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.List;
 
@@ -52,19 +43,8 @@ import static org.junit.Assert.assertEquals;
  * @author Mark Brightwell
  *
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {
-    CommonModule.class,
-    CacheConfigModuleRef.class,
-    CacheDbAccessModule.class,
-    CacheLoadingModuleRef.class,
-    SupervisionModule.class,
-    ConfigurationModule.class,
-    DaqModule.class,
-    RuleModule.class,
-    ProcessCommunicationManagerMock.class
-})
-public class ConfigurationMapperTest {
+@ContextConfiguration(classes = ProcessCommunicationManagerMock.class)
+public class ConfigurationMapperTest extends ConfigurationCacheTest {
 
   @Rule
   @Autowired

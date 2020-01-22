@@ -5,8 +5,10 @@ import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.rule.RuleTagCacheObject;
 import cern.c2mon.shared.daq.config.Change;
 
+import javax.inject.Named;
 import java.util.Properties;
 
+@Named
 public class RuleTagCacheObjectFactory extends AbstractTagCacheObjectFactory<RuleTag> {
 
   @Override
