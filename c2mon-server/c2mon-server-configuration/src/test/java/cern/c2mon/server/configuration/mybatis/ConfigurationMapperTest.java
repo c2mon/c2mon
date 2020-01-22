@@ -17,19 +17,15 @@
 package cern.c2mon.server.configuration.mybatis;
 
 import cern.c2mon.server.configuration.ConfigurationCacheTest;
-import cern.c2mon.server.configuration.config.ProcessCommunicationManagerMock;
 import cern.c2mon.server.configuration.dao.ConfigurationDAO;
-import cern.c2mon.server.configuration.junit.ConfigurationDatabasePopulationRule;
 import cern.c2mon.server.daq.update.JmsContainerManagerImpl;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Status;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import org.junit.After;
-import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
 
 import java.util.List;
 
@@ -43,12 +39,7 @@ import static org.junit.Assert.assertEquals;
  * @author Mark Brightwell
  *
  */
-@ContextConfiguration(classes = ProcessCommunicationManagerMock.class)
 public class ConfigurationMapperTest extends ConfigurationCacheTest {
-
-  @Rule
-  @Autowired
-  public ConfigurationDatabasePopulationRule populationRule;
 
   @Autowired
   private ConfigurationDAO configurationDAO;

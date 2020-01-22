@@ -70,7 +70,7 @@ public class CachePopulationRule extends DatabasePopulationRule {
       subEquipmentCache, equipmentCache, processCache,
       commFaultTagCache, aliveTimerCache, stateTagCache,
       alarmCache,
-      dataTagCache, ruleTagCache, commandTagCache
+      ruleTagCache, dataTagCache, commandTagCache
     ).forEach(C2monCache::init);
   }
 }

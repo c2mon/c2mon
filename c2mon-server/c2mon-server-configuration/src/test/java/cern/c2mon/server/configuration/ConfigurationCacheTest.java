@@ -8,6 +8,7 @@ import cern.c2mon.server.cache.loading.config.CacheLoadingModuleRef;
 import cern.c2mon.server.common.config.CommonModule;
 import cern.c2mon.server.configuration.config.ConfigurationModule;
 import cern.c2mon.server.configuration.config.ProcessCommunicationManagerMock;
+import cern.c2mon.server.configuration.junit.ConfigRuleChain;
 import cern.c2mon.server.daq.config.DaqModule;
 import cern.c2mon.server.daq.update.JmsContainerManagerImpl;
 import cern.c2mon.server.rule.config.RuleModule;
@@ -42,7 +43,7 @@ public abstract class ConfigurationCacheTest {
 
   @Rule
   @Inject
-  public CachePopulationRule configurationCachePopulationRule;
+  public ConfigRuleChain configRuleChain;
 
   @Rule
   public Timeout forceTimeout = new Timeout(1, TimeUnit.SECONDS);

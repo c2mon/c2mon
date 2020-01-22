@@ -52,9 +52,7 @@ import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.rule.RuleTagCacheObject;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
-import cern.c2mon.server.configuration.config.ProcessCommunicationManagerMock;
 import cern.c2mon.server.configuration.helper.ObjectEqualityComparison;
-import cern.c2mon.server.configuration.junit.ConfigurationDatabasePopulationRule;
 import cern.c2mon.server.daq.out.ProcessCommunicationManager;
 import cern.c2mon.server.daq.update.JmsContainerManagerImpl;
 import cern.c2mon.server.rule.config.RuleModule;
@@ -82,6 +80,10 @@ import cern.c2mon.shared.daq.config.Change;
 import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
 import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
@@ -92,12 +94,7 @@ import static org.junit.Assert.*;
  *
  * @author Mark Brightwell
  */
-@ContextConfiguration(classes = ProcessCommunicationManagerMock.class)
 public class ConfigurationLoaderTest extends ConfigurationCacheTest {
-
-  @Rule
-  @Autowired
-  public ConfigurationDatabasePopulationRule populationRule;
 
   /**
    * Mocked daqcommunication-out module.
@@ -1139,7 +1136,7 @@ public class ConfigurationLoaderTest extends ConfigurationCacheTest {
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
 
     deviceClass = deviceClassCache.get(400L);
-    assertTrue(((DeviceClassCacheObject) deviceClass).getDeviceIds().size() == 3);
+    assertEquals(3, ((DeviceClassCacheObject) deviceClass).getDeviceIds().size());
 
     Device device = deviceCache.get(20L);
     assertNotNull(device);
