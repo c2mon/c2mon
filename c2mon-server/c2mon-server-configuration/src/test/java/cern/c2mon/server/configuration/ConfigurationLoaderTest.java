@@ -25,11 +25,7 @@ import javax.xml.transform.TransformerException;
 
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
-import org.junit.*;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.cache.actions.datatag.DataTagService;
 import cern.c2mon.cache.actions.equipment.EquipmentService;
@@ -54,11 +50,6 @@ import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
 import cern.c2mon.server.configuration.helper.ObjectEqualityComparison;
 import cern.c2mon.server.daq.out.ProcessCommunicationManager;
-import cern.c2mon.server.daq.update.JmsContainerManagerImpl;
-import cern.c2mon.server.rule.config.RuleModule;
-import cern.c2mon.server.supervision.config.SupervisionModule;
-import cern.c2mon.shared.client.alarm.condition.AlarmCondition;
-import cern.c2mon.server.test.CachePopulationRule;
 import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Status;
@@ -80,7 +71,6 @@ import cern.c2mon.shared.daq.config.Change;
 import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ChangeReport.CHANGE_STATE;
 import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -177,9 +167,6 @@ public class ConfigurationLoaderTest extends ConfigurationCacheTest {
   @Autowired
   private DeviceMapper deviceMapper;
 
-  @Autowired
-  private JmsContainerManagerImpl jmsContainerManager;
-
   /**
    * Clears DB of failed previous tests and resets the mock before each test.
    *
@@ -192,14 +179,6 @@ public class ConfigurationLoaderTest extends ConfigurationCacheTest {
 
     // reset mock
     reset(mockManager);
-  }
-
-  @After
-  public void cleanUp() {
-    // Make sure the JmsContainerManager is stopped, otherwise the
-    // DefaultMessageListenerContainers inside will keep trying to connect to
-    // a JMS broker (which will not be running)
-    jmsContainerManager.stop();
   }
 
   @Test

@@ -49,7 +49,7 @@ public abstract class ConfigurationCacheTest {
   public Timeout forceTimeout = new Timeout(1, TimeUnit.SECONDS);
 
   @Inject
-  private JmsContainerManagerImpl jmsContainerManager;
+  protected JmsContainerManagerImpl jmsContainerManager;
 
   @After
   public void cleanUp() {

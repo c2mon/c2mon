@@ -38,7 +38,6 @@ import cern.c2mon.server.configuration.api.util.TestConfigurationProvider;
 import cern.c2mon.server.configuration.helper.ObjectEqualityComparison;
 import cern.c2mon.server.configuration.parser.util.*;
 import cern.c2mon.server.daq.out.ProcessCommunicationManager;
-import cern.c2mon.server.daq.update.JmsContainerManagerImpl;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.api.Configuration;
@@ -60,7 +59,6 @@ import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
 import lombok.extern.slf4j.Slf4j;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -152,23 +150,12 @@ public class EverythingEverConfigurationTest extends ConfigurationCacheTest {
   private ProcessService processService;
 
   @Autowired
-  private JmsContainerManagerImpl jmsContainerManager;
-
-  @Autowired
   private DataTagService dataTagService;
 
   @Before
   public void beforeTest() throws IOException {
     // reset mock
     reset(communicationManager);
-  }
-
-  @After
-  public void cleanUp() {
-    // Make sure the JmsContainerManager is stopped, otherwise the
-    // DefaultMessageListenerContainers inside will keep trying to connect to
-    // a JMS broker (which will not be running)
-    jmsContainerManager.stop();
   }
 
   @Test

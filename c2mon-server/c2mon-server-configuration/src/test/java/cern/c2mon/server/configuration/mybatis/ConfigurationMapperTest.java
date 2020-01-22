@@ -18,12 +18,10 @@ package cern.c2mon.server.configuration.mybatis;
 
 import cern.c2mon.server.configuration.ConfigurationCacheTest;
 import cern.c2mon.server.configuration.dao.ConfigurationDAO;
-import cern.c2mon.server.daq.update.JmsContainerManagerImpl;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Status;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
-import org.junit.After;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -43,14 +41,6 @@ public class ConfigurationMapperTest extends ConfigurationCacheTest {
 
   @Autowired
   private ConfigurationDAO configurationDAO;
-
-  @Autowired
-  private JmsContainerManagerImpl jmsContainerManager;
-
-  @After
-  public void cleanUp() {
-    jmsContainerManager.stop();
-  }
 
   @Test
   public void testGetConfigName() {
