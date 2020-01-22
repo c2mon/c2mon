@@ -22,7 +22,7 @@ public class EquipmentCacheObjectFactory extends AbstractEquipmentCacheObjectFac
 
   @Override
   public EquipmentCacheObject sampleBase() {
-    EquipmentCacheObject equipmentCacheObject = new EquipmentCacheObject(100L);
+    EquipmentCacheObject equipmentCacheObject = new EquipmentCacheObject(150L);
     initDefaults(equipmentCacheObject);
 
     equipmentCacheObject.setAddress("Test address");
