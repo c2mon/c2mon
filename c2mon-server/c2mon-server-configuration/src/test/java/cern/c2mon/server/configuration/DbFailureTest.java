@@ -27,6 +27,7 @@ import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.configuration.handler.transacted.ProcessConfigHandler;
+import cern.c2mon.server.configuration.junit.ConfigRuleChain;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
@@ -34,6 +35,7 @@ import cern.c2mon.shared.common.command.CommandTag;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.test.annotation.DirtiesContext;
 
@@ -50,6 +52,10 @@ import static org.junit.Assert.*;
  */
 @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 public class DbFailureTest extends ConfigurationCacheTest {
+
+  @Rule
+  @Inject
+  public ConfigRuleChain configRuleChain;
 
   private IMocksControl mockControl = EasyMock.createNiceControl();
 

@@ -18,13 +18,15 @@ package cern.c2mon.server.configuration.mybatis;
 
 import cern.c2mon.server.configuration.ConfigurationCacheTest;
 import cern.c2mon.server.configuration.dao.ConfigurationDAO;
+import cern.c2mon.server.configuration.junit.ConfigRuleChain;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Status;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
+import org.junit.Rule;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.inject.Inject;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -39,7 +41,11 @@ import static org.junit.Assert.assertEquals;
  */
 public class ConfigurationMapperTest extends ConfigurationCacheTest {
 
-  @Autowired
+  @Rule
+  @Inject
+  public ConfigRuleChain configRuleChain;
+
+  @Inject
   private ConfigurationDAO configurationDAO;
 
   @Test

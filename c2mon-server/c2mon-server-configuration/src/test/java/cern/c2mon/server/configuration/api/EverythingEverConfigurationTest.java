@@ -36,6 +36,7 @@ import cern.c2mon.server.configuration.ConfigurationLoader;
 import cern.c2mon.server.configuration.api.util.CacheObjectFactory;
 import cern.c2mon.server.configuration.api.util.TestConfigurationProvider;
 import cern.c2mon.server.configuration.helper.ObjectEqualityComparison;
+import cern.c2mon.server.configuration.junit.ConfigLoaderRuleChain;
 import cern.c2mon.server.configuration.parser.util.*;
 import cern.c2mon.server.daq.out.ProcessCommunicationManager;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
@@ -60,9 +61,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.inject.Inject;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import java.io.IOException;
@@ -82,6 +85,10 @@ import static org.junit.Assert.*;
 @SuppressWarnings("ALL")
 @Slf4j
 public class EverythingEverConfigurationTest extends ConfigurationCacheTest {
+
+  @Rule
+  @Inject
+  public ConfigLoaderRuleChain configRuleChain;
 
   @Autowired
   private CacheObjectFactory cacheObjectFactory;

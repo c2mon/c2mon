@@ -5,12 +5,9 @@ import cern.c2mon.server.cache.dbaccess.AlarmMapper;
 import cern.c2mon.server.cache.dbaccess.RuleTagMapper;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.rule.RuleTag;
-import cern.c2mon.shared.common.NoSimpleValueParseException;
 import org.junit.Test;
 
 import javax.inject.Inject;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
@@ -136,17 +133,9 @@ public class AlarmConfigTest extends ConfigurationCacheLoaderTest<Alarm> {
 
   /**
    * Tests that a tag removal does indeed remove an associated alarm.
-   *
-   * @throws NoSimpleValueParseException
-   * @throws NoSuchFieldException
-   * @throws TransformerException
-   * @throws InstantiationException
-   * @throws IllegalAccessException
-   * @throws ParserConfigurationException
    */
   @Test
-  public void testAlarmRemovedOnTagRemoval() throws ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException,
-    NoSuchFieldException, NoSimpleValueParseException {
+  public void testAlarmRemovedOnTagRemoval() {
     replay(mockManager);
 
     // test removal of (rule)tag 60000 removes the alarm also
