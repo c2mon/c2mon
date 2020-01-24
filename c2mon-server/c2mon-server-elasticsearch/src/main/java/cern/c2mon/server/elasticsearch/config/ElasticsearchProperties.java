@@ -50,6 +50,21 @@ public class ElasticsearchProperties {
   private int port = 9200;
 
   /**
+   * Scheme to be used to communicate with Elasticsearch server (only application for REST client)
+   */
+  private String scheme = "http";
+
+  /**
+   * Username to be used to authenticate with Elasticsearch server
+   */
+  private String username;
+
+  /**
+   * Password to be used to authenticate with Elasticsearch server
+   */
+  private String password;
+
+  /**
    * Name of the Elasticsearch cluster to connect to. Must be the same for all
    * nodes meant to lie inside the same cluster
    */

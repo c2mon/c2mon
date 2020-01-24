@@ -24,7 +24,12 @@ import java.util.concurrent.TimeoutException;
 import java.util.function.BiConsumer;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpHost;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.elasticsearch.ElasticsearchStatusException;
 import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
@@ -81,7 +86,22 @@ public final class ElasticsearchClientRest implements ElasticsearchClient {
     this.properties = properties;
 
     RestClientBuilder restClientBuilder =
-        RestClient.builder(new HttpHost(properties.getHost(), properties.getPort(), "http"));
+        RestClient.builder(new HttpHost(properties.getHost(), properties.getPort(), properties.getScheme()));
+
+    if (StringUtils.isNotEmpty(properties.getUsername()) && StringUtils.isNotEmpty(properties.getPassword())) {
+      UsernamePasswordCredentials credentials =
+          new UsernamePasswordCredentials(properties.getUsername(), properties.getPassword());
+
+      CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+      credentialsProvider.setCredentials(AuthScope.ANY, credentials);
+
+      restClientBuilder.setHttpClientConfigCallback(
+          httpClientBuilder -> httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider));
+    } else {
+      if (StringUtils.isNotEmpty(properties.getUsername()) || StringUtils.isNotEmpty(properties.getPassword())) {
+        log.warn("Both username and password must be configured to setup ES authentication.");
+      }
+    }
 
     client = new RestHighLevelClient(restClientBuilder);
 
