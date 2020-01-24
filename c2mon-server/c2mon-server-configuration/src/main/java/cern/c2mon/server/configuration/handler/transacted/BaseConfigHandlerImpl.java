@@ -9,10 +9,9 @@ import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import cern.c2mon.shared.common.Cacheable;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.daq.config.Change;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.UnexpectedRollbackException;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Properties;
 import java.util.function.Supplier;
@@ -20,9 +19,10 @@ import java.util.function.Supplier;
 @Slf4j
 public abstract class BaseConfigHandlerImpl<CACHEABLE extends Cacheable,RETURN> implements BaseConfigHandler<RETURN> {
 
+  @Getter
   protected C2monCache<CACHEABLE> cache;
 
-  private ConfigurableDAO<CACHEABLE> cacheLoaderDAO;
+  protected ConfigurableDAO<CACHEABLE> cacheLoaderDAO;
 
   protected AbstractCacheObjectFactory<CACHEABLE> factory;
 
@@ -37,7 +37,6 @@ public abstract class BaseConfigHandlerImpl<CACHEABLE extends Cacheable,RETURN> 
   }
 
   @Override
-  @Transactional(value = "cacheTransactionManager", propagation = Propagation.REQUIRES_NEW)
   public RETURN create(ConfigurationElement element) {
     if (cache.containsKey(element.getEntityId())) {
       throw new ConfigurationException(ConfigurationException.ENTITY_EXISTS,
@@ -66,7 +65,6 @@ public abstract class BaseConfigHandlerImpl<CACHEABLE extends Cacheable,RETURN> 
   }
 
   @Override
-  @Transactional(value = "cacheTransactionManager", propagation = Propagation.REQUIRES_NEW)
   public RETURN update(Long id, Properties properties) {
     if (!cache.containsKey(id)) {
       throw new ConfigurationException(ConfigurationException.ENTITY_DOES_NOT_EXIST,
@@ -103,7 +101,6 @@ public abstract class BaseConfigHandlerImpl<CACHEABLE extends Cacheable,RETURN> 
   }
 
   @Override
-  @Transactional(value = "cacheTransactionManager", propagation = Propagation.REQUIRES_NEW)
   public RETURN remove(Long id, ConfigurationElementReport report) {
     if (!cache.containsKey(id)) {
       log.warn("Attempting to remove a non-existent cache object - no action taken.");

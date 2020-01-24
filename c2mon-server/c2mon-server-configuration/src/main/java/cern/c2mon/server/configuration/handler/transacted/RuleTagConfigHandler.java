@@ -116,7 +116,7 @@ public class RuleTagConfigHandler extends AbstractTagConfigHandler<RuleTag> {
   protected void doPreRemove(RuleTag ruleTag, ConfigurationElementReport elementReport) {
     super.doPreRemove(ruleTag, elementReport);
 
-    createConfigRemovalReportsFor(Entity.ALARM, ruleTag.getAlarmIds(), alarmConfigHandler.cache)
+    createConfigRemovalReportsFor(Entity.ALARM, ruleTag.getAlarmIds(), alarmConfigHandler.getCache())
       .forEach(elementReport::addSubReport);
 
     createConfigRemovalReportsFor(Entity.RULETAG, ruleTag.getRuleIds(), cache)

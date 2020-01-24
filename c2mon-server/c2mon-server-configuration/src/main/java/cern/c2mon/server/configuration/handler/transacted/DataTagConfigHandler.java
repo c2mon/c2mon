@@ -41,8 +41,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Properties;
 import java.util.function.Supplier;
@@ -137,7 +135,6 @@ public class DataTagConfigHandler extends AbstractTagConfigHandler<DataTag> impl
    * @return an change event if action is necessary by the DAQ; otherwise null
    */
   @Override
-  @Transactional(value = "cacheTransactionManager", propagation = Propagation.REQUIRES_NEW)
   public ProcessChange update(final Long id, final Properties properties) {
     log.trace("Updating DataTag " + id);
     removeKeyIfExists(properties, "equipmentId");
@@ -163,10 +160,10 @@ public class DataTagConfigHandler extends AbstractTagConfigHandler<DataTag> impl
 
   @Override
   protected void doPreRemove(DataTag dataTag, ConfigurationElementReport elementReport) {
-    createConfigRemovalReportsFor(Entity.ALARM, dataTag.getAlarmIds(), alarmConfigHandler.cache)
+    createConfigRemovalReportsFor(Entity.ALARM, dataTag.getAlarmIds(), alarmConfigHandler.getCache())
       .forEach(elementReport::addSubReport);
 
-    createConfigRemovalReportsFor(Entity.RULETAG, dataTag.getRuleIds(), ruleTagConfigHandler.cache)
+    createConfigRemovalReportsFor(Entity.RULETAG, dataTag.getRuleIds(), ruleTagConfigHandler.getCache())
       .forEach(elementReport::addSubReport);
 
     // Alert listeners

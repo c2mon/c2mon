@@ -61,8 +61,6 @@ import java.util.stream.Collectors;
 @Slf4j
 abstract class AbstractTagConfigHandler<TAG extends Tag> extends BaseConfigHandlerImpl<TAG, ProcessChange> {
 
-  protected ConfigurableDAO<TAG> configurableDAO;
-
   private final RuleTagService ruleTagService;
   protected final Collection<ConfigurationEventListener> configurationEventListeners;
 
@@ -161,7 +159,7 @@ abstract class AbstractTagConfigHandler<TAG extends Tag> extends BaseConfigHandl
   private void ifConditionEditTag(final Long tagId, Predicate<TAG> condition, Consumer<TAG> mutator) {
     cache.computeQuiet(tagId, tag -> {
       if (condition.test(tag)) {
-        configurableDAO.updateConfig(tag);
+        cacheLoaderDAO.updateConfig(tag);
         mutator.accept(tag);
       }
     });
