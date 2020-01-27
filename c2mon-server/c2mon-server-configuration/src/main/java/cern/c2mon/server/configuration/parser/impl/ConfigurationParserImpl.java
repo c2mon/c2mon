@@ -56,12 +56,14 @@ public class ConfigurationParserImpl implements ConfigurationParser {
   private SubEquipmentFactory subEquipmentFactory;
   private AliveTagFactory aliveTagFactory;
   private CommFaultTagFactory commFaultTagFactory;
+  private SupervisionStateTagFactory stateTagFactory;
 
   @Autowired
   public ConfigurationParserImpl(
     AlarmFactory alarmFactory, CommandTagFactory commandTagFactory,
     DataTagFactory dataTagFactory, EquipmentFactory equipmentFactory, ProcessFactory processFactory, RuleTagFactory ruleTagFactory,
-    SubEquipmentFactory subEquipmentFactory, AliveTagFactory aliveTagFactory, CommFaultTagFactory commFaultTagFactory) {
+    SubEquipmentFactory subEquipmentFactory, AliveTagFactory aliveTagFactory, CommFaultTagFactory commFaultTagFactory,
+    SupervisionStateTagFactory stateTagFactory) {
     this.alarmFactory = alarmFactory;
     this.commandTagFactory = commandTagFactory;
     this.dataTagFactory = dataTagFactory;
@@ -71,6 +73,7 @@ public class ConfigurationParserImpl implements ConfigurationParser {
     this.subEquipmentFactory = subEquipmentFactory;
     this.aliveTagFactory = aliveTagFactory;
     this.commFaultTagFactory = commFaultTagFactory;
+    this.stateTagFactory = stateTagFactory;
   }
 
   @Override
@@ -147,9 +150,9 @@ public class ConfigurationParserImpl implements ConfigurationParser {
     if (entity instanceof AliveTag) {
       return aliveTagFactory;
     }
-//    if (entity instanceof StatusTag) {
-//      return statusTagFactory;
-//    }
+    if (entity instanceof StatusTag) {
+      return stateTagFactory;
+    }
     if (entity instanceof CommFaultTag) {
       return commFaultTagFactory;
     }

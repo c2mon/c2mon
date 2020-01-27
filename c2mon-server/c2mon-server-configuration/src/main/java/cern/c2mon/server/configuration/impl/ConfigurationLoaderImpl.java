@@ -21,6 +21,7 @@ import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.loading.SequenceDAO;
 import cern.c2mon.server.common.config.ServerProperties;
 import cern.c2mon.server.common.process.Process;
+import cern.c2mon.server.common.util.KotlinAPIs;
 import cern.c2mon.server.configuration.ConfigProgressMonitor;
 import cern.c2mon.server.configuration.ConfigurationLoader;
 import cern.c2mon.server.configuration.config.ConfigurationProperties;
@@ -114,6 +115,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
    */
   private boolean daqConfigEnabled;
 
+  private ConfigurationHandlerActor configHandlerActor;
   /**
    * The directory name in C2MON home where the configreports will be saved.
    */
@@ -146,6 +148,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
                                  ConfigurationParser configParser,
                                  SequenceDAO sequenceDAO,
                                  ConfigurationProperties properties,
+                                 ConfigurationHandlerActor configHandlerActor,
                                  ServerProperties serverProperties) {
     super();
     this.processCommunicationManager = processCommunicationManager;
@@ -164,6 +167,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
     this.configParser = configParser;
     this.sequenceDAO = sequenceDAO;
     this.daqConfigEnabled = properties.isDaqConfigEnabled();
+    this.configHandlerActor = configHandlerActor;
     this.reportDirectory = serverProperties.getHome() + "/reports";
   }
 
@@ -504,7 +508,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
                                                  final ConfigurationElementReport elementReport) throws IllegalAccessException {
 
     //initialize the DAQ config event
-    List<ProcessChange> daqConfigEvents = new ArrayList<>();
+    final List<ProcessChange> daqConfigEvents = new ArrayList<>();
       if (log.isTraceEnabled()) {
         log.trace(element.getConfigId() + " Applying configuration element with sequence id " + element.getSequenceId());
       }
@@ -515,21 +519,16 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
       }
       switch (element.getAction()) {
       case CREATE :
-        switch (element.getEntity()) {
-        case DATATAG : daqConfigEvents.add(dataTagConfigHandler.create(element)); break;
-        case RULETAG : ruleTagConfigHandler.create(element); break;
-//        case CONTROLTAG: daqConfigEvents.add(controlTagConfigHandler.create(element)); break; TODO (Alex) Review this
-        case COMMANDTAG : daqConfigEvents = commandTagConfigHandler.createCommandTag(element); break;
-        case ALARM : alarmConfigHandler.create(element); break;
-        case PROCESS : daqConfigEvents.add(processConfigHandler.create(element));
-                       element.setDaqStatus(Status.RESTART); break;
-        case EQUIPMENT : daqConfigEvents.addAll(equipmentConfigHandler.create(element)); break;
-        case SUBEQUIPMENT : daqConfigEvents.addAll(subEquipmentConfigHandler.create(element)); break;
-        case DEVICECLASS : daqConfigEvents.add(deviceClassConfigHandler.create(element)); break;
-        case DEVICE : daqConfigEvents.add(deviceConfigHandler.create(element)); break;
-        default : elementReport.setFailure("Unrecognized reconfiguration entity: " + element.getEntity());
-          log.warn("Unrecognized reconfiguration entity: {} - see reconfiguration report for details.", element.getEntity());
+        KotlinAPIs.applyNotNull(
+          configHandlerActor.doWithHandler(element.getEntity(), handler -> handler.create(element)),
+          result -> daqConfigEvents.add(result)
+        );
+        if (element.getEntity() == ConfigConstants.Entity.PROCESS) {
+          element.setDaqStatus(Status.RESTART);
         }
+//        default : elementReport.setFailure("Unrecognized reconfiguration entity: " + element.getEntity());
+//          log.warn("Unrecognized reconfiguration entity: {} - see reconfiguration report for details.", element.getEntity());
+//        }
         break;
       case UPDATE :
         switch (element.getEntity()) {

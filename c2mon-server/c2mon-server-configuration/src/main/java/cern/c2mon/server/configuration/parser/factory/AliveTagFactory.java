@@ -62,6 +62,6 @@ public class AliveTagFactory extends EntityFactory<AliveTag> {
 
   @Override
   ConfigConstants.Entity getEntity() {
-    return ConfigConstants.Entity.CONTROLTAG;
+    return ConfigConstants.Entity.ALIVETAG;
   }
 }

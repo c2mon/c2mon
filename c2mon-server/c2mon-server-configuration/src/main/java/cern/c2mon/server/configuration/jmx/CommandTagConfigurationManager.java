@@ -56,7 +56,7 @@ public class CommandTagConfigurationManager {
       log.debug("Persisting " + tagIdList.size() + " configuration of cache object(s) to the database (CommandTag)");
       int counter = 0, overall = 0;
       for (Long id : tagIdList) {
-        commandTagDAO.updateCommandTag(commandTagCache.get(id));
+        commandTagDAO.updateConfig(commandTagCache.get(id));
         counter++;
         overall++;
         if (counter >= tagIdList.size() * 0.1) {
@@ -74,7 +74,7 @@ public class CommandTagConfigurationManager {
     try {
       Set<Long> tagIdList = commandTagCache.getKeys();
       log.debug("Persisting " + tagIdList + " configuration of cache object(s) to the database (CommandTag)");
-      tagIdList.parallelStream().forEach((key) -> commandTagDAO.updateCommandTag(commandTagCache.get(key)));
+      tagIdList.parallelStream().forEach((key) -> commandTagDAO.updateConfig(commandTagCache.get(key)));
       log.debug("Persisting commandTags configuration done");
 
     }catch (Exception e){

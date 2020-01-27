@@ -17,7 +17,7 @@ public interface BaseConfigHandler<T> {
    * @param element element with configuration details
    */
   @Transactional(value = "cacheTransactionManager", propagation = Propagation.REQUIRED)
-  T create(ConfigurationElement element) throws IllegalAccessException;
+  T create(ConfigurationElement element);
 
   /**
    * Updates the Cacheable object in the C2MON server.
@@ -26,7 +26,7 @@ public interface BaseConfigHandler<T> {
    * @param properties reconfiguration details
    */
   @Transactional(value = "cacheTransactionManager", propagation = Propagation.REQUIRED)
-  T update(Long id, Properties properties) ;
+  T update(Long id, Properties properties);
 
   /**
    * Removes a Cacheable from C2MON server.

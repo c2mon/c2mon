@@ -19,8 +19,6 @@ package cern.c2mon.server.configuration.handler.transacted;
 import cern.c2mon.cache.actions.command.CommandTagCacheObjectFactory;
 import cern.c2mon.cache.actions.command.CommandTagService;
 import cern.c2mon.cache.actions.equipment.EquipmentService;
-import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.server.cache.loading.CommandTagDAO;
 import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
@@ -31,8 +29,9 @@ import cern.c2mon.shared.daq.config.Change;
 import cern.c2mon.shared.daq.config.CommandTagAdd;
 import cern.c2mon.shared.daq.config.CommandTagRemove;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -43,104 +42,77 @@ import java.util.Properties;
  * @author Mark Brightwell
  */
 @Slf4j
-@Service
-public class CommandTagConfigHandler {
+@Named
+public class CommandTagConfigHandler extends BaseConfigHandlerImpl<CommandTag, List<ProcessChange>> {
 
   private CommandTagService commandTagService;
 
-  private CommandTagDAO commandTagDAO;
-
-  private CommandTagCacheObjectFactory commandTagCacheObjectFactory;
-
-  private C2monCache<CommandTag> commandTagCache;
-
   private EquipmentService equipmentService;
 
+  @Inject
   public CommandTagConfigHandler(CommandTagService commandTagService, CommandTagDAO commandTagDAO,
                                  CommandTagCacheObjectFactory commandTagCacheObjectFactory, EquipmentService equipmentService) {
+    super(commandTagService.getCache(), commandTagDAO, commandTagCacheObjectFactory, ArrayList::new);
     this.commandTagService = commandTagService;
-    this.commandTagDAO = commandTagDAO;
-    this.commandTagCache = commandTagService.getCache();
-    this.commandTagCacheObjectFactory = commandTagCacheObjectFactory;
     this.equipmentService = equipmentService;
   }
 
-  public List<ProcessChange> createCommandTag(ConfigurationElement element) {
-    return commandTagCache.executeTransaction(() -> {
-      log.trace("Creating CommandTag " + element.getEntityId());
-      CommandTag<?> commandTag = commandTagCacheObjectFactory.createCacheObject(element.getEntityId(), element.getElementProperties());
-      commandTagDAO.insertCommandTag(commandTag);
-      commandTagCache.putQuiet(commandTag.getId(), commandTag);
-      equipmentService.addCommandToEquipment(commandTag.getEquipmentId(), commandTag.getId());
+  @Override
+  protected void doPostCreate(CommandTag commandTag) {
+    super.doPostCreate(commandTag);
+    equipmentService.addCommandToEquipment(commandTag.getEquipmentId(), commandTag.getId());
+    cache.getCacheListenerManager().notifyListenersOf(CacheEvent.UPDATE_ACCEPTED, commandTag);
+  }
 
-      commandTagCache.getCacheListenerManager().notifyListenersOf(CacheEvent.UPDATE_ACCEPTED, commandTag);
+  @Override
+  protected List<ProcessChange> createReturnValue(CommandTag commandTag, ConfigurationElement element) {
+    CommandTagAdd commandTagAdd = new CommandTagAdd(
+      element.getSequenceId(),
+      commandTag.getEquipmentId(),
+      commandTagService.generateSourceCommandTag(commandTag)
+    );
 
-      CommandTagAdd commandTagAdd = new CommandTagAdd(element.getSequenceId(),
-        commandTag.getEquipmentId(),
-        commandTagService.generateSourceCommandTag(commandTag));
-      ArrayList<ProcessChange> processChanges = new ArrayList<>();
-      processChanges.add(new ProcessChange(equipmentService.getProcessId(commandTag.getEquipmentId()), commandTagAdd));
-      return processChanges;
-    });
+    ArrayList<ProcessChange> processChanges = new ArrayList<>();
+    processChanges.add(new ProcessChange(equipmentService.getProcessId(commandTag.getEquipmentId()), commandTagAdd));
+    return processChanges;
   }
 
   public List<ProcessChange> updateCommandTag(Long id, Properties properties) {
-    log.trace("Updating CommandTag {}", id);
     //reject if trying to change equipment it is attached to - not currently allowed
     if (properties.containsKey("equipmentId")) {
       log.warn("Attempting to change the equipment to which a command is attached - this is not currently supported!");
       properties.remove("equipmentId");
     }
-    Long equipmentId = commandTagCache.get(id).getEquipmentId();
+    return super.update(id, properties);
+  }
 
-    Change commandTagUpdate = commandTagCache.executeTransaction(() -> {
-      Change commandTagUpdateInternal;
-      CommandTag<?> commandTag = commandTagCache.get(id);
-      commandTagUpdateInternal = commandTagCacheObjectFactory.updateConfig(commandTag, properties);
-      commandTagDAO.updateCommandTag(commandTag);
-      return commandTagUpdateInternal;
-    });
-
+  @Override
+  protected List<ProcessChange> updateReturnValue(CommandTag commandTag, Change commandTagUpdate, Properties properties) {
     List<ProcessChange> processChanges = new ArrayList<>();
 
     if (commandTagUpdate.hasChanged()) {
-      processChanges.add(new ProcessChange(equipmentService.getProcessId(equipmentId), commandTagUpdate));
+      processChanges.add(new ProcessChange(equipmentService.getProcessId(commandTag.getEquipmentId()), commandTagUpdate));
     }
 
     return processChanges;
   }
 
-  /**
-   * @param id
-   * @param elementReport
-   * @return a ProcessChange event to send to the DAQ if no error occurred
-   */
-  public List<ProcessChange> removeCommandTag(final Long id, final ConfigurationElementReport elementReport) {
-    log.trace("Removing CommandTag " + id);
+  @Override
+  protected List<ProcessChange> removeReturnValue(CommandTag commandTag, ConfigurationElementReport report) {
     ArrayList<ProcessChange> processChanges = new ArrayList<>();
 
-    commandTagCache.executeTransaction(() -> {
-      try {
-        CommandTag<?> commandTag = commandTagCache.get(id);
-        commandTagDAO.deleteCommandTag(commandTag.getId());
-        commandTagCache.remove(commandTag.getId());
-        Long equipmentId = commandTag.getEquipmentId();
+    try {
+      equipmentService.removeCommandFromEquipment(commandTag.getEquipmentId(), commandTag.getId());
+      CommandTagRemove removeEvent = new CommandTagRemove();
+      removeEvent.setCommandTagId(commandTag.getId());
+      removeEvent.setEquipmentId(commandTag.getEquipmentId());
+      processChanges.add(new ProcessChange(equipmentService.getProcessId(commandTag.getEquipmentId()), removeEvent));
+    } catch (Exception ex) {
+      report.setFailure("Exception caught while removing a commandtag.", ex);
+      log.error("Exception caught while removing a commandtag (id: " + commandTag.getId() + ")", ex);
+      throw new RuntimeException(ex);
+    }
 
-        //unlock before accessing equipment
-        equipmentService.removeCommandFromEquipment(commandTag.getEquipmentId(), commandTag.getId());
-        CommandTagRemove removeEvent = new CommandTagRemove();
-        removeEvent.setCommandTagId(id);
-        removeEvent.setEquipmentId(equipmentId);
-        processChanges.add(new ProcessChange(equipmentService.getProcessId(commandTag.getEquipmentId()), removeEvent));
-      } catch (CacheElementNotFoundException e) {
-        log.warn("Attempting to remove a non-existent Command - no action taken.");
-        elementReport.setWarning("Attempting to remove a non-existent CommandTag");
-      } catch (Exception ex) {
-        elementReport.setFailure("Exception caught while removing a commandtag.", ex);
-        log.error("Exception caught while removing a commandtag (id: " + id + ")", ex);
-        throw new RuntimeException(ex);
-      }
-    });
     return processChanges;
   }
 

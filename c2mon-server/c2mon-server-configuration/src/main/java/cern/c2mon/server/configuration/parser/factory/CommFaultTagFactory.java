@@ -38,7 +38,7 @@ public class CommFaultTagFactory extends EntityFactory<CommFaultTag> {
 
     if (configurationEntity.getName() != null
       && !queryByClientInput(cache, aTag -> aTag.getEquipmentName(), configurationEntity.getName()).isEmpty()) {
-      throw new ConfigurationParseException("Error creating aliveTag " + configurationEntity.getName() + ": " +
+      throw new ConfigurationParseException("Error creating commFaultTag " + configurationEntity.getName() + ": " +
         "Name already exists");
     } else {
       return configurationEntity.getId() != null ? configurationEntity.getId() : sequenceDAO.getNextTagId();
@@ -62,6 +62,6 @@ public class CommFaultTagFactory extends EntityFactory<CommFaultTag> {
 
   @Override
   ConfigConstants.Entity getEntity() {
-    return ConfigConstants.Entity.CONTROLTAG;
+    return ConfigConstants.Entity.COMMFAULTTAG;
   }
 }

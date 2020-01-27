@@ -41,14 +41,16 @@ public class ProcessFactory extends EntityFactory<Process> {
   private ProcessDAO processDAO;
   private SequenceDAO sequenceDAO;
   private final AliveTagFactory aliveTagFactory;
+  private final SupervisionStateTagFactory stateTagFactory;
 
   @Autowired
   public ProcessFactory(C2monCache<cern.c2mon.server.common.process.Process> processCache, SequenceDAO sequenceDAO,
-                        ProcessDAO processDAO, AliveTagFactory aliveTagFactory) {
+                        ProcessDAO processDAO, AliveTagFactory aliveTagFactory, SupervisionStateTagFactory stateTagFactory) {
     super(processCache);
     this.sequenceDAO = sequenceDAO;
     this.processDAO = processDAO;
     this.aliveTagFactory = aliveTagFactory;
+    this.stateTagFactory = stateTagFactory;
   }
 
 
@@ -64,7 +66,7 @@ public class ProcessFactory extends EntityFactory<Process> {
     entity = setDefaultControlTags(entity);
 
     configurationElements.addAll(aliveTagFactory.createInstance(entity.getAliveTag()));
-//    configurationElements.addAll(controlTagFactory.createInstance(entity.getStatusTag()));
+    configurationElements.addAll(stateTagFactory.createInstance(entity.getStatusTag()));
 
     createProcess.getElementProperties().setProperty("aliveTagId", entity.getAliveTag().getId().toString());
     createProcess.getElementProperties().setProperty("statusTagId", entity.getStatusTag().getId().toString());
