@@ -21,7 +21,6 @@ import cern.c2mon.cache.api.factory.AbstractCacheObjectFactory;
 import cern.c2mon.server.cache.loading.ConfigurableDAO;
 import cern.c2mon.server.common.listener.ConfigurationEventListener;
 import cern.c2mon.server.common.tag.Tag;
-import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.server.rule.RuleTagService;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
@@ -30,6 +29,7 @@ import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -59,7 +59,7 @@ import java.util.stream.Collectors;
  *
  */
 @Slf4j
-abstract class AbstractTagConfigHandler<TAG extends Tag> extends BaseConfigHandlerImpl<TAG, ProcessChange> {
+abstract class AbstractTagConfigHandler<TAG extends Tag> extends BaseConfigHandlerImpl<TAG> {
 
   private final RuleTagService ruleTagService;
   protected final Collection<ConfigurationEventListener> configurationEventListeners;
@@ -69,7 +69,7 @@ abstract class AbstractTagConfigHandler<TAG extends Tag> extends BaseConfigHandl
                                   final AbstractCacheObjectFactory<TAG> tagCacheObjectFactory,
                                   final RuleTagService ruleTagService,
                                   final GenericApplicationContext context) {
-    super(tagCache, configurableDAO, tagCacheObjectFactory, ProcessChange::new);
+    super(tagCache, configurableDAO, tagCacheObjectFactory, ArrayList::new);
     this.ruleTagService = ruleTagService;
     this.configurationEventListeners = context.getBeansOfType(ConfigurationEventListener.class).values();
   }

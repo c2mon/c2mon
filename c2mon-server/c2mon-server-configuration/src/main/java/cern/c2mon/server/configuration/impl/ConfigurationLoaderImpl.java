@@ -26,7 +26,6 @@ import cern.c2mon.server.configuration.ConfigProgressMonitor;
 import cern.c2mon.server.configuration.ConfigurationLoader;
 import cern.c2mon.server.configuration.config.ConfigurationProperties;
 import cern.c2mon.server.configuration.dao.ConfigurationDAO;
-import cern.c2mon.server.configuration.handler.transacted.*;
 import cern.c2mon.server.configuration.parser.ConfigurationParser;
 import cern.c2mon.server.daq.out.ProcessCommunicationManager;
 import cern.c2mon.shared.client.configuration.*;
@@ -57,6 +56,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Implementation of the server ConfigurationLoader bean.
@@ -80,7 +80,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
 
   //TODO element & element report status always both need updating - redesign this part
 
-  int changeId = 0; //unique id for all generated changes (including those recursive ones during removal)
+  private AtomicInteger changeId = new AtomicInteger(0); //unique id for all generated changes (including those recursive ones during removal)
 
   private final ProcessCommunicationManager processCommunicationManager;
 
@@ -88,27 +88,9 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
 
   private final SequenceDAO sequenceDAO;
 
-  private final DataTagConfigHandler dataTagConfigHandler;
-
-  private final CommandTagConfigHandler commandTagConfigHandler;
-
-  private final AlarmConfigHandler alarmConfigHandler;
-
-  private final RuleTagConfigHandler ruleTagConfigHandler;
-
-  private final EquipmentConfigHandler equipmentConfigHandler;
-
-  private final SubEquipmentConfigHandler subEquipmentConfigHandler;
-
-  private final ProcessConfigHandler processConfigHandler;
-
   private final ProcessService processService;
 
   private final C2monCache<Process> processCache;
-
-  private final DeviceClassConfigHandler deviceClassConfigHandler;
-
-  private final DeviceConfigHandler deviceConfigHandler;
 
   /**
    * Flag recording if configuration events should be sent to the DAQ layer (set in XML).
@@ -134,17 +116,8 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
   @Inject
   public ConfigurationLoaderImpl(ProcessCommunicationManager processCommunicationManager,
                                  ConfigurationDAO configurationDAO,
-                                 DataTagConfigHandler dataTagConfigHandler,
-                                 CommandTagConfigHandler commandTagConfigHandler,
-                                 AlarmConfigHandler alarmConfigHandler,
-                                 RuleTagConfigHandler ruleTagConfigHandler,
-                                 EquipmentConfigHandler equipmentConfigHandler,
-                                 SubEquipmentConfigHandler subEquipmentConfigHandler,
-                                 ProcessConfigHandler processConfigHandler,
                                  ProcessService processService,
                                  C2monCache<Process> processCache,
-                                 DeviceClassConfigHandler deviceClassConfigHandler,
-                                 DeviceConfigHandler deviceConfigHandler,
                                  ConfigurationParser configParser,
                                  SequenceDAO sequenceDAO,
                                  ConfigurationProperties properties,
@@ -153,17 +126,8 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
     super();
     this.processCommunicationManager = processCommunicationManager;
     this.configurationDAO = configurationDAO;
-    this.dataTagConfigHandler = dataTagConfigHandler;
-    this.commandTagConfigHandler = commandTagConfigHandler;
-    this.alarmConfigHandler = alarmConfigHandler;
-    this.ruleTagConfigHandler = ruleTagConfigHandler;
-    this.equipmentConfigHandler = equipmentConfigHandler;
-    this.subEquipmentConfigHandler = subEquipmentConfigHandler;
-    this.processConfigHandler = processConfigHandler;
     this.processService = processService;
     this.processCache = processCache;
-    this.deviceClassConfigHandler = deviceClassConfigHandler;
-    this.deviceConfigHandler = deviceConfigHandler;
     this.configParser = configParser;
     this.sequenceDAO = sequenceDAO;
     this.daqConfigEnabled = properties.isDaqConfigEnabled();
@@ -518,61 +482,37 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
         return null;
       }
       switch (element.getAction()) {
-      case CREATE :
-        KotlinAPIs.applyNotNull(
-          configHandlerActor.doWithHandler(element.getEntity(), handler -> handler.create(element)),
-          result -> daqConfigEvents.add(result)
-        );
-        if (element.getEntity() == ConfigConstants.Entity.PROCESS) {
-          element.setDaqStatus(Status.RESTART);
-        }
-//        default : elementReport.setFailure("Unrecognized reconfiguration entity: " + element.getEntity());
-//          log.warn("Unrecognized reconfiguration entity: {} - see reconfiguration report for details.", element.getEntity());
-//        }
-        break;
-      case UPDATE :
-        switch (element.getEntity()) {
-        case DATATAG :
-          daqConfigEvents.add(dataTagConfigHandler.update(element.getEntityId(), element.getElementProperties())); break;
-//        case CONTROLTAG : TODO (Alex) Review this
-//          daqConfigEvents.add(controlTagConfigHandler.update(element.getEntityId(), element.getElementProperties())); break;
-        case RULETAG :
-          ruleTagConfigHandler.update(element.getEntityId(), element.getElementProperties()); break;
-        case COMMANDTAG :
-          daqConfigEvents.addAll(commandTagConfigHandler.updateCommandTag(element.getEntityId(), element.getElementProperties())); break;
-        case ALARM :
-          alarmConfigHandler.update(element.getEntityId(), element.getElementProperties()); break;
-        case PROCESS :
-          daqConfigEvents.add(processConfigHandler.update(element.getEntityId(), element.getElementProperties())); break;
-        case EQUIPMENT :
-          daqConfigEvents.addAll(equipmentConfigHandler.update(element.getEntityId(), element.getElementProperties())); break;
-        case SUBEQUIPMENT :
-          daqConfigEvents.addAll(subEquipmentConfigHandler.update(element.getEntityId(), element.getElementProperties())); break;
-        case DEVICECLASS :
-          daqConfigEvents.add(deviceClassConfigHandler.update(element.getEntityId(), element.getElementProperties())); break;
-        case DEVICE :
-          daqConfigEvents.add(deviceConfigHandler.update(element.getEntityId(), element.getElementProperties())); break;
-        default : elementReport.setFailure("Unrecognized reconfiguration entity: " + element.getEntity());
-          log.warn("Unrecognized reconfiguration entity: {}  - see reconfiguration report for details.",  element.getEntity());
-        }
-        break;
-      case REMOVE :
-        switch (element.getEntity()) {
-        case DATATAG : daqConfigEvents.add(dataTagConfigHandler.remove(element.getEntityId(), elementReport)); break;
-//        case CONTROLTAG : daqConfigEvents.add(controlTagConfigHandler.remove(element.getEntityId(), elementReport)); break; TODO (Alex) Review this
-        case RULETAG : ruleTagConfigHandler.remove(element.getEntityId(), elementReport); break;
-        case COMMANDTAG : daqConfigEvents.addAll(commandTagConfigHandler.removeCommandTag(element.getEntityId(), elementReport)); break;
-        case ALARM : alarmConfigHandler.remove(element.getEntityId(), elementReport); break;
-        case PROCESS : daqConfigEvents.add(processConfigHandler.remove(element.getEntityId(), elementReport)); break;
-        case EQUIPMENT : daqConfigEvents.addAll(equipmentConfigHandler.remove(element.getEntityId(), elementReport)); break;
-        case SUBEQUIPMENT : daqConfigEvents.addAll(subEquipmentConfigHandler.remove(element.getEntityId(), elementReport)); break;
-        case DEVICECLASS : deviceClassConfigHandler.remove(element.getEntityId(), elementReport); break;
-        case DEVICE : deviceConfigHandler.remove(element.getEntityId(), elementReport); break;
-        default : elementReport.setFailure("Unrecognized reconfiguration entity: " + element.getEntity());
-        log.warn("Unrecognized reconfiguration entity: {} - see reconfiguration report for details.", element.getEntity());
-        }
-        break;
-      default : elementReport.setFailure("Unrecognized reconfiguration action: " + element.getAction());
+        case CREATE :
+          KotlinAPIs.applyNotNull(
+            configHandlerActor.doWithHandler(element.getEntity(), handler -> handler.create(element)),
+            daqConfigEvents::addAll
+          );
+          if (element.getEntity() == ConfigConstants.Entity.PROCESS) {
+            element.setDaqStatus(Status.RESTART);
+          }
+  //        default : elementReport.setFailure("Unrecognized reconfiguration entity: " + element.getEntity());
+  //          log.warn("Unrecognized reconfiguration entity: {} - see reconfiguration report for details.", element.getEntity());
+  //        }
+          break;
+        case UPDATE :
+          KotlinAPIs.applyNotNull(
+            configHandlerActor.doWithHandler(
+              element.getEntity(),
+              handler -> handler.update(element.getEntityId(), element.getElementProperties())
+            ),
+            daqConfigEvents::addAll
+          );
+          break;
+        case REMOVE :
+          KotlinAPIs.applyNotNull(
+            configHandlerActor.doWithHandler(
+              element.getEntity(),
+              handler -> handler.remove(element.getEntityId(), elementReport)
+            ),
+            daqConfigEvents::addAll
+          );
+          break;
+        default : elementReport.setFailure("Unrecognized reconfiguration action: " + element.getAction());
       log.warn("Unrecognized reconfiguration action: {} - see reconfiguration report for details.", element.getAction());
       }
 
@@ -580,8 +520,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
       if (!daqConfigEvents.isEmpty()) {
         for (ProcessChange processChange : daqConfigEvents) {
           if (processChange.processActionRequired()) {
-            processChange.getChangeEvent().setChangeId(changeId);
-            changeId++;
+            processChange.getChangeEvent().setChangeId(changeId.getAndIncrement());
           }
         }
       }

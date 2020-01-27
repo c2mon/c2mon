@@ -33,12 +33,13 @@ import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import cern.c2mon.shared.common.CacheEvent;
 import cern.c2mon.shared.common.ConfigurationException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.UnexpectedRollbackException;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -47,8 +48,8 @@ import java.util.Properties;
  * @author Alexandros Papageorgiou
  */
 @Slf4j
-@Service
-public class ProcessConfigHandler extends BaseConfigHandlerImpl<Process, ProcessChange> {
+@Named
+public class ProcessConfigHandler extends BaseConfigHandlerImpl<Process> {
 
   private final C2monCache<AliveTag> aliveTimerCache;
   private final ProcessService processService;
@@ -57,7 +58,7 @@ public class ProcessConfigHandler extends BaseConfigHandlerImpl<Process, Process
   private final SupervisionStateTagService stateTagService;
   private final boolean allowRunningProcessRemoval;
   private final AliveTagService aliveTagService;
-  private AliveTimerConfigHandler aliveTimerConfigHandler;
+  private AliveTagConfigHandler aliveTimerConfigHandler;
 
   /**
    * Autowired constructor.
@@ -65,7 +66,7 @@ public class ProcessConfigHandler extends BaseConfigHandlerImpl<Process, Process
    * @param processCache the cache bean
    * @param processDAO   the DAO bean
    */
-  @Autowired
+  @Inject
   public ProcessConfigHandler(final C2monCache<Process> processCache, final ProcessDAO processDAO,
                               final ProcessCacheObjectFactory processCacheObjectFactory,
                               final AliveTagService aliveTagService,
@@ -75,7 +76,7 @@ public class ProcessConfigHandler extends BaseConfigHandlerImpl<Process, Process
                               final JmsContainerManager jmsContainerManager,
                               final EquipmentConfigHandler equipmentConfigTransacted
                                      ) {
-    super(processCache, processDAO, processCacheObjectFactory, ProcessChange::new);
+    super(processCache, processDAO, processCacheObjectFactory, ArrayList::new);
     this.aliveTagService = aliveTagService;
     this.aliveTimerCache = aliveTagService.getCache();
     this.processService = processService;
@@ -118,21 +119,21 @@ public class ProcessConfigHandler extends BaseConfigHandlerImpl<Process, Process
   }
 
   @Override
-  public ProcessChange update(Long id, Properties properties) {
+  public List<ProcessChange> update(Long id, Properties properties) {
     removeKeyIfExists(properties, "id");
     removeKeyIfExists(properties, "name");
 
-    ProcessChange processChange = super.update(id, properties);
+    List<ProcessChange> processChanges = super.update(id, properties);
 
     if (properties.containsKey("aliveInterval") || properties.containsKey("aliveTagId")) {
       Process process = processService.getCache().get(id);
       aliveTagService.updateBasedOnSupervised(process);
 
       // TODO (Alex) Is this call correct? Looks like maybe they wanted to setReboot instead?
-      processChange.requiresReboot();
+//      processChanges.requiresReboot();
     }
 
-    return processChange;
+    return processChanges;
   }
 
   /**
@@ -148,7 +149,7 @@ public class ProcessConfigHandler extends BaseConfigHandlerImpl<Process, Process
    *               subreports can be attached
    */
   @Override
-  public ProcessChange remove(Long id, ConfigurationElementReport report) {
+  public List<ProcessChange> remove(Long id, ConfigurationElementReport report) {
     Process process = cache.get(id);
 
     boolean isRunning = process.getStateTagId() != null && stateTagService.isRunning(process.getStateTagId());

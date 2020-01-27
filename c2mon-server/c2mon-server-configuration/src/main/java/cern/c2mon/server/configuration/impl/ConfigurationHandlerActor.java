@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -19,11 +20,11 @@ import static java.util.Collections.unmodifiableMap;
 @Slf4j
 public class ConfigurationHandlerActor {
 
-  private final Map<ConfigConstants.Entity, BaseConfigHandler<?>> handlerMap;
+  private final Map<ConfigConstants.Entity, BaseConfigHandler> handlerMap;
 
   @Inject
   public ConfigurationHandlerActor(AlarmConfigHandler alarmConfigHandler,
-                                   AliveTimerConfigHandler aliveTagConfigHandler,
+                                   AliveTagConfigHandler aliveTagConfigHandler,
                                    CommandTagConfigHandler commandTagConfigHandler,
                                    CommFaultConfigHandler commFaultConfigHandler,
                                    DataTagConfigHandler dataTagConfigHandler,
@@ -51,7 +52,7 @@ public class ConfigurationHandlerActor {
       }));
   }
 
-  public <RETURN> RETURN doWithHandler(ConfigConstants.Entity entity, Function<BaseConfigHandler<?>, RETURN> action) {
+  public List<ProcessChange> doWithHandler(ConfigConstants.Entity entity, Function<BaseConfigHandler<?>, List<ProcessChange>> action) {
     if (!handlerMap.containsKey(entity)) {
       log.warn("Unrecognized reconfiguration entity: {} ", entity);
     }

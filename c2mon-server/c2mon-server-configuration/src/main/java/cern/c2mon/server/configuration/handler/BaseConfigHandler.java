@@ -1,15 +1,17 @@
 package cern.c2mon.server.configuration.handler;
 
+import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Properties;
 
 @EnableTransactionManagement(proxyTargetClass = true)
-public interface BaseConfigHandler<T> {
+public interface BaseConfigHandler {
 
   /**
    * Creates a new Cacheable object in the C2MON server.
@@ -17,7 +19,7 @@ public interface BaseConfigHandler<T> {
    * @param element element with configuration details
    */
   @Transactional(value = "cacheTransactionManager", propagation = Propagation.REQUIRED)
-  T create(ConfigurationElement element);
+  List<ProcessChange> create(ConfigurationElement element);
 
   /**
    * Updates the Cacheable object in the C2MON server.
@@ -26,7 +28,7 @@ public interface BaseConfigHandler<T> {
    * @param properties reconfiguration details
    */
   @Transactional(value = "cacheTransactionManager", propagation = Propagation.REQUIRED)
-  T update(Long id, Properties properties);
+  List<ProcessChange> update(Long id, Properties properties);
 
   /**
    * Removes a Cacheable from C2MON server.
@@ -36,5 +38,5 @@ public interface BaseConfigHandler<T> {
    *               actions may need to add subreports)
    */
   @Transactional(value = "cacheTransactionManager", propagation = Propagation.REQUIRED)
-  T remove(Long id, ConfigurationElementReport report);
+  List<ProcessChange> remove(Long id, ConfigurationElementReport report);
 }

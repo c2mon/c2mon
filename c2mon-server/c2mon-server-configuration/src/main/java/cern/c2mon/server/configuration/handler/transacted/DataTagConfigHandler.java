@@ -23,7 +23,6 @@ import cern.c2mon.cache.actions.subequipment.SubEquipmentService;
 import cern.c2mon.server.cache.loading.DataTagLoaderDAO;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.listener.ConfigurationEventListener;
-import cern.c2mon.server.configuration.handler.BaseConfigHandler;
 import cern.c2mon.server.configuration.handler.TagConfigHandler;
 import cern.c2mon.server.configuration.impl.ConfigurationUpdateImpl;
 import cern.c2mon.server.configuration.impl.ProcessChange;
@@ -38,10 +37,12 @@ import cern.c2mon.shared.daq.config.DataTagAdd;
 import cern.c2mon.shared.daq.config.DataTagRemove;
 import cern.c2mon.shared.daq.config.IChange;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.GenericApplicationContext;
-import org.springframework.stereotype.Service;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
 import java.util.function.Supplier;
 
@@ -50,9 +51,9 @@ import java.util.function.Supplier;
  *
  * @author Alexandros Papageorgiou
  */
-@Service
+@Named
 @Slf4j
-public class DataTagConfigHandler extends AbstractTagConfigHandler<DataTag> implements TagConfigHandler, BaseConfigHandler<ProcessChange> {
+public class DataTagConfigHandler extends AbstractTagConfigHandler<DataTag> implements TagConfigHandler<DataTag> {
 
   private final DataTagService dataTagService;
   /**
@@ -79,7 +80,7 @@ public class DataTagConfigHandler extends AbstractTagConfigHandler<DataTag> impl
    */
   private ConfigurationUpdateImpl configurationUpdateImpl;
 
-  @Autowired
+  @Inject
   public DataTagConfigHandler(final DataTagService dataTagService,
                               final DataTagLoaderDAO dataTagLoaderDAO,
                               final DataTagCacheObjectFactory dataTagCacheObjectFactory,
@@ -107,10 +108,11 @@ public class DataTagConfigHandler extends AbstractTagConfigHandler<DataTag> impl
   }
 
   @Override
-  protected ProcessChange createReturnValue(DataTag dataTag, ConfigurationElement element) {
-    return createIChange(dataTag,
+  protected List<ProcessChange> createReturnValue(DataTag dataTag, ConfigurationElement element) {
+    return Collections.singletonList(createIChange(dataTag,
       () -> new DataTagAdd(element.getSequenceId(), dataTag.getEquipmentId(), dataTagService.generateSourceDataTag(dataTag)),
-      () -> new DataTagAdd(element.getSequenceId(), subEquipmentService.getEquipmentIdForSubEquipment(dataTag.getSubEquipmentId()), dataTagService.generateSourceDataTag(dataTag)));
+      () -> new DataTagAdd(element.getSequenceId(), subEquipmentService.getEquipmentIdForSubEquipment(dataTag.getSubEquipmentId()), dataTagService.generateSourceDataTag(dataTag)))
+    );
   }
 
   private ProcessChange createIChange(DataTag dataTag, Supplier<IChange> eqEventGenerator, Supplier<IChange> subeqEventGenerator) {
@@ -135,7 +137,7 @@ public class DataTagConfigHandler extends AbstractTagConfigHandler<DataTag> impl
    * @return an change event if action is necessary by the DAQ; otherwise null
    */
   @Override
-  public ProcessChange update(final Long id, final Properties properties) {
+  public List<ProcessChange> update(final Long id, final Properties properties) {
     log.trace("Updating DataTag " + id);
     removeKeyIfExists(properties, "equipmentId");
     removeKeyIfExists(properties, "subEquipmentId");
@@ -150,12 +152,12 @@ public class DataTagConfigHandler extends AbstractTagConfigHandler<DataTag> impl
   }
 
   @Override
-  protected ProcessChange updateReturnValue(DataTag dataTag, Change change, Properties properties) {
+  protected List<ProcessChange> updateReturnValue(DataTag dataTag, Change change, Properties properties) {
     if (change.hasChanged())
-      return dataTag.getEquipmentId() != null
+      return Collections.singletonList(dataTag.getEquipmentId() != null
         ? new ProcessChange(equipmentService.getProcessId(dataTag.getEquipmentId()), change)
-        : new ProcessChange(subEquipmentService.getProcessId(dataTag.getSubEquipmentId()), change);
-    return new ProcessChange();
+        : new ProcessChange(subEquipmentService.getProcessId(dataTag.getSubEquipmentId()), change));
+    return Collections.singletonList(new ProcessChange());
   }
 
   @Override
@@ -173,8 +175,8 @@ public class DataTagConfigHandler extends AbstractTagConfigHandler<DataTag> impl
   }
 
   @Override
-  protected ProcessChange removeReturnValue(DataTag dataTag, ConfigurationElementReport report) {
-    return createIChange(dataTag, DataTagRemove::new, DataTagRemove::new);
+  protected List<ProcessChange> removeReturnValue(DataTag dataTag, ConfigurationElementReport report) {
+    return Collections.singletonList(createIChange(dataTag, DataTagRemove::new, DataTagRemove::new));
   }
 
 }

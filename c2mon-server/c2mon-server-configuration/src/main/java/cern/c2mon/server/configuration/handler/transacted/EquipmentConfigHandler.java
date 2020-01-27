@@ -31,9 +31,9 @@ import cern.c2mon.shared.daq.config.EquipmentUnitAdd;
 import cern.c2mon.shared.daq.config.EquipmentUnitRemove;
 import cern.c2mon.shared.daq.config.IChange;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -44,7 +44,7 @@ import java.util.Properties;
  *
  * @author Mark Brightwell
  */
-@Service
+@Named
 @Slf4j
 public class EquipmentConfigHandler extends AbstractEquipmentConfigHandler<Equipment> {
 
@@ -54,13 +54,13 @@ public class EquipmentConfigHandler extends AbstractEquipmentConfigHandler<Equip
 
   private final SubEquipmentConfigHandler subEquipmentConfigTransacted;
 
-  @Autowired
+  @Inject
   public EquipmentConfigHandler(
     final EquipmentService equipmentService,
     final ConfigurableDAO<Equipment> subEquipmentDAO,
     final AbstractCacheObjectFactory<Equipment> subEquipmentCacheObjectFactory,
     final ProcessXMLProvider processXMLProvider,
-    final AliveTimerConfigHandler aliveTagConfigEventHandler,
+    final AliveTagConfigHandler aliveTagConfigEventHandler,
     final DataTagService dataTagService,
     final DataTagConfigHandler dataTagConfigTransacted, CommandTagConfigHandler commandTagConfigHandler, SubEquipmentConfigHandler subEquipmentConfigTransacted) {
     super(equipmentService.getCache(), subEquipmentDAO, subEquipmentCacheObjectFactory, processXMLProvider, aliveTagConfigEventHandler, dataTagService, dataTagConfigTransacted);
@@ -170,7 +170,7 @@ public class EquipmentConfigHandler extends AbstractEquipmentConfigHandler<Equip
     for (Long commandTagId : new ArrayList<>(equipment.getCommandTagIds())) {
       ConfigurationElementReport commandReport = new ConfigurationElementReport(Action.REMOVE, Entity.COMMANDTAG, commandTagId);
       equipmentReport.addSubReport(commandReport);
-      commandTagConfigHandler.removeCommandTag(commandTagId, commandReport);
+      commandTagConfigHandler.remove(commandTagId, commandReport);
     }
   }
 

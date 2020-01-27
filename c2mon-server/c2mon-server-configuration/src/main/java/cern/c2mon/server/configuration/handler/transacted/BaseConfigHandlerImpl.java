@@ -4,6 +4,7 @@ import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.factory.AbstractCacheObjectFactory;
 import cern.c2mon.server.cache.loading.ConfigurableDAO;
 import cern.c2mon.server.configuration.handler.BaseConfigHandler;
+import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import cern.c2mon.shared.common.Cacheable;
@@ -13,11 +14,12 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.UnexpectedRollbackException;
 
+import java.util.List;
 import java.util.Properties;
 import java.util.function.Supplier;
 
 @Slf4j
-public abstract class BaseConfigHandlerImpl<CACHEABLE extends Cacheable,RETURN> implements BaseConfigHandler<RETURN> {
+public abstract class BaseConfigHandlerImpl<CACHEABLE extends Cacheable> implements BaseConfigHandler {
 
   @Getter
   protected C2monCache<CACHEABLE> cache;
@@ -26,10 +28,10 @@ public abstract class BaseConfigHandlerImpl<CACHEABLE extends Cacheable,RETURN> 
 
   protected AbstractCacheObjectFactory<CACHEABLE> factory;
 
-  protected Supplier<RETURN> defaultValue; // TODO (Alex) Remove this if never different
+  protected Supplier<List<ProcessChange>> defaultValue; // TODO (Alex) Remove this if never different
 
   protected BaseConfigHandlerImpl(C2monCache<CACHEABLE> cache, ConfigurableDAO<CACHEABLE> cacheLoaderDAO,
-                                  AbstractCacheObjectFactory<CACHEABLE> factory, Supplier<RETURN> defaultValue) {
+                                  AbstractCacheObjectFactory<CACHEABLE> factory, Supplier<List<ProcessChange>> defaultValue) {
     this.cache = cache;
     this.cacheLoaderDAO = cacheLoaderDAO;
     this.factory = factory;
@@ -37,7 +39,7 @@ public abstract class BaseConfigHandlerImpl<CACHEABLE extends Cacheable,RETURN> 
   }
 
   @Override
-  public RETURN create(ConfigurationElement element) {
+  public List<ProcessChange> create(ConfigurationElement element) {
     if (cache.containsKey(element.getEntityId())) {
       throw new ConfigurationException(ConfigurationException.ENTITY_EXISTS,
         "Attempting to create a cache object with an already existing id: " + element.getEntityId());
@@ -60,12 +62,12 @@ public abstract class BaseConfigHandlerImpl<CACHEABLE extends Cacheable,RETURN> 
 
   }
 
-  protected RETURN createReturnValue(CACHEABLE cacheable, ConfigurationElement element) {
+  protected List<ProcessChange> createReturnValue(CACHEABLE cacheable, ConfigurationElement element) {
     return defaultValue.get();
   }
 
   @Override
-  public RETURN update(Long id, Properties properties) {
+  public List<ProcessChange> update(Long id, Properties properties) {
     if (!cache.containsKey(id)) {
       throw new ConfigurationException(ConfigurationException.ENTITY_DOES_NOT_EXIST,
         "Attempting to create a cache object with an already existing id: " + id);
@@ -89,7 +91,7 @@ public abstract class BaseConfigHandlerImpl<CACHEABLE extends Cacheable,RETURN> 
 
   }
 
-  protected RETURN updateReturnValue(CACHEABLE cacheable, Change change, Properties properties) {
+  protected List<ProcessChange> updateReturnValue(CACHEABLE cacheable, Change change, Properties properties) {
     return defaultValue.get();
   }
 
@@ -101,7 +103,7 @@ public abstract class BaseConfigHandlerImpl<CACHEABLE extends Cacheable,RETURN> 
   }
 
   @Override
-  public RETURN remove(Long id, ConfigurationElementReport report) {
+  public List<ProcessChange> remove(Long id, ConfigurationElementReport report) {
     if (!cache.containsKey(id)) {
       log.warn("Attempting to remove a non-existent cache object - no action taken.");
       report.setWarning("Attempting to remove a non-existent cache object");
@@ -129,7 +131,7 @@ public abstract class BaseConfigHandlerImpl<CACHEABLE extends Cacheable,RETURN> 
 
   }
 
-  protected RETURN removeReturnValue(CACHEABLE cacheable, ConfigurationElementReport report) {
+  protected List<ProcessChange> removeReturnValue(CACHEABLE cacheable, ConfigurationElementReport report) {
     return defaultValue.get();
   }
 }

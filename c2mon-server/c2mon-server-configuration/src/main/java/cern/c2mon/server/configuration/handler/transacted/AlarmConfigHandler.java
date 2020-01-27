@@ -23,6 +23,7 @@ import cern.c2mon.cache.config.tag.UnifiedTagCacheFacade;
 import cern.c2mon.server.cache.loading.AlarmLoaderDAO;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.listener.ConfigurationEventListener;
+import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +31,9 @@ import org.springframework.context.support.GenericApplicationContext;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -40,7 +43,7 @@ import java.util.Properties;
  */
 @Named
 @Slf4j
-public class AlarmConfigHandler extends BaseConfigHandlerImpl<Alarm, Void> {
+public class AlarmConfigHandler extends BaseConfigHandlerImpl<Alarm> {
 
   private final Collection<ConfigurationEventListener> configurationEventListeners;
 
@@ -53,7 +56,7 @@ public class AlarmConfigHandler extends BaseConfigHandlerImpl<Alarm, Void> {
                             final GenericApplicationContext context,
                             final UnifiedTagCacheFacade unifiedTagCacheFacade,
                             final AlarmService alarmService) {
-    super(alarmCache, alarmDAO, alarmCacheObjectFactory, () -> null);
+    super(alarmCache, alarmDAO, alarmCacheObjectFactory, ArrayList::new);
     this.configurationEventListeners = context.getBeansOfType(ConfigurationEventListener.class).values();
     this.unifiedTagCacheFacade = unifiedTagCacheFacade;
     this.alarmService = alarmService;
@@ -80,14 +83,14 @@ public class AlarmConfigHandler extends BaseConfigHandlerImpl<Alarm, Void> {
    * @param properties the update details
    */
   @Override
-  public Void update(final Long alarmId, final Properties properties) {
+  public List<ProcessChange> update(final Long alarmId, final Properties properties) {
     removeKeyIfExists(properties, "dataTagId");
 
     super.update(alarmId, properties);
 
     alarmService.evaluateAlarm(alarmId);
 
-    return null;
+    return defaultValue.get();
   }
 
   @Override

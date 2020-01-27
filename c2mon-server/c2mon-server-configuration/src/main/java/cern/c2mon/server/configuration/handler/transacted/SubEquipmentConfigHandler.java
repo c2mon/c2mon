@@ -30,27 +30,27 @@ import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import cern.c2mon.shared.daq.config.SubEquipmentUnitAdd;
 import cern.c2mon.shared.daq.config.SubEquipmentUnitRemove;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.List;
 import java.util.Properties;
 
 /**
  * @author Alexandros Papageorgiou
  */
-@Service
+@Named
 @Slf4j
 public class SubEquipmentConfigHandler extends AbstractEquipmentConfigHandler<SubEquipment> {
 
   private final EquipmentService equipmentService;
 
-  @Autowired
+  @Inject
   public SubEquipmentConfigHandler(final C2monCache<SubEquipment> subEquipmentCache,
                                    final SubEquipmentDAO subEquipmentDAO,
                                    final SubEquipmentCacheObjectFactory subEquipmentCacheObjectFactory,
                                    final ProcessXMLProvider processXMLProvider,
-                                   final AliveTimerConfigHandler aliveTagConfigEventHandler,
+                                   final AliveTagConfigHandler aliveTagConfigEventHandler,
                                    final DataTagService dataTagService,
                                    final DataTagConfigHandler dataTagConfigTransacted,
                                    final EquipmentService equipmentService) {

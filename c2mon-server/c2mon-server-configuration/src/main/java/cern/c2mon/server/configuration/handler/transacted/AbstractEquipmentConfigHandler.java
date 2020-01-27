@@ -31,7 +31,6 @@ import cern.c2mon.shared.common.CacheEvent;
 import cern.c2mon.shared.daq.config.Change;
 import cern.c2mon.shared.daq.config.EquipmentConfigurationUpdate;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,20 +44,19 @@ import java.util.Properties;
  * @author Mark Brightwell
  */
 @Slf4j
-public abstract class AbstractEquipmentConfigHandler<T extends AbstractEquipment> extends BaseConfigHandlerImpl<T, List<ProcessChange>> {
+public abstract class AbstractEquipmentConfigHandler<T extends AbstractEquipment> extends BaseConfigHandlerImpl<T> {
 
   protected final ProcessXMLProvider processXMLProvider;
-  private final AliveTimerConfigHandler aliveTagConfigEventHandler;
+  private final AliveTagConfigHandler aliveTagConfigEventHandler;
   protected final DataTagService dataTagService;
   protected final DataTagConfigHandler dataTagConfigTransacted;
 
-  @Autowired
   public AbstractEquipmentConfigHandler(
     final C2monCache<T> subEquipmentCache,
     final ConfigurableDAO<T> subEquipmentDAO,
     final AbstractCacheObjectFactory<T> subEquipmentCacheObjectFactory,
     final ProcessXMLProvider processXMLProvider,
-    final AliveTimerConfigHandler aliveTagConfigEventHandler,
+    final AliveTagConfigHandler aliveTagConfigEventHandler,
     final DataTagService dataTagService,
     final DataTagConfigHandler dataTagConfigTransacted) {
     super(subEquipmentCache, subEquipmentDAO, subEquipmentCacheObjectFactory, ArrayList::new);
@@ -128,14 +126,14 @@ public abstract class AbstractEquipmentConfigHandler<T extends AbstractEquipment
       ConfigurationElementReport tagReport = new ConfigurationElementReport(Action.REMOVE, Entity.DATATAG, dataTagId);
       report.addSubReport(tagReport);
 
-      ProcessChange change = dataTagConfigTransacted.remove(dataTagId, tagReport);
-
-      if (change.processActionRequired()) {
-        change.setNestedSubReport(tagReport);
-        processChanges.add(change);
-      } else {
-        report.addSubReport(tagReport);
-      }
+      dataTagConfigTransacted.remove(dataTagId, tagReport).forEach(change -> {
+        if (change.processActionRequired()) {
+          change.setNestedSubReport(tagReport);
+          processChanges.add(change);
+        } else {
+          report.addSubReport(tagReport);
+        }
+      });
     }
     return processChanges;
   }

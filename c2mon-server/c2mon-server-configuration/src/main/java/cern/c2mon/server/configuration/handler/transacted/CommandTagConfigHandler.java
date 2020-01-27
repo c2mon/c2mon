@@ -43,7 +43,7 @@ import java.util.Properties;
  */
 @Slf4j
 @Named
-public class CommandTagConfigHandler extends BaseConfigHandlerImpl<CommandTag, List<ProcessChange>> {
+public class CommandTagConfigHandler extends BaseConfigHandlerImpl<CommandTag> {
 
   private CommandTagService commandTagService;
 

@@ -29,12 +29,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.Collection;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -70,8 +69,7 @@ public class RuleTagConfigHandler extends AbstractTagConfigHandler<RuleTag> {
   }
 
   @Override
-  @Transactional(value = "cacheTransactionManager", propagation = Propagation.REQUIRES_NEW)
-  public ProcessChange update(Long id, Properties properties) {
+  public List<ProcessChange> update(Long id, Properties properties) {
     Collection<Long> oldTagIds = null;
 
     //first record the old tag Ids before reconfiguring
@@ -79,7 +77,7 @@ public class RuleTagConfigHandler extends AbstractTagConfigHandler<RuleTag> {
       oldTagIds = cache.get(id).getRuleInputTagIds();
     }
 
-    ProcessChange processChange = super.update(id, properties);
+    List<ProcessChange> processChanges = super.update(id, properties);
 
 
     if (oldTagIds != null) {
@@ -93,7 +91,7 @@ public class RuleTagConfigHandler extends AbstractTagConfigHandler<RuleTag> {
       }
     }
 
-    return processChange;
+    return processChanges;
   }
 
   @Override
@@ -128,7 +126,7 @@ public class RuleTagConfigHandler extends AbstractTagConfigHandler<RuleTag> {
   }
 
   @Override
-  protected ProcessChange removeReturnValue(RuleTag ruleTag, ConfigurationElementReport report) {
+  protected List<ProcessChange> removeReturnValue(RuleTag ruleTag, ConfigurationElementReport report) {
     for (ConfigurationEventListener listener : configurationEventListeners) {
       listener.onConfigurationEvent(ruleTag, Action.REMOVE);
     }

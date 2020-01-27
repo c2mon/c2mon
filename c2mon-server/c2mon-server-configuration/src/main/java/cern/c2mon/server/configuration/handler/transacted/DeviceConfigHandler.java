@@ -21,17 +21,18 @@ import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.loading.DeviceDAO;
 import cern.c2mon.server.common.device.Device;
 import cern.c2mon.server.common.device.DeviceClass;
-import cern.c2mon.server.configuration.impl.ProcessChange;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import java.util.ArrayList;
 
 /**
  * @author Alexandros Papageorgiou
  */
-@Service
+@Named
 @Slf4j
-public class DeviceConfigHandler extends BaseConfigHandlerImpl<Device, ProcessChange> {
+public class DeviceConfigHandler extends BaseConfigHandlerImpl<Device> {
 
   private C2monCache<DeviceClass> deviceClassCache;
 
@@ -43,11 +44,11 @@ public class DeviceConfigHandler extends BaseConfigHandlerImpl<Device, ProcessCh
    * @param deviceCacheObjectFactory reference to the Device DAO bean.
    * @param deviceClassCache         reference to the DeviceClass cache.
    */
-  @Autowired
+  @Inject
   public DeviceConfigHandler(final C2monCache<Device> deviceCache,
                              final DeviceDAO deviceDAO, final DeviceCacheObjectFactory deviceCacheObjectFactory,
                              final C2monCache<DeviceClass> deviceClassCache) {
-    super(deviceCache, deviceDAO, deviceCacheObjectFactory, ProcessChange::new);
+    super(deviceCache, deviceDAO, deviceCacheObjectFactory, ArrayList::new);
     this.deviceClassCache = deviceClassCache;
   }
 
