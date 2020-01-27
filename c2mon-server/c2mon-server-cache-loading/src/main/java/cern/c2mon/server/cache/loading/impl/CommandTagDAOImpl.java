@@ -46,17 +46,17 @@ public class CommandTagDAOImpl extends AbstractDefaultLoaderDAO<CommandTag> impl
   }
 
   @Override
-  public void insertCommandTag(CommandTag commandTag) {
+  public void insert(CommandTag commandTag) {
     commandTagMapper.insertCommandTag((CommandTagCacheObject) commandTag);
   }
 
   @Override
-  public void updateCommandTag(CommandTag commandTag) {
+  public void updateConfig(CommandTag commandTag) {
     commandTagMapper.updateCommandTag((CommandTagCacheObject) commandTag);
   }
 
   @Override
-  public void deleteCommandTag(Long commandTagId) {
+  public void deleteItem(Long commandTagId) {
     commandTagMapper.deleteCommandTag(commandTagId);
   }
 
