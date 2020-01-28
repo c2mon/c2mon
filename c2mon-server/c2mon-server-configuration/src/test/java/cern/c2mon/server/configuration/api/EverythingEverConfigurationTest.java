@@ -88,7 +88,7 @@ public class EverythingEverConfigurationTest extends ConfigurationCacheTest {
 
   @Rule
   @Inject
-  public ConfigLoaderRuleChain configRuleChain;
+  public ConfigLoaderRuleChain configRuleChain; // This one also starts the process
 
   @Autowired
   private CacheObjectFactory cacheObjectFactory;
