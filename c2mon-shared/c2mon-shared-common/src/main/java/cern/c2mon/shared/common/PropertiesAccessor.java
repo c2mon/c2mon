@@ -64,5 +64,9 @@ public class PropertiesAccessor {
       }
       return PropertiesAccessor.this;
     }
+
+    public T getNullableValue() {
+      return value;
+    }
   }
 }
