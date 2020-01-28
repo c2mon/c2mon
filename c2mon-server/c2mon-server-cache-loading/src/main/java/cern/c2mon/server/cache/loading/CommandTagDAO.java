@@ -24,6 +24,6 @@ import cern.c2mon.shared.common.command.CommandTag;
  *
  * @author Mark Brightwell
  */
-public interface CommandTagDAO extends ConfigurableDAO<CommandTag> {
+public interface CommandTagDAO extends ConfigurableDAO<CommandTag>, CacheLoaderDAO<CommandTag> {
 
 }
