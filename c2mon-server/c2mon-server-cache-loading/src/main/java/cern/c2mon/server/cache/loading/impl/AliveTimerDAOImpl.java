@@ -17,6 +17,7 @@
 package cern.c2mon.server.cache.loading.impl;
 
 import cern.c2mon.server.cache.dbaccess.AliveTagMapper;
+import cern.c2mon.server.cache.loading.AliveTagDAO;
 import cern.c2mon.server.cache.loading.CacheLoaderName;
 import cern.c2mon.server.cache.loading.ControlTagDAOImpl;
 import cern.c2mon.server.common.alive.AliveTag;
@@ -30,7 +31,7 @@ import javax.inject.Inject;
  * @author Mark Brightwell
  */
 @Service(CacheLoaderName.Names.ALIVETIMER)
-public class AliveTimerDAOImpl extends ControlTagDAOImpl<AliveTag> {
+public class AliveTimerDAOImpl extends ControlTagDAOImpl<AliveTag> implements AliveTagDAO {
 
   @Inject
   public AliveTimerDAOImpl(AliveTagMapper aliveTimerMapper) {

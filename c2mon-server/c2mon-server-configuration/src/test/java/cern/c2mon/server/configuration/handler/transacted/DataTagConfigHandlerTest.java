@@ -39,8 +39,9 @@ public class DataTagConfigHandlerTest extends ConfigurationCacheTest {
     // put
 //    dataTagLoaderDAO.updateConfig(dataTag);  ??????
 
-    ProcessChange change = dataTagConfigTransacted.update(dataTag.getId(), new Properties());
-    assertFalse(change.processActionRequired());
+    for (ProcessChange processChange : dataTagConfigTransacted.update(dataTag.getId(), new Properties())) {
+      assertFalse(processChange.processActionRequired());
+    }
   }
 
   @Test
@@ -54,9 +55,10 @@ public class DataTagConfigHandlerTest extends ConfigurationCacheTest {
 
     // put
 
-    ProcessChange change = dataTagConfigTransacted.update(dataTag.getId(), new Properties());
-    assertFalse(change.processActionRequired());
-    assertNull(change.getProcessId());
+    for (ProcessChange processChange : dataTagConfigTransacted.update(dataTag.getId(), new Properties())) {
+      assertFalse(processChange.processActionRequired());
+      assertNull(processChange.getProcessId());
+    }
   }
 
   @Test
@@ -75,9 +77,10 @@ public class DataTagConfigHandlerTest extends ConfigurationCacheTest {
     properties.put("maxValue", "new max val");
 
     // put
-    ProcessChange change = dataTagConfigTransacted.update(dataTag.getId(), properties);
-    assertTrue(change.processActionRequired());
-    assertEquals(Long.valueOf(50), change.getProcessId());
+    for (ProcessChange change : dataTagConfigTransacted.update(dataTag.getId(), properties)) {
+      assertTrue(change.processActionRequired());
+      assertEquals(Long.valueOf(50), change.getProcessId());
+    }
 
   }
 
@@ -105,7 +108,8 @@ public class DataTagConfigHandlerTest extends ConfigurationCacheTest {
 
     // put
 
-    ProcessChange change = dataTagConfigTransacted.update(dataTag.getId(), properties);
-    assertFalse(change.processActionRequired());
+    for (ProcessChange change : dataTagConfigTransacted.update(dataTag.getId(), properties)) {
+      assertFalse(change.processActionRequired());
+    }
   }
 }

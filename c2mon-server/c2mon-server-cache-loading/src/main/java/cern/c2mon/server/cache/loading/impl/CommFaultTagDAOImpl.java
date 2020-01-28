@@ -18,6 +18,7 @@ package cern.c2mon.server.cache.loading.impl;
 
 import cern.c2mon.server.cache.dbaccess.CommFaultTagMapper;
 import cern.c2mon.server.cache.loading.CacheLoaderName;
+import cern.c2mon.server.cache.loading.CommFaultTagDAO;
 import cern.c2mon.server.cache.loading.ControlTagDAOImpl;
 import cern.c2mon.server.common.commfault.CommFaultTag;
 import org.springframework.stereotype.Service;
@@ -30,7 +31,7 @@ import javax.inject.Inject;
  * @author Mark Brightwell
  */
 @Service(CacheLoaderName.Names.COMMFAULTTAG)
-public class CommFaultTagDAOImpl extends ControlTagDAOImpl<CommFaultTag> {
+public class CommFaultTagDAOImpl extends ControlTagDAOImpl<CommFaultTag> implements CommFaultTagDAO {
 
   @Inject
   public CommFaultTagDAOImpl(CommFaultTagMapper commFaultTagMapper) {

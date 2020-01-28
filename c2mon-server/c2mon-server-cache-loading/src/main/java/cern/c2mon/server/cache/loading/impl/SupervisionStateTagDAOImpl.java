@@ -19,6 +19,7 @@ package cern.c2mon.server.cache.loading.impl;
 import cern.c2mon.server.cache.dbaccess.SupervisionStateTagMapper;
 import cern.c2mon.server.cache.loading.CacheLoaderName;
 import cern.c2mon.server.cache.loading.ControlTagDAOImpl;
+import cern.c2mon.server.cache.loading.SupervisionStateTagDAO;
 import cern.c2mon.server.common.supervision.SupervisionStateTag;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +31,7 @@ import javax.inject.Inject;
  * @author Alexandros Papageorgiou
  */
 @Service(CacheLoaderName.Names.STATETAG)
-public class SupervisionStateTagDAOImpl extends ControlTagDAOImpl<SupervisionStateTag> {
+public class SupervisionStateTagDAOImpl extends ControlTagDAOImpl<SupervisionStateTag> implements SupervisionStateTagDAO {
 
   @Inject
   public SupervisionStateTagDAOImpl(SupervisionStateTagMapper stateTagMapper) {
