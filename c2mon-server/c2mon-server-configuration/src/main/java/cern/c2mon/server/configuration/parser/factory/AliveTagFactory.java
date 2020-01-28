@@ -3,6 +3,7 @@ package cern.c2mon.server.configuration.parser.factory;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.server.cache.loading.SequenceDAO;
+import cern.c2mon.server.common.tag.AbstractTagCacheObject;
 import cern.c2mon.server.configuration.parser.exception.ConfigurationParseException;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
@@ -34,30 +35,24 @@ public class AliveTagFactory extends EntityFactory<AliveTag> {
   }
 
   @Override
-  Long createId(AliveTag configurationEntity) {
-
-    if (configurationEntity.getName() != null
-      && !queryByClientInput(cache, aTag -> aTag.getSupervisedName(), configurationEntity.getName()).isEmpty()) {
-      throw new ConfigurationParseException("Error creating aliveTag " + configurationEntity.getName() + ": " +
+  Long createId(AliveTag aliveTag) {
+    if (aliveTag.getName() != null
+      && !queryByClientInput(cache, AbstractTagCacheObject::getName, aliveTag.getName()).isEmpty()) {
+      throw new ConfigurationParseException("Error creating aliveTag " + aliveTag.getName() + ": " +
         "Name already exists");
     } else {
-      return configurationEntity.getId() != null ? configurationEntity.getId() : sequenceDAO.getNextTagId();
+      return aliveTag.getId() != null ? aliveTag.getId() : sequenceDAO.getNextTagId();
     }
   }
 
   @Override
-  Long getId(AliveTag configurationEntity) {
-    return configurationEntity.getId() != null
-      ? configurationEntity.getId()
-      : queryByClientInput(cache, aTag -> aTag.getSupervisedName(), configurationEntity.getName())
+  Long getId(AliveTag aliveTag) {
+    return aliveTag.getId() != null
+      ? aliveTag.getId()
+      : queryByClientInput(cache, AbstractTagCacheObject::getName, aliveTag.getName())
         .stream().findFirst()
         .orElseThrow(CacheElementNotFoundException::new)
         .getId();
-  }
-
-  @Override
-  boolean hasEntity(Long id) {
-    return id != null && cache.containsKey(id);
   }
 
   @Override

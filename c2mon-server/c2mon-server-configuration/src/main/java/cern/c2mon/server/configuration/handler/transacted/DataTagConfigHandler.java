@@ -103,7 +103,7 @@ public class DataTagConfigHandler extends AbstractTagConfigHandler<DataTag> impl
   @Override
   protected void doPostCreate(DataTag dataTag) {
     super.doPostCreate(dataTag);
-    cache.getCacheListenerManager().notifyListenersOf(CacheEvent.UPDATE_ACCEPTED, dataTag);
+    cache.getCacheListenerManager().notifyListenersOf(CacheEvent.INSERTED, dataTag);
     configurationUpdateImpl.notifyListeners(dataTag.getId());
   }
 

@@ -99,7 +99,7 @@ public class ProcessConfigHandler extends BaseConfigHandlerImpl<Process> {
     if (process.getAliveTagId() != null)
       aliveTagService.startOrUpdateTimestamp(process.getAliveTagId(), System.currentTimeMillis());
 
-    cache.getCacheListenerManager().notifyListenersOf(CacheEvent.UPDATE_ACCEPTED, process);
+    cache.getCacheListenerManager().notifyListenersOf(CacheEvent.INSERTED, process);
 
     // TODO (Alex) unsubscribe on failures?
 //    if (process != null) {
@@ -188,7 +188,7 @@ public class ProcessConfigHandler extends BaseConfigHandlerImpl<Process> {
       ConfigurationElementReport tagReport = new ConfigurationElementReport(ConfigConstants.Action.REMOVE, ConfigConstants.Entity.CONTROLTAG, aliveTagId);
       report.addSubReport(tagReport);
       aliveTimerConfigHandler.remove(aliveTagId, tagReport);
-      aliveTagService.removeAliveTimer(aliveTagId);
+      aliveTagService.removeAliveTimer(aliveTagId); // TODO (Alex) Replace this with a DELETED event listener
       // TODO (Alex) Do we want to also remove it from process cache?
     }
 

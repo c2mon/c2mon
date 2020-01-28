@@ -12,10 +12,9 @@ import java.util.Properties;
 public abstract class AbstractCacheObjectFactory<T extends Cacheable> {
 
   /**
-   * Creates CacheObject wrapped with properties, use this one
+   * Creates CacheObject wrapped with properties
    *
    * @return CacheObject
-   * @throws IllegalAccessException
    */
   public T createCacheObject(Long id, Properties properties) {
     T cacheable = createCacheObject(id);
@@ -46,7 +45,7 @@ public abstract class AbstractCacheObjectFactory<T extends Cacheable> {
    * @return always returns null, as no CacheObject change needs propagating to the DAQ layer
    * @throws ConfigurationException if cannot configure the CacheObject from the properties
    */
-  public abstract Change configureCacheObject(T cacheable, Properties properties);
+  protected abstract Change configureCacheObject(T cacheable, Properties properties);
 
   /**
    * Perform a series of consistency checks on the CacheObject. This method
@@ -56,7 +55,7 @@ public abstract class AbstractCacheObjectFactory<T extends Cacheable> {
    * @param cacheable the cache object to validate
    * @throws ConfigurationException if one of the consistency checks fails
    */
-  public abstract void validateConfig(T cacheable) throws ConfigurationException;
+  protected abstract void validateConfig(T cacheable) throws ConfigurationException;
 
   /**
    * If the String is "null", then set the return value

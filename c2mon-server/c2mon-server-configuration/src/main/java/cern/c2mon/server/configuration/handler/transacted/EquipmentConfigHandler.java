@@ -156,7 +156,7 @@ public class EquipmentConfigHandler extends AbstractEquipmentConfigHandler<Equip
     for (Long dataTagId : new ArrayList<>(dataTagService.getDataTagIdsByEquipmentId(equipment.getId()))) {
       ConfigurationElementReport tagReport = new ConfigurationElementReport(Action.REMOVE, Entity.DATATAG, dataTagId);
       equipmentReport.addSubReport(tagReport);
-      dataTagConfigTransacted.remove(dataTagId, tagReport);
+      dataTagConfigHandler.remove(dataTagId, tagReport);
     }
   }
 

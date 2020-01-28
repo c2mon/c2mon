@@ -52,7 +52,7 @@ public class ConfigurationHandlerActor {
       }));
   }
 
-  public List<ProcessChange> doWithHandler(ConfigConstants.Entity entity, Function<BaseConfigHandler<?>, List<ProcessChange>> action) {
+  public List<ProcessChange> doWithHandler(ConfigConstants.Entity entity, Function<BaseConfigHandler, List<ProcessChange>> action) {
     if (!handlerMap.containsKey(entity)) {
       log.warn("Unrecognized reconfiguration entity: {} ", entity);
     }

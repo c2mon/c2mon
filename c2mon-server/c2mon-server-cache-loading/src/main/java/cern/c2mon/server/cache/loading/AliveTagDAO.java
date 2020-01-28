@@ -23,6 +23,6 @@ import cern.c2mon.server.common.alive.AliveTag;
  *
  * @author Mark Brightwell
  */
-public interface AliveTagDAO extends CacheLoaderDAO<AliveTag> {
+public interface AliveTagDAO extends CacheLoaderDAO<AliveTag>, ConfigurableDAO<AliveTag> {
 
 }

@@ -17,9 +17,8 @@
 package cern.c2mon.server.cache.loading.impl;
 
 import cern.c2mon.server.cache.dbaccess.AliveTagMapper;
-import cern.c2mon.server.cache.loading.AliveTagDAO;
 import cern.c2mon.server.cache.loading.CacheLoaderName;
-import cern.c2mon.server.cache.loading.common.AbstractDefaultLoaderDAO;
+import cern.c2mon.server.cache.loading.ControlTagDAOImpl;
 import cern.c2mon.server.common.alive.AliveTag;
 import org.springframework.stereotype.Service;
 
@@ -31,23 +30,11 @@ import javax.inject.Inject;
  * @author Mark Brightwell
  */
 @Service(CacheLoaderName.Names.ALIVETIMER)
-public class AliveTimerDAOImpl extends AbstractDefaultLoaderDAO<AliveTag> implements AliveTagDAO {
-
-  /**
-   * Reference to mapper.
-   */
-  private AliveTagMapper aliveTimerMapper;
+public class AliveTimerDAOImpl extends ControlTagDAOImpl<AliveTag> {
 
   @Inject
   public AliveTimerDAOImpl(AliveTagMapper aliveTimerMapper) {
     super(1000, aliveTimerMapper);
-    this.aliveTimerMapper = aliveTimerMapper;
-  }
-
-  @Override
-  protected AliveTag doPostDbLoading(AliveTag item) {
-    //do nothing for this cache
-    return item;
   }
 
 }

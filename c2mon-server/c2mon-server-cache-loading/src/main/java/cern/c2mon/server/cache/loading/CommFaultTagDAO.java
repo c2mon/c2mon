@@ -24,6 +24,6 @@ import cern.c2mon.server.common.commfault.CommFaultTag;
  *
  * @author Mark Brightwell
  */
-public interface CommFaultTagDAO extends CacheLoaderDAO<CommFaultTag> {
+public interface CommFaultTagDAO extends CacheLoaderDAO<CommFaultTag>, ConfigurableDAO<CommFaultTag> {
 
 }

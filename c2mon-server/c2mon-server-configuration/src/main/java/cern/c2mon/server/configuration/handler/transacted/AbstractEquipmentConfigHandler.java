@@ -49,7 +49,7 @@ public abstract class AbstractEquipmentConfigHandler<T extends AbstractEquipment
   protected final ProcessXMLProvider processXMLProvider;
   private final AliveTagConfigHandler aliveTagConfigEventHandler;
   protected final DataTagService dataTagService;
-  protected final DataTagConfigHandler dataTagConfigTransacted;
+  protected final DataTagConfigHandler dataTagConfigHandler;
 
   public AbstractEquipmentConfigHandler(
     final C2monCache<T> subEquipmentCache,
@@ -58,12 +58,12 @@ public abstract class AbstractEquipmentConfigHandler<T extends AbstractEquipment
     final ProcessXMLProvider processXMLProvider,
     final AliveTagConfigHandler aliveTagConfigEventHandler,
     final DataTagService dataTagService,
-    final DataTagConfigHandler dataTagConfigTransacted) {
+    final DataTagConfigHandler dataTagConfigHandler) {
     super(subEquipmentCache, subEquipmentDAO, subEquipmentCacheObjectFactory, ArrayList::new);
     this.processXMLProvider = processXMLProvider;
     this.aliveTagConfigEventHandler = aliveTagConfigEventHandler;
     this.dataTagService = dataTagService;
-    this.dataTagConfigTransacted = dataTagConfigTransacted;
+    this.dataTagConfigHandler = dataTagConfigHandler;
   }
 
   @Override
@@ -75,7 +75,6 @@ public abstract class AbstractEquipmentConfigHandler<T extends AbstractEquipment
   protected void doPostCreate(T cacheable) {
     super.doPostCreate(cacheable);
     cache.getCacheListenerManager().notifyListenersOf(CacheEvent.INSERTED, cacheable);
-    cache.getCacheListenerManager().notifyListenersOf(CacheEvent.UPDATE_ACCEPTED, cacheable);
   }
 
   @Override
@@ -102,7 +101,7 @@ public abstract class AbstractEquipmentConfigHandler<T extends AbstractEquipment
       // null if this alive does not have an Address -> is not in list of
       // DataTags on DAQ
       if (processChange != null) {
-        ConfigurationElementReport subReport = new ConfigurationElementReport(Action.CREATE, Entity.CONTROLTAG, equipmentUpdate.getAliveTagId());
+        ConfigurationElementReport subReport = new ConfigurationElementReport(Action.CREATE, Entity.ALIVETAG, equipmentUpdate.getAliveTagId());
         processChange.setNestedSubReport(subReport);
         processChanges.add(processChange);
       }
@@ -126,7 +125,7 @@ public abstract class AbstractEquipmentConfigHandler<T extends AbstractEquipment
       ConfigurationElementReport tagReport = new ConfigurationElementReport(Action.REMOVE, Entity.DATATAG, dataTagId);
       report.addSubReport(tagReport);
 
-      dataTagConfigTransacted.remove(dataTagId, tagReport).forEach(change -> {
+      dataTagConfigHandler.remove(dataTagId, tagReport).forEach(change -> {
         if (change.processActionRequired()) {
           change.setNestedSubReport(tagReport);
           processChanges.add(change);

@@ -7,6 +7,6 @@ import cern.c2mon.server.common.supervision.SupervisionStateTag;
  *
  * @author Alexandros Papageorgiou
  */
-public interface SupervisionStateTagDAO extends CacheLoaderDAO<SupervisionStateTag> {
+public interface SupervisionStateTagDAO extends CacheLoaderDAO<SupervisionStateTag>, ConfigurableDAO<SupervisionStateTag> {
 
 }

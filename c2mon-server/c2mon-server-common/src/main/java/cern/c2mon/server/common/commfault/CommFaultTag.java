@@ -42,12 +42,6 @@ public class CommFaultTag extends ControlTag {
 
     /**
      * Constructor setting all fields.
-     *
-     * @param id
-     * @param equipmentId
-     * @param equipmentName
-     * @param aliveTagId
-     * @param stateTagId
      */
     public CommFaultTag(@NonNull Long id, @NonNull Long equipmentId, String equipmentName, String equipmentType, Long stateTagId, Long aliveTagId) {
         super(id, equipmentId, SupervisionEntity.parse(equipmentType));

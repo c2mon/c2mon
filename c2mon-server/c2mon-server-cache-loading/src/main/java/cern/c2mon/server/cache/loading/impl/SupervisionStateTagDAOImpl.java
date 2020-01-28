@@ -18,8 +18,7 @@ package cern.c2mon.server.cache.loading.impl;
 
 import cern.c2mon.server.cache.dbaccess.SupervisionStateTagMapper;
 import cern.c2mon.server.cache.loading.CacheLoaderName;
-import cern.c2mon.server.cache.loading.SupervisionStateTagDAO;
-import cern.c2mon.server.cache.loading.common.AbstractDefaultLoaderDAO;
+import cern.c2mon.server.cache.loading.ControlTagDAOImpl;
 import cern.c2mon.server.common.supervision.SupervisionStateTag;
 import org.springframework.stereotype.Service;
 
@@ -31,23 +30,11 @@ import javax.inject.Inject;
  * @author Alexandros Papageorgiou
  */
 @Service(CacheLoaderName.Names.STATETAG)
-public class SupervisionStateTagDAOImpl extends AbstractDefaultLoaderDAO<SupervisionStateTag> implements SupervisionStateTagDAO {
-
-  /**
-   * Reference to mapper.
-   */
-  private SupervisionStateTagMapper stateTagMapper;
+public class SupervisionStateTagDAOImpl extends ControlTagDAOImpl<SupervisionStateTag> {
 
   @Inject
   public SupervisionStateTagDAOImpl(SupervisionStateTagMapper stateTagMapper) {
     super(1000, stateTagMapper); //initial buffer size
-    this.stateTagMapper = stateTagMapper;
-  }
-
-  @Override
-  protected SupervisionStateTag doPostDbLoading(SupervisionStateTag item) {
-    //do nothing for this cache
-    return item;
   }
 
 }

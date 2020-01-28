@@ -61,7 +61,7 @@ public class CommandTagConfigHandler extends BaseConfigHandlerImpl<CommandTag> {
   protected void doPostCreate(CommandTag commandTag) {
     super.doPostCreate(commandTag);
     equipmentService.addCommandToEquipment(commandTag.getEquipmentId(), commandTag.getId());
-    cache.getCacheListenerManager().notifyListenersOf(CacheEvent.UPDATE_ACCEPTED, commandTag);
+    cache.getCacheListenerManager().notifyListenersOf(CacheEvent.INSERTED, commandTag);
   }
 
   @Override
