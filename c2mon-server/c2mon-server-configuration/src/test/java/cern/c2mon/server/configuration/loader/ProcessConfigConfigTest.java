@@ -15,12 +15,9 @@ import cern.c2mon.server.configuration.helper.ObjectEqualityComparison;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.converter.ProcessListConverter;
-import cern.c2mon.shared.common.NoSimpleValueParseException;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 import java.util.Set;
 
 import static org.easymock.EasyMock.replay;
@@ -69,12 +66,7 @@ public class ProcessConfigConfigTest extends ConfigurationCacheLoaderTest<Proces
   private ProcessService processService;
 
   @Test
-  public void testCreateUpdateRemoveProcess() throws ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException,
-    NoSuchFieldException, NoSimpleValueParseException {
-    // currently no configuration required on DAQ layer for Process
-    // configuration options
-    replay(mockManager);
-
+  public void testCreateUpdateRemoveProcess() {
     ConfigurationReport report = configurationLoader.applyConfiguration(16);
 
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
@@ -95,15 +87,12 @@ public class ProcessConfigConfigTest extends ConfigurationCacheLoaderTest<Proces
     // update
     report = configurationLoader.applyConfiguration(17);
 
-
     cacheObject = (ProcessCacheObject) processCache.get(2L);
     expectedObject.setDescription("updated description");
     expectedObject.setMaxMessageDelay(4000);
 
     ObjectEqualityComparison.assertProcessEquals(expectedObject, cacheObject);
-    assertFalse(report.getProcessesToReboot().isEmpty());
-
-    verify(mockManager);
+    assertTrue(report.getProcessesToReboot().contains(expectedObject.getName()));
   }
 
   /**
@@ -161,17 +150,17 @@ public class ProcessConfigConfigTest extends ConfigurationCacheLoaderTest<Proces
 
     String list = "[P_TEST01, P_TEST02]";
     Set<String> processList = converter.convert(list);
-    assertTrue(processList.size() == 2);
+    assertEquals(2, processList.size());
     assertTrue(processList.contains("P_TEST01"));
     assertTrue(processList.contains("P_TEST02"));
 
     list = "[P_TEST01]";
     processList = converter.convert(list);
-    assertTrue(processList.size() == 1);
+    assertEquals(1, processList.size());
     assertTrue(processList.contains("P_TEST01"));
 
     list = "[]";
     processList = converter.convert(list);
-    assertTrue(processList.size() == 0);
+    assertEquals(0, processList.size());
   }
 }

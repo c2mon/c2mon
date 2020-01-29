@@ -32,15 +32,16 @@ import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import cern.c2mon.shared.common.CacheEvent;
 import cern.c2mon.shared.common.ConfigurationException;
+import cern.c2mon.shared.daq.config.Change;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.UnexpectedRollbackException;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
+
+import static cern.c2mon.server.common.util.KotlinAPIs.apply;
+import static cern.c2mon.server.common.util.KotlinAPIs.applyNotNull;
 
 /**
  * Bean managing configuration updates to C2MON DataTags.
@@ -75,8 +76,8 @@ public class ProcessConfigHandler extends BaseConfigHandlerImpl<Process> {
                               final ConfigurationProperties properties,
                               final JmsContainerManager jmsContainerManager,
                               final EquipmentConfigHandler equipmentConfigTransacted
-                                     ) {
-    super(processCache, processDAO, processCacheObjectFactory, ArrayList::new);
+  ) {
+    super(processCache, processDAO, processCacheObjectFactory, () -> null);
     this.aliveTagService = aliveTagService;
     this.aliveTimerCache = aliveTagService.getCache();
     this.processService = processService;
@@ -101,20 +102,21 @@ public class ProcessConfigHandler extends BaseConfigHandlerImpl<Process> {
 
     cache.getCacheListenerManager().notifyListenersOf(CacheEvent.INSERTED, process);
 
-    // TODO (Alex) unsubscribe on failures?
-//    if (process != null) {
-//      jmsContainerManager.unsubscribe(process);
-//    }
-
     try {
-      aliveTimerCache.computeQuiet(process.getAliveTagId(), aliveTimer -> {
-        log.trace("Adding process id #{} to alive timer {} (#{})", process.getId(), aliveTimer.getSupervisedName(), aliveTimer.getId());
-//        aliveTimer.setSupervisedId(process.getId());
-        // TODO (Alex) Copy constructor here? Is it even possible that we would want to change a supervised id?
-      });
+      applyNotNull(process.getAliveTagId(), aliveTagId ->
+        aliveTimerCache.computeQuiet(aliveTagId, aliveTimer -> {
+          log.trace("Adding process id #{} to alive timer {} (#{})", process.getId(), aliveTimer.getName(), aliveTimer.getId());
+          aliveTimer.setSupervisedId(process.getId());
+        }));
+      applyNotNull(process.getStateTagId(), stateTagId ->
+        stateTagService.getCache().computeQuiet(stateTagId, supervisionStateTag -> {
+          log.trace("Adding process id #{} to state tag {} (#{})", process.getId(), supervisionStateTag.getName(), supervisionStateTag.getId());
+          supervisionStateTag.setSupervisedId(process.getId());
+        }));
     } catch (CacheElementNotFoundException e) {
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
-        String.format("No Alive tag (%s) found for process #%d (%s).", process.getAliveTagId(), process.getId(), process.getName()));
+        String.format("No Alive tag (%s) found for process #%d (%s).",
+          process.getAliveTagId(), process.getId(), process.getName()));
     }
   }
 
@@ -128,12 +130,18 @@ public class ProcessConfigHandler extends BaseConfigHandlerImpl<Process> {
     if (properties.containsKey("aliveInterval") || properties.containsKey("aliveTagId")) {
       Process process = processService.getCache().get(id);
       aliveTagService.updateBasedOnSupervised(process);
-
-      // TODO (Alex) Is this call correct? Looks like maybe they wanted to setReboot instead?
-//      processChanges.requiresReboot();
     }
 
     return processChanges;
+  }
+
+  @Override
+  protected List<ProcessChange> updateReturnValue(Process cacheable, Change change, Properties properties) {
+    return Collections.singletonList(
+      apply(
+        new ProcessChange(cacheable.getId(), change),
+        procChange -> procChange.requiresReboot(true))
+    );
   }
 
   /**
