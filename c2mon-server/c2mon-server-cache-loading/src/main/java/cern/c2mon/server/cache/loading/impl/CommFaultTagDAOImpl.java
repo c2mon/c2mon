@@ -17,6 +17,7 @@
 package cern.c2mon.server.cache.loading.impl;
 
 import cern.c2mon.server.cache.dbaccess.CommFaultTagMapper;
+import cern.c2mon.server.cache.dbaccess.DataTagMapper;
 import cern.c2mon.server.cache.loading.CacheLoaderName;
 import cern.c2mon.server.cache.loading.CommFaultTagDAO;
 import cern.c2mon.server.common.commfault.CommFaultTag;
@@ -33,7 +34,7 @@ import javax.inject.Inject;
 public class CommFaultTagDAOImpl extends ControlTagDAOImpl<CommFaultTag> implements CommFaultTagDAO {
 
   @Inject
-  public CommFaultTagDAOImpl(CommFaultTagMapper commFaultTagMapper) {
-    super(1000, commFaultTagMapper);
+  public CommFaultTagDAOImpl(CommFaultTagMapper commFaultTagMapper, DataTagMapper dataTagMapper) {
+    super(1000, commFaultTagMapper, dataTagMapper);
   }
 }

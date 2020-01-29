@@ -1,11 +1,21 @@
 package cern.c2mon.server.cache.loading.impl;
 
+import cern.c2mon.server.cache.dbaccess.DataTagMapper;
 import cern.c2mon.server.cache.dbaccess.LoaderMapper;
 import cern.c2mon.server.cache.loading.ConfigurableDAO;
 import cern.c2mon.server.cache.loading.common.AbstractDefaultLoaderDAO;
 import cern.c2mon.server.common.control.ControlTag;
+import cern.c2mon.server.common.datatag.DataTag;
+import cern.c2mon.server.common.datatag.DataTagCacheObject;
+import cern.c2mon.shared.common.supervision.SupervisionEntity;
+import lombok.NonNull;
+
+import static cern.c2mon.server.common.util.KotlinAPIs.apply;
+import static cern.c2mon.server.common.util.KotlinAPIs.applyNotNull;
 
 public abstract class ControlTagDAOImpl<CONTROL extends ControlTag> extends AbstractDefaultLoaderDAO<CONTROL> implements ConfigurableDAO<CONTROL> {
+
+  private final DataTagMapper dataTagMapper;
 
   /**
    * Constructor.
@@ -13,8 +23,9 @@ public abstract class ControlTagDAOImpl<CONTROL extends ControlTag> extends Abst
    * @param initialBufferSize size of buffer for storing the objects
    * @param loaderMapper      required mapper for loading from the DB
    */
-  public ControlTagDAOImpl(int initialBufferSize, LoaderMapper<CONTROL> loaderMapper) {
+  public ControlTagDAOImpl(int initialBufferSize, LoaderMapper<CONTROL> loaderMapper, final DataTagMapper dataTagMapper) {
     super(initialBufferSize, loaderMapper);
+    this.dataTagMapper = dataTagMapper;
   }
 
   @Override
@@ -25,16 +36,48 @@ public abstract class ControlTagDAOImpl<CONTROL extends ControlTag> extends Abst
 
   @Override
   public void deleteItem(Long id) {
-    // TODO (Alex) Figure out defaults for this
+    dataTagMapper.deleteDataTag(id);
+    // TODO (Alex) Should we be deleting from somewhere else too?
   }
 
   @Override
   public void updateConfig(CONTROL cacheable) {
-    // TODO (Alex) Figure out defaults for this
+    dataTagMapper.updateConfig(convertToDataTag(cacheable));
   }
 
   @Override
-  public void insert(CONTROL cacheable) {
-    // TODO (Alex) Figure out defaults for this
+  public void insert(@NonNull CONTROL cacheable) {
+    dataTagMapper.insertControlTag(convertToDataTag(cacheable));
+  }
+
+  protected DataTag convertToDataTag(CONTROL control) {
+    return apply(new DataTagCacheObject(control.getId()), dataTag -> {
+      applyNotNull(control.getSupervisedId(), id -> {
+        if (control.getSupervisedEntity() == SupervisionEntity.PROCESS)
+          dataTag.setProcessId(id);
+        else if (control.getSupervisedEntity() == SupervisionEntity.EQUIPMENT)
+          dataTag.setEquipmentId(id);
+        else
+          dataTag.setSubEquipmentId(id);
+      });
+
+      dataTag.setEquipmentId(-1L); // TODO (Alex) We are setting this currently because we fail to save processes. How should we do that?
+
+      dataTag.setSourceTimestamp(control.getSourceTimestamp());
+      dataTag.setCacheTimestamp(control.getCacheTimestamp());
+      dataTag.setName(control.getName());
+      dataTag.setDescription(control.getDescription());
+      dataTag.setDataType(control.getDataType());
+      dataTag.setMode(control.getMode());
+      dataTag.setValue(control.getValue());
+      dataTag.setValueDescription(control.getValueDescription());
+      dataTag.setDataTagQuality(control.getDataTagQuality());
+      dataTag.setUnit(control.getUnit());
+      dataTag.setMetadata(control.getMetadata());
+      dataTag.setRuleIds(control.getRuleIds());
+      dataTag.setAlarmIds(control.getAlarmIds());
+      dataTag.setDipAddress(control.getDipAddress());
+      dataTag.setAddress(control.getAddress());
+    });
   }
 }

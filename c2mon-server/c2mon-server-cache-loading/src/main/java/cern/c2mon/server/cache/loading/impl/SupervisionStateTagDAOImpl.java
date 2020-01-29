@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.loading.impl;
 
+import cern.c2mon.server.cache.dbaccess.DataTagMapper;
 import cern.c2mon.server.cache.dbaccess.SupervisionStateTagMapper;
 import cern.c2mon.server.cache.loading.CacheLoaderName;
 import cern.c2mon.server.cache.loading.SupervisionStateTagDAO;
@@ -33,8 +34,8 @@ import javax.inject.Inject;
 public class SupervisionStateTagDAOImpl extends ControlTagDAOImpl<SupervisionStateTag> implements SupervisionStateTagDAO {
 
   @Inject
-  public SupervisionStateTagDAOImpl(SupervisionStateTagMapper stateTagMapper) {
-    super(1000, stateTagMapper); //initial buffer size
+  public SupervisionStateTagDAOImpl(SupervisionStateTagMapper stateTagMapper, DataTagMapper dataTagMapper) {
+    super(1000, stateTagMapper, dataTagMapper); //initial buffer size
   }
 
 }

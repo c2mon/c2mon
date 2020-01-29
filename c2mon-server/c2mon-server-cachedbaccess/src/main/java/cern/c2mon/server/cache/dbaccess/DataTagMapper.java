@@ -30,6 +30,8 @@ public interface DataTagMapper extends PersistenceMapper<DataTag>, LoaderMapper<
                                             BatchLoaderMapper<DataTag>, ConfigurableMapper<DataTag> {
   
   void insertDataTag(DataTag dataTag);
+
+  void insertControlTag(DataTag controlTag);
   
   void deleteDataTag(Long id);
   
