@@ -18,10 +18,7 @@ package cern.c2mon.server.common.alive;
 
 import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.shared.common.supervision.SupervisionEntity;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.Collection;
 
@@ -69,6 +66,11 @@ public class AliveTag extends ControlTag {
      * the DAQ process is stopped. TODO are these used??? remove if not necessary
      */
     private Collection<Long> dependentAliveTimerIds = null;
+
+
+    public AliveTag(@NonNull Long id) {
+        super(id, null, null);
+    }
 
     /**
      * Constructor used in iBatis sqlmap.

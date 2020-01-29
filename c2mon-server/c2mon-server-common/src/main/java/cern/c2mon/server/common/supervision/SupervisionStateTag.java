@@ -5,10 +5,7 @@ import cern.c2mon.server.common.commfault.CommFaultTag;
 import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.shared.common.supervision.SupervisionEntity;
 import cern.c2mon.shared.common.supervision.SupervisionStatus;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.ToString;
+import lombok.*;
 
 import java.sql.Timestamp;
 
@@ -21,17 +18,18 @@ import static cern.c2mon.server.common.util.KotlinAPIs.orElse;
  * @apiNote <a href=https://stackoverflow.com/questions/1162816/naming-conventions-state-versus-status>State vs Status discussion for technical jargon naming</a>
  */
 @Getter
+@Setter
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class SupervisionStateTag extends ControlTag {
   /**
    * Id of the associated {@link AliveTag} used for supervision, or null
    */
-  final Long aliveTagId;
+  Long aliveTagId;
   /**
    * Id of the associated {@link CommFaultTag} used for supervision, or null
    */
-  final Long commFaultTagId;
+  Long commFaultTagId;
   /**
    * Supervision status of this object when it was recovered from cache
    */
@@ -52,6 +50,10 @@ public class SupervisionStateTag extends ControlTag {
     super(id, supervisedId, SupervisionEntity.parse(supervisedEntity));
     this.aliveTagId = aliveTagId;
     this.commFaultTagId = commFaultTagId;
+  }
+
+  public SupervisionStateTag(@NonNull Long id) {
+    super(id, null, null);
   }
 
   /**

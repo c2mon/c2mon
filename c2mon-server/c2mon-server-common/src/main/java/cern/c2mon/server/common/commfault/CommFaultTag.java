@@ -51,6 +51,13 @@ public class CommFaultTag extends ControlTag {
     }
 
     /**
+     * Cache constructor
+     */
+    public CommFaultTag(Long id) {
+        super(id, null, null);
+    }
+
+    /**
      * Clone not supported so far.
      */
     @Override

@@ -90,9 +90,9 @@ public class SubEquipmentConfigTest extends ConfigurationCacheLoaderTest<SubEqui
     assertTrue(equipment.getSubEquipmentIds().contains(expectedObject.getId()));
     // the alivetimer and commfault caches should reflect the changes
     assertNotNull(aliveTimerCache.get(expectedObject.getAliveTagId()));
-    assertEquals(expectedObject.getId(), aliveTimerCache.get(cacheObject.getAliveTagId()).getSupervisedId());
+    assertEquals(expectedObject.getId(), (long) aliveTimerCache.get(cacheObject.getAliveTagId()).getSupervisedId());
     assertNotNull(commFaultTagCache.get(expectedObject.getCommFaultTagId()));
-    assertEquals(expectedObject.getId(), commFaultTagCache.get(cacheObject.getCommFaultTagId()).getSupervisedId());
+    assertEquals(expectedObject.getId(), (long) commFaultTagCache.get(cacheObject.getCommFaultTagId()).getSupervisedId());
 
     report = configurationLoader.applyConfiguration(20);
 

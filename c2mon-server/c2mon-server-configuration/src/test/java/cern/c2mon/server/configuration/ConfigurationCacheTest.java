@@ -14,14 +14,11 @@ import cern.c2mon.server.rule.config.RuleModule;
 import cern.c2mon.server.supervision.config.SupervisionModule;
 import cern.c2mon.server.test.CachePopulationRule;
 import org.junit.After;
-import org.junit.Rule;
-import org.junit.rules.Timeout;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.inject.Inject;
-import java.util.concurrent.TimeUnit;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {
@@ -40,8 +37,8 @@ import java.util.concurrent.TimeUnit;
 })
 public abstract class ConfigurationCacheTest {
 
-  @Rule
-  public Timeout forceTimeout = new Timeout(1, TimeUnit.SECONDS);
+//  @Rule
+//  public Timeout forceTimeout = new Timeout(1, TimeUnit.SECONDS);
 
   @Inject
   protected JmsContainerManagerImpl jmsContainerManager;

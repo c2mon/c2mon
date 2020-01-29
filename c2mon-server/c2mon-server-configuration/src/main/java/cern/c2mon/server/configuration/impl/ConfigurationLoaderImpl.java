@@ -385,74 +385,74 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
                                          Map<Long, ConfigurationElementReport> daqReportPlaceholder,
                                          ConfigurationReport report, Integer configId,
                                          final ConfigProgressMonitor configProgressMonitor){
-    if (!cancelRequested) {
-      if (element.getEntity().equals(ConfigConstants.Entity.MISSING)) {
-        ConfigurationElementReport elementReport = new ConfigurationElementReport(element.getAction(), element.getEntity(), element.getEntityId());
-        elementReport.setWarning("Entity " + element.getEntityId() + " does not exist");
-        report.addElementReport(elementReport);
-        report.setStatusDescription("Please check subreport description for details");
-        report.addStatus(Status.WARNING);
-      } else {
-          //initialize success report
-          ConfigurationElementReport elementReport = new ConfigurationElementReport(element.getAction(),
-                  element.getEntity(),
-                  element.getEntityId());
-          report.addElementReport(elementReport);
-          List<ProcessChange> processChanges;
-          try {
-            processChanges = applyConfigElement(element, elementReport);  //never returns null
-
-            if (processChanges != null) {
-
-
-              for (ProcessChange processChange : processChanges) {
-
-                Long processId = processChange.getProcessId();
-                if (processChange.processActionRequired()) {
-
-                  if (!processLists.containsKey(processId)) {
-                    processLists.put(processId, new ArrayList<>());
-                  }
-
-                  //cast to implementation needed as DomFactory uses this - TODO change to interface
-                  processLists.get(processId).add((Change) processChange.getChangeEvent());
-
-                  if (processChange.hasNestedSubReport()) {
-                    elementReport.addSubReport(processChange.getNestedSubReport());
-                    daqReportPlaceholder.put(processChange.getChangeEvent().getChangeId(), processChange.getNestedSubReport());
-                  } else {
-                    daqReportPlaceholder.put(processChange.getChangeEvent().getChangeId(), elementReport);
-                  }
-
-                  elementPlaceholder.put(processChange.getChangeEvent().getChangeId(), element);
-                  element.setDaqStatus(Status.RESTART); //default to restart; if successful on DAQ layer switch to OK
-                } else if (processChange.requiresReboot()) {
-                  if (log.isDebugEnabled()) {
-                    log.debug(configId + " RESTART for " + processChange.getProcessId() + " required");
-                  }
-                  element.setDaqStatus(Status.RESTART);
-                  report.addStatus(Status.RESTART);
-                  report.addProcessToReboot(processCache.get(processId).getName());
-                  element.setStatus(Status.RESTART);
-                  processService.setRequiresReboot(processId, Boolean.TRUE);
-                }
-              }
-            }
-          } catch (Exception ex) {
-            String errMessage = configId + " Exception caught while applying the configuration change (Action, Entity, " +
-                    "Entity id) = (" + element.getAction() + "; " + element.getEntity() + "; " + element.getEntityId() + ")";
-            log.error(errMessage, ex.getMessage());
-            elementReport.setFailure("Exception caught while applying the configuration change.", ex);
-            element.setStatus(Status.FAILURE);
-            report.addStatus(Status.FAILURE);
-            report.setStatusDescription("Failure: see details below.");
-          }
-      }
-      if (configProgressMonitor != null){
-        configProgressMonitor.incrementServerProgress(element.buildDescription());
-      }
-    } else {
+    if (cancelRequested) {
       log.info(configId + " Interrupting configuration due to cancel request.");
+      return;
+    }
+    if (element.getEntity().equals(ConfigConstants.Entity.MISSING)) {
+      ConfigurationElementReport elementReport = new ConfigurationElementReport(element.getAction(), element.getEntity(), element.getEntityId());
+      elementReport.setWarning("Entity " + element.getEntityId() + " does not exist");
+      report.addElementReport(elementReport);
+      report.setStatusDescription("Please check subreport description for details");
+      report.addStatus(Status.WARNING);
+      return;
+    }
+    //initialize success report
+    ConfigurationElementReport elementReport = new ConfigurationElementReport(element.getAction(),
+            element.getEntity(),
+            element.getEntityId());
+    report.addElementReport(elementReport);
+    List<ProcessChange> processChanges;
+    try {
+      processChanges = applyConfigElement(element, elementReport);  //never returns null
+
+      if (processChanges != null) {
+
+
+        for (ProcessChange processChange : processChanges) {
+
+          Long processId = processChange.getProcessId();
+          if (processChange.processActionRequired()) {
+
+            if (!processLists.containsKey(processId)) {
+              processLists.put(processId, new ArrayList<>());
+            }
+
+            //cast to implementation needed as DomFactory uses this - TODO change to interface
+            processLists.get(processId).add((Change) processChange.getChangeEvent());
+
+            if (processChange.hasNestedSubReport()) {
+              elementReport.addSubReport(processChange.getNestedSubReport());
+              daqReportPlaceholder.put(processChange.getChangeEvent().getChangeId(), processChange.getNestedSubReport());
+            } else {
+              daqReportPlaceholder.put(processChange.getChangeEvent().getChangeId(), elementReport);
+            }
+
+            elementPlaceholder.put(processChange.getChangeEvent().getChangeId(), element);
+            element.setDaqStatus(Status.RESTART); //default to restart; if successful on DAQ layer switch to OK
+          } else if (processChange.requiresReboot()) {
+            if (log.isDebugEnabled()) {
+              log.debug(configId + " RESTART for " + processChange.getProcessId() + " required");
+            }
+            element.setDaqStatus(Status.RESTART);
+            report.addStatus(Status.RESTART);
+            report.addProcessToReboot(processCache.get(processId).getName());
+            element.setStatus(Status.RESTART);
+            processService.setRequiresReboot(processId, Boolean.TRUE);
+          }
+        }
+      }
+    } catch (Exception ex) {
+      String errMessage = configId + " Exception caught while applying the configuration change (Action, Entity, " +
+              "Entity id) = (" + element.getAction() + "; " + element.getEntity() + "; " + element.getEntityId() + ")";
+      log.error(errMessage, ex.getMessage());
+      elementReport.setFailure("Exception caught while applying the configuration change.", ex);
+      element.setStatus(Status.FAILURE);
+      report.addStatus(Status.FAILURE);
+      report.setStatusDescription("Failure: see details below.");
+    }
+    if (configProgressMonitor != null){
+      configProgressMonitor.incrementServerProgress(element.buildDescription());
     }
   }
 

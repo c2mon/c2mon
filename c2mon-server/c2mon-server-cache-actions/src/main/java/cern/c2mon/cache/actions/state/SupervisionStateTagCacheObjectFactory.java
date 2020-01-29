@@ -8,21 +8,25 @@ import cern.c2mon.shared.daq.config.Change;
 import javax.inject.Named;
 import java.util.Properties;
 
-import static cern.c2mon.server.common.util.KotlinAPIs.let;
+import static cern.c2mon.server.common.util.KotlinAPIs.apply;
 
 @Named
 public class SupervisionStateTagCacheObjectFactory extends ControlTagCacheObjectFactory<SupervisionStateTag> {
 
   @Override
-  public Change configureCacheObject(SupervisionStateTag cacheable, Properties properties) {
-    SupervisionStateTag commFaultTag = let(new PropertiesAccessor(properties), accessor -> new SupervisionStateTag(
-      accessor.getLong("id").getNullableValue(),
-      accessor.getLong("supervisedId").getNullableValue(),
-      accessor.getString("supervisedType").getNullableValue(), // TODO (Alex) Update this to whatever the clients use
-      accessor.getLong("aliveTagId").getNullableValue(),
-      accessor.getLong("commFaultTagId").getNullableValue()
-    ));
+  public SupervisionStateTag createCacheObject(Long id) {
+    return new SupervisionStateTag(id);
+  }
 
-    return super.configureCacheObject(commFaultTag, properties);
+  @Override
+  public Change configureCacheObject(SupervisionStateTag supervisionStateTag, Properties properties) {
+
+    apply(new PropertiesAccessor(properties), accessor -> {
+      accessor.getLong("supervisedId").ifPresent(supervisionStateTag::setSupervisedId)
+        .getLong("aliveTagId").ifPresent(supervisionStateTag::setAliveTagId)
+        .getLong("commFaultTagId").ifPresent(supervisionStateTag::setCommFaultTagId);
+    });
+
+    return super.configureCacheObject(supervisionStateTag, properties);
   }
 }
