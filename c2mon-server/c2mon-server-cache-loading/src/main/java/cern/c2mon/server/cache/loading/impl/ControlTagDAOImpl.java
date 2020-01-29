@@ -1,6 +1,7 @@
-package cern.c2mon.server.cache.loading;
+package cern.c2mon.server.cache.loading.impl;
 
 import cern.c2mon.server.cache.dbaccess.LoaderMapper;
+import cern.c2mon.server.cache.loading.ConfigurableDAO;
 import cern.c2mon.server.cache.loading.common.AbstractDefaultLoaderDAO;
 import cern.c2mon.server.common.control.ControlTag;
 

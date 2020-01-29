@@ -19,7 +19,6 @@ package cern.c2mon.server.cache.loading.impl;
 import cern.c2mon.server.cache.dbaccess.AliveTagMapper;
 import cern.c2mon.server.cache.loading.AliveTagDAO;
 import cern.c2mon.server.cache.loading.CacheLoaderName;
-import cern.c2mon.server.cache.loading.ControlTagDAOImpl;
 import cern.c2mon.server.common.alive.AliveTag;
 import org.springframework.stereotype.Service;
 
