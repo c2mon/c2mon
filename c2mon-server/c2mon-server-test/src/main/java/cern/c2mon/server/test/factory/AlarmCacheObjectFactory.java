@@ -17,7 +17,7 @@
 package cern.c2mon.server.test.factory;
 
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
-import cern.c2mon.server.common.alarm.AlarmCondition;
+import cern.c2mon.shared.client.alarm.condition.AlarmCondition;
 
 import java.sql.Timestamp;
 

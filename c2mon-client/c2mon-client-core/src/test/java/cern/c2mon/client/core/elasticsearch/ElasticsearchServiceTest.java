@@ -16,11 +16,11 @@
  *****************************************************************************/
 package cern.c2mon.client.core.elasticsearch;
 
+import cern.c2mon.cache.actions.alarm.AlarmService;
+import cern.c2mon.cache.api.impl.SimpleC2monCache;
+import cern.c2mon.cache.config.tag.UnifiedTagCacheFacade;
 import cern.c2mon.client.core.config.C2monClientProperties;
-import cern.c2mon.server.cache.EquipmentCache;
-import cern.c2mon.server.cache.ProcessCache;
-import cern.c2mon.server.cache.SubEquipmentCache;
-import cern.c2mon.server.cache.TagFacadeGateway;
+import cern.c2mon.server.common.alarm.TagWithAlarms;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.elasticsearch.IndexManager;
 import cern.c2mon.server.elasticsearch.MappingFactory;
@@ -34,13 +34,11 @@ import cern.c2mon.server.elasticsearch.util.EmbeddedElasticsearchManager;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import org.apache.http.annotation.NotThreadSafe;
 import org.easymock.Mock;
-import org.elasticsearch.node.NodeValidationException;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
@@ -63,22 +61,26 @@ public class ElasticsearchServiceTest {
   private IndexManager indexManager;
 
   @Mock
-  private TagFacadeGateway tagFacadeGateway;
+  private AlarmService alarmService;
 
   public ElasticsearchServiceTest() {
     client = new ElasticsearchClientRest(elasticsearchProperties);
     indexManager = new IndexManager(client);
     TagConfigDocumentIndexer indexer = new TagConfigDocumentIndexer(elasticsearchProperties, indexManager);
-    ProcessCache processCache = createNiceMock(ProcessCache.class);
-    EquipmentCache equipmentCache = createNiceMock(EquipmentCache.class);
-    SubEquipmentCache subequipmentCache = createNiceMock(SubEquipmentCache.class);
-    TagConfigDocumentConverter converter = new TagConfigDocumentConverter(processCache, equipmentCache, subequipmentCache);
-    tagFacadeGateway = createNiceMock(TagFacadeGateway.class);
-    tagDocumentListener = new TagConfigDocumentListener(elasticsearchProperties, indexer, converter, tagFacadeGateway);
+    TagConfigDocumentConverter converter = new TagConfigDocumentConverter(
+      new SimpleC2monCache<>("procCache"),
+      new SimpleC2monCache<>("eqCache"),
+      new SimpleC2monCache<>("subEqCache")
+    );
+    UnifiedTagCacheFacade tagCacheFacade = new UnifiedTagCacheFacade(new SimpleC2monCache<>("rule"),
+      new SimpleC2monCache<>("data"), new SimpleC2monCache<>("alive"), new SimpleC2monCache<>("cFault"),
+      new SimpleC2monCache<>("state"));
+    alarmService = new AlarmService(new SimpleC2monCache<>("alarmCache"), tagCacheFacade, null);
+    tagDocumentListener = new TagConfigDocumentListener(elasticsearchProperties, indexer, converter, tagCacheFacade, alarmService);
   }
 
   @BeforeClass
-  public static void setUpClass() throws IOException, InterruptedException {
+  public static void setUpClass() {
     EmbeddedElasticsearchManager.start(elasticsearchProperties);
   }
 
@@ -88,7 +90,7 @@ public class ElasticsearchServiceTest {
   }
 
   @Before
-  public void setupElasticsearch() throws InterruptedException, NodeValidationException {
+  public void setupElasticsearch() throws InterruptedException {
     try {
       CompletableFuture<Void> nodeReady = CompletableFuture.runAsync(() -> {
         EmbeddedElasticsearchManager.getEmbeddedNode().deleteIndex(elasticsearchProperties.getTagConfigIndex());
@@ -108,7 +110,7 @@ public class ElasticsearchServiceTest {
 
   @Before
   public void resetMocks() {
-    reset(tagFacadeGateway);
+    reset(alarmService);
   }
 
   @Test
@@ -119,8 +121,8 @@ public class ElasticsearchServiceTest {
       String responsible = "responsible";
       DataTagCacheObject tag = new DataTagCacheObject(testUserTagId);
       tag.getMetadata().getMetadata().put(responsible, testUser);
-      expect(tagFacadeGateway.getAlarms(anyObject(DataTagCacheObject.class))).andReturn(Collections.emptyList()).times(2);
-      replay(tagFacadeGateway);
+      expect(alarmService.getTagWithAlarmsAtomically(anyLong())).andReturn(new TagWithAlarms<>(tag,Collections.emptyList())).times(2);
+      replay(alarmService);
       tagDocumentListener.onConfigurationEvent(tag, ConfigConstants.Action.CREATE);
       Long tag1234Id = Double.doubleToLongBits(Math.random()) % 10000;
       String value1234 = "1234";
@@ -159,8 +161,8 @@ public class ElasticsearchServiceTest {
       String tagname = "tagname";
       tag.setName(tagname);
       tag.getMetadata().getMetadata().put(metadataKey, testUser);
-      expect(tagFacadeGateway.getAlarms(anyObject(DataTagCacheObject.class))).andReturn(Collections.emptyList()).times(3);
-      replay(tagFacadeGateway);
+      expect(alarmService.getTagWithAlarmsAtomically(anyLong())).andReturn(new TagWithAlarms<>(tag,Collections.emptyList())).times(3);
+      replay(alarmService);
       tagDocumentListener.onConfigurationEvent(tag, ConfigConstants.Action.CREATE);
 
       tag = new DataTagCacheObject(Double.doubleToLongBits(Math.random()) % 10000);
@@ -188,7 +190,7 @@ public class ElasticsearchServiceTest {
   }
 
   @Test
-  public void testSearchByName() throws InterruptedException {
+  public void testSearchByName() {
     try {
       ElasticsearchService service = new ElasticsearchService(properties, "c2mon");
       Collection<Long> tagsForResponsibleUser = service.findTagsByName("TEST");

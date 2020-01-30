@@ -39,11 +39,11 @@ import cern.c2mon.server.configuration.helper.ObjectEqualityComparison;
 import cern.c2mon.server.configuration.junit.ConfigLoaderRuleChain;
 import cern.c2mon.server.configuration.parser.util.*;
 import cern.c2mon.server.daq.out.ProcessCommunicationManager;
+import cern.c2mon.shared.client.alarm.condition.ValueAlarmCondition;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.api.Configuration;
 import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
-import cern.c2mon.shared.client.configuration.api.alarm.ValueCondition;
 import cern.c2mon.shared.client.configuration.api.equipment.Equipment;
 import cern.c2mon.shared.client.configuration.api.equipment.SubEquipment;
 import cern.c2mon.shared.client.configuration.api.process.Process;
@@ -1419,7 +1419,7 @@ public class EverythingEverConfigurationTest extends ConfigurationCacheTest {
     processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
 
     // TEST:Build configuration to update the test Alarm
-    Alarm alarmUpdate = Alarm.update(2000L).alarmCondition(new ValueCondition(Integer.class, 5)).build();
+    Alarm alarmUpdate = Alarm.update(2000L).alarmCondition(new ValueAlarmCondition(5)).build();
     Configuration configuration = new Configuration();
     configuration.addEntity(alarmUpdate);
 

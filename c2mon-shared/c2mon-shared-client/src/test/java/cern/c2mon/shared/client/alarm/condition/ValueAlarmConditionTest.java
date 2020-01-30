@@ -16,14 +16,13 @@
  *****************************************************************************/
 package cern.c2mon.shared.client.alarm.condition;
 
-import javax.xml.parsers.ParserConfigurationException;
-
+import cern.c2mon.shared.common.supervision.SupervisionStatus;
+import cern.c2mon.shared.util.parser.SimpleXMLParser;
 import org.junit.Assert;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
-import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
-import cern.c2mon.shared.util.parser.SimpleXMLParser;
+import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * Unit test of value alarm condition implementation.
