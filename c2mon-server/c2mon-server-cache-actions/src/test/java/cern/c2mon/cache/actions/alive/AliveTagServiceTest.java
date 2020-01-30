@@ -1,7 +1,7 @@
 package cern.c2mon.cache.actions.alive;
 
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.cache.api.impl.SimpleC2monCache;
+import cern.c2mon.cache.api.impl.SimpleCache;
 import cern.c2mon.server.common.alive.AliveTag;
 import cern.c2mon.server.test.factory.AliveTagCacheObjectFactory;
 import org.junit.Before;
@@ -26,7 +26,7 @@ public class AliveTagServiceTest {
 
   @Before
   public void init() {
-    aliveTimerCacheRef = new SimpleC2monCache<>("alive-timer-cache");
+    aliveTimerCacheRef = new SimpleCache<>("alive-timer-cache");
     aliveTimerService = new AliveTagService(aliveTimerCacheRef);
   }
 

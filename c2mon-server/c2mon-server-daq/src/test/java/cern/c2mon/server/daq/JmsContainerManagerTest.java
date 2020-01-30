@@ -17,7 +17,7 @@
 package cern.c2mon.server.daq;
 
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.cache.api.impl.SimpleC2monCache;
+import cern.c2mon.cache.api.impl.SimpleCache;
 import cern.c2mon.cache.config.CacheConfigModuleRef;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.common.config.CommonModule;
@@ -94,7 +94,7 @@ public class JmsContainerManagerTest {
 
   @Before
   public void setUp() throws Exception {
-    mockProcessCache = new SimpleC2monCache<>("process");
+    mockProcessCache = new SimpleCache<>("process");
     mockListener = EasyMock.createMock(SessionAwareMessageListener.class);
 
     jmsSender = new ActiveJmsSender();

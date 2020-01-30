@@ -1,7 +1,7 @@
 package cern.c2mon.cache.actions.command;
 
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.cache.api.impl.SimpleC2monCache;
+import cern.c2mon.cache.api.impl.SimpleCache;
 import cern.c2mon.server.common.command.CommandTagCacheObject;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.equipment.EquipmentCacheObject;
@@ -27,7 +27,7 @@ public class CommandCacheObjectFactoryTest {
 
   @Before
   public void init() {
-    equipmentCache = new SimpleC2monCache<>("equipmentCache");
+    equipmentCache = new SimpleCache<>("equipmentCache");
     EquipmentCacheObject equipment = new EquipmentCacheObjectFactory().sampleBase();
     equipmentCache.put(equipment.getId(), equipment);
     eqid = equipment.getId();

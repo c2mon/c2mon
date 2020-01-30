@@ -1,6 +1,6 @@
 package cern.c2mon.cache.api;
 
-import cern.c2mon.cache.api.impl.SimpleC2monCache;
+import cern.c2mon.cache.api.impl.SimpleCache;
 import cern.c2mon.cache.api.listener.CacheListener;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
@@ -18,7 +18,7 @@ public class CacheEventsTest {
 
   private final Alarm sample = new AlarmCacheObject(1L);
   private final CacheListener<Alarm> listenerAction = eq -> eventCounter.incrementAndGet();
-  private C2monCache<Alarm> cache = new SimpleC2monCache<>("alarm");
+  private C2monCache<Alarm> cache = new SimpleCache<>("alarm");
 
   @Before
   public void reset() {

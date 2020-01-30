@@ -1,6 +1,6 @@
 package cern.c2mon.cache.api;
 
-import cern.c2mon.cache.api.impl.SimpleC2monCache;
+import cern.c2mon.cache.api.impl.SimpleCache;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import org.junit.BeforeClass;
@@ -38,13 +38,13 @@ public class SimpleCacheTest {
 
   @Test
   public void createCache() {
-    C2monCache<DataTag> c2monCache = new SimpleC2monCache<>("simple-c2monCache");
+    C2monCache<DataTag> c2monCache = new SimpleCache<>("simple-c2monCache");
     assertNotNull("C2monCache should be not null", c2monCache);
   }
 
   @Test
   public void populateCache() {
-    C2monCache<DataTag> c2monCache = new SimpleC2monCache<>("simple-c2monCache");
+    C2monCache<DataTag> c2monCache = new SimpleCache<>("simple-c2monCache");
 
     c2monCache.putAll(map);
 
@@ -53,7 +53,7 @@ public class SimpleCacheTest {
 
   @Test
   public void getAllByKeys() {
-    C2monCache<DataTag> c2monCache = new SimpleC2monCache<>("simple-c2monCache");
+    C2monCache<DataTag> c2monCache = new SimpleCache<>("simple-c2monCache");
     c2monCache.putAll(map);
 
     Map<Long, DataTag> selectedMap = c2monCache.getAll(keys);
@@ -66,7 +66,7 @@ public class SimpleCacheTest {
 
   @Test
   public void getAllEntriesByProvidedKeySet() {
-    C2monCache<DataTag> c2monCache = new SimpleC2monCache<>("simple-c2monCache");
+    C2monCache<DataTag> c2monCache = new SimpleCache<>("simple-c2monCache");
     c2monCache.putAll(map);
 
     long removedId = getRandom();

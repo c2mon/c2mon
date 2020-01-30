@@ -18,7 +18,7 @@ package cern.c2mon.cache.actions.oscillation;
 
 import cern.c2mon.cache.actions.alarm.AlarmService;
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.cache.api.impl.SimpleC2monCache;
+import cern.c2mon.cache.api.impl.SimpleCache;
 import cern.c2mon.cache.config.tag.UnifiedTagCacheFacade;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
@@ -44,8 +44,8 @@ public class OscillationUpdateCheckerTest {
   @Before
   public void setup() {
     // Tag caches
-    dataTagCache = new SimpleC2monCache<>("dataTag");
-    UnifiedTagCacheFacade unifiedTagCacheFacade = new UnifiedTagCacheFacade(new SimpleC2monCache<>("ruleTag"), dataTagCache, null, null, null);
+    dataTagCache = new SimpleCache<>("dataTag");
+    UnifiedTagCacheFacade unifiedTagCacheFacade = new UnifiedTagCacheFacade(new SimpleCache<>("ruleTag"), dataTagCache, null, null, null);
     dataTagCacheObject = new DataTagCacheObjectFactory().sampleBase();
     dataTagCacheObject.setValue(Boolean.FALSE);
     dataTagCacheObject.setSourceTimestamp(new Timestamp(System.currentTimeMillis() - 100000L));
@@ -54,11 +54,11 @@ public class OscillationUpdateCheckerTest {
     // Oscillation
     oscillationProperties = new OscillationProperties();
     OscillationUpdater oscillationUpdater = new OscillationUpdater(oscillationProperties);
-    OscillationService oscillationService = new OscillationService(new SimpleC2monCache<>("lastAccess"));
+    OscillationService oscillationService = new OscillationService(new SimpleCache<>("lastAccess"));
     oscillationService.setLastOscillationCheck(1);
 
     // Alarms
-    alarmCache = new SimpleC2monCache<>("alarmCache");
+    alarmCache = new SimpleCache<>("alarmCache");
     AlarmService alarmCacheUpdater = new AlarmService(alarmCache, unifiedTagCacheFacade, oscillationUpdater);
     oscillationUpdateChecker = new OscillationUpdateChecker(oscillationService, oscillationUpdater, alarmCacheUpdater, dataTagCache);
 

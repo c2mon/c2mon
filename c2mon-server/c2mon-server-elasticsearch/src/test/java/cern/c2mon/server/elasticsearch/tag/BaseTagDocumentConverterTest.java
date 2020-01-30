@@ -17,18 +17,17 @@
 package cern.c2mon.server.elasticsearch.tag;
 
 
-import java.util.Map;
-
-import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
-
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.cache.api.impl.SimpleC2monCache;
+import cern.c2mon.cache.api.impl.SimpleCache;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.elasticsearch.util.EntityUtils;
+import org.junit.runner.RunWith;
+import org.mockito.runners.MockitoJUnitRunner;
+
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
@@ -38,11 +37,11 @@ import static org.junit.Assert.assertEquals;
 @RunWith(MockitoJUnitRunner.class)
 public abstract class BaseTagDocumentConverterTest {
 
-  protected C2monCache<Process> processCache = new SimpleC2monCache<>("proc");
+  protected C2monCache<Process> processCache = new SimpleCache<>("proc");
 
-  protected C2monCache<Equipment> equipmentCache = new SimpleC2monCache<>("eq");
+  protected C2monCache<Equipment> equipmentCache = new SimpleCache<>("eq");
 
-  protected C2monCache<SubEquipment> subEquipmentCache = new SimpleC2monCache<>("subEq");
+  protected C2monCache<SubEquipment> subEquipmentCache = new SimpleCache<>("subEq");
 
   protected TagDocumentConverter converter = new TagDocumentConverter(processCache, equipmentCache, subEquipmentCache);
 

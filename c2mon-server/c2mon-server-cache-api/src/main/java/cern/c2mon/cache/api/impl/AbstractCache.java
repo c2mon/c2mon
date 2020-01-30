@@ -1,5 +1,6 @@
-package cern.c2mon.cache.api;
+package cern.c2mon.cache.api.impl;
 
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.cache.api.flow.CacheUpdateFlow;
 import cern.c2mon.cache.api.flow.DefaultCacheFlow;
@@ -24,7 +25,7 @@ import static cern.c2mon.shared.common.CacheEvent.*;
 import static java.util.Objects.requireNonNull;
 
 @Slf4j
-public abstract class C2monCacheimpl<CACHEABLE extends Cacheable> implements C2monCache<CACHEABLE> {
+public abstract class AbstractCache<CACHEABLE extends Cacheable> implements C2monCache<CACHEABLE> {
 
   protected final String cacheName;
 
@@ -40,7 +41,7 @@ public abstract class C2monCacheimpl<CACHEABLE extends Cacheable> implements C2m
   @Setter
   protected CacheListenerManager<CACHEABLE> cacheListenerManager = new CacheListenerManagerImpl<>();
 
-  public C2monCacheimpl(String cacheName) {
+  public AbstractCache(String cacheName) {
     this.cacheName = cacheName;
   }
 

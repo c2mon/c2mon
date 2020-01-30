@@ -2,7 +2,7 @@ package cern.c2mon.cache.actions.commfault;
 
 import cern.c2mon.cache.actions.state.SupervisionStateTagService;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
-import cern.c2mon.cache.api.impl.SimpleC2monCache;
+import cern.c2mon.cache.api.impl.SimpleCache;
 import cern.c2mon.server.common.commfault.CommFaultTag;
 import cern.c2mon.server.common.supervision.SupervisionStateTag;
 import cern.c2mon.server.test.factory.CommFaultTagCacheObjectFactory;
@@ -25,13 +25,13 @@ public class CommFaultCascadeTests {
   private final CommFaultTagCacheObjectFactory commFaultFactory = new CommFaultTagCacheObjectFactory();
   private final SupervisionStateTagFactory stateTagFactory = new SupervisionStateTagFactory();
 
-  private SupervisionStateTagService stateTagService = new SupervisionStateTagService(new SimpleC2monCache<>("stateTag"));
+  private SupervisionStateTagService stateTagService = new SupervisionStateTagService(new SimpleCache<>("stateTag"));
 
   private CommFaultTagUpdateCascader updateCascader;
 
   @Before
   public void init() {
-    updateCascader = new CommFaultTagUpdateCascader(new SimpleC2monCache<>("cFault"), stateTagService);
+    updateCascader = new CommFaultTagUpdateCascader(new SimpleCache<>("cFault"), stateTagService);
     updateCascader.register();
   }
 

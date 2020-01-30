@@ -1,7 +1,7 @@
 package cern.c2mon.cache.actions.device;
 
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.cache.api.impl.SimpleC2monCache;
+import cern.c2mon.cache.api.impl.SimpleCache;
 import cern.c2mon.server.common.device.*;
 import cern.c2mon.server.test.factory.DeviceClassCacheObjectFactory;
 import cern.c2mon.shared.client.device.DeviceCommand;
@@ -32,7 +32,7 @@ public class DeviceCacheObjectFactoryTest {
 
   @Before
   public void init() {
-    deviceClassCache = new SimpleC2monCache<>("deviceClass");
+    deviceClassCache = new SimpleCache<>("deviceClass");
     testObjectFactory = new DeviceClassCacheObjectFactory();
     factory = new DeviceCacheObjectFactory(deviceClassCache);
   }

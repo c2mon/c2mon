@@ -1,6 +1,5 @@
 package cern.c2mon.cache.api.impl;
 
-import cern.c2mon.cache.api.C2monCacheimpl;
 import cern.c2mon.cache.api.spi.CacheQuery;
 import cern.c2mon.shared.common.Cacheable;
 import lombok.Getter;
@@ -17,12 +16,12 @@ import java.util.stream.Collectors;
  * @author Szymon Halastra
  * @author Alexandros Papageorgiou Koufidis
  */
-public class SimpleC2monCache<V extends Cacheable> extends C2monCacheimpl<V> {
+public class SimpleCache<V extends Cacheable> extends AbstractCache<V> {
 
   @Getter
   private final MapBasedCache<V> cache;
 
-  public SimpleC2monCache(String cacheName) {
+  public SimpleCache(String cacheName) {
     super(cacheName);
     cache = new MapBasedCache<>();
   }

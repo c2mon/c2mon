@@ -1,6 +1,6 @@
 package cern.c2mon.cache.impl;
 
-import cern.c2mon.cache.api.C2monCacheimpl;
+import cern.c2mon.cache.api.impl.AbstractCache;
 import cern.c2mon.cache.api.spi.CacheQuery;
 import cern.c2mon.shared.common.Cacheable;
 import lombok.Getter;
@@ -28,7 +28,7 @@ import java.util.stream.StreamSupport;
  * @author Alexandros Papageorgiou Koufidis
  */
 @Slf4j
-public class IgniteC2monCache<V extends Cacheable> extends C2monCacheimpl<V> {
+public class IgniteC2monCache<V extends Cacheable> extends AbstractCache<V> {
 
   protected final String cacheName;
   private final Ignite igniteInstance;

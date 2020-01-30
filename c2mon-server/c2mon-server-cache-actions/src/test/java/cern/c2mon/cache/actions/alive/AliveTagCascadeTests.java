@@ -4,7 +4,7 @@ import cern.c2mon.cache.actions.commfault.CommFaultService;
 import cern.c2mon.cache.actions.state.SupervisionStateTagService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
-import cern.c2mon.cache.api.impl.SimpleC2monCache;
+import cern.c2mon.cache.api.impl.SimpleCache;
 import cern.c2mon.server.test.factory.AliveTagCacheObjectFactory;
 import cern.c2mon.server.test.factory.CommFaultTagCacheObjectFactory;
 import cern.c2mon.server.test.factory.SupervisionStateTagFactory;
@@ -25,11 +25,11 @@ public class AliveTagCascadeTests {
   private final AliveTagCacheObjectFactory factory = new AliveTagCacheObjectFactory();
   private final CommFaultTagCacheObjectFactory commFaultFactory = new CommFaultTagCacheObjectFactory();
   private final SupervisionStateTagFactory stateTagFactory = new SupervisionStateTagFactory();
-  private CommFaultService commFaultService = new CommFaultService(new SimpleC2monCache<>("commFault"));
-  private SupervisionStateTagService stateTagService = new SupervisionStateTagService(new SimpleC2monCache<>("stateTag"));
+  private CommFaultService commFaultService = new CommFaultService(new SimpleCache<>("commFault"));
+  private SupervisionStateTagService stateTagService = new SupervisionStateTagService(new SimpleCache<>("stateTag"));
 
   private AliveTagUpdateCascader updateCascader =
-    new AliveTagUpdateCascader(new SimpleC2monCache<>("aliveTag"), commFaultService, stateTagService);
+    new AliveTagUpdateCascader(new SimpleCache<>("aliveTag"), commFaultService, stateTagService);
 
   @Before
   public void setUp() {
