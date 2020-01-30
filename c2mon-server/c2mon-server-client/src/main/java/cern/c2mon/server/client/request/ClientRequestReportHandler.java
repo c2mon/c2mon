@@ -16,26 +16,18 @@
  *****************************************************************************/
 package cern.c2mon.server.client.request;
 
+import cern.c2mon.server.configuration.ConfigProgressMonitor;
+import cern.c2mon.shared.client.configuration.ConfigurationReport;
+import cern.c2mon.shared.client.request.ClientRequestProgressReport;
+import cern.c2mon.shared.client.request.ClientRequestResult;
+import cern.c2mon.shared.util.json.GsonFactory;
+import com.google.gson.Gson;
+import lombok.extern.slf4j.Slf4j;
+
+import javax.jms.*;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import javax.jms.DeliveryMode;
-import javax.jms.Destination;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageProducer;
-import javax.jms.Session;
-
-import lombok.extern.slf4j.Slf4j;
-
-import cern.c2mon.server.configuration.ConfigProgressMonitor;
-import cern.c2mon.shared.client.request.ClientRequestProgressReport;
-import cern.c2mon.shared.client.request.ClientRequestResult;
-import cern.c2mon.shared.client.configuration.ConfigurationReport;
-import cern.c2mon.shared.util.json.GsonFactory;
-
-import com.google.gson.Gson;
 
 /**
  * Receives updates about long - running requests in the server
@@ -122,7 +114,7 @@ public class ClientRequestReportHandler implements ConfigProgressMonitor {
       messageProducer.send(replyMessage);
 
       log.debug("ClientRequestReportHandler() : Report sent.");
-    } catch (Throwable e) {
+    } catch (Exception e) {
       log.warn("daqTotalParts(): Failed to send Progress report :" + e.getMessage(), e);
     } finally {
       if (messageProducer != null) {

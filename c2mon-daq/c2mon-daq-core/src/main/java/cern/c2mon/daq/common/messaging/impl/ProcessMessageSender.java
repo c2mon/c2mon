@@ -16,14 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.daq.common.messaging.impl;
 
-import java.util.Collection;
-import java.util.Iterator;
-
-import javax.jms.JMSException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import cern.c2mon.daq.common.conf.core.ProcessConfigurationHolder;
 import cern.c2mon.daq.common.messaging.IProcessMessageSender;
 import cern.c2mon.daq.common.messaging.JmsSender;
@@ -36,6 +28,12 @@ import cern.c2mon.shared.util.buffer.PullEvent;
 import cern.c2mon.shared.util.buffer.PullException;
 import cern.c2mon.shared.util.buffer.SynchroBuffer;
 import cern.c2mon.shared.util.buffer.SynchroBufferListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.jms.JMSException;
+import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * The ProcessMessageSender class is responsible for sending JMS messages from
@@ -147,7 +145,7 @@ public class ProcessMessageSender implements IProcessMessageSender {
     catch (JMSException ex) {
       LOGGER.error("sendAlive : JMSException caught :" + ex.getMessage());
     }
-    catch (Throwable e) {
+    catch (Exception e) {
       LOGGER.error("sendAlive : Unexpected Exception caught :", e);
     }
 
