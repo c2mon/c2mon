@@ -16,8 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.shared.common.datatag;
 
-import java.sql.Timestamp;
-
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +24,8 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import java.sql.Timestamp;
 
 /**
  * Objects of the SourceDataTagValue class represent the current value of a
@@ -62,7 +62,7 @@ public final class SourceDataTagValue implements Cloneable {
   /**
    * Log4j Logger for logging DataTag values.
    */
-  protected static final Logger TAG_LOG = LoggerFactory.getLogger("SourceDataTagLogger");
+  private static final Logger TAG_LOG = LoggerFactory.getLogger("SourceDataTagLogger");
 
   // ----------------------------------------------------------------------------
   // MEMBERS
@@ -285,7 +285,7 @@ public final class SourceDataTagValue implements Cloneable {
     if (id != null) {
       name = domElement.getAttribute(XML_ATTRIBUTE_NAME);
       if (domElement.getAttribute(XML_ATTRIBUTE_CONTROLTAG) != null) {
-        control = domElement.getAttribute(XML_ATTRIBUTE_CONTROLTAG).equals("true");
+        control = "true".equals(domElement.getAttribute(XML_ATTRIBUTE_CONTROLTAG));
       } else {
         throw new RuntimeException("Control tag attribute not set in SourceDataTagValue XML - unable to decode it.");
       }
@@ -305,41 +305,41 @@ public final class SourceDataTagValue implements Cloneable {
           fieldName = fieldNode.getNodeName();
           if (fieldNode.getFirstChild() != null) {
             fieldValueString = fieldNode.getFirstChild().getNodeValue();
-            if (fieldName.equals("value")) {
+            if ("value".equals(fieldName)) {
               String dataType = fieldNode.getAttributes().item(0).getNodeValue();
 
-              if (dataType.equals("Integer")) {
+              if ("Integer".equals(dataType)) {
                 result.value = Integer.valueOf(fieldValueString);
-              } else if (dataType.equals("Float")) {
+              } else if ("Float".equals(dataType)) {
                 result.value = Float.valueOf(fieldValueString);
-              } else if (dataType.equals("Double")) {
+              } else if ("Double".equals(dataType)) {
                 result.value = Double.valueOf(fieldValueString);
-              } else if (dataType.equals("Long")) {
+              } else if ("Long".equals(dataType)) {
                 result.value = Long.valueOf(fieldValueString);
-              } else if (dataType.equals("Boolean")) {
+              } else if ("Boolean".equals(dataType)) {
                 result.value = Boolean.valueOf(fieldValueString);
-              } else if (dataType.equals("String")) {
+              } else if ("String".equals(dataType)) {
                 result.value = fieldValueString;
               }
-            } else if (fieldName.equals("value-description")) {
+            } else if ("value-description".equals(fieldName)) {
               result.valueDescription = fieldNode.getFirstChild().getNodeValue();
-            } else if (fieldName.equals("quality")) {
+            } else if ("quality".equals(fieldName)) {
               result.quality = SourceDataTagQuality.fromXML((Element) fieldNode);
-            } else if (fieldName.equals("timestamp")) {
+            } else if ("timestamp".equals(fieldName)) {
               try {
                 result.timestamp = new Timestamp(Long.parseLong(fieldValueString));
               } catch (NumberFormatException nfe) {
                 log.error("Error during timestamp extraction.");
                 result.timestamp = new Timestamp(System.currentTimeMillis());
               }
-            } else if (fieldName.equals("daq-timestamp")) {
+            } else if ("daq-timestamp".equals(fieldName)) {
               try {
                 result.daqTimestamp = new Timestamp(Long.parseLong(fieldValueString));
               } catch (NumberFormatException nfe) {
                 log.error("Error during DAQ timestamp extraction - leaving null.");
                 result.daqTimestamp = null;
               }
-            } else if (fieldName.equals("simulated")) {
+            } else if ("simulated".equals(fieldName)) {
               result.simulated = true;
             }
           }
@@ -395,43 +395,8 @@ public final class SourceDataTagValue implements Cloneable {
   }
 
   @Override
-  public boolean equals(final Object pObj) {
-    boolean result = pObj != null && pObj instanceof SourceDataTagValue;
-    if (result) {
-      SourceDataTagValue copy = (SourceDataTagValue) pObj;
-      result = this.controlTag == copy.controlTag && this.guaranteedDelivery == copy.guaranteedDelivery
-          && this.simulated == copy.simulated && this.priority == copy.priority;
-      if (result) {
-        if (this.value != null) {
-          result = result && this.value.equals(copy.value);
-        }
-        if (this.valueDescription != null) {
-          result = result && this.valueDescription.equals(copy.valueDescription);
-        }
-        if (this.id != null) {
-          result = result && this.id.equals(copy.id);
-        }
-        if (this.name != null) {
-          result = result && this.name.equals(copy.name);
-        }
-        if (this.quality != null) {
-          result = result && this.quality.equals(copy.quality);
-        }
-        if (this.timestamp != null) {
-          result = result && this.timestamp.equals(copy.timestamp);
-        }
-        if (this.daqTimestamp != null) {
-          result = result && this.daqTimestamp.equals(copy.daqTimestamp);
-        }
-      }
-
-    }
-    return result;
-  }
-
-  @Override
   public String toString() {
-    StringBuffer str = new StringBuffer();
+    StringBuilder str = new StringBuilder();
 
     str.append(getId());
     str.append('\t');

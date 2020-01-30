@@ -30,7 +30,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import javax.xml.parsers.ParserConfigurationException;
-
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -547,22 +546,6 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
           }
         }
       }
-    }
-    return result;
-  }
-
-  @Override
-  public boolean equals(Object original) {
-    boolean result = original instanceof DataTagAddress;
-    if (result) {
-      DataTagAddress addr = (DataTagAddress) original;
-      result = this.guaranteedDelivery == addr.guaranteedDelivery && this.priority == addr.priority
-          && this.timeDeadband == addr.timeDeadband && this.timeToLive == addr.timeToLive
-          && this.valueDeadband == addr.valueDeadband && this.valueDeadbandType == addr.valueDeadbandType;
-      result = result && this.hardwareAddress == null ? addr.hardwareAddress == null : this.hardwareAddress
-          .equals(addr.hardwareAddress);
-      result &= this.addressParameters.equals(((DataTagAddress) original).getAddressParameters());
-
     }
     return result;
   }
