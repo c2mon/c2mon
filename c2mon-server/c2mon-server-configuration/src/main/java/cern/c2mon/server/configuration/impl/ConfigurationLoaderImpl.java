@@ -149,7 +149,8 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
       } catch (Exception e) {
         String message = "Exception caught while loading the configuration for " + configId + " from the DB: " + e.getMessage();
         log.error(message, e);
-        throw new RuntimeException(message, e);
+        // Gets caught by the wrapping block
+        throw e;
       }
 
       report = configApplier.applyList(configId, configName, configElements, configProgressMonitor, true);
@@ -269,7 +270,6 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
     RegistryMatcher matcher = new RegistryMatcher();
     matcher.bind(Timestamp.class, new DateFormatConverter(format));
     Strategy strategy = new AnnotationStrategy();
-    Serializer serializer = new Persister(strategy, matcher);
-    return serializer;
+    return new Persister(strategy, matcher);
   }
 }
