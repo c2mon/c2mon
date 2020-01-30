@@ -7,11 +7,9 @@ import cern.c2mon.server.cache.loading.common.AbstractDefaultLoaderDAO;
 import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
-import cern.c2mon.shared.common.supervision.SupervisionEntity;
 import lombok.NonNull;
 
 import static cern.c2mon.server.common.util.KotlinAPIs.apply;
-import static cern.c2mon.server.common.util.KotlinAPIs.applyNotNull;
 
 public abstract class ControlTagDAOImpl<CONTROL extends ControlTag> extends AbstractDefaultLoaderDAO<CONTROL> implements ConfigurableDAO<CONTROL> {
 
@@ -52,16 +50,6 @@ public abstract class ControlTagDAOImpl<CONTROL extends ControlTag> extends Abst
 
   protected DataTag convertToDataTag(CONTROL control) {
     return apply(new DataTagCacheObject(control.getId()), dataTag -> {
-      applyNotNull(control.getSupervisedId(), id -> {
-        if (control.getSupervisedEntity() == SupervisionEntity.PROCESS)
-          dataTag.setProcessId(id);
-        else if (control.getSupervisedEntity() == SupervisionEntity.EQUIPMENT)
-          dataTag.setEquipmentId(id);
-        else
-          dataTag.setSubEquipmentId(id);
-      });
-
-      dataTag.setEquipmentId(-1L); // TODO (Alex) We are setting this currently because we fail to save processes. How should we do that?
 
       dataTag.setSourceTimestamp(control.getSourceTimestamp());
       dataTag.setCacheTimestamp(control.getCacheTimestamp());

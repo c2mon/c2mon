@@ -222,7 +222,7 @@
       INSERT INTO DATATAG (TAGID, TAGNAME, TAGDESC, TAGMODE, TAGDATATYPE,
                             TAGVALUE, TAGVALUEDESC,
                             TAGTIMESTAMP, TAGDAQTIMESTAMP, TAGSRVTIMESTAMP,
-                            TAGQUALITYDESC, TAG_EQID,
+                            TAGQUALITYDESC,
                             TAGMINVAL, TAGMAXVAL,
                             TAGUNIT, TAGSIMULATED, TAGLOGGED, TAGADDRESS,
                             TAGDIPADDRESS, TAGJAPCADDRESS,
@@ -232,14 +232,6 @@
               #{value,javaType=java.lang.Object,jdbcType=VARCHAR},SUBSTR(#{valueDescription,jdbcType=VARCHAR}, 1, 2000),
               #{sourceTimestamp, jdbcType=TIMESTAMP},#{daqTimestamp,jdbcType=TIMESTAMP},#{cacheTimestamp,jdbcType=TIMESTAMP},
               SUBSTR(#{dataTagQuality,javaType=cern.c2mon.shared.common.datatag.DataTagQuality,jdbcType=VARCHAR}, 1, 1000),
-
-              <if test="equipmentId != null">
-                #{equipmentId,jdbcType=NUMERIC},
-              </if>
-              <if test="subEquipmentId != null">
-                #{subEquipmentId,jdbcType=NUMERIC},
-              </if>
-
               #{minValue,javaType=java.lang.Comparable,jdbcType=VARCHAR},#{maxValue,javaType=java.lang.Comparable,jdbcType=VARCHAR},
               #{unit,jdbcType=VARCHAR},#{simulated,jdbcType=NUMERIC},#{logged,jdbcType=NUMERIC},
               #{address,jdbcType=VARCHAR}, #{dipAddress,jdbcType=VARCHAR},#{japcAddress,jdbcType=VARCHAR},
