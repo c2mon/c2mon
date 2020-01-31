@@ -14,13 +14,13 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.test;
+package cern.c2mon.server.cache.test;
 
+import cern.c2mon.server.cache.test.factory.*;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.command.CommandTagCacheObject;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.common.rule.RuleTagCacheObject;
-import cern.c2mon.server.test.factory.*;
 
 /**
  * Contains static methods for creating test cache objects.

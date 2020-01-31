@@ -21,8 +21,8 @@ import cern.c2mon.server.common.process.ProcessCacheObject;
 import cern.c2mon.server.common.process.ProcessCacheObject.LocalConfig;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.inject.Inject;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -33,7 +33,7 @@ public class ProcessMapperTest extends AbstractMapperTest {
   /**
    * Class to test
    */
-  @Autowired
+  @Inject
   private ProcessMapper processMapper;
 
   private ProcessCacheObject originalProcess;

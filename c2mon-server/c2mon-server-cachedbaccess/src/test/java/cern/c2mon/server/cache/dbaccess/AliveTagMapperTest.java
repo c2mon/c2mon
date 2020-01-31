@@ -43,7 +43,7 @@ public class AliveTagMapperTest extends AbstractMapperTest {
 //    ControlTag aliveTag = CacheObjectCreation.createTestProcessAlive();
 //    Equipment equipment = CacheObjectCreation.createTestEquipment();
     //id in control tag cache is the same as in alivetimer cache
-    AliveTag retrievedCacheObject = (AliveTag) aliveTimerMapper.getItem(1221L);
+    AliveTag retrievedCacheObject = aliveTimerMapper.getItem(1221L);
 //    assertEquals(aliveTag.getId(), retrievedCacheObject.getId());
     assertEquals(60000L, (int) retrievedCacheObject.getAliveInterval());
     assertEquals(SupervisionEntity.PROCESS, retrievedCacheObject.getSupervisedEntity());

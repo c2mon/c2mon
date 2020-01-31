@@ -14,17 +14,17 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.test.factory;
+package cern.c2mon.server.cache.test.factory;
 
-import cern.c2mon.server.common.tag.AbstractTagCacheObject;
-import cern.c2mon.shared.common.datatag.DataTagQuality;
-import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
+import cern.c2mon.server.common.equipment.AbstractEquipmentCacheObject;
 
-abstract class AbstractTagCacheObjectFactory<T extends AbstractTagCacheObject> extends AbstractCacheObjectFactory<T> {
+abstract class AbstractEquipmentCacheObjectFactory<T extends AbstractEquipmentCacheObject> extends AbstractCacheObjectFactory<T> {
 
-  public DataTagQuality createValidQuality() {
-    DataTagQuality dataTagQuality = new DataTagQualityImpl();
-    dataTagQuality.validate();
-    return dataTagQuality;
+  void initDefaults(T base){
+    base.setDescription("Test desc");
+    base.setHandlerClassName("Test class name");
+    base.setAliveTagId(1224L);
+    base.setAliveInterval(10);
+    base.setCommFaultTagId(1223L);
   }
 }

@@ -1,4 +1,4 @@
-package cern.c2mon.server.test.factory;
+package cern.c2mon.server.cache.test.factory;
 
 import cern.c2mon.server.common.device.Command;
 import cern.c2mon.server.common.device.DeviceClassCacheObject;

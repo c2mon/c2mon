@@ -1,6 +1,6 @@
 package cern.c2mon.server.configuration.junit;
 
-import cern.c2mon.server.test.CachePopulationRule;
+import cern.c2mon.server.cache.test.CachePopulationRule;
 import cern.c2mon.server.test.junit.AbstractRuleChainCreator;
 
 import javax.inject.Inject;

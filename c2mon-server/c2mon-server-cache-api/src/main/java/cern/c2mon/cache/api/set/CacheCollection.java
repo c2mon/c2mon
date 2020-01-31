@@ -29,6 +29,19 @@ public abstract class CacheCollection<T extends Cacheable> {
   }
 
   /**
+   * Checks if the given key is contained in any of the caches
+   * @param id the key to look for
+   * @return true if the object was found, false otherwise
+   */
+  public boolean containsKey(long id) {
+    try {
+      return doAcrossCaches(id, cache -> cache.containsKey(id));
+    } catch (CacheElementNotFoundException e) {
+      return false;
+    }
+  }
+
+  /**
    * Gets the object from any of the caches in this collection
    *
    * @param id the key to look for
@@ -109,7 +122,7 @@ public abstract class CacheCollection<T extends Cacheable> {
    *
    * @param action what you wish to do with the cache
    */
-  protected void forEachCache(Consumer<C2monCache<? extends T>> action) {
+  public void forEachCache(Consumer<C2monCache<? extends T>> action) {
     for (C2monCache<? extends T> c2monCache : caches) {
       action.accept(c2monCache);
     }

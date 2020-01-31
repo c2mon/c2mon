@@ -21,9 +21,9 @@ import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 
+import javax.inject.Inject;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -33,10 +33,10 @@ public class SubEquipmentMapperTest extends AbstractMapperTest {
   /**
    * Class to test
    */
-  @Autowired
+  @Inject
   private SubEquipmentMapper subEquipmentMapper;
 
-  @Autowired
+  @Inject
   private EquipmentMapper equipmentMapper;
 
   private SubEquipmentCacheObject subEquipmentCacheObject;

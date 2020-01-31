@@ -16,7 +16,7 @@ import java.sql.Timestamp;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import static cern.c2mon.server.test.factory.SourceDataTagValueFactory.sampleAlive;
+import static cern.c2mon.server.cache.test.factory.SourceDataTagValueFactory.sampleAlive;
 import static org.junit.Assert.*;
 
 /**

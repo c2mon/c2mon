@@ -5,9 +5,10 @@ import cern.c2mon.server.common.config.CommonModule;
 import cern.c2mon.server.test.DatabasePopulationRule;
 import org.junit.Rule;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import javax.inject.Inject;
 
 /**
  * @author Justin Lewis Salmon
@@ -21,6 +22,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public abstract class AbstractMapperTest {
 
   @Rule
-  @Autowired
+  @Inject
   public DatabasePopulationRule databasePopulationRule;
 }

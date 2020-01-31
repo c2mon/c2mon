@@ -18,6 +18,7 @@
     <module>c2mon-server-cache-api</module>
     <module>c2mon-server-cache-loading</module>
     <module>c2mon-server-cache-provider-ignite</module>
+    <module>c2mon-server-cache-test</module>
     <module>c2mon-server-cachedbaccess</module>
     <module>c2mon-server-cachepersistence</module>
     <module>c2mon-server-client</module>
@@ -138,6 +139,12 @@
         <groupId>cern.c2mon.server</groupId>
         <artifactId>c2mon-server-elasticsearch</artifactId>
         <version>${project.parent.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>cern.c2mon.server</groupId>
+        <artifactId>c2mon-server-cache-test</artifactId>
+        <version>${project.parent.version}</version>
+        <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>cern.c2mon.server</groupId>

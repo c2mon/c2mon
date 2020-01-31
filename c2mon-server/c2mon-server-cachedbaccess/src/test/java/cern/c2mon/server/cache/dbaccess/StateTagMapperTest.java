@@ -18,24 +18,18 @@
 package cern.c2mon.server.cache.dbaccess;
 
 import cern.c2mon.server.common.supervision.SupervisionStateTag;
-import cern.c2mon.server.test.DatabasePopulationRule;
 import cern.c2mon.shared.common.Cacheable;
 import cern.c2mon.shared.common.supervision.SupervisionEntity;
-import org.junit.Rule;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.inject.Inject;
 import java.util.List;
 
 import static org.junit.Assert.*;
 
 public class StateTagMapperTest extends AbstractMapperTest {
 
-  @Rule
-  @Autowired
-  public DatabasePopulationRule databasePopulationRule;
-
-  @Autowired
+  @Inject
   private SupervisionStateTagMapper stateTagMapper;
 
   @Test

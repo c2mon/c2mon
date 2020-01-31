@@ -14,26 +14,17 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.test.factory;
+package cern.c2mon.server.cache.test.factory;
 
-import cern.c2mon.server.common.process.ProcessCacheObject;
+import cern.c2mon.server.common.tag.AbstractTagCacheObject;
+import cern.c2mon.shared.common.datatag.DataTagQuality;
+import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 
-import java.sql.Timestamp;
+abstract class AbstractTagCacheObjectFactory<T extends AbstractTagCacheObject> extends AbstractCacheObjectFactory<T> {
 
-public class ProcessCacheObjectFactory extends AbstractCacheObjectFactory<ProcessCacheObject> {
-
-  @Override
-  public ProcessCacheObject sampleBase() {
-    ProcessCacheObject processCacheObject = new ProcessCacheObject(51L, "P_TESTHANDLER04", 1260L, 100, 100);
-    processCacheObject.setDescription("Test process description");
-    processCacheObject.setAliveInterval(60);
-    processCacheObject.setAliveTagId(1261L); //FK ref
-    processCacheObject.setStartupTime(new Timestamp(0));
-    processCacheObject.setCurrentHost("test host");
-    processCacheObject.setRequiresReboot(false);
-    processCacheObject.setProcessPIK(12345L);
-    processCacheObject.setLocalConfig(ProcessCacheObject.LocalConfig.Y);
-
-    return processCacheObject;
+  public DataTagQuality createValidQuality() {
+    DataTagQuality dataTagQuality = new DataTagQualityImpl();
+    dataTagQuality.validate();
+    return dataTagQuality;
   }
 }

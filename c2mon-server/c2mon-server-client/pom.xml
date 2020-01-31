@@ -59,7 +59,7 @@
     </dependency>
     <dependency>
       <groupId>cern.c2mon.server</groupId>
-      <artifactId>c2mon-server-test</artifactId>
+      <artifactId>c2mon-server-cache-test</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

@@ -18,23 +18,17 @@
 package cern.c2mon.server.cache.dbaccess;
 
 import cern.c2mon.server.common.commfault.CommFaultTag;
-import cern.c2mon.server.test.DatabasePopulationRule;
 import cern.c2mon.shared.common.Cacheable;
-import org.junit.Rule;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.inject.Inject;
 import java.util.List;
 
 import static org.junit.Assert.*;
 
 public class CommFaultMapperTest extends AbstractMapperTest {
 
-  @Rule
-  @Autowired
-  public DatabasePopulationRule databasePopulationRule;
-
-  @Autowired
+  @Inject
   private CommFaultTagMapper commFaultTagMapper;
 
   @Test

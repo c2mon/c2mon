@@ -2,10 +2,10 @@ package cern.c2mon.cache.actions.command;
 
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.impl.SimpleCache;
+import cern.c2mon.server.cache.test.factory.EquipmentCacheObjectFactory;
 import cern.c2mon.server.common.command.CommandTagCacheObject;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.equipment.EquipmentCacheObject;
-import cern.c2mon.server.test.factory.EquipmentCacheObjectFactory;
 import cern.c2mon.shared.common.ConfigurationException;
 import org.junit.Before;
 import org.junit.Test;

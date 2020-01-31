@@ -30,7 +30,7 @@ import javax.inject.Inject;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import static cern.c2mon.server.test.factory.SourceDataTagValueFactory.sampleCommFault;
+import static cern.c2mon.server.cache.test.factory.SourceDataTagValueFactory.sampleCommFault;
 import static cern.c2mon.shared.common.CacheEvent.UPDATE_ACCEPTED;
 import static cern.c2mon.shared.common.supervision.SupervisionStatus.DOWN;
 import static cern.c2mon.shared.common.supervision.SupervisionStatus.RUNNING;

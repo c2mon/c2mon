@@ -1,4 +1,4 @@
-package cern.c2mon.server.test.factory;
+package cern.c2mon.server.cache.test.factory;
 
 import cern.c2mon.shared.common.datatag.SourceDataTagQuality;
 import cern.c2mon.shared.common.datatag.SourceDataTagValue;

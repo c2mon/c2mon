@@ -24,8 +24,8 @@ import cern.c2mon.shared.common.command.CommandTag;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.inject.Inject;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -36,22 +36,22 @@ public class EquipmentMapperTest extends AbstractMapperTest {
   /**
    * Class to test
    */
-  @Autowired
+  @Inject
   private EquipmentMapper equipmentMapper;
 
   /**
    * Used to create subequipments of the test equipment.
    */
-  @Autowired
+  @Inject
   private SubEquipmentMapper subEquipmentMapper;
 
   /**
    * Used to create test datatag.
    */
-  @Autowired
+  @Inject
   private DataTagMapper dataTagMapper;
 
-  @Autowired
+  @Inject
   private CommandTagMapper commandTagMapper;
 
   private EquipmentCacheObject equipmentCacheObject;

@@ -20,12 +20,12 @@ import cern.c2mon.cache.actions.alarm.AlarmService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.impl.SimpleCache;
 import cern.c2mon.cache.config.collections.TagCacheCollection;
+import cern.c2mon.server.cache.test.factory.DataTagCacheObjectFactory;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.ValueAlarmCondition;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
-import cern.c2mon.server.test.factory.DataTagCacheObjectFactory;
 import org.junit.Before;
 import org.junit.Test;
 

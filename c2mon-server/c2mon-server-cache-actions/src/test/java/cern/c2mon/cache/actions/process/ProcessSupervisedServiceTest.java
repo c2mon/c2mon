@@ -2,10 +2,10 @@ package cern.c2mon.cache.actions.process;
 
 import cern.c2mon.cache.SupervisedServiceTest;
 import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.server.cache.test.factory.AbstractCacheObjectFactory;
+import cern.c2mon.server.cache.test.factory.ProcessCacheObjectFactory;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.process.ProcessCacheObject;
-import cern.c2mon.server.test.factory.AbstractCacheObjectFactory;
-import cern.c2mon.server.test.factory.ProcessCacheObjectFactory;
 import lombok.Getter;
 
 import javax.inject.Inject;

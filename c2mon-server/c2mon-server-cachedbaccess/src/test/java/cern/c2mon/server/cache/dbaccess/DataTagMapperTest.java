@@ -29,8 +29,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Builder;
 import lombok.Data;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.inject.Inject;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -41,7 +41,7 @@ import static org.junit.Assert.*;
 
 public class DataTagMapperTest extends AbstractMapperTest {
 
-  @Autowired
+  @Inject
   private DataTagMapper dataTagMapper;
 
   @Test

@@ -2,8 +2,8 @@ package cern.c2mon.cache.actions.alive;
 
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.impl.SimpleCache;
+import cern.c2mon.server.cache.test.factory.AliveTagCacheObjectFactory;
 import cern.c2mon.server.common.alive.AliveTag;
-import cern.c2mon.server.test.factory.AliveTagCacheObjectFactory;
 import org.junit.Before;
 import org.junit.Test;
 

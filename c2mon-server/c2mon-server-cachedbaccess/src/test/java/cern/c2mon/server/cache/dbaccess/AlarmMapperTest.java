@@ -85,7 +85,7 @@ public class AlarmMapperTest extends AbstractMapperTest {
   public void testUpdateAlarm() {
     AlarmCacheObject alarmOriginal = (AlarmCacheObject) alarmMapper.getItem(350000L);
     //check is terminated
-    assertEquals(alarmOriginal.isActive(), false);
+    assertFalse(alarmOriginal.isActive());
     //update fields
     alarmOriginal.setActive(true);
     alarmOriginal.setInternalActive(true);

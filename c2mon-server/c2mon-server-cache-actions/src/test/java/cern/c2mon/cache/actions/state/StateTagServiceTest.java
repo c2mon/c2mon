@@ -4,9 +4,9 @@ import cern.c2mon.cache.actions.AbstractCacheListenerTest;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.cache.api.listener.CacheListener;
+import cern.c2mon.server.cache.test.factory.AbstractCacheObjectFactory;
+import cern.c2mon.server.cache.test.factory.SupervisionStateTagFactory;
 import cern.c2mon.server.common.supervision.SupervisionStateTag;
-import cern.c2mon.server.test.factory.AbstractCacheObjectFactory;
-import cern.c2mon.server.test.factory.SupervisionStateTagFactory;
 import cern.c2mon.shared.common.CacheEvent;
 import org.junit.Test;
 

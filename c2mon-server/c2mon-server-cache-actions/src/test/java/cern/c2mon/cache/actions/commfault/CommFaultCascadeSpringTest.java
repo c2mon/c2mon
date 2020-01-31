@@ -2,11 +2,11 @@ package cern.c2mon.cache.actions.commfault;
 
 import cern.c2mon.cache.AbstractCacheTest;
 import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.server.cache.test.SupervisionCacheResetRule;
+import cern.c2mon.server.cache.test.factory.AbstractCacheObjectFactory;
+import cern.c2mon.server.cache.test.factory.CommFaultTagCacheObjectFactory;
 import cern.c2mon.server.common.commfault.CommFaultTag;
 import cern.c2mon.server.common.supervision.SupervisionStateTag;
-import cern.c2mon.server.test.SupervisionCacheResetRule;
-import cern.c2mon.server.test.factory.AbstractCacheObjectFactory;
-import cern.c2mon.server.test.factory.CommFaultTagCacheObjectFactory;
 import cern.c2mon.shared.common.supervision.SupervisionStatus;
 import org.junit.Ignore;
 import org.junit.Rule;

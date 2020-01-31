@@ -16,18 +16,18 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.dbaccess;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import org.junit.Assert;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import cern.c2mon.server.common.device.Device;
 import cern.c2mon.server.common.device.DeviceCacheObject;
 import cern.c2mon.shared.client.device.DeviceCommand;
 import cern.c2mon.shared.client.device.DeviceProperty;
+import org.junit.Assert;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static cern.c2mon.server.test.device.ObjectComparison.assertDeviceCommandEquals;
 import static cern.c2mon.server.test.device.ObjectComparison.assertDevicePropertyListContains;
@@ -38,7 +38,7 @@ import static cern.c2mon.server.test.device.ObjectComparison.assertDevicePropert
 public class DeviceMapperTest extends AbstractMapperTest {
 
   /** Component to test */
-  @Autowired
+  @Inject
   private DeviceMapper deviceMapper;
 
   @Autowired

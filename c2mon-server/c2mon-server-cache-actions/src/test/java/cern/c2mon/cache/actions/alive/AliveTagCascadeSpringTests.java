@@ -2,13 +2,13 @@ package cern.c2mon.cache.actions.alive;
 
 import cern.c2mon.cache.AbstractCacheTest;
 import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.server.cache.test.CachePopulationRule;
+import cern.c2mon.server.cache.test.SupervisionCacheResetRule;
+import cern.c2mon.server.cache.test.factory.AbstractCacheObjectFactory;
+import cern.c2mon.server.cache.test.factory.AliveTagCacheObjectFactory;
 import cern.c2mon.server.common.alive.AliveTag;
 import cern.c2mon.server.common.commfault.CommFaultTag;
 import cern.c2mon.server.common.supervision.SupervisionStateTag;
-import cern.c2mon.server.test.CachePopulationRule;
-import cern.c2mon.server.test.SupervisionCacheResetRule;
-import cern.c2mon.server.test.factory.AbstractCacheObjectFactory;
-import cern.c2mon.server.test.factory.AliveTagCacheObjectFactory;
 import org.junit.Test;
 import org.springframework.test.context.ContextConfiguration;
 

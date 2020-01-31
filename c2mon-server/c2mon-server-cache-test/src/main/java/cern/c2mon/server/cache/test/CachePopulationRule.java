@@ -1,4 +1,4 @@
-package cern.c2mon.server.test;
+package cern.c2mon.server.cache.test;
 
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.alarm.Alarm;
@@ -12,6 +12,7 @@ import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.common.supervision.SupervisionStateTag;
+import cern.c2mon.server.test.DatabasePopulationRule;
 import cern.c2mon.shared.common.Cacheable;
 import cern.c2mon.shared.common.command.CommandTag;
 

@@ -17,6 +17,7 @@
 package cern.c2mon.server.cache.dbaccess;
 
 import cern.c2mon.server.common.command.CommandTagCacheObject;
+import cern.c2mon.server.common.metadata.Metadata;
 import cern.c2mon.server.test.CacheObjectComparison;
 import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
 import cern.c2mon.shared.common.ConfigurationException;
@@ -24,18 +25,17 @@ import cern.c2mon.shared.common.command.CommandTag;
 import cern.c2mon.shared.common.datatag.DataTagConstants;
 import cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl;
 import cern.c2mon.shared.common.datatag.address.impl.SimpleHardwareAddressImpl;
-import cern.c2mon.server.common.metadata.Metadata;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.inject.Inject;
 import java.util.List;
 
 import static org.junit.Assert.*;
 
 public class CommandTagMapperTest extends AbstractMapperTest {
 
-  @Autowired
+  @Inject
   private CommandTagMapper commandTagMapper;
 
   private CommandTagCacheObject commandTag;

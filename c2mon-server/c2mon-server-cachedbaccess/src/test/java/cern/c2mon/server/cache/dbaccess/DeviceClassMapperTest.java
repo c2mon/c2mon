@@ -22,8 +22,8 @@ import cern.c2mon.server.common.device.DeviceClassCacheObject;
 import cern.c2mon.server.common.device.Property;
 import org.junit.Assert;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -37,7 +37,7 @@ import static cern.c2mon.server.test.device.ObjectComparison.assertPropertyListC
 public class DeviceClassMapperTest extends AbstractMapperTest {
 
   /** Component to test */
-  @Autowired
+  @Inject
   private DeviceClassMapper deviceClassMapper;
 
   @Test

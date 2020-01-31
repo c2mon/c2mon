@@ -5,7 +5,6 @@ import cern.c2mon.cache.config.AbstractCacheLoaderTest;
 import cern.c2mon.server.cache.dbaccess.LoaderMapper;
 import cern.c2mon.server.cache.dbaccess.SupervisionStateTagMapper;
 import cern.c2mon.server.common.supervision.SupervisionStateTag;
-import cern.c2mon.server.test.factory.SupervisionStateTagFactory;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -13,7 +12,6 @@ import java.util.Map;
 
 public class SupervisionStateTagCacheLoaderTest extends AbstractCacheLoaderTest<SupervisionStateTag> {
 
-  private final SupervisionStateTagFactory stateTagFactory = new SupervisionStateTagFactory();
   @Inject
   private C2monCache<SupervisionStateTag> stateTagCacheRef;
   @Inject
@@ -35,7 +33,7 @@ public class SupervisionStateTagCacheLoaderTest extends AbstractCacheLoaderTest<
 
   @Override
   protected SupervisionStateTag getSample() {
-    return stateTagFactory.sampleBase();
+    return new SupervisionStateTag(1L);
   }
 
   @Override

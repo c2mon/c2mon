@@ -16,9 +16,9 @@
  *****************************************************************************/
 package cern.c2mon.server.history;
 
+import cern.c2mon.server.cache.test.CacheObjectCreation;
 import cern.c2mon.server.history.listener.CommandRecordListener;
 import cern.c2mon.server.history.mapper.CommandRecordMapper;
-import cern.c2mon.server.test.CacheObjectCreation;
 import cern.c2mon.shared.client.command.CommandExecutionStatus;
 import cern.c2mon.shared.client.command.CommandRecord;
 import cern.c2mon.shared.client.command.CommandReport;
