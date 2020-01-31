@@ -34,6 +34,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Supplier;
 
 import static cern.c2mon.cache.config.ClientQueryProvider.queryByClientInput;
 
@@ -41,8 +42,9 @@ import static cern.c2mon.cache.config.ClientQueryProvider.queryByClientInput;
  * @author Franz Ritter
  */
 @Service
-public class DataTagFactory extends EntityFactory<DataTag> {
+class DataTagFactory extends EntityFactory<DataTag> {
 
+  public static final String ERROR_CREATING_DATA_TAG = "Error creating data tag #";
   private EquipmentDAO equipmentDAO;
   private C2monCache<Equipment> equipmentCache;
   private SubEquipmentDAO subEquipmentDAO;
@@ -77,38 +79,45 @@ public class DataTagFactory extends EntityFactory<DataTag> {
     Long parentId;
 
     if (dataTag.getEquipmentId() != null || dataTag.getEquipmentName() != null) {
-      if (dataTag.getSubEquipmentId() == null && dataTag.getSubEquipmentName() == null) {
+      throwIfHasSubEquipmentId(dataTag);
 
-        parentId = dataTag.getEquipmentId() != null ? dataTag.getEquipmentId() : equipmentDAO.getIdByName(dataTag
-            .getEquipmentName());
+      parentId = getOrFindByName(dataTag.getEquipmentId(), () -> equipmentDAO.getIdByName(dataTag
+        .getEquipmentName()));
 
-        if (parentId == null || !equipmentCache.containsKey(parentId)) {
-          throw new ConfigurationParseException("Error creating data tag #" + dataTag.getId() + ": " +
-              "Specified parent equipment does not exist!");
-        }
-
-        dataTag.setEquipmentId(parentId);
-      } else {
-        throw new ConfigurationParseException("Error creating data tag #" + dataTag.getId() + ": " +
-            "Cannot specify both equipment and sub equipment as parent!");
+      if (parentId == null || !equipmentCache.containsKey(parentId)) {
+        throw new ConfigurationParseException(ERROR_CREATING_DATA_TAG + dataTag.getId() + ": " +
+            "Specified parent equipment does not exist!");
       }
+
+      dataTag.setEquipmentId(parentId);
     } else if (dataTag.getSubEquipmentId() != null || dataTag.getSubEquipmentName() != null) {
 
-      parentId = dataTag.getSubEquipmentId() != null ? dataTag.getSubEquipmentId() : subEquipmentDAO.getIdByName
-          (dataTag.getSubEquipmentName());
+      parentId = getOrFindByName(dataTag.getSubEquipmentId(), () ->
+        subEquipmentDAO.getIdByName(dataTag.getSubEquipmentName()));
 
       if (parentId == null || !subEquipmentCache.containsKey(parentId)) {
-        throw new ConfigurationParseException("Error creating data tag #" + dataTag.getId() + ": " +
+        throw new ConfigurationParseException(ERROR_CREATING_DATA_TAG + dataTag.getId() + ": " +
             "Specified parent sub equipment does not exist!");
       }
 
       dataTag.setSubEquipmentId(parentId);
     } else {
-      throw new ConfigurationParseException("Error creating data tag #" + dataTag.getId() + ": " +
+      throw new ConfigurationParseException(ERROR_CREATING_DATA_TAG + dataTag.getId() + ": " +
           "No parent equipment or sub equipment specified!");
     }
 
     return dataTag;
+  }
+
+  private void throwIfHasSubEquipmentId(DataTag dataTag) {
+    if (dataTag.getSubEquipmentId() != null || dataTag.getSubEquipmentName() != null) {
+      throw new ConfigurationParseException(ERROR_CREATING_DATA_TAG + dataTag.getId() + ": " +
+          "Cannot specify both equipment and sub equipment as parent!");
+    }
+  }
+
+  private Long getOrFindByName(Long equipmentId, Supplier<Long> findIdByName) {
+    return equipmentId != null ? equipmentId : findIdByName.get();
   }
 
   @Override
@@ -117,9 +126,9 @@ public class DataTagFactory extends EntityFactory<DataTag> {
       && !queryByClientInput(dataTagCache, Tag::getName, configurationEntity.getName()).isEmpty()) {
         throw new ConfigurationParseException("Error creating data tag " + configurationEntity.getName() + ": " +
             "Name already exists!");
-    } else {
-      return configurationEntity.getId() != null ? configurationEntity.getId() : sequenceDAO.getNextTagId();
     }
+
+    return getOrFindByName(configurationEntity.getId(), () -> sequenceDAO.getNextTagId());
   }
 
   @Override
@@ -138,7 +147,7 @@ public class DataTagFactory extends EntityFactory<DataTag> {
   }
 
   @Override
-  ConfigConstants.Entity getEntity() {
+  public ConfigConstants.Entity getEntity() {
     return ConfigConstants.Entity.DATATAG;
   }
 }

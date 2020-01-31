@@ -38,7 +38,7 @@ import java.util.List;
  * @author Franz Ritter
  */
 @Service
-public class EquipmentFactory extends EntityFactory<Equipment> {
+class EquipmentFactory extends EntityFactory<Equipment> {
 
   private EquipmentDAO equipmentDAO;
   private SequenceDAO sequenceDAO;
@@ -46,11 +46,12 @@ public class EquipmentFactory extends EntityFactory<Equipment> {
   private final CommFaultTagFactory commFaultTagFactory;
   private C2monCache<Process> processCache;
   private ProcessDAO processDAO;
+  private final SupervisionStateTagFactory stateTagFactory;
 
   @Autowired
   public EquipmentFactory(C2monCache<cern.c2mon.server.common.equipment.Equipment> equipmentCache, EquipmentDAO equipmentDAO, SequenceDAO sequenceDAO,
                           AliveTagFactory aliveTagFactory, CommFaultTagFactory commFaultTagFactory,
-                          C2monCache<Process> processCache, ProcessDAO processDAO) {
+                          C2monCache<Process> processCache, ProcessDAO processDAO, SupervisionStateTagFactory stateTagFactory) {
     super(equipmentCache);
     this.equipmentDAO = equipmentDAO;
     this.sequenceDAO = sequenceDAO;
@@ -58,6 +59,7 @@ public class EquipmentFactory extends EntityFactory<Equipment> {
     this.commFaultTagFactory = commFaultTagFactory;
     this.processCache = processCache;
     this.processDAO = processDAO;
+    this.stateTagFactory = stateTagFactory;
   }
 
   @Override
@@ -75,7 +77,7 @@ public class EquipmentFactory extends EntityFactory<Equipment> {
       equipment = setDefaultControlTags(equipment);
 
       configurationElements.addAll(commFaultTagFactory.createInstance(equipment.getCommFaultTag()));
-//      configurationElements.addAll(controlTagFactory.createInstance(equipment.getStatusTag()));
+      configurationElements.addAll(stateTagFactory.createInstance(equipment.getStatusTag()));
 
       if (equipment.getAliveTag() != null) {
         configurationElements.addAll(aliveTagFactory.createInstance(equipment.getAliveTag()));
@@ -146,7 +148,7 @@ public class EquipmentFactory extends EntityFactory<Equipment> {
   }
 
   @Override
-  ConfigConstants.Entity getEntity() {
+  public ConfigConstants.Entity getEntity() {
     return ConfigConstants.Entity.EQUIPMENT;
   }
 }

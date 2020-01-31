@@ -38,7 +38,7 @@ import java.util.List;
  * @author Franz Ritter
  */
 @Service
-public class SubEquipmentFactory extends EntityFactory<SubEquipment> {
+class SubEquipmentFactory extends EntityFactory<SubEquipment> {
 
   private SubEquipmentDAO subEquipmentDAO;
   private C2monCache<cern.c2mon.server.common.equipment.Equipment> equipmentCache;
@@ -46,11 +46,12 @@ public class SubEquipmentFactory extends EntityFactory<SubEquipment> {
   private SequenceDAO sequenceDAO;
   private final AliveTagFactory aliveTagFactory;
   private final CommFaultTagFactory commFaultTagFactory;
+  private final SupervisionStateTagFactory stateTagFactory;
 
   @Autowired
   public SubEquipmentFactory(C2monCache<cern.c2mon.server.common.subequipment.SubEquipment> subEquipmentCache, SubEquipmentDAO subEquipmentDAO,
                              SequenceDAO sequenceDAO, C2monCache<Equipment> equipmentCache, EquipmentDAO equipmentDAO,
-                             AliveTagFactory aliveTagFactory, CommFaultTagFactory commFaultTagFactory) {
+                             AliveTagFactory aliveTagFactory, CommFaultTagFactory commFaultTagFactory, SupervisionStateTagFactory stateTagFactory) {
     super(subEquipmentCache);
     this.subEquipmentDAO = subEquipmentDAO;
     this.sequenceDAO = sequenceDAO;
@@ -58,6 +59,7 @@ public class SubEquipmentFactory extends EntityFactory<SubEquipment> {
     this.equipmentDAO = equipmentDAO;
     this.aliveTagFactory = aliveTagFactory;
     this.commFaultTagFactory = commFaultTagFactory;
+    this.stateTagFactory = stateTagFactory;
   }
 
   @Override
@@ -75,7 +77,7 @@ public class SubEquipmentFactory extends EntityFactory<SubEquipment> {
       subEquipment = setDefaultControlTags(subEquipment);
 
       configurationElements.addAll(commFaultTagFactory.createInstance(subEquipment.getCommFaultTag()));
-//      configurationElements.addAll(controlTagFactory.createInstance(subEquipment.getStatusTag()));
+      configurationElements.addAll(stateTagFactory.createInstance(subEquipment.getStatusTag()));
       configurationElements.addAll(aliveTagFactory.createInstance(subEquipment.getAliveTag()));
 
       createSubEquipment.getElementProperties().setProperty("statusTagId", subEquipment.getStatusTag().getId().toString());
@@ -145,7 +147,7 @@ public class SubEquipmentFactory extends EntityFactory<SubEquipment> {
   }
 
   @Override
-  ConfigConstants.Entity getEntity() {
+  public ConfigConstants.Entity getEntity() {
     return ConfigConstants.Entity.SUBEQUIPMENT;
   }
 }

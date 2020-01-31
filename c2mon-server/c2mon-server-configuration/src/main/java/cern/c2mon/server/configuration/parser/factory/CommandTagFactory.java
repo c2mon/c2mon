@@ -37,7 +37,7 @@ import static cern.c2mon.cache.config.ClientQueryProvider.queryByClientInput;
  * @author Franz Ritter
  */
 @Service
-public class CommandTagFactory extends EntityFactory<CommandTag> {
+class CommandTagFactory extends EntityFactory<CommandTag> {
 
   private final SequenceDAO sequenceDAO;
   private final EquipmentDAO equipmentDAO;
@@ -96,7 +96,7 @@ public class CommandTagFactory extends EntityFactory<CommandTag> {
   }
 
   @Override
-  ConfigConstants.Entity getEntity() {
+  public ConfigConstants.Entity getEntity() {
     return ConfigConstants.Entity.COMMANDTAG;
   }
 }

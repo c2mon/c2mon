@@ -37,7 +37,7 @@ import static cern.c2mon.cache.config.ClientQueryProvider.queryByClientInput;
  * @author Franz Ritter
  */
 @Service
-public class RuleTagFactory extends EntityFactory<RuleTag> {
+class RuleTagFactory extends EntityFactory<RuleTag> {
   private final C2monCache<cern.c2mon.server.common.rule.RuleTag> ruleTagCache;
   private final UnifiedTagCacheFacade tagFacadeGateway;
   private final SequenceDAO sequenceDAO;
@@ -82,7 +82,7 @@ public class RuleTagFactory extends EntityFactory<RuleTag> {
   }
 
   @Override
-  ConfigConstants.Entity getEntity() {
+  public ConfigConstants.Entity getEntity() {
     return ConfigConstants.Entity.RULETAG;
   }
 }

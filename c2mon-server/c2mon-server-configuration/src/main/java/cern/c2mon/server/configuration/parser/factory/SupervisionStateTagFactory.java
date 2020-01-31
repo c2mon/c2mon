@@ -17,7 +17,7 @@ import java.util.List;
 import static cern.c2mon.cache.config.ClientQueryProvider.queryByClientInput;
 
 @Named
-public class SupervisionStateTagFactory extends EntityFactory<StatusTag> {
+class SupervisionStateTagFactory extends EntityFactory<StatusTag> {
 
   private final C2monCache<cern.c2mon.server.common.supervision.SupervisionStateTag> cache;
   private SequenceDAO sequenceDAO;
@@ -55,7 +55,7 @@ public class SupervisionStateTagFactory extends EntityFactory<StatusTag> {
   }
 
   @Override
-  ConfigConstants.Entity getEntity() {
+  public ConfigConstants.Entity getEntity() {
     return ConfigConstants.Entity.STATETAG;
   }
 }

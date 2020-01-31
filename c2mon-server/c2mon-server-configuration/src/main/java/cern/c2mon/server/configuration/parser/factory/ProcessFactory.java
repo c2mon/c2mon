@@ -36,7 +36,7 @@ import java.util.List;
  * @author Franz Ritter
  */
 @Service
-public class ProcessFactory extends EntityFactory<Process> {
+class ProcessFactory extends EntityFactory<Process> {
 
   private ProcessDAO processDAO;
   private SequenceDAO sequenceDAO;
@@ -123,7 +123,7 @@ public class ProcessFactory extends EntityFactory<Process> {
   }
 
   @Override
-  ConfigConstants.Entity getEntity() {
+  public ConfigConstants.Entity getEntity() {
     return ConfigConstants.Entity.PROCESS;
   }
 }

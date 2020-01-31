@@ -35,7 +35,7 @@ import java.util.List;
  * @author Franz Ritter
  */
 @Service
-public class AlarmFactory extends EntityFactory<Alarm> {
+class AlarmFactory extends EntityFactory<Alarm> {
 
   private SequenceDAO sequenceDAO;
   private UnifiedTagCacheFacade tagFacadeGateway;
@@ -51,7 +51,7 @@ public class AlarmFactory extends EntityFactory<Alarm> {
 
   @Override
   public List<ConfigurationElement> createInstance(Alarm alarm) {
-    Long tagId = alarm.getDataTagId() != null
+    long tagId = alarm.getDataTagId() != null
         ? alarm.getDataTagId() : dataTagCache.get(alarm.getDataTagId()).getId();
 
     // Check if the parent id exists
@@ -77,7 +77,7 @@ public class AlarmFactory extends EntityFactory<Alarm> {
   }
 
   @Override
-  ConfigConstants.Entity getEntity() {
+  public ConfigConstants.Entity getEntity() {
     return ConfigConstants.Entity.ALARM;
   }
 }

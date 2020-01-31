@@ -16,7 +16,7 @@ import java.util.List;
 import static cern.c2mon.cache.config.ClientQueryProvider.queryByClientInput;
 
 @Named
-public class CommFaultTagFactory extends EntityFactory<CommFaultTag> {
+class CommFaultTagFactory extends EntityFactory<CommFaultTag> {
 
   private final C2monCache<cern.c2mon.server.common.commfault.CommFaultTag> cache;
   private SequenceDAO sequenceDAO;
@@ -61,7 +61,7 @@ public class CommFaultTagFactory extends EntityFactory<CommFaultTag> {
   }
 
   @Override
-  ConfigConstants.Entity getEntity() {
+  public ConfigConstants.Entity getEntity() {
     return ConfigConstants.Entity.COMMFAULTTAG;
   }
 }
