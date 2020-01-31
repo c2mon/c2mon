@@ -34,10 +34,16 @@ import static org.mockito.Mockito.when;
 
 
 /**
+ * Tests for {@link TagConfigDocumentConverter}, executed by {@link cern.c2mon.server.elasticsearch.ElasticsearchSuiteTest}.
+ *
+ * NOTE: The naming convention (&lt;class name&gt;TestSuite) is used specifically to prevent test execution plugins
+ * (like Surefire) to execute the tests individually.
+ *
  * @author Szymon Halastra
  * @author Justin Lewis Salmon
+ * @author Serhiy Boychenko
  */
-public class TagConfigDocumentConverterTests extends BaseTagDocumentConverterTest {
+public class TagConfigDocumentConverterTestSuite extends BaseTagDocumentConverterTest {
 
   @InjectMocks
   private TagConfigDocumentConverter converter;

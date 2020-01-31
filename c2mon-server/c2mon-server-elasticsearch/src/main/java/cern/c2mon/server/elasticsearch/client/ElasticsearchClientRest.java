@@ -241,7 +241,7 @@ public final class ElasticsearchClientRest implements ElasticsearchClient {
             break;
           }
 
-          sleep(100L);
+          sleep(1000L);
         }
         log.info("Elasticsearch cluster is yellow");
       });
@@ -277,7 +277,7 @@ public final class ElasticsearchClientRest implements ElasticsearchClient {
       return status == ClusterHealthStatus.YELLOW.value() || status == ClusterHealthStatus.GREEN.value();
     } catch (IOException e) {
       log.info("Elasticsearch cluster not yet ready: {}", e.getMessage());
-      log.debug("Elasticsearch cluster not yet ready: ", e);
+      log.trace("Elasticsearch cluster not yet ready: ", e);
     }
     return false;
   }

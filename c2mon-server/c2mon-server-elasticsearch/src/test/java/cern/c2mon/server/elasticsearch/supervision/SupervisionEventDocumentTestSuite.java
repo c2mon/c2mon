@@ -26,10 +26,16 @@ import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import static junit.framework.TestCase.assertEquals;
 
 /**
+ * Tests for {@link SupervisionEventDocument}, executed by {@link cern.c2mon.server.elasticsearch.ElasticsearchSuiteTest}.
+ *
+ * NOTE: The naming convention (&lt;class name&gt;TestSuite) is used specifically to prevent test execution plugins
+ * (like Surefire) to execute the tests individually.
+ *
  * @author Alban Marguet
+ * @author Serhiy Boychenko
  */
 @RunWith(JUnit4.class)
-public class SupervisionEventDocumentTests {
+public class SupervisionEventDocumentTestSuite {
 
   private SupervisionEventDocumentConverter converter = new SupervisionEventDocumentConverter();
 

@@ -16,37 +16,49 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch;
 
+import java.util.concurrent.TimeUnit;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
+import org.junit.rules.Timeout;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
-import cern.c2mon.server.elasticsearch.alarm.AlarmDocumentConverterTests;
-import cern.c2mon.server.elasticsearch.alarm.AlarmDocumentIndexerTests;
+import cern.c2mon.server.elasticsearch.alarm.AlarmDocumentConverterTestSuite;
+import cern.c2mon.server.elasticsearch.alarm.AlarmDocumentIndexerTestSuite;
 import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
-import cern.c2mon.server.elasticsearch.supervision.SupervisionEventDocumentIndexerTests;
-import cern.c2mon.server.elasticsearch.supervision.SupervisionEventDocumentTests;
-import cern.c2mon.server.elasticsearch.tag.TagDocumentConverterTests;
-import cern.c2mon.server.elasticsearch.tag.TagDocumentIndexerTests;
-import cern.c2mon.server.elasticsearch.tag.config.TagConfigDocumentConverterTests;
-import cern.c2mon.server.elasticsearch.tag.config.TagConfigDocumentIndexerTests;
+import cern.c2mon.server.elasticsearch.supervision.SupervisionEventDocumentIndexerTestSuite;
+import cern.c2mon.server.elasticsearch.supervision.SupervisionEventDocumentTestSuite;
+import cern.c2mon.server.elasticsearch.tag.TagDocumentConverterTestSuite;
+import cern.c2mon.server.elasticsearch.tag.TagDocumentIndexerTestSuite;
+import cern.c2mon.server.elasticsearch.tag.config.TagConfigDocumentConverterTestSuite;
+import cern.c2mon.server.elasticsearch.tag.config.TagConfigDocumentIndexerTestSuite;
 import cern.c2mon.server.elasticsearch.util.EmbeddedElasticsearchManager;
 
+/**
+ * Perform the necessary setup to run ES tests
+ *
+ * @author Serhiy Boychenko
+ */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    ElasticsearchModuleIntegrationTests.class,
-    IndexManagerTests.class,
-    IndexNameManagerTests.class,
-    AlarmDocumentConverterTests.class,
-    AlarmDocumentIndexerTests.class,
-    SupervisionEventDocumentIndexerTests.class,
-    SupervisionEventDocumentTests.class,
-    TagDocumentConverterTests.class,
-    TagDocumentIndexerTests.class,
-    TagConfigDocumentConverterTests.class,
-    TagConfigDocumentIndexerTests.class
+    ElasticsearchModuleIntegrationTestSuite.class,
+    IndexManagerTestSuite.class,
+    IndexNameManagerTestSuite.class,
+    AlarmDocumentConverterTestSuite.class,
+    AlarmDocumentIndexerTestSuite.class,
+    SupervisionEventDocumentIndexerTestSuite.class,
+    SupervisionEventDocumentTestSuite.class,
+    TagDocumentConverterTestSuite.class,
+    TagDocumentIndexerTestSuite.class,
+    TagConfigDocumentConverterTestSuite.class,
+    TagConfigDocumentIndexerTestSuite.class
 })
 public class ElasticsearchSuiteTest {
+
+  @ClassRule
+  public static Timeout classTimeout = new Timeout(2, TimeUnit.MINUTES);
 
   private static final ElasticsearchProperties properties = new ElasticsearchProperties();
 

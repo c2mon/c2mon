@@ -40,10 +40,16 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
+ * Tests for {@link TagConfigDocumentIndexer}, executed by {@link ElasticsearchSuiteTest}.
+ *
+ * NOTE: The naming convention (&lt;class name&gt;TestSuite) is used specifically to prevent test execution plugins
+ * (like Surefire) to execute the tests individually.
+ *
  * @author Szymon Halastra
  * @author Justin Lewis Salmon
+ * @author Serhiy Boychenko
  */
-public class TagConfigDocumentIndexerTests extends ElasticsearchTestDefinition {
+public class TagConfigDocumentIndexerTestSuite extends ElasticsearchTestDefinition {
 
   @Autowired
   private IndexNameManager indexNameManager;

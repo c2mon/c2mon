@@ -32,12 +32,17 @@ import cern.c2mon.server.elasticsearch.util.EntityUtils;
 import static junit.framework.TestCase.assertEquals;
 
 /**
+ * Tests for {@link AlarmValueDocumentConverter}, executed by {@link cern.c2mon.server.elasticsearch.ElasticsearchSuiteTest}.
+ *
+ * NOTE: The naming convention (&lt;class name&gt;TestSuite) is used specifically to prevent test execution plugins
+ * (like Surefire) to execute the tests individually.
+ *
  * @author Alban Marguet
  * @author Justin Lewis Salmon
  */
 @Slf4j
 @RunWith(JUnit4.class)
-public class AlarmDocumentConverterTests {
+public class AlarmDocumentConverterTestSuite {
 
   private static final String TIMESTAMP_PROPERTY = "timestamp";
 

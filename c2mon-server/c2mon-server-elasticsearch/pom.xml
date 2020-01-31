@@ -108,6 +108,10 @@
       <artifactId>junit</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.awaitility</groupId>
+      <artifactId>awaitility</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.hamcrest</groupId>
       <artifactId>hamcrest-library</artifactId>
     </dependency>
@@ -116,14 +120,14 @@
       <artifactId>mockito-all</artifactId>
     </dependency>
     <dependency>
+      <groupId>pl.allegro.tech</groupId>
+      <artifactId>embedded-elasticsearch</artifactId>
+      <version>2.7.0</version>
+    </dependency>
+    <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient</artifactId>
       <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>pl.allegro.tech</groupId>
-      <artifactId>embedded-elasticsearch</artifactId>
-      <version>RELEASE</version>
     </dependency>
   </dependencies>
 </project>

@@ -17,15 +17,23 @@
 package cern.c2mon.server.elasticsearch.util;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.springframework.boot.configurationprocessor.json.JSONException;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
 
 import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 
+/**
+ * @author Serhiy Boychenko
+ */
 public class IndexUtils {
 
   private IndexUtils() {
@@ -37,5 +45,12 @@ public class IndexUtils {
     HttpClient httpClient = HttpClientBuilder.create().build();
     HttpResponse httpResponse = httpClient.execute(httpRequest);
     return httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK;
+  }
+
+  public static long countDocuments(String indexName, ElasticsearchProperties properties) throws IOException, JSONException {
+    HttpGet httpRequest = new HttpGet(("http://" + properties.getHost() + ":" + properties.getPort() + "/" + indexName + "/_count"));
+    HttpClient httpClient = HttpClientBuilder.create().build();
+    HttpResponse httpResponse = httpClient.execute(httpRequest);
+    return new JSONObject(IOUtils.toString(httpResponse.getEntity().getContent(), Charset.defaultCharset())).getLong("count");
   }
 }

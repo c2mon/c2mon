@@ -36,10 +36,16 @@ import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import static junit.framework.TestCase.assertTrue;
 
 /**
+ * Tests for {@link SupervisionEventDocumentIndexer}, executed by {@link ElasticsearchSuiteTest}.
+ *
+ * NOTE: The naming convention (&lt;class name&gt;TestSuite) is used specifically to prevent test execution plugins
+ * (like Surefire) to execute the tests individually.
+ *
  * @author Alban Marguet
  * @author Justin LEwis Salmon
+ * @author Serhiy Boychenko
  */
-public class SupervisionEventDocumentIndexerTests extends ElasticsearchTestDefinition {
+public class SupervisionEventDocumentIndexerTestSuite extends ElasticsearchTestDefinition {
 
   @Autowired
   private IndexNameManager indexNameManager;

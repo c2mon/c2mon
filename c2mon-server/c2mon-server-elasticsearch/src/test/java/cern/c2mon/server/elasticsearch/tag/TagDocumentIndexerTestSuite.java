@@ -19,6 +19,7 @@ package cern.c2mon.server.elasticsearch.tag;
 import java.io.IOException;
 import java.util.List;
 
+import org.awaitility.Awaitility;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -38,10 +39,16 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
+ * tests for {@link TagDocumentIndexer}, executed by {@link ElasticsearchSuiteTest}.
+ *
+ * NOTE: The naming convention (&lt;class name&gt;TestSuite) is used specifically to prevent test execution plugins
+ * (like Surefire) to execute the tests individually.
+ *
  * @author Alban Marguet
  * @author Justin Lewis Salmon
+ * @authro Serhiy Boychenko
  */
-public class TagDocumentIndexerTests extends ElasticsearchTestDefinition {
+public class TagDocumentIndexerTestSuite extends ElasticsearchTestDefinition {
 
   @Autowired
   private TagDocumentIndexer indexer;
@@ -66,11 +73,11 @@ public class TagDocumentIndexerTests extends ElasticsearchTestDefinition {
   }
 
   @Test
-  public void indexSingleTagTest() throws IDBPersistenceException, InterruptedException, IOException {
+  public void indexSingleTagTest() throws IDBPersistenceException, IOException {
     indexer.storeData(document);
 
     // Bulk flush operation seem to require more time
-    Thread.sleep(1000L);
+    Awaitility.await().until(() -> IndexUtils.countDocuments(indexName, ElasticsearchSuiteTest.getProperties()) == 1);
 
     EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
 
@@ -82,12 +89,12 @@ public class TagDocumentIndexerTests extends ElasticsearchTestDefinition {
   }
 
   @Test
-  public void indexMultipleTagsTest() throws IDBPersistenceException, InterruptedException, IOException {
+  public void indexMultipleTagsTest() throws IDBPersistenceException, IOException {
     indexer.storeData(document);
     indexer.storeData(document);
 
     // Bulk flush operation seem to require more time
-    Thread.sleep(1000l);
+    Awaitility.await().until(() -> IndexUtils.countDocuments(indexName, ElasticsearchSuiteTest.getProperties()) == 2);
 
     EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
 

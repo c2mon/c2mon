@@ -37,10 +37,16 @@ import cern.c2mon.server.elasticsearch.util.IndexUtils;
 import static junit.framework.TestCase.assertTrue;
 
 /**
+ * Tests for {@link AlarmDocumentIndexer}, executed by {@link ElasticsearchSuiteTest}.
+ *
+ * NOTE: The naming convention (&lt;class name&gt;TestSuite) is used specifically to prevent test execution plugins
+ * (like Surefire) to execute the tests individually.
+ *
  * @author Alban Marguet
  * @author Justin Lewis Salmon
+ * @author Serhiy Boychenko
  */
-public class AlarmDocumentIndexerTests extends ElasticsearchTestDefinition {
+public class AlarmDocumentIndexerTestSuite extends ElasticsearchTestDefinition {
 
   @Autowired
   private IndexNameManager indexNameManager;

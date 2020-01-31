@@ -21,41 +21,27 @@ import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import cern.c2mon.server.cache.config.CacheModule;
-import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
-import cern.c2mon.server.cache.loading.config.CacheLoadingModule;
-import cern.c2mon.server.common.config.CommonModule;
-import cern.c2mon.server.elasticsearch.config.ElasticsearchModule;
-import cern.c2mon.server.elasticsearch.junit.CachePopulationRule;
 import cern.c2mon.server.elasticsearch.util.EmbeddedElasticsearchManager;
-import cern.c2mon.server.supervision.config.SupervisionModule;
 
 import static org.junit.Assert.assertEquals;
 
 /**
+ * Test the startup of embedded ES instance
+ *
+ * NOTE: The naming convention (&lt;class name&gt;TestSuite) is used specifically to prevent test execution plugins
+ * (like Surefire) to execute the tests individually.
+ *
  * @author Alban Marguet
+ * @author Serhiy Boychenko
  */
 @Slf4j
-@ContextConfiguration(classes = {
-    CommonModule.class,
-    CacheModule.class,
-    CacheDbAccessModule.class,
-    CacheLoadingModule.class,
-    SupervisionModule.class,
-    ElasticsearchModule.class,
-    CachePopulationRule.class
-})
-@RunWith(SpringJUnit4ClassRunner.class)
-public class ElasticsearchModuleIntegrationTests {
+public class ElasticsearchModuleIntegrationTestSuite extends ElasticsearchTestDefinition {
 
   @Test
   public void testModuleStartup() throws IOException {
     List<String> indexData = EmbeddedElasticsearchManager.getEmbeddedNode().fetchAllDocuments();
-    assertEquals("Embedded node should not contain any documents before each test and start successfuly.",
+    assertEquals("Embedded node should not contain any documents before each test and start successfully.",
         0, indexData.size());
   }
 }

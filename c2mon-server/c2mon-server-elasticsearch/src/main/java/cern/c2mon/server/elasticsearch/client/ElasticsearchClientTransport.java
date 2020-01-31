@@ -238,7 +238,7 @@ public final class ElasticsearchClientTransport implements ElasticsearchClient {
                 break;
               }
 
-              sleep(100L);
+              sleep(1000L);
             }
             log.info("Elasticsearch cluster is yellow");
           }
@@ -272,7 +272,7 @@ public final class ElasticsearchClientTransport implements ElasticsearchClient {
       return status.equals(ClusterHealthStatus.YELLOW) || status.equals(ClusterHealthStatus.GREEN);
     } catch (NoNodeAvailableException e) {
       log.info("Elasticsearch cluster not yet ready: {}", e.getMessage());
-      log.debug("Elasticsearch cluster not yet ready: ", e);
+      log.trace("Elasticsearch cluster not yet ready: ", e);
     }
     return false;
   }
