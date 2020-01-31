@@ -250,11 +250,8 @@ public final class ConfigurationApplier {
       //never returns null
       processChanges = configurationHandlerSelector.applyConfigElement(element, elementReport);
 
-      if (processChanges != null) {
-
-        for (ProcessChange processChange : processChanges) {
-          handleProcessChange(element, processLists, elementPlaceholder, daqReportPlaceholder, report, configId, elementReport, processChange);
-        }
+      for (ProcessChange processChange : processChanges) {
+        handleProcessChange(element, processLists, elementPlaceholder, daqReportPlaceholder, report, configId, elementReport, processChange);
       }
     } catch (Exception ex) {
       String errMessage = configId + " Exception caught while applying the configuration change (Action, Entity, " +

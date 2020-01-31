@@ -16,6 +16,13 @@
  *****************************************************************************/
 package cern.c2mon.shared.client.configuration;
 
+import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
+import cern.c2mon.shared.client.configuration.api.equipment.Equipment;
+import cern.c2mon.shared.client.configuration.api.equipment.SubEquipment;
+import cern.c2mon.shared.client.configuration.api.process.Process;
+import cern.c2mon.shared.client.configuration.api.tag.*;
+import cern.c2mon.shared.client.configuration.api.util.ConfigurationEntity;
+
 /**
  * Constants used for the server (re-)configuration functionality,.
  *
@@ -37,7 +44,32 @@ public class ConfigConstants {
    * @author Mark Brightwell
    *
    */
-  public enum Entity { DATATAG, CONTROLTAG, RULETAG, COMMANDTAG, PROCESS, EQUIPMENT, ALARM, SUBEQUIPMENT, DEVICECLASS, DEVICE, ALIVETAG, COMMFAULTTAG, STATETAG, MISSING }
+  public enum Entity {
+    ALARM(Alarm.class),
+    ALIVETAG(AliveTag.class),
+    COMMANDTAG(CommandTag.class),
+    COMMFAULTTAG(CommFaultTag.class),
+    CONTROLTAG(ControlTag.class),
+    DATATAG(DataTag.class),
+    DEVICE(null),
+    DEVICECLASS(null),
+    EQUIPMENT(Equipment.class),
+    MISSING(null),
+    PROCESS(Process.class),
+    RULETAG(RuleTag.class),
+    STATETAG(StatusTag.class),
+    SUBEQUIPMENT(SubEquipment.class);
+
+    Class<? extends ConfigurationEntity> classRef;
+
+    Entity(Class<? extends ConfigurationEntity> classRef) {
+      this.classRef = classRef;
+    }
+
+    public Class<? extends ConfigurationEntity> getClassRef() {
+      return classRef;
+    }
+  }
 
   /**
    * The result of a reconfiguration action.

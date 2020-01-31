@@ -9,10 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
@@ -23,7 +20,7 @@ import static java.util.Collections.unmodifiableMap;
 
 @Named
 @Slf4j
-public class ConfigurationHandlerSelector {
+class ConfigurationHandlerSelector {
 
   private final Map<ConfigConstants.Entity, BaseConfigHandler> handlerMap;
   /**
@@ -81,7 +78,7 @@ public class ConfigurationHandlerSelector {
 
     if (element.getAction() == null || element.getEntity() == null || element.getEntityId() == null) {
       elementReport.setFailure("Parameter missing in configuration line with sequence id " + element.getSequenceId());
-      return null;
+      return Collections.emptyList();
     }
 
     List<ProcessChange> processChanges = chooseHandlerThenDo(

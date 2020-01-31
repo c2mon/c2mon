@@ -151,7 +151,7 @@ public abstract class EntityFactory<T extends ConfigurationEntity> {
    *
    * @return The correct {@link ConfigConstants.Entity}.
    */
-  abstract ConfigConstants.Entity getEntity();
+  public abstract ConfigConstants.Entity getEntity();
 
   /**
    * Helper method for calling the reflection procedure for parsing the create information of a {@link ConfigurationEntity} object.

@@ -196,7 +196,8 @@ public class ProcessConfigHandler extends BaseConfigHandlerImpl<Process> {
       ConfigurationElementReport tagReport = new ConfigurationElementReport(ConfigConstants.Action.REMOVE, ConfigConstants.Entity.CONTROLTAG, aliveTagId);
       report.addSubReport(tagReport);
       aliveTimerConfigHandler.remove(aliveTagId, tagReport);
-      aliveTagService.removeAliveTimer(aliveTagId); // TODO (Alex) Replace this with a DELETED event listener
+      // TODO (Alex) Replace this with a DELETED event listener
+      aliveTagService.removeAliveTimer(aliveTagId);
       // TODO (Alex) Do we want to also remove it from process cache?
     }
 

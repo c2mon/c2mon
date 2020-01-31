@@ -19,20 +19,16 @@ package cern.c2mon.server.configuration.parser.impl;
 import cern.c2mon.server.configuration.parser.ConfigurationParser;
 import cern.c2mon.server.configuration.parser.exception.ConfigurationParseException;
 import cern.c2mon.server.configuration.parser.exception.EntityDoesNotExistException;
-import cern.c2mon.server.configuration.parser.factory.*;
+import cern.c2mon.server.configuration.parser.factory.EntityFactory;
+import cern.c2mon.server.configuration.parser.factory.ParserFactorySelector;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.api.Configuration;
-import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
-import cern.c2mon.shared.client.configuration.api.equipment.Equipment;
-import cern.c2mon.shared.client.configuration.api.equipment.SubEquipment;
-import cern.c2mon.shared.client.configuration.api.process.Process;
-import cern.c2mon.shared.client.configuration.api.tag.*;
 import cern.c2mon.shared.client.configuration.api.util.ConfigurationEntity;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,36 +40,14 @@ import java.util.List;
  * @author Franz Ritter
  */
 @Slf4j
-@Component
+@Named
 public class ConfigurationParserImpl implements ConfigurationParser {
 
-  private AlarmFactory alarmFactory;
-  private CommandTagFactory commandTagFactory;
-  private DataTagFactory dataTagFactory;
-  private EquipmentFactory equipmentFactory;
-  private ProcessFactory processFactory;
-  private RuleTagFactory ruleTagFactory;
-  private SubEquipmentFactory subEquipmentFactory;
-  private AliveTagFactory aliveTagFactory;
-  private CommFaultTagFactory commFaultTagFactory;
-  private SupervisionStateTagFactory stateTagFactory;
+  private final ParserFactorySelector factorySelector;
 
-  @Autowired
-  public ConfigurationParserImpl(
-    AlarmFactory alarmFactory, CommandTagFactory commandTagFactory,
-    DataTagFactory dataTagFactory, EquipmentFactory equipmentFactory, ProcessFactory processFactory, RuleTagFactory ruleTagFactory,
-    SubEquipmentFactory subEquipmentFactory, AliveTagFactory aliveTagFactory, CommFaultTagFactory commFaultTagFactory,
-    SupervisionStateTagFactory stateTagFactory) {
-    this.alarmFactory = alarmFactory;
-    this.commandTagFactory = commandTagFactory;
-    this.dataTagFactory = dataTagFactory;
-    this.equipmentFactory = equipmentFactory;
-    this.processFactory = processFactory;
-    this.ruleTagFactory = ruleTagFactory;
-    this.subEquipmentFactory = subEquipmentFactory;
-    this.aliveTagFactory = aliveTagFactory;
-    this.commFaultTagFactory = commFaultTagFactory;
-    this.stateTagFactory = stateTagFactory;
+  @Inject
+  public ConfigurationParserImpl(ParserFactorySelector factorySelector) {
+    this.factorySelector = factorySelector;
   }
 
   @Override
@@ -82,7 +56,6 @@ public class ConfigurationParserImpl implements ConfigurationParser {
 
       return parseConfigurationList(configuration.getEntities());
     } else {
-
       throw new ConfigurationParseException("Empty configuration received!");
     }
   }
@@ -97,10 +70,9 @@ public class ConfigurationParserImpl implements ConfigurationParser {
   @SuppressWarnings("unchecked")
   private List<ConfigurationElement> parseConfigurationList(List<? extends ConfigurationEntity> entities) {
     List<ConfigurationElement> results = new ArrayList<>();
-    EntityFactory entityFactory;
 
     for (ConfigurationEntity configurationEntity : entities) {
-      entityFactory = getEntityFactory(configurationEntity);
+      EntityFactory entityFactory = factorySelector.getEntityFactory(configurationEntity);
 
       if (configurationEntity.isDeleted()) {
         try {
@@ -112,13 +84,7 @@ public class ConfigurationParserImpl implements ConfigurationParser {
         try {
           results.add(entityFactory.updateInstance(configurationEntity));
         } catch (EntityDoesNotExistException e) {
-          ConfigurationElement missingEntity = new ConfigurationElement();
-          missingEntity.setStatus(ConfigConstants.Status.WARNING);
-          missingEntity.setEntityId(configurationEntity.getId());
-          missingEntity.setAction(ConfigConstants.Action.UPDATE);
-          missingEntity.setConfigId(-1L);
-          missingEntity.setEntity(ConfigConstants.Entity.MISSING);
-          results.add(missingEntity);
+          results.add(createMissingEntity(configurationEntity));
           log.warn(e.getMessage());
         }
       } else if (configurationEntity.isCreated()) {
@@ -130,45 +96,14 @@ public class ConfigurationParserImpl implements ConfigurationParser {
     return results;
   }
 
-  /**
-   * Determine the correct {@link EntityFactory} based on the instance of the
-   * {@link ConfigurationEntity}.
-   *
-   * @param entity A entity for creating a {@link ConfigurationElement}.
-   * @return The corresponding factory.
-   */
-  private EntityFactory getEntityFactory(ConfigurationEntity entity) {
-    if (entity instanceof Process) {
-      return processFactory;
-    }
-    if (entity instanceof Equipment) {
-      return equipmentFactory;
-    }
-    if (entity instanceof SubEquipment) {
-      return subEquipmentFactory;
-    }
-    if (entity instanceof AliveTag) {
-      return aliveTagFactory;
-    }
-    if (entity instanceof StatusTag) {
-      return stateTagFactory;
-    }
-    if (entity instanceof CommFaultTag) {
-      return commFaultTagFactory;
-    }
-    if (entity instanceof DataTag) {
-      return dataTagFactory;
-    }
-    if (entity instanceof RuleTag) {
-      return ruleTagFactory;
-    }
-    if (entity instanceof Alarm) {
-      return alarmFactory;
-    }
-    if (entity instanceof CommandTag) {
-      return commandTagFactory;
-    }
-    throw new IllegalArgumentException("No EntityFactory for class " + entity.getClass() + " could be determined!");
+  private static ConfigurationElement createMissingEntity(ConfigurationEntity configurationEntity) {
+    ConfigurationElement missingEntity = new ConfigurationElement();
+    missingEntity.setStatus(ConfigConstants.Status.WARNING);
+    missingEntity.setEntityId(configurationEntity.getId());
+    missingEntity.setAction(ConfigConstants.Action.UPDATE);
+    missingEntity.setConfigId(-1L);
+    missingEntity.setEntity(ConfigConstants.Entity.MISSING);
+    return missingEntity;
   }
 
 }
