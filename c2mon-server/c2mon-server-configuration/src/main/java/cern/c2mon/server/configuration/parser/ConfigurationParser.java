@@ -22,7 +22,7 @@ import cern.c2mon.shared.client.configuration.api.Configuration;
 import java.util.List;
 
 /**
- * This class holds all information about a Configoration object to translate
+ * This class holds all information about a Configuration object to translate
  * this object in List of ConfigurationElement.
  *
  * @author Franz Ritter

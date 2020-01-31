@@ -207,11 +207,6 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
   }
 
   @Override
-  public void cancelCurrentConfiguration() {
-    configApplier.cancelRequested = true;
-  }
-
-  @Override
   public ConfigurationReport applyConfiguration(int configId) {
     return applyConfiguration(configId, null);
   }

@@ -26,6 +26,9 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+/**
+ * Provides a single API for taking in a config report and applying all its elements
+ */
 @Slf4j
 @Named
 public final class ConfigurationApplier {
@@ -40,11 +43,6 @@ public final class ConfigurationApplier {
    * Flag recording if configuration events should be sent to the DAQ layer (set in XML).
    */
   boolean daqConfigEnabled;
-
-  /**
-   * Flag indicating if a cancel request has been made.
-   */
-  volatile boolean cancelRequested = false;
 
   @Inject
   public ConfigurationApplier(ProcessCommunicationManager processCommunicationManager,
@@ -103,57 +101,56 @@ public final class ConfigurationApplier {
       log.info(configId + " Reconfiguring " + processLists.keySet().size()+ " processes ...");
 
       for (Long processId : processLists.keySet()) {
-        if (!cancelRequested){
-          List<Change> processChangeEvents = processLists.get(processId);
-          if (processService.isRunning(processId) && !processService.isRebootRequired(processId)) {
-            try {
-              log.trace(configId + " Sending " + processChangeEvents.size() + " change events to process " + processId + "...");
-              ConfigurationChangeEventReport processReport = processCommunicationManager.sendConfiguration(processId, processChangeEvents);
-              if (!processReport.getChangeReports().isEmpty()) {
 
-                log.trace(configId + " Received " + processReport.getChangeReports().size() + " back from process.");
+        List<Change> processChangeEvents = processLists.get(processId);
+        if (processService.isRunning(processId) && !processService.isRebootRequired(processId)) {
+          try {
+            log.trace(configId + " Sending " + processChangeEvents.size() + " change events to process " + processId + "...");
+            ConfigurationChangeEventReport processReport = processCommunicationManager.sendConfiguration(processId, processChangeEvents);
+            if (!processReport.getChangeReports().isEmpty()) {
+
+              log.trace(configId + " Received " + processReport.getChangeReports().size() + " back from process.");
+            } else {
+              log.trace(configId + " Received 0 reports back from process");
+            }
+            for (ChangeReport changeReport : processReport.getChangeReports()) {
+              ConfigurationElementReport convertedReport =
+                ConfigurationReportConverter.fromProcessReport(changeReport, daqReportPlaceholder.get(changeReport.getChangeId()));
+              daqReportPlaceholder.get(changeReport.getChangeId()).addSubReport(convertedReport);
+              //if change report has REBOOT status, mark this DAQ for a reboot in the configuration
+              if (changeReport.isReboot()) {
+                report.addProcessToReboot(processCache.get(processId).getName());
+                elementPlaceholder.get(changeReport.getChangeId()).setDaqStatus(ConfigConstants.Status.RESTART);
+                //TODO set flag & tag to indicate that process restart is needed
+              } else if (changeReport.isFail()) {
+                log.debug(configId + " changeRequest failed at process " + processCache.get(processId).getName());
+                report.addStatus(ConfigConstants.Status.FAILURE);
+                report.setStatusDescription("Failed to apply the configuration successfully. See details in the report below.");
+                elementPlaceholder.get(changeReport.getChangeId()).setDaqStatus(ConfigConstants.Status.FAILURE);
+              //success, override default failure
               } else {
-                log.trace(configId + " Received 0 reports back from process");
-              }
-              for (ChangeReport changeReport : processReport.getChangeReports()) {
-                ConfigurationElementReport convertedReport =
-                  ConfigurationReportConverter.fromProcessReport(changeReport, daqReportPlaceholder.get(changeReport.getChangeId()));
-                daqReportPlaceholder.get(changeReport.getChangeId()).addSubReport(convertedReport);
-                //if change report has REBOOT status, mark this DAQ for a reboot in the configuration
-                if (changeReport.isReboot()) {
-                  report.addProcessToReboot(processCache.get(processId).getName());
-                  elementPlaceholder.get(changeReport.getChangeId()).setDaqStatus(ConfigConstants.Status.RESTART);
-                  //TODO set flag & tag to indicate that process restart is needed
-                } else if (changeReport.isFail()) {
-                  log.debug(configId + " changeRequest failed at process " + processCache.get(processId).getName());
-                  report.addStatus(ConfigConstants.Status.FAILURE);
-                  report.setStatusDescription("Failed to apply the configuration successfully. See details in the report below.");
-                  elementPlaceholder.get(changeReport.getChangeId()).setDaqStatus(ConfigConstants.Status.FAILURE);
-                } else { //success, override default failure
-                  if (elementPlaceholder.get(changeReport.getChangeId()).getDaqStatus().equals(ConfigConstants.Status.RESTART)) {
-                    elementPlaceholder.get(changeReport.getChangeId()).setDaqStatus(ConfigConstants.Status.OK);
-                  }
+                if (elementPlaceholder.get(changeReport.getChangeId()).getDaqStatus().equals(ConfigConstants.Status.RESTART)) {
+                  elementPlaceholder.get(changeReport.getChangeId()).setDaqStatus(ConfigConstants.Status.OK);
                 }
               }
-            } catch (Exception e) {
-              String errorMessage = "Error during DAQ reconfiguration: unsuccessful application of configuration (possible timeout) to Process " + processCache.get(processId).getName();
-              log.error(errorMessage, e);
-              processService.setRequiresReboot(processId, true);
-              report.addProcessToReboot(processCache.get(processId).getName());
-              report.addStatus(ConfigConstants.Status.FAILURE);
-              report.setStatusDescription(report.getStatusDescription() + errorMessage + "\n");
             }
-          } else {
+          } catch (Exception e) {
+            String errorMessage = "Error during DAQ reconfiguration: unsuccessful application of configuration (possible timeout) to Process " + processCache.get(processId).getName();
+            log.error(errorMessage, e);
             processService.setRequiresReboot(processId, true);
             report.addProcessToReboot(processCache.get(processId).getName());
-            report.addStatus(ConfigConstants.Status.RESTART);
-          }
-          if (configProgressMonitor != null) {
-            configProgressMonitor.incrementDaqProgress();
+            report.addStatus(ConfigConstants.Status.FAILURE);
+            report.setStatusDescription(report.getStatusDescription() + errorMessage + "\n");
           }
         } else {
-          log.info("Interrupting configuration " + configId + " due to cancel request.");
+          processService.setRequiresReboot(processId, true);
+          report.addProcessToReboot(processCache.get(processId).getName());
+          report.addStatus(ConfigConstants.Status.RESTART);
         }
+        if (configProgressMonitor != null) {
+          configProgressMonitor.incrementDaqProgress();
+        }
+
       }
     } else {
       log.debug("DAQ runtime reconfiguration not enabled - setting required restart flags");
@@ -183,7 +180,8 @@ public final class ConfigurationApplier {
   }
 
   private void parallelConfiguration(int configId, List<ConfigurationElement> configElements, ConfigProgressMonitor configProgressMonitor, ConfigurationReport report, Map<Long, ConfigurationElementReport> daqReportPlaceholder, Map<Long, ConfigurationElement> elementPlaceholder, Map<Long, List<Change>> processLists) {
-    ForkJoinPool forkJoinPool = new ForkJoinPool(10); // TODO (Alex) Switch this to commonPool
+    // TODO (Alex) Switch this to commonPool
+    ForkJoinPool forkJoinPool = new ForkJoinPool(10);
     try {
       //https://blog.krecan.net/2014/03/18/how-to-specify-thread-pool-for-java-8-parallel-streams/
       forkJoinPool.submit(() ->
@@ -234,10 +232,6 @@ public final class ConfigurationApplier {
                                          Map<Long, ConfigurationElementReport> daqReportPlaceholder,
                                          ConfigurationReport report, Integer configId,
                                          final ConfigProgressMonitor configProgressMonitor){
-    if (cancelRequested) {
-      log.info(configId + " Interrupting configuration due to cancel request.");
-      return;
-    }
     if (element.getEntity().equals(ConfigConstants.Entity.MISSING)) {
       ConfigurationElementReport elementReport = new ConfigurationElementReport(element.getAction(), element.getEntity(), element.getEntityId());
       elementReport.setWarning("Entity " + element.getEntityId() + " does not exist");
@@ -253,7 +247,8 @@ public final class ConfigurationApplier {
     report.addElementReport(elementReport);
     List<ProcessChange> processChanges;
     try {
-      processChanges = configurationHandlerSelector.applyConfigElement(element, elementReport);  //never returns null
+      //never returns null
+      processChanges = configurationHandlerSelector.applyConfigElement(element, elementReport);
 
       if (processChanges != null) {
 
@@ -301,7 +296,8 @@ public final class ConfigurationApplier {
       }
 
       elementPlaceholder.put(processChange.getChangeEvent().getChangeId(), element);
-      element.setDaqStatus(ConfigConstants.Status.RESTART); //default to restart; if successful on DAQ layer switch to OK
+      //default to restart; if successful on DAQ layer switch to OK
+      element.setDaqStatus(ConfigConstants.Status.RESTART);
     } else if (processChange.requiresReboot()) {
       log.debug(configId + " RESTART for " + processChange.getProcessId() + " required");
       element.setDaqStatus(ConfigConstants.Status.RESTART);

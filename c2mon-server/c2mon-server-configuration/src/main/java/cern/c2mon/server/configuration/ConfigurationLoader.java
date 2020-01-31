@@ -16,12 +16,12 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration;
 
-import java.util.List;
-
 import cern.c2mon.shared.client.configuration.ConfigurationException;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.ConfigurationReportHeader;
 import cern.c2mon.shared.client.configuration.api.Configuration;
+
+import java.util.List;
 
 /**
  * Public bean that can be accessed to load configurations into
@@ -93,15 +93,9 @@ public interface ConfigurationLoader {
   ConfigurationReport applyConfiguration(Configuration configuration);
 
   /**
-   * Will cancel the configuration that is currently running, once the element currently
-   * being applied has terminated.
-   */
-  void cancelCurrentConfiguration();
-
-  /**
    * Retrieve all previously applied configuration reports. Note: this only
    * returns partial information about the configuration report. To retrieve the
-   * full report, use {@link ConfigurationLoader#getConfigurationReports(Long)}.
+   * full report, use {@link ConfigurationLoader#getConfigurationReports(String)}.
    *
    * @return the list of reports
    */
