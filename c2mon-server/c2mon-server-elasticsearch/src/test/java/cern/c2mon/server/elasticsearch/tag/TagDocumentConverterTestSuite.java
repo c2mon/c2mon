@@ -53,7 +53,7 @@ public class TagDocumentConverterTestSuite extends BaseTagDocumentConverterTest 
   private TagDocumentConverter converter;
 
   @Before
-  public void setup() {
+  public void setUp() {
     ProcessCacheObject process = new ProcessCacheObject(1L);
     process.setName("P_TEST");
 

@@ -73,6 +73,8 @@ public final class ElasticsearchClientTransport implements ElasticsearchClient {
   private final Client client;
 
   /**
+   * Elasticsearch Transport client constructor
+   *
    * @param properties to initialize Transport client.
    */
   @Autowired

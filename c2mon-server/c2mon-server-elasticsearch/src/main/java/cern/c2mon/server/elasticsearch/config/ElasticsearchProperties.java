@@ -20,6 +20,8 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
+ * Elasticsearch module properties
+ *
  * @author Justin Lewis Salmon
  * @author Serhiy Boychenko
  */

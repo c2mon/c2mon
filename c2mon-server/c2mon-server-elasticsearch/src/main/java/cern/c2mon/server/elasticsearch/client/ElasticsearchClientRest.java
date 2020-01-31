@@ -79,6 +79,8 @@ public final class ElasticsearchClientRest implements ElasticsearchClient {
   private final RestHighLevelClient client;
 
   /**
+   * Elasticsearch REST client constructor
+   *
    * @param properties to initialize REST client.
    */
   @Autowired
