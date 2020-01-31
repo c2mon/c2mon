@@ -18,7 +18,7 @@ package cern.c2mon.client.core.elasticsearch;
 
 import cern.c2mon.cache.actions.alarm.AlarmService;
 import cern.c2mon.cache.api.impl.SimpleCache;
-import cern.c2mon.cache.config.tag.UnifiedTagCacheFacade;
+import cern.c2mon.cache.config.collections.TagCacheCollection;
 import cern.c2mon.client.core.config.C2monClientProperties;
 import cern.c2mon.server.common.alarm.TagWithAlarms;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
@@ -72,7 +72,7 @@ public class ElasticsearchServiceTest {
       new SimpleCache<>("eqCache"),
       new SimpleCache<>("subEqCache")
     );
-    UnifiedTagCacheFacade tagCacheFacade = new UnifiedTagCacheFacade(new SimpleCache<>("rule"),
+    TagCacheCollection tagCacheFacade = new TagCacheCollection(new SimpleCache<>("rule"),
       new SimpleCache<>("data"), new SimpleCache<>("alive"), new SimpleCache<>("cFault"),
       new SimpleCache<>("state"));
     alarmService = new AlarmService(new SimpleCache<>("alarmCache"), tagCacheFacade, null);

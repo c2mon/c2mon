@@ -19,7 +19,7 @@ package cern.c2mon.cache.actions.oscillation;
 import cern.c2mon.cache.actions.alarm.AlarmService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.impl.SimpleCache;
-import cern.c2mon.cache.config.tag.UnifiedTagCacheFacade;
+import cern.c2mon.cache.config.collections.TagCacheCollection;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.datatag.DataTag;
@@ -243,7 +243,7 @@ public class OscillationUpdaterTest {
   @Test
   public void testOscillationInfo() throws Exception {
     C2monCache<DataTag> dataTagCache = new SimpleCache<>("dataTagCache");
-    UnifiedTagCacheFacade unifiedTagCacheFacade = new UnifiedTagCacheFacade(
+    TagCacheCollection unifiedTagCacheFacade = new TagCacheCollection(
       new SimpleCache<>("ruleTagCache"), dataTagCache, null, null, null);
     AlarmService myAlarmCacheUpdater = new AlarmService(alarmCache, unifiedTagCacheFacade, oscUpdater);
 

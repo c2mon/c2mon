@@ -18,7 +18,7 @@
 package cern.c2mon.server.configuration.parser.factory;
 
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.cache.config.tag.UnifiedTagCacheFacade;
+import cern.c2mon.cache.config.collections.TagCacheCollection;
 import cern.c2mon.server.cache.loading.EquipmentDAO;
 import cern.c2mon.server.cache.loading.SequenceDAO;
 import cern.c2mon.server.cache.loading.SubEquipmentDAO;
@@ -51,11 +51,11 @@ class DataTagFactory extends EntityFactory<DataTag> {
   private C2monCache<SubEquipment> subEquipmentCache;
 
   private C2monCache<cern.c2mon.server.common.datatag.DataTag> dataTagCache;
-  private UnifiedTagCacheFacade unifiedTagCacheFacade;
+  private TagCacheCollection unifiedTagCacheFacade;
   private SequenceDAO sequenceDAO;
 
   @Autowired
-  public DataTagFactory(C2monCache<cern.c2mon.server.common.datatag.DataTag> dataTagCache, UnifiedTagCacheFacade unifiedTagCacheFacade, SequenceDAO sequenceDAO,
+  public DataTagFactory(C2monCache<cern.c2mon.server.common.datatag.DataTag> dataTagCache, TagCacheCollection unifiedTagCacheFacade, SequenceDAO sequenceDAO,
                         EquipmentDAO equipmentDAO, C2monCache<Equipment> equipmentCache, SubEquipmentDAO subEquipmentDAO,
                         C2monCache<SubEquipment> subEquipmentCache) {
     super(dataTagCache);

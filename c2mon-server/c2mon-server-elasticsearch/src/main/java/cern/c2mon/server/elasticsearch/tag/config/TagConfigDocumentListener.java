@@ -16,21 +16,20 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch.tag.config;
 
-import java.util.Collections;
-import java.util.Collection;
-
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import cern.c2mon.cache.actions.alarm.AlarmService;
-import cern.c2mon.cache.config.tag.UnifiedTagCacheFacade;
+import cern.c2mon.cache.config.collections.TagCacheCollection;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.listener.ConfigurationEventListener;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 import cern.c2mon.server.elasticsearch.exception.IndexingException;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * Listens for tag configuration events, converts them to
@@ -48,13 +47,13 @@ public class TagConfigDocumentListener implements ConfigurationEventListener {
 
   private final TagConfigDocumentConverter converter;
 
-  private final UnifiedTagCacheFacade unifiedTagCacheFacade;
+  private final TagCacheCollection unifiedTagCacheFacade;
 
   private final AlarmService alarmService;
 
   @Autowired
   public TagConfigDocumentListener(ElasticsearchProperties properties, TagConfigDocumentIndexer indexer, TagConfigDocumentConverter converter,
-                                   final UnifiedTagCacheFacade unifiedTagCacheFacade,
+                                   final TagCacheCollection unifiedTagCacheFacade,
                                    final AlarmService alarmService) {
     this.properties = properties;
     this.indexer = indexer;

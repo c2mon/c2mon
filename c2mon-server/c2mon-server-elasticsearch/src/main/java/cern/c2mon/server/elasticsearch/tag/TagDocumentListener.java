@@ -16,23 +16,21 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch.tag;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import cern.c2mon.cache.config.tag.UnifiedTagCacheFacade;
+import cern.c2mon.cache.config.collections.TagCacheCollection;
 import cern.c2mon.pmanager.persistence.IPersistenceManager;
 import cern.c2mon.server.common.tag.Tag;
+import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 import cern.c2mon.shared.common.CacheEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
-
 import javax.annotation.PostConstruct;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Listens for {@link Tag} updates and converts them to {@link TagDocument}
@@ -47,7 +45,7 @@ public class TagDocumentListener {
 
   private final ElasticsearchProperties properties;
 
-  private final UnifiedTagCacheFacade unifiedTagCacheFacade;
+  private final TagCacheCollection unifiedTagCacheFacade;
 
   @Qualifier("tagDocumentPersistenceManager")
   private final IPersistenceManager<TagDocument> persistenceManager;
@@ -61,7 +59,7 @@ public class TagDocumentListener {
    * @param converter to convert the tags
    */
   @Autowired
-  public TagDocumentListener(ElasticsearchProperties properties, UnifiedTagCacheFacade unifiedTagCacheFacade, IPersistenceManager<TagDocument> persistenceManager, TagDocumentConverter converter) {
+  public TagDocumentListener(ElasticsearchProperties properties, TagCacheCollection unifiedTagCacheFacade, IPersistenceManager<TagDocument> persistenceManager, TagDocumentConverter converter) {
     this.properties = properties;
     this.persistenceManager = persistenceManager;
     this.converter = converter;

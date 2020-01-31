@@ -17,7 +17,7 @@
 package cern.c2mon.server.client.request;
 
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.cache.config.tag.UnifiedTagCacheFacade;
+import cern.c2mon.cache.config.collections.TagCacheCollection;
 import cern.c2mon.server.client.util.TransferObjectFactory;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.tag.Tag;
@@ -45,13 +45,13 @@ class ClientAlarmRequestHandler {
   private static final Logger LOG = LoggerFactory.getLogger(ClientAlarmRequestHandler.class);
 
   /** Reference to the tag location service to check whether a tag exists */
-  private final UnifiedTagCacheFacade unifiedTagCacheFacade;
+  private final TagCacheCollection unifiedTagCacheFacade;
 
   /** Reference to the AlarmCache */
   private final C2monCache<Alarm> alarmCache;
 
   @Autowired
-  protected ClientAlarmRequestHandler(final C2monCache<Alarm> alarmCache, final UnifiedTagCacheFacade unifiedTagCacheFacade) {
+  protected ClientAlarmRequestHandler(final C2monCache<Alarm> alarmCache, final TagCacheCollection unifiedTagCacheFacade) {
     this.alarmCache = alarmCache;
     this.unifiedTagCacheFacade = unifiedTagCacheFacade;
   }

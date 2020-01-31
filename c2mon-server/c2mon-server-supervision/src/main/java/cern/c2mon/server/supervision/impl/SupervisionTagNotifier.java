@@ -24,7 +24,7 @@ import cern.c2mon.cache.actions.subequipment.SubEquipmentService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.SupervisionAppender;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
-import cern.c2mon.cache.config.tag.UnifiedTagCacheFacade;
+import cern.c2mon.cache.config.collections.TagCacheCollection;
 import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.common.datatag.DataTag;
@@ -110,7 +110,7 @@ public class SupervisionTagNotifier implements SupervisionListener, SmartLifecyc
   /**
    * Used for locating a Tag in the appropriate Tag cache.
    */
-  private UnifiedTagCacheFacade unifiedTagCacheFacade;
+  private TagCacheCollection unifiedTagCacheFacade;
 
   /**
    * Caches with listeners notified of supervision information (Tag caches).
@@ -149,7 +149,7 @@ public class SupervisionTagNotifier implements SupervisionListener, SmartLifecyc
    */
   @Autowired
   public SupervisionTagNotifier(final SupervisionNotifier supervisionNotifier,
-                                final UnifiedTagCacheFacade unifiedTagCacheFacade,
+                                final TagCacheCollection unifiedTagCacheFacade,
                                 final SupervisionAppender supervisionAppender,
                                 DataTagService dataTagService, final ProcessService processService,
                                 final EquipmentService equipmentService,

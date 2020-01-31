@@ -19,7 +19,7 @@ package cern.c2mon.server.configuration.handler.transacted;
 import cern.c2mon.cache.actions.alarm.AlarmCacheObjectFactory;
 import cern.c2mon.cache.actions.alarm.AlarmService;
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.cache.config.tag.UnifiedTagCacheFacade;
+import cern.c2mon.cache.config.collections.TagCacheCollection;
 import cern.c2mon.server.cache.loading.AlarmLoaderDAO;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.listener.ConfigurationEventListener;
@@ -47,14 +47,14 @@ public class AlarmConfigHandler extends BaseConfigHandlerImpl<Alarm> {
 
   private final Collection<ConfigurationEventListener> configurationEventListeners;
 
-  private final UnifiedTagCacheFacade unifiedTagCacheFacade;
+  private final TagCacheCollection unifiedTagCacheFacade;
   private AlarmService alarmService;
 
   @Inject
   public AlarmConfigHandler(final C2monCache<Alarm> alarmCache, final AlarmLoaderDAO alarmDAO,
                             final AlarmCacheObjectFactory alarmCacheObjectFactory,
                             final GenericApplicationContext context,
-                            final UnifiedTagCacheFacade unifiedTagCacheFacade,
+                            final TagCacheCollection unifiedTagCacheFacade,
                             final AlarmService alarmService) {
     super(alarmCache, alarmDAO, alarmCacheObjectFactory, ArrayList::new);
     this.configurationEventListeners = context.getBeansOfType(ConfigurationEventListener.class).values();

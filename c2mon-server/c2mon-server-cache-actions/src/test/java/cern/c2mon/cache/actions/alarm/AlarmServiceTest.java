@@ -4,7 +4,7 @@ import cern.c2mon.cache.actions.oscillation.OscillationProperties;
 import cern.c2mon.cache.actions.oscillation.OscillationUpdater;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.impl.SimpleCache;
-import cern.c2mon.cache.config.tag.UnifiedTagCacheFacade;
+import cern.c2mon.cache.config.collections.TagCacheCollection;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.datatag.DataTag;
@@ -38,7 +38,7 @@ public class AlarmServiceTest {
     alarmCache = new SimpleCache<>("alarm");
     C2monCache<RuleTag> ruleTagCache = new SimpleCache<>("rules");
     dataTagCache = new SimpleCache<>("data");
-    UnifiedTagCacheFacade unifiedTagCacheFacade = new UnifiedTagCacheFacade(ruleTagCache, dataTagCache, null, null, null);
+    TagCacheCollection unifiedTagCacheFacade = new TagCacheCollection(ruleTagCache, dataTagCache, null, null, null);
     alarmService = new AlarmService(alarmCache, unifiedTagCacheFacade, new OscillationUpdater(new OscillationProperties()));
   }
 

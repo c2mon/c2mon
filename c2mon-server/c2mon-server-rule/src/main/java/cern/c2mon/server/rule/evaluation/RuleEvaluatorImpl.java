@@ -18,7 +18,7 @@ package cern.c2mon.server.rule.evaluation;
 
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
-import cern.c2mon.cache.config.tag.UnifiedTagCacheFacade;
+import cern.c2mon.cache.config.collections.TagCacheCollection;
 import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.rule.RuleEvaluator;
@@ -57,14 +57,14 @@ public class RuleEvaluatorImpl implements RuleEvaluator {
   /** This temporary buffer is used to filter out intermediate rule evaluation results. */
   private final RuleUpdateBuffer ruleUpdateBuffer;
 
-  private final UnifiedTagCacheFacade unifiedTagCacheFacade;
+  private final TagCacheCollection unifiedTagCacheFacade;
 
   private final RuleProperties properties;
 
   @Autowired
   public RuleEvaluatorImpl(C2monCache<RuleTag> ruleTagCache,
                            RuleUpdateBuffer ruleUpdateBuffer,
-                           UnifiedTagCacheFacade unifiedTagCacheFacade,
+                           TagCacheCollection unifiedTagCacheFacade,
                            RuleProperties properties) {
     super();
     this.ruleTagCache = ruleTagCache;

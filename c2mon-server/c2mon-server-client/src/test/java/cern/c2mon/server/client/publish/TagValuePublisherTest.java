@@ -18,7 +18,7 @@ package cern.c2mon.server.client.publish;
 
 import cern.c2mon.cache.actions.CacheActionsModuleRef;
 import cern.c2mon.cache.actions.alarm.AlarmModule;
-import cern.c2mon.cache.config.tag.UnifiedTagCacheFacade;
+import cern.c2mon.cache.config.collections.TagCacheCollection;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.client.config.ClientModule;
 import cern.c2mon.server.command.config.CommandModule;
@@ -98,7 +98,7 @@ public class TagValuePublisherTest {
   private TagValuePublisher tagValuePublisher;
 
   @Autowired
-  private UnifiedTagCacheFacade unifiedTagCacheFacade;
+  private TagCacheCollection unifiedTagCacheFacade;
 
   @Autowired
   @Qualifier("clientActiveMQConnectionFactory")

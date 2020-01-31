@@ -17,7 +17,7 @@
 package cern.c2mon.server.client.publish;
 
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.cache.config.tag.UnifiedTagCacheFacade;
+import cern.c2mon.cache.config.collections.TagCacheCollection;
 import cern.c2mon.server.client.util.TransferObjectFactory;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.config.ServerConstants;
@@ -63,7 +63,7 @@ public class AlarmPublisher implements SmartLifecycle, Publisher<AlarmValue>  {
   private final C2monCache<Alarm> alarmCache;
 
   /** Reference to the tag location service to check whether a tag exists */
-  private final UnifiedTagCacheFacade unifiedTagCacheFacade;
+  private final TagCacheCollection unifiedTagCacheFacade;
 
   /** Json message serializer/deserializer */
   private static final Gson GSON = GsonFactory.createGson();
@@ -84,7 +84,7 @@ public class AlarmPublisher implements SmartLifecycle, Publisher<AlarmValue>  {
   @Autowired
   public AlarmPublisher(@Qualifier("alarmTopicPublisher") final JmsSender jmsSender
       , final C2monCache<Alarm> alarmCache
-      , final UnifiedTagCacheFacade unifiedTagCacheFacade) {
+      , final TagCacheCollection unifiedTagCacheFacade) {
 
     this.jmsSender = jmsSender;
     this.alarmCache = alarmCache;

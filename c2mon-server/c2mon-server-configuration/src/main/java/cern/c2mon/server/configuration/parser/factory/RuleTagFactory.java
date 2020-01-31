@@ -18,7 +18,7 @@
 package cern.c2mon.server.configuration.parser.factory;
 
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.cache.config.tag.UnifiedTagCacheFacade;
+import cern.c2mon.cache.config.collections.TagCacheCollection;
 import cern.c2mon.server.cache.loading.SequenceDAO;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.configuration.parser.exception.ConfigurationParseException;
@@ -39,11 +39,11 @@ import static cern.c2mon.cache.config.ClientQueryProvider.queryByClientInput;
 @Service
 class RuleTagFactory extends EntityFactory<RuleTag> {
   private final C2monCache<cern.c2mon.server.common.rule.RuleTag> ruleTagCache;
-  private final UnifiedTagCacheFacade tagFacadeGateway;
+  private final TagCacheCollection tagFacadeGateway;
   private final SequenceDAO sequenceDAO;
 
   @Autowired
-  public RuleTagFactory(C2monCache<cern.c2mon.server.common.rule.RuleTag> ruleTagCache, UnifiedTagCacheFacade tagFacadeGateway, SequenceDAO sequenceDAO) {
+  public RuleTagFactory(C2monCache<cern.c2mon.server.common.rule.RuleTag> ruleTagCache, TagCacheCollection tagFacadeGateway, SequenceDAO sequenceDAO) {
     super(ruleTagCache);
     this.ruleTagCache = ruleTagCache;
     this.tagFacadeGateway = tagFacadeGateway;

@@ -20,7 +20,7 @@ import cern.c2mon.cache.actions.alarm.AlarmAggregator;
 import cern.c2mon.cache.actions.alarm.AlarmAggregatorListener;
 import cern.c2mon.cache.actions.alarm.AlarmService;
 import cern.c2mon.cache.actions.alive.AliveTagService;
-import cern.c2mon.cache.config.tag.UnifiedTagCacheFacade;
+import cern.c2mon.cache.config.collections.TagCacheCollection;
 import cern.c2mon.server.client.config.ClientProperties;
 import cern.c2mon.server.client.util.TransferObjectFactory;
 import cern.c2mon.server.common.alarm.TagWithAlarms;
@@ -89,7 +89,7 @@ public class TagValuePublisher implements AlarmAggregatorListener, Configuration
   private final AlarmService alarmService;
 
   /** Reference to the tag location service */
-  private UnifiedTagCacheFacade tagLocationService;
+  private TagCacheCollection tagLocationService;
 
   /** Used to determine, whether a given tag is an AliveTag */
   private AliveTagService aliveTimerFacade;
@@ -111,7 +111,7 @@ public class TagValuePublisher implements AlarmAggregatorListener, Configuration
                            final AliveTagService aliveTimerFacade,
                            final ConfigurationUpdate configurationUpdate,
                            final AlarmService alarmService,
-                           final UnifiedTagCacheFacade tagLocationService,
+                           final TagCacheCollection tagLocationService,
                            final ClientProperties properties) {
     this.aliveTimerFacade = aliveTimerFacade;
     this.jmsSender = jmsSender;

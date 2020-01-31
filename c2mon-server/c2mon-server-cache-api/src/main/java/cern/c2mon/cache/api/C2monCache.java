@@ -112,7 +112,7 @@ public interface C2monCache<CACHEABLE extends Cacheable> extends CacheDelegator<
    * @return a {@code Collection} of results, may be empty, never null
    * @throws NullPointerException when {@code filter} is null
    */
-  Collection<CACHEABLE> query(@NonNull Function<CACHEABLE, Boolean> filter) throws NullPointerException;
+  Collection<CACHEABLE> query(@NonNull Function<CACHEABLE, Boolean> filter);
 
   /**
    * Overload of {@link C2monCache#query(Function)} allowing the user to provide additional search parameters
@@ -122,7 +122,7 @@ public interface C2monCache<CACHEABLE extends Cacheable> extends CacheDelegator<
    * @throws NullPointerException when {@code providedQuery} is null
    * @see C2monCache#query(Function)
    */
-  Collection<CACHEABLE> query(@NonNull CacheQuery<CACHEABLE> providedQuery) throws NullPointerException;
+  Collection<CACHEABLE> query(@NonNull CacheQuery<CACHEABLE> providedQuery);
 
   /**
    * Put an element to the cache - inserts or updates if the element existed already
@@ -131,5 +131,5 @@ public interface C2monCache<CACHEABLE extends Cacheable> extends CacheDelegator<
    *
    * @throws NullPointerException when {@code value} is null
    */
-  void putQuiet(long key, @NonNull CACHEABLE value) throws NullPointerException;
+  void putQuiet(long key, @NonNull CACHEABLE value);
 }

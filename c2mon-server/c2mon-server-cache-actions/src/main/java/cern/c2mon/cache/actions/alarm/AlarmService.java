@@ -4,7 +4,7 @@ import cern.c2mon.cache.actions.AbstractCacheServiceImpl;
 import cern.c2mon.cache.actions.oscillation.OscillationUpdater;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
-import cern.c2mon.cache.config.tag.UnifiedTagCacheFacade;
+import cern.c2mon.cache.config.collections.TagCacheCollection;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.TagWithAlarms;
@@ -32,12 +32,12 @@ public class AlarmService extends AbstractCacheServiceImpl<Alarm> implements Ala
 
   private List<AlarmAggregatorListener> alarmUpdateObservable = new ArrayList<>();
 
-  private UnifiedTagCacheFacade unifiedTagCacheFacade;
+  private TagCacheCollection unifiedTagCacheFacade;
 
   private OscillationUpdater oscillationUpdater;
 
   @Inject
-  public AlarmService(final C2monCache<Alarm> cache, final UnifiedTagCacheFacade unifiedTagCacheFacade,
+  public AlarmService(final C2monCache<Alarm> cache, final TagCacheCollection unifiedTagCacheFacade,
                       final OscillationUpdater oscillationUpdater) {
     super(cache, new AlarmCacheFlow());
     // TODO (Alex) We probably want to increase the number of threads in the CacheListenerManager here

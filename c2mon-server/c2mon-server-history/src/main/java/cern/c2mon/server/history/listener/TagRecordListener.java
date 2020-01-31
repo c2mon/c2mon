@@ -16,7 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.history.listener;
 
-import cern.c2mon.cache.config.tag.UnifiedTagCacheFacade;
+import cern.c2mon.cache.config.collections.TagCacheCollection;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.history.logger.BatchLogger;
 import cern.c2mon.shared.common.CacheEvent;
@@ -41,7 +41,7 @@ public class TagRecordListener {
    * Bean that logs Tags into the history.
    */
   private BatchLogger<Tag> tagLogger;
-  private UnifiedTagCacheFacade unifiedTagCacheFacade;
+  private TagCacheCollection unifiedTagCacheFacade;
 
   /**
    * Autowired constructor.
@@ -50,7 +50,7 @@ public class TagRecordListener {
    * @param tagLogger                for logging cache objects to the STL
    */
   @Autowired
-  public TagRecordListener(final UnifiedTagCacheFacade unifiedTagCacheFacade,
+  public TagRecordListener(final TagCacheCollection unifiedTagCacheFacade,
                            @Qualifier("tagLogger") final BatchLogger<Tag> tagLogger) {
     super();
     this.unifiedTagCacheFacade = unifiedTagCacheFacade;

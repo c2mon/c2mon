@@ -19,7 +19,7 @@ package cern.c2mon.cache.actions.oscillation;
 import cern.c2mon.cache.actions.alarm.AlarmService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.impl.SimpleCache;
-import cern.c2mon.cache.config.tag.UnifiedTagCacheFacade;
+import cern.c2mon.cache.config.collections.TagCacheCollection;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.ValueAlarmCondition;
@@ -45,7 +45,7 @@ public class OscillationUpdateCheckerTest {
   public void setup() {
     // Tag caches
     dataTagCache = new SimpleCache<>("dataTag");
-    UnifiedTagCacheFacade unifiedTagCacheFacade = new UnifiedTagCacheFacade(new SimpleCache<>("ruleTag"), dataTagCache, null, null, null);
+    TagCacheCollection unifiedTagCacheFacade = new TagCacheCollection(new SimpleCache<>("ruleTag"), dataTagCache, null, null, null);
     dataTagCacheObject = new DataTagCacheObjectFactory().sampleBase();
     dataTagCacheObject.setValue(Boolean.FALSE);
     dataTagCacheObject.setSourceTimestamp(new Timestamp(System.currentTimeMillis() - 100000L));
