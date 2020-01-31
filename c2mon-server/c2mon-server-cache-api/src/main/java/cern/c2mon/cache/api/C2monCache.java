@@ -16,8 +16,11 @@ import java.util.function.Supplier;
 
 
 /**
+ * The base interface for the C2mon caching layer
+ *
  * @param <CACHEABLE> cache element type
  * @author Szymon Halastra, Alexandros Papageorgiou Koufidis, Brice Copy
+ * @see cern.c2mon.cache.api.impl.AbstractCache
  */
 public interface C2monCache<CACHEABLE extends Cacheable> extends CacheDelegator<CACHEABLE> {
 
@@ -30,13 +33,11 @@ public interface C2monCache<CACHEABLE extends Cacheable> extends CacheDelegator<
    */
   void setCacheUpdateFlow(CacheUpdateFlow<CACHEABLE> cacheFlow);
 
-  CacheLoader getCacheLoader();
-
   void setCacheLoader(CacheLoader<CACHEABLE> cacheLoader);
 
   CacheListenerManager<CACHEABLE> getCacheListenerManager();
 
-  void setCacheListenerManager(CacheListenerManager<CACHEABLE> CacheListenerManager);
+  void setCacheListenerManager(CacheListenerManager<CACHEABLE> cacheListenerManager);
 
   // === Section: Custom cache methods ===
 

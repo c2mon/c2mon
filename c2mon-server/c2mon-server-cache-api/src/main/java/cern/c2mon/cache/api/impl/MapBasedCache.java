@@ -22,7 +22,7 @@ import static cern.c2mon.server.common.util.KotlinAPIs.letNotNull;
 /**
  * This is a very simple cache implementation, used for testing.
  */
-public class MapBasedCache<V extends Cacheable> implements Cache<Long, V> {
+class MapBasedCache<V extends Cacheable> implements Cache<Long, V> {
 
   @Getter
   private Map<Long, V> map = new ConcurrentHashMap<>(100);
