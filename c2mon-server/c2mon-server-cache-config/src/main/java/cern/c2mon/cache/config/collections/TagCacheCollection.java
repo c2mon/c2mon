@@ -14,7 +14,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.Collection;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Aggregates [Control,Data,Rule]tag caches
@@ -34,8 +33,8 @@ public class TagCacheCollection extends CacheCollection<Tag> {
   }
 
   public Collection<Tag> findByNameRegex(String regex) {
-    return Stream.of(caches)
-      .parallel()
+    return caches
+      .parallelStream()
       .flatMap(cache -> ClientQueryProvider.queryByClientInput(cache, Tag::getName, regex).stream())
       .collect(Collectors.toSet());
   }

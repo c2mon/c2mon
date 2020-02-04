@@ -19,7 +19,7 @@ package cern.c2mon.cache.api.exception;
 /**
  * Unchecked exception thrown when a query to a cache is unsuccessful.
  * If it is not certain that a cache contains the sought-after element,
- * preferably use the hasKey() cache method before attempting to retrieve
+ * preferably use the containsKey() cache method before attempting to retrieve
  * the cache element.
  * 
  * @author mbrightw

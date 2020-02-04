@@ -12,18 +12,16 @@ import javax.inject.Named;
 public class SupervisionCacheResetRule extends ExternalResource {
 
   private ControlCacheCollection controlCacheCollection;
-  private final CachePopulationRule cachePopulationRule;
 
   @Inject
-  public SupervisionCacheResetRule(ControlCacheCollection controlCacheCollection, CachePopulationRule cachePopulationRule) {
+  public SupervisionCacheResetRule(ControlCacheCollection controlCacheCollection) {
     this.controlCacheCollection = controlCacheCollection;
-    this.cachePopulationRule = cachePopulationRule;
   }
 
   @Override
   protected void before() throws Throwable {
-    controlCacheCollection.forEachCache(Cache::clear);
+    controlCacheCollection.getCaches().forEach(Cache::clear);
     super.before();
-    controlCacheCollection.forEachCache(C2monCache::init);
+    controlCacheCollection.getCaches().forEach(C2monCache::init);
   }
 }
