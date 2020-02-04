@@ -51,4 +51,10 @@ public class CachePopulationRule extends DatabasePopulationRule {
     super.before();
     allCaches.forEach(C2monCache::init);
   }
+
+  @Override
+  protected void after() {
+    super.after();
+    allCaches.forEach(C2monCache::clear);
+  }
 }
