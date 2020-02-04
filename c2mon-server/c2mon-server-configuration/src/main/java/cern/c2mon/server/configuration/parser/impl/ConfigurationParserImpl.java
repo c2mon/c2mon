@@ -76,7 +76,7 @@ public class ConfigurationParserImpl implements ConfigurationParser {
 
       if (configurationEntity.isDeleted()) {
         try {
-          results.add(entityFactory.deleteInstance(configurationEntity));
+          results.addAll(entityFactory.deleteInstance(configurationEntity));
         } catch (ConfigurationParseException ex) {
           log.debug("Element {} (name = {}) already deleted. Detailed reason: {}", configurationEntity.getId(), configurationEntity.getName(), ex.getMessage());
         }

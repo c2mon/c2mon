@@ -86,7 +86,7 @@ public class ProcessService extends AbstractSupervisedService<Process>
 
   @Override
   public Long getProcessIdFromAlive(Long aliveTimerId) {
-    AliveTag aliveTimer = aliveTimerService.getCache().get(aliveTimerId);
+    AliveTag aliveTimer = aliveTagService.getCache().get(aliveTimerId);
     if (aliveTimer.getSupervisedEntity() == SupervisionEntity.PROCESS) {
       return aliveTimer.getSupervisedId();
     } else if (aliveTimer.getSupervisedEntity() == SupervisionEntity.EQUIPMENT) {

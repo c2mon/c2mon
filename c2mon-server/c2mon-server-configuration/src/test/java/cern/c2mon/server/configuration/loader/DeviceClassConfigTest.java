@@ -12,8 +12,6 @@ import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.*;
 
 public class DeviceClassConfigTest extends ConfigurationCacheLoaderTest<Device> {
@@ -29,8 +27,6 @@ public class DeviceClassConfigTest extends ConfigurationCacheLoaderTest<Device> 
 
   @Test
   public void testCreateUpdateDeviceClass() throws ClassNotFoundException {
-    replay(mockManager);
-
     ConfigurationReport report = configurationLoader.applyConfiguration(30);
 
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
@@ -75,8 +71,6 @@ public class DeviceClassConfigTest extends ConfigurationCacheLoaderTest<Device> 
     expectedProperties.add(new Property(14L, "numCores", "The number of CPU cores on this device"));
     expectedObject.setProperties(expectedProperties);
     ObjectEqualityComparison.assertDeviceClassEquals(expectedObject, cacheObject);
-
-    verify(mockManager);
   }
 
   @Test
@@ -85,8 +79,6 @@ public class DeviceClassConfigTest extends ConfigurationCacheLoaderTest<Device> 
     assertNotNull(deviceClass);
     assertTrue(deviceClassCache.containsKey(400L));
     assertNotNull(deviceClassMapper.getItem(400L));
-
-    replay(mockManager);
 
     ConfigurationReport report = configurationLoader.applyConfiguration(33);
 
@@ -104,7 +96,5 @@ public class DeviceClassConfigTest extends ConfigurationCacheLoaderTest<Device> 
     assertFalse(deviceClassCache.containsKey(400L));
     DeviceClass cacheObject = deviceClassMapper.getItem(400L);
     assertNull(cacheObject);
-
-    verify(mockManager);
   }
 }

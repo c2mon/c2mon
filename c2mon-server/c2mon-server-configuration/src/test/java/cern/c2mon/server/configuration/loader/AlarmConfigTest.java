@@ -9,8 +9,6 @@ import org.junit.Test;
 
 import javax.inject.Inject;
 
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 
@@ -136,14 +134,11 @@ public class AlarmConfigTest extends ConfigurationCacheLoaderTest<Alarm> {
    */
   @Test
   public void testAlarmRemovedOnTagRemoval() {
-    replay(mockManager);
-
     // test removal of (rule)tag 60000 removes the alarm also
     configurationLoader.applyConfiguration(27);
     assertFalse(alarmCache.containsKey(350000L));
     assertNull(alarmMapper.getItem(350000L));
     assertFalse(ruleTagCache.containsKey(60000L));
     assertNull(ruleTagMapper.getItem(60000L));
-    verify(mockManager);
   }
 }

@@ -12,19 +12,25 @@ import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.process.ProcessCacheObject;
 import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.configuration.helper.ObjectEqualityComparison;
+import cern.c2mon.server.configuration.parser.util.ConfigurationProcessUtil;
+import cern.c2mon.server.configuration.util.TestConfigurationProvider;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
+import cern.c2mon.shared.client.configuration.api.Configuration;
 import cern.c2mon.shared.client.configuration.converter.ProcessListConverter;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.sql.Timestamp;
+import java.util.Properties;
 import java.util.Set;
 
+import static cern.c2mon.server.configuration.parser.util.ConfigurationProcessUtil.buildCreateAllFieldsProcess;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.*;
 
-public class ProcessConfigConfigTest extends ConfigurationCacheLoaderTest<Process> {
+public class ProcessConfigTest extends ConfigurationCacheLoaderTest<Process> {
 
   @Autowired
   private C2monCache<Process> processCache;
@@ -64,6 +70,89 @@ public class ProcessConfigConfigTest extends ConfigurationCacheLoaderTest<Proces
 
   @Autowired
   private ProcessService processService;
+
+  @Test
+  public void createProcess() {
+    replay(mockManager);
+
+    Properties expectedProperties = new Properties();
+    cern.c2mon.shared.client.configuration.api.process.Process process = buildCreateAllFieldsProcess(1L, expectedProperties);
+    expectedProperties.setProperty("stateTagId", "300000");
+    expectedProperties.setProperty("aliveTagId", "300001");
+
+    Configuration configuration = new Configuration();
+    configuration.addEntity(process);
+
+    //apply the configuration to the server
+    ConfigurationReport report = configurationLoader.applyConfiguration(configuration);
+
+    // check report result and caches
+    assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
+    assertEquals(ConfigConstants.Status.RESTART, report.getStatus());
+    assertEquals(3, report.getElementReports().size());
+
+    assertTrue(processCache.containsKey(1L));
+    assertNotNull(processMapper.getItem(1L));
+    assertTrue(aliveTimerCache.containsKey(300_000L));
+
+    // Check Process in the cache
+    ProcessCacheObject cacheObjectProcess = (ProcessCacheObject) processCache.get(1L);
+    ProcessCacheObject expectedObjectProcess = cacheObjectFactory.buildProcessCacheObject(1L, process);
+
+    ObjectEqualityComparison.assertProcessEquals(expectedObjectProcess, cacheObjectProcess);
+
+    verify(mockManager);
+  }
+
+
+  @Test
+  public void updateProcess() {
+    // called once when updating the equipment;
+    // mock returns a list with the correct number of SUCCESS ChangeReports
+    replay(mockManager);
+
+    // SETUP:
+    Configuration createProcess = TestConfigurationProvider.createProcess();
+    configurationLoader.applyConfiguration(createProcess);
+    processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
+
+    // TEST:
+    // Build configuration to add the test equipment
+    cern.c2mon.shared.client.configuration.api.process.Process process = ConfigurationProcessUtil.buildUpdateProcessWithAllFields(5L, null);
+    Configuration configuration = new Configuration();
+    configuration.addEntity(process);
+
+    //apply the configuration to the server
+    ConfigurationReport report = configurationLoader.applyConfiguration(configuration);
+
+    // check report result
+    assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
+    assertEquals(ConfigConstants.Status.RESTART, report.getStatus());
+    assertEquals(1, report.getElementReports().size());
+
+    // get cacheObject from the cache and compare to the an expected cacheObject
+    ProcessCacheObject cacheObjectProcess = (ProcessCacheObject) processCache.get(5L);
+    ProcessCacheObject expectedCacheObjectProcess = cacheObjectFactory.buildProcessUpdateCacheObject(cacheObjectProcess, process);
+
+    ObjectEqualityComparison.assertProcessEquals(expectedCacheObjectProcess, cacheObjectProcess);
+
+    verify(mockManager);
+  }
+
+  @Test
+  public void stopAndRemove() {
+    configurationLoader.applyConfiguration(TestConfigurationProvider.createProcess());
+    assertTrue(processCache.containsKey(5L));
+
+    Configuration remove = TestConfigurationProvider.deleteProcess();
+    ConfigurationReport report = configurationLoader.applyConfiguration(remove);
+    assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
+    assertSame(report.getStatus(), ConfigConstants.Status.OK);
+
+    assertFalse(processCache.containsKey(5L));
+    assertNull(processMapper.getItem(5L));
+    assertFalse(aliveTimerCache.containsKey(101L));
+  }
 
   @Test
   public void testCreateUpdateRemoveProcess() {

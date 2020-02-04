@@ -83,7 +83,7 @@ class ProcessFactory extends EntityFactory<Process> {
    * @param process The Process which contains the information of an create.
    * @return The same process from the parameters attached with the status tag information.
    */
-  public static Process setDefaultControlTags(Process process) {
+  private static Process setDefaultControlTags(Process process) {
 
     if (process.getAliveTag() == null) {
 

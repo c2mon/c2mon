@@ -10,9 +10,12 @@ import cern.c2mon.cache.api.flow.DefaultCacheFlow;
 import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.equipment.AbstractEquipment;
 import cern.c2mon.server.common.supervision.Supervised;
+import cern.c2mon.shared.common.ConfigurationException;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.function.BiConsumer;
+
+import static cern.c2mon.server.common.util.KotlinAPIs.applyNotNull;
 
 /**
  * @author Szymon Halastra, Alexandros Papageorgiou Koufidis
@@ -22,16 +25,16 @@ public abstract class AbstractSupervisedService<T extends Supervised> extends Ab
 
   // TODO (Alex) Most previous supervision notifications were connected to a Tag. Do we want this behaviour?
 
-  protected final AliveTagService aliveTimerService;
+  protected final AliveTagService aliveTagService;
   protected final SupervisionStateTagService stateTagService;
   private final CommFaultService commFaultService;
 
   public AbstractSupervisedService(final C2monCache<T> cache,
-                                   final AliveTagService aliveTimerService,
+                                   final AliveTagService aliveTagService,
                                    final CommFaultService commFaultService,
                                    final SupervisionStateTagService stateTagService) {
     super(cache, new DefaultCacheFlow<>());
-    this.aliveTimerService = aliveTimerService;
+    this.aliveTagService = aliveTagService;
     this.commFaultService = commFaultService;
     this.stateTagService = stateTagService;
   }
@@ -63,12 +66,40 @@ public abstract class AbstractSupervisedService<T extends Supervised> extends Ab
     return stateTagService.isRunning(cache.get(supervisedId).getStateTagId());
   }
 
+  public void updateControlTagCacheIds(Supervised supervised) {
+    try {
+      applyNotNull(supervised.getAliveTagId(), aliveTagId ->
+        aliveTagService.getCache().computeQuiet(aliveTagId, aliveTimer -> {
+          log.trace("Adding supervised id #{} to alive timer {} (#{})", supervised.getId(), aliveTimer.getName(), aliveTimer.getId());
+          aliveTimer.setSupervisedId(supervised.getId());
+        }));
+
+      if (supervised instanceof AbstractEquipment) {
+        applyNotNull(((AbstractEquipment) supervised).getCommFaultTagId(), commFaultTagId ->
+          commFaultService.getCache().computeQuiet(commFaultTagId, commFaultTag -> {
+            log.trace("Adding supervised id #{} to commFault tag {} (#{})", supervised.getId(), commFaultTag.getName(), commFaultTag.getId());
+            commFaultTag.setSupervisedId(supervised.getId());
+          }));
+      }
+
+      applyNotNull(supervised.getStateTagId(), stateTagId ->
+        stateTagService.getCache().computeQuiet(stateTagId, supervisionStateTag -> {
+          log.trace("Adding supervised id #{} to state tag {} (#{})", supervised.getId(), supervisionStateTag.getName(), supervisionStateTag.getId());
+          supervisionStateTag.setSupervisedId(supervised.getId());
+        }));
+    } catch (CacheElementNotFoundException e) {
+      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
+        String.format("Supervised tag (%s) not found for supervised #%d (%s).",
+          supervised.getAliveTagId(), supervised.getId(), supervised.getName()));
+    }
+  }
+
   private void cascadeOnControlTagCaches(long supervisedId, BiConsumer<Long, SupervisedCacheService<? extends ControlTag>> action) {
     try {
       T supervised = cache.get(supervisedId);
       cache.executeTransaction(() -> {
         if (supervised.getAliveTagId() != null) {
-          action.accept(supervised.getAliveTagId(), aliveTimerService);
+          action.accept(supervised.getAliveTagId(), aliveTagService);
         }
         if (supervised instanceof AbstractEquipment && ((AbstractEquipment) supervised).getCommFaultTagId() != null) {
           action.accept(((AbstractEquipment) supervised).getCommFaultTagId(), commFaultService);
@@ -78,7 +109,7 @@ public abstract class AbstractSupervisedService<T extends Supervised> extends Ab
         }
       });
     } catch (CacheElementNotFoundException e) {
-      log.error("Could not find supervised object with id " + supervisedId + " to start. Taking no action", e);
+      log.error("Could not find supervised object with id " + supervisedId + " to edit. Taking no action", e);
     }
   }
 }

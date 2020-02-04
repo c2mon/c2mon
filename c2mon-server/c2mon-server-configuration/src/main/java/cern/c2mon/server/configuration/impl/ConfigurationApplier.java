@@ -254,6 +254,7 @@ public final class ConfigurationApplier {
         handleProcessChange(element, processLists, elementPlaceholder, daqReportPlaceholder, report, configId, elementReport, processChange);
       }
     } catch (Exception ex) {
+      ex.printStackTrace();
       String errMessage = configId + " Exception caught while applying the configuration change (Action, Entity, " +
         "Entity id) = (" + element.getAction() + "; " + element.getEntity() + "; " + element.getEntityId() + ")";
       log.error(errMessage, ex.getMessage());

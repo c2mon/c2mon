@@ -28,16 +28,15 @@ import cern.c2mon.server.common.command.CommandTagCacheObject;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.common.equipment.EquipmentCacheObject;
 import cern.c2mon.server.common.metadata.Metadata;
-import cern.c2mon.server.common.process.ProcessCacheObject;
 import cern.c2mon.server.common.rule.RuleTagCacheObject;
 import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
 import cern.c2mon.server.configuration.ConfigurationCacheTest;
 import cern.c2mon.server.configuration.ConfigurationLoader;
-import cern.c2mon.server.configuration.api.util.CacheObjectFactory;
-import cern.c2mon.server.configuration.api.util.TestConfigurationProvider;
 import cern.c2mon.server.configuration.helper.ObjectEqualityComparison;
 import cern.c2mon.server.configuration.junit.ConfigLoaderRuleChain;
 import cern.c2mon.server.configuration.parser.util.*;
+import cern.c2mon.server.configuration.util.CacheObjectFactory;
+import cern.c2mon.server.configuration.util.TestConfigurationProvider;
 import cern.c2mon.server.daq.out.ProcessCommunicationManager;
 import cern.c2mon.shared.client.alarm.condition.ValueAlarmCondition;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
@@ -46,7 +45,6 @@ import cern.c2mon.shared.client.configuration.api.Configuration;
 import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
 import cern.c2mon.shared.client.configuration.api.equipment.Equipment;
 import cern.c2mon.shared.client.configuration.api.equipment.SubEquipment;
-import cern.c2mon.shared.client.configuration.api.process.Process;
 import cern.c2mon.shared.client.configuration.api.tag.*;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.common.CacheEvent;
@@ -75,7 +73,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 
-import static cern.c2mon.server.configuration.parser.util.ConfigurationProcessUtil.buildCreateAllFieldsProcess;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -163,53 +160,6 @@ public class EverythingEverConfigurationTest extends ConfigurationCacheTest {
   public void beforeTest() throws IOException {
     // reset mock
     reset(communicationManager);
-  }
-
-  @Test
-  public void createProcess() {
-    replay(communicationManager);
-
-    Properties expectedProperties = new Properties();
-    Process process = buildCreateAllFieldsProcess(1L, expectedProperties);
-    expectedProperties.setProperty("stateTagId", "300000");
-    expectedProperties.setProperty("aliveTagId", "300001");
-
-    Configuration configuration = new Configuration();
-    configuration.addEntity(process);
-
-    //apply the configuration to the server
-    ConfigurationReport report = configurationLoader.applyConfiguration(configuration);
-
-    // check report result and caches
-    assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
-    assertEquals(ConfigConstants.Status.RESTART, report.getStatus());
-    assertTrue(report.getElementReports().size() == 3);
-
-    assertTrue(processCache.containsKey(1L));
-    assertNotNull(processMapper.getItem(1L));
-    assertTrue(aliveTimerCache.containsKey(300_000L));
-
-    // Check Process in the cache
-    ProcessCacheObject cacheObjectProcess = (ProcessCacheObject) processCache.get(1L);
-    ProcessCacheObject expectedObjectProcess = cacheObjectFactory.buildProcessCacheObject(1L, process);
-
-    ObjectEqualityComparison.assertProcessEquals(expectedObjectProcess, cacheObjectProcess);
-
-    verify(communicationManager);
-
-    // remove the process from the server
-    Process removeProcess = ConfigurationProcessUtil.buildDeleteProcess(1L);
-    Configuration remove = new Configuration();
-    remove.addEntity(removeProcess);
-    report = configurationLoader.applyConfiguration(remove);
-    assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
-    assertTrue(report.getStatus() == ConfigConstants.Status.OK);
-
-    assertFalse(processCache.containsKey(1L));
-    assertNull(processMapper.getItem(1L));
-    assertFalse(aliveTimerCache.containsKey(300_001L));
-
-    verify(communicationManager);
   }
 
   @Test
@@ -325,53 +275,6 @@ public class EverythingEverConfigurationTest extends ConfigurationCacheTest {
     // get cacheObject from the cache and compare to the an expected cacheObject
     DataTagCacheObject cacheObjectData = (DataTagCacheObject) dataTagCache.get(1000L);
     assertEquals(expectedCacheObjectData.getMetadata(), cacheObjectData.getMetadata());
-
-    verify(communicationManager);
-  }
-
-  @Test
-  public void updateProcess() throws IllegalAccessException, TransformerException, InstantiationException, NoSimpleValueParseException, ParserConfigurationException, NoSuchFieldException {
-    // called once when updating the equipment;
-    // mock returns a list with the correct number of SUCCESS ChangeReports
-    replay(communicationManager);
-
-    // SETUP:
-    Configuration createProcess = TestConfigurationProvider.createProcess();
-    configurationLoader.applyConfiguration(createProcess);
-    processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
-
-    // TEST:
-    // Build configuration to add the test equipment
-    Process process = ConfigurationProcessUtil.buildUpdateProcessWithAllFields(5L, null);
-    Configuration configuration = new Configuration();
-    configuration.addEntity(process);
-
-    //apply the configuration to the server
-    ConfigurationReport report = configurationLoader.applyConfiguration(configuration);
-
-    // check report result
-    assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
-    assertEquals(ConfigConstants.Status.RESTART, report.getStatus());
-    assertTrue(report.getElementReports().size() == 1);
-
-    // get cacheObject from the cache and compare to the an expected cacheObject
-    ProcessCacheObject cacheObjectProcess = (ProcessCacheObject) processCache.get(5L);
-    ProcessCacheObject expectedCacheObjectProcess = cacheObjectFactory.buildProcessUpdateCacheObject(cacheObjectProcess, process);
-
-    ObjectEqualityComparison.assertProcessEquals(expectedCacheObjectProcess, cacheObjectProcess);
-
-    verify(communicationManager);
-
-    // remove the process and equipments from the server
-    processService.stop(5L, System.currentTimeMillis());
-    Configuration remove = TestConfigurationProvider.deleteProcess();
-    report = configurationLoader.applyConfiguration(remove);
-    assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
-    assertTrue(report.getStatus() == ConfigConstants.Status.OK);
-
-    assertFalse(processCache.containsKey(5L));
-    assertNull(processMapper.getItem(5L));
-    assertFalse(aliveTimerCache.containsKey(101L));
 
     verify(communicationManager);
   }

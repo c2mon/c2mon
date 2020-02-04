@@ -1,7 +1,7 @@
 package cern.c2mon.server.configuration.handler.transacted;
 
 import cern.c2mon.cache.actions.alive.AliveTagCacheObjectFactory;
-import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.actions.alive.AliveTagService;
 import cern.c2mon.server.cache.loading.AliveTagDAO;
 import cern.c2mon.server.common.alive.AliveTag;
 import cern.c2mon.server.configuration.impl.ProcessChange;
@@ -10,11 +10,20 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 @Named
-public class AliveTagConfigHandler extends BaseConfigHandlerImpl<AliveTag> {
+public class AliveTagConfigHandler extends AbstractControlTagConfigHandler<AliveTag> {
 
   @Inject
-  public AliveTagConfigHandler(C2monCache<AliveTag> aliveTimerCache, AliveTagDAO dao, AliveTagCacheObjectFactory aliveTagFactory) {
-    super(aliveTimerCache, dao, aliveTagFactory, () -> null);
+  public AliveTagConfigHandler(AliveTagService aliveTagService,
+                               AliveTagDAO dao,
+                               AliveTagCacheObjectFactory aliveTagFactory) {
+    super(aliveTagService, dao, aliveTagFactory);
+  }
+
+  @Override
+  protected void doPostCreate(AliveTag aliveTag) {
+    super.doPostCreate(aliveTag);
+
+    ((AliveTagService) service).startOrUpdateTimestamp(aliveTag.getId(), System.currentTimeMillis());
   }
 
   /**

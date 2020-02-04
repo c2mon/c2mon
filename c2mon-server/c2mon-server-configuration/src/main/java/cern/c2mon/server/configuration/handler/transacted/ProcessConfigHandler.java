@@ -16,22 +16,17 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.handler.transacted;
 
-import cern.c2mon.cache.actions.alive.AliveTagService;
 import cern.c2mon.cache.actions.process.ProcessCacheObjectFactory;
 import cern.c2mon.cache.actions.process.ProcessService;
-import cern.c2mon.cache.actions.state.SupervisionStateTagService;
-import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.server.cache.loading.ProcessDAO;
-import cern.c2mon.server.common.alive.AliveTag;
 import cern.c2mon.server.common.process.Process;
+import cern.c2mon.server.common.util.KotlinAPIs;
 import cern.c2mon.server.configuration.config.ConfigurationProperties;
 import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.server.daq.JmsContainerManager;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import cern.c2mon.shared.common.CacheEvent;
-import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.daq.config.Change;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.UnexpectedRollbackException;
@@ -39,9 +34,6 @@ import org.springframework.transaction.UnexpectedRollbackException;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.*;
-
-import static cern.c2mon.server.common.util.KotlinAPIs.apply;
-import static cern.c2mon.server.common.util.KotlinAPIs.applyNotNull;
 
 /**
  * Bean managing configuration updates to C2MON DataTags.
@@ -52,36 +44,23 @@ import static cern.c2mon.server.common.util.KotlinAPIs.applyNotNull;
 @Named
 public class ProcessConfigHandler extends BaseConfigHandlerImpl<Process> {
 
-  private final C2monCache<AliveTag> aliveTimerCache;
   private final ProcessService processService;
   private final JmsContainerManager jmsContainerManager;
   private final EquipmentConfigHandler equipmentConfigTransacted;
-  private final SupervisionStateTagService stateTagService;
+  private final ControlTagHandlerCollection controlTagHandlerCollection;
   private final boolean allowRunningProcessRemoval;
-  private final AliveTagService aliveTagService;
-  private AliveTagConfigHandler aliveTimerConfigHandler;
 
-  /**
-   * Autowired constructor.
-   *
-   * @param processCache the cache bean
-   * @param processDAO   the DAO bean
-   */
   @Inject
-  public ProcessConfigHandler(final C2monCache<Process> processCache, final ProcessDAO processDAO,
+  public ProcessConfigHandler(final ProcessDAO processDAO,
                               final ProcessCacheObjectFactory processCacheObjectFactory,
-                              final AliveTagService aliveTagService,
                               final ProcessService processService,
-                              final SupervisionStateTagService stateTagService,
+                              final ControlTagHandlerCollection controlTagHandlerCollection,
                               final ConfigurationProperties properties,
                               final JmsContainerManager jmsContainerManager,
-                              final EquipmentConfigHandler equipmentConfigTransacted
-  ) {
-    super(processCache, processDAO, processCacheObjectFactory, () -> null);
-    this.aliveTagService = aliveTagService;
-    this.aliveTimerCache = aliveTagService.getCache();
+                              final EquipmentConfigHandler equipmentConfigTransacted) {
+    super(processService.getCache(), processDAO, processCacheObjectFactory, ArrayList::new);
     this.processService = processService;
-    this.stateTagService = stateTagService;
+    this.controlTagHandlerCollection = controlTagHandlerCollection;
     this.allowRunningProcessRemoval = properties.isAllowRunningProcessRemoval();
     this.jmsContainerManager = jmsContainerManager;
     this.equipmentConfigTransacted = equipmentConfigTransacted;
@@ -97,27 +76,9 @@ public class ProcessConfigHandler extends BaseConfigHandlerImpl<Process> {
     // TODO (Alex) Switch to CacheEvent.INSERTED ?
     jmsContainerManager.subscribe(process);
 
-    if (process.getAliveTagId() != null)
-      aliveTagService.startOrUpdateTimestamp(process.getAliveTagId(), System.currentTimeMillis());
-
     cache.getCacheListenerManager().notifyListenersOf(CacheEvent.INSERTED, process);
 
-    try {
-      applyNotNull(process.getAliveTagId(), aliveTagId ->
-        aliveTimerCache.computeQuiet(aliveTagId, aliveTimer -> {
-          log.trace("Adding process id #{} to alive timer {} (#{})", process.getId(), aliveTimer.getName(), aliveTimer.getId());
-          aliveTimer.setSupervisedId(process.getId());
-        }));
-      applyNotNull(process.getStateTagId(), stateTagId ->
-        stateTagService.getCache().computeQuiet(stateTagId, supervisionStateTag -> {
-          log.trace("Adding process id #{} to state tag {} (#{})", process.getId(), supervisionStateTag.getName(), supervisionStateTag.getId());
-          supervisionStateTag.setSupervisedId(process.getId());
-        }));
-    } catch (CacheElementNotFoundException e) {
-      throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
-        String.format("No Alive tag (%s) found for process #%d (%s).",
-          process.getAliveTagId(), process.getId(), process.getName()));
-    }
+    processService.updateControlTagCacheIds(process);
   }
 
   @Override
@@ -127,19 +88,20 @@ public class ProcessConfigHandler extends BaseConfigHandlerImpl<Process> {
 
     List<ProcessChange> processChanges = super.update(id, properties);
 
+    // TODO (Alex) Should we also check for commFault and state tag id?
     if (properties.containsKey("aliveInterval") || properties.containsKey("aliveTagId")) {
       Process process = processService.getCache().get(id);
-      aliveTagService.updateBasedOnSupervised(process);
+//      aliveTagService.updateBasedOnSupervised(process);
     }
 
     return processChanges;
   }
 
   @Override
-  protected List<ProcessChange> updateReturnValue(Process cacheable, Change change, Properties properties) {
+  protected List<ProcessChange> updateReturnValue(Process process, Change change, Properties properties) {
     return Collections.singletonList(
-      apply(
-        new ProcessChange(cacheable.getId(), change),
+      KotlinAPIs.apply(
+        new ProcessChange(process.getId(), change),
         procChange -> procChange.requiresReboot(true))
     );
   }
@@ -158,22 +120,28 @@ public class ProcessConfigHandler extends BaseConfigHandlerImpl<Process> {
    */
   @Override
   public List<ProcessChange> remove(Long id, ConfigurationElementReport report) {
-    Process process = cache.get(id);
+    boolean isRunning = processService.isRunning(id);
 
-    boolean isRunning = process.getStateTagId() != null && stateTagService.isRunning(process.getStateTagId());
+    // Save a copy to be able to cascade remove later
+    Process process = cache.get(id);
 
     if (isRunning && !allowRunningProcessRemoval) {
       String message = "Unable to remove Process " + process.getName() + " as currently running - please stop it first.";
       log.warn(message);
       report.setFailure(message);
       return defaultValue.get();
-    } else
-      return super.remove(id, report);
+    }
+
+    return KotlinAPIs.applyNotNull(super.remove(id, report), __ -> {
+      log.debug("Removing Process control tags for process {}", process.getName());
+      controlTagHandlerCollection.cascadeRemove(process, report);
+
+      jmsContainerManager.unsubscribe(process);
+    });
   }
 
   @Override
   protected void doPreRemove(Process process, ConfigurationElementReport report) {
-
     Collection<Long> equipmentIds = new ArrayList<>(process.getEquipmentIds());
 
     //remove all associated equipment from system
@@ -189,19 +157,6 @@ public class ProcessConfigHandler extends BaseConfigHandlerImpl<Process> {
         throw new UnexpectedRollbackException("Unexpected exception caught while removing an Equipment.", ex);
       }
     }
-
-    log.debug("Removing Process control tags for process " + process.getId());
-    Long aliveTagId = process.getAliveTagId();
-    if (aliveTagId != null) {
-      ConfigurationElementReport tagReport = new ConfigurationElementReport(ConfigConstants.Action.REMOVE, ConfigConstants.Entity.CONTROLTAG, aliveTagId);
-      report.addSubReport(tagReport);
-      aliveTimerConfigHandler.remove(aliveTagId, tagReport);
-      // TODO (Alex) Replace this with a DELETED event listener
-      aliveTagService.removeAliveTimer(aliveTagId);
-      // TODO (Alex) Do we want to also remove it from process cache?
-    }
-
-    jmsContainerManager.unsubscribe(process);
   }
 
   /**

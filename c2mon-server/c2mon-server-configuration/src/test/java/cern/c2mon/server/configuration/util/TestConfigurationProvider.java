@@ -15,7 +15,7 @@
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package cern.c2mon.server.configuration.api.util;
+package cern.c2mon.server.configuration.util;
 
 import cern.c2mon.server.configuration.parser.util.ConfigurationProcessUtil;
 import cern.c2mon.server.configuration.parser.util.ConfigurationRuleTagUtil;

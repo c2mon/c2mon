@@ -27,6 +27,7 @@ import cern.c2mon.shared.client.configuration.api.util.ConfigurationEntity;
 import cern.c2mon.shared.common.Cacheable;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
@@ -98,14 +99,14 @@ public abstract class EntityFactory<T extends ConfigurationEntity> {
    * @param configurationEntity The entity which contains the id for a 'delete' {@link ConfigurationElement}.
    * @return A {@link ConfigurationElement} which deletes than a Entity.
    */
-  public ConfigurationElement deleteInstance(T configurationEntity) {
+  public List<ConfigurationElement> deleteInstance(T configurationEntity) {
     ConfigurationElement element = createSetupConfigurationElement();
     Long entityId = getId(configurationEntity);
 
     if (hasEntity(entityId)) {
       element.setEntityId(entityId);
       element.setAction(ConfigConstants.Action.REMOVE);
-      return element;
+      return Collections.singletonList(element);
 
     } else {
       throw new EntityDoesNotExistException(entityId, configurationEntity.getClass().getSimpleName(), configurationEntity.getName());

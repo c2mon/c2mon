@@ -29,8 +29,6 @@ public class DeviceConfigTest extends ConfigurationCacheLoaderTest<Device> {
 
   @Test
   public void testCreateUpdateDevice() throws ClassNotFoundException {
-    replay(mockManager);
-
     ConfigurationReport report = configurationLoader.applyConfiguration(33);
 
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
@@ -66,8 +64,6 @@ public class DeviceConfigTest extends ConfigurationCacheLoaderTest<Device> {
     expectedProperties.add(new DeviceProperty(4L, "numCores", "4", "constantValue", "Integer"));
     expectedObject.setDeviceProperties(expectedProperties);
     ObjectEqualityComparison.assertDeviceEquals(expectedObject, cacheObject);
-
-    verify(mockManager);
   }
 
   @Test
