@@ -76,7 +76,7 @@ public final class ElasticsearchClientRest implements ElasticsearchClient {
 
   private final ElasticsearchProperties properties;
 
-  private final RestHighLevelClient client;
+  private RestHighLevelClient client;
 
   /**
    * Elasticsearch REST client constructor
@@ -87,25 +87,7 @@ public final class ElasticsearchClientRest implements ElasticsearchClient {
   public ElasticsearchClientRest(ElasticsearchProperties properties) {
     this.properties = properties;
 
-    RestClientBuilder restClientBuilder =
-        RestClient.builder(new HttpHost(properties.getHost(), properties.getPort(), properties.getScheme()));
-
-    if (StringUtils.isNotEmpty(properties.getUsername()) && StringUtils.isNotEmpty(properties.getPassword())) {
-      UsernamePasswordCredentials credentials =
-          new UsernamePasswordCredentials(properties.getUsername(), properties.getPassword());
-
-      CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-      credentialsProvider.setCredentials(AuthScope.ANY, credentials);
-
-      restClientBuilder.setHttpClientConfigCallback(
-          httpClientBuilder -> httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider));
-    } else {
-      if (StringUtils.isNotEmpty(properties.getUsername()) || StringUtils.isNotEmpty(properties.getPassword())) {
-        log.warn("Both username and password must be configured to setup ES authentication.");
-      }
-    }
-
-    client = new RestHighLevelClient(restClientBuilder);
+    setup();
 
     connectAsynchronously();
   }
@@ -247,7 +229,7 @@ public final class ElasticsearchClientRest implements ElasticsearchClient {
         }
         log.info("Elasticsearch cluster is yellow");
       });
-      nodeReady.get(120, TimeUnit.SECONDS);
+      nodeReady.get(ElasticsearchClientConfiguration.CLIENT_SETUP_TIMEOUT, TimeUnit.MILLISECONDS);
     } catch (InterruptedException | ExecutionException | TimeoutException e) {
       log.error("Exception when waiting for yellow status", e);
       throw new IllegalStateException("Exception when waiting for Elasticsearch yellow status!", e);
@@ -280,6 +262,40 @@ public final class ElasticsearchClientRest implements ElasticsearchClient {
     } catch (IOException e) {
       log.info("Elasticsearch cluster not yet ready: {}", e.getMessage());
       log.trace("Elasticsearch cluster not yet ready: ", e);
+    }
+    return false;
+  }
+
+  @Override
+  public void setup() {
+    RestClientBuilder restClientBuilder =
+        RestClient.builder(new HttpHost(properties.getHost(), properties.getPort(), properties.getScheme()));
+
+    if (StringUtils.isNotEmpty(properties.getUsername()) && StringUtils.isNotEmpty(properties.getPassword())) {
+      UsernamePasswordCredentials credentials =
+          new UsernamePasswordCredentials(properties.getUsername(), properties.getPassword());
+
+      CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+      credentialsProvider.setCredentials(AuthScope.ANY, credentials);
+
+      restClientBuilder.setHttpClientConfigCallback(
+          httpClientBuilder -> httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider));
+    } else {
+      if (StringUtils.isNotEmpty(properties.getUsername()) || StringUtils.isNotEmpty(properties.getPassword())) {
+        log.warn("Both username and password must be configured to setup ES authentication.");
+      }
+    }
+
+    client = new RestHighLevelClient(restClientBuilder);
+  }
+
+  @Override
+  public boolean isClientHealthy() {
+    try {
+      getClusterHealth();
+      return true;
+    } catch (Exception e) {
+      log.error("An error occurred checking cluster health: ", e);
     }
     return false;
   }

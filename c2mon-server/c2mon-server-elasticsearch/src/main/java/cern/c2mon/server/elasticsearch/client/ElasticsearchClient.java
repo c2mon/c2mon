@@ -88,6 +88,18 @@ public interface ElasticsearchClient {
   boolean isClusterYellow();
 
   /**
+   * Perform client setup
+   */
+  void setup();
+
+  /**
+   * Check if client is capable of sending requests to server
+   *
+   * @return true if client is healthy, false otherwise
+   */
+  boolean isClientHealthy();
+
+  /**
    * Closes client connection.
    */
   void close();

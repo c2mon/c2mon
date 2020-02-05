@@ -70,6 +70,16 @@ public class ElasticsearchClientStub implements ElasticsearchClient {
   }
 
   @Override
+  public void setup() {
+    throw new UnsupportedOperationException(STUB_CLIENT_ERROR_MESSAGE);
+  }
+
+  @Override
+  public boolean isClientHealthy() {
+    throw new UnsupportedOperationException(STUB_CLIENT_ERROR_MESSAGE);
+  }
+
+  @Override
   public void close() {
     throw new UnsupportedOperationException(STUB_CLIENT_ERROR_MESSAGE);
   }
