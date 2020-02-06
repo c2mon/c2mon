@@ -16,8 +16,6 @@ import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.*;
 
 public class DeviceConfigTest extends ConfigurationCacheLoaderTest<Device> {
@@ -90,14 +88,10 @@ public class DeviceConfigTest extends ConfigurationCacheLoaderTest<Device> {
     assertTrue(deviceCache.containsKey(300L));
     assertNotNull(deviceMapper.getItem(300L));
 
-    replay(mockManager);
-
     ConfigurationReport report = configurationLoader.applyConfiguration(35);
 
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     assertFalse(deviceCache.containsKey(300L));
     assertNull(deviceMapper.getItem(300L));
-
-    verify(mockManager);
   }
 }
