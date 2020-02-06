@@ -16,17 +16,17 @@
  *****************************************************************************/
 package cern.c2mon.server.common.republisher;
 
-import java.util.Collections;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jms.JmsException;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
+
+import java.util.Collections;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 
 /**
@@ -142,8 +142,10 @@ class RepublisherImpl<T> implements Republisher<T> {
               totalRepublicationAttempts.incrementAndGet();
             } catch (Exception e) {
               LOGGER.error("Unexpected exception caught while checking for failed " + eventName + " publications: this event will not be re-published", e);
-              totalRepublicationAttempts.incrementAndGet();
-              toBePublished.remove(event);
+              synchronized (republicatonLock) {
+                totalRepublicationAttempts.incrementAndGet();
+                toBePublished.remove(event);
+              }
             }
           }
         }

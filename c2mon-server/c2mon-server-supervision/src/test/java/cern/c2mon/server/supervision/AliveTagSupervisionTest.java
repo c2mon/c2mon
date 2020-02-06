@@ -37,6 +37,7 @@ public class AliveTagSupervisionTest extends SupervisionCacheTest {
 
   @Before
   public void initialStatusIsCorrect() {
+    processService.getCache().init();
     AliveTag aliveTimer = aliveTimerCache.get(1221L);
     assertNotNull(aliveTimer);
     assertEquals(0, aliveTimer.getLastUpdate());
@@ -70,11 +71,11 @@ public class AliveTagSupervisionTest extends SupervisionCacheTest {
     assertTrue(aliveTimer.getLastUpdate() > System.currentTimeMillis() - 10000); //account for non-synchronized
 
     //check process status is changed
-    SupervisionStateTag process = stateTagCache.get(aliveTimer.getStateTagId());
-    assertEquals(SupervisionStatus.RUNNING, process.getSupervisionStatus());
-    Timestamp processTime = process.getStatusTime();
+    SupervisionStateTag supervisionStateTag = stateTagCache.get(aliveTimer.getStateTagId());
+    assertEquals(SupervisionStatus.RUNNING, supervisionStateTag.getSupervisionStatus());
+    Timestamp processTime = supervisionStateTag.getStatusTime();
     assertTrue(processTime.after(new Timestamp(updateTime - 1)));
-    assertNotNull(process.getStatusDescription());
+    assertNotNull(supervisionStateTag.getStatusDescription());
 
     assertTrue(latch.await(1, TimeUnit.SECONDS)); //wait for notification on listener thread
   }
