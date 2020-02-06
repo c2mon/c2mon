@@ -20,7 +20,6 @@ import cern.c2mon.cache.actions.device.DeviceCacheObjectFactory;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.loading.DeviceDAO;
 import cern.c2mon.server.common.device.Device;
-import cern.c2mon.server.common.device.DeviceClass;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Inject;
@@ -36,29 +35,17 @@ import java.util.ArrayList;
 @Slf4j
 public class DeviceConfigHandler extends BaseConfigHandlerImpl<Device> {
 
-  private C2monCache<DeviceClass> deviceClassCache;
-
   /**
    * Default constructor.
    *
    * @param deviceCache              reference to the Device cache.
-   * @param deviceDAO
+   * @param deviceDAO                the loader DAO
    * @param deviceCacheObjectFactory reference to the Device DAO bean.
-   * @param deviceClassCache         reference to the DeviceClass cache.
    */
   @Inject
   public DeviceConfigHandler(final C2monCache<Device> deviceCache,
-                             final DeviceDAO deviceDAO, final DeviceCacheObjectFactory deviceCacheObjectFactory,
-                             final C2monCache<DeviceClass> deviceClassCache) {
+                             final DeviceDAO deviceDAO, final DeviceCacheObjectFactory deviceCacheObjectFactory) {
     super(deviceCache, deviceDAO, deviceCacheObjectFactory, ArrayList::new);
-    this.deviceClassCache = deviceClassCache;
-  }
-
-  @Override
-  protected void doPostCreate(Device element) {
-    // Update the cacheObject class so that it knows about the new cacheObject
-    // TODO (Alex) Create loadFromDb
-//    deviceClassCache.loadFromDb(element.getDeviceClassId());
   }
 
 }
