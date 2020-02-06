@@ -1,5 +1,6 @@
 package cern.c2mon.server.configuration.loader;
 
+import cern.c2mon.cache.actions.device.DeviceService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.dbaccess.DeviceMapper;
 import cern.c2mon.server.common.device.Device;
@@ -23,6 +24,9 @@ public class DeviceConfigTest extends ConfigurationCacheLoaderTest<Device> {
 
   @Inject
   private C2monCache<Device> deviceCache;
+
+  @Inject
+  private DeviceService deviceService;
 
   @Inject
   private DeviceMapper deviceMapper;
@@ -64,6 +68,19 @@ public class DeviceConfigTest extends ConfigurationCacheLoaderTest<Device> {
     expectedProperties.add(new DeviceProperty(4L, "numCores", "4", "constantValue", "Integer"));
     expectedObject.setDeviceProperties(expectedProperties);
     ObjectEqualityComparison.assertDeviceEquals(expectedObject, cacheObject);
+  }
+
+  @Test
+  public void deviceCreationAddsSelfToClass() {
+    assertEquals(2, deviceService.getByDeviceClassId(400L).size());
+    ConfigurationReport report = configurationLoader.applyConfiguration(33);
+
+    assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
+
+    assertEquals(3, deviceService.getByDeviceClassId(400L).size());
+
+    Device device = deviceCache.get(20L);
+    assertNotNull(device);
   }
 
   @Test

@@ -22,7 +22,6 @@ import cern.c2mon.server.common.config.CommonModule;
 import cern.c2mon.server.common.device.DeviceClass;
 import cern.c2mon.server.common.device.DeviceClassCacheObject;
 import cern.c2mon.server.test.DatabasePopulationRule;
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,7 +29,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.inject.Inject;
-import java.util.List;
 
 import static org.junit.Assert.assertNotNull;
 
@@ -60,8 +58,6 @@ public class DeviceClassDAOTest {
   public void testGetItem() {
     DeviceClassCacheObject device1 = (DeviceClassCacheObject) deviceClassDAO.getItem(400L);
     assertNotNull(device1);
-    List<Long> deviceIds = device1.getDeviceIds();
-    Assert.assertFalse(deviceIds.isEmpty());
 
     DeviceClass device2 = deviceClassDAO.getItem(401L);
     assertNotNull(device2);

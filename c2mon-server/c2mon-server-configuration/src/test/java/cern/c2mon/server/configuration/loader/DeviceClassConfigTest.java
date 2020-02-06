@@ -1,5 +1,6 @@
 package cern.c2mon.server.configuration.loader;
 
+import cern.c2mon.cache.actions.device.DeviceService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.dbaccess.DeviceClassMapper;
 import cern.c2mon.server.common.device.*;
@@ -20,13 +21,16 @@ public class DeviceClassConfigTest extends ConfigurationCacheLoaderTest<Device> 
   private DeviceClassMapper deviceClassMapper;
 
   @Inject
+  private DeviceService deviceService;
+
+  @Inject
   private C2monCache<DeviceClass> deviceClassCache;
 
   @Inject
   private C2monCache<Device> deviceCache;
 
   @Test
-  public void testCreateUpdateDeviceClass() throws ClassNotFoundException {
+  public void createUpdateDeviceClass() throws ClassNotFoundException {
     ConfigurationReport report = configurationLoader.applyConfiguration(30);
 
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
@@ -61,36 +65,27 @@ public class DeviceClassConfigTest extends ConfigurationCacheLoaderTest<Device> 
     DeviceClassCacheObject dbObject = (DeviceClassCacheObject) deviceClassMapper.getItem(10L);
     assertNotNull(dbObject);
     ObjectEqualityComparison.assertDeviceClassEquals(expectedObject, dbObject);
+  }
 
-    // Update should succeed
-    report = configurationLoader.applyConfiguration(31);
+  @Test
+  public void updateDeviceClass() throws ClassNotFoundException {
+    configurationLoader.applyConfiguration(30);
+    ConfigurationReport report = configurationLoader.applyConfiguration(31);
 
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
-    cacheObject = (DeviceClassCacheObject) deviceClassCache.get(10L);
+    DeviceClassCacheObject cacheObject = (DeviceClassCacheObject) deviceClassCache.get(10L);
 
+    List<Property> expectedProperties = new ArrayList<>();
+    DeviceClassCacheObject expectedObject = (DeviceClassCacheObject) deviceClassMapper.getItem(10L);
     expectedProperties.add(new Property(14L, "numCores", "The number of CPU cores on this device"));
+
     expectedObject.setProperties(expectedProperties);
     ObjectEqualityComparison.assertDeviceClassEquals(expectedObject, cacheObject);
   }
 
   @Test
-  public void testRemoveDeviceClass() {
-    DeviceClass deviceClass = deviceClassCache.get(400L);
-    assertNotNull(deviceClass);
-    assertTrue(deviceClassCache.containsKey(400L));
-    assertNotNull(deviceClassMapper.getItem(400L));
-
-    ConfigurationReport report = configurationLoader.applyConfiguration(33);
-
-    assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
-
-    deviceClass = deviceClassCache.get(400L);
-    assertEquals(3, ((DeviceClassCacheObject) deviceClass).getDeviceIds().size());
-
-    Device device = deviceCache.get(20L);
-    assertNotNull(device);
-
-    report = configurationLoader.applyConfiguration(32);
+  public void removeDeviceClass() {
+    ConfigurationReport report = configurationLoader.applyConfiguration(32);
 
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     assertFalse(deviceClassCache.containsKey(400L));

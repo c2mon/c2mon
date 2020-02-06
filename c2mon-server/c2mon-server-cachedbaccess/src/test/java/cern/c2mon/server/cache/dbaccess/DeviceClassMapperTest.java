@@ -66,12 +66,6 @@ public class DeviceClassMapperTest extends AbstractMapperTest {
     assertCommandListContains(commands, new Command(1L, "TEST_COMMAND_1", "Description of TEST_COMMAND_1"));
     assertCommandListContains(commands, new Command(2L, "TEST_COMMAND_2", "Description of TEST_COMMAND_2"));
 
-    List<Long> deviceIds = deviceClass1.getDeviceIds();
-    Assert.assertNotNull(deviceIds);
-    Assert.assertFalse(deviceIds.isEmpty());
-    Assert.assertTrue(deviceIds.contains(300L));
-    Assert.assertTrue(deviceIds.contains(301L));
-
     DeviceClassCacheObject deviceClass2 = (DeviceClassCacheObject) deviceClassMapper.getItem(401L);
     Assert.assertNotNull(deviceClass2);
     properties = deviceClass2.getProperties();
@@ -87,12 +81,6 @@ public class DeviceClassMapperTest extends AbstractMapperTest {
     Assert.assertTrue(commands.size() == 2);
     assertCommandListContains(commands, new Command(3L, "TEST_COMMAND_3", "Description of TEST_COMMAND_3"));
     assertCommandListContains(commands, new Command(4L, "TEST_COMMAND_4", "Description of TEST_COMMAND_4"));
-
-    deviceIds = deviceClass2.getDeviceIds();
-    Assert.assertNotNull(deviceIds);
-    Assert.assertFalse(deviceIds.isEmpty());
-    Assert.assertTrue(deviceIds.contains(302L));
-    Assert.assertTrue(deviceIds.contains(303L));
   }
 
   @Test

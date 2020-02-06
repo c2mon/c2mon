@@ -8,10 +8,11 @@ import cern.c2mon.cache.api.flow.DefaultCacheFlow;
 import cern.c2mon.server.common.device.Device;
 import cern.c2mon.shared.client.device.DeviceInfo;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static cern.c2mon.server.common.util.Java9Collections.setOf;
 
@@ -19,7 +20,7 @@ import static cern.c2mon.server.common.util.Java9Collections.setOf;
  * @author Szymon Halastra, Alexandros Papageorgiou
  */
 @Slf4j
-@Service
+@Named
 public class DeviceService extends AbstractCacheServiceImpl<Device> {
 
   private final DeviceClassService deviceClassService;
@@ -30,29 +31,24 @@ public class DeviceService extends AbstractCacheServiceImpl<Device> {
     this.deviceClassService = deviceClassService;
   }
 
-  public Collection<Device> getDevices(String deviceClassName) {
-    Collection<Device> devices = new ArrayList<>();
-
+  public Collection<Device> getDevicesByClassName(String deviceClassName) {
     try {
       // Search the name attribute of the class cache
       long deviceClassId = deviceClassService.getIdByName(deviceClassName);
 
-      devices = getByDeviceClassId(deviceClassId);
-
+      return getByDeviceClassId(deviceClassId);
     } catch (CacheElementNotFoundException e) {
       // If we didn't find a class with the given name, return an empty list.
       log.warn("Error getting device class by name", e);
-      return devices;
+      return new ArrayList<>();
     }
-
-    return devices;
   }
 
-  private Collection<Device> getByDeviceClassId(long deviceClassId) {
+  public Collection<Device> getByDeviceClassId(long deviceClassId) {
     return cache.query(device -> device.getDeviceClassId() == deviceClassId);
   }
 
-  public List<Device> getDevices(Set<DeviceInfo> deviceInfoList) {
+  public List<Device> getDevicesByInfo(Set<DeviceInfo> deviceInfoList) {
     List<Device> devices = new ArrayList<>();
 
     // Reorganise the data structure to make processing a bit easier
@@ -72,18 +68,10 @@ public class DeviceService extends AbstractCacheServiceImpl<Device> {
       String className = entry.getKey();
       Set<String> deviceNames = entry.getValue();
 
-      try {
-        Collection<Device> deviceList = getDevices(className);
-
-        for (Device device : deviceList) {
-          if (deviceNames.contains(device.getName())) {
-            devices.add(device);
-          }
-        }
-
-      } catch (CacheElementNotFoundException e) {
-        log.warn("Didn't find any devices of class " + className, e);
-      }
+      devices = getDevicesByClassName(className)
+        .stream()
+        .filter(device -> deviceNames.contains(device.getName()))
+        .collect(Collectors.toList());
     }
 
     return devices;

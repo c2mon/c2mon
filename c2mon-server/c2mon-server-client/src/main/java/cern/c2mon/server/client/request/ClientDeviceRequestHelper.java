@@ -83,11 +83,10 @@ class ClientDeviceRequestHelper {
 
     if (deviceRequest.getObjectParameter() != null) {
       Set<DeviceInfo> deviceInfoList = (Set<DeviceInfo>) deviceRequest.getObjectParameter();
-      devices = deviceService.getDevices(deviceInfoList);
-    }
-    else {
+      devices = deviceService.getDevicesByInfo(deviceInfoList);
+    } else {
       String deviceClassName = deviceRequest.getRequestParameter();
-      devices = deviceService.getDevices(deviceClassName);
+      devices = deviceService.getDevicesByClassName(deviceClassName);
     }
 
     return devices

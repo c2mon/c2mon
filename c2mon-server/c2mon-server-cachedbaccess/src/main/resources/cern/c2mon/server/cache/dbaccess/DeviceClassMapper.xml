@@ -12,7 +12,6 @@
     </constructor>
     <collection property="properties" ofType="cern.c2mon.server.common.device.Property" javaType="java.util.ArrayList" resultMap="propertyResultMap" />
     <collection property="commands" ofType="cern.c2mon.server.common.device.Command" javaType="java.util.ArrayList" resultMap="commandResultMap" />
-    <collection property="deviceIds" ofType="Long" javaType="java.util.ArrayList" resultMap="deviceIdsResultMap" />
   </resultMap>
 
   <resultMap id="propertyResultMap" type="cern.c2mon.server.common.device.Property">
@@ -32,10 +31,6 @@
     <result column="command_description" property="description" />
   </resultMap>
 
-  <resultMap id="deviceIdsResultMap" type="Long">
-    <id column="device_id" jdbcType="NUMERIC" javaType="java.lang.Long"/>
-  </resultMap>
-
   <!-- getAll needed for persistent caches -->
   <select id="getAll" resultMap="deviceClassResultMap">
         SELECT DEVICECLASS.DEVCLASSID as device_class_id,
@@ -48,8 +43,7 @@
            FIELD.FIELDNAME as field_name,
            COMMAND.CMDID as command_id,
            COMMAND.CMDNAME as command_name,
-           COMMAND.CMDDESC as command_description,
-           DEVICE.DEVID as device_id
+           COMMAND.CMDDESC as command_description
       FROM DEVICECLASS
            LEFT OUTER JOIN PROPERTY
         ON DEVICECLASS.DEVCLASSID = PROPERTY.PROPDEVCLASSID
@@ -57,8 +51,6 @@
         ON PROPERTY.PROPID = FIELD.FIELDPROPID
            LEFT OUTER JOIN COMMAND
         ON DEVICECLASS.DEVCLASSID = COMMAND.CMDDEVCLASSID
-           LEFT OUTER JOIN DEVICE
-        ON DEVICECLASS.DEVCLASSID = DEVICE.DEVCLASSID
   </select>
 
   <!-- getItem needed for persistence caches -->

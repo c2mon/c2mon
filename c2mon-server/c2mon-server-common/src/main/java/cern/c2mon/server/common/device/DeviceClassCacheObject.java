@@ -64,11 +64,6 @@ public class DeviceClassCacheObject extends AbstractCacheableImpl implements Dev
   private List<Command> commands = new ArrayList<>();
 
   /**
-   * List of IDs of devices that are instances of this class.
-   */
-  private List<Long> deviceIds = new ArrayList<>();
-
-  /**
    * Default constructor.
    *
    * @param id          the unique ID of the device class
@@ -101,7 +96,6 @@ public class DeviceClassCacheObject extends AbstractCacheableImpl implements Dev
     clone.commands = commands.stream()
       .map(item ->  new Command(item.getId(), item.getName(), item.getDescription()))
       .collect(Collectors.toList());
-    clone.deviceIds = new ArrayList<>(deviceIds);
 
     return clone;
   }
