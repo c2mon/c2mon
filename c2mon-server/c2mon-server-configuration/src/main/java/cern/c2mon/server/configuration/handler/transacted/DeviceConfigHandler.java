@@ -28,6 +28,8 @@ import javax.inject.Named;
 import java.util.ArrayList;
 
 /**
+ * Device and DeviceClass are only configured using the DB, not through the config API
+ *
  * @author Alexandros Papageorgiou
  */
 @Named

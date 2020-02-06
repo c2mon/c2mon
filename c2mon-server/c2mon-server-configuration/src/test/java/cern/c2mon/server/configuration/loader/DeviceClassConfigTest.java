@@ -1,6 +1,5 @@
 package cern.c2mon.server.configuration.loader;
 
-import cern.c2mon.cache.actions.device.DeviceService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.dbaccess.DeviceClassMapper;
 import cern.c2mon.server.common.device.*;
@@ -21,13 +20,7 @@ public class DeviceClassConfigTest extends ConfigurationCacheLoaderTest<Device> 
   private DeviceClassMapper deviceClassMapper;
 
   @Inject
-  private DeviceService deviceService;
-
-  @Inject
   private C2monCache<DeviceClass> deviceClassCache;
-
-  @Inject
-  private C2monCache<Device> deviceCache;
 
   @Test
   public void createUpdateDeviceClass() throws ClassNotFoundException {
