@@ -22,7 +22,6 @@ import cern.c2mon.server.cache.loading.DeviceClassDAO;
 import cern.c2mon.server.cache.loading.common.AbstractDefaultLoaderDAO;
 import cern.c2mon.server.common.device.Command;
 import cern.c2mon.server.common.device.DeviceClass;
-import cern.c2mon.server.common.device.DeviceClassCacheObject;
 import cern.c2mon.server.common.device.Property;
 import org.springframework.stereotype.Service;
 
@@ -41,6 +40,11 @@ public class DeviceClassDAOImpl extends AbstractDefaultLoaderDAO<DeviceClass> im
    */
   private DeviceClassMapper deviceClassMapper;
 
+  /**
+   * Base constructor, made for injection
+   *
+   * @param deviceClassMapper the batis mapper
+   */
   @Inject
   public DeviceClassDAOImpl(final DeviceClassMapper deviceClassMapper) {
     super(2000, deviceClassMapper);
@@ -77,7 +81,7 @@ public class DeviceClassDAOImpl extends AbstractDefaultLoaderDAO<DeviceClass> im
   public void insert(DeviceClass deviceClass) {
     deviceClassMapper.insertDeviceClass(deviceClass);
 
-    for (Property property : ((DeviceClassCacheObject) deviceClass).getProperties()) {
+    for (Property property : deviceClass.getProperties()) {
       deviceClassMapper.insertDeviceClassProperty(deviceClass.getId(), property);
 
       if (property.getFields() != null) {
@@ -87,11 +91,17 @@ public class DeviceClassDAOImpl extends AbstractDefaultLoaderDAO<DeviceClass> im
       }
     }
 
-    for (Command command : ((DeviceClassCacheObject) deviceClass).getCommands()) {
+    for (Command command : deviceClass.getCommands()) {
       deviceClassMapper.insertDeviceClassCommand(deviceClass.getId(), command);
     }
   }
 
+  /**
+   * @param id the cache object unique id
+   * @apiNote this function used to be empty (2016-2020).
+   * If this was for some reason desired behavior, remove
+   * the mapper call here (and please document why!)
+   */
   @Override
   public void deleteItem(Long id) {
     deviceClassMapper.deleteDeviceClass(id);
