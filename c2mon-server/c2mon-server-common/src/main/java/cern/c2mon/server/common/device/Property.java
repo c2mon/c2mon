@@ -54,7 +54,7 @@ public class Property implements Serializable {
    * The list of nested fields of this property.
    */
   @ElementList(required = false, name = "Fields")
-  private List<Property> fields;
+  private List<Property> fields = new ArrayList<>();
 
   /**
    * Default constructor.
@@ -78,9 +78,7 @@ public class Property implements Serializable {
    * @param fields the property fields
    */
   public Property(final Long id, final String name, final String description, final List<Property> fields) {
-    this.id = id;
-    this.name = name;
-    this.description = description;
+    this(id, name, description);
     this.fields = fields;
   }
 

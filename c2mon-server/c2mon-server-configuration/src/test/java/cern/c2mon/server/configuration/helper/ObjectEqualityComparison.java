@@ -20,10 +20,7 @@ import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alive.AliveTag;
 import cern.c2mon.server.common.command.CommandTagCacheObject;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
-import cern.c2mon.server.common.device.Command;
 import cern.c2mon.server.common.device.DeviceCacheObject;
-import cern.c2mon.server.common.device.DeviceClassCacheObject;
-import cern.c2mon.server.common.device.Property;
 import cern.c2mon.server.common.equipment.AbstractEquipmentCacheObject;
 import cern.c2mon.server.common.equipment.EquipmentCacheObject;
 import cern.c2mon.server.common.process.ProcessCacheObject;
@@ -156,22 +153,6 @@ public class ObjectEqualityComparison {
     assertEquals(expectedObject.getFaultCode(), cacheObject.getFaultCode());
     assertEquals(expectedObject.getCondition(), cacheObject.getCondition());
     assertEquals(expectedObject.getDataTagId(), cacheObject.getDataTagId());
-  }
-
-  public static void assertDeviceClassEquals(DeviceClassCacheObject expectedObject, DeviceClassCacheObject cacheObject) throws ClassNotFoundException {
-    assertEquals(expectedObject.getId(), cacheObject.getId());
-    assertEquals(expectedObject.getName(), cacheObject.getName());
-    assertEquals(expectedObject.getDescription(), cacheObject.getDescription());
-    assertEquals(expectedObject.getProperties().size(), cacheObject.getProperties().size());
-
-    for (Property property : expectedObject.getProperties()) {
-      ObjectComparison.assertPropertyListContains(cacheObject.getProperties(), property);
-    }
-
-    assertEquals(expectedObject.getCommands().size(), cacheObject.getCommands().size());
-    for (Command command : expectedObject.getCommands()) {
-      ObjectComparison.assertCommandListContains(cacheObject.getCommands(), command);
-    }
   }
 
   public static void assertDeviceEquals(DeviceCacheObject expectedObject, DeviceCacheObject cacheObject) throws ClassNotFoundException {
