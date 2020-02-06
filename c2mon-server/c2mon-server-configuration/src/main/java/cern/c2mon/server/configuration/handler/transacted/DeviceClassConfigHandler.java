@@ -16,19 +16,22 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.handler.transacted;
 
+import cern.c2mon.cache.actions.device.DeviceService;
 import cern.c2mon.cache.actions.deviceclass.DeviceClassCacheObjectFactory;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.loading.DeviceClassDAO;
-import cern.c2mon.server.common.device.Device;
 import cern.c2mon.server.common.device.DeviceClass;
+import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
+import cern.c2mon.shared.common.Cacheable;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Device and DeviceClass are only configured using the DB, not through the config API
@@ -39,7 +42,7 @@ import java.util.ArrayList;
 @Slf4j
 public class DeviceClassConfigHandler extends BaseConfigHandlerImpl<DeviceClass> {
 
-  private final C2monCache<Device> deviceCache;
+  private final DeviceService deviceService;
   private final DeviceConfigHandler deviceConfigHandler;
 
   /**
@@ -47,25 +50,41 @@ public class DeviceClassConfigHandler extends BaseConfigHandlerImpl<DeviceClass>
    *
    * @param deviceClassCache reference to the DeviceClass cache.
    * @param deviceClassDAO   reference to the DeviceClass DAO bean.
+   * @param deviceClassCacheObjectFactory
+   * @param deviceConfigHandler
+   * @param deviceService
    */
   @Inject
   public DeviceClassConfigHandler(final C2monCache<DeviceClass> deviceClassCache,
                                   final DeviceClassDAO deviceClassDAO,
                                   final DeviceClassCacheObjectFactory deviceClassCacheObjectFactory,
-                                  final C2monCache<Device> deviceCache, final DeviceConfigHandler deviceConfigHandler) {
+                                  final DeviceService deviceService, final DeviceConfigHandler deviceConfigHandler) {
     super(deviceClassCache, deviceClassDAO, deviceClassCacheObjectFactory, ArrayList::new);
-    this.deviceCache = deviceCache;
+    this.deviceService = deviceService;
     this.deviceConfigHandler = deviceConfigHandler;
   }
 
+  /**
+   * Removes the device class with the given id and cascades onto the devices
+   *
+   * Due to FK constraints, the devices with the given device class id
+   * are removed first, even if the device class is not found afterwards.
+   * If you would like to change this behaviour, you can use the
+   * {@link super#doPreRemove(Cacheable, ConfigurationElementReport)} hook.
+   *
+   * @param id the device class id to remove
+   * @param report the ConfigurationElementReport to collect the results
+   * @return
+   */
   @Override
-  protected void doPreRemove(DeviceClass deviceClass, ConfigurationElementReport report) {
-    deviceCache.query(device -> device.getDeviceClassId().equals(deviceClass.getId()))
+  public List<ProcessChange> remove(Long id, ConfigurationElementReport report) {
+    deviceService.getByDeviceClassId(id)
       .forEach(device -> {
         ConfigurationElementReport newReport = new ConfigurationElementReport(Action.REMOVE, Entity.DEVICE, device.getId());
         report.addSubReport(newReport);
-        // TODO (Alex) Do we want to keep this bidirectional?
         deviceConfigHandler.remove(device.getId(), newReport);
       });
+    // Returns an empty list of processChanges
+     return super.remove(id, report);
   }
 }

@@ -25,6 +25,7 @@ import cern.c2mon.server.test.DatabasePopulationRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -54,6 +55,9 @@ public class DeviceClassDAOTest {
   @Inject
   DeviceClassDAO deviceClassDAO;
 
+  @Inject
+  private DeviceDAO deviceDAO;
+
   @Test
   public void testGetItem() {
     DeviceClassCacheObject device1 = (DeviceClassCacheObject) deviceClassDAO.getItem(400L);
@@ -62,4 +66,24 @@ public class DeviceClassDAOTest {
     DeviceClass device2 = deviceClassDAO.getItem(401L);
     assertNotNull(device2);
   }
+
+  @Test
+  public void deleteWithRemovingDevicesNoFields() {
+    deviceDAO.deleteItem(302L);
+    deviceDAO.deleteItem(303L);
+    deviceClassDAO.deleteItem(401L);
+  }
+
+  @Test
+  public void deleteWithRemovingDevicesHasFields() {
+    deviceDAO.deleteItem(300L);
+    deviceDAO.deleteItem(301L);
+    deviceClassDAO.deleteItem(400L);
+  }
+
+  @Test(expected = DataIntegrityViolationException.class)
+  public void deleteWithoutRemovingDevices() {
+    deviceClassDAO.deleteItem(400L);
+  }
+
 }

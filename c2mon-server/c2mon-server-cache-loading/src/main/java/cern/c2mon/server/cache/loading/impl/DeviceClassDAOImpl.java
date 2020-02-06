@@ -62,17 +62,6 @@ public class DeviceClassDAOImpl extends AbstractDefaultLoaderDAO<DeviceClass> im
   }
 
   @Override
-  public void deleteItem(DeviceClass deviceClass) {
-    for (Long propertyId : deviceClass.getPropertyIds()) {
-      deviceClassMapper.deleteFields(propertyId);
-    }
-
-    deviceClassMapper.deleteProperties(deviceClass.getId());
-    deviceClassMapper.deleteCommands(deviceClass.getId());
-    deviceClassMapper.deleteDeviceClass(deviceClass.getId());
-  }
-
-  @Override
   public void updateConfig(DeviceClass deviceClass) {
     deviceClassMapper.updateDeviceClassConfig(deviceClass);
   }
@@ -97,13 +86,31 @@ public class DeviceClassDAOImpl extends AbstractDefaultLoaderDAO<DeviceClass> im
   }
 
   /**
-   * @param id the cache object unique id
-   * @apiNote this function used to be empty (2016-2020).
+   * Remove a device class, given an id
+   *
+   * This function used to be empty (2016-2020).
+   * It appears the reason was to force consumers to use
+   * another impl that took an entire object as argument,
+   * in order to cascade the deletes properly.
    * If this was for some reason desired behavior, remove
    * the mapper call here (and please document why!)
+   *
+   * Will throw if there are any devices with this class
+   * as their device class in the db. You should remove
+   * them first.
+   *
+   * @param id the cache object unique id
    */
   @Override
   public void deleteItem(Long id) {
-    deviceClassMapper.deleteDeviceClass(id);
+    DeviceClass deviceClass = deviceClassMapper.getItem(id);
+
+    for (Long propertyId : deviceClass.getPropertyIds()) {
+      deviceClassMapper.deleteFields(propertyId);
+    }
+
+    deviceClassMapper.deleteProperties(deviceClass.getId());
+    deviceClassMapper.deleteCommands(deviceClass.getId());
+    deviceClassMapper.deleteDeviceClass(deviceClass.getId());
   }
 }
