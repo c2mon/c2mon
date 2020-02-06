@@ -20,6 +20,7 @@ import cern.c2mon.server.common.AbstractCacheableImpl;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +37,7 @@ import java.util.stream.Collectors;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 public class DeviceClassCacheObject extends AbstractCacheableImpl implements DeviceClass {
 
   /**
@@ -122,17 +124,22 @@ public class DeviceClassCacheObject extends AbstractCacheableImpl implements Dev
 
   @Override
   public Long getPropertyId(String name) {
-    return properties.stream()
-      .filter(prop -> prop.getName().equals(name)).findFirst()
-      // TODO This code is a very suboptimal use of Optional. It has been chosen only to maintain
-      //  backwards compatibility with previous callers and should be dropped eventually
-      .map(Property::getId).orElse(null);
+    for (Property prop : properties) {
+      if (prop.getName().equals(name)) {
+        return prop.getId();
+      }
+    }
+    return null;
   }
 
   @Override
   public Long getCommandId(String name) {
-    // TODO Same as above about suboptimal Optional
-    return commands.stream().filter(command -> command.getName().equals(name)).findFirst().map(Command::getId).orElse(null);
+    for (Command command : commands) {
+      if (command.getName().equals(name)) {
+        return command.getId();
+      }
+    }
+    return null;
   }
 
   @Override
@@ -147,8 +154,13 @@ public class DeviceClassCacheObject extends AbstractCacheableImpl implements Dev
 
 
   private <T> List<T> mapPropertyFields(String propertyName, Function<Property, T> mapper) {
-    return properties.stream().filter(prop -> prop.getName().equals(propertyName))
-      .findFirst().map(Property::getFields).orElse(new ArrayList<>())
-      .stream().map(mapper).collect(Collectors.toList());
+    return properties
+      .stream()
+      .filter(prop -> prop.getName().equals(propertyName))
+      .findFirst()
+      .map(Property::getFields).orElse(new ArrayList<>())
+      .stream()
+      .map(mapper)
+      .collect(Collectors.toList());
   }
 }
