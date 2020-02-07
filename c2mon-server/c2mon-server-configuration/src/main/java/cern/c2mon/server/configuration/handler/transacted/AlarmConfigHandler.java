@@ -47,18 +47,18 @@ public class AlarmConfigHandler extends BaseConfigHandlerImpl<Alarm> {
 
   private final Collection<ConfigurationEventListener> configurationEventListeners;
 
-  private final TagCacheCollection unifiedTagCacheFacade;
+  private final TagCacheCollection tagCacheCollection;
   private AlarmService alarmService;
 
   @Inject
   public AlarmConfigHandler(final C2monCache<Alarm> alarmCache, final AlarmLoaderDAO alarmDAO,
                             final AlarmCacheObjectFactory alarmCacheObjectFactory,
                             final GenericApplicationContext context,
-                            final TagCacheCollection unifiedTagCacheFacade,
+                            final TagCacheCollection tagCacheCollection,
                             final AlarmService alarmService) {
     super(alarmCache, alarmDAO, alarmCacheObjectFactory, ArrayList::new);
     this.configurationEventListeners = context.getBeansOfType(ConfigurationEventListener.class).values();
-    this.unifiedTagCacheFacade = unifiedTagCacheFacade;
+    this.tagCacheCollection = tagCacheCollection;
     this.alarmService = alarmService;
   }
 
@@ -68,7 +68,7 @@ public class AlarmConfigHandler extends BaseConfigHandlerImpl<Alarm> {
       listener.onConfigurationEvent(alarm, ConfigConstants.Action.CREATE);
     }
 
-    unifiedTagCacheFacade.addAlarmToTag(alarm.getDataTagId(), alarm.getId());
+    tagCacheCollection.addAlarmToTag(alarm.getDataTagId(), alarm.getId());
 
     alarmService.evaluateAlarm(alarm.getId());
   }
@@ -93,12 +93,22 @@ public class AlarmConfigHandler extends BaseConfigHandlerImpl<Alarm> {
     return defaultValue.get();
   }
 
+  /**
+   * Removes self from the (data)tag that it is connected with
+   *
+   * @param alarm   the alarm for removal
+   * @param report  the report to collect results in
+   */
   @Override
   protected void doPreRemove(Alarm alarm, ConfigurationElementReport report) {
     for (ConfigurationEventListener listener : this.configurationEventListeners) {
       listener.onConfigurationEvent(alarm, ConfigConstants.Action.REMOVE);
     }
 
-    unifiedTagCacheFacade.removeAlarmFromTag(alarm.getDataTagId(), alarm.getId());
+    if (alarm.getDataTagId() != null) {
+      tagCacheCollection.removeAlarmFromTag(alarm.getDataTagId(), alarm.getId());
+    } else {
+      log.debug("Failed to find tag id for alarm #{}", alarm.getId());
+    }
   }
 }

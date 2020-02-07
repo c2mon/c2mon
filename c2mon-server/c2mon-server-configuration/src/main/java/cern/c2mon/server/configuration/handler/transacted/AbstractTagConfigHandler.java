@@ -39,22 +39,22 @@ import java.util.stream.Collectors;
  * Public methods in this class should perform the complete
  * configuration process for the given tag (i.e. cache update
  * and database persistence).
- * 
- * <p>The methods contain the common reconfiguration logic for
+ *
+ * The methods contain the common reconfiguration logic for
  * all Tag objects (Control, Data and Rule tags).
- * 
- * <p>The appropriate Facade and DAO objects must be passed
+ *
+ * The appropriate Facade and DAO objects must be passed
  * to the constructor to provide the common configuration
- * functionality. 
- * 
- * <p>Notice that these methods will always be called within
+ * functionality.
+ *
+ * Notice that these methods will always be called within
  * a transaction initiated at the ConfigurationLoader level
  * and passed through the handler via a "create", "update"
- * or "remove" method, with rollback of DB changes if a 
+ * or "remove" method, with rollback of DB changes if a
  * RuntimeException is thrown.
- * 
+ *
  * @author Alexandros Papageorgiou, Mark Brightwell
- * 
+ *
  * @param <TAG> the type of Tag
  *
  */
@@ -63,15 +63,18 @@ abstract class AbstractTagConfigHandler<TAG extends Tag> extends BaseConfigHandl
 
   private final TagCacheCollection tagCacheCollection;
   protected final Collection<ConfigurationEventListener> configurationEventListeners;
+  private final AlarmConfigHandler alarmConfigHandler;
 
   public AbstractTagConfigHandler(final C2monCache<TAG> tagCache,
                                   final ConfigurableDAO<TAG> configurableDAO,
                                   final AbstractCacheObjectFactory<TAG> tagCacheObjectFactory,
                                   final TagCacheCollection tagCacheCollection,
-                                  final GenericApplicationContext context) {
+                                  final GenericApplicationContext context,
+                                  AlarmConfigHandler alarmConfigHandler) {
     super(tagCache, configurableDAO, tagCacheObjectFactory, ArrayList::new);
     this.tagCacheCollection = tagCacheCollection;
     this.configurationEventListeners = context.getBeansOfType(ConfigurationEventListener.class).values();
+    this.alarmConfigHandler = alarmConfigHandler;
   }
 
   @Override
@@ -91,12 +94,29 @@ abstract class AbstractTagConfigHandler<TAG extends Tag> extends BaseConfigHandl
   }
 
   /**
+   * Cascades removal into the alarms connected with this tag
+   *
+   * @param tag     the Tag for removal
+   * @param report  the report on this action
+   */
+  @Override
+  protected void doPreRemove(TAG tag, ConfigurationElementReport report) {
+    super.doPreRemove(tag, report);
+
+    tag.getAlarmIds().forEach(alarmId -> {
+      report.addSubReport(
+              new ConfigurationElementReport(ConfigConstants.Action.REMOVE, ConfigConstants.Entity.ALARM, alarmId));
+      alarmConfigHandler.remove(alarmId, report);
+    });
+  }
+
+  /**
    * Adds this Rule to the list of Rules that
    * need evaluating when this tag changes.
    *
    * If necessary, updates the list of rules that need evaluating for this tag,
    * persisting the change to the database also.
-   * 
+   *
    * @param tagId the tag object in the cache
    * @param ruleId the rule id
    */
@@ -123,32 +143,6 @@ abstract class AbstractTagConfigHandler<TAG extends Tag> extends BaseConfigHandl
       tag -> tagCacheCollection.removeDependentRuleFromTag(tagId, ruleId));
   }
 
-  /**
-   * Adds the alarm to the list of alarms associated to this
-   * tag.
-   *
-   * @param tagId the id of the tag
-   * @param alarmId the id of the alarm
-   */
-  @Transactional(value = "cacheTransactionManager", propagation = Propagation.REQUIRES_NEW)
-  public void addAlarmToTag(final Long tagId, final Long alarmId) {
-    log.trace("Adding Alarm " + alarmId + " reference from Tag " + tagId);
-    editTag(tagId, tag -> tag.getAlarmIds().add(alarmId));
-  }
-
-  /**
-   * Removes the Alarm from the list of alarms
-   * attached to the Tag.
-   *
-   * @param tagId the Tag id
-   * @param alarmId the id of the alarm to remove
-   */
-  @Transactional(value = "cacheTransactionManager", propagation = Propagation.REQUIRES_NEW)
-  public void removeAlarmFromTag(final Long tagId, final Long alarmId) {
-    log.trace("Removing Alarm " + alarmId + " reference from Tag " + tagId);
-    editTag(tagId, tag -> tag.getAlarmIds().remove(alarmId));
-  }
-
   Collection<ConfigurationElementReport> createConfigRemovalReportsFor(ConfigConstants.Entity entity, Collection<Long> ids, C2monCache<?> targetCache) {
     return ids.stream()
       .filter(targetCache::containsKey)
@@ -164,10 +158,5 @@ abstract class AbstractTagConfigHandler<TAG extends Tag> extends BaseConfigHandl
       }
     });
   }
-
-  private void editTag(final Long tagId, Consumer<TAG> mutator) {
-    ifConditionEditTag(tagId, tag -> true, mutator);
-  }
-  
 }
 
