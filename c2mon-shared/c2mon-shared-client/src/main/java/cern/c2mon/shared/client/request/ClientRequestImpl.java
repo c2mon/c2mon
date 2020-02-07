@@ -316,6 +316,7 @@ public class ClientRequestImpl<T extends ClientRequestResult> implements ClientR
   }
 
   /**
+   * Factory method to deserialize from json back to {@link ClientRequest}
    * @param json Json string representation of a <code>TransferTagRequestImpl</code> class
    * @return The deserialized Json message
    * @throws JsonSyntaxException This exception is raised when Gson attempts to read
