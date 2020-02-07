@@ -101,10 +101,6 @@ public class AlarmConfigHandler extends BaseConfigHandlerImpl<Alarm> {
 
     if (alarm.getDataTagId() != null) {
       tagCacheCollection.removeAlarmFromTag(alarm.getDataTagId(), alarm.getId());
-      report.addSubReport(
-        // Technically this is all kinds of tags, but we had to choose one entity
-        new ConfigurationElementReport(ConfigConstants.Action.REMOVE, ConfigConstants.Entity.DATATAG, alarm.getDataTagId())
-      );
     } else {
       log.debug("Failed to find tag id for alarm #{}", alarm.getId());
     }
