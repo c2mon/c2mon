@@ -1,16 +1,21 @@
 package cern.c2mon.server.configuration.loader;
 
+import cern.c2mon.cache.actions.process.ProcessService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.dbaccess.CommandTagMapper;
 import cern.c2mon.server.common.command.CommandTagCacheObject;
 import cern.c2mon.server.configuration.helper.ObjectEqualityComparison;
+import cern.c2mon.server.configuration.parser.util.ConfigurationCommandTagUtil;
+import cern.c2mon.server.configuration.util.TestConfigurationProvider;
 import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
+import cern.c2mon.shared.client.configuration.api.Configuration;
 import cern.c2mon.shared.common.NoSimpleValueParseException;
 import cern.c2mon.shared.common.command.CommandTag;
 import cern.c2mon.shared.common.datatag.DataTagConstants;
 import cern.c2mon.shared.common.datatag.address.HardwareAddressFactory;
+import cern.c2mon.shared.common.datatag.address.impl.SimpleHardwareAddressImpl;
 import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
 import org.easymock.EasyMock;
 import org.junit.Test;
@@ -18,6 +23,7 @@ import org.junit.Test;
 import javax.inject.Inject;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
+import java.sql.Timestamp;
 import java.util.List;
 
 import static org.easymock.EasyMock.*;
@@ -30,6 +36,9 @@ public class CommandTagConfigTest extends ConfigurationCacheLoaderTest<CommandTa
 
   @Inject
   private CommandTagMapper commandTagMapper;
+
+  @Inject
+  private ProcessService processService;
 
   @Test
   public void testCreateAndUpdateCommandTag() throws ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException,
@@ -99,6 +108,90 @@ public class CommandTagConfigTest extends ConfigurationCacheLoaderTest<CommandTa
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     assertFalse(commandTagCache.containsKey(11000L));
     assertNull(commandTagMapper.getItem(11000L));
+    verify(mockManager);
+  }
+
+  @Test
+  public void createCommandTag() throws IllegalAccessException, TransformerException, InstantiationException, NoSimpleValueParseException, ParserConfigurationException, NoSuchFieldException {
+    // called once when updating the equipment;
+    // mock returns a list with the correct number of SUCCESS ChangeReports
+    expect(mockManager.sendConfiguration(eq(5L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
+    replay(mockManager);
+
+    // SETUP:
+    Configuration createProcess = TestConfigurationProvider.createProcess();
+    configurationLoader.applyConfiguration(createProcess);
+    Configuration createEquipment = TestConfigurationProvider.createEquipment();
+    configurationLoader.applyConfiguration(createEquipment);
+    processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
+
+    // TEST:
+    // Build configuration to add the test DataTag
+    cern.c2mon.shared.client.configuration.api.tag.CommandTag commandTag = ConfigurationCommandTagUtil.buildCreateAllFieldsCommandTag(500L, null);
+    commandTag.setEquipmentId(15L);
+
+    Configuration configuration = new Configuration();
+    configuration.addEntity(commandTag);
+
+    //apply the configuration to the server
+    ConfigurationReport report = configurationLoader.applyConfiguration(configuration);
+
+    // check report result
+    assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
+    assertEquals(ConfigConstants.Status.OK, report.getStatus());
+    assertTrue(report.getProcessesToReboot().isEmpty());
+    assertEquals(1, report.getElementReports().size());
+
+    // get cacheObject from the cache and compare to the an expected cacheObject
+    CommandTagCacheObject cacheObjectCommand = (CommandTagCacheObject) commandTagCache.get(500L);
+    CommandTagCacheObject expectedCacheObjectCommand = cacheObjectFactory.buildCommandTagCacheObject(500L, commandTag);
+
+    ObjectEqualityComparison.assertCommandTagEquals(expectedCacheObjectCommand, cacheObjectCommand);
+
+    verify(mockManager);
+  }
+
+  @Test
+  public void updateCommandTag() throws IllegalAccessException, TransformerException, InstantiationException, NoSimpleValueParseException, ParserConfigurationException, NoSuchFieldException {
+    // called once when updating the equipment;
+    // mock returns a list with the correct number of SUCCESS ChangeReports
+    expect(mockManager.sendConfiguration(eq(5L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
+    replay(mockManager);
+
+    // SETUP:
+    Configuration createProcess = TestConfigurationProvider.createProcess();
+    configurationLoader.applyConfiguration(createProcess);
+    Configuration createEquipment = TestConfigurationProvider.createEquipment();
+    configurationLoader.applyConfiguration(createEquipment);
+    Configuration createCommandTag = TestConfigurationProvider.createCommandTag();
+    configurationLoader.applyConfiguration(createCommandTag);
+    processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
+
+    // TEST:
+    // Build configuration to update the test CommandTag
+    cern.c2mon.shared.client.configuration.api.tag.CommandTag commandTagUpdate = cern.c2mon.shared.client.configuration.api.tag.CommandTag.update(500L)
+      .hardwareAddress(new SimpleHardwareAddressImpl("updateAddress"))
+      .minimum(50)
+      .rbacClass("updateClass")
+      .description("new description").build();
+    Configuration configuration = new Configuration();
+    configuration.addEntity(commandTagUpdate);
+
+    ///apply the configuration to the server
+    ConfigurationReport report = configurationLoader.applyConfiguration(configuration);
+
+    // check report result
+    assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
+    assertEquals(ConfigConstants.Status.OK, report.getStatus());
+    assertTrue(report.getProcessesToReboot().isEmpty());
+    assertEquals(1, report.getElementReports().size());
+
+    // get cacheObject from the cache and compare to the an expected cacheObject
+    CommandTagCacheObject cacheObjectCommand = (CommandTagCacheObject) commandTagCache.get(500L);
+    CommandTagCacheObject expectedCacheObjectCommand = cacheObjectFactory.buildCommandTagUpdateCacheObject(cacheObjectCommand, commandTagUpdate);
+
+    ObjectEqualityComparison.assertCommandTagEquals(expectedCacheObjectCommand, cacheObjectCommand);
+
     verify(mockManager);
   }
 }

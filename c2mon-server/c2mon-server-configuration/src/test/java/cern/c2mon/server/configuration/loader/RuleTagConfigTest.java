@@ -7,6 +7,7 @@ import cern.c2mon.server.cache.dbaccess.RuleTagMapper;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.rule.RuleTagCacheObject;
+import cern.c2mon.server.configuration.ConfigurationLoader;
 import cern.c2mon.server.configuration.helper.ObjectEqualityComparison;
 import cern.c2mon.server.configuration.parser.util.ConfigurationRuleTagUtil;
 import cern.c2mon.server.configuration.util.TestConfigurationProvider;
@@ -53,38 +54,24 @@ public class RuleTagConfigTest extends ConfigurationCacheLoaderTest<RuleTag> {
    * No communication should take place with the DAQs during rule configuration.
    */
   @Test
-  public void create() throws ParserConfigurationException, IllegalAccessException, InstantiationException,
-    TransformerException, NoSuchFieldException, NoSimpleValueParseException {
+  public void create()  {
     // the mocked ProcessCommmunicationManager will be called once when creating
     // the datatag to base the rule on
-    expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
-    replay(mockManager);
+//    expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
+//    replay(mockManager);
 
     // insert datatag to base rule on
     configurationLoader.applyConfiguration(1);
     ConfigurationReport report = configurationLoader.applyConfiguration(10);
 
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
-    RuleTagCacheObject cacheObject = (RuleTagCacheObject) ruleTagCache.get(50100L);
-
-    RuleTagCacheObject expectedObject = expectedObject();
-    ObjectEqualityComparison.assertRuleTagConfigEquals(expectedObject, cacheObject);
-
-    verify(mockManager);
+    assertEquals(expectedObject(), ruleTagCache.get(50100L));
   }
 
   @Test
   public void createFromDb() {
     // SETUP:
-    Configuration createProcess = TestConfigurationProvider.createProcess();
-    configurationLoader.applyConfiguration(createProcess);
-    Configuration createEquipment = TestConfigurationProvider.createEquipment();
-    configurationLoader.applyConfiguration(createEquipment);
-    Configuration createSubEquipment = TestConfigurationProvider.createSubEquipment();
-    configurationLoader.applyConfiguration(createSubEquipment);
-    Configuration createDataTag = TestConfigurationProvider.createEquipmentDataTag(15L);
-    configurationLoader.applyConfiguration(createDataTag);
-    processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
+    setUp(configurationLoader, processService);
 
     // TEST:Build configuration to add the test RuleTag
     cern.c2mon.shared.client.configuration.api.tag.RuleTag ruleTag = ConfigurationRuleTagUtil.buildCreateAllFieldsRuleTag(1500L, null);
@@ -179,17 +166,9 @@ public class RuleTagConfigTest extends ConfigurationCacheLoaderTest<RuleTag> {
   public void updateRuleTag() throws InterruptedException, IllegalAccessException, TransformerException, InstantiationException, NoSimpleValueParseException, ParserConfigurationException, NoSuchFieldException {
     replay(mockManager);
     // SETUP:
-    Configuration createProcess = TestConfigurationProvider.createProcess();
-    configurationLoader.applyConfiguration(createProcess);
-    Configuration createEquipment = TestConfigurationProvider.createEquipment();
-    configurationLoader.applyConfiguration(createEquipment);
-    Configuration createSubEquipment = TestConfigurationProvider.createSubEquipment();
-    configurationLoader.applyConfiguration(createSubEquipment);
-    Configuration createDataTag = TestConfigurationProvider.createEquipmentDataTag(15L);
-    configurationLoader.applyConfiguration(createDataTag);
+    setUp(configurationLoader, processService);
     Configuration createRuleTag = TestConfigurationProvider.createRuleTag();
     configurationLoader.applyConfiguration(createRuleTag);
-    processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
 
     final CountDownLatch latch = new CountDownLatch(1);
     ruleTagCache.getCacheListenerManager().registerListener(cacheable -> latch.countDown(), CacheEvent.UPDATE_ACCEPTED);
@@ -227,15 +206,7 @@ public class RuleTagConfigTest extends ConfigurationCacheLoaderTest<RuleTag> {
     // mock returns a list with the correct number of SUCCESS ChangeReports
     expect(mockManager.sendConfiguration(eq(5L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
     replay(mockManager);
-    Configuration createProcess = TestConfigurationProvider.createProcess();
-    configurationLoader.applyConfiguration(createProcess);
-    Configuration createEquipment = TestConfigurationProvider.createEquipment();
-    configurationLoader.applyConfiguration(createEquipment);
-    Configuration createSubEquipment = TestConfigurationProvider.createSubEquipment();
-    configurationLoader.applyConfiguration(createSubEquipment);
-    Configuration createDataTag = TestConfigurationProvider.createEquipmentDataTag(15L);
-    configurationLoader.applyConfiguration(createDataTag);
-    processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
+    setUp(configurationLoader, processService);
     Configuration createRuleTag = TestConfigurationProvider.createRuleTag();
     configurationLoader.applyConfiguration(createRuleTag);
 
@@ -278,5 +249,17 @@ public class RuleTagConfigTest extends ConfigurationCacheLoaderTest<RuleTag> {
     expectedObject.setEquipmentIds(setOf(150L));
     expectedObject.setProcessIds(setOf(50L));
     return expectedObject;
+  }
+
+  private static void setUp(ConfigurationLoader configurationLoader, ProcessService processService) {
+    Configuration createProcess = TestConfigurationProvider.createProcess();
+    configurationLoader.applyConfiguration(createProcess);
+    Configuration createEquipment = TestConfigurationProvider.createEquipment();
+    configurationLoader.applyConfiguration(createEquipment);
+    Configuration createSubEquipment = TestConfigurationProvider.createSubEquipment();
+    configurationLoader.applyConfiguration(createSubEquipment);
+    Configuration createDataTag = TestConfigurationProvider.createEquipmentDataTag(15L);
+    configurationLoader.applyConfiguration(createDataTag);
+    processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
   }
 }

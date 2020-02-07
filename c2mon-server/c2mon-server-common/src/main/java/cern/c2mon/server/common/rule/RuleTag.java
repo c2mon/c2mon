@@ -20,7 +20,6 @@ import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.rule.RuleExpression;
 
 import java.sql.Timestamp;
-import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -37,7 +36,7 @@ public interface RuleTag extends Tag {
    * is null returns an empty collection.
    * @return the ids of Tag used in this rule
    */
-  Collection<Long> getRuleInputTagIds();
+  Set<Long> getRuleInputTagIds();
 
   /**
    * Returns the RuleExpression that encodes the logic behind the rule.

@@ -25,7 +25,6 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.sql.Timestamp;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -137,10 +136,10 @@ public class RuleTagCacheObject extends AbstractTagCacheObject implements RuleTa
   }
 
   @Override
-  public final Collection<Long> getRuleInputTagIds() {
+  public final Set<Long> getRuleInputTagIds() {
     return ruleExpression != null
       ? ruleExpression.getInputTagIds()
-      : Collections.emptyList();
+      : Collections.emptySet();
   }
 
   /**

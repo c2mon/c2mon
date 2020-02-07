@@ -4,14 +4,13 @@ import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.cache.api.listener.BufferedCacheListener;
 import cern.c2mon.cache.api.listener.CacheListener;
+import cern.c2mon.server.common.util.KotlinAPIs;
 import cern.c2mon.shared.common.CacheEvent;
 import cern.c2mon.shared.common.Cacheable;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -64,6 +63,22 @@ public class CacheCollection<T extends Cacheable> {
    */
   public T get(long id) {
     return doAcrossCaches(id, cache -> cache.get(id));
+  }
+
+  /**
+   * Gets all the objects from all the caches whose id is contained
+   * in the input set of ids.
+   *
+   * @param ids the keys to look for
+   * @return a set of all the objects found across the caches, potentially empty
+   */
+  public Map<Long, ? extends T> getAll(Set<Long> ids) {
+    return caches
+      .parallelStream()
+      .map(cache -> cache.getAll(ids))
+      .reduce(new HashMap<>(),
+        (map, map2) -> KotlinAPIs.apply(map, __ -> map.putAll(map2))
+      );
   }
 
   /**

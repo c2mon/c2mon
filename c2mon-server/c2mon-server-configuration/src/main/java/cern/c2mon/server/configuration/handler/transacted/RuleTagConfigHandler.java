@@ -36,6 +36,7 @@ import javax.inject.Named;
 import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -49,8 +50,6 @@ import java.util.stream.Collectors;
 public class RuleTagConfigHandler extends AbstractTagConfigHandler<RuleTag> {
 
   private final RuleTagService ruleTagService;
-  private AlarmConfigHandler alarmConfigHandler;
-  private TagCacheCollection tagCacheCollection;
 
   @Inject
   public RuleTagConfigHandler(RuleTagService ruleTagService,
@@ -59,16 +58,16 @@ public class RuleTagConfigHandler extends AbstractTagConfigHandler<RuleTag> {
                               GenericApplicationContext context,
                               AlarmConfigHandler alarmConfigHandler,
                               TagCacheCollection tagCacheCollection) {
-    super(ruleTagService.getCache(), ruleTagLoaderDAO, ruleTagCacheObjectFactory, ruleTagService, context);
+    super(ruleTagService.getCache(), ruleTagLoaderDAO, ruleTagCacheObjectFactory, tagCacheCollection, context, alarmConfigHandler);
     this.ruleTagService = ruleTagService;
-    this.alarmConfigHandler = alarmConfigHandler;
-    this.tagCacheCollection = tagCacheCollection;
   }
 
   @Override
   protected void doPostCreate(RuleTag ruleTag) {
     for (Long tagId : ruleTag.getRuleInputTagIds()) {
-      addRuleToTag(tagId, ruleTag.getId());
+      tagCacheCollection.addDependentRuleToTag(tagId, ruleTag.getId());
+      // TODO (Alex) Evaluate rule (maybe just let it get eval'd on INSERTED?
+      // TODO (Alex) Infer PROC/EQ/SUBEQ ids from each tag
     }
     super.doPostCreate(ruleTag);
   }
@@ -89,10 +88,10 @@ public class RuleTagConfigHandler extends AbstractTagConfigHandler<RuleTag> {
       Collection<Long> newTagIds = cache.get(id).getRuleInputTagIds();
 
       for (Long oldTagId : oldTagIds) {
-        removeRuleFromTag(oldTagId, id);
+        tagCacheCollection.removeDependentRuleFromTag(oldTagId, id);
       }
       for (Long newTagId : newTagIds) {
-        addRuleToTag(newTagId, id);
+        tagCacheCollection.addDependentRuleToTag(newTagId, id);
       }
     }
 
@@ -129,13 +128,13 @@ public class RuleTagConfigHandler extends AbstractTagConfigHandler<RuleTag> {
 //        elementReport.addSubReport(report);
 //      });
 
-    List<Long> existingRuleInputTagIds = ruleTag.getRuleInputTagIds()
+    Set<Long> existingRuleInputTagIds = ruleTag.getRuleInputTagIds()
       .stream()
       .filter(tagCacheCollection::containsKey)
-      .collect(Collectors.toList());
+      .collect(Collectors.toSet());
 
     for (Long inputTagId : existingRuleInputTagIds) {
-      removeRuleFromTag(inputTagId, ruleTag.getId());
+      tagCacheCollection.removeDependentRuleFromTag(inputTagId, ruleTag.getId());
     }
   }
 

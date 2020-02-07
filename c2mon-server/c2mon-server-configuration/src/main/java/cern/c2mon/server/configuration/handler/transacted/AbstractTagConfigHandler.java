@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -26,51 +26,41 @@ import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.GenericApplicationContext;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
  * Public methods in this class should perform the complete
  * configuration process for the given tag (i.e. cache update
  * and database persistence).
- *
+ * <p>
  * The methods contain the common reconfiguration logic for
  * all Tag objects (Control, Data and Rule tags).
- *
- * The appropriate Facade and DAO objects must be passed
- * to the constructor to provide the common configuration
- * functionality.
- *
+ * <p>
  * Notice that these methods will always be called within
  * a transaction initiated at the ConfigurationLoader level
  * and passed through the handler via a "create", "update"
  * or "remove" method, with rollback of DB changes if a
  * RuntimeException is thrown.
  *
- * @author Alexandros Papageorgiou, Mark Brightwell
- *
  * @param <TAG> the type of Tag
- *
+ * @author Alexandros Papageorgiou, Mark Brightwell
  */
 @Slf4j
 abstract class AbstractTagConfigHandler<TAG extends Tag> extends BaseConfigHandlerImpl<TAG> {
 
-  private final TagCacheCollection tagCacheCollection;
+  protected final TagCacheCollection tagCacheCollection;
   protected final Collection<ConfigurationEventListener> configurationEventListeners;
-  private final AlarmConfigHandler alarmConfigHandler;
+  protected final AlarmConfigHandler alarmConfigHandler;
 
   public AbstractTagConfigHandler(final C2monCache<TAG> tagCache,
                                   final ConfigurableDAO<TAG> configurableDAO,
                                   final AbstractCacheObjectFactory<TAG> tagCacheObjectFactory,
                                   final TagCacheCollection tagCacheCollection,
                                   final GenericApplicationContext context,
-                                  AlarmConfigHandler alarmConfigHandler) {
+                                  final AlarmConfigHandler alarmConfigHandler) {
     super(tagCache, configurableDAO, tagCacheObjectFactory, ArrayList::new);
     this.tagCacheCollection = tagCacheCollection;
     this.configurationEventListeners = context.getBeansOfType(ConfigurationEventListener.class).values();
@@ -96,8 +86,8 @@ abstract class AbstractTagConfigHandler<TAG extends Tag> extends BaseConfigHandl
   /**
    * Cascades removal into the alarms connected with this tag
    *
-   * @param tag     the Tag for removal
-   * @param report  the report on this action
+   * @param tag    the Tag for removal
+   * @param report the report on this action
    */
   @Override
   protected void doPreRemove(TAG tag, ConfigurationElementReport report) {
@@ -105,42 +95,9 @@ abstract class AbstractTagConfigHandler<TAG extends Tag> extends BaseConfigHandl
 
     tag.getAlarmIds().forEach(alarmId -> {
       report.addSubReport(
-              new ConfigurationElementReport(ConfigConstants.Action.REMOVE, ConfigConstants.Entity.ALARM, alarmId));
+        new ConfigurationElementReport(ConfigConstants.Action.REMOVE, ConfigConstants.Entity.ALARM, alarmId));
       alarmConfigHandler.remove(alarmId, report);
     });
-  }
-
-  /**
-   * Adds this Rule to the list of Rules that
-   * need evaluating when this tag changes.
-   *
-   * If necessary, updates the list of rules that need evaluating for this tag,
-   * persisting the change to the database also.
-   *
-   * @param tagId the tag object in the cache
-   * @param ruleId the rule id
-   */
-  @Transactional(value = "cacheTransactionManager", propagation = Propagation.REQUIRES_NEW)
-  public void addRuleToTag(final Long tagId, final Long ruleId) {
-    log.trace("Adding rule " + ruleId + " reference from Tag " + tagId);
-    ifConditionEditTag(tagId,
-      tag -> !tag.getRuleIds().contains(ruleId),
-      tag -> tagCacheCollection.addDependentRuleToTag(tagId, ruleId));
-  }
-
-  /**
-   * Removes this Rule from the list of Rules
-   * that need evaluating when this Tag changes.
-   *
-   * @param tagId the tag pointing to the rule
-   * @param ruleId the rule that no longer needs evaluating
-   */
-  @Transactional(value = "cacheTransactionManager", propagation = Propagation.REQUIRES_NEW)
-  public void removeRuleFromTag(final Long tagId, final Long ruleId) {
-    log.trace("Removing rule " + ruleId + " reference from Tag " + tagId);
-    ifConditionEditTag(tagId,
-      tag -> tag.getRuleIds().contains(ruleId),
-      tag -> tagCacheCollection.removeDependentRuleFromTag(tagId, ruleId));
   }
 
   Collection<ConfigurationElementReport> createConfigRemovalReportsFor(ConfigConstants.Entity entity, Collection<Long> ids, C2monCache<?> targetCache) {
@@ -148,15 +105,6 @@ abstract class AbstractTagConfigHandler<TAG extends Tag> extends BaseConfigHandl
       .filter(targetCache::containsKey)
       .map(id -> new ConfigurationElementReport(ConfigConstants.Action.REMOVE, entity, id))
       .collect(Collectors.toList());
-  }
-
-  private void ifConditionEditTag(final Long tagId, Predicate<TAG> condition, Consumer<TAG> mutator) {
-    cache.computeQuiet(tagId, tag -> {
-      if (condition.test(tag)) {
-        cacheLoaderDAO.updateConfig(tag);
-        mutator.accept(tag);
-      }
-    });
   }
 }
 

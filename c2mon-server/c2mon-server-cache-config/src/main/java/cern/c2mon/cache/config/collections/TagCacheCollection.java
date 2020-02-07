@@ -52,8 +52,11 @@ public class TagCacheCollection extends CacheCollection<Tag> {
    * @throws CacheElementNotFoundException if the tag cannot be found in the cache
    */
   public void addAlarmToTag(long tagId, long alarmId) {
-    log.trace("Adding Alarm " + alarmId + " reference from Tag " + tagId);
-    doAcrossCaches(tagId, cache -> cache.computeQuiet(tagId, tag -> tag.getAlarmIds().add(alarmId)));
+    log.trace("Adding Alarm {} reference from Tag {}",alarmId, tagId);
+    doAcrossCaches(tagId, cache -> cache.computeQuiet(tagId, tag -> {
+      if (!tag.getAlarmIds().contains(alarmId))
+        tag.getAlarmIds().add(alarmId);
+      }));
   }
 
   /**
@@ -65,7 +68,7 @@ public class TagCacheCollection extends CacheCollection<Tag> {
    * @throws CacheElementNotFoundException if the tag cannot be found in the cache
    */
   public void removeAlarmFromTag(long tagId, long alarmId) {
-    log.trace("Removing Alarm " + alarmId + " reference from Tag " + tagId);
+    log.trace("Removing Alarm {} reference from Tag {}",alarmId, tagId);
     doAcrossCaches(tagId, cache -> cache.computeQuiet(tagId, tag -> tag.getAlarmIds().remove(alarmId)));
   }
 
@@ -79,6 +82,7 @@ public class TagCacheCollection extends CacheCollection<Tag> {
    * @param ruleTagId the id of the rule
    */
   public void removeDependentRuleFromTag(long tagId, final Long ruleTagId) {
+    log.trace("Removing RuleTag {} reference from Tag {}",ruleTagId, tagId);
     doAcrossCaches(tagId, cache ->
       cache.compute(tagId, tag -> {
         tag.getRuleIds().remove(ruleTagId);
@@ -93,6 +97,7 @@ public class TagCacheCollection extends CacheCollection<Tag> {
    * Note also adjust text field of cache object.
    */
   public void addDependentRuleToTag(final long tagId, final Long ruleTagId) {
+    log.trace("Adding RuleTag {} reference to Tag {}",ruleTagId, tagId);
     doAcrossCaches(tagId, cache ->
       cache.compute(tagId, tag -> {
         if (!tag.getRuleIds().contains(ruleTagId)) {

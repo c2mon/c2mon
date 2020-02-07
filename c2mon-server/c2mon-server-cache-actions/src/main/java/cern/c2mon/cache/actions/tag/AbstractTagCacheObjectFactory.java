@@ -40,7 +40,8 @@ public abstract class AbstractTagCacheObjectFactory<TAG extends Tag> extends Abs
     new MicroValidator<>(cacheable)
       .notNull(Tag::getId, "id")
       .notNull(Tag::getName, "name")
-      .not(tagObj -> tagObj.getName().isEmpty(), "Parameter \"name\" cannot be empty") // This had a commented out max check as well, do we want that?
+      // This had a commented out max check as well, do we want that?
+      .not(tagObj -> tagObj.getName().isEmpty(), "Parameter \"name\" cannot be empty")
       .notNull(Tag::getDataType, "dataType")
       .between(Tag::getMode, MODE_OPERATIONAL, MODE_TEST, "mode")
       .not(tagObj -> tagObj.getUnit() != null && tagObj.getUnit().length() > 20, "Parameter \"unit\" must be 0 to 20 characters long");
