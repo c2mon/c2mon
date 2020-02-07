@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -39,24 +39,23 @@ import java.util.stream.Collectors;
  * Public methods in this class should perform the complete
  * configuration process for the given tag (i.e. cache update
  * and database persistence).
- * 
- * <p>The methods contain the common reconfiguration logic for
+ *
+ * The methods contain the common reconfiguration logic for
  * all Tag objects (Control, Data and Rule tags).
- * 
- * <p>The appropriate Facade and DAO objects must be passed
+ *
+ * The appropriate Facade and DAO objects must be passed
  * to the constructor to provide the common configuration
- * functionality. 
- * 
- * <p>Notice that these methods will always be called within
+ * functionality.
+ *
+ * Notice that these methods will always be called within
  * a transaction initiated at the ConfigurationLoader level
  * and passed through the handler via a "create", "update"
- * or "remove" method, with rollback of DB changes if a 
+ * or "remove" method, with rollback of DB changes if a
  * RuntimeException is thrown.
- * 
- * @author Alexandros Papageorgiou, Mark Brightwell
- * 
- * @param <TAG> the type of Tag
  *
+ * @author Alexandros Papageorgiou, Mark Brightwell
+ *
+ * @param <TAG> the type of Tag
  */
 @Slf4j
 abstract class AbstractTagConfigHandler<TAG extends Tag> extends BaseConfigHandlerImpl<TAG> {
@@ -96,7 +95,7 @@ abstract class AbstractTagConfigHandler<TAG extends Tag> extends BaseConfigHandl
    *
    * If necessary, updates the list of rules that need evaluating for this tag,
    * persisting the change to the database also.
-   * 
+   *
    * @param tagId the tag object in the cache
    * @param ruleId the rule id
    */
@@ -123,32 +122,6 @@ abstract class AbstractTagConfigHandler<TAG extends Tag> extends BaseConfigHandl
       tag -> ruleTagService.removeDependentRuleFromTag(tag, ruleId));
   }
 
-  /**
-   * Adds the alarm to the list of alarms associated to this
-   * tag.
-   *
-   * @param tagId the id of the tag
-   * @param alarmId the id of the alarm
-   */
-  @Transactional(value = "cacheTransactionManager", propagation = Propagation.REQUIRES_NEW)
-  public void addAlarmToTag(final Long tagId, final Long alarmId) {
-    log.trace("Adding Alarm " + alarmId + " reference from Tag " + tagId);
-    editTag(tagId, tag -> tag.getAlarmIds().add(alarmId));
-  }
-
-  /**
-   * Removes the Alarm from the list of alarms
-   * attached to the Tag.
-   *
-   * @param tagId the Tag id
-   * @param alarmId the id of the alarm to remove
-   */
-  @Transactional(value = "cacheTransactionManager", propagation = Propagation.REQUIRES_NEW)
-  public void removeAlarmFromTag(final Long tagId, final Long alarmId) {
-    log.trace("Removing Alarm " + alarmId + " reference from Tag " + tagId);
-    editTag(tagId, tag -> tag.getAlarmIds().remove(alarmId));
-  }
-
   Collection<ConfigurationElementReport> createConfigRemovalReportsFor(ConfigConstants.Entity entity, Collection<Long> ids, C2monCache<?> targetCache) {
     return ids.stream()
       .filter(targetCache::containsKey)
@@ -164,10 +137,5 @@ abstract class AbstractTagConfigHandler<TAG extends Tag> extends BaseConfigHandl
       }
     });
   }
-
-  private void editTag(final Long tagId, Consumer<TAG> mutator) {
-    ifConditionEditTag(tagId, tag -> true, mutator);
-  }
-  
 }
 
