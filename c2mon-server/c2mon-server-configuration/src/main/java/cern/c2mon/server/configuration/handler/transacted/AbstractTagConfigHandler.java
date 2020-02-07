@@ -62,15 +62,18 @@ abstract class AbstractTagConfigHandler<TAG extends Tag> extends BaseConfigHandl
 
   private final RuleTagService ruleTagService;
   protected final Collection<ConfigurationEventListener> configurationEventListeners;
+  private final AlarmConfigHandler alarmConfigHandler;
 
   public AbstractTagConfigHandler(final C2monCache<TAG> tagCache,
                                   final ConfigurableDAO<TAG> configurableDAO,
                                   final AbstractCacheObjectFactory<TAG> tagCacheObjectFactory,
                                   final RuleTagService ruleTagService,
-                                  final GenericApplicationContext context) {
+                                  final GenericApplicationContext context,
+                                  AlarmConfigHandler alarmConfigHandler) {
     super(tagCache, configurableDAO, tagCacheObjectFactory, ArrayList::new);
     this.ruleTagService = ruleTagService;
     this.configurationEventListeners = context.getBeansOfType(ConfigurationEventListener.class).values();
+    this.alarmConfigHandler = alarmConfigHandler;
   }
 
   @Override
@@ -87,6 +90,23 @@ abstract class AbstractTagConfigHandler<TAG extends Tag> extends BaseConfigHandl
     for (ConfigurationEventListener listener : configurationEventListeners) {
       listener.onConfigurationEvent(cacheable, ConfigConstants.Action.UPDATE);
     }
+  }
+
+  /**
+   * Cascades removal into the alarms connected with this tag
+   *
+   * @param tag     the Tag for removal
+   * @param report  the report on this action
+   */
+  @Override
+  protected void doPreRemove(TAG tag, ConfigurationElementReport report) {
+    super.doPreRemove(tag, report);
+
+    tag.getAlarmIds().forEach(alarmId -> {
+      report.addSubReport(
+              new ConfigurationElementReport(ConfigConstants.Action.REMOVE, ConfigConstants.Entity.ALARM, alarmId));
+      alarmConfigHandler.remove(alarmId, report);
+    });
   }
 
   /**

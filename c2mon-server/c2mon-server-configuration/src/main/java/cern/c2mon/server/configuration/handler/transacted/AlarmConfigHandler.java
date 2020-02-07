@@ -93,6 +93,12 @@ public class AlarmConfigHandler extends BaseConfigHandlerImpl<Alarm> {
     return defaultValue.get();
   }
 
+  /**
+   * Removes self from the (data)tag that it is connected with
+   *
+   * @param alarm   the alarm for removal
+   * @param report  the report to collect results in
+   */
   @Override
   protected void doPreRemove(Alarm alarm, ConfigurationElementReport report) {
     for (ConfigurationEventListener listener : this.configurationEventListeners) {
