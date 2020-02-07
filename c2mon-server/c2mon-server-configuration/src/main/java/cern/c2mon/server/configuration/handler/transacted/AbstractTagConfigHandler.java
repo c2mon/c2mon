@@ -18,10 +18,10 @@ package cern.c2mon.server.configuration.handler.transacted;
 
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.factory.AbstractCacheObjectFactory;
+import cern.c2mon.cache.config.collections.TagCacheCollection;
 import cern.c2mon.server.cache.loading.ConfigurableDAO;
 import cern.c2mon.server.common.listener.ConfigurationEventListener;
 import cern.c2mon.server.common.tag.Tag;
-import cern.c2mon.server.rule.RuleTagService;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import lombok.extern.slf4j.Slf4j;
@@ -61,16 +61,16 @@ import java.util.stream.Collectors;
 @Slf4j
 abstract class AbstractTagConfigHandler<TAG extends Tag> extends BaseConfigHandlerImpl<TAG> {
 
-  private final RuleTagService ruleTagService;
+  private final TagCacheCollection tagCacheCollection;
   protected final Collection<ConfigurationEventListener> configurationEventListeners;
 
   public AbstractTagConfigHandler(final C2monCache<TAG> tagCache,
                                   final ConfigurableDAO<TAG> configurableDAO,
                                   final AbstractCacheObjectFactory<TAG> tagCacheObjectFactory,
-                                  final RuleTagService ruleTagService,
+                                  final TagCacheCollection tagCacheCollection,
                                   final GenericApplicationContext context) {
     super(tagCache, configurableDAO, tagCacheObjectFactory, ArrayList::new);
-    this.ruleTagService = ruleTagService;
+    this.tagCacheCollection = tagCacheCollection;
     this.configurationEventListeners = context.getBeansOfType(ConfigurationEventListener.class).values();
   }
 
@@ -105,7 +105,7 @@ abstract class AbstractTagConfigHandler<TAG extends Tag> extends BaseConfigHandl
     log.trace("Adding rule " + ruleId + " reference from Tag " + tagId);
     ifConditionEditTag(tagId,
       tag -> !tag.getRuleIds().contains(ruleId),
-      tag -> ruleTagService.addDependentRuleToTag(tag, ruleId));
+      tag -> tagCacheCollection.addDependentRuleToTag(tagId, ruleId));
   }
 
   /**
@@ -120,7 +120,7 @@ abstract class AbstractTagConfigHandler<TAG extends Tag> extends BaseConfigHandl
     log.trace("Removing rule " + ruleId + " reference from Tag " + tagId);
     ifConditionEditTag(tagId,
       tag -> tag.getRuleIds().contains(ruleId),
-      tag -> ruleTagService.removeDependentRuleFromTag(tag, ruleId));
+      tag -> tagCacheCollection.removeDependentRuleFromTag(tagId, ruleId));
   }
 
   /**

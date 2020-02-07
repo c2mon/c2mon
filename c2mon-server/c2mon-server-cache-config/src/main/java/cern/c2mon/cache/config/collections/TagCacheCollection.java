@@ -8,6 +8,7 @@ import cern.c2mon.server.common.commfault.CommFaultTag;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.supervision.SupervisionStateTag;
+import cern.c2mon.server.common.tag.AbstractTagCacheObject;
 import cern.c2mon.server.common.tag.Tag;
 
 import javax.inject.Inject;
@@ -45,5 +46,54 @@ public class TagCacheCollection extends CacheCollection<Tag> {
 
   public void removeAlarmFromTag(long tagId, long alarmId) {
     doAcrossCaches(tagId, cache -> cache.computeQuiet(tagId, tag -> tag.getAlarmIds().remove(alarmId)));
+  }
+
+  /**
+   * Removes this rule from the list of those that need evaluating when
+   * this tag is updated.
+   * <p>
+   * Note also adjusts text field of cache object.
+   *
+   * @param tagId     the id of the tag used in the rule (directly, not via another rule)
+   * @param ruleTagId the id of the rule
+   */
+  public void removeDependentRuleFromTag(long tagId, final Long ruleTagId) {
+    doAcrossCaches(tagId, cache ->
+      cache.compute(tagId, tag -> {
+        tag.getRuleIds().remove(ruleTagId);
+        updateRuleIdsString(tag);
+      }));
+  }
+
+  /**
+   * Adds the rule to the list of those that need evaluating when
+   * this tag is updated.
+   * <p>
+   * Note also adjust text field of cache object.
+   */
+  public void addDependentRuleToTag(final long tagId, final Long ruleTagId) {
+    doAcrossCaches(tagId, cache ->
+      cache.compute(tagId, tag -> {
+        if (!tag.getRuleIds().contains(ruleTagId)) {
+          tag.getRuleIds().add(ruleTagId);
+          updateRuleIdsString(tag);
+        }
+      }));
+  }
+
+  private void updateRuleIdsString(Tag tag) {
+    AbstractTagCacheObject cacheTag = (AbstractTagCacheObject) tag;
+
+    StringBuilder bld = new StringBuilder();
+    for (Long id : cacheTag.getRuleIds()) {
+      bld.append(id).append(",");
+    }
+
+    cacheTag.setRuleIdsString(bld.toString());
+
+    if (bld.length() > 0) {
+      //remove ", "
+      cacheTag.setRuleIdsString(bld.toString().substring(0, bld.length() - 1));
+    }
   }
 }

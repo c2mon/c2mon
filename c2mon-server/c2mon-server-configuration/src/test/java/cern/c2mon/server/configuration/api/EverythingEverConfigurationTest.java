@@ -28,7 +28,6 @@ import cern.c2mon.server.common.command.CommandTagCacheObject;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.common.equipment.EquipmentCacheObject;
 import cern.c2mon.server.common.metadata.Metadata;
-import cern.c2mon.server.common.rule.RuleTagCacheObject;
 import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
 import cern.c2mon.server.configuration.ConfigurationCacheTest;
 import cern.c2mon.server.configuration.ConfigurationLoader;
@@ -45,12 +44,13 @@ import cern.c2mon.shared.client.configuration.api.Configuration;
 import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
 import cern.c2mon.shared.client.configuration.api.equipment.Equipment;
 import cern.c2mon.shared.client.configuration.api.equipment.SubEquipment;
-import cern.c2mon.shared.client.configuration.api.tag.*;
+import cern.c2mon.shared.client.configuration.api.tag.CommFaultTag;
+import cern.c2mon.shared.client.configuration.api.tag.CommandTag;
+import cern.c2mon.shared.client.configuration.api.tag.DataTag;
+import cern.c2mon.shared.client.configuration.api.tag.StatusTag;
 import cern.c2mon.shared.client.tag.TagMode;
-import cern.c2mon.shared.common.CacheEvent;
 import cern.c2mon.shared.common.NoSimpleValueParseException;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
-import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.common.datatag.address.impl.SimpleHardwareAddressImpl;
 import cern.c2mon.shared.daq.config.Change;
 import cern.c2mon.shared.daq.config.ChangeReport;
@@ -68,10 +68,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
-import java.util.concurrent.CountDownLatch;
 
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
@@ -1051,199 +1049,6 @@ public class EverythingEverConfigurationTest extends ConfigurationCacheTest {
     assertFalse(aliveTimerCache.containsKey(302L));
     assertFalse(dataTagCache.containsKey(1000L));
     assertNull(dataTagMapper.getItem(1000L));
-
-    verify(communicationManager);
-  }
-
-  @Test
-  public void createRuleTag() {
-    // called once when updating the equipment;
-    // mock returns a list with the correct number of SUCCESS ChangeReports
-    replay(communicationManager);
-
-    // SETUP:
-    Configuration createProcess = TestConfigurationProvider.createProcess();
-    configurationLoader.applyConfiguration(createProcess);
-    Configuration createEquipment = TestConfigurationProvider.createEquipment();
-    configurationLoader.applyConfiguration(createEquipment);
-    Configuration createSubEquipment = TestConfigurationProvider.createSubEquipment();
-    configurationLoader.applyConfiguration(createSubEquipment);
-    Configuration createDataTag = TestConfigurationProvider.createEquipmentDataTag(15L);
-    configurationLoader.applyConfiguration(createDataTag);
-    processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
-
-    // TEST:Build configuration to add the test RuleTag
-    RuleTag ruleTag = ConfigurationRuleTagUtil.buildCreateAllFieldsRuleTag(1500L, null);
-    Configuration configuration = new Configuration();
-    configuration.addEntity(ruleTag);
-
-    ///apply the configuration to the server
-    ConfigurationReport report = configurationLoader.applyConfiguration(configuration);
-
-    // check report result
-    assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
-    assertEquals(ConfigConstants.Status.OK, report.getStatus());
-    assertTrue(report.getElementReports().size() == 1);
-
-    // get cacheObject from the cache and compare it with the expected cacheObject
-    RuleTagCacheObject cacheObjectRule = (RuleTagCacheObject) ruleTagCache.get(1500L);
-    cacheObjectRule.setDataTagQuality(new DataTagQualityImpl());
-    RuleTagCacheObject expectedCacheObjectRule = cacheObjectFactory.buildRuleTagCacheObject(1500L, ruleTag);
-
-    ObjectEqualityComparison.assertRuleTagConfigEquals(expectedCacheObjectRule, cacheObjectRule);
-    // Check if all caches are updated
-    assertNotNull(ruleTagMapper.getItem(1500L));
-
-    verify(communicationManager);
-
-    // remove the process and equipments from the server
-    processService.stop(5L, System.currentTimeMillis());
-    Configuration remove = TestConfigurationProvider.deleteProcess();
-    report = configurationLoader.applyConfiguration(remove);
-    assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
-    assertTrue(report.getStatus() == ConfigConstants.Status.OK);
-
-    assertFalse(processCache.containsKey(5L));
-    assertNull(processMapper.getItem(5L));
-    assertFalse(aliveTimerCache.containsKey(101L));
-
-    // equipment stuff
-    assertFalse(equipmentCache.containsKey(15L));
-    assertNull(equipmentMapper.getItem(15L));
-    assertFalse(commFaultTagCache.containsKey(201L));
-    assertFalse(ruleTagCache.containsKey(1500L));
-    assertNull(ruleTagMapper.getItem(1500L));
-
-    verify(communicationManager);
-  }
-
-  @Test
-  public void updateRuleTag() throws InterruptedException, IllegalAccessException, TransformerException, InstantiationException, NoSimpleValueParseException, ParserConfigurationException, NoSuchFieldException {
-    replay(communicationManager);
-    // SETUP:
-    Configuration createProcess = TestConfigurationProvider.createProcess();
-    configurationLoader.applyConfiguration(createProcess);
-    Configuration createEquipment = TestConfigurationProvider.createEquipment();
-    configurationLoader.applyConfiguration(createEquipment);
-    Configuration createSubEquipment = TestConfigurationProvider.createSubEquipment();
-    configurationLoader.applyConfiguration(createSubEquipment);
-    Configuration createDataTag = TestConfigurationProvider.createEquipmentDataTag(15L);
-    configurationLoader.applyConfiguration(createDataTag);
-    Configuration createRuleTag = TestConfigurationProvider.createRuleTag();
-    configurationLoader.applyConfiguration(createRuleTag);
-    processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
-
-    final CountDownLatch latch = new CountDownLatch(1);
-    ruleTagCache.getCacheListenerManager().registerListener(cacheable -> latch.countDown(), CacheEvent.UPDATE_ACCEPTED);
-
-    // TEST:
-    // Build configuration to add the test RuleTagUpdate
-    RuleTag ruleTagUpdate = RuleTag.update(1500L).ruleText("(2 > 1)[1],true[0]").description("new description").build();
-    Configuration configuration = new Configuration();
-    configuration.addEntity(ruleTagUpdate);
-
-    ///apply the configuration to the server
-    ConfigurationReport report = configurationLoader.applyConfiguration(configuration);
-
-    // check report result
-    assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
-    assertEquals(ConfigConstants.Status.OK, report.getStatus());
-    assertTrue(report.getElementReports().size() == 1);
-
-    // get cacheObject from the cache and compare to the an expected cacheObject
-    RuleTagCacheObject cacheObjectData = (RuleTagCacheObject) ruleTagCache.get(1500L);
-    RuleTagCacheObject expectedCacheObjectRule = cacheObjectFactory.buildRuleTagUpdateCacheObject(cacheObjectData, ruleTagUpdate);
-    expectedCacheObjectRule.setProcessIds(Collections.EMPTY_SET);
-    expectedCacheObjectRule.setEquipmentIds(Collections.EMPTY_SET);
-    expectedCacheObjectRule.getDataTagQuality().validate();
-    latch.await();
-
-    ObjectEqualityComparison.assertRuleTagConfigEquals(expectedCacheObjectRule, (RuleTagCacheObject) ruleTagCache.get(1500L));
-
-    verify(communicationManager);
-
-    // remove the process and equipments from the server
-    processService.stop(5L, System.currentTimeMillis());
-    Configuration remove = TestConfigurationProvider.deleteProcess();
-    report = configurationLoader.applyConfiguration(remove);
-    assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
-    assertTrue(report.getStatus() == ConfigConstants.Status.OK);
-    Configuration removeRule = TestConfigurationProvider.deleteRuleTag();
-    report = configurationLoader.applyConfiguration(removeRule);
-    assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
-    assertTrue(report.getStatus() == ConfigConstants.Status.OK);
-
-    assertFalse(processCache.containsKey(5L));
-    assertNull(processMapper.getItem(5L));
-    assertFalse(aliveTimerCache.containsKey(101L));
-
-    // equipment stuff
-    assertFalse(equipmentCache.containsKey(15L));
-    assertNull(equipmentMapper.getItem(15L));
-    assertFalse(commFaultTagCache.containsKey(201L));
-    assertFalse(ruleTagCache.containsKey(1500L));
-    assertNull(ruleTagMapper.getItem(1500L));
-
-    verify(communicationManager);
-  }
-
-  @Test
-  public void deleteRuleWithDeleteDataTag() throws IllegalAccessException, TransformerException, InstantiationException, NoSimpleValueParseException, ParserConfigurationException, NoSuchFieldException, InterruptedException {
-    // called once when updating the equipment;
-    // mock returns a list with the correct number of SUCCESS ChangeReports
-    expect(communicationManager.sendConfiguration(eq(5L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
-    replay(communicationManager);
-    Configuration createProcess = TestConfigurationProvider.createProcess();
-    configurationLoader.applyConfiguration(createProcess);
-    Configuration createEquipment = TestConfigurationProvider.createEquipment();
-    configurationLoader.applyConfiguration(createEquipment);
-    Configuration createSubEquipment = TestConfigurationProvider.createSubEquipment();
-    configurationLoader.applyConfiguration(createSubEquipment);
-    Configuration createDataTag = TestConfigurationProvider.createEquipmentDataTag(15L);
-    configurationLoader.applyConfiguration(createDataTag);
-    processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
-    Configuration createRuleTag = TestConfigurationProvider.createRuleTag();
-    configurationLoader.applyConfiguration(createRuleTag);
-
-    // TEST:
-    // check if the DataTag and rules are in the cache
-    assertTrue(ruleTagCache.containsKey(1500L));
-    assertNotNull(ruleTagMapper.getItem(1500L));
-    assertTrue(dataTagCache.containsKey(1000L));
-    assertNotNull(dataTagMapper.getItem(1000L));
-
-    // Build configuration to remove the DataTag
-    Configuration removeTag = TestConfigurationProvider.deleteDataTag();
-    ConfigurationReport report = configurationLoader.applyConfiguration(removeTag);
-
-    //check report result
-    assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
-    assertTrue(report.getStatus() == ConfigConstants.Status.OK);
-    assertTrue(report.getElementReports().size() == 1);
-
-    // Check if all caches are updated
-    assertFalse(ruleTagCache.containsKey(1500L));
-    assertNull(ruleTagMapper.getItem(1500L));
-    assertFalse(dataTagCache.containsKey(1000L));
-    assertNull(dataTagMapper.getItem(1000L));
-
-    verify(communicationManager);
-
-    // remove the rest for finishing the test
-    processService.stop(5L, System.currentTimeMillis());
-    Configuration remove = TestConfigurationProvider.deleteProcess();
-    report = configurationLoader.applyConfiguration(remove);
-    assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
-    assertTrue(report.getStatus() == ConfigConstants.Status.OK);
-
-    assertFalse(processCache.containsKey(5L));
-    assertNull(processMapper.getItem(5L));
-    assertFalse(aliveTimerCache.containsKey(101L));
-
-    // equipment stuff
-    assertFalse(equipmentCache.containsKey(15L));
-    assertNull(equipmentMapper.getItem(15L));
-    assertFalse(commFaultTagCache.containsKey(201L));
 
     verify(communicationManager);
   }

@@ -70,7 +70,7 @@ public abstract class BaseConfigHandlerImpl<CACHEABLE extends Cacheable> impleme
   public List<ProcessChange> update(Long id, Properties properties) {
     if (!cache.containsKey(id)) {
       throw new ConfigurationException(ConfigurationException.ENTITY_DOES_NOT_EXIST,
-        "Attempting to create a cache object with an already existing id: " + id);
+        "Attempting to update a cache object with a nonexistent id: " + id);
     }
 
     CACHEABLE cacheObject = cache.get(id);

@@ -17,6 +17,7 @@
 package cern.c2mon.server.configuration.handler.transacted;
 
 import cern.c2mon.cache.actions.rule.RuleTagCacheObjectFactory;
+import cern.c2mon.cache.config.collections.TagCacheCollection;
 import cern.c2mon.server.cache.loading.RuleTagLoaderDAO;
 import cern.c2mon.server.common.listener.ConfigurationEventListener;
 import cern.c2mon.server.common.rule.RuleTag;
@@ -35,6 +36,7 @@ import javax.inject.Named;
 import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 /**
  * Implementation of transacted configuration methods.
@@ -48,16 +50,19 @@ public class RuleTagConfigHandler extends AbstractTagConfigHandler<RuleTag> {
 
   private final RuleTagService ruleTagService;
   private AlarmConfigHandler alarmConfigHandler;
+  private TagCacheCollection tagCacheCollection;
 
   @Inject
   public RuleTagConfigHandler(RuleTagService ruleTagService,
                               RuleTagCacheObjectFactory ruleTagCacheObjectFactory,
                               RuleTagLoaderDAO ruleTagLoaderDAO,
                               GenericApplicationContext context,
-                              AlarmConfigHandler alarmConfigHandler) {
+                              AlarmConfigHandler alarmConfigHandler,
+                              TagCacheCollection tagCacheCollection) {
     super(ruleTagService.getCache(), ruleTagLoaderDAO, ruleTagCacheObjectFactory, ruleTagService, context);
     this.ruleTagService = ruleTagService;
     this.alarmConfigHandler = alarmConfigHandler;
+    this.tagCacheCollection = tagCacheCollection;
   }
 
   @Override
@@ -112,15 +117,24 @@ public class RuleTagConfigHandler extends AbstractTagConfigHandler<RuleTag> {
 
   @Override
   protected void doPreRemove(RuleTag ruleTag, ConfigurationElementReport elementReport) {
-    super.doPreRemove(ruleTag, elementReport);
-
     createConfigRemovalReportsFor(Entity.ALARM, ruleTag.getAlarmIds(), alarmConfigHandler.getCache())
-      .forEach(elementReport::addSubReport);
+      .forEach(report -> {
+        alarmConfigHandler.remove(report.getId(), elementReport);
+        elementReport.addSubReport(report);
+      });
 
-    createConfigRemovalReportsFor(Entity.RULETAG, ruleTag.getRuleIds(), cache)
-      .forEach(elementReport::addSubReport);
+    // TODO (Alex) Do we want to be removing dependent rules?
+//    createConfigRemovalReportsFor(Entity.RULETAG, ruleTag.getRuleIds(), cache)
+//      .forEach(report -> {
+//        elementReport.addSubReport(report);
+//      });
 
-    for (Long inputTagId : ruleTag.getCopyRuleInputTagIds()) {
+    List<Long> existingRuleInputTagIds = ruleTag.getRuleInputTagIds()
+      .stream()
+      .filter(tagCacheCollection::containsKey)
+      .collect(Collectors.toList());
+
+    for (Long inputTagId : existingRuleInputTagIds) {
       removeRuleFromTag(inputTagId, ruleTag.getId());
     }
   }

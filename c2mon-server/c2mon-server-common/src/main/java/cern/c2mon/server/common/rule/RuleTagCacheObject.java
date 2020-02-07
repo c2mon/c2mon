@@ -25,7 +25,10 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Cache object representing a rule in the server. Make sure to update the clone method if modifying the fields.
@@ -137,13 +140,6 @@ public class RuleTagCacheObject extends AbstractTagCacheObject implements RuleTa
   public final Collection<Long> getRuleInputTagIds() {
     return ruleExpression != null
       ? ruleExpression.getInputTagIds()
-      : Collections.emptyList();
-  }
-
-  @Override
-  public final Collection<Long> getCopyRuleInputTagIds() {
-    return (ruleExpression != null)
-      ? new ArrayList<>(ruleExpression.getInputTagIds())
       : Collections.emptyList();
   }
 

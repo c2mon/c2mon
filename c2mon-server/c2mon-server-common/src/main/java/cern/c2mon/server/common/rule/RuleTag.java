@@ -90,12 +90,6 @@ public interface RuleTag extends Tag {
   void setProcessIds(Set<Long> processIds);
 
   /**
-   * Returns an own copy of the tags used by this rule.
-   * @return ids of tags used in this rule
-   */
-  Collection<Long> getCopyRuleInputTagIds();
-
-  /**
    * Returns the process with the lowest id from the process id
    * list (sort each time). Used for creating cache object.
    * Returns 0 if list is empty.
