@@ -67,6 +67,7 @@ public class RuleTagCacheObject extends AbstractTagCacheObject implements RuleTa
    */
   private Set<Long> processIds = new HashSet<>();
 
+  @EqualsAndHashCode.Exclude
   private Timestamp evalTimestamp;
 
   /**

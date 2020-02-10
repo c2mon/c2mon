@@ -33,8 +33,15 @@ public class RuleTagCacheObjectFactory extends AbstractTagCacheObjectFactory<Rul
     RuleTagCacheObject ruleTagCacheObject = (RuleTagCacheObject) ruleTag;
 
     new PropertiesAccessor(properties)
-      .getString("ruleText").ifPresent(ruleTagCacheObject::setRuleText);
+      .getString("ruleText").ifPresent(ruleText -> {
+      ruleTagCacheObject.setRuleText(ruleText);
+        // Also, reset supervision ids
+      ruleTag.getEquipmentIds().clear();
+      ruleTag.getSubEquipmentIds().clear();
+      ruleTag.getProcessIds().clear();
+    });
 
+    // Set new supervision ids, if any exist
     if (!ruleTag.getRuleInputTagIds().isEmpty()) {
       addSupervisionIdsBasedOnRuleInput(ruleTag);
     }

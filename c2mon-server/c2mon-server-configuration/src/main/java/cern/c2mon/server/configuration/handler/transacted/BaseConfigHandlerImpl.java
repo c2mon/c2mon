@@ -51,7 +51,7 @@ public abstract class BaseConfigHandlerImpl<CACHEABLE extends Cacheable> impleme
     cacheLoaderDAO.insert(cacheObject);
 
     // Cache insert
-    cache.putQuiet(cacheObject.getId(), cacheObject);
+    cache.put(cacheObject.getId(), cacheObject);
 
     doPostCreate(cacheObject);
 
@@ -79,7 +79,7 @@ public abstract class BaseConfigHandlerImpl<CACHEABLE extends Cacheable> impleme
 
     cacheLoaderDAO.updateConfig(cacheObject);
 
-    cache.putQuiet(id, cacheObject);
+    cache.put(id, cacheObject);
 
     doPostUpdate(cacheObject);
 

@@ -11,6 +11,7 @@ import cern.c2mon.server.common.rule.RuleTagCacheObject;
 import cern.c2mon.server.configuration.ConfigurationLoader;
 import cern.c2mon.server.configuration.parser.util.ConfigurationRuleTagUtil;
 import cern.c2mon.server.configuration.util.TestConfigurationProvider;
+import cern.c2mon.server.rule.RuleTagService;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.api.Configuration;
@@ -44,6 +45,9 @@ public class RuleTagConfigTest extends ConfigurationCacheLoaderTest<RuleTag> {
   
   @Inject
   private ProcessService processService;
+
+  @Inject
+  private RuleTagService ruleTagService;
 
   /**
    * No communication should take place with the DAQs during rule configuration.
@@ -93,23 +97,24 @@ public class RuleTagConfigTest extends ConfigurationCacheLoaderTest<RuleTag> {
       ((DataTagCacheObject) dataTag).setValue(15.0f);
       dataTag.getDataTagQuality().validate();
     });
-    RuleTagCacheObject expectedObject = expectedObject();
-    expectedObject.setJapcAddress("newTestConfigJAPCaddress");
-    expectedObject.setRuleText("(2 > 1)[1],true[0]");
-    expectedObject.setProcessIds(Collections.emptySet());
-    expectedObject.setEquipmentIds(Collections.emptySet());
-    expectedObject.getDataTagQuality().validate();
+    // Reregister evaluation listeners, because the ConfigRuleChain nuked them
+    ruleTagService.init();
+    RuleTagCacheObject expectedObject = afterUpdateObject();
 
+    // Expecting 2 updates and 2 evaluations
     final CountDownLatch latch = new CountDownLatch(1);
-    ruleTagCache.getCacheListenerManager().registerListener(__ -> latch.countDown(), CacheEvent.UPDATE_ACCEPTED);
 
+    ruleTagCache.getCacheListenerManager().registerListener(ruleTag -> {
+      System.out.println("Received: " + ruleTag);
+      if (ruleTag.getDataTagQuality().isValid())
+        latch.countDown();
+    }, CacheEvent.UPDATE_ACCEPTED);
     configurationLoader.applyConfiguration(10);
     configurationLoader.applyConfiguration(11);
 
-    // sleep is to allow for rule evaluation on separate thread
-    latch.await(1, TimeUnit.SECONDS);
+    assertTrue(latch.await(1, TimeUnit.SECONDS));
 
-    assertEquals("Object should be evaluated/validated", expectedObject, ruleTagCache.get(50100L));
+    assertEquals("Object should be evaluated", expectedObject, ruleTagCache.get(50100L));
   }
 
   @Test
@@ -160,9 +165,13 @@ public class RuleTagConfigTest extends ConfigurationCacheLoaderTest<RuleTag> {
     // SETUP:
     setUp(configurationLoader, processService);
     configurationLoader.applyConfiguration(TestConfigurationProvider.createRuleTag());
+    ruleTagService.init();
 
     final CountDownLatch latch = new CountDownLatch(1);
-    ruleTagCache.getCacheListenerManager().registerListener(__ -> latch.countDown(), CacheEvent.UPDATE_ACCEPTED);
+    ruleTagCache.getCacheListenerManager().registerListener(ruleTag -> {
+      if (ruleTag.getDataTagQuality().isValid())
+        latch.countDown();
+    }, CacheEvent.UPDATE_ACCEPTED);
 
     // TEST:
     // Build configuration to add the test RuleTagUpdate
@@ -186,6 +195,8 @@ public class RuleTagConfigTest extends ConfigurationCacheLoaderTest<RuleTag> {
     expectedCacheObjectRule.setProcessIds(Collections.emptySet());
     expectedCacheObjectRule.setEquipmentIds(Collections.emptySet());
     expectedCacheObjectRule.getDataTagQuality().validate();
+    expectedCacheObjectRule.setValue(1);
+    expectedCacheObjectRule.setValueDescription("Rule result");
 
     latch.await(1, TimeUnit.SECONDS);
 
@@ -193,7 +204,7 @@ public class RuleTagConfigTest extends ConfigurationCacheLoaderTest<RuleTag> {
   }
 
   @Test
-  public void deleteRuleWithDeleteDataTag() {
+  public void deleteDataTagDoesNotDeleteRule() {
     setUp(configurationLoader, processService);
     configurationLoader.applyConfiguration(TestConfigurationProvider.createRuleTag());
 
@@ -210,12 +221,11 @@ public class RuleTagConfigTest extends ConfigurationCacheLoaderTest<RuleTag> {
 
     //check report result
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
-    assertSame(report.getStatus(), ConfigConstants.Status.OK);
     assertEquals(1, report.getElementReports().size());
 
     // Check if all caches are updated
-    assertFalse(ruleTagCache.containsKey(1500L));
-    assertNull(ruleTagMapper.getItem(1500L));
+    assertTrue(ruleTagCache.containsKey(1500L));
+    assertNotNull(ruleTagMapper.getItem(1500L));
     assertFalse(dataTagCache.containsKey(1000L));
     assertNull(dataTagMapper.getItem(1000L));
   }
@@ -246,5 +256,17 @@ public class RuleTagConfigTest extends ConfigurationCacheLoaderTest<RuleTag> {
     Configuration createDataTag = TestConfigurationProvider.createEquipmentDataTag(15L);
     configurationLoader.applyConfiguration(createDataTag);
     processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
+  }
+
+  private RuleTagCacheObject afterUpdateObject() {
+    RuleTagCacheObject expectedObject = expectedObject();
+    expectedObject.setJapcAddress("newTestConfigJAPCaddress");
+    expectedObject.setRuleText("(2 > 1)[1],true[0]");
+    expectedObject.setValueDescription("Rule result");
+    expectedObject.setProcessIds(Collections.emptySet());
+    expectedObject.setEquipmentIds(Collections.emptySet());
+    expectedObject.getDataTagQuality().validate();
+    expectedObject.setValue(1.0F);
+    return expectedObject;
   }
 }

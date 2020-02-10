@@ -71,7 +71,6 @@ public class RuleTagConfigHandler extends AbstractTagConfigHandler<RuleTag> {
     for (Long tagId : ruleTag.getRuleInputTagIds()) {
       tagCacheCollection.addRuleToTag(tagId, ruleTag.getId());
     }
-    ruleEvaluator.evaluateRule(ruleTag.getId());
 
     super.doPostCreate(ruleTag);
   }
