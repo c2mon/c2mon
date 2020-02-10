@@ -122,11 +122,11 @@ class EquipmentFactory extends EntityFactory<Equipment> {
       equipment.setStatusTag(statusTag);
     }
 
-    equipment.getCommFaultTag().setProcessId(equipment.getId());
-    equipment.getStatusTag().setProcessId(equipment.getId());
+    equipment.getCommFaultTag().setEquipmentId(equipment.getId());
+    equipment.getStatusTag().setEquipmentId(equipment.getId());
 
     if (equipment.getAliveTag() != null) {
-      equipment.getAliveTag().setProcessId(equipment.getId());
+      equipment.getAliveTag().setEquipmentId(equipment.getId());
     }
 
     return equipment;

@@ -22,20 +22,18 @@ public class CommFaultTagCacheObjectFactory extends ControlTagCacheObjectFactory
 
   @Override
   public Change configureCacheObject(CommFaultTag commFaultTag, Properties properties) {
-    apply(new PropertiesAccessor(properties), accessor -> {
-      accessor
-        .getLong("equipmentId").ifPresent(id -> {
-        commFaultTag.setSupervisedId(id);
-        commFaultTag.setSupervisedEntity(SupervisionEntity.EQUIPMENT);
-      })
-        .getLong("subequipmentId").ifPresent(id -> {
-        commFaultTag.setSupervisedId(id);
-        commFaultTag.setSupervisedEntity(SUBEQUIPMENT);
-      })
-        .getString("equipmentName").ifPresent(commFaultTag::setEquipmentName)
-        .getLong("stateTagId").ifPresent(commFaultTag::setStateTagId)
-        .getLong("aliveTagId").ifPresent(commFaultTag::setAliveTagId);
-    });
+    apply(new PropertiesAccessor(properties), accessor -> accessor
+      .getLong("equipmentId").ifPresent(id -> {
+      commFaultTag.setSupervisedId(id);
+      commFaultTag.setSupervisedEntity(SupervisionEntity.EQUIPMENT);
+    })
+      .getLong("subequipmentId").ifPresent(id -> {
+      commFaultTag.setSupervisedId(id);
+      commFaultTag.setSupervisedEntity(SUBEQUIPMENT);
+    })
+      .getString("equipmentName").ifPresent(commFaultTag::setEquipmentName)
+      .getLong("stateTagId").ifPresent(commFaultTag::setStateTagId)
+      .getLong("aliveTagId").ifPresent(commFaultTag::setAliveTagId));
 
     return super.configureCacheObject(commFaultTag, properties);
   }

@@ -26,7 +26,6 @@ import java.util.Properties;
 import java.util.Set;
 
 import static cern.c2mon.server.configuration.parser.util.ConfigurationProcessUtil.buildCreateAllFieldsProcess;
-import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.*;
 
@@ -73,8 +72,6 @@ public class ProcessConfigTest extends ConfigurationCacheLoaderTest<Process> {
 
   @Test
   public void createProcess() {
-    replay(mockManager);
-
     Properties expectedProperties = new Properties();
     cern.c2mon.shared.client.configuration.api.process.Process process = buildCreateAllFieldsProcess(1L, expectedProperties);
     expectedProperties.setProperty("stateTagId", "300000");
@@ -107,10 +104,6 @@ public class ProcessConfigTest extends ConfigurationCacheLoaderTest<Process> {
 
   @Test
   public void updateProcess() {
-    // called once when updating the equipment;
-    // mock returns a list with the correct number of SUCCESS ChangeReports
-    replay(mockManager);
-
     // SETUP:
     Configuration createProcess = TestConfigurationProvider.createProcess();
     configurationLoader.applyConfiguration(createProcess);
@@ -193,8 +186,6 @@ public class ProcessConfigTest extends ConfigurationCacheLoaderTest<Process> {
   public void testRemoveProcess() {
     // stop DAQ else remove not allowed
     processService.stop(50L, System.currentTimeMillis());
-
-    replay(mockManager);
 
     ConfigurationReport report = configurationLoader.applyConfiguration(28);
 

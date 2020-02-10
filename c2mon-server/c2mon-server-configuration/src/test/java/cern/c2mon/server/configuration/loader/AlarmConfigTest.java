@@ -55,7 +55,6 @@ public class AlarmConfigTest extends ConfigurationCacheLoaderTest<Alarm> {
 
   @Test
   public void testCreateAlarmWithExistingDatatag() {
-    replay(mockManager);
 
     // we  expect to send the alarm as the datatag is initialized.
 //    C2monCacheListener<Alarm> checker = EasyMock.createMock(C2monCacheListener.class);
@@ -78,7 +77,6 @@ public class AlarmConfigTest extends ConfigurationCacheLoaderTest<Alarm> {
    */
   @Test
   public void testCreateUpdateAlarm() {
-    replay(mockManager);
 
     // we do not expect to send the alarm as the datatag is unitialized.
 //    C2monCacheListener<Alarm> checker = EasyMock.createMock(C2monCacheListener.class);
@@ -130,8 +128,6 @@ public class AlarmConfigTest extends ConfigurationCacheLoaderTest<Alarm> {
     assertTrue(alarmCache.containsKey(350000L));
     assertNotNull(alarmMapper.getItem(350000L));
 
-    replay(mockManager);
-
     // we  expect to notify the cache listeners about a TERM alarm.
 //    C2monCacheListener<Alarm> checker = EasyMock.createMock(C2monCacheListener.class);
 //    checker.notifyElementUpdated(EasyMock.isA(Alarm.class));
@@ -150,8 +146,6 @@ public class AlarmConfigTest extends ConfigurationCacheLoaderTest<Alarm> {
 
   @Test
   public void createAlarm() {
-    // SETUP:
-    replay(mockManager);
     setUp();
 
     // TEST:Build configuration to add the test Alarm
@@ -174,13 +168,10 @@ public class AlarmConfigTest extends ConfigurationCacheLoaderTest<Alarm> {
     ObjectEqualityComparison.assertAlarmEquals(expectedCacheObjectAlarm, cacheObjectAlarm);
     // Check if all caches are updated
     assertNotNull(alarmMapper.getItem(2000L));
-
-    verify(mockManager);
   }
 
   @Test
   public void updateAlarm() {
-    replay(mockManager);
     setUp();
     configurationLoader.applyConfiguration(TestConfigurationProvider.createAlarm());
 

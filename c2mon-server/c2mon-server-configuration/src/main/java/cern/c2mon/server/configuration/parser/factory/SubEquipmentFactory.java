@@ -119,11 +119,11 @@ class SubEquipmentFactory extends EntityFactory<SubEquipment> {
       subEquipment.setStatusTag(statusTag);
     }
 
-    subEquipment.getCommFaultTag().setProcessId(subEquipment.getId());
-    subEquipment.getStatusTag().setProcessId(subEquipment.getId());
+    subEquipment.getCommFaultTag().setSubEquipmentId(subEquipment.getId());
+    subEquipment.getStatusTag().setSubEquipmentId(subEquipment.getId());
 
     if (subEquipment.getAliveTag() != null && subEquipment.getAliveTag().getAddress() != null) {
-      subEquipment.getAliveTag().setProcessId(subEquipment.getId());
+      subEquipment.getAliveTag().setSubEquipmentId(subEquipment.getId());
     } else {
       throw new ConfigurationParseException("Error creating sub equipment #" + subEquipment.getId() + ": " +
           "No alive tag address was specified!");

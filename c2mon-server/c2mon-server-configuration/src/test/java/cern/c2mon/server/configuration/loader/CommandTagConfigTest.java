@@ -11,22 +11,17 @@ import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.api.Configuration;
-import cern.c2mon.shared.common.NoSimpleValueParseException;
 import cern.c2mon.shared.common.command.CommandTag;
 import cern.c2mon.shared.common.datatag.DataTagConstants;
 import cern.c2mon.shared.common.datatag.address.HardwareAddressFactory;
 import cern.c2mon.shared.common.datatag.address.impl.SimpleHardwareAddressImpl;
-import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
-import org.easymock.EasyMock;
 import org.junit.Test;
 
 import javax.inject.Inject;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 import java.sql.Timestamp;
-import java.util.List;
 
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.*;
 
 public class CommandTagConfigTest extends ConfigurationCacheLoaderTest<CommandTag> {
@@ -41,15 +36,7 @@ public class CommandTagConfigTest extends ConfigurationCacheLoaderTest<CommandTa
   private ProcessService processService;
 
   @Test
-  public void testCreateAndUpdateCommandTag() throws ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException,
-    NoSuchFieldException, NoSimpleValueParseException {
-    // the mocked ProcessCommmunicationManager can return an empty report
-    // (expect 3 calls)
-    expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
-    expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
-    expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
-    replay(mockManager);
-
+  public void testCreateAndUpdateCommandTag() {
     ConfigurationReport report = configurationLoader.applyConfiguration(3);
 
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
@@ -93,12 +80,10 @@ public class CommandTagConfigTest extends ConfigurationCacheLoaderTest<CommandTa
   }
 
   @Test
-  public void testRemoveCommand() throws ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException,
-    NoSuchFieldException, NoSimpleValueParseException {
+  public void testRemoveCommand() {
     // check as expected
     assertTrue(commandTagCache.containsKey(11000L));
     assertNotNull(commandTagMapper.getItem(11000L));
-    EasyMock.expect(mockManager.sendConfiguration(EasyMock.isA(Long.class), EasyMock.isA(List.class))).andReturn(new ConfigurationChangeEventReport());
 
     // rung test
     replay(mockManager);
@@ -112,12 +97,7 @@ public class CommandTagConfigTest extends ConfigurationCacheLoaderTest<CommandTa
   }
 
   @Test
-  public void createCommandTag() throws IllegalAccessException, TransformerException, InstantiationException, NoSimpleValueParseException, ParserConfigurationException, NoSuchFieldException {
-    // called once when updating the equipment;
-    // mock returns a list with the correct number of SUCCESS ChangeReports
-    expect(mockManager.sendConfiguration(eq(5L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
-    replay(mockManager);
-
+  public void createCommandTag() {
     // SETUP:
     Configuration createProcess = TestConfigurationProvider.createProcess();
     configurationLoader.applyConfiguration(createProcess);
@@ -152,11 +132,7 @@ public class CommandTagConfigTest extends ConfigurationCacheLoaderTest<CommandTa
   }
 
   @Test
-  public void updateCommandTag() throws IllegalAccessException, TransformerException, InstantiationException, NoSimpleValueParseException, ParserConfigurationException, NoSuchFieldException {
-    // called once when updating the equipment;
-    // mock returns a list with the correct number of SUCCESS ChangeReports
-    expect(mockManager.sendConfiguration(eq(5L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
-    replay(mockManager);
+  public void updateCommandTag() {
 
     // SETUP:
     Configuration createProcess = TestConfigurationProvider.createProcess();

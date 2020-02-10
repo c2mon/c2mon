@@ -18,20 +18,13 @@ import cern.c2mon.server.configuration.util.TestConfigurationProvider;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.api.Configuration;
-import cern.c2mon.shared.common.NoSimpleValueParseException;
-import cern.c2mon.shared.daq.config.Change;
-import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
-import org.easymock.EasyMock;
 import org.junit.Test;
 
 import javax.inject.Inject;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 import java.sql.Timestamp;
-import java.util.List;
 import java.util.Properties;
 
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.*;
 
 public class SubEquipmentConfigTest extends ConfigurationCacheLoaderTest<SubEquipment> {
@@ -93,8 +86,7 @@ public class SubEquipmentConfigTest extends ConfigurationCacheLoaderTest<SubEqui
     SubEquipmentCacheObject dbObject = (SubEquipmentCacheObject) subEquipmentMapper.getItem(200L);
     assertEquals(expectedObject, dbObject);
 
-    // also check that the equipment, commfault and alive cache were updated
-    Equipment equipment = equipmentCache.get(expectedObject.getParentId());
+    // also check that the commfault and alive cache were updated
     // the alivetimer, commfault, state caches should reflect the changes
     assertNotNull(aliveTimerCache.get(expectedObject.getAliveTagId()));
     assertEquals(expectedObject.getId(), (long) aliveTimerCache.get(cacheObject.getAliveTagId()).getSupervisedId());
@@ -164,8 +156,7 @@ public class SubEquipmentConfigTest extends ConfigurationCacheLoaderTest<SubEqui
   }
 
   @Test
-  public void testRemoveSubEquipment() throws IllegalAccessException, InstantiationException, NoSuchFieldException, ParserConfigurationException,
-    TransformerException, NoSimpleValueParseException {
+  public void testRemoveSubEquipment() {
     // Create the subequipment
     ConfigurationReport report = configurationLoader.applyConfiguration(19);
 
@@ -177,10 +168,6 @@ public class SubEquipmentConfigTest extends ConfigurationCacheLoaderTest<SubEqui
     assertTrue(commFaultTagCache.containsKey(subEquipment.getCommFaultTagId()));
     assertTrue(stateTagCache.containsKey(subEquipment.getStateTagId()));
 
-    reset(mockManager);
-    expect(mockManager.sendConfiguration(EasyMock.anyLong(), EasyMock.<List<Change>> anyObject())).andReturn(new ConfigurationChangeEventReport());
-    replay(mockManager);
-
     report = configurationLoader.applyConfiguration(98);
 
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
@@ -189,6 +176,7 @@ public class SubEquipmentConfigTest extends ConfigurationCacheLoaderTest<SubEqui
 
     assertFalse(aliveTimerCache.containsKey(subEquipment.getAliveTagId()));
     assertFalse(commFaultTagCache.containsKey(subEquipment.getCommFaultTagId()));
+    assertFalse(stateTagCache.containsKey(subEquipment.getStateTagId()));
 
 //    assertNull(controlTagMapper.getItem(subEquipment.getAliveTagId()));
 //    assertNull(controlTagMapper.getItem(subEquipment.getStateTagId()));

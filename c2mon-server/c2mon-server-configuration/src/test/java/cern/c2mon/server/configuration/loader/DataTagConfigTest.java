@@ -9,21 +9,15 @@ import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.common.ConfigurationException;
-import cern.c2mon.shared.common.NoSimpleValueParseException;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.DataTagConstants;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl;
-import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
-import org.easymock.EasyMock;
 import org.junit.Test;
 
 import javax.inject.Inject;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-import java.util.List;
 
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.*;
 
 public class DataTagConfigTest extends ConfigurationCacheLoaderTest<DataTag> {
@@ -41,14 +35,7 @@ public class DataTagConfigTest extends ConfigurationCacheLoaderTest<DataTag> {
   private C2monCache<Equipment> equipmentCache;
 
   @Test
-  public void testCreateAndUpdateDataTag() throws ConfigurationException, InterruptedException, ParserConfigurationException, IllegalAccessException,
-    InstantiationException, TransformerException, NoSuchFieldException, NoSimpleValueParseException {
-    // the mocked ProcessCommmunicationManager can return an empty report
-    // (expect 3 calls for create, update and remove)
-    expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
-    expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
-    expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
-    replay(mockManager);
+  public void testCreateAndUpdateDataTag() throws ConfigurationException {
 
     ConfigurationReport report = configurationLoader.applyConfiguration(1);
 
@@ -110,17 +97,13 @@ public class DataTagConfigTest extends ConfigurationCacheLoaderTest<DataTag> {
   }
 
   @Test
-  public void testRemoveDataTag() throws ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException,
-    NoSuchFieldException, NoSimpleValueParseException {
+  public void testRemoveDataTag() {
     // check data as expected
     Long tagId = 200001L;
     DataTagCacheObject cacheObject = (DataTagCacheObject) dataTagCache.get(200001L);
     assertNotNull(cacheObject);
     assertNotNull(dataTagMapper.getItem(tagId));
 
-    EasyMock.expect(mockManager.sendConfiguration(EasyMock.isA(Long.class), EasyMock.isA(List.class))).andReturn(new ConfigurationChangeEventReport());
-
-    replay(mockManager);
     // run test
     ConfigurationReport report = configurationLoader.applyConfiguration(7);
 

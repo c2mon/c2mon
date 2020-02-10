@@ -19,11 +19,6 @@ import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.common.NoSimpleValueParseException;
-import cern.c2mon.shared.daq.config.Change;
-import cern.c2mon.shared.daq.config.ChangeReport;
-import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
-import org.easymock.EasyMock;
-import org.easymock.IAnswer;
 import org.junit.Test;
 
 import javax.inject.Inject;
@@ -31,7 +26,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import java.util.List;
 
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.*;
 
 public class EquipmentConfigTest extends ConfigurationCacheLoaderTest<Equipment> {
@@ -80,27 +75,7 @@ public class EquipmentConfigTest extends ConfigurationCacheLoaderTest<Equipment>
    * @throws ParserConfigurationException
    */
   @Test
-  public void testCreateUpdateEquipment() throws ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException,
-    NoSuchFieldException, NoSimpleValueParseException {
-    // called once when updating the equipment;
-    // mock returns a list with the correct number of SUCCESS ChangeReports
-    expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andAnswer(new IAnswer<ConfigurationChangeEventReport>() {
-
-      @Override
-      public ConfigurationChangeEventReport answer() throws Throwable {
-        List<Change> changeList = (List<Change>) EasyMock.getCurrentArguments()[1];
-        ConfigurationChangeEventReport report = new ConfigurationChangeEventReport();
-        for (Change change : changeList) {
-          ChangeReport changeReport = new ChangeReport(change);
-          changeReport.setState(ChangeReport.CHANGE_STATE.SUCCESS);
-          report.appendChangeReport(changeReport);
-        }
-        return report;
-      }
-    }).times(2); // twice: once for create, another for update
-
-    replay(mockManager);
-
+  public void testCreateUpdateEquipment() {
     ConfigurationReport report = configurationLoader.applyConfiguration(13);
 
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
@@ -182,8 +157,7 @@ public class EquipmentConfigTest extends ConfigurationCacheLoaderTest<Equipment>
    * @throws ParserConfigurationException
    */
   @Test
-  public void testRemoveEquipement() throws ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException,
-    NoSuchFieldException, NoSimpleValueParseException {
+  public void testRemoveEquipement() {
     // check as expected
     Equipment equipment = equipmentCache.get(150L);
     assertNotNull(equipment);
@@ -191,22 +165,6 @@ public class EquipmentConfigTest extends ConfigurationCacheLoaderTest<Equipment>
     assertTrue(aliveTimerCache.containsKey(equipment.getAliveTagId()));
     assertTrue(commFaultTagCache.containsKey(equipment.getCommFaultTagId()));
 
-    expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andAnswer(new IAnswer<ConfigurationChangeEventReport>() {
-
-      @Override
-      public ConfigurationChangeEventReport answer() throws Throwable {
-        List<Change> changeList = (List<Change>) EasyMock.getCurrentArguments()[1];
-        ConfigurationChangeEventReport report = new ConfigurationChangeEventReport();
-        for (Change change : changeList) {
-          ChangeReport changeReport = new ChangeReport(change);
-          changeReport.setState(ChangeReport.CHANGE_STATE.SUCCESS);
-          report.appendChangeReport(changeReport);
-        }
-        return report;
-      }
-    });
-
-    replay(mockManager);
     // remove equipment
     // remove completes successfully; both Equipment and ControlTags are removed
     ConfigurationReport report = configurationLoader.applyConfiguration(15);
@@ -236,27 +194,7 @@ public class EquipmentConfigTest extends ConfigurationCacheLoaderTest<Equipment>
    * @throws ParserConfigurationException
    */
   @Test
-  public void testRemoveEquipmentDependentObjects() throws ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException,
-    NoSuchFieldException, NoSimpleValueParseException {
-
-    // expect equipment remove message to DAQ
-    expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andAnswer(new IAnswer<ConfigurationChangeEventReport>() {
-
-      @Override
-      public ConfigurationChangeEventReport answer() throws Throwable {
-        List<Change> changeList = (List<Change>) EasyMock.getCurrentArguments()[1];
-        ConfigurationChangeEventReport report = new ConfigurationChangeEventReport();
-        for (Change change : changeList) {
-          ChangeReport changeReport = new ChangeReport(change);
-          changeReport.setState(ChangeReport.CHANGE_STATE.SUCCESS);
-          report.appendChangeReport(changeReport);
-        }
-        return report;
-      }
-    });
-
-    replay(mockManager);
-
+  public void testRemoveEquipmentDependentObjects() {
     ConfigurationReport report = configurationLoader.applyConfiguration(29);
     verify(mockManager);
     // check equipment, tag, rules and alarms are gone
