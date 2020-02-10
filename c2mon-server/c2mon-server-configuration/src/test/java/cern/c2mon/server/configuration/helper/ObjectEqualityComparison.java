@@ -24,8 +24,6 @@ import cern.c2mon.server.common.device.DeviceCacheObject;
 import cern.c2mon.server.common.equipment.AbstractEquipmentCacheObject;
 import cern.c2mon.server.common.equipment.EquipmentCacheObject;
 import cern.c2mon.server.common.process.ProcessCacheObject;
-import cern.c2mon.server.common.rule.RuleTagCacheObject;
-import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
 import cern.c2mon.server.common.tag.AbstractTagCacheObject;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.test.device.ObjectComparison;
@@ -104,22 +102,11 @@ public class ObjectEqualityComparison {
     assertEquals(expectedObject.getHardwareAddress().toConfigXML(), object.getHardwareAddress().toConfigXML());
   }
 
-  public static void assertRuleTagConfigEquals(RuleTagCacheObject expectedObject, RuleTagCacheObject cacheObject) {
-    assertTagConfigEquals(expectedObject, cacheObject);
-    assertEquals(expectedObject.getRuleText(), cacheObject.getRuleText());
-  }
-
   public static void assertEquipmentEquals(EquipmentCacheObject expectedObject, EquipmentCacheObject actualObject) {
     assertAbstractEquipmentEquals(expectedObject, actualObject);
     assertEquals(expectedObject.getProcessId(), actualObject.getProcessId());
     assertEquals(expectedObject.getAddress(), actualObject.getAddress());
     assertEquals(expectedObject.getCommandTagIds(), actualObject.getCommandTagIds());
-    assertEquals(expectedObject.getSubEquipmentIds(), actualObject.getSubEquipmentIds());
-  }
-
-  public static void assertSubEquipmentEquals(SubEquipmentCacheObject expectedObject, SubEquipmentCacheObject actualObject) {
-    assertAbstractEquipmentEquals(expectedObject, actualObject);
-    assertEquals(expectedObject.getParentId(), actualObject.getParentId());
   }
 
   public static void assertAbstractEquipmentEquals(AbstractEquipmentCacheObject expectedObject, AbstractEquipmentCacheObject actualObject) {

@@ -26,14 +26,12 @@ import cern.c2mon.server.common.alive.AliveTag;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.common.equipment.EquipmentCacheObject;
 import cern.c2mon.server.common.metadata.Metadata;
-import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
 import cern.c2mon.server.configuration.ConfigurationCacheTest;
 import cern.c2mon.server.configuration.ConfigurationLoader;
 import cern.c2mon.server.configuration.helper.ObjectEqualityComparison;
 import cern.c2mon.server.configuration.junit.ConfigLoaderRuleChain;
 import cern.c2mon.server.configuration.parser.util.ConfigurationDataTagUtil;
 import cern.c2mon.server.configuration.parser.util.ConfigurationEquipmentUtil;
-import cern.c2mon.server.configuration.parser.util.ConfigurationSubEquipmentUtil;
 import cern.c2mon.server.configuration.util.CacheObjectFactory;
 import cern.c2mon.server.configuration.util.TestConfigurationProvider;
 import cern.c2mon.server.daq.out.ProcessCommunicationManager;
@@ -41,7 +39,6 @@ import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.api.Configuration;
 import cern.c2mon.shared.client.configuration.api.equipment.Equipment;
-import cern.c2mon.shared.client.configuration.api.equipment.SubEquipment;
 import cern.c2mon.shared.client.configuration.api.tag.CommFaultTag;
 import cern.c2mon.shared.client.configuration.api.tag.DataTag;
 import cern.c2mon.shared.client.configuration.api.tag.StatusTag;
@@ -466,169 +463,6 @@ public class EverythingEverConfigurationTest extends ConfigurationCacheTest {
     assertNull(equipmentMapper.getItem(15L));
     assertFalse(commFaultTagCache.containsKey(201L));
     assertFalse(aliveTimerCache.containsKey(202L));
-
-    verify(communicationManager);
-  }
-
-  @Test
-  public void createSubEquipment() throws IllegalAccessException, TransformerException, InstantiationException, NoSimpleValueParseException, ParserConfigurationException, NoSuchFieldException {
-    // called once when updating the equipment;
-    // mock returns a list with the correct number of SUCCESS ChangeReports
-    expect(communicationManager.sendConfiguration(eq(5L), isA(List.class))).andAnswer(new IAnswer<ConfigurationChangeEventReport>() {
-
-      @Override
-      public ConfigurationChangeEventReport answer() throws Throwable {
-        List<Change> changeList = (List<Change>) EasyMock.getCurrentArguments()[1];
-        ConfigurationChangeEventReport report = new ConfigurationChangeEventReport();
-        for (Change change : changeList) {
-          ChangeReport changeReport = new ChangeReport(change);
-          changeReport.setState(ChangeReport.CHANGE_STATE.SUCCESS);
-          report.appendChangeReport(changeReport);
-        }
-        return report;
-      }
-    });
-    replay(communicationManager);
-
-    // SETUP:
-    Configuration createProcess = TestConfigurationProvider.createProcess();
-    configurationLoader.applyConfiguration(createProcess);
-    Configuration createEquipment = TestConfigurationProvider.createEquipment();
-    configurationLoader.applyConfiguration(createEquipment);
-    processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
-
-    // TEST:Build configuration to add the test equipment
-    Properties expectedProperties = new Properties();
-    SubEquipment subEquipment = ConfigurationSubEquipmentUtil.buildCreateAllFieldsSubEquipment(20L, expectedProperties);
-    subEquipment.setEquipmentId(15L);
-    expectedProperties.setProperty("stateTagId", "300000");
-    expectedProperties.setProperty("commFaultTagId", "300001");
-    expectedProperties.setProperty("aliveTagId", "300002");
-
-    Configuration configuration = new Configuration();
-    configuration.addEntity(subEquipment);
-
-    //apply the configuration to the server
-    ConfigurationReport report = configurationLoader.applyConfiguration(configuration);
-
-    // check report result
-    assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
-    assertEquals(ConfigConstants.Status.OK, report.getStatus());
-    assertTrue(report.getElementReports().size() == 4);
-
-    // check Equipment in the cache
-    SubEquipmentCacheObject cacheObject = (SubEquipmentCacheObject) subEquipmentCache.get(20L);
-    SubEquipmentCacheObject expectedObject = cacheObjectFactory.buildSubEquipmentCacheObject(20L, subEquipment);
-
-    ObjectEqualityComparison.assertSubEquipmentEquals(expectedObject, cacheObject);
-
-    // Check if all caches are updated
-    cern.c2mon.server.common.equipment.Equipment equip = equipmentCache.get(expectedObject.getParentId());
-    assertTrue(equip.getSubEquipmentIds().contains(expectedObject.getId()));
-    assertNotNull(commFaultTagCache.get(expectedObject.getCommFaultTagId()));
-    assertEquals(expectedObject.getId(), (long) commFaultTagCache.get(cacheObject.getCommFaultTagId()).getSupervisedId());
-    assertNotNull(subEquipmentMapper.getItem(20L));
-
-    verify(communicationManager);
-
-    // remove the process and equipments from the server
-    processService.stop(5L, System.currentTimeMillis());
-    Configuration remove = TestConfigurationProvider.deleteProcess();
-    report = configurationLoader.applyConfiguration(remove);
-    assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
-    assertTrue(report.getStatus() == ConfigConstants.Status.OK);
-
-    assertFalse(processCache.containsKey(5L));
-    assertNull(processMapper.getItem(5L));
-    assertFalse(aliveTimerCache.containsKey(101L));
-
-    // equipment stuff
-    assertFalse(equipmentCache.containsKey(15L));
-    assertNull(equipmentMapper.getItem(15L));
-    assertFalse(commFaultTagCache.containsKey(201L));
-    assertFalse(aliveTimerCache.containsKey(201L));
-
-    assertFalse(equipmentCache.containsKey(20L));
-    assertNull(subEquipmentMapper.getItem(20L));
-    assertFalse(commFaultTagCache.containsKey(300_001L));
-    assertFalse(aliveTimerCache.containsKey(300_002L));
-
-    verify(communicationManager);
-  }
-
-  @Test
-  public void updateSubEquipment() throws IllegalAccessException, TransformerException, InstantiationException, NoSimpleValueParseException, ParserConfigurationException, NoSuchFieldException {
-    // called once when updating the equipment;
-    // mock returns a list with the correct number of SUCCESS ChangeReports
-    expect(communicationManager.sendConfiguration(eq(5L), isA(List.class))).andAnswer(new IAnswer<ConfigurationChangeEventReport>() {
-
-      @Override
-      public ConfigurationChangeEventReport answer() throws Throwable {
-        List<Change> changeList = (List<Change>) EasyMock.getCurrentArguments()[1];
-        ConfigurationChangeEventReport report = new ConfigurationChangeEventReport();
-        for (Change change : changeList) {
-          ChangeReport changeReport = new ChangeReport(change);
-          changeReport.setState(ChangeReport.CHANGE_STATE.SUCCESS);
-          report.appendChangeReport(changeReport);
-        }
-        return report;
-      }
-    });
-    replay(communicationManager);
-
-    // SETUP:
-    Configuration createProcess = TestConfigurationProvider.createProcess();
-    configurationLoader.applyConfiguration(createProcess);
-    Configuration createEquipment = TestConfigurationProvider.createEquipment();
-    configurationLoader.applyConfiguration(createEquipment);
-    Configuration createSubEquipment = TestConfigurationProvider.createSubEquipment();
-    configurationLoader.applyConfiguration(createSubEquipment);
-    processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
-
-    // TEST:
-    // Build configuration to add the test equipment
-    SubEquipment subEquipment = ConfigurationSubEquipmentUtil.buildUpdateSubEquipmentWithAllFields(25L, null);
-    Configuration configuration = new Configuration();
-    configuration.addEntity(subEquipment);
-
-    //apply the configuration to the server
-    ConfigurationReport report = configurationLoader.applyConfiguration(configuration);
-
-    // check report result
-    assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
-    assertEquals(ConfigConstants.Status.OK, report.getStatus());
-    assertTrue(report.getProcessesToReboot().isEmpty());
-    assertTrue(report.getElementReports().size() == 1);
-
-    // get cacheObject from the cache and compare to the an expected cacheObject
-    SubEquipmentCacheObject cacheObjectEquipment = (SubEquipmentCacheObject) subEquipmentCache.get(25L);
-    SubEquipmentCacheObject expectedCacheObjectEquipment = cacheObjectFactory.buildSubEquipmentUpdateCacheObject(cacheObjectEquipment, subEquipment);
-
-    ObjectEqualityComparison.assertSubEquipmentEquals(expectedCacheObjectEquipment, cacheObjectEquipment);
-
-    verify(communicationManager);
-
-    // remove the process and equipments from the server
-    processService.stop(5L, System.currentTimeMillis());
-    Configuration remove = TestConfigurationProvider.deleteProcess();
-    report = configurationLoader.applyConfiguration(remove);
-    assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
-    assertTrue(report.getStatus() == ConfigConstants.Status.OK);
-
-    assertFalse(processCache.containsKey(5L));
-    assertNull(processMapper.getItem(5L));
-    assertFalse(aliveTimerCache.containsKey(101L));
-
-    // equipment stuff
-    assertFalse(equipmentCache.containsKey(15L));
-    assertNull(equipmentMapper.getItem(15L));
-    assertFalse(commFaultTagCache.containsKey(201L));
-    assertFalse(aliveTimerCache.containsKey(201L));
-
-    assertFalse(equipmentCache.containsKey(25L));
-    assertNull(subEquipmentMapper.getItem(25L));
-    assertFalse(commFaultTagCache.containsKey(301L));
-    assertFalse(aliveTimerCache.containsKey(302L));
 
     verify(communicationManager);
   }

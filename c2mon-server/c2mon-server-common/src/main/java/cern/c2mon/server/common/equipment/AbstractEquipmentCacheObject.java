@@ -29,7 +29,7 @@ import lombok.ToString;
  */
 @Getter
 @Setter
-@ToString
+@ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public abstract class AbstractEquipmentCacheObject extends AbstractSupervisedCacheObject implements AbstractEquipment {
 

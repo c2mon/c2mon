@@ -7,7 +7,6 @@ import cern.c2mon.cache.actions.subequipment.SubEquipmentService;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.cache.api.exception.TooManyQueryResultsException;
 import cern.c2mon.server.common.config.ServerProperties;
-import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.process.ProcessCacheObject;
 import cern.c2mon.shared.common.supervision.SupervisionEntity;
@@ -337,13 +336,11 @@ public class ProcessEvents extends SupervisionEventHandler<Process> {
    * @param message      stop message
    */
   private void stopEquipments(final Collection<Long> equipmentIds, long timestamp, final String message) {
-    Equipment currentEquipmentCopy;
     for (Long equipmentId : equipmentIds) {
       try {
         try {
-          currentEquipmentCopy = equipmentService.getCache().get(equipmentId);
           equipmentService.stop(equipmentId, timestamp);
-          for (Long subId : currentEquipmentCopy.getSubEquipmentIds()) {
+          for (Long subId : subEquipmentService.getSubEquipmentIdsFor(equipmentId)) {
             try {
               subEquipmentService.stop(subId, timestamp);
             } catch (CacheElementNotFoundException ex) {

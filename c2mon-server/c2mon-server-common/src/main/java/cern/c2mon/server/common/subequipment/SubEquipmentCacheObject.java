@@ -35,7 +35,7 @@ import lombok.ToString;
  */
 @Getter
 @Setter
-@ToString
+@ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class SubEquipmentCacheObject extends AbstractEquipmentCacheObject implements SubEquipment {
 

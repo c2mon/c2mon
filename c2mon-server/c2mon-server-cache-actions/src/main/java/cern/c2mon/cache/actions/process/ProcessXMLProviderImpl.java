@@ -52,25 +52,22 @@ public class ProcessXMLProviderImpl implements ProcessXMLProvider {
    * Required facade, cache and DAO beans.
    */
   private C2monCache<Equipment> equipmentCache;
-  private C2monCache<SubEquipment> subEquipmentCache;
+  private SubEquipmentService subEquipmentService;
   private C2monCache<Process> processCache;
   private SubEquipmentDAO subEquipmentDAO;
-  private SubEquipmentService subEquipmentService;
   private DataTagService dataTagService;
   private C2monCache<AliveTag> aliveTimerCache;
   private CommandTagService commandTagService;
   private AliveTagService aliveTimerService;
 
-  public ProcessXMLProviderImpl(C2monCache<Equipment> equipmentCache, C2monCache<SubEquipment> subEquipmentCache,
+  public ProcessXMLProviderImpl(C2monCache<Equipment> equipmentCache, SubEquipmentService subEquipmentService,
                                 C2monCache<Process> processCache, SubEquipmentDAO subEquipmentDAO,
-                                SubEquipmentService subEquipmentService, DataTagService dataTagService,
-                                C2monCache<AliveTag> aliveTimerCache, CommandTagService commandTagService,
-                                AliveTagService aliveTimerService) {
+                                DataTagService dataTagService, C2monCache<AliveTag> aliveTimerCache,
+                                CommandTagService commandTagService, AliveTagService aliveTimerService) {
     this.equipmentCache = equipmentCache;
-    this.subEquipmentCache = subEquipmentCache;
+    this.subEquipmentService = subEquipmentService;
     this.processCache = processCache;
     this.subEquipmentDAO = subEquipmentDAO;
-    this.subEquipmentService = subEquipmentService;
     this.dataTagService = dataTagService;
     this.aliveTimerCache = aliveTimerCache;
     this.commandTagService = commandTagService;
@@ -305,7 +302,7 @@ public class ProcessXMLProviderImpl implements ProcessXMLProvider {
     // Note that the SubEquipment tags live inside the parent Equipment block
     // and not the SubEquipment block. This is to avoid modification of the DAQ
     // layer when supporting tags attached to SubEquipments.
-    for (Long subEquipmentId : equipment.getSubEquipmentIds()) {
+    for (Long subEquipmentId : subEquipmentService.getSubEquipmentIdsFor(equipment.getId())) {
       dataTags.addAll(dataTagService.getDataTagIdsBySubEquipmentId(subEquipmentId));
     }
 
@@ -336,8 +333,8 @@ public class ProcessXMLProviderImpl implements ProcessXMLProvider {
     str.append(appendAliveTagDaqXmlConfiguration(equipment.getAliveTagId()));
 
     // add sub-equipment alive tags to XML if they have a hardware address
-    for (Long subEquipmentId : equipment.getSubEquipmentIds()) {
-      str.append(appendAliveTagDaqXmlConfiguration(subEquipmentCache.get(subEquipmentId).getAliveTagId()));
+    for (Long subEquipmentId : subEquipmentService.getSubEquipmentIdsFor(equipment.getId())) {
+      str.append(appendAliveTagDaqXmlConfiguration(subEquipmentService.getCache().get(subEquipmentId).getAliveTagId()));
     }
 
     //Return the resulting XML structure

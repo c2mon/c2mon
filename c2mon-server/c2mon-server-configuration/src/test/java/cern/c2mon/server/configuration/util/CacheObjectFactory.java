@@ -23,12 +23,10 @@ import cern.c2mon.server.common.equipment.EquipmentCacheObject;
 import cern.c2mon.server.common.metadata.Metadata;
 import cern.c2mon.server.common.process.ProcessCacheObject;
 import cern.c2mon.server.common.rule.RuleTagCacheObject;
-import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
 import cern.c2mon.shared.client.alarm.condition.AlarmCondition;
 import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
 import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
 import cern.c2mon.shared.client.configuration.api.equipment.Equipment;
-import cern.c2mon.shared.client.configuration.api.equipment.SubEquipment;
 import cern.c2mon.shared.client.configuration.api.process.Process;
 import cern.c2mon.shared.client.configuration.api.tag.CommandTag;
 import cern.c2mon.shared.client.configuration.api.tag.DataTag;
@@ -124,46 +122,6 @@ public class CacheObjectFactory {
     }
     if (configObject.getProcessId() != null) {
       cacheObject.setProcessId(configObject.getProcessId());
-    }
-    if (configObject.getDescription() != null) {
-      cacheObject.setDescription(configObject.getDescription());
-    }
-    return cacheObject;
-  }
-
-  public SubEquipmentCacheObject buildSubEquipmentCacheObject(Long id, SubEquipment configEquipment) {
-    SubEquipmentCacheObject expectedObject = new SubEquipmentCacheObject(id);
-    expectedObject = setCacheSubEquipmentCacheObjectFields(expectedObject, configEquipment);
-
-    return expectedObject;
-  }
-
-  public SubEquipmentCacheObject buildSubEquipmentUpdateCacheObject(SubEquipmentCacheObject originalObject, SubEquipment configObject) {
-    SubEquipmentCacheObject result = originalObject.clone();
-    setCacheSubEquipmentCacheObjectFields(result, configObject);
-
-    return result;
-  }
-
-  private SubEquipmentCacheObject setCacheSubEquipmentCacheObjectFields(SubEquipmentCacheObject cacheObject, SubEquipment configObject) {
-
-    if (configObject.getName() != null) {
-      cacheObject.setName(configObject.getName());
-    }
-    if (configObject.getAliveInterval() != null) {
-      cacheObject.setAliveInterval(configObject.getAliveInterval());
-    }
-    if (configObject.getAliveTag() != null) {
-      cacheObject.setAliveTagId(configObject.getAliveTag().getId());
-    }
-    if (configObject.getStatusTag() != null) {
-      cacheObject.setStateTagId(configObject.getStatusTag().getId());
-    }
-    if (configObject.getCommFaultTag() != null) {
-      cacheObject.setCommFaultTagId(configObject.getCommFaultTag().getId());
-    }
-    if (configObject.getEquipmentId() != null) {
-      cacheObject.setParentId(configObject.getEquipmentId());
     }
     if (configObject.getDescription() != null) {
       cacheObject.setDescription(configObject.getDescription());

@@ -156,7 +156,6 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
       report = configApplier.applyList(configId, configName, configElements, configProgressMonitor, true);
 
     } catch (Exception ex) {
-      ex.printStackTrace();
       log.error("Exception caught while applying configuration " + configId, ex);
         report = new ConfigurationReport(configId, "UNKNOWN", "", Status.FAILURE,
             "Exception caught when applying configuration with id <" + configId + ">.");

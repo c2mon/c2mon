@@ -146,7 +146,6 @@ public class EquipmentMapperTest extends AbstractMapperTest {
     List<Long> subEquipmentIds = new LinkedList<Long>();
     subEquipmentIds.add(subEquipmentCacheObject.getId());
 //    subEquipmentIds.add(subEquipmentCacheObject2.getId());
-    assertEquals(subEquipmentIds, retrievedObject.getSubEquipmentIds());
     assertTrue(retrievedObject.getCommandTagIds().contains(commandTag.getId())); //check it contains the commandtag
 
     //assertEquals(dataTagCacheObject.getId(), retrievedObject.getDataTagIds().iterator().next()); //TODO just one in array so far
@@ -155,7 +154,7 @@ public class EquipmentMapperTest extends AbstractMapperTest {
   @Test
   public void getByName() {
     Long retrievedId = equipmentMapper.getIdByName("E_TESTHANDLER_TESTHANDLER03");
-    assertTrue(retrievedId == 150L);
+    assertEquals(150L, (long) retrievedId);
   }
 
   @Test

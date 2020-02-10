@@ -101,10 +101,10 @@ public class EquipmentConfigHandler extends AbstractEquipmentConfigHandler<Equip
     //WARNING: outside equipment lock, as all these use methods that access a Process (to create ProcessChange object)!
     removeEquipmentDataTags(equipment, report);
     removeEquipmentCommands(equipment, report);
-    removeSubEquipments(new ArrayList<>(equipment.getSubEquipmentIds()), report);
 
 //    TODO (Alex)
 //     removeControlTags();
+//     remove subequipments
   }
 
   @Override

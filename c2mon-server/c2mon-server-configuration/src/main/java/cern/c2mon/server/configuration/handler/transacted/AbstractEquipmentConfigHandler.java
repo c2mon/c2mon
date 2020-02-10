@@ -97,8 +97,7 @@ public abstract class AbstractEquipmentConfigHandler<T extends AbstractEquipment
     if (equipmentUpdate.getAliveTagId() != null) {
       ProcessChange processChange = aliveTagConfigEventHandler
         .getCreateEvent(equipmentUpdate.getChangeId(), cacheable.getAliveTagId(), cacheable.getId(), processId);
-      // null if this alive does not have an Address -> is not in list of
-      // DataTags on DAQ
+      // null if this alive does not have an Address -> is not in list of DataTags on DAQ
       if (processChange != null) {
         ConfigurationElementReport subReport = new ConfigurationElementReport(Action.CREATE, Entity.ALIVETAG, equipmentUpdate.getAliveTagId());
         processChange.setNestedSubReport(subReport);

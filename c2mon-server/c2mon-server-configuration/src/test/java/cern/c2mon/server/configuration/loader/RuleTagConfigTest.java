@@ -1,6 +1,5 @@
 package cern.c2mon.server.configuration.loader;
 
-import cern.c2mon.cache.actions.process.ProcessService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.dbaccess.DataTagMapper;
 import cern.c2mon.server.cache.dbaccess.RuleTagMapper;
@@ -8,7 +7,6 @@ import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.rule.RuleTagCacheObject;
-import cern.c2mon.server.configuration.ConfigurationLoader;
 import cern.c2mon.server.configuration.parser.util.ConfigurationRuleTagUtil;
 import cern.c2mon.server.configuration.util.TestConfigurationProvider;
 import cern.c2mon.server.rule.RuleTagService;
@@ -21,7 +19,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.inject.Inject;
-import java.sql.Timestamp;
 import java.util.Collections;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -42,9 +39,6 @@ public class RuleTagConfigTest extends ConfigurationCacheLoaderTest<RuleTag> {
 
   @Inject
   private DataTagMapper dataTagMapper;
-  
-  @Inject
-  private ProcessService processService;
 
   @Inject
   private RuleTagService ruleTagService;
@@ -54,11 +48,6 @@ public class RuleTagConfigTest extends ConfigurationCacheLoaderTest<RuleTag> {
    */
   @Test
   public void create()  {
-    // the mocked ProcessCommmunicationManager will be called once when creating
-    // the datatag to base the rule on
-//    expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
-//    replay(mockManager);
-
     // insert datatag to base rule on
     configurationLoader.applyConfiguration(1);
     ConfigurationReport report = configurationLoader.applyConfiguration(10);
@@ -69,8 +58,7 @@ public class RuleTagConfigTest extends ConfigurationCacheLoaderTest<RuleTag> {
 
   @Test
   public void createFromDb() {
-    // SETUP:
-    setUp(configurationLoader, processService);
+    setUp();
 
     // TEST:Build configuration to add the test RuleTag
     cern.c2mon.shared.client.configuration.api.tag.RuleTag ruleTag = ConfigurationRuleTagUtil.buildCreateAllFieldsRuleTag(1500L, null);
@@ -162,8 +150,7 @@ public class RuleTagConfigTest extends ConfigurationCacheLoaderTest<RuleTag> {
 
   @Test
   public void updateRuleTag() throws InterruptedException {
-    // SETUP:
-    setUp(configurationLoader, processService);
+    setUp();
     configurationLoader.applyConfiguration(TestConfigurationProvider.createRuleTag());
     ruleTagService.init();
 
@@ -205,7 +192,7 @@ public class RuleTagConfigTest extends ConfigurationCacheLoaderTest<RuleTag> {
 
   @Test
   public void deleteDataTagDoesNotDeleteRule() {
-    setUp(configurationLoader, processService);
+    setUp();
     configurationLoader.applyConfiguration(TestConfigurationProvider.createRuleTag());
 
     // TEST:
@@ -244,18 +231,6 @@ public class RuleTagConfigTest extends ConfigurationCacheLoaderTest<RuleTag> {
     expectedObject.setEquipmentIds(setOf(150L));
     expectedObject.setProcessIds(setOf(50L));
     return expectedObject;
-  }
-
-  private static void setUp(ConfigurationLoader configurationLoader, ProcessService processService) {
-    Configuration createProcess = TestConfigurationProvider.createProcess();
-    configurationLoader.applyConfiguration(createProcess);
-    Configuration createEquipment = TestConfigurationProvider.createEquipment();
-    configurationLoader.applyConfiguration(createEquipment);
-    Configuration createSubEquipment = TestConfigurationProvider.createSubEquipment();
-    configurationLoader.applyConfiguration(createSubEquipment);
-    Configuration createDataTag = TestConfigurationProvider.createEquipmentDataTag(15L);
-    configurationLoader.applyConfiguration(createDataTag);
-    processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
   }
 
   private RuleTagCacheObject afterUpdateObject() {

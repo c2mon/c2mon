@@ -23,12 +23,7 @@
     <resultMap id="equipmentResultMap" type="cern.c2mon.server.common.equipment.EquipmentCacheObject" extends="abstractEquipmentResultMap">
       <result property="address" column="equipment_address"/>
       <result property="processId" column="equipment_procid"/>
-      <collection property="subEquipmentIds" ofType="Long" javaType="java.util.LinkedList" resultMap="subEquipmentIdsResultMap"/>
       <collection property="commandTagIds" ofType="Long" javaType="java.util.LinkedList" resultMap="commandTagIdsResultMap"/>
-    </resultMap>
-
-    <resultMap id="subEquipmentIdsResultMap" type="Long">
-      <id column="subequipment_id" jdbcType="NUMERIC" javaType="java.lang.Long"/>
     </resultMap>
 
     <resultMap id="commandTagIdsResultMap" type="Long">

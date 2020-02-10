@@ -57,7 +57,8 @@ public abstract class AbstractEquipmentCacheObjectFactory<T extends AbstractEqui
       abstractEquipmentCacheObject.setCommFaultTagId(commFaultTagId);
       configurationUpdate.setCommfaultTagId(commFaultTagId);
     }).getLong("statusTagId").ifPresent(abstractEquipmentCacheObject::setStateTagId)
-      .getLong("stateTagId").ifPresent(abstractEquipmentCacheObject::setStateTagId); // One of the two will be set
+      // One of the two will be set
+      .getLong("stateTagId").ifPresent(abstractEquipmentCacheObject::setStateTagId);
 
     return configurationUpdate;
   }

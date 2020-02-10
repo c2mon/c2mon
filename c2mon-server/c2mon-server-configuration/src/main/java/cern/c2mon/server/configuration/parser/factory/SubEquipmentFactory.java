@@ -67,14 +67,15 @@ class SubEquipmentFactory extends EntityFactory<SubEquipment> {
     List<ConfigurationElement> configurationElements = new ArrayList<>();
 
     Long equipmentId = subEquipment.getEquipmentId() != null
-        ? subEquipment.getEquipmentId() : equipmentDAO.getIdByName(subEquipment.getParentEquipmentName());
+        ? subEquipment.getEquipmentId()
+      : equipmentDAO.getIdByName(subEquipment.getParentEquipmentName());
     subEquipment.setEquipmentId(equipmentId);
 
     // check information about the parent id
     if (equipmentCache.containsKey(equipmentId)) {
 
       ConfigurationElement createSubEquipment = doCreateInstance(subEquipment);
-      subEquipment = setDefaultControlTags(subEquipment);
+      setDefaultControlTags(subEquipment);
 
       configurationElements.addAll(commFaultTagFactory.createInstance(subEquipment.getCommFaultTag()));
       configurationElements.addAll(stateTagFactory.createInstance(subEquipment.getStatusTag()));

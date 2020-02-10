@@ -60,8 +60,7 @@ public class SubEquipmentService extends BaseEquipmentServiceImpl<SubEquipment> 
   }
 
   @Override
-  public void removeSubEquipmentFromEquipment(Long equipmentId, Long subEquipmentId) {
-    equipmentService.removeSubequipmentFromEquipment(subEquipmentId, equipmentId);
+  public void removeSubEquipmentFromEquipment(Long subEquipmentId) {
     cache.remove(subEquipmentId);
   }
 
@@ -70,8 +69,8 @@ public class SubEquipmentService extends BaseEquipmentServiceImpl<SubEquipment> 
     return equipmentService.getProcessId(cache.get(abstractEquipmentId).getParentId());
   }
 
-  public List<Long> getSubEquipmentIdsFor(long supervisedId) {
-    return cache.query(subEq -> subEq.getParentId() == supervisedId)
+  public List<Long> getSubEquipmentIdsFor(long equipmentId) {
+    return cache.query(subEq -> subEq.getParentId() == equipmentId)
       .stream()
       .map(Cacheable::getId)
       .collect(Collectors.toList());

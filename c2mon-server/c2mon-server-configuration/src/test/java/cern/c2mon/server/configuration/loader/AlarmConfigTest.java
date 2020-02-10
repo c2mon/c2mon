@@ -1,6 +1,5 @@
 package cern.c2mon.server.configuration.loader;
 
-import cern.c2mon.cache.actions.process.ProcessService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.dbaccess.AlarmMapper;
 import cern.c2mon.server.cache.dbaccess.DataTagMapper;
@@ -25,7 +24,6 @@ import org.junit.Test;
 import javax.inject.Inject;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
-import java.sql.Timestamp;
 import java.util.List;
 
 import static org.easymock.EasyMock.*;
@@ -50,9 +48,6 @@ public class AlarmConfigTest extends ConfigurationCacheLoaderTest<Alarm> {
 
   @Inject
   private DataTagMapper dataTagMapper;
-
-  @Inject
-  private ProcessService processService;
 
   /**
    * Test the creation, update and removal of alarm.
@@ -254,17 +249,5 @@ public class AlarmConfigTest extends ConfigurationCacheLoaderTest<Alarm> {
     assertNull(alarmMapper.getItem(350000L));
     assertFalse(ruleTagCache.containsKey(60000L));
     assertNull(ruleTagMapper.getItem(60000L));
-  }
-
-  private void setUp() {
-    Configuration createProcess = TestConfigurationProvider.createProcess();
-    configurationLoader.applyConfiguration(createProcess);
-    Configuration createEquipment = TestConfigurationProvider.createEquipment();
-    configurationLoader.applyConfiguration(createEquipment);
-    Configuration createSubEquipment = TestConfigurationProvider.createSubEquipment();
-    configurationLoader.applyConfiguration(createSubEquipment);
-    Configuration createDataTag = TestConfigurationProvider.createEquipmentDataTag(15L);
-    configurationLoader.applyConfiguration(createDataTag);
-    processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
   }
 }

@@ -50,7 +50,6 @@ public class SubEquipmentCacheObjectFactory extends AbstractEquipmentCacheObject
       .getLong("equipmentId").ifPresent(subEquipmentCacheObject::setParentId);
     // TODO: Remove obsolete parent_equip_id property
 
-
     // Not catching the CacheElNotFound here, if the parent is missing that's pretty bad
     EquipmentCacheObject parentEquipment = (EquipmentCacheObject) equipmentCache.get(subEquipment.getParentId());
     subEquipmentCacheObject.setHandlerClassName(parentEquipment.getHandlerClassName());
@@ -65,7 +64,6 @@ public class SubEquipmentCacheObjectFactory extends AbstractEquipmentCacheObject
    * @return empty EquipmentConfigurationUpdate because SubEquipments are not used
    * on the DAQ layer and no event is sent (return type necessary as in
    * common interface).
-   * @throws IllegalAccessException
    */
   @Override
   public EquipmentConfigurationUpdate updateConfig(final SubEquipment subEquipment,

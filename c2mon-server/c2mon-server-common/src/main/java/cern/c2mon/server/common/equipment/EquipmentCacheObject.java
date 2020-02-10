@@ -51,12 +51,6 @@ public class EquipmentCacheObject extends AbstractEquipmentCacheObject implement
     private final SupervisionEntity supervisionEntity = SupervisionEntity.EQUIPMENT;
 
     /**
-     * Collection of the subequipments of this equipment. LinkedList since never access elements in the middle, and no
-     * resizing is done on adding.
-     */
-    private LinkedList<Long> subEquipmentIds = new LinkedList<>();
-
-    /**
      * Ids of all command tag attached to this equipment.
      */
     private LinkedList<Long> commandTagIds = new LinkedList<>();
@@ -72,7 +66,6 @@ public class EquipmentCacheObject extends AbstractEquipmentCacheObject implement
     public EquipmentCacheObject clone() {
         EquipmentCacheObject equipmentCacheObject = (EquipmentCacheObject) super.clone();
         equipmentCacheObject.commandTagIds = (LinkedList<Long>) this.commandTagIds.clone();
-        equipmentCacheObject.subEquipmentIds = (LinkedList<Long>) this.subEquipmentIds.clone();
 
         return equipmentCacheObject;
     }
