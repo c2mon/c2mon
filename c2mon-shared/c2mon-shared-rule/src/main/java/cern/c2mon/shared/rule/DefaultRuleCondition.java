@@ -134,8 +134,7 @@ class DefaultRuleCondition extends RuleExpression implements IRuleCondition, Clo
         }
 
         if (result == null) {
-            throw new RuleEvaluationException(new StringBuffer("Error evaluating condition: ").append(
-                    this.condition.getExpression()).toString());
+            throw new RuleEvaluationException("Error evaluating condition: " + condition.getExpression());
         }
        
         return calculateReturnValue(result);

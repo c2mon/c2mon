@@ -56,8 +56,6 @@ public abstract class AbstractEquipmentCacheObject extends AbstractSupervisedCac
      */
     private static final Boolean COMM_FAULT_TAG_VALUE = Boolean.FALSE;
 
-
-
     /**
      * Constructor setting the minimal set of fields that can be expected to be non-null for all (sub-)equipment cache
      * objects circulating in the server. Is used to construct fake cache objects.

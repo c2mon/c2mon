@@ -112,8 +112,8 @@ public class RuleEvaluatorImpl implements RuleEvaluator {
 
   /**
    * Performs the rule evaluation for a given tag id. In case that
-   * the id does not belong to a rule a warning message is logged to
-   * log4j. Please note, that the rule will always use the time stamp
+   * the id does not belong to a rule a warning message is logged.
+   * Please note, that the rule will always use the time stamp
    * of the latest incoming data tag update.
    * @param pRuleId The id of a rule.
    */
@@ -126,51 +126,56 @@ public class RuleEvaluatorImpl implements RuleEvaluator {
     try {
       ruleTagCache.compute(pRuleId, rule -> {
         if (rule.getRuleExpression() != null) {
-          final Collection<Long> ruleInputTagIds = rule.getRuleExpression().getInputTagIds();
-
-          // Retrieve all input tags for the rule
-          final Map<Long, Object> tags = new HashMap<>(ruleInputTagIds.size());
-
-          Tag tag = null;
-          Long actualTag = null;
-          try {
-            for (Long inputTagId : ruleInputTagIds) {
-              actualTag = inputTagId;
-              // We don't use a read lock here, because a tag change would anyway
-              // result in another rule evaluation
-              // look for tag in datatag, rule and control caches
-              tag = unifiedTagCacheFacade.get(inputTagId);
-
-              // put reference to cache object in map
-              tags.put(inputTagId, tag);
-            }
-
-            // Retrieve class type of resulting value, in order to cast correctly
-            // the evaluation result
-            Class<?> ruleResultClass = getType(rule.getDataType());
-
-            Object value = rule.getRuleExpression().evaluate(tags, ruleResultClass);
-            ruleUpdateBuffer.update(pRuleId, value, "Rule result", ruleResultTimestamp);
-          } catch (CacheElementNotFoundException cacheEx) {
-            log.warn("evaluateRule #{} - Failed to locate tag with id {} in any tag cache (during rule evaluation) - unable to evaluate rule.", pRuleId, actualTag, cacheEx);
-            ruleUpdateBuffer.invalidate(pRuleId, TagQualityStatus.UNKNOWN_REASON,
-              "Unable to evaluate rule as cannot find required Tag in cache: " + cacheEx.getMessage(), ruleResultTimestamp);
-          } catch (RuleEvaluationException re) {
-            // TODO change in rule engine: this should NOT be done using an
-            // exception since it is normal behavior switched to trace
-            log.trace("Problem evaluating expresion for rule #{} - invalidating rule with quality UNKNOWN_REASON ({})", pRuleId, re.getMessage());
-            // switched from INACCESSIBLE in old code
-            ruleUpdateBuffer.invalidate(pRuleId, TagQualityStatus.UNKNOWN_REASON, re.getMessage(), ruleResultTimestamp);
-          } catch (Exception e) {
-            log.error("Unexpected Error evaluating expresion of rule #{} - invalidating rule with quality UNKNOWN_REASON", pRuleId, e);
-            // switched from INACCESSIBLE in old code
-            ruleUpdateBuffer.invalidate(pRuleId, TagQualityStatus.UNKNOWN_REASON, e.getMessage(), ruleResultTimestamp);
-          }
-        }});
+          evaluateRuleExpression(pRuleId, ruleResultTimestamp, rule);
+        }
+      });
     } catch (CacheElementNotFoundException cacheEx) {
       log.error("Rule #{} not found in cache - unable to evaluate it.", pRuleId, cacheEx);
     } catch (Exception e) {
       log.error("Unexpected Error caught while retrieving #{} from rule cache.", pRuleId, e);
+      // switched from INACCESSIBLE in old code
+      ruleUpdateBuffer.invalidate(pRuleId, TagQualityStatus.UNKNOWN_REASON, e.getMessage(), ruleResultTimestamp);
+    }
+  }
+
+  private void evaluateRuleExpression(Long pRuleId, Timestamp ruleResultTimestamp, RuleTag rule) {
+    final Collection<Long> ruleInputTagIds = rule.getRuleExpression().getInputTagIds();
+
+    // Retrieve all input tags for the rule
+    final Map<Long, Object> tags = new HashMap<>(ruleInputTagIds.size());
+
+    Tag tag = null;
+    Long actualTag = null;
+    try {
+      for (Long inputTagId : ruleInputTagIds) {
+        actualTag = inputTagId;
+        // We don't use a read lock here, because a tag change would anyway
+        // result in another rule evaluation
+        // look for tag in datatag, rule and control caches
+        tag = unifiedTagCacheFacade.get(inputTagId);
+
+        // put reference to cache object in map
+        tags.put(inputTagId, tag);
+      }
+
+      // Retrieve class type of resulting value, in order to cast correctly
+      // the evaluation result
+      Class<?> ruleResultClass = getType(rule.getDataType());
+
+      Object value = rule.getRuleExpression().evaluate(tags, ruleResultClass);
+      ruleUpdateBuffer.update(pRuleId, value, "Rule result", ruleResultTimestamp);
+    } catch (CacheElementNotFoundException cacheEx) {
+      log.warn("evaluateRule #{} - Failed to locate tag with id {} in any tag cache (during rule evaluation) - unable to evaluate rule.", pRuleId, actualTag, cacheEx);
+      ruleUpdateBuffer.invalidate(pRuleId, TagQualityStatus.UNKNOWN_REASON,
+        "Unable to evaluate rule as cannot find required Tag in cache: " + cacheEx.getMessage(), ruleResultTimestamp);
+    } catch (RuleEvaluationException re) {
+      // TODO change in rule engine: this should NOT be done using an
+      // exception since it is normal behavior switched to trace
+      log.trace("Problem evaluating expresion for rule #{} - invalidating rule with quality UNKNOWN_REASON ({})", pRuleId, re.getMessage());
+      // switched from INACCESSIBLE in old code
+      ruleUpdateBuffer.invalidate(pRuleId, TagQualityStatus.UNKNOWN_REASON, re.getMessage(), ruleResultTimestamp);
+    } catch (Exception e) {
+      log.error("Unexpected Error evaluating expresion of rule #{} - invalidating rule with quality UNKNOWN_REASON", pRuleId, e);
       // switched from INACCESSIBLE in old code
       ruleUpdateBuffer.invalidate(pRuleId, TagQualityStatus.UNKNOWN_REASON, e.getMessage(), ruleResultTimestamp);
     }

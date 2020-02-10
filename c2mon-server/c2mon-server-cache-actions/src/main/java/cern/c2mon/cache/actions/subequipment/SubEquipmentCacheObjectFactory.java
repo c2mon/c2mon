@@ -1,6 +1,9 @@
 package cern.c2mon.cache.actions.subequipment;
 
 import cern.c2mon.cache.actions.equipment.AbstractEquipmentCacheObjectFactory;
+import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.server.common.equipment.Equipment;
+import cern.c2mon.server.common.equipment.EquipmentCacheObject;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
 import cern.c2mon.shared.common.ConfigurationException;
@@ -8,19 +11,51 @@ import cern.c2mon.shared.common.PropertiesAccessor;
 import cern.c2mon.shared.common.validation.MicroValidator;
 import cern.c2mon.shared.daq.config.Change;
 import cern.c2mon.shared.daq.config.EquipmentConfigurationUpdate;
-import org.springframework.stereotype.Component;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.Properties;
 
 /**
  * @author Szymon Halastra, Alexandros Papageorgiou
  */
-@Component
+@Named
 public class SubEquipmentCacheObjectFactory extends AbstractEquipmentCacheObjectFactory<SubEquipment> {
+
+  private C2monCache<Equipment> equipmentCache;
+
+  @Inject
+  public SubEquipmentCacheObjectFactory(C2monCache<Equipment> equipmentCache) {
+    this.equipmentCache = equipmentCache;
+  }
 
   @Override
   public SubEquipment createCacheObject(Long id) {
     return new SubEquipmentCacheObject(id);
+  }
+
+  /**
+   * Sets the fields particular for SubEquipment from the properties object.
+   *
+   * @param subEquipment sets the fields in this object
+   * @param properties   looks for relevant properties in this object
+   */
+  @Override
+  public Change configureCacheObject(SubEquipment subEquipment, Properties properties) {
+    SubEquipmentCacheObject subEquipmentCacheObject = (SubEquipmentCacheObject) subEquipment;
+    EquipmentConfigurationUpdate update = setCommonProperties(subEquipment, properties);
+
+    new PropertiesAccessor(properties)
+      .getLong("parent_equip_id").ifPresent(subEquipmentCacheObject::setParentId)
+      .getLong("equipmentId").ifPresent(subEquipmentCacheObject::setParentId);
+    // TODO: Remove obsolete parent_equip_id property
+
+
+    // Not catching the CacheElNotFound here, if the parent is missing that's pretty bad
+    EquipmentCacheObject parentEquipment = (EquipmentCacheObject) equipmentCache.get(subEquipment.getParentId());
+    subEquipmentCacheObject.setHandlerClassName(parentEquipment.getHandlerClassName());
+
+    return update;
   }
 
   /**
@@ -47,6 +82,7 @@ public class SubEquipmentCacheObjectFactory extends AbstractEquipmentCacheObject
     }
 
     super.updateConfig(subEquipment, properties);
+
     return new EquipmentConfigurationUpdate();
   }
 
@@ -63,24 +99,5 @@ public class SubEquipmentCacheObjectFactory extends AbstractEquipmentCacheObject
     super.validateConfig(subEquipmentCacheObject);
     new MicroValidator<>(subEquipment)
       .notNull(SubEquipment::getParentId, "parentId");
-  }
-
-  /**
-   * Sets the fields particular for SubEquipment from the properties object.
-   *
-   * @param subEquipment sets the fields in this object
-   * @param properties   looks for relevant properties in this object
-   */
-  @Override
-  public Change configureCacheObject(SubEquipment subEquipment, Properties properties) {
-    SubEquipmentCacheObject subEquipmentCacheObject = (SubEquipmentCacheObject) subEquipment;
-    EquipmentConfigurationUpdate update = setCommonProperties(subEquipment, properties);
-
-    new PropertiesAccessor(properties)
-      .getLong("parent_equip_id").ifPresent(subEquipmentCacheObject::setParentId)
-      .getLong("equipmentId").ifPresent(subEquipmentCacheObject::setParentId);
-    // TODO: Remove obsolete parent_equip_id property
-
-    return update;
   }
 }

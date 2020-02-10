@@ -71,7 +71,7 @@ public class EquipmentConfigHandler extends AbstractEquipmentConfigHandler<Equip
 
   @Override
   protected List<ProcessChange> createReturnValue(Equipment equipment, ConfigurationElement element) {
-    List<ProcessChange> result = super.create(element);
+    List<ProcessChange> result = super.createReturnValue(equipment, element);
 
     equipmentService.addEquipmentToProcess(equipment.getId(), equipment.getProcessId());
 

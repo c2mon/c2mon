@@ -145,7 +145,7 @@ public class CacheCollection<T extends Cacheable> {
       }
     }
 
-    throw new CacheElementNotFoundException();
+    throw new CacheElementNotFoundException(id + " not found in caches");
   }
 
 }

@@ -5,32 +5,27 @@ import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.dbaccess.DataTagMapper;
 import cern.c2mon.server.cache.dbaccess.RuleTagMapper;
 import cern.c2mon.server.common.datatag.DataTag;
+import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.rule.RuleTagCacheObject;
 import cern.c2mon.server.configuration.ConfigurationLoader;
-import cern.c2mon.server.configuration.helper.ObjectEqualityComparison;
 import cern.c2mon.server.configuration.parser.util.ConfigurationRuleTagUtil;
 import cern.c2mon.server.configuration.util.TestConfigurationProvider;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.api.Configuration;
 import cern.c2mon.shared.common.CacheEvent;
-import cern.c2mon.shared.common.NoSimpleValueParseException;
 import cern.c2mon.shared.common.datatag.DataTagConstants;
-import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
-import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.inject.Inject;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 import java.sql.Timestamp;
 import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import static cern.c2mon.server.common.util.Java9Collections.setOf;
-import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 public class RuleTagConfigTest extends ConfigurationCacheLoaderTest<RuleTag> {
@@ -86,18 +81,18 @@ public class RuleTagConfigTest extends ConfigurationCacheLoaderTest<RuleTag> {
     assertEquals(ConfigConstants.Status.OK, report.getStatus());
     assertEquals(1, report.getElementReports().size());
 
-    // get cacheObject from the cache and compare it with the expected cacheObject
-    RuleTagCacheObject cacheObjectRule = (RuleTagCacheObject) ruleTagCache.get(1500L);
-    cacheObjectRule.setDataTagQuality(new DataTagQualityImpl());
-    RuleTagCacheObject expectedCacheObjectRule = cacheObjectFactory.buildRuleTagCacheObject(1500L, ruleTag);
-
-    ObjectEqualityComparison.assertRuleTagConfigEquals(expectedCacheObjectRule, cacheObjectRule);
+    assertEquals(cacheObjectFactory.buildRuleTagCacheObject(1500L, ruleTag), ruleTagCache.get(1500L));
     // Check if all caches are updated
     assertNotNull(ruleTagMapper.getItem(1500L));
   }
 
   @Test
   public void update() throws InterruptedException {
+    configurationLoader.applyConfiguration(1);
+    dataTagCache.computeQuiet(5000000L, dataTag -> {
+      ((DataTagCacheObject) dataTag).setValue(15.0f);
+      dataTag.getDataTagQuality().validate();
+    });
     RuleTagCacheObject expectedObject = expectedObject();
     expectedObject.setJapcAddress("newTestConfigJAPCaddress");
     expectedObject.setRuleText("(2 > 1)[1],true[0]");
@@ -105,13 +100,16 @@ public class RuleTagConfigTest extends ConfigurationCacheLoaderTest<RuleTag> {
     expectedObject.setEquipmentIds(Collections.emptySet());
     expectedObject.getDataTagQuality().validate();
 
-    ConfigurationReport report = configurationLoader.applyConfiguration(11);
+    final CountDownLatch latch = new CountDownLatch(1);
+    ruleTagCache.getCacheListenerManager().registerListener(__ -> latch.countDown(), CacheEvent.UPDATE_ACCEPTED);
+
+    configurationLoader.applyConfiguration(10);
+    configurationLoader.applyConfiguration(11);
 
     // sleep is to allow for rule evaluation on separate thread
-    Thread.sleep(1000);
+    latch.await(1, TimeUnit.SECONDS);
 
-    RuleTagCacheObject updatedCacheObject = (RuleTagCacheObject) ruleTagCache.get(50100L);
-    ObjectEqualityComparison.assertRuleTagConfigEquals(expectedObject, updatedCacheObject);
+    assertEquals("Object should be evaluated/validated", expectedObject, ruleTagCache.get(50100L));
   }
 
   @Test
@@ -122,18 +120,20 @@ public class RuleTagConfigTest extends ConfigurationCacheLoaderTest<RuleTag> {
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     assertFalse(ruleTagCache.containsKey(60007L));
     assertNull(ruleTagMapper.getItem(60007L));
+  }
 
+  @Test
+  @Ignore("This behaviour was changed with the cache refactoring of 2020")
+  public void removingRuleDeletesDependentRules() {
+    configurationLoader.applyConfiguration(12);
     // dependent rules removed, e.g.
     assertFalse(ruleTagCache.containsKey(60009L));
     assertNull(ruleTagMapper.getItem(60009L));
   }
 
-  /**
-   * Tests a dependent rule is removed when a tag is.
-   */
   @Test
-  public void testRuleRemovedOnTagRemoval() throws ParserConfigurationException, IllegalAccessException, InstantiationException, TransformerException,
-    NoSuchFieldException, NoSimpleValueParseException {
+  @Ignore("This behaviour was changed with the cache refactoring of 2020 to no longer delete dependent rules")
+  public void removingTagDeletesDependentRules() {
     Long tagId = 200001L;
     Long ruleId1 = 60000L; // two of the rules that should be removed
     Long ruleId2 = 59999L;
@@ -144,11 +144,6 @@ public class RuleTagConfigTest extends ConfigurationCacheLoaderTest<RuleTag> {
     assertTrue(dataTagCache.containsKey(tagId));
     assertNotNull(dataTagMapper.getItem(tagId));
 
-    // for tag removal
-    expect(mockManager.sendConfiguration(eq(50L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
-
-    replay(mockManager);
-
     // test removal of tag 20004L removes the rule also
     configurationLoader.applyConfiguration(7);
 
@@ -158,24 +153,22 @@ public class RuleTagConfigTest extends ConfigurationCacheLoaderTest<RuleTag> {
     assertNull(ruleTagMapper.getItem(ruleId2));
     assertFalse(dataTagCache.containsKey(tagId));
     assertNull(dataTagMapper.getItem(tagId));
-
-    verify(mockManager);
   }
 
   @Test
-  public void updateRuleTag() throws InterruptedException, IllegalAccessException, TransformerException, InstantiationException, NoSimpleValueParseException, ParserConfigurationException, NoSuchFieldException {
-    replay(mockManager);
+  public void updateRuleTag() throws InterruptedException {
     // SETUP:
     setUp(configurationLoader, processService);
-    Configuration createRuleTag = TestConfigurationProvider.createRuleTag();
-    configurationLoader.applyConfiguration(createRuleTag);
+    configurationLoader.applyConfiguration(TestConfigurationProvider.createRuleTag());
 
     final CountDownLatch latch = new CountDownLatch(1);
-    ruleTagCache.getCacheListenerManager().registerListener(cacheable -> latch.countDown(), CacheEvent.UPDATE_ACCEPTED);
+    ruleTagCache.getCacheListenerManager().registerListener(__ -> latch.countDown(), CacheEvent.UPDATE_ACCEPTED);
 
     // TEST:
     // Build configuration to add the test RuleTagUpdate
-    cern.c2mon.shared.client.configuration.api.tag.RuleTag ruleTagUpdate = cern.c2mon.shared.client.configuration.api.tag.RuleTag.update(1500L).ruleText("(2 > 1)[1],true[0]").description("new description").build();
+    cern.c2mon.shared.client.configuration.api.tag.RuleTag ruleTagUpdate =
+      cern.c2mon.shared.client.configuration.api.tag.RuleTag
+        .update(1500L).ruleText("(2 > 1)[1],true[0]").description("new description").build();
     Configuration configuration = new Configuration();
     configuration.addEntity(ruleTagUpdate);
 
@@ -193,22 +186,16 @@ public class RuleTagConfigTest extends ConfigurationCacheLoaderTest<RuleTag> {
     expectedCacheObjectRule.setProcessIds(Collections.emptySet());
     expectedCacheObjectRule.setEquipmentIds(Collections.emptySet());
     expectedCacheObjectRule.getDataTagQuality().validate();
-    latch.await();
 
-    ObjectEqualityComparison.assertRuleTagConfigEquals(expectedCacheObjectRule, (RuleTagCacheObject) ruleTagCache.get(1500L));
+    latch.await(1, TimeUnit.SECONDS);
 
-    verify(mockManager);
+    assertEquals(expectedCacheObjectRule, ruleTagCache.get(1500L));
   }
 
   @Test
-  public void deleteRuleWithDeleteDataTag() throws IllegalAccessException, TransformerException, InstantiationException, NoSimpleValueParseException, ParserConfigurationException, NoSuchFieldException {
-    // called once when updating the equipment;
-    // mock returns a list with the correct number of SUCCESS ChangeReports
-    expect(mockManager.sendConfiguration(eq(5L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
-    replay(mockManager);
+  public void deleteRuleWithDeleteDataTag() {
     setUp(configurationLoader, processService);
-    Configuration createRuleTag = TestConfigurationProvider.createRuleTag();
-    configurationLoader.applyConfiguration(createRuleTag);
+    configurationLoader.applyConfiguration(TestConfigurationProvider.createRuleTag());
 
     // TEST:
     // check if the DataTag and rules are in the cache
@@ -231,8 +218,6 @@ public class RuleTagConfigTest extends ConfigurationCacheLoaderTest<RuleTag> {
     assertNull(ruleTagMapper.getItem(1500L));
     assertFalse(dataTagCache.containsKey(1000L));
     assertNull(dataTagMapper.getItem(1000L));
-
-    verify(mockManager);
   }
 
   private static RuleTagCacheObject expectedObject() {

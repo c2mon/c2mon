@@ -22,6 +22,7 @@ import cern.c2mon.server.cache.loading.RuleTagLoaderDAO;
 import cern.c2mon.server.common.listener.ConfigurationEventListener;
 import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.configuration.impl.ProcessChange;
+import cern.c2mon.server.rule.RuleEvaluator;
 import cern.c2mon.server.rule.RuleTagService;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
@@ -50,6 +51,7 @@ import java.util.stream.Collectors;
 public class RuleTagConfigHandler extends AbstractTagConfigHandler<RuleTag> {
 
   private final RuleTagService ruleTagService;
+  private final RuleEvaluator ruleEvaluator;
 
   @Inject
   public RuleTagConfigHandler(RuleTagService ruleTagService,
@@ -57,18 +59,20 @@ public class RuleTagConfigHandler extends AbstractTagConfigHandler<RuleTag> {
                               RuleTagLoaderDAO ruleTagLoaderDAO,
                               GenericApplicationContext context,
                               AlarmConfigHandler alarmConfigHandler,
-                              TagCacheCollection tagCacheCollection) {
+                              TagCacheCollection tagCacheCollection,
+                              RuleEvaluator ruleEvaluator) {
     super(ruleTagService.getCache(), ruleTagLoaderDAO, ruleTagCacheObjectFactory, tagCacheCollection, context, alarmConfigHandler);
     this.ruleTagService = ruleTagService;
+    this.ruleEvaluator = ruleEvaluator;
   }
 
   @Override
   protected void doPostCreate(RuleTag ruleTag) {
     for (Long tagId : ruleTag.getRuleInputTagIds()) {
-      tagCacheCollection.addDependentRuleToTag(tagId, ruleTag.getId());
-      // TODO (Alex) Evaluate rule (maybe just let it get eval'd on INSERTED?
-      // TODO (Alex) Infer PROC/EQ/SUBEQ ids from each tag
+      tagCacheCollection.addRuleToTag(tagId, ruleTag.getId());
     }
+    ruleEvaluator.evaluateRule(ruleTag.getId());
+
     super.doPostCreate(ruleTag);
   }
 
@@ -88,10 +92,10 @@ public class RuleTagConfigHandler extends AbstractTagConfigHandler<RuleTag> {
       Collection<Long> newTagIds = cache.get(id).getRuleInputTagIds();
 
       for (Long oldTagId : oldTagIds) {
-        tagCacheCollection.removeDependentRuleFromTag(oldTagId, id);
+        tagCacheCollection.removeRuleFromTag(oldTagId, id);
       }
       for (Long newTagId : newTagIds) {
-        tagCacheCollection.addDependentRuleToTag(newTagId, id);
+        tagCacheCollection.addRuleToTag(newTagId, id);
       }
     }
 
@@ -134,7 +138,7 @@ public class RuleTagConfigHandler extends AbstractTagConfigHandler<RuleTag> {
       .collect(Collectors.toSet());
 
     for (Long inputTagId : existingRuleInputTagIds) {
-      tagCacheCollection.removeDependentRuleFromTag(inputTagId, ruleTag.getId());
+      tagCacheCollection.removeRuleFromTag(inputTagId, ruleTag.getId());
     }
   }
 

@@ -81,7 +81,7 @@ public class TagCacheCollection extends CacheCollection<Tag> {
    * @param tagId     the id of the tag used in the rule (directly, not via another rule)
    * @param ruleTagId the id of the rule
    */
-  public void removeDependentRuleFromTag(long tagId, final Long ruleTagId) {
+  public void removeRuleFromTag(long tagId, final Long ruleTagId) {
     log.trace("Removing RuleTag {} reference from Tag {}",ruleTagId, tagId);
     doAcrossCaches(tagId, cache ->
       cache.compute(tagId, tag -> {
@@ -96,7 +96,7 @@ public class TagCacheCollection extends CacheCollection<Tag> {
    * <p>
    * Note also adjust text field of cache object.
    */
-  public void addDependentRuleToTag(final long tagId, final Long ruleTagId) {
+  public void addRuleToTag(final long tagId, final Long ruleTagId) {
     log.trace("Adding RuleTag {} reference to Tag {}",ruleTagId, tagId);
     doAcrossCaches(tagId, cache ->
       cache.compute(tagId, tag -> {

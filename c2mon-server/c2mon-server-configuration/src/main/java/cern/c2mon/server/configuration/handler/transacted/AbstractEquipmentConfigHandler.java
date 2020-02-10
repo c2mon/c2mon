@@ -33,7 +33,6 @@ import cern.c2mon.shared.daq.config.EquipmentConfigurationUpdate;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
@@ -110,7 +109,7 @@ public abstract class AbstractEquipmentConfigHandler<T extends AbstractEquipment
   }
 
   private List<ProcessChange> updateControlTagInformation(final ConfigurationElement element, T cacheable) {
-    return Collections.emptyList();
+    return new ArrayList<>();
   }
 
   protected abstract Long getProcessId(T cacheable);
