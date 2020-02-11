@@ -20,7 +20,6 @@ import org.junit.Test;
 import javax.inject.Inject;
 import java.sql.Timestamp;
 
-import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.*;
 
@@ -86,7 +85,6 @@ public class CommandTagConfigTest extends ConfigurationCacheLoaderTest<CommandTa
     assertNotNull(commandTagMapper.getItem(11000L));
 
     // rung test
-    replay(mockManager);
     ConfigurationReport report = configurationLoader.applyConfiguration(9);
 
     // check successful

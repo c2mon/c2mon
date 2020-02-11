@@ -33,6 +33,7 @@ import cern.c2mon.shared.daq.config.EquipmentConfigurationUpdate;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 
@@ -49,6 +50,7 @@ public abstract class AbstractEquipmentConfigHandler<T extends AbstractEquipment
   private final AliveTagConfigHandler aliveTagConfigEventHandler;
   protected final DataTagService dataTagService;
   protected final DataTagConfigHandler dataTagConfigHandler;
+  protected final ControlTagHandlerCollection controlTagHandlerCollection;
 
   public AbstractEquipmentConfigHandler(
     final C2monCache<T> subEquipmentCache,
@@ -57,12 +59,14 @@ public abstract class AbstractEquipmentConfigHandler<T extends AbstractEquipment
     final ProcessXMLProvider processXMLProvider,
     final AliveTagConfigHandler aliveTagConfigEventHandler,
     final DataTagService dataTagService,
-    final DataTagConfigHandler dataTagConfigHandler) {
+    final DataTagConfigHandler dataTagConfigHandler,
+    final ControlTagHandlerCollection controlTagHandlerCollection) {
     super(subEquipmentCache, subEquipmentDAO, subEquipmentCacheObjectFactory, ArrayList::new);
     this.processXMLProvider = processXMLProvider;
     this.aliveTagConfigEventHandler = aliveTagConfigEventHandler;
     this.dataTagService = dataTagService;
     this.dataTagConfigHandler = dataTagConfigHandler;
+    this.controlTagHandlerCollection = controlTagHandlerCollection;
   }
 
   @Override
@@ -113,13 +117,12 @@ public abstract class AbstractEquipmentConfigHandler<T extends AbstractEquipment
 
   protected abstract Long getProcessId(T cacheable);
 
-  @Override
-  protected List<ProcessChange> removeReturnValue(T cacheable, ConfigurationElementReport report) {
+  protected List<ProcessChange> cascadeRemoveDatatags(Collection<Long> dataTagIds, ConfigurationElementReport report) {
     List<ProcessChange> processChanges = new ArrayList<>();
 
     // TODO (Alex) Cascade delete through the control tags?
 
-    for (Long dataTagId : dataTagService.getDataTagIdsByEquipmentId(cacheable.getId())) {
+    for (Long dataTagId : dataTagIds) {
       ConfigurationElementReport tagReport = new ConfigurationElementReport(Action.REMOVE, Entity.DATATAG, dataTagId);
       report.addSubReport(tagReport);
 
@@ -134,5 +137,4 @@ public abstract class AbstractEquipmentConfigHandler<T extends AbstractEquipment
     }
     return processChanges;
   }
-
 }

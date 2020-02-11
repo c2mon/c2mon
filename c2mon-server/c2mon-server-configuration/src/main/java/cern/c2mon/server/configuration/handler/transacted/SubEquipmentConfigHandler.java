@@ -20,11 +20,12 @@ import cern.c2mon.cache.actions.datatag.DataTagService;
 import cern.c2mon.cache.actions.equipment.EquipmentService;
 import cern.c2mon.cache.actions.process.ProcessXMLProvider;
 import cern.c2mon.cache.actions.subequipment.SubEquipmentCacheObjectFactory;
-import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.actions.subequipment.SubEquipmentService;
 import cern.c2mon.server.cache.loading.SubEquipmentDAO;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
 import cern.c2mon.server.configuration.impl.ProcessChange;
+import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import cern.c2mon.shared.daq.config.SubEquipmentUnitAdd;
@@ -43,19 +44,22 @@ import java.util.Properties;
 @Slf4j
 public class SubEquipmentConfigHandler extends AbstractEquipmentConfigHandler<SubEquipment> {
 
+  private final SubEquipmentService subEquipmentService;
   private final EquipmentService equipmentService;
 
   @Inject
-  public SubEquipmentConfigHandler(final C2monCache<SubEquipment> subEquipmentCache,
+  public SubEquipmentConfigHandler(final SubEquipmentService subEquipmentService,
                                    final SubEquipmentDAO subEquipmentDAO,
                                    final SubEquipmentCacheObjectFactory subEquipmentCacheObjectFactory,
                                    final ProcessXMLProvider processXMLProvider,
                                    final AliveTagConfigHandler aliveTagConfigEventHandler,
                                    final DataTagService dataTagService,
                                    final DataTagConfigHandler dataTagConfigTransacted,
-                                   final EquipmentService equipmentService) {
-    super(subEquipmentCache, subEquipmentDAO, subEquipmentCacheObjectFactory,
-      processXMLProvider, aliveTagConfigEventHandler, dataTagService, dataTagConfigTransacted);
+                                   final EquipmentService equipmentService,
+                                   final ControlTagHandlerCollection controlTagHandlerCollection) {
+    super(subEquipmentService.getCache(), subEquipmentDAO, subEquipmentCacheObjectFactory,
+      processXMLProvider, aliveTagConfigEventHandler, dataTagService, dataTagConfigTransacted, controlTagHandlerCollection);
+    this.subEquipmentService = subEquipmentService;
     this.equipmentService = equipmentService;
   }
 
@@ -83,6 +87,16 @@ public class SubEquipmentConfigHandler extends AbstractEquipmentConfigHandler<Su
   }
 
   @Override
+  public List<ProcessChange> remove(Long id, ConfigurationElementReport report) {
+    SubEquipmentCacheObject subEquipmentCacheObject = (SubEquipmentCacheObject) cache.get(id);
+    List<ProcessChange> cascadeChanges = cascadeRemoveDatatags(dataTagService.getDataTagIdsBySubEquipmentId(id), report);
+    cascadeChanges.addAll(super.remove(id, report));
+    cascadeChanges.addAll(controlTagHandlerCollection.cascadeRemove(subEquipmentCacheObject, report));
+
+    return cascadeChanges;
+  }
+
+  @Override
   protected List<ProcessChange> removeReturnValue(SubEquipment subEquipment, ConfigurationElementReport report) {
     List<ProcessChange> processChanges = super.removeReturnValue(subEquipment, report);
 
@@ -93,6 +107,31 @@ public class SubEquipmentConfigHandler extends AbstractEquipmentConfigHandler<Su
     processChanges.add(new ProcessChange(processId, subEquipmentUnitRemove));
 
     return processChanges;
+  }
+
+  /**
+   * Removes the subequipments attached to this equipment.
+   * Exceptions are caught, added to the report and thrown
+   * up to interrupt the equipment removal.
+   *
+   * <p>Call within Equipment lock.
+   *
+   * @param equipmentId     the equipment id for which the subequipments should be removed
+   * @param equipmentReport the report at the equipment level
+   */
+  public void removeSubEquipmentsByEqId(long equipmentId, ConfigurationElementReport equipmentReport) {
+    for (Long subEquipmentId : subEquipmentService.getSubEquipmentIdsFor(equipmentId)) {
+      ConfigurationElementReport subEquipmentReport = new ConfigurationElementReport(ConfigConstants.Action.REMOVE, ConfigConstants.Entity.SUBEQUIPMENT, subEquipmentId);
+      equipmentReport.addSubReport(subEquipmentReport);
+      try {
+        remove(subEquipmentId, subEquipmentReport);
+      } catch (Exception ex) {
+        subEquipmentReport.setFailure("Exception caught - aborting removal of subequipment "
+          + subEquipmentId, ex);
+        throw new RuntimeException("Aborting reconfiguration as unable to remove subequipment.", ex);
+      }
+
+    }
   }
 
 }
