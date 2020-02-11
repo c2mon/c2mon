@@ -171,7 +171,7 @@ public class ProcessConfigTest extends ConfigurationCacheLoaderTest<Process> {
     expectedObject.setMaxMessageDelay(1000);
     expectedObject.setDescription("test description");
 
-    ObjectEqualityComparison.assertProcessEquals(expectedObject, cacheObject);
+    assertEquals(expectedObject, cacheObject);
 
     // update
     report = configurationLoader.applyConfiguration(17);
@@ -180,7 +180,7 @@ public class ProcessConfigTest extends ConfigurationCacheLoaderTest<Process> {
     expectedObject.setDescription("updated description");
     expectedObject.setMaxMessageDelay(4000);
 
-    ObjectEqualityComparison.assertProcessEquals(expectedObject, cacheObject);
+    assertEquals(expectedObject, cacheObject);
     assertTrue(report.getProcessesToReboot().contains(expectedObject.getName()));
   }
 

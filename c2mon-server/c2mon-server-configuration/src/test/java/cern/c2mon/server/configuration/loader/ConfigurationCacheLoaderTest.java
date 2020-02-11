@@ -44,10 +44,10 @@ public abstract class ConfigurationCacheLoaderTest<T extends Cacheable> extends 
 
   @Before
   public void beforeTest() {
+    ((ConfigurationLoaderImpl) configurationLoader).setDaqConfigEnabled(true);
     reset(mockManager);
     try {
       expect(mockManager.sendConfiguration(anyLong(), anyObject())).andReturn(new ConfigurationChangeEventReport()).anyTimes();
-      ((ConfigurationLoaderImpl) configurationLoader).setDaqConfigEnabled(false);
     } catch (Exception e) {
       log.info("Failed to set up mock interceptor for the DAQ config report");
     }
