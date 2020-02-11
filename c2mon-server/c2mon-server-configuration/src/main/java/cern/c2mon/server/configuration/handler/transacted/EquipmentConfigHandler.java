@@ -105,8 +105,9 @@ public class EquipmentConfigHandler extends AbstractEquipmentConfigHandler<Equip
     EquipmentCacheObject equipmentCacheObject = (EquipmentCacheObject) cache.get(id);
     List<ProcessChange> cascadeChanges = cascadeRemoveDatatags(dataTagService.getDataTagIdsByEquipmentId(equipmentCacheObject.getId()), report);
     removeEquipmentCommands(equipmentCacheObject, report);
-    cascadeChanges.addAll(super.remove(id, report));
     subEquipmentConfigTransacted.removeSubEquipmentsByEqId(id, report);
+    cascadeChanges.addAll(super.remove(id, report));
+    // The FKs for control tags go backwards (ControlTag -> Eq), so we need to remove them after the equipment
     cascadeChanges.addAll(controlTagHandlerCollection.cascadeRemove(equipmentCacheObject, report));
 
     return cascadeChanges;

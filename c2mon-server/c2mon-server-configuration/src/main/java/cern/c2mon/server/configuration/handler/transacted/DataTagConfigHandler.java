@@ -30,7 +30,9 @@ import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import cern.c2mon.shared.common.CacheEvent;
+import cern.c2mon.shared.common.datatag.SourceDataTag;
 import cern.c2mon.shared.daq.config.Change;
+import cern.c2mon.shared.daq.config.DataTagAdd;
 import cern.c2mon.shared.daq.config.DataTagRemove;
 import cern.c2mon.shared.daq.config.IChange;
 import lombok.extern.slf4j.Slf4j;
@@ -92,11 +94,10 @@ public class DataTagConfigHandler extends AbstractTagConfigHandler<DataTag> {
 
   @Override
   protected List<ProcessChange> createReturnValue(DataTag dataTag, ConfigurationElement element) {
-    return Collections.emptyList();
-//    return Collections.singletonList(createIChange(dataTag,
-//      () -> new DataTagAdd(element.getSequenceId(), dataTag.getEquipmentId(), dataTagService.generateSourceDataTag(dataTag)),
-//      () -> new DataTagAdd(element.getSequenceId(), subEquipmentService.getEquipmentIdForSubEquipment(dataTag.getSubEquipmentId()), dataTagService.generateSourceDataTag(dataTag)))
-//    );
+    return Collections.singletonList(createIChange(dataTag,
+      () -> new DataTagAdd(element.getSequenceId(), dataTag.getEquipmentId(), generateSourceDataTag(dataTag)),
+      () -> new DataTagAdd(element.getSequenceId(), subEquipmentService.getEquipmentIdForSubEquipment(dataTag.getSubEquipmentId()), generateSourceDataTag(dataTag)))
+    );
   }
 
   private ProcessChange createIChange(DataTag dataTag, Supplier<IChange> eqEventGenerator, Supplier<IChange> subeqEventGenerator) {
@@ -153,4 +154,21 @@ public class DataTagConfigHandler extends AbstractTagConfigHandler<DataTag> {
     return Collections.singletonList(createIChange(dataTag, DataTagRemove::new, DataTagRemove::new));
   }
 
+  /**
+   * Generates a {@link SourceDataTag} object from the given data tag
+   *
+   * @param dataTag The data tag which shall be converted
+   * @return The resulting source data tag
+   */
+  private SourceDataTag generateSourceDataTag(final DataTag dataTag) {
+    SourceDataTag sourceDataTag = new SourceDataTag(dataTag.getId(), dataTag.getName(), false);
+    sourceDataTag.setDataType(dataTag.getDataType());
+    sourceDataTag.setMode(dataTag.getMode());
+    sourceDataTag.setMinValue((Number) dataTag.getMinValue());
+    sourceDataTag.setMaxValue((Number) dataTag.getMaxValue());
+    if (dataTag.getAddress() != null) {
+      sourceDataTag.setAddress(dataTag.getAddress());
+    }
+    return sourceDataTag;
+  }
 }

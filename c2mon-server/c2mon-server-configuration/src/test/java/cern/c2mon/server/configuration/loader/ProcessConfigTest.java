@@ -11,6 +11,7 @@ import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.process.ProcessCacheObject;
 import cern.c2mon.server.common.rule.RuleTag;
+import cern.c2mon.server.common.supervision.SupervisionStateTag;
 import cern.c2mon.server.configuration.helper.ObjectEqualityComparison;
 import cern.c2mon.server.configuration.parser.util.ConfigurationProcessUtil;
 import cern.c2mon.server.configuration.util.TestConfigurationProvider;
@@ -23,6 +24,7 @@ import cern.c2mon.shared.client.tag.TagMode;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.inject.Inject;
 import java.sql.Timestamp;
 import java.util.Properties;
 import java.util.Set;
@@ -44,6 +46,9 @@ public class ProcessConfigTest extends ConfigurationCacheLoaderTest<Process> {
 
   @Autowired
   private C2monCache<CommFaultTag> commFaultTagCache;
+
+  @Inject
+  private C2monCache<SupervisionStateTag> stateTagCache;
 
   @Autowired
   private C2monCache<DataTag> dataTagCache;
@@ -268,12 +273,9 @@ public class ProcessConfigTest extends ConfigurationCacheLoaderTest<Process> {
     assertEquals(1, report.getElementReports().size());
 
     // check aliveTag in the cache
-    AliveTag cacheObjectAlive = (AliveTag) aliveTimerCache.get(101L);
+    AliveTag cacheObjectAlive = aliveTimerCache.get(101L);
     AliveTag expectedObjectAlive = new AliveTag(101L, 5L, "P_INI_TEST", "PROC", null, 100L, 60000);
-    ObjectEqualityComparison.assertAliveTimerValuesEquals(expectedObjectAlive, cacheObjectAlive);
-
-//    ControlTagCacheObject cacheObjectAliveControlCache = (ControlTagCacheObject) controlTagCache.get(101L);
-//    Assert.assertEquals(cacheObjectAliveControlCache.getDescription(), "new description");
+    assertEquals(expectedObjectAlive, cacheObjectAlive);
   }
 
   @Test
@@ -296,10 +298,8 @@ public class ProcessConfigTest extends ConfigurationCacheLoaderTest<Process> {
     assertEquals(ConfigConstants.Status.OK, report.getStatus());
     assertTrue(report.getProcessesToReboot().isEmpty());
     assertEquals(1, report.getElementReports().size());
-
-//    ControlTagCacheObject cacheObjectStatusControlCache = (ControlTagCacheObject) controlTagCache.get(100L);
-//    assertEquals(cacheObjectStatusControlCache.getDescription(), "new description");
-//    assertEquals(cacheObjectStatusControlCache.getMode(), TagMode.OPERATIONAL.ordinal());
+    SupervisionStateTag expectedStateTag = new SupervisionStateTag(100L, 5L, "PROC", 101L, null);
+    assertEquals(expectedStateTag, stateTagCache.get(100L));
   }
 
   @Test
@@ -325,10 +325,7 @@ public class ProcessConfigTest extends ConfigurationCacheLoaderTest<Process> {
     assertEquals(ConfigConstants.Status.OK, report.getStatus());
     assertTrue(report.getProcessesToReboot().isEmpty());
     assertEquals(1, report.getElementReports().size());
-
-    // check aliveTag in the cache
-//    ControlTagCacheObject cacheObjectStatusControlCache = (ControlTagCacheObject) controlTagCache.get(201L);
-//    assertEquals(cacheObjectStatusControlCache.getDescription(), "new description");
-//    assertEquals(cacheObjectStatusControlCache.getMode(), TagMode.OPERATIONAL.ordinal());
+    CommFaultTag expectedCommFault = new CommFaultTag(201L, 15L, "E_INI_TEST","EQ", 200L, null);
+    assertEquals(expectedCommFault, commFaultTagCache.get(201L));
   }
 }
