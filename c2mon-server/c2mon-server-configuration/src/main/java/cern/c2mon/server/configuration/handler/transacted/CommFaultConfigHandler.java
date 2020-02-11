@@ -4,15 +4,42 @@ import cern.c2mon.cache.actions.commfault.CommFaultService;
 import cern.c2mon.cache.actions.commfault.CommFaultTagCacheObjectFactory;
 import cern.c2mon.server.cache.loading.CommFaultTagDAO;
 import cern.c2mon.server.common.commfault.CommFaultTag;
+import cern.c2mon.server.configuration.impl.ProcessChange;
+import cern.c2mon.server.configuration.parser.factory.CommFaultTagFactory;
+import cern.c2mon.shared.client.configuration.ConfigConstants;
+import cern.c2mon.shared.client.configuration.ConfigurationElement;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Named;
+import java.util.ArrayList;
+import java.util.List;
 
 @Named
-public class CommFaultConfigHandler extends AbstractControlTagConfigHandler<CommFaultTag> {
+@Slf4j
+public class CommFaultConfigHandler extends AbstractControlTagConfigHandler<CommFaultTag, cern.c2mon.shared.client.configuration.api.tag.CommFaultTag> {
 
   protected CommFaultConfigHandler(CommFaultService commFaultService,
                                    CommFaultTagDAO commFaultTagDAO,
-                                   CommFaultTagCacheObjectFactory factory) {
-    super(commFaultService, commFaultTagDAO, factory);
+                                   CommFaultTagCacheObjectFactory factory,
+                                   CommFaultTagFactory commFaultTagFactory) {
+    super(commFaultService, commFaultTagDAO, factory, commFaultTagFactory);
+  }
+
+  @Override
+  public List<ProcessChange> createBySupervised(ConfigurationElement configurationElement) {
+
+    ConfigConstants.Entity entity = configurationElement.getEntity();
+    String name = configurationElement.getElementProperties().getProperty("name");
+
+    if (!(entity== ConfigConstants.Entity.EQUIPMENT || entity == ConfigConstants.Entity.SUBEQUIPMENT)) {
+      log.debug("Cannot create commFaultTag for object that isn't an Equipment: {} {} #{}",
+        entity, name, configurationElement.getEntityId());
+      return new ArrayList<>();
+    }
+
+    return super.createBySupervised(configurationElement,
+        () -> cern.c2mon.shared.client.configuration.api.tag.CommFaultTag.create(name + ":COMM_FAULT")
+          .description("Communication fault tag for " + entity + " " + name)
+          .build());
   }
 }

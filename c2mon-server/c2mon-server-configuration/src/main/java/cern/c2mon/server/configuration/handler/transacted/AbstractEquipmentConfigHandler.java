@@ -18,7 +18,7 @@ package cern.c2mon.server.configuration.handler.transacted;
 
 import cern.c2mon.cache.actions.datatag.DataTagService;
 import cern.c2mon.cache.actions.process.ProcessXMLProvider;
-import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.actions.supervision.AbstractSupervisedService;
 import cern.c2mon.cache.api.factory.AbstractCacheObjectFactory;
 import cern.c2mon.server.cache.loading.ConfigurableDAO;
 import cern.c2mon.server.common.equipment.AbstractEquipment;
@@ -27,7 +27,6 @@ import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
-import cern.c2mon.shared.common.CacheEvent;
 import cern.c2mon.shared.daq.config.Change;
 import cern.c2mon.shared.daq.config.EquipmentConfigurationUpdate;
 import lombok.extern.slf4j.Slf4j;
@@ -46,6 +45,7 @@ import java.util.Properties;
 @Slf4j
 public abstract class AbstractEquipmentConfigHandler<T extends AbstractEquipment> extends BaseConfigHandlerImpl<T> {
 
+  private final AbstractSupervisedService<T> abstractSupervisedService;
   protected final ProcessXMLProvider processXMLProvider;
   private final AliveTagConfigHandler aliveTagConfigEventHandler;
   protected final DataTagService dataTagService;
@@ -53,7 +53,7 @@ public abstract class AbstractEquipmentConfigHandler<T extends AbstractEquipment
   protected final ControlTagHandlerCollection controlTagHandlerCollection;
 
   public AbstractEquipmentConfigHandler(
-    final C2monCache<T> subEquipmentCache,
+    final AbstractSupervisedService<T> abstractSupervisedService,
     final ConfigurableDAO<T> subEquipmentDAO,
     final AbstractCacheObjectFactory<T> subEquipmentCacheObjectFactory,
     final ProcessXMLProvider processXMLProvider,
@@ -61,7 +61,8 @@ public abstract class AbstractEquipmentConfigHandler<T extends AbstractEquipment
     final DataTagService dataTagService,
     final DataTagConfigHandler dataTagConfigHandler,
     final ControlTagHandlerCollection controlTagHandlerCollection) {
-    super(subEquipmentCache, subEquipmentDAO, subEquipmentCacheObjectFactory, ArrayList::new);
+    super(abstractSupervisedService.getCache(), subEquipmentDAO, subEquipmentCacheObjectFactory, ArrayList::new);
+    this.abstractSupervisedService = abstractSupervisedService;
     this.processXMLProvider = processXMLProvider;
     this.aliveTagConfigEventHandler = aliveTagConfigEventHandler;
     this.dataTagService = dataTagService;
@@ -70,14 +71,15 @@ public abstract class AbstractEquipmentConfigHandler<T extends AbstractEquipment
   }
 
   @Override
-  protected List<ProcessChange> createReturnValue(T cacheable, ConfigurationElement element) {
-    return updateControlTagInformation(element, cacheable);
+  public List<ProcessChange> create(ConfigurationElement element) {
+    controlTagHandlerCollection.createIfMissing(element);
+    return super.create(element);
   }
 
   @Override
-  protected void doPostCreate(T cacheable) {
-    super.doPostCreate(cacheable);
-    cache.getCacheListenerManager().notifyListenersOf(CacheEvent.INSERTED, cacheable);
+  protected List<ProcessChange> createReturnValue(T cacheable, ConfigurationElement element) {
+    abstractSupervisedService.updateControlTagCacheIds(cacheable);
+    return super.createReturnValue(cacheable, element);
   }
 
   @Override
@@ -109,10 +111,6 @@ public abstract class AbstractEquipmentConfigHandler<T extends AbstractEquipment
       }
     }
     return processChanges;
-  }
-
-  private List<ProcessChange> updateControlTagInformation(final ConfigurationElement element, T cacheable) {
-    return new ArrayList<>();
   }
 
   protected abstract Long getProcessId(T cacheable);

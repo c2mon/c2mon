@@ -26,8 +26,6 @@ import cern.c2mon.server.configuration.parser.exception.ConfigurationParseExcept
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.api.equipment.SubEquipment;
-import cern.c2mon.shared.client.configuration.api.tag.CommFaultTag;
-import cern.c2mon.shared.client.configuration.api.tag.StatusTag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -44,22 +42,15 @@ class SubEquipmentFactory extends EntityFactory<SubEquipment> {
   private C2monCache<cern.c2mon.server.common.equipment.Equipment> equipmentCache;
   private EquipmentDAO equipmentDAO;
   private SequenceDAO sequenceDAO;
-  private final AliveTagFactory aliveTagFactory;
-  private final CommFaultTagFactory commFaultTagFactory;
-  private final SupervisionStateTagFactory stateTagFactory;
 
   @Autowired
   public SubEquipmentFactory(C2monCache<cern.c2mon.server.common.subequipment.SubEquipment> subEquipmentCache, SubEquipmentDAO subEquipmentDAO,
-                             SequenceDAO sequenceDAO, C2monCache<Equipment> equipmentCache, EquipmentDAO equipmentDAO,
-                             AliveTagFactory aliveTagFactory, CommFaultTagFactory commFaultTagFactory, SupervisionStateTagFactory stateTagFactory) {
+                             SequenceDAO sequenceDAO, C2monCache<Equipment> equipmentCache, EquipmentDAO equipmentDAO) {
     super(subEquipmentCache);
     this.subEquipmentDAO = subEquipmentDAO;
     this.sequenceDAO = sequenceDAO;
     this.equipmentCache = equipmentCache;
     this.equipmentDAO = equipmentDAO;
-    this.aliveTagFactory = aliveTagFactory;
-    this.commFaultTagFactory = commFaultTagFactory;
-    this.stateTagFactory = stateTagFactory;
   }
 
   @Override
@@ -75,15 +66,7 @@ class SubEquipmentFactory extends EntityFactory<SubEquipment> {
     if (equipmentCache.containsKey(equipmentId)) {
 
       ConfigurationElement createSubEquipment = doCreateInstance(subEquipment);
-      setDefaultControlTags(subEquipment);
 
-      configurationElements.addAll(commFaultTagFactory.createInstance(subEquipment.getCommFaultTag()));
-      configurationElements.addAll(stateTagFactory.createInstance(subEquipment.getStatusTag()));
-      configurationElements.addAll(aliveTagFactory.createInstance(subEquipment.getAliveTag()));
-
-      createSubEquipment.getElementProperties().setProperty("statusTagId", subEquipment.getStatusTag().getId().toString());
-      createSubEquipment.getElementProperties().setProperty("commFaultTagId", subEquipment.getCommFaultTag().getId().toString());
-      createSubEquipment.getElementProperties().setProperty("aliveTagId", subEquipment.getAliveTag().getId().toString());
 
       configurationElements.add(createSubEquipment);
 
@@ -92,44 +75,6 @@ class SubEquipmentFactory extends EntityFactory<SubEquipment> {
       throw new ConfigurationParseException("Error creating subequipment #" + subEquipment.getId() + ": " +
           "Specified parent equipment does not exist!");
     }
-  }
-
-  /**
-   * Checks if the Equipment has a defined {@link CommFaultTag} or {@link StatusTag}.
-   * If not a automatic Status tag will be created and attached to the equipment configuration.
-   *
-   * @param subEquipment The Equipment which contains the information of an create.
-   * @return The same equipment from the parameters attached with the status tag information.
-   */
-  protected static SubEquipment setDefaultControlTags(SubEquipment subEquipment) {
-
-    if (subEquipment.getCommFaultTag() == null) {
-
-      CommFaultTag commfaultTag = CommFaultTag.create(subEquipment.getName() + ":COMM_FAULT")
-          .description("Communication fault tag for sub equipment " + subEquipment.getName())
-          .build();
-      subEquipment.setCommFaultTag(commfaultTag);
-    }
-
-    if (subEquipment.getStatusTag() == null) {
-
-      StatusTag statusTag = StatusTag.create(subEquipment.getName() + ":STATUS")
-          .description("Status tag for sub equipment " + subEquipment.getName())
-          .build();
-      subEquipment.setStatusTag(statusTag);
-    }
-
-    subEquipment.getCommFaultTag().setSubEquipmentId(subEquipment.getId());
-    subEquipment.getStatusTag().setSubEquipmentId(subEquipment.getId());
-
-    if (subEquipment.getAliveTag() != null && subEquipment.getAliveTag().getAddress() != null) {
-      subEquipment.getAliveTag().setSubEquipmentId(subEquipment.getId());
-    } else {
-      throw new ConfigurationParseException("Error creating sub equipment #" + subEquipment.getId() + ": " +
-          "No alive tag address was specified!");
-    }
-
-    return subEquipment;
   }
 
   @Override

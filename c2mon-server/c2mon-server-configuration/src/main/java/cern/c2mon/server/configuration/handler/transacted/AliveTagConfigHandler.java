@@ -5,18 +5,25 @@ import cern.c2mon.cache.actions.alive.AliveTagService;
 import cern.c2mon.server.cache.loading.AliveTagDAO;
 import cern.c2mon.server.common.alive.AliveTag;
 import cern.c2mon.server.configuration.impl.ProcessChange;
+import cern.c2mon.server.configuration.parser.factory.AliveTagFactory;
+import cern.c2mon.shared.client.configuration.ConfigConstants;
+import cern.c2mon.shared.client.configuration.ConfigurationElement;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.util.List;
 
 @Named
-public class AliveTagConfigHandler extends AbstractControlTagConfigHandler<AliveTag> {
+@Slf4j
+public class AliveTagConfigHandler extends AbstractControlTagConfigHandler<AliveTag, cern.c2mon.shared.client.configuration.api.tag.AliveTag> {
 
   @Inject
   public AliveTagConfigHandler(AliveTagService aliveTagService,
                                AliveTagDAO dao,
-                               AliveTagCacheObjectFactory aliveTagFactory) {
-    super(aliveTagService, dao, aliveTagFactory);
+                               AliveTagCacheObjectFactory aliveTagCacheObjectFactory,
+                               AliveTagFactory aliveTagFactory) {
+    super(aliveTagService, dao, aliveTagCacheObjectFactory, aliveTagFactory);
   }
 
   @Override
@@ -24,6 +31,18 @@ public class AliveTagConfigHandler extends AbstractControlTagConfigHandler<Alive
     super.doPostCreate(aliveTag);
 
     ((AliveTagService) service).startOrUpdateTimestamp(aliveTag.getId(), System.currentTimeMillis());
+  }
+
+  @Override
+  public List<ProcessChange> createBySupervised(ConfigurationElement configurationElement) {
+    ConfigConstants.Entity entity = configurationElement.getEntity();
+    String name = configurationElement.getElementProperties().getProperty("name");
+
+    return super.createBySupervised(configurationElement,
+      () -> cern.c2mon.shared.client.configuration.api.tag.AliveTag.create(name + ":ALIVE")
+        .description("Alive tag for " + entity.toString() + " " + name)
+        .build()
+    );
   }
 
   /**
@@ -39,10 +58,10 @@ public class AliveTagConfigHandler extends AbstractControlTagConfigHandler<Alive
    * are referenced by some Equipment (and hence also belong to a given
    * DAQ!). Updates to ControlTags can be sent immediately
    *
-   * @param configId the id of the configuration
+   * @param configId     the id of the configuration
    * @param controlTagId the id of the ControlTag that needs creating on the DAQ layer
-   * @param equipmentId the id of the Equipment this control tag is attached to (compulsory)
-   * @param processId the id of the Process to reconfigure
+   * @param equipmentId  the id of the Equipment this control tag is attached to (compulsory)
+   * @param processId    the id of the Process to reconfigure
    * @return the change event including the process id
    */
   public ProcessChange getCreateEvent(final Long configId, final Long controlTagId, final Long equipmentId, final Long processId) {

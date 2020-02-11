@@ -25,6 +25,7 @@ import cern.c2mon.server.configuration.config.ConfigurationProperties;
 import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.server.daq.JmsContainerManager;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
+import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import cern.c2mon.shared.common.CacheEvent;
 import cern.c2mon.shared.daq.config.Change;
@@ -64,6 +65,12 @@ public class ProcessConfigHandler extends BaseConfigHandlerImpl<Process> {
     this.allowRunningProcessRemoval = properties.isAllowRunningProcessRemoval();
     this.jmsContainerManager = jmsContainerManager;
     this.equipmentConfigTransacted = equipmentConfigTransacted;
+  }
+
+  @Override
+  public List<ProcessChange> create(ConfigurationElement element) {
+    controlTagHandlerCollection.createIfMissing(element);
+    return super.create(element);
   }
 
   /**

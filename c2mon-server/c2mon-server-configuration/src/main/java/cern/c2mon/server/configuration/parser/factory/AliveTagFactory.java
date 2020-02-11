@@ -17,7 +17,7 @@ import java.util.List;
 import static cern.c2mon.cache.config.ClientQueryProvider.queryByClientInput;
 
 @Named
-class AliveTagFactory extends EntityFactory<AliveTag> {
+public class AliveTagFactory extends EntityFactory<AliveTag> {
 
   private final C2monCache<cern.c2mon.server.common.alive.AliveTag> cache;
   private SequenceDAO sequenceDAO;

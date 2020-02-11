@@ -66,7 +66,7 @@ public class EquipmentConfigHandler extends AbstractEquipmentConfigHandler<Equip
     final CommandTagConfigHandler commandTagConfigHandler,
     final SubEquipmentConfigHandler subEquipmentConfigTransacted,
     final ControlTagHandlerCollection controlTagHandlerCollection) {
-    super(equipmentService.getCache(), subEquipmentDAO, subEquipmentCacheObjectFactory, processXMLProvider,
+    super(equipmentService, subEquipmentDAO, subEquipmentCacheObjectFactory, processXMLProvider,
       aliveTagConfigEventHandler, dataTagService, dataTagConfigTransacted, controlTagHandlerCollection);
     this.equipmentService = equipmentService;
     this.commandTagConfigHandler = commandTagConfigHandler;

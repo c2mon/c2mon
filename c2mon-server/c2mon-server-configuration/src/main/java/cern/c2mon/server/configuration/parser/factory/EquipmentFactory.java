@@ -26,8 +26,6 @@ import cern.c2mon.server.configuration.parser.exception.ConfigurationParseExcept
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.api.equipment.Equipment;
-import cern.c2mon.shared.client.configuration.api.tag.CommFaultTag;
-import cern.c2mon.shared.client.configuration.api.tag.StatusTag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -42,24 +40,17 @@ class EquipmentFactory extends EntityFactory<Equipment> {
 
   private EquipmentDAO equipmentDAO;
   private SequenceDAO sequenceDAO;
-  private final AliveTagFactory aliveTagFactory;
-  private final CommFaultTagFactory commFaultTagFactory;
   private C2monCache<Process> processCache;
   private ProcessDAO processDAO;
-  private final SupervisionStateTagFactory stateTagFactory;
 
   @Autowired
   public EquipmentFactory(C2monCache<cern.c2mon.server.common.equipment.Equipment> equipmentCache, EquipmentDAO equipmentDAO, SequenceDAO sequenceDAO,
-                          AliveTagFactory aliveTagFactory, CommFaultTagFactory commFaultTagFactory,
-                          C2monCache<Process> processCache, ProcessDAO processDAO, SupervisionStateTagFactory stateTagFactory) {
+                          C2monCache<Process> processCache, ProcessDAO processDAO) {
     super(equipmentCache);
     this.equipmentDAO = equipmentDAO;
     this.sequenceDAO = sequenceDAO;
-    this.aliveTagFactory = aliveTagFactory;
-    this.commFaultTagFactory = commFaultTagFactory;
     this.processCache = processCache;
     this.processDAO = processDAO;
-    this.stateTagFactory = stateTagFactory;
   }
 
   @Override
@@ -74,19 +65,6 @@ class EquipmentFactory extends EntityFactory<Equipment> {
     if (processCache.containsKey(processId)) {
 
       ConfigurationElement createEquipment = doCreateInstance(equipment);
-      equipment = setDefaultControlTags(equipment);
-
-      configurationElements.addAll(commFaultTagFactory.createInstance(equipment.getCommFaultTag()));
-      configurationElements.addAll(stateTagFactory.createInstance(equipment.getStatusTag()));
-
-      if (equipment.getAliveTag() != null) {
-        configurationElements.addAll(aliveTagFactory.createInstance(equipment.getAliveTag()));
-        createEquipment.getElementProperties().setProperty("aliveTagId", equipment.getAliveTag().getId().toString());
-      }
-
-      createEquipment.getElementProperties().setProperty("statusTagId", equipment.getStatusTag().getId().toString());
-      createEquipment.getElementProperties().setProperty("commFaultTagId", equipment.getCommFaultTag().getId().toString());
-
 
       configurationElements.add(createEquipment);
 
@@ -95,41 +73,6 @@ class EquipmentFactory extends EntityFactory<Equipment> {
       throw new ConfigurationParseException("Error creating equipment #" + equipment.getId() + ": " +
           "Specified parent process does not exist!");
     }
-  }
-
-  /**
-   * Checks if the Equipment has a defined {@link CommFaultTag} or {@link StatusTag}.
-   * If not a automatic ControlTag tag will be created and attached to the equipment configuration.
-   *
-   * @param equipment The Equipment which contains the information of an create.
-   * @return The same equipment from the parameters attached with the controlTag tag information.
-   */
-  protected static Equipment setDefaultControlTags(Equipment equipment) {
-
-    if (equipment.getCommFaultTag() == null) {
-
-      CommFaultTag commfaultTag = CommFaultTag.create(equipment.getName() + ":COMM_FAULT")
-          .description("Communication fault tag for equipment " + equipment.getName())
-          .build();
-      equipment.setCommFaultTag(commfaultTag);
-    }
-
-    if (equipment.getStatusTag() == null) {
-
-      StatusTag statusTag = StatusTag.create(equipment.getName() + ":STATUS")
-          .description("Status tag for equipment " + equipment.getName())
-          .build();
-      equipment.setStatusTag(statusTag);
-    }
-
-    equipment.getCommFaultTag().setEquipmentId(equipment.getId());
-    equipment.getStatusTag().setEquipmentId(equipment.getId());
-
-    if (equipment.getAliveTag() != null) {
-      equipment.getAliveTag().setEquipmentId(equipment.getId());
-    }
-
-    return equipment;
   }
 
   @Override

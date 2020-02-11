@@ -4,6 +4,7 @@ import cern.c2mon.server.common.equipment.AbstractEquipment;
 import cern.c2mon.server.common.supervision.Supervised;
 import cern.c2mon.server.common.util.KotlinAPIs;
 import cern.c2mon.server.configuration.impl.ProcessChange;
+import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,6 +26,16 @@ public class ControlTagHandlerCollection {
     this.aliveTagConfigHandler = aliveTagConfigHandler;
     this.commFaultConfigHandler = commFaultConfigHandler;
     this.stateTagConfigHandler = stateTagConfigHandler;
+  }
+
+  public List<ProcessChange> createIfMissing(ConfigurationElement element) {
+    List<ProcessChange> changes = new ArrayList<>();
+
+    changes.addAll(aliveTagConfigHandler.createBySupervised(element));
+    changes.addAll(commFaultConfigHandler.createBySupervised(element));
+    changes.addAll(stateTagConfigHandler.createBySupervised(element));
+
+    return changes;
   }
 
   public List<ProcessChange> cascadeRemove(Supervised supervised, ConfigurationElementReport report) {
