@@ -15,18 +15,22 @@ import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.process.ProcessCacheObject;
 import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.configuration.helper.ObjectEqualityComparison;
+import cern.c2mon.server.configuration.parser.util.ConfigurationEquipmentUtil;
+import cern.c2mon.server.configuration.util.TestConfigurationProvider;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
+import cern.c2mon.shared.client.configuration.api.Configuration;
 import cern.c2mon.shared.common.NoSimpleValueParseException;
 import org.junit.Test;
 
 import javax.inject.Inject;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
+import java.sql.Timestamp;
 import java.util.List;
+import java.util.Properties;
 
-import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.*;
 
 public class EquipmentConfigTest extends ConfigurationCacheLoaderTest<Equipment> {
@@ -142,22 +146,13 @@ public class EquipmentConfigTest extends ConfigurationCacheLoaderTest<Equipment>
     assertEquals(new Long(1251L), equipmentMapper.getItem(110L).getAliveTagId());
     // also expect alivetimercache to have element 501:
     assertNotNull(aliveTimerCache.get(1251L));
-
-    verify(mockManager);
   }
 
   /**
    * Test equipment and control tags are removed correctly.
-   *
-   * @throws NoSimpleValueParseException
-   * @throws NoSuchFieldException
-   * @throws TransformerException
-   * @throws InstantiationException
-   * @throws IllegalAccessException
-   * @throws ParserConfigurationException
    */
   @Test
-  public void testRemoveEquipement() {
+  public void testRemoveEquipment() {
     // check as expected
     Equipment equipment = equipmentCache.get(150L);
     assertNotNull(equipment);
@@ -178,25 +173,16 @@ public class EquipmentConfigTest extends ConfigurationCacheLoaderTest<Equipment>
     // commfault and alive should no longer be in cache
     assertFalse(aliveTimerCache.containsKey(equipment.getAliveTagId()));
     assertFalse(commFaultTagCache.containsKey(equipment.getCommFaultTagId()));
-    verify(mockManager);
   }
 
   /**
    * Tests the removal of a process succeeds, with dependent rules and alarms.
    * Relies on permanent test data in test account and must be rolled back. No
    * changes should be sent to the DAQ layer.
-   *
-   * @throws NoSimpleValueParseException
-   * @throws NoSuchFieldException
-   * @throws TransformerException
-   * @throws InstantiationException
-   * @throws IllegalAccessException
-   * @throws ParserConfigurationException
    */
   @Test
   public void testRemoveEquipmentDependentObjects() {
-    ConfigurationReport report = configurationLoader.applyConfiguration(29);
-    verify(mockManager);
+    configurationLoader.applyConfiguration(29);
     // check equipment, tag, rules and alarms are gone
     assertFalse(equipmentCache.containsKey(150L));
     assertNull(equipmentMapper.getItem(150L));
@@ -222,7 +208,76 @@ public class EquipmentConfigTest extends ConfigurationCacheLoaderTest<Equipment>
     assertNull(alarmMapper.getItem(350000L));
     assertFalse(alarmCache.containsKey(350001L));
     assertNull(alarmMapper.getItem(350001L));
+  }
 
-    verify(mockManager);
+  @Test
+  public void createEquipment() {
+    // SETUP:First add a process to the server
+    Configuration createProcess = TestConfigurationProvider.createProcess();
+    configurationLoader.applyConfiguration(createProcess);
+    processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
+
+    // TEST:Build configuration to add the test equipment
+    Properties expectedProperties = new Properties();
+    cern.c2mon.shared.client.configuration.api.equipment.Equipment equipment = ConfigurationEquipmentUtil.buildCreateAllFieldsEquipment(10L, expectedProperties);
+    equipment.setProcessId(5L);
+    expectedProperties.setProperty("stateTagId", "300000");
+    expectedProperties.setProperty("commFaultTagId", "300001");
+    expectedProperties.setProperty("aliveTagId", "300002");
+
+    Configuration configuration = new Configuration();
+    configuration.addEntity(equipment);
+
+    //apply the configuration to the server
+    ConfigurationReport report = configurationLoader.applyConfiguration(configuration);
+
+    // check Report result
+    assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
+    assertEquals(ConfigConstants.Status.OK, report.getStatus());
+    assertEquals(4, report.getElementReports().size());
+
+    // check Equipment in the cache
+    EquipmentCacheObject cacheObject = (EquipmentCacheObject) equipmentCache.get(10L);
+    EquipmentCacheObject expectedObject = cacheObjectFactory.buildEquipmentCacheObject(10L, equipment);
+
+    assertEquals(expectedObject, cacheObject);
+
+    // Check if all caches are updated
+    cern.c2mon.server.common.process.Process processObj = processCache.get(expectedObject.getProcessId());
+    assertTrue(processObj.getEquipmentIds().contains(expectedObject.getId()));
+    assertNotNull(commFaultTagCache.get(expectedObject.getCommFaultTagId()));
+    assertEquals(expectedObject.getId(), (long) commFaultTagCache.get(cacheObject.getCommFaultTagId()).getSupervisedId());
+    assertNotNull(equipmentMapper.getItem(10L));
+  }
+
+  @Test
+  public void updateEquipment() {
+    // SETUP:
+    Configuration createProcess = TestConfigurationProvider.createProcess();
+    configurationLoader.applyConfiguration(createProcess);
+    Configuration createEquipment = TestConfigurationProvider.createEquipment();
+    configurationLoader.applyConfiguration(createEquipment);
+    processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
+
+    // TEST:
+    // Build configuration to add the test equipment
+    cern.c2mon.shared.client.configuration.api.equipment.Equipment equipment = ConfigurationEquipmentUtil.buildUpdateEquipmentWithAllFields(15L, null);
+    Configuration configuration = new Configuration();
+    configuration.addEntity(equipment);
+
+    //apply the configuration to the server
+    ConfigurationReport report = configurationLoader.applyConfiguration(configuration);
+
+    // check report result
+    assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
+    assertEquals(ConfigConstants.Status.OK, report.getStatus());
+    assertTrue(report.getProcessesToReboot().isEmpty());
+    assertEquals(1, report.getElementReports().size());
+
+    // get cacheObject from the cache and compare to the an expected cacheObject
+    EquipmentCacheObject cacheObjectEquipment = (EquipmentCacheObject) equipmentCache.get(15L);
+    EquipmentCacheObject expectedCacheObjectEquipment = cacheObjectFactory.buildEquipmentUpdateCacheObject(cacheObjectEquipment, equipment);
+
+    assertEquals(expectedCacheObjectEquipment, cacheObjectEquipment);
   }
 }

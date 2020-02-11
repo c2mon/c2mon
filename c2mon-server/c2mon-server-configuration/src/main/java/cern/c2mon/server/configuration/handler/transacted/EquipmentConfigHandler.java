@@ -105,6 +105,7 @@ public class EquipmentConfigHandler extends AbstractEquipmentConfigHandler<Equip
     EquipmentCacheObject equipmentCacheObject = (EquipmentCacheObject) cache.get(id);
     List<ProcessChange> cascadeChanges = cascadeRemoveDatatags(dataTagService.getDataTagIdsByEquipmentId(equipmentCacheObject.getId()), report);
     removeEquipmentCommands(equipmentCacheObject, report);
+    cascadeChanges.addAll(super.remove(id, report));
     subEquipmentConfigTransacted.removeSubEquipmentsByEqId(id, report);
     cascadeChanges.addAll(controlTagHandlerCollection.cascadeRemove(equipmentCacheObject, report));
 

@@ -16,21 +16,19 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration;
 
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
-
+import cern.c2mon.server.common.alarm.Alarm;
+import cern.c2mon.server.common.alarm.AlarmCacheObject;
+import cern.c2mon.server.common.datatag.DataTagCacheObject;
+import cern.c2mon.server.configuration.impl.ConfigurationUpdateImpl;
+import cern.c2mon.shared.common.datatag.DataTagConstants;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
 
-import cern.c2mon.server.common.alarm.Alarm;
-import cern.c2mon.server.common.alarm.AlarmCacheObject;
-import cern.c2mon.server.common.datatag.DataTag;
-import cern.c2mon.server.common.datatag.DataTagCacheObject;
-import cern.c2mon.server.configuration.impl.ConfigurationUpdateImpl;
-import cern.c2mon.shared.common.datatag.DataTagConstants;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -73,14 +71,14 @@ public class ConfigurationUpdateTest {
  @Test
  public void testNotifyConfigurationUpdated() {
 	 // Data Tag
-	 DataTag tag = new DataTagCacheObject(5L, "test NachTag", "Float", DataTagConstants.MODE_OPERATIONAL);
-	 ((DataTagCacheObject)tag).setCacheTimestamp(new Timestamp(System.currentTimeMillis()));
+	 DataTagCacheObject tag = new DataTagCacheObject(5L, "test NachTag", "Float", DataTagConstants.MODE_OPERATIONAL);
+	 tag.setCacheTimestamp(new Timestamp(System.currentTimeMillis()));
 	 // Alarms
 	 List<Long> alarmIds = new ArrayList<Long>();
 	 alarmIds.add(10L);
 	 alarmIds.add(20L);
-	 ((DataTagCacheObject) tag).setAlarmIds(alarmIds);
-	 List<Alarm> alarmList = new ArrayList<Alarm>();
+	 tag.setAlarmIds(alarmIds);
+	 List<Alarm> alarmList = new ArrayList<>();
 	 alarmList.add(new AlarmCacheObject(10L));
 	 alarmList.add(new AlarmCacheObject(20L));  
 	 

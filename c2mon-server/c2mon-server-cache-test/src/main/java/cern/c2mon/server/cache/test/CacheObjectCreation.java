@@ -66,16 +66,6 @@ public final class CacheObjectCreation {
   }
 
   /**
-   * Does not set reference to tag id.
-   * Created alarm has not been published to external alarm system (i.e. publication field is null)
-   *
-   * @return the alarm
-   */
-  public static AlarmCacheObject createTestAlarm2() {
-    return alarmCacheObjectFactory.alarmActiveWithFalseCondition();
-  }
-
-  /**
    * Need to first insert test equipment using EquipmentMapper
    *
    * @return the DataTag

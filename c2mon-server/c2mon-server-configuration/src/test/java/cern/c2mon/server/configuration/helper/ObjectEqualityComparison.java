@@ -19,19 +19,15 @@ package cern.c2mon.server.configuration.helper;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alive.AliveTag;
 import cern.c2mon.server.common.command.CommandTagCacheObject;
-import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.common.device.DeviceCacheObject;
 import cern.c2mon.server.common.equipment.AbstractEquipmentCacheObject;
 import cern.c2mon.server.common.equipment.EquipmentCacheObject;
 import cern.c2mon.server.common.process.ProcessCacheObject;
-import cern.c2mon.server.common.tag.AbstractTagCacheObject;
-import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.test.device.ObjectComparison;
 import cern.c2mon.shared.client.device.DeviceCommand;
 import cern.c2mon.shared.client.device.DeviceProperty;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Junit helper class for comparing cache objects.
@@ -48,41 +44,6 @@ public class ObjectEqualityComparison {
     assertEquals(expectedObject.getStateTagId(), object.getStateTagId());
     assertEquals(expectedObject.getSupervisedEntity(), object.getSupervisedEntity());
     assertEquals(expectedObject.getAliveInterval(), object.getAliveInterval());
-  }
-
-  public static void assertDataTagConfigEquals(DataTagCacheObject expectedObject, DataTagCacheObject object) {
-    assertTagConfigEquals(expectedObject, object);
-    assertEquals(expectedObject.getEquipmentId(), object.getEquipmentId());
-    assertEquals(expectedObject.getProcessId(), object.getProcessId());
-    assertEquals(expectedObject.getMinValue(), object.getMinValue());
-    assertEquals(expectedObject.getMaxValue(), object.getMaxValue());
-    if (expectedObject.getAddress() != null) {
-      assertEquals(expectedObject.getAddress().toConfigXML(), object.getAddress().toConfigXML());
-    }
-    if (expectedObject.getMetadata() != null) {
-      assertTrue(expectedObject.getMetadata().equals(object.getMetadata()));
-    }
-  }
-
-  public static void assertTagConfigEquals(AbstractTagCacheObject expectedObject, AbstractTagCacheObject object) {
-    assertEquals(expectedObject.getId(), object.getId());
-    assertEquals(expectedObject.getName(), object.getName());
-    assertEquals(expectedObject.getDescription(), object.getDescription());
-    assertEquals(expectedObject.getMode(), object.getMode());
-    assertEquals(expectedObject.getDataType(), object.getDataType());
-    assertEquals(expectedObject.isLogged(), object.isLogged());
-    assertEquals(expectedObject.getUnit(), object.getUnit());
-    assertEquals(expectedObject.getDipAddress(), object.getDipAddress());
-    assertEquals(expectedObject.getJapcAddress(), object.getJapcAddress());
-    assertEquals(expectedObject.isSimulated(), object.isSimulated());
-    assertEquals(expectedObject.getMetadata(), object.getMetadata());
-    // assertEquals(expectedObject.getValueDictionary().toXML(),
-    // object.getValueDictionary().toXML()); //compare XML of value dictionary
-    assertEquals(expectedObject.getDataTagQuality(), object.getDataTagQuality());
-    assertEquals(expectedObject.getRuleIdsString(), object.getRuleIdsString());
-    assertEquals(expectedObject.getRuleIds(), object.getRuleIds());
-    assertEquals(((Tag) expectedObject).getProcessIds(), ((Tag) object).getProcessIds());
-    assertEquals(((Tag) expectedObject).getEquipmentIds(), ((Tag) object).getEquipmentIds());
   }
 
   public static void assertCommandTagEquals(CommandTagCacheObject expectedObject, CommandTagCacheObject object) {

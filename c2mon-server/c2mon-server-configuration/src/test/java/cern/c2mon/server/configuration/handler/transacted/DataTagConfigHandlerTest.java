@@ -15,11 +15,6 @@ import java.util.Properties;
 
 import static org.junit.Assert.*;
 
-//@RunWith(SpringJUnit4ClassRunner.class)
-//@ContextConfiguration(classes = {
-//  GenericApplicationContext.class,
-//  ConfigurationModule.class
-//})
 public class DataTagConfigHandlerTest extends ConfigurationCacheTest {
 
   @Rule

@@ -17,16 +17,11 @@ import cern.c2mon.shared.client.alarm.condition.ValueAlarmCondition;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.api.Configuration;
-import cern.c2mon.shared.common.NoSimpleValueParseException;
-import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
 import org.junit.Test;
 
 import javax.inject.Inject;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-import java.util.List;
 
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.*;
 
 public class AlarmConfigTest extends ConfigurationCacheLoaderTest<Alarm> {
@@ -198,9 +193,7 @@ public class AlarmConfigTest extends ConfigurationCacheLoaderTest<Alarm> {
   }
 
   @Test
-  public void deleteAlarmWithDeleteDataTag() throws IllegalAccessException, TransformerException, InstantiationException, NoSimpleValueParseException, ParserConfigurationException, NoSuchFieldException, InterruptedException {
-    expect(mockManager.sendConfiguration(eq(5L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
-    replay(mockManager);
+  public void deleteAlarmWithDeleteDataTag() {
     setUp();
     configurationLoader.applyConfiguration(TestConfigurationProvider.createAlarm());
 
@@ -225,8 +218,6 @@ public class AlarmConfigTest extends ConfigurationCacheLoaderTest<Alarm> {
     assertNull(alarmMapper.getItem(2000L));
     assertFalse(dataTagCache.containsKey(100L));
     assertNull(dataTagMapper.getItem(100L));
-
-    verify(mockManager);
   }
 
   /**

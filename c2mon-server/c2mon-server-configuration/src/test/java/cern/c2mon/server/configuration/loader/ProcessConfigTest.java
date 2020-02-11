@@ -17,7 +17,9 @@ import cern.c2mon.server.configuration.util.TestConfigurationProvider;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.api.Configuration;
+import cern.c2mon.shared.client.configuration.api.tag.StatusTag;
 import cern.c2mon.shared.client.configuration.converter.ProcessListConverter;
+import cern.c2mon.shared.client.tag.TagMode;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -242,5 +244,91 @@ public class ProcessConfigTest extends ConfigurationCacheLoaderTest<Process> {
     list = "[]";
     processList = converter.convert(list);
     assertEquals(0, processList.size());
+  }
+
+  @Test
+  public void updateAliveTag() {
+    // SETUP:
+    Configuration createProcess = TestConfigurationProvider.createProcess();
+    configurationLoader.applyConfiguration(createProcess);
+    processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
+
+    // TEST:
+    cern.c2mon.shared.client.configuration.api.tag.AliveTag aliveTagUpdate = cern.c2mon.shared.client.configuration.api.tag.AliveTag.update(101L).description("new description").mode(TagMode.OPERATIONAL).build();
+    Configuration configuration = new Configuration();
+    configuration.addEntity(aliveTagUpdate);
+
+    ///apply the configuration to the server
+    ConfigurationReport report = configurationLoader.applyConfiguration(configuration);
+
+    // check report result
+    assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
+    assertEquals(ConfigConstants.Status.OK, report.getStatus());
+    assertTrue(report.getProcessesToReboot().isEmpty());
+    assertEquals(1, report.getElementReports().size());
+
+    // check aliveTag in the cache
+    AliveTag cacheObjectAlive = (AliveTag) aliveTimerCache.get(101L);
+    AliveTag expectedObjectAlive = new AliveTag(101L, 5L, "P_INI_TEST", "PROC", null, 100L, 60000);
+    ObjectEqualityComparison.assertAliveTimerValuesEquals(expectedObjectAlive, cacheObjectAlive);
+
+//    ControlTagCacheObject cacheObjectAliveControlCache = (ControlTagCacheObject) controlTagCache.get(101L);
+//    Assert.assertEquals(cacheObjectAliveControlCache.getDescription(), "new description");
+  }
+
+  @Test
+  public void updateStatusTag() {
+    // SETUP:
+    Configuration createProcess = TestConfigurationProvider.createProcess();
+    configurationLoader.applyConfiguration(createProcess);
+    processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
+
+    // TEST:
+    StatusTag statusTagUpdate = StatusTag.update(100L).description("new description").mode(TagMode.OPERATIONAL).build();
+    Configuration configuration = new Configuration();
+    configuration.addEntity(statusTagUpdate);
+
+    ///apply the configuration to the server
+    ConfigurationReport report = configurationLoader.applyConfiguration(configuration);
+
+    // check report result
+    assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
+    assertEquals(ConfigConstants.Status.OK, report.getStatus());
+    assertTrue(report.getProcessesToReboot().isEmpty());
+    assertEquals(1, report.getElementReports().size());
+
+//    ControlTagCacheObject cacheObjectStatusControlCache = (ControlTagCacheObject) controlTagCache.get(100L);
+//    assertEquals(cacheObjectStatusControlCache.getDescription(), "new description");
+//    assertEquals(cacheObjectStatusControlCache.getMode(), TagMode.OPERATIONAL.ordinal());
+  }
+
+  @Test
+  public void updateCommFaultTag() {
+    // SETUP:
+    Configuration createProcess = TestConfigurationProvider.createProcess();
+    configurationLoader.applyConfiguration(createProcess);
+    Configuration createEquipment = TestConfigurationProvider.createEquipment();
+    configurationLoader.applyConfiguration(createEquipment);
+    processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
+
+    // TEST:
+    // Build configuration to update the test equipment
+    cern.c2mon.shared.client.configuration.api.tag.CommFaultTag commFaultTagUpdate = cern.c2mon.shared.client.configuration.api.tag.CommFaultTag.update(201L).description("new description").mode(TagMode.OPERATIONAL).build();
+    Configuration configuration = new Configuration();
+    configuration.addEntity(commFaultTagUpdate);
+
+    ///apply the configuration to the server
+    ConfigurationReport report = configurationLoader.applyConfiguration(configuration);
+
+    // check report result
+    assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
+    assertEquals(ConfigConstants.Status.OK, report.getStatus());
+    assertTrue(report.getProcessesToReboot().isEmpty());
+    assertEquals(1, report.getElementReports().size());
+
+    // check aliveTag in the cache
+//    ControlTagCacheObject cacheObjectStatusControlCache = (ControlTagCacheObject) controlTagCache.get(201L);
+//    assertEquals(cacheObjectStatusControlCache.getDescription(), "new description");
+//    assertEquals(cacheObjectStatusControlCache.getMode(), TagMode.OPERATIONAL.ordinal());
   }
 }

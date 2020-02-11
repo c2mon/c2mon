@@ -27,12 +27,10 @@ import cern.c2mon.server.common.listener.ConfigurationEventListener;
 import cern.c2mon.server.configuration.impl.ConfigurationUpdateImpl;
 import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
-import cern.c2mon.shared.client.configuration.ConfigConstants.Entity;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import cern.c2mon.shared.common.CacheEvent;
 import cern.c2mon.shared.daq.config.Change;
-import cern.c2mon.shared.daq.config.DataTagAdd;
 import cern.c2mon.shared.daq.config.DataTagRemove;
 import cern.c2mon.shared.daq.config.IChange;
 import lombok.extern.slf4j.Slf4j;
@@ -54,7 +52,6 @@ import java.util.function.Supplier;
 @Slf4j
 public class DataTagConfigHandler extends AbstractTagConfigHandler<DataTag> {
 
-  private final DataTagService dataTagService;
   /**
    * Reference to the equipment facade.
    */
@@ -63,10 +60,6 @@ public class DataTagConfigHandler extends AbstractTagConfigHandler<DataTag> {
    * Reference to the subequipment facade.
    */
   private SubEquipmentService subEquipmentService;
-  /**
-   * For recursive deletion of rules.
-   */
-  private RuleTagConfigHandler ruleTagConfigHandler;
 
   /**
    * Helper class for accessing the List of registered listeners
@@ -82,14 +75,11 @@ public class DataTagConfigHandler extends AbstractTagConfigHandler<DataTag> {
                               final SubEquipmentService subEquipmentService,
                               final TagCacheCollection tagCacheCollection,
                               final GenericApplicationContext context,
-                              final RuleTagConfigHandler ruleTagConfigHandler,
                               final AlarmConfigHandler alarmConfigHandler,
                               final ConfigurationUpdateImpl configurationUpdateImpl) {
     super(dataTagService.getCache(), dataTagLoaderDAO, dataTagCacheObjectFactory, tagCacheCollection, context, alarmConfigHandler);
     this.equipmentService = equipmentService;
     this.subEquipmentService = subEquipmentService;
-    this.dataTagService = dataTagService;
-    this.ruleTagConfigHandler = ruleTagConfigHandler;
     this.configurationUpdateImpl = configurationUpdateImpl;
   }
 
@@ -102,10 +92,11 @@ public class DataTagConfigHandler extends AbstractTagConfigHandler<DataTag> {
 
   @Override
   protected List<ProcessChange> createReturnValue(DataTag dataTag, ConfigurationElement element) {
-    return Collections.singletonList(createIChange(dataTag,
-      () -> new DataTagAdd(element.getSequenceId(), dataTag.getEquipmentId(), dataTagService.generateSourceDataTag(dataTag)),
-      () -> new DataTagAdd(element.getSequenceId(), subEquipmentService.getEquipmentIdForSubEquipment(dataTag.getSubEquipmentId()), dataTagService.generateSourceDataTag(dataTag)))
-    );
+    return Collections.emptyList();
+//    return Collections.singletonList(createIChange(dataTag,
+//      () -> new DataTagAdd(element.getSequenceId(), dataTag.getEquipmentId(), dataTagService.generateSourceDataTag(dataTag)),
+//      () -> new DataTagAdd(element.getSequenceId(), subEquipmentService.getEquipmentIdForSubEquipment(dataTag.getSubEquipmentId()), dataTagService.generateSourceDataTag(dataTag)))
+//    );
   }
 
   private ProcessChange createIChange(DataTag dataTag, Supplier<IChange> eqEventGenerator, Supplier<IChange> subeqEventGenerator) {
@@ -146,29 +137,19 @@ public class DataTagConfigHandler extends AbstractTagConfigHandler<DataTag> {
 
   @Override
   protected List<ProcessChange> updateReturnValue(DataTag dataTag, Change change, Properties properties) {
-    if (change.hasChanged())
+    if (change.hasChanged()) {
       return Collections.singletonList(dataTag.getEquipmentId() != null
         ? new ProcessChange(equipmentService.getProcessId(dataTag.getEquipmentId()), change)
         : new ProcessChange(subEquipmentService.getProcessId(dataTag.getSubEquipmentId()), change));
+    }
     return Collections.singletonList(new ProcessChange());
   }
 
   @Override
-  protected void doPreRemove(DataTag dataTag, ConfigurationElementReport elementReport) {
-    createConfigRemovalReportsFor(Entity.ALARM, dataTag.getAlarmIds(), alarmConfigHandler.getCache())
-      .forEach(elementReport::addSubReport);
-
-    createConfigRemovalReportsFor(Entity.RULETAG, dataTag.getRuleIds(), ruleTagConfigHandler.getCache())
-      .forEach(elementReport::addSubReport);
-
-    // Alert listeners
+  protected List<ProcessChange> removeReturnValue(DataTag dataTag, ConfigurationElementReport report) {
     for (ConfigurationEventListener listener : configurationEventListeners) {
       listener.onConfigurationEvent(dataTag, Action.REMOVE);
     }
-  }
-
-  @Override
-  protected List<ProcessChange> removeReturnValue(DataTag dataTag, ConfigurationElementReport report) {
     return Collections.singletonList(createIChange(dataTag, DataTagRemove::new, DataTagRemove::new));
   }
 
