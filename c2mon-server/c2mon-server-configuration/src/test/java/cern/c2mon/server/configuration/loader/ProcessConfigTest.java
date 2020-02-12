@@ -11,17 +11,13 @@ import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.process.ProcessCacheObject;
 import cern.c2mon.server.common.rule.RuleTag;
-import cern.c2mon.server.common.supervision.SupervisionStateTag;
 import cern.c2mon.server.configuration.parser.util.ConfigurationProcessUtil;
 import cern.c2mon.server.configuration.util.TestConfigurationProvider;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.api.Configuration;
-import cern.c2mon.shared.client.configuration.api.tag.StatusTag;
 import cern.c2mon.shared.client.configuration.converter.ProcessListConverter;
-import cern.c2mon.shared.client.tag.TagMode;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.inject.Inject;
 import java.sql.Timestamp;
@@ -29,52 +25,37 @@ import java.util.Properties;
 import java.util.Set;
 
 import static cern.c2mon.server.configuration.parser.util.ConfigurationProcessUtil.buildCreateAllFieldsProcess;
-import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.*;
 
 public class ProcessConfigTest extends ConfigurationCacheLoaderTest<Process> {
 
-  @Autowired
-  private C2monCache<Process> processCache;
+  @Inject private C2monCache<Process> processCache;
 
-  @Autowired
-  private ProcessMapper processMapper;
+  @Inject private ProcessMapper processMapper;
 
-  @Autowired
-  private C2monCache<AliveTag> aliveTimerCache;
+  @Inject private C2monCache<AliveTag> aliveTimerCache;
 
-  @Autowired
-  private C2monCache<CommFaultTag> commFaultTagCache;
+  @Inject private C2monCache<CommFaultTag> commFaultTagCache;
 
-  @Inject
-  private C2monCache<SupervisionStateTag> stateTagCache;
+  @Inject private C2monCache<DataTag> dataTagCache;
 
-  @Autowired
-  private C2monCache<DataTag> dataTagCache;
+  @Inject private C2monCache<RuleTag> ruleTagCache;
 
-  @Autowired
-  private C2monCache<RuleTag> ruleTagCache;
+  @Inject private RuleTagMapper ruleTagMapper;
 
-  @Autowired
-  private RuleTagMapper ruleTagMapper;
+  @Inject private C2monCache<Equipment> equipmentCache;
 
-  @Autowired
-  private C2monCache<Equipment> equipmentCache;
+  @Inject private EquipmentMapper equipmentMapper;
 
-  @Autowired
-  private EquipmentMapper equipmentMapper;
+  @Inject private AlarmMapper alarmMapper;
 
-  @Autowired
-  private AlarmMapper alarmMapper;
+  @Inject private DataTagMapper dataTagMapper;
 
-  @Autowired
-  private DataTagMapper dataTagMapper;
+  @Inject private C2monCache<Alarm> alarmCache;
 
-  @Autowired
-  private C2monCache<Alarm> alarmCache;
+  @Inject private ProcessService processService;
 
-  @Autowired
-  private ProcessService processService;
+  @Inject private SupervisionStateTagMapper stateTagMapper;
 
   @Test
   public void createProcess() {
@@ -150,30 +131,24 @@ public class ProcessConfigTest extends ConfigurationCacheLoaderTest<Process> {
   }
 
   @Test
-  public void testCreateUpdateRemoveProcess() {
+  public void createProcessFromDb() {
     ConfigurationReport report = configurationLoader.applyConfiguration(16);
 
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
 
-    ProcessCacheObject cacheObject = (ProcessCacheObject) processCache.get(2L);
+    assertEquals(expectedObject(), processCache.get(2L));
+  }
 
-    ProcessCacheObject expectedObject = new ProcessCacheObject(2L);
-    expectedObject.setName("P_TEST");
-    expectedObject.setAliveInterval(60000);
-    expectedObject.setAliveTagId(1221L);
-    expectedObject.setStateTagId(1220L);
-    expectedObject.setMaxMessageSize(200);
-    expectedObject.setMaxMessageDelay(1000);
-    expectedObject.setDescription("test description");
-
-    assertEquals(expectedObject, cacheObject);
-
-    // update
+  @Test
+  public void updateProcessByDb() {
+    ConfigurationReport report = configurationLoader.applyConfiguration(16);
     report = configurationLoader.applyConfiguration(17);
 
-    cacheObject = (ProcessCacheObject) processCache.get(2L);
+    ProcessCacheObject cacheObject = (ProcessCacheObject) processCache.get(2L);
+    ProcessCacheObject expectedObject = expectedObject();
     expectedObject.setDescription("updated description");
     expectedObject.setMaxMessageDelay(4000);
+    expectedObject.setRequiresReboot(true);
 
     assertEquals(expectedObject, cacheObject);
     assertTrue(report.getProcessesToReboot().contains(expectedObject.getName()));
@@ -192,7 +167,6 @@ public class ProcessConfigTest extends ConfigurationCacheLoaderTest<Process> {
     ConfigurationReport report = configurationLoader.applyConfiguration(28);
 
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
-    verify(mockManager);
     // check process, tag, rules and alarms are gone
     assertFalse(processCache.containsKey(50L));
     assertNull(processMapper.getItem(50L));
@@ -208,22 +182,17 @@ public class ProcessConfigTest extends ConfigurationCacheLoaderTest<Process> {
     assertNull(dataTagMapper.getItem(200002L));
     assertFalse(dataTagCache.containsKey(200003L));
     assertNull(dataTagMapper.getItem(200003L));
-    // control tags
-//    assertNull(controlTagMapper.getItem(1220L));
-//    assertNull(controlTagMapper.getItem(1221L));
-    // equipment control tags
-//    assertNull(controlTagMapper.getItem(1222L));
-//    assertNull(controlTagMapper.getItem(1223L));
     // equipment commfault
+    assertNull(stateTagMapper.getItem(1222L));
     assertFalse(commFaultTagCache.containsKey(1223L));
     // process alive
+    assertNull(stateTagMapper.getItem(1220L));
     assertFalse(aliveTimerCache.containsKey(1221L));
     // alarms
     assertFalse(alarmCache.containsKey(350000L));
     assertNull(alarmMapper.getItem(350000L));
     assertFalse(alarmCache.containsKey(350001L));
     assertNull(alarmMapper.getItem(350001L));
-    verify(mockManager);
   }
 
   @Test
@@ -246,81 +215,15 @@ public class ProcessConfigTest extends ConfigurationCacheLoaderTest<Process> {
     assertEquals(0, processList.size());
   }
 
-  @Test
-  public void updateAliveTag() {
-    // SETUP:
-    Configuration createProcess = TestConfigurationProvider.createProcess();
-    configurationLoader.applyConfiguration(createProcess);
-    processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
-
-    // TEST:
-    cern.c2mon.shared.client.configuration.api.tag.AliveTag aliveTagUpdate = cern.c2mon.shared.client.configuration.api.tag.AliveTag.update(101L).description("new description").mode(TagMode.OPERATIONAL).build();
-    Configuration configuration = new Configuration();
-    configuration.addEntity(aliveTagUpdate);
-
-    ///apply the configuration to the server
-    ConfigurationReport report = configurationLoader.applyConfiguration(configuration);
-
-    // check report result
-    assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
-    assertEquals(ConfigConstants.Status.OK, report.getStatus());
-    assertTrue(report.getProcessesToReboot().isEmpty());
-    assertEquals(1, report.getElementReports().size());
-
-    // check aliveTag in the cache
-    AliveTag cacheObjectAlive = aliveTimerCache.get(101L);
-    AliveTag expectedObjectAlive = new AliveTag(101L, 5L, "P_INI_TEST", "PROC", null, 100L, 60000);
-    assertEquals(expectedObjectAlive, cacheObjectAlive);
-  }
-
-  @Test
-  public void updateStatusTag() {
-    // SETUP:
-    Configuration createProcess = TestConfigurationProvider.createProcess();
-    configurationLoader.applyConfiguration(createProcess);
-    processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
-
-    // TEST:
-    StatusTag statusTagUpdate = StatusTag.update(100L).description("new description").mode(TagMode.OPERATIONAL).build();
-    Configuration configuration = new Configuration();
-    configuration.addEntity(statusTagUpdate);
-
-    ///apply the configuration to the server
-    ConfigurationReport report = configurationLoader.applyConfiguration(configuration);
-
-    // check report result
-    assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
-    assertEquals(ConfigConstants.Status.OK, report.getStatus());
-    assertTrue(report.getProcessesToReboot().isEmpty());
-    assertEquals(1, report.getElementReports().size());
-    SupervisionStateTag expectedStateTag = new SupervisionStateTag(100L, 5L, "PROC", 101L, null);
-    assertEquals(expectedStateTag, stateTagCache.get(100L));
-  }
-
-  @Test
-  public void updateCommFaultTag() {
-    // SETUP:
-    Configuration createProcess = TestConfigurationProvider.createProcess();
-    configurationLoader.applyConfiguration(createProcess);
-    Configuration createEquipment = TestConfigurationProvider.createEquipment();
-    configurationLoader.applyConfiguration(createEquipment);
-    processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
-
-    // TEST:
-    // Build configuration to update the test equipment
-    cern.c2mon.shared.client.configuration.api.tag.CommFaultTag commFaultTagUpdate = cern.c2mon.shared.client.configuration.api.tag.CommFaultTag.update(201L).description("new description").mode(TagMode.OPERATIONAL).build();
-    Configuration configuration = new Configuration();
-    configuration.addEntity(commFaultTagUpdate);
-
-    ///apply the configuration to the server
-    ConfigurationReport report = configurationLoader.applyConfiguration(configuration);
-
-    // check report result
-    assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
-    assertEquals(ConfigConstants.Status.OK, report.getStatus());
-    assertTrue(report.getProcessesToReboot().isEmpty());
-    assertEquals(1, report.getElementReports().size());
-    CommFaultTag expectedCommFault = new CommFaultTag(201L, 15L, "E_INI_TEST","EQ", 200L, null);
-    assertEquals(expectedCommFault, commFaultTagCache.get(201L));
+  private static ProcessCacheObject expectedObject() {
+    ProcessCacheObject expectedObject = new ProcessCacheObject(2L);
+    expectedObject.setName("P_TEST");
+    expectedObject.setAliveInterval(60000);
+    expectedObject.setAliveTagId(1221L);
+    expectedObject.setStateTagId(1220L);
+    expectedObject.setMaxMessageSize(200);
+    expectedObject.setMaxMessageDelay(1000);
+    expectedObject.setDescription("test description");
+    return expectedObject;
   }
 }

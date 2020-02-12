@@ -32,9 +32,10 @@ import org.simpleframework.xml.convert.AnnotationStrategy;
 import org.simpleframework.xml.core.Persister;
 import org.simpleframework.xml.strategy.Strategy;
 import org.simpleframework.xml.transform.RegistryMatcher;
-import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -59,10 +60,10 @@ import java.util.List;
  * <p>Creations of processes and equipments require a DAQ restart.
  *
  * @author Mark Brightwell
- *
  */
 @Slf4j
-@Component
+@Named
+@Singleton
 public class ConfigurationLoaderImpl implements ConfigurationLoader {
 
   //TODO element & element report status always both need updating - redesign this part
@@ -83,12 +84,13 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
   private ConfigurationParser configParser;
 
   @Inject
-  public ConfigurationLoaderImpl(ConfigurationDAO configurationDAO,
-                                 ConfigurationParser configParser,
-                                 SequenceDAO sequenceDAO,
-                                 ConfigurationApplier configApplier,
-                                 ServerProperties serverProperties) {
-    super();
+  public ConfigurationLoaderImpl(
+    ConfigurationDAO configurationDAO,
+    ConfigurationParser configParser,
+    SequenceDAO sequenceDAO,
+    ConfigurationApplier configApplier,
+    ServerProperties serverProperties) {
+
     this.configurationDAO = configurationDAO;
     this.configParser = configParser;
     this.sequenceDAO = sequenceDAO;
@@ -133,12 +135,12 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
       if (configName == null) {
         log.warn(configId + " Unable to locate configuration - cannot be applied.");
         return new ConfigurationReport(
-            configId,
-            "UNKNOWN",
-            "", //TODO set user name through RBAC once available
-            Status.FAILURE,
-            "Configuration with id <" + configId + "> not found. Please try again with a valid configuration id"
-          );
+          configId,
+          "UNKNOWN",
+          "", //TODO set user name through RBAC once available
+          Status.FAILURE,
+          "Configuration with id <" + configId + "> not found. Please try again with a valid configuration id"
+        );
       }
 
       List<ConfigurationElement> configElements;
@@ -157,9 +159,9 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
 
     } catch (Exception ex) {
       log.error("Exception caught while applying configuration " + configId, ex);
-        report = new ConfigurationReport(configId, "UNKNOWN", "", Status.FAILURE,
-            "Exception caught when applying configuration with id <" + configId + ">.");
-        report.setExceptionTrace(ex);
+      report = new ConfigurationReport(configId, "UNKNOWN", "", Status.FAILURE,
+        "Exception caught when applying configuration with id <" + configId + ">.");
+      report.setExceptionTrace(ex);
       throw new ConfigurationException(report, ex);
     } finally {
       if (report != null) {
@@ -173,7 +175,8 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
 
   /**
    * Save the report to disk.
-   * @param configId id of the config
+   *
+   * @param configId  id of the config
    * @param xmlReport the XML report in String format
    */
   private void archiveReport(String configId, String xmlReport) {
@@ -200,6 +203,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
 
   /**
    * Set the (absolute) directory where the config reports should be saved.
+   *
    * @param reportDirectory report directory
    */
   public void setReportDirectory(final String reportDirectory) {

@@ -37,13 +37,18 @@ import java.util.List;
 class ProcessFactory extends EntityFactory<Process> {
 
   private ProcessDAO processDAO;
+  private final AliveTagFactory aliveTagFactory;
+  private final SupervisionStateTagFactory stateTagFactory;
   private SequenceDAO sequenceDAO;
 
   @Autowired
-  public ProcessFactory(C2monCache<cern.c2mon.server.common.process.Process> processCache, SequenceDAO sequenceDAO, ProcessDAO processDAO) {
+  public ProcessFactory(C2monCache<cern.c2mon.server.common.process.Process> processCache, SequenceDAO sequenceDAO, ProcessDAO processDAO,
+                        AliveTagFactory aliveTagFactory, SupervisionStateTagFactory stateTagFactory) {
     super(processCache);
     this.sequenceDAO = sequenceDAO;
     this.processDAO = processDAO;
+    this.aliveTagFactory = aliveTagFactory;
+    this.stateTagFactory = stateTagFactory;
   }
 
 
@@ -53,6 +58,16 @@ class ProcessFactory extends EntityFactory<Process> {
 
     // build the process configuration element. This also set the id of the process
     ConfigurationElement createProcess = doCreateInstance(entity);
+
+    // If the user specified any custom tag info, use it (otherwise it will be created by the handler
+    if (entity.getAliveTag() != null) {
+      configurationElements.addAll(aliveTagFactory.createInstance(entity.getAliveTag()));
+      createProcess.getElementProperties().setProperty("aliveTagId", entity.getAliveTag().getId().toString());
+    }
+    if (entity.getStatusTag() != null) {
+      configurationElements.addAll(stateTagFactory.createInstance(entity.getStatusTag()));
+      createProcess.getElementProperties().setProperty("stateTagId", entity.getStatusTag().getId().toString());
+    }
 
     configurationElements.add(createProcess);
 

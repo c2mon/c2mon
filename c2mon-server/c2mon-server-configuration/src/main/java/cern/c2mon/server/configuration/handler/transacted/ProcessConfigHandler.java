@@ -109,7 +109,12 @@ public class ProcessConfigHandler extends BaseConfigHandlerImpl<Process> {
     return Collections.singletonList(
       KotlinAPIs.apply(
         new ProcessChange(process.getId(), change),
-        procChange -> procChange.requiresReboot(true))
+        procChange -> {
+          // Description is the only thing that can change without rebooting required
+          if (properties.size() > 1 || (properties.size() > 0 && !properties.containsKey("description"))) {
+            procChange.requiresReboot(true);
+          }
+        })
     );
   }
 

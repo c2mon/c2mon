@@ -42,15 +42,22 @@ class EquipmentFactory extends EntityFactory<Equipment> {
   private SequenceDAO sequenceDAO;
   private C2monCache<Process> processCache;
   private ProcessDAO processDAO;
+  private final AliveTagFactory aliveTagFactory;
+  private final CommFaultTagFactory commFaultTagFactory;
+  private final SupervisionStateTagFactory stateTagFactory;
 
   @Autowired
   public EquipmentFactory(C2monCache<cern.c2mon.server.common.equipment.Equipment> equipmentCache, EquipmentDAO equipmentDAO, SequenceDAO sequenceDAO,
-                          C2monCache<Process> processCache, ProcessDAO processDAO) {
+                          C2monCache<Process> processCache, ProcessDAO processDAO,
+                          AliveTagFactory aliveTagFactory, CommFaultTagFactory commFaultTagFactory, SupervisionStateTagFactory stateTagFactory) {
     super(equipmentCache);
     this.equipmentDAO = equipmentDAO;
     this.sequenceDAO = sequenceDAO;
     this.processCache = processCache;
     this.processDAO = processDAO;
+    this.aliveTagFactory = aliveTagFactory;
+    this.commFaultTagFactory = commFaultTagFactory;
+    this.stateTagFactory = stateTagFactory;
   }
 
   @Override
@@ -62,17 +69,30 @@ class EquipmentFactory extends EntityFactory<Equipment> {
     equipment.setProcessId(processId);
 
     // check information about the parent id
-    if (processCache.containsKey(processId)) {
-
-      ConfigurationElement createEquipment = doCreateInstance(equipment);
-
-      configurationElements.add(createEquipment);
-
-      return configurationElements;
-    } else {
+    if (!processCache.containsKey(processId)) {
       throw new ConfigurationParseException("Error creating equipment #" + equipment.getId() + ": " +
           "Specified parent process does not exist!");
     }
+
+    ConfigurationElement createEquipment = doCreateInstance(equipment);
+
+    // If the user specified any custom tag info, use it (otherwise it will be created by the handler
+    if (equipment.getAliveTag() != null) {
+      configurationElements.addAll(aliveTagFactory.createInstance(equipment.getAliveTag()));
+      createEquipment.getElementProperties().setProperty("aliveTagId", equipment.getAliveTag().getId().toString());
+    }
+    if (equipment.getCommFaultTag() != null) {
+      configurationElements.addAll(commFaultTagFactory.createInstance(equipment.getCommFaultTag()));
+      createEquipment.getElementProperties().setProperty("commFaultTagId", equipment.getCommFaultTag().getId().toString());
+    }
+    if (equipment.getStatusTag() != null) {
+      configurationElements.addAll(stateTagFactory.createInstance(equipment.getStatusTag()));
+      createEquipment.getElementProperties().setProperty("stateTagId", equipment.getStatusTag().getId().toString());
+    }
+
+    configurationElements.add(createEquipment);
+
+    return configurationElements;
   }
 
   @Override

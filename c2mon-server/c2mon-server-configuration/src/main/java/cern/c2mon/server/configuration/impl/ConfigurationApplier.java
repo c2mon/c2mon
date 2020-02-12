@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,7 +32,8 @@ import java.util.concurrent.TimeoutException;
  */
 @Slf4j
 @Named
-public final class ConfigurationApplier {
+@Singleton
+final class ConfigurationApplier {
 
   private final ProcessCommunicationManager processCommunicationManager;
   private final ConfigurationHandlerSelector configurationHandlerSelector;
@@ -45,7 +47,7 @@ public final class ConfigurationApplier {
   boolean daqConfigEnabled;
 
   @Inject
-  public ConfigurationApplier(ProcessCommunicationManager processCommunicationManager,
+  ConfigurationApplier(ProcessCommunicationManager processCommunicationManager,
                               ConfigurationHandlerSelector configurationHandlerSelector, ConfigurationDAO configurationDAO,
                               ProcessService processService,
                               C2monCache<Process> processCache) {
