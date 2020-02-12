@@ -9,7 +9,6 @@ import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.common.rule.RuleTag;
-import cern.c2mon.server.configuration.helper.ObjectEqualityComparison;
 import cern.c2mon.server.configuration.parser.util.ConfigurationAlarmUtil;
 import cern.c2mon.server.configuration.util.TestConfigurationProvider;
 import cern.c2mon.shared.client.alarm.condition.AlarmCondition;
@@ -21,7 +20,6 @@ import org.junit.Test;
 
 import javax.inject.Inject;
 
-import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.*;
 
 public class AlarmConfigTest extends ConfigurationCacheLoaderTest<Alarm> {
@@ -160,7 +158,7 @@ public class AlarmConfigTest extends ConfigurationCacheLoaderTest<Alarm> {
     AlarmCacheObject cacheObjectAlarm = (AlarmCacheObject) alarmCache.get(2000L);
     AlarmCacheObject expectedCacheObjectAlarm = cacheObjectFactory.buildAlarmCacheObject(2000L, alarm);
 
-    ObjectEqualityComparison.assertAlarmEquals(expectedCacheObjectAlarm, cacheObjectAlarm);
+    assertEquals(expectedCacheObjectAlarm, cacheObjectAlarm);
     // Check if all caches are updated
     assertNotNull(alarmMapper.getItem(2000L));
   }
@@ -187,9 +185,7 @@ public class AlarmConfigTest extends ConfigurationCacheLoaderTest<Alarm> {
     AlarmCacheObject cacheObjectAlarm = (AlarmCacheObject) alarmCache.get(2000L);
     AlarmCacheObject expectedCacheObjectAlarm = cacheObjectFactory.buildAlarmUpdateCacheObject(cacheObjectAlarm, alarmUpdate);
 
-    ObjectEqualityComparison.assertAlarmEquals(expectedCacheObjectAlarm, cacheObjectAlarm);
-
-    verify(mockManager);
+    assertEquals(expectedCacheObjectAlarm, cacheObjectAlarm);
   }
 
   @Test

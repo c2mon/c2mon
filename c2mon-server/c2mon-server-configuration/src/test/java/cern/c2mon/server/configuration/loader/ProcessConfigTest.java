@@ -12,7 +12,6 @@ import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.process.ProcessCacheObject;
 import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.supervision.SupervisionStateTag;
-import cern.c2mon.server.configuration.helper.ObjectEqualityComparison;
 import cern.c2mon.server.configuration.parser.util.ConfigurationProcessUtil;
 import cern.c2mon.server.configuration.util.TestConfigurationProvider;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
@@ -103,9 +102,7 @@ public class ProcessConfigTest extends ConfigurationCacheLoaderTest<Process> {
     ProcessCacheObject cacheObjectProcess = (ProcessCacheObject) processCache.get(1L);
     ProcessCacheObject expectedObjectProcess = cacheObjectFactory.buildProcessCacheObject(1L, process);
 
-    ObjectEqualityComparison.assertProcessEquals(expectedObjectProcess, cacheObjectProcess);
-
-    verify(mockManager);
+    assertEquals(expectedObjectProcess, cacheObjectProcess);
   }
 
 
@@ -134,9 +131,7 @@ public class ProcessConfigTest extends ConfigurationCacheLoaderTest<Process> {
     ProcessCacheObject cacheObjectProcess = (ProcessCacheObject) processCache.get(5L);
     ProcessCacheObject expectedCacheObjectProcess = cacheObjectFactory.buildProcessUpdateCacheObject(cacheObjectProcess, process);
 
-    ObjectEqualityComparison.assertProcessEquals(expectedCacheObjectProcess, cacheObjectProcess);
-
-    verify(mockManager);
+    assertEquals(expectedCacheObjectProcess, cacheObjectProcess);
   }
 
   @Test

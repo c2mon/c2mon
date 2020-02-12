@@ -4,7 +4,6 @@ import cern.c2mon.cache.actions.process.ProcessService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.dbaccess.CommandTagMapper;
 import cern.c2mon.server.common.command.CommandTagCacheObject;
-import cern.c2mon.server.configuration.helper.ObjectEqualityComparison;
 import cern.c2mon.server.configuration.parser.util.ConfigurationCommandTagUtil;
 import cern.c2mon.server.configuration.util.TestConfigurationProvider;
 import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
@@ -58,7 +57,7 @@ public class CommandTagConfigTest extends ConfigurationCacheLoaderTest<CommandTa
         .getInstance()
         .fromConfigXML(
           "<HardwareAddress class=\"cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl\"><opc-item-name>PLC_B_CMD_ACQ_DEF_5A6</opc-item-name><command-pulse-length>100</command-pulse-length></HardwareAddress>"));
-    ObjectEqualityComparison.assertCommandTagEquals(expectedObject, cacheObject);
+    assertEquals(expectedObject, cacheObject);
 
     // test update
     report = configurationLoader.applyConfiguration(5);
@@ -75,7 +74,7 @@ public class CommandTagConfigTest extends ConfigurationCacheLoaderTest<CommandTa
         .getInstance()
         .fromConfigXML(
           "<HardwareAddress class=\"cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl\"><opc-item-name>PLC_B_CMD_ACQ_DEF_5A6</opc-item-name><command-pulse-length>150</command-pulse-length></HardwareAddress>"));
-    ObjectEqualityComparison.assertCommandTagEquals(expectedObject, cacheObjectUpdated);
+    assertEquals(expectedObject, cacheObjectUpdated);
   }
 
   @Test
@@ -124,7 +123,7 @@ public class CommandTagConfigTest extends ConfigurationCacheLoaderTest<CommandTa
     CommandTagCacheObject cacheObjectCommand = (CommandTagCacheObject) commandTagCache.get(500L);
     CommandTagCacheObject expectedCacheObjectCommand = cacheObjectFactory.buildCommandTagCacheObject(500L, commandTag);
 
-    ObjectEqualityComparison.assertCommandTagEquals(expectedCacheObjectCommand, cacheObjectCommand);
+    assertEquals(expectedCacheObjectCommand, cacheObjectCommand);
 
     verify(mockManager);
   }
@@ -164,7 +163,7 @@ public class CommandTagConfigTest extends ConfigurationCacheLoaderTest<CommandTa
     CommandTagCacheObject cacheObjectCommand = (CommandTagCacheObject) commandTagCache.get(500L);
     CommandTagCacheObject expectedCacheObjectCommand = cacheObjectFactory.buildCommandTagUpdateCacheObject(cacheObjectCommand, commandTagUpdate);
 
-    ObjectEqualityComparison.assertCommandTagEquals(expectedCacheObjectCommand, cacheObjectCommand);
+    assertEquals(expectedCacheObjectCommand, cacheObjectCommand);
 
     verify(mockManager);
   }

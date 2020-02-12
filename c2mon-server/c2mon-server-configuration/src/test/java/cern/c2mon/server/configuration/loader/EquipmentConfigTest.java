@@ -14,7 +14,6 @@ import cern.c2mon.server.common.equipment.EquipmentCacheObject;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.process.ProcessCacheObject;
 import cern.c2mon.server.common.rule.RuleTag;
-import cern.c2mon.server.configuration.helper.ObjectEqualityComparison;
 import cern.c2mon.server.configuration.parser.util.ConfigurationEquipmentUtil;
 import cern.c2mon.server.configuration.util.TestConfigurationProvider;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
@@ -98,7 +97,7 @@ public class EquipmentConfigTest extends ConfigurationCacheLoaderTest<Equipment>
     expectedObject.setProcessId(50L);
     expectedObject.setDescription("test description");
 
-    ObjectEqualityComparison.assertEquipmentEquals(expectedObject, cacheObject);
+    assertEquals(expectedObject, cacheObject);
 
     // also check that the process, commfault and alive cache were updated
     Process process = processCache.get(expectedObject.getProcessId());
@@ -140,7 +139,7 @@ public class EquipmentConfigTest extends ConfigurationCacheLoaderTest<Equipment>
     expectedObject.setAddress("serverHostName=VGTCVENTTEST;test");
     expectedObject.setAliveTagId(1251L);
 
-    ObjectEqualityComparison.assertEquipmentEquals(expectedObject, cacheObject);
+    assertEquals(expectedObject, cacheObject);
 
     // check alive timer reference is updated in DB
     assertEquals(new Long(1251L), equipmentMapper.getItem(110L).getAliveTagId());

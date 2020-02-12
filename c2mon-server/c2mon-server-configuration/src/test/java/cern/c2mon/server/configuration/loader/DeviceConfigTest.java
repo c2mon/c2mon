@@ -5,7 +5,6 @@ import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.dbaccess.DeviceMapper;
 import cern.c2mon.server.common.device.Device;
 import cern.c2mon.server.common.device.DeviceCacheObject;
-import cern.c2mon.server.configuration.helper.ObjectEqualityComparison;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.device.DeviceCommand;
@@ -55,7 +54,7 @@ public class DeviceConfigTest extends ConfigurationCacheLoaderTest<Device> {
     expectedObject.setDeviceProperties(expectedProperties);
     expectedObject.setDeviceCommands(expectedCommands);
 
-    ObjectEqualityComparison.assertDeviceEquals(expectedObject, cacheObject);
+    assertEquals(expectedObject, cacheObject);
 
     // Update should succeed
     report = configurationLoader.applyConfiguration(34);
@@ -65,7 +64,7 @@ public class DeviceConfigTest extends ConfigurationCacheLoaderTest<Device> {
 
     expectedProperties.add(new DeviceProperty(4L, "numCores", "4", "constantValue", "Integer"));
     expectedObject.setDeviceProperties(expectedProperties);
-    ObjectEqualityComparison.assertDeviceEquals(expectedObject, cacheObject);
+    assertEquals(expectedObject, cacheObject);
   }
 
   @Test
