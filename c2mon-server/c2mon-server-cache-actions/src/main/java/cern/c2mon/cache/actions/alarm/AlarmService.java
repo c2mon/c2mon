@@ -28,8 +28,6 @@ import static cern.c2mon.cache.actions.alarm.AlarmEvaluator.createAdditionalInfo
 @Service
 public class AlarmService extends AbstractCacheServiceImpl<Alarm> implements AlarmAggregator {
 
-  public static final String ALARM_TOPIC = "tim.alarm";
-
   private List<AlarmAggregatorListener> alarmUpdateObservable = new ArrayList<>();
 
   private TagCacheCollection unifiedTagCacheFacade;
@@ -130,19 +128,6 @@ public class AlarmService extends AbstractCacheServiceImpl<Alarm> implements Ala
       Set<Long> alarms = new HashSet<>(tag.getAlarmIds());
       return new TagWithAlarms<>(tag, cache.getAll(alarms).values());
     });
-  }
-
-  /**
-   * Derives a valid JMS topic name for distributing the alarm's values to
-   * clients (currently the same for all alarms, so returns a constant).
-   *
-   * @param alarm the alarm for which the topic should be provided
-   * @return a valid JMS topic name for the alarm
-   * @deprecated use {@link AlarmService#ALARM_TOPIC} instead
-   */
-  @Deprecated
-  public String getTopicForAlarm(final Alarm alarm) {
-    return ALARM_TOPIC;
   }
 
   @Override

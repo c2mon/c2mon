@@ -58,7 +58,6 @@ public class AlarmCacheObjectFactory extends AbstractCacheObjectFactory<Alarm> {
     alarm.setTriggerTimestamp(new Timestamp(0));
     alarm.setSourceTimestamp(new Timestamp(0));
     alarm.setInfo("");
-    alarm.setTopic(AlarmService.ALARM_TOPIC);
 
     return alarm;
   }
