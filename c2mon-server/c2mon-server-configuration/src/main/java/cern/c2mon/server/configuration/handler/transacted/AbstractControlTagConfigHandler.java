@@ -12,7 +12,6 @@ import cern.c2mon.server.configuration.parser.factory.EntityFactory;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
-import cern.c2mon.shared.client.configuration.api.tag.StatusTag;
 import cern.c2mon.shared.common.CacheEvent;
 
 import java.util.ArrayList;
@@ -68,29 +67,21 @@ public abstract class AbstractControlTagConfigHandler<
 
   public abstract List<ProcessChange> createBySupervised(ConfigurationElement configurationElement);
 
-  protected List<ProcessChange> createBySupervised(ConfigurationElement configurationElement, Supplier<CONTROL_ENTITY> supplier) {
+  protected List<ProcessChange> createBySupervised(ConfigurationElement configurationElement, String propertyName, Supplier<CONTROL_ENTITY> supplier) {
     List<ProcessChange> changes = new ArrayList<>();
 
-    Long supervisionId = configurationElement.getEntityId();
+    Long supervisionId = null;
+    if (configurationElement.getElementProperties().containsKey(propertyName)) {
+      supervisionId = Long.parseLong(configurationElement.getElementProperties().getProperty(propertyName));
+    }
 
     if (supervisionId == null || !cache.containsKey(supervisionId)) {
-      CONTROL_ENTITY statusTag = supplier.get();
-      ConfigurationElement configStatusTag = entityFactory.createInstance(statusTag).get(0);
-      setAppropriateId(statusTag, configurationElement);
+      CONTROL_ENTITY controlTag = supplier.get();
+      ConfigurationElement configStatusTag = entityFactory.createInstance(controlTag).get(0);
+      configurationElement.getElementProperties().setProperty(propertyName, controlTag.getId().toString());
       changes = super.create(configStatusTag);
     }
 
     return changes;
-  }
-
-  protected void setAppropriateId(CONTROL_ENTITY controlTag, ConfigurationElement configurationElement) {
-    // Don't set the parent supervision id yet, as it doesn't exist in the database -__-
-    if (controlTag instanceof cern.c2mon.shared.client.configuration.api.tag.AliveTag) {
-      configurationElement.getElementProperties().setProperty("aliveTagId", controlTag.getId().toString());
-    } else if (controlTag instanceof StatusTag) {
-      configurationElement.getElementProperties().setProperty("stateTagId", controlTag.getId().toString());
-    } else if (controlTag instanceof cern.c2mon.shared.client.configuration.api.tag.CommFaultTag) {
-      configurationElement.getElementProperties().setProperty("commFaultTagId", controlTag.getId().toString());
-    }
   }
 }

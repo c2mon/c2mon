@@ -5,6 +5,9 @@ import cern.c2mon.cache.actions.subequipment.SubEquipmentService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.dbaccess.EquipmentMapper;
 import cern.c2mon.server.cache.dbaccess.SubEquipmentMapper;
+import cern.c2mon.server.cache.loading.AliveTagDAO;
+import cern.c2mon.server.cache.loading.CommFaultTagDAO;
+import cern.c2mon.server.cache.loading.SupervisionStateTagDAO;
 import cern.c2mon.server.common.alive.AliveTag;
 import cern.c2mon.server.common.commfault.CommFaultTag;
 import cern.c2mon.server.common.datatag.DataTag;
@@ -29,42 +32,38 @@ import static org.junit.Assert.*;
 
 public class SubEquipmentConfigTest extends ConfigurationCacheLoaderTest<SubEquipment> {
   
-  @Inject
-  private C2monCache<SubEquipment> subEquipmentCache;
+  @Inject private C2monCache<SubEquipment> subEquipmentCache;
 
-  @Inject
-  private SubEquipmentMapper subEquipmentMapper;
+  @Inject private SubEquipmentMapper subEquipmentMapper;
 
-  @Inject
-  private SubEquipmentService subEquipmentService;
+  @Inject private SubEquipmentService subEquipmentService;
 
-  @Inject
-  private C2monCache<Equipment> equipmentCache;
+  @Inject private C2monCache<Equipment> equipmentCache;
 
-  @Inject
-  private EquipmentMapper equipmentMapper;
+  @Inject private EquipmentMapper equipmentMapper;
 
-  @Inject
-  private C2monCache<AliveTag> aliveTimerCache;
+  @Inject private C2monCache<AliveTag> aliveTimerCache;
 
-  @Inject
-  private C2monCache<CommFaultTag> commFaultTagCache;
+  @Inject private AliveTagDAO aliveTagDAO;
 
-  @Inject
-  private C2monCache<SupervisionStateTag> stateTagCache;
+  @Inject private C2monCache<CommFaultTag> commFaultTagCache;
 
-  @Inject
-  private C2monCache<DataTag> dataTagCache;
+  @Inject private CommFaultTagDAO commFaultTagDAO;
 
-  @Inject
-  private DataTagService dataTagService;
+  @Inject private C2monCache<SupervisionStateTag> stateTagCache;
+
+  @Inject private SupervisionStateTagDAO stateTagDAO;
+
+  @Inject private C2monCache<DataTag> dataTagCache;
+
+  @Inject private DataTagService dataTagService;
 
   /**
    * Test the creation, update and removal of equipment.
    */
-
   @Test
   public void testCreateUpdateSubEquipment() {
+    purgePreviousControlCachesAndDb();
     ConfigurationReport report = configurationLoader.applyConfiguration(19);
 
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
@@ -73,8 +72,8 @@ public class SubEquipmentConfigTest extends ConfigurationCacheLoaderTest<SubEqui
     SubEquipmentCacheObject expectedObject = new SubEquipmentCacheObject(200L);
     expectedObject.setName("SUB_E_TEST");
     expectedObject.setStateTagId(1250L);
-    expectedObject.setCommFaultTagId(1252L);
     expectedObject.setAliveTagId(1251L);
+    expectedObject.setCommFaultTagId(1252L);
     expectedObject.setAliveInterval(30000);
     expectedObject.setHandlerClassName("cern.c2mon.daq.testhandler.TestMessageHandler");
     expectedObject.setParentId(150L);
@@ -98,8 +97,6 @@ public class SubEquipmentConfigTest extends ConfigurationCacheLoaderTest<SubEqui
     report = configurationLoader.applyConfiguration(20);
 
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
-
-    verify(mockManager);
   }
 
   @Test
@@ -158,6 +155,7 @@ public class SubEquipmentConfigTest extends ConfigurationCacheLoaderTest<SubEqui
   @Test
   public void testRemoveSubEquipment() {
     // Create the subequipment
+    purgePreviousControlCachesAndDb();
     ConfigurationReport report = configurationLoader.applyConfiguration(19);
 
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
@@ -254,6 +252,18 @@ public class SubEquipmentConfigTest extends ConfigurationCacheLoaderTest<SubEqui
     expectedCacheObjectEquipment.setHandlerClassName("handlerClass");
 
     assertEquals(expectedCacheObjectEquipment, cacheObjectEquipment);
+  }
+
+  /**
+   * Configuration 19 contains some duplicate stuff that already exists in DB
+   */
+  private void purgePreviousControlCachesAndDb(){
+    stateTagCache.remove(1250L);
+    aliveTimerCache.remove(1251L);
+    commFaultTagCache.remove(1252L);
+    stateTagDAO.deleteItem(1250L);
+    aliveTagDAO.deleteItem(1251L);
+    commFaultTagDAO.deleteItem(1252L);
   }
 
   private SubEquipmentCacheObject buildSubEquipmentCacheObject(Long id,

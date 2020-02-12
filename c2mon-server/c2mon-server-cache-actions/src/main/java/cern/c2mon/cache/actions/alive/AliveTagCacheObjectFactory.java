@@ -21,7 +21,7 @@ public class AliveTagCacheObjectFactory extends ControlTagCacheObjectFactory<Ali
 
   @Override
   public Change configureCacheObject(AliveTag aliveTag, Properties properties) {
-    apply(new PropertiesAccessor(properties), accessor -> {
+    apply(new PropertiesAccessor(properties), accessor ->
       accessor
         .getLong("processId").ifPresent(id -> {
         aliveTag.setSupervisedId(id);
@@ -38,8 +38,7 @@ public class AliveTagCacheObjectFactory extends ControlTagCacheObjectFactory<Ali
         .getInteger("aliveInterval").ifPresent(aliveTag::setAliveInterval)
         .getLong("commFaultTagId").ifPresent(aliveTag::setCommFaultTagId)
         .getLong("statusTagId").ifPresent(aliveTag::setStateTagId)
-        .getString("supervisedName").ifPresent(aliveTag::setSupervisedName);
-    });
+        .getString("supervisedName").ifPresent(aliveTag::setSupervisedName));
 
     // TODO (Alex) Also check for address changes?
 

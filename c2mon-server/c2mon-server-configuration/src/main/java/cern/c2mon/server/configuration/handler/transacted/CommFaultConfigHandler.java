@@ -8,6 +8,7 @@ import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.server.configuration.parser.factory.CommFaultTagFactory;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
+import cern.c2mon.shared.common.PropertiesAccessor;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Named;
@@ -37,9 +38,13 @@ public class CommFaultConfigHandler extends AbstractControlTagConfigHandler<Comm
       return new ArrayList<>();
     }
 
-    return super.createBySupervised(configurationElement,
-        () -> cern.c2mon.shared.client.configuration.api.tag.CommFaultTag.create(name + ":COMM_FAULT")
-          .description("Communication fault tag for " + entity + " " + name)
-          .build());
+    cern.c2mon.shared.client.configuration.api.tag.CommFaultTag.CreateBuilder builder =
+      cern.c2mon.shared.client.configuration.api.tag.CommFaultTag.create(name + ":COMM_FAULT")
+        .description("Communication fault tag for " + entity + " " + name);
+
+    new PropertiesAccessor(configurationElement.getElementProperties())
+      .getLong("commFaultTagId").ifPresent(builder::id);
+
+    return super.createBySupervised(configurationElement, "commFaultTagId", builder::build);
   }
 }

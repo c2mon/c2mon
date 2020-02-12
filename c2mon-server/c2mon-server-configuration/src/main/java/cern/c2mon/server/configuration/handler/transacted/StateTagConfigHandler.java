@@ -9,6 +9,7 @@ import cern.c2mon.server.configuration.parser.factory.SupervisionStateTagFactory
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.api.tag.StatusTag;
+import cern.c2mon.shared.common.PropertiesAccessor;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Inject;
@@ -31,9 +32,12 @@ public class StateTagConfigHandler extends AbstractControlTagConfigHandler<Super
     ConfigConstants.Entity entity = element.getEntity();
     String name = element.getElementProperties().getProperty("name");
 
-    return super.createBySupervised(element,
-      () -> StatusTag.create(name + ":STATUS")
-        .description("State tag for " + entity + " " + name)
-        .build());
+    StatusTag.CreateBuilder builder = StatusTag.create(name + ":STATUS")
+      .description("State tag for " + entity + " " + name);
+
+    new PropertiesAccessor(element.getElementProperties())
+      .getLong("stateTagId").ifPresent(builder::id);
+
+    return super.createBySupervised(element, "stateTagId", builder::build);
   }
 }

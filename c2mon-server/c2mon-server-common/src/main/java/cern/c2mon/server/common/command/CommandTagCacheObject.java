@@ -36,12 +36,11 @@ import org.simpleframework.xml.Transient;
  */
 @Getter
 @Setter
-@ToString
+@ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public final class CommandTagCacheObject<T> extends AbstractCacheableImpl implements CommandTag<T> {
 
     private static final long serialVersionUID = -5348795528961997767L;
-
 
     /**
      * Unique name of the CommandTag

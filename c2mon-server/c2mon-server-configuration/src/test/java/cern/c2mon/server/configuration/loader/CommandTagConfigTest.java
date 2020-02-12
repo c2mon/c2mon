@@ -19,7 +19,6 @@ import org.junit.Test;
 import javax.inject.Inject;
 import java.sql.Timestamp;
 
-import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.*;
 
 public class CommandTagConfigTest extends ConfigurationCacheLoaderTest<CommandTag> {
@@ -90,7 +89,6 @@ public class CommandTagConfigTest extends ConfigurationCacheLoaderTest<CommandTa
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     assertFalse(commandTagCache.containsKey(11000L));
     assertNull(commandTagMapper.getItem(11000L));
-    verify(mockManager);
   }
 
   @Test
@@ -124,8 +122,6 @@ public class CommandTagConfigTest extends ConfigurationCacheLoaderTest<CommandTa
     CommandTagCacheObject expectedCacheObjectCommand = cacheObjectFactory.buildCommandTagCacheObject(500L, commandTag);
 
     assertEquals(expectedCacheObjectCommand, cacheObjectCommand);
-
-    verify(mockManager);
   }
 
   @Test
@@ -164,7 +160,5 @@ public class CommandTagConfigTest extends ConfigurationCacheLoaderTest<CommandTa
     CommandTagCacheObject expectedCacheObjectCommand = cacheObjectFactory.buildCommandTagUpdateCacheObject(cacheObjectCommand, commandTagUpdate);
 
     assertEquals(expectedCacheObjectCommand, cacheObjectCommand);
-
-    verify(mockManager);
   }
 }

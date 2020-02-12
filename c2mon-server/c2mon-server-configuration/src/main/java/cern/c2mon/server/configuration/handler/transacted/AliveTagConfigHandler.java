@@ -8,6 +8,7 @@ import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.server.configuration.parser.factory.AliveTagFactory;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
+import cern.c2mon.shared.common.PropertiesAccessor;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Inject;
@@ -38,11 +39,14 @@ public class AliveTagConfigHandler extends AbstractControlTagConfigHandler<Alive
     ConfigConstants.Entity entity = configurationElement.getEntity();
     String name = configurationElement.getElementProperties().getProperty("name");
 
-    return super.createBySupervised(configurationElement,
-      () -> cern.c2mon.shared.client.configuration.api.tag.AliveTag.create(name + ":ALIVE")
-        .description("Alive tag for " + entity.toString() + " " + name)
-        .build()
-    );
+    cern.c2mon.shared.client.configuration.api.tag.AliveTag.CreateBuilder aliveTagBuilder =
+      cern.c2mon.shared.client.configuration.api.tag.AliveTag.create(name + ":ALIVE")
+        .description("Alive tag for " + entity.toString() + " " + name);
+
+    new PropertiesAccessor(configurationElement.getElementProperties())
+      .getLong("aliveTagId").ifPresent(aliveTagBuilder::id);
+
+    return super.createBySupervised(configurationElement, "aliveTagId", aliveTagBuilder::build);
   }
 
   /**
