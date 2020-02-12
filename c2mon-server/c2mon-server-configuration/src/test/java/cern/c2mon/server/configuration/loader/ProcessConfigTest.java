@@ -172,11 +172,6 @@ public class ProcessConfigTest extends ConfigurationCacheLoaderTest<Process> {
     assertNull(processMapper.getItem(50L));
     assertFalse(equipmentCache.containsKey(150L));
     assertNull(equipmentMapper.getItem(150L));
-    // check couple of rules
-    assertFalse(ruleTagCache.containsKey(60010L));
-    assertNull(ruleTagMapper.getItem(60010L));
-    assertFalse(ruleTagCache.containsKey(60002L));
-    assertNull(ruleTagMapper.getItem(60002L));
     // tags
     assertFalse(dataTagCache.containsKey(200002L));
     assertNull(dataTagMapper.getItem(200002L));
@@ -188,11 +183,6 @@ public class ProcessConfigTest extends ConfigurationCacheLoaderTest<Process> {
     // process alive
     assertNull(stateTagMapper.getItem(1220L));
     assertFalse(aliveTimerCache.containsKey(1221L));
-    // alarms
-    assertFalse(alarmCache.containsKey(350000L));
-    assertNull(alarmMapper.getItem(350000L));
-    assertFalse(alarmCache.containsKey(350001L));
-    assertNull(alarmMapper.getItem(350001L));
   }
 
   @Test
