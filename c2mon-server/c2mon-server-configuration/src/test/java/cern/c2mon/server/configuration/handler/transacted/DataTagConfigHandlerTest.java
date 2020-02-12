@@ -1,7 +1,5 @@
 package cern.c2mon.server.configuration.handler.transacted;
 
-import cern.c2mon.server.cache.test.CacheObjectCreation;
-import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.configuration.ConfigurationCacheTest;
 import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.server.configuration.junit.ConfigRuleChain;
@@ -22,35 +20,36 @@ public class DataTagConfigHandlerTest extends ConfigurationCacheTest {
   public ConfigRuleChain configRuleChain;
 
   @Inject private DataTagConfigHandler dataTagConfigTransacted;
+  
+  private static final long VALID_ID = 200000;
+  private static final long VALID_EQ_ID = 150;
 
   @Test
   public void testEmptyUpdateDataTag() {
-    DataTagCacheObject dataTag = CacheObjectCreation.createTestDataTag();
     // mimic the actions of the datatag facade
     DataTagUpdate update = new DataTagUpdate();
-    update.setDataTagId(dataTag.getId());
-    update.setEquipmentId(dataTag.getEquipmentId());
+    update.setDataTagId(VALID_ID);
+    update.setEquipmentId(VALID_EQ_ID);
 
     // put
 //    dataTagLoaderDAO.updateConfig(dataTag);  ??????
 
-    for (ProcessChange processChange : dataTagConfigTransacted.update(dataTag.getId(), new Properties())) {
+    for (ProcessChange processChange : dataTagConfigTransacted.update(VALID_ID, new Properties())) {
       assertFalse(processChange.processActionRequired());
     }
   }
 
   @Test
   public void testNotEmptyUpdateDataTag() {
-    DataTagCacheObject dataTag = CacheObjectCreation.createTestDataTag();
     // mimic the actions of the datatag facade
     DataTagUpdate update = new DataTagUpdate();
-    update.setDataTagId(dataTag.getId());
-    update.setEquipmentId(dataTag.getEquipmentId());
+    update.setDataTagId(VALID_ID);
+    update.setEquipmentId(VALID_EQ_ID);
     update.setName("new name");
 
     // put
 
-    for (ProcessChange processChange : dataTagConfigTransacted.update(dataTag.getId(), new Properties())) {
+    for (ProcessChange processChange : dataTagConfigTransacted.update(VALID_ID, new Properties())) {
       assertFalse(processChange.processActionRequired());
       assertNull(processChange.getProcessId());
     }
@@ -58,11 +57,9 @@ public class DataTagConfigHandlerTest extends ConfigurationCacheTest {
 
   @Test
   public void testUpdateDAQRelatedPropertiesOfDataTag() {
-    DataTagCacheObject dataTag = CacheObjectCreation.createTestDataTag();
-
     DataTagUpdate update = new DataTagUpdate();
-    update.setDataTagId(dataTag.getId());
-    update.setEquipmentId(dataTag.getEquipmentId());
+    update.setDataTagId(VALID_ID);
+    update.setEquipmentId(VALID_EQ_ID);
     update.setDataTagAddressUpdate(new DataTagAddressUpdate());
 
     Properties properties = new Properties();
@@ -72,7 +69,7 @@ public class DataTagConfigHandlerTest extends ConfigurationCacheTest {
     properties.put("maxValue", "new max val");
 
     // put
-    for (ProcessChange change : dataTagConfigTransacted.update(dataTag.getId(), properties)) {
+    for (ProcessChange change : dataTagConfigTransacted.update(VALID_ID, properties)) {
       assertTrue(change.processActionRequired());
       assertEquals(Long.valueOf(50), change.getProcessId());
     }
@@ -81,29 +78,27 @@ public class DataTagConfigHandlerTest extends ConfigurationCacheTest {
 
   @Test
   public void testUpdateNonDAQRelatedPropertiesOfDataTag() {
-    DataTagCacheObject dataTag = CacheObjectCreation.createTestDataTag();
-
     DataTagUpdate update = new DataTagUpdate();
-    update.setDataTagId(dataTag.getId());
-    update.setEquipmentId(dataTag.getEquipmentId());
+    update.setDataTagId(VALID_ID);
+    update.setEquipmentId(VALID_EQ_ID);
     update.setName("new name");
 
     // Update all properties that do not require DAQ reconfiguration
     Properties properties = new Properties();
-    properties.put("id", dataTag.getId());
+    properties.put("id", VALID_ID);
     properties.put("name", "new name");
     properties.put("description", "new description");
-    properties.put("mode", "new mode");
-    properties.put("isLogged", "new logged");
+    properties.put("mode", 1);
+    properties.put("isLogged", false);
     properties.put("unit", "new unit");
-    properties.put("equipmentId", dataTag.getEquipmentId());
+    properties.put("equipmentId", VALID_EQ_ID);
     properties.put("valueDictionary", "new dict");
     properties.put("japcAddress", "new japc address");
     properties.put("dipAddress", "new dip address");
 
     // put
 
-    for (ProcessChange change : dataTagConfigTransacted.update(dataTag.getId(), properties)) {
+    for (ProcessChange change : dataTagConfigTransacted.update(VALID_ID, properties)) {
       assertFalse(change.processActionRequired());
     }
   }
