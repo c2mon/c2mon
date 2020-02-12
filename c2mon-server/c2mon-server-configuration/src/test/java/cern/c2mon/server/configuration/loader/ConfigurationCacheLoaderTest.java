@@ -57,12 +57,12 @@ public abstract class ConfigurationCacheLoaderTest<T extends Cacheable> extends 
   protected void setUp() {
     Configuration createProcess = TestConfigurationProvider.createProcess();
     configurationLoader.applyConfiguration(createProcess);
+    processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
     Configuration createEquipment = TestConfigurationProvider.createEquipment();
     configurationLoader.applyConfiguration(createEquipment);
     Configuration createSubEquipment = TestConfigurationProvider.createSubEquipment();
     configurationLoader.applyConfiguration(createSubEquipment);
     Configuration createDataTag = TestConfigurationProvider.createEquipmentDataTag(15L);
     configurationLoader.applyConfiguration(createDataTag);
-    processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
   }
 }

@@ -108,7 +108,8 @@ public class AlarmServiceTest {
     alarmService.update(alarm, tag, true);
 
     assertFalse(alarm.isActive());
-    assertFalse(alarm.isActive()); //also update alarm parameter object (usually in cache)
+    //also update alarm parameter object (usually in cache)
+    assertFalse(alarm.isActive());
   }
 
   @Test

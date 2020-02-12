@@ -20,12 +20,9 @@ import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.api.Configuration;
-import cern.c2mon.shared.common.NoSimpleValueParseException;
 import org.junit.Test;
 
 import javax.inject.Inject;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Properties;
@@ -68,36 +65,32 @@ public class EquipmentConfigTest extends ConfigurationCacheLoaderTest<Equipment>
   private AlarmMapper alarmMapper;
 
   /**
-   * Test the creation, update and removal of equipment.
-   *
-   * @throws NoSimpleValueParseException
-   * @throws NoSuchFieldException
-   * @throws TransformerException
-   * @throws InstantiationException
-   * @throws IllegalAccessException
-   * @throws ParserConfigurationException
+   * Test the creation of equipment
    */
   @Test
-  public void testCreateUpdateEquipment() {
+  public void createFromDb() {
     ConfigurationReport report = configurationLoader.applyConfiguration(13);
 
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     assertEquals(ConfigConstants.Status.OK, report.getStatus()); // ok as DAQ handles Equipment
     // creation
     assertFalse(report.getProcessesToReboot().contains("P_TESTHANDLER03"));
+  }
 
-    EquipmentCacheObject cacheObject = (EquipmentCacheObject) equipmentCache.get(110L);
-    EquipmentCacheObject expectedObject = new EquipmentCacheObject(110L);
-    expectedObject.setName("E_CONFIG_TEST");
-    expectedObject.setAddress("serverHostName=VGTCVENTTEST");
-    expectedObject.setAliveTagId(1251L);
-    expectedObject.setStateTagId(1250L);
-    expectedObject.setCommFaultTagId(1252L);
-    expectedObject.setHandlerClassName("cern.c2mon.driver.");
-    expectedObject.setProcessId(50L);
-    expectedObject.setDescription("test description");
+  @Test
+  public void createFromDbLoadsCache() {
+    EquipmentCacheObject expectedObject = expectedObject();
 
-    assertEquals(expectedObject, cacheObject);
+    configurationLoader.applyConfiguration(13);
+
+    assertEquals(expectedObject, equipmentCache.get(110L));
+  }
+
+  @Test
+  public void createFromDbUpdatesProcess() {
+    EquipmentCacheObject expectedObject = expectedObject();
+
+    configurationLoader.applyConfiguration(13);
 
     // also check that the process, commfault and alive cache were updated
     Process process = processCache.get(expectedObject.getProcessId());
@@ -105,13 +98,24 @@ public class EquipmentConfigTest extends ConfigurationCacheLoaderTest<Equipment>
     ((ProcessCacheObject) process).setRequiresReboot(false);
     assertFalse(process.getRequiresReboot());
     assertTrue(process.getEquipmentIds().contains(expectedObject.getId()));
+  }
+
+  @Test
+  public void createFromDbCreatesControlTags() {
+    EquipmentCacheObject expectedObject = expectedObject();
+
+    configurationLoader.applyConfiguration(13);
+
     // the alivetimer and commfault have overriden those already in the cache
     // (check reference to the equipment has changed)
     assertNotNull(commFaultTagCache.get(expectedObject.getCommFaultTagId()));
-    assertEquals(expectedObject.getId(), (long) commFaultTagCache.get(cacheObject.getCommFaultTagId()).getSupervisedId());
+    assertEquals(expectedObject.getId(), (long) commFaultTagCache.get(expectedObject.getCommFaultTagId()).getSupervisedId());
+  }
 
+  @Test
+  public void updateFromDb(){
     // update (creates controltag and updates equipment) - should succeed
-    report = configurationLoader.applyConfiguration(25);
+    ConfigurationReport report = configurationLoader.applyConfiguration(25);
 
     // expect 2 top elements (control and equipment, with control first)
     // equipment report should have 1 sub-reports from DAQ (control tag has no
@@ -134,12 +138,12 @@ public class EquipmentConfigTest extends ConfigurationCacheLoaderTest<Equipment>
     assertEquals(ConfigConstants.Status.OK, report.getStatus());
     assertTrue(report.getProcessesToReboot().isEmpty());
 
-    cacheObject = (EquipmentCacheObject) equipmentCache.get(110L);
+    EquipmentCacheObject expectedObject = expectedObject();
     expectedObject.setDescription("updated description");
     expectedObject.setAddress("serverHostName=VGTCVENTTEST;test");
     expectedObject.setAliveTagId(1251L);
 
-    assertEquals(expectedObject, cacheObject);
+    assertEquals(expectedObject, equipmentCache.get(110L));
 
     // check alive timer reference is updated in DB
     assertEquals(new Long(1251L), equipmentMapper.getItem(110L).getAliveTagId());
@@ -278,5 +282,18 @@ public class EquipmentConfigTest extends ConfigurationCacheLoaderTest<Equipment>
     EquipmentCacheObject expectedCacheObjectEquipment = cacheObjectFactory.buildEquipmentUpdateCacheObject(cacheObjectEquipment, equipment);
 
     assertEquals(expectedCacheObjectEquipment, cacheObjectEquipment);
+  }
+
+  private static EquipmentCacheObject expectedObject() {
+    EquipmentCacheObject expectedObject = new EquipmentCacheObject(110L);
+    expectedObject.setName("E_CONFIG_TEST");
+    expectedObject.setAddress("serverHostName=VGTCVENTTEST");
+    expectedObject.setAliveTagId(1251L);
+    expectedObject.setStateTagId(1250L);
+    expectedObject.setCommFaultTagId(1252L);
+    expectedObject.setHandlerClassName("cern.c2mon.driver.");
+    expectedObject.setProcessId(50L);
+    expectedObject.setDescription("test description");
+    return expectedObject;
   }
 }

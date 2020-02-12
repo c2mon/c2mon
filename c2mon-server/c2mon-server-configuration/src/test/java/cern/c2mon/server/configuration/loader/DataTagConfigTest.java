@@ -41,7 +41,7 @@ public class DataTagConfigTest extends ConfigurationCacheLoaderTest<DataTag> {
 
   @Test
   public void testCreateAndUpdateDataTag() throws ConfigurationException {
-
+    processService.start(50, System.currentTimeMillis());
     ConfigurationReport report = configurationLoader.applyConfiguration(1);
 
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
@@ -103,6 +103,7 @@ public class DataTagConfigTest extends ConfigurationCacheLoaderTest<DataTag> {
 
   @Test
   public void testRemoveDataTag() {
+    processService.start(50, System.currentTimeMillis());
     // check data as expected
     Long tagId = 200001L;
     DataTagCacheObject cacheObject = (DataTagCacheObject) dataTagCache.get(200001L);
@@ -192,6 +193,7 @@ public class DataTagConfigTest extends ConfigurationCacheLoaderTest<DataTag> {
   public void createSubEquipmentDataTag() {
     Configuration createProcess = TestConfigurationProvider.createProcess();
     configurationLoader.applyConfiguration(createProcess);
+    processService.start(5L, System.currentTimeMillis());
     Configuration createEquipment = TestConfigurationProvider.createEquipment();
     configurationLoader.applyConfiguration(createEquipment);
     Configuration createSubEquipment = TestConfigurationProvider.createSubEquipment();
@@ -231,6 +233,7 @@ public class DataTagConfigTest extends ConfigurationCacheLoaderTest<DataTag> {
     /// SETUP:
     Configuration createProcess = TestConfigurationProvider.createProcess();
     configurationLoader.applyConfiguration(createProcess);
+    processService.start(5L, System.currentTimeMillis());
     Configuration createEquipment = TestConfigurationProvider.createEquipment();
     configurationLoader.applyConfiguration(createEquipment);
     Configuration createSubEquipment = TestConfigurationProvider.createSubEquipment();
