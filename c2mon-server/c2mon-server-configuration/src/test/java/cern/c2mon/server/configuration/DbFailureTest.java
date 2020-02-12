@@ -25,13 +25,11 @@ import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.rule.RuleTag;
-import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.configuration.handler.transacted.ProcessConfigHandler;
 import cern.c2mon.server.configuration.junit.ConfigRuleChain;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
-import cern.c2mon.shared.common.command.CommandTag;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.Before;
@@ -50,7 +48,7 @@ import static org.junit.Assert.*;
  * @author Mark Brightwell
  *
  */
-@SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
+
 public class DbFailureTest extends ConfigurationCacheTest {
 
   @Rule
@@ -60,9 +58,6 @@ public class DbFailureTest extends ConfigurationCacheTest {
   private IMocksControl mockControl = EasyMock.createNiceControl();
 
   @Inject
-  private ProcessConfigHandler processConfigHandler;
-
-  @Inject
   private ConfigurationLoader configurationLoader;
 
   @Inject
@@ -70,13 +65,6 @@ public class DbFailureTest extends ConfigurationCacheTest {
 
   @Inject
   private DataTagMapper dataTagMapper;
-
-  @Inject
-  private C2monCache<CommandTag> commandTagCache;
-
-  @Inject
-  private CommandTagMapper commandTagMapper;
-
   @Inject
   private C2monCache<RuleTag> ruleTagCache;
 
@@ -88,12 +76,6 @@ public class DbFailureTest extends ConfigurationCacheTest {
 
   @Inject
   private EquipmentMapper equipmentMapper;
-
-  @Inject
-  private C2monCache<SubEquipment> subEquipmentCache;
-
-  @Inject
-  private SubEquipmentMapper subEquipmentMapper;
 
   @Inject
   private C2monCache<Process> processCache;
@@ -160,7 +142,5 @@ public class DbFailureTest extends ConfigurationCacheTest {
     assertNull(alarmMapper.getItem(350000L));
     assertFalse(alarmCache.containsKey(350001L));
     assertNull(alarmMapper.getItem(350001L));
-
-    mockControl.verify();
   }
 }

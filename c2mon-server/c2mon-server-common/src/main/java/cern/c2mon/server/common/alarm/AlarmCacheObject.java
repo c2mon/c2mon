@@ -17,12 +17,11 @@
 package cern.c2mon.server.common.alarm;
 
 import cern.c2mon.server.common.AbstractCacheableImpl;
-import cern.c2mon.shared.client.alarm.condition.AlarmCondition;
 import cern.c2mon.server.common.metadata.Metadata;
+import cern.c2mon.shared.client.alarm.condition.AlarmCondition;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 import java.sql.Timestamp;
 import java.util.LinkedList;
@@ -34,11 +33,9 @@ import java.util.LinkedList;
  * careful when sending to LASER as this may be the reason (?)
  *
  * @author Mark Brightwell
- *
  */
 @Getter
 @Setter
-@ToString
 @EqualsAndHashCode(callSuper = true)
 public class AlarmCacheObject extends AbstractCacheableImpl implements Alarm {
 

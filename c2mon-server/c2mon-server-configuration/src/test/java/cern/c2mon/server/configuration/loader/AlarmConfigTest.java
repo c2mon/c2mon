@@ -70,12 +70,6 @@ public class AlarmConfigTest extends ConfigurationCacheLoaderTest<Alarm> {
    */
   @Test
   public void testCreateUpdateAlarm() {
-
-    // we do not expect to send the alarm as the datatag is unitialized.
-//    C2monCacheListener<Alarm> checker = EasyMock.createMock(C2monCacheListener.class);
-//    EasyMock.replay(checker);
-//    alarmCache.registerSynchronousListener(checker);
-
     ConfigurationReport report = configurationLoader.applyConfiguration(22);
 
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));

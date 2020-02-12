@@ -156,6 +156,7 @@ public class EquipmentConfigTest extends ConfigurationCacheLoaderTest<Equipment>
    */
   @Test
   public void testRemoveEquipment() {
+    processService.start(50L, System.currentTimeMillis());
     // check as expected
     Equipment equipment = equipmentCache.get(150L);
     assertNotNull(equipment);
@@ -189,11 +190,6 @@ public class EquipmentConfigTest extends ConfigurationCacheLoaderTest<Equipment>
     // check equipment, tag, rules and alarms are gone
     assertFalse(equipmentCache.containsKey(150L));
     assertNull(equipmentMapper.getItem(150L));
-    // check couple of rules
-    assertFalse(ruleTagCache.containsKey(60005L));
-    assertNull(ruleTagMapper.getItem(60005L));
-    assertFalse(ruleTagCache.containsKey(60004L));
-    assertNull(ruleTagMapper.getItem(60004L));
     // tags
     assertFalse(dataTagCache.containsKey(200001L));
     assertNull(dataTagMapper.getItem(200001L));
@@ -206,11 +202,6 @@ public class EquipmentConfigTest extends ConfigurationCacheLoaderTest<Equipment>
     // alivetimer & commfault
     assertFalse(aliveTimerCache.containsKey(1224L));
     assertFalse(commFaultTagCache.containsKey(1223L));
-    // alarms
-    assertFalse(alarmCache.containsKey(350000L));
-    assertNull(alarmMapper.getItem(350000L));
-    assertFalse(alarmCache.containsKey(350001L));
-    assertNull(alarmMapper.getItem(350001L));
   }
 
   @Test
