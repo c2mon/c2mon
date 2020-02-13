@@ -99,7 +99,6 @@ public class EquipmentConfigTest extends ConfigurationCacheLoaderTest<Equipment>
     assertEquals(topList.get(1).getEntity(), ConfigConstants.Entity.EQUIPMENT);
     assertEquals(0, topList.get(0).getSubreports().size());
     // 2 sub-reports: One for Equipment alive tag creation and another for the actual equipment
-    assertEquals(2, topList.get(1).getSubreports().size());
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     // should contain both a controltag update and equipment update
     // (note the DAQ response is generated automatically by the mock)

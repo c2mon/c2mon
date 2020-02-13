@@ -34,7 +34,7 @@ public class ConfigurationException extends RuntimeException {
   /**
    * Wrapped report for sending to the client. 
    */
-  private ConfigurationReport configurationReport;
+  private final ConfigurationReport configurationReport;
 
   /**
    * Constructor.

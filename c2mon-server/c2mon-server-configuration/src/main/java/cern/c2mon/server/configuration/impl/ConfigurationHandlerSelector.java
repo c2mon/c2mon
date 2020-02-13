@@ -33,6 +33,7 @@ class ConfigurationHandlerSelector {
                                       AliveTagConfigHandler aliveTagConfigHandler,
                                       CommandTagConfigHandler commandTagConfigHandler,
                                       CommFaultConfigHandler commFaultConfigHandler,
+                                      ControlTagHandlerSelector controlTagHandlerSelector,
                                       DataTagConfigHandler dataTagConfigHandler,
                                       DeviceClassConfigHandler deviceClassConfigHandler,
                                       DeviceConfigHandler deviceConfigHandler,
@@ -47,6 +48,7 @@ class ConfigurationHandlerSelector {
         map.put(ALIVETAG, aliveTagConfigHandler);
         map.put(COMMANDTAG, commandTagConfigHandler);
         map.put(COMMFAULTTAG, commFaultConfigHandler);
+        map.put(CONTROLTAG, controlTagHandlerSelector);
         map.put(DATATAG, dataTagConfigHandler);
         map.put(DEVICE, deviceConfigHandler);
         map.put(DEVICECLASS, deviceClassConfigHandler);
