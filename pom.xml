@@ -419,11 +419,6 @@
         <plugin>
           <artifactId>maven-surefire-plugin</artifactId>
           <version>3.0.0-M4</version>
-          <configuration>
-            <forkMode>never</forkMode>
-            <perCoreThreadCount>false</perCoreThreadCount>
-          </configuration>
-
         </plugin>
         <plugin>
           <artifactId>maven-jar-plugin</artifactId>
@@ -447,8 +442,7 @@
           <artifactId>maven-compiler-plugin</artifactId>
           <version>3.8.1</version>
           <configuration>
-            <source>${java.version}</source>
-            <target>${java.version}</target>
+            <release>${java.version}</release>
             <useIncrementalCompilation>false</useIncrementalCompilation>
           </configuration>
         </plugin>
@@ -469,6 +463,31 @@
           <artifactId>sonar-maven-plugin</artifactId>
           <version>3.3.0.603</version>
         </plugin>
+        
+        <plugins>
+           <plugin>
+             <groupId>org.apache.maven.plugins</groupId>
+             <artifactId>maven-enforcer-plugin</artifactId>
+             <version>3.0.0-M3</version>
+             <executions>
+               <execution>
+                 <id>enforce-versions</id>
+                 <goals>
+                   <goal>enforce</goal>
+                 </goals>
+                 <configuration>
+                   <rules>
+                     <requireMavenVersion>
+                       <version>3.6.2</version>
+                     </requireMavenVersion>
+                     <requireJavaVersion>
+                       <version>11</version>
+                     </requireJavaVersion>
+                   </rules>
+                 </configuration>
+               </execution>
+             </executions>
+           </plugin>
       </plugins>
 
     </pluginManagement>
@@ -519,7 +538,7 @@
         <version>0.0.4</version>
         <inherited>false</inherited>
         <configuration>
-          <mavenVersion>3.3.1</mavenVersion>
+          <mavenVersion>3.6.2</mavenVersion>
         </configuration>
       </plugin>
 
