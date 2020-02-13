@@ -39,15 +39,6 @@ public interface EquipmentOperations extends CommonEquipmentOperations {
   Collection<Long> getEquipmentAlives();
 
   /**
-   * Adds the equipment to list of those under the process. The Process
-   * cache object is updated (write lock at Process level).
-   *
-   * @param equipmentId Equipment id
-   * @param process     Process processId
-   */
-  void addEquipmentToProcess(Long equipmentId, Long processId);
-
-  /**
    * Removes the command from the list of commands for this Equipment.
    *
    * @param equipmentId the equipment id

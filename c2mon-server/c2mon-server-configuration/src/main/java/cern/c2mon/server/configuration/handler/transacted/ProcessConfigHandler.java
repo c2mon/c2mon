@@ -176,16 +176,4 @@ public class ProcessConfigHandler extends BaseConfigHandlerImpl<Process> {
     }
   }
 
-  /**
-   * Removes an equipment reference from the process that contains it.
-   *
-   * @param equipmentId the equipment to remove
-   * @param processId   the process to remove the equipment reference from
-   * @throws UnexpectedRollbackException if this operation fails
-   */
-  public void removeEquipmentFromProcess(Long equipmentId, Long processId) {
-    log.debug("Removing Process Equipment {} for processId {}", equipmentId, processId);
-    cache.compute(processId, process -> process.getEquipmentIds().remove(equipmentId));
-  }
-
 }

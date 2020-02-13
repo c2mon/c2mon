@@ -1,11 +1,8 @@
 package cern.c2mon.server.configuration.loader;
 
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.server.cache.dbaccess.AlarmMapper;
 import cern.c2mon.server.cache.dbaccess.DataTagMapper;
 import cern.c2mon.server.cache.dbaccess.EquipmentMapper;
-import cern.c2mon.server.cache.dbaccess.RuleTagMapper;
-import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alive.AliveTag;
 import cern.c2mon.server.common.commfault.CommFaultTag;
 import cern.c2mon.server.common.datatag.DataTag;
@@ -13,7 +10,6 @@ import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.equipment.EquipmentCacheObject;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.process.ProcessCacheObject;
-import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.configuration.parser.util.ConfigurationEquipmentUtil;
 import cern.c2mon.server.configuration.util.TestConfigurationProvider;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
@@ -31,38 +27,19 @@ import static org.junit.Assert.*;
 
 public class EquipmentConfigTest extends ConfigurationCacheLoaderTest<Equipment> {
 
-  @Inject
-  private C2monCache<Equipment> equipmentCache;
+  @Inject private C2monCache<Equipment> equipmentCache;
 
-  @Inject
-  private EquipmentMapper equipmentMapper;
+  @Inject private EquipmentMapper equipmentMapper;
 
-  @Inject
-  private C2monCache<AliveTag> aliveTimerCache;
+  @Inject private C2monCache<AliveTag> aliveTimerCache;
 
-  @Inject
-  private C2monCache<CommFaultTag> commFaultTagCache;
+  @Inject private C2monCache<CommFaultTag> commFaultTagCache;
 
-  @Inject
-  private C2monCache<Process> processCache;
+  @Inject private C2monCache<Process> processCache;
 
-  @Inject
-  private C2monCache<RuleTag> ruleTagCache;
+  @Inject private C2monCache<DataTag> dataTagCache;
 
-  @Inject
-  private RuleTagMapper ruleTagMapper;
-
-  @Inject
-  private C2monCache<DataTag> dataTagCache;
-
-  @Inject
-  private DataTagMapper dataTagMapper;
-
-  @Inject
-  private C2monCache<Alarm> alarmCache;
-
-  @Inject
-  private AlarmMapper alarmMapper;
+  @Inject private DataTagMapper dataTagMapper;
 
   /**
    * Test the creation of equipment

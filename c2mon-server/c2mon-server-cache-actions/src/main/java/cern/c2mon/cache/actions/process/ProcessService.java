@@ -18,6 +18,7 @@ import cern.c2mon.shared.common.supervision.SupervisionStatus;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.UnexpectedRollbackException;
 
 import javax.inject.Inject;
 import java.sql.Timestamp;
@@ -30,8 +31,7 @@ import java.util.Map;
  */
 @Slf4j
 @Service
-public class ProcessService extends AbstractSupervisedService<Process>
-  implements ProcessOperationService {
+public class ProcessService extends AbstractSupervisedService<Process> implements ProcessOperationService {
 
   @Getter
   protected SupervisedCacheService<Process> supervisedService;
@@ -139,6 +139,31 @@ public class ProcessService extends AbstractSupervisedService<Process>
   @Override
   public void setLocalConfig(Long processId, ProcessCacheObject.LocalConfig localType) {
     cache.compute(processId, process -> ((ProcessCacheObject) process).setLocalConfig(localType));
+  }
+
+  /**
+   * Adds an equipment reference to the process that contains it.
+   *
+   * @param equipmentId the equipment to add
+   * @param processId   the process to add the equipment reference to
+   * @throws UnexpectedRollbackException if this operation fails
+   */
+  public void addEquipmentToProcess(Long equipmentId, Long processId) {
+    log.debug("Adding Process Equipment {} for processId {}", equipmentId, processId);
+    cache.compute(processId, process -> process.getEquipmentIds().add(equipmentId));
+
+  }
+
+  /**
+   * Removes an equipment reference from the process that contains it.
+   *
+   * @param equipmentId the equipment to remove
+   * @param processId   the process to remove the equipment reference from
+   * @throws UnexpectedRollbackException if this operation fails
+   */
+  public void removeEquipmentFromProcess(Long equipmentId, Long processId) {
+    log.debug("Removing Process Equipment {} for processId {}", equipmentId, processId);
+    cache.compute(processId, process -> process.getEquipmentIds().remove(equipmentId));
   }
 
   private void applyErrorStatus(final Process process, final String errorMessage) {

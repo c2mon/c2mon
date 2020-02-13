@@ -18,6 +18,7 @@ package cern.c2mon.server.configuration.handler.transacted;
 
 import cern.c2mon.cache.actions.datatag.DataTagService;
 import cern.c2mon.cache.actions.equipment.EquipmentService;
+import cern.c2mon.cache.actions.process.ProcessService;
 import cern.c2mon.cache.actions.process.ProcessXMLProvider;
 import cern.c2mon.cache.api.factory.AbstractCacheObjectFactory;
 import cern.c2mon.server.cache.loading.ConfigurableDAO;
@@ -53,6 +54,7 @@ public class EquipmentConfigHandler extends AbstractEquipmentConfigHandler<Equip
   private final CommandTagConfigHandler commandTagConfigHandler;
 
   private final SubEquipmentConfigHandler subEquipmentConfigTransacted;
+  private final ProcessService processService;
 
   @Inject
   public EquipmentConfigHandler(
@@ -65,19 +67,21 @@ public class EquipmentConfigHandler extends AbstractEquipmentConfigHandler<Equip
     final DataTagConfigHandler dataTagConfigTransacted,
     final CommandTagConfigHandler commandTagConfigHandler,
     final SubEquipmentConfigHandler subEquipmentConfigTransacted,
-    final ControlTagHandlerCollection controlTagHandlerCollection) {
+    final ControlTagHandlerCollection controlTagHandlerCollection,
+    final ProcessService processService) {
     super(equipmentService, subEquipmentDAO, subEquipmentCacheObjectFactory, processXMLProvider,
       aliveTagConfigEventHandler, dataTagService, dataTagConfigTransacted, controlTagHandlerCollection);
     this.equipmentService = equipmentService;
     this.commandTagConfigHandler = commandTagConfigHandler;
     this.subEquipmentConfigTransacted = subEquipmentConfigTransacted;
+    this.processService = processService;
   }
 
   @Override
   protected List<ProcessChange> createReturnValue(Equipment equipment, ConfigurationElement element) {
     List<ProcessChange> result = super.createReturnValue(equipment, element);
 
-    equipmentService.addEquipmentToProcess(equipment.getId(), equipment.getProcessId());
+    processService.addEquipmentToProcess(equipment.getId(), equipment.getProcessId());
 
     // Please note, that the Equipment XML configuration is also containing the Alive tag configuration.
     // It's therefore not required to send an additional ProcessChange object for creating it.
@@ -106,8 +110,11 @@ public class EquipmentConfigHandler extends AbstractEquipmentConfigHandler<Equip
     List<ProcessChange> cascadeChanges = cascadeRemoveDatatags(dataTagService.getDataTagIdsByEquipmentId(equipmentCacheObject.getId()), report);
     removeEquipmentCommands(equipmentCacheObject, report);
     subEquipmentConfigTransacted.removeSubEquipmentsByEqId(id, report);
+    processService.removeEquipmentFromProcess(equipmentCacheObject.getId(), equipmentCacheObject.getProcessId());
+
+    // Actually remove the equipment
     cascadeChanges.addAll(super.remove(id, report));
-    // The FKs for control tags go backwards (ControlTag -> Eq), so we need to remove them after the equipment
+    // The FKs for control tags go backwards (ControlTag -> Eq), so we need to remove them after the equipment has been removed
     cascadeChanges.addAll(controlTagHandlerCollection.cascadeRemove(equipmentCacheObject, report));
 
     return cascadeChanges;

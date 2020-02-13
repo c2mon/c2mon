@@ -33,12 +33,6 @@ public class EquipmentService extends BaseEquipmentServiceImpl<Equipment> implem
   }
 
   @Override
-  public void addEquipmentToProcess(Long equipmentId, Long processId) {
-    // TODO do these with Brice
-
-  }
-
-  @Override
   public void removeCommandFromEquipment(Long equipmentId, Long commandId) {
 
   }
