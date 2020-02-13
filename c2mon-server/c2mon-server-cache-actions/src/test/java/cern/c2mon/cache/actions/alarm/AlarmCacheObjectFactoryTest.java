@@ -17,7 +17,7 @@ public class AlarmCacheObjectFactoryTest {
   private AlarmCacheObjectFactory factory= new AlarmCacheObjectFactory();
 
   @Test
-  public void createAlarmCacheObjectWithProperties() throws IllegalAccessException {
+  public void createAlarmCacheObjectWithProperties() {
 
     Properties properties = new Properties();
     properties.setProperty("dataTagId", "100");
@@ -32,11 +32,10 @@ public class AlarmCacheObjectFactoryTest {
     assertEquals("alarm should have dataTagId set", Long.valueOf(100L), alarm.getDataTagId());
     assertEquals("alarm should have faultFamily set", "fault-family", alarm.getFaultFamily());
     assertEquals("alarm should have faultMember set", "fault-member", alarm.getFaultMember());
-    assertEquals("alarm should have alarm topic set", "tim.alarm", alarm.getTopic());
   }
 
   @Test
-  public void throwExceptionWhenDataTagIdIsMissing() throws IllegalAccessException {
+  public void throwExceptionWhenDataTagIdIsMissing() {
     Properties properties = new Properties();
 
     try {
@@ -48,7 +47,7 @@ public class AlarmCacheObjectFactoryTest {
   }
 
   @Test
-  public void throwExceptionWhenFaultFamilyIsMissing() throws IllegalAccessException {
+  public void throwExceptionWhenFaultFamilyIsMissing() {
     Properties properties = new Properties();
     properties.setProperty("dataTagId", "100");
 
@@ -61,7 +60,7 @@ public class AlarmCacheObjectFactoryTest {
   }
 
   @Test
-  public void throwExceptionWhenFaultMemberIsMissing() throws IllegalAccessException {
+  public void throwExceptionWhenFaultMemberIsMissing() {
     Properties properties = new Properties();
     properties.setProperty("dataTagId", "100");
     properties.setProperty("faultFamily", "fault family");
@@ -75,7 +74,7 @@ public class AlarmCacheObjectFactoryTest {
   }
 
   @Test
-  public void throwExceptionWhenAlarmConditionIsMissing() throws IllegalAccessException {
+  public void throwExceptionWhenAlarmConditionIsMissing() {
     Properties properties = new Properties();
     properties.setProperty("dataTagId", "100");
     properties.setProperty("faultFamily", "fault-family");
