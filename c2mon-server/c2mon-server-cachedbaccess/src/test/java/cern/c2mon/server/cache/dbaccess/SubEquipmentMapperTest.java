@@ -33,11 +33,7 @@ public class SubEquipmentMapperTest extends AbstractMapperTest {
   /**
    * Class to test
    */
-  @Inject
-  private SubEquipmentMapper subEquipmentMapper;
-
-  @Inject
-  private EquipmentMapper equipmentMapper;
+  @Inject private SubEquipmentMapper subEquipmentMapper;
 
   private SubEquipmentCacheObject subEquipmentCacheObject;
 
@@ -86,15 +82,14 @@ public class SubEquipmentMapperTest extends AbstractMapperTest {
 
   @Test
   public void testUpdateConfig() {
-    assertEquals(new Long(1231), subEquipmentCacheObject.getAliveTagId());
-    subEquipmentCacheObject.setAliveTagId(1251L);
-    subEquipmentCacheObject.setCommFaultTagId(1252L);
-    subEquipmentCacheObject.setStateTagId(1250L);
+    subEquipmentCacheObject.setAliveTagId(1224L);
+    subEquipmentCacheObject.setCommFaultTagId(1223L);
+    subEquipmentCacheObject.setStateTagId(1222L);
     subEquipmentMapper.updateSubEquipmentConfig(subEquipmentCacheObject);
     SubEquipment updatedEquipment = subEquipmentMapper.getItem(subEquipmentCacheObject.getId());
-    assertEquals(new Long(1251), updatedEquipment.getAliveTagId());
-    assertEquals(new Long(1252), updatedEquipment.getCommFaultTagId());
-    assertEquals(new Long(1250), updatedEquipment.getStateTagId());
+    assertEquals(1224L, updatedEquipment.getAliveTagId().longValue());
+    assertEquals(1223L, updatedEquipment.getCommFaultTagId().longValue());
+    assertEquals(1222L, updatedEquipment.getStateTagId().longValue());
   }
 
   /**

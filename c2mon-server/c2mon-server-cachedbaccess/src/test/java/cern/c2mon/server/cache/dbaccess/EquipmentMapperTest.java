@@ -58,8 +58,6 @@ public class EquipmentMapperTest extends AbstractMapperTest {
 
   private SubEquipmentCacheObject subEquipmentCacheObject;
 
-//  private SubEquipmentCacheObject subEquipmentCacheObject2;
-
   private DataTagCacheObject dataTagCacheObject1;
 
   private DataTagCacheObject dataTagCacheObject2;
@@ -170,22 +168,20 @@ public class EquipmentMapperTest extends AbstractMapperTest {
    */
   @Test
   public void testTagCollectionLoading() {
-    EquipmentCacheObject equipment = (EquipmentCacheObject) equipmentMapper.getItem(150L); //using test DB data for this!! TODO use permanent
-    // data instead
+    EquipmentCacheObject equipment = (EquipmentCacheObject) equipmentMapper.getItem(150L);
     assertEquals(2, equipment.getCommandTagIds().size());
   }
 
   @Test
   public void testUpdateConfig() {
-    assertEquals(new Long(1224), equipmentCacheObject.getAliveTagId());
-    equipmentCacheObject.setAliveTagId(1251L);
-    equipmentCacheObject.setCommFaultTagId(1252L);
-    equipmentCacheObject.setStateTagId(1250L);
+    equipmentCacheObject.setAliveTagId(1231L);
+    equipmentCacheObject.setCommFaultTagId(1232L);
+    equipmentCacheObject.setStateTagId(1230L);
     equipmentMapper.updateEquipmentConfig(equipmentCacheObject);
     Equipment updatedEquipment = equipmentMapper.getItem(equipmentCacheObject.getId());
-    assertEquals(new Long(1251), updatedEquipment.getAliveTagId());
-    assertEquals(new Long(1252), updatedEquipment.getCommFaultTagId());
-    assertEquals(new Long(1250), updatedEquipment.getStateTagId());
+    assertEquals(1231L, updatedEquipment.getAliveTagId().longValue());
+    assertEquals(1232L, updatedEquipment.getCommFaultTagId().longValue());
+    assertEquals(1230L, updatedEquipment.getStateTagId().longValue());
   }
 
   @Test
