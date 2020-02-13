@@ -45,6 +45,8 @@ public class EquipmentConfigTest extends ConfigurationCacheLoaderTest<Equipment>
    */
   @Test
   public void createFromDb() {
+    processService.start(50L, 0);
+
     ConfigurationReport report = configurationLoader.applyConfiguration(13);
 
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
@@ -87,7 +89,9 @@ public class EquipmentConfigTest extends ConfigurationCacheLoaderTest<Equipment>
 
   @Test
   public void updateFromDb(){
+    processService.start(50L, 0);
     configurationLoader.applyConfiguration(13);
+
     ConfigurationReport report = configurationLoader.applyConfiguration(25);
 
     // expect 2 top elements (control and equipment, with control first)
