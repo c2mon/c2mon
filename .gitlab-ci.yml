@@ -23,7 +23,9 @@ variables:
 .build_base:
   stage: compile
   dependencies: []
-  image: gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-maven:gcc-jdk-11-mvn-3.6
+  image: 
+    name: gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-maven:gcc-jdk-11-mvn-3.6
+    entrypoint: [""]   
   script:
     - export MAVEN_OPTS=""
     - cd $TARGET
@@ -103,7 +105,9 @@ build_daq:
 
 .test_base:
   stage: test
-  image: gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-maven:gcc-jdk-11-mvn-3.6
+  image: 
+    name: gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-maven:gcc-jdk-11-mvn-3.6
+    entrypoint: [""]   
   script:
     - export MAVEN_OPTS=""
     - mkdir reports
@@ -158,8 +162,9 @@ test_daq:
 # These tasks may need to override MAVEN_OPTS manually
 sonar_preview:
   stage: qa
-  tags: [c2mon]
-  image: gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-maven:gcc-jdk-11-mvn-3.6
+  image: 
+    name: gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-maven:gcc-jdk-11-mvn-3.6
+    entrypoint: [""]   
   dependencies:
     - build_shared
     - build_server
@@ -173,8 +178,9 @@ sonar_preview:
 
 quality_assurance:
   stage: qa
-  tags: [c2mon]
-  image: gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-maven:gcc-jdk-11-mvn-3.6
+  image: 
+    name: gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-maven:gcc-jdk-11-mvn-3.6
+    entrypoint: [""]   
   dependencies:
     - build_shared
     - build_server
@@ -192,8 +198,9 @@ quality_assurance:
 # Fully build and publish master branch
 publish:
   stage: publish
-  tags: [c2mon]
-  image: gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-maven:gcc-jdk-11-mvn-3.6
+  image: 
+    name: gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-maven:gcc-jdk-11-mvn-3.6
+    entrypoint: [""]   
   dependencies:
     - build_shared
     - build_server
@@ -212,7 +219,6 @@ publish:
 
 trigger_build:
   stage: deploy
-  tags: [c2mon]
   image: appropriate/curl:3.1
   dependencies: []
   script:
