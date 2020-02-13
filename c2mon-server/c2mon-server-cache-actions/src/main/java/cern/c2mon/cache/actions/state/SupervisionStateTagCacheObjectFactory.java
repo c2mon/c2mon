@@ -21,11 +21,10 @@ public class SupervisionStateTagCacheObjectFactory extends ControlTagCacheObject
   @Override
   public Change configureCacheObject(SupervisionStateTag supervisionStateTag, Properties properties) {
 
-    apply(new PropertiesAccessor(properties), accessor -> {
+    apply(new PropertiesAccessor(properties), accessor ->
       accessor.getLong("supervisedId").ifPresent(supervisionStateTag::setSupervisedId)
         .getLong("aliveTagId").ifPresent(supervisionStateTag::setAliveTagId)
-        .getLong("commFaultTagId").ifPresent(supervisionStateTag::setCommFaultTagId);
-    });
+        .getLong("commFaultTagId").ifPresent(supervisionStateTag::setCommFaultTagId));
 
     return super.configureCacheObject(supervisionStateTag, properties);
   }

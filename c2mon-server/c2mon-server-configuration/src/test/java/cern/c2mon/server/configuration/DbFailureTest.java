@@ -32,10 +32,8 @@ import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.springframework.test.annotation.DirtiesContext;
 
 import javax.inject.Inject;
 
@@ -48,7 +46,6 @@ import static org.junit.Assert.*;
  * @author Mark Brightwell
  *
  */
-
 public class DbFailureTest extends ConfigurationCacheTest {
 
   @Rule
@@ -95,24 +92,13 @@ public class DbFailureTest extends ConfigurationCacheTest {
   @Inject
   private AlarmMapper alarmMapper;
 
-  @Before
-  public void init() {
-    mockControl.reset();
-  }
-
   /**
    * Tests the system is left in the correct consistent state if the removal of
    * the Process from the DB fails.
    */
   @Test
-  @DirtiesContext
   public void testDBPersistenceFailure() {
-    //reset ProcessConfigTransacted to mock
-    ProcessConfigHandler processConfigTransacted = mockControl.createMock(ProcessConfigHandler.class);
-    processConfigTransacted.remove(EasyMock.isA(Long.class), EasyMock.isA(ConfigurationElementReport.class));
-    EasyMock.expectLastCall().andThrow(new RuntimeException("fake exception thrown"));
-
-    mockControl.replay();
+    setUpMocks();
 
     ConfigurationReport report = configurationLoader.applyConfiguration(28);
     assertTrue(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
@@ -142,5 +128,15 @@ public class DbFailureTest extends ConfigurationCacheTest {
     assertNull(alarmMapper.getItem(350000L));
     assertFalse(alarmCache.containsKey(350001L));
     assertNull(alarmMapper.getItem(350001L));
+  }
+
+  private void setUpMocks() {
+    //reset ProcessConfigTransacted to mock
+    mockControl.reset();
+    ProcessConfigHandler processConfigTransacted = mockControl.createMock(ProcessConfigHandler.class);
+    processConfigTransacted.remove(EasyMock.isA(Long.class), EasyMock.isA(ConfigurationElementReport.class));
+    EasyMock.expectLastCall().andThrow(new RuntimeException("fake exception thrown"));
+
+    mockControl.replay();
   }
 }

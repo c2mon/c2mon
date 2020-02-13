@@ -14,7 +14,6 @@ import cern.c2mon.shared.client.tag.TagMode;
 import org.junit.Test;
 
 import javax.inject.Inject;
-import java.sql.Timestamp;
 
 import static org.junit.Assert.*;
 
@@ -46,7 +45,6 @@ public class ControlTagConfigTest extends ConfigurationCacheLoaderTest<Process> 
     // SETUP:
     Configuration createProcess = TestConfigurationProvider.createProcess();
     configurationLoader.applyConfiguration(createProcess);
-    processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
 
     // TEST:
     cern.c2mon.shared.client.configuration.api.tag.AliveTag aliveTagUpdate =
@@ -78,12 +76,17 @@ public class ControlTagConfigTest extends ConfigurationCacheLoaderTest<Process> 
     // SETUP:
     Configuration createProcess = TestConfigurationProvider.createProcess();
     configurationLoader.applyConfiguration(createProcess);
-    processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
 
     // TEST:
     StatusTag statusTagUpdate = StatusTag.update(100L).description("new description").mode(TagMode.OPERATIONAL).build();
     Configuration configuration = new Configuration();
     configuration.addEntity(statusTagUpdate);
+    SupervisionStateTag expectedStateTag = new SupervisionStateTag(100L, 5L, "PROC", 101L, null);
+    expectedStateTag.setName("P:STATUS");
+    expectedStateTag.setDescription("new description");
+    expectedStateTag.setLogged(true);
+    expectedStateTag.setMode((short) TagMode.OPERATIONAL.ordinal());
+    expectedStateTag.setDataType("java.lang.String");
 
     ///apply the configuration to the server
     ConfigurationReport report = configurationLoader.applyConfiguration(configuration);
@@ -93,7 +96,6 @@ public class ControlTagConfigTest extends ConfigurationCacheLoaderTest<Process> 
     assertEquals(ConfigConstants.Status.OK, report.getStatus());
     assertTrue(report.getProcessesToReboot().isEmpty());
     assertEquals(1, report.getElementReports().size());
-    SupervisionStateTag expectedStateTag = new SupervisionStateTag(100L, 5L, "PROC", 101L, null);
     assertEquals(expectedStateTag, stateTagCache.get(100L));
   }
 
@@ -104,7 +106,6 @@ public class ControlTagConfigTest extends ConfigurationCacheLoaderTest<Process> 
     configurationLoader.applyConfiguration(createProcess);
     Configuration createEquipment = TestConfigurationProvider.createEquipment();
     configurationLoader.applyConfiguration(createEquipment);
-    processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
 
     cern.c2mon.shared.client.configuration.api.tag.CommFaultTag commFaultTagUpdate =
       cern.c2mon.shared.client.configuration.api.tag.CommFaultTag.update(201L).description("new description").mode(TagMode.OPERATIONAL).build();
