@@ -9,7 +9,6 @@ import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.equipment.EquipmentCacheObject;
 import cern.c2mon.server.common.process.Process;
-import cern.c2mon.server.common.process.ProcessCacheObject;
 import cern.c2mon.server.configuration.parser.util.ConfigurationEquipmentUtil;
 import cern.c2mon.server.configuration.util.TestConfigurationProvider;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
@@ -69,11 +68,8 @@ public class EquipmentConfigTest extends ConfigurationCacheLoaderTest<Equipment>
 
     configurationLoader.applyConfiguration(13);
 
-    // also check that the process, commfault and alive cache were updated
+    // also check that the process cache was updated
     Process process = processCache.get(expectedObject.getProcessId());
-    // check process is running
-    ((ProcessCacheObject) process).setRequiresReboot(false);
-    assertFalse(process.getRequiresReboot());
     assertTrue(process.getEquipmentIds().contains(expectedObject.getId()));
   }
 
@@ -91,7 +87,7 @@ public class EquipmentConfigTest extends ConfigurationCacheLoaderTest<Equipment>
 
   @Test
   public void updateFromDb(){
-    // update (creates controltag and updates equipment) - should succeed
+    configurationLoader.applyConfiguration(13);
     ConfigurationReport report = configurationLoader.applyConfiguration(25);
 
     // expect 2 top elements (control and equipment, with control first)

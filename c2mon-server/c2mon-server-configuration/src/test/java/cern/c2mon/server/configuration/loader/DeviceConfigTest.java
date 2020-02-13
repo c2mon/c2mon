@@ -35,36 +35,21 @@ public class DeviceConfigTest extends ConfigurationCacheLoaderTest<Device> {
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
 
     DeviceCacheObject cacheObject = (DeviceCacheObject) deviceCache.get(20L);
-    DeviceCacheObject expectedObject = new DeviceCacheObject(20L, "TEST_DEVICE_20", 400L);
-
-    List<DeviceProperty> expectedProperties = new ArrayList<>();
-    expectedProperties.add(new DeviceProperty(1L, "cpuLoadInPercent", "987654", "tagId", null));
-    expectedProperties.add(new DeviceProperty(2L, "responsiblePerson", "Mr. Administrator", "constantValue", null));
-    expectedProperties.add(new DeviceProperty(3L, "someCalculations", "(#123 + #234) / 2", "clientRule", "Float"));
-
-    List<DeviceProperty> expectedFields = new ArrayList<>();
-    expectedFields.add(new DeviceProperty(1L, "field1", "987654", "tagId", null));
-    expectedFields.add(new DeviceProperty(2L, "field2", "(#123 + #234) / 2", "clientRule", null));
-    expectedProperties.add(new DeviceProperty(9L, "TEST_PROPERTY_WITH_FIELDS", "mappedProperty", expectedFields));
-
-    List<DeviceCommand> expectedCommands = new ArrayList<>();
-    expectedCommands.add(new DeviceCommand(1L, "TEST_COMMAND_1", "4287", "commandTagId", null));
-    expectedCommands.add(new DeviceCommand(2L, "TEST_COMMAND_2", "4288", "commandTagId", null));
-
-    expectedObject.setDeviceProperties(expectedProperties);
-    expectedObject.setDeviceCommands(expectedCommands);
+    DeviceCacheObject expectedObject = expectedObject();
 
     assertEquals(expectedObject, cacheObject);
+  }
 
-    // Update should succeed
-    report = configurationLoader.applyConfiguration(34);
+  @Test
+  public void updateDeviceFromDb() {
+    DeviceCacheObject expectedObject = expectedObject();
+    expectedObject.getDeviceProperties().add(new DeviceProperty(4L, "numCores", "4", "constantValue", "Integer"));
+    configurationLoader.applyConfiguration(33);
+    ConfigurationReport report = configurationLoader.applyConfiguration(34);
 
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
-    cacheObject = (DeviceCacheObject) deviceCache.get(20L);
 
-    expectedProperties.add(new DeviceProperty(4L, "numCores", "4", "constantValue", "Integer"));
-    expectedObject.setDeviceProperties(expectedProperties);
-    assertEquals(expectedObject, cacheObject);
+    assertEquals(expectedObject, deviceCache.get(20L));
   }
 
   @Test
@@ -92,5 +77,28 @@ public class DeviceConfigTest extends ConfigurationCacheLoaderTest<Device> {
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     assertFalse(deviceCache.containsKey(300L));
     assertNull(deviceMapper.getItem(300L));
+  }
+
+  private static DeviceCacheObject expectedObject() {
+    DeviceCacheObject deviceCacheObject = new DeviceCacheObject(20L, "TEST_DEVICE_20", 400L);
+
+    List<DeviceProperty> expectedProperties = new ArrayList<>();
+    expectedProperties.add(new DeviceProperty(1L, "cpuLoadInPercent", "987654", "tagId", null));
+    expectedProperties.add(new DeviceProperty(2L, "responsiblePerson", "Mr. Administrator", "constantValue", null));
+    expectedProperties.add(new DeviceProperty(3L, "someCalculations", "(#123 + #234) / 2", "clientRule", "Float"));
+
+    List<DeviceProperty> expectedFields = new ArrayList<>();
+    expectedFields.add(new DeviceProperty(1L, "field1", "987654", "tagId", null));
+    expectedFields.add(new DeviceProperty(2L, "field2", "(#123 + #234) / 2", "clientRule", "Float"));
+    expectedProperties.add(new DeviceProperty(9L, "TEST_PROPERTY_WITH_FIELDS", "mappedProperty", expectedFields));
+
+    List<DeviceCommand> expectedCommands = new ArrayList<>();
+    expectedCommands.add(new DeviceCommand(1L, "TEST_COMMAND_1", "4287", "commandTagId", null));
+    expectedCommands.add(new DeviceCommand(2L, "TEST_COMMAND_2", "4288", "commandTagId", null));
+
+    deviceCacheObject.setDeviceProperties(expectedProperties);
+    deviceCacheObject.setDeviceCommands(expectedCommands);
+
+    return deviceCacheObject;
   }
 }
