@@ -310,7 +310,7 @@ final class ConfigurationApplier {
       report.addStatus(ConfigConstants.Status.RESTART);
       report.addProcessToReboot(processCache.get(processId).getName());
       element.setStatus(ConfigConstants.Status.RESTART);
-      processService.setRequiresReboot(processId, Boolean.TRUE);
+      processService.setRequiresReboot(processId, true);
     }
   }
 }

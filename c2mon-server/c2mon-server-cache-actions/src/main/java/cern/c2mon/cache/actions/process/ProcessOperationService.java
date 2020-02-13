@@ -82,7 +82,7 @@ public interface ProcessOperationService {
    * @param processId id of the process
    * @param reboot true if restart required
    */
-  void setRequiresReboot(Long processId, Boolean reboot);
+  void setRequiresReboot(Long processId, boolean reboot);
 
   /**
    * Sets the PIK of the process.

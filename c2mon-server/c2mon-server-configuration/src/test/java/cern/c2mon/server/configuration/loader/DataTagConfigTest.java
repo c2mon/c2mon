@@ -193,7 +193,7 @@ public class DataTagConfigTest extends ConfigurationCacheLoaderTest<DataTag> {
   public void createSubEquipmentDataTag() {
     Configuration createProcess = TestConfigurationProvider.createProcess();
     configurationLoader.applyConfiguration(createProcess);
-    processService.start(5L, System.currentTimeMillis());
+    processService.start(5L, "", new Timestamp(0));
     Configuration createEquipment = TestConfigurationProvider.createEquipment();
     configurationLoader.applyConfiguration(createEquipment);
     Configuration createSubEquipment = TestConfigurationProvider.createSubEquipment();
@@ -233,7 +233,7 @@ public class DataTagConfigTest extends ConfigurationCacheLoaderTest<DataTag> {
     /// SETUP:
     Configuration createProcess = TestConfigurationProvider.createProcess();
     configurationLoader.applyConfiguration(createProcess);
-    processService.start(5L, System.currentTimeMillis());
+    processService.start(5L, "", new Timestamp(0));
     Configuration createEquipment = TestConfigurationProvider.createEquipment();
     configurationLoader.applyConfiguration(createEquipment);
     Configuration createSubEquipment = TestConfigurationProvider.createSubEquipment();

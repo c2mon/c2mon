@@ -53,7 +53,7 @@ public class ProcessService extends AbstractSupervisedService<Process> implement
    * Records the start up time of the process and the host it is running on,
    * (and sets it's status to STARTUP - may remove this in the future as duplicate
    * of state tag of the DAQ)
-   * <p>
+   *
    * <p>Also starts the alive timer.
    *
    * @param processId   the Process id to start
@@ -71,6 +71,7 @@ public class ProcessService extends AbstractSupervisedService<Process> implement
       log.trace("start " + (properties.isTestMode() ? "- TEST Mode " : "")
         + "- Process " + process.getName() + ", PIK " + process.getProcessPIK());
 
+      ((ProcessCacheObject) process).setRequiresReboot(false);
       start(processId, startupTime.getTime());
 
 //    if (getLocalConfig() != null && getLocalConfig().equals(ProcessCacheObject.LocalConfig.Y)) {
@@ -127,7 +128,7 @@ public class ProcessService extends AbstractSupervisedService<Process> implement
   }
 
   @Override
-  public void setRequiresReboot(Long processId, Boolean reboot) {
+  public void setRequiresReboot(Long processId, boolean reboot) {
     cache.compute(processId, process -> ((ProcessCacheObject) process).setRequiresReboot(reboot));
   }
 

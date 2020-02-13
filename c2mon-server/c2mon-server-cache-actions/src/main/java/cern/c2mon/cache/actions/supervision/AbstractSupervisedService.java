@@ -17,6 +17,7 @@ import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.supervision.SupervisionEntity;
 import lombok.extern.slf4j.Slf4j;
 
+import java.sql.Timestamp;
 import java.util.function.BiConsumer;
 
 import static cern.c2mon.server.common.util.KotlinAPIs.applyNotNull;
@@ -43,6 +44,13 @@ public abstract class AbstractSupervisedService<T extends Supervised> extends Ab
     this.stateTagService = stateTagService;
   }
 
+  /**
+   * For processes, please use the dedicated method
+   * {@link cern.c2mon.cache.actions.process.ProcessService#start(Long, String, Timestamp)}
+   *
+   * @param id        The cache id of the supervised object
+   * @param timestamp time of the start
+   */
   @Override
   public void start(long id, long timestamp) {
     if (!isRunning(id)) {
