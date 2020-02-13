@@ -1,6 +1,7 @@
 package cern.c2mon.server.configuration.loader;
 
 import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.config.collections.TagCacheCollection;
 import cern.c2mon.server.cache.dbaccess.AlarmMapper;
 import cern.c2mon.server.cache.dbaccess.DataTagMapper;
 import cern.c2mon.server.cache.dbaccess.RuleTagMapper;
@@ -9,6 +10,7 @@ import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.common.rule.RuleTag;
+import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.configuration.parser.util.ConfigurationAlarmUtil;
 import cern.c2mon.server.configuration.util.TestConfigurationProvider;
 import cern.c2mon.shared.client.alarm.condition.AlarmCondition;
@@ -24,23 +26,19 @@ import static org.junit.Assert.*;
 
 public class AlarmConfigTest extends ConfigurationCacheLoaderTest<Alarm> {
 
-  @Inject
-  private C2monCache<Alarm> alarmCache;
+  @Inject private C2monCache<Alarm> alarmCache;
 
-  @Inject
-  private AlarmMapper alarmMapper;
+  @Inject private AlarmMapper alarmMapper;
 
-  @Inject
-  private C2monCache<RuleTag> ruleTagCache;
+  @Inject private C2monCache<RuleTag> ruleTagCache;
 
-  @Inject
-  private RuleTagMapper ruleTagMapper;
+  @Inject private RuleTagMapper ruleTagMapper;
 
-  @Inject
-  private C2monCache<DataTag> dataTagCache;
+  @Inject private C2monCache<DataTag> dataTagCache;
 
-  @Inject
-  private DataTagMapper dataTagMapper;
+  @Inject private DataTagMapper dataTagMapper;
+
+  @Inject private TagCacheCollection tagCacheCollection;
 
   /**
    * Test the creation, update and removal of alarm.
@@ -48,14 +46,6 @@ public class AlarmConfigTest extends ConfigurationCacheLoaderTest<Alarm> {
 
   @Test
   public void testCreateAlarmWithExistingDatatag() {
-
-    // we  expect to send the alarm as the datatag is initialized.
-//    C2monCacheListener<Alarm> checker = EasyMock.createMock(C2monCacheListener.class);
-//    checker.notifyElementUpdated(EasyMock.isA(Alarm.class));
-//    EasyMock.expectLastCall().once();
-//    EasyMock.replay(checker);
-//    alarmCache.registerSynchronousListener(checker);
-
     dataTagCache.computeQuiet(200003L, dataTag -> {
       ((DataTagCacheObject) dataTag).setValue(Boolean.TRUE);
       dataTag.getDataTagQuality().validate();
@@ -115,19 +105,13 @@ public class AlarmConfigTest extends ConfigurationCacheLoaderTest<Alarm> {
     assertTrue(alarmCache.containsKey(350000L));
     assertNotNull(alarmMapper.getItem(350000L));
 
-    // we  expect to notify the cache listeners about a TERM alarm.
-//    C2monCacheListener<Alarm> checker = EasyMock.createMock(C2monCacheListener.class);
-//    checker.notifyElementUpdated(EasyMock.isA(Alarm.class));
-//    EasyMock.expectLastCall().once();
-//    EasyMock.replay(checker);
-//    alarmCache.registerSynchronousListener(checker);
-
     ConfigurationReport report = configurationLoader.applyConfiguration(24);
 
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     assertFalse(alarmCache.containsKey(350000L));
     assertNull(alarmMapper.getItem(350000L));
-    DataTag tag = dataTagCache.get(alarm.getDataTagId());
+
+    Tag tag = tagCacheCollection.get(alarm.getDataTagId());
     assertFalse(tag.getAlarmIds().contains(alarm.getId()));
   }
 
