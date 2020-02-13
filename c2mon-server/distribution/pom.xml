@@ -11,11 +11,16 @@
   <artifactId>distribution</artifactId>
   <packaging>pom</packaging>
 
-  <modules>
-    <module>tar</module>
-    <module>images</module>
-    <module>kubernetes</module>
-  </modules>
+  <profiles>
+    <profile>
+      <id>ci-deploy</id>
+      <modules>
+        <module>tar</module>
+        <module>images</module>
+        <module>kubernetes</module>
+      </modules>
+    </profile>
+  </profiles>
 
   <dependencyManagement>
     <dependencies>
