@@ -9,6 +9,7 @@ import cern.c2mon.server.common.supervision.Supervised;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 /**
  * Aggregates the [Equipment, SubEquipment, Process] caches
@@ -16,6 +17,7 @@ import javax.inject.Named;
  * @author Alexandros Papageorgiou Koufidis
  */
 @Named
+@Singleton
 public class SupervisedCacheCollection extends CacheCollection<Supervised> {
 
   @Inject

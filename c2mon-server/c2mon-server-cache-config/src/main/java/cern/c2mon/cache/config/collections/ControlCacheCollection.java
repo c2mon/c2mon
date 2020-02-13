@@ -9,6 +9,7 @@ import cern.c2mon.server.common.supervision.SupervisionStateTag;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 /**
  * Aggregates [Control,Data,Rule]tag caches
@@ -16,6 +17,7 @@ import javax.inject.Named;
  * @author Alexandros Papageorgiou Koufidis
  */
 @Named
+@Singleton
 public class ControlCacheCollection extends CacheCollection<ControlTag> {
 
   @Inject

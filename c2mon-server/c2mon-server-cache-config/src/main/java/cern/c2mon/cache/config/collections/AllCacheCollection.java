@@ -10,6 +10,7 @@ import cern.c2mon.shared.common.command.CommandTag;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 /**
  * Aggregates all C2MON caches
@@ -17,6 +18,7 @@ import javax.inject.Named;
  * @author Alexandros Papageorgiou
  */
 @Named
+@Singleton
 public class AllCacheCollection extends CacheCollection<Cacheable> {
 
   @Inject
