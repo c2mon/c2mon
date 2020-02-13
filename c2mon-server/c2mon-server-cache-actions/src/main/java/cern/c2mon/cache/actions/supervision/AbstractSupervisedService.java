@@ -9,8 +9,12 @@ import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.cache.api.flow.DefaultCacheFlow;
 import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.equipment.AbstractEquipment;
+import cern.c2mon.server.common.equipment.AbstractEquipmentCacheObject;
+import cern.c2mon.server.common.equipment.Equipment;
+import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.supervision.Supervised;
 import cern.c2mon.shared.common.ConfigurationException;
+import cern.c2mon.shared.common.supervision.SupervisionEntity;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.function.BiConsumer;
@@ -68,17 +72,34 @@ public abstract class AbstractSupervisedService<T extends Supervised> extends Ab
 
   public void updateControlTagCacheIds(Supervised supervised) {
     try {
+      final AbstractEquipmentCacheObject abstractEquipment =
+        (supervised instanceof AbstractEquipmentCacheObject)
+          ? (AbstractEquipmentCacheObject) supervised
+          : null;
+      final SupervisionEntity entity = (supervised instanceof Process)
+        ? SupervisionEntity.PROCESS : (supervised instanceof Equipment)
+        ? SupervisionEntity.EQUIPMENT : SupervisionEntity.SUBEQUIPMENT;
+
       applyNotNull(supervised.getAliveTagId(), aliveTagId ->
         aliveTagService.getCache().computeQuiet(aliveTagId, aliveTimer -> {
           log.trace("Adding supervised id #{} to alive timer {} (#{})", supervised.getId(), aliveTimer.getName(), aliveTimer.getId());
           aliveTimer.setSupervisedId(supervised.getId());
+          aliveTimer.setSupervisedEntity(entity);
+          if (abstractEquipment != null) {
+            applyNotNull(abstractEquipment.getCommFaultTagId(), aliveTimer::setCommFaultTagId);
+          }
+          applyNotNull(supervised.getStateTagId(), aliveTimer::setStateTagId);
         }));
 
-      if (supervised instanceof AbstractEquipment) {
-        applyNotNull(((AbstractEquipment) supervised).getCommFaultTagId(), commFaultTagId ->
+      if (abstractEquipment != null) {
+        applyNotNull(abstractEquipment.getCommFaultTagId(), commFaultTagId ->
           commFaultService.getCache().computeQuiet(commFaultTagId, commFaultTag -> {
             log.trace("Adding supervised id #{} to commFault tag {} (#{})", supervised.getId(), commFaultTag.getName(), commFaultTag.getId());
             commFaultTag.setSupervisedId(supervised.getId());
+            commFaultTag.setSupervisedEntity(entity);
+            commFaultTag.setEquipmentName(supervised.getName());
+            applyNotNull(supervised.getAliveTagId(), commFaultTag::setAliveTagId);
+            applyNotNull(supervised.getStateTagId(), commFaultTag::setStateTagId);
           }));
       }
 
@@ -86,6 +107,11 @@ public abstract class AbstractSupervisedService<T extends Supervised> extends Ab
         stateTagService.getCache().computeQuiet(stateTagId, supervisionStateTag -> {
           log.trace("Adding supervised id #{} to state tag {} (#{})", supervised.getId(), supervisionStateTag.getName(), supervisionStateTag.getId());
           supervisionStateTag.setSupervisedId(supervised.getId());
+          supervisionStateTag.setSupervisedEntity(entity);
+          applyNotNull(supervised.getAliveTagId(), supervisionStateTag::setAliveTagId);
+          if (abstractEquipment != null) {
+            applyNotNull(abstractEquipment.getCommFaultTagId(), supervisionStateTag::setCommFaultTagId);
+          }
         }));
     } catch (CacheElementNotFoundException e) {
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,

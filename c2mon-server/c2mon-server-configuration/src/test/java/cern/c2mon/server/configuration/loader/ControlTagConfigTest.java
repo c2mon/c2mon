@@ -87,12 +87,17 @@ public class ControlTagConfigTest extends ConfigurationCacheLoaderTest<Process> 
     configurationLoader.applyConfiguration(createEquipment);
     processService.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
 
-    // TEST:
-    // Build configuration to update the test equipment
     cern.c2mon.shared.client.configuration.api.tag.CommFaultTag commFaultTagUpdate =
       cern.c2mon.shared.client.configuration.api.tag.CommFaultTag.update(201L).description("new description").mode(TagMode.OPERATIONAL).build();
     Configuration configuration = new Configuration();
     configuration.addEntity(commFaultTagUpdate);
+
+    // Unsure if this aliveTagId is flaky because it relies on autogen'd sequence number
+    CommFaultTag expectedCommFault = new CommFaultTag(201L, 15L, "E_INI_TEST","EQ", 200L, 300000L);
+    expectedCommFault.setDescription("new description");
+    expectedCommFault.setName("E:Comm");
+    expectedCommFault.setLogged(true);
+    expectedCommFault.setMode((short) TagMode.OPERATIONAL.ordinal());
 
     ///apply the configuration to the server
     ConfigurationReport report = configurationLoader.applyConfiguration(configuration);
@@ -102,7 +107,7 @@ public class ControlTagConfigTest extends ConfigurationCacheLoaderTest<Process> 
     assertEquals(ConfigConstants.Status.OK, report.getStatus());
     assertTrue(report.getProcessesToReboot().isEmpty());
     assertEquals(1, report.getElementReports().size());
-    CommFaultTag expectedCommFault = new CommFaultTag(201L, 15L, "E_INI_TEST","EQ", 200L, null);
+
     assertEquals(expectedCommFault, commFaultTagCache.get(201L));
   }
 }

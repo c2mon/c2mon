@@ -31,7 +31,7 @@ public abstract class ControlTag extends AbstractInfoTagCacheObject implements I
 
   public ControlTag(@NonNull Long id, Long supervisedId, SupervisionEntity supervisedEntity) {
     super(id);
-    setDataType("Boolean");
+    setDataType("java.lang.Boolean");
     setValue(faultValue);
     this.supervisedId = supervisedId;
     this.supervisedEntity = supervisedEntity;
