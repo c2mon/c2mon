@@ -39,32 +39,22 @@ public class CommandTagConfigTest extends ConfigurationCacheLoaderTest<CommandTa
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     CommandTagCacheObject cacheObject = (CommandTagCacheObject) commandTagCache.get(10000L);
 
-    CommandTagCacheObject expectedObject = new CommandTagCacheObject(10000L, "Test CommandTag", "test description", "String", DataTagConstants.MODE_TEST);
-    // expectedObject.setAuthorizedHostsPattern("*");
-    expectedObject.setEquipmentId(150L);
-    expectedObject.setClientTimeout(30000);
-    expectedObject.setExecTimeout(6000);
-    expectedObject.setSourceRetries(2);
-    expectedObject.setSourceTimeout(200);
-    RbacAuthorizationDetails details = new RbacAuthorizationDetails();
-    details.setRbacClass("RBAC class");
-    details.setRbacDevice("RBAC device");
-    details.setRbacProperty("RBAC property");
-    expectedObject.setAuthorizationDetails(details);
-    expectedObject
-      .setHardwareAddress(HardwareAddressFactory
-        .getInstance()
-        .fromConfigXML(
-          "<HardwareAddress class=\"cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl\"><opc-item-name>PLC_B_CMD_ACQ_DEF_5A6</opc-item-name><command-pulse-length>100</command-pulse-length></HardwareAddress>"));
+    CommandTagCacheObject expectedObject = expectedCommandTag10000();
     assertEquals(expectedObject, cacheObject);
+  }
 
+  @Test
+  public void updateCommandTagFromDb(){
+    // Create in DB
+    configurationLoader.applyConfiguration(3);
     // test update
-    report = configurationLoader.applyConfiguration(5);
+    ConfigurationReport report = configurationLoader.applyConfiguration(5);
 
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
 
     CommandTagCacheObject cacheObjectUpdated = (CommandTagCacheObject) commandTagCache.get(10000L);
 
+    CommandTagCacheObject expectedObject = expectedCommandTag10000();
     expectedObject.setName("Test CommandTag Updated");
     expectedObject.getAuthorizationDetails().setRbacClass("new RBAC class");
     expectedObject.getAuthorizationDetails().setRbacDevice("new RBAC device");
@@ -104,6 +94,7 @@ public class CommandTagConfigTest extends ConfigurationCacheLoaderTest<CommandTa
     // Build configuration to add the test DataTag
     cern.c2mon.shared.client.configuration.api.tag.CommandTag commandTag = ConfigurationCommandTagUtil.buildCreateAllFieldsCommandTag(500L, null);
     commandTag.setEquipmentId(15L);
+    CommandTagCacheObject expectedCacheObjectCommand = cacheObjectFactory.buildCommandTagCacheObject(500L, commandTag);
 
     Configuration configuration = new Configuration();
     configuration.addEntity(commandTag);
@@ -117,16 +108,11 @@ public class CommandTagConfigTest extends ConfigurationCacheLoaderTest<CommandTa
     assertTrue(report.getProcessesToReboot().isEmpty());
     assertEquals(1, report.getElementReports().size());
 
-    // get cacheObject from the cache and compare to the an expected cacheObject
-    CommandTagCacheObject cacheObjectCommand = (CommandTagCacheObject) commandTagCache.get(500L);
-    CommandTagCacheObject expectedCacheObjectCommand = cacheObjectFactory.buildCommandTagCacheObject(500L, commandTag);
-
-    assertEquals(expectedCacheObjectCommand, cacheObjectCommand);
+    assertEquals(expectedCacheObjectCommand, commandTagCache.get(500L));
   }
 
   @Test
   public void updateCommandTag() {
-
     // SETUP:
     Configuration createProcess = TestConfigurationProvider.createProcess();
     configurationLoader.applyConfiguration(createProcess);
@@ -145,6 +131,8 @@ public class CommandTagConfigTest extends ConfigurationCacheLoaderTest<CommandTa
       .description("new description").build();
     Configuration configuration = new Configuration();
     configuration.addEntity(commandTagUpdate);
+    CommandTagCacheObject expectedCacheObjectCommand =
+      cacheObjectFactory.buildCommandTagUpdateCacheObject((CommandTagCacheObject) commandTagCache.get(500L), commandTagUpdate);
 
     ///apply the configuration to the server
     ConfigurationReport report = configurationLoader.applyConfiguration(configuration);
@@ -155,10 +143,27 @@ public class CommandTagConfigTest extends ConfigurationCacheLoaderTest<CommandTa
     assertTrue(report.getProcessesToReboot().isEmpty());
     assertEquals(1, report.getElementReports().size());
 
-    // get cacheObject from the cache and compare to the an expected cacheObject
-    CommandTagCacheObject cacheObjectCommand = (CommandTagCacheObject) commandTagCache.get(500L);
-    CommandTagCacheObject expectedCacheObjectCommand = cacheObjectFactory.buildCommandTagUpdateCacheObject(cacheObjectCommand, commandTagUpdate);
+    assertEquals(expectedCacheObjectCommand, commandTagCache.get(500L));
+  }
 
-    assertEquals(expectedCacheObjectCommand, cacheObjectCommand);
+  private static CommandTagCacheObject expectedCommandTag10000() {
+    CommandTagCacheObject expectedObject = new CommandTagCacheObject(10000L, "Test CommandTag", "test description", "String", DataTagConstants.MODE_TEST);
+    expectedObject.setProcessId(50L);
+    expectedObject.setEquipmentId(150L);
+    expectedObject.setClientTimeout(30000);
+    expectedObject.setExecTimeout(6000);
+    expectedObject.setSourceRetries(2);
+    expectedObject.setSourceTimeout(200);
+    RbacAuthorizationDetails details = new RbacAuthorizationDetails();
+    details.setRbacClass("RBAC class");
+    details.setRbacDevice("RBAC device");
+    details.setRbacProperty("RBAC property");
+    expectedObject.setAuthorizationDetails(details);
+    expectedObject
+      .setHardwareAddress(HardwareAddressFactory
+        .getInstance()
+        .fromConfigXML(
+          "<HardwareAddress class=\"cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl\"><opc-item-name>PLC_B_CMD_ACQ_DEF_5A6</opc-item-name><command-pulse-length>100</command-pulse-length></HardwareAddress>"));
+    return expectedObject;
   }
 }

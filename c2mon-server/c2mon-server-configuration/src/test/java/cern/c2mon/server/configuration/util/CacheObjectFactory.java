@@ -342,7 +342,7 @@ public class CacheObjectFactory {
       cacheObject.setMaximum((Comparable) configObject.getMaxValue());
     }
     if (configObject.getMinValue() != null) {
-      cacheObject.setMaximum((Comparable) configObject.getMinValue());
+      cacheObject.setMinimum((Comparable) configObject.getMinValue());
     }
     if (configObject.getDescription() != null) {
       cacheObject.setDescription(configObject.getDescription());

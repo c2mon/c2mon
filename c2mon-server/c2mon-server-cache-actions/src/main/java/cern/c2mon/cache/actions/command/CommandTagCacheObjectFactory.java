@@ -4,6 +4,7 @@ import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.factory.AbstractCacheObjectFactory;
 import cern.c2mon.server.common.command.CommandTagCacheObject;
 import cern.c2mon.server.common.equipment.Equipment;
+import cern.c2mon.server.common.util.MetadataUtils;
 import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
 import cern.c2mon.shared.common.Cacheable;
 import cern.c2mon.shared.common.ConfigurationException;
@@ -82,6 +83,9 @@ public class CommandTagCacheObjectFactory extends AbstractCacheObjectFactory<Com
       commandTagCacheObject.setEquipmentId(equipmentId);
       commandTagCacheObject.setProcessId(equipmentCacheRef.get(equipmentId).getProcessId());
     });
+
+    cern.c2mon.server.common.metadata.Metadata newMetadata = MetadataUtils.parseMetadataConfiguration(properties, null);
+    commandTagCacheObject.setMetadata(newMetadata);
 
     // This should eventually be removed, once RbacAuth is properly removed and replaced by metadata
     RbacAuthorizationDetails rbacAuthorizationDetails = createRbacAuthorizationDetails(commandTagCacheObject, properties);
