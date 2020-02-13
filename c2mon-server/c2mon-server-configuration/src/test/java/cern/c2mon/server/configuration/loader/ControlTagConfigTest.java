@@ -37,7 +37,11 @@ public class ControlTagConfigTest extends ConfigurationCacheLoaderTest<Process> 
     expectedObjectAlive.setDataType("java.lang.Long");
     expectedObjectAlive.setValue(true);
 
-    assertEquals(expectedObjectAlive, aliveTimerCache.get(101L));
+    AliveTag cacheObject = aliveTimerCache.get(101L);
+    // We need to set this, as it was non deterministic
+    expectedObjectAlive.setLastUpdate(cacheObject.getLastUpdate());
+
+    assertEquals(expectedObjectAlive, cacheObject);
   }
 
   @Test
@@ -68,7 +72,11 @@ public class ControlTagConfigTest extends ConfigurationCacheLoaderTest<Process> 
     assertTrue(report.getProcessesToReboot().isEmpty());
     assertEquals(1, report.getElementReports().size());
 
-    assertEquals(expectedObjectAlive, aliveTimerCache.get(101L));
+    AliveTag cacheObject = aliveTimerCache.get(101L);
+    // We need to set this, as it was non deterministic
+    expectedObjectAlive.setLastUpdate(cacheObject.getLastUpdate());
+
+    assertEquals(expectedObjectAlive, cacheObject);
   }
 
   @Test
