@@ -23,7 +23,7 @@ variables:
 .build_base:
   stage: compile
   dependencies: []
-  image: maven:3.6.2-jdk-8-slim
+  image: gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-maven:gcc-jdk-11-mvn-3.6
   script:
     - export MAVEN_OPTS=""
     - cd $TARGET
@@ -103,7 +103,7 @@ build_daq:
 
 .test_base:
   stage: test
-  image: maven:3.6.2-jdk-8-slim
+  image: gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-maven:gcc-jdk-11-mvn-3.6
   script:
     - export MAVEN_OPTS=""
     - mkdir reports
@@ -159,7 +159,7 @@ test_daq:
 sonar_preview:
   stage: qa
   tags: [c2mon]
-  image: maven:3.6.2-jdk-8-slim
+  image: gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-maven:gcc-jdk-11-mvn-3.6
   dependencies:
     - build_shared
     - build_server
@@ -174,7 +174,7 @@ sonar_preview:
 quality_assurance:
   stage: qa
   tags: [c2mon]
-  image: maven:3.6.2-jdk-8-slim
+  image: gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-maven:gcc-jdk-11-mvn-3.6
   dependencies:
     - build_shared
     - build_server
@@ -193,7 +193,7 @@ quality_assurance:
 publish:
   stage: publish
   tags: [c2mon]
-  image: maven:3.6.2-jdk-8-slim
+  image: gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-maven:gcc-jdk-11-mvn-3.6
   dependencies:
     - build_shared
     - build_server
