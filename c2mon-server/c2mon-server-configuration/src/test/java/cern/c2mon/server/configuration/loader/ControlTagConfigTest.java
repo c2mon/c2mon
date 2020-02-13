@@ -27,6 +27,21 @@ public class ControlTagConfigTest extends ConfigurationCacheLoaderTest<Process> 
   @Inject private C2monCache<SupervisionStateTag> stateTagCache;
 
   @Test
+  public void createAliveTag() {
+    Configuration createProcess = TestConfigurationProvider.createProcess();
+    configurationLoader.applyConfiguration(createProcess);
+
+    AliveTag expectedObjectAlive = new AliveTag(101L, 5L, "P_INI_TEST", "PROC", null, 100L, 60000);
+    expectedObjectAlive.setName("P:ALIVE");
+    expectedObjectAlive.setDescription("<no description provided>");
+    expectedObjectAlive.setMode((short) TagMode.OPERATIONAL.ordinal());
+    expectedObjectAlive.setDataType("java.lang.Long");
+    expectedObjectAlive.setValue(true);
+
+    assertEquals(expectedObjectAlive, aliveTimerCache.get(101L));
+  }
+
+  @Test
   public void updateAliveTag() {
     // SETUP:
     Configuration createProcess = TestConfigurationProvider.createProcess();
@@ -39,6 +54,13 @@ public class ControlTagConfigTest extends ConfigurationCacheLoaderTest<Process> 
     Configuration configuration = new Configuration();
     configuration.addEntity(aliveTagUpdate);
 
+    AliveTag expectedObjectAlive = new AliveTag(101L, 5L, "P_INI_TEST", "PROC", null, 100L, 60000);
+    expectedObjectAlive.setName("P:ALIVE");
+    expectedObjectAlive.setDescription("new description");
+    expectedObjectAlive.setMode((short) TagMode.OPERATIONAL.ordinal());
+    expectedObjectAlive.setDataType("java.lang.Long");
+    expectedObjectAlive.setValue(true);
+
     ///apply the configuration to the server
     ConfigurationReport report = configurationLoader.applyConfiguration(configuration);
 
@@ -48,10 +70,7 @@ public class ControlTagConfigTest extends ConfigurationCacheLoaderTest<Process> 
     assertTrue(report.getProcessesToReboot().isEmpty());
     assertEquals(1, report.getElementReports().size());
 
-    // check aliveTag in the cache
-    AliveTag cacheObjectAlive = aliveTimerCache.get(101L);
-    AliveTag expectedObjectAlive = new AliveTag(101L, 5L, "P_INI_TEST", "PROC", null, 100L, 60000);
-    assertEquals(expectedObjectAlive, cacheObjectAlive);
+    assertEquals(expectedObjectAlive, aliveTimerCache.get(101L));
   }
 
   @Test

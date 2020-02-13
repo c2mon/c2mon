@@ -57,6 +57,7 @@ public class AliveTag extends ControlTag {
      * Timestamp of the last update of the alive tag. This information is used to periodically check which alive timers
      * have expired.
      */
+    @EqualsAndHashCode.Exclude
     private long lastUpdate;
 
     /**

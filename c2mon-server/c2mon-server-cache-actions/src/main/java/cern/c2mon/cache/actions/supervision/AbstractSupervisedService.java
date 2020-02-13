@@ -85,6 +85,8 @@ public abstract class AbstractSupervisedService<T extends Supervised> extends Ab
           log.trace("Adding supervised id #{} to alive timer {} (#{})", supervised.getId(), aliveTimer.getName(), aliveTimer.getId());
           aliveTimer.setSupervisedId(supervised.getId());
           aliveTimer.setSupervisedEntity(entity);
+          aliveTimer.setSupervisedName(supervised.getName());
+          aliveTimer.setAliveInterval(supervised.getAliveInterval());
           if (abstractEquipment != null) {
             applyNotNull(abstractEquipment.getCommFaultTagId(), aliveTimer::setCommFaultTagId);
           }
