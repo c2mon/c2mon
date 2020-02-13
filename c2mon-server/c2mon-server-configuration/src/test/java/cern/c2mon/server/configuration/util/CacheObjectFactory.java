@@ -46,12 +46,13 @@ public class CacheObjectFactory {
   public ProcessCacheObject buildProcessCacheObject(Long id, Process configProcess) {
     ProcessCacheObject expectedObject = new ProcessCacheObject(id);
     expectedObject = setCacheProcessCacheObjectFields(expectedObject, configProcess);
+    expectedObject.setRequiresReboot(true);
 
     return expectedObject;
   }
 
   public ProcessCacheObject buildProcessUpdateCacheObject(ProcessCacheObject originalObject, Process configProcess) {
-    ProcessCacheObject result = (ProcessCacheObject) originalObject.clone();
+    ProcessCacheObject result = originalObject.clone();
     setCacheProcessCacheObjectFields(result, configProcess);
 
     return result;

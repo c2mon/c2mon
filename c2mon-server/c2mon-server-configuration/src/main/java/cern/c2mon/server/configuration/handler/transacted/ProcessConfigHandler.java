@@ -89,6 +89,11 @@ public class ProcessConfigHandler extends BaseConfigHandlerImpl<Process> {
   }
 
   @Override
+  protected List<ProcessChange> createReturnValue(Process cacheable, ConfigurationElement element) {
+    return Collections.singletonList(new ProcessChange(cacheable.getId()));
+  }
+
+  @Override
   public List<ProcessChange> update(Long id, Properties properties) {
     removeKeyIfExists(properties, "id");
     removeKeyIfExists(properties, "name");

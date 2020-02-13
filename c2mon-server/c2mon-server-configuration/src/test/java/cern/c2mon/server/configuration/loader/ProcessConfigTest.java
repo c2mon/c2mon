@@ -2,15 +2,17 @@ package cern.c2mon.server.configuration.loader;
 
 import cern.c2mon.cache.actions.process.ProcessService;
 import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.server.cache.dbaccess.*;
-import cern.c2mon.server.common.alarm.Alarm;
+import cern.c2mon.server.cache.dbaccess.DataTagMapper;
+import cern.c2mon.server.cache.dbaccess.EquipmentMapper;
+import cern.c2mon.server.cache.dbaccess.ProcessMapper;
+import cern.c2mon.server.cache.dbaccess.SupervisionStateTagMapper;
 import cern.c2mon.server.common.alive.AliveTag;
 import cern.c2mon.server.common.commfault.CommFaultTag;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.process.ProcessCacheObject;
-import cern.c2mon.server.common.rule.RuleTag;
+import cern.c2mon.server.configuration.impl.ConfigurationLoaderImpl;
 import cern.c2mon.server.configuration.parser.util.ConfigurationProcessUtil;
 import cern.c2mon.server.configuration.util.TestConfigurationProvider;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
@@ -39,19 +41,11 @@ public class ProcessConfigTest extends ConfigurationCacheLoaderTest<Process> {
 
   @Inject private C2monCache<DataTag> dataTagCache;
 
-  @Inject private C2monCache<RuleTag> ruleTagCache;
-
-  @Inject private RuleTagMapper ruleTagMapper;
-
   @Inject private C2monCache<Equipment> equipmentCache;
 
   @Inject private EquipmentMapper equipmentMapper;
 
-  @Inject private AlarmMapper alarmMapper;
-
   @Inject private DataTagMapper dataTagMapper;
-
-  @Inject private C2monCache<Alarm> alarmCache;
 
   @Inject private ProcessService processService;
 
@@ -80,15 +74,15 @@ public class ProcessConfigTest extends ConfigurationCacheLoaderTest<Process> {
     assertTrue(aliveTimerCache.containsKey(300_000L));
 
     // Check Process in the cache
-    ProcessCacheObject cacheObjectProcess = (ProcessCacheObject) processCache.get(1L);
     ProcessCacheObject expectedObjectProcess = cacheObjectFactory.buildProcessCacheObject(1L, process);
 
-    assertEquals(expectedObjectProcess, cacheObjectProcess);
+    assertEquals(expectedObjectProcess, processCache.get(1L));
   }
 
 
   @Test
   public void updateProcess() {
+    ((ConfigurationLoaderImpl) configurationLoader).setDaqConfigEnabled(false);
     // SETUP:
     Configuration createProcess = TestConfigurationProvider.createProcess();
     configurationLoader.applyConfiguration(createProcess);
@@ -214,6 +208,7 @@ public class ProcessConfigTest extends ConfigurationCacheLoaderTest<Process> {
     expectedObject.setMaxMessageSize(200);
     expectedObject.setMaxMessageDelay(1000);
     expectedObject.setDescription("test description");
+    expectedObject.setRequiresReboot(true);
     return expectedObject;
   }
 }

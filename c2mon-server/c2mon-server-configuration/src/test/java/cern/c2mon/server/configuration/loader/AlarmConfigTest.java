@@ -51,7 +51,7 @@ public class AlarmConfigTest extends ConfigurationCacheLoaderTest<Alarm> {
       dataTag.getDataTagQuality().validate();
     });
 
-    ConfigurationReport report = configurationLoader.applyConfiguration(22);
+    configurationLoader.applyConfiguration(22);
   }
 
 
