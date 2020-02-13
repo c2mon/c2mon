@@ -291,7 +291,6 @@ final class ConfigurationApplier {
         processLists.put(processId, new ArrayList<>());
       }
 
-      //cast to implementation needed as DomFactory uses this - TODO change to interface
       processLists.get(processId).add((Change) processChange.getChangeEvent());
 
       if (processChange.hasNestedSubReport()) {
