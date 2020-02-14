@@ -136,7 +136,7 @@ test_shared:
 
 # When the client no longer depends on the server, this task can be changed to only run tests
 # and the task for building the client can be readdded
-test_client:
+build_test_client:
   extends: .test_base
   dependencies:
     - build_shared

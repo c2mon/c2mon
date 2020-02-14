@@ -33,6 +33,7 @@ import cern.c2mon.server.elasticsearch.tag.config.TagConfigDocumentListener;
 import cern.c2mon.server.elasticsearch.util.EmbeddedElasticsearchManager;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import org.apache.http.annotation.NotThreadSafe;
+import org.easymock.EasyMock;
 import org.easymock.Mock;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -75,7 +76,7 @@ public class ElasticsearchServiceTest {
     TagCacheCollection tagCacheFacade = new TagCacheCollection(new SimpleCache<>("rule"),
       new SimpleCache<>("data"), new SimpleCache<>("alive"), new SimpleCache<>("cFault"),
       new SimpleCache<>("state"));
-    alarmService = new AlarmService(new SimpleCache<>("alarmCache"), tagCacheFacade, null);
+    alarmService = EasyMock.createNiceMock(AlarmService.class);
     tagDocumentListener = new TagConfigDocumentListener(elasticsearchProperties, indexer, converter, tagCacheFacade, alarmService);
   }
 
