@@ -16,7 +16,7 @@
       <result property="sourceTimestamp" column="ALARMSOURCETIME" jdbcType="TIMESTAMP"/>
       <result property="info" column="ALARMINFO" jdbcType="VARCHAR"/>
       <result property="condition" column="ALARMCONDITION" javaType="cern.c2mon.shared.client.alarm.condition.AlarmCondition" jdbcType="VARCHAR"/>
-      <result property="dataTagId" column="ALARM_TAGID" jdbcType="NUMERIC" javaType="java.lang.Long"/>
+      <result property="tagId" column="ALARM_TAGID" jdbcType="NUMERIC" javaType="java.lang.Long"/>
       <result property="metadata" column="ALARMMETADATA" javaType="cern.c2mon.server.common.metadata.Metadata" jdbcType="VARCHAR"/>
       <result property="oscillating" column="ALARMOSCILLATION" jdbcType="NUMERIC"/>
     </resultMap>
@@ -87,7 +87,7 @@
               #{triggerTimestamp,jdbcType=TIMESTAMP},
               #{sourceTimestamp,jdbcType=TIMESTAMP}, #{info,jdbcType=VARCHAR},
               #{condition,javaType=cern.c2mon.shared.client.alarm.condition.AlarmCondition,jdbcType=VARCHAR},
-              #{dataTagId,jdbcType=NUMERIC},
+              #{tagId,jdbcType=NUMERIC},
               #{metadata, jdbcType=VARCHAR},
               #{oscillating,jdbcType=NUMERIC}
              )
