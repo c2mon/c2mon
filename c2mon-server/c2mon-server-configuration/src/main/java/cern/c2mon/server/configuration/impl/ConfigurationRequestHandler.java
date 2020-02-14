@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2020 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -19,32 +19,26 @@ package cern.c2mon.server.configuration.impl;
 import java.io.IOException;
 import java.lang.reflect.Type;
 
-import javax.jms.Destination;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.MessageProducer;
-import javax.jms.Session;
-import javax.jms.TextMessage;
+import javax.jms.*;
 
-import cern.c2mon.shared.client.configuration.ConfigConstants;
-import cern.c2mon.shared.common.serialisation.HardwareAddressDeserializer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.google.gson.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.listener.SessionAwareMessageListener;
 import org.springframework.jms.support.converter.MessageConversionException;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.configuration.ConfigurationLoader;
+import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationException;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.api.Configuration;
 import cern.c2mon.shared.common.datatag.address.HardwareAddress;
+import cern.c2mon.shared.common.serialisation.HardwareAddressDeserializer;
 
 /**
  * Handles configuration requests received on JMS from clients.
@@ -57,13 +51,9 @@ import cern.c2mon.shared.common.datatag.address.HardwareAddress;
  * @author Justin Lewis Salmon
  *
  */
+@Slf4j
 @Service("configurationRequestHandler")
 public class ConfigurationRequestHandler implements SessionAwareMessageListener<Message> {
-
-  /**
-   * Private class logger.
-   */
-  private static final Logger log = LoggerFactory.getLogger(ConfigurationRequestHandler.class);
 
   /**
    * Reference to the configuration loader.
@@ -81,9 +71,12 @@ public class ConfigurationRequestHandler implements SessionAwareMessageListener<
 
     ConfigurationReport configurationReport;
     try {
-      Configuration configuration = mapper.readValue(TextMessage.class.cast(message).getText(),Configuration.class);
+      String configJson = TextMessage.class.cast(message).getText();
+      // TODO: Remove that code with the next release.
+      configJson = convertDeprecatedAlarmConfigurationRequest(configJson);
+      Configuration configuration = mapper.readValue(configJson, Configuration.class);
 
-    log.info(String.format("Configuration request received"));
+      log.info("Configuration request received");
 
       configurationReport = configurationLoader.applyConfiguration(configuration);
     } catch (ConfigurationException ex) {
@@ -93,6 +86,7 @@ public class ConfigurationRequestHandler implements SessionAwareMessageListener<
       configurationReport.setExceptionTrace(e);
       configurationReport.setStatus(ConfigConstants.Status.FAILURE);
       configurationReport.setStatusDescription("Serialization or Deserialization of Configuration on Server side failed");
+      log.warn("Deserialization of client configuration request failed. Could not treat request", e);
     }
 
     // Extract reply topic
@@ -100,7 +94,7 @@ public class ConfigurationRequestHandler implements SessionAwareMessageListener<
     try {
       replyDestination = message.getJMSReplyTo();
     } catch (JMSException jmse) {
-      log.error("onMessage() : Cannot extract ReplyTo from message.", jmse);
+      log.error("Cannot extract ReplyTo from message.", jmse);
       throw jmse;
     }
 
@@ -116,16 +110,34 @@ public class ConfigurationRequestHandler implements SessionAwareMessageListener<
         log.info("Sending reconfiguration report to client.");
         messageProducer.send(replyMessage);
       } catch (JsonProcessingException e) {
-        log.error("error while serializing the configurationReport: "+ e.getMessage());
+        log.error("Error while serializing the configurationReport: "+ e.getMessage());
       } finally {
         if (messageProducer != null) {
             messageProducer.close();
         }
       }
     } else {
-      log.error("onMessage(): JMSReplyTo destination is null - cannot send reply.");
+      log.error("JMSReplyTo destination is null - cannot send reply.");
       throw new MessageConversionException("JMS reply queue could not be extracted (returned null).");
     }
+  }
+
+  /**
+   * TODO: Remove that code with the next release.
+   * @param configJson The
+   * @return
+   * @deprecated Temporary class for backward compatibility to v1.9.2. Will be removed with the next version
+   */
+  @SuppressWarnings("unused")
+  @Deprecated
+  private String convertDeprecatedAlarmConfigurationRequest(String configJson) {
+    configJson = configJson.replace("cern.c2mon.shared.client.configuration.api.alarm.ValueCondition", "cern.c2mon.shared.client.alarm.condition.ValueAlarmCondition");
+    configJson = configJson.replace("cern.c2mon.server.common.alarm.ValueAlarmCondition", "cern.c2mon.shared.client.alarm.condition.ValueAlarmCondition");
+    if (configJson.contains("cern.c2mon.shared.client.alarm.condition.ValueAlarmCondition")) {
+      configJson = configJson.replace("\"value\"","\"alarmValue\"");
+    }
+
+    return configJson;
   }
 
   /**

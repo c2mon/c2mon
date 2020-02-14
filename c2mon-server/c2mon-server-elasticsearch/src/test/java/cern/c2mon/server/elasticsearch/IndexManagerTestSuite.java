@@ -47,10 +47,15 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Tests for implementations of {@link IndexManager}.
+ * Tests for {@link IndexManager}, executed by {@link ElasticsearchSuiteTest}.
+ *
+ * NOTE: The naming convention (&lt;class name&gt;TestSuite) is used specifically to prevent test execution plugins
+ * (like Surefire) to execute the tests individually.
+ *
+ * @author Serhiy Boychenko
  */
 @RunWith(Parameterized.class)
-public class IndexManagerTests {
+public class IndexManagerTestSuite {
   private static final String MAPPINGS_FILE = "mappings/test.json";
 
   private static final String NAME = "Test Name";
@@ -84,7 +89,7 @@ public class IndexManagerTests {
    *
    * @param indexManager instance for current test set execution.
    */
-  public IndexManagerTests(IndexManager indexManager) {
+  public IndexManagerTestSuite(IndexManager indexManager) {
     this.indexManager = indexManager;
   }
 

@@ -16,12 +16,15 @@
  *****************************************************************************/
 package cern.c2mon.shared.common.type;
 
-import cern.c2mon.shared.common.supervision.SupervisionStatus;
-import org.junit.Test;
-
 import java.util.Random;
 
-import static org.junit.Assert.*;
+import org.junit.Test;
+
+import cern.c2mon.shared.common.supervision.SupervisionStatus;
+
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class TypeConverterTest {
 

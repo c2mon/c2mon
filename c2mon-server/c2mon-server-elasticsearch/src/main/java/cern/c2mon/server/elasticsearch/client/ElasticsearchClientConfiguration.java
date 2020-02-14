@@ -30,9 +30,13 @@ import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 @Configuration
 public class ElasticsearchClientConfiguration {
 
+  public static final long CLIENT_SETUP_TIMEOUT = 120000;
+
   private final ElasticsearchProperties properties;
 
   /**
+   * Constructor with properties parameter
+   *
    * @param properties to be used to set up the client
    */
   @Autowired

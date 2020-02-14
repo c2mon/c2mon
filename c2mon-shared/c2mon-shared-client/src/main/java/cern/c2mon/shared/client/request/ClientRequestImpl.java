@@ -28,7 +28,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
-
 import lombok.Getter;
 
 import cern.c2mon.shared.client.alarm.AlarmValue;
@@ -77,12 +76,12 @@ public class ClientRequestImpl<T extends ClientRequestResult> implements ClientR
   private int requestTimeout;
 
   /** List of ids. Please note this field should one day be renamed to ids. */
-  @Getter(onMethod=@__({@Deprecated}))
-  private final Collection<Long> tagIds = new HashSet<Long>();
+  @Getter
+  private final Collection<Long> tagIds = new HashSet<>();
 
   /** List of regular expressions, which is e.g. used to search via tag name */
   @Getter
-  private final Collection<String> regexList = new HashSet<String>();
+  private final Collection<String> regexList = new HashSet<>();
 
   /** Request parameter */
   @Getter
@@ -185,6 +184,7 @@ public class ClientRequestImpl<T extends ClientRequestResult> implements ClientR
   }
 
 
+  @Override
   public Collection<Long> getIds() {
     return this.tagIds;
   }
@@ -304,7 +304,7 @@ public class ClientRequestImpl<T extends ClientRequestResult> implements ClientR
    */
   public static final ClientRequest fromObject(final Object object) {
     if (object instanceof CommandExecuteRequest) {
-      ClientRequestImpl<CommandReport> clientRequest = new ClientRequestImpl<CommandReport>(CommandReport.class);
+      ClientRequestImpl<CommandReport> clientRequest = new ClientRequestImpl<>(CommandReport.class);
       clientRequest.setObjectParameter(object);
       return clientRequest;
     } else if (object instanceof Set) {
@@ -316,6 +316,7 @@ public class ClientRequestImpl<T extends ClientRequestResult> implements ClientR
   }
 
   /**
+   * Factory method to deserialize from json back to {@link ClientRequest}
    * @param json Json string representation of a <code>TransferTagRequestImpl</code> class
    * @return The deserialized Json message
    * @throws JsonSyntaxException This exception is raised when Gson attempts to read

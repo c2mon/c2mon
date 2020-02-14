@@ -14,88 +14,76 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.elasticsearch.tag;
+package cern.c2mon.server.elasticsearch.supervision;
+
+import java.io.IOException;
+import java.util.List;
+
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
-import cern.c2mon.server.cache.test.CachePopulationRule;
-import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.elasticsearch.ElasticsearchSuiteTest;
 import cern.c2mon.server.elasticsearch.ElasticsearchTestDefinition;
 import cern.c2mon.server.elasticsearch.IndexNameManager;
 import cern.c2mon.server.elasticsearch.util.EmbeddedElasticsearchManager;
 import cern.c2mon.server.elasticsearch.util.EntityUtils;
 import cern.c2mon.server.elasticsearch.util.IndexUtils;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
+import cern.c2mon.shared.client.supervision.SupervisionEvent;
 
-import java.io.IOException;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static junit.framework.TestCase.assertTrue;
 
 /**
+ * Tests for {@link SupervisionEventDocumentIndexer}, executed by {@link ElasticsearchSuiteTest}.
+ *
+ * NOTE: The naming convention (&lt;class name&gt;TestSuite) is used specifically to prevent test execution plugins
+ * (like Surefire) to execute the tests individually.
+ *
  * @author Alban Marguet
- * @author Justin Lewis Salmon
+ * @author Justin LEwis Salmon
+ * @author Serhiy Boychenko
  */
-@ContextConfiguration(classes = CachePopulationRule.class)
-public class TagDocumentIndexerTests extends ElasticsearchTestDefinition {
-
-  @Autowired
-  private TagDocumentIndexer indexer;
+public class SupervisionEventDocumentIndexerTestSuite extends ElasticsearchTestDefinition {
 
   @Autowired
   private IndexNameManager indexNameManager;
 
-  @Rule
   @Autowired
-  public CachePopulationRule cachePopulationRule;
+  private SupervisionEventDocumentIndexer indexer;
 
-  @Autowired
-  private TagDocumentConverter converter;
-
-  private TagDocument document;
+  private SupervisionEventDocument document;
 
   @Before
   public void setUp() {
-    DataTagCacheObject tag = (DataTagCacheObject) EntityUtils.createDataTag();
-    document = converter.convert(tag).orElseThrow(() -> new IllegalArgumentException("TagDocument conversion failed"));
+    SupervisionEvent event = EntityUtils.createSupervisionEvent();
+    document = new SupervisionEventDocumentConverter().convert(event);
     indexName = indexNameManager.indexFor(document);
   }
 
   @Test
-  public void indexSingleTagTest() throws IDBPersistenceException, InterruptedException, IOException {
+  public void logSingleSupervisionEventTest() throws IDBPersistenceException, IOException {
     indexer.storeData(document);
-
-    // Bulk flush operation seem to require more time
-    Thread.sleep(1000L);
 
     EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
 
-    assertTrue("Index should have been created.",
-        IndexUtils.doesIndexExist(indexName, ElasticsearchSuiteTest.getProperties()));
+    assertTrue("Index should have been created.", IndexUtils.doesIndexExist(indexName, ElasticsearchSuiteTest.getProperties()));
 
     List<String> indexData = EmbeddedElasticsearchManager.getEmbeddedNode().fetchAllDocuments(indexName);
-    assertEquals("Index should have one document inserted.", 1, indexData.size());
+    Assert.assertEquals("Index should have one document inserted.", 1, indexData.size());
   }
 
   @Test
-  public void indexMultipleTagsTest() throws IDBPersistenceException, InterruptedException, IOException {
+  public void logMultipleSupervisionEventsTest() throws IDBPersistenceException, IOException {
     indexer.storeData(document);
     indexer.storeData(document);
-
-    // Bulk flush operation seem to require more time
-    Thread.sleep(1000l);
 
     EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
 
-    assertTrue("Index should have been created.",
-        IndexUtils.doesIndexExist(indexName, ElasticsearchSuiteTest.getProperties()));
+    assertTrue("Index should have been created.", IndexUtils.doesIndexExist(indexName, ElasticsearchSuiteTest.getProperties()));
 
     List<String> indexData = EmbeddedElasticsearchManager.getEmbeddedNode().fetchAllDocuments(indexName);
-    assertEquals("Index should have two documents inserted.", 2, indexData.size());
+    Assert.assertEquals("Index should have two documents inserted.", 2, indexData.size());
   }
 }

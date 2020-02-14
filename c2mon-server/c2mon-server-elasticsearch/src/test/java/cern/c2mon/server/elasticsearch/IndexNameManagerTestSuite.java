@@ -28,9 +28,15 @@ import cern.c2mon.server.elasticsearch.tag.TagDocument;
 import static junit.framework.TestCase.assertEquals;
 
 /**
+ * Tests for {@link IndexNameManager}, executed by {@link ElasticsearchSuiteTest}.
+ *
+ * NOTE: The naming convention (&lt;class name&gt;TestSuite) is used specifically to prevent test execution plugins
+ * (like Surefire) to execute the tests individually.
+ *
  * @author Justin Lewis Salmon
+ * @author Serhiy Boychenko
  */
-public class IndexNameManagerTests {
+public class IndexNameManagerTestSuite {
 
   private static final String TIMESTAMP_PROPERTY = "timestamp";
 

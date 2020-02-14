@@ -70,15 +70,18 @@ public final class ElasticsearchClientTransport implements ElasticsearchClient {
 
   private final ElasticsearchProperties properties;
 
-  private final Client client;
+  private TransportClient client;
 
   /**
+   * Elasticsearch Transport client constructor
+   *
    * @param properties to initialize Transport client.
    */
   @Autowired
   public ElasticsearchClientTransport(ElasticsearchProperties properties) {
     this.properties = properties;
-    this.client = createClient();
+
+    setup();
 
     connectAsynchronously();
   }
@@ -190,30 +193,6 @@ public final class ElasticsearchClientTransport implements ElasticsearchClient {
   }
 
   /**
-   * Creates a {@link Client} to communicate with the Elasticsearch cluster.
-   *
-   * @return the {@link Client} instance
-   */
-  @SuppressWarnings("squid:S2095")
-  private Client createClient() {
-    final Settings.Builder settingsBuilder = Settings.builder();
-
-    settingsBuilder.put("node.name", properties.getNodeName())
-        .put("cluster.name", properties.getClusterName())
-        .put("http.enabled", properties.isHttpEnabled());
-
-    TransportClient transportClient = new PreBuiltTransportClient(settingsBuilder.build());
-    try {
-      transportClient.addTransportAddress(new TransportAddress(InetAddress.getByName(properties.getHost()), properties.getPort()));
-    } catch (UnknownHostException e) {
-      log.error("Error connecting to the Elasticsearch cluster at {}:{}", properties.getHost(), properties.getPort(), e);
-      return null;
-    }
-
-    return transportClient;
-  }
-
-  /**
    * Connect to the cluster in a separate thread.
    */
   private void connectAsynchronously() {
@@ -238,12 +217,12 @@ public final class ElasticsearchClientTransport implements ElasticsearchClient {
                 break;
               }
 
-              sleep(100L);
+              sleep(1000L);
             }
             log.info("Elasticsearch cluster is yellow");
           }
       );
-      nodeReady.get(120, TimeUnit.SECONDS);
+      nodeReady.get(ElasticsearchClientConfiguration.CLIENT_SETUP_TIMEOUT, TimeUnit.MILLISECONDS);
     } catch (InterruptedException | ExecutionException | TimeoutException e) {
       log.error("Exception when waiting for yellow status", e);
       throw new IllegalStateException("Exception when waiting for Elasticsearch yellow status!", e);
@@ -272,7 +251,35 @@ public final class ElasticsearchClientTransport implements ElasticsearchClient {
       return status.equals(ClusterHealthStatus.YELLOW) || status.equals(ClusterHealthStatus.GREEN);
     } catch (NoNodeAvailableException e) {
       log.info("Elasticsearch cluster not yet ready: {}", e.getMessage());
-      log.debug("Elasticsearch cluster not yet ready: ", e);
+      log.trace("Elasticsearch cluster not yet ready: ", e);
+    }
+    return false;
+  }
+
+  @Override
+  @SuppressWarnings("squid:S2095")
+  public void setup() {
+    final Settings.Builder settingsBuilder = Settings.builder();
+
+    settingsBuilder.put("node.name", properties.getNodeName())
+        .put("cluster.name", properties.getClusterName())
+        .put("http.enabled", properties.isHttpEnabled());
+
+    client = new PreBuiltTransportClient(settingsBuilder.build());
+    try {
+      client.addTransportAddress(new TransportAddress(InetAddress.getByName(properties.getHost()), properties.getPort()));
+    } catch (UnknownHostException e) {
+      log.error("Error connecting to the Elasticsearch cluster at {}:{}", properties.getHost(), properties.getPort(), e);
+    }
+  }
+
+  @Override
+  public boolean isClientHealthy() {
+    try {
+      getClusterHealth();
+      return true;
+    } catch (Exception e) {
+      log.error("An error occurred checking cluster health: ", e);
     }
     return false;
   }

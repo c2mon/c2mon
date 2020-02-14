@@ -16,24 +16,33 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch.alarm;
 
+import java.sql.Timestamp;
+import java.util.Map;
+
+import lombok.extern.slf4j.Slf4j;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.mockito.internal.util.reflection.Whitebox;
+
 import cern.c2mon.pmanager.fallback.exception.DataFallbackException;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.elasticsearch.util.EntityUtils;
-import lombok.extern.slf4j.Slf4j;
-import org.junit.Test;
-import org.mockito.internal.util.reflection.Whitebox;
-
-import java.sql.Timestamp;
-import java.util.Map;
 
 import static junit.framework.TestCase.assertEquals;
 
 /**
+ * Tests for {@link AlarmValueDocumentConverter}, executed by {@link cern.c2mon.server.elasticsearch.ElasticsearchSuiteTest}.
+ *
+ * NOTE: The naming convention (&lt;class name&gt;TestSuite) is used specifically to prevent test execution plugins
+ * (like Surefire) to execute the tests individually.
+ *
  * @author Alban Marguet
  * @author Justin Lewis Salmon
  */
 @Slf4j
-public class AlarmDocumentConverterTests {
+@RunWith(JUnit4.class)
+public class AlarmDocumentConverterTestSuite {
 
   private static final String TIMESTAMP_PROPERTY = "timestamp";
 
@@ -50,8 +59,8 @@ public class AlarmDocumentConverterTests {
     // Deserialize
     document = (AlarmDocument) document.getObject(json);
 
-    assertEquals(alarm.getId(), document.get("id"));
-    assertEquals(alarm.getDataTagId().intValue(), document.get("tagId"));
+    assertEquals(alarm.getId().intValue(), document.get("id"));
+    assertEquals(alarm.getTagId().intValue(), document.get("tagId"));
     assertEquals(alarm.getFaultFamily(), document.get("faultFamily"));
     assertEquals(alarm.getFaultMember(), document.get("faultMember"));
     assertEquals(alarm.getFaultCode(), document.get("faultCode"));

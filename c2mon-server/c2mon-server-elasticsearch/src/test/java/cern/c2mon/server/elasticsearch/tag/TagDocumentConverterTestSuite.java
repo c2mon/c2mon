@@ -21,6 +21,9 @@ import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.equipment.EquipmentCacheObject;
@@ -29,29 +32,41 @@ import cern.c2mon.server.elasticsearch.util.EntityUtils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.when;
 
 /**
+ * Tests for {@link TagDocumentConverter}, executed by {@link cern.c2mon.server.elasticsearch.ElasticsearchSuiteTest}.
+ *
+ * NOTE: The naming convention (&lt;class name&gt;TestSuite) is used specifically to prevent test execution plugins
+ * (like Surefire) to execute the tests individually.
+ *
  * @author Alban Marguet
  * @author Matthias Braeger
  * @author Justin Lewis Salmon
+ * @author Serhiy Boychenko
  */
-public class TagDocumentConverterTests extends BaseTagDocumentConverterTest{
+@RunWith(MockitoJUnitRunner.class)
+public class TagDocumentConverterTestSuite extends BaseTagDocumentConverterTest {
+
+  @InjectMocks
+  private TagDocumentConverter converter;
 
   @Before
-  public void setup() {
-
-    ProcessCacheObject process = new ProcessCacheObject(tag.getProcessId());
+  public void setUp() {
+    ProcessCacheObject process = new ProcessCacheObject(1L);
     process.setName("P_TEST");
 
-    EquipmentCacheObject equipment = new EquipmentCacheObject(tag.getEquipmentId());
+    EquipmentCacheObject equipment = new EquipmentCacheObject(1L);
     equipment.setName("E_TEST");
 
-    processCache.put(process.getId(), process);
-    equipmentCache.put(equipment.getId(), equipment);
+    when(processCache.get(any())).thenReturn(process);
+    when(equipmentCache.get(any())).thenReturn(equipment);
   }
 
   @Test
   public void toAndFromJson() {
+    DataTag tag = EntityUtils.createDataTag();
 
     TagDocument document = converter.convert(tag).orElseThrow(() -> new IllegalArgumentException("TagDocument conversion failed"));
 

@@ -16,34 +16,39 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch.tag.config;
 
-import cern.c2mon.server.cache.test.CachePopulationRule;
-import cern.c2mon.server.common.datatag.DataTagCacheObject;
-import cern.c2mon.server.elasticsearch.ElasticsearchSuiteTest;
-import cern.c2mon.server.elasticsearch.ElasticsearchTestDefinition;
-import cern.c2mon.server.elasticsearch.IndexNameManager;
-import cern.c2mon.server.elasticsearch.util.EmbeddedElasticsearchManager;
-import cern.c2mon.server.elasticsearch.util.EntityUtils;
-import cern.c2mon.server.elasticsearch.util.IndexUtils;
+import java.util.List;
+import java.util.Map;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
 
-import java.util.List;
-import java.util.Map;
+import cern.c2mon.server.common.datatag.DataTagCacheObject;
+import cern.c2mon.server.elasticsearch.ElasticsearchSuiteTest;
+import cern.c2mon.server.elasticsearch.ElasticsearchTestDefinition;
+import cern.c2mon.server.elasticsearch.IndexNameManager;
+import cern.c2mon.server.cache.test.CachePopulationRule;
+import cern.c2mon.server.elasticsearch.util.EmbeddedElasticsearchManager;
+import cern.c2mon.server.elasticsearch.util.EntityUtils;
+import cern.c2mon.server.elasticsearch.util.IndexUtils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
+ * Tests for {@link TagConfigDocumentIndexer}, executed by {@link ElasticsearchSuiteTest}.
+ *
+ * NOTE: The naming convention (&lt;class name&gt;TestSuite) is used specifically to prevent test execution plugins
+ * (like Surefire) to execute the tests individually.
+ *
  * @author Szymon Halastra
  * @author Justin Lewis Salmon
+ * @author Serhiy Boychenko
  */
-@ContextConfiguration(classes = CachePopulationRule.class)
-public class TagConfigDocumentIndexerTests extends ElasticsearchTestDefinition {
+public class TagConfigDocumentIndexerTestSuite extends ElasticsearchTestDefinition {
 
   @Autowired
   private IndexNameManager indexNameManager;
