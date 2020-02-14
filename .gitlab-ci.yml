@@ -81,7 +81,8 @@ build_server:
   variables:
     TARGET: "c2mon-server"
 
-build_client:
+# Disabled because the client currently has a dependency on server for ElasticSearch
+.build_client:
   extends: .build_base
   dependencies: [build_shared]
   variables:
@@ -137,7 +138,13 @@ test_client:
   extends: .test_base
   dependencies:
     - build_shared
-    - build_client
+    - build_server
+  script:
+    - export MAVEN_OPTS=""
+    - mkdir reports
+    - cd $TARGET
+    - mvn $MAVEN_CLI_OPTS install -DskipTests
+    - mvn $MAVEN_CLI_OPTS surefire:test && find -iname 'TEST-*.xml' -exec cp {} ../reports/ \;
   variables:
     TARGET: "c2mon-client"
 
