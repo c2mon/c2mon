@@ -54,14 +54,15 @@ public class CacheDataSourceConfig {
   }
 
   @Bean
-  public static SqlSessionFactoryBean cacheSqlSessionFactory(DataSource cacheDataSource) throws Exception {
+  public static SqlSessionFactoryBean cacheSqlSessionFactory(DataSource cacheDataSource, VendorDatabaseIdProvider databaseIdProvider) {
     SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
     sessionFactory.setDataSource(cacheDataSource);
-    sessionFactory.setDatabaseIdProvider(databaseIdProvider());
+    sessionFactory.setDatabaseIdProvider(databaseIdProvider);
     sessionFactory.setTypeHandlersPackage("cern.c2mon.server.cache.dbaccess.type");
     return sessionFactory;
   }
 
+  @Bean
   public static VendorDatabaseIdProvider databaseIdProvider() {
     VendorDatabaseIdProvider databaseIdProvider = new VendorDatabaseIdProvider();
     databaseIdProvider.setProperties(
