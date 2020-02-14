@@ -109,7 +109,7 @@ public class AlarmPublisher implements SmartLifecycle, Publisher<AlarmValue>  {
    */
   public void notifyElementUpdated(final Alarm alarm) {
 
-    Long tagId = alarm.getDataTagId();
+    Long tagId = alarm.getTagId();
     AlarmValue alarmValue = null;
 
     if (unifiedTagCacheFacade.containsKey(tagId)) {

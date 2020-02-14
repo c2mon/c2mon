@@ -47,7 +47,7 @@ public class AlarmCacheObject extends AbstractCacheableImpl implements Alarm {
    * The Alarm is activated or terminated depending on the current value of this
    * data tag.
    */
-  private Long dataTagId;
+  private Long tagId;
 
   /**
    * Fault family of the alarm.
@@ -174,7 +174,7 @@ public class AlarmCacheObject extends AbstractCacheableImpl implements Alarm {
 
     str.append(getId())
        .append('\t')
-       .append(this.getDataTagId())
+       .append(this.getTagId())
        .append('\t')
        .append(this.getTriggerTimestamp())
        .append('\t')

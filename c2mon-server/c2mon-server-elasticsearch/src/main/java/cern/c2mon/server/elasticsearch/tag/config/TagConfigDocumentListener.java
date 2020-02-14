@@ -76,7 +76,7 @@ public class TagConfigDocumentListener implements ConfigurationEventListener {
   @Override
   public void onConfigurationEvent(Alarm alarm, Action action) {
     if (properties.isEnabled()) {
-      this.updateConfiguration(unifiedTagCacheFacade.get(alarm.getDataTagId()), Collections.singletonList(alarm), action);
+      this.updateConfiguration(unifiedTagCacheFacade.get(alarm.getTagId()), Collections.singletonList(alarm), action);
     }
   }
 

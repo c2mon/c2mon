@@ -72,11 +72,6 @@
       </dependency>
       <dependency>
         <groupId>cern.c2mon.server</groupId>
-        <artifactId>c2mon-server-cache-loading</artifactId>
-        <version>${project.parent.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>cern.c2mon.server</groupId>
         <artifactId>c2mon-server-cachedbaccess</artifactId>
         <version>${project.parent.version}</version>
       </dependency>

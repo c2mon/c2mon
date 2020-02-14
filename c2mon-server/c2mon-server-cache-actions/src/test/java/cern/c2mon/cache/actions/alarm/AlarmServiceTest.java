@@ -72,7 +72,7 @@ public class AlarmServiceTest {
     insertAlarmAndDatatagThen(
       (alarm, dataTag) -> {
         alarm.setActive(false);
-        alarm.setDataTagId(dataTag.getId());
+        alarm.setTagId(dataTag.getId());
 
         dataTag.setDataTagQuality(new DataTagQualityImpl(TagQualityStatus.UNINITIALISED));
         dataTag.setValue("value");
@@ -143,7 +143,7 @@ public class AlarmServiceTest {
     DataTagCacheObject dataTag = new DataTagCacheObjectFactory().sampleBase();
     Timestamp tagTime = new Timestamp(System.currentTimeMillis() - 1000);
     dataTag.setSourceTimestamp(tagTime);
-    alarm.setDataTagId(dataTag.getId());
+    alarm.setTagId(dataTag.getId());
 
     // Alarm is active, but the condition is false
     assertTrue(alarm.isActive());

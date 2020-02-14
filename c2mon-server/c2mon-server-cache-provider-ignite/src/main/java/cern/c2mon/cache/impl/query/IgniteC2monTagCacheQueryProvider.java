@@ -42,7 +42,7 @@ public class IgniteC2monTagCacheQueryProvider implements C2monTagCacheQueryProvi
   @Override
   public List<Alarm> getAlarms(Tag tag) {
 //    TODO Check what happens if tag id is modified on the fly?
-    return new ArrayList<>(alarmCache.query(alarm -> alarm.getDataTagId().equals(tag.getId())));
+    return new ArrayList<>(alarmCache.query(alarm -> alarm.getTagId().equals(tag.getId())));
   }
 
   @Override

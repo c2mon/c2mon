@@ -267,7 +267,7 @@ public class CacheObjectFactory {
   private AlarmCacheObject setCacheAlarmCacheObjectFields(AlarmCacheObject cacheObject, Alarm configObject) {
 
     if (configObject.getDataTagId() != null) {
-      cacheObject.setDataTagId(configObject.getDataTagId());
+      cacheObject.setTagId(configObject.getDataTagId());
     }
     if (configObject.getFaultFamily() != null) {
       cacheObject.setFaultFamily(configObject.getFaultFamily());

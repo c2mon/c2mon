@@ -69,7 +69,7 @@ public class AlarmConfigTest extends ConfigurationCacheLoaderTest<Alarm> {
     assertEquals(expectedObject, alarmCache.get(300000L));
 
     // also check that the Tag was updated
-    DataTag tag = dataTagCache.get(expectedObject.getDataTagId());
+    DataTag tag = dataTagCache.get(expectedObject.getTagId());
     assertTrue(tag.getAlarmIds().contains(expectedObject.getId()));
   }
 
@@ -87,7 +87,7 @@ public class AlarmConfigTest extends ConfigurationCacheLoaderTest<Alarm> {
 
   private static AlarmCacheObject expectedObject() {
     AlarmCacheObject expectedObject = new AlarmCacheObject(300000L);
-    expectedObject.setDataTagId(200003L);
+    expectedObject.setTagId(200003L);
     expectedObject.setFaultFamily("fault family");
     expectedObject.setFaultMember("fault member");
     expectedObject.setFaultCode(223);
@@ -111,7 +111,7 @@ public class AlarmConfigTest extends ConfigurationCacheLoaderTest<Alarm> {
     assertFalse(alarmCache.containsKey(350000L));
     assertNull(alarmMapper.getItem(350000L));
 
-    Tag tag = tagCacheCollection.get(alarm.getDataTagId());
+    Tag tag = tagCacheCollection.get(alarm.getTagId());
     assertFalse(tag.getAlarmIds().contains(alarm.getId()));
   }
 

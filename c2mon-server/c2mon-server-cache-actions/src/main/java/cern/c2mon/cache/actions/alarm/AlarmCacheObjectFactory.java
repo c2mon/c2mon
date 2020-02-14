@@ -77,7 +77,7 @@ public class AlarmCacheObjectFactory extends AbstractCacheObjectFactory<Alarm> {
     AlarmCacheObject alarmCacheObject = (AlarmCacheObject) alarm;
 
     new PropertiesAccessor(alarmProperties)
-      .getLong("dataTagId").ifPresent(alarmCacheObject::setDataTagId)
+      .getLong("dataTagId").ifPresent(alarmCacheObject::setTagId)
       .getString("faultFamily").ifPresent(alarmCacheObject::setFaultFamily)
       .getString("faultMember").ifPresent(alarmCacheObject::setFaultMember)
       .getInteger("faultCode").ifPresent(alarmCacheObject::setFaultCode)
@@ -95,7 +95,7 @@ public class AlarmCacheObjectFactory extends AbstractCacheObjectFactory<Alarm> {
 
     new MicroValidator<>(alarm)
       .notNull(Alarm::getId, "id")
-      .notNull(Alarm::getDataTagId, "dataTagId")
+      .notNull(Alarm::getTagId, "dataTagId")
       .notNull(Alarm::getFaultFamily, "faultFamily")
       .between(alarmObj -> alarmObj.getFaultFamily().length(), 0, MAX_FAULT_FAMILY_LENGTH,
         "Parameter \"faultFamily\" must be 1 to " + MAX_FAULT_FAMILY_LENGTH + " characters long")

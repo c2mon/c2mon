@@ -68,7 +68,7 @@ public class AlarmConfigHandler extends BaseConfigHandlerImpl<Alarm> {
       listener.onConfigurationEvent(alarm, ConfigConstants.Action.CREATE);
     }
 
-    tagCacheCollection.addAlarmToTag(alarm.getDataTagId(), alarm.getId());
+    tagCacheCollection.addAlarmToTag(alarm.getTagId(), alarm.getId());
 
     alarmService.evaluateAlarm(alarm.getId());
   }
@@ -105,8 +105,8 @@ public class AlarmConfigHandler extends BaseConfigHandlerImpl<Alarm> {
       listener.onConfigurationEvent(alarm, ConfigConstants.Action.REMOVE);
     }
 
-    if (alarm.getDataTagId() != null) {
-      tagCacheCollection.removeAlarmFromTag(alarm.getDataTagId(), alarm.getId());
+    if (alarm.getTagId() != null) {
+      tagCacheCollection.removeAlarmFromTag(alarm.getTagId(), alarm.getId());
     } else {
       log.debug("Failed to find tag id for alarm #{}", alarm.getId());
     }

@@ -57,7 +57,7 @@ public class AlarmCacheObjectFactory extends AbstractCacheObjectFactory<AlarmCac
     alarm1.setActive(false);
     alarm1.setInternalActive(false);
     alarm1.setTriggerTimestamp(new Timestamp(0L));
-    alarm1.setDataTagId(100003L);
+    alarm1.setTagId(100003L);
     return alarm1;
   }
 }

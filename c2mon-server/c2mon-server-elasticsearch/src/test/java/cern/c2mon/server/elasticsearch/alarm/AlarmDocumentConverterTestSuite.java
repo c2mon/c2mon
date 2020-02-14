@@ -16,18 +16,17 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch.alarm;
 
-import java.sql.Timestamp;
-import java.util.Map;
-
+import cern.c2mon.pmanager.fallback.exception.DataFallbackException;
+import cern.c2mon.server.common.alarm.Alarm;
+import cern.c2mon.server.elasticsearch.util.EntityUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.mockito.internal.util.reflection.Whitebox;
 
-import cern.c2mon.pmanager.fallback.exception.DataFallbackException;
-import cern.c2mon.server.common.alarm.Alarm;
-import cern.c2mon.server.elasticsearch.util.EntityUtils;
+import java.sql.Timestamp;
+import java.util.Map;
 
 import static junit.framework.TestCase.assertEquals;
 
@@ -59,7 +58,7 @@ public class AlarmDocumentConverterTestSuite {
     // Deserialize
     document = (AlarmDocument) document.getObject(json);
 
-    assertEquals(alarm.getId().intValue(), document.get("id"));
+    assertEquals(alarm.getId(), document.get("id"));
     assertEquals(alarm.getTagId().intValue(), document.get("tagId"));
     assertEquals(alarm.getFaultFamily(), document.get("faultFamily"));
     assertEquals(alarm.getFaultMember(), document.get("faultMember"));

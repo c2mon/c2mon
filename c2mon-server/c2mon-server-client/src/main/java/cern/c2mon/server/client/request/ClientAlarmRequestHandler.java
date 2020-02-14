@@ -72,9 +72,9 @@ class ClientAlarmRequestHandler {
     Collection<Alarm> result = alarmCache.query(Alarm::isActive);
 
     for (Alarm alarm : result) {
-        Tag tag = unifiedTagCacheFacade.get(alarm.getDataTagId());
+        Tag tag = unifiedTagCacheFacade.get(alarm.getTagId());
         if (tag == null) {
-            LOG.warn("No tag found for TagID = " + alarm.getDataTagId() + ". This may be a configuration issue for alarm " + alarm.getId());
+            LOG.warn("No tag found for TagID = " + alarm.getTagId() + ". This may be a configuration issue for alarm " + alarm.getId());
         } else {
             activeAlarms.add(TransferObjectFactory.createAlarmValue(alarm, tag));
         }
@@ -102,7 +102,7 @@ class ClientAlarmRequestHandler {
       if (alarmCache.containsKey(alarmId)) {
         final Alarm alarm = alarmCache.get(alarmId);
         if (alarmRequest.getResultType() == ClientRequest.ResultType.TRANSFER_ALARM_LIST) {
-          Long tagId = alarm.getDataTagId();
+          Long tagId = alarm.getTagId();
           if (unifiedTagCacheFacade.containsKey(tagId)) {
             Tag tag = unifiedTagCacheFacade.get(tagId);
             alarms.add(TransferObjectFactory.createAlarmValue(alarm, tag));

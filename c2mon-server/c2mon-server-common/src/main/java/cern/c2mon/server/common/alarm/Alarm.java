@@ -74,7 +74,7 @@ public interface Alarm extends Cacheable {
    * Get the unique identifier of the Tag to which the alarm is attached
    * @return the unique identifier of the Tag
    */
-  Long getDataTagId();
+  Long getTagId();
 
   /**
    * Get the AlarmCondition object associated with this Alarm

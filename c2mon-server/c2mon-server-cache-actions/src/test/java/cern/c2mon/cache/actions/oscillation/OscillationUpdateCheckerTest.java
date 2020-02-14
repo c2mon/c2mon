@@ -158,7 +158,7 @@ public class OscillationUpdateCheckerTest {
 
   private AlarmCacheObject createSample() {
     AlarmCacheObject alarm = new AlarmCacheObject(123L);
-    alarm.setDataTagId(dataTagCacheObject.getId());
+    alarm.setTagId(dataTagCacheObject.getId());
     alarm.setActive(true);
     alarm.setInternalActive(true);
     alarm.setTimestamp(new Timestamp(System.currentTimeMillis() - 500000L));

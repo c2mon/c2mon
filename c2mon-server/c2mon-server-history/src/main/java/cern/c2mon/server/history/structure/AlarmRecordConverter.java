@@ -30,7 +30,7 @@ public final class AlarmRecordConverter implements LoggerConverter<Alarm> {
   public Loggable convertToLogged(Alarm alarm) {
     AlarmRecord alarmRecord = new AlarmRecord();
 
-    alarmRecord.setTagId(alarm.getDataTagId());
+    alarmRecord.setTagId(alarm.getTagId());
     alarmRecord.setAlarmId(alarm.getId());
 
     alarmRecord.setActive(alarm.isActive());

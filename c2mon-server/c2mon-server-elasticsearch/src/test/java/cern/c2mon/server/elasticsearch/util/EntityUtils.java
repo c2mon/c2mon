@@ -16,9 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch.util;
 
-import java.sql.Timestamp;
-import java.util.Collections;
-
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.datatag.DataTag;
@@ -32,6 +29,9 @@ import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.common.supervision.SupervisionEntity;
 import cern.c2mon.shared.common.supervision.SupervisionStatus;
 
+import java.sql.Timestamp;
+import java.util.Collections;
+
 /**
  * @author Justin Lewis Salmon
  */
@@ -43,7 +43,7 @@ public class EntityUtils {
 
   public static Alarm createAlarm() {
     AlarmCacheObject alarm = new AlarmCacheObject(1L);
-    alarm.setDataTagId(2L);
+    alarm.setTagId(2L);
     alarm.setFaultFamily("fault family");
     alarm.setFaultMember("fault member");
     alarm.setFaultCode(0);

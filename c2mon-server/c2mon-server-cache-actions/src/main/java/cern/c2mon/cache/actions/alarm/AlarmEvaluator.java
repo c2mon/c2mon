@@ -24,7 +24,7 @@ class AlarmEvaluator {
   static boolean alarmShouldBeUpdated(Alarm alarm, Tag tag) {
     if (!isAlarmConnectedToTag(alarm, tag)) {
       log.warn("Alarm #{} with datatagId #{} will not be updated - the tag passed in the update does not have a matching id: #{}",
-        alarm.getId(), alarm.getDataTagId(),tag.getId());
+        alarm.getId(), alarm.getTagId(),tag.getId());
       return false;
     }
 
@@ -42,7 +42,7 @@ class AlarmEvaluator {
   }
 
   private static boolean isAlarmConnectedToTag(Alarm alarm, Tag tag) {
-    return Objects.equals(alarm.getDataTagId(), tag.getId());
+    return Objects.equals(alarm.getTagId(), tag.getId());
   }
 
   private static boolean isTagMissingCriticalInformation(Tag tag) {

@@ -1,10 +1,7 @@
 package cern.c2mon.server.cache.dbaccess.config;
 
-import java.util.Properties;
-
-import javax.sql.DataSource;
-
-import com.google.common.collect.ImmutableMap;
+import cern.c2mon.server.common.util.HsqlDatabaseBuilder;
+import cern.c2mon.server.common.util.KotlinAPIs;
 import org.apache.ibatis.mapping.VendorDatabaseIdProvider;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.annotation.MapperScan;
@@ -16,7 +13,8 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import cern.c2mon.server.common.util.HsqlDatabaseBuilder;
+import javax.sql.DataSource;
+import java.util.Properties;
 
 /**
  * @author Justin Lewis Salmon
@@ -64,16 +62,15 @@ public class CacheDataSourceConfig {
     return sessionFactory;
   }
 
-  @Bean
   public static VendorDatabaseIdProvider databaseIdProvider() {
     VendorDatabaseIdProvider databaseIdProvider = new VendorDatabaseIdProvider();
-    Properties properties = new Properties();
-    properties.putAll(ImmutableMap.of(
-        "HSQL", "hsql",
-        "Oracle", "oracle",
-        "MySQL", "mysql"
-    ));
-    databaseIdProvider.setProperties(properties);
+    databaseIdProvider.setProperties(
+      KotlinAPIs.apply(new Properties(), props -> {
+        props.setProperty("HSQL", "hsql");
+        props.setProperty("Oracle", "oracle");
+        props.setProperty("MySQL", "mysql");
+      })
+    );
     return databaseIdProvider;
   }
 }

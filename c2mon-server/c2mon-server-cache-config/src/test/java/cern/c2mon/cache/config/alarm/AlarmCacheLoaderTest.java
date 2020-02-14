@@ -28,7 +28,7 @@ public class AlarmCacheLoaderTest extends AbstractCacheLoaderTest<Alarm> {
   protected void customCompare(List<Alarm> mapperList, Map<Long, Alarm> cacheList) {
     for (Alarm alarm : mapperList) {
       //compare ids of associated datatags
-      assertEquals("Cached Alarm should have the same name as Alarm in DB", alarm.getDataTagId(), cache.get(alarm.getId()).getDataTagId());
+      assertEquals("Cached Alarm should have the same name as Alarm in DB", alarm.getTagId(), cache.get(alarm.getId()).getTagId());
     }
   }
 

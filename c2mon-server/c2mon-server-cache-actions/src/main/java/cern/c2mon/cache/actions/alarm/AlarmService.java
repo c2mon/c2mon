@@ -61,7 +61,7 @@ public class AlarmService extends AbstractCacheServiceImpl<Alarm> implements Ala
   public Alarm evaluateAlarm(Long alarmId) {
     return cache.executeTransaction(() -> {
       Alarm alarm = cache.get(alarmId);
-      Tag tag = unifiedTagCacheFacade.get(alarm.getDataTagId());
+      Tag tag = unifiedTagCacheFacade.get(alarm.getTagId());
       update((AlarmCacheObject) alarm, tag, true);
       return alarm;
     });
