@@ -69,7 +69,7 @@ public class SupervisionStateTag extends ControlTag {
                              @NonNull Timestamp statusTime) {
     this.supervisionStatus = supervisionStatus;
     this.statusDescription = orElse(statusDescription, "");
-    this.statusTime = new Timestamp(statusTime.getTime());
+    this.statusTime = (Timestamp) statusTime.clone();
   }
 
   @Override
