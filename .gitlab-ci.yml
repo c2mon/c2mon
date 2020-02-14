@@ -83,7 +83,7 @@ build_server:
 
 build_client:
   extends: .build_base
-  dependencies: [build_server]
+  dependencies: [build_shared]
   variables:
     TARGET: "c2mon-client"
 
