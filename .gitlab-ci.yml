@@ -192,7 +192,7 @@ quality_assurance:
     - build_shared
     - build_server
 #    - build_client
-    - test_client
+    - build_test_client
     - build_daq
   script:
     - mvn $MAVEN_CLI_OPTS package sonar:sonar -Dmaven.test.skip=true -DskipDocker=true -Dsonar.host.url=${SONAR_URL} -Dsonar.dependencyCheck.reportPath=target/dependency-check-report.xml
@@ -213,7 +213,7 @@ publish:
     - build_shared
     - build_server
 #    - build_client
-    - test_client
+    - build_test_client
     - build_daq
   script:
     - mvn $MAVEN_CLI_OPTS -P ci-deploy deploy
