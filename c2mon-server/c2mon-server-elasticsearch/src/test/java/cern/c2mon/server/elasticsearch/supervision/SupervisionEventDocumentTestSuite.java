@@ -16,12 +16,11 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch.supervision;
 
+import cern.c2mon.server.elasticsearch.util.EntityUtils;
+import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-
-import cern.c2mon.server.elasticsearch.util.EntityUtils;
-import cern.c2mon.shared.client.supervision.SupervisionEvent;
 
 import static junit.framework.TestCase.assertEquals;
 
@@ -51,7 +50,7 @@ public class SupervisionEventDocumentTestSuite {
     document = (SupervisionEventDocument) document.getObject(json);
 
     assertEquals(event.getEntity().name(), document.get("entity"));
-    assertEquals(event.getEntityId(), document.get("id"));
+    assertEquals((int) event.getEntityId(), document.get("id"));
     assertEquals(event.getEventTime().getTime(), document.get("timestamp"));
     assertEquals(event.getName(), document.get("name"));
     assertEquals(event.getStatus().name(), document.get("status"));
