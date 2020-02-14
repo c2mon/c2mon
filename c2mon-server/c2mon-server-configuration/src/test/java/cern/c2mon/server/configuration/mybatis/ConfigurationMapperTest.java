@@ -63,14 +63,14 @@ public class ConfigurationMapperTest extends ConfigurationCacheTest {
     //in the right order
     ConfigurationElement elementFirst = configElements.get(0);
     ConfigurationElement elementLast = configElements.get(1);
-    assertEquals(new Long(25), elementFirst.getSequenceId());
-    assertEquals(new Long(26), elementLast.getSequenceId());
+    assertEquals(Long.valueOf(25), elementFirst.getSequenceId());
+    assertEquals(Long.valueOf(26), elementLast.getSequenceId());
 
     //first element
     assertEquals(Action.CREATE, elementFirst.getAction());
     assertEquals(9, elementFirst.getElementProperties().size());
     assertEquals(Entity.CONTROLTAG, elementFirst.getEntity());
-    assertEquals(new Long(25), elementFirst.getConfigId());
+    assertEquals(Long.valueOf(25), elementFirst.getConfigId());
 
     assertEquals("Equipment alive", elementFirst.getElementProperties().get("name"));
     assertEquals("test", elementFirst.getElementProperties().get("description"));
@@ -91,7 +91,7 @@ public class ConfigurationMapperTest extends ConfigurationCacheTest {
     assertEquals(Action.UPDATE, elementLast.getAction());
     assertEquals(Entity.EQUIPMENT, elementLast.getEntity());
     assertEquals(3, elementLast.getElementProperties().size());
-    assertEquals(new Long(25), elementLast.getConfigId());
+    assertEquals(Long.valueOf(25), elementLast.getConfigId());
 
     assertEquals("serverHostName=VGTCVENTTEST;test", elementLast.getElementProperties().get("address"));
     assertEquals("updated description", elementLast.getElementProperties().get("description"));
