@@ -29,13 +29,14 @@ variables:
   script:
     - export MAVEN_OPTS=""
     - cd $TARGET
-    - mvn $MAVEN_CLI_OPTS test-compile
+    - mvn $MAVEN_CLI_OPTS install -DskipTests
   artifacts:
     name: "$TARGET#$CI_COMMIT_REF_NAME"
     when: on_success
     expire_in: 60 minutes
     paths:
-      - "$TARGET"
+      - .m2
+      - $TARGET
   except:
     - master
     - tags
@@ -53,7 +54,6 @@ build_shared:
   artifacts:
     paths:
       - .m2
-      - "$TARGET"
 
 #  =========================
 #  ===== Stage: Compile ====
@@ -80,24 +80,18 @@ build_server:
   dependencies: [build_shared]
   variables:
     TARGET: "c2mon-server"
-  artifacts:
-    paths: [c2mon-server]
 
 build_client:
   extends: .build_base
   dependencies: [build_shared]
   variables:
     TARGET: "c2mon-client"
-  artifacts:
-    paths: [c2mon-client]
 
 build_daq:
   extends: .build_base
   dependencies: [build_shared]
   variables:
     TARGET: "c2mon-daq"
-  artifacts:
-    paths: [c2mon-daq]
 
 #  =========================
 #  ===== Stage: Test =======
