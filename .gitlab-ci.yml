@@ -139,14 +139,18 @@ test_client:
   dependencies:
     - build_shared
     - build_server
+  variables:
+    TARGET: "c2mon-client"
   script:
     - export MAVEN_OPTS=""
     - mkdir reports
     - cd $TARGET
     - mvn $MAVEN_CLI_OPTS install -DskipTests
     - mvn $MAVEN_CLI_OPTS surefire:test && find -iname 'TEST-*.xml' -exec cp {} ../reports/ \;
-  variables:
-    TARGET: "c2mon-client"
+  artifacts:
+    paths:
+      - .m2
+      - $TARGET
 
 test_daq:
   extends: .test_base
@@ -169,7 +173,7 @@ sonar_preview:
   dependencies:
     - build_shared
     - build_server
-    - build_client
+#    - build_client
     - build_daq
   script:
     - mvn $MAVEN_CLI_OPTS sonar:sonar -Dsonar.host.url=${SONAR_URL} -Dsonar.analysis.mode=preview -Dsonar.gitlab.commit_sha=$CI_BUILD_REF -Dsonar.gitlab.ref_name=$CI_BUILD_REF_NAME -Dsonar.gitlab.project_id=$CI_PROJECT_ID -Dsonar.gitlab.max_major_issues_gate=0
@@ -185,7 +189,8 @@ quality_assurance:
   dependencies:
     - build_shared
     - build_server
-    - build_client
+#    - build_client
+    - test_client
     - build_daq
   script:
     - mvn $MAVEN_CLI_OPTS package sonar:sonar -Dmaven.test.skip=true -DskipDocker=true -Dsonar.host.url=${SONAR_URL} -Dsonar.dependencyCheck.reportPath=target/dependency-check-report.xml
@@ -205,7 +210,8 @@ publish:
   dependencies:
     - build_shared
     - build_server
-    - build_client
+#    - build_client
+    - test_client
     - build_daq
   script:
     - mvn $MAVEN_CLI_OPTS -P ci-deploy deploy
