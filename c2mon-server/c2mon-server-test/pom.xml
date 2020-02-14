@@ -20,10 +20,6 @@
       <groupId>cern.c2mon.server</groupId>
       <artifactId>c2mon-server-common</artifactId>
     </dependency>
-    <dependency>
-      <groupId>cern.c2mon.server</groupId>
-      <artifactId>c2mon-server-cache-api</artifactId>
-    </dependency>
 
     <!-- 3rd-party dependencies -->
     <dependency>
