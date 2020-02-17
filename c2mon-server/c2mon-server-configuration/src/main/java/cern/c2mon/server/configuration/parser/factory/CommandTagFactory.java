@@ -25,18 +25,22 @@ import cern.c2mon.server.configuration.parser.exception.ConfigurationParseExcept
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.api.tag.CommandTag;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.util.Collections;
 import java.util.List;
 
 import static cern.c2mon.cache.config.ClientQueryProvider.queryByClientInput;
 
 /**
- * @author Franz Ritter
+ * Creates {@link ConfigurationElement} out of {@link CommandTag}s received in the MQ
+ *
+ * @author Alexandros Papageorgiou, Franz Ritter
  */
-@Service
+@Named
+@Singleton
 class CommandTagFactory extends EntityFactory<CommandTag> {
 
   private final SequenceDAO sequenceDAO;
@@ -44,7 +48,7 @@ class CommandTagFactory extends EntityFactory<CommandTag> {
   private final C2monCache<Equipment> equipmentCache;
   private final C2monCache<cern.c2mon.shared.common.command.CommandTag> commandTagCache;
 
-  @Autowired
+  @Inject
   public CommandTagFactory(C2monCache<cern.c2mon.shared.common.command.CommandTag> commandTagCache,
                            C2monCache<Equipment> equipmentCache,
                            SequenceDAO sequenceDAO,

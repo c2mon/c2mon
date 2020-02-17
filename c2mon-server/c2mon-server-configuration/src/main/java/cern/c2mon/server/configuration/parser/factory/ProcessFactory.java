@@ -24,16 +24,18 @@ import cern.c2mon.server.configuration.parser.exception.ConfigurationParseExcept
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.api.process.Process;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author Franz Ritter
  */
-@Service
+@Named
+@Singleton
 class ProcessFactory extends EntityFactory<Process> {
 
   private ProcessDAO processDAO;
@@ -41,7 +43,7 @@ class ProcessFactory extends EntityFactory<Process> {
   private final SupervisionStateTagFactory stateTagFactory;
   private SequenceDAO sequenceDAO;
 
-  @Autowired
+  @Inject
   public ProcessFactory(C2monCache<cern.c2mon.server.common.process.Process> processCache, SequenceDAO sequenceDAO, ProcessDAO processDAO,
                         AliveTagFactory aliveTagFactory, SupervisionStateTagFactory stateTagFactory) {
     super(processCache);

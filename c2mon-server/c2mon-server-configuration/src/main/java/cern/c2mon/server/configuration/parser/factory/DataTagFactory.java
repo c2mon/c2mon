@@ -29,9 +29,10 @@ import cern.c2mon.server.configuration.parser.exception.ConfigurationParseExcept
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.api.tag.DataTag;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
@@ -41,7 +42,8 @@ import static cern.c2mon.cache.config.ClientQueryProvider.queryByClientInput;
 /**
  * @author Franz Ritter
  */
-@Service
+@Named
+@Singleton
 class DataTagFactory extends EntityFactory<DataTag> {
 
   public static final String ERROR_CREATING_DATA_TAG = "Error creating data tag #";
@@ -54,7 +56,7 @@ class DataTagFactory extends EntityFactory<DataTag> {
   private TagCacheCollection unifiedTagCacheFacade;
   private SequenceDAO sequenceDAO;
 
-  @Autowired
+  @Inject
   public DataTagFactory(C2monCache<cern.c2mon.server.common.datatag.DataTag> dataTagCache, TagCacheCollection unifiedTagCacheFacade, SequenceDAO sequenceDAO,
                         EquipmentDAO equipmentDAO, C2monCache<Equipment> equipmentCache, SubEquipmentDAO subEquipmentDAO,
                         C2monCache<SubEquipment> subEquipmentCache) {

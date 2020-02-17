@@ -25,24 +25,28 @@ import cern.c2mon.server.configuration.parser.exception.ConfigurationParseExcept
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.api.tag.RuleTag;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.util.Collections;
 import java.util.List;
 
 import static cern.c2mon.cache.config.ClientQueryProvider.queryByClientInput;
 
 /**
- * @author Franz Ritter
+ * Creates {@link ConfigurationElement}s out of {@link RuleTag}s received via MQ
+ *
+ * @author Alexandros Papageorgiou, Franz Ritter
  */
-@Service
+@Named
+@Singleton
 class RuleTagFactory extends EntityFactory<RuleTag> {
   private final C2monCache<cern.c2mon.server.common.rule.RuleTag> ruleTagCache;
   private final TagCacheCollection tagFacadeGateway;
   private final SequenceDAO sequenceDAO;
 
-  @Autowired
+  @Inject
   public RuleTagFactory(C2monCache<cern.c2mon.server.common.rule.RuleTag> ruleTagCache, TagCacheCollection tagFacadeGateway, SequenceDAO sequenceDAO) {
     super(ruleTagCache);
     this.ruleTagCache = ruleTagCache;

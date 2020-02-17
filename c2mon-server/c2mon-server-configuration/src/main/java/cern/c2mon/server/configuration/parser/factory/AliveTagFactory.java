@@ -11,12 +11,19 @@ import cern.c2mon.shared.client.configuration.api.tag.AliveTag;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 import java.util.Collections;
 import java.util.List;
 
 import static cern.c2mon.cache.config.ClientQueryProvider.queryByClientInput;
 
+/**
+ * Creates {@link ConfigurationElement} out of {@link AliveTag}s received in the MQ
+ *
+ * @author Alexandros Papageorgiou
+ */
 @Named
+@Singleton
 public class AliveTagFactory extends EntityFactory<AliveTag> {
 
   private final C2monCache<cern.c2mon.server.common.alive.AliveTag> cache;

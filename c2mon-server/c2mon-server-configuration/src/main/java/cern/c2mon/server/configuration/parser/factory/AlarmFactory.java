@@ -25,23 +25,25 @@ import cern.c2mon.server.configuration.parser.exception.ConfigurationParseExcept
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.util.Collections;
 import java.util.List;
 
 /**
  * @author Franz Ritter
  */
-@Service
+@Named
+@Singleton
 class AlarmFactory extends EntityFactory<Alarm> {
 
   private SequenceDAO sequenceDAO;
   private TagCacheCollection tagFacadeGateway;
   private C2monCache<DataTag> dataTagCache;
 
-  @Autowired
+  @Inject
   public AlarmFactory(SequenceDAO sequenceDAO, C2monCache<cern.c2mon.server.common.alarm.Alarm> alarmCache, C2monCache<DataTag> dataTagCache, TagCacheCollection tagFacadeGateway) {
     super(alarmCache);
     this.sequenceDAO = sequenceDAO;

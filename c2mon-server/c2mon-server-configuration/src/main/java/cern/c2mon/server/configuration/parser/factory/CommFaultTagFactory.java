@@ -10,12 +10,14 @@ import cern.c2mon.shared.client.configuration.api.tag.CommFaultTag;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 import java.util.Collections;
 import java.util.List;
 
 import static cern.c2mon.cache.config.ClientQueryProvider.queryByClientInput;
 
 @Named
+@Singleton
 public class CommFaultTagFactory extends EntityFactory<CommFaultTag> {
 
   private final C2monCache<cern.c2mon.server.common.commfault.CommFaultTag> cache;

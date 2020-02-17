@@ -26,16 +26,18 @@ import cern.c2mon.server.configuration.parser.exception.ConfigurationParseExcept
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.api.equipment.SubEquipment;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author Franz Ritter
  */
-@Service
+@Named
+@Singleton
 class SubEquipmentFactory extends EntityFactory<SubEquipment> {
 
   private SubEquipmentDAO subEquipmentDAO;
@@ -46,7 +48,7 @@ class SubEquipmentFactory extends EntityFactory<SubEquipment> {
   private final SupervisionStateTagFactory stateTagFactory;
   private SequenceDAO sequenceDAO;
 
-  @Autowired
+  @Inject
   public SubEquipmentFactory(C2monCache<cern.c2mon.server.common.subequipment.SubEquipment> subEquipmentCache, SubEquipmentDAO subEquipmentDAO,
                              SequenceDAO sequenceDAO, C2monCache<Equipment> equipmentCache, EquipmentDAO equipmentDAO,
                              AliveTagFactory aliveTagFactory, CommFaultTagFactory commFaultTagFactory, SupervisionStateTagFactory stateTagFactory) {

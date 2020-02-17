@@ -10,18 +10,22 @@ import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.api.tag.StatusTag;
 
+import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 import java.util.Collections;
 import java.util.List;
 
 import static cern.c2mon.cache.config.ClientQueryProvider.queryByClientInput;
 
 @Named
+@Singleton
 public class SupervisionStateTagFactory extends EntityFactory<StatusTag> {
 
   private final C2monCache<cern.c2mon.server.common.supervision.SupervisionStateTag> cache;
   private SequenceDAO sequenceDAO;
 
+  @Inject
   public SupervisionStateTagFactory(C2monCache<SupervisionStateTag> cache, SequenceDAO sequenceDAO) {
     super(cache);
     this.cache = cache;

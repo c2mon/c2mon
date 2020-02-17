@@ -4,7 +4,9 @@ import cern.c2mon.server.common.util.Java9Collections;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.api.util.ConfigurationEntity;
 
+import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 import java.util.HashMap;
 
 /**
@@ -12,10 +14,12 @@ import java.util.HashMap;
  * based on the passed {@link ConfigurationEntity}
  */
 @Named
+@Singleton
 public class ParserFactorySelector {
 
   private HashMap<Class<?>, EntityFactory<? extends ConfigurationEntity>> classToFactoryMap;
 
+  @Inject
   public ParserFactorySelector(
     AlarmFactory alarmFactory, CommandTagFactory commandTagFactory,
     DataTagFactory dataTagFactory, EquipmentFactory equipmentFactory, ProcessFactory processFactory, RuleTagFactory ruleTagFactory,
