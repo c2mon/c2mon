@@ -28,7 +28,7 @@ public class BatchCacheLoader<V extends Cacheable> implements CacheLoader<V> {
   /**
    * Timeout before an inactive thread is returned to the pool
    */
-  private static final int THREAD_TIMEOUT = 5; //in seconds
+  private static final int THREAD_TIMEOUT_IN_SECONDS = 5;
 
   /**
    * The max number of cache object fetched in one query from the DB and loaded
@@ -132,12 +132,7 @@ public class BatchCacheLoader<V extends Cacheable> implements CacheLoader<V> {
     public Object call() {
       Map<Long, V> cacheLoaderMap = batchCacheLoaderDAO.getBatchAsMap(firstId, lastId);
       //preloadBuffer.putAll(cacheLoaderMap);
-      for (Long key : cacheLoaderMap.keySet()) {
-        if (log.isTraceEnabled()) {
-          log.trace("MapLoaderTask - Putting key {} to cache {}", key, c2monCache.getName());
-        }
-        c2monCache.put(key, cacheLoaderMap.get(key));
-      }
+      c2monCache.putAll(cacheLoaderMap);
       return null;
     }
   }

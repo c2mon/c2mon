@@ -133,11 +133,6 @@ public class AliveTagService extends AbstractBooleanControlTagService<AliveTag> 
     return cache.executeTransaction(() -> {
       final AliveTag aliveTag = cache.get(sourceDataTagValue.getId());
 
-      if (sourceDataTagValue == null) {
-        log.error("Attempting to update a dataTag with a null source value - ignoring update.");
-        return new Event<>(aliveTag.getCacheTimestamp().getTime(), false);
-      }
-
       // TODO (Alex) This does not properly account for potential filterout as part of cache.put. Should it?
 //      Event<Boolean> returnValue = updateFromSource(aliveTag, sourceDataTagValue);
 

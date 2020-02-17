@@ -4,7 +4,10 @@ import cern.c2mon.server.common.supervision.Supervised;
 import cern.c2mon.server.common.tag.AbstractInfoTagCacheObject;
 import cern.c2mon.server.common.tag.InfoTag;
 import cern.c2mon.shared.common.supervision.SupervisionEntity;
-import lombok.*;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.util.Collections;
 import java.util.Set;
@@ -29,7 +32,7 @@ public abstract class ControlTag extends AbstractInfoTagCacheObject implements I
   // always FALSE in TIM; TRUE not supported
   private final Boolean faultValue = Boolean.FALSE;
 
-  public ControlTag(@NonNull Long id, Long supervisedId, SupervisionEntity supervisedEntity) {
+  public ControlTag(Long id, Long supervisedId, SupervisionEntity supervisedEntity) {
     super(id);
     setDataType("java.lang.Boolean");
     setValue(faultValue);

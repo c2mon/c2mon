@@ -8,7 +8,8 @@ import cern.c2mon.server.common.util.KotlinAPIs;
 import cern.c2mon.shared.common.CacheEvent;
 import cern.c2mon.shared.common.Cacheable;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.function.Function;
@@ -19,8 +20,8 @@ import java.util.stream.Collectors;
  *
  * @param <T> The highest common parent type between the types stored in the caches
  */
-@Slf4j
 public class CacheCollection<T extends Cacheable> {
+  private static final Logger log = LoggerFactory.getLogger(CacheCollection.class);
 
   @Getter
   protected final List<C2monCache<? extends T>> caches;

@@ -2,7 +2,8 @@ package cern.c2mon.cache.api.listener;
 
 import cern.c2mon.shared.common.CacheEvent;
 import cern.c2mon.shared.common.Cacheable;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.Map;
@@ -30,8 +31,8 @@ import java.util.concurrent.*;
  * @param <CACHEABLE> the type of objects received during events.
  * @author Alexandros Papageorgiou Koufidis
  */
-@Slf4j
 public class CacheListenerManagerImpl<CACHEABLE extends Cacheable> implements CacheListenerManager<CACHEABLE> {
+  private static final Logger log = LoggerFactory.getLogger(CacheListenerManager.class);
   private static final long DEFAULT_SHUTDOWN_WAIT = 1;
   private static final TimeUnit DEFAULT_SHUTDOWN_WAIT_UNITS = TimeUnit.SECONDS;
   private static final int DEFAULT_CONCURRENCY = 1000;
@@ -106,8 +107,7 @@ public class CacheListenerManagerImpl<CACHEABLE extends Cacheable> implements Ca
       scheduledExecutorService.awaitTermination(DEFAULT_SHUTDOWN_WAIT, DEFAULT_SHUTDOWN_WAIT_UNITS);
       centralizedExecutorService.awaitTermination(DEFAULT_SHUTDOWN_WAIT, DEFAULT_SHUTDOWN_WAIT_UNITS);
     } catch (InterruptedException e) {
-      log.warn("Executor service interrupted while shutting down");
-      e.printStackTrace();
+      log.warn("Executor service interrupted while shutting down", e);
     }
   }
 }

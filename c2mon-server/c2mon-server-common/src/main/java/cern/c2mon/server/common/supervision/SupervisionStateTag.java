@@ -46,13 +46,13 @@ public class SupervisionStateTag extends ControlTag {
   /**
    * Primary Ctor, also used by MyBatis (hence the Long instead of long)
    */
-  public SupervisionStateTag(@NonNull Long id, @NonNull Long supervisedId, String supervisedEntity, Long aliveTagId, Long commFaultTagId) {
+  public SupervisionStateTag(Long id, @NonNull Long supervisedId, String supervisedEntity, Long aliveTagId, Long commFaultTagId) {
     super(id, supervisedId, SupervisionEntity.parse(supervisedEntity));
     this.aliveTagId = aliveTagId;
     this.commFaultTagId = commFaultTagId;
   }
 
-  public SupervisionStateTag(@NonNull Long id) {
+  public SupervisionStateTag(Long id) {
     super(id, null, null);
   }
 

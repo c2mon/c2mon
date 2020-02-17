@@ -12,7 +12,6 @@ import cern.c2mon.shared.common.Cacheable;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 
 import java.sql.Timestamp;
 import java.util.Set;
@@ -24,9 +23,7 @@ import java.util.stream.Collectors;
 import static cern.c2mon.shared.common.CacheEvent.*;
 import static java.util.Objects.requireNonNull;
 
-@Slf4j
 public abstract class AbstractCache<CACHEABLE extends Cacheable> implements C2monCache<CACHEABLE> {
-
   protected final String cacheName;
 
   @Getter
