@@ -31,6 +31,8 @@ image:
     - export MAVEN_OPTS=""
     - cd $TARGET
     - mvn $MAVEN_CLI_OPTS install -DskipTests
+    - export MAVEN_SONAR_OPTS="-Dsonar.host.url=${SONAR_URL} -Dsonar.analysis.mode=preview -Dsonar.gitlab.commit_sha=$CI_BUILD_REF -Dsonar.gitlab.ref_name=$CI_BUILD_REF_NAME -Dsonar.gitlab.project_id=$CI_PROJECT_ID -Dsonar.gitlab.max_major_issues_gate=0"
+    - mvn $MAVEN_CLI_OPTS sonar:sonar $MAVEN_SONAR_OPTS
   artifacts:
     name: "$TARGET#$CI_COMMIT_REF_NAME"
     when: on_success
@@ -162,7 +164,7 @@ test_daq:
 #  =========================
 
 # These tasks may need to override MAVEN_OPTS manually
-sonar_preview:
+.sonar_preview:
   stage: qa
   dependencies:
     - build_shared
@@ -170,7 +172,9 @@ sonar_preview:
     - build_test_client
     - build_daq
   script:
-    - mvn $MAVEN_CLI_OPTS compile sonar:sonar -Dsonar.host.url=${SONAR_URL} -Dsonar.analysis.mode=preview -Dsonar.gitlab.commit_sha=$CI_BUILD_REF -Dsonar.gitlab.ref_name=$CI_BUILD_REF_NAME -Dsonar.gitlab.project_id=$CI_PROJECT_ID -Dsonar.gitlab.max_major_issues_gate=0
+    - export MAVEN_OPTS=""
+    - export MAVEN_SONAR_OPTS="-Dsonar.host.url=${SONAR_URL} -Dsonar.analysis.mode=preview -Dsonar.gitlab.commit_sha=$CI_BUILD_REF -Dsonar.gitlab.ref_name=$CI_BUILD_REF_NAME -Dsonar.gitlab.project_id=$CI_PROJECT_ID -Dsonar.gitlab.max_major_issues_gate=0"
+    - mvn $MAVEN_CLI_OPTS compile sonar:sonar $MAVEN_SONAR_OPTS
   except:
     - master
     - tags
