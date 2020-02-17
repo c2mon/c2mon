@@ -24,8 +24,7 @@ variables:
     -Dsonar.scanner.dumpToFile=$CI_PROJECT_DIR/.m2/sonarDump.txt
 
 image:
-  name: gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-maven:gcc-jdk-11-mvn-3.6-1
-  entrypoint: [""]
+  name: maven:3.6.2-jdk-11-slim
 
 #  =========================
 #  === Stage: Precompile ===
