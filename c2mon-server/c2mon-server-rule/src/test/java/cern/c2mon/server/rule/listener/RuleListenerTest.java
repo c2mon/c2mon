@@ -98,8 +98,8 @@ public class RuleListenerTest {
     //and have correct values
     // This may be getting flaky due to listeners active. If you notice and can
     // reproduce, try setting the caches to empty listener managers?
-    assertEquals(Boolean.TRUE, dataTagCache.get(dataTag1.getId()).getValue());
-    assertEquals(Boolean.TRUE, dataTagCache.get(dataTag2.getId()).getValue());
+    assertTrue((Boolean) dataTagCache.get(dataTag1.getId()).getValue());
+    assertTrue((Boolean) dataTagCache.get(dataTag2.getId()).getValue());
     assertEquals(1000, ruleTagCache.get(ruleTag.getId()).getValue());
   }
 
