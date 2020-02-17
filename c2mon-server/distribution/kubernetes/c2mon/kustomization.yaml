@@ -1,0 +1,11 @@
+resources:
+  - apachemq.yaml
+  - c2mon-server.yaml
+  - daq.yaml
+generatorOptions:
+  disableNameSuffixHash: true
+configMapGenerator:
+  - name: c2mon-server-properties
+    env: c2mon-server.properties
+  - name: c2mon-daq-properties
+    env: c2mon-daq.properties

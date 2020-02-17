@@ -261,7 +261,7 @@
         <artifactId>jackson-databind</artifactId>
         <version>${com.fasterxml.jackson.core}</version>
       </dependency>
-      
+
       <!-- Required extra dependencies to replace obsolete Java 8 dependencies in Java 11 -->
       <dependency>
         <groupId>javax.xml.bind</groupId>
@@ -283,7 +283,7 @@
         <artifactId>javax.annotation-api</artifactId>
         <version>1.3.2</version>
       </dependency>
-      
+
       <!-- The following dependencies are required for using Ehcache & BigMemory.
            ehcache-ee-2.7.5 is shipped together with bigmemory-4.0.5 -->
       <dependency>
@@ -465,7 +465,7 @@
           <artifactId>sonar-maven-plugin</artifactId>
           <version>3.3.0.603</version>
         </plugin>
-        
+
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-enforcer-plugin</artifactId>

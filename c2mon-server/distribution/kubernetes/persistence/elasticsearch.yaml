@@ -1,43 +1,20 @@
-apiVersion: v1
-kind: Service
-metadata:
-  namespace: c2mon-dev
-  name: es
-  labels:
-    service: es
-spec:
-  clusterIP: None
-  ports:
-    - port: 9200
-      name: serving
-    - port: 9300
-      name: node-to-node
-  selector:
-    io.kompose.service: es
----
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
 metadata:
-  creationTimestamp: null
-  namespace: c2mon-dev
-  labels:
-    io.kompose.service: es
   name: es-node
 spec:
-  serviceName: es
+  replicas: 1
   selector:
     matchLabels:
-      io.kompose.service: es
+      type: es
   template:
     metadata:
-      namespace: c2mon-dev
-      creationTimestamp: null
       labels:
-        io.kompose.service: es
+        type: es
       name: c2mon-es-node
     spec:
       containers:
-      - image: cern/c2mon-ext:elasticsearch-5.6-c2mon-1.8.46-SNAPSHOT
+      - image: cern/c2mon-ext:elasticsearch-5.6-c2mon-1.9.0
         name: c2mon-es-node
         env:
         - name: namespace
@@ -62,3 +39,16 @@ spec:
         - containerPort: 9300
       restartPolicy: Always
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: es
+spec:
+  clusterIP: None
+  ports:
+    - name: serving
+      port: 9200
+    - name: node-to-node
+      port: 9300
+  selector:
+    type: es

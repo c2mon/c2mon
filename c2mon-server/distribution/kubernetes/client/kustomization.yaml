@@ -1,0 +1,10 @@
+resources:
+  - c2mon-web.yaml
+  - grafana.yaml
+generatorOptions:
+  disableNameSuffixHash: true
+configMapGenerator:
+  - name: c2mon-client-properties
+    env: c2mon-client.properties
+  - name: grafana-config
+    env: grafana.properties

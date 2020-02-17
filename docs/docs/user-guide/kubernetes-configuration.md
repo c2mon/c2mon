@@ -38,9 +38,9 @@ This tutorial assumes you have access to a cluster supporting Kubernetes API v1 
 Getting a  C2MON server cluster up and running is super simple! Choose one of the options below :
 - You can manually import [the individual yaml files](https://github.com/c2mon/c2mon/tree/master/c2mon-server/distribution/kubernetes) for fine grained control, 
 - You can import the [single full yaml](https://raw.githubusercontent.com/c2mon/c2mon/master/c2mon-server/distribution/kubernetes/c2mon-kube-single.yaml) for ease, 
-- or just run the following  
+- or just run the following (with kubectl > 1.14, check with `kubectl version`) 
 ```shell
-kubectl -f https://raw.githubusercontent.com/c2mon/c2mon/master/c2mon-server/distribution/kubernetes/c2mon-kube-single.yaml
+kubectl -f apply -k github.com/c2mon/c2mon//c2mon-server/distribution/kubernetes
 ```
  
 The cluster creates the namespace 'c2mon-dev' and starts the following pods:

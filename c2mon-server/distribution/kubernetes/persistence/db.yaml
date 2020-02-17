@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      type: db
+  template:
+    metadata:
+      labels:
+        type: db
+    spec:
+      containers:
+      - env:
+        - name: MYSQL_ALLOW_EMPTY_PASSWORD
+          value: "yes"
+        image: cern/c2mon-ext:mysql-5.7.15-c2mon-1.9.0
+        name: db
+        ports:
+        - containerPort: 3306
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: db
+spec:
+  ports:
+    - name: mysql-default
+      port: 3306
+      targetPort: 3306
+  selector:
+    type: db
