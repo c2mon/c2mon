@@ -16,6 +16,10 @@ variables:
       --batch-mode --errors --fail-at-end --show-version --settings $CI_PROJECT_DIR/settings.xml
 # It would be good to get the certs for this one
 
+image:
+  name: gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-maven:gcc-jdk-11-mvn-3.6-1
+  entrypoint: [""]
+
 #  =========================
 #  === Stage: Precompile ===
 #  =========================
@@ -23,9 +27,6 @@ variables:
 .build_base:
   stage: compile
   dependencies: []
-  image:
-    name: gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-maven:gcc-jdk-11-mvn-3.6-1
-    entrypoint: [""]
   script:
     - export MAVEN_OPTS=""
     - cd $TARGET
@@ -100,9 +101,6 @@ build_daq:
 
 .test_base:
   stage: test
-  image:
-    name: gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-maven:gcc-jdk-11-mvn-3.6-1
-    entrypoint: [""]
   script:
     - export MAVEN_OPTS=""
     - mkdir reports
@@ -169,9 +167,6 @@ test_daq:
 # These tasks may need to override MAVEN_OPTS manually
 sonar_preview:
   stage: qa
-  image:
-    name: gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-maven:gcc-jdk-11-mvn-3.6-1
-    entrypoint: [""]
   dependencies:
     - build_shared
     - build_server
@@ -186,9 +181,6 @@ sonar_preview:
 
 quality_assurance:
   stage: qa
-  image:
-    name: gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-maven:gcc-jdk-11-mvn-3.6-1
-    entrypoint: [""]
   dependencies:
     - build_shared
     - build_server
@@ -207,9 +199,6 @@ quality_assurance:
 # Fully build and publish master branch
 publish:
   stage: publish
-  image:
-    name: gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-maven:gcc-jdk-11-mvn-3.6-1
-    entrypoint: [""]
   dependencies:
     - build_shared
     - build_server
