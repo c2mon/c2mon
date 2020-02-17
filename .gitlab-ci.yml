@@ -170,7 +170,7 @@ sonar_preview:
     - build_test_client
     - build_daq
   script:
-    - mvn $MAVEN_CLI_OPTS package -Dmaven.test.skip=true sonar:sonar -Dsonar.host.url=${SONAR_URL} -Dsonar.analysis.mode=preview -Dsonar.gitlab.commit_sha=$CI_BUILD_REF -Dsonar.gitlab.ref_name=$CI_BUILD_REF_NAME -Dsonar.gitlab.project_id=$CI_PROJECT_ID -Dsonar.gitlab.max_major_issues_gate=0
+    - mvn $MAVEN_CLI_OPTS compile sonar:sonar -Dsonar.host.url=${SONAR_URL} -Dsonar.analysis.mode=preview -Dsonar.gitlab.commit_sha=$CI_BUILD_REF -Dsonar.gitlab.ref_name=$CI_BUILD_REF_NAME -Dsonar.gitlab.project_id=$CI_PROJECT_ID -Dsonar.gitlab.max_major_issues_gate=0
   except:
     - master
     - tags
@@ -183,7 +183,7 @@ quality_assurance:
     - build_test_client
     - build_daq
   script:
-    - mvn $MAVEN_CLI_OPTS package sonar:sonar -Dmaven.test.skip=true -DskipDocker=true -Dsonar.host.url=${SONAR_URL} -Dsonar.dependencyCheck.reportPath=target/dependency-check-report.xml
+    - mvn $MAVEN_CLI_OPTS compile sonar:sonar -Dmaven.test.skip=true -DskipDocker=true -Dsonar.host.url=${SONAR_URL} -Dsonar.dependencyCheck.reportPath=target/dependency-check-report.xml
   only:
     - master
 
