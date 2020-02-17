@@ -20,11 +20,12 @@ variables:
     -Dsonar.gitlab.commit_sha=$CI_BUILD_REF
     -Dsonar.gitlab.ref_name=$CI_BUILD_REF_NAME
     -Dsonar.gitlab.project_id=$CI_PROJECT_ID
-    -Dsonar.gitlab.max_major_issues_gate=0
-    -Dsonar.scanner.dumpToFile=$CI_PROJECT_DIR/.m2/sonarDump.txt
+#  Deactivated issue gate
+#    -Dsonar.gitlab.max_major_issues_gate=0
 
 image:
-  name: maven:3.6.2-jdk-11-slim
+  name: gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-maven:gcc-jdk-11-mvn-3.6-1
+  entrypoint: [""]
 
 #  =========================
 #  === Stage: Precompile ===
