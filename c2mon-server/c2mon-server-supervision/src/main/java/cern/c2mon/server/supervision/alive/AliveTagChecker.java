@@ -24,11 +24,11 @@ import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.supervision.SupervisionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.SmartLifecycle;
-import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -36,6 +36,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Timer that regularly checks all the active alive timers monitoring
  * the connections to the DAQs, Equipment and SubEquipment.
+ *
+ * This component used to take precautions to ensure it only runs on
+ * one server. There has been a functionality change with the cache
+ * refactoring of 2020 and later versions of this component do not
+ * take such measures. This component will run on any C2MON servers
  *
  * <p>Notice that an alive timer is considered expired when alive-interval
  *  + alive-interval/3 milliseconds have expired since the last alive
@@ -45,7 +50,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Mark Brightwell
  *
  */
-@Service
+@Named
+@Singleton
 public class AliveTagChecker extends TimerTask implements SmartLifecycle {
 
   /**
@@ -57,22 +63,6 @@ public class AliveTagChecker extends TimerTask implements SmartLifecycle {
    * SMS logger for warnings.
    */
   private static final Logger SMS_LOGGER = LoggerFactory.getLogger("AdminSmsLogger");
-
-  /**
-   * Cluster cache key to ensure that a server does not try to access
-   * LAST_ALIVE_TIMER_CHECK_LONG during instantiation if it already exists. This
-   * is because a cache loading blockage can happen if a server holds
-   * LAST_ALIVE_TIMER_CHECK_LONG while another server starts up. See
-   * https://issues.cern.ch/browse/TIMS-1037.
-   */
-  private static final String LAST_ALIVE_TIMER_CHECK_INITIALISATION_KEY = "c2mon.supervision.AliveTimerChecker.lastAliveTimerCheckInitialisationKey";
-
-  /**
-   * Cluster cache key for retrieving the time of last check
-   * of the alives. Across server cluster it assures that
-   * the alive check only takes place on a single server.
-   */
-  private static final String LAST_ALIVE_TIMER_CHECK_LONG = "c2mon.supervision.AliveTimerChecker.lastAliveTimerCheck";
 
   /**
    * How often the timer checks whether the alive
@@ -100,7 +90,7 @@ public class AliveTagChecker extends TimerTask implements SmartLifecycle {
   /**
    * Reference to alive timer facade.
    */
-  private AliveTagService aliveTimerService;
+  private final AliveTagService aliveTimerService;
 
   /**
    * Reference to alive timer cache.
@@ -110,7 +100,7 @@ public class AliveTagChecker extends TimerTask implements SmartLifecycle {
   /**
    * Reference to the SupervisionManager bean.
    */
-  private SupervisionManager supervisionManager;
+  private final SupervisionManager supervisionManager;
 
   /**
    * Threshold of DAQ/Equipment/SubEqu. down when warning is sent to admin.
@@ -127,38 +117,22 @@ public class AliveTagChecker extends TimerTask implements SmartLifecycle {
    */
   private AtomicInteger warningSwitchOffCountDown = new AtomicInteger(SWITCH_OFF_COUNTDOWN);
 
-  private static final int SWITCH_OFF_COUNTDOWN = 60; //10mins
+  /**
+   * 10mins, because we decrement this once per scan, so time value is 60 * SCAN_INTERVAL
+   */
+  private static final int SWITCH_OFF_COUNTDOWN = 60;
+
+  private static long lastCheck = 0L;
 
   /**
    * @param aliveTimerService the alive timer facade bean
    * @param supervisionManager the supervision manager bean
    */
-  @Autowired
-  public AliveTagChecker(final AliveTagService aliveTimerService,
-                         final SupervisionManager supervisionManager) {
-    super();
+  @Inject
+  public AliveTagChecker(AliveTagService aliveTimerService, SupervisionManager supervisionManager) {
     this.aliveTimerService = aliveTimerService;
     this.aliveTimerCache = aliveTimerService.getCache();
     this.supervisionManager = supervisionManager;
-  }
-
-  /**
-   * Initialises the clustered values
-   */
-  @PostConstruct
-  public void init() {
-    LOGGER.trace("Initialising AliveTimerChecker...");
-    // TODO (Alex) Replace this logic
-//    clusterCache.acquireWriteLockOnKey(LAST_ALIVE_TIMER_CHECK_INITIALISATION_KEY);
-//    try {
-//      if (!clusterCache.hasKey(LAST_ALIVE_TIMER_CHECK_INITIALISATION_KEY)) {
-//        clusterCache.put(LAST_ALIVE_TIMER_CHECK_INITIALISATION_KEY, true);
-//        clusterCache.put(LAST_ALIVE_TIMER_CHECK_LONG, 0L);
-//      }
-//    } finally {
-//      clusterCache.releaseWriteLockOnKey(LAST_ALIVE_TIMER_CHECK_INITIALISATION_KEY);
-//    }
-    LOGGER.trace("Initialisation complete.");
   }
 
   /**
@@ -188,70 +162,64 @@ public class AliveTagChecker extends TimerTask implements SmartLifecycle {
   /**
    * Run method of the AliveTimerManager thread.
    */
-  // TODO (Alex) Review this logic
-  //TODO: create additional cache with ExpirePolicy enabled, thanks to that we would be able to replace current logic inside run() and check if aliveTimerCacheObject has expired
-  //TODO: it should work like this:
-  //TODO: if aliveTimer expires insdie of AliveTimerExpireCache(doesnt exist yet), then aliveTimer inside AliveTimerCache should be updated
   @Override
   public void run() {
-//    Long lastCheck = (Long) clusterCache.getCopy(LAST_ALIVE_TIMER_CHECK_LONG);
-    long lastCheck = 0L;
-    if (System.currentTimeMillis() - lastCheck < 9000) { //results in check on a single server
+    if (System.currentTimeMillis() - lastCheck < 9000) {
       LOGGER.debug("Skipping alive check as already performed.");
-    } else {
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("run() : checking alive timers ... ");
-      }
-      short aliveDownCount = 0;
-      try {
-        for (Long currentId : aliveTimerCache.getKeys()) {
-          AliveTag aliveTimerCopy = null;
-          boolean aliveExpiration = false;
-          aliveTimerCopy = aliveTimerCache.get(currentId);
-
-          if (aliveTimerCopy.getValue()) {
-            if (aliveTimerService.hasExpired(currentId)) {
-              aliveTimerService.stop(currentId, System.currentTimeMillis());
-              aliveExpiration = true;
-              aliveDownCount++;
-            }
-          } else {
-            aliveDownCount++;
-          }
-
-          if (aliveExpiration) {
-            onAliveTimerExpiration(currentId);
-          }
-
-        }
-        if (!alarmActive && aliveDownCount > WARNING_THRESHOLD) {
-          alarmActive = true;
-          SMS_LOGGER.warn("Over " + WARNING_THRESHOLD + " DAQ/Equipment are currently down.");
-        } else if (alarmActive && warningSwitchOffCountDown.decrementAndGet() == 0) {
-          SMS_LOGGER.warn("DAQ/Equipment status back to normal (" + aliveDownCount + " detected as down)");
-          alarmActive = false;
-          warningSwitchOffCountDown = new AtomicInteger(SWITCH_OFF_COUNTDOWN);
-        }
-      } catch (CacheElementNotFoundException cacheEx) {
-        LOGGER.warn("Failed to locate alive timer in cache on expiration check (may happen exceptionally if just removed).", cacheEx);
-      } catch (Exception e) {
-        LOGGER.error("Unexpected exception when checking the alive timers", e);
-      }
-      lastCheck = System.currentTimeMillis();
-//      clusterCache.put(LAST_ALIVE_TIMER_CHECK_LONG, lastCheck);
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("run() : finished checking alive timers ... ");
-      }
     }
+
+    LOGGER.debug("run() : checking alive timers ... ");
+
+    try {
+      long aliveDownCount = calculateAliveDownAndNotify();
+
+      sendNotificationsIfRequired(aliveDownCount);
+    } catch (Exception e) {
+      LOGGER.error("Unexpected exception when checking the alive timers", e);
+    }
+    lastCheck = System.currentTimeMillis();
+
+    LOGGER.debug("run() : finished checking alive timers ... ");
   }
 
-  /**
-   * Notifies the supervision manager.
-   *
-   * @param aliveTimerId the alive timer that has expired
-   */
-  private void onAliveTimerExpiration(final Long aliveTimerId) {
-    supervisionManager.onAliveTimerExpiration(aliveTimerId);
+  private long calculateAliveDownAndNotify() {
+    return aliveTimerCache.getKeys()
+      // Potentially optimizable by switching to single stream
+      .parallelStream()
+      .filter(this::isExpired)
+      .peek(supervisionManager::onAliveTimerExpiration)
+      .count();
+  }
+
+  private boolean isExpired(long id) {
+    boolean aliveExpired = false;
+
+    if (aliveTimerCache.containsKey(id)) {
+      try {
+        if (aliveTimerService.hasExpired(id)) {
+          aliveTimerService.stop(id, System.currentTimeMillis());
+          aliveExpired = true;
+        }
+      } catch (CacheElementNotFoundException notFound) {
+        LOGGER.warn("Failed to locate alive timer in cache on expiration check (may happen exceptionally if just removed).", notFound);
+      }
+    } else {
+      aliveExpired = true;
+    }
+
+    return aliveExpired;
+  }
+
+  private void sendNotificationsIfRequired(long aliveDownCount) {
+    if (!alarmActive && aliveDownCount > WARNING_THRESHOLD) {
+      alarmActive = true;
+      LOGGER.warn("Over {} DAQ/Equipment are currently down.", WARNING_THRESHOLD);
+      SMS_LOGGER.warn("Over {} DAQ/Equipment are currently down.", WARNING_THRESHOLD);
+    } else if (alarmActive && warningSwitchOffCountDown.decrementAndGet() == 0) {
+      SMS_LOGGER.warn("DAQ/Equipment status back to normal ({} detected as down)", aliveDownCount);
+      alarmActive = false;
+      warningSwitchOffCountDown = new AtomicInteger(SWITCH_OFF_COUNTDOWN);
+    }
   }
 
   @Override

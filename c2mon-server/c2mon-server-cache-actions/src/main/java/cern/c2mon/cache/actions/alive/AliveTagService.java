@@ -45,6 +45,7 @@ public class AliveTagService extends AbstractBooleanControlTagService<AliveTag> 
    *
    * @return true if the alive timer is active and it has not been updated since
    * at least "aliveInterval" milliseconds.
+   * @throws cern.c2mon.cache.api.exception.CacheElementNotFoundException if you tried to access a missing aliveTimerId
    */
   public boolean hasExpired(final Long aliveTimerId) {
     AliveTag aliveTimer = cache.get(aliveTimerId);
