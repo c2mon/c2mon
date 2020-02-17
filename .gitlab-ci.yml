@@ -14,7 +14,14 @@ variables:
   MAVEN_CLI_OPTS:
     -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository
       --batch-mode --errors --fail-at-end --show-version --settings $CI_PROJECT_DIR/settings.xml
-# It would be good to get the certs for this one
+  MAVEN_SONAR_OPTS:
+    -Dsonar.host.url=${SONAR_URL}
+    -Dsonar.analysis.mode=preview
+    -Dsonar.gitlab.commit_sha=$CI_BUILD_REF
+    -Dsonar.gitlab.ref_name=$CI_BUILD_REF_NAME
+    -Dsonar.gitlab.project_id=$CI_PROJECT_ID
+    -Dsonar.gitlab.max_major_issues_gate=0
+    -Dsonar.scanner.dumpToFile=$CI_PROJECT_DIR/.m2/sonarDump.txt
 
 image:
   name: gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-maven:gcc-jdk-11-mvn-3.6-1
@@ -31,7 +38,6 @@ image:
     - export MAVEN_OPTS=""
     - cd $TARGET
     - mvn $MAVEN_CLI_OPTS install -DskipTests
-    - export MAVEN_SONAR_OPTS="-Dsonar.host.url=${SONAR_URL} -Dsonar.analysis.mode=preview -Dsonar.gitlab.commit_sha=$CI_BUILD_REF -Dsonar.gitlab.ref_name=$CI_BUILD_REF_NAME -Dsonar.gitlab.project_id=$CI_PROJECT_ID -Dsonar.gitlab.max_major_issues_gate=0"
     - mvn $MAVEN_CLI_OPTS sonar:sonar $MAVEN_SONAR_OPTS
   artifacts:
     name: "$TARGET#$CI_COMMIT_REF_NAME"
@@ -173,7 +179,6 @@ test_daq:
     - build_daq
   script:
     - export MAVEN_OPTS=""
-    - export MAVEN_SONAR_OPTS="-Dsonar.host.url=${SONAR_URL} -Dsonar.analysis.mode=preview -Dsonar.gitlab.commit_sha=$CI_BUILD_REF -Dsonar.gitlab.ref_name=$CI_BUILD_REF_NAME -Dsonar.gitlab.project_id=$CI_PROJECT_ID -Dsonar.gitlab.max_major_issues_gate=0"
     - mvn $MAVEN_CLI_OPTS compile sonar:sonar $MAVEN_SONAR_OPTS
   except:
     - master
