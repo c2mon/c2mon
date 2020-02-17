@@ -141,11 +141,9 @@ public class ProcessMessageSender implements IProcessMessageSender {
                                            // prority
           false, null, 3 * processConfiguration.getAliveInterval());
       distributeValue(aliveTagValue);
-    }
-    catch (JMSException ex) {
+    } catch (JMSException ex) {
       LOGGER.error("sendAlive : JMSException caught :" + ex.getMessage());
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       LOGGER.error("sendAlive : Unexpected Exception caught :", e);
     }
 

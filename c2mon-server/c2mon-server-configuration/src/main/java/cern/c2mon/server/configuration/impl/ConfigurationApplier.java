@@ -134,9 +134,10 @@ final class ConfigurationApplier {
                                           Map<Long, ConfigurationElementReport> daqReportPlaceholder,
                                           Map<Long, ConfigurationElement> elementPlaceholder,
                                           Map<Long, List<Change>> processLists) {
-    for (Long processId : processLists.keySet()) {
+    for (Map.Entry<Long, List<Change>> entry : processLists.entrySet()) {
 
-      List<Change> processChangeEvents = processLists.get(processId);
+      Long processId = entry.getKey();
+      List<Change> processChangeEvents = entry.getValue();
       if (processService.isRunning(processId) && !processService.isRebootRequired(processId)) {
         try {
           log.trace(configId + " Sending " + processChangeEvents.size() + " change events to process " + processId + "...");
@@ -262,7 +263,6 @@ final class ConfigurationApplier {
         handleProcessChange(element, processLists, elementPlaceholder, daqReportPlaceholder, report, configId, elementReport, processChange);
       }
     } catch (Exception ex) {
-      ex.printStackTrace();
       String errMessage = configId + " Exception caught while applying the configuration change (Action, Entity, " +
         "Entity id) = (" + element.getAction() + "; " + element.getEntity() + "; " + element.getEntityId() + ")";
       log.error(errMessage, ex.getMessage());

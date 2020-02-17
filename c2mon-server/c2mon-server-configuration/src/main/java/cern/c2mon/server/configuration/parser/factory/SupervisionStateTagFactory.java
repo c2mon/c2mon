@@ -46,7 +46,7 @@ public class SupervisionStateTagFactory extends EntityFactory<StatusTag> {
 
   @Override
   Long getId(StatusTag entity) {
-    return entity != null
+    return entity.getId() != null
       ? entity.getId()
       : queryByClientInput(cache, AbstractTagCacheObject::getName, entity.getName())
       .stream().findFirst()

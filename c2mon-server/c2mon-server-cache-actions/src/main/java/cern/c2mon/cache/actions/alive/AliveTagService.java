@@ -147,15 +147,6 @@ public class AliveTagService extends AbstractBooleanControlTagService<AliveTag> 
     });
   }
 
-  /**
-   * Updates the AliveTag based on new supervised properties, e.g after a reconfiguration
-   *
-   * @param supervised
-   */
-  public void updateBasedOnSupervised(Supervised supervised) {
-    // TODO (Alex)
-  }
-
   @Override
   protected void compareAndSetNewValues(AliveTag aliveTag, boolean active, long timestamp) {
     if (aliveTag.getValue() != active || timestamp >= aliveTag.getTimestamp().getTime()) {

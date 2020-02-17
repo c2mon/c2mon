@@ -60,13 +60,18 @@ class CacheUpdaterTask extends TimerTask {
 
       // create first a copy of all rule objects that needs to be updated
       synchronized (RuleUpdateBuffer.BUFFER_LOCK) {
-        rulesToUpdate = new ArrayList<RuleBufferObject>(); // List of rules where the cache shall be updated
-        Integer actCounter = null; // actual cycle counter
-        boolean hasJustBeenUpdated = false; // flag indicating, if the actual rule was updated since the last check
-        boolean forceCacheUpdate = false; // true, if a cache update shall be forced due to an exceed of the MAX_CYCLE_WAIT
-        for (Long actTagId : RuleUpdateBuffer.UPDATE_RECEIVED_FLAGS.keySet()) {
-          hasJustBeenUpdated = RuleUpdateBuffer.UPDATE_RECEIVED_FLAGS.get(actTagId);
-          actCounter = (Integer) CYCLE_COUNTERS.get(actTagId);
+        // List of rules where the cache shall be updated
+        rulesToUpdate = new ArrayList<RuleBufferObject>();
+        // actual cycle counter
+        Integer actCounter = null;
+        // flag indicating, if the actual rule was updated since the last check
+        boolean hasJustBeenUpdated = false;
+        // true, if a cache update shall be forced due to an exceed of the MAX_CYCLE_WAIT
+        boolean forceCacheUpdate = false;
+        for (Map.Entry<Long, Boolean> entry : RuleUpdateBuffer.UPDATE_RECEIVED_FLAGS.entrySet()) {
+          Long actTagId = entry.getKey();
+          hasJustBeenUpdated = entry.getValue();
+          actCounter = CYCLE_COUNTERS.get(actTagId);
           forceCacheUpdate = (actCounter != null && actCounter >= MAX_CYCLES_WAIT);
 
           if (!hasJustBeenUpdated || forceCacheUpdate) {

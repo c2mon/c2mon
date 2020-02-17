@@ -96,9 +96,11 @@ public class RuleListenerTest {
     assertTrue(dataTagCache.containsKey(dataTag2.getId()));
     assertTrue(ruleTagCache.containsKey(ruleTag.getId()));
     //and have correct values
-    assertEquals(dataTagCache.get(dataTag1.getId()).getValue(), Boolean.TRUE);
-    assertEquals(dataTagCache.get(dataTag2.getId()).getValue(), Boolean.TRUE);
-    assertEquals(ruleTagCache.get(ruleTag.getId()).getValue(), 1000);
+    // This may be getting flaky due to listeners active. If you notice and can
+    // reproduce, try setting the caches to empty listener managers?
+    assertEquals(Boolean.TRUE, dataTagCache.get(dataTag1.getId()).getValue());
+    assertEquals(Boolean.TRUE, dataTagCache.get(dataTag2.getId()).getValue());
+    assertEquals(1000, ruleTagCache.get(ruleTag.getId()).getValue());
   }
 
   /**

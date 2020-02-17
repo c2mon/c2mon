@@ -98,15 +98,7 @@ public class ProcessConfigHandler extends BaseConfigHandlerImpl<Process> {
     removeKeyIfExists(properties, "id");
     removeKeyIfExists(properties, "name");
 
-    List<ProcessChange> processChanges = super.update(id, properties);
-
-    // TODO (Alex) Should we also check for commFault and state tag id?
-    if (properties.containsKey("aliveInterval") || properties.containsKey("aliveTagId")) {
-      Process process = processService.getCache().get(id);
-//      aliveTagService.updateBasedOnSupervised(process);
-    }
-
-    return processChanges;
+    return super.update(id, properties);
   }
 
   @Override

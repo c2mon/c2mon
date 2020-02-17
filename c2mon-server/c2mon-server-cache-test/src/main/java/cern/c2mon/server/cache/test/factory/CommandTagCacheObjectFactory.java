@@ -18,7 +18,6 @@ package cern.c2mon.server.cache.test.factory;
 
 import cern.c2mon.server.common.command.CommandTagCacheObject;
 import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
-import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.command.CommandExecutionDetails;
 import cern.c2mon.shared.common.datatag.DataTagConstants;
 import cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl;
@@ -38,11 +37,7 @@ public class CommandTagCacheObjectFactory extends AbstractCacheObjectFactory<Com
 
     commandTag.setAuthorizationDetails(createRbacAuthorizationDetails());
     commandTag.setClientTimeout(10000);
-    try {
-      commandTag.setHardwareAddress(new OPCHardwareAddressImpl("test"));
-    } catch (ConfigurationException e) {
-      e.printStackTrace();
-    }
+    commandTag.setHardwareAddress(new OPCHardwareAddressImpl("test"));
     commandTag.setSourceTimeout(10000);
     commandTag.setSourceRetries(4);
     commandTag.setExecTimeout(10000);

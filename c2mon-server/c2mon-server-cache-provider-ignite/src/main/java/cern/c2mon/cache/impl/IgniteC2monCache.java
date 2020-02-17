@@ -98,11 +98,7 @@ public class IgniteC2monCache<V extends Cacheable> extends AbstractCache<V> {
 
   @Override
   public <S> S executeTransaction(Supplier<S> callable) {
-    try (Transaction tx = (igniteInstance.transactions().tx() != null ?
-      // If there is an existing transaction, use it
-      igniteInstance.transactions().tx() :
-      // Otherwise start a new one
-      igniteInstance.transactions().txStart())) {
+    try (Transaction tx = startOrUseTransaction()) {
 
       S returnValue = callable.get();
 
@@ -116,5 +112,18 @@ public class IgniteC2monCache<V extends Cacheable> extends AbstractCache<V> {
       }
       throw e;
     }
+  }
+
+  /**
+   * Finds and reuses the current {@link Transaction} if one exists,
+   * otherwise starts a new one
+   *
+   * @return a non-null Transaction
+   */
+  private Transaction startOrUseTransaction() {
+    if (igniteInstance.transactions().tx() != null) {
+      return igniteInstance.transactions().tx();
+    }
+    return igniteInstance.transactions().txStart();
   }
 }
