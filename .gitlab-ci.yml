@@ -52,9 +52,6 @@ build_shared:
       - .m2/
   variables:
     TARGET: "c2mon-shared"
-  artifacts:
-    paths:
-      - .m2
 
 #  =========================
 #  ===== Stage: Compile ====
