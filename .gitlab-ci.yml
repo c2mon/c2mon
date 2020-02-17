@@ -176,6 +176,7 @@ sonar_preview:
     - build_shared
     - build_server
 #    - build_client
+    - build_test_client
     - build_daq
   script:
     - mvn $MAVEN_CLI_OPTS sonar:sonar -Dsonar.host.url=${SONAR_URL} -Dsonar.analysis.mode=preview -Dsonar.gitlab.commit_sha=$CI_BUILD_REF -Dsonar.gitlab.ref_name=$CI_BUILD_REF_NAME -Dsonar.gitlab.project_id=$CI_PROJECT_ID -Dsonar.gitlab.max_major_issues_gate=0
