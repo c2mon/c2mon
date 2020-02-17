@@ -167,7 +167,6 @@ sonar_preview:
   dependencies:
     - build_shared
     - build_server
-#    - build_client
     - build_test_client
     - build_daq
   script:
@@ -181,7 +180,6 @@ quality_assurance:
   dependencies:
     - build_shared
     - build_server
-#    - build_client
     - build_test_client
     - build_daq
   script:
@@ -199,7 +197,6 @@ publish:
   dependencies:
     - build_shared
     - build_server
-#    - build_client
     - build_test_client
     - build_daq
   script:
