@@ -18,11 +18,13 @@ package cern.c2mon.server.supervision;
 
 import cern.c2mon.cache.actions.state.SupervisionStateTagUpdateCascader;
 import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.listener.CacheListenerManagerImpl;
 import cern.c2mon.server.common.commfault.CommFaultTag;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.common.supervision.SupervisionStateTag;
 import cern.c2mon.shared.common.datatag.SourceDataTagValue;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.test.context.ContextConfiguration;
 
@@ -48,17 +50,25 @@ public class CommFaultTagSupervisionTest extends SupervisionCacheTest {
   public static final long EQ_ID = 150L;
   public static final long SUBEQ_ID = 250L;
 
-  @Inject
-  private C2monCache<Equipment> equipmentCache;
+  @Inject private C2monCache<Equipment> equipmentCache;
 
-  @Inject
-  private C2monCache<CommFaultTag> commFaultTagCache;
+  @Inject private C2monCache<CommFaultTag> commFaultTagCache;
 
-  @Inject
-  private C2monCache<SubEquipment> subEquipmentCache;
+  @Inject private C2monCache<SubEquipment> subEquipmentCache;
 
-  @Inject
-  private C2monCache<SupervisionStateTag> stateTagCache;
+  @Inject private C2monCache<SupervisionStateTag> stateTagCache;
+
+  @Inject private SupervisionStateTagUpdateCascader updateCascader;
+
+  @Before
+  public void resetListenersAndInitCaches() {
+    commFaultTagCache.setCacheListenerManager(new CacheListenerManagerImpl<>());
+    stateTagCache.setCacheListenerManager(new CacheListenerManagerImpl<>());
+    updateCascader.register();
+
+    equipmentCache.init();
+    subEquipmentCache.init();
+  }
 
   @Test
   public void initCorrectly() {
@@ -78,18 +88,26 @@ public class CommFaultTagSupervisionTest extends SupervisionCacheTest {
   }
 
   @Test
-  public void processCommFaultTagStatusSubEqCascade() throws InterruptedException {
+  public void processCommFaultTagStatusSubEqCascade() {
     CountDownLatch expectingOneUpdate = new CountDownLatch(1);
     stateTagCache.getCacheListenerManager().registerListener(subEq -> {
-      if (SUBEQ_ID == subEq.getSupervisedId())
+      if (SUBEQ_ID == subEq.getSupervisedId()) {
         expectingOneUpdate.countDown();
+      }
     }, UPDATE_ACCEPTED);
 
     supervisionManager.processControlTag(sampleCommFault(System.currentTimeMillis()));
 
-    assertTrue("Subequipment should be updated", expectingOneUpdate.await(100, TimeUnit.MILLISECONDS));
-    assertEquals(RUNNING, stateTagCache.get(equipmentCache.get(EQ_ID).getStateTagId()).getSupervisionStatus());
-    assertEquals(RUNNING, stateTagCache.get(subEquipmentCache.get(SUBEQ_ID).getStateTagId()).getSupervisionStatus());
+    // We use a transaction here because to guarantee the previous one will have been committed
+    stateTagCache.executeTransaction(() -> {
+      try {
+        assertTrue("Subequipment should be updated", expectingOneUpdate.await(100, TimeUnit.MILLISECONDS));
+        assertEquals(RUNNING, stateTagCache.get(equipmentCache.get(EQ_ID).getStateTagId()).getSupervisionStatus());
+        assertEquals(RUNNING, stateTagCache.get(subEquipmentCache.get(SUBEQ_ID).getStateTagId()).getSupervisionStatus());
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+    });
   }
 
   @Test

@@ -43,7 +43,7 @@ import static cern.c2mon.shared.common.datatag.DataTagConstants.*;
 @Slf4j
 @Getter
 @Setter
-@ToString
+@ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public abstract class AbstractTagCacheObject extends AbstractCacheableImpl implements Serializable, Tag {
 

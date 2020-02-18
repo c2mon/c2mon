@@ -96,7 +96,6 @@ public class SupervisionNotifierImpl implements SupervisionNotifier {
    */
   @Autowired
   public SupervisionNotifierImpl(final C2monCache<SupervisionStateTag> stateTagCache) {
-    super();
     this.stateTagCache = stateTagCache;
   }
 

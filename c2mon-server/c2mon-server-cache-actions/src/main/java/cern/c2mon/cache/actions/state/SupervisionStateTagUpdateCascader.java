@@ -8,10 +8,12 @@ import cern.c2mon.shared.common.supervision.SupervisionEntity;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import static cern.c2mon.cache.actions.state.SupervisionCascadeLogMessages.autoAction;
 import static cern.c2mon.shared.common.CacheEvent.SUPERVISION_CHANGE;
 
+@Named
 public class SupervisionStateTagUpdateCascader implements CacheListener<SupervisionStateTag> {
 
   private final C2monCache<SupervisionStateTag> stateTagCache;
