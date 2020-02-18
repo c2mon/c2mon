@@ -5,19 +5,20 @@ import cern.c2mon.cache.api.factory.AbstractCacheFactory;
 import cern.c2mon.shared.common.Cacheable;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ignite.configuration.CacheConfiguration;
-import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 /**
  * @author Szymon Halastra, Alexander Papageorgiou
  */
-
 @Slf4j
-@Service
+@Named
+@Singleton
 public class IgniteFactory extends AbstractCacheFactory {
 
-  // Is this thread safe? We may get some mixups here with the spring autowiring if used concurrently
+  // This seems to be thread safe, but keep an eye out for strange behavior
   private final IgniteC2monBean igniteInstance;
 
   @Inject

@@ -7,6 +7,8 @@ import cern.c2mon.cache.api.loader.CacheLoader;
 import cern.c2mon.cache.api.spi.CacheQuery;
 import cern.c2mon.shared.common.Cacheable;
 import lombok.NonNull;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.Set;
@@ -66,13 +68,17 @@ public interface C2monCache<CACHEABLE extends Cacheable> extends CacheDelegator<
    *
    * @implNote Make sure that you check for the existence of a transaction before starting a new one!
    */
+  @Transactional(propagation = Propagation.REQUIRED)
   <T> T executeTransaction(Supplier<T> callable);
 
   /**
    * Alternative api to {@link C2monCache#executeTransaction(Supplier)} when you don't need the result
    *
+   * Calls {@link C2monCache#executeTransaction(Supplier)} underneath, so it will be fully transactional
+   *
    * @param runnable the {@code Runnable} you want to run
    */
+  @Transactional(propagation = Propagation.REQUIRED)
   void executeTransaction(Runnable runnable);
 
   /**

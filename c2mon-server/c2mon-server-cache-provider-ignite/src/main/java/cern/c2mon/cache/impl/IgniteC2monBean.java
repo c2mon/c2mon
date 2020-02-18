@@ -5,14 +5,11 @@ import org.apache.ignite.Ignite;
 import org.apache.ignite.IgniteException;
 import org.apache.ignite.Ignition;
 import org.apache.ignite.configuration.IgniteConfiguration;
-import org.apache.ignite.logger.slf4j.Slf4jLogger;
 import org.springframework.beans.factory.DisposableBean;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-
-import static cern.c2mon.cache.impl.C2monCacheProperties.METRICS_LOG_FREQUENCY;
 
 /**
  * Made as a copy of {@link org.apache.ignite.IgniteSpringBean}, to work around the limitation it imposes:
@@ -35,9 +32,10 @@ public class IgniteC2monBean implements Ignite, DisposableBean {
   @Delegate(types = Ignite.class)
   private Ignite igniteInstance;
 
-  public IgniteC2monBean() {
+  @Inject
+  public IgniteC2monBean(IgniteConfiguration defaultConfiguration) {
     // Not in a try because we want to fail-fast if there's a problem here
-    igniteInstance = Ignition.getOrStart(defaultConfiguration());
+    igniteInstance = Ignition.getOrStart(defaultConfiguration);
   }
 
   @Override
@@ -48,17 +46,5 @@ public class IgniteC2monBean implements Ignite, DisposableBean {
       // This can also just log a warning and fail quietly
       throw new Exception(exception);
     }
-  }
-
-  private IgniteConfiguration defaultConfiguration() {
-    ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("ignite-config.xml");
-
-    IgniteConfiguration config = (IgniteConfiguration) context.getBean("base-ignite.cfg");
-
-    config.setGridLogger(new Slf4jLogger());
-
-    config.setMetricsLogFrequency(METRICS_LOG_FREQUENCY);
-
-    return config;
   }
 }

@@ -8,7 +8,6 @@ import org.apache.ignite.Ignite;
 import org.apache.ignite.IgniteCache;
 import org.apache.ignite.cache.query.ScanQuery;
 import org.apache.ignite.configuration.CacheConfiguration;
-import org.apache.ignite.transactions.Transaction;
 import org.apache.ignite.transactions.TransactionDeadlockException;
 import org.apache.ignite.transactions.TransactionTimeoutException;
 import org.slf4j.Logger;
@@ -98,32 +97,18 @@ public class IgniteC2monCache<V extends Cacheable> extends AbstractCache<V> {
 
   @Override
   public <S> S executeTransaction(Supplier<S> callable) {
-    try (Transaction tx = startOrUseTransaction()) {
-
-      S returnValue = callable.get();
-
-      tx.commit();
-
-      return returnValue;
+    try {
+      return callable.get();
     } catch (CacheException e) {
-      if (e.getCause() instanceof TransactionTimeoutException &&
-        e.getCause().getCause() instanceof TransactionDeadlockException) {
-        LOG.error("DeadLock occurred: {}", e.getCause().getCause().getMessage());
-      }
+      logDeadlockException(e);
       throw e;
     }
   }
 
-  /**
-   * Finds and reuses the current {@link Transaction} if one exists,
-   * otherwise starts a new one
-   *
-   * @return a non-null Transaction
-   */
-  private Transaction startOrUseTransaction() {
-    if (igniteInstance.transactions().tx() != null) {
-      return igniteInstance.transactions().tx();
+  private void logDeadlockException(CacheException e) {
+    if (e.getCause() instanceof TransactionTimeoutException &&
+      e.getCause().getCause() instanceof TransactionDeadlockException) {
+      LOG.error("DeadLock occurred: {}", e.getCause().getCause().getMessage());
     }
-    return igniteInstance.transactions().txStart();
   }
 }
