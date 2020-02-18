@@ -8,8 +8,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 @Configuration
 public class TransactionFactory {
 
-  @Bean
-  public PlatformTransactionManager txManager(IgniteC2monBean igniteC2monBean) {
+  @Bean(name = "cacheTransactionManager")
+  public PlatformTransactionManager cacheTransactionManager(IgniteC2monBean igniteC2monBean) {
     SpringTransactionManager transactionManager = new SpringTransactionManager();
     transactionManager.setIgniteInstanceName(igniteC2monBean.name());
     return transactionManager;

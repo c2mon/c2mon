@@ -49,7 +49,7 @@ public class CacheDataSourceConfig {
   }
 
   @Bean
-  public DataSourceTransactionManager cacheTransactionManager(DataSource cacheDataSource) {
+  public DataSourceTransactionManager databaseTransactionManager(DataSource cacheDataSource) {
     return new DataSourceTransactionManager(cacheDataSource);
   }
 

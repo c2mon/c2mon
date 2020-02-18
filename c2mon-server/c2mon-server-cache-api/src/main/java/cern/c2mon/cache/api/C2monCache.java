@@ -68,7 +68,7 @@ public interface C2monCache<CACHEABLE extends Cacheable> extends CacheDelegator<
    *
    * @implNote Make sure that you check for the existence of a transaction before starting a new one!
    */
-  @Transactional(propagation = Propagation.REQUIRED)
+  @Transactional(transactionManager = "chainedCacheTransactionManager", propagation = Propagation.REQUIRED)
   <T> T executeTransaction(Supplier<T> callable);
 
   /**
@@ -78,7 +78,7 @@ public interface C2monCache<CACHEABLE extends Cacheable> extends CacheDelegator<
    *
    * @param runnable the {@code Runnable} you want to run
    */
-  @Transactional(propagation = Propagation.REQUIRED)
+  @Transactional(transactionManager = "chainedCacheTransactionManager", propagation = Propagation.REQUIRED)
   void executeTransaction(Runnable runnable);
 
   /**

@@ -18,7 +18,7 @@ public interface BaseConfigHandler {
    *
    * @param element element with configuration details
    */
-  @Transactional(value = "cacheTransactionManager", propagation = Propagation.REQUIRED)
+  @Transactional(value = "databaseTransactionManager", propagation = Propagation.REQUIRED)
   List<ProcessChange> create(ConfigurationElement element);
 
   /**
@@ -27,7 +27,7 @@ public interface BaseConfigHandler {
    * @param id         id of Cacheable to update
    * @param properties reconfiguration details
    */
-  @Transactional(value = "cacheTransactionManager", propagation = Propagation.REQUIRED)
+  @Transactional(value = "databaseTransactionManager", propagation = Propagation.REQUIRED)
   List<ProcessChange> update(Long id, Properties properties);
 
   /**
@@ -37,6 +37,6 @@ public interface BaseConfigHandler {
    * @param report the report on this action (is passed as cascading
    *               actions may need to add subreports)
    */
-  @Transactional(value = "cacheTransactionManager", propagation = Propagation.REQUIRED)
+  @Transactional(value = "databaseTransactionManager", propagation = Propagation.REQUIRED)
   List<ProcessChange> remove(Long id, ConfigurationElementReport report);
 }

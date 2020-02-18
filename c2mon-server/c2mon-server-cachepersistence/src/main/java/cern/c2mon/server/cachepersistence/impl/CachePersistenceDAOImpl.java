@@ -68,7 +68,7 @@ public class CachePersistenceDAOImpl<T extends Cacheable> implements CachePersis
    * Persists a single cacheable
    * setting).
    */
-  @Transactional("cacheTransactionManager")
+  @Transactional("databaseTransactionManager")
   @Override
   public void updateCacheable(final T cacheable) {
     persistenceMapper.updateCacheable(cacheable);
@@ -79,7 +79,7 @@ public class CachePersistenceDAOImpl<T extends Cacheable> implements CachePersis
    * An object that is not found in the cache will not be persisted and skipped.
    * @param keyList keys of the elements that need persisting
    */
-  @Transactional(value = "cacheTransactionManager")
+  @Transactional(value = "databaseTransactionManager")
   @Override
   public void persistBatch(final List<Long> keyList) {
     T cacheObject;
