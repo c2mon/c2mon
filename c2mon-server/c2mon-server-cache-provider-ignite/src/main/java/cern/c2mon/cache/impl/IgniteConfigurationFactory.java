@@ -8,6 +8,9 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import static cern.c2mon.cache.impl.C2monCacheProperties.METRICS_LOG_FREQUENCY;
 
+/**
+ * Configures the entire ignite instance
+ */
 @Configuration
 public class IgniteConfigurationFactory {
 

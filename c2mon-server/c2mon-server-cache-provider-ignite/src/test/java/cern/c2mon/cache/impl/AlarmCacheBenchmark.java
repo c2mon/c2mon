@@ -17,7 +17,7 @@ public class AlarmCacheBenchmark extends AbstractCacheBenchmarkTest {
   private IgniteCache<Long, Alarm> barebonesCache;
 
   public void initCache() {
-    alarmCache = new IgniteC2monCache<>("Test", new DefaultIgniteCacheConfiguration<>("Test"), Ignition.start());
+    alarmCache = new IgniteC2monCache<>("Test", IgniteFactory.defaultIgniteCacheConfiguration("Test"), Ignition.start());
     barebonesCache = Ignition.ignite().createCache("BarebonesCache");
     alarmCache.init();
   }

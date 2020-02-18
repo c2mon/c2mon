@@ -1,7 +1,7 @@
 package cern.c2mon.cache.impl;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import cern.c2mon.server.common.AbstractCacheableImpl;
+import lombok.EqualsAndHashCode;
 import org.apache.ignite.Ignite;
 import org.apache.ignite.IgniteException;
 import org.apache.ignite.Ignition;
@@ -19,7 +19,7 @@ public class IgniteTest {
   @Test
   public void configAfterStart() {
     try (Ignite ignite = Ignition.start()) {
-      ignite.addCacheConfiguration(new DefaultIgniteCacheConfiguration("testCache"));
+      ignite.addCacheConfiguration(IgniteFactory.defaultIgniteCacheConfiguration("testCache"));
     }
   }
 
@@ -38,19 +38,23 @@ public class IgniteTest {
   @Test
   public void mutateObject() {
     try (Ignite ignite = Ignition.start()) {
-      Cache<Long, DeepClass> cache = ignite.createCache(new DefaultIgniteCacheConfiguration<>("testCache"));
+      Cache<Long, DeepClass> cache = ignite.createCache(IgniteFactory.defaultIgniteCacheConfiguration("testCache"));
       cache.put(1L, new DeepClass(1, "Instance 1"));
-      cache.get(1L).setName("Instance 2");
+      cache.get(1L).name = "Instance 2";
       assertEquals(cache.get(1L).name, "Instance 1");
       cache.replace(1L, new DeepClass(1, "Instance 2"));
       assertEquals(cache.get(1L).name, "Instance 2");
     }
   }
 
-  @Data
-  @AllArgsConstructor
-  private class DeepClass {
-    private long id;
-    private String name;
+  @EqualsAndHashCode(callSuper = true)
+  private class DeepClass extends AbstractCacheableImpl {
+    long id;
+    String name;
+
+    public DeepClass(long id, String name) {
+      super(id);
+      this.name = name;
+    }
   }
 }

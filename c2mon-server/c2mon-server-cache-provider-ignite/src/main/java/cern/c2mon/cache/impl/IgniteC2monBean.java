@@ -1,6 +1,7 @@
 package cern.c2mon.cache.impl;
 
 import lombok.experimental.Delegate;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.ignite.Ignite;
 import org.apache.ignite.IgniteException;
 import org.apache.ignite.Ignition;
@@ -23,7 +24,8 @@ import javax.inject.Singleton;
  *
  * @author Alexandros Papageorgiou Koufidis
  */
-@Named("C2monIgnite")
+@Slf4j
+@Named
 @Singleton
 public class IgniteC2monBean implements Ignite, DisposableBean {
 
@@ -44,7 +46,7 @@ public class IgniteC2monBean implements Ignite, DisposableBean {
       igniteInstance.close();
     } catch (IgniteException exception) {
       // This can also just log a warning and fail quietly
-      throw new Exception(exception);
+      log.warn("Failed to property shut down running ignite instance", exception);
     }
   }
 }

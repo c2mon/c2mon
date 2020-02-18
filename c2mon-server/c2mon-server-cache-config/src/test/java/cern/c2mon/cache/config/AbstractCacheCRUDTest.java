@@ -11,7 +11,7 @@ import static org.junit.Assert.*;
  * @author Szymon Halastra
  * @author Alexandros Papageorgiou
  */
-public abstract class AbstractCacheCRUDTest<V extends Cacheable> extends AbstractCacheTest<V> {
+public abstract class AbstractCacheCRUDTest<V extends Cacheable> extends AbstractCacheTransactionTest<V> {
   protected Long existingKey;
 
   @Before
