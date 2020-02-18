@@ -38,6 +38,12 @@ public abstract class AbstractCache<CACHEABLE extends Cacheable> implements C2mo
   @Setter
   protected CacheListenerManager<CACHEABLE> cacheListenerManager = new CacheListenerManagerImpl<>();
 
+  /**
+   * Default Cache constructor. Be careful with the name, don't use any special characters,
+   * as some cache implementations will have trouble with that
+   *
+   * @param cacheName
+   */
   public AbstractCache(String cacheName) {
     this.cacheName = cacheName;
   }
@@ -59,10 +65,11 @@ public abstract class AbstractCache<CACHEABLE extends Cacheable> implements C2mo
     return executeTransaction(() -> {
       CACHEABLE cachedObj = get(key);
       transformer.accept(cachedObj);
-      if (notifyListeners)
-        put(key, cachedObj); // TODO Write tests that verify this doesn't force cause a deadlock, as put will also get the obj
-      else
+      if (notifyListeners) {
+        put(key, cachedObj);
+      } else {
         putQuiet(key, cachedObj);
+      }
       return cachedObj;
     });
   }
