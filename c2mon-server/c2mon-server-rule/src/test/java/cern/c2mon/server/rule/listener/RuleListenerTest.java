@@ -20,6 +20,7 @@ import cern.c2mon.cache.actions.CacheActionsModuleRef;
 import cern.c2mon.cache.actions.datatag.DataTagService;
 import cern.c2mon.cache.actions.tag.TagController;
 import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.listener.CacheListenerManagerImpl;
 import cern.c2mon.cache.config.CacheConfigModuleRef;
 import cern.c2mon.cache.impl.configuration.C2monIgniteConfiguration;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
@@ -30,7 +31,9 @@ import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.rule.RuleTagCacheObject;
+import cern.c2mon.server.rule.RuleTagService;
 import cern.c2mon.server.rule.config.RuleModule;
+import cern.c2mon.server.rule.evaluation.RuleEvaluatorImpl;
 import cern.c2mon.shared.common.CacheEvent;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,6 +43,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -76,8 +80,15 @@ public class RuleListenerTest {
   private DataTagCacheObject dataTag1;
   private RuleTagCacheObject ruleTag;
 
+  @Autowired RuleEvaluatorImpl ruleEvaluator;
+  @Autowired RuleTagService ruleTagService;
+
   @Before
   public void populateCaches() {
+    // Remove existing listener managers during data insertion
+    dataTagCache.setCacheListenerManager(new CacheListenerManagerImpl<>());
+    ruleTagCache.setCacheListenerManager(new CacheListenerManagerImpl<>());
+
     dataTag1 = CacheObjectCreation.createTestDataTag();
     DataTag dataTag2 = CacheObjectCreation.createTestDataTag2();
     ruleTag = CacheObjectCreation.createTestRuleTag();
@@ -96,11 +107,13 @@ public class RuleListenerTest {
     assertTrue(dataTagCache.containsKey(dataTag2.getId()));
     assertTrue(ruleTagCache.containsKey(ruleTag.getId()));
     //and have correct values
-    // This may be getting flaky due to listeners active. If you notice and can
-    // reproduce, try setting the caches to empty listener managers?
     assertTrue((Boolean) dataTagCache.get(dataTag1.getId()).getValue());
     assertTrue((Boolean) dataTagCache.get(dataTag2.getId()).getValue());
     assertEquals(1000, ruleTagCache.get(ruleTag.getId()).getValue());
+
+    // Reinsert the useful listeners
+    ruleEvaluator.init();
+//    ruleTagService.init();
   }
 
   /**
@@ -115,6 +128,7 @@ public class RuleListenerTest {
     final CountDownLatch latch = new CountDownLatch(1);
 
     ruleTagCache.getCacheListenerManager().registerListener(cacheable -> {
+      System.out.println("Listener 1: " + cacheable);
       latch.countDown();
     }, CacheEvent.UPDATE_ACCEPTED);
 
@@ -127,32 +141,7 @@ public class RuleListenerTest {
 
     //check update was made
     assertEquals(Boolean.FALSE, dataTagCache.get(dataTag1.getId()).getValue());
-    latch.await();
+    assertTrue("Event should be received", latch.await(1, TimeUnit.SECONDS));
     assertEquals(3, ruleTagCache.get(ruleTag.getId()).getValue());
-  }
-
-  /**
-   * Tests that a update to a data tag in the cache results in
-   * an update to a rule depending on it.
-   *
-   * Uses the test data created in the cache modules.
-   */
-  @Test
-  public void testRuleTrue() throws InterruptedException {
-    final CountDownLatch latch = new CountDownLatch(1);
-
-    ruleTagCache.getCacheListenerManager().registerListener(cacheable -> {
-      latch.countDown();
-    }, CacheEvent.UPDATE_ACCEPTED);
-
-    //(2) second test of rule update
-    //update dataTag to TRUE, notify listeners and check rule was again updated
-    dataTagService.getCache().compute(dataTag1.getId(), dataTag -> {
-      TagController.setValue(dataTag, Boolean.TRUE, "now true");
-      TagController.validate(dataTag);
-    });
-    assertEquals(Boolean.TRUE, dataTagCache.get(dataTag1.getId()).getValue());
-    latch.await();
-    assertEquals(2, ruleTagCache.get(ruleTag.getId()).getValue());
   }
 }

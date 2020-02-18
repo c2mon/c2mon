@@ -82,7 +82,7 @@ public class RuleEvaluatorImpl implements RuleEvaluator {
       try {
         evaluateRules(tag);
       } catch (Exception e) {
-        log.error("Error caught when evaluating dependend rules ({}) of #{}", tag.getRuleIds(), tag.getId(), e);
+        log.error("Error caught when evaluating dependent rules ({}) of #{}", tag.getRuleIds(), tag.getId(), e);
       }
     }, CacheEvent.UPDATE_ACCEPTED, CacheEvent.CONFIRM_STATUS);
   }
