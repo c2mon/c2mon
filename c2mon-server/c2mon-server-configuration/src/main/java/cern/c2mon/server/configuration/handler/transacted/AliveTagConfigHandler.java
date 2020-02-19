@@ -9,6 +9,8 @@ import cern.c2mon.server.configuration.parser.factory.AliveTagFactory;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.common.PropertiesAccessor;
+import cern.c2mon.shared.common.datatag.SourceDataTag;
+import cern.c2mon.shared.daq.config.DataTagAdd;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Inject;
@@ -71,18 +73,29 @@ public class AliveTagConfigHandler extends AbstractControlTagConfigHandler<Alive
   public ProcessChange getCreateEvent(final Long configId, final Long controlTagId, final Long equipmentId, final Long processId) {
     ProcessChange processChange = null;
 
-    AliveTag aliveTimer = cache.get(controlTagId);
+    AliveTag aliveTag = cache.get(controlTagId);
 
-//    TODO (Alex) Turn this on when we have ControlTag events
-//    if (aliveTimer.getAddress != null) {
-//      DataTagAdd dataTagAdd = new DataTagAdd(configId, equipmentId, dataTagFacade.generateSourceDataTag(aliveTimer));
-//      processChange = new ProcessChange(processId, dataTagAdd);
-//    }
-
-//        if (processFacade.getProcessIdFromControlTag(controlTag.getId()) != null) {
-//          processChange = new ProcessChange(processFacade.getProcessIdFromControlTag(controlTag.getId()));
-//        }
+    if (aliveTag.getAddress() != null) {
+      DataTagAdd dataTagAdd = new DataTagAdd(configId, equipmentId, generateSourceDataTag(aliveTag));
+      processChange = new ProcessChange(processId, dataTagAdd);
+    }
 
     return processChange;
+  }
+
+  /**
+   * Generates a {@link SourceDataTag} object from the given alive tag
+   *
+   * @param aliveTag The alive tag which shall be converted
+   * @return The resulting source data tag
+   */
+  private SourceDataTag generateSourceDataTag(final AliveTag aliveTag) {
+    SourceDataTag sourceDataTag = new SourceDataTag(aliveTag.getId(), aliveTag.getName(), true);
+    sourceDataTag.setDataType(aliveTag.getDataType());
+    sourceDataTag.setMode(aliveTag.getMode());
+    if (aliveTag.getAddress() != null) {
+      sourceDataTag.setAddress(aliveTag.getAddress());
+    }
+    return sourceDataTag;
   }
 }
