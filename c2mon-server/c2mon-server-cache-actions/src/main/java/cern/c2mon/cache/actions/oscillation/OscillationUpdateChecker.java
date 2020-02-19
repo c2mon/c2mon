@@ -28,9 +28,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
-import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.util.Collection;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -48,7 +49,8 @@ import java.util.TimerTask;
  * @author Alexandros Papageorgiou
  * @author Brice Copy
  */
-@Service
+@Named
+@Singleton
 @Slf4j
 public class OscillationUpdateChecker extends TimerTask implements SmartLifecycle {
 

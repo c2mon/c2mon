@@ -11,10 +11,11 @@ import cern.c2mon.server.common.alarm.TagWithAlarms;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.common.CacheEvent;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -25,7 +26,8 @@ import static cern.c2mon.cache.actions.alarm.AlarmEvaluator.createAdditionalInfo
  * @author Szymon Halastra, Alexandros Papageorgiou, Brice Copy
  */
 @Slf4j
-@Service
+@Named
+@Singleton
 public class AlarmService extends AbstractCacheServiceImpl<Alarm> implements AlarmAggregator {
 
   private List<AlarmAggregatorListener> alarmUpdateObservable = new ArrayList<>();

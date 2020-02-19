@@ -7,10 +7,11 @@ import cern.c2mon.cache.api.listener.CacheListener;
 import cern.c2mon.server.common.commfault.CommFaultTag;
 import cern.c2mon.shared.common.CacheEvent;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.util.Objects;
 
 /**
@@ -18,7 +19,8 @@ import java.util.Objects;
  * cache. Applies sanitation and validation before sending the event
  * for performance reasons
  */
-@Service
+@Named
+@Singleton
 @Slf4j
 public class CommFaultTagUpdateCascader implements CacheListener<CommFaultTag> {
 

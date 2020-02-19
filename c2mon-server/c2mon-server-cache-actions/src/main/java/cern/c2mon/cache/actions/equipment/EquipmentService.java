@@ -6,9 +6,10 @@ import cern.c2mon.cache.actions.state.SupervisionStateTagService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.equipment.Equipment;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
@@ -16,7 +17,8 @@ import java.util.stream.Collectors;
  * @author Szymon Halastra, Alexandros Papageorgiou Koufidis
  */
 @Slf4j
-@Service
+@Named
+@Singleton
 public class EquipmentService extends BaseEquipmentServiceImpl<Equipment> implements EquipmentOperations {
 
   @Inject

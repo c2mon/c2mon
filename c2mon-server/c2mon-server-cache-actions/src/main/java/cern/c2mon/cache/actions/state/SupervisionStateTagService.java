@@ -11,9 +11,10 @@ import cern.c2mon.shared.common.supervision.SupervisionEntity;
 import cern.c2mon.shared.common.supervision.SupervisionStatus;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,7 +25,8 @@ import static cern.c2mon.cache.actions.state.SupervisionStateTagEvaluator.matche
 import static cern.c2mon.shared.common.supervision.SupervisionStatus.*;
 
 @Slf4j
-@Service
+@Named
+@Singleton
 public class SupervisionStateTagService extends AbstractCacheServiceImpl<SupervisionStateTag>
   implements SupervisedCacheService<SupervisionStateTag> {
 

@@ -10,16 +10,18 @@ import cern.c2mon.server.common.thread.Event;
 import cern.c2mon.shared.common.datatag.SourceDataTagValue;
 import cern.c2mon.shared.common.supervision.SupervisionEntity;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 
 /**
  * @author Szymon Halastra, Alexandros Papageorgiou
  */
 @Slf4j
-@Service
+@Named
+@Singleton
 public class CommFaultService extends AbstractBooleanControlTagService<CommFaultTag> implements SupervisedCacheService<CommFaultTag> {
 
   @Inject

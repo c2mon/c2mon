@@ -7,15 +7,17 @@ import cern.c2mon.cache.api.flow.DefaultCacheFlow;
 import cern.c2mon.shared.common.command.CommandTag;
 import cern.c2mon.shared.common.command.SourceCommandTag;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 /**
  * @author Szymon Halastra
  */
 @Slf4j
-@Service
+@Named
+@Singleton
 public class CommandTagService extends AbstractCacheServiceImpl<CommandTag> {
 
   @Inject

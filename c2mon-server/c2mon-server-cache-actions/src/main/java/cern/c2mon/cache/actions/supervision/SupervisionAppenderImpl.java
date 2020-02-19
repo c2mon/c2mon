@@ -23,9 +23,10 @@ import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 /**
  * Helper bean for adding the supervision status to
@@ -34,7 +35,8 @@ import javax.inject.Inject;
  * @author Mark Brightwell
  */
 @Slf4j
-@Service
+@Named
+@Singleton
 public class SupervisionAppenderImpl implements SupervisionAppender {
 
   /**

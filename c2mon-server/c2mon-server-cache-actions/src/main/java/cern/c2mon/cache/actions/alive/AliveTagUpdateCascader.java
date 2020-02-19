@@ -9,10 +9,11 @@ import cern.c2mon.server.common.alive.AliveTag;
 import cern.c2mon.shared.common.CacheEvent;
 import cern.c2mon.shared.common.supervision.SupervisionEntity;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.util.Objects;
 
 /**
@@ -20,7 +21,8 @@ import java.util.Objects;
  * and SupervisionState caches. Applies sanitation and validation before
  * sending the event for performance reasons
  */
-@Service
+@Named
+@Singleton
 @Slf4j
 public class AliveTagUpdateCascader implements CacheListener<AliveTag> {
 

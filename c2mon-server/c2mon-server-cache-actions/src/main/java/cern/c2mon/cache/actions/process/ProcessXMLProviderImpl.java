@@ -33,8 +33,9 @@ import cern.c2mon.server.common.process.ProcessCacheObject;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -44,7 +45,8 @@ import java.util.concurrent.*;
 /**
  * @author Mark Brightwell
  */
-@Service
+@Named
+@Singleton
 @Slf4j
 public class ProcessXMLProviderImpl implements ProcessXMLProvider {
 

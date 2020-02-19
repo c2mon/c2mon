@@ -6,16 +6,18 @@ import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.cache.api.flow.DefaultCacheFlow;
 import cern.c2mon.cache.api.spi.CacheQuery;
 import cern.c2mon.server.common.device.DeviceClass;
-import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
  * @author Szymon Halastra, Alexandros Papageorgiou
  */
-@Service
+@Named
+@Singleton
 public class DeviceClassService extends AbstractCacheServiceImpl<DeviceClass> {
 
   @Inject

@@ -10,10 +10,11 @@ import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
 import cern.c2mon.shared.common.Cacheable;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,7 +23,8 @@ import java.util.stream.Collectors;
  * @author Alexandros Papageorgiou Koufidis
  */
 @Slf4j
-@Service
+@Named
+@Singleton
 public class SubEquipmentService extends BaseEquipmentServiceImpl<SubEquipment> implements SubEquipmentOperations {
 
   private final EquipmentService equipmentService;

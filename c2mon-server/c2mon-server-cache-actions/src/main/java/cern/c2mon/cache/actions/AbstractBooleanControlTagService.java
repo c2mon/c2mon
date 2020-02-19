@@ -6,12 +6,22 @@ import cern.c2mon.cache.api.flow.CacheUpdateFlow;
 import cern.c2mon.server.common.control.ControlTag;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Hosts the shared functionality for {@link ControlTag} Services whose
+ * values are {@code Boolean}
+ *
+ * @param <T> the type of control tag - one of {@link cern.c2mon.server.common.alive.AliveTag}
+ *           or {@link cern.c2mon.server.common.commfault.CommFaultTag}
+ */
 @Slf4j
-public class AbstractBooleanControlTagService<T extends ControlTag> extends AbstractCacheServiceImpl<T>
+public abstract class AbstractBooleanControlTagService<T extends ControlTag> extends AbstractCacheServiceImpl<T>
   implements SupervisedCacheService<T> {
 
 
-  public AbstractBooleanControlTagService(C2monCache<T> cache, CacheUpdateFlow<T> c2monCacheFlow) {
+  /**
+   * Constructor for internal use by implementations
+   */
+  protected AbstractBooleanControlTagService(C2monCache<T> cache, CacheUpdateFlow<T> c2monCacheFlow) {
     super(cache, c2monCacheFlow);
   }
 
@@ -27,7 +37,7 @@ public class AbstractBooleanControlTagService<T extends ControlTag> extends Abst
    * @throws NullPointerException when {@code id} is null
    */
   @Override
-  public void start(long id, long timestamp) throws NullPointerException {
+  public void start(long id, long timestamp) {
     setTagAsActive(id, true, timestamp);
   }
 
@@ -43,17 +53,17 @@ public class AbstractBooleanControlTagService<T extends ControlTag> extends Abst
    * @throws NullPointerException when {@code id} is null
    */
   @Override
-  public void stop(long id, long timestamp) throws NullPointerException {
+  public void stop(long id, long timestamp) {
     setTagAsActive(id, false, timestamp);
   }
 
   @Override
-  public void resume(long aliveTimerId, long timestamp, String message) throws NullPointerException {
+  public void resume(long aliveTimerId, long timestamp, String message) {
     start(aliveTimerId, timestamp);
   }
 
   @Override
-  public void suspend(long aliveTimerId, long timestamp, String message) throws NullPointerException {
+  public void suspend(long aliveTimerId, long timestamp, String message) {
     stop(aliveTimerId, timestamp);
   }
 

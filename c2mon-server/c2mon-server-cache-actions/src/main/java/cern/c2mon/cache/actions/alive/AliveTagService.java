@@ -8,9 +8,10 @@ import cern.c2mon.server.common.supervision.Supervised;
 import cern.c2mon.server.common.thread.Event;
 import cern.c2mon.shared.common.datatag.SourceDataTagValue;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 /**
  * Manages operations on {@link AliveTag}s
@@ -19,7 +20,8 @@ import javax.inject.Inject;
  * @see AliveTag
  */
 @Slf4j
-@Service
+@Named
+@Singleton
 public class AliveTagService extends AbstractBooleanControlTagService<AliveTag> implements SupervisedCacheService<AliveTag> {
 
   @Inject

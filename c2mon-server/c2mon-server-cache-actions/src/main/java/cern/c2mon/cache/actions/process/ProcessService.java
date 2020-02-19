@@ -17,10 +17,11 @@ import cern.c2mon.shared.common.supervision.SupervisionEntity;
 import cern.c2mon.shared.common.supervision.SupervisionStatus;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.UnexpectedRollbackException;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Collection;
@@ -30,7 +31,8 @@ import java.util.Map;
  * @author Szymon Halastra, Alexandros Papageorgiou Koufidis
  */
 @Slf4j
-@Service
+@Named
+@Singleton
 public class ProcessService extends AbstractSupervisedService<Process> implements ProcessOperationService {
 
   @Getter

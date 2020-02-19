@@ -12,10 +12,11 @@ import cern.c2mon.server.common.thread.Event;
 import cern.c2mon.shared.common.CacheEvent;
 import cern.c2mon.shared.common.datatag.SourceDataTagValue;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.stream.Collectors;
@@ -26,7 +27,8 @@ import static cern.c2mon.cache.actions.datatag.DataTagEvaluator.dataTypeMatches;
  * @author Alexandros Papageorgiou
  */
 @Slf4j
-@Service
+@Named
+@Singleton
 public class DataTagService extends AbstractCacheServiceImpl<DataTag> {
 
   private final C2monCache<Alarm> alarmCache;
