@@ -17,11 +17,7 @@
 package cern.c2mon.server.supervision.alive;
 
 import cern.c2mon.cache.actions.alive.AliveTagService;
-import cern.c2mon.cache.api.C2monCache;
-import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
-import cern.c2mon.server.common.alive.AliveTag;
 import cern.c2mon.server.common.config.ServerConstants;
-import cern.c2mon.server.supervision.SupervisionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.SmartLifecycle;
@@ -30,8 +26,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Timer that regularly checks all the active alive timers monitoring
@@ -47,22 +41,17 @@ import java.util.concurrent.atomic.AtomicInteger;
  *  message arrived, where alive-interval is specific to the AliveTimer
  *  object (see <code>hasExpired</code> in {@link AliveTagService}).
  *
- * @author Mark Brightwell
- *
+ * @see AliveTagChecker
+ * @author Alexandros Papageorgiou, Mark Brightwell
  */
 @Named
 @Singleton
-public class AliveTagChecker extends TimerTask implements SmartLifecycle {
+public class AliveTagChecker implements SmartLifecycle {
 
   /**
    * Log4j Logger for this class.
    */
   private static final Logger LOGGER = LoggerFactory.getLogger(AliveTagChecker.class);
-
-  /**
-   * SMS logger for warnings.
-   */
-  private static final Logger SMS_LOGGER = LoggerFactory.getLogger("AdminSmsLogger");
 
   /**
    * How often the timer checks whether the alive
@@ -87,52 +76,17 @@ public class AliveTagChecker extends TimerTask implements SmartLifecycle {
    */
   private Timer timer;
 
-  /**
-   * Reference to alive timer facade.
-   */
-  private final AliveTagService aliveTimerService;
+  private AliveTagCheckerTask aliveTagCheckerTask;
 
   /**
-   * Reference to alive timer cache.
-   */
-  private C2monCache<AliveTag> aliveTimerCache;
-
-  /**
-   * Reference to the SupervisionManager bean.
-   */
-  private final SupervisionManager supervisionManager;
-
-  /**
-   * Threshold of DAQ/Equipment/SubEqu. down when warning is sent to admin.
-   */
-  private static final short WARNING_THRESHOLD = 50;
-
-  /**
-   * Warning has been sent.
-   */
-  private boolean alarmActive = false;
-
-  /**
-   * Count down to alarm switch off.
-   */
-  private AtomicInteger warningSwitchOffCountDown = new AtomicInteger(SWITCH_OFF_COUNTDOWN);
-
-  /**
-   * 10mins, because we decrement this once per scan, so time value is 60 * SCAN_INTERVAL
-   */
-  private static final int SWITCH_OFF_COUNTDOWN = 60;
-
-  private static long lastCheck = 0L;
-
-  /**
-   * @param aliveTimerService the alive timer facade bean
-   * @param supervisionManager the supervision manager bean
+   *
+   *
+   * @param aliveTagCheckerTask the actual task that will run every
+   *        {@link AliveTagChecker#SCAN_INTERVAL} millis
    */
   @Inject
-  public AliveTagChecker(AliveTagService aliveTimerService, SupervisionManager supervisionManager) {
-    this.aliveTimerService = aliveTimerService;
-    this.aliveTimerCache = aliveTimerService.getCache();
-    this.supervisionManager = supervisionManager;
+  public AliveTagChecker(AliveTagCheckerTask aliveTagCheckerTask) {
+    this.aliveTagCheckerTask = aliveTagCheckerTask;
   }
 
   /**
@@ -142,7 +96,7 @@ public class AliveTagChecker extends TimerTask implements SmartLifecycle {
   public synchronized void start() {
     LOGGER.info("Starting the C2MON alive timer mechanism.");
     timer = new Timer("AliveChecker");
-    timer.schedule(this, INITIAL_SCAN_DELAY, SCAN_INTERVAL);
+    timer.schedule(aliveTagCheckerTask, INITIAL_SCAN_DELAY, SCAN_INTERVAL);
     running = true;
   }
 
@@ -157,69 +111,6 @@ public class AliveTagChecker extends TimerTask implements SmartLifecycle {
     LOGGER.info("Stopping the C2MON alive timer mechanism.");
     timer.cancel();
     running = false;
-  }
-
-  /**
-   * Run method of the AliveTimerManager thread.
-   */
-  @Override
-  public void run() {
-    if (System.currentTimeMillis() - lastCheck < 9000) {
-      LOGGER.debug("Skipping alive check as already performed.");
-    }
-
-    LOGGER.debug("run() : checking alive timers ... ");
-
-    try {
-      long aliveDownCount = calculateAliveDownAndNotify();
-
-      sendNotificationsIfRequired(aliveDownCount);
-    } catch (Exception e) {
-      LOGGER.error("Unexpected exception when checking the alive timers", e);
-    }
-    lastCheck = System.currentTimeMillis();
-
-    LOGGER.debug("run() : finished checking alive timers ... ");
-  }
-
-  private long calculateAliveDownAndNotify() {
-    return aliveTimerCache.getKeys()
-      // Potentially optimizable by switching to single stream
-      .parallelStream()
-      .filter(this::isExpired)
-      .peek(supervisionManager::onAliveTimerExpiration)
-      .count();
-  }
-
-  private boolean isExpired(long id) {
-    boolean aliveExpired = false;
-
-    if (aliveTimerCache.containsKey(id)) {
-      try {
-        if (aliveTimerService.hasExpired(id)) {
-          aliveTimerService.stop(id, System.currentTimeMillis());
-          aliveExpired = true;
-        }
-      } catch (CacheElementNotFoundException notFound) {
-        LOGGER.warn("Failed to locate alive timer in cache on expiration check (may happen exceptionally if just removed).", notFound);
-      }
-    } else {
-      aliveExpired = true;
-    }
-
-    return aliveExpired;
-  }
-
-  private void sendNotificationsIfRequired(long aliveDownCount) {
-    if (!alarmActive && aliveDownCount > WARNING_THRESHOLD) {
-      alarmActive = true;
-      LOGGER.warn("Over {} DAQ/Equipment are currently down.", WARNING_THRESHOLD);
-      SMS_LOGGER.warn("Over {} DAQ/Equipment are currently down.", WARNING_THRESHOLD);
-    } else if (alarmActive && warningSwitchOffCountDown.decrementAndGet() == 0) {
-      SMS_LOGGER.warn("DAQ/Equipment status back to normal ({} detected as down)", aliveDownCount);
-      alarmActive = false;
-      warningSwitchOffCountDown = new AtomicInteger(SWITCH_OFF_COUNTDOWN);
-    }
   }
 
   @Override
