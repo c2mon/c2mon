@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -21,6 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @see AliveTagChecker
  * @author Alexandros Papageorgiou, Mark Brightwell
  */
+@Named
 public class AliveTagCheckerTask extends TimerTask {
 
   /**
