@@ -40,7 +40,7 @@ public class DataTagConfigTest extends ConfigurationCacheLoaderTest<DataTag> {
   private C2monCache<Equipment> equipmentCache;
 
   @Test
-  public void testCreateAndUpdateDataTag() throws ConfigurationException {
+  public void createAndUpdateDataTag() throws ConfigurationException {
     processService.start(50, System.currentTimeMillis());
     ConfigurationReport report = configurationLoader.applyConfiguration(1);
 
@@ -51,54 +51,33 @@ public class DataTagConfigTest extends ConfigurationCacheLoaderTest<DataTag> {
     DataTagCacheObject cacheObject = (DataTagCacheObject) dataTagCache.get(5000000L);
 
     // corresponds to data inserted using SQL file
-    DataTagCacheObject expectedObject = new DataTagCacheObject(5000000L);
-    expectedObject.setName("Config_test_datatag"); // non null
-    expectedObject.setDescription("test description config datatag");
-    expectedObject.setMode(DataTagConstants.MODE_TEST); // non null
-    expectedObject.setDataType("Float"); // non null
-    expectedObject.setLogged(false); // null allowed
-    expectedObject.setUnit("config unit m/sec");
-    expectedObject.setDipAddress("testConfigDIPaddress");
-    expectedObject.setJapcAddress("testConfigJAPCaddress");
-    // expectedObject.setValue(Boolean.TRUE);
-    // expectedObject.setValueDescription("test config value description");
-    expectedObject.setSimulated(false); // null allowed
-    expectedObject.setEquipmentId(150L); // need test equipment
-    // inserted
-    expectedObject.setProcessId(50L);
-    expectedObject.setMinValue(12.2f);
-    expectedObject.setMaxValue(23.3f);
-    expectedObject.setAddress(new DataTagAddress(new OPCHardwareAddressImpl("CW_TEMP_IN_COND3")));
-    expectedObject.setDataTagQuality(new DataTagQualityImpl());
-    // expectedObject.setCacheTimestamp(new
-    // Timestamp(System.currentTimeMillis())); //should be set to creation time,
-    // so not null
-    // expectedObject.setSourceTimestamp(new
-    // Timestamp(System.currentTimeMillis()));
-    // expectedObject.setRuleIdsString("1234,3456"); //NO: never loaded at
-    // reconfiguration of datatag, but only when a new rule is added
+    DataTagCacheObject expectedObject = expectedDataTagObject();
 
     assertEquals(expectedObject, cacheObject);
 
     Equipment equipment = equipmentCache.get(cacheObject.getEquipmentId());
     // check equipment now has datatag in list
     assertTrue(dataTagService.getDataTagIdsByEquipmentId(cacheObject.getEquipmentId()).contains(5000000L));
+  }
 
-    // test update of this datatag
-    report = configurationLoader.applyConfiguration(4);
+  @Test
+  public void updateDataTag() {
+    processService.start(50, System.currentTimeMillis());
+    configurationLoader.applyConfiguration(1);
+    ConfigurationReport report = configurationLoader.applyConfiguration(4);
 
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     assertEquals(ConfigConstants.Status.OK, report.getStatus());
     assertTrue(report.getProcessesToReboot().isEmpty());
     DataTagCacheObject updatedCacheObject = (DataTagCacheObject) dataTagCache.get(5000000L);
 
+    DataTagCacheObject expectedObject = expectedDataTagObject();
     expectedObject.setJapcAddress("testConfigJAPCaddress2");
     expectedObject.setDipAddress(null); // checks can be set to null also
     expectedObject.setMaxValue(26f);
     expectedObject.setAddress(new DataTagAddress(new OPCHardwareAddressImpl("CW_TEMP_IN_COND4")));
 
     assertEquals(expectedObject, updatedCacheObject);
-    equipment = equipmentCache.get(cacheObject.getEquipmentId());
   }
 
   @Test
@@ -418,5 +397,28 @@ public class DataTagConfigTest extends ConfigurationCacheLoaderTest<DataTag> {
     //and the element report status for 1010L is WARNING
     assertEquals(ConfigConstants.Status.WARNING, report.getElementReports().get(0).getStatus());
     assertEquals(ConfigConstants.Status.OK, report.getElementReports().get(1).getStatus());
+  }
+
+  private DataTagCacheObject expectedDataTagObject() {
+    DataTagCacheObject expectedObject = new DataTagCacheObject(5000000L);
+    expectedObject.setName("Config_test_datatag"); // non null
+    expectedObject.setDescription("test description config datatag");
+    expectedObject.setMode(DataTagConstants.MODE_TEST); // non null
+    expectedObject.setDataType("Float"); // non null
+    expectedObject.setLogged(false); // null allowed
+    expectedObject.setUnit("config unit m/sec");
+    expectedObject.setDipAddress("testConfigDIPaddress");
+    expectedObject.setJapcAddress("testConfigJAPCaddress");
+    // expectedObject.setValue(Boolean.TRUE);
+    // expectedObject.setValueDescription("test config value description");
+    expectedObject.setSimulated(false); // null allowed
+    expectedObject.setEquipmentId(150L); // need test equipment
+    // inserted
+    expectedObject.setProcessId(50L);
+    expectedObject.setMinValue(12.2f);
+    expectedObject.setMaxValue(23.3f);
+    expectedObject.setAddress(new DataTagAddress(new OPCHardwareAddressImpl("CW_TEMP_IN_COND3")));
+    expectedObject.setDataTagQuality(new DataTagQualityImpl());
+    return expectedObject;
   }
 }

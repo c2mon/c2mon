@@ -204,11 +204,14 @@ public class EquipmentConfigTest extends ConfigurationCacheLoaderTest<Equipment>
     // check Report result
     assertFalse(report.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
     assertEquals(ConfigConstants.Status.OK, report.getStatus());
-    assertEquals(4, report.getElementReports().size());
+    assertEquals(1, report.getElementReports().size());
 
     // check Equipment in the cache
     EquipmentCacheObject cacheObject = (EquipmentCacheObject) equipmentCache.get(10L);
     EquipmentCacheObject expectedObject = cacheObjectFactory.buildEquipmentCacheObject(10L, equipment);
+    expectedObject.setAliveTagId(300_000L);
+    expectedObject.setCommFaultTagId(300_001L);
+    expectedObject.setStateTagId(300_002L);
 
     assertEquals(expectedObject, cacheObject);
 

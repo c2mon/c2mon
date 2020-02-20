@@ -123,7 +123,7 @@ public class ControlTagConfigTest extends ConfigurationCacheLoaderTest<Process> 
     // Unsure if this aliveTagId is flaky because it relies on autogen'd sequence number
     CommFaultTag expectedCommFault = new CommFaultTag(201L, 15L, "E_INI_TEST","EQ", 200L, 300000L);
     expectedCommFault.setDescription("new description");
-    expectedCommFault.setName("E:Comm");
+    expectedCommFault.setName("E_INI_TEST:COMM_FAULT");
     expectedCommFault.setLogged(true);
     expectedCommFault.setMode((short) TagMode.OPERATIONAL.ordinal());
 

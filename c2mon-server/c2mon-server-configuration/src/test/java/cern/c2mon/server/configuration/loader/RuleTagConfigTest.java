@@ -93,7 +93,6 @@ public class RuleTagConfigTest extends ConfigurationCacheLoaderTest<RuleTag> {
     final CountDownLatch latch = new CountDownLatch(1);
 
     ruleTagCache.getCacheListenerManager().registerListener(ruleTag -> {
-      System.out.println("Received: " + ruleTag);
       if (ruleTag.getDataTagQuality().isValid())
         latch.countDown();
     }, CacheEvent.UPDATE_ACCEPTED);

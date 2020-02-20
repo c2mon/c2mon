@@ -32,7 +32,7 @@ import java.util.LinkedList;
  */
 @Getter
 @Setter
-@ToString
+@ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class EquipmentCacheObject extends AbstractEquipmentCacheObject implements Equipment, Serializable {
 

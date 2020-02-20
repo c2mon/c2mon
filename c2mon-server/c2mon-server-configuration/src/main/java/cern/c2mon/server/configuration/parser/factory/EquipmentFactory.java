@@ -79,16 +79,16 @@ class EquipmentFactory extends EntityFactory<Equipment> {
     ConfigurationElement createEquipment = doCreateInstance(equipment);
 
     // If the user specified any custom tag info, use it (otherwise it will be created by the handler
-    if (equipment.getAliveTag() != null) {
-      configurationElements.addAll(aliveTagFactory.createInstance(equipment.getAliveTag()));
+    if (equipment.getAliveTag() != null && equipment.getAliveTag().getId() != null) {
+//      configurationElements.addAll(aliveTagFactory.createInstance(equipment.getAliveTag()));
       createEquipment.getElementProperties().setProperty("aliveTagId", equipment.getAliveTag().getId().toString());
     }
-    if (equipment.getCommFaultTag() != null) {
-      configurationElements.addAll(commFaultTagFactory.createInstance(equipment.getCommFaultTag()));
+    if (equipment.getCommFaultTag() != null && equipment.getCommFaultTag().getId() != null) {
+//      configurationElements.addAll(commFaultTagFactory.createInstance(equipment.getCommFaultTag()));
       createEquipment.getElementProperties().setProperty("commFaultTagId", equipment.getCommFaultTag().getId().toString());
     }
-    if (equipment.getStatusTag() != null) {
-      configurationElements.addAll(stateTagFactory.createInstance(equipment.getStatusTag()));
+    if (equipment.getStatusTag() != null && equipment.getStatusTag().getId() != null) {
+//      configurationElements.addAll(stateTagFactory.createInstance(equipment.getStatusTag()));
       createEquipment.getElementProperties().setProperty("stateTagId", equipment.getStatusTag().getId().toString());
     }
 
