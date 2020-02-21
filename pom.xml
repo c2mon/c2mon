@@ -434,6 +434,8 @@
             <release>${java.version}</release>
             <source>${java.version}</source>
             <target>${java.version}</target>
+            <!-- Warning: If switched to true, you get the entire module recompiled for every change! -->
+            <!-- https://stackoverflow.com/a/41301660/5576379 -->
             <useIncrementalCompilation>false</useIncrementalCompilation>
           </configuration>
         </plugin>
