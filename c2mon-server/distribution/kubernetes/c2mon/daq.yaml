@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    type: daq
+  name: daq
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      type: daq
+  template:
+    metadata:
+      labels:
+        type: daq
+    spec:
+      containers:
+      - image: cern/c2mon-daq:c2mon-daq-hostmetrics-0.0.4-SNAPSHOT
+        name: daq
+        envFrom:
+          - configMapRef:
+              name: c2mon-daq-properties
+        args: [ "-f", "P_HOST01" ]

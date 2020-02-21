@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    type: c2mon-server
+  name: c2mon-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      type: c2mon-server
+  template:
+    metadata:
+      labels:
+        type: c2mon-server
+    spec:
+      containers:
+      - name: c2mon-server
+        envFrom:
+          - configMapRef:
+              name: c2mon-server-properties
+        image: cern/c2mon:1.9.3-SNAPSHOT
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    type: c2mon-server
+  name: c2mon-server
+spec:
+  ports:
+    - name: c2mon-server
+      port: 9001
+      targetPort: 9001
+  selector:
+    type: c2mon-server

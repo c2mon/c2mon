@@ -1,46 +1,42 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: c2mon-dev
   labels:
-    io.kompose.service: mq
+    type: mq
   name: mq
 spec:
   replicas: 1
-  strategy: {}
+  selector:
+    matchLabels:
+      type: mq
   template:
     metadata:
-      creationTimestamp: null
       labels:
-        io.kompose.service: mq
+        type: mq
     spec:
       containers:
-      - image: cern/c2mon-ext:activemq-5.15.2-c2mon-1.8.46-SNAPSHOT
+      - image: cern/c2mon-ext:activemq-5.15.6-c2mon-1.9.0
         name: mq
         ports:
         - containerPort: 61616
         - containerPort: 61614
         resources: {}
       restartPolicy: Always
-status: {}
 ---
 apiVersion: v1
 kind: Service
 metadata:
   namespace: c2mon-dev
   labels:
-    io.kompose.service: mq
+    type: mq
   name: mq
 spec:
   ports:
-    - name: "61616"
+    - name: activemq-default-tcp
       port: 61616
       targetPort: 61616
     - name: "61614"
       port: 61614
       targetPort: 61614
   selector:
-    io.kompose.service: mq
-status:
-  loadBalancer: {}
----
+    type: mq

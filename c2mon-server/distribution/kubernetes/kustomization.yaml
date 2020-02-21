@@ -1,0 +1,5 @@
+namespace: c2mon-dev
+bases:
+  - persistence
+  - c2mon
+  - client
