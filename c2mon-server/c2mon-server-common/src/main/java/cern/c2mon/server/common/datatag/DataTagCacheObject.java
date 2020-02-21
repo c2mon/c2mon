@@ -86,8 +86,9 @@ public class DataTagCacheObject extends AbstractInfoTagCacheObject implements Da
 
   public DataTagCacheObject(Long id) {
     super(id);
-  }  @Override
+  }
 
+  @Override
   public Set<Long> getEquipmentIds() {
     return setOfNonNulls(equipmentId);
   }

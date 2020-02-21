@@ -17,7 +17,6 @@
 package cern.c2mon.cache.actions.supervision;
 
 import cern.c2mon.cache.actions.AbstractCacheService;
-import cern.c2mon.cache.api.flow.CacheUpdateFlow;
 import cern.c2mon.shared.common.Cacheable;
 import lombok.NonNull;
 
@@ -49,7 +48,6 @@ public interface SupervisedCacheService<T extends Cacheable> extends AbstractCac
    *
    * @param id        The cache id of the supervised object
    * @param timestamp time of the start
-   * @return the cache object, after {@link CacheUpdateFlow#postInsertEvents(Cacheable, Cacheable)}
    */
   void start(long id, long timestamp);
 
@@ -61,7 +59,6 @@ public interface SupervisedCacheService<T extends Cacheable> extends AbstractCac
    *
    * @param id        The cache id of the supervised object
    * @param timestamp time of the stop
-   * @return the cache object, after {@link CacheUpdateFlow#postInsertEvents(Cacheable, Cacheable)}
    */
   void stop(long id, long timestamp);
 
@@ -73,7 +70,6 @@ public interface SupervisedCacheService<T extends Cacheable> extends AbstractCac
    * @param id        The cache id of the supervised object
    * @param timestamp time of the running event
    * @param message   details of the event
-   * @return the cache object, after {@link CacheUpdateFlow#postInsertEvents(Cacheable, Cacheable)}
    */
   void resume(long id,long timestamp, @NonNull String message);
 
@@ -83,7 +79,6 @@ public interface SupervisedCacheService<T extends Cacheable> extends AbstractCac
    * @param id        The cache id of the supervised object
    * @param timestamp time of problem
    * @param message   details
-   * @return the cache object, after {@link CacheUpdateFlow#postInsertEvents(Cacheable, Cacheable)}
    */
   void suspend(long id, long timestamp, @NonNull String message);
 }
