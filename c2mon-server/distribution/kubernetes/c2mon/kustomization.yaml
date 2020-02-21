@@ -1,5 +1,5 @@
 resources:
-  - apachemq.yaml
+  - activemq.yaml
   - c2mon-server.yaml
   - daq.yaml
 generatorOptions:
