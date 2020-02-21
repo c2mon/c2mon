@@ -27,6 +27,11 @@
       <groupId>cern.c2mon.client</groupId>
       <artifactId>c2mon-client-common</artifactId>
     </dependency>
+    <dependency>
+      <groupId>cern.c2mon.server</groupId>
+      <artifactId>c2mon-server-elasticsearch</artifactId>
+      <version>${project.parent.version}</version>
+    </dependency>
 
     <!-- 3rd party dependencies -->
     <dependency>
@@ -105,11 +110,6 @@
       <artifactId>powermock-core</artifactId>
       <version>1.6.3</version>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>cern.c2mon.server</groupId>
-      <artifactId>c2mon-server-elasticsearch</artifactId>
-      <version>${project.parent.version}</version>
     </dependency>
     <dependency>
       <groupId>org.powermock</groupId>
