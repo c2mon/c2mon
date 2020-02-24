@@ -1,7 +1,9 @@
 package cern.c2mon.server.config;
 
+import cern.c2mon.cache.actions.CacheActionsModuleRef;
 import cern.c2mon.cache.actions.alarm.AlarmModule;
 import cern.c2mon.cache.config.CacheConfigModuleRef;
+import cern.c2mon.cache.impl.configuration.C2monIgniteConfiguration;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.cache.loading.config.CacheLoadingModuleRef;
 import cern.c2mon.server.cachepersistence.config.CachePersistenceModule;
@@ -26,20 +28,22 @@ import org.springframework.context.support.DefaultLifecycleProcessor;
  */
 @Configuration
 @Import({
-        CommonModule.class,
-        CacheConfigModuleRef.class,
-        CacheLoadingModuleRef.class,
-        CacheDbAccessModule.class,
-        CachePersistenceModule.class,
-        SupervisionModule.class,
-        DaqModule.class,
-        RuleModule.class,
-        ConfigurationModule.class,
-        ElasticsearchModule.class,
-        HistoryModule.class,
-        ClientModule.class,
-        AlarmModule.class,
-        CommandModule.class
+  CommonModule.class,
+  CacheActionsModuleRef.class,
+  CacheConfigModuleRef.class,
+  CacheLoadingModuleRef.class,
+  CacheDbAccessModule.class,
+  CachePersistenceModule.class,
+  C2monIgniteConfiguration.class,
+  SupervisionModule.class,
+  DaqModule.class,
+  RuleModule.class,
+  ConfigurationModule.class,
+  ElasticsearchModule.class,
+  HistoryModule.class,
+  ClientModule.class,
+  AlarmModule.class,
+  CommandModule.class
 })
 public class ModuleConfig {
 
