@@ -26,8 +26,6 @@ import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.tag.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.SmartLifecycle;
-import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.context.event.EventListener;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -106,17 +104,6 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
     this.oscillationUpdater = oscillationUpdater;
     this.alarmService = alarmService;
     this.dataTagCacheRef = dataTagCacheRef;
-  }
-
-
-  /**
-   * Initializes the clustered values
-   */
-  @EventListener
-  public void init(ContextRefreshedEvent event) {
-    log.trace("Initialising Alarm oscillation checker ...");
-    oscillationCheckService.setLastOscillationCheck(0);
-    log.trace("Initialisation complete.");
   }
 
   /**

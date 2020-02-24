@@ -4,6 +4,7 @@ import cern.c2mon.cache.actions.AbstractCacheServiceImpl;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.alarm.OscillationTimestamp;
 
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -21,6 +22,14 @@ public class OscillationService extends AbstractCacheServiceImpl<OscillationTime
   @Inject
   public OscillationService(C2monCache<OscillationTimestamp> lastAccessCache) {
     super(lastAccessCache, new OscillationC2monCacheFlow());
+  }
+
+  /**
+   * Initialize the cache with a value
+   */
+  @PostConstruct
+  public void init() {
+    setLastOscillationCheck(0);
   }
 
   public long getLastOscillationCheck() {

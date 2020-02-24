@@ -28,8 +28,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.SmartLifecycle;
-import org.springframework.stereotype.Component;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -46,7 +47,8 @@ import java.util.TimerTask;
  * @author Mark Brightwell
  */
 @Slf4j
-@Component
+@Named
+@Singleton
 public class HeartbeatManagerImpl implements HeartbeatManager, SmartLifecycle {
 
   /**
