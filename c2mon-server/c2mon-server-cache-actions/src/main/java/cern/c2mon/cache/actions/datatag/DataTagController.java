@@ -94,11 +94,7 @@ public class DataTagController {
     str.append(dataTagCacheObject.getId());
     str.append("\" name=\"");
     str.append(dataTagCacheObject.getName());
-//      if (dataTagCacheObject instanceof ControlTag) {
-//        str.append("\" control=\"true\">\n");
-//      } else {
-//        str.append("\" control=\"false\">\n");
-//      }
+    str.append("\" control=\"false\">\n");
 
     // <mode> ... </mode>
     if (!dataTagCacheObject.isInOperation()) {
