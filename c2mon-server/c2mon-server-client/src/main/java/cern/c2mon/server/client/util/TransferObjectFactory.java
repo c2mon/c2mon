@@ -23,6 +23,7 @@ import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.device.Device;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.rule.RuleTag;
+import cern.c2mon.server.common.tag.InfoTag;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.client.alarm.AlarmValueImpl;
 import cern.c2mon.shared.client.device.DeviceClassNameResponse;
@@ -192,17 +193,29 @@ public abstract class TransferObjectFactory {
     if (tag != null) {
 
       tagConfig = new TagConfigImpl(tag.getId());
-      tagConfig.setAlarmIds(new ArrayList<Long>(tag.getAlarmIds()));
+      tagConfig.setAlarmIds(new ArrayList<>(tag.getAlarmIds()));
 
-      Boolean controlTag = Boolean.FALSE;
-      if (tag instanceof ControlTag) {
-        controlTag = Boolean.TRUE;
+      tagConfig.setControlTag(tag instanceof ControlTag);
+
+      if (tag instanceof InfoTag) {
+        InfoTag infoTag = (InfoTag) tag;
+
+        if (infoTag.getAddress() != null) {
+
+          tagConfig.setValueDeadbandType(infoTag.getAddress().getValueDeadbandType());
+          tagConfig.setValueDeadband(infoTag.getAddress().getValueDeadband());
+          tagConfig.setTimeDeadband(infoTag.getAddress().getTimeDeadband());
+          tagConfig.setGuaranteedDelivery(infoTag.getAddress().isGuaranteedDelivery());
+          tagConfig.setPriority(infoTag.getAddress().getPriority());
+          tagConfig.setAddressParameters(infoTag.getAddress().getAddressParameters());
+          if(infoTag.getAddress().getHardwareAddress() != null){
+            tagConfig.setHardwareAddress(infoTag.getAddress().getHardwareAddress().toConfigXML());
+          }
+        }
       }
-      tagConfig.setControlTag(controlTag);
 
-      if (tag instanceof DataTag || tag instanceof ControlTag) {
+      if (tag instanceof DataTag) {
         DataTag dataTag = (DataTag) tag;
-
         // check if min. value is defined, since it is not mandatory
         if (dataTag.getMinValue() != null)
           tagConfig.setMinValue(dataTag.getMinValue().toString());
@@ -210,19 +223,6 @@ public abstract class TransferObjectFactory {
         // check if max. value is defined, since it is not mandatory
         if (dataTag.getMaxValue() != null)
           tagConfig.setMaxValue(dataTag.getMaxValue().toString());
-
-        if (dataTag.getAddress() != null) {
-
-          tagConfig.setValueDeadbandType(dataTag.getAddress().getValueDeadbandType());
-          tagConfig.setValueDeadband(dataTag.getAddress().getValueDeadband());
-          tagConfig.setTimeDeadband(dataTag.getAddress().getTimeDeadband());
-          tagConfig.setGuaranteedDelivery(dataTag.getAddress().isGuaranteedDelivery());
-          tagConfig.setPriority(dataTag.getAddress().getPriority());
-          tagConfig.setAddressParameters(dataTag.getAddress().getAddressParameters());
-          if(dataTag.getAddress().getHardwareAddress() != null){
-            tagConfig.setHardwareAddress(dataTag.getAddress().getHardwareAddress().toConfigXML());
-          }
-        }
       }
 
       if (tag instanceof RuleTag) {
