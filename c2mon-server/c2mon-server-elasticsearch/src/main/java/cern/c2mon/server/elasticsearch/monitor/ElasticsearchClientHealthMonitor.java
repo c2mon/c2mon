@@ -16,14 +16,14 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch.monitor;
 
+import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
+import cern.c2mon.server.elasticsearch.client.ElasticsearchClientConfiguration;
+import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
-import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
-import cern.c2mon.server.elasticsearch.client.ElasticsearchClientConfiguration;
 
 /**
  * Performs period checks of configured ES client health
@@ -37,19 +37,23 @@ public class ElasticsearchClientHealthMonitor {
 
   private final ElasticsearchClient client;
 
+  private final ElasticsearchProperties properties;
+
   /**
    * Constructs ES client health monitor
    *
    * @param client to be monitored
+   * @param properties the properties, to check if enabled
    */
   @Autowired
-  public ElasticsearchClientHealthMonitor(ElasticsearchClient client) {
+  public ElasticsearchClientHealthMonitor(ElasticsearchClient client, ElasticsearchProperties properties) {
     this.client = client;
+    this.properties = properties;
   }
 
   @Scheduled(fixedRate = 10000, initialDelay = ElasticsearchClientConfiguration.CLIENT_SETUP_TIMEOUT)
   private void check() {
-    if (!client.isClientHealthy()) {
+    if (properties.isEnabled() && !client.isClientHealthy()) {
       log.warn("ES client is not healthy! Setting up a new client . . .");
       client.setup();
       log.info("New ES client set up completed.");
