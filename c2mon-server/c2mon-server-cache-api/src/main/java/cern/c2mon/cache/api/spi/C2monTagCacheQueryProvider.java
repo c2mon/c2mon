@@ -74,7 +74,6 @@ public interface C2monTagCacheQueryProvider {
    * @return All tags where the tag name is matching the regular expression.
    * Please note, that the result is limited to 100'000 in order to avoid a
    * OutOfMemory exception!
-   * @see net.sf.ehcache.search.expression.ILike
    * @see #get(String)
    */
   Collection<Tag> findByNameWildcard(String regex);
