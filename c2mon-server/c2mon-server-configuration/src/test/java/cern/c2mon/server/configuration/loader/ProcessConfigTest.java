@@ -12,6 +12,7 @@ import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.process.ProcessCacheObject;
+import cern.c2mon.server.common.supervision.SupervisionStateTag;
 import cern.c2mon.server.configuration.impl.ConfigurationLoaderImpl;
 import cern.c2mon.server.configuration.parser.util.ConfigurationProcessUtil;
 import cern.c2mon.server.configuration.util.TestConfigurationProvider;
@@ -38,6 +39,8 @@ public class ProcessConfigTest extends ConfigurationCacheLoaderTest<Process> {
   @Inject private C2monCache<AliveTag> aliveTimerCache;
 
   @Inject private C2monCache<CommFaultTag> commFaultTagCache;
+
+  @Inject private C2monCache<SupervisionStateTag> stateTagCache;
 
   @Inject private C2monCache<DataTag> dataTagCache;
 
@@ -77,6 +80,22 @@ public class ProcessConfigTest extends ConfigurationCacheLoaderTest<Process> {
     ProcessCacheObject expectedObjectProcess = cacheObjectFactory.buildProcessCacheObject(1L, process);
 
     assertEquals(expectedObjectProcess, processCache.get(1L));
+  }
+
+  @Test
+  public void createSimpleProcess() {
+    cern.c2mon.shared.client.configuration.api.process.Process simpleProcess =
+      cern.c2mon.shared.client.configuration.api.process.Process.create("P_TEST").build();
+
+    Configuration configuration = new Configuration();
+    configuration.addEntity(simpleProcess);
+
+    configurationLoader.applyConfiguration(configuration);
+
+    // Disable if flaky
+    assertTrue(processCache.containsKey(10000L));
+    // Autocreated control tags
+    assertTrue(aliveTimerCache.containsKey(1000000L));
   }
 
 

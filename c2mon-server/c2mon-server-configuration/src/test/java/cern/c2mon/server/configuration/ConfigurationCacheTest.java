@@ -13,7 +13,7 @@ import cern.c2mon.server.daq.config.DaqModule;
 import cern.c2mon.server.daq.update.JmsContainerManagerImpl;
 import cern.c2mon.server.rule.config.RuleModule;
 import cern.c2mon.server.supervision.config.SupervisionModule;
-import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.Timeout;
 import org.junit.runner.RunWith;
@@ -46,7 +46,7 @@ public abstract class ConfigurationCacheTest {
   @Inject
   protected JmsContainerManagerImpl jmsContainerManager;
 
-  @After
+  @Before
   public void cleanUp() {
     // Make sure the JmsContainerManager is stopped, otherwise the
     // DefaultMessageListenerContainers inside will keep trying to connect to
