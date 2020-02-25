@@ -19,15 +19,16 @@ package cern.c2mon.server.cache.loading.impl;
 
 import cern.c2mon.server.cache.dbaccess.SequenceMapper;
 import cern.c2mon.server.cache.loading.SequenceDAO;
-import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 /**
  * @author Franz Ritter
  */
-//TODO: refer a name
-@Service("sequenceDAORef")
+@Named
+@Singleton
 public class SequenceDAOImpl implements SequenceDAO {
 
   private SequenceMapper sequenceMapper;
@@ -38,6 +39,12 @@ public class SequenceDAOImpl implements SequenceDAO {
   }
 
 
+  /**
+   * There is a bug that manifests mainly in Kubernetes: If the server connects
+   * to the database before it is fully initialized, this statement is unbound
+   * and MyBatis fails to execute this. To tackle this, ensure the server only
+   * connects to the database once it is fully initialized
+   */
   @Override
   public Long getNextConfigId() {
     return sequenceMapper.getNextConfigId();

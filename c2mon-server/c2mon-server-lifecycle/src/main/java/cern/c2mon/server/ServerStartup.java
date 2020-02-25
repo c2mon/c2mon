@@ -24,8 +24,6 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerA
 import org.springframework.boot.autoconfigure.jms.JmsAutoConfiguration;
 import org.springframework.boot.autoconfigure.jms.activemq.ActiveMQAutoConfiguration;
 
-import java.io.IOException;
-
 /**
  * This class is responsible for bootstrapping the C2MON application server.
  *
@@ -46,7 +44,7 @@ import java.io.IOException;
 @Slf4j
 public class ServerStartup {
 
-  public static void main(final String[] args) throws IOException {
+  public static void main(final String[] args) {
     SpringApplication.run(ServerStartup.class, args);
 
     log.info("C2MON server is now initialised");
