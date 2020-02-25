@@ -19,7 +19,8 @@ spec:
         envFrom:
           - configMapRef:
               name: c2mon-server-properties
-        image: cern/c2mon:1.9.3-SNAPSHOT
+        image: cern/c2mon:experimental-cache-1.9.3-SNAPSHOT
+        imagePullPolicy: Always
       restartPolicy: Always
 ---
 apiVersion: v1
