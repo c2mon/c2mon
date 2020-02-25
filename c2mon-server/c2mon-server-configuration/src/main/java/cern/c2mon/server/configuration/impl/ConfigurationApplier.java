@@ -123,7 +123,7 @@ final class ConfigurationApplier {
       configurationDAO.markAsApplied(configId);
     }
 
-    log.info("Finished applying configuraton " + configId);
+    log.info("Finished applying configuration " + configId);
 
     report.normalize();
 
