@@ -118,7 +118,7 @@ public class CacheCollection<T extends Cacheable> {
   public void registerBufferedListener(BufferedCacheListener<T> listener, CacheEvent... events) {
     caches.forEach(cache ->
       cache.getCacheListenerManager()
-        .registerBufferedListener(tags -> listener.apply((List<T>) tags), events)
+        .registerBufferedListener(tags -> listener.apply((Set<T>) tags), events)
     );
   }
 

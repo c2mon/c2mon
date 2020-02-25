@@ -2,16 +2,15 @@ package cern.c2mon.cache.api.listener;
 
 import cern.c2mon.shared.common.Cacheable;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 
 final class BufferedCacheListenerImpl<CACHEABLE extends Cacheable> implements CacheListener<CACHEABLE>, Runnable {
 
-  private static final int DEFAULT_MAX_SIZE = 100_000;
-  //  TODO (Alex) This could be a set, to eliminate duplicates
-  private final List<CACHEABLE> items = Collections.synchronizedList(new ArrayList<>());
+  private static final int DEFAULT_MAX_SIZE = 10_000;
+  private final Set<CACHEABLE> items = ConcurrentHashMap.newKeySet();
   private final ExecutorService centralizedExecutorService;
   private BufferedCacheListener<CACHEABLE> eventHandler;
 
@@ -41,10 +40,11 @@ final class BufferedCacheListenerImpl<CACHEABLE extends Cacheable> implements Ca
   public final void run() {
     if (items.isEmpty())
       return;
-    List<CACHEABLE> copyList = new ArrayList<>(items);
+
+    Set<CACHEABLE> itemsCopy = new HashSet<>(items);
     // We're not doing a clear here, as other items may have joined the list
     // This relies on our Cacheables having a proper equals implementation!
-    items.removeAll(copyList);
-    eventHandler.apply(copyList);
+    items.removeAll(itemsCopy);
+    eventHandler.apply(itemsCopy);
   }
 }
