@@ -1,0 +1,60 @@
+# === Service Account ===
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ignite
+  namespace: env-1
+---
+# === Cluster Role Declaration ===
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: ignite
+rules:
+  - apiGroups:
+      - ""
+    resources: # Here are resources you can access
+      - pods
+      - endpoints
+    verbs: # That is what you can do with them
+      - get
+      - list
+      - watch
+---
+# === Cluster Role Binding ===
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: ignite
+roleRef:
+  kind: ClusterRole
+  name: ignite
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+  - kind: ServiceAccount
+    name: ignite
+    namespace: env-1
+---
+apiVersion: v1
+kind: Service
+metadata:
+  # Name of Ignite Service used by Kubernetes IP finder for IP addresses lookup.
+  name: ignite
+spec:
+  type: LoadBalancer
+  ports:
+    - name: rest
+      port: 8080
+      targetPort: 8080
+    - name: sql
+      port: 10800
+      targetPort: 10800
+    - name: thinclients
+      port: 10900
+      targetPort: 10900
+  # Optional - remove 'sessionAffinity' property if the Ignite cluster
+  # and applications deployed within Kubernetes
+  #  sessionAffinity: ClientIP
+  selector:
+    # Must be equal to the label set for Ignite pods.
+    app: ignite

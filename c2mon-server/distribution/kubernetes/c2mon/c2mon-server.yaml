@@ -21,11 +21,19 @@ spec:
           imagePullPolicy: IfNotPresent
       containers:
       - name: c2mon-server
+        ports:
+          - containerPort: 11211 # REST port number.
+          - containerPort: 47100 # communication SPI port number.
+          - containerPort: 47500 # discovery SPI port number.
+          - containerPort: 49112 # JMX port number.
+          - containerPort: 10800 # SQL port number.
+          - containerPort: 10900 # Thin clients port number.
         envFrom:
           - configMapRef:
               name: c2mon-server-properties
         image: cern/c2mon:experimental-cache-1.9.3-SNAPSHOT
         imagePullPolicy: Always
+      serviceAccountName: ignite
       restartPolicy: Always
 ---
 apiVersion: v1

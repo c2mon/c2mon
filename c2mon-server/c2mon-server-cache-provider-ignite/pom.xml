@@ -29,6 +29,11 @@
     </dependency>
     <dependency>
       <groupId>org.apache.ignite</groupId>
+      <artifactId>ignite-kubernetes</artifactId>
+      <version>${ignite.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.ignite</groupId>
       <artifactId>ignite-spring</artifactId>
       <version>${ignite.version}</version>
     </dependency>

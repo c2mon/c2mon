@@ -2,6 +2,7 @@ resources:
   - activemq.yaml
   - c2mon-server.yaml
   - daq.yaml
+  - igniteConfig.yaml
 generatorOptions:
   disableNameSuffixHash: true
 configMapGenerator:
