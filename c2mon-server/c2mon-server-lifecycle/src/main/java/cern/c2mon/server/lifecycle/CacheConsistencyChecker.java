@@ -127,7 +127,7 @@ public class CacheConsistencyChecker implements SmartLifecycle {
         int dbSize = mapper.getNumberItems();
 
         if (cacheSize != dbSize) {
-          messages.add(cache.getClass().getSimpleName() + " consistency check failed (cache size: " + cacheSize + ", DB size: " + dbSize + ")");
+          messages.add(cache.getName() + " consistency check failed (cache size: " + cacheSize + ", DB size: " + dbSize + ")");
         }
       }
 
