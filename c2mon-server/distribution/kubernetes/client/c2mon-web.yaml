@@ -14,6 +14,11 @@ spec:
       labels:
         type: c2mon-web
     spec:
+      initContainers:
+        - name: wait-for-db
+          image: busybox:1.31.0
+          command: ['sh', '-c', 'sleep 30']
+          imagePullPolicy: IfNotPresent
       containers:
       - envFrom:
           - configMapRef:

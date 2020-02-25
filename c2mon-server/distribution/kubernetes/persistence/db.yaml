@@ -16,10 +16,11 @@ spec:
       - env:
         - name: MYSQL_ALLOW_EMPTY_PASSWORD
           value: "yes"
-        image: cern/c2mon-ext:mysql-5.7.15-c2mon-1.9.0
+        image: cern/c2mon-ext:mysql-5.7.15-c2mon-1.9.3-SNAPSHOT
         name: db
         ports:
         - containerPort: 3306
+        imagePullPolicy: Always
       restartPolicy: Always
 ---
 apiVersion: v1
