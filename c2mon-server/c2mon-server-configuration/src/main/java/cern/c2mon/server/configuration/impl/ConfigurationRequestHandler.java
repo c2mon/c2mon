@@ -58,17 +58,29 @@ public class ConfigurationRequestHandler implements SessionAwareMessageListener<
   /**
    * Reference to the configuration loader.
    */
+  private final ConfigurationLoader configurationLoader;
+
+  /** Jackson deserialzer */
+  private final ObjectMapper mapper;
+
   @Autowired
-  private ConfigurationLoader configurationLoader;
+  public ConfigurationRequestHandler(ConfigurationLoader configurationLoader) {
+    this.configurationLoader = configurationLoader;
+    this.mapper = createJacksonDeserializer();
+  }
+
+  private ObjectMapper createJacksonDeserializer() {
+    ObjectMapper newMapper = new ObjectMapper();
+    SimpleModule module = new SimpleModule();
+    module.addDeserializer(HardwareAddress.class, new HardwareAddressDeserializer());
+    newMapper.registerModule(module);
+    newMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+
+    return newMapper;
+  }
 
   @Override
   public void onMessage(Message message, Session session) throws JMSException {
-    ObjectMapper mapper = new ObjectMapper();
-    SimpleModule module = new SimpleModule();
-    module.addDeserializer(HardwareAddress.class, new HardwareAddressDeserializer());
-    mapper.registerModule(module);
-    mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-
     ConfigurationReport configurationReport;
     try {
       String configJson = TextMessage.class.cast(message).getText();

@@ -25,6 +25,7 @@ import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.apache.commons.lang.ArrayUtils;
 import org.w3c.dom.Element;
@@ -88,6 +89,7 @@ public abstract class AlarmCondition implements Serializable {
    * This method should be overwritten by every alarm condition Class
    * @return A human readable description of the condition
    */
+  @JsonIgnore
   public String getDescription() {
     return EMPTY_STRING;
   }
@@ -95,6 +97,7 @@ public abstract class AlarmCondition implements Serializable {
   /**
    * @return a representation of the condition class as XML format
    */
+  @JsonIgnore
   public final String getXMLCondition() {
     return this.toConfigXML();
   }
