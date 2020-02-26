@@ -8,9 +8,6 @@ import org.junit.Test;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -23,11 +20,8 @@ public class BufferCacheListenerSchedulerTest {
 
   private AtomicReference<Consumer<Set<DataTag>>> expectations = new AtomicReference<>();
 
-  private ExecutorService executorService = Executors.newScheduledThreadPool(1);
-
-  private BufferedCacheListenerImpl<DataTag> bufferedCacheListener = new BufferedCacheListenerImpl<>(
-    executorService,
-    cacheables -> expectations.get().accept(cacheables)
+  private BatchCacheListener<DataTag> bufferedCacheListener = new BatchCacheListener<>(
+    results -> expectations.get().accept(results)
   );
 
   @Test
@@ -43,8 +37,8 @@ public class BufferCacheListenerSchedulerTest {
       assertEquals(MAX_OVERFLOW, sortedResults.size());
     });
 
-    executorService.shutdown();
-    executorService.awaitTermination(1, TimeUnit.SECONDS);
+    Thread.sleep(100);
+
     bufferedCacheListener.run();
   }
 }

@@ -115,10 +115,10 @@ public class CacheCollection<T extends Cacheable> {
    * @param listener the buffered listener to register
    * @param events   the events to listen to
    */
-  public void registerBufferedListener(BatchConsumer<T> listener, CacheEvent... events) {
+  public void registerBufferedListener(BatchConsumer<T> listener, CacheEvent baseEvent, CacheEvent... events) {
     caches.forEach(cache ->
       cache.getCacheListenerManager()
-        .registerBufferedListener(tags -> listener.apply((Set<T>) tags), events)
+        .registerBufferedListener(tags -> listener.apply((Set<T>) tags), baseEvent, events)
     );
   }
 

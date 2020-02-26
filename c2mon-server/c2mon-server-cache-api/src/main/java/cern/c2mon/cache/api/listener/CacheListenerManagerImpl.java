@@ -5,16 +5,15 @@ import cern.c2mon.shared.common.Cacheable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
 
 /**
- * A base implementation of {@link CacheListener} that uses an {@link ExecutorService} to manage incoming events
- * <p>
- * Will attempt to shut down cleanly if possible. As soon as a shutdown signal {@link CacheListenerManagerImpl#close()}
- * is received, new incoming events will be rejected.
+ * Implements a {@link CacheListener} that uses an {@link ExecutorService} to manage incoming events
  * <p>
  * Thread safety of this class:
  * <ul>
@@ -27,45 +26,48 @@ import java.util.concurrent.*;
  * <p>
  * The buffered event handler will be run during a fixed period (by default 10 seconds), or when the pending
  * updates exceed the maximum limit specified (default 100.000)
+ * <p>
+ * Will attempt to shut down cleanly if possible. As soon as a shutdown signal {@link CacheListenerManagerImpl#close()}
+ * is received, new incoming events will be rejected.
  *
  * @param <CACHEABLE> the type of objects received during events.
  * @author Alexandros Papageorgiou Koufidis
  */
 public class CacheListenerManagerImpl<CACHEABLE extends Cacheable> implements CacheListenerManager<CACHEABLE> {
   private static final Logger log = LoggerFactory.getLogger(CacheListenerManager.class);
-  private static final long DEFAULT_SHUTDOWN_WAIT = 1;
-  private static final TimeUnit DEFAULT_SHUTDOWN_WAIT_UNITS = TimeUnit.SECONDS;
-  private static final int DEFAULT_CONCURRENCY = 1000;
-  private static final long DEFAULT_PERIOD = 1000;
 
   private final ExecutorService centralizedExecutorService;
-  private final ScheduledExecutorService scheduledExecutorService;
+  //
+  private final CacheListenerProperties cacheListenerProperties;
 
   // Is and should remain concurrent both in the map level and the set level!
   private final Map<CacheEvent, Set<CacheListener<? super CACHEABLE>>> eventListeners;
 
   public CacheListenerManagerImpl() {
-    this(DEFAULT_CONCURRENCY, DEFAULT_PERIOD);
-  }
-
-  public CacheListenerManagerImpl(int concurrency, long schedulingPeriod) {
+    cacheListenerProperties = new CacheListenerProperties();
     eventListeners = new ConcurrentHashMap<>();
     // Initialize each list using a "ConcurrentSet"
     for (CacheEvent event : CacheEvent.values()) {
-      eventListeners.put(event, Collections.newSetFromMap(new ConcurrentHashMap<>()));
+      eventListeners.put(event, ConcurrentHashMap.newKeySet());
     }
-    centralizedExecutorService = Executors.newFixedThreadPool(concurrency);
-    scheduledExecutorService = Executors.newScheduledThreadPool(2);
+    centralizedExecutorService = Executors.newFixedThreadPool(cacheListenerProperties.getConcurrency());
   }
 
   @Override
   public void notifyListenersOf(CacheEvent event, CACHEABLE source) {
-    eventListeners.get(event) // TODO (Alex) Do we want this many clones?
+    if (!cacheListenerProperties.isEnabled()) {
+      log.debug("Dropping update received as cache listeners are disabled");
+      return;
+    }
+
+    eventListeners.get(event)
       .forEach(listener -> {
         try {
+          // The clones here may end up bottlenecking, though I doubt it. Keep an eye on them though
           centralizedExecutorService.submit(() -> listener.apply((CACHEABLE) source.clone()));
         } catch (RejectedExecutionException rejected) {
-          log.info("Rejected execution of {} #{} for source event {}", source.getClass(), source.getId(), event);
+          log.info("Rejected execution of {} #{} for source event {}. Details: {}",
+            source.getClass(), source.getId(), event, rejected);
         }
       });
   }
@@ -79,20 +81,17 @@ public class CacheListenerManagerImpl<CACHEABLE extends Cacheable> implements Ca
   }
 
   @Override
-  public void registerBufferedListener(BufferedCacheListenerImpl<CACHEABLE> listener, CacheEvent... events) {
-//    BufferedCacheListenerImpl<CACHEABLE> runnableListener = new BufferedCacheListenerImpl<>(scheduledExecutorService, listener);
-
-    // By adding to the normal event listener list, we get the items in the buffered listener list
-    for (CacheEvent cacheEvent : events) {
-      eventListeners.get(cacheEvent).add(listener);
-    }
-
-    scheduledExecutorService.scheduleAtFixedRate(listener, 0, DEFAULT_PERIOD, TimeUnit.MILLISECONDS);
+  public void registerBufferedListener(BatchConsumer<CACHEABLE> listener, CacheEvent baseEvent, CacheEvent... events) {
+    registerBufferedListener(new BatchCacheListener<>(listener), baseEvent, events);
   }
 
   @Override
-  public void registerBufferedListener(BatchConsumer<CACHEABLE> listener, CacheEvent... events) {
-    registerBufferedListener(new BufferedCacheListenerImpl<>(scheduledExecutorService, listener));
+  public void registerBufferedListener(BatchCacheListener<CACHEABLE> listener, CacheEvent baseEvent, CacheEvent... events) {
+    // By adding to the normal event listener list, we get the items in the buffered listener list
+    eventListeners.get(baseEvent).add(listener);
+    for (CacheEvent cacheEvent : events) {
+      eventListeners.get(cacheEvent).add(listener);
+    }
   }
 
   /**
@@ -106,11 +105,9 @@ public class CacheListenerManagerImpl<CACHEABLE extends Cacheable> implements Ca
       // TODO (Alex) Process pending items?
 
       // Give the executor a chance to exit gracefully
-      scheduledExecutorService.shutdown();
       centralizedExecutorService.shutdown();
 
-      scheduledExecutorService.awaitTermination(DEFAULT_SHUTDOWN_WAIT, DEFAULT_SHUTDOWN_WAIT_UNITS);
-      centralizedExecutorService.awaitTermination(DEFAULT_SHUTDOWN_WAIT, DEFAULT_SHUTDOWN_WAIT_UNITS);
+      centralizedExecutorService.awaitTermination(cacheListenerProperties.getShutdownWait(), cacheListenerProperties.getShutdownWaitUnits());
     } catch (InterruptedException e) {
       log.warn("Executor service interrupted while shutting down", e);
     }

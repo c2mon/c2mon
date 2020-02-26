@@ -16,12 +16,10 @@ import java.util.stream.LongStream;
 import static org.junit.Assert.assertEquals;
 
 public class BufferCacheListenerTest {
-
-  public static final int DEFAULT_MAX_LISTENER_SIZE = 10_000;
+  public static final int DEFAULT_MAX_LISTENER_SIZE = new CacheListenerProperties().getBatchSize();
   private AtomicReference<Consumer<Set<DataTag>>> expectations = new AtomicReference<>();
 
-  private BufferedCacheListenerImpl<DataTag> bufferedCacheListener = new BufferedCacheListenerImpl<>(
-    null,
+  private BatchCacheListener<DataTag> bufferedCacheListener = new BatchCacheListener<>(
     cacheables -> expectations.get().accept(cacheables)
   );
 
