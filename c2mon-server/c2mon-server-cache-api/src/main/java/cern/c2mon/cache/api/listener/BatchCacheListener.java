@@ -4,7 +4,6 @@ import cern.c2mon.shared.common.Cacheable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.Closeable;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.*;
@@ -22,7 +21,7 @@ import java.util.concurrent.*;
  *
  * @param <CACHEABLE> the type of {@link Cacheable}s handled by this listener
  */
-final class BatchCacheListener<CACHEABLE extends Cacheable> implements CacheListener<CACHEABLE>, Runnable, Closeable {
+final class BatchCacheListener<CACHEABLE extends Cacheable> implements CacheListener<CACHEABLE>, Runnable {
   private static final Logger log = LoggerFactory.getLogger(BatchCacheListener.class);
   /**
    * Executor for *emergency* offloading tasks when the primary one is full
@@ -90,22 +89,5 @@ final class BatchCacheListener<CACHEABLE extends Cacheable> implements CacheList
     // This relies on our Cacheables having a proper equals implementation!
     items.removeAll(itemsCopy);
     eventHandler.apply(itemsCopy);
-  }
-
-  @Override
-  public void close() {
-    try {
-      // Give the executor a chance to exit gracefully
-      scheduledExecutorService.shutdown();
-
-      if (!overflowTaskExecutor.isShutdown()) {
-        overflowTaskExecutor.shutdown();
-      }
-
-      overflowTaskExecutor.awaitTermination(properties.getShutdownWait(), properties.getShutdownWaitUnits());
-      scheduledExecutorService.awaitTermination(properties.getShutdownWait(), properties.getShutdownWaitUnits());
-    } catch (InterruptedException e) {
-      log.warn("Executor service interrupted while shutting down", e);
-    }
   }
 }

@@ -10,8 +10,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static cern.c2mon.server.common.util.KotlinAPIs.apply;
+import static org.junit.Assert.*;
 
 public class CacheListenerManagerTest {
   private static final AtomicInteger eventCounter = new AtomicInteger(0);
@@ -53,14 +53,15 @@ public class CacheListenerManagerTest {
   public void registeredBufferListener() throws InterruptedException {
     CountDownLatch latch = new CountDownLatch(1);
 
-    BatchConsumer<Alarm> alarmBufferedCacheListener = alarms ->
-      alarms.forEach( __ -> latch.countDown() );
+    BatchCacheListener<Alarm> alarmBufferedCacheListener = new BatchCacheListener<>(
+      alarms -> alarms.forEach( __ -> latch.countDown()),
+      apply(new CacheListenerProperties(), p -> p.setBatchSchedulePeriodMillis(100))
+    );
 
-    cacheListenerManager.registerBufferedListener(alarmBufferedCacheListener, CacheEvent.UPDATE_ACCEPTED);
+    cacheListenerManager.registerBatchListener(alarmBufferedCacheListener, CacheEvent.UPDATE_ACCEPTED);
 
     cacheListenerManager.notifyListenersOf(CacheEvent.UPDATE_ACCEPTED, sample);
-    latch.await(1100, TimeUnit.MILLISECONDS);
-    cacheListenerManager.close();
+    assertTrue(latch.await(200, TimeUnit.MILLISECONDS));
   }
 
   @Test

@@ -81,12 +81,12 @@ public class CacheListenerManagerImpl<CACHEABLE extends Cacheable> implements Ca
   }
 
   @Override
-  public void registerBufferedListener(BatchConsumer<CACHEABLE> listener, CacheEvent baseEvent, CacheEvent... events) {
-    registerBufferedListener(new BatchCacheListener<>(listener), baseEvent, events);
+  public void registerBatchListener(BatchConsumer<CACHEABLE> listener, CacheEvent baseEvent, CacheEvent... events) {
+    registerBatchListener(new BatchCacheListener<>(listener), baseEvent, events);
   }
 
   @Override
-  public void registerBufferedListener(BatchCacheListener<CACHEABLE> listener, CacheEvent baseEvent, CacheEvent... events) {
+  public void registerBatchListener(BatchCacheListener<CACHEABLE> listener, CacheEvent baseEvent, CacheEvent... events) {
     // By adding to the normal event listener list, we get the items in the buffered listener list
     eventListeners.get(baseEvent).add(listener);
     for (CacheEvent cacheEvent : events) {

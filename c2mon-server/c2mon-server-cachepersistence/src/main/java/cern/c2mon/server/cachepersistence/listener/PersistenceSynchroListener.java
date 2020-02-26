@@ -16,12 +16,12 @@
  *****************************************************************************/
 package cern.c2mon.server.cachepersistence.listener;
 
-import cern.c2mon.cache.api.listener.BufferedCacheListener;
+import cern.c2mon.cache.api.listener.BatchConsumer;
 import cern.c2mon.server.cachepersistence.common.BatchPersistenceManager;
 import cern.c2mon.shared.common.Cacheable;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
  * @author Mark Brightwell
  */
 @Slf4j
-public class PersistenceSynchroListener<CACHEABLE extends Cacheable> implements BufferedCacheListener<CACHEABLE> {
+public class PersistenceSynchroListener<CACHEABLE extends Cacheable> implements BatchConsumer<CACHEABLE> {
 
   /**
    * The DAQ used to persist the Collection to
@@ -56,7 +56,7 @@ public class PersistenceSynchroListener<CACHEABLE extends Cacheable> implements 
   }
 
   @Override
-  public void apply(List<CACHEABLE> cacheables) {
+  public void apply(Set<CACHEABLE> cacheables) {
     persistenceManager.persistList(cacheables.stream().map(Cacheable::getId).collect(Collectors.toList()));
   }
 }

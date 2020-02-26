@@ -51,10 +51,10 @@ public interface CacheListenerManager<CACHEABLE extends Cacheable> extends Close
    *
    * This is the simpler lambda based constructor.
    *
-   * @see CacheListenerManager#registerBufferedListener(BatchCacheListener, CacheEvent, CacheEvent...)
+   * @see CacheListenerManager#registerBatchListener(BatchCacheListener, CacheEvent, CacheEvent...)
    *      If you need more customization over the listener, such as parameterized scheduling
    */
-  void registerBufferedListener(BatchConsumer<CACHEABLE> listener, CacheEvent requiredEvent, CacheEvent... events);
+  void registerBatchListener(BatchConsumer<CACHEABLE> listener, CacheEvent requiredEvent, CacheEvent... events);
 
   /**
    * An alternative cache listener, that collects all incoming updates to a list, then periodically runs an event handler
@@ -63,7 +63,7 @@ public interface CacheListenerManager<CACHEABLE extends Cacheable> extends Close
    * Use buffered listeners to increase performance for very busy caches with loads of updates,
    * or for operations optimized for {@code Collection}s
    */
-  void registerBufferedListener(BatchCacheListener<CACHEABLE> listener, CacheEvent requiredEvent, CacheEvent... events);
+  void registerBatchListener(BatchCacheListener<CACHEABLE> listener, CacheEvent requiredEvent, CacheEvent... events);
 
   /**
    * Stops accepting any future events and terminates the underlying pool
