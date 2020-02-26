@@ -79,15 +79,20 @@ public class CacheListenerManagerImpl<CACHEABLE extends Cacheable> implements Ca
   }
 
   @Override
-  public void registerBufferedListener(BufferedCacheListener<CACHEABLE> listener, CacheEvent... events) {
-    BufferedCacheListenerImpl<CACHEABLE> runnableListener = new BufferedCacheListenerImpl<>(scheduledExecutorService, listener);
+  public void registerBufferedListener(BufferedCacheListenerImpl<CACHEABLE> listener, CacheEvent... events) {
+//    BufferedCacheListenerImpl<CACHEABLE> runnableListener = new BufferedCacheListenerImpl<>(scheduledExecutorService, listener);
 
     // By adding to the normal event listener list, we get the items in the buffered listener list
     for (CacheEvent cacheEvent : events) {
-      eventListeners.get(cacheEvent).add(runnableListener);
+      eventListeners.get(cacheEvent).add(listener);
     }
 
-    scheduledExecutorService.scheduleAtFixedRate(runnableListener, 0, DEFAULT_PERIOD, TimeUnit.MILLISECONDS);
+    scheduledExecutorService.scheduleAtFixedRate(listener, 0, DEFAULT_PERIOD, TimeUnit.MILLISECONDS);
+  }
+
+  @Override
+  public void registerBufferedListener(BatchConsumer<CACHEABLE> listener, CacheEvent... events) {
+    registerBufferedListener(new BufferedCacheListenerImpl<>(scheduledExecutorService, listener));
   }
 
   /**

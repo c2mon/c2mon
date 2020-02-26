@@ -12,9 +12,9 @@ final class BufferedCacheListenerImpl<CACHEABLE extends Cacheable> implements Ca
   private static final int DEFAULT_MAX_SIZE = 10_000;
   private final Set<CACHEABLE> items = ConcurrentHashMap.newKeySet();
   private final ExecutorService centralizedExecutorService;
-  private BufferedCacheListener<CACHEABLE> eventHandler;
+  private BatchConsumer<CACHEABLE> eventHandler;
 
-  BufferedCacheListenerImpl(ExecutorService executorService, BufferedCacheListener<CACHEABLE> eventHandler) {
+  BufferedCacheListenerImpl(ExecutorService executorService, BatchConsumer<CACHEABLE> eventHandler) {
     this.centralizedExecutorService = executorService;
     this.eventHandler = eventHandler;
   }

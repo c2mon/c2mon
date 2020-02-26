@@ -16,7 +16,7 @@ import java.util.Set;
  * If between updates it collects a large amount of items (more than {@code BufferedCacheListenerImpl.DEFAULT_MAX_SIZE}),
  * it will create a task to handle those items proactively.
  */
-public interface BufferedCacheListener<CACHEABLE extends Cacheable> extends EventListener {
+public interface BatchConsumer<CACHEABLE extends Cacheable> extends EventListener {
 
   /**
    * @param cacheables the set of items sent to the listener so far, after

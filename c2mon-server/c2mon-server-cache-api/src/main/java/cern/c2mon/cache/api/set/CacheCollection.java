@@ -2,7 +2,7 @@ package cern.c2mon.cache.api.set;
 
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
-import cern.c2mon.cache.api.listener.BufferedCacheListener;
+import cern.c2mon.cache.api.listener.BatchConsumer;
 import cern.c2mon.cache.api.listener.CacheListener;
 import cern.c2mon.server.common.util.KotlinAPIs;
 import cern.c2mon.shared.common.CacheEvent;
@@ -115,7 +115,7 @@ public class CacheCollection<T extends Cacheable> {
    * @param listener the buffered listener to register
    * @param events   the events to listen to
    */
-  public void registerBufferedListener(BufferedCacheListener<T> listener, CacheEvent... events) {
+  public void registerBufferedListener(BatchConsumer<T> listener, CacheEvent... events) {
     caches.forEach(cache ->
       cache.getCacheListenerManager()
         .registerBufferedListener(tags -> listener.apply((Set<T>) tags), events)

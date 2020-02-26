@@ -1,14 +1,13 @@
-package cern.c2mon.cache.api;
+package cern.c2mon.cache.api.listener;
 
-import cern.c2mon.cache.api.listener.CacheListener;
-import cern.c2mon.cache.api.listener.CacheListenerManager;
-import cern.c2mon.cache.api.listener.CacheListenerManagerImpl;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.shared.common.CacheEvent;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.assertEquals;
@@ -51,6 +50,20 @@ public class CacheListenerManagerTest {
   }
 
   @Test
+  public void registeredBufferListener() throws InterruptedException {
+    CountDownLatch latch = new CountDownLatch(1);
+
+    BatchConsumer<Alarm> alarmBufferedCacheListener = alarms ->
+      alarms.forEach( __ -> latch.countDown() );
+
+    cacheListenerManager.registerBufferedListener(alarmBufferedCacheListener, CacheEvent.UPDATE_ACCEPTED);
+
+    cacheListenerManager.notifyListenersOf(CacheEvent.UPDATE_ACCEPTED, sample);
+    latch.await(1100, TimeUnit.MILLISECONDS);
+    cacheListenerManager.close();
+  }
+
+  @Test
   public void multipleEventsDontGetLost() {
     int repetitions = 100;
 
@@ -74,4 +87,6 @@ public class CacheListenerManagerTest {
 
     cacheListenerManager.close();
   }
+
+
 }
