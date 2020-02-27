@@ -32,24 +32,23 @@ public class AlarmService extends AbstractCacheServiceImpl<Alarm> implements Ala
 
   private List<AlarmAggregatorListener> alarmUpdateObservable = new ArrayList<>();
 
-  private TagCacheCollection unifiedTagCacheFacade;
+  private TagCacheCollection tagCacheCollection;
 
   private OscillationUpdater oscillationUpdater;
 
   @Inject
-  public AlarmService(final C2monCache<Alarm> cache, final TagCacheCollection unifiedTagCacheFacade,
+  public AlarmService(final C2monCache<Alarm> cache, final TagCacheCollection tagCacheCollection,
                       final OscillationUpdater oscillationUpdater) {
     super(cache, new AlarmCacheFlow());
     // TODO (Alex) We probably want to increase the number of threads in the CacheListenerManager here
-    this.unifiedTagCacheFacade = unifiedTagCacheFacade;
+    this.tagCacheCollection = tagCacheCollection;
     this.oscillationUpdater = oscillationUpdater;
   }
 
   @PostConstruct
   public void init() {
-//    TODO (Alex) Reactivate these with type safety
-//    unifiedTagCacheFacade.registerListener(tag -> supervisionChangeListener(tag), CacheEvent.SUPERVISION_CHANGE);
-//    unifiedTagCacheFacade.registerListener(this::updateAcceptedListener, CacheEvent.UPDATE_ACCEPTED);
+    tagCacheCollection.registerListener(this::supervisionChangeListener, CacheEvent.SUPERVISION_CHANGE);
+    tagCacheCollection.registerListener(this::updateAcceptedListener, CacheEvent.UPDATE_ACCEPTED);
   }
 
   /**
@@ -63,7 +62,7 @@ public class AlarmService extends AbstractCacheServiceImpl<Alarm> implements Ala
   public Alarm evaluateAlarm(Long alarmId) {
     return cache.executeTransaction(() -> {
       Alarm alarm = cache.get(alarmId);
-      Tag tag = unifiedTagCacheFacade.get(alarm.getTagId());
+      Tag tag = tagCacheCollection.get(alarm.getTagId());
       update((AlarmCacheObject) alarm, tag, true);
       return alarm;
     });
@@ -126,7 +125,7 @@ public class AlarmService extends AbstractCacheServiceImpl<Alarm> implements Ala
 
   public TagWithAlarms getTagWithAlarmsAtomically(Long tagId) {
     return cache.executeTransaction(() -> {
-      Tag tag = unifiedTagCacheFacade.get(tagId);
+      Tag tag = tagCacheCollection.get(tagId);
       Set<Long> alarms = new HashSet<>(tag.getAlarmIds());
       return new TagWithAlarms<>(tag, cache.getAll(alarms).values());
     });
