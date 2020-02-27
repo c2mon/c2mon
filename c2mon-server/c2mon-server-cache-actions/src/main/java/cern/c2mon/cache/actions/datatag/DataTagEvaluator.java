@@ -26,9 +26,9 @@ public class DataTagEvaluator {
    * Method containing all the logic for filtering out incoming datatag updates before any updates are
    * attempted.
    *
-   * @return true if the update should be filtered out, false if it should be kept
+   * @return true if the update should go through, false if it should be rejected
    */
-  public static boolean filterout(DataTag olderTag, DataTag newerTag) {
+  public static boolean allowUpdate(DataTag olderTag, DataTag newerTag) {
 
     //set the timestamps to compare:
     //(1)if both daq timestamps are set, compare these
@@ -43,7 +43,8 @@ public class DataTagEvaluator {
       olderTagTimestamp = olderTag.getSourceTimestamp();
       newerTagTimestamp = newerTag.getTimestamp();
     } else {
-      return false; //since only server timestamp is set on olderTag, all incoming source values should be accepted
+      //since only server timestamp is set on olderTag, all incoming source values should be accepted
+      return true;
     }
 
     //neither timestamps should be null from here
@@ -56,7 +57,7 @@ public class DataTagEvaluator {
     if (newerTagTimestamp.before(olderTagTimestamp)) {
       if (olderTag.getDataTagQuality() == null || olderTag.getDataTagQuality().isAccessible()) {
         log.debug("update() : older timestamp and not inaccessible -> reject update");
-        return true;
+        return false;
       } else {
         log.debug("update() : older timestamp but tag currently inaccessible -> update with older timestamp");
       }
@@ -66,16 +67,16 @@ public class DataTagEvaluator {
     // perform an update if the values are different (and valid). The values are considered
     // to be different by default if the old value is null.
     if (newerTagTimestamp.equals(olderTagTimestamp)
-      && valuesAreDifferentAndValid(olderTag, newerTag)) {
+      && valuesAreSameAndValid(olderTag, newerTag)) {
         log.debug("update() : values and timestamps are equal, so nothing to update -> reject update");
-        return true;
+        return false;
     }
 
     //false means allow the update to proceed
-    return false;
+    return true;
   }
 
-  private static boolean valuesAreDifferentAndValid(DataTag olderTag, DataTag newerTag) {
+  private static boolean valuesAreSameAndValid(DataTag olderTag, DataTag newerTag) {
     return olderTag.getValue() != null && newerTag.getValue().equals(olderTag.getValue())
       && olderTag.getDataTagQuality() != null && olderTag.getDataTagQuality().isValid()
       && newerTag.getDataTagQuality() != null && newerTag.getDataTagQuality().isValid();

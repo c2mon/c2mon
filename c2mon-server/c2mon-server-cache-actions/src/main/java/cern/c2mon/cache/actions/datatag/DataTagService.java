@@ -126,11 +126,7 @@ public class DataTagService extends AbstractCacheServiceImpl<DataTag> {
       // TODO (Alex) This does not properly account for potential filterout as part of cache.put. Should it?
       Event<Boolean> returnValue = updateFromSource(dataTag, sourceDataTagValue);
 
-      if (sourceDataTagValue.isValid()) {
-        cache.putQuiet(id, dataTag);
-      } else {
-        cache.put(id, dataTag);
-      }
+      cache.put(id, dataTag);
 
       return returnValue;
     });
