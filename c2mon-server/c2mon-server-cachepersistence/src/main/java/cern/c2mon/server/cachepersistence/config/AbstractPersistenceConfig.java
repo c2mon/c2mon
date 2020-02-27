@@ -4,6 +4,7 @@ import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cachepersistence.CachePersistenceDAO;
 import cern.c2mon.server.cachepersistence.common.BatchPersistenceManagerImpl;
 import cern.c2mon.server.cachepersistence.listener.PersistenceSynchroListener;
+import cern.c2mon.shared.common.CacheEvent;
 import cern.c2mon.shared.common.Cacheable;
 import lombok.Getter;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -40,6 +41,6 @@ public abstract class AbstractPersistenceConfig<CACHEABLE extends Cacheable> {
   public void init() {
     batchPersistenceManager = new BatchPersistenceManagerImpl<>(persistenceDAO, cache, cachePersistenceThreadPoolTaskExecutor);
     batchPersistenceManager.setTimeoutPerBatch(properties.getTimeoutPerBatch());
-    cache.getCacheListenerManager().registerBufferedListener(new PersistenceSynchroListener<>(batchPersistenceManager));
+    cache.getCacheListenerManager().registerBatchListener(new PersistenceSynchroListener<>(batchPersistenceManager), CacheEvent.UPDATE_ACCEPTED);
   }
 }

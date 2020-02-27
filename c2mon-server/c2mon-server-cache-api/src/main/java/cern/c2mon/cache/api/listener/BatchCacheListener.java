@@ -21,7 +21,7 @@ import java.util.concurrent.*;
  *
  * @param <CACHEABLE> the type of {@link Cacheable}s handled by this listener
  */
-final class BatchCacheListener<CACHEABLE extends Cacheable> implements CacheListener<CACHEABLE>, Runnable {
+public final class BatchCacheListener<CACHEABLE extends Cacheable> implements CacheListener<CACHEABLE>, Runnable {
   private static final Logger log = LoggerFactory.getLogger(BatchCacheListener.class);
   /**
    * Executor for *emergency* offloading tasks when the primary one is full

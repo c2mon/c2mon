@@ -79,13 +79,14 @@ public class BatchCacheLoader<V extends Cacheable> implements CacheLoader<V> {
   public void preload() {
     log.debug("preload() - Start preloading data for c2monCache " + c2monCache.getName());
 
-    Integer lastRow = batchCacheLoaderDAO.getMaxRow(); // 0 if no cache objects!
+    Integer lastRow; // 0 if no cache objects!
+    lastRow = batchCacheLoaderDAO.getMaxRow();
     log.info("Preload is running for " + c2monCache.getName());
 
     cacheLoaderTaskExecutor.setThreadNamePrefix(this.threadNamePrefix);
     cacheLoaderTaskExecutor.initialize();
 
-    Integer firstRow = 0;
+    int firstRow = 0;
     LinkedList<Callable<Object>> tasks = new LinkedList<>();
     while (firstRow <= lastRow) {
       MapLoaderTask mapTask = new MapLoaderTask(firstRow + 1, firstRow + batchSize);
@@ -94,14 +95,12 @@ public class BatchCacheLoader<V extends Cacheable> implements CacheLoader<V> {
     }
     try {
       cacheLoaderTaskExecutor.getThreadPoolExecutor().invokeAll(tasks, 1800, TimeUnit.SECONDS);
-    }
-    catch (RejectedExecutionException e) {
+    } catch (RejectedExecutionException e) {
       log.error("Exception caught while loading a server cache from the database. This is probably due to the cache.loader.queue.size being"
               + "too small. Increase this to at least 'id range'/'cache loader batch size', or alternatively increase the"
               + "batch size.");
       throw e;
-    }
-    catch (InterruptedException e) {
+    } catch (InterruptedException e) {
       log.error("Interrupted while waiting for cache loading threads to terminate.", e);
     }
     cacheLoaderTaskExecutor.shutdown();

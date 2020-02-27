@@ -25,7 +25,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -41,19 +40,17 @@ public class TagRecordListener {
    * Bean that logs Tags into the history.
    */
   private BatchLogger<Tag> tagLogger;
-  private TagCacheCollection unifiedTagCacheFacade;
+  private TagCacheCollection tagCacheCollection;
 
   /**
    * Autowired constructor.
    *
-   * @param unifiedTagCacheFacade for registering cache listeners
+   * @param tagCacheCollection for registering cache listeners
    * @param tagLogger                for logging cache objects to the STL
    */
   @Autowired
-  public TagRecordListener(final TagCacheCollection unifiedTagCacheFacade,
-                           @Qualifier("tagLogger") final BatchLogger<Tag> tagLogger) {
-    super();
-    this.unifiedTagCacheFacade = unifiedTagCacheFacade;
+  public TagRecordListener(final TagCacheCollection tagCacheCollection, @Qualifier("tagLogger") final BatchLogger<Tag> tagLogger) {
+    this.tagCacheCollection = tagCacheCollection;
     this.tagLogger = tagLogger;
   }
 
@@ -62,8 +59,7 @@ public class TagRecordListener {
    */
   @PostConstruct
   public void init() {
-    unifiedTagCacheFacade.registerBufferedListener( tags ->
-      tagLogger.log(((List<Tag>) tags).stream().filter(tag -> !tag.isLogged()).collect(Collectors.toList()))
+    tagCacheCollection.registerBufferedListener(tags -> tagLogger.log(tags.stream().filter(Tag::isLogged).collect(Collectors.toList()))
     , CacheEvent.UPDATE_ACCEPTED);
   }
 }

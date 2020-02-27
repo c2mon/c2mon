@@ -1,10 +1,7 @@
 package cern.c2mon.server.history.config;
 
-import java.util.Properties;
-
-import javax.sql.DataSource;
-
-import com.google.common.collect.ImmutableMap;
+import cern.c2mon.server.common.util.HsqlDatabaseBuilder;
+import cern.c2mon.server.common.util.KotlinAPIs;
 import org.apache.ibatis.mapping.VendorDatabaseIdProvider;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.annotation.MapperScan;
@@ -17,7 +14,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 
-import cern.c2mon.server.common.util.HsqlDatabaseBuilder;
+import javax.sql.DataSource;
+import java.util.Properties;
 
 /**
  * @author Justin Lewis Salmon
@@ -62,19 +60,20 @@ public class HistoryDataSourceConfig {
   }
 
   @Bean
-  public static SqlSessionFactoryBean historySqlSessionFactory(DataSource historyDataSource) throws Exception {
+  public static SqlSessionFactoryBean historySqlSessionFactory(DataSource historyDataSource) {
     SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
     sessionFactory.setDataSource(historyDataSource);
     sessionFactory.setTypeHandlersPackage("cern.c2mon.server.history.mapper");
 
     VendorDatabaseIdProvider databaseIdProvider = new VendorDatabaseIdProvider();
-    Properties properties = new Properties();
-    properties.putAll(ImmutableMap.of(
-        "HSQL", "oracle",
-        "Oracle", "oracle",
-        "MySQL", "mysql"
-    ));
-    databaseIdProvider.setProperties(properties);
+
+    databaseIdProvider.setProperties(
+      KotlinAPIs.apply(new Properties(), properties -> {
+        properties.setProperty("HSQL", "hsql");
+        properties.setProperty("Oracle", "oracle");
+        properties.setProperty("MySQL", "mysql");
+      })
+    );
 
     sessionFactory.setDatabaseIdProvider(databaseIdProvider);
     return sessionFactory;

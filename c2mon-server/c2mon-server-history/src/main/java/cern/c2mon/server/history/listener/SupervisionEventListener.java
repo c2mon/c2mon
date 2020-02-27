@@ -16,8 +16,12 @@
  *****************************************************************************/
 package cern.c2mon.server.history.listener;
 
-import javax.annotation.PostConstruct;
-
+import cern.c2mon.server.common.component.Lifecycle;
+import cern.c2mon.server.common.config.ServerConstants;
+import cern.c2mon.server.history.mapper.SupervisionEventMapper;
+import cern.c2mon.server.supervision.SupervisionListener;
+import cern.c2mon.server.supervision.SupervisionNotifier;
+import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,12 +31,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import cern.c2mon.server.common.component.Lifecycle;
-import cern.c2mon.server.common.config.ServerConstants;
-import cern.c2mon.server.history.mapper.SupervisionEventMapper;
-import cern.c2mon.server.supervision.SupervisionListener;
-import cern.c2mon.server.supervision.SupervisionNotifier;
-import cern.c2mon.shared.client.supervision.SupervisionEvent;
+import javax.annotation.PostConstruct;
 
 /**
  * Listens for supervision notifications from the core and logs
@@ -71,7 +70,7 @@ public class SupervisionEventListener implements SupervisionListener, SmartLifec
   /**
    * Autowired constructor.
    *
-   * @param supervisionNotifier the notifier to register to
+   * @param supervisionNotifier    the notifier to register to
    * @param supervisionEventMapper the mapper to write to the DB
    */
   @Autowired
@@ -91,14 +90,12 @@ public class SupervisionEventListener implements SupervisionListener, SmartLifec
     listenerContainer = supervisionNotifier.registerAsListener(this);
   }
 
-  @Transactional(propagation=Propagation.REQUIRED,isolation=Isolation.DEFAULT)
+  @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
   @Override
   public void notifySupervisionEvent(final SupervisionEvent supervisionEvent) {
-    if (LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Logging supervision status " + supervisionEvent.getStatus()
-            + " for " + supervisionEvent.getEntity()
-            + " " + supervisionEvent.getEntityId());
-    }
+    LOGGER.debug("Logging supervision status {} for {} {}",
+      supervisionEvent.getStatus(), supervisionEvent.getEntity(), supervisionEvent.getEntityId());
+
     supervisionEventMapper.logSupervisionEvent(supervisionEvent);
   }
 
