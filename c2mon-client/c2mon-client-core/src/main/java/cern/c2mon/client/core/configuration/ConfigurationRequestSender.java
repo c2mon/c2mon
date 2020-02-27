@@ -21,6 +21,7 @@ import java.io.IOException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,6 +40,7 @@ import cern.c2mon.shared.util.jms.JmsSender;
  *
  * @author Justin Lewis Salmon
  */
+@Slf4j
 @Service
 public class ConfigurationRequestSender {
 
@@ -50,7 +52,7 @@ public class ConfigurationRequestSender {
   @Autowired
   private C2monClientProperties properties;
 
-  private ObjectMapper mapper;
+  private final ObjectMapper mapper;
 
   public ConfigurationRequestSender() {
     mapper = new ObjectMapper();
@@ -82,6 +84,7 @@ public class ConfigurationRequestSender {
       }
 
     } catch (IOException e) {
+      log.error("Exception while trying to serialize configuration", e);
       ConfigurationReport failureReport = new ConfigurationReport();
       failureReport.setExceptionTrace(e);
       failureReport.setStatus(ConfigConstants.Status.FAILURE);

@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.shared.client.alarm.condition;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -60,12 +61,14 @@ public class RangeAlarmCondition<T extends Number & Comparable<T>> extends Alarm
    * Lower boundary of the alarm range. May be null. Please note that the
    * maxValue MUST be of the same type as the associated data tag.
    */
+  @JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include=JsonTypeInfo.As.PROPERTY, property="@class")
   private Comparable<T> minValue;
 
   /**
    * Upper boundary of the alarm range. May be null. Please note that the
    * maxValue MUST be of the same type as the associated data tag.
    */
+  @JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include=JsonTypeInfo.As.PROPERTY, property="@class")
   private Comparable<T> maxValue;
 
   /**

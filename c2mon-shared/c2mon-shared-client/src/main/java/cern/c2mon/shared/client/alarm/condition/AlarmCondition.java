@@ -17,20 +17,23 @@
 package cern.c2mon.shared.client.alarm.condition;
 
 
-import cern.c2mon.shared.common.type.TypeConverter;
-import cern.c2mon.shared.util.parser.SimpleXMLParser;
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.xml.parsers.ParserConfigurationException;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.apache.commons.lang.ArrayUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.HashMap;
-import java.util.Map;
+import cern.c2mon.shared.common.type.TypeConverter;
+import cern.c2mon.shared.util.parser.SimpleXMLParser;
 
 
 /**
@@ -86,6 +89,7 @@ public abstract class AlarmCondition implements Serializable {
    * This method should be overwritten by every alarm condition Class
    * @return A human readable description of the condition
    */
+  @JsonIgnore
   public String getDescription() {
     return EMPTY_STRING;
   }
@@ -93,6 +97,7 @@ public abstract class AlarmCondition implements Serializable {
   /**
    * @return a representation of the condition class as XML format
    */
+  @JsonIgnore
   public final String getXMLCondition() {
     return this.toConfigXML();
   }
