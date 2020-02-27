@@ -89,7 +89,7 @@ public class BatchCacheLoader<V extends Cacheable> implements CacheLoader<V> {
     int firstRow = 0;
     LinkedList<Callable<Object>> tasks = new LinkedList<>();
     while (firstRow <= lastRow) {
-      MapLoaderTask mapTask = new MapLoaderTask(firstRow + 1, firstRow + batchSize);
+      MapLoaderTask mapTask = new MapLoaderTask(firstRow, firstRow + batchSize);
       tasks.push(mapTask);
       firstRow += batchSize;
     }
