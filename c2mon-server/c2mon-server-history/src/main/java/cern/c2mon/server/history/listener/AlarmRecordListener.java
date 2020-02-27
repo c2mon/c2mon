@@ -20,10 +20,10 @@ import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.history.logger.BatchLogger;
 import cern.c2mon.shared.common.CacheEvent;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 
 import static cern.c2mon.server.common.util.Java9Collections.listOf;
 
@@ -49,7 +49,7 @@ public class AlarmRecordListener {
    * @param alarmCache  for registering cache listeners
    * @param alarmLogger for logging cache objects to the history
    */
-  @Autowired
+  @Inject
   public AlarmRecordListener(final C2monCache<Alarm> alarmCache, final BatchLogger<Alarm> alarmLogger) {
     this.alarmCache = alarmCache;
     this.alarmLogger = alarmLogger;

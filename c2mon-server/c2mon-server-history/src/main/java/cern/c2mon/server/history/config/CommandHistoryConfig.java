@@ -6,19 +6,20 @@ import cern.c2mon.server.history.dao.LoggerDAO;
 import cern.c2mon.server.history.mapper.CommandRecordMapper;
 import cern.c2mon.shared.client.command.CommandRecord;
 import org.mybatis.spring.SqlSessionFactoryBean;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
+
+import javax.inject.Inject;
 
 /**
  * @author Justin Lewis Salmon
  */
 public class CommandHistoryConfig {
 
-  @Autowired
+  @Inject
   private HistoryProperties properties;
 
-  @Autowired
+  @Inject
   @Qualifier("historySqlSessionFactory")
   private SqlSessionFactoryBean historySqlSessionFactory;
 

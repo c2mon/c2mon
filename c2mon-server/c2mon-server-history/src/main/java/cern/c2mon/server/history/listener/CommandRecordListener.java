@@ -16,18 +16,17 @@
  *****************************************************************************/
 package cern.c2mon.server.history.listener;
 
-import javax.annotation.PostConstruct;
-
-import cern.c2mon.shared.client.command.CommandRecord;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
-
 import cern.c2mon.pmanager.persistence.IPersistenceManager;
 import cern.c2mon.server.command.CommandExecutionManager;
 import cern.c2mon.server.command.CommandPersistenceListener;
+import cern.c2mon.shared.client.command.CommandRecord;
 import cern.c2mon.shared.client.command.CommandReport;
 import cern.c2mon.shared.common.command.CommandTag;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 
 /**
  * Bean listening to the command module and logging command executions to
@@ -62,7 +61,7 @@ public class CommandRecordListener implements CommandPersistenceListener {
    * @param persistenceManager persistence manager instantiated in XML
    * @param commandExecutionManager from command module
    */
-  @Autowired
+  @Inject
   public CommandRecordListener(@Qualifier("commandHistoryPersistenceManager") final IPersistenceManager persistenceManager,
                                final CommandExecutionManager commandExecutionManager) {
     super();

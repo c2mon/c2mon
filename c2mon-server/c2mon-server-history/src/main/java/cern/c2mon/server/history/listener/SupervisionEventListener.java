@@ -24,7 +24,6 @@ import cern.c2mon.server.supervision.SupervisionNotifier;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -32,6 +31,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 
 /**
  * Listens for supervision notifications from the core and logs
@@ -73,7 +73,7 @@ public class SupervisionEventListener implements SupervisionListener, SmartLifec
    * @param supervisionNotifier    the notifier to register to
    * @param supervisionEventMapper the mapper to write to the DB
    */
-  @Autowired
+  @Inject
   public SupervisionEventListener(final SupervisionNotifier supervisionNotifier, final SupervisionEventMapper supervisionEventMapper) {
     super();
     this.supervisionNotifier = supervisionNotifier;

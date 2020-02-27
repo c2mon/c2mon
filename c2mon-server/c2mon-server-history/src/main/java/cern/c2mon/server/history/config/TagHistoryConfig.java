@@ -10,19 +10,20 @@ import cern.c2mon.server.history.mapper.TagRecordMapper;
 import cern.c2mon.server.history.structure.TagRecord;
 import cern.c2mon.server.history.structure.TagRecordConverter;
 import org.mybatis.spring.SqlSessionFactoryBean;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
+
+import javax.inject.Inject;
 
 /**
  * @author Justin Lewis Salmon
  */
 public class TagHistoryConfig {
 
-  @Autowired
+  @Inject
   private HistoryProperties properties;
 
-  @Autowired
+  @Inject
   @Qualifier("historySqlSessionFactory")
   private SqlSessionFactoryBean historySqlSessionFactory;
 

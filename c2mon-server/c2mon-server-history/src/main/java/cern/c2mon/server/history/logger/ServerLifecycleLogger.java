@@ -16,22 +16,21 @@
  *****************************************************************************/
 package cern.c2mon.server.history.logger;
 
-import java.sql.Timestamp;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import org.apache.ibatis.exceptions.PersistenceException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.SmartLifecycle;
-import org.springframework.stereotype.Component;
-
 import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.common.config.ServerProperties;
 import cern.c2mon.server.history.mapper.ServerLifecycleEventMapper;
 import cern.c2mon.shared.client.lifecycle.LifecycleEventType;
 import cern.c2mon.shared.client.lifecycle.ServerLifecycleEvent;
+import org.apache.ibatis.exceptions.PersistenceException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.SmartLifecycle;
+import org.springframework.stereotype.Component;
+
+import javax.inject.Inject;
+import java.sql.Timestamp;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Bean listening for server stops/starts and logging
@@ -83,7 +82,7 @@ public class ServerLifecycleLogger implements SmartLifecycle {
    * Constructor.
    * @param serverLifecycleEventMapper the mapper bean used for writing to the DB
    */
-  @Autowired
+  @Inject
   public ServerLifecycleLogger(final ServerLifecycleEventMapper serverLifecycleEventMapper, ServerProperties properties) {
     this.serverLifecycleEventMapper = serverLifecycleEventMapper;
     this.serverName = properties.getName();

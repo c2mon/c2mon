@@ -20,11 +20,11 @@ import cern.c2mon.cache.config.collections.TagCacheCollection;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.history.logger.BatchLogger;
 import cern.c2mon.shared.common.CacheEvent;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 import java.util.stream.Collectors;
 
 /**
@@ -48,7 +48,7 @@ public class TagRecordListener {
    * @param tagCacheCollection for registering cache listeners
    * @param tagLogger                for logging cache objects to the STL
    */
-  @Autowired
+  @Inject
   public TagRecordListener(final TagCacheCollection tagCacheCollection, @Qualifier("tagLogger") final BatchLogger<Tag> tagLogger) {
     this.tagCacheCollection = tagCacheCollection;
     this.tagLogger = tagLogger;
