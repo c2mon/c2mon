@@ -18,14 +18,12 @@ package cern.c2mon.server.history.logger;
 
 import cern.c2mon.server.common.config.ServerProperties;
 import cern.c2mon.server.history.mapper.ServerLifecycleEventMapper;
+import cern.c2mon.shared.client.lifecycle.ServerLifecycleEvent;
 import org.apache.ibatis.exceptions.PersistenceException;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
-
-import cern.c2mon.shared.client.lifecycle.ServerLifecycleEvent;
-import org.springframework.mock.env.MockEnvironment;
 
 import java.util.concurrent.CountDownLatch;
 
@@ -48,7 +46,7 @@ public class ServerLifecycleLoggerTest {
     control = EasyMock.createNiceControl();
     lifecycleMapper = control.createMock(ServerLifecycleEventMapper.class);
     serverLifecycleLogger = new ServerLifecycleLogger(lifecycleMapper, new ServerProperties());
-    serverLifecycleLogger.setTimeBetweenRelogs(1000);
+    serverLifecycleLogger.setTimeBetweenRelogs(100);
   }
 
   /**
