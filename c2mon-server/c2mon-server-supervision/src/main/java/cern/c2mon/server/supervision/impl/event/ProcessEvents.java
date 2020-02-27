@@ -45,7 +45,6 @@ public class ProcessEvents extends SupervisionEventHandler<Process> {
   }
 
   /**
-   * TODO write...
    * The onUp() method is called in one of the following cases:
    * <UL>
    * <LI>an alive tag attached to a process/equipment has been received
@@ -68,32 +67,6 @@ public class ProcessEvents extends SupervisionEventHandler<Process> {
     service.resume(id, timestamp, message);
 
     // TODO (Alex) Where and how can we "revalidate"? And how can we ask the DAQ for the latest values?
-
-//    final Process process = processCache.getCopy(processId);
-//
-//    //check state tag is correctly set
-//    Long stateTagId = process.getStateTagId(); //never null
-//    controlTagCache.acquireWriteLockOnKey(stateTagId);
-//    try {
-//      ControlTag stateTag = controlTagCache.get(stateTagId);
-//
-//      if (stateTag.getValue() == null || !stateTag.getValue().equals(SupervisionConstants.SupervisionStatus.RUNNING.toString()) || !stateTag.isValid()) {
-//
-//        // If the process is running under a local configuration, set the status
-//        // tag to RUNNING_LOCAL
-//        if (process.getLocalConfig() != null && process.getLocalConfig().equals(ProcessCacheObject.LocalConfig.Y)) {
-//          log.debug("onProcessUp(): Process is running on a local configuration, setting status to RUNNING_LOCAL");
-//          controlTagFacade.updateAndValidate(stateTagId, SupervisionConstants.SupervisionStatus.RUNNING_LOCAL.toString(), pMessage, pTimestamp);
-//
-//        } else if (stateTag.getValue() == null || !stateTag.getValue().equals(SupervisionConstants.SupervisionStatus.RUNNING.toString())) {
-//          controlTagFacade.updateAndValidate(stateTagId, SupervisionConstants.SupervisionStatus.RUNNING.toString(), pMessage, pTimestamp);
-//        }
-//      }
-//    } catch (CacheElementNotFoundException controlCacheEx) {
-//      log.error("Unable to locate state tag in cache (id is " + stateTagId + ")", controlCacheEx);
-//    } finally {
-//      controlTagCache.releaseWriteLockOnKey(stateTagId);
-//    }
   }
 
   /**

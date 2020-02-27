@@ -2,6 +2,7 @@ package cern.c2mon.cache.actions.state;
 
 import cern.c2mon.cache.actions.AbstractCacheServiceImpl;
 import cern.c2mon.cache.actions.supervision.SupervisedCacheService;
+import cern.c2mon.cache.actions.tag.TagController;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.control.ControlTag;
@@ -203,6 +204,7 @@ public class SupervisionStateTagService extends AbstractCacheServiceImpl<Supervi
         if (stateTag.getSupervisionStatus() != newStatus) {
           stateTag.setSupervision(newStatus, "", new Timestamp(timestamp));
           stateTag.setValue(SupervisionStateTagEvaluator.isRunning(stateTag));
+          TagController.validate(stateTag);
         }
       });
     } catch (Exception e) {

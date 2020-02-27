@@ -70,8 +70,8 @@ public class ProcessService extends AbstractSupervisedService<Process> implement
 
     return cache.compute(processId, process -> {
       ProcessController.start(process, hostName, startupTime);
-      log.trace("start " + (properties.isTestMode() ? "- TEST Mode " : "")
-        + "- Process " + process.getName() + ", PIK " + process.getProcessPIK());
+      log.trace("start {} - Process {} , PIK {}",
+        properties.isTestMode() ? "- TEST Mode " : "", process.getName(), process.getProcessPIK());
 
       ((ProcessCacheObject) process).setRequiresReboot(false);
       start(processId, startupTime.getTime());

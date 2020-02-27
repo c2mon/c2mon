@@ -1,6 +1,7 @@
 package cern.c2mon.cache.actions;
 
 import cern.c2mon.cache.actions.supervision.SupervisedCacheService;
+import cern.c2mon.cache.actions.tag.TagController;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.flow.CacheUpdateFlow;
 import cern.c2mon.server.common.control.ControlTag;
@@ -85,6 +86,7 @@ public abstract class AbstractBooleanControlTagService<T extends ControlTag> ext
   protected void compareAndSetNewValues(T controlTag, boolean active, long timestamp) {
     if (controlTag.getValue() != active || timestamp >= controlTag.getTimestamp().getTime()) {
       controlTag.setValue(active);
+      TagController.validate(controlTag);
     }
   }
 }
