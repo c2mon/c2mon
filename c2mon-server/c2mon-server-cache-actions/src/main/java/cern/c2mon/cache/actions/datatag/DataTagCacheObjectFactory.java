@@ -3,7 +3,7 @@ package cern.c2mon.cache.actions.datatag;
 import cern.c2mon.cache.actions.equipment.BaseEquipmentServiceImpl;
 import cern.c2mon.cache.actions.equipment.EquipmentService;
 import cern.c2mon.cache.actions.subequipment.SubEquipmentService;
-import cern.c2mon.cache.actions.tag.AbstractTagCacheObjectFactory;
+import cern.c2mon.cache.config.tag.AbstractTagCacheObjectFactory;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.common.tag.AbstractTagCacheObject;

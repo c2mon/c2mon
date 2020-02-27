@@ -1,4 +1,4 @@
-package cern.c2mon.cache.actions.process;
+package cern.c2mon.cache.config.process;
 
 import cern.c2mon.cache.api.factory.AbstractCacheObjectFactory;
 import cern.c2mon.server.common.process.Process;

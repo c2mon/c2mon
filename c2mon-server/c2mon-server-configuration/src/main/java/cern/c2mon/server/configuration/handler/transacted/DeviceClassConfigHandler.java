@@ -17,8 +17,8 @@
 package cern.c2mon.server.configuration.handler.transacted;
 
 import cern.c2mon.cache.actions.device.DeviceService;
-import cern.c2mon.cache.actions.deviceclass.DeviceClassCacheObjectFactory;
 import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.config.deviceclass.DeviceClassCacheObjectFactory;
 import cern.c2mon.server.cache.loading.DeviceClassDAO;
 import cern.c2mon.server.common.device.DeviceClass;
 import cern.c2mon.server.configuration.impl.ProcessChange;

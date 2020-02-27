@@ -16,9 +16,9 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.handler.transacted;
 
-import cern.c2mon.cache.actions.alarm.AlarmCacheObjectFactory;
 import cern.c2mon.cache.actions.alarm.AlarmService;
 import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.config.alarm.AlarmCacheObjectFactory;
 import cern.c2mon.cache.config.collections.TagCacheCollection;
 import cern.c2mon.server.cache.loading.AlarmLoaderDAO;
 import cern.c2mon.server.common.alarm.Alarm;

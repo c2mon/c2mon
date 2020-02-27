@@ -1,4 +1,4 @@
-package cern.c2mon.cache.actions.alarm;
+package cern.c2mon.cache.config.alarm;
 
 import lombok.Getter;
 import lombok.Setter;

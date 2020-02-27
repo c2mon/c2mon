@@ -1,5 +1,6 @@
 package cern.c2mon.cache.actions.equipment;
 
+import cern.c2mon.cache.config.equipment.EquipmentCacheObjectFactory;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.shared.common.ConfigurationException;
 import org.junit.Before;

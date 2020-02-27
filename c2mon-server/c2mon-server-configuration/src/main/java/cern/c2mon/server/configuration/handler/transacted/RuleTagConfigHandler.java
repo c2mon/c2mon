@@ -16,8 +16,8 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.handler.transacted;
 
-import cern.c2mon.cache.actions.rule.RuleTagCacheObjectFactory;
 import cern.c2mon.cache.config.collections.TagCacheCollection;
+import cern.c2mon.cache.config.rule.RuleTagCacheObjectFactory;
 import cern.c2mon.server.cache.loading.RuleTagLoaderDAO;
 import cern.c2mon.server.common.listener.ConfigurationEventListener;
 import cern.c2mon.server.common.rule.RuleTag;

@@ -1,7 +1,7 @@
 package cern.c2mon.server.configuration.handler.transacted;
 
 import cern.c2mon.cache.actions.commfault.CommFaultService;
-import cern.c2mon.cache.actions.commfault.CommFaultTagCacheObjectFactory;
+import cern.c2mon.cache.config.commfault.CommFaultTagCacheObjectFactory;
 import cern.c2mon.server.cache.loading.CommFaultTagDAO;
 import cern.c2mon.server.common.commfault.CommFaultTag;
 import cern.c2mon.server.configuration.impl.ProcessChange;

@@ -1,4 +1,4 @@
-package cern.c2mon.cache.actions.device;
+package cern.c2mon.cache.config.device;
 
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.factory.AbstractCacheObjectFactory;

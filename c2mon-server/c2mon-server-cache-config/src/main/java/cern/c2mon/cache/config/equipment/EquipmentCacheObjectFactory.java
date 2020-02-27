@@ -1,4 +1,4 @@
-package cern.c2mon.cache.actions.equipment;
+package cern.c2mon.cache.config.equipment;
 
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.equipment.EquipmentCacheObject;

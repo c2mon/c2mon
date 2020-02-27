@@ -1,4 +1,4 @@
-package cern.c2mon.cache.actions.alarm;
+package cern.c2mon.cache.config.alarm;
 
 import cern.c2mon.cache.api.factory.AbstractCacheObjectFactory;
 import cern.c2mon.server.common.alarm.Alarm;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 import java.sql.Timestamp;
 import java.util.Properties;
 
-import static cern.c2mon.cache.actions.alarm.AlarmProperties.MAX_FAULT_FAMILY_LENGTH;
+import static cern.c2mon.cache.config.alarm.AlarmProperties.MAX_FAULT_FAMILY_LENGTH;
 
 /**
  * @author Szymon Halastra

@@ -1,5 +1,6 @@
 package cern.c2mon.cache.actions.deviceclass;
 
+import cern.c2mon.cache.config.deviceclass.DeviceClassCacheObjectFactory;
 import cern.c2mon.server.common.device.Command;
 import cern.c2mon.server.common.device.DeviceClass;
 import cern.c2mon.server.common.device.DeviceClassCacheObject;

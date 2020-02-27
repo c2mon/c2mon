@@ -2,6 +2,7 @@ package cern.c2mon.cache.actions.command;
 
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.impl.SimpleCache;
+import cern.c2mon.cache.config.command.CommandTagCacheObjectFactory;
 import cern.c2mon.server.cache.test.factory.EquipmentCacheObjectFactory;
 import cern.c2mon.server.common.command.CommandTagCacheObject;
 import cern.c2mon.server.common.equipment.Equipment;

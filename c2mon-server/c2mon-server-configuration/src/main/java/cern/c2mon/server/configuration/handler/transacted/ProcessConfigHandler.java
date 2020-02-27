@@ -16,8 +16,8 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.handler.transacted;
 
-import cern.c2mon.cache.actions.process.ProcessCacheObjectFactory;
 import cern.c2mon.cache.actions.process.ProcessService;
+import cern.c2mon.cache.config.process.ProcessCacheObjectFactory;
 import cern.c2mon.server.cache.loading.ProcessDAO;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.util.KotlinAPIs;

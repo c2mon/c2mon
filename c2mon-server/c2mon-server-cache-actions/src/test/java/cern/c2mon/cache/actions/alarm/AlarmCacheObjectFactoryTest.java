@@ -1,5 +1,6 @@
 package cern.c2mon.cache.actions.alarm;
 
+import cern.c2mon.cache.config.alarm.AlarmCacheObjectFactory;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.shared.common.ConfigurationException;
 import org.junit.Test;

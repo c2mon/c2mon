@@ -1,4 +1,4 @@
-package cern.c2mon.cache.config.alivetimer;
+package cern.c2mon.cache.config.alive;
 
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.config.AbstractCacheLoaderTest;

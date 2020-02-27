@@ -1,7 +1,7 @@
 package cern.c2mon.server.configuration.handler.transacted;
 
-import cern.c2mon.cache.actions.alive.AliveTagCacheObjectFactory;
 import cern.c2mon.cache.actions.alive.AliveTagService;
+import cern.c2mon.cache.config.alive.AliveTagCacheObjectFactory;
 import cern.c2mon.server.cache.loading.AliveTagDAO;
 import cern.c2mon.server.common.alive.AliveTag;
 import cern.c2mon.server.configuration.impl.ProcessChange;

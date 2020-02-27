@@ -1,7 +1,7 @@
-package cern.c2mon.cache.actions.subequipment;
+package cern.c2mon.cache.config.subequipment;
 
-import cern.c2mon.cache.actions.equipment.AbstractEquipmentCacheObjectFactory;
 import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.config.equipment.AbstractEquipmentCacheObjectFactory;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.equipment.EquipmentCacheObject;
 import cern.c2mon.server.common.subequipment.SubEquipment;

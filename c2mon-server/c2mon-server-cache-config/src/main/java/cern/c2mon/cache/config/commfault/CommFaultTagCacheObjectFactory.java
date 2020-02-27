@@ -1,6 +1,6 @@
-package cern.c2mon.cache.actions.commfault;
+package cern.c2mon.cache.config.commfault;
 
-import cern.c2mon.cache.actions.ControlTagCacheObjectFactory;
+import cern.c2mon.cache.config.tag.ControlTagCacheObjectFactory;
 import cern.c2mon.server.common.commfault.CommFaultTag;
 import cern.c2mon.shared.common.PropertiesAccessor;
 import cern.c2mon.shared.common.supervision.SupervisionEntity;

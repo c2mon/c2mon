@@ -2,6 +2,7 @@ package cern.c2mon.cache.actions.device;
 
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.impl.SimpleCache;
+import cern.c2mon.cache.config.device.DeviceCacheObjectFactory;
 import cern.c2mon.server.cache.test.factory.DeviceClassCacheObjectFactory;
 import cern.c2mon.server.common.device.*;
 import cern.c2mon.shared.client.device.DeviceCommand;

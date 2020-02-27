@@ -1,6 +1,5 @@
-package cern.c2mon.cache.actions;
+package cern.c2mon.cache.config.tag;
 
-import cern.c2mon.cache.actions.tag.AbstractTagCacheObjectFactory;
 import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.shared.daq.config.Change;
 

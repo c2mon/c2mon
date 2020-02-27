@@ -1,6 +1,6 @@
-package cern.c2mon.cache.actions.state;
+package cern.c2mon.cache.config.state;
 
-import cern.c2mon.cache.actions.ControlTagCacheObjectFactory;
+import cern.c2mon.cache.config.tag.ControlTagCacheObjectFactory;
 import cern.c2mon.server.common.supervision.SupervisionStateTag;
 import cern.c2mon.shared.common.PropertiesAccessor;
 import cern.c2mon.shared.daq.config.Change;

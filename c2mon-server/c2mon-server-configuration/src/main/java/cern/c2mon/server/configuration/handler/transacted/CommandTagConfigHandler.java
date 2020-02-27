@@ -16,9 +16,9 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.handler.transacted;
 
-import cern.c2mon.cache.actions.command.CommandTagCacheObjectFactory;
 import cern.c2mon.cache.actions.command.CommandTagService;
 import cern.c2mon.cache.actions.equipment.EquipmentService;
+import cern.c2mon.cache.config.command.CommandTagCacheObjectFactory;
 import cern.c2mon.server.cache.loading.CommandTagDAO;
 import cern.c2mon.server.configuration.impl.ProcessChange;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;

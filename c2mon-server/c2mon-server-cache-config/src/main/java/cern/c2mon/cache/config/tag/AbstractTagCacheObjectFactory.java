@@ -1,4 +1,4 @@
-package cern.c2mon.cache.actions.tag;
+package cern.c2mon.cache.config.tag;
 
 import cern.c2mon.cache.api.factory.AbstractCacheObjectFactory;
 import cern.c2mon.server.common.tag.AbstractTagCacheObject;

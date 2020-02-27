@@ -1,4 +1,4 @@
-package cern.c2mon.cache.actions.deviceclass;
+package cern.c2mon.cache.config.deviceclass;
 
 import cern.c2mon.cache.api.factory.AbstractCacheObjectFactory;
 import cern.c2mon.server.common.device.CommandList;

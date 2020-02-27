@@ -16,8 +16,8 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.handler.transacted;
 
-import cern.c2mon.cache.actions.device.DeviceCacheObjectFactory;
 import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.config.device.DeviceCacheObjectFactory;
 import cern.c2mon.server.cache.loading.DeviceDAO;
 import cern.c2mon.server.common.device.Device;
 import lombok.extern.slf4j.Slf4j;

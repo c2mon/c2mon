@@ -1,7 +1,7 @@
-package cern.c2mon.cache.actions.rule;
+package cern.c2mon.cache.config.rule;
 
-import cern.c2mon.cache.actions.tag.AbstractTagCacheObjectFactory;
 import cern.c2mon.cache.config.collections.TagCacheCollection;
+import cern.c2mon.cache.config.tag.AbstractTagCacheObjectFactory;
 import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.rule.RuleTagCacheObject;
 import cern.c2mon.shared.common.PropertiesAccessor;

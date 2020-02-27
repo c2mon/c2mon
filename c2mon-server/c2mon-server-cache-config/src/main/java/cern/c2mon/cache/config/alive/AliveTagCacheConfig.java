@@ -1,4 +1,4 @@
-package cern.c2mon.cache.config.alivetimer;
+package cern.c2mon.cache.config.alive;
 
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.factory.AbstractCacheFactory;
@@ -16,10 +16,10 @@ import javax.inject.Inject;
  * @author Alexandros Papageorgiou Koufidis
  */
 @Configuration
-public class AliveTimerCacheConfig extends AbstractSimpleCacheConfig<AliveTag> {
+public class AliveTagCacheConfig extends AbstractSimpleCacheConfig<AliveTag> {
 
   @Inject
-  public AliveTimerCacheConfig(AbstractCacheFactory cachingFactory, CacheLoaderDAO<AliveTag> cacheLoaderDAORef) {
+  public AliveTagCacheConfig(AbstractCacheFactory cachingFactory, CacheLoaderDAO<AliveTag> cacheLoaderDAORef) {
     super(cachingFactory, CacheName.ALIVETIMER, AliveTag.class, cacheLoaderDAORef);
   }
 
