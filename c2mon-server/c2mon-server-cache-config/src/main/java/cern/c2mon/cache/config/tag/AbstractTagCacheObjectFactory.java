@@ -26,6 +26,8 @@ public abstract class AbstractTagCacheObjectFactory<TAG extends Tag> extends Abs
       .getShort("mode").ifPresent(tagCacheObject::setMode)
       .getString("isLogged").ifPresent(isLogged -> tagCacheObject.setLogged(isLogged.equalsIgnoreCase("true")))
       .getString("unit").ifPresent(unit -> tagCacheObject.setUnit(checkAndSetNull(unit)))
+      .getString("value").ifPresent(tagCacheObject::setValue)
+      .getString("valueDescription").ifPresent(tagCacheObject::setValueDescription)
       .getString("dipAddress").ifPresent(dipAddress -> tagCacheObject.setDipAddress(checkAndSetNull(dipAddress)))
       .getString("japcAddress").ifPresent(japcAddress -> tagCacheObject.setJapcAddress(checkAndSetNull(japcAddress)));
 
