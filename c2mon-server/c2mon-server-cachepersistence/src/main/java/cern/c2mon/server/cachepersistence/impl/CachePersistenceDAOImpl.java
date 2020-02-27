@@ -32,6 +32,8 @@ import java.util.List;
  * to the database. The cache object needs to have a corresponding
  * {@link PersistenceMapper}.
  *
+ * Type safety has been broken because ControlTags are written as datatags in the db
+ *
  * @author Mark Brightwell
  *
  * @param <T> the type of the cache object
@@ -42,8 +44,10 @@ public class CachePersistenceDAOImpl<T extends Cacheable> implements CachePersis
   /**
    * Mapper for persisting cache updates. Needs setting in
    * the constructor.
+   *
+   * Type safety has been broken because ControlTags are written as datatags in the db
    */
-  private PersistenceMapper<T> persistenceMapper;
+  private PersistenceMapper persistenceMapper;
 
   /**
    * Reference to the cache where the cache objects can be retrieved
@@ -55,23 +59,15 @@ public class CachePersistenceDAOImpl<T extends Cacheable> implements CachePersis
   /**
    * Constructor required cache and the persistence bean for this cache.
    *
+   * Type safety has been broken because ControlTags are written as datatags in the db
+   *
    * @param persistenceMapper the mapper bean for this cache
    * @param cache the cache that is being persisted
    */
-  public CachePersistenceDAOImpl(final PersistenceMapper<T> persistenceMapper, final C2monCache<T> cache) {
+  public CachePersistenceDAOImpl(final PersistenceMapper persistenceMapper, final C2monCache<T> cache) {
     super();
     this.persistenceMapper = persistenceMapper;
     this.cache = cache;
-  }
-
-  /**
-   * Persists a single cacheable
-   * setting).
-   */
-  @Transactional("databaseTransactionManager")
-  @Override
-  public void updateCacheable(final T cacheable) {
-    persistenceMapper.updateCacheable(cacheable);
   }
 
   /**
@@ -86,15 +82,32 @@ public class CachePersistenceDAOImpl<T extends Cacheable> implements CachePersis
     for (Long key : keyList) {
       try {
         cacheObject = cache.get(key);
-        //do not persist unconfigured tags TODO could remove as unconfigured not used
-        if (cacheObject != null && (!(cacheObject instanceof Tag) || !((Tag) cacheObject).isInUnconfigured())) {
-          persistenceMapper.updateCacheable(cacheObject);
+        if (cacheObject != null && (!isUnconfiguredTag(cacheObject))) {
+          persistenceMapper.updateCacheable(adaptCacheObject(cacheObject));
         }
       } catch (CacheElementNotFoundException ex) {
         log.warn("Cache element with id {} could not be persisted as not found in cache " +
             "(may have been removed in the meantime by a re-configuration). Cache is {}", key, cache.getClass().getSimpleName(), ex);
       }
     }
+  }
+
+  /**
+   * Avoids persisting unconfigured tags
+   *
+   * Potentially deprecated? There was a note that unconfigured is unused
+   */
+  private boolean isUnconfiguredTag(T cacheObject) {
+    return (cacheObject instanceof Tag) && ((Tag) cacheObject).isInUnconfigured();
+  }
+
+  /**
+   * Allows overriding the cache object before putting in the db
+   *
+   * Used mainly for control tags, which need to be registered in the datatag tables
+   */
+  protected Cacheable adaptCacheObject(T cacheObject) {
+    return cacheObject;
   }
 
 

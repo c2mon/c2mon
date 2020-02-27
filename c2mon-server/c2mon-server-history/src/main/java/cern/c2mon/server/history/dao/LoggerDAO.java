@@ -16,8 +16,10 @@
  *****************************************************************************/
 package cern.c2mon.server.history.dao;
 
-import java.util.List;
-
+import cern.c2mon.pmanager.IDBPersistenceHandler;
+import cern.c2mon.pmanager.IFallback;
+import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
+import cern.c2mon.server.history.mapper.LoggerMapper;
 import org.apache.ibatis.exceptions.PersistenceException;
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
@@ -25,10 +27,7 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import cern.c2mon.pmanager.IDBPersistenceHandler;
-import cern.c2mon.pmanager.IFallback;
-import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
-import cern.c2mon.server.history.mapper.LoggerMapper;
+import java.util.List;
 
 /**
  * Common DAO implementation for objects that need storing in a history table using
@@ -75,7 +74,6 @@ public class LoggerDAO<T extends IFallback> implements IDBPersistenceHandler<T> 
   /**
    *
    * @param sqlSessionFactory
-   * @param loggerMapper
    *          the auto-commit mapper for single queries/inserts
    * @param dbUrl
    *          only used for logging error messages

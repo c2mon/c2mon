@@ -20,6 +20,8 @@ import cern.c2mon.cache.config.collections.TagCacheCollection;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.history.logger.BatchLogger;
 import cern.c2mon.shared.common.CacheEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
@@ -35,6 +37,7 @@ import java.util.stream.Collectors;
  */
 @Service
 public class TagRecordListener {
+  private static final Logger LOG = LoggerFactory.getLogger(TagRecordListener.class);
 
   /**
    * Bean that logs Tags into the history.
@@ -59,7 +62,13 @@ public class TagRecordListener {
    */
   @PostConstruct
   public void init() {
-    tagCacheCollection.registerBufferedListener(tags -> tagLogger.log(tags.stream().filter(Tag::isLogged).collect(Collectors.toList()))
+    tagCacheCollection.registerBufferedListener(tags -> {
+      try {
+        tagLogger.log(tags.stream().filter(Tag::isLogged).collect(Collectors.toList()));
+      } catch (Exception e) {
+        LOG.info("Failed to save cache updates to database", e);
+      }
+      }
     , CacheEvent.UPDATE_ACCEPTED);
   }
 }

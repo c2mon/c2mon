@@ -1,21 +1,27 @@
 package cern.c2mon.server.cachepersistence.config;
 
 import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.server.cache.dbaccess.PersistenceMapper;
+import cern.c2mon.server.cachepersistence.impl.ControlTagPersistenceDAOImpl;
+import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.supervision.SupervisionStateTag;
-import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 /**
  * @author Alexandros Papageorgiou
  */
-@Service
+@Named
+@Singleton
 public class SupervisionStateTagPersistenceConfig extends AbstractPersistenceConfig<SupervisionStateTag> {
 
-  // TODO (Alex) Complete this when control tag refactoring is through
-
   @Inject
-  public SupervisionStateTagPersistenceConfig(final C2monCache<SupervisionStateTag> supervisionStateTagC2monCache) {
-    super(supervisionStateTagC2monCache, null);
+  public SupervisionStateTagPersistenceConfig(
+    final C2monCache<SupervisionStateTag> StateTagCache,
+    PersistenceMapper<DataTag> dataTagMapper) {
+
+    super(StateTagCache, new ControlTagPersistenceDAOImpl<>(dataTagMapper, StateTagCache));
   }
 }

@@ -17,7 +17,6 @@
 
 package cern.c2mon.server.history.structure;
 
-import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.tag.InfoTag;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
@@ -74,14 +73,11 @@ public final class TagRecordConverter implements LoggerConverter<Tag> {
 
       if (tag.getValue() != null) {
         try {
-
           tagRecord.setTagValue(mapper.writeValueAsString(tag.getValue()));
-
         } catch (JsonProcessingException e) {
           log.error("Could nor parse the invalid states of the tag "+tag.getId()+" into a String.", e);
         }
       } else {
-
           tagRecord.setTagValue(null);
       }
 
@@ -89,8 +85,8 @@ public final class TagRecordConverter implements LoggerConverter<Tag> {
       tagRecord.setTagDataType(tag.getDataType());
 
       if (tag instanceof InfoTag) {
-        tagRecord.setSourceTimestamp(((DataTag) tag).getSourceTimestamp());
-        tagRecord.setDaqTimestamp(((DataTag) tag).getDaqTimestamp());
+        tagRecord.setSourceTimestamp(((InfoTag) tag).getSourceTimestamp());
+        tagRecord.setDaqTimestamp(((InfoTag) tag).getDaqTimestamp());
       }
 
       tagRecord.setServerTimestamp(tag.getCacheTimestamp());
@@ -102,7 +98,8 @@ public final class TagRecordConverter implements LoggerConverter<Tag> {
         }
       }
 
-      tagRecord.setTagQualityCode(code); //for longterm log and statistics purpose
+      //for longterm log and statistics purpose
+      tagRecord.setTagQualityCode(code);
 
       try {
         tagRecord.setTagQualityDesc(mapper.writeValueAsString(tag.getDataTagQuality().getInvalidQualityStates()));

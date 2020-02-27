@@ -16,9 +16,9 @@
  *****************************************************************************/
 package cern.c2mon.server.cachepersistence;
 
-import java.util.List;
-
 import cern.c2mon.shared.common.Cacheable;
+
+import java.util.List;
 
 /**
  * Interface of cache DAOs used to persist cache updates
@@ -29,15 +29,6 @@ import cern.c2mon.shared.common.Cacheable;
  * @param <T> the type in the cache
  */
 public interface CachePersistenceDAO<T extends Cacheable> {
-  
-  /**
-   * Persist a single updated cache object to the DB.
-   * (only value fields are saved! i.e. those that change
-   * due to incoming updates).
-   * 
-   * @param cacheable the cache object to persist
-   */
-  void updateCacheable(T cacheable);
 
   /**
    * Persists a batch of cache objects in a single transaction.
