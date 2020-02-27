@@ -76,9 +76,10 @@ public class ProcessService extends AbstractSupervisedService<Process> implement
       ((ProcessCacheObject) process).setRequiresReboot(false);
       start(processId, startupTime.getTime());
 
-//    if (getLocalConfig() != null && getLocalConfig().equals(ProcessCacheObject.LocalConfig.Y)) {
-//      setSupervision(SupervisionStatus.RUNNING_LOCAL, message, timestamp);
-//    } TODO (Alex) Review this
+      if (process.getLocalConfig() != null && process.getLocalConfig().equals(ProcessCacheObject.LocalConfig.Y)) {
+        stateTagService.getCache().compute(process.getStateTagId(), stateTag ->
+          stateTag.setSupervision(SupervisionStatus.RUNNING_LOCAL, "Process was started locally", startupTime));
+      }
     });
   }
 

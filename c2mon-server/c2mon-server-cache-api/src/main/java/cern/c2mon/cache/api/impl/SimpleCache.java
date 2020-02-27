@@ -55,9 +55,9 @@ public class SimpleCache<V extends Cacheable> extends AbstractCache<V> {
   public void close() {
     // It's quite possible that the cache is already closed, so check first
     synchronized (this) {
-      if (!cache.isClosed())
+      if (!cache.isClosed()) {
         cache.close();
-      // TODO (Alex) Close listener manager?
+      }
     }
   }
 }
