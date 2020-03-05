@@ -17,7 +17,7 @@
       <modules>
         <module>tar</module>
         <module>images</module>
-        <module>kubernetes</module>
+        <!--module>kubernetes</module-->
       </modules>
     </profile>
   </profiles>
