@@ -71,7 +71,7 @@ build_docs:
     when: on_success
     expire_in: 7 days
     paths:
-      - _site
+      - docs/_site
   only:
     - master
 
