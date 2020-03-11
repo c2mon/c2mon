@@ -33,14 +33,11 @@ import cern.c2mon.shared.client.device.DeviceClassNameResponse;
 import cern.c2mon.shared.client.device.DeviceClassNameResponseImpl;
 import cern.c2mon.shared.client.device.TransferDevice;
 import cern.c2mon.shared.client.device.TransferDeviceImpl;
-import cern.c2mon.shared.client.tag.Publisher;
-import cern.c2mon.shared.client.tag.TagConfigImpl;
-import cern.c2mon.shared.client.tag.TagMode;
-import cern.c2mon.shared.client.tag.TransferTagImpl;
-import cern.c2mon.shared.client.tag.TransferTagValueImpl;
+import cern.c2mon.shared.client.tag.*;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 
-import static cern.c2mon.shared.common.type.TypeConverter.*;
+import static cern.c2mon.shared.common.type.TypeConverter.getType;
+import static cern.c2mon.shared.common.type.TypeConverter.isKnownClass;
 
 /**
  * Factory class for creating transfer objects for sending to the C2MON client layer
@@ -152,6 +149,8 @@ public abstract class TransferObjectFactory {
               .faultMemeber(alarm.getFaultMember())
               .faultFamily(alarm.getFaultFamily())
               .info(alarm.getInfo())
+              .alarmConditionDescription(alarm.getCondition().getDescription())
+              .alarmConditionXml(alarm.getCondition().getXMLCondition())
               .tagId(alarm.getTagId())
               .timestamp(alarm.getTimestamp())
               .active(alarm.isActive())
@@ -195,7 +194,7 @@ public abstract class TransferObjectFactory {
     if (tag != null) {
 
       tagConfig = new TagConfigImpl(tag.getId());
-      tagConfig.setAlarmIds(new ArrayList<Long>(tag.getAlarmIds()));
+      tagConfig.setAlarmIds(new ArrayList<>(tag.getAlarmIds()));
 
       Boolean controlTag = Boolean.FALSE;
       if (tag instanceof ControlTag) {
@@ -246,7 +245,7 @@ public abstract class TransferObjectFactory {
       } else {
         tagConfig.setLogged(Boolean.FALSE);
       }
-      ArrayList<String> processNames = new ArrayList<String>();
+      ArrayList<String> processNames = new ArrayList<>();
       for (Process process : tagProcesses) {
         processNames.add(process.getName());
       }
@@ -284,7 +283,7 @@ public abstract class TransferObjectFactory {
    */
   private static void addAlarmValues(final TransferTagValueImpl tagValue, final Collection<Alarm> alarms) {
     if (alarms != null) {
-      List<AlarmValueImpl> alarmValues = new ArrayList<AlarmValueImpl>(alarms.size());
+      List<AlarmValueImpl> alarmValues = new ArrayList<>(alarms.size());
       for (Alarm alarm : alarms) {
         AlarmValueImpl alarmValue =
                 AlarmValueImpl.builder()
@@ -297,8 +296,8 @@ public abstract class TransferObjectFactory {
                 .timestamp(alarm.getTimestamp())
                 .active(alarm.isActive())
                 .oscillating(alarm.isOscillating())
-                .sourceTimestamp(alarm.getSourceTimestamp()).build();    
-                
+                .sourceTimestamp(alarm.getSourceTimestamp()).build();
+
         if (alarm.getMetadata()!= null){
           alarmValue.setMetadata(alarm.getMetadata().getMetadata());
         }

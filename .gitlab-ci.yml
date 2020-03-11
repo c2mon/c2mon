@@ -29,7 +29,7 @@ variables:
   script:
     - export MAVEN_OPTS=""
     - cd $TARGET
-    - mvn $MAVEN_CLI_OPTS test-compile
+    - mvn $MAVEN_CLI_OPTS -DskipTests install
   artifacts:
     name: "$TARGET#$CI_COMMIT_REF_NAME"
     when: on_success
@@ -177,7 +177,7 @@ sonar_preview:
     - tags
 
 quality_assurance:
-  stage: qa
+  stage: qa                                                     
   image: 
     name: gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-maven:gcc-jdk-11-mvn-3.6-1
     entrypoint: [""]   
@@ -188,7 +188,7 @@ quality_assurance:
     - build_daq
   script:
     - mvn $MAVEN_CLI_OPTS package sonar:sonar -Dmaven.test.skip=true -DskipDocker=true -Dsonar.host.url=${SONAR_URL} -Dsonar.dependencyCheck.reportPath=target/dependency-check-report.xml
-  only:
+  only:                                                    
     - master
 
 #  =========================
@@ -202,10 +202,10 @@ publish:
     name: gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-maven:gcc-jdk-11-mvn-3.6-1
     entrypoint: [""]   
   dependencies:
-    - build_shared
-    - build_server
-    - build_client
-    - build_daq
+    - test_shared
+    - test_server
+    - test_client
+    - test_daq
   script:
     - mvn $MAVEN_CLI_OPTS -P ci-deploy deploy
   only:
@@ -218,7 +218,7 @@ publish:
 #  =========================
 
 trigger_build:
-  stage: deploy
+  stage: deploy                            
   image: appropriate/curl:3.1
   dependencies: []
   script:
