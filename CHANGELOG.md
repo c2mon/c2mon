@@ -10,6 +10,7 @@ For more details on a given release, please check also the [version planning](ht
 ### Added
 - Server: Added support for Elasticsearch 6.x (CM-144)
 - Server: Integrated Elasticsearch REST client
+- Rules: Added support for scientific (exponential) notation in rule engine syntax
 - Alarm: Added support for alarms activation outside of a given range (CM-237)
 - Alarm: The `AlarmValue` object contains now information about the alarm condition that triggered the alarm (CM-243). You can get it as User targeted text description and as XML for admins. 
 
