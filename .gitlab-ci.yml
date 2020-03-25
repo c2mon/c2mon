@@ -28,7 +28,7 @@ variables:
     entrypoint: [""]   
   script:
     - export MAVEN_OPTS=""
-    - find .m2/repository/cern/c2mon
+    - test -e $CI_PROJECT_DIR/.m2/repository/cern/c2mon && find $CI_PROJECT_DIR/.m2/repository/cern/c2mon
     - cd $TARGET
     - mvn $MAVEN_CLI_OPTS -DskipTests install
   artifacts:
@@ -53,7 +53,7 @@ build_shared:
     TARGET: "c2mon-shared"
   artifacts:
     paths:
-      - .m2
+      - $CI_PROJECT_DIR/.m2
       - "$TARGET"
 
 #  =========================
