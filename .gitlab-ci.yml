@@ -29,7 +29,7 @@ variables:
   script:
     - export MAVEN_OPTS=""
     - test -e $CI_PROJECT_DIR/.m2/repository/cern/c2mon && find $CI_PROJECT_DIR/.m2/repository/cern/c2mon
-    - mvn -pl $MAVEN_CLI_OPTS -DskipTests install
+    - mvn -pl $TARGET $MAVEN_CLI_OPTS -DskipTests install
   artifacts:
     name: "$TARGET#$CI_COMMIT_REF_NAME"
     when: on_success
