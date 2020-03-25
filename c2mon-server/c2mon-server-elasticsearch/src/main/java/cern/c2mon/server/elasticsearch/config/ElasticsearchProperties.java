@@ -42,6 +42,11 @@ public class ElasticsearchProperties {
   private boolean enabled = true;
 
   /**
+   * Enable/Disable the initiation of Embedded ES instance (should be used only for tests)
+   */
+  private boolean embedded = true;
+
+  /**
    * Host name or IP address pointing to the Elasticsearch cluster
    */
   private String host = "localhost";
