@@ -28,6 +28,7 @@ variables:
     entrypoint: [""]   
   script:
     - export MAVEN_OPTS=""
+    - find .m2/repository/cern/c2mon
     - cd $TARGET
     - mvn $MAVEN_CLI_OPTS -DskipTests install
   artifacts:
