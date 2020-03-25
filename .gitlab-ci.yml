@@ -104,7 +104,7 @@ build_daq:
 .test_base:
   stage: test
   image: 
-    name: gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-maven:gcc-jdk-11-mvn-3.6-1
+    name: gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-maven:jdk-11-mvn-3.6-1
     entrypoint: [""]   
   script:
     - export MAVEN_OPTS=""
@@ -160,7 +160,7 @@ test_daq:
 sonar_preview:
   stage: qa
   image: 
-    name: gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-maven:gcc-jdk-11-mvn-3.6-1
+    name: gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-maven:jdk-11-mvn-3.6-1
     entrypoint: [""]   
   dependencies:
     - build_shared
@@ -176,7 +176,7 @@ sonar_preview:
 quality_assurance:
   stage: qa                                                     
   image: 
-    name: gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-maven:gcc-jdk-11-mvn-3.6-1
+    name: gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-maven:jdk-11-mvn-3.6-1
     entrypoint: [""]   
   dependencies:
     - build_shared
@@ -196,7 +196,7 @@ quality_assurance:
 publish:
   stage: publish
   image: 
-    name: gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-maven:gcc-jdk-11-mvn-3.6-1
+    name: gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-maven:jdk-11-mvn-3.6-1
     entrypoint: [""]   
   dependencies:
     - test_shared
