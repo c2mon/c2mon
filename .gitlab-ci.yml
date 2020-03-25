@@ -24,19 +24,16 @@ variables:
   stage: compile
   dependencies: []
   image: 
-    name: gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-maven:gcc-jdk-11-mvn-3.6-1
+    name: gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-maven:jdk-11-mvn-3.6-1
     entrypoint: [""]   
   script:
     - export MAVEN_OPTS=""
     - test -e $CI_PROJECT_DIR/.m2/repository/cern/c2mon && find $CI_PROJECT_DIR/.m2/repository/cern/c2mon
-    - cd $TARGET
-    - mvn $MAVEN_CLI_OPTS -DskipTests install
+    - mvn -pl $MAVEN_CLI_OPTS -DskipTests install
   artifacts:
     name: "$TARGET#$CI_COMMIT_REF_NAME"
     when: on_success
     expire_in: 60 minutes
-    paths:
-      - "$TARGET"
   except:
     - master
     - tags
@@ -53,7 +50,7 @@ build_shared:
     TARGET: "c2mon-shared"
   artifacts:
     paths:
-      - $CI_PROJECT_DIR/.m2
+      - .m2/
       - "$TARGET"
 
 #  =========================
@@ -112,8 +109,7 @@ build_daq:
   script:
     - export MAVEN_OPTS=""
     - mkdir reports
-    - cd $TARGET
-    - mvn $MAVEN_CLI_OPTS surefire:test && find -iname 'TEST-*.xml' -exec cp {} ../reports/ \;
+    - mvn -pl $TARGET $MAVEN_CLI_OPTS surefire:test && find -iname 'TEST-*.xml' -exec cp {} ../reports/ \;
   artifacts:
     name: "$CI_JOB_NAME"
     expire_in: 60 minutes
