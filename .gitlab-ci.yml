@@ -1,10 +1,13 @@
 stages:
-  - precompile
-  - compile
+  - build
   - test
   - qa
   - publish
-  - deploy
+
+image: 
+  name: gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-maven:jdk-11-mvn-3.6-1
+  entrypoint: [""]   
+
 
 variables:
   # This will suppress any download for dependencies and plugins or upload messages which would clutter the console log.
@@ -16,89 +19,51 @@ variables:
       --batch-mode --errors --fail-at-end --show-version --settings $CI_PROJECT_DIR/settings.xml
 # It would be good to get the certs for this one
 
+
 #  =========================
-#  === Stage: Precompile ===
+#  === Stage: build      ===
 #  =========================
 
-.build_base:
-  stage: compile
-  dependencies: []
-  image: 
-    name: gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-maven:jdk-11-mvn-3.6-1
-    entrypoint: [""]   
+Compile:
+  stage: build
   script:
     - export MAVEN_OPTS=""
-    - test -e $CI_PROJECT_DIR/.m2/repository/cern/c2mon && find $CI_PROJECT_DIR/.m2/repository/cern/c2mon
-    - mvn -pl $TARGET $MAVEN_CLI_OPTS -DskipTests install
-    - test -e $CI_PROJECT_DIR/.m2/repository/cern/c2mon && find $CI_PROJECT_DIR/.m2/repository/cern/c2mon
+    - mvn $MAVEN_CLI_OPTS -DskipTests install
   artifacts:
     name: "$CI_JOB_NAME"
+    untracked: true
     when: on_success
     expire_in: 60 minutes
-    paths:
-      - $CI_PROJECT_DIR/.m2/
-      - "$TARGET"
   except:
     - master
     - tags
-
-build_shared:
-  extends: .build_base
-  stage: precompile
-  variables:
-    TARGET: "c2mon-shared"
-
-#  =========================
-#  ===== Stage: Compile ====
-#  =========================
-
-build_docs:
-  stage: compile
+    
+"Build docs":
+  stage: build
   image: jekyll/builder:3.8.5
-  tags: [docker]
   script:
     - cd docs
     - jekyll build --config "_config.yml,_overwrite_url.yml"
   artifacts:
     name: site
     when: on_success
-    expire_in: 7 days
+    expire_in: 2 days
     paths:
       - docs/_site
   only:
     - master
 
-build_server:
-  extends: .build_base
-  dependencies: [build_shared]
-  variables:
-    TARGET: "c2mon-server"
-
-build_client:
-  extends: .build_base
-  dependencies: [build_shared]
-  variables:
-    TARGET: "c2mon-client"
-
-build_daq:
-  extends: .build_base
-  dependencies: [build_shared]
-  variables:
-    TARGET: "c2mon-daq"
 
 #  =========================
-#  ===== Stage: Test =======
+#  ===== Stage: test =======
 #  =========================
 
-.test_base:
+Test:
   stage: test
-  image: 
-    name: gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-maven:jdk-11-mvn-3.6-1
-    entrypoint: [""]   
   script:
     - export MAVEN_OPTS=""
     - mkdir reports
-    - mvn -pl $TARGET $MAVEN_CLI_OPTS surefire:test && find -iname 'TEST-*.xml' -exec cp {} ./reports/ \;
+    - mvn $MAVEN_CLI_OPTS surefire:test && find -iname 'TEST-*.xml' -exec cp {} ./reports/ \;
   artifacts:
     name: "$CI_JOB_NAME"
     expire_in: 60 minutes
@@ -109,53 +74,13 @@ build_daq:
     - master
     - tags
 
-# Ordered higher as it's the slowest to run
-test_server:
-  extends: .test_base
-  dependencies:
-    - build_shared
-    - build_server
-  variables:
-    TARGET: "c2mon-server"
-
-test_shared:
-  extends: .test_base
-  dependencies:
-    - build_shared
-  variables:
-    TARGET: "c2mon-shared"
-
-test_client:
-  extends: .test_base
-  dependencies:
-    - build_shared
-    - build_client
-  variables:
-    TARGET: "c2mon-client"
-
-test_daq:
-  extends: .test_base
-  dependencies:
-    - build_shared
-    - build_daq
-  variables:
-    TARGET: "c2mon-daq"
-
 #  =========================
 #  ====== Stage: QA ========
 #  =========================
 
 # These tasks may need to override MAVEN_OPTS manually
-sonar_preview:
+"Sonar QA":
   stage: qa
-  image: 
-    name: gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-maven:jdk-11-mvn-3.6-1
-    entrypoint: [""]   
-  dependencies:
-    - build_shared
-    - build_server
-    - build_client
-    - build_daq
   script:
     - test -e $CI_PROJECT_DIR/.m2/repository/cern/c2mon && find $CI_PROJECT_DIR/.m2/repository/cern/c2mon
     - mvn $MAVEN_CLI_OPTS sonar:sonar -Dsonar.host.url=${SONAR_URL} -Dsonar.analysis.mode=preview -Dsonar.gitlab.commit_sha=$CI_BUILD_REF -Dsonar.gitlab.ref_name=$CI_BUILD_REF_NAME -Dsonar.gitlab.project_id=$CI_PROJECT_ID -Dsonar.gitlab.max_major_issues_gate=0
@@ -163,16 +88,8 @@ sonar_preview:
     - master
     - tags
 
-quality_assurance:
+"Sonar master QA":
   stage: qa                                                     
-  image: 
-    name: gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-maven:jdk-11-mvn-3.6-1
-    entrypoint: [""]   
-  dependencies:
-    - build_shared
-    - build_server
-    - build_client
-    - build_daq
   script:
     - mvn $MAVEN_CLI_OPTS package sonar:sonar -Dmaven.test.skip=true -DskipDocker=true -Dsonar.host.url=${SONAR_URL} -Dsonar.dependencyCheck.reportPath=target/dependency-check-report.xml
   only:                                                    
@@ -183,20 +100,8 @@ quality_assurance:
 #  =========================
 
 # Fully build and publish master branch
-publish:
+Publish:
   stage: publish
-  image: 
-    name: gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-maven:jdk-11-mvn-3.6-1
-    entrypoint: [""]   
-  dependencies:
-    - build_shared
-    - build_server
-    - build_client
-    - build_daq
-    - test_shared
-    - test_server
-    - test_client
-    - test_daq
   script:
     - mvn $MAVEN_CLI_OPTS -P ci-deploy deploy
   only:
@@ -204,12 +109,9 @@ publish:
 
 # Publish docker images?
 
-#  =========================
-#  ===== Stage: Deploy =====
-#  =========================
 
-trigger_build:
-  stage: deploy                            
+"Trigger TIM build":
+  stage: publish                            
   image: appropriate/curl:3.1
   dependencies: []
   script:
@@ -217,8 +119,8 @@ trigger_build:
   only:
   - master
 
-deploy_docs:
-  stage: deploy
+"Deploy docs":
+  stage: publish
   image: gitlab-registry.cern.ch/ci-tools/ci-worker:cc7
   dependencies:
     - build_docs
