@@ -30,6 +30,7 @@ variables:
     - export MAVEN_OPTS=""
     - test -e $CI_PROJECT_DIR/.m2/repository/cern/c2mon && find $CI_PROJECT_DIR/.m2/repository/cern/c2mon
     - mvn -pl $TARGET $MAVEN_CLI_OPTS -DskipTests install
+    - test -e $CI_PROJECT_DIR/.m2/repository/cern/c2mon && find $CI_PROJECT_DIR/.m2/repository/cern/c2mon
   artifacts:
     name: "$CI_JOB_NAME"
     when: on_success
@@ -188,6 +189,10 @@ publish:
     name: gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-maven:jdk-11-mvn-3.6-1
     entrypoint: [""]   
   dependencies:
+    - build_shared
+    - build_server
+    - build_client
+    - build_daq
     - test_shared
     - test_server
     - test_client
