@@ -58,44 +58,21 @@ Compile:
 #  ===== Stage: test =======
 #  =========================
 
-.test_base:
+Test:
   stage: test
   script:
     - export MAVEN_OPTS=""
     - mkdir reports
-    - cd $TARGET
-    - mvn $MAVEN_CLI_OPTS surefire:test && find -iname 'TEST-*.xml' -exec cp {} ../reports/ \;
+    - mvn $MAVEN_CLI_OPTS surefire:test && find -iname 'TEST-*.xml' -exec cp {} ./reports/ \;
   artifacts:
     name: "$CI_JOB_NAME"
-    expire_in: 3 days
+    expire_in: 60 minutes
     when: always
     reports:
       junit: reports/*.xml
   except:
     - master
     - tags
-
-"Test Shared":
-  extends: .test_base
-  variables:
-    TARGET: "c2mon-shared"
-
-"Test Server":
-  extends: .test_base
-  variables:
-    TARGET: "c2mon-server"
-
-
-"Test Client":
-  extends: .test_base
-  variables:
-    TARGET: "c2mon-client"
-
-"Test DAQ":
-  extends: .test_base
-  variables:
-    TARGET: "c2mon-daq"
-
 
 #  =========================
 #  ====== Stage: QA ========
