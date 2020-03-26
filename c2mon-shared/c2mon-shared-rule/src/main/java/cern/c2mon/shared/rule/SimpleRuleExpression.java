@@ -208,6 +208,14 @@ public class SimpleRuleExpression extends RuleExpression implements Cloneable {
                         i++;
                     }
                 }
+                if (i < len && "E".equalsIgnoreCase(chars[i]+"")) {
+                    tempStr.append('E');
+                    i++;
+                    while (i < len && ( Character.isDigit(chars[i]) || chars[i] == '-')) {
+                        tempStr.append(chars[i]);
+                        i++;
+                    }
+                }
                 buffer.add(Double.valueOf(tempStr.toString()));
                 break;
             case '.':
