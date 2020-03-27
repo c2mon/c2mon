@@ -16,7 +16,7 @@ variables:
   # when running from the command line.
   MAVEN_CLI_OPTS:
     -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository
-      --batch-mode --errors --fail-at-end --show-version --settings $CI_PROJECT_DIR/settings.xml
+      --batch-mode --errors --show-version --settings $CI_PROJECT_DIR/settings.xml
 # It would be good to get the certs for this one
 
 
@@ -63,7 +63,8 @@ Test:
   script:
     - export MAVEN_OPTS=""
     - mkdir reports
-    - mvn $MAVEN_CLI_OPTS surefire:test && find -iname 'TEST-*.xml' -exec cp {} ./reports/ \;
+    - mvn $MAVEN_CLI_OPTS surefire:test 
+    - find -iname 'TEST-*.xml' -exec cp {} ./reports/ \;
   artifacts:
     name: "$CI_JOB_NAME"
     expire_in: 60 minutes
