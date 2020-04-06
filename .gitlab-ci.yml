@@ -30,13 +30,14 @@ build_and_publish:
   only:
     - master
 
-# Just run tests on feature branches
+# Just run unit and integration tests on feature branches
 build:
   stage: build
   tags:
     - docker-privileged
   script:
     - mvn -U -B test -DskipDockerBuild -DskipDockerTag --settings settings-ci.xml
+    - mvn -U -B failsafe:integration-test  -DskipDockerBuild -DskipDockerTag --settings settings-ci.xml
   except:
     - master
 
