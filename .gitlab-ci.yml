@@ -36,8 +36,7 @@ build:
   tags:
     - docker-privileged
   script:
-    - mvn -U -B test -DskipDockerBuild -DskipDockerTag --settings settings-ci.xml
-    - mvn -U -B failsafe:integration-test  -DskipDockerBuild -DskipDockerTag --settings settings-ci.xml
+    - mvn -U -B test failsafe:integration-test -DskipDockerBuild -DskipDockerTag --settings settings-ci.xml
   except:
     - master
 
