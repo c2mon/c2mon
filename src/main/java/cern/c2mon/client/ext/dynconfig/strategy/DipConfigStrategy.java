@@ -1,59 +1,49 @@
 package cern.c2mon.client.ext.dynconfig.strategy;
 
-import java.net.URI;
-import java.util.Collection;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-
-import cern.c2mon.client.ext.dynconfig.SupportedProtocolsEnum;
-import cern.c2mon.client.ext.dynconfig.configuration.ProcessEquipmentURIMapping;
+import cern.c2mon.client.ext.dynconfig.config.ProcessEquipmentURIMapping;
+import cern.c2mon.client.ext.dynconfig.query.DipQueryObj;
+import cern.c2mon.shared.client.configuration.api.equipment.Equipment;
 import cern.c2mon.shared.client.configuration.api.tag.DataTag;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
+import cern.c2mon.shared.common.datatag.address.HardwareAddress;
 import cern.c2mon.shared.common.datatag.address.impl.DIPHardwareAddressImpl;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 /**
  * Implements a configuration strategy for DIP.
- * 
- * @author CERN
  *
  */
-public class DipConfigStrategy extends AConfigStrategy  implements ITagConfigurationStrategy {
+@NoArgsConstructor
+@AllArgsConstructor
+public class DipConfigStrategy implements ITagConfigStrategy {
 
-	Logger logger = LoggerFactory.getLogger(this.getClass());
-	
-	public DipConfigStrategy() {
+	private static final String MESSAGE_HANDLER = "cern.c2mon.daq.dip.DIPMessageHandler";
+	private DipQueryObj queryObj;
+
+	public DataTag prepareTagConfigurations() {
+		DataTagAddress address = new DataTagAddress(getHardwareAddress());
+		return DataTag
+				.create(queryObj.getTagName(), queryObj.getDataType(), address)
+				.description(queryObj.getTagDescription()).build();
 	}
 
 	/**
-	 * Create DIP Data Tags out of the given URIs
-	 * 
-	 * @see cern.c2mon.client.ext.dynconfig.strategy.ITagConfigurationStrategy#getConfiguration(java.util.Collection)
+	 * Returns a DIP hardware address with the values contained in the queryObj.
+	 * @return a C2MON hardware address with itemName defined in the queryObj.
 	 */
-	@Override
-	public MultiValueMap<String, DataTag> getConfigurations(ProcessEquipmentURIMapping mapping, Collection<URI> uris) {
-		String msgHandler = "cern.c2mon.daq.dip.DIPMessageHandler";
-		
-		createProcessIfRequired(mapping, msgHandler);
-
-		MultiValueMap<String, DataTag> dataTags = new LinkedMultiValueMap<String, DataTag>();
-		for (URI uri : uris) {
-				DataTagAddress address = new DataTagAddress(new DIPHardwareAddressImpl(uri.getHost() + uri.getPath()));
-				
-				DataTag tagToCreate = DataTag.create(uri.toString(), Object.class, address).description(uri.toString()).build();
-				dataTags.add(mapping.getEquipmentName(), tagToCreate);
-		}
-
-		return dataTags;
+	public HardwareAddress getHardwareAddress() {
+		return new DIPHardwareAddressImpl(queryObj.getItemName());
 	}
 
-	@Override
-	public boolean test(URI uri) {
-		return uri.getScheme().equals(SupportedProtocolsEnum.PROTOCOL_DIP.getUrlScheme());
+	/**
+	 * Create those fields of the equipmentBuilder that are protocol-specific
+ 	 * @param mapping contains additional specification regarding the C2MON-internal equipment name and description
+	 * @return equipmentBuilder the equipmentBuilder to extend with protocol-specific fields
+	 */
+	public Equipment prepareEquipmentConfiguration(ProcessEquipmentURIMapping mapping) {
+		return Equipment.create(mapping.getEquipmentName(), MESSAGE_HANDLER)
+				.description(mapping.getEquipmentDescription())
+				.address(queryObj.getUri()).build();
 	}
-
-
-	
 }

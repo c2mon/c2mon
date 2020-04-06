@@ -1,0 +1,7 @@
+# ActiveMQ URL
+c2mon:
+  client:
+    jms:
+      url: failover:tcp://dockc2mon.cern.ch:61616?wireFormat.tcpNoDelayEnabled=true
+      # user: P_Test
+      # password: Test_P

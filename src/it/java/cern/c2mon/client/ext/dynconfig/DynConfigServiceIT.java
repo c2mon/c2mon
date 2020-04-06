@@ -1,86 +1,84 @@
 package cern.c2mon.client.ext.dynconfig;
 
-import static org.junit.Assert.assertTrue;
-
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-
-import org.junit.Test;
-
-import cern.c2mon.client.common.listener.TagListener;
 import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.core.C2monServiceGateway;
+import cern.c2mon.client.core.service.ConfigurationService;
 import cern.c2mon.client.core.service.TagService;
-import cern.c2mon.client.ext.dynconfig.configuration.DynConfigConfiguration;
-import cern.c2mon.client.ext.dynconfig.configuration.ProcessEquipmentURIMapping;
-import cern.c2mon.client.ext.dynconfig.strategy.DipConfigStrategy;
-import cern.c2mon.client.ext.dynconfig.strategy.ITagConfigurationStrategy;
+import cern.c2mon.client.ext.dynconfig.config.DynConfiguration;
+import cern.c2mon.client.ext.dynconfig.factories.ProtocolSpecificFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.*;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.wait.strategy.Wait;
 
+import java.net.URI;
+import java.util.Collections;
+
+@Slf4j
+@SpringBootTest(classes = {DynConfigService.class, DynConfiguration.class})
+@TestPropertySource(locations = "classpath:mapping.properties")
+@RunWith(SpringRunner.class)
 public class DynConfigServiceIT {
-	@Test
-	public void testDynConfigService() throws Exception {
-		//System.setProperty("c2mon.client.conf.url", "classpath:c2mon-dynconfig-client.properties");
+
+	private static final URI uri = URI.create("dip://dip/acc/LHC/RunControl/Page1?itemName=Page1");
+
+	@Autowired
+	private TagService ts;
+
+	@Autowired
+	private ConfigurationService cs;
+
+	@Autowired
+	private DynConfigService dcs;
+
+	@BeforeClass
+	public static void setupServer() {
+		GenericContainer<?> c2mon = new GenericContainer("cern/c2mon:1.9.2")
+				.waitingFor(Wait.forListeningPort())
+				.withNetworkMode("host");
+		c2mon.start();
+		log.info("C2MON is starting... ");
+
+		//System.setProperty("c2mon.client.conf.url", "classpath:c2mon-dynconfig-client.yml");
 		//System.setProperty("c2mon.client.jms.url", "http://dash.web.cern.ch");
-		System.setProperty("c2mon.client.jms.url", "tcp://localhost:61616");
-		System.setProperty("c2mon.dynconfig.component.active", "false");
 		C2monServiceGateway.startC2monClientSynchronous();
-		
-		DynConfigService dcs = new DynConfigService();
-		dcs.setConfigurationService(C2monServiceGateway.getConfigurationService());
-		dcs.setTagService(C2monServiceGateway.getTagService());
-		
-		dcs.setConfig(new DynConfigConfiguration());
-		List<ProcessEquipmentURIMapping> mappings = new ArrayList<>();
-		
-		mappings.add(ProcessEquipmentURIMapping.builder().uriPattern("^dip.*")
-				.processId(10001L).processName("P_DYNDIP")
-				.equipmentName("E_DYNDIP").build());
-		
-		dcs.getConfig().setMappings(mappings);
-		
-		DipConfigStrategy dipCS = new DipConfigStrategy();
-		
-		dcs.setConfigurationStrategies(Arrays.asList(new ITagConfigurationStrategy[]{dipCS}));
-		
-		URI uri = new URI("dip://dip/acc/LHC/RunControl/Page1");
-		Tag tag = dcs.getTagForURI(uri);
-		
-		TagService ts = C2monServiceGateway.getTagService();
-        //ts.subscribe(100000L, new TagListener() {
-        ts.subscribe(tag.getId(), new TagListener() {
-
-			@Override
-			public void onUpdate(Tag tagUpdate) {
-				onInitialUpdate(Arrays.asList(new Tag[] { tagUpdate }));
-			}
-
-			@Override
-			public void onInitialUpdate(Collection<Tag> initialValues) {
-				for (Tag tagUpdate : initialValues) {
-					System.out.println(String.format("received update for %s : %s", tagUpdate.getName(), tagUpdate.getValue()));
-					
-				}
-
-			} 
-		});
-		
-		
-
-		System.out.println("Waiting for updates...");
-		Thread.sleep(3000l);
-		
-		
-		System.out.println("Deleting the tag now ...");
-		dcs.deleteTagForURI(uri);
-		
-		assertTrue(ts.findByName(SupportedProtocolsEnum.convertToTagName(uri)).isEmpty());
-		
-		System.out.println("Done.");
 	}
 
-	
+	@After
+	public void clean() throws DynConfigException {
+		dcs.deleteTagForURI(uri);
+	}
 
+	@Test
+	public void getTagForURIWithUnknownTagShouldCreateTag() throws Exception {
+		String tagName = ProtocolSpecificFactory.of(uri).createQueryObj().getTagName();
+
+		Assert.assertTrue(ts.findByName(tagName).isEmpty());
+		dcs.getTagForURI(uri);
+		Assert.assertFalse(ts.findByName(tagName).isEmpty());
+	}
+
+	@Test
+	public void getTagForURIWithUnknownTagShouldReturnCreatedTag() throws Exception {
+		Tag tag = dcs.getTagForURI(uri);
+		Assert.assertEquals(Collections.singletonList(tag), ts.findByName(ProtocolSpecificFactory.of(uri).createQueryObj().getTagName()));
+	}
+
+	@Test
+	public void deleteTagForURIWithExistingTagShouldRemoveTag() throws Exception {
+		dcs.getTagForURI(uri);
+		dcs.deleteTagForURI(uri);
+		Assert.assertTrue(ts.findByName(ProtocolSpecificFactory.of(uri).createQueryObj().getTagName()).isEmpty());
+	}
+
+	@Test
+	public void deleteTagForURIWithoutTagShouldDoNothing() throws Exception {
+		dcs.deleteTagForURI(uri);
+		Assert.assertTrue(ts.findByName(ProtocolSpecificFactory.of(uri).createQueryObj().getTagName()).isEmpty());
+	}
 }

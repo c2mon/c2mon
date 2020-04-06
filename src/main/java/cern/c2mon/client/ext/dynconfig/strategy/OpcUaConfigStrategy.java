@@ -1,77 +1,61 @@
 package cern.c2mon.client.ext.dynconfig.strategy;
 
-import java.net.URI;
-import java.util.Collection;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-
-import cern.c2mon.client.core.service.ConfigurationService;
-import cern.c2mon.client.ext.dynconfig.DynConfigService;
-import cern.c2mon.client.ext.dynconfig.SupportedProtocolsEnum;
-import cern.c2mon.client.ext.dynconfig.configuration.ProcessEquipmentURIMapping;
+import cern.c2mon.client.ext.dynconfig.config.ProcessEquipmentURIMapping;
+import cern.c2mon.client.ext.dynconfig.query.OpcUaQueryObj;
 import cern.c2mon.shared.client.configuration.api.equipment.Equipment;
-import cern.c2mon.shared.client.configuration.api.process.Process;
 import cern.c2mon.shared.client.configuration.api.tag.DataTag;
-import cern.c2mon.shared.client.process.ProcessNameResponse;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
+import cern.c2mon.shared.common.datatag.address.HardwareAddress;
+import cern.c2mon.shared.common.datatag.address.OPCCommandHardwareAddress;
 import cern.c2mon.shared.common.datatag.address.OPCHardwareAddress.ADDRESS_TYPE;
 import cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
-public class OpcUaConfigStrategy extends AConfigStrategy implements ITagConfigurationStrategy {
+/**
+ * Implements a configuration strategy for OPC UA.
+ */
+@NoArgsConstructor
+@AllArgsConstructor
+public class OpcUaConfigStrategy implements ITagConfigStrategy {
 
-	private ConfigurationService configurationService;
-	
-	Logger logger = LoggerFactory.getLogger(this.getClass());
-	
-	public OpcUaConfigStrategy(DynConfigService dynConfServ, ConfigurationService configurationService){
-		this.configurationService = configurationService;
+	private static  final String MESSAGE_HANDLER = "cern.c2mon.daq.opcua.OPCUAMessageHandler";
+	private OpcUaQueryObj queryObj;
+
+
+	public DataTag prepareTagConfigurations() {
+		DataTagAddress address = new DataTagAddress(getHardwareAddress());
+		return DataTag
+				.create(queryObj.getTagName(), queryObj.getDataType(), address)
+				.description(queryObj.getTagDescription()).build();
 	}
-	
-	
-	@Override
-	public MultiValueMap<String, DataTag> getConfigurations(ProcessEquipmentURIMapping mapping, Collection<URI> uris) {
-		MultiValueMap<String, DataTag> dataTags = new LinkedMultiValueMap<String, DataTag>();
-		
- 		String msgHandler = "cern.c2mon.daq.dip.DIPMessageHandler";
-
-        createProcessIfRequired(mapping, msgHandler);
-
-		Collection<ProcessNameResponse> processes = configurationService.getProcessNames();
-		if (! processes.contains(mapping.getProcessName())) {
-			Process process = Process.create(mapping.getProcessName()).id(mapping.getProcessId()).description(mapping.getProcessDescription()).build();
-			
-			configurationService.createProcess(process);
-			
-			Equipment equipment = Equipment.create(mapping.getEquipmentName(), "cern.c2mon.daq.opcua.OPCUAMessageHandler").description(mapping.getEquipmentDescription()).build();
-			configurationService.createEquipment(mapping.getProcessName(),  equipment);
+	/**
+	 * Returns an OPC hardware address with the values contained in the queryObj.
+	 * @return a C2MON hardware address with itemName and Namespace as defined in the queryObj. The hardware address is always of type String.
+	 */
+	public HardwareAddress getHardwareAddress() {
+		Integer commandPulseLength = queryObj.getCommandPulseLength();
+		OPCHardwareAddressImpl hwAddr = (commandPulseLength != null)
+				? new OPCHardwareAddressImpl(queryObj.getItemName(), commandPulseLength)
+				: new OPCHardwareAddressImpl(queryObj.getItemName());
+		hwAddr.setAddressType(ADDRESS_TYPE.STRING);
+		hwAddr.setNamespace(queryObj.getNamespace());
+		OPCCommandHardwareAddress.COMMAND_TYPE commandType = queryObj.getCommandType();
+		if (commandType != null) {
+			hwAddr.setCommandType(commandType);
 		}
-		
-		for (URI uri : uris) {
-			if (uri.getScheme().equals(SupportedProtocolsEnum.PROTOCOL_OPCUA.getUrlScheme())) {
-				OPCHardwareAddressImpl hwAddr = new OPCHardwareAddressImpl(uri.getPath().substring(1) );
-				hwAddr.setAddressType(ADDRESS_TYPE.STRING);
-				hwAddr.setNamespace(1);
-				DataTagAddress address = new DataTagAddress(hwAddr);
-				
-				DataTag tagToCreate = DataTag.create(uri.toString(), Object.class, address).description(uri.toString()).build();
-				dataTags.add(mapping.getEquipmentName(), tagToCreate);
-			}
-		}
-			
-		return dataTags;
+		return  hwAddr;
 	}
 
-
-	@Override
-	public boolean test(URI uri) {
-		return uri.getScheme().equals(SupportedProtocolsEnum.PROTOCOL_OPCUA.getUrlScheme());
+	/**
+	 * Create those fields of the equipmentBuilder that are protocol-specific.
+	 * @param mapping contains additional specification regading the C2MON-internal equipment name and description
+	 * @return equipmentBuilder the equipmentBuilder to extend with protocol-specific fields
+	 */
+	public Equipment prepareEquipmentConfiguration(ProcessEquipmentURIMapping mapping) {
+		return Equipment.create(mapping.getEquipmentName(), MESSAGE_HANDLER)
+				.description(mapping.getEquipmentDescription())
+				.address(queryObj.getUri()).build();
 	}
-
-
-
-
 
 }
