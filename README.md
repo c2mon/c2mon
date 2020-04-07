@@ -30,14 +30,14 @@ a cross-platform, self-contained bootstrap mechanism for the build.
 
 ### Prerequisites
 
-[Git][] and [JDK 8 update 152 or later][JDK8 build]
+[Git][] and [JDK 11.0.6 or later][JDK11 build]
 
-Be sure that your `JAVA_HOME` environment variable points to the `jdk1.8.0` folder
+Be sure that your `JAVA_HOME` environment variable points to the `JDK 11` folder
 extracted from the JDK download.
 
 #### IDEs
 
-To reduce the boiler plate code we make use of [Lombok](https://projectlombok.org/), which requires to be [setup in your IDE](https://projectlombok.org/setup/overview) in order to compile the project.
+To reduce the boiler plate code we make use of the latest [Lombok](https://projectlombok.org/), which requires to be [setup in your IDE](https://projectlombok.org/setup/overview) in order to compile the project.
 
 ### Check out sources
 `git clone git@github.com:c2mon/c2mon.git`
@@ -59,7 +59,7 @@ C2MON is released under the [GNU LGPLv3 License][].
 [Find here]: https://gitlab.cern.ch/c2mon/c2mon/milestones?state=all
 [Maven]: http://maven.apache.org
 [Git]: http://help.github.com/set-up-git-redirect
-[JDK8 build]: http://www.oracle.com/technetwork/java/javase/downloads
+[JDK11 build]: https://www.oracle.com/java/technologies/javase-jdk11-downloads.html
 [Pull requests]: http://help.github.com/send-pull-requests
 [contributor guidelines]: /CONTRIBUTING.md
 [GNU LGPLv3 License]: /LICENSE
