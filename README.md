@@ -1,5 +1,5 @@
 # C2MON : CERN Control and Monitoring Platform
-[![build status](https://gitlab.cern.ch/%{project_path})](https://gitlab.cern.ch/c2mon/c2mon/commits/master)
+[![build status](https://gitlab.cern.ch/c2mon/c2mon/badges/master/pipeline.svg)](https://gitlab.cern.ch/c2mon/c2mon/commits/master)
 
 The CERN Control and Monitoring Platform (C2MON) is a heterogeneous data acquisition and monitoring framework. It contains many useful features
 such as historical metric persistence and browsing, command execution and alerting. It can be suitable for building many different types
