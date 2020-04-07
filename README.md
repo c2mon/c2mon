@@ -53,7 +53,7 @@ C2MON is released under the [GNU LGPLv3 License][].
 
 [Javadoc]: https://c2mon.web.cern.ch/c2mon/javadoc/
 [reference docs]: http://c2mon.web.cern.ch/c2mon/docs/
-[CERN JIRA]: https://its.cern.ch/jira/issues/?jql=project%20%3D%20CM%20AND%20resolution%20%3D%20Unresolved%20AND%20component%20%3D%20%22Client%20Ext%20History%22%20ORDER%20BY%20priority%20DESC%2C%20updated%20DESC
+[CERN JIRA]: https://its.cern.ch/jira/projects/CM
 [GitHub issues]: https://github.com/c2mon/c2mon/issues
 [CHANGELOG.md]: /CHANGELOG.md
 [Find here]: https://gitlab.cern.ch/c2mon/c2mon/milestones?state=all
