@@ -1,10 +1,20 @@
-image: gitlab-registry.cern.ch/industrial-controls/sw-infra/jenkins/mvn-plus-jdk
-
 stages:
   - build
-  - deploy 
+  - deploy
   - release
   - sonar
+
+services:
+  # To obtain a Docker daemon, request a Docker-in-Docker service
+  - docker:19.03.1-dind
+
+variables:
+  DOCKER_TLS_CERTDIR: ""
+  DOCKER_HOST: "tcp://docker:2375/"
+
+image:
+  name: gitlab-registry.cern.ch/industrial-controls/sw-infra/mvn-dind:3.6.2-19.3.0-jdk11
+  entrypoint: [""]
 
 # Get the settings file from c2mon project
 before_script:
@@ -13,33 +23,33 @@ before_script:
 # Fully build and publish master branch
 build_and_publish:
   stage: deploy
-  script: 
-    - mvn -U -B deploy -Djavax.net.ssl.trustStore=${JAVA_HOME}/jre/lib/security/cacerts --settings settings-ci.xml
+  tags:
+    - docker-privileged
+  script:
+    - mvn -U -B deploy --settings settings-ci.xml
   only:
     - master
-  except:
-    - tags
-    
-# Just run tests on feature branches
+
+# Just run unit and integration tests on feature branches
 build:
   stage: build
+  tags:
+    - docker-privileged
   script:
-    - mvn -U -B test -Djavax.net.ssl.trustStore=${JAVA_HOME}/jre/lib/security/cacerts --settings settings-ci.xml
+    - mvn -U -B test failsafe:integration-test -DskipDockerBuild -DskipDockerTag --settings settings-ci.xml
   except:
     - master
-    
+
 sonar_preview:
   stage: sonar
   script:
-    - mvn -q -U -B clean compile sonar:sonar -Dmaven.test.skip=true -Dsonar.host.url=${SONAR_URL} -Djavax.net.ssl.trustStore=${JAVA_HOME}/jre/lib/security/cacerts -Dsonar.analysis.mode=preview -Dsonar.gitlab.commit_sha=$CI_BUILD_REF -Dsonar.gitlab.ref_name=$CI_BUILD_REF_NAME -Dsonar.gitlab.project_id=$CI_PROJECT_ID -Dsonar.gitlab.max_major_issues_gate=0 --settings settings-ci.xml
+    - mvn -q -U -B clean compile sonar:sonar -Dmaven.test.skip=true -Dsonar.host.url=${SONAR_URL} -Dsonar.analysis.mode=preview -Dsonar.gitlab.commit_sha=$CI_BUILD_REF -Dsonar.gitlab.ref_name=$CI_BUILD_REF_NAME -Dsonar.gitlab.project_id=$CI_PROJECT_ID -Dsonar.gitlab.max_major_issues_gate=0 --settings settings-ci.xml
   except:
     - master
-    - tags
 
 quality_assurance:
   stage: sonar
   script:
-    - mvn package sonar:sonar -Dmaven.test.skip=true -Dsonar.host.url=${SONAR_URL} -Djavax.net.ssl.trustStore=${JAVA_HOME}/jre/lib/security/cacerts -Dsonar.dependencyCheck.reportPath=target/dependency-check-report.xml --settings settings-ci.xml
+    - mvn package sonar:sonar -Dmaven.test.skip=true -Dsonar.host.url=${SONAR_URL} -Dsonar.dependencyCheck.reportPath=target/dependency-check-report.xml --settings settings-ci.xml
   only:
     - master
-

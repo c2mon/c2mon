@@ -26,6 +26,7 @@ import java.util.Collections;
 public class DynConfigServiceIT {
 
 	private static final URI uri = URI.create("dip://dip/acc/LHC/RunControl/Page1?itemName=Page1");
+	private static final int JMS_PORT = 61616;
 
 	@Autowired
 	private TagService ts;
@@ -40,12 +41,11 @@ public class DynConfigServiceIT {
 	public static void setupServer() {
 		GenericContainer<?> c2mon = new GenericContainer("cern/c2mon:1.9.2")
 				.waitingFor(Wait.forListeningPort())
-				.withNetworkMode("host");
+				.withExposedPorts(JMS_PORT);
 		c2mon.start();
 		log.info("C2MON is starting... ");
 
-		//System.setProperty("c2mon.client.conf.url", "classpath:c2mon-dynconfig-client.yml");
-		//System.setProperty("c2mon.client.jms.url", "http://dash.web.cern.ch");
+		System.setProperty("c2mon.client.jms.url", "tcp://" + c2mon.getContainerIpAddress() + ":" + c2mon.getMappedPort(JMS_PORT));
 		C2monServiceGateway.startC2monClientSynchronous();
 	}
 
