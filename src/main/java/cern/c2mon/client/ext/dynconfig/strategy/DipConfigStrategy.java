@@ -1,49 +1,37 @@
 package cern.c2mon.client.ext.dynconfig.strategy;
 
-import cern.c2mon.client.ext.dynconfig.config.ProcessEquipmentURIMapping;
-import cern.c2mon.client.ext.dynconfig.query.DipQueryObj;
-import cern.c2mon.shared.client.configuration.api.equipment.Equipment;
+import cern.c2mon.client.ext.dynconfig.DynConfigException;
+import cern.c2mon.client.ext.dynconfig.query.QueryKey;
 import cern.c2mon.shared.client.configuration.api.tag.DataTag;
-import cern.c2mon.shared.common.datatag.DataTagAddress;
-import cern.c2mon.shared.common.datatag.address.HardwareAddress;
+import cern.c2mon.shared.common.datatag.address.DIPHardwareAddress;
 import cern.c2mon.shared.common.datatag.address.impl.DIPHardwareAddressImpl;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+
+import java.net.URI;
+import java.util.Arrays;
 
 /**
  * Implements a configuration strategy for DIP.
  *
  */
-@NoArgsConstructor
-@AllArgsConstructor
-public class DipConfigStrategy implements ITagConfigStrategy {
+public class DipConfigStrategy extends TagConfigStrategy implements ITagConfigStrategy {
+	/**
+	 * These  Query Keys must be handles specifically as they must be set in the HardwareAddress constructor.
+	 */
+	private static final QueryKey<String> PUBLICATION_NAME =new QueryKey<>("publicationName", null, true);
+	private static final QueryKey<String> FIELD_NAME = new QueryKey<>("fieldName");
+	private static final QueryKey<Integer> FIELD_INDEX = new QueryKey<>("fieldIndex", -1);
 
-	private static final String MESSAGE_HANDLER = "cern.c2mon.daq.dip.DIPMessageHandler";
-	private DipQueryObj queryObj;
-
-	public DataTag prepareTagConfigurations() {
-		DataTagAddress address = new DataTagAddress(getHardwareAddress());
-		return DataTag
-				.create(queryObj.getTagName(), queryObj.getDataType(), address)
-				.description(queryObj.getTagDescription()).build();
+	DipConfigStrategy(URI uri) throws DynConfigException {
+		messageHandler = "cern.c2mon.daq.dip.DIPMessageHandler";
+		super.createQueryObj(uri, Arrays.asList(PUBLICATION_NAME, FIELD_NAME, FIELD_NAME));
 	}
 
-	/**
-	 * Returns a DIP hardware address with the values contained in the queryObj.
-	 * @return a C2MON hardware address with itemName defined in the queryObj.
-	 */
-	public HardwareAddress getHardwareAddress() {
-		return new DIPHardwareAddressImpl(queryObj.getItemName());
-	}
-
-	/**
-	 * Create those fields of the equipmentBuilder that are protocol-specific
- 	 * @param mapping contains additional specification regarding the C2MON-internal equipment name and description
-	 * @return equipmentBuilder the equipmentBuilder to extend with protocol-specific fields
-	 */
-	public Equipment prepareEquipmentConfiguration(ProcessEquipmentURIMapping mapping) {
-		return Equipment.create(mapping.getEquipmentName(), MESSAGE_HANDLER)
-				.description(mapping.getEquipmentDescription())
-				.address(queryObj.getUri()).build();
+	@Override
+	public DataTag prepareTagConfigurations() throws DynConfigException {
+		DIPHardwareAddress dipHardwareAddress = new DIPHardwareAddressImpl(
+				queryObj.get(PUBLICATION_NAME).get(0),
+				queryObj.get(FIELD_NAME).get(0),
+				queryObj.get(FIELD_INDEX, Integer.class).get(0));
+		return super.toTagConfiguration(dipHardwareAddress);
 	}
 }

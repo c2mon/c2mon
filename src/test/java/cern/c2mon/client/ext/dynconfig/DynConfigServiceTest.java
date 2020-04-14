@@ -92,7 +92,7 @@ class DynConfigServiceTest {
     }
 
     @Test
-    void getTagForURIShouldReturnFirstTagFound() throws DynConfigException {
+    void getSingleTagForURIShouldReturnFirstTagFound() throws DynConfigException {
         expect(tagService.findByName(anyString()))
                 .andReturn(tags)
                 .once();
@@ -104,7 +104,7 @@ class DynConfigServiceTest {
     }
 
     @Test
-    void getTagForURIShouldCreateTagIfNotFound() throws DynConfigException {
+    void getSingleTagForURIShouldCreateTagIfNotFound() throws DynConfigException {
         setupMockForCreateTagWithReport(new ConfigurationReport());
         replay(tagService, configurationService);
         Tag tagsForURI = dcs.getTagForURI(opcUa);
@@ -113,8 +113,9 @@ class DynConfigServiceTest {
         Assertions.assertEquals(tags.iterator().next(), tagsForURI);
     }
 
+
     @Test
-    void getTagForURIShouldThrowErrorWhenCreateTagReportsError() {
+    void getSingleTagForURIShouldThrowErrorWhenCreateTagReportsError() {
         setupMockForCreateTagWithReport(new ConfigurationReport(false, "fail"));
         replay(tagService, configurationService);
         Assertions.assertThrows(DynConfigException.class, () -> dcs.getTagForURI(opcUa));

@@ -1,28 +1,40 @@
 package cern.c2mon.client.ext.dynconfig.strategy;
 
 import cern.c2mon.client.ext.dynconfig.DynConfigException;
-import cern.c2mon.client.ext.dynconfig.query.DipQueryObj;
+import cern.c2mon.shared.common.datatag.address.DIPHardwareAddress;
+import cern.c2mon.shared.common.datatag.address.HardwareAddress;
 import cern.c2mon.shared.common.datatag.address.impl.DIPHardwareAddressImpl;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 
-class DipConfigStrategyTest {
-    DipConfigStrategy strategy = new DipConfigStrategy();
+import static org.junit.jupiter.api.Assertions.*;
 
-    @BeforeEach
-    void setUp() throws DynConfigException {
-        URI uri = URI.create("dip://host/path?itemName=x1");
-        DipQueryObj queryObj = new DipQueryObj(uri);
-        strategy = new DipConfigStrategy(queryObj);
+class DipConfigStrategyTest {
+
+    @Test
+    void createStrategyWithoutPublicationNameShouldThrowError() {
+        URI uri = URI.create("dip://host/path");
+        assertThrows(DynConfigException.class, () -> new DipConfigStrategy(uri));
     }
 
     @Test
-    void getHardwareAddress() {
-        DIPHardwareAddressImpl expected = new DIPHardwareAddressImpl("x1");
+    void prepareTagConfigurationsShouldReturnProperAddressClass() throws DynConfigException {
+        HardwareAddress actual = createHardwareAddressFrom("publicationName=x1");
+        assertTrue(actual instanceof DIPHardwareAddress);
+    }
 
-        Assertions.assertEquals(expected, strategy.getHardwareAddress());
+
+    @Test
+    void prepareTagConfigurationsWithFieldNameAndIndexShouldSetThem() throws DynConfigException {
+        DIPHardwareAddressImpl expected = new DIPHardwareAddressImpl("x1", "b", 2);
+        HardwareAddress actual = createHardwareAddressFrom("publicationName=x1&fieldName=b&fieldIndex=2");
+        assertEquals(expected, actual);
+    }
+
+    static HardwareAddress createHardwareAddressFrom(String queries) throws DynConfigException {
+        URI uri = URI.create("dip://host/path?"+ queries);
+        ITagConfigStrategy strategy = new DipConfigStrategy(uri);
+        return strategy.prepareTagConfigurations().getAddress().getHardwareAddress();
     }
 }

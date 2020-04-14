@@ -5,8 +5,6 @@ import cern.c2mon.client.core.service.ConfigurationService;
 import cern.c2mon.client.core.service.TagService;
 import cern.c2mon.client.ext.dynconfig.config.DynConfiguration;
 import cern.c2mon.client.ext.dynconfig.config.ProcessEquipmentURIMapping;
-import cern.c2mon.client.ext.dynconfig.factories.ProtocolSpecificFactory;
-import cern.c2mon.client.ext.dynconfig.query.IQueryObj;
 import cern.c2mon.client.ext.dynconfig.strategy.ITagConfigStrategy;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.api.equipment.Equipment;
@@ -51,8 +49,8 @@ public class DynConfigService {
 	 * @throws DynConfigException if the Tag exists but could not be deleted.
 	 */
 	public void deleteTagForURI(URI uri) throws DynConfigException {
-		ProtocolSpecificFactory factory = ProtocolSpecificFactory.of(uri);
-		Collection<Tag> tags = findExistingTag(factory.createQueryObj());
+		String tagName = URIParser.toTagName(uri);
+		Collection<Tag> tags = tagService.findByName(tagName);
 		if (!tags.isEmpty()) {
 			deleteTags(tags);
 			log.info("Deleting data tags {} completed.", tags);
@@ -86,15 +84,13 @@ public class DynConfigService {
 		Collection<ConfigurationReport> reports = new ArrayList<>();
 
 		for (URI uri : uris) {
-			ProtocolSpecificFactory factory = ProtocolSpecificFactory.of(uri);
-			IQueryObj queryObj = factory.createQueryObj();
-			Collection<Tag> tagsForUri = findExistingTag(queryObj);
+			String tagName = URIParser.toTagName(uri);
+			Collection<Tag> tagsForUri = tagService.findByName(tagName);
 			if (tagsForUri.isEmpty()) {
 				log.info("No data tag could be found for {}. Creating.. ", uri);
-				ITagConfigStrategy strategy = factory.createStrategy(queryObj);
-				ConfigurationReport report = createTagsAndReport(queryObj, strategy);
+				ConfigurationReport report = createTagsAndReport(uri, tagName);
 				reports.add(report);
-				tagsForUri = findExistingTag(queryObj);
+				tagsForUri = tagService.findByName(tagName);
 				log.info("Data tag {} has been created ", tagsForUri);
 			} else {
 				log.info("Data tag {} already exists", tagsForUri);
@@ -105,10 +101,6 @@ public class DynConfigService {
 		handleConfigurationReport(reports, DynConfigException.Context.CREATE_TAG);
 		log.info("Getting data tags {} completed.", tags);
 		return tags;
-	}
-
-	private Collection<Tag> findExistingTag(IQueryObj queryObj) {
-		return tagService.findByName(queryObj.getTagName());
 	}
 
 	private void deleteTags(Collection<Tag> dataTags) throws DynConfigException {
@@ -123,8 +115,9 @@ public class DynConfigService {
 		return tags.stream().map(Tag::getId).collect(Collectors.toSet());
 	}
 
-	private ConfigurationReport createTagsAndReport(IQueryObj queryObj, ITagConfigStrategy strategy) throws DynConfigException {
-		ProcessEquipmentURIMapping mapping = findMappingFor(queryObj);
+	private ConfigurationReport createTagsAndReport(URI uri, String tagName) throws DynConfigException {
+		ITagConfigStrategy strategy = ITagConfigStrategy.of(uri);
+		ProcessEquipmentURIMapping mapping = findMappingFor(strategy, tagName);
 		if (!isCompatibleProcessRunning(mapping)) {
 			log.info("No compatible process is running. Create process and equipment. ");
 			createProcessAndEquipment(mapping, strategy);
@@ -138,7 +131,7 @@ public class DynConfigService {
 				.anyMatch(response -> response.getProcessName().contains(mapping.getProcessName()));
 	}
 
-	private void createProcessAndEquipment(ProcessEquipmentURIMapping mapping, ITagConfigStrategy strategy) {
+	private void createProcessAndEquipment(ProcessEquipmentURIMapping mapping, ITagConfigStrategy strategy) throws DynConfigException {
 		Process process = Process.create(mapping.getProcessName())
 				.id(mapping.getProcessId())
 				.description(mapping.getProcessDescription())
@@ -151,11 +144,11 @@ public class DynConfigService {
 		log.info("Equipment created: {}", equipment.getName());
 	}
 
-	private ProcessEquipmentURIMapping findMappingFor(IQueryObj queryObj) throws DynConfigException {
+	private ProcessEquipmentURIMapping findMappingFor(ITagConfigStrategy strategy, String tagName) throws DynConfigException {
 		return config.getMappings().stream()
-				.filter(m -> queryObj.matches(m.getUriPattern()))
+				.filter(m -> strategy.matches(m.getUriPattern()))
 				.findFirst()
-				.orElseThrow(() -> new DynConfigException(DynConfigException.Context.NO_MAPPING, queryObj.getTagName()));
+				.orElseThrow(() -> new DynConfigException(DynConfigException.Context.NO_MAPPING, tagName));
 	}
 
 	private void handleConfigurationReport(Collection<ConfigurationReport> reports, DynConfigException.Context context) throws DynConfigException {

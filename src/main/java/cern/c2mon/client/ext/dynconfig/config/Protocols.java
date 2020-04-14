@@ -1,26 +1,24 @@
 package cern.c2mon.client.ext.dynconfig.config;
 
 import cern.c2mon.client.ext.dynconfig.DynConfigException;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
 
 
 /**
  * This enum defined the protocols currently supported by the DynConfig Module along with their schemes.
  */
-@AllArgsConstructor
-@Getter
 public enum Protocols {
-    PROTOCOL_DIP("dip", false),
-    PROTOCOL_OPCUA("opc.tcp", false),
-    PROTOCOL_OPCDA("opcda",false),
-    PROTOCOL_SIMU("simu", false),
-    PROTOCOL_HEARTBEAT("heartbeat", false),
-    PROTOCOL_RDA("rda", false),
-    PROTOCOL_JAPC("japc", false);
+    PROTOCOL_DIP("dip"),
+    PROTOCOL_OPCUA("opc.tcp"),
+    PROTOCOL_REST("http", "https");
 
-    private final String urlScheme;
-    private final boolean supportsAuthentication;
+    private final List<String> urlSchemes;
+
+    Protocols(String... urlSchemes) {
+        this.urlSchemes = Arrays.asList(urlSchemes);
+    }
 
     /**
      * Fetches the Protocols enum object matching a scheme
@@ -29,10 +27,13 @@ public enum Protocols {
      * @throws DynConfigException if the scheme does not correspond to any supported Protocol
      */
     public static Protocols getEnumForScheme(String scheme) throws DynConfigException {
-        if (scheme.equalsIgnoreCase(PROTOCOL_DIP.urlScheme)) {
+        scheme = scheme.toLowerCase(Locale.getDefault());
+        if (PROTOCOL_DIP.urlSchemes.contains(scheme)) {
             return PROTOCOL_DIP;
-        } else if (scheme.equalsIgnoreCase(PROTOCOL_OPCUA.urlScheme)) {
+        } else if (PROTOCOL_OPCUA.urlSchemes.contains(scheme)) {
             return PROTOCOL_OPCUA;
+        } else if (PROTOCOL_REST.urlSchemes.contains(scheme)) {
+            return PROTOCOL_REST;
         } else {
             throw new DynConfigException(DynConfigException.Context.UNSUPPORTED_SCHEME, scheme);
         }
