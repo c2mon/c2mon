@@ -22,6 +22,10 @@
     </profile>
   </profiles>
 
+  <modules>
+        <module>tar</module>
+  </modules>
+  
   <dependencyManagement>
     <dependencies>
       <dependency>
