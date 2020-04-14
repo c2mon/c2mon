@@ -104,7 +104,7 @@ Test:
 Publish:
   stage: publish
   script:
-    - mvn $MAVEN_CLI_OPTS -P ci-deploy deploy
+    - mvn $MAVEN_CLI_OPTS deploy
   only:
     - master
 
