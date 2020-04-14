@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch.monitor;
 
+import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -35,20 +36,28 @@ import cern.c2mon.server.elasticsearch.client.ElasticsearchClientConfiguration;
 @EnableScheduling
 public class ElasticsearchClientHealthMonitor {
 
+  private final ElasticsearchProperties properties;
+
   private final ElasticsearchClient client;
 
   /**
    * Constructs ES client health monitor
    *
+   * @param properties of Elasticsearch instance
    * @param client to be monitored
    */
   @Autowired
-  public ElasticsearchClientHealthMonitor(ElasticsearchClient client) {
+  public ElasticsearchClientHealthMonitor(ElasticsearchProperties properties, ElasticsearchClient client) {
+    this.properties = properties;
     this.client = client;
   }
 
   @Scheduled(fixedRate = 10000, initialDelay = ElasticsearchClientConfiguration.CLIENT_SETUP_TIMEOUT)
   private void check() {
+    if (!properties.isEnabled()) {
+      return ;
+    }
+
     if (!client.isClientHealthy()) {
       log.warn("ES client is not healthy! Setting up a new client . . .");
       client.setup();
