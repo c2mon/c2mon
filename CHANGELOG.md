@@ -7,6 +7,8 @@ All issues referenced in parentheses can be consulted under [CERN JIRA](https://
 For more details on a given release, please check also the [version planning](https://its.cern.ch/jira/projects/CM/versions).
 
 ## [Unreleased]
+
+## 1.9.4 - 2020-04-15
 ### Added
 - Server: Added support for Elasticsearch 6.x (CM-144)
 - Server: Integrated Elasticsearch REST client
