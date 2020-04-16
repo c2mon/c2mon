@@ -35,7 +35,6 @@ import cern.c2mon.server.elasticsearch.domain.IndexMetadata;
  */
 @Slf4j
 @Component
-@ManagedResource(objectName = "cern.c2mon:name=tagConfigDocumentIndexer")
 public class TagConfigDocumentIndexer {
 
   private final String configIndex;
