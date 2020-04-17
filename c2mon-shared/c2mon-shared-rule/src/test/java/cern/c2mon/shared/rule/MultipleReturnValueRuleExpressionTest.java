@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.shared.rule;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Collection;
@@ -96,6 +97,8 @@ public class MultipleReturnValueRuleExpressionTest {
   /** --------------------------------------------------------------------------------------------**/
   /** --------------------------------------------------------------------------------------------**/
   
+  private static final String FLOAT_COMPARISON_RULE_1 = "( 6E-1  >  9E-2 ) [true], true [false]";
+  private static final String FLOAT_COMPARISON_RULE_2 = "( 8E-13  <  10E-12 ) [true], true [false]";
   
   private static final String TEST_1 = "#156279L = 0[0]|  true[3]";
   
@@ -250,6 +253,12 @@ public class MultipleReturnValueRuleExpressionTest {
     assertTrue(resultValue.contains("2"));
     assertTrue(resultValue.contains("3"));
     assertTrue(resultValue.size() == 2);
+  }
+  
+  @Test
+  public void testFloatComparison() throws RuleEvaluationException {
+	  assertTrue((Boolean) evaluateRule(FLOAT_COMPARISON_RULE_1));
+	  assertTrue((Boolean) evaluateRule(FLOAT_COMPARISON_RULE_2));
   }
   
   private Object evaluateRule(final RuleExpression rule) throws RuleEvaluationException {

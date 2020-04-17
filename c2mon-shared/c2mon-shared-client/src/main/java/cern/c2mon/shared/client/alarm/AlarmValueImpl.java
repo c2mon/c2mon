@@ -33,6 +33,7 @@ import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.convert.AnnotationStrategy;
 import org.simpleframework.xml.core.Persister;
 
+import cern.c2mon.shared.client.alarm.condition.AlarmCondition;
 import cern.c2mon.shared.client.request.ClientRequestReport;
 
 /**
@@ -74,6 +75,14 @@ public final class AlarmValueImpl extends ClientRequestReport implements AlarmVa
   /** Free text for additional information about the alarm */
   @Element(required = false)
   private String info;
+
+  /** Corresponds to the description of {@link AlarmCondition#getDescription()} */
+  @Element(required = false)
+  private String alarmConditionDescription;
+
+  /** XML representation of the {@link AlarmCondition} */
+  @Element(required = false)
+  private String alarmConditionXml;
 
   /** Unique identifier of the Tag to which the alarm is attached */
   @Element

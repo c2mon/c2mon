@@ -16,6 +16,10 @@
  *****************************************************************************/
 package cern.c2mon.server.client.util;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.TagWithAlarms;
 import cern.c2mon.server.common.control.ControlTag;
@@ -32,10 +36,6 @@ import cern.c2mon.shared.client.device.TransferDevice;
 import cern.c2mon.shared.client.device.TransferDeviceImpl;
 import cern.c2mon.shared.client.tag.*;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 import static cern.c2mon.shared.common.type.TypeConverter.getType;
 import static cern.c2mon.shared.common.type.TypeConverter.isKnownClass;
@@ -216,6 +216,7 @@ public abstract class TransferObjectFactory {
 
       if (tag instanceof DataTag) {
         DataTag dataTag = (DataTag) tag;
+
         // check if min. value is defined, since it is not mandatory
         if (dataTag.getMinValue() != null)
           tagConfig.setMinValue(dataTag.getMinValue().toString());
@@ -223,6 +224,19 @@ public abstract class TransferObjectFactory {
         // check if max. value is defined, since it is not mandatory
         if (dataTag.getMaxValue() != null)
           tagConfig.setMaxValue(dataTag.getMaxValue().toString());
+
+        if (dataTag.getAddress() != null) {
+
+          tagConfig.setValueDeadbandType(dataTag.getAddress().getValueDeadbandType());
+          tagConfig.setValueDeadband(dataTag.getAddress().getValueDeadband());
+          tagConfig.setTimeDeadband(dataTag.getAddress().getTimeDeadband());
+          tagConfig.setGuaranteedDelivery(dataTag.getAddress().isGuaranteedDelivery());
+          tagConfig.setPriority(dataTag.getAddress().getPriority());
+          tagConfig.setAddressParameters(dataTag.getAddress().getAddressParameters());
+          if(dataTag.getAddress().getHardwareAddress() != null){
+            tagConfig.setHardwareAddress(dataTag.getAddress().getHardwareAddress().toConfigXML());
+          }
+        }
       }
 
       if (tag instanceof RuleTag) {

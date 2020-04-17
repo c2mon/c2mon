@@ -69,7 +69,7 @@ public class HistoryDataSourceConfig {
 
     databaseIdProvider.setProperties(
       KotlinAPIs.apply(new Properties(), properties -> {
-        properties.setProperty("HSQL", "hsql");
+        properties.setProperty("HSQL", "oracle");
         properties.setProperty("Oracle", "oracle");
         properties.setProperty("MySQL", "mysql");
       })

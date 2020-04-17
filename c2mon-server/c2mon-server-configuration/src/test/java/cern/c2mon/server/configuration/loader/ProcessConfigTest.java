@@ -93,9 +93,9 @@ public class ProcessConfigTest extends ConfigurationCacheLoaderTest<Process> {
     configurationLoader.applyConfiguration(configuration);
 
     // Disable if flaky
-    assertTrue(processCache.containsKey(10000L));
+    assertTrue(processCache.containsKey(10_000L));
     // Autocreated control tags
-    assertTrue(aliveTimerCache.containsKey(1000000L));
+    assertTrue(aliveTimerCache.containsKey(300_000L));
   }
 
 

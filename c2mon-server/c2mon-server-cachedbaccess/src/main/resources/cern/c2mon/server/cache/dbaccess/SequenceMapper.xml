@@ -22,20 +22,12 @@
 <!-- take "namespace=Mapper interface" for the mapper SQL statements to be picked up automatically -->
 <mapper namespace="cern.c2mon.server.cache.dbaccess.SequenceMapper">
 
-  <select id="getNextConfigId" databaseId="hsql" resultType="java.lang.Long">
-    CALL NEXT VALUE FOR CONFIG_ID_SEQUENCE
-  </select>
-
   <select id="getNextConfigId" databaseId="oracle" resultType="java.lang.Long">
     SELECT CONFIG_ID_SEQUENCE.NEXTVAL FROM DUAL
   </select>
 
   <select id="getNextConfigId" databaseId="mysql" resultType="java.lang.Long">
     SELECT NEXTVAL('CONFIG_ID');
-  </select>
-
-  <select id="getNextProcessId" databaseId="hsql" resultType="java.lang.Long">
-    CALL NEXT VALUE FOR PROCESS_ID_SEQUENCE
   </select>
 
   <select id="getNextProcessId" databaseId="oracle" resultType="java.lang.Long">
@@ -46,10 +38,6 @@
     SELECT NEXTVAL('PROCESS_ID');
   </select>
 
-  <select id="getNextEquipmentId" databaseId="hsql" resultType="java.lang.Long">
-    CALL NEXT VALUE FOR EQUIPMENT_ID_SEQUENCE
-  </select>
-
   <select id="getNextEquipmentId" databaseId="oracle" resultType="java.lang.Long">
     SELECT EQUIPMENT_ID_SEQUENCE.NEXTVAL FROM DUAL
   </select>
@@ -58,20 +46,12 @@
     SELECT NEXTVAL('Equipment_ID');
   </select>
 
-  <select id="getNextTagId" databaseId="hsql" resultType="java.lang.Long">
-    CALL NEXT VALUE FOR TAG_ID_SEQUENCE
-  </select>
-
   <select id="getNextTagId" databaseId="oracle" resultType="java.lang.Long">
     SELECT TAG_ID_SEQUENCE.NEXTVAL FROM DUAL
   </select>
 
   <select id="getNextTagId" databaseId="mysql" resultType="java.lang.Long">
     SELECT NEXTVAL('PROCESS_ID');
-  </select>
-
-  <select id="getNextAlarmId" databaseId="hsql" resultType="java.lang.Long">
-    CALL NEXT VALUE FOR ALARM_ID_SEQUENCE
   </select>
 
   <select id="getNextAlarmId" databaseId="oracle" resultType="java.lang.Long">
