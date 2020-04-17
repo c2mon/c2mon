@@ -52,12 +52,12 @@ public class ElasticsearchServiceTest {
   public ElasticsearchServiceTest() {
     client = new ElasticsearchClientRest(elasticsearchProperties);
     indexManager = new IndexManager(client);
-    TagConfigDocumentIndexer indexer = new TagConfigDocumentIndexer(elasticsearchProperties, indexManager);
     ProcessCache processCache = createNiceMock(ProcessCache.class);
     EquipmentCache equipmentCache = createNiceMock(EquipmentCache.class);
     SubEquipmentCache subequipmentCache = createNiceMock(SubEquipmentCache.class);
     TagConfigDocumentConverter converter = new TagConfigDocumentConverter(processCache, equipmentCache, subequipmentCache);
     tagFacadeGateway = createNiceMock(TagFacadeGateway.class);
+    TagConfigDocumentIndexer indexer = new TagConfigDocumentIndexer(elasticsearchProperties, indexManager, tagFacadeGateway, converter);
     tagDocumentListener = new TagConfigDocumentListener(elasticsearchProperties, indexer, converter, tagFacadeGateway);
   }
 

@@ -120,11 +120,6 @@
       <artifactId>mockito-all</artifactId>
     </dependency>
     <dependency>
-      <groupId>pl.allegro.tech</groupId>
-      <artifactId>embedded-elasticsearch</artifactId>
-      <version>2.7.0</version>
-    </dependency>
-    <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient</artifactId>
       <scope>compile</scope>

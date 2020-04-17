@@ -16,8 +16,12 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch.tag.config;
 
+import cern.c2mon.server.cache.TagFacadeGateway;
+import cern.c2mon.server.common.tag.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jmx.export.annotation.ManagedOperation;
+import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Component;
 
 import cern.c2mon.server.elasticsearch.IndexManager;
@@ -35,18 +39,27 @@ import cern.c2mon.server.elasticsearch.domain.IndexMetadata;
  */
 @Slf4j
 @Component
+@ManagedResource(objectName = "cern.c2mon:name=tagConfigDocumentIndexer")
 public class TagConfigDocumentIndexer {
 
   private final String configIndex;
   private final IndexManager indexManager;
+  private final TagFacadeGateway tagFacadeGateway;
+  private final TagConfigDocumentConverter converter;
 
   /**
+   * Tag configuration document constructor
+   *
    * @param properties   of Elasticsearch server the application is communicating with.
    * @param indexManager to perform index-related operations.
+   * @param tagFacadeGateway to locate correct facade bean for re-index operation
+   * @param converter to convert tags
    */
   @Autowired
-  public TagConfigDocumentIndexer(ElasticsearchProperties properties, IndexManager indexManager) {
+  public TagConfigDocumentIndexer(ElasticsearchProperties properties, IndexManager indexManager, TagFacadeGateway tagFacadeGateway, TagConfigDocumentConverter converter) {
     this.indexManager = indexManager;
+    this.tagFacadeGateway = tagFacadeGateway;
+    this.converter = converter;
     this.configIndex = properties.getTagConfigIndex();
   }
 
@@ -96,5 +109,20 @@ public class TagConfigDocumentIndexer {
     }
 
     indexManager.delete(indexMetadata);
+  }
+
+  /**
+   * Re-index all tag config documents from the cache.
+   */
+  @ManagedOperation(description = "Re-indexes all tag configs from the cache to Elasticsearch")
+  public void reindexAllTagConfigDocuments() {
+    if (tagFacadeGateway == null) {
+      throw new IllegalStateException("Tag Facade Gateway is null");
+    }
+
+    for (Long id : tagFacadeGateway.getKeys()) {
+      Tag tag = tagFacadeGateway.getTag(id);
+      converter.convert(tag, tagFacadeGateway.getAlarms(tag)).ifPresent(this::updateTagConfig);
+    }
   }
 }
