@@ -10,6 +10,7 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
 
 /**
+ * Creates all Beans required for the JMS communication
  * @author Justin Lewis Salmon
  */
 public class JmsConfig {
@@ -32,18 +33,16 @@ public class JmsConfig {
 
   @Bean
   public JmsTemplate sourceUpdateJmsTemplate() {
-    JmsTemplate template = new JmsTemplate(singleConnectionFactory());
-    template.setDefaultDestination(new ActiveMQQueue(properties.getJms().getQueuePrefix() + ".update." + properties.getName()));
-    template.setMessageConverter(new DataTagValueUpdateConverter());
-    return template;
+    JmsTemplate jmsTemplate = new JmsTemplate(singleConnectionFactory());
+    addDefaultUpdateJmsTemplateQueueProperties(jmsTemplate);
+    return jmsTemplate;
   }
 
   @Bean
   public JmsTemplate processRequestJmsTemplate() {
-    String queueTrunk = properties.getJms().getQueuePrefix();
-    JmsTemplate template = new JmsTemplate(singleConnectionFactory());
-    template.setDefaultDestination(new ActiveMQQueue(queueTrunk + ".request"));
-    return template;
+    JmsTemplate jmsTemplate = new JmsTemplate(singleConnectionFactory());
+    addDefaultProcessRequestJmsTemplateProperties(jmsTemplate);
+    return jmsTemplate;
   }
 
   @Bean
@@ -77,9 +76,9 @@ public class JmsConfig {
     String queueTrunk = properties.getJms().getQueuePrefix();
     JmsTemplate template = new JmsTemplate(filterConnectionFactory());
     template.setDefaultDestination(new ActiveMQQueue(queueTrunk + ".filter"));
+    template.setExplicitQosEnabled(true);
     template.setDeliveryPersistent(false);
-    template.setPriority(1);
-    template.setTimeToLive(1800000);
+    template.setTimeToLive(60_000L);
     return template;
   }
 
@@ -98,18 +97,16 @@ public class JmsConfig {
 
   @Bean
   public JmsTemplate secondSourceUpdateJmsTemplate() {
-    JmsTemplate template = new JmsTemplate(secondSingleConnectionFactory());
-    template.setDefaultDestination(new ActiveMQQueue(properties.getJms().getQueuePrefix() + ".update." + properties.getName()));
-    template.setMessageConverter(new DataTagValueUpdateConverter());
-    return template;
+    JmsTemplate jmsTemplate = new JmsTemplate(secondSingleConnectionFactory());
+    addDefaultUpdateJmsTemplateQueueProperties(jmsTemplate);
+    return jmsTemplate;
   }
 
   @Bean
   public JmsTemplate secondProcessRequestJmsTemplate() {
-    String queueTrunk = properties.getJms().getQueuePrefix();
-    JmsTemplate template = new JmsTemplate(secondSingleConnectionFactory());
-    template.setDefaultDestination(new ActiveMQQueue(queueTrunk + ".request"));
-    return template;
+    JmsTemplate jmsTemplate = new JmsTemplate(secondSingleConnectionFactory());
+    addDefaultProcessRequestJmsTemplateProperties(jmsTemplate);
+    return jmsTemplate;
   }
 
   @Bean
@@ -123,5 +120,17 @@ public class JmsConfig {
     container.setIdleTaskExecutionLimit(10);
     container.setAutoStartup(false);
     return container;
+  }
+  
+  private void addDefaultUpdateJmsTemplateQueueProperties(JmsTemplate jmsTemplate) {
+    jmsTemplate.setDefaultDestination(new ActiveMQQueue(properties.getJms().getQueuePrefix() + ".update." + properties.getName()));
+    jmsTemplate.setExplicitQosEnabled(true);
+    jmsTemplate.setDeliveryPersistent(true);
+    jmsTemplate.setMessageConverter(new DataTagValueUpdateConverter());
+  }
+  
+  private void addDefaultProcessRequestJmsTemplateProperties(JmsTemplate jmsTemplate) {
+    String queueTrunk = properties.getJms().getQueuePrefix();
+    jmsTemplate.setDefaultDestination(new ActiveMQQueue(queueTrunk + ".request"));
   }
 }
