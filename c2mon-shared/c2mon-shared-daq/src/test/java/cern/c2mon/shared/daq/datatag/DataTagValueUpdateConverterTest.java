@@ -1,5 +1,5 @@
-/*
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+/**
+ * Copyright (C) 2010-2020 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package cern.c2mon.shared.daq.datatag;
 
 import cern.c2mon.shared.common.datatag.DataTagValueUpdate;
@@ -65,8 +64,18 @@ public class DataTagValueUpdateConverterTest {
 
   @Before
   public void beforeTest() {
-    valueObject = new SourceDataTagValue(11L, "name", true, null, null, new Timestamp(System.currentTimeMillis()), 1,
-        true, "description", 666);
+    valueObject = SourceDataTagValue.builder()
+        .id(11L)
+        .name("name")
+        .controlTag(true)
+        .value(null)
+        .timestamp(new Timestamp(System.currentTimeMillis()))
+        .daqTimestamp(new Timestamp(System.currentTimeMillis()))
+        .priority(1)
+        .valueDescription("description")
+        .guaranteedDelivery(true)
+        .timeToLive(666)
+        .build();
     value = new DataTagValueUpdate(11L);
     value.addValue(valueObject);
   }

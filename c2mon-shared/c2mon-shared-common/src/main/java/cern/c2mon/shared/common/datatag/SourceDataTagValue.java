@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2020 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -18,14 +18,17 @@ package cern.c2mon.shared.common.datatag;
 
 import java.sql.Timestamp;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Objects of the SourceDataTagValue class represent the current value of a
@@ -52,7 +55,9 @@ import org.w3c.dom.NodeList;
  */
 @Slf4j
 @Data
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public final class SourceDataTagValue implements Cloneable {
   // ----------------------------------------------------------------------------
   // PRIVATE STATIC MEMBERS
@@ -126,43 +131,16 @@ public final class SourceDataTagValue implements Cloneable {
    * Constructor. The DAQ timestamp is set at object creation.
    */
   public SourceDataTagValue(final Long pId, final String pName, final boolean pControlTag) {
-    this(pId, pName, pControlTag, null, // value
-        null, // quality
-        null, // timestamp
-        DataTagAddress.PRIORITY_LOW, false, // no guaranteed delivery
-        null, // no value description
-        DataTagAddress.TTL_FOREVER);
-  }
-
-  /**
-   * Constructor. The DAQ timestamp is set at object creation.
-   */
-  public SourceDataTagValue(final Long pId, final String pName, final boolean pControlTag, final Object pValue,
-      final SourceDataTagQuality pQuality, final long pTimestamp, final int pPriority, final boolean pGuaranteedDelivery,
-      final String pDescription, final int pTimeToLive) {
-    this(pId, pName, pControlTag, pValue, pQuality, new Timestamp(pTimestamp), pPriority, pGuaranteedDelivery,
-        pDescription, pTimeToLive);
-  }
-
-  /**
-   * Constructor. The DAQ timestamp is set at object creation.
-   *
-   * @param pDescription
-   *          the value description
-   */
-  public SourceDataTagValue(final Long pId, final String pName, final boolean pControlTag, final Object pValue,
-      final SourceDataTagQuality pQuality, final Timestamp pTimestamp, final int pPriority,
-      final boolean pGuaranteedDelivery, final String pDescription, final int pTimeToLive) {
     this.id = pId;
     this.name = pName;
     this.controlTag = pControlTag;
-    this.value = pValue;
-    this.setValueDescription(pDescription);
-    this.quality = pQuality;
-    this.timestamp = pTimestamp;
-    this.priority = pPriority;
-    this.guaranteedDelivery = pGuaranteedDelivery;
-    this.timeToLive = pTimeToLive;
+    this.value = null;
+    this.valueDescription = "";
+    this.quality = null;
+    this.timestamp = null;
+    this.priority = DataTagAddress.PRIORITY_LOW;
+    this.guaranteedDelivery = false;
+    this.timeToLive = DataTagAddress.TTL_FOREVER;
     this.simulated = false;
     daqTimestamp = new Timestamp(System.currentTimeMillis());
   }
@@ -176,11 +154,17 @@ public final class SourceDataTagValue implements Cloneable {
    *          original to be copied.
    */
   public SourceDataTagValue(final SourceDataTagValue pOld) {
-    this(pOld.id, pOld.name, pOld.controlTag, pOld.value, pOld.quality, pOld.timestamp, pOld.priority,
-        pOld.guaranteedDelivery, pOld.valueDescription, pOld.timeToLive);
-    // also set simulated flag, which is not part of any constructor
+    this.id =  pOld.id;
+    this.name =  pOld.name;
+    this.controlTag =  pOld.controlTag;
+    this.value =  pOld.value;
+    this.setValueDescription( pOld.valueDescription);
+    this.quality =  pOld.quality;
+    this.timestamp =  pOld.timestamp;
+    this.priority =  pOld.priority;
+    this.guaranteedDelivery =  pOld.guaranteedDelivery;
+    this.timeToLive =  pOld.timeToLive;
     this.simulated = pOld.simulated;
-    // override new DAQ timestamp set by constructor
     this.daqTimestamp = pOld.daqTimestamp;
   }
 
@@ -210,10 +194,11 @@ public final class SourceDataTagValue implements Cloneable {
    */
   public void setValueDescription(final String description) {
     // if description is not defined, store empty string instead of null
-    if (description == null)
+    if (description == null) {
       this.valueDescription = "";
-    else
+    } else {
       this.valueDescription = description;
+    }
   }
 
   /**

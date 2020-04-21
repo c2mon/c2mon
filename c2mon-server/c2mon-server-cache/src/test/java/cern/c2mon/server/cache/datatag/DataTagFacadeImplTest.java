@@ -247,8 +247,19 @@ public class DataTagFacadeImplTest {
   @Test
   public void testValidUpdateAllFieldsSet() {
     Timestamp sourceTime = new Timestamp(System.currentTimeMillis() - 1000);
-    SourceDataTagValue sourceTag = new SourceDataTagValue(2L, "tag name", false, "new value", new SourceDataTagQuality(), sourceTime,
-        DataTagConstants.PRIORITY_HIGH, false, "value desc", DataTagConstants.TTL_FOREVER);
+    
+    SourceDataTagValue sourceTag = SourceDataTagValue.builder()
+        .id(2L)
+        .name("tag name")
+        .controlTag(false)
+        .value("new value")
+        .quality(new SourceDataTagQuality())
+        .timestamp(sourceTime)
+        .daqTimestamp(new Timestamp(System.currentTimeMillis()))
+        .priority(DataTagConstants.PRIORITY_HIGH)
+        .valueDescription("value desc")
+        .timeToLive(DataTagConstants.TTL_FOREVER)
+        .build();
 
     //src, DAQ timestamps are null, cache t.s. is not null
     DataTagCacheObject dataTag = new DataTagCacheObject(2L, "test name", "String", DataTagConstants.MODE_OPERATIONAL);

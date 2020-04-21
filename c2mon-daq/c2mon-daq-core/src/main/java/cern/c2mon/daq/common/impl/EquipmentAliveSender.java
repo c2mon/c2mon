@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2020 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -17,10 +17,7 @@
 package cern.c2mon.daq.common.impl;
 
 import cern.c2mon.daq.common.messaging.IProcessMessageSender;
-import cern.c2mon.shared.common.datatag.DataTagConstants;
-import cern.c2mon.shared.common.datatag.SourceDataTag;
-import cern.c2mon.shared.common.datatag.SourceDataTagValue;
-import cern.c2mon.shared.common.datatag.ValueUpdate;
+import cern.c2mon.shared.common.datatag.*;
 import cern.c2mon.shared.common.type.TypeConverter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,6 +25,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static java.lang.String.format;
+
+import java.sql.Timestamp;
 
 /**
  * This class has all methods for sending the Equipment Supervision Alive Tags
@@ -128,9 +127,20 @@ class EquipmentAliveSender {
       if (aliveTagInterval <= Integer.MAX_VALUE) {
         ttl = aliveTagInterval.intValue();
       }
-
-      aliveTagValue = new SourceDataTagValue(this.aliveTagId, "EQUIPMENT_ALIVE_" + confName, true, currentTimestamp, null, currentTimestamp, DataTagConstants.PRIORITY_HIGH, false,
-          "Alive tag for Equipment " + confName, ttl);
+      
+      aliveTagValue = SourceDataTagValue.builder()
+          .id(this.aliveTagId)
+          .name("EQUIPMENT_ALIVE_" + confName)
+          .controlTag(true)
+          .value(currentTimestamp)
+          .quality(new SourceDataTagQuality())
+          .timestamp(new Timestamp(currentTimestamp))
+          .daqTimestamp(new Timestamp(currentTimestamp))
+          .priority(DataTagAddress.PRIORITY_HIGHEST)
+          .guaranteedDelivery(false)
+          .valueDescription("Alive tag for Equipment " + confName)
+          .timeToLive(ttl)
+          .build();
     }
 
     log.debug("Sending equipment alive message with timestamp {}", currentTimestamp);

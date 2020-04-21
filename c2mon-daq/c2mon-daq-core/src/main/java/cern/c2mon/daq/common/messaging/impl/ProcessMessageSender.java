@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2020 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -16,13 +16,13 @@
  *****************************************************************************/
 package cern.c2mon.daq.common.messaging.impl;
 
+import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.Iterator;
 
 import javax.jms.JMSException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import cern.c2mon.daq.common.conf.core.ProcessConfigurationHolder;
 import cern.c2mon.daq.common.messaging.IProcessMessageSender;
@@ -51,6 +51,7 @@ import cern.c2mon.shared.util.buffer.SynchroBufferListener;
  * For low priority messages, two synchrobuffer's are used (one for persistent,
  * the other for non-persistent messages).
  */
+@Slf4j
 public class ProcessMessageSender implements IProcessMessageSender {
 
   /**
@@ -73,11 +74,6 @@ public class ProcessMessageSender implements IProcessMessageSender {
    * specific broker). Injected in Spring XML configuration file.
    */
   private Collection<JmsSender> jmsSenders;
-
-  /**
-   * The system's logger
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(ProcessMessageSender.class);
 
   public void init() {
     aliveTimer = new AliveTimer(this);
@@ -122,98 +118,79 @@ public class ProcessMessageSender implements IProcessMessageSender {
   @Override
   public final void sendAlive() {
     ProcessConfiguration processConfiguration = ProcessConfigurationHolder.getInstance();
-    LOGGER.debug("sending AliveTag. tag id : " + processConfiguration.getAliveTagID());
-
-    // Just to know what are the arguments :
-    // SourceDataTagValue(Long id,
-    // String name,
-    // boolean controlTag,
-    // Object value,
-    // SourceDataTagQuality quality,
-    // long timestamp,
-    // int priority,
-    // boolean guaranteedDelivery,
-    // int timeToLive)
+    log.debug("sending AliveTag. tag id : " + processConfiguration.getAliveTagID());
 
     long timestamp = System.currentTimeMillis();
-    try {
-      SourceDataTagValue aliveTagValue = new SourceDataTagValue(Long.valueOf(processConfiguration.getAliveTagID()), processConfiguration.getProcessName()
-          + "::AliveTag", true, Long.valueOf(timestamp), new SourceDataTagQuality(), timestamp,
-      /* DataTagAddress.PRIORITY_HIGH */9, // set the highest possible
-                                           // prority
-          false, null, 3 * processConfiguration.getAliveInterval());
+    SourceDataTagValue aliveTagValue = SourceDataTagValue.builder()
+        .id(Long.valueOf(processConfiguration.getAliveTagID()))
+        .name(processConfiguration.getProcessName() + "::AliveTag")
+        .controlTag(true)
+        .value(Long.valueOf(timestamp))
+        .quality(new SourceDataTagQuality())
+        .timestamp(new Timestamp(timestamp))
+        .daqTimestamp(new Timestamp(timestamp))
+        .priority(DataTagAddress.PRIORITY_HIGHEST)
+        .guaranteedDelivery(false)
+        .valueDescription("")
+        .timeToLive(processConfiguration.getAliveInterval())
+        .build();
+    try {  
       distributeValue(aliveTagValue);
-    }
-    catch (JMSException ex) {
-      LOGGER.error("sendAlive : JMSException caught :" + ex.getMessage());
-    }
-    catch (Throwable e) {
-      LOGGER.error("sendAlive : Unexpected Exception caught :", e);
+    } catch (JMSException ex) {
+      log.error("sendAlive : JMSException caught :" + ex.getMessage());
+    } catch (Throwable e) {
+      log.error("sendAlive : Unexpected Exception caught :", e);
     }
 
   }
 
   @Override
   public void sendCommfaultTag(long tagID, String tagName, boolean value, String pDescription) {
-    LOGGER.debug("Sending CommfaultTag. tag id : " + tagID);
-
-    // Just to know what are the arguments :
-    // SourceDataTagValue(Long id,
-    // String name,
-    // boolean controlTag,
-    // Object value,
-    // SourceDataTagQuality quality,
-    // long timestamp,
-    // int priority,
-    // boolean guaranteedDelivery,
-    // int timeToLive)
+    log.debug("Sending CommfaultTag. tag id : " + tagID);
 
     long timestamp = System.currentTimeMillis();
-    SourceDataTagValue commfaultTagValue =
-        new SourceDataTagValue(Long.valueOf(tagID),
-                                                      tagName,
-                                                      true,
-                                                      value,
-                                                      new SourceDataTagQuality(),
-                                                      timestamp,
-                                                      DataTagAddress.PRIORITY_HIGH,
-                                                      false,
-                                                      pDescription,
-                                                      9999999);
-
+    SourceDataTagValue commfaultTagValue = SourceDataTagValue.builder()
+        .id(tagID)
+        .name(tagName)
+        .controlTag(true)
+        .value(value)
+        .quality(new SourceDataTagQuality())
+        .timestamp(new Timestamp(timestamp))
+        .daqTimestamp(new Timestamp(timestamp))
+        .priority(DataTagAddress.PRIORITY_HIGHEST)
+        .guaranteedDelivery(false)
+        .valueDescription(pDescription)
+        .timeToLive(180_000)
+        .build();
     try {
       distributeValue(commfaultTagValue);
-    }
-    catch (JMSException ex) {
-      LOGGER.error("sendCommfaultTag : JMSException caught :" + ex.getMessage());
+    } catch (JMSException ex) {
+      log.error("sendCommfaultTag : JMSException caught :" + ex.getMessage());
     }
   }
 
   @Override
   public final void addValue(final SourceDataTagValue dataTagValue) {
-    LOGGER.debug("entering addValue()..");
-    LOGGER.debug("adding data tag " + dataTagValue.getId() + " to a sending buffer");
+    log.debug("entering addValue()..");
+    log.debug("adding data tag " + dataTagValue.getId() + " to a sending buffer");
     if (dataTagValue.getPriority() == DataTagAddress.PRIORITY_HIGH) {
-      LOGGER.debug("\t sourceDataTagValue priority is HIGH");
+      log.debug("\t sourceDataTagValue priority is HIGH");
       try {
         this.distributeValue(dataTagValue);
+      } catch (JMSException ex) {
+        log.error("addValue : JMSException caught :" + ex.getMessage());
       }
-      catch (JMSException ex) {
-        LOGGER.error("addValue : JMSException caught :" + ex.getMessage());
-      }
-    }
-    else {
-      LOGGER.debug("\t sourceDataTagValue priority is LOW");
+    } else {
+      log.debug("\t sourceDataTagValue priority is LOW");
       // check whether it's message with guaranteed delivery or not
       if (dataTagValue.isGuaranteedDelivery()) {
-        LOGGER.debug("\t guaranteedDelivery is TRUE");
+        log.debug("\t guaranteedDelivery is TRUE");
 
         // note : synchrobuffer's push method is thread-safety,
         // so no external synchronization is needed
         this.persistentTagsBuffer.push(dataTagValue);
-      }
-      else {
-        LOGGER.debug("\t guaranteedDelivery is FALSE");
+      } else {
+        log.debug("\t guaranteedDelivery is FALSE");
 
         // note : synchrobuffer's push method is thread-safety,
         // so no external synchronization is needed
@@ -221,7 +198,7 @@ public class ProcessMessageSender implements IProcessMessageSender {
       }
     }
 
-    LOGGER.debug("leaving addValue()");
+    log.debug("leaving addValue()");
   }
 
   /**
@@ -257,7 +234,7 @@ public class ProcessMessageSender implements IProcessMessageSender {
       try {
         jmsSender.processValue(sourceDataTagValue);
       } catch (Exception e) {
-        LOGGER.error("Unhandled exception caught while sending a source value (tag id " + sourceDataTagValue.getId() + ") - the value update will be lost.", e);
+        log.error("Unhandled exception caught while sending a source value (tag id " + sourceDataTagValue.getId() + ") - the value update will be lost.", e);
       }
     }
     // log value in appropriate log file
@@ -276,7 +253,7 @@ public class ProcessMessageSender implements IProcessMessageSender {
       try {
         jmsSender.processValues(dataTagValueUpdate);
       } catch (Exception e) {
-        LOGGER.error("Unhandled exception caught while sending a collection of source values - the updates will be lost.", e);
+        log.error("Unhandled exception caught while sending a collection of source values - the updates will be lost.", e);
       }
     }
     // log value in appropriate log file
@@ -310,8 +287,8 @@ public class ProcessMessageSender implements IProcessMessageSender {
     @Override
     public void pull(PullEvent event) throws PullException {
       ProcessConfiguration processConfiguration = ProcessConfigurationHolder.getInstance();
-      LOGGER.debug("entering pull()..");
-      LOGGER.debug("\t Number of pulled objects : " + event.getPulled().size());
+      log.debug("entering pull()..");
+      log.debug("\t Number of pulled objects : " + event.getPulled().size());
 
       // We add the PIK to our communication process
       DataTagValueUpdate dataTagValueUpdate;
@@ -328,10 +305,9 @@ public class ProcessMessageSender implements IProcessMessageSender {
             distributeValues(dataTagValueUpdate);
             // clear the dataTagValueUpdate object reference !!
             dataTagValueUpdate = null;
-            LOGGER.debug("\t sent " + currentMsgSize + " SourceDataTagValue objects");
-          }
-          catch (JMSException ex) {
-            LOGGER.error("\tpull : JMSException caught while invoking processValues methods :" + ex.getMessage());
+            log.debug("\t sent " + currentMsgSize + " SourceDataTagValue objects");
+          } catch (JMSException ex) {
+            log.error("\tpull : JMSException caught while invoking processValues methods :" + ex.getMessage());
           }
 
           // clear the message size counter
@@ -348,9 +324,8 @@ public class ProcessMessageSender implements IProcessMessageSender {
           dataTagValueUpdate.addValue(sdtValue);
           // increase the message size counter
           currentMsgSize++;
-        }
-        else {
-          LOGGER.debug("\t pull : Discarded value update for tag id " + sdtValue.getId() + ", because TTL was exceeded.");
+        } else {
+          log.debug("\t pull : Discarded value update for tag id " + sdtValue.getId() + ", because TTL was exceeded.");
         }
       } // while
 
@@ -359,14 +334,13 @@ public class ProcessMessageSender implements IProcessMessageSender {
       if (dataTagValueUpdate != null && currentMsgSize > 0) {
         try {
           distributeValues(dataTagValueUpdate);
-          LOGGER.debug("\t sent " + dataTagValueUpdate.getValues().size() + " SourceDataTagValue objects");
-        }
-        catch (JMSException ex) {
-          LOGGER.error("\t pull : JMSException caught while invoking processValues methods :" + ex.getMessage());
+          log.debug("\t sent " + dataTagValueUpdate.getValues().size() + " SourceDataTagValue objects");
+        } catch (JMSException ex) {
+          log.error("\t pull : JMSException caught while invoking processValues methods :" + ex.getMessage());
         }
       } // if
 
-      LOGGER.debug("leaving pull method");
+      log.debug("leaving pull method");
     }
 
     /**
@@ -374,16 +348,13 @@ public class ProcessMessageSender implements IProcessMessageSender {
      * @return <code>true</code>, if the message has expired
      */
     private boolean isMessageExpired(final SourceDataTagValue sdtValue) {
-      if (sdtValue.getTimeToLive() == DataTagAddress.TTL_FOREVER) {
+      if (sdtValue.getTimeToLive() == DataTagAddress.TTL_FOREVER 
+          || (sdtValue.getDaqTimestamp().getTime() + sdtValue.getTimeToLive()) >= System.currentTimeMillis()) {
         return false;
-      }
-      else if ((sdtValue.getDaqTimestamp().getTime() + sdtValue.getTimeToLive()) >= System.currentTimeMillis()) {
-        return false;
-      }
-      else {
-        // message is expired
-        return true;
-      }
+      } 
+
+      // message is expired
+      return true;
     }
   }
 

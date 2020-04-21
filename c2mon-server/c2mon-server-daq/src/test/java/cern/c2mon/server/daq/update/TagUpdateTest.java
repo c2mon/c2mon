@@ -118,15 +118,19 @@ public class TagUpdateTest {
 //    assertEquals(Boolean.TRUE, dataTag.getValue());
 
     //set source update with value
-    SourceDataTagValue sourceDataTagValue = new SourceDataTagValue(dataTag.getId(),
-        dataTag.getName(),
-        false, 1,
-        new SourceDataTagQuality(),
-        timestamp,
-        DataTagConstants.PRIORITY_LOW,
-        false,
-        "test description",
-        DataTagAddress.TTL_FOREVER);
+    SourceDataTagValue sourceDataTagValue = SourceDataTagValue.builder()
+        .id(dataTag.getId())
+        .name(dataTag.getName())
+        .controlTag(false)
+        .value(1)
+        .quality(new SourceDataTagQuality())
+        .timestamp(timestamp)
+        .daqTimestamp(new Timestamp(System.currentTimeMillis()))
+        .priority(DataTagConstants.PRIORITY_LOW)
+        .valueDescription("test description")
+        .timeToLive(DataTagConstants.TTL_FOREVER)
+        .build();
+    
     sourceDataTagValue.setDaqTimestamp(daqTimestamp);
     ArrayList<SourceDataTagValue> tagList = new ArrayList<SourceDataTagValue>();
     tagList.add(sourceDataTagValue);
@@ -152,15 +156,18 @@ public class TagUpdateTest {
 //    assertEquals(Boolean.TRUE, dataTag.getValue());
 
     //set source update with value
-    SourceDataTagValue sourceDataTagValue = new SourceDataTagValue(dataTag.getId(),
-        dataTag.getName(),
-        false, 1,
-        new SourceDataTagQuality(SourceDataTagQualityCode.DATA_UNAVAILABLE), //invalid
-        timestamp,
-        DataTagConstants.PRIORITY_LOW,
-        false,
-        "test description",
-        DataTagAddress.TTL_FOREVER);
+    SourceDataTagValue sourceDataTagValue = SourceDataTagValue.builder()
+        .id(dataTag.getId())
+        .name(dataTag.getName())
+        .controlTag(false)
+        .value(1)
+        .quality(new SourceDataTagQuality(SourceDataTagQualityCode.DATA_UNAVAILABLE))
+        .timestamp(timestamp)
+        .daqTimestamp(new Timestamp(System.currentTimeMillis()))
+        .priority(DataTagConstants.PRIORITY_LOW)
+        .valueDescription("test description")
+        .timeToLive(DataTagConstants.TTL_FOREVER)
+        .build();
     sourceDataTagValue.setDaqTimestamp(daqTimestamp);
     ArrayList<SourceDataTagValue> tagList = new ArrayList<SourceDataTagValue>();
     tagList.add(sourceDataTagValue);
@@ -189,15 +196,18 @@ public class TagUpdateTest {
     //create a source update for this tag
     Timestamp timestamp = new Timestamp(System.currentTimeMillis());
     Timestamp daqTimestamp = new Timestamp(System.currentTimeMillis() + 1);
-    SourceDataTagValue sourceDataTagValue = new SourceDataTagValue(controlTag.getId(),
-        controlTag.getName(),
-        true, new Long(2000),   //CONTROL TAG WITH VALUE 2000
-        new SourceDataTagQuality(),
-        timestamp,
-        DataTagConstants.PRIORITY_LOW,
-        false,
-        "test description",
-        DataTagAddress.TTL_FOREVER);
+    SourceDataTagValue sourceDataTagValue = SourceDataTagValue.builder()
+        .id(controlTag.getId())
+        .name(controlTag.getName())
+        .controlTag(true)
+        .value(2000)
+        .quality(new SourceDataTagQuality())
+        .timestamp(timestamp)
+        .daqTimestamp(new Timestamp(System.currentTimeMillis()))
+        .priority(DataTagConstants.PRIORITY_LOW)
+        .valueDescription("test description")
+        .timeToLive(DataTagConstants.TTL_FOREVER)
+        .build();
     sourceDataTagValue.setDaqTimestamp(daqTimestamp);
     ArrayList<SourceDataTagValue> tagList = new ArrayList<SourceDataTagValue>();
     tagList.add(sourceDataTagValue);
