@@ -63,6 +63,12 @@ public class DaqProperties {
      * running in double publication mode)
      */
     private String secondaryUrl = "tcp://0.0.0.0:61617";
+    
+    /**
+     * Set the time-to-live in seconds for all requests that are sent via JMS to the C2MON server.
+     * Default is 60 seconds
+     */
+    private int requestMsgtimeToLive = 60;
   }
 
   /**
