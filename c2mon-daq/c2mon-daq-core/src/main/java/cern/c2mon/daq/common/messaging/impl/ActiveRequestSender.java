@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2020 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -16,18 +16,18 @@
  *****************************************************************************/
 package cern.c2mon.daq.common.messaging.impl;
 
+import javax.jms.*;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jms.core.JmsTemplate;
+
+import lombok.extern.slf4j.Slf4j;
+
 import cern.c2mon.daq.common.conf.core.ProcessConfigurationHolder;
 import cern.c2mon.daq.common.messaging.ProcessRequestSender;
 import cern.c2mon.daq.config.DaqProperties;
 import cern.c2mon.shared.common.process.ProcessConfiguration;
 import cern.c2mon.shared.daq.process.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jms.core.JmsTemplate;
-import org.springframework.jms.core.SessionCallback;
-
-import javax.jms.*;
 
 /**
  * Implementation of ProcessRequestSender interface for ActiveMQ JMS middleware.
@@ -35,12 +35,8 @@ import javax.jms.*;
  * @author mbrightw
  * @author vilches (refactoring updates)
  */
+@Slf4j
 public class ActiveRequestSender implements ProcessRequestSender {
-
-  /**
-   * Class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(ActiveRequestSender.class);
 
   /**
    * Constant of the PIK request time out
@@ -70,104 +66,77 @@ public class ActiveRequestSender implements ProcessRequestSender {
 
   @Override
   public ProcessConfigurationResponse sendProcessConfigurationRequest(final String processName) {
-    LOGGER.debug("sendProcessConfigurationRequest - Sending Process Configuration request to server.");
-    // use of JmsTemplate here means exceptions are caught by Spring and
-    // converted!
-    // JMS template NOT used for reply as need to use same connection &
-    // session
+    log.debug("sendProcessConfigurationRequest - Sending Process Configuration request to server.");
+    // use of JmsTemplate here means exceptions are caught by Spring and converted!
+    // JMS template NOT used for reply as need to use same connection & session
     final Destination requestDestination = jmsTemplate.getDefaultDestination();
-    ProcessConfigurationResponse processConfigurationResponse = (ProcessConfigurationResponse) jmsTemplate.execute(new SessionCallback<Object>() {
-      public Object doInJms(final Session session) throws JMSException {
-        TemporaryQueue replyQueue = session.createTemporaryQueue();
+    // start the connection for receiving messages
+    return (ProcessConfigurationResponse) jmsTemplate.execute(session -> {
+      TemporaryQueue replyQueue = session.createTemporaryQueue();
 
-        ProcessConfigurationRequest processConfigurationRequest = new ProcessConfigurationRequest(processName);
-        processConfigurationRequest.setprocessPIK(ProcessConfigurationHolder.getInstance().getprocessPIK());
+      ProcessConfigurationRequest processConfigurationRequest = new ProcessConfigurationRequest(processName);
+      processConfigurationRequest.setprocessPIK(ProcessConfigurationHolder.getInstance().getprocessPIK());
 
-        Message message = processMessageConverter.toMessage(processConfigurationRequest, session);
-        message.setJMSReplyTo(replyQueue);
-        MessageProducer messageProducer = session.createProducer(requestDestination);
+      Message message = processMessageConverter.toMessage(processConfigurationRequest, session);
+      message.setJMSReplyTo(replyQueue);
+      MessageProducer messageProducer = session.createProducer(requestDestination);
+      try {
+        Long requestTimeout = properties.getServerRequestTimeout();
+        messageProducer.setTimeToLive(requestTimeout);
+        messageProducer.send(message);
+
+        // wait for reply (receive timeout is set in XML)
+        MessageConsumer consumer = session.createConsumer(replyQueue);
         try {
-          Long requestTimeout = properties.getServerRequestTimeout();
-          messageProducer.setTimeToLive(requestTimeout);
-          messageProducer.send(message);
-
-          // wait for reply (receive timeout is set in XML)
-          MessageConsumer consumer = session.createConsumer(replyQueue);
-          try {
-            Message replyMessage = consumer.receive(requestTimeout);
-            if (replyMessage == null) {
-              return null;
-            } else {
-              return processMessageConverter.fromMessage(replyMessage);
-            }
-          } finally {
-            consumer.close();
-          }
+          Message replyMessage = consumer.receive(requestTimeout);
+          return ((replyMessage == null) ? null : processMessageConverter.fromMessage(replyMessage));
         } finally {
-          messageProducer.close();
+          consumer.close();
         }
+      } finally {
+        messageProducer.close();
       }
-    }, true); // start the connection for receiving messages
-
-    // Can be null if there is a TimeOut
-    return processConfigurationResponse;
+    }, true);
   }
 
   @Override
   public ProcessConnectionResponse sendProcessConnectionRequest(final String processName) {
-    LOGGER.debug("sendProcessConnectionRequest - Sending Process Connection Request to server.");
-    // use of JmsTemplate here means exceptions are caught by Spring and
-    // converted!
-    // JMS template NOT used for reply as need to use same connection &
-    // session
+    log.debug("sendProcessConnectionRequest - Sending Process Connection Request to server.");
+    // use of JmsTemplate here means exceptions are caught by Spring and converted!
+    // JMS template NOT used for reply as need to use same connection & session
     final Destination requestDestination = jmsTemplate.getDefaultDestination();
 
-    ProcessConnectionResponse processConnectionResponse = (ProcessConnectionResponse) jmsTemplate.execute(new SessionCallback<Object>() {
-      public Object doInJms(final Session session) throws JMSException {
-        TemporaryQueue replyQueue = session.createTemporaryQueue();
-        // Process PIK Request
-        ProcessConnectionRequest processConnectionRequest = new ProcessConnectionRequest(processName);
-//        configurationController.setStartUp(processConnectionRequest.getProcessStartupTime().getTime());
+    // start the connection for receiving PIK messages
+    return (ProcessConnectionResponse) jmsTemplate.execute(session -> {
+      TemporaryQueue replyQueue = session.createTemporaryQueue();
+      // Process PIK Request
+      ProcessConnectionRequest processConnectionRequest = new ProcessConnectionRequest(processName);
 
-        Message message = processMessageConverter.toMessage(processConnectionRequest, session);
-        message.setJMSReplyTo(replyQueue);
-        MessageProducer messageProducer = session.createProducer(requestDestination);
+      Message message = processMessageConverter.toMessage(processConnectionRequest, session);
+      message.setJMSReplyTo(replyQueue);
+      MessageProducer messageProducer = session.createProducer(requestDestination);
+      try {
+        messageProducer.setTimeToLive(PIK_REQUEST_TIMEOUT);
+        messageProducer.send(message);
+
+        // If there is a timeout SystemExit
+        // wait for reply (receive timeout is set in XML) -> 12000
+        MessageConsumer consumer = session.createConsumer(replyQueue);
         try {
-          // TimeOut (too long for the PIK) 12000
-          //messageProducer.setTimeToLive(commonConfiguration.getRequestTimeout());
-          messageProducer.setTimeToLive(PIK_REQUEST_TIMEOUT);
-          messageProducer.send(message);
-
-          // If there is a timeout SystemExit
-
-          // wait for reply (receive timeout is set in XML) -> 12000
-          MessageConsumer consumer = session.createConsumer(replyQueue);
-          try {
-            //Message replyMessage = consumer.receive(commonConfiguration.getRequestTimeout());
-            Message replyMessage = consumer.receive(PIK_REQUEST_TIMEOUT);
-            if (replyMessage == null) {
-              return null;
-            } else {
-              // Convert the XML and return it as a ProcessConnectionRespond object
-              return processMessageConverter.fromMessage(replyMessage);
-            }
-          } finally {
-            consumer.close();
-          }
+          Message replyMessage = consumer.receive(PIK_REQUEST_TIMEOUT);
+          return ((replyMessage == null) ? null : processMessageConverter.fromMessage(replyMessage));
         } finally {
-          messageProducer.close();
+          consumer.close();
         }
+      } finally {
+        messageProducer.close();
       }
-    }, true); // start the connection for receiving PIK messages
-
-    // Can be null if there is a TimeOut
-    return processConnectionResponse;
+    }, true);
   }
 
   @Override
   public void sendProcessDisconnectionRequest(ProcessConfiguration processConfiguration, long startupTime) {
-    LOGGER.debug("sendProcessDisconnectionRequest - Sending Process Disconnection notification to server.");
-//    ProcessConfiguration processConfiguration = this.configurationController.getProcessConfiguration();
+    log.debug("sendProcessDisconnectionRequest - Sending Process Disconnection notification to server.");
     ProcessDisconnectionRequest processDisconnectionRequest;
 
     // processConfiguration set up for ProcessDisconnectionRequest compatibility
@@ -194,12 +163,12 @@ public class ActiveRequestSender implements ProcessRequestSender {
           startupTime);
     }
 
-    LOGGER.trace("sendProcessDisconnectionRequest - Converting and sending disconnection message");
+    log.trace("sendProcessDisconnectionRequest - Converting and sending disconnection message");
 
     jmsTemplate.setMessageConverter(this.processMessageConverter);
     jmsTemplate.convertAndSend(processDisconnectionRequest);
 
-    LOGGER.trace("sendProcessDisconnectionRequest - Process Disconnection for " + processConfiguration.getProcessName() + " sent");
+    log.trace("sendProcessDisconnectionRequest - Process Disconnection for " + processConfiguration.getProcessName() + " sent");
   }
 
   /**
