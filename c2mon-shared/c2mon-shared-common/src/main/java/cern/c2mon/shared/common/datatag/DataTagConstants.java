@@ -16,6 +16,8 @@
  *****************************************************************************/
 package cern.c2mon.shared.common.datatag;
 
+import javax.jms.Message;
+
 /**
  * Constants used through the TIM system.
  *
@@ -82,7 +84,7 @@ public interface DataTagConstants {
    * of DartaTagValueUpdate messages sent to the server queue. This may cause
    * a certain delay in processing.
    */
-  public static final int PRIORITY_MEDIUM = 5;
+  public static final int PRIORITY_MEDIUM = Message.DEFAULT_PRIORITY;
 
   /**
    * Tags with priority set to PRIORITY_HIGH must be treated by the driver
@@ -91,6 +93,11 @@ public interface DataTagConstants {
    * to PRIORITY_HIGH.
    */
   public static final int PRIORITY_HIGH = 7;
+  
+  /**
+   * This flag should only be used for control tags, such as Alive Tags
+   */
+  public static final int PRIORITY_HIGHEST = 9;
 
   // ----------------------------------------------------------------------------
   // TRANSFORMATION CONSTANT DEFINITIONS
