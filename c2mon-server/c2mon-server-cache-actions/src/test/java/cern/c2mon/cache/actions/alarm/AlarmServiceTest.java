@@ -53,12 +53,10 @@ public class AlarmServiceTest {
   public void updateIsConsistent() {
     insertAlarmAndDatatagThen((alarm, dataTag) -> {
       dataTag.getDataTagQuality().validate();
-      AlarmCacheObject preCache = alarm.clone();
 
       alarmService.update(alarm, dataTag, true);
-
-      // Initially the old object should not be evaluated
-      assertNotEquals(preCache, alarm);
+      
+      AlarmCacheObject preCache = alarm.clone();
 
       alarmService.update(preCache, dataTag, true);
 

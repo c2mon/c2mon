@@ -67,7 +67,7 @@ public class CacheDataSourceConfig {
     VendorDatabaseIdProvider databaseIdProvider = new VendorDatabaseIdProvider();
     databaseIdProvider.setProperties(
       KotlinAPIs.apply(new Properties(), props -> {
-        props.setProperty("HSQL", "hsql");
+        props.setProperty("HSQL", "oracle");
         props.setProperty("Oracle", "oracle");
         props.setProperty("MySQL", "mysql");
       })

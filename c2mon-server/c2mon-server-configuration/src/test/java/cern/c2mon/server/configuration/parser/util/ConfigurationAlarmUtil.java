@@ -37,13 +37,13 @@ public class ConfigurationAlarmUtil {
       properties = new Properties();
     }
 
-    Alarm alarm = Alarm.create("faultFamily", "faultMember", 1337, new ValueAlarmCondition(1)).dataTagId(100L).build();
+    Alarm alarm = Alarm.create("faultFamily", "faultMember", 1337, new ValueAlarmCondition(1)).dataTagId(1000L).build();
 
     properties.setProperty("faultFamily", "faultFamily");
     properties.setProperty("faultMember", "faultMember");
     properties.setProperty("faultCode", "1337");
     properties.setProperty("alarmCondition", new ValueAlarmCondition(1).getXMLCondition());
-    properties.setProperty("dataTagId", "100");
+    properties.setProperty("dataTagId", "1000");
 
     return alarm;
   }
@@ -60,7 +60,7 @@ public class ConfigurationAlarmUtil {
     Alarm alarm = Alarm.create("faultFamily", "faultMember", 1337, new ValueAlarmCondition(1))
         .id(id)
         .addMetadata("testMetadata", 11)
-        .dataTagId(100L)
+        .dataTagId(1000L)
         .build();
 
     properties.setProperty("faultFamily", "faultFamily");
