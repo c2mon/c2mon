@@ -25,7 +25,6 @@ public class DaqJmsConfig {
     String url = properties.getJms().getUrl();
     ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(url);
     connectionFactory.setClientIDPrefix("C2MON-SERVER-DAQ-IN");
-    connectionFactory.setWatchTopicAdvisories(false);
     return connectionFactory;
   }
 
@@ -63,7 +62,6 @@ public class DaqJmsConfig {
     ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(properties.getJms().getUrl());
 
     connectionFactory.setClientIDPrefix("C2MON-DAQ-OUT");
-    connectionFactory.setWatchTopicAdvisories(false);
     return connectionFactory;
   }
 }

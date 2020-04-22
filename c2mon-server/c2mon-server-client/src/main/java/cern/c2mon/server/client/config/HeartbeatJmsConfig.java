@@ -37,7 +37,6 @@ public class HeartbeatJmsConfig {
   public ActiveMQConnectionFactory heartbeatConnectionFactory() {
     ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory(properties.getJms().getUrl());
     factory.setClientIDPrefix("C2MON-SERVER-HEARTBEAT");
-    factory.setWatchTopicAdvisories(false);
     return factory;
   }
 

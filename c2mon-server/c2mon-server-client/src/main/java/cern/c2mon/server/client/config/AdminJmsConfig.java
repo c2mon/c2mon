@@ -32,7 +32,6 @@ public class AdminJmsConfig {
 
     ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(url);
     connectionFactory.setClientIDPrefix("C2MON-SERVER-CLIENT");
-    connectionFactory.setWatchTopicAdvisories(false);
 
     ActiveMQPrefetchPolicy prefetchPolicy = new ActiveMQPrefetchPolicy();
     prefetchPolicy.setQueuePrefetch(0);

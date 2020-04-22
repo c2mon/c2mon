@@ -38,7 +38,6 @@ public class JmsConfig {
   public ActiveMQConnectionFactory activeMQConnectionFactory() {
     ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory(properties.getJms().getUrl());
     factory.setClientIDPrefix("C2MON-DAQ-" + properties.getName());
-    factory.setWatchTopicAdvisories(false);
     return factory;
   }
 
@@ -78,7 +77,6 @@ public class JmsConfig {
   public ActiveMQConnectionFactory filterActiveMQConnectionFactory() {
     ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory(properties.getFilter().getJms().getUrl());
     factory.setClientIDPrefix("C2MON_DAQ_FILTER");
-    factory.setWatchTopicAdvisories(false);
     return factory;
   }
 
@@ -102,7 +100,6 @@ public class JmsConfig {
   public ActiveMQConnectionFactory secondActiveMQConnectionFactory() {
     ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory(properties.getJms().getSecondaryUrl());
     factory.setClientIDPrefix("C2MON-DAQ-" + properties.getName());
-    factory.setWatchTopicAdvisories(false);
     return factory;
   }
 
