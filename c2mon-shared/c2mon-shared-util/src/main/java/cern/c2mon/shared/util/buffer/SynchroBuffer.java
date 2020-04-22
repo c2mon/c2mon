@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2020 CERN. All rights not expressly granted are reserved.
  * 
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -16,21 +16,16 @@
  *****************************************************************************/
 package cern.c2mon.shared.util.buffer;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /** A buffering utility class.
+ * @param <T> The object that shall be buffered
  * @author F.Calderini
  */
-public class SynchroBuffer {
+public class SynchroBuffer<T> {
 
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SynchroBuffer.class.getName());
@@ -72,11 +67,11 @@ public class SynchroBuffer {
   private volatile boolean firing = false;
   private volatile boolean enabled = false;
     
-  private SynchroBufferListener listener = null;
+  private SynchroBufferListener<T> listener = null;
     
   /** The buffer */
-  private List buffer = null;
-  private Map bufferMap = null;
+  private List<T> buffer = null;
+  private Map<T, Integer> bufferMap = null;
   
   /** Allows object duplication.
    */
@@ -191,8 +186,8 @@ public class SynchroBuffer {
       this.windowGrowthFactor = growthFactor;
       this.duplicatePolicy = policy;
       this.capacity = capacity;
-      buffer = new ArrayList();
-      bufferMap = new LinkedHashMap();
+      buffer = new ArrayList<>();
+      bufferMap = new LinkedHashMap<>();
       checkingThread = "".equalsIgnoreCase(name) ? new CheckingThread() : new CheckingThread(name);
       checkingThread.setDaemon(daemon);
       checkingThread.start();
@@ -203,22 +198,22 @@ public class SynchroBuffer {
     //if (buffer.size() == 0)
 //          return 0;
     setFiring(true);
-    Collection pulled = null;
+    Collection<T> pulled = null;
     synchronized(buffer) {
-      pulled = (Collection) ((ArrayList)buffer).clone();
+      pulled = (Collection<T>) ((ArrayList<T>)buffer).clone();
       buffer.clear();
       bufferMap.clear();
     }
     long time_before = System.currentTimeMillis();
-    if (listener != null) {
-      if (pulled.size() > 0) {
-        try {
-          listener.pull(new PullEvent(this, pulled));
-        } catch (Exception ex) {
-          LOGGER.error("Exception caught when calling registered SynchroBuffer listener", ex);
-        }
+    
+    if (listener != null && !pulled.isEmpty()) {
+      try {
+        listener.pull(new PullEvent<T>(this, pulled));
+      } catch (Exception ex) {
+        LOGGER.error("Exception caught when calling registered SynchroBuffer listener", ex);
       }
     }
+    
     long time_after = System.currentTimeMillis();
     long time_elapsed = time_after-time_before;
     setFiring(false);
@@ -233,7 +228,7 @@ public class SynchroBuffer {
    * <code>equals</code> method is used to determine duplications.
    * @param o the object to push
    */
-  public void push(Object object) {
+  public void push(T object) {
     if (isClosed()) {
       LOGGER.debug("synchro isClosed - eXception");
       throw new IllegalArgumentException("buffer closed");
@@ -297,7 +292,7 @@ public class SynchroBuffer {
   /** Push a collection of objects into the buffer.
    * @param collection the collection of objects to push
    */
-  public void push(Collection collection) {
+  public void push(Collection<T> collection) {
     if (isClosed()) {
       LOGGER.debug("synchrocol isClosed - Exception");
       throw new IllegalArgumentException("buffer closed");
@@ -315,9 +310,8 @@ public class SynchroBuffer {
                 }
             }
         } else {
-          Iterator iterator = collection.iterator();
-          while (iterator.hasNext()) {
-            push(iterator.next());
+          for (T next : collection) {
+            push(next);
           }
         }
       }
@@ -327,7 +321,7 @@ public class SynchroBuffer {
   /** Set the buffer consumer listener.
    * @param listener the listener
    */
-  public void setSynchroBufferListener(SynchroBufferListener listener) {
+  public void setSynchroBufferListener(SynchroBufferListener<T> listener) {
     LOGGER.debug("synchro listener");
     this.listener = listener;
   }
@@ -450,6 +444,3 @@ public class SynchroBuffer {
     }
   }
 }
-
-
-

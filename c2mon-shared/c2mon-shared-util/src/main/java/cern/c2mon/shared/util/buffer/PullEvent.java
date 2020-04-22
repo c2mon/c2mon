@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2020 CERN. All rights not expressly granted are reserved.
  * 
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -21,16 +21,20 @@ import java.util.EventObject;
 
 /** A buffer pull event class. A PullEvent instance
  * is passed as parameter to the SynchroBufferListener pull method.
+ * @param <T> The object that shall be buffered
  * @author F.Calderini
  */
-public class PullEvent extends EventObject {
-    private Collection pulled;
+public class PullEvent<T> extends EventObject {
+    /** Serial version UID */
+  private static final long serialVersionUID = -6152791310866194659L;
+  
+    private Collection<T> pulled;
     
     /** Creates a new instance of PullEvent.
      * @param source the event source
      * @param pulled the pulled objects
      */
-    public PullEvent(Object source, Collection pulled) {
+    public PullEvent(Object source, Collection<T> pulled) {
         super(source);
         this.pulled = pulled;
     }
@@ -38,13 +42,12 @@ public class PullEvent extends EventObject {
     /** Accessor method. 
      * @return the pulled objects
      */
-    public Collection getPulled() {
+    public Collection<T> getPulled() {
         return pulled;
     }
 
-    public String toString() 
-    {
-      StringBuffer buffer = new StringBuffer();
+    public String toString() {
+      StringBuilder buffer = new StringBuilder();
       buffer.append("[source=");
       buffer.append(getSource());
       buffer.append(", pulled=");
