@@ -2,6 +2,7 @@ package cern.c2mon.server.rule;
 
 import cern.c2mon.cache.actions.AbstractCacheServiceImpl;
 import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.cache.api.flow.DefaultCacheFlow;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.rule.RuleTag;
@@ -63,7 +64,7 @@ public class RuleTagService extends AbstractCacheServiceImpl<RuleTag> {
           }
           return ruleTagCache.get(inputTagId);
         } else {
-          throw new RuntimeException("Unable to set rule parent process & equipment ids for rule " + ruleTag.getId()
+          throw new CacheElementNotFoundException("Unable to set rule parent process & equipment ids for rule " + ruleTag.getId()
             + ": unable to locate tag " + inputTagId + " in either RuleTag or DataTag cache (ControlTags not supported in rules)");
         }
       })
