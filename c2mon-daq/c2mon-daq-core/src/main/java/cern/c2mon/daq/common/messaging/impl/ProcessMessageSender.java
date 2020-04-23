@@ -18,9 +18,10 @@ package cern.c2mon.daq.common.messaging.impl;
 
 import java.sql.Timestamp;
 import java.util.Collection;
-import java.util.Iterator;
 
 import javax.jms.JMSException;
+
+import org.springframework.jms.JmsException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -248,7 +249,7 @@ public class ProcessMessageSender implements IProcessMessageSender {
    *           should also listen to these locally to take any necessary action)
    * @param dataTagValueUpdate the values to send
    */
-  private void distributeValues(final DataTagValueUpdate dataTagValueUpdate) throws JMSException {
+  private void distributeValues(final DataTagValueUpdate dataTagValueUpdate) {
     for (JmsSender jmsSender : jmsSenders) {
       try {
         jmsSender.processValues(dataTagValueUpdate);
@@ -275,9 +276,11 @@ public class ProcessMessageSender implements IProcessMessageSender {
    * are able to handle Pull events.
    */
   class SynchroBufferEventsListener implements SynchroBufferListener<SourceDataTagValue> {
+    
+    ProcessConfiguration processConfiguration = ProcessConfigurationHolder.getInstance();
 
     /**
-     * This method is called by Synchorbuffer, each time a PullEvent occurs.
+     * This method is called by SynchroBuffer, each time a PullEvent occurs.
      *
      * @param event the pull event, containing the collection of objects to be
      *          sent
@@ -285,58 +288,44 @@ public class ProcessMessageSender implements IProcessMessageSender {
      */
     @Override
     public void pull(PullEvent<SourceDataTagValue> event) throws PullException {
-      ProcessConfiguration processConfiguration = ProcessConfigurationHolder.getInstance();
-      log.debug("entering pull()..");
-      log.debug("\t Number of pulled objects : " + event.getPulled().size());
+      log.trace("entering pull()..");
+      log.debug("\t Number of pulled objects : {}", event.getPulled().size());
 
       // We add the PIK to our communication process
-      DataTagValueUpdate dataTagValueUpdate = new DataTagValueUpdate(processConfiguration.getProcessID(), processConfiguration.getprocessPIK());
+      DataTagValueUpdate dataTagValueUpdate = createNewDataTagValueUpdate();
 
       for (SourceDataTagValue sdtValue : event.getPulled()) {
-
+        if (isMessageExpired(sdtValue)) {
+          log.debug("\t pull : Discarded value update for tag id #{}, because TTL was exceeded", sdtValue.getId());
+        } else {
+          dataTagValueUpdate.addValue(sdtValue);
+        }
+        
         // check if the maximum allowed message size has been reached
         if (dataTagValueUpdate.getValues().size() >= processConfiguration.getMaxMessageSize()) {
-          try {
-            // send the message
-            distributeValues(dataTagValueUpdate);
-            log.debug("\t sent {} SourceDataTagValue objects", dataTagValueUpdate.getValues().size());
-          } catch (JMSException ex) {
-            log.error("\tpull : JMSException caught while invoking processValues methods :" + ex.getMessage());
-          }
-          
+          sendMessage(dataTagValueUpdate);
           // create new dataTagValueUpdate object
-          dataTagValueUpdate = new DataTagValueUpdate(processConfiguration.getProcessID(), processConfiguration.getprocessPIK());
-        } // if
-
-        if (!isMessageExpired(sdtValue)) {
-          // append next SourceDataTagValue object to the message
-          dataTagValueUpdate.addValue(sdtValue);
-        } else {
-          log.debug("\t pull : Discarded value update for tag id " + sdtValue.getId() + ", because TTL was exceeded.");
+          dataTagValueUpdate = createNewDataTagValueUpdate();
         }
       }
 
-      // find out if there'was something left inside dataTagValueUpdate
-      // if yes - prepare the message and send it too
+      sendMessage(dataTagValueUpdate);
+
+      log.trace("leaving pull method");
+    }
+    
+    private DataTagValueUpdate createNewDataTagValueUpdate() {
+      return new DataTagValueUpdate(processConfiguration.getProcessID(), processConfiguration.getprocessPIK());
+    }
+    
+    private void sendMessage(DataTagValueUpdate dataTagValueUpdate) {
       if (!dataTagValueUpdate.getValues().isEmpty()) {
         try {
           distributeValues(dataTagValueUpdate);
           log.debug("\t sent " + dataTagValueUpdate.getValues().size() + " SourceDataTagValue objects");
-        } catch (JMSException ex) {
+        } catch (JmsException ex) {
           log.error("\t pull : JMSException caught while invoking processValues methods :" + ex.getMessage());
         }
-      } // if
-
-      log.debug("leaving pull method");
-    }
-    
-    private void sendMessage(DataTagValueUpdate dataTagValueUpdate) {
-      try {
-        // send the message
-        distributeValues(dataTagValueUpdate);
-        log.debug("\t sent {} SourceDataTagValue objects", dataTagValueUpdate.getValues().size());
-      } catch (JMSException ex) {
-        log.error("\tpull : JMSException caught while invoking processValues methods :" + ex.getMessage());
       }
     }
 
@@ -345,13 +334,8 @@ public class ProcessMessageSender implements IProcessMessageSender {
      * @return <code>true</code>, if the message has expired
      */
     private boolean isMessageExpired(final SourceDataTagValue sdtValue) {
-      if (sdtValue.getTimeToLive() == DataTagAddress.TTL_FOREVER 
-          || (sdtValue.getDaqTimestamp().getTime() + sdtValue.getTimeToLive()) >= System.currentTimeMillis()) {
-        return false;
-      } 
-
-      // message is expired
-      return true;
+      return sdtValue.getTimeToLive() != DataTagAddress.TTL_FOREVER 
+          && (sdtValue.getDaqTimestamp().getTime() + sdtValue.getTimeToLive()) < System.currentTimeMillis();
     }
   }
 
@@ -359,9 +343,6 @@ public class ProcessMessageSender implements IProcessMessageSender {
    * Shuts down all JmsSenders.
    */
   public void shutdown() {
-    Iterator<JmsSender> it = jmsSenders.iterator();
-    while (it.hasNext()) {
-      it.next().shutdown();
-    }
+    jmsSenders.stream().forEach(JmsSender::shutdown);
   }
 }

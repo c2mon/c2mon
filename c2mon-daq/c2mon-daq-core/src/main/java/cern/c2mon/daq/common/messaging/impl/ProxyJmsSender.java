@@ -116,7 +116,7 @@ public class ProxyJmsSender implements JmsSender {
    * @param sourceDataTagValue the value to process
    */
   @Override
-  public final void processValue(final SourceDataTagValue sourceDataTagValue) throws JMSException {
+  public final void processValue(final SourceDataTagValue sourceDataTagValue) {
     if (LOGGER.isTraceEnabled()) {
       LOGGER.trace("pushing SourceDataTagValue into proxy buffer");
     }
@@ -128,7 +128,7 @@ public class ProxyJmsSender implements JmsSender {
    * @throws JMSException not used in proxy
    */
   @Override
-  public final void processValues(final DataTagValueUpdate dataTagValueUpdate) throws JMSException {
+  public final void processValues(final DataTagValueUpdate dataTagValueUpdate) {
     if (LOGGER.isTraceEnabled()) {
       LOGGER.trace("pushing DataTagValueUpdate into proxy buffer");
     }

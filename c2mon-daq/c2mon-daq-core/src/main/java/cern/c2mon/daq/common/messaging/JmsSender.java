@@ -16,7 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.daq.common.messaging;
 
-import javax.jms.JMSException;
+import org.springframework.jms.JmsException;
 
 import cern.c2mon.shared.common.datatag.DataTagValueUpdate;
 import cern.c2mon.shared.common.datatag.SourceDataTagValue;
@@ -45,28 +45,22 @@ public interface JmsSender {
    * This method is called automatically every time a PullEvent comes from dataTags
    * synchrobuffer.
    * @param dataTagValueUpdate the collection of SourceDataTagValue's to send
-   * @throws JMSException if a JMS exception is caught while sending the values
+   * @throws JmsException if a JMS exception is caught while sending the values
    */
-  void processValues(DataTagValueUpdate dataTagValueUpdate) throws JMSException;
+  void processValues(DataTagValueUpdate dataTagValueUpdate);
 
   /**
    * The ProcessValue method creates a JMS message with a content of the DataTagValue
    * object (passed as an argument) encoded into XML.
    * @param sourceDataTagValue the source value to send
-   * @throws JMSException if a JMS exception occurs
+   * @throws JmsException if a JMS exception occurs
    */
-  void processValue(SourceDataTagValue sourceDataTagValue) throws JMSException;
+  void processValue(SourceDataTagValue sourceDataTagValue);
 
   /**
    * Do final shutdown.
    */
   void shutdown();
-
-//  /**
-//   * This method is used for JMX
-//   * @return The Spring name for the current JmsSender
-//   */
-//  String getBeanName();
 
   /**
    * Sets the isEnabled current value

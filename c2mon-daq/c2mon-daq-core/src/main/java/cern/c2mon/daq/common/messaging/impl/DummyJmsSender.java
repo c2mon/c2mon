@@ -50,13 +50,13 @@ public class DummyJmsSender implements JmsSender {
   }
 
   @Override
-  public void processValue(SourceDataTagValue sourceDataTagValue) throws JMSException {
+  public void processValue(SourceDataTagValue sourceDataTagValue) {
     messages.add(sourceDataTagValue);
 
   }
 
   @Override
-  public void processValues(DataTagValueUpdate dataTagValueUpdate) throws JMSException {
+  public void processValues(DataTagValueUpdate dataTagValueUpdate) {
     // TODO Auto-generated method stub
 
   }
