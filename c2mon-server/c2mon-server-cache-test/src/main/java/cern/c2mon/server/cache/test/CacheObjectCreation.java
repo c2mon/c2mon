@@ -103,6 +103,15 @@ public final class CacheObjectCreation {
   }
 
   /**
+   * Constructs second RuleTag.
+   *
+   * @return the RuleTag
+   */
+  public static RuleTagCacheObject createTestRuleTag2() {
+    return ruleTagCacheObjectFactory.sampleBase(2222L);
+  }
+
+  /**
    * Creates a test CommandTag
    *
    * @return the test CommandTag

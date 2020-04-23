@@ -25,8 +25,12 @@ public class RuleTagCacheObjectFactory extends AbstractTagCacheObjectFactory<Rul
 
   @Override
   public RuleTagCacheObject sampleBase() {
+    return sampleBase(130L);
+  }
+
+  public RuleTagCacheObject sampleBase(long id) {
     RuleTagCacheObject cacheObject =
-      new RuleTagCacheObject(130L,
+      new RuleTagCacheObject(id,
         "Junit_test_tag",
         "Integer",
         DataTagConstants.MODE_TEST,

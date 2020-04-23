@@ -137,7 +137,7 @@ public class RuleTagCacheObject extends AbstractTagCacheObject implements RuleTa
   }
 
   @Override
-  public final Set<Long> getRuleInputTagIds() {
+  public Set<Long> getRuleInputTagIds() {
     return ruleExpression != null
       ? ruleExpression.getInputTagIds()
       : Collections.emptySet();
