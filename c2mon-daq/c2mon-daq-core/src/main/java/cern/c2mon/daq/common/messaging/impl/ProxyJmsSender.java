@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2020 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -60,13 +60,13 @@ public class ProxyJmsSender implements JmsSender {
    * Buffer storing the high priority messages
    * (sent with processValue).
    */
-  private SynchroBuffer highPriorityBuffer;
+  private SynchroBuffer<SourceDataTagValue> highPriorityBuffer;
 
   /**
    * Buffer storing the low priority messages
    * (sent with processValues).
    */
-  private SynchroBuffer lowPriorityBuffer;
+  private SynchroBuffer<DataTagValueUpdate> lowPriorityBuffer;
 
   public ProxyJmsSender(final JmsSender wrappedSender) {
     this.wrappedSender = wrappedSender;
@@ -78,11 +78,11 @@ public class ProxyJmsSender implements JmsSender {
    */
   private void init() {
     //initialize high priority buffer
-    highPriorityBuffer = new SynchroBuffer(100, 200, 100, SynchroBuffer.DUPLICATE_OK, 10000);
+    highPriorityBuffer = new SynchroBuffer<>(100, 200, 100, SynchroBuffer.DUPLICATE_OK, 10000);
     highPriorityBuffer.setSynchroBufferListener(new HighPriorityListener());
     highPriorityBuffer.enable();
 
-    lowPriorityBuffer = new SynchroBuffer(100, 500, 100, SynchroBuffer.DUPLICATE_OK, 10000);
+    lowPriorityBuffer = new SynchroBuffer<>(100, 500, 100, SynchroBuffer.DUPLICATE_OK, 10000);
     lowPriorityBuffer.setSynchroBufferListener(new LowPriorityListener());
     lowPriorityBuffer.enable();
   }
@@ -140,7 +140,7 @@ public class ProxyJmsSender implements JmsSender {
    * @author mbrightw
    *
    */
-  private class LowPriorityListener implements SynchroBufferListener {
+  private class LowPriorityListener implements SynchroBufferListener<DataTagValueUpdate> {
 
     /**
      * Retrieve the DataTagValueUpdate objects and call the wrapped processValues method for each
@@ -149,7 +149,7 @@ public class ProxyJmsSender implements JmsSender {
      * @throws PullException not used
      */
     @Override
-    public void pull(final PullEvent event) throws PullException {
+    public void pull(final PullEvent<DataTagValueUpdate> event) throws PullException {
       if (LOGGER.isTraceEnabled()) {
         LOGGER.trace("entering pull() of proxy low priority buffer...");
         LOGGER.trace("\t Number of pulled dataTagValueUpdate objects (collections!) : " + event.getPulled().size());
@@ -161,8 +161,7 @@ public class ProxyJmsSender implements JmsSender {
         //catch and log JMSExceptions (proxy should shield DAQ)
         try {
           wrappedSender.processValues(it.next());
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
           LOGGER.error("JMSException caught when calling the proxied JMSSender's processValue method", ex);
         }
       }
@@ -178,7 +177,7 @@ public class ProxyJmsSender implements JmsSender {
    * @author mbrightw
    *
    */
-  private class HighPriorityListener implements SynchroBufferListener {
+  private class HighPriorityListener implements SynchroBufferListener<SourceDataTagValue> {
 
     /**
      * Method called when the buffer triggers and event.
@@ -189,7 +188,7 @@ public class ProxyJmsSender implements JmsSender {
      * @throws PullException not used in this case
      */
     @Override
-    public void pull(final PullEvent event) throws PullException {
+    public void pull(final PullEvent<SourceDataTagValue> event) throws PullException {
       if (LOGGER.isTraceEnabled()) {
         LOGGER.trace("entering pull() of proxy high priority buffer...");
         LOGGER.trace("\t Number of pulled objects : " + event.getPulled().size());
@@ -201,8 +200,7 @@ public class ProxyJmsSender implements JmsSender {
         //catch and log JMSExceptions (proxy should shield DAQ)
         try {
           wrappedSender.processValue(it.next());
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
           LOGGER.error("Exception caught when calling the proxied JMSSender's processValue method: " , ex);
         }
       }

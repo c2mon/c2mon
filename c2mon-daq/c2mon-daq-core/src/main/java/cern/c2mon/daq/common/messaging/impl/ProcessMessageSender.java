@@ -57,12 +57,12 @@ public class ProcessMessageSender implements IProcessMessageSender {
   /**
    * The buffer for non-persistent SourceDataTags objects
    */
-  private SynchroBuffer dataTagsBuffer;
+  private SynchroBuffer<SourceDataTagValue> dataTagsBuffer;
 
   /**
    * The buffer for persistent SourceDataTags objects
    */
-  private SynchroBuffer persistentTagsBuffer;
+  private SynchroBuffer<SourceDataTagValue> persistentTagsBuffer;
 
   /**
    * The reference for the AliveTimer object
@@ -81,9 +81,9 @@ public class ProcessMessageSender implements IProcessMessageSender {
     ProcessConfiguration processConfiguration = ProcessConfigurationHolder.getInstance();
     // TODO move the min window size to properties or database
     // create and initialize dataTagsBuffer for non-persistent tags
-    dataTagsBuffer = new SynchroBuffer(200, processConfiguration.getMaxMessageDelay(), 100, SynchroBuffer.DUPLICATE_OK);
+    dataTagsBuffer = new SynchroBuffer<>(200, processConfiguration.getMaxMessageDelay(), 100, SynchroBuffer.DUPLICATE_OK);
     // create and initialize dataTagsBuffer for persistent tags
-    persistentTagsBuffer = new SynchroBuffer(200, processConfiguration.getMaxMessageDelay(), 100, SynchroBuffer.DUPLICATE_OK);
+    persistentTagsBuffer = new SynchroBuffer<>(200, processConfiguration.getMaxMessageDelay(), 100, SynchroBuffer.DUPLICATE_OK);
 
     dataTagsBuffer.setSynchroBufferListener(new SynchroBufferEventsListener());
     persistentTagsBuffer.setSynchroBufferListener(new SynchroBufferEventsListener());
@@ -274,7 +274,7 @@ public class ProcessMessageSender implements IProcessMessageSender {
    * ProcessMessageSender's tag buffers (for persistent and non-persistent) tags
    * are able to handle Pull events.
    */
-  class SynchroBufferEventsListener implements SynchroBufferListener {
+  class SynchroBufferEventsListener implements SynchroBufferListener<SourceDataTagValue> {
 
     /**
      * This method is called by Synchorbuffer, each time a PullEvent occurs.
@@ -283,55 +283,42 @@ public class ProcessMessageSender implements IProcessMessageSender {
      *          sent
      * @throws cern.c2mon.shared.util.buffer.PullException
      */
-    @SuppressWarnings("unchecked")
     @Override
-    public void pull(PullEvent event) throws PullException {
+    public void pull(PullEvent<SourceDataTagValue> event) throws PullException {
       ProcessConfiguration processConfiguration = ProcessConfigurationHolder.getInstance();
       log.debug("entering pull()..");
       log.debug("\t Number of pulled objects : " + event.getPulled().size());
 
       // We add the PIK to our communication process
-      DataTagValueUpdate dataTagValueUpdate;
-      dataTagValueUpdate = new DataTagValueUpdate(processConfiguration.getProcessID(), processConfiguration.getprocessPIK());
+      DataTagValueUpdate dataTagValueUpdate = new DataTagValueUpdate(processConfiguration.getProcessID(), processConfiguration.getprocessPIK());
 
-      long currentMsgSize = 0;
-
-      for (SourceDataTagValue sdtValue : (Collection<SourceDataTagValue>) event.getPulled()) {
+      for (SourceDataTagValue sdtValue : event.getPulled()) {
 
         // check if the maximum allowed message size has been reached
-        if (currentMsgSize == processConfiguration.getMaxMessageSize()) {
+        if (dataTagValueUpdate.getValues().size() >= processConfiguration.getMaxMessageSize()) {
           try {
             // send the message
             distributeValues(dataTagValueUpdate);
-            // clear the dataTagValueUpdate object reference !!
-            dataTagValueUpdate = null;
-            log.debug("\t sent " + currentMsgSize + " SourceDataTagValue objects");
+            log.debug("\t sent {} SourceDataTagValue objects", dataTagValueUpdate.getValues().size());
           } catch (JMSException ex) {
             log.error("\tpull : JMSException caught while invoking processValues methods :" + ex.getMessage());
           }
-
-          // clear the message size counter
-          currentMsgSize = 0;
-
+          
           // create new dataTagValueUpdate object
-
-          // We add the PIK to our communication process
           dataTagValueUpdate = new DataTagValueUpdate(processConfiguration.getProcessID(), processConfiguration.getprocessPIK());
         } // if
 
         if (!isMessageExpired(sdtValue)) {
           // append next SourceDataTagValue object to the message
           dataTagValueUpdate.addValue(sdtValue);
-          // increase the message size counter
-          currentMsgSize++;
         } else {
           log.debug("\t pull : Discarded value update for tag id " + sdtValue.getId() + ", because TTL was exceeded.");
         }
-      } // while
+      }
 
       // find out if there'was something left inside dataTagValueUpdate
       // if yes - prepare the message and send it too
-      if (dataTagValueUpdate != null && currentMsgSize > 0) {
+      if (!dataTagValueUpdate.getValues().isEmpty()) {
         try {
           distributeValues(dataTagValueUpdate);
           log.debug("\t sent " + dataTagValueUpdate.getValues().size() + " SourceDataTagValue objects");
@@ -341,6 +328,16 @@ public class ProcessMessageSender implements IProcessMessageSender {
       } // if
 
       log.debug("leaving pull method");
+    }
+    
+    private void sendMessage(DataTagValueUpdate dataTagValueUpdate) {
+      try {
+        // send the message
+        distributeValues(dataTagValueUpdate);
+        log.debug("\t sent {} SourceDataTagValue objects", dataTagValueUpdate.getValues().size());
+      } catch (JMSException ex) {
+        log.error("\tpull : JMSException caught while invoking processValues methods :" + ex.getMessage());
+      }
     }
 
     /**
