@@ -5,18 +5,19 @@ import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.flow.DefaultCacheFlow;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.rule.RuleTag;
+import cern.c2mon.server.common.tag.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
-
-import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Function;
 
 import static cern.c2mon.shared.common.CacheEvent.INSERTED;
 import static cern.c2mon.shared.common.CacheEvent.UPDATE_ACCEPTED;
+import static java.util.stream.Collectors.toSet;
 
 /**
  * @author Szymon Halastra, Alexandros Papageorgiou Koufidis
@@ -49,45 +50,36 @@ public class RuleTagService extends AbstractCacheServiceImpl<RuleTag> {
 	  log.trace("setParentSupervisionIds() - Setting supervision ids for rule {}...", ruleTagId);
     RuleTag ruleTag = ruleTagCache.get(ruleTagId);
 
-    Set<Long> processIds = new HashSet<>();
-    Set<Long> equipmentIds = new HashSet<>();
-    Set<Long> subEquipmentIds = new HashSet<>();
-    int cnt = 0;
-
-    log.trace("Rule {} has {} input rule tags", ruleTag.getId(), ruleTag.getRuleInputTagIds().size());
-    for (Long inputTagId : ruleTag.getRuleInputTagIds()) {
-      cnt++;
-      log.trace("For rule {}, trying to find rule input tag number {} with id {} in caches...", ruleTag.getId(), cnt, inputTagId);
-      if (dataTagCache.containsKey(inputTagId)) {
-        DataTag dataTag = dataTagCache.get(inputTagId);
-        processIds.add(dataTag.getProcessId());
-        equipmentIds.add(dataTag.getEquipmentId());
-        if (dataTag.getSubEquipmentId() != null) {
-          subEquipmentIds.add(dataTag.getSubEquipmentId());
+    Set<Tag> inputTags = ruleTag.getRuleInputTagIds()
+      .stream()
+      .map(inputTagId -> {
+        log.trace("For rule {}, trying to find rule input tag {} in caches...", ruleTagId, inputTagId);
+        if (dataTagCache.containsKey(inputTagId)) {
+          return dataTagCache.get(inputTagId);
+        } else if (ruleTagCache.containsKey(inputTagId)) {
+          // if not empty, already processed; if empty, needs processing
+          if (ruleTagCache.get(inputTagId).getProcessIds().isEmpty()) {
+            setParentSupervisionIds(inputTagId);
+          }
+          return ruleTagCache.get(inputTagId);
+        } else {
+          throw new RuntimeException("Unable to set rule parent process & equipment ids for rule " + ruleTag.getId()
+            + ": unable to locate tag " + inputTagId + " in either RuleTag or DataTag cache (ControlTags not supported in rules)");
         }
-      } else if (ruleTagCache.containsKey(inputTagId)) {
-        RuleTag childRuleTag = ruleTagCache.get(inputTagId);
+      })
+      .collect(toSet());
 
-        // if not empty, already processed; if empty, needs processing
-        if (childRuleTag.getProcessIds().isEmpty()) {
-          setParentSupervisionIds(childRuleTag.getId());
-        }
-
-        childRuleTag = ruleTagCache.get(inputTagId);
-        processIds.addAll(childRuleTag.getProcessIds());
-        equipmentIds.addAll(childRuleTag.getEquipmentIds());
-        subEquipmentIds.addAll(childRuleTag.getSubEquipmentIds());
-      } else {
-        throw new RuntimeException("Unable to set rule parent process & equipment ids for rule " + ruleTag.getId()
-          + ": unable to locate tag " + inputTagId + " in either RuleTag or DataTag cache (ControlTags not supported in rules)");
-      }
-    }
+    ruleTag.setProcessIds(collectIds(inputTags, Tag::getProcessIds));
+    ruleTag.setEquipmentIds(collectIds(inputTags, Tag::getEquipmentIds));
+    ruleTag.setSubEquipmentIds(collectIds(inputTags, Tag::getSubEquipmentIds));
 
     log.debug("setParentSupervisionIds() - Setting parent ids for rule {}; process ids: {}; equipment ids: {}; sub-equipment ids: {}",
-      ruleTag.getId(), processIds, equipmentIds, subEquipmentIds);
-    ruleTag.setProcessIds(processIds);
-    ruleTag.setEquipmentIds(equipmentIds);
-    ruleTag.setSubEquipmentIds(subEquipmentIds);
+      ruleTag.getId(), ruleTag.getProcessIds(), ruleTag.getEquipmentIds(), ruleTag.getSubEquipmentIds());
+
     ruleTagCache.putQuiet(ruleTagId, ruleTag);
+  }
+
+  private static Set<Long> collectIds(Set<Tag> tags, Function<Tag, Set<Long>> idsGetter) {
+    return tags.stream().flatMap(t -> idsGetter.apply(t).stream()).collect(toSet());
   }
 }
