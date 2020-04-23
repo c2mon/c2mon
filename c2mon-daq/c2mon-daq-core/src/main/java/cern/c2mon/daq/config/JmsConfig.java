@@ -16,7 +16,6 @@
  ******************************************************************************/
 package cern.c2mon.daq.config;
 
-import cern.c2mon.shared.daq.datatag.DataTagValueUpdateConverter;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.command.ActiveMQQueue;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +23,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.jms.connection.SingleConnectionFactory;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
+
+import cern.c2mon.shared.daq.datatag.DataTagValueUpdateConverter;
 
 /**
  * Creates all Beans required for the JMS communication
@@ -47,10 +48,8 @@ public class JmsConfig {
   }
 
   @Bean
-  public JmsTemplate sourceUpdateJmsTemplate() {
-    JmsTemplate jmsTemplate = new JmsTemplate(singleConnectionFactory());
-    addDefaultUpdateJmsTemplateQueueProperties(jmsTemplate);
-    return jmsTemplate;
+  public JmsUpdateQueueTemplateFactory sourceUpdateJmsTemplate() {
+    return new JmsUpdateQueueTemplateFactory(singleConnectionFactory(), properties);
   }
 
   @Bean
@@ -109,10 +108,8 @@ public class JmsConfig {
   }
 
   @Bean
-  public JmsTemplate secondSourceUpdateJmsTemplate() {
-    JmsTemplate jmsTemplate = new JmsTemplate(secondSingleConnectionFactory());
-    addDefaultUpdateJmsTemplateQueueProperties(jmsTemplate);
-    return jmsTemplate;
+  public JmsUpdateQueueTemplateFactory secondSourceUpdateJmsTemplate() {
+    return new JmsUpdateQueueTemplateFactory(secondSingleConnectionFactory(), properties);
   }
 
   @Bean

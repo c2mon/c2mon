@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2020 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -58,11 +58,11 @@ public class ProcessMessageSenderConfig {
 
   @Autowired
   @Qualifier("sourceUpdateJmsTemplate")
-  private JmsTemplate sourceUpdateJmsTemplate;
+  private JmsUpdateQueueTemplateFactory sourceUpdateJmsTemplate;
 
   @Autowired
   @Qualifier("secondSourceUpdateJmsTemplate")
-  private JmsTemplate secondSourceUpdateJmsTemplate;
+  private JmsUpdateQueueTemplateFactory secondSourceUpdateJmsTemplate;
 
   @Autowired
   @Qualifier("filterJmsTemplate")
