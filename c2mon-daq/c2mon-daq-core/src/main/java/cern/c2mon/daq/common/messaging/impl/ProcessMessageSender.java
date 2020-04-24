@@ -28,10 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import cern.c2mon.daq.common.conf.core.ProcessConfigurationHolder;
 import cern.c2mon.daq.common.messaging.IProcessMessageSender;
 import cern.c2mon.daq.common.messaging.JmsSender;
-import cern.c2mon.shared.common.datatag.DataTagAddress;
-import cern.c2mon.shared.common.datatag.DataTagValueUpdate;
-import cern.c2mon.shared.common.datatag.SourceDataTagQuality;
-import cern.c2mon.shared.common.datatag.SourceDataTagValue;
+import cern.c2mon.shared.common.datatag.*;
 import cern.c2mon.shared.common.process.ProcessConfiguration;
 import cern.c2mon.shared.util.buffer.PullEvent;
 import cern.c2mon.shared.util.buffer.PullException;
@@ -133,21 +130,16 @@ public class ProcessMessageSender implements IProcessMessageSender {
         .priority(DataTagAddress.PRIORITY_HIGHEST)
         .guaranteedDelivery(false)
         .valueDescription("")
-        .timeToLive(processConfiguration.getAliveInterval())
+         // we keep the message on the broker max twice as long as the configured alive interval
+        .timeToLive(processConfiguration.getAliveInterval() * 2)
         .build();
-    try {  
-      distributeValue(aliveTagValue);
-    } catch (JMSException ex) {
-      log.error("sendAlive : JMSException caught :" + ex.getMessage());
-    } catch (Throwable e) {
-      log.error("sendAlive : Unexpected Exception caught :", e);
-    }
 
+    distributeValue(aliveTagValue);
   }
 
   @Override
   public void sendCommfaultTag(long tagID, String tagName, boolean value, String pDescription) {
-    log.debug("Sending CommfaultTag. tag id : " + tagID);
+    log.debug("Sending CommfaultTag tag {} (#{})", tagName, tagID);
 
     long timestamp = System.currentTimeMillis();
     SourceDataTagValue commfaultTagValue = SourceDataTagValue.builder()
@@ -159,28 +151,19 @@ public class ProcessMessageSender implements IProcessMessageSender {
         .timestamp(new Timestamp(timestamp))
         .daqTimestamp(new Timestamp(timestamp))
         .priority(DataTagAddress.PRIORITY_HIGHEST)
-        .guaranteedDelivery(false)
+        .timeToLive(DataTagConstants.TTL_FOREVER)
         .valueDescription(pDescription)
-        .timeToLive(180_000)
         .build();
-    try {
-      distributeValue(commfaultTagValue);
-    } catch (JMSException ex) {
-      log.error("sendCommfaultTag : JMSException caught :" + ex.getMessage());
-    }
+    
+    distributeValue(commfaultTagValue);
   }
 
   @Override
   public final void addValue(final SourceDataTagValue dataTagValue) {
-    log.debug("entering addValue()..");
     log.debug("adding data tag " + dataTagValue.getId() + " to a sending buffer");
     if (dataTagValue.getPriority() == DataTagAddress.PRIORITY_HIGH) {
       log.debug("\t sourceDataTagValue priority is HIGH");
-      try {
-        this.distributeValue(dataTagValue);
-      } catch (JMSException ex) {
-        log.error("addValue : JMSException caught :" + ex.getMessage());
-      }
+      this.distributeValue(dataTagValue);
     } else {
       log.debug("\t sourceDataTagValue priority is LOW");
       // check whether it's message with guaranteed delivery or not
@@ -198,8 +181,6 @@ public class ProcessMessageSender implements IProcessMessageSender {
         this.dataTagsBuffer.push(dataTagValue);
       }
     }
-
-    log.debug("leaving addValue()");
   }
 
   /**
@@ -230,7 +211,7 @@ public class ProcessMessageSender implements IProcessMessageSender {
    * @param sourceDataTagValue the value to send
    * @throws JMSException if one of the senders fails
    */
-  private void distributeValue(final SourceDataTagValue sourceDataTagValue) throws JMSException {
+  private void distributeValue(final SourceDataTagValue sourceDataTagValue) {
     for (JmsSender jmsSender : jmsSenders) {
       try {
         jmsSender.processValue(sourceDataTagValue);
