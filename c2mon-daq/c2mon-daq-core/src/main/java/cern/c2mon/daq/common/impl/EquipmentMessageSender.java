@@ -54,24 +54,24 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
    * The filter message sender. All tags a filter rule matched are added to
    * this.
    */
-  private IFilterMessageSender filterMessageSender;
+  private final IFilterMessageSender filterMessageSender;
 
   /**
    * The process message sender takes the messages actually send to the server.
    */
-  private IProcessMessageSender processMessageSender;
+  private final IProcessMessageSender processMessageSender;
 
   /**
    * The dynamic time band filter activator activates time deadband filtering
    * based on tag occurrence. This one is for medium priorities.
    */
-  private IDynamicTimeDeadbandFilterActivator medDynamicTimeDeadbandFilterActivator;
+  private final IDynamicTimeDeadbandFilterActivator medDynamicTimeDeadbandFilterActivator;
 
   /**
    * The dynamic time band filter activator activates time deadband filtering
    * based on tag occurrence. This one is for low priorities.
    */
-  private IDynamicTimeDeadbandFilterActivator lowDynamicTimeDeadbandFilterActivator;
+  private final IDynamicTimeDeadbandFilterActivator lowDynamicTimeDeadbandFilterActivator;
 
   /**
    * The equipment configuration of this sender.
@@ -103,7 +103,9 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
    */
   private EquipmentSenderFilterModule equipmentSenderFilterModule;
 
-  private FreshnessMonitor freshnessMonitor;
+  private final FreshnessMonitor freshnessMonitor;
+  
+  private EquipmentStateSender equipmentStateSender;
 
   /**
    * Creates a new EquipmentMessageSender.
@@ -132,13 +134,15 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
   }
 
   /**
-   * Init
+   * Initialize the {@link EquipmentStateSender} with the equipment configuration
    *
-   * @param equipmentConfiguration
+   * @param equipmentConfiguration the equipment configuration parameters
    */
   public void init(final EquipmentConfiguration equipmentConfiguration) {
     // Configuration
     setEquipmentConfiguration(equipmentConfiguration);
+    
+    this.equipmentStateSender = new EquipmentStateSender(equipmentConfiguration, processMessageSender);
 
     // Filter module
     this.equipmentSenderFilterModule = new EquipmentSenderFilterModule(this.filterMessageSender);
@@ -343,69 +347,24 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
     return (!address.isStaticTimedeadband() && this.equipmentConfiguration.isDynamicTimeDeadbandEnabled());
   }
 
-  /**
-   * Sends a note to the business layer, to confirm that the equipment is not
-   * properly configured, or connected to its data source
-   */
   @Override
   public final void confirmEquipmentStateIncorrect() {
-    confirmEquipmentStateIncorrect(null);
+    equipmentStateSender.confirmEquipmentStateIncorrect();
   }
 
-  /**
-   * Sends a note to the business layer, to confirm that the equipment is not
-   * properly configured, or connected to its data source
-   *
-   * @param pDescription additional description
-   */
   @Override
   public final void confirmEquipmentStateIncorrect(final String pDescription) {
-    sendCommfaultTag(this.equipmentConfiguration.getCommFaultTagId(), equipmentConfiguration.getName(), this.equipmentConfiguration.getCommFaultTagValue(), pDescription);
-
-    // Send the commFaultTag for the equipment's subequipments too
-    Map<Long, SubEquipmentConfiguration> subEquipmentConfigurations = equipmentConfiguration.getSubEquipmentConfigurations();
-
-    for (SubEquipmentConfiguration subEquipmentConfiguration : subEquipmentConfigurations.values()) {
-      sendCommfaultTag(subEquipmentConfiguration.getCommFaultTagId(), subEquipmentConfiguration.getName(), subEquipmentConfiguration.getCommFaultTagValue(), pDescription);
-    }
+    equipmentStateSender.confirmEquipmentStateIncorrect(pDescription);
   }
 
-  /**
-   * Sends the CommfaultTag message.
-   *
-   * @param tagID       The CommfaultTag id.
-   * @param value       The CommFaultTag value to send.
-   * @param description The description of the CommfaultTag
-   */
-  private void sendCommfaultTag(final long tagID, final String equipmentName, final boolean value, final String description) {
-    this.processMessageSender.sendCommfaultTag(tagID, equipmentName + ":COMM_FAULT", value, description);
-  }
-
-  /**
-   * Sends a note to the business layer, to confirm that the equipment is
-   * properly configured, connected to its source and running
-   */
   @Override
   public final void confirmEquipmentStateOK() {
-    confirmEquipmentStateOK(null);
+    equipmentStateSender.confirmEquipmentStateOK();
   }
 
-  /**
-   * Sends a note to the business layer, to confirm that the equipment is
-   * properly configured, connected to its source and running
-   *
-   * @param pDescription additional description
-   */
   @Override
   public final void confirmEquipmentStateOK(final String pDescription) {
-    sendCommfaultTag(this.equipmentConfiguration.getCommFaultTagId(), equipmentConfiguration.getName(), !this.equipmentConfiguration.getCommFaultTagValue(), pDescription);
-
-    // Send the commFaultTag for the equipment's subequipments too
-    Map<Long, SubEquipmentConfiguration> subEquipmentConfigurations = equipmentConfiguration.getSubEquipmentConfigurations();
-
-    for (SubEquipmentConfiguration subEquipmentConfiguration : subEquipmentConfigurations.values()) {
-      sendCommfaultTag(subEquipmentConfiguration.getCommFaultTagId(), subEquipmentConfiguration.getName(), !subEquipmentConfiguration.getCommFaultTagValue(), pDescription);
-    }
+    equipmentStateSender.confirmEquipmentStateOK(pDescription);
   }
 
   /**
