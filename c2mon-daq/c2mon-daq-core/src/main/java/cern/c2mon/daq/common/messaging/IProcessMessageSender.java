@@ -51,5 +51,5 @@ public interface IProcessMessageSender {
      * This method is responsible for creating a JMS XML message containing
      * alive tag and putting it to the TIM JMS queue.
      */
-    void sendAlive();
+    void sendProcessAlive();
 }
