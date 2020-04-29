@@ -16,17 +16,15 @@
  *****************************************************************************/
 package cern.c2mon.daq.common.impl;
 
-import cern.c2mon.daq.common.messaging.IProcessMessageSender;
-import cern.c2mon.shared.common.datatag.*;
-import cern.c2mon.shared.common.type.TypeConverter;
-import lombok.extern.slf4j.Slf4j;
-
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
-import static java.lang.String.format;
+import lombok.extern.slf4j.Slf4j;
 
-import java.sql.Timestamp;
+import cern.c2mon.daq.common.messaging.IProcessMessageSender;
+import cern.c2mon.shared.common.datatag.*;
+import cern.c2mon.shared.common.type.TypeConverter;
 
 /**
  * This class has all methods for sending the Equipment Supervision Alive Tags
@@ -60,7 +58,7 @@ class EquipmentAliveSender {
    * The Equipment alive tag interval to be used for sending or not the
    * equipment alive
    */
-  private Long aliveTagInterval;
+  private long aliveTagInterval;
 
   /**
    * The Equipment Configuration Name
@@ -89,7 +87,7 @@ class EquipmentAliveSender {
    * @param aliveTagInterval Equipment configuration Tag interval
    * @param confName         Equipment configuration name
    */
-  public void init(final Long aliveTagInterval, final String confName) {
+  public void init(final long aliveTagInterval, final String confName) {
     this.aliveTagInterval = aliveTagInterval;
     this.confName = confName;
   }
@@ -122,24 +120,19 @@ class EquipmentAliveSender {
       ValueUpdate update = new ValueUpdate(value, "Auto-generated alive value of Equipment " + confName, currentTimestamp);
       aliveTagValue = aliveTag.update(update);
     } else {
-
-      int ttl = DataTagConstants.TTL_FOREVER;
-      if (aliveTagInterval <= Integer.MAX_VALUE) {
-        ttl = aliveTagInterval.intValue();
-      }
       
       aliveTagValue = SourceDataTagValue.builder()
           .id(this.aliveTagId)
           .name("EQUIPMENT_ALIVE_" + confName)
           .controlTag(true)
           .value(currentTimestamp)
+          .valueDescription("Alive tag for Equipment " + confName)
           .quality(new SourceDataTagQuality())
           .timestamp(new Timestamp(currentTimestamp))
           .daqTimestamp(new Timestamp(currentTimestamp))
           .priority(DataTagAddress.PRIORITY_HIGHEST)
           .guaranteedDelivery(false)
-          .valueDescription("Alive tag for Equipment " + confName)
-          .timeToLive(ttl)
+          .timeToLive(aliveTagInterval)
           .build();
     }
 
@@ -205,10 +198,8 @@ class EquipmentAliveSender {
       } else {
         return false;
       }
-    }
-
-    // If PREVENT_TOO_FREQUENT_EQUIPMENT_ALIVES is disabled (by default it is)
-    else {
+    } else {
+      // If PREVENT_TOO_FREQUENT_EQUIPMENT_ALIVES is disabled (by default it is)
       doSendEquipmentAlive(aliveTagValue);
       return true;
     }
@@ -216,18 +207,18 @@ class EquipmentAliveSender {
 
   /**
    * Sends that alive tag by adding it to the process message sender queue.
+   * The method assures as well that expired alive tags get discarded from the broker
    *
    * @param aliveTagValue the alive tag value to be sent.
    */
   private void doSendEquipmentAlive(final SourceDataTagValue aliveTagValue) {
-    int ttl = aliveTagValue.getTimeToLive();
-    if (aliveTagInterval <= Integer.MAX_VALUE) {
-      ttl = aliveTagInterval.intValue();
+    aliveTagValue.setTimeToLive(aliveTagInterval);
+    aliveTagValue.setPriority(DataTagConstants.PRIORITY_HIGHEST);
+    aliveTagValue.setGuaranteedDelivery(false);
+    try {
+      this.processMessageSender.addValue(aliveTagValue);
+    } catch (InterruptedException e) {
+      log.error("Equipment Alive tag could not be sent and is lost!: {}", aliveTagValue);
     }
-
-    // Make sure expired alive tags get discarded from the broker
-    aliveTagValue.setTimeToLive(ttl);
-    aliveTagValue.setPriority(DataTagConstants.PRIORITY_HIGH);
-    this.processMessageSender.addValue(aliveTagValue);
   }
 }
