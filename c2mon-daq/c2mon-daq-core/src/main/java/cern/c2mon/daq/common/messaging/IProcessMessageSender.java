@@ -17,6 +17,7 @@
 package cern.c2mon.daq.common.messaging;
 
 import cern.c2mon.shared.common.datatag.SourceDataTagValue;
+import cern.c2mon.shared.util.buffer.SynchroBufferQueue;
 
 /**
  * This interface specifies all operations, that ProcessMessageSender class MUST
@@ -34,14 +35,16 @@ public interface IProcessMessageSender {
      * the buffer. The content of the buffer will be later encapsulated in a JMS
      * message and sent to recipients via JMS
      *
-     * @param dataTagValue
-     *            the SourceDataTagValue object
+     * @param dataTagValue the SourceDataTagValue object
+     * @exception InterruptedException Thrown in case the {@link SynchroBufferQueue} 
+     *            is interrupted while waiting for the put to return
      */
     void addValue(SourceDataTagValue dataTagValue) throws InterruptedException;
 
     /**
      * Sends a communication fault tag message.
      * @param tagId The tag ID to use.
+     * @param tagName the name of the tag
      * @param commOK The value to send.
      * @param description The description to add to the message
      */
