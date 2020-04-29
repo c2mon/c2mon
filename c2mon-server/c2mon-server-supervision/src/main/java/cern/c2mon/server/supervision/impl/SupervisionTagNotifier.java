@@ -33,7 +33,6 @@ import org.springframework.stereotype.Service;
 import cern.c2mon.server.cache.*;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.cache.supervision.SupervisionAppender;
-import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.process.Process;
@@ -43,6 +42,7 @@ import cern.c2mon.server.supervision.SupervisionListener;
 import cern.c2mon.server.supervision.SupervisionNotifier;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
+import cern.c2mon.shared.daq.lifecycle.Lifecycle;
 
 /**
  * On supervision status changes, calls listeners of all C2monCacheWithSupervision

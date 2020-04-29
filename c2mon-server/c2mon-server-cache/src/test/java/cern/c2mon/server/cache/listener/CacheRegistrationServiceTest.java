@@ -17,11 +17,11 @@
 package cern.c2mon.server.cache.listener;
 
 import cern.c2mon.server.cache.*;
-import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.test.CacheObjectCreation;
+import cern.c2mon.shared.daq.lifecycle.Lifecycle;
 
 import org.awaitility.Duration;
 import org.junit.Before;

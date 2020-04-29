@@ -27,12 +27,12 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.history.mapper.SupervisionEventMapper;
 import cern.c2mon.server.supervision.SupervisionListener;
 import cern.c2mon.server.supervision.SupervisionNotifier;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
+import cern.c2mon.shared.daq.lifecycle.Lifecycle;
 
 /**
  * Listens for supervision notifications from the core and logs

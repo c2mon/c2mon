@@ -25,8 +25,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import cern.c2mon.server.cache.C2monBufferedCacheListener;
 import cern.c2mon.server.cache.C2monCacheListener;
-import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.shared.common.Cacheable;
+import cern.c2mon.shared.daq.lifecycle.Lifecycle;
 
 /**
  * Abstract listener implementation that batches the notifications before

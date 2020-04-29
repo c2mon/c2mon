@@ -30,10 +30,10 @@ import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.cache.C2monBufferedCacheListener;
 import cern.c2mon.server.cache.CacheRegistrationService;
-import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.history.logger.BatchLogger;
+import cern.c2mon.shared.daq.lifecycle.Lifecycle;
 
 /**
  * Listens to updates in the Rule and DataTag caches and calls the DAO

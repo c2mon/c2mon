@@ -28,9 +28,9 @@ import org.springframework.context.SmartLifecycle;
 import cern.c2mon.server.cache.C2monBufferedCacheListener;
 import cern.c2mon.server.cache.C2monCacheWithListeners;
 import cern.c2mon.server.cachepersistence.common.BatchPersistenceManager;
-import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.shared.common.Cacheable;
+import cern.c2mon.shared.daq.lifecycle.Lifecycle;
 
 /**
  * A common implementation of the SynchroBufferListener

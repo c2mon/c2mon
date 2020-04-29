@@ -17,10 +17,10 @@
 package cern.c2mon.server.cache;
 
 import cern.c2mon.server.common.alarm.Alarm;
-import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.tag.Tag;
+import cern.c2mon.shared.daq.lifecycle.Lifecycle;
 
 /**
  * Service providing helper methods for registering as cache listeners to the

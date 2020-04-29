@@ -14,23 +14,20 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.common.republisher;
+package cern.c2mon.shared.daq.republisher;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.util.concurrent.CountDownLatch;
 
 import org.easymock.EasyMock;
-import org.easymock.IAnswer;
 import org.easymock.IMocksControl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.jms.UncategorizedJmsException;
-
-import cern.c2mon.server.common.republisher.Publisher;
-import cern.c2mon.server.common.republisher.RepublisherImpl;
-
-import java.util.concurrent.CountDownLatch;
 
 
 /**

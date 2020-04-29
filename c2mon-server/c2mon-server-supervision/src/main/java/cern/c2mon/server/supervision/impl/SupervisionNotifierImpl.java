@@ -40,12 +40,12 @@ import cern.c2mon.server.cache.EquipmentCache;
 import cern.c2mon.server.cache.ProcessCache;
 import cern.c2mon.server.cache.SubEquipmentCache;
 import cern.c2mon.server.common.component.ExecutorLifecycleHandle;
-import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.server.common.supervision.Supervised;
 import cern.c2mon.server.supervision.SupervisionListener;
 import cern.c2mon.server.supervision.SupervisionNotifier;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
+import cern.c2mon.shared.daq.lifecycle.Lifecycle;
 
 /**
  * Notifies the all the listeners of changes in the

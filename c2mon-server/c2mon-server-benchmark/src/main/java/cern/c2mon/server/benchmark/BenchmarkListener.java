@@ -27,12 +27,12 @@ import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.cache.C2monCacheListener;
 import cern.c2mon.server.cache.CacheRegistrationService;
-import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
+import cern.c2mon.shared.daq.lifecycle.Lifecycle;
 
 @Slf4j
 @Service

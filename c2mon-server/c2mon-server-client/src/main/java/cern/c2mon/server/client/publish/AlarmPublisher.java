@@ -33,13 +33,13 @@ import cern.c2mon.server.cache.CacheRegistrationService;
 import cern.c2mon.server.cache.TagLocationService;
 import cern.c2mon.server.client.util.TransferObjectFactory;
 import cern.c2mon.server.common.alarm.Alarm;
-import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.server.common.config.ServerConstants;
-import cern.c2mon.server.common.republisher.Publisher;
-import cern.c2mon.server.common.republisher.Republisher;
-import cern.c2mon.server.common.republisher.RepublisherFactory;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.client.alarm.AlarmValue;
+import cern.c2mon.shared.daq.lifecycle.Lifecycle;
+import cern.c2mon.shared.daq.republisher.Publisher;
+import cern.c2mon.shared.daq.republisher.Republisher;
+import cern.c2mon.shared.daq.republisher.RepublisherFactory;
 import cern.c2mon.shared.util.jms.JmsSender;
 import cern.c2mon.shared.util.json.GsonFactory;
 

@@ -14,32 +14,29 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.common.component;
+package cern.c2mon.shared.daq.republisher;
 
 /**
- * Internal server component lifecycle interface,
- * for components that do not live in the Spring context.
+ * Factory for creating a Republisher.
  * 
  * @author Mark Brightwell
  *
  */
-public interface Lifecycle {
+public class RepublisherFactory {
 
   /**
-   * Start the component.
-   */
-  void start();
-  
-  /**
-   * Stop this component.
-   */
-  void stop();
-  
-  /**
-   * Checks if this component is running.
+   * Creates a Republisher for use by the past publisher. 
    * 
-   * @return true if the component is running
+   * <p>Life-cycle needs managing externally using Lifecycle methods.
+   * 
+   * @param publisher
+   * @param eventName the name of the event type, used for logging
+   * @return a republisher for this publisher
    */
-  boolean isRunning();
+  public static <T extends Object> Republisher<T> createRepublisher(Publisher<T> publisher, String eventName) {
+    return new RepublisherImpl<T>(publisher, eventName);
+  }
+  
+  
   
 }

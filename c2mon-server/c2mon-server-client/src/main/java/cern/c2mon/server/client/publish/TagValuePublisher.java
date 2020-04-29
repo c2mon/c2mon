@@ -41,15 +41,15 @@ import cern.c2mon.server.client.util.TransferObjectFactory;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.TagWithAlarms;
 import cern.c2mon.server.common.alarm.TagWithAlarmsImpl;
-import cern.c2mon.server.common.republisher.Publisher;
-import cern.c2mon.server.common.republisher.Republisher;
-import cern.c2mon.server.common.republisher.RepublisherFactory;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.configuration.ConfigurationUpdate;
 import cern.c2mon.server.configuration.ConfigurationUpdateListener;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
 import cern.c2mon.shared.client.tag.TransferTagImpl;
 import cern.c2mon.shared.client.tag.TransferTagValueImpl;
+import cern.c2mon.shared.daq.republisher.Publisher;
+import cern.c2mon.shared.daq.republisher.Republisher;
+import cern.c2mon.shared.daq.republisher.RepublisherFactory;
 import cern.c2mon.shared.util.jms.JmsSender;
 
 /**

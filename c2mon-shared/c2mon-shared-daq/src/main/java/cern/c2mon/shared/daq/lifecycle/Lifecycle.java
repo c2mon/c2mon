@@ -14,43 +14,32 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.common.republisher;
-
-import cern.c2mon.server.common.component.Lifecycle;
+package cern.c2mon.shared.daq.lifecycle;
 
 /**
- * A Republisher can be used for managing re-publication of
- * any events in case of failure. 
- * 
- * <p> Instantiate one of these through the RepublisherFactory.
+ * Internal server component lifecycle interface,
+ * for components that do not live in the Spring context.
  * 
  * @author Mark Brightwell
  *
- * @param <T> the type of event the publisher publishes
  */
-public interface Republisher<T> extends Lifecycle {
+public interface Lifecycle {
 
   /**
-   * Call this method to indicate that the publication of this
-   * event failed and should be re-attempted. 
-   * @param event publication failed for this event
+   * Start the component.
    */
-  void publicationFailed(T event);
-
-  /**
-   * Override republication delay (default is 10s)
-   * @param republicationDelay in milliseconds
-   */
-  void setRepublicationDelay(int republicationDelay);
+  void start();
   
   /**
-   * @return returns the total number of failed publication attempts since the
-   * application started.
+   * Stop this component.
    */
-  long getNumberFailedPublications();
+  void stop();
   
   /**
-   * @return returns the current number of events waiting for re-publication
+   * Checks if this component is running.
+   * 
+   * @return true if the component is running
    */
-  int getSizeUnpublishedList();
+  boolean isRunning();
+  
 }

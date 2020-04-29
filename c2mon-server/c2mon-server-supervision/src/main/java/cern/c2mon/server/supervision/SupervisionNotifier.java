@@ -17,7 +17,7 @@
 package cern.c2mon.server.supervision;
 
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
-import cern.c2mon.server.common.component.Lifecycle;
+import cern.c2mon.shared.daq.lifecycle.Lifecycle;
 
 /**
  * Interface to bean responsible for notifying listeners interested

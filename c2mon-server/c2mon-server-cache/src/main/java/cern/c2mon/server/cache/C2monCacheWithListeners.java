@@ -17,8 +17,8 @@
 package cern.c2mon.server.cache;
 
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
-import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.shared.common.Cacheable;
+import cern.c2mon.shared.daq.lifecycle.Lifecycle;
 
 public interface C2monCacheWithListeners<K, T extends Cacheable> extends C2monCache<K, T> {
   

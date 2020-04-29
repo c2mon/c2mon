@@ -14,51 +14,43 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.common.component;
-
-import java.util.concurrent.ExecutorService;
+package cern.c2mon.shared.daq.republisher;
 
 import cern.c2mon.shared.daq.lifecycle.Lifecycle;
 
 /**
- * Allows executor shutdown via the C2MON {@link Lifecycle} interface.
- * Used in particular for listeners to be able to shutdown notification
- * threads running as ExecutorService's.
+ * A Republisher can be used for managing re-publication of
+ * any events in case of failure. 
  * 
- * <p>Only attempts smooth shutdown. Stop() will not return if unsuccessful.
+ * <p> Instantiate one of these through the RepublisherFactory.
  * 
  * @author Mark Brightwell
  *
+ * @param <T> the type of event the publisher publishes
  */
-public class ExecutorLifecycleHandle implements Lifecycle {
+public interface Republisher<T> extends Lifecycle {
 
   /**
-   * Service to manage.
+   * Call this method to indicate that the publication of this
+   * event failed and should be re-attempted. 
+   * @param event publication failed for this event
    */
-  private ExecutorService executor;
+  void publicationFailed(T event);
+
+  /**
+   * Override republication delay (default is 10s)
+   * @param republicationDelay in milliseconds
+   */
+  void setRepublicationDelay(int republicationDelay);
   
   /**
-   * Constructor
-   * @param executor service whose lifecycle is to be managed
+   * @return returns the total number of failed publication attempts since the
+   * application started.
    */
-  public ExecutorLifecycleHandle(final ExecutorService executor) {
-    super();
-    this.executor = executor;
-  }
-
-  @Override
-  public boolean isRunning() {
-    return !executor.isShutdown();
-  }
-
-  @Override
-  public void start() {
-    //do nothing
-  }
-
-  @Override
-  public void stop() {
-    executor.shutdown();
-  }
-
+  long getNumberFailedPublications();
+  
+  /**
+   * @return returns the current number of events waiting for re-publication
+   */
+  int getSizeUnpublishedList();
 }

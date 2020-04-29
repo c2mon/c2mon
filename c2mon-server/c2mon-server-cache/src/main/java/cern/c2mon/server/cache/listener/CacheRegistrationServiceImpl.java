@@ -30,10 +30,10 @@ import cern.c2mon.server.cache.ControlTagCache;
 import cern.c2mon.server.cache.DataTagCache;
 import cern.c2mon.server.cache.RuleTagCache;
 import cern.c2mon.server.common.alarm.Alarm;
-import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.tag.Tag;
+import cern.c2mon.shared.daq.lifecycle.Lifecycle;
 import cern.c2mon.shared.util.threadhandler.ThreadHandler;
 
 /**

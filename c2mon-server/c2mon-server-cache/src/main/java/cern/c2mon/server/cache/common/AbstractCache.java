@@ -44,9 +44,9 @@ import cern.c2mon.server.cache.listener.CacheListener;
 import cern.c2mon.server.cache.listener.DefaultBufferedCacheListener;
 import cern.c2mon.server.cache.listener.MultiThreadedCacheListener;
 import cern.c2mon.server.cache.loading.SimpleCacheLoaderDAO;
-import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.server.common.config.C2monCacheName;
 import cern.c2mon.shared.common.Cacheable;
+import cern.c2mon.shared.daq.lifecycle.Lifecycle;
 
 /**
  * Abstract cache that all the other C2MON caches extend.

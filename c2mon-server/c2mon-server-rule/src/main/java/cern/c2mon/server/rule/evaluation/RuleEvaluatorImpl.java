@@ -33,13 +33,13 @@ import cern.c2mon.server.cache.CacheRegistrationService;
 import cern.c2mon.server.cache.RuleTagCache;
 import cern.c2mon.server.cache.TagLocationService;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
-import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.rule.RuleEvaluator;
 import cern.c2mon.server.rule.config.RuleProperties;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
+import cern.c2mon.shared.daq.lifecycle.Lifecycle;
 import cern.c2mon.shared.rule.RuleEvaluationException;
 
 import static cern.c2mon.shared.common.type.TypeConverter.getType;

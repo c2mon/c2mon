@@ -30,10 +30,10 @@ import org.springframework.stereotype.Component;
 import cern.c2mon.pmanager.persistence.IPersistenceManager;
 import cern.c2mon.server.cache.C2monBufferedCacheListener;
 import cern.c2mon.server.cache.CacheRegistrationService;
-import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
+import cern.c2mon.shared.daq.lifecycle.Lifecycle;
 
 /**
  * Listens for {@link Tag} updates and converts them to {@link TagDocument}
