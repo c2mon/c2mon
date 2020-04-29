@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2020 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -29,6 +29,7 @@ import org.simpleframework.xml.core.Commit;
 
 import cern.c2mon.shared.common.command.ISourceCommandTag;
 import cern.c2mon.shared.common.command.SourceCommandTag;
+import cern.c2mon.shared.common.datatag.DataTagConstants;
 import cern.c2mon.shared.common.datatag.ISourceDataTag;
 import cern.c2mon.shared.common.datatag.SourceDataTag;
 
@@ -154,12 +155,41 @@ public class EquipmentConfiguration implements IEquipmentConfiguration, Cloneabl
     }
 
     for (SourceDataTag tag : sourceDataTagList) {
+      adjustJmsPriority(tag);
       sourceDataTags.put(tag.getId(), tag);
     }
 
     for (SourceCommandTag tag : sourceCommandTagList) {
       sourceCommandTags.put(tag.getId(), tag);
     }
+  }
+  
+  /**
+   * The DAQ only supports four JMS priorities which are further described
+   * by the given constants. This has influence also on the local message buffering
+   * which is used to send value update in bunches.
+   * <p>
+   * This adjustment is necessary as the initial design has slightly changed over the
+   * years to improve the overall sending performance.
+   * 
+   * @param tag The tag configuration received by the server
+   * @see DataTagConstants
+   */
+  private void adjustJmsPriority(SourceDataTag tag) {
+    int priority = tag.getCurrentValue().getPriority();
+    int convertedPriority;
+    
+    if (tag.isControl()) {
+      convertedPriority = DataTagConstants.PRIORITY_HIGHEST;
+    } else if (priority > DataTagConstants.PRIORITY_MEDIUM) {
+      convertedPriority = DataTagConstants.PRIORITY_HIGH;
+    } else if (priority == DataTagConstants.PRIORITY_MEDIUM) {
+      convertedPriority =  DataTagConstants.PRIORITY_MEDIUM;
+    } else {
+      // priority < DataTagConstants.PRIORITY_MEDIUM
+      convertedPriority =  DataTagConstants.PRIORITY_LOW;
+    }
+    tag.getCurrentValue().setPriority(convertedPriority);
   }
 
   /**
