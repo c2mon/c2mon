@@ -1,8 +1,27 @@
+/*******************************************************************************
+ * Copyright (C) 2010-2020 CERN. All rights not expressly granted are reserved.
+ *
+ * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
+ * C2MON is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation, either version 3 of the license.
+ *
+ * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
 package cern.c2mon.daq.config;
 
-import cern.c2mon.shared.daq.config.DaqJmsProperties;
-import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+
+import lombok.Data;
+
+import cern.c2mon.shared.common.datatag.DataTagAddress;
+import cern.c2mon.shared.daq.config.DaqJmsProperties;
 
 /**
  * @author Justin Lewis Salmon
@@ -69,6 +88,42 @@ public class DaqProperties {
      * Default is 60 seconds
      */
     private int requestMsgtimeToLive = 60;
+    
+    /**
+     * Maximum number of tag value objects to be packed into a single 
+     * JMS message sent to the server.
+     */
+    private int maxMessageFrameSize = 1000;
+
+    /**
+     * Interval in milliseconds at which High-Priority messages are to be sent to the server, if
+     * there are tag updates to be processed and {@link #maxMessageFrameSize} is not reached.
+     * <p>
+     * Default is 500 ms
+     * 
+     * @see DataTagAddress#PRIORITY_HIGH
+     */
+    private long maxMessageDelayPriorityHigh = 500L;
+    
+    /**
+     * Interval in milliseconds at which messages are to be sent to the server, if
+     * there are tag updates to be processed and {@link #maxMessageFrameSize} is not reached.
+     * <p>
+     * Default is 1000 ms
+     * 
+     * @see DataTagAddress#PRIORITY_MEDIUM
+     */
+    private long maxMessageDelayPriorityMedium = 1000L;
+    
+    /**
+     * Interval in milliseconds at which messages are to be sent to the server, if
+     * there are tag updates to be processed and {@link #maxMessageFrameSize} is not reached.
+     * <p>
+     * Default is 1000 ms
+     * 
+     * @see DataTagAddress#PRIORITY_LOW
+     */
+    private long maxMessageDelayPriorityLow = 1000L;
   }
 
   /**
