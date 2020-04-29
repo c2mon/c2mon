@@ -6,8 +6,12 @@ public class SupervisionStateTagFactory extends AbstractCacheObjectFactory<Super
 
   @Override
   public SupervisionStateTag sampleBase() {
+    return sampleBase(1222L);
+  }
+
+  public SupervisionStateTag sampleBase(long id) {
     return new SupervisionStateTag(
-      1222L,
+      id,
       150L,
       "EQ",
       1224L,
