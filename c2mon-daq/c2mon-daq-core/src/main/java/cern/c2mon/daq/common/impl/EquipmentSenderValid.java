@@ -171,7 +171,11 @@ class EquipmentSenderValid {
 
     // All checks and filters are successful, send the tag to the server:
     SourceDataTagValue tagValue = currentSourceDataTag.update(update);
-    this.processMessageSender.addValue(tagValue);
+    try {
+      this.processMessageSender.addValue(tagValue);
+    } catch (InterruptedException e) {
+      log.error("Data could not be sent and is lost!: {}", tagValue);
+    }
 
     // Checks if the dynamic TimeDeadband filter is enabled, Static disable and record it depending on the priority
     this.dynamicTimeDeadbandFilterer.recordTag(currentSourceDataTag);

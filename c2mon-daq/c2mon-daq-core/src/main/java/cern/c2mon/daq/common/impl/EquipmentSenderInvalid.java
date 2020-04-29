@@ -177,7 +177,11 @@ class EquipmentSenderInvalid {
         log.warn("Method called with 0(OK) quality code for tag #{}. This should normally not happen! " +
             "sendTagFiltered() method should have been called before.", sourceDataTag.getId());
       } else {
-        this.processMessageSender.addValue(newSDValue);
+        try {
+          this.processMessageSender.addValue(newSDValue);
+        } catch (InterruptedException e) {
+          log.error("Data could not be sent and is lost!: {}", newSDQuality);
+        }
 
         // Checks if the dynamic TimeDeadband filter is enabled, Static disable
         // and record it depending on the priority

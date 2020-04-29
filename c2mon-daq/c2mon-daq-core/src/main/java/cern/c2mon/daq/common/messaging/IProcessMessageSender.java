@@ -37,7 +37,7 @@ public interface IProcessMessageSender {
      * @param dataTagValue
      *            the SourceDataTagValue object
      */
-    void addValue(SourceDataTagValue dataTagValue);
+    void addValue(SourceDataTagValue dataTagValue) throws InterruptedException;
 
     /**
      * Sends a communication fault tag message.
