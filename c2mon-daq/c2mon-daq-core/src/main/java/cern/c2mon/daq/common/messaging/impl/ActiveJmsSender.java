@@ -29,6 +29,9 @@ import cern.c2mon.daq.config.JmsUpdateQueueTemplateFactory;
 import cern.c2mon.shared.common.datatag.DataTagValueUpdate;
 import cern.c2mon.shared.common.datatag.SourceDataTagValue;
 import cern.c2mon.shared.common.process.ProcessConfiguration;
+import cern.c2mon.shared.daq.republisher.Publisher;
+import cern.c2mon.shared.daq.republisher.Republisher;
+import cern.c2mon.shared.daq.republisher.RepublisherFactory;
 
 /**
  * Implementation of the JMSSender interface for sending update messages to
@@ -37,7 +40,7 @@ import cern.c2mon.shared.common.process.ProcessConfiguration;
  * @author mbrightw
  */
 @Slf4j
-public class ActiveJmsSender implements JmsSender {
+public class ActiveJmsSender implements JmsSender, Publisher<DataTagValueUpdate> {
 
   /**
    * The JmsTemplateFactory managing the calls to JMS.
@@ -52,6 +55,9 @@ public class ActiveJmsSender implements JmsSender {
   /** Used to determine, if this is the primary broker */
   @Getter @Setter
   private boolean primaryBroker = false;
+  
+  /** Contains re-publication logic */
+  private final Republisher<DataTagValueUpdate> republisher;
 
   /**
    * Unique constructor.
@@ -60,6 +66,7 @@ public class ActiveJmsSender implements JmsSender {
    */
   public ActiveJmsSender(final JmsUpdateQueueTemplateFactory jmsUpdateQueueTemplateFactory) {
     this.jmsUpdateQueueTemplateFactory = jmsUpdateQueueTemplateFactory;
+    this.republisher = RepublisherFactory.createRepublisher(this, "DataTagValueUpdate");
   }
 
   /**
@@ -105,15 +112,18 @@ public class ActiveJmsSender implements JmsSender {
    */
   @Override
   public final void processValues(final DataTagValueUpdate dataTagValueUpdate) {
-    // If the sending action is Enabled
-    if (this.isEnabled && !dataTagValueUpdate.getValues().isEmpty()) {
-      SourceDataTagValue sdtValue = dataTagValueUpdate.getValues().iterator().next();
-      QosSettings settings = QosSettingsFactory.extractQosSettings(sdtValue);
-      // convert and send the collection of updates
-      jmsUpdateQueueTemplateFactory.getDataTagValueUpdateJmsTemplate(settings).convertAndSend(dataTagValueUpdate);
-    } else if (!this.isEnabled){
-      log.debug("DAQ in test mode; not sending the value to JMS");
-    }
+      // If the sending action is Enabled
+      if (this.isEnabled && !dataTagValueUpdate.getValues().isEmpty()) {
+        try {
+          publish(dataTagValueUpdate);
+        } catch (JmsException e) {
+          log.error("Error occured when sending dataTagValueUpdate to server via JMS - submitting for republication", e);
+          republisher.publicationFailed(dataTagValueUpdate);
+        }
+      } else if (!this.isEnabled){
+        log.debug("DAQ in test mode; not sending the value to JMS");
+      }
+    
   }
 
   @Override
@@ -139,5 +149,13 @@ public class ActiveJmsSender implements JmsSender {
   @Override
   public final boolean getEnabled() {
     return this.isEnabled;
+  }
+
+  @Override
+  public void publish(DataTagValueUpdate dataTagValueUpdate) {
+    SourceDataTagValue sdtValue = dataTagValueUpdate.getValues().iterator().next();
+    QosSettings settings = QosSettingsFactory.extractQosSettings(sdtValue);
+    // convert and send the collection of updates
+    jmsUpdateQueueTemplateFactory.getDataTagValueUpdateJmsTemplate(settings).convertAndSend(dataTagValueUpdate);
   }
 }
