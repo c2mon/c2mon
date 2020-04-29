@@ -65,6 +65,11 @@ public class ProcessMessageSender implements IProcessMessageSender {
   
   private final DaqProperties daqProperties;
   
+  /**
+   * Unique Constructor
+   * @param jmsSenders List of {@link JmsSender} who should be informed about tag updates
+   * @param properties the DAQ properties
+   */
   public ProcessMessageSender(final Collection<JmsSender> jmsSenders, DaqProperties properties) {
     this.daqProperties = properties;
     this.jmsSenders = jmsSenders;
@@ -177,6 +182,7 @@ public class ProcessMessageSender implements IProcessMessageSender {
       try {
         jmsSender.processValue(dataTagValue);
       } catch (Exception e) {
+        // This is just a security measure, but should hopefully never happen
         log.error("Unhandled exception caught while sending a source value (tag id {}) - the value update is lost.", dataTagValue.getId(), e);
       }
     }
