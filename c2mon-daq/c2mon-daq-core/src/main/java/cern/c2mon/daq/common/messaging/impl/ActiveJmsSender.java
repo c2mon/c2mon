@@ -16,12 +16,11 @@
  *****************************************************************************/
 package cern.c2mon.daq.common.messaging.impl;
 
-import javax.jms.DeliveryMode;
-
 import org.springframework.jms.JmsException;
-import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.support.QosSettings;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import cern.c2mon.daq.common.conf.core.ProcessConfigurationHolder;
@@ -49,6 +48,10 @@ public class ActiveJmsSender implements JmsSender {
    * Enabling/disabling the action of sending information to the brokers
    */
   private boolean isEnabled = true;
+  
+  /** Used to determine, if this is the primary broker */
+  @Getter @Setter
+  private boolean primaryBroker = false;
 
   /**
    * Unique constructor.
@@ -103,12 +106,12 @@ public class ActiveJmsSender implements JmsSender {
   @Override
   public final void processValues(final DataTagValueUpdate dataTagValueUpdate) {
     // If the sending action is Enabled
-    if (this.isEnabled) {
+    if (this.isEnabled && !dataTagValueUpdate.getValues().isEmpty()) {
       SourceDataTagValue sdtValue = dataTagValueUpdate.getValues().iterator().next();
-      QosSettings settings = extractQosSettings(sdtValue);
+      QosSettings settings = QosSettingsFactory.extractQosSettings(sdtValue);
       // convert and send the collection of updates
       jmsUpdateQueueTemplateFactory.getDataTagValueUpdateJmsTemplate(settings).convertAndSend(dataTagValueUpdate);
-    } else {
+    } else if (!this.isEnabled){
       log.debug("DAQ in test mode; not sending the value to JMS");
     }
   }
@@ -136,28 +139,5 @@ public class ActiveJmsSender implements JmsSender {
   @Override
   public final boolean getEnabled() {
     return this.isEnabled;
-  }
-  
-  /**
-   * We Take the first {@link SourceDataTagValue} object from collection to determine
-   * the Quality-of-Service settings for the message sending
-   * @param sourceDataTagValue the first tag extracted from {@link DataTagValueUpdate}
-   * @return the Quality-of-Service settings for determine the {@link JmsTemplate}
-   */
-  private QosSettings extractQosSettings(SourceDataTagValue sourceDataTagValue) {
-    QosSettings settings = new QosSettings();
-    
-    settings.setPriority(sourceDataTagValue.getPriority());
-    settings.setTimeToLive(sourceDataTagValue.getTimeToLive());
-
-    if (sourceDataTagValue.isGuaranteedDelivery()) {
-      log.debug("\t sending PERSISTENT message");
-      settings.setDeliveryMode(DeliveryMode.PERSISTENT);
-    } else {
-      log.debug("\t sending NON-PERSISTENT message");
-      settings.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
-    }
-    
-    return settings;
   }
 }
