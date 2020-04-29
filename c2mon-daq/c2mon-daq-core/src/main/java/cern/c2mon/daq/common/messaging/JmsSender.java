@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2020 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -75,4 +75,16 @@ public interface JmsSender {
    * @return isEnabled Current status of the action of sending information to the brokers
    */
   boolean getEnabled();
+  
+  /**
+   * Determines a primary broker.
+   * <p>
+   * Only messages to the primary broker are backed up in case of JMS communication problems.
+   * Currently, the logic only supports one primary broker.
+   * 
+   * @return false by default
+   */
+  default boolean isPrimaryBroker() {
+    return false;
+  }
 }
