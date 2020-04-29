@@ -116,7 +116,7 @@ public final class SourceDataTagValue implements Cloneable {
    * Time to live in milliseconds. If the transmission to the server takes
    * longer, the value is discarded.
    */
-  protected int timeToLive;
+  protected long timeToLive;
 
   /**
    * Flag indicating whether the value is the result of a simulation.
