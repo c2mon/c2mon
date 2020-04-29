@@ -54,7 +54,7 @@ public class ActiveJmsSender implements JmsSender, Publisher<DataTagValueUpdate>
   
   /** Used to determine, if this is the primary broker */
   @Getter @Setter
-  private boolean primaryBroker = false;
+  private boolean primaryBroker;
   
   /** Contains re-publication logic */
   private final Republisher<DataTagValueUpdate> republisher;
@@ -117,8 +117,12 @@ public class ActiveJmsSender implements JmsSender, Publisher<DataTagValueUpdate>
         try {
           publish(dataTagValueUpdate);
         } catch (JmsException e) {
-          log.error("Error occured when sending dataTagValueUpdate to server via JMS - submitting for republication", e);
-          republisher.publicationFailed(dataTagValueUpdate);
+          if (primaryBroker) {
+            log.error("Error occured when sending dataTagValueUpdate to primary JMS broker - submitting for republication", e);
+            republisher.publicationFailed(dataTagValueUpdate);
+          } else {
+            log.error("Error occured when sending dataTagValueUpdate to secondary JMS broker - data is lost!", e);
+          }
         }
       } else if (!this.isEnabled){
         log.debug("DAQ in test mode; not sending the value to JMS");
