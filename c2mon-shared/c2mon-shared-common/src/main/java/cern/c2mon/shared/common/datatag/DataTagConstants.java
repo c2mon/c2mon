@@ -75,6 +75,8 @@ public interface DataTagConstants {
    * larger DataTagValueUpdate messages in order to decrease the number
    * of DartaTagValueUpdate messages sent to the server queue. This may cause
    * a certain delay in processing.
+   * <p>
+   * The exact delay is configured is the DAQ properties.
    */
   public static final int PRIORITY_LOW = 2;
 
@@ -83,19 +85,28 @@ public interface DataTagConstants {
    * larger DataTagValueUpdate messages in order to decrease the number
    * of DartaTagValueUpdate messages sent to the server queue. This may cause
    * a certain delay in processing.
+   * <p>
+   * The exact delay is configured is the DAQ properties.
    */
   public static final int PRIORITY_MEDIUM = Message.DEFAULT_PRIORITY;
 
   /**
-   * Tags with priority set to PRIORITY_HIGH must be treated by the driver
-   * without delay. Value updates must be notified to the server immediately.
-   * The JMS priority of the DataTagValueUpdate message must also be set
-   * to PRIORITY_HIGH.
+   * Tags with priority set to PRIORITY_HIGHEST can be grouped together in
+   * larger DataTagValueUpdate messages in order to decrease the number
+   * of DartaTagValueUpdate messages sent to the server queue. This may cause
+   * a certain delay in processing, but is much less than on {@link DataTagConstants#PRIORITY_LOW}
+   * and {@link DataTagConstants#PRIORITY_MEDIUM}
+   * <p>
+   * The exact delay is configured is the DAQ properties.
    */
   public static final int PRIORITY_HIGH = 7;
   
   /**
-   * This flag should only be used for control tags, such as Alive Tags
+   * This flag is reserved for control tags, such as Alive and COMM_FAULT Tags.
+   * Tags with priority set to PRIORITY_HIGHEST must be treated by the driver
+   * without delay. Value updates must be notified to the server immediately.
+   * The JMS priority of the DataTagValueUpdate message must also be set
+   * to PRIORITY_HIGHEST.
    */
   public static final int PRIORITY_HIGHEST = 9;
 
