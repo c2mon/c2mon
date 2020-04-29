@@ -71,29 +71,25 @@ public class ProcessMessageSenderConfig {
   @Bean
   @Profile("single")
   public ProcessMessageSender singleMessageSender() {
-    ProcessMessageSender processMessageSender = new ProcessMessageSender();
-    processMessageSender.setJmsSenders(Collections.singletonList(activeJmsSender()));
-    return processMessageSender;
+    return new ProcessMessageSender(Collections.singletonList(activeJmsSender()), properties);
   }
 
   @Bean
   @Profile("double")
   public ProcessMessageSender doubleMessageSender() {
-    ProcessMessageSender processMessageSender = new ProcessMessageSender();
-    processMessageSender.setJmsSenders(Arrays.asList(activeJmsSender(), proxyJmsSender()));
-    return processMessageSender;
+    return new ProcessMessageSender(Arrays.asList(activeJmsSender(), proxyJmsSender()), properties);
   }
 
   @Bean
   @Profile("test")
   public ProcessMessageSender testMessageSender() {
-    ProcessMessageSender processMessageSender = new ProcessMessageSender();
-    processMessageSender.setJmsSenders(Collections.singletonList(dummyJmsSender()));
-    return processMessageSender;
+    return new ProcessMessageSender(Collections.singletonList(dummyJmsSender()), properties);
   }
 
   private JmsSender activeJmsSender() {
-    return new ActiveJmsSender(sourceUpdateJmsTemplate);
+    ActiveJmsSender jmsSender = new ActiveJmsSender(sourceUpdateJmsTemplate);
+    jmsSender.setPrimaryBroker(true);
+    return jmsSender;
   }
 
   private JmsSender secondActiveJmsSender() {

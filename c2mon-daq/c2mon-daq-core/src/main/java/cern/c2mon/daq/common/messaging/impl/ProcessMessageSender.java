@@ -21,19 +21,17 @@ import java.util.Collection;
 
 import javax.jms.JMSException;
 
-import org.springframework.jms.JmsException;
+import org.springframework.jms.support.QosSettings;
 
 import lombok.extern.slf4j.Slf4j;
 
+import cern.c2mon.daq.common.DriverKernel;
 import cern.c2mon.daq.common.conf.core.ProcessConfigurationHolder;
 import cern.c2mon.daq.common.messaging.IProcessMessageSender;
 import cern.c2mon.daq.common.messaging.JmsSender;
+import cern.c2mon.daq.config.DaqProperties;
 import cern.c2mon.shared.common.datatag.*;
 import cern.c2mon.shared.common.process.ProcessConfiguration;
-import cern.c2mon.shared.util.buffer.PullEvent;
-import cern.c2mon.shared.util.buffer.PullException;
-import cern.c2mon.shared.util.buffer.SynchroBuffer;
-import cern.c2mon.shared.util.buffer.SynchroBufferListener;
 
 /**
  * The ProcessMessageSender class is responsible for sending JMS messages from
@@ -53,41 +51,31 @@ import cern.c2mon.shared.util.buffer.SynchroBufferListener;
 public class ProcessMessageSender implements IProcessMessageSender {
 
   /**
-   * The buffer for non-persistent SourceDataTags objects
-   */
-  private SynchroBuffer<SourceDataTagValue> dataTagsBuffer;
-
-  /**
-   * The buffer for persistent SourceDataTags objects
-   */
-  private SynchroBuffer<SourceDataTagValue> persistentTagsBuffer;
-
-  /**
    * The reference for the AliveTimer object
    */
   private AliveTimer aliveTimer;
+  
+  private SynchroBufferFactory synchroBufferFactory;
 
   /**
    * The collection of JMS senders (each responsible for sending updates to a
    * specific broker). Injected in Spring XML configuration file.
    */
-  private Collection<JmsSender> jmsSenders;
+  private final Collection<JmsSender> jmsSenders;
+  
+  private final DaqProperties daqProperties;
+  
+  public ProcessMessageSender(final Collection<JmsSender> jmsSenders, DaqProperties properties) {
+    this.daqProperties = properties;
+    this.jmsSenders = jmsSenders;
+  }
 
+  /**
+   * Gets called by the {@link DriverKernel}
+   */
   public void init() {
     aliveTimer = new AliveTimer(this);
-
-    ProcessConfiguration processConfiguration = ProcessConfigurationHolder.getInstance();
-    // TODO move the min window size to properties or database
-    // create and initialize dataTagsBuffer for non-persistent tags
-    dataTagsBuffer = new SynchroBuffer<>(200, processConfiguration.getMaxMessageDelay(), 100, SynchroBuffer.DUPLICATE_OK);
-    // create and initialize dataTagsBuffer for persistent tags
-    persistentTagsBuffer = new SynchroBuffer<>(200, processConfiguration.getMaxMessageDelay(), 100, SynchroBuffer.DUPLICATE_OK);
-
-    dataTagsBuffer.setSynchroBufferListener(new SynchroBufferEventsListener());
-    persistentTagsBuffer.setSynchroBufferListener(new SynchroBufferEventsListener());
-
-    dataTagsBuffer.enable();
-    persistentTagsBuffer.enable();
+    synchroBufferFactory = new SynchroBufferFactory(daqProperties, this);
   }
 
   /**
@@ -114,14 +102,14 @@ public class ProcessMessageSender implements IProcessMessageSender {
    * tag and putting it to the TIM JMS queue
    */
   @Override
-  public final void sendAlive() {
+  public final void sendProcessAlive() {
     ProcessConfiguration processConfiguration = ProcessConfigurationHolder.getInstance();
     log.debug("sending AliveTag. tag id : " + processConfiguration.getAliveTagID());
 
     long timestamp = System.currentTimeMillis();
     SourceDataTagValue aliveTagValue = SourceDataTagValue.builder()
         .id(Long.valueOf(processConfiguration.getAliveTagID()))
-        .name(processConfiguration.getProcessName() + "::AliveTag")
+        .name(processConfiguration.getProcessName() + ":AliveTag")
         .controlTag(true)
         .value(Long.valueOf(timestamp))
         .quality(new SourceDataTagQuality())
@@ -130,8 +118,7 @@ public class ProcessMessageSender implements IProcessMessageSender {
         .priority(DataTagAddress.PRIORITY_HIGHEST)
         .guaranteedDelivery(false)
         .valueDescription("")
-         // we keep the message on the broker max twice as long as the configured alive interval
-        .timeToLive(processConfiguration.getAliveInterval() * 2)
+        .timeToLive(processConfiguration.getAliveInterval())
         .build();
 
     distributeValue(aliveTagValue);
@@ -159,27 +146,12 @@ public class ProcessMessageSender implements IProcessMessageSender {
   }
 
   @Override
-  public final void addValue(final SourceDataTagValue dataTagValue) {
-    log.debug("adding data tag " + dataTagValue.getId() + " to a sending buffer");
-    if (dataTagValue.getPriority() == DataTagAddress.PRIORITY_HIGH) {
-      log.debug("\t sourceDataTagValue priority is HIGH");
-      this.distributeValue(dataTagValue);
+  public final void addValue(final SourceDataTagValue dataTagValue) throws InterruptedException {
+    if (dataTagValue.getPriority() == DataTagConstants.PRIORITY_HIGHEST) {
+      distributeValue(dataTagValue);
     } else {
-      log.debug("\t sourceDataTagValue priority is LOW");
-      // check whether it's message with guaranteed delivery or not
-      if (dataTagValue.isGuaranteedDelivery()) {
-        log.debug("\t guaranteedDelivery is TRUE");
-
-        // note : synchrobuffer's push method is thread-safety,
-        // so no external synchronization is needed
-        this.persistentTagsBuffer.push(dataTagValue);
-      } else {
-        log.debug("\t guaranteedDelivery is FALSE");
-
-        // note : synchrobuffer's push method is thread-safety,
-        // so no external synchronization is needed
-        this.dataTagsBuffer.push(dataTagValue);
-      }
+      QosSettings settings = QosSettingsFactory.extractQosSettings(dataTagValue);
+      synchroBufferFactory.getSynchroBuffer(settings).put(dataTagValue);
     }
   }
 
@@ -195,32 +167,21 @@ public class ProcessMessageSender implements IProcessMessageSender {
   }
 
   /**
-   * This methods gently closes and disables ProcessMessageSender's
-   * synchrobuffers.
-   */
-  public final void closeSourceDataTagsBuffers() {
-    dataTagsBuffer.disable();
-    dataTagsBuffer.close();
-    persistentTagsBuffer.disable();
-    persistentTagsBuffer.close();
-  }
-
-  /**
    * Forwards the value to all the JMS senders.
    *
-   * @param sourceDataTagValue the value to send
+   * @param dataTagValue the value to send
    * @throws JMSException if one of the senders fails
    */
-  private void distributeValue(final SourceDataTagValue sourceDataTagValue) {
+  private void distributeValue(final SourceDataTagValue dataTagValue) {
     for (JmsSender jmsSender : jmsSenders) {
       try {
-        jmsSender.processValue(sourceDataTagValue);
+        jmsSender.processValue(dataTagValue);
       } catch (Exception e) {
-        log.error("Unhandled exception caught while sending a source value (tag id " + sourceDataTagValue.getId() + ") - the value update will be lost.", e);
+        log.error("Unhandled exception caught while sending a source value (tag id {}) - the value update is lost.", dataTagValue.getId(), e);
       }
     }
     // log value in appropriate log file
-    sourceDataTagValue.log();
+    dataTagValue.log();
   }
 
   /**
@@ -230,7 +191,7 @@ public class ProcessMessageSender implements IProcessMessageSender {
    *           should also listen to these locally to take any necessary action)
    * @param dataTagValueUpdate the values to send
    */
-  private void distributeValues(final DataTagValueUpdate dataTagValueUpdate) {
+   void distributeValues(final DataTagValueUpdate dataTagValueUpdate) {
     for (JmsSender jmsSender : jmsSenders) {
       try {
         jmsSender.processValues(dataTagValueUpdate);
@@ -240,84 +201,6 @@ public class ProcessMessageSender implements IProcessMessageSender {
     }
     // log value in appropriate log file
     dataTagValueUpdate.log();
-  }
-
-  /**
-   * Setter method.
-   *
-   * @param jmsSenders the jmsSenders to set
-   */
-  public final void setJmsSenders(final Collection<JmsSender> jmsSenders) {
-    this.jmsSenders = jmsSenders;
-  }
-
-  /**
-   * This class implements SynchroBuffer's SychroBufferListener, so that both
-   * ProcessMessageSender's tag buffers (for persistent and non-persistent) tags
-   * are able to handle Pull events.
-   */
-  class SynchroBufferEventsListener implements SynchroBufferListener<SourceDataTagValue> {
-    
-    ProcessConfiguration processConfiguration = ProcessConfigurationHolder.getInstance();
-
-    /**
-     * This method is called by SynchroBuffer, each time a PullEvent occurs.
-     *
-     * @param event the pull event, containing the collection of objects to be
-     *          sent
-     * @throws cern.c2mon.shared.util.buffer.PullException
-     */
-    @Override
-    public void pull(PullEvent<SourceDataTagValue> event) throws PullException {
-      log.trace("entering pull()..");
-      log.debug("\t Number of pulled objects : {}", event.getPulled().size());
-
-      // We add the PIK to our communication process
-      DataTagValueUpdate dataTagValueUpdate = createNewDataTagValueUpdate();
-
-      for (SourceDataTagValue sdtValue : event.getPulled()) {
-        if (isMessageExpired(sdtValue)) {
-          log.debug("\t pull : Discarded value update for tag id #{}, because TTL was exceeded", sdtValue.getId());
-        } else {
-          dataTagValueUpdate.addValue(sdtValue);
-        }
-        
-        // check if the maximum allowed message size has been reached
-        if (dataTagValueUpdate.getValues().size() >= processConfiguration.getMaxMessageSize()) {
-          sendMessage(dataTagValueUpdate);
-          // create new dataTagValueUpdate object
-          dataTagValueUpdate = createNewDataTagValueUpdate();
-        }
-      }
-
-      sendMessage(dataTagValueUpdate);
-
-      log.trace("leaving pull method");
-    }
-    
-    private DataTagValueUpdate createNewDataTagValueUpdate() {
-      return new DataTagValueUpdate(processConfiguration.getProcessID(), processConfiguration.getprocessPIK());
-    }
-    
-    private void sendMessage(DataTagValueUpdate dataTagValueUpdate) {
-      if (!dataTagValueUpdate.getValues().isEmpty()) {
-        try {
-          distributeValues(dataTagValueUpdate);
-          log.debug("\t sent " + dataTagValueUpdate.getValues().size() + " SourceDataTagValue objects");
-        } catch (JmsException ex) {
-          log.error("\t pull : JMSException caught while invoking processValues methods :" + ex.getMessage());
-        }
-      }
-    }
-
-    /**
-     * @param sdtValue the message value that shall be checked
-     * @return <code>true</code>, if the message has expired
-     */
-    private boolean isMessageExpired(final SourceDataTagValue sdtValue) {
-      return sdtValue.getTimeToLive() != DataTagAddress.TTL_FOREVER 
-          && (sdtValue.getDaqTimestamp().getTime() + sdtValue.getTimeToLive()) < System.currentTimeMillis();
-    }
   }
 
   /**
