@@ -5,7 +5,7 @@
   <parent>
     <groupId>cern.c2mon.server</groupId>
     <artifactId>c2mon-docker-parent</artifactId>
-    <version>1.9.3-SNAPSHOT</version>
+    <version>1.9.5-SNAPSHOT</version>
   </parent>
 
   <artifactId>img-mysql</artifactId>
@@ -15,7 +15,7 @@
   <properties>
     <image.base>mysql:${mysql.version}</image.base>
     <image.tag>mysql-${mysql.version}-c2mon-${project.version}</image.tag>
-    <gitlab-repo>c2mon-ext</gitlab-repo>
+    <gitlab-repo>c2mon/mysql</gitlab-repo>
     <dockerhub-repo>cern/c2mon-ext</dockerhub-repo>
     <docker.entrypoint>docker-entrypoint-initdb.d</docker.entrypoint>
   </properties>
@@ -70,7 +70,7 @@
             </environment>
           </container>
           <extraDirectories>
-              <paths>${project.build.directory}/mount/</paths>
+              <paths><path>${project.build.directory}/mount/</path></paths>
           </extraDirectories>
         </configuration>
       </plugin>
