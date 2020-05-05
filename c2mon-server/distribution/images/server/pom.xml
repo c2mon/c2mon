@@ -73,6 +73,7 @@
               <entrypoint>bin/c2mon.sh</entrypoint>
               <entrypoint>run</entrypoint>
             </entrypoint>
+            <user>1000:0</user>
           </container>
           <extraDirectories>
                 <paths>${project.build.directory}/dependency</paths>
