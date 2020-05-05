@@ -91,7 +91,7 @@
             </tags>
           </to>
           <container>
-            <!--useCurrentTimestamp>true</useCurrentTimestamp-->
+            <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
           </container>
           <skip>${skipDocker}</skip>
         </configuration>
