@@ -39,6 +39,7 @@ public class JmsConfig {
   @Bean
   public ActiveMQConnectionFactory clientJmsConnectionFactory() {
     ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory(properties.getJms().getUrl());
+    factory.setConnectionIDPrefix(properties.getJms().getConnectionIDPrefix() + properties.getJms().getClientIdPrefix());
     factory.setTrustAllPackages(true);
     
     ActiveMQPrefetchPolicy prefetchPolicy = new ActiveMQPrefetchPolicy();

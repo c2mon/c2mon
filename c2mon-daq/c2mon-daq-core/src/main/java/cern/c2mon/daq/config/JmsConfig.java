@@ -24,8 +24,6 @@ import org.springframework.jms.connection.SingleConnectionFactory;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
 
-import cern.c2mon.shared.daq.datatag.DataTagValueUpdateConverter;
-
 /**
  * Creates all Beans required for the JMS communication
  * @author Justin Lewis Salmon
@@ -37,7 +35,7 @@ public class JmsConfig {
 
   @Bean
   public ActiveMQConnectionFactory activeMQConnectionFactory() {
-    ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory(properties.getJms().getUrl());
+    ActiveMQConnectionFactory factory = createNewConnectionFactory(properties.getJms().getUrl());
     factory.setClientIDPrefix("C2MON-DAQ-" + properties.getName());
     return factory;
   }
@@ -74,7 +72,7 @@ public class JmsConfig {
 
   @Bean
   public ActiveMQConnectionFactory filterActiveMQConnectionFactory() {
-    ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory(properties.getFilter().getJms().getUrl());
+    ActiveMQConnectionFactory factory = createNewConnectionFactory(properties.getFilter().getJms().getUrl());
     factory.setClientIDPrefix("C2MON_DAQ_FILTER");
     return factory;
   }
@@ -97,7 +95,7 @@ public class JmsConfig {
 
   @Bean
   public ActiveMQConnectionFactory secondActiveMQConnectionFactory() {
-    ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory(properties.getJms().getSecondaryUrl());
+    ActiveMQConnectionFactory factory = createNewConnectionFactory(properties.getJms().getSecondaryUrl());
     factory.setClientIDPrefix("C2MON-DAQ-" + properties.getName());
     return factory;
   }
@@ -131,13 +129,7 @@ public class JmsConfig {
     container.setAutoStartup(false);
     return container;
   }
-  
-  private void addDefaultUpdateJmsTemplateQueueProperties(JmsTemplate jmsTemplate) {
-    jmsTemplate.setDefaultDestination(new ActiveMQQueue(properties.getJms().getQueuePrefix() + ".update." + properties.getName()));
-    jmsTemplate.setExplicitQosEnabled(true);
-    jmsTemplate.setMessageConverter(new DataTagValueUpdateConverter());
-  }
-  
+
   private void addDefaultProcessRequestJmsTemplateProperties(JmsTemplate jmsTemplate) {
     String queueTrunk = properties.getJms().getQueuePrefix();
     jmsTemplate.setDefaultDestination(new ActiveMQQueue(queueTrunk + ".request"));
@@ -146,5 +138,11 @@ public class JmsConfig {
     long ttl = properties.getJms().getRequestMsgtimeToLive() * 1000L;
     jmsTemplate.setTimeToLive(ttl);
     jmsTemplate.setDeliveryPersistent(false);
+  }
+  
+  private ActiveMQConnectionFactory createNewConnectionFactory(String brokerUrl) {
+    ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory(brokerUrl);
+    factory.setConnectionIDPrefix(properties.getJms().getConnectionIDPrefix() + properties.getJms().getClientIdPrefix());
+    return factory;
   }
 }

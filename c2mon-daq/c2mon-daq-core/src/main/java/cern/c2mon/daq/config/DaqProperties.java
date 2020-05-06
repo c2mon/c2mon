@@ -20,6 +20,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import lombok.Data;
 
+import cern.c2mon.shared.common.config.CommonJmsProperties;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.daq.config.DaqJmsProperties;
 
@@ -193,16 +194,6 @@ public class DaqProperties {
     /**
      * Filtered data JMS settings
      */
-    private final Jms jms = new Jms();
-
-    @Data
-    public static class Jms {
-
-      /**
-       * URL of the broker to which to publish filtered values. Only relevant
-       * if c2mon.daq.filter.publishFilteredValues=true
-       */
-      private String url = "tcp://0.0.0.0:61616";
-    }
+    private final CommonJmsProperties jms = new CommonJmsProperties();
   }
 }

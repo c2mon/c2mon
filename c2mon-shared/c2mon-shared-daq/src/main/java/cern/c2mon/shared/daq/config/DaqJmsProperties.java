@@ -2,16 +2,13 @@ package cern.c2mon.shared.daq.config;
 
 import lombok.Data;
 
+import cern.c2mon.shared.common.config.CommonJmsProperties;
+
 /**
  * @author Justin Lewis Salmon
  */
 @Data
-public class DaqJmsProperties {
-
-  /**
-   * URL of the primary JMS broker to which to publish
-   */
-  private String url = "failover:tcp://0.0.0.0:61616";
+public class DaqJmsProperties extends CommonJmsProperties {
 
   /**
    * The queue prefix used to publish data tags to the server. The process ID

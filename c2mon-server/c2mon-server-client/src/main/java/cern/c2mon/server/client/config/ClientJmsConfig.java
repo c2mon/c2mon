@@ -48,6 +48,7 @@ public class ClientJmsConfig {
     String url = properties.getJms().getUrl();
     ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(url);
     connectionFactory.setClientIDPrefix("C2MON-SERVER-CLIENT");
+    connectionFactory.setConnectionIDPrefix(properties.getJms().getConnectionIDPrefix() + properties.getJms().getClientIdPrefix());
     connectionFactory.setTrustAllPackages(true);
     return connectionFactory;
   }
