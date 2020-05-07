@@ -136,9 +136,7 @@ class EquipmentSenderFilterModule {
    */
   private FilteredDataTagValue makeFilterValue(SourceDataTag sdt, final ValueUpdate update, final SourceDataTagQuality sourceQuality,
                                                final boolean dynamicFiltered, final int filterApplied) {
-    SourceDataTagValue currentVal = sdt.getCurrentValue();
-
-    FilteredDataTagValue returnValue = new FilteredDataTagValue(currentVal.getId(), currentVal.getName(),
+    FilteredDataTagValue returnValue = new FilteredDataTagValue(sdt.getId(), sdt.getName(),
         update.getValue().toString(), update.getValueDescription(), sourceQuality.getQualityCode().getQualityCode(),
         sourceQuality.getDescription(), new Timestamp(update.getSourceTimestamp()),
         sdt.getDataType(), dynamicFiltered, filterApplied);
