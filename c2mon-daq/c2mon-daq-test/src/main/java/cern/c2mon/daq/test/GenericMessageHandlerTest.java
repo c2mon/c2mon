@@ -68,9 +68,7 @@ public abstract class GenericMessageHandlerTest {
 
   protected IFilterMessageSender filterMessageSender;
 
-  protected IDynamicTimeDeadbandFilterActivator medDynamicTimeDeadbandFilterActivator;
-
-  protected IDynamicTimeDeadbandFilterActivator lowDynamicTimeDeadbandFilterActivator;
+  protected IDynamicTimeDeadbandFilterActivator dynamicTimeDeadbandFilterActivator;
 
   protected EquipmentMessageSender equipmentMessageSender;
 
@@ -143,12 +141,9 @@ public abstract class GenericMessageHandlerTest {
       filterMessageSender = createMock(IFilterMessageSender.class);
       freshnessMonitorMock = new FreshnessMonitor(new DaqProperties());
 
-      lowDynamicTimeDeadbandFilterActivator = new TimeDifferenceMovingAverageTimeDeadbandActivator(10, 110, 150, 30000);
+      dynamicTimeDeadbandFilterActivator = new TimeDifferenceMovingAverageTimeDeadbandActivator(10, 110, 150, 30000);
 
-      medDynamicTimeDeadbandFilterActivator = new TimeDifferenceMovingAverageTimeDeadbandActivator(6, 6000, 44, 44);
-
-      equipmentMessageSender = new EquipmentMessageSender(filterMessageSender, messageSender,
-              medDynamicTimeDeadbandFilterActivator, lowDynamicTimeDeadbandFilterActivator, freshnessMonitorMock);
+      equipmentMessageSender = new EquipmentMessageSender(filterMessageSender, messageSender, dynamicTimeDeadbandFilterActivator, freshnessMonitorMock);
 
       configurationController = new ConfigurationController();
       configurationController.setProcessConfiguration(pconf);
