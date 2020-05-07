@@ -120,12 +120,8 @@ class EquipmentSenderValid {
    */
   public boolean update(final SourceDataTag currentSourceDataTag, final ValueUpdate update) {
     boolean successfullySent = false;
-    log.trace("update - entering update()");
-
     try {
-
       successfullySent = doUpdate(currentSourceDataTag, update);
-
     } catch (Exception ex) {
       log.error("update - Unexpected exception caught for tag " + currentSourceDataTag.getId() + ", " + ex.getStackTrace(), ex);
 
@@ -133,7 +129,9 @@ class EquipmentSenderValid {
       this.equipmentSender.update(currentSourceDataTag.getId(), quality, update.getSourceTimestamp());
     }
 
-    log.trace("update - leaving update()");
+    if (!successfullySent) {
+      log.error("Value update for tag #{} could not be sent. Please check the configuration. Data is lost!: {}", currentSourceDataTag.getId(), update.toString());
+    }
     return successfullySent;
   }
 
