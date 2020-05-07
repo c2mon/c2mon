@@ -17,22 +17,20 @@
 package cern.c2mon.daq.common.impl;
 
 import java.security.InvalidParameterException;
-import java.sql.Timestamp;
 import java.util.Map;
-import java.util.Map.Entry;
 
-import lombok.extern.slf4j.Slf4j;
-import cern.c2mon.daq.common.timer.FreshnessMonitor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import lombok.extern.slf4j.Slf4j;
 
 import cern.c2mon.daq.common.IDynamicTimeDeadbandFilterer;
 import cern.c2mon.daq.common.IEquipmentMessageSender;
 import cern.c2mon.daq.common.conf.equipment.ICoreDataTagChanger;
 import cern.c2mon.daq.common.messaging.IProcessMessageSender;
+import cern.c2mon.daq.common.timer.FreshnessMonitor;
 import cern.c2mon.daq.filter.IFilterMessageSender;
 import cern.c2mon.daq.filter.dynamic.IDynamicTimeDeadbandFilterActivator;
 import cern.c2mon.shared.common.datatag.*;
@@ -104,11 +102,10 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
   /**
    * Creates a new EquipmentMessageSender.
    *
-   * @param filterMessageSender                   The filter message sender to send filtered tag
-   *                                              values.
-   * @param processMessageSender                  The process message sender to send tags to the
-   *                                              server.
+   * @param filterMessageSender The filter message sender to send filtered tag values.
+   * @param processMessageSender The process message sender to send tags to the server.
    * @param dynamicTimeDeadbandFilterActivator The dynamic time deadband activator.
+   * @param freshnessMonitor Monitors tag that shall be updated regularly
    */
   @Autowired
   public EquipmentMessageSender(final IFilterMessageSender filterMessageSender,
@@ -194,40 +191,6 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
     }
 
     this.equipmentAliveSender.sendEquipmentAlive(supAliveTag);
-  }
-
-  @Override @Deprecated
-  public boolean sendTagFiltered(final ISourceDataTag currentTag, final Object tagValue, final long milisecTimestamp) {
-    return sendTagFiltered(currentTag, tagValue, milisecTimestamp, null);
-  }
-
-  @Override @Deprecated
-  public boolean sendTagFiltered(final ISourceDataTag currentTag, final Object tagValue, final long milisecTimestamp, String pValueDescr) {
-    return sendTagFiltered(currentTag, tagValue, milisecTimestamp, pValueDescr, false);
-  }
-
-  @Override @Deprecated
-  public boolean sendTagFiltered(final ISourceDataTag currentTag, final Object tagValue, final long sourceTimestamp, String pValueDescr,
-      boolean sentByValueCheckMonitor) {
-    if (currentTag != null) {
-      long tagID = currentTag.getId();
-
-      return update(tagID, new ValueUpdate(tagValue, pValueDescr, sourceTimestamp));
-    }
-
-    return false;
-  }
-
-  @Override @Deprecated
-  public void sendInvalidTag(final ISourceDataTag sourceDataTag, final short pQualityCode, final String pDescription) {
-    sendInvalidTag(sourceDataTag, pQualityCode, pDescription, null);
-  }
-
-  @Override @Deprecated
-  public void sendInvalidTag(final ISourceDataTag sourceDataTag, final short qualityCode, final String qualityDescription, final Timestamp pTimestamp) {
-    long time = pTimestamp == null ? System.currentTimeMillis() : pTimestamp.getTime();
-    SourceDataTagQuality quality = new SourceDataTagQuality(SourceDataTagQualityCode.getEnum(qualityCode), qualityDescription);
-    update(sourceDataTag.getId(), quality, time);
   }
 
   @Override
