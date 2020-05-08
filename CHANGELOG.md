@@ -7,6 +7,22 @@ All issues referenced in parentheses can be consulted under [CERN JIRA](https://
 For more details on a given release, please check also the [version planning](https://its.cern.ch/jira/projects/CM/versions).
 
 ## [Unreleased]
+### Added
+- DAQ Core: Values that couldn't be sent to the C2MON server because of JMS exceptions are now kept in the DAQ memory until the problem is resolved. Before the message was lost. (CM-256)
+- ActiveMQ config: A Connection ID prefix got introduced (`ID:c2mon.`) to be able to remove completely Advisory topics on the broker configuration. This works only in a static two-broker redundancy setup! (CM-257)
+
+### Changed
+- DAQ Core: In case dynamic filtering is enabled (`c2mon.daq.filter.dynamicDeadband.enabled=true`) messages of all priorities can be filtered. Before, HIGH_PRIORITY messages were not affected. (CM-174)
+- DAQ Core: Major refactoring of the internal message buffering mechanism, in order to reduce amount of JMS messages produced in case of data avalanches. (CM-252)
+- DAQ Core: COMM_FAULT messages are now filtered if the status message is redundant to the previous one. This improves the overall message load, up to the Client API. (CM-254)
+
+### Fixed
+- DAQ Core: Fixed an ActiveMQ missconfiguration concerning the expiration time of a JMS messages. That is in particular important for alive messages as it could otherwise lead to data accumulation in the JMS message queues, in case the server is down for a while. (CM-251)
+- DAQ Core: Dynamic time-deadband filtering was not applied for tags flipping between valid and invalid messages. (CM-258)
+
+### Removed
+- ActiveMQ config: Removed `setWatchTopicAdvisories()` from C2MON code. Instead, this should be directly configured on the broker URL. (CM-253)
+- DAQ Core: Removed `@Deprecated` methods in EquipmentMessageSender class (CM-259)
 
 ## 1.9.4 - 2020-04-15
 ### Added
