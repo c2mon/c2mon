@@ -116,7 +116,7 @@ Publish:
   image: appropriate/curl:3.1
   dependencies: []
   script:
-    - "curl -X POST -F token=$TIM_SERVER_TOKEN -F ref=master https://gitlab.cern.ch/api/v4/projects/9859/trigger/pipeline"
+    - "curl --insecure -X POST -F token=$TIM_SERVER_TOKEN -F ref=master https://gitlab.cern.ch/api/v4/projects/9859/trigger/pipeline"
   only:
   - master
 
