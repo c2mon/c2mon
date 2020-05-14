@@ -111,10 +111,8 @@ class EquipmentSenderValid {
    * This method decides how the tag should be sent to the server.
    * If the value is an array or an arbitrary object the sending changes as it is not a primitive type.
    *
-   * @param currentTag       The tag to which the value belongs.
-   * @param sourceTimestamp  The timestamp of the tag.
-   * @param newTagValue      The tag value to send.
-   * @param valueDescription A description belonging to the value.
+   * @param currentSourceDataTag       The tag to which the value belongs.
+   * @param update      The tag value to send.
    * @return True if the tag has been send successfully to the server.
    * False if the tag has been invalidated or filtered out.
    */
@@ -127,10 +125,6 @@ class EquipmentSenderValid {
 
       SourceDataTagQuality quality = new SourceDataTagQuality(SourceDataTagQualityCode.UNKNOWN, "Could not send incoming valid source update to server: " + ex.getMessage());
       this.equipmentSender.update(currentSourceDataTag.getId(), quality, update.getSourceTimestamp());
-    }
-
-    if (!successfullySent) {
-      log.error("Value update for tag #{} could not be sent. Please check the configuration. Data is lost!: {}", currentSourceDataTag.getId(), update.toString());
     }
     return successfullySent;
   }
@@ -146,7 +140,8 @@ class EquipmentSenderValid {
   private boolean doUpdate(final SourceDataTag currentSourceDataTag, final ValueUpdate update) {
     // do a validation check on the new value:
     if (!checkValidation(currentSourceDataTag, update)) {
-      return false; //TODO Check, if that case is correctly treated by upper logic
+      log.error("Value update for tag #{} could not be sent because it didn't pass the validation. Please check the configuration. Data is lost!: {}", currentSourceDataTag.getId(), update.toString());
+      return false;
     }
 
     // cast the value to the defined dataType if the type is not 'ArbitraryObject':
@@ -159,20 +154,22 @@ class EquipmentSenderValid {
 
     // do a filtering on the new value:
     if (!checkFiltering(currentSourceDataTag, update)) {
+      log.trace("Value update for tag #{} was filtered out and has not been sent to server. Redundant or old value?: {}", currentSourceDataTag.getId(), update.toString());
       return false;
     }
 
     // check if the new value is in a time deadband:
     if (!checkTimeDeadband(currentSourceDataTag, update)) {
+      log.trace("Value update for tag #{} was passed to the static time deadband scheduler and has not (yet) been sent to server: {}", currentSourceDataTag.getId(), update.toString());
       return false;
     }
 
-    // All checks and filters are successful, send the tag to the server:
+    log.trace("All checks and filters are fine for for tag update of #{}. Sending update to server: {}", currentSourceDataTag.getId(), update.toString());
     SourceDataTagValue tagValue = currentSourceDataTag.update(update);
     try {
       this.processMessageSender.addValue(tagValue);
     } catch (InterruptedException e) {
-      log.error("Data could not be sent and is lost!: {}", tagValue);
+      log.error("Data for tag #{} could not be sent and is lost!: {}", currentSourceDataTag.getId(), tagValue.toString());
     }
 
     // Checks if the dynamic TimeDeadband filter is enabled, Static disable and record it depending on the priority
@@ -258,9 +255,7 @@ class EquipmentSenderValid {
         this.equipmentTimeDeadband.removeFromTimeDeadband(currentSourceDataTag);
       }
 
-      // No deadband detected -> DataValue is not okay, return true
       return true;
-
     }
   }
 
