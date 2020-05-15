@@ -9,19 +9,14 @@ import java.sql.Timestamp;
 
 public final class SupervisionStateTagController {
 
-  private SupervisionStateTagController() {
-
-  }
+  private SupervisionStateTagController() {}
 
   public static SupervisionEvent createSupervisionEvent(@NonNull SupervisionStateTag stateTag) {
-    Timestamp supervisionTime;
-    String supervisionMessage;
-
-    supervisionTime = stateTag.getStatusTime() != null
+    Timestamp supervisionTime = stateTag.getStatusTime() != null
       ? stateTag.getStatusTime()
       : new Timestamp(System.currentTimeMillis());
 
-    supervisionMessage = stateTag.getStatusDescription() != null
+    String supervisionMessage = stateTag.getStatusDescription() != null
       ? stateTag.getStatusDescription()
       : stateTag.getSupervisedEntity() + " " + stateTag.getName() + " is " + stateTag.getSupervisionStatus();
 
