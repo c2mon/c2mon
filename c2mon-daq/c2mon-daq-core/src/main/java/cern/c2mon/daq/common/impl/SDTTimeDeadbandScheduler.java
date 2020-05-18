@@ -121,14 +121,9 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
   public void start() {
     // create timers
     if (sourceDataTag.getAddress().isTimeDeadbandEnabled()) {
-      if (sourceDataTag.getAddress().getTimeDeadband() > 0) {
-        log.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : setting scheduling interval to : "
-              + this.sourceDataTag.getAddress().getTimeDeadband() + " miliseconds");
-      }
-
+      log.debug("\tscheduler[{}] : setting scheduling interval to : {} miliseconds", this.sourceDataTag.getId(), this.sourceDataTag.getAddress().getTimeDeadband());
       this.timeDeadbandTimer.scheduleAtFixedRate(this, 0, this.sourceDataTag.getAddress().getTimeDeadband());
-
-      log.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : setting scheduled");
+      log.debug("\tscheduler[{}] : setting scheduled", this.sourceDataTag.getId());
     }
   }
 
@@ -137,7 +132,7 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
    */
   public void flushAndCancel() {
     synchronized (this.sourceDataTag) {
-      log.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : flush and reset");
+      log.debug("\tscheduler[{}] : flush and reset", this.sourceDataTag.getId());
 
       // Execute the run method to empty the scheduler
       this.cancel();
@@ -159,7 +154,7 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
    */
   @Override
   public void run() {
-    log.debug("scheduler[" + this.sourceDataTag.getId() + "] : entering run()..");
+    log.debug("scheduler[{}] : entering run()..", this.sourceDataTag.getId());
 
     try {
       synchronized (this.sourceDataTag) {
@@ -171,7 +166,7 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
           // The first time the lastSentSDTagValue is empty
           if (this.lastSourceDataTag == null) {
             filterType = FilterType.NO_FILTERING;
-            log.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : first time running scheduler");
+            log.debug("\tscheduler[{}] : first time running scheduler", this.sourceDataTag.getId() );
           } else {
             // Check the current Source Data tag against the last one sent since
             // they have never been compared
@@ -194,10 +189,9 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
             // Add the value sent
             this.processMessageSender.addValue(currentSDValue);
 
-            log.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : sending value: " + currentSDValue.getValue());
-          }
-          // The new value is filtered out
-          else {
+            log.debug("\tscheduler[{}] : sending value: {}", this.sourceDataTag.getId(), currentSDValue.getValue());
+          } else {
+            // The new value is filtered out
             ValueUpdate update = new ValueUpdate(currentSDValue.getValue(), currentSDValue.getValueDescription(), currentSDValue.getTimestamp().getTime());
 
             // Send to filter module (Dynamic or Static information added)

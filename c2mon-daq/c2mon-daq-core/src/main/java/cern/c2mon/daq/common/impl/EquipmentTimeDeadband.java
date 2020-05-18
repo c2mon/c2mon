@@ -29,6 +29,7 @@ import cern.c2mon.daq.common.messaging.IProcessMessageSender;
 import cern.c2mon.daq.tools.DataTagValueFilter;
 import cern.c2mon.shared.common.datatag.SourceDataTag;
 import cern.c2mon.shared.common.datatag.SourceDataTagQuality;
+import cern.c2mon.shared.common.datatag.SourceDataTagValue;
 import cern.c2mon.shared.common.datatag.ValueUpdate;
 import cern.c2mon.shared.common.filter.FilteredDataTagValue.FilterType;
 
@@ -93,7 +94,7 @@ class EquipmentTimeDeadband {
    * @param currentTag The tag which should have a time deadband scheduler.
    */
   private void createSDTtimeDeadbandScheduler(final SourceDataTag currentTag) {
-    if (currentTag.getAddress().isTimeDeadbandEnabled() && currentTag.getAddress().getTimeDeadband() > 0) {
+    if (currentTag.getAddress().isTimeDeadbandEnabled() ) {
       log.debug("createSDTtimeDeadbandScheduler - creating time-deadband scheduler for tag #{}", currentTag.getId());
       this.sdtTimeDeadbandSchedulers.put(currentTag.getId(), new SDTTimeDeadbandScheduler(currentTag, this.processMessageSender,
       this.equipmentSenderFilterModule, timeDeadbandTimer, this.dataTagValueFilter, this.dynamicTimeDeadbandFilterer));
@@ -120,31 +121,42 @@ class EquipmentTimeDeadband {
    * @param newSDQuality     the new tag quality
    */
   public void addToTimeDeadband(final SourceDataTag currentTag, final ValueUpdate update, final SourceDataTagQuality newSDQuality) {
-    // Synchronizing here, since the scheduler runs on a different thread
-    synchronized (currentTag) {
-      long tagID = currentTag.getId();
-      // Scheduler for the Static TimeDeadband
-      SDTTimeDeadbandScheduler tagScheduler = this.sdtTimeDeadbandSchedulers.get(tagID);
-
-      if (tagScheduler == null) {
-        tagScheduler = createTagScheduler(currentTag);
-        startSDTtimeDeadbandScheduler(tagScheduler);
+    if (currentTag.getAddress().isTimeDeadbandEnabled()) {
+      // Synchronizing here, since the scheduler runs on a different thread
+      synchronized (currentTag) {
+        long tagID = currentTag.getId();
+        // Scheduler for the Static TimeDeadband
+        SDTTimeDeadbandScheduler tagScheduler = this.sdtTimeDeadbandSchedulers.get(tagID);
+  
+        if (tagScheduler == null) {
+          tagScheduler = createTagScheduler(currentTag);
+          startSDTtimeDeadbandScheduler(tagScheduler);
+        }
+  
+        // Checks if the dynamic TimeDeadband filter is enabled, Static disable and record it depending on the priority
+        this.dynamicTimeDeadbandFilterer.recordTag(currentTag);
+  
+        // if the scheduler is set to send the current tag value, then we need to send it
+        // to the statistics module before updating the tag
+        if (tagScheduler.isScheduledForSending()) {
+          sendToFilterModule(currentTag);
+        } else {
+          log.debug("addToTimeDeadband - scheduling value update due to time-deadband filtering rule");
+          tagScheduler.scheduleValueForSending();
+        }
+        
+        // update the tag value
+        currentTag.update(update, newSDQuality);
       }
-
-      // Checks if the dynamic TimeDeadband filter is enabled, Static disable and record it depending on the priority
-      this.dynamicTimeDeadbandFilterer.recordTag(currentTag);
-
-      // if the scheduler is set to send the current tag value, then we need to send it
-      // to the statistics module before updating the tag
-      if (tagScheduler.isScheduledForSending()) {
-        sendToFilterModule(currentTag);
-      } else {
-        log.debug("addToTimeDeadband - scheduling value update due to time-deadband filtering rule");
-        tagScheduler.scheduleValueForSending();
+    } else {
+      log.error("Called addToTimeDeadband() for tag #{}, but timedeadband time is set to {}. This should normally never happen! Sending value directly instead.",
+          currentTag.getId(), currentTag.getAddress().getTimeDeadband()); 
+      SourceDataTagValue tagValue = currentTag.update(update, newSDQuality);
+      try {
+        this.processMessageSender.addValue(tagValue);
+      } catch (InterruptedException e) {
+        log.error("Data for tag #{} could not be sent and is lost!: {}", currentTag.getId(), tagValue.toString());
       }
-
-      // update the tag value
-      currentTag.update(update, newSDQuality);
     }
   }
   
@@ -185,7 +197,6 @@ class EquipmentTimeDeadband {
    */
   protected SDTTimeDeadbandScheduler createTagScheduler(final SourceDataTag currentTag) {
     long tagID = currentTag.getId();
-
     createSDTtimeDeadbandScheduler(currentTag);
     return this.sdtTimeDeadbandSchedulers.get(tagID);
   }
