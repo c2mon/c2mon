@@ -6,8 +6,20 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 All issues referenced in parentheses can be consulted under [CERN JIRA](https://its.cern.ch/jira/projects/CM).
 For more details on a given release, please check also the [version planning](https://its.cern.ch/jira/projects/CM/versions).
 
-## [Unreleased]
+## Unreleased
 ### Added
+
+### Changed
+
+### Fixed
+
+## 1.9.5 - 2020-05-19
+
+This version introduces many improvements to increase the stability of the DAQ Core communiaction with the server.
+
+### Added
+- Server ES module: Added default non-root user required by Elasticsearch in Embedded mode
+- Server ES module: Reinstated JMX MBean to trigger indexations manually
 - DAQ Core: Values that couldn't be sent to the C2MON server because of JMS exceptions are now kept in the DAQ memory until the problem is resolved. Before the message was lost. (CM-256)
 - ActiveMQ config: A Connection ID prefix got introduced (`ID:c2mon.`) to be able to remove completely Advisory topics on the broker configuration. This works only in a static two-broker redundancy setup! (CM-257)
 
@@ -19,12 +31,16 @@ For more details on a given release, please check also the [version planning](ht
 ### Fixed
 - DAQ Core: Fixed an ActiveMQ missconfiguration concerning the expiration time of a JMS messages. That is in particular important for alive messages as it could otherwise lead to data accumulation in the JMS message queues, in case the server is down for a while. (CM-251)
 - DAQ Core: Dynamic time-deadband filtering was not applied for tags flipping between valid and invalid messages. (CM-258)
+- DAQ Core: Corrected problem with `c2mon-daq-parent` POM which was introduced with previous version and prevented building DAQ modules.
 
 ### Removed
 - ActiveMQ config: Removed `setWatchTopicAdvisories()` from C2MON code. Instead, this should be directly configured on the broker URL. (CM-253)
 - DAQ Core: Removed `@Deprecated` methods in EquipmentMessageSender class (CM-259)
 
 ## 1.9.4 - 2020-04-15
+
+### DAQ CORE INTEGRATION BROKEN, DUE TO PROBLEM IN C2MON-DAQ-PARENT POM !!! FIXED IN NEXT RELEASE
+
 ### Added
 - Server: Added support for Elasticsearch 6.x (CM-144)
 - Server: Integrated Elasticsearch REST client
