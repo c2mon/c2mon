@@ -13,6 +13,12 @@ For more details on a given release, please check also the [version planning](ht
 
 ### Fixed
 
+
+## 1.9.6 - 2020-05-22 (Hotfix)
+
+### Fixed
+- Client API: Fixed dependency resolution on `c2mon-client-core`. Accidentially, we removed the test scope flag on `c2mon-server-elasticsearch`
+
 ## 1.9.5 - 2020-05-19
 
 This version introduces many improvements to increase the stability of the DAQ Core communiaction with the server.
