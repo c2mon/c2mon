@@ -26,12 +26,14 @@ import cern.c2mon.server.common.config.CommonModule;
 import cern.c2mon.server.elasticsearch.config.ElasticsearchModule;
 import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 import cern.c2mon.server.elasticsearch.util.ElasticsearchTestClient;
+import cern.c2mon.server.elasticsearch.util.EmbeddedElasticsearchManager;
 import cern.c2mon.server.supervision.config.SupervisionModule;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit4.SpringRunner;
 
 @ContextConfiguration(classes = {
     CommonModule.class,
@@ -44,7 +46,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
     C2monIgniteConfiguration.class,
     CachePopulationRule.class
 })
-@RunWith(SpringJUnit4ClassRunner.class)
+@RunWith(SpringRunner.class)
 public abstract class ElasticsearchTestDefinition {
 
   @Autowired
@@ -52,6 +54,18 @@ public abstract class ElasticsearchTestDefinition {
 
   @Autowired
   protected ElasticsearchTestClient esTestClient;
+
+  /**
+   * NOTE Running this method multiple times will have no effect. The ElasticSearch
+   * server is stopped once at {@link ElasticsearchSuiteTest#cleanup}. The startup
+   * happens here because access to the common ElasticSearch properties is desired.
+   */
+  @Before
+  public void commonSetUp() {
+    if (properties.isEmbedded()) {
+      EmbeddedElasticsearchManager.start(properties);
+    }
+  }
 
   @After
   public void tearDown() {
