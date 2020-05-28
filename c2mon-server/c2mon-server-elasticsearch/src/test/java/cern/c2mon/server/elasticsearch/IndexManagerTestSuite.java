@@ -69,7 +69,7 @@ public class IndexManagerTestSuite extends ElasticsearchTestDefinition {
     indexManager.create(IndexMetadata.builder().name(indexName).build(), mapping);
 
     assertTrue("Index should have been created.",
-        IndexUtils.doesIndexExist(indexName, ElasticsearchSuiteTest.getProperties()));
+        IndexUtils.doesIndexExist(indexName, properties));
   }
 
   @Test

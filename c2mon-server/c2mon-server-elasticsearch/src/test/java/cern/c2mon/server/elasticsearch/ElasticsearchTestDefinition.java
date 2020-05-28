@@ -24,6 +24,7 @@ import cern.c2mon.server.cache.loading.config.CacheLoadingModuleRef;
 import cern.c2mon.server.cache.test.CachePopulationRule;
 import cern.c2mon.server.common.config.CommonModule;
 import cern.c2mon.server.elasticsearch.config.ElasticsearchModule;
+import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 import cern.c2mon.server.elasticsearch.util.ElasticsearchTestClient;
 import cern.c2mon.server.supervision.config.SupervisionModule;
 import org.junit.After;
@@ -45,6 +46,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 })
 @RunWith(SpringJUnit4ClassRunner.class)
 public abstract class ElasticsearchTestDefinition {
+
+  @Autowired
+  protected ElasticsearchProperties properties;
 
   @Autowired
   protected ElasticsearchTestClient esTestClient;

@@ -18,7 +18,6 @@ package cern.c2mon.server.elasticsearch;
 
 import java.util.concurrent.TimeUnit;
 
-import lombok.Getter;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -61,7 +60,6 @@ public class ElasticsearchSuiteTest {
   @ClassRule
   public static Timeout classTimeout = new Timeout(2, TimeUnit.MINUTES);
 
-  @Getter
   private static final ElasticsearchProperties properties = new ElasticsearchProperties();
 
   @BeforeClass

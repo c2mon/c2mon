@@ -78,12 +78,12 @@ public class TagDocumentIndexerTestSuite extends ElasticsearchTestDefinition {
     indexer.storeData(document);
 
     // Bulk flush operation seem to require more time
-    Awaitility.await().until(() -> IndexUtils.countDocuments(indexName, ElasticsearchSuiteTest.getProperties()) == 1);
+    Awaitility.await().until(() -> IndexUtils.countDocuments(indexName, properties) == 1);
 
     esTestClient.refreshIndices();
 
     assertTrue("Index should have been created.",
-        IndexUtils.doesIndexExist(indexName, ElasticsearchSuiteTest.getProperties()));
+        IndexUtils.doesIndexExist(indexName, properties));
 
     List<Map<String, Object>> indexData = esTestClient.fetchAllDocuments(indexName);
     assertEquals("Index should have one document inserted.", 1, indexData.size());
@@ -95,12 +95,12 @@ public class TagDocumentIndexerTestSuite extends ElasticsearchTestDefinition {
     indexer.storeData(document);
 
     // Bulk flush operation seem to require more time
-    Awaitility.await().until(() -> IndexUtils.countDocuments(indexName, ElasticsearchSuiteTest.getProperties()) == 2);
+    Awaitility.await().until(() -> IndexUtils.countDocuments(indexName, properties) == 2);
 
     esTestClient.refreshIndices();
 
     assertTrue("Index should have been created.",
-        IndexUtils.doesIndexExist(indexName, ElasticsearchSuiteTest.getProperties()));
+        IndexUtils.doesIndexExist(indexName, properties));
 
     List<Map<String, Object>> indexData = esTestClient.fetchAllDocuments(indexName);
     assertEquals("Index should have two documents inserted.", 2, indexData.size());

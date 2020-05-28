@@ -69,7 +69,7 @@ public class SupervisionEventDocumentIndexerTestSuite extends ElasticsearchTestD
 
     esTestClient.refreshIndices();
 
-    assertTrue("Index should have been created.", IndexUtils.doesIndexExist(indexName, ElasticsearchSuiteTest.getProperties()));
+    assertTrue("Index should have been created.", IndexUtils.doesIndexExist(indexName, properties));
 
     List<Map<String, Object>> indexData = esTestClient.fetchAllDocuments(indexName);
     Assert.assertEquals("Index should have one document inserted.", 1, indexData.size());
@@ -82,7 +82,7 @@ public class SupervisionEventDocumentIndexerTestSuite extends ElasticsearchTestD
 
     esTestClient.refreshIndices();
 
-    assertTrue("Index should have been created.", IndexUtils.doesIndexExist(indexName, ElasticsearchSuiteTest.getProperties()));
+    assertTrue("Index should have been created.", IndexUtils.doesIndexExist(indexName, properties));
 
     List<Map<String, Object>> indexData = esTestClient.fetchAllDocuments(indexName);
     Assert.assertEquals("Index should have two documents inserted.", 2, indexData.size());
