@@ -19,14 +19,12 @@ package cern.c2mon.server.elasticsearch;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.rules.Timeout;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 import cern.c2mon.server.elasticsearch.alarm.AlarmDocumentIndexerTestSuite;
-import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 import cern.c2mon.server.elasticsearch.supervision.SupervisionEventDocumentIndexerTestSuite;
 import cern.c2mon.server.elasticsearch.tag.TagDocumentIndexerTestSuite;
 import cern.c2mon.server.elasticsearch.tag.config.TagConfigDocumentIndexerTestSuite;
@@ -52,19 +50,8 @@ public class ElasticsearchSuiteTest {
   @ClassRule
   public static Timeout classTimeout = new Timeout(2, TimeUnit.MINUTES);
 
-  private static final ElasticsearchProperties properties = new ElasticsearchProperties();
-
-  @BeforeClass
-  public static void setUpClass() {
-    if (properties.isEmbedded()) {
-      EmbeddedElasticsearchManager.start(properties);
-    }
-  }
-
   @AfterClass
   public static void cleanup() {
-    if (properties.isEmbedded()) {
-      EmbeddedElasticsearchManager.stop();
-    }
+    EmbeddedElasticsearchManager.stop();
   }
 }
