@@ -58,7 +58,6 @@ public class ElasticsearchClientConfiguration {
 
     if (properties.isEmbedded()) {
       EmbeddedElasticsearchManager.start(properties);
-      return new ElasticsearchClientRest(properties);
     }
 
     if (ElasticsearchClientType.TRANSPORT.name().equalsIgnoreCase(properties.getClient())) {
