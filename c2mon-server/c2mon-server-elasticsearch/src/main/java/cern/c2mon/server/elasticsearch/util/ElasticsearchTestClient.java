@@ -24,6 +24,10 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 
+/**
+ * Class containing ElasticSearch operations used for testing. It builds upon
+ * {@link ElasticsearchClientRest}.
+ */
 @Slf4j
 @Component
 public class ElasticsearchTestClient {
