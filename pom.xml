@@ -580,15 +580,38 @@
           <format>XML</format>
         </configuration>
       </plugin>
+
+      <!-- Expose property ${c2mon.root} for use from any module or submodule -->
+      <plugin>
+        <groupId>org.commonjava.maven.plugins</groupId>
+        <artifactId>directory-maven-plugin</artifactId>
+        <version>0.1</version>
+        <executions>
+          <execution>
+            <id>directories</id>
+            <goals>
+              <goal>directory-of</goal>
+            </goals>
+            <phase>initialize</phase>
+            <configuration>
+              <property>c2mon.root</property>
+              <project>
+                <groupId>cern.c2mon</groupId>
+                <artifactId>c2mon</artifactId>
+              </project>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 
   <profiles>
    <profile>
      <id>gitlab-ci</id>
-     <!--activation>
+     <!-- <activation>
         <property><name>${env.CI}</name></property>
-     </activation-->
+     </activation> -->
      <build>
        <plugins>
           <plugin>
@@ -596,7 +619,7 @@
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
               <systemPropertyVariables>
-                <c2mon.server.properties>${project.basedir}/c2mon-shared/gitlab-ci.c2mon.server.properties</c2mon.server.properties>
+                <c2mon.server.properties>${c2mon.root}/c2mon-shared/c2mon-server-gitlab-ci.properties</c2mon.server.properties>
               </systemPropertyVariables>
             </configuration>
           </plugin>
@@ -605,4 +628,3 @@
     </profile>
   </profiles>
 </project>
-
