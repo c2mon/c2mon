@@ -53,7 +53,7 @@ public class ElasticsearchServiceTest {
 
   public ElasticsearchServiceTest() {
     client = new ElasticsearchClientRest(elasticsearchProperties);
-    esTestClient = new ElasticsearchTestClient(client);
+    esTestClient = new ElasticsearchTestClient(elasticsearchProperties);
     indexManager = new IndexManager(client);
     ProcessCache processCache = createNiceMock(ProcessCache.class);
     EquipmentCache equipmentCache = createNiceMock(EquipmentCache.class);
