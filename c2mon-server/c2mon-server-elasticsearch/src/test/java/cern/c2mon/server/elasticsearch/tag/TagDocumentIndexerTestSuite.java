@@ -18,6 +18,7 @@ package cern.c2mon.server.elasticsearch.tag;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import org.awaitility.Awaitility;
 import org.junit.Before;
@@ -26,12 +27,11 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
+import cern.c2mon.server.cache.test.CachePopulationRule;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.elasticsearch.ElasticsearchSuiteTest;
 import cern.c2mon.server.elasticsearch.ElasticsearchTestDefinition;
 import cern.c2mon.server.elasticsearch.IndexNameManager;
-import cern.c2mon.server.elasticsearch.junit.CachePopulationRule;
-import cern.c2mon.server.elasticsearch.util.EmbeddedElasticsearchManager;
 import cern.c2mon.server.elasticsearch.util.EntityUtils;
 import cern.c2mon.server.elasticsearch.util.IndexUtils;
 
@@ -46,7 +46,7 @@ import static org.junit.Assert.assertTrue;
  *
  * @author Alban Marguet
  * @author Justin Lewis Salmon
- * @authro Serhiy Boychenko
+ * @author Serhiy Boychenko
  */
 public class TagDocumentIndexerTestSuite extends ElasticsearchTestDefinition {
 
@@ -64,6 +64,7 @@ public class TagDocumentIndexerTestSuite extends ElasticsearchTestDefinition {
   private TagDocumentConverter converter;
 
   private TagDocument document;
+  private String indexName;
 
   @Before
   public void setUp() {
@@ -79,12 +80,12 @@ public class TagDocumentIndexerTestSuite extends ElasticsearchTestDefinition {
     // Bulk flush operation seem to require more time
     Awaitility.await().until(() -> IndexUtils.countDocuments(indexName, ElasticsearchSuiteTest.getProperties()) == 1);
 
-    EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
+    esTestClient.refreshIndices();
 
     assertTrue("Index should have been created.",
         IndexUtils.doesIndexExist(indexName, ElasticsearchSuiteTest.getProperties()));
 
-    List<String> indexData = EmbeddedElasticsearchManager.getEmbeddedNode().fetchAllDocuments(indexName);
+    List<Map<String, Object>> indexData = esTestClient.fetchAllDocuments(indexName);
     assertEquals("Index should have one document inserted.", 1, indexData.size());
   }
 
@@ -96,12 +97,12 @@ public class TagDocumentIndexerTestSuite extends ElasticsearchTestDefinition {
     // Bulk flush operation seem to require more time
     Awaitility.await().until(() -> IndexUtils.countDocuments(indexName, ElasticsearchSuiteTest.getProperties()) == 2);
 
-    EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
+    esTestClient.refreshIndices();
 
     assertTrue("Index should have been created.",
         IndexUtils.doesIndexExist(indexName, ElasticsearchSuiteTest.getProperties()));
 
-    List<String> indexData = EmbeddedElasticsearchManager.getEmbeddedNode().fetchAllDocuments(indexName);
+    List<Map<String, Object>> indexData = esTestClient.fetchAllDocuments(indexName);
     assertEquals("Index should have two documents inserted.", 2, indexData.size());
   }
 }

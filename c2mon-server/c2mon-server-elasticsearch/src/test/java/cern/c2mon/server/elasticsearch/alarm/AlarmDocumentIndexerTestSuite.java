@@ -16,23 +16,22 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch.alarm;
 
-import java.io.IOException;
-import java.sql.Timestamp;
-import java.util.List;
-
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.elasticsearch.ElasticsearchSuiteTest;
 import cern.c2mon.server.elasticsearch.ElasticsearchTestDefinition;
 import cern.c2mon.server.elasticsearch.IndexNameManager;
-import cern.c2mon.server.elasticsearch.util.EmbeddedElasticsearchManager;
 import cern.c2mon.server.elasticsearch.util.EntityUtils;
 import cern.c2mon.server.elasticsearch.util.IndexUtils;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.List;
+import java.util.Map;
 
 import static junit.framework.TestCase.assertTrue;
 
@@ -55,10 +54,12 @@ public class AlarmDocumentIndexerTestSuite extends ElasticsearchTestDefinition {
   private AlarmDocumentIndexer indexer;
 
   private AlarmDocument document;
+  private String indexName;
 
   @Before
   public void setUp() {
     AlarmCacheObject alarm = (AlarmCacheObject) EntityUtils.createAlarm();
+    alarm.setTriggerTimestamp(new Timestamp(0));
     alarm.setTimestamp(new Timestamp(0));
     document = new AlarmValueDocumentConverter().convert(alarm);
     indexName = indexNameManager.indexFor(document);
@@ -68,11 +69,11 @@ public class AlarmDocumentIndexerTestSuite extends ElasticsearchTestDefinition {
   public void indexSingleAlarmTest() throws IDBPersistenceException, IOException {
     indexer.storeData(document);
 
-    EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
+    esTestClient.refreshIndices();
 
     assertTrue("Index should have been created.", IndexUtils.doesIndexExist(indexName, ElasticsearchSuiteTest.getProperties()));
 
-    List<String> indexData = EmbeddedElasticsearchManager.getEmbeddedNode().fetchAllDocuments(indexName);
+    List<Map<String, Object>> indexData = esTestClient.fetchAllDocuments(indexName);
     Assert.assertEquals("Index should have one document inserted.", 1, indexData.size());
   }
 
@@ -81,11 +82,11 @@ public class AlarmDocumentIndexerTestSuite extends ElasticsearchTestDefinition {
     indexer.storeData(document);
     indexer.storeData(document);
 
-    EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
+    esTestClient.refreshIndices();
 
     assertTrue("Index should have been created.", IndexUtils.doesIndexExist(indexName, ElasticsearchSuiteTest.getProperties()));
 
-    List<String> indexData = EmbeddedElasticsearchManager.getEmbeddedNode().fetchAllDocuments(indexName);
+    List<Map<String, Object>> indexData = esTestClient.fetchAllDocuments(indexName);
     Assert.assertEquals("Index should have two documents inserted.", 2, indexData.size());
   }
 }

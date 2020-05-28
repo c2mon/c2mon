@@ -16,37 +16,42 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch;
 
+import cern.c2mon.cache.actions.CacheActionsModuleRef;
+import cern.c2mon.cache.config.CacheConfigModuleRef;
+import cern.c2mon.cache.impl.configuration.C2monIgniteConfiguration;
+import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
+import cern.c2mon.server.cache.loading.config.CacheLoadingModuleRef;
+import cern.c2mon.server.cache.test.CachePopulationRule;
+import cern.c2mon.server.common.config.CommonModule;
+import cern.c2mon.server.elasticsearch.config.ElasticsearchModule;
+import cern.c2mon.server.elasticsearch.util.ElasticsearchTestClient;
+import cern.c2mon.server.supervision.config.SupervisionModule;
 import org.junit.After;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import cern.c2mon.server.cache.config.CacheModule;
-import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
-import cern.c2mon.server.cache.loading.config.CacheLoadingModule;
-import cern.c2mon.server.common.config.CommonModule;
-import cern.c2mon.server.elasticsearch.config.ElasticsearchModule;
-import cern.c2mon.server.elasticsearch.junit.CachePopulationRule;
-import cern.c2mon.server.elasticsearch.util.EmbeddedElasticsearchManager;
-import cern.c2mon.server.supervision.config.SupervisionModule;
-
 @ContextConfiguration(classes = {
     CommonModule.class,
-    CacheModule.class,
+    CacheActionsModuleRef.class,
+    CacheConfigModuleRef.class,
     CacheDbAccessModule.class,
-    CacheLoadingModule.class,
+    CacheLoadingModuleRef.class,
     SupervisionModule.class,
     ElasticsearchModule.class,
+    C2monIgniteConfiguration.class,
     CachePopulationRule.class
 })
 @RunWith(SpringJUnit4ClassRunner.class)
 public abstract class ElasticsearchTestDefinition {
 
-  protected String indexName;
+  @Autowired
+  protected ElasticsearchTestClient esTestClient;
 
   @After
   public void tearDown() {
-    EmbeddedElasticsearchManager.getEmbeddedNode().deleteIndex(indexName);
-    EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
+    esTestClient.deleteIndex("_all");
+    esTestClient.refreshIndices();
   }
 }

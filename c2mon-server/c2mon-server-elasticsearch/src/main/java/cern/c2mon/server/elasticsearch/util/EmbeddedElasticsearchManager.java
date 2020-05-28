@@ -34,7 +34,7 @@ import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 @Slf4j
 public final class EmbeddedElasticsearchManager {
 
-  private static final String ELASTICSEARCH_VERSION = "6.4.0";
+  private static final String ELASTICSEARCH_VERSION = "6.8.9";
 
   private static EmbeddedElastic embeddedNode;
 
