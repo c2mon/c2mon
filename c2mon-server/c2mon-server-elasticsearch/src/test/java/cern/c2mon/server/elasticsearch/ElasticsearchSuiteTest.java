@@ -25,14 +25,10 @@ import org.junit.rules.Timeout;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
-import cern.c2mon.server.elasticsearch.alarm.AlarmDocumentConverterTestSuite;
 import cern.c2mon.server.elasticsearch.alarm.AlarmDocumentIndexerTestSuite;
 import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 import cern.c2mon.server.elasticsearch.supervision.SupervisionEventDocumentIndexerTestSuite;
-import cern.c2mon.server.elasticsearch.supervision.SupervisionEventDocumentTestSuite;
-import cern.c2mon.server.elasticsearch.tag.TagDocumentConverterTestSuite;
 import cern.c2mon.server.elasticsearch.tag.TagDocumentIndexerTestSuite;
-import cern.c2mon.server.elasticsearch.tag.config.TagConfigDocumentConverterTestSuite;
 import cern.c2mon.server.elasticsearch.tag.config.TagConfigDocumentIndexerTestSuite;
 import cern.c2mon.server.elasticsearch.util.EmbeddedElasticsearchManager;
 
@@ -46,13 +42,9 @@ import cern.c2mon.server.elasticsearch.util.EmbeddedElasticsearchManager;
     ElasticsearchModuleIntegrationTestSuite.class,
     IndexManagerTestSuite.class,
     IndexNameManagerTestSuite.class,
-    AlarmDocumentConverterTestSuite.class,
     AlarmDocumentIndexerTestSuite.class,
     SupervisionEventDocumentIndexerTestSuite.class,
-    SupervisionEventDocumentTestSuite.class,
-    TagDocumentConverterTestSuite.class,
     TagDocumentIndexerTestSuite.class,
-    TagConfigDocumentConverterTestSuite.class,
     TagConfigDocumentIndexerTestSuite.class
 })
 public class ElasticsearchSuiteTest {
