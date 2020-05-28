@@ -70,7 +70,7 @@ public class ElasticsearchServiceTest {
 
   public ElasticsearchServiceTest() {
     client = new ElasticsearchClientRest(elasticsearchProperties);
-    esTestClient = new ElasticsearchTestClient(client);
+    esTestClient = new ElasticsearchTestClient(elasticsearchProperties);
     indexManager = new IndexManager(client);
     TagConfigDocumentIndexer indexer = new TagConfigDocumentIndexer(elasticsearchProperties, indexManager, null, null, null);
     TagConfigDocumentConverter converter = new TagConfigDocumentConverter(
