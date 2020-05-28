@@ -23,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.BiConsumer;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpHost;
@@ -76,6 +77,7 @@ public final class ElasticsearchClientRest implements ElasticsearchClient {
 
   private final ElasticsearchProperties properties;
 
+  @Getter
   private RestHighLevelClient client;
 
   /**

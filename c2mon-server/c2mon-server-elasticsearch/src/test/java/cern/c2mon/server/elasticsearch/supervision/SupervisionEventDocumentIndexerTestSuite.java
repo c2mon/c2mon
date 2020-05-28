@@ -18,6 +18,7 @@ package cern.c2mon.server.elasticsearch.supervision;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -28,7 +29,6 @@ import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
 import cern.c2mon.server.elasticsearch.ElasticsearchSuiteTest;
 import cern.c2mon.server.elasticsearch.ElasticsearchTestDefinition;
 import cern.c2mon.server.elasticsearch.IndexNameManager;
-import cern.c2mon.server.elasticsearch.util.EmbeddedElasticsearchManager;
 import cern.c2mon.server.elasticsearch.util.EntityUtils;
 import cern.c2mon.server.elasticsearch.util.IndexUtils;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
@@ -42,7 +42,7 @@ import static junit.framework.TestCase.assertTrue;
  * (like Surefire) to execute the tests individually.
  *
  * @author Alban Marguet
- * @author Justin LEwis Salmon
+ * @author Justin Lewis Salmon
  * @author Serhiy Boychenko
  */
 public class SupervisionEventDocumentIndexerTestSuite extends ElasticsearchTestDefinition {
@@ -54,6 +54,7 @@ public class SupervisionEventDocumentIndexerTestSuite extends ElasticsearchTestD
   private SupervisionEventDocumentIndexer indexer;
 
   private SupervisionEventDocument document;
+  private String indexName;
 
   @Before
   public void setUp() {
@@ -66,11 +67,11 @@ public class SupervisionEventDocumentIndexerTestSuite extends ElasticsearchTestD
   public void logSingleSupervisionEventTest() throws IDBPersistenceException, IOException {
     indexer.storeData(document);
 
-    EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
+    esTestClient.refreshIndices();
 
     assertTrue("Index should have been created.", IndexUtils.doesIndexExist(indexName, ElasticsearchSuiteTest.getProperties()));
 
-    List<String> indexData = EmbeddedElasticsearchManager.getEmbeddedNode().fetchAllDocuments(indexName);
+    List<Map<String, Object>> indexData = esTestClient.fetchAllDocuments(indexName);
     Assert.assertEquals("Index should have one document inserted.", 1, indexData.size());
   }
 
@@ -79,11 +80,11 @@ public class SupervisionEventDocumentIndexerTestSuite extends ElasticsearchTestD
     indexer.storeData(document);
     indexer.storeData(document);
 
-    EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
+    esTestClient.refreshIndices();
 
     assertTrue("Index should have been created.", IndexUtils.doesIndexExist(indexName, ElasticsearchSuiteTest.getProperties()));
 
-    List<String> indexData = EmbeddedElasticsearchManager.getEmbeddedNode().fetchAllDocuments(indexName);
+    List<Map<String, Object>> indexData = esTestClient.fetchAllDocuments(indexName);
     Assert.assertEquals("Index should have two documents inserted.", 2, indexData.size());
   }
 }

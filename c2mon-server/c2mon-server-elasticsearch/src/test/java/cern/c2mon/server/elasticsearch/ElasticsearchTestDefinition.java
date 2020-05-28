@@ -24,10 +24,11 @@ import cern.c2mon.server.cache.loading.config.CacheLoadingModuleRef;
 import cern.c2mon.server.cache.test.CachePopulationRule;
 import cern.c2mon.server.common.config.CommonModule;
 import cern.c2mon.server.elasticsearch.config.ElasticsearchModule;
-import cern.c2mon.server.elasticsearch.util.EmbeddedElasticsearchManager;
+import cern.c2mon.server.elasticsearch.util.ElasticsearchTestClient;
 import cern.c2mon.server.supervision.config.SupervisionModule;
 import org.junit.After;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -45,11 +46,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 public abstract class ElasticsearchTestDefinition {
 
-  protected String indexName;
+  @Autowired
+  protected ElasticsearchTestClient esTestClient;
 
   @After
   public void tearDown() {
-    EmbeddedElasticsearchManager.getEmbeddedNode().deleteIndex(indexName);
-    EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
+    esTestClient.deleteIndex("_all");
+    esTestClient.refreshIndices();
   }
 }
