@@ -195,8 +195,8 @@ public abstract class AbstractTagCacheObject extends AbstractCacheableImpl imple
     if (dataTagQuality != null) {
       cacheObject.dataTagQuality = dataTagQuality.clone();
     }
-    cacheObject.alarmIds = (ArrayList<Long>) ((ArrayList<Long>) alarmIds).clone();
-    cacheObject.ruleIds = (ArrayList<Long>) ((ArrayList<Long>) ruleIds).clone();
+    cacheObject.alarmIds = new ArrayList<>(alarmIds);
+    cacheObject.ruleIds = new ArrayList<>(ruleIds);
     return cacheObject;
   }
 

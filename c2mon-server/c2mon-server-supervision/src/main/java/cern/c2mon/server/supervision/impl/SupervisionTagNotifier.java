@@ -32,23 +32,26 @@ import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.subequipment.SubEquipment;
+import cern.c2mon.server.common.supervision.Supervised;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.supervision.SupervisionListener;
 import cern.c2mon.server.supervision.SupervisionNotifier;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.common.CacheEvent;
 import cern.c2mon.shared.common.supervision.SupervisionStatus;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * On supervision status changes, calls listeners of all C2monCacheWithSupervision
@@ -75,48 +78,40 @@ import java.util.Map;
  * dependent elements (eg. Rules dependent on a Tag).
  *
  * @author Mark Brightwell
- *
  */
+@Slf4j
 @Service
 public class SupervisionTagNotifier implements SupervisionListener, SmartLifecycle {
 
   /**
-   * Class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(SupervisionTagNotifier.class);
-
-  /**
    * Register for notifications from the SupervisionNotifier bean.
    */
-  private SupervisionNotifier supervisionNotifier;
+  private final SupervisionNotifier supervisionNotifier;
 
   /**
    * For adding supervision info.
    */
-  private SupervisionAppender supervisionAppender;
+  private final SupervisionAppender supervisionAppender;
 
   /**
    * Caches used for accessing supervision states.
    */
-  private C2monCache<Process> processCache;
-  private C2monCache<Equipment> equipmentCache;
-  private C2monCache<SubEquipment> subEquipmentCache;
-  private SupervisionStateTagService stateTagService;
-  private DataTagService dataTagService;
-  private ProcessService processService;
-  private EquipmentService equipmentService;
-  private SubEquipmentService subEquipmentService;
+  private final C2monCache<Process> processCache;
+  private final C2monCache<Equipment> equipmentCache;
+  private final C2monCache<SubEquipment> subEquipmentCache;
+  private final SupervisionStateTagService stateTagService;
+  private final DataTagService dataTagService;
 
   /**
    * Used for locating a Tag in the appropriate Tag cache.
    */
-  private TagCacheCollection unifiedTagCacheFacade;
+  private final TagCacheCollection unifiedTagCacheFacade;
 
   /**
    * Caches with listeners notified of supervision information (Tag caches).
    */
-  private C2monCache<DataTag> dataTagCache;
-  private C2monCache<RuleTag> ruleTagCache;
+  private final C2monCache<DataTag> dataTagCache;
+  private final C2monCache<RuleTag> ruleTagCache;
 
   /**
    * Caches used to filter out older supervision events, to prevent overtaking of DOWN and
@@ -129,9 +124,6 @@ public class SupervisionTagNotifier implements SupervisionListener, SmartLifecyc
    * <p>All elements are shared through the cluster
    */
 
-  /** Cluster cache key lock */
-  protected static final String EVENT_LOCK = "c2mon.supervision.SupervisionTagNotifier.eventLock";
-
   /**
    * For lifecycle callback to stop listener threads.
    */
@@ -143,33 +135,28 @@ public class SupervisionTagNotifier implements SupervisionListener, SmartLifecyc
   private volatile boolean running = false;
 
   /**
-   * @param supervisionAppender
-   *        Reference to helper bean for adding the current supervision status of Processes
-   *        and Equipments to Tags
+   * @param supervisionAppender Reference to helper bean for adding the current supervision status
+   *                            of Processes and Equipments to Tags
    */
   @Autowired
   public SupervisionTagNotifier(final SupervisionNotifier supervisionNotifier,
                                 final TagCacheCollection unifiedTagCacheFacade,
                                 final SupervisionAppender supervisionAppender,
-                                DataTagService dataTagService, final ProcessService processService,
+                                final DataTagService dataTagService,
+                                final ProcessService processService,
                                 final EquipmentService equipmentService,
                                 final SubEquipmentService subEquipmentService,
                                 final C2monCache<RuleTag> ruleTagCache,
                                 final SupervisionStateTagService stateTagService) {
-    super();
     this.supervisionNotifier = supervisionNotifier;
     this.unifiedTagCacheFacade = unifiedTagCacheFacade;
     this.supervisionAppender = supervisionAppender;
     this.dataTagService = dataTagService;
-    this.processService = processService;
-    this.equipmentService = equipmentService;
-    this.subEquipmentService = subEquipmentService;
     this.dataTagCache = dataTagService.getCache();
-    this.ruleTagCache = ruleTagCache;
-
     this.processCache = processService.getCache();
     this.equipmentCache = equipmentService.getCache();
     this.subEquipmentCache = subEquipmentService.getCache();
+    this.ruleTagCache = ruleTagCache;
     this.stateTagService = stateTagService;
   }
 
@@ -184,11 +171,9 @@ public class SupervisionTagNotifier implements SupervisionListener, SmartLifecyc
   @Override
   public void notifySupervisionEvent(final SupervisionEvent event) {
     SupervisionStatus status = event.getStatus();
-    Long entityId = event.getEntityId();
-    if (status.equals(SupervisionStatus.RUNNING) || status.equals(SupervisionStatus.RUNNING_LOCAL)
-      || status.equals(SupervisionStatus.STOPPED) || status.equals(SupervisionStatus.DOWN)) {
-
-
+    if (status == SupervisionStatus.RUNNING || status == SupervisionStatus.RUNNING_LOCAL
+      || status == SupervisionStatus.STOPPED || status == SupervisionStatus.DOWN) {
+      Long entityId = event.getEntityId();
       switch (event.getEntity()) {
         case PROCESS:
           notifyProcessTags(entityId);
@@ -218,23 +203,13 @@ public class SupervisionTagNotifier implements SupervisionListener, SmartLifecyc
 
   /**
    * Calls notification method for all tags associated to the Equipment (DataTags only).
-   * @param equipementId the equipment id
+   * @param equipmentId the equipment id
    */
-  private void notifyEquipmentTags(final Long equipementId) {
+  private void notifyEquipmentTags(final Long equipmentId) {
     try {
-      //local map so as not to notify rules twice; lock on map when modifying
-      Map<Long, Boolean> notifiedRules = new HashMap<>();
-      Collection<Long> tagIds = dataTagService.getDataTagIdsByEquipmentId(equipementId);
-      for (Long id : tagIds) {
-       try {
-         callCacheNotification(id, notifiedRules); //recursively notifies all dependent rules also, once only
-       } catch (CacheElementNotFoundException cacheEx) {
-         LOGGER.warn("Unable to locate Tag/Rule cache element during Tag supervision " //TODO ask DAQ refresh
-             + "change callback (some Tags/Rules may have been omitted)", cacheEx);
-       }
-      }
+      notifyTags(dataTagService.getDataTagIdsByEquipmentId(equipmentId));
     } catch (CacheElementNotFoundException cacheEx) {
-      LOGGER.warn("Unable to locate Equipment element during Tag supervision "
+      log.warn("Unable to locate Equipment element during Tag supervision "
           + "change callback (so no invalidation callbacks performed for associated Tags)", cacheEx);
     }
   }
@@ -246,20 +221,25 @@ public class SupervisionTagNotifier implements SupervisionListener, SmartLifecyc
    */
   private void notifySubEquipmentTags(final Long subEquipmentId) {
     try {
-      //local map so as not to notify rules twice; lock on map when modifying
-      Map<Long, Boolean> notifiedRules = new HashMap<>();
-      Collection<Long> tagIds = dataTagService.getDataTagIdsBySubEquipmentId(subEquipmentId);
-      for (Long id : tagIds) {
-       try {
-         callCacheNotification(id, notifiedRules); //recursively notifies all dependent rules also, once only
-       } catch (CacheElementNotFoundException cacheEx) {
-         LOGGER.warn("Unable to locate Tag/Rule cache element during Tag supervision " //TODO ask DAQ refresh
-             + "change callback (some Tags/Rules may have been omitted)", cacheEx);
-       }
-      }
+      notifyTags(dataTagService.getDataTagIdsBySubEquipmentId(subEquipmentId));
     } catch (CacheElementNotFoundException cacheEx) {
-      LOGGER.warn("Unable to locate SubEquipment element during Tag supervision "
+      log.warn("Unable to locate SubEquipment element during Tag supervision "
           + "change callback (so no invalidation callbacks performed for associated Tags)", cacheEx);
+    }
+  }
+
+  private void notifyTags(final Collection<Long> tagIds) {
+    // local set so as not to notify rules twice; lock on set when modifying
+    Set<Long> notifiedRules = new HashSet<>();
+
+    for (Long id : tagIds) {
+      try {
+        // recursively notifies all dependent rules also, once only
+        callCacheNotification(id, notifiedRules);
+      } catch (CacheElementNotFoundException cacheEx) {
+        log.warn("Unable to locate Tag/Rule cache element during Tag supervision " // TODO ask DAQ refresh
+          + "change callback (some Tags/Rules may have been omitted)", cacheEx);
+      }
     }
   }
 
@@ -267,43 +247,33 @@ public class SupervisionTagNotifier implements SupervisionListener, SmartLifecyc
    * Private recursive method for calling all listeners; recursive calls for
    * calling the notification for all dependent rules also.
    * @param id tag id
-   * @param notifiedRules map for preventing multiple notifications for rules
+   * @param notifiedRules set for preventing multiple notifications for rules
    */
-  private void callCacheNotification(final Long id, final Map<Long, Boolean> notifiedRules) {
+  private void callCacheNotification(final Long id, final Set<Long> notifiedRules) {
     synchronized (notifiedRules) {
       Tag tagCopy = unifiedTagCacheFacade.get(id);
-      if (!notifiedRules.containsKey(tagCopy.getId())) {
-        LOGGER.trace("Performing supervision notification for tag " + id);
-        boolean dirtyTagContext = false;
 
-        for (Long procId : tagCopy.getProcessIds()) {
-          if (processCache.containsKey(procId)) { //null never override a value, so if statement ok out of lock
+      if (!notifiedRules.contains(tagCopy.getId())) {
+        log.trace("Performing supervision notification for tag " + id);
 
-            supervisionAppender.addSupervisionQuality(tagCopy,
-              stateTagService.getSupervisionEvent(processCache.get(procId).getStateTagId()));
-            dirtyTagContext = true;
-          }
-        }
-        for (Long eqId : tagCopy.getEquipmentIds()) {
-          if (equipmentCache.containsKey(eqId)) {
-            supervisionAppender.addSupervisionQuality(tagCopy,
-              stateTagService.getSupervisionEvent(equipmentCache.get(eqId).getStateTagId()));
-            dirtyTagContext = true;
-          }
-        }
-        for (Long subEqId : tagCopy.getSubEquipmentIds()) {
-          if (subEquipmentCache.containsKey(subEqId)) {
-            supervisionAppender.addSupervisionQuality(tagCopy,
-              stateTagService.getSupervisionEvent(subEquipmentCache.get(subEqId).getStateTagId()));
-            dirtyTagContext = true;
-          }
-        }
+        List<Long> stateTagIds = Stream.of(
+          tagCopy.getProcessIds().stream().filter(processCache::containsKey).map(processCache::get),
+          tagCopy.getEquipmentIds().stream().filter(equipmentCache::containsKey).map(equipmentCache::get),
+          tagCopy.getSubEquipmentIds().stream().filter(subEquipmentCache::containsKey).map(subEquipmentCache::get)
+        )
+        .flatMap(x -> x)
+        .map(Supervised::getStateTagId)
+        .collect(toList());
 
-        if (dirtyTagContext) {
+        stateTagIds.forEach(stateTagId ->
+          supervisionAppender.addSupervisionQuality(tagCopy, stateTagService.getSupervisionEvent(stateTagId))
+        );
+
+        if (!stateTagIds.isEmpty()) {
           if (tagCopy instanceof DataTag) {
-            dataTagCache.getCacheListenerManager().notifyListenersOf(CacheEvent.SUPERVISION_CHANGE,(DataTag) tagCopy);
+            dataTagCache.getCacheListenerManager().notifyListenersOf(CacheEvent.SUPERVISION_CHANGE, (DataTag) tagCopy);
           } else if (tagCopy instanceof RuleTag) {
-            ruleTagCache.getCacheListenerManager().notifyListenersOf(CacheEvent.SUPERVISION_CHANGE,(RuleTag) tagCopy);
+            ruleTagCache.getCacheListenerManager().notifyListenersOf(CacheEvent.SUPERVISION_CHANGE, (RuleTag) tagCopy);
           } else {
             throw new IllegalArgumentException("Unexpected call with Tag parameter that is neither DataTag or RuleTag; "
                 + "type is " + tagCopy.getClass().getSimpleName());
@@ -311,11 +281,9 @@ public class SupervisionTagNotifier implements SupervisionListener, SmartLifecyc
         }
       }
 
-      Collection<Long> ruleIds;
-      ruleIds = new ArrayList<>(tagCopy.getRuleIds());
-      for (Long ruleId : ruleIds) {
+      for (Long ruleId : tagCopy.getRuleIds()) {
         callCacheNotification(ruleId, notifiedRules);
-        notifiedRules.put(ruleId, true);
+        notifiedRules.add(ruleId);
       }
     }
   }
@@ -338,14 +306,14 @@ public class SupervisionTagNotifier implements SupervisionListener, SmartLifecyc
 
   @Override
   public void start() {
-    LOGGER.debug("Starting SupervisionTagNotifier");
+    log.debug("Starting SupervisionTagNotifier");
     running = true;
     listenerContainer.start();
   }
 
   @Override
   public void stop() {
-    LOGGER.debug("Stopping SupervisionTagNotifier");
+    log.debug("Stopping SupervisionTagNotifier");
     listenerContainer.stop();
     running = false;
   }
@@ -354,5 +322,4 @@ public class SupervisionTagNotifier implements SupervisionListener, SmartLifecyc
   public int getPhase() {
     return ServerConstants.PHASE_STOP_LAST + 1;
   }
-
 }
