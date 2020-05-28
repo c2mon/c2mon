@@ -9,6 +9,8 @@ image:
   name: gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-maven:jdk-11-mvn-3.6-1
   entrypoint: [""]   
 
+services:
+  - elasticsearch:6.8.9
 
 variables:
   # This will suppress any download for dependencies and plugins or upload messages which would clutter the console log.
