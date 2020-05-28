@@ -91,6 +91,11 @@
           <version>${logback.version}</version>
         </dependency>
       <dependency>
+        <groupId>javax.inject</groupId>
+        <artifactId>javax.inject</artifactId>
+        <version>1</version>
+      </dependency>
+      <dependency>
         <groupId>org.projectlombok</groupId>
         <artifactId>lombok</artifactId>
         <version>1.18.12</version>
@@ -171,11 +176,6 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-activemq</artifactId>
         <version>${org.springframework.boot.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.google.guava</groupId>
-        <artifactId>guava</artifactId>
-        <version>20.0</version>
       </dependency>
       <dependency>
         <groupId>com.oracle</groupId>
@@ -300,18 +300,6 @@
         <version>1.3.2</version>
       </dependency>
 
-      <!-- The following dependencies are required for using Ehcache & BigMemory.
-           ehcache-ee-2.7.5 is shipped together with bigmemory-4.0.5 -->
-      <dependency>
-        <groupId>net.sf.ehcache</groupId>
-        <artifactId>ehcache-ee</artifactId>
-        <version>2.7.5</version>
-      </dependency>
-      <dependency>
-        <groupId>net.sf.ehcache</groupId>
-        <artifactId>ehcache-core</artifactId>
-        <version>2.6.6</version>
-      </dependency>
       <dependency>
         <groupId>org.terracotta.bigmemory</groupId>
         <artifactId>bigmemory</artifactId>
@@ -426,7 +414,7 @@
       <plugins>
         <plugin>
           <artifactId>maven-assembly-plugin</artifactId>
-          <version>2.6</version>
+          <version>3.2.0</version>
         </plugin>
         <plugin>
           <artifactId>maven-antrun-plugin</artifactId>
@@ -461,6 +449,8 @@
             <release>${java.version}</release>
             <source>${java.version}</source>
             <target>${java.version}</target>
+            <!-- Warning: If switched to true, you get the entire module recompiled for every change! -->
+            <!-- https://stackoverflow.com/a/41301660/5576379 -->
             <useIncrementalCompilation>false</useIncrementalCompilation>
           </configuration>
         </plugin>
@@ -590,7 +580,51 @@
           <format>XML</format>
         </configuration>
       </plugin>
+
+      <!-- Expose property ${c2mon.root} for use from any module or submodule -->
+      <plugin>
+        <groupId>org.commonjava.maven.plugins</groupId>
+        <artifactId>directory-maven-plugin</artifactId>
+        <version>0.1</version>
+        <executions>
+          <execution>
+            <id>directories</id>
+            <goals>
+              <goal>directory-of</goal>
+            </goals>
+            <phase>initialize</phase>
+            <configuration>
+              <property>c2mon.root</property>
+              <project>
+                <groupId>cern.c2mon</groupId>
+                <artifactId>c2mon</artifactId>
+              </project>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
-</project>
 
+  <profiles>
+   <profile>
+     <id>gitlab-ci</id>
+     <!-- <activation>
+        <property><name>${env.CI}</name></property>
+     </activation> -->
+     <build>
+       <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <systemPropertyVariables>
+                <c2mon.server.properties>${c2mon.root}/c2mon-shared/c2mon-server-gitlab-ci.properties</c2mon.server.properties>
+              </systemPropertyVariables>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>
