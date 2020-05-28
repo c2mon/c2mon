@@ -1,6 +1,7 @@
 package cern.c2mon.server.elasticsearch.util;
 
 import cern.c2mon.server.elasticsearch.client.ElasticsearchClientRest;
+import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.ElasticsearchStatusException;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
@@ -29,8 +30,8 @@ public class ElasticsearchTestClient {
   private final ElasticsearchClientRest esClient;
 
   @Autowired
-  public ElasticsearchTestClient(ElasticsearchClientRest esClient) {
-    this.esClient = esClient;
+  public ElasticsearchTestClient(ElasticsearchProperties properties) {
+    this.esClient = new ElasticsearchClientRest(properties.withPort(9200));
   }
 
   public void refreshIndices() {
