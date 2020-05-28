@@ -24,6 +24,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import cern.c2mon.server.elasticsearch.tag.TagDocument;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import static junit.framework.TestCase.assertEquals;
 
@@ -36,11 +37,12 @@ import static junit.framework.TestCase.assertEquals;
  * @author Justin Lewis Salmon
  * @author Serhiy Boychenko
  */
-public class IndexNameManagerTestSuite {
+public class IndexNameManagerTestSuite extends ElasticsearchTestDefinition {
 
   private static final String TIMESTAMP_PROPERTY = "timestamp";
 
-  private IndexNameManager indexNameManager = new IndexNameManager(ElasticsearchSuiteTest.getProperties());
+  @Autowired
+  private IndexNameManager indexNameManager;
 
   @Before
   public void setUp() {

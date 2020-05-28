@@ -78,7 +78,7 @@ public class TagConfigDocumentIndexerTestSuite extends ElasticsearchTestDefiniti
     esTestClient.refreshIndices();
 
     assertTrue("Index should have been created.",
-        IndexUtils.doesIndexExist(indexName, ElasticsearchSuiteTest.getProperties()));
+        IndexUtils.doesIndexExist(indexName, properties));
 
     List<Map<String, Object>> indexData = esTestClient.fetchAllDocuments(indexName);
     assertEquals("Index should have one document inserted.", 1, indexData.size());
@@ -93,7 +93,7 @@ public class TagConfigDocumentIndexerTestSuite extends ElasticsearchTestDefiniti
     esTestClient.refreshIndices();
 
     assertTrue("Index should have been created when trying to update non-existing one.",
-        IndexUtils.doesIndexExist(indexName, ElasticsearchSuiteTest.getProperties()));
+        IndexUtils.doesIndexExist(indexName, properties));
 
     List<Map<String, Object>> indexData = esTestClient.fetchAllDocuments(indexName);
     assertEquals("Index should have one document inserted.", 1, indexData.size());
@@ -116,7 +116,7 @@ public class TagConfigDocumentIndexerTestSuite extends ElasticsearchTestDefiniti
     esTestClient.refreshIndices();
 
     assertTrue("Index should exist after tag config deletion.",
-        IndexUtils.doesIndexExist(indexName, ElasticsearchSuiteTest.getProperties()));
+        IndexUtils.doesIndexExist(indexName, properties));
 
     indexData = esTestClient.fetchAllDocuments(indexName);
     assertEquals("Index documents should been deleted.", 0, indexData.size());
