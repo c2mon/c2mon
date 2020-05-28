@@ -52,6 +52,10 @@ public class ElasticsearchSuiteTest {
 
   @AfterClass
   public static void cleanup() {
-    EmbeddedElasticsearchManager.stop();
+    if (ElasticsearchTestDefinition.esContainer != null) {
+      ElasticsearchTestDefinition.esContainer.stop();
+    } else {
+      EmbeddedElasticsearchManager.stop();
+    }
   }
 }
