@@ -14,6 +14,7 @@ import cern.c2mon.server.elasticsearch.domain.IndexMetadata;
 import cern.c2mon.server.elasticsearch.tag.config.TagConfigDocumentConverter;
 import cern.c2mon.server.elasticsearch.tag.config.TagConfigDocumentIndexer;
 import cern.c2mon.server.elasticsearch.tag.config.TagConfigDocumentListener;
+import cern.c2mon.server.elasticsearch.util.ElasticsearchTestClient;
 import cern.c2mon.server.elasticsearch.util.EmbeddedElasticsearchManager;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import org.apache.http.annotation.NotThreadSafe;
@@ -44,6 +45,7 @@ public class ElasticsearchServiceTest {
   private TagConfigDocumentListener tagDocumentListener;
   private C2monClientProperties properties = new C2monClientProperties();
   private ElasticsearchClientRest client;
+  private ElasticsearchTestClient esTestClient;
   private IndexManager indexManager;
 
   @Mock
@@ -51,6 +53,7 @@ public class ElasticsearchServiceTest {
 
   public ElasticsearchServiceTest() {
     client = new ElasticsearchClientRest(elasticsearchProperties);
+    esTestClient = new ElasticsearchTestClient(client);
     indexManager = new IndexManager(client);
     ProcessCache processCache = createNiceMock(ProcessCache.class);
     EquipmentCache equipmentCache = createNiceMock(EquipmentCache.class);
@@ -75,7 +78,7 @@ public class ElasticsearchServiceTest {
   public void setupElasticsearch() throws InterruptedException, NodeValidationException {
     try {
       CompletableFuture<Void> nodeReady = CompletableFuture.runAsync(() -> {
-        EmbeddedElasticsearchManager.getEmbeddedNode().deleteIndex(elasticsearchProperties.getTagConfigIndex());
+        esTestClient.deleteIndex(elasticsearchProperties.getTagConfigIndex());
         indexManager.create(IndexMetadata.builder().name(elasticsearchProperties.getTagConfigIndex()).build(),
             MappingFactory.createTagConfigMapping());
         try {
@@ -113,7 +116,7 @@ public class ElasticsearchServiceTest {
       tag.getMetadata().getMetadata().put(key1234, value1234);
       tagDocumentListener.onConfigurationEvent(tag, ConfigConstants.Action.CREATE);
 
-      EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
+      esTestClient.refreshIndices();
       Thread.sleep(10000);
 
       ElasticsearchService service = new ElasticsearchService(properties, "c2mon");
@@ -157,7 +160,7 @@ public class ElasticsearchServiceTest {
       tag.getMetadata().getMetadata().put(metadataKey, testUser);
       tagDocumentListener.onConfigurationEvent(tag, ConfigConstants.Action.CREATE);
 
-      EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
+      esTestClient.refreshIndices();
       Thread.sleep(10000);
 
       ElasticsearchService service = new ElasticsearchService(properties, "c2mon");

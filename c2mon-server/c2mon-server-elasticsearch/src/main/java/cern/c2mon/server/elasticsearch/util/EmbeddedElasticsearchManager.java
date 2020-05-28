@@ -80,14 +80,4 @@ public final class EmbeddedElasticsearchManager {
       }
     }
   }
-
-  /**
-   * @return an instance of running embedded Elasticsearch server.
-   */
-  public static EmbeddedElastic getEmbeddedNode() {
-    if (embeddedNode == null) {
-      throw new IllegalStateException("Embedded Elasticsearh instance must be started first!");
-    }
-    return embeddedNode;
-  }
 }

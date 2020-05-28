@@ -2,6 +2,7 @@ package cern.c2mon.server.elasticsearch.util;
 
 import cern.c2mon.server.elasticsearch.client.ElasticsearchClientRest;
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.ElasticsearchStatusException;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
@@ -56,6 +57,12 @@ public class ElasticsearchTestClient {
 
       if (!res.isAcknowledged()) {
         throw new RuntimeException("Request to delete index failed.");
+      }
+    } catch (ElasticsearchStatusException e) {
+      if (e.status().equals(RestStatus.NOT_FOUND)) {
+        log.warn("Index \"{}\" couldn't be found, thus it wasn't removed.", index);
+      } else {
+        throw new RuntimeException("Request to delete index failed.", e);
       }
     } catch (IOException e) {
       throw new RuntimeException("Request to delete index failed.", e);
