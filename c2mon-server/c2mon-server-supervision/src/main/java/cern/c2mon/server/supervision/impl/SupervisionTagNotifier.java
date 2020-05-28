@@ -51,7 +51,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
 
 /**
@@ -262,7 +261,7 @@ public class SupervisionTagNotifier implements SupervisionListener, SmartLifecyc
           tagCopy.getEquipmentIds().stream().filter(equipmentCache::containsKey).map(equipmentCache::get),
           tagCopy.getSubEquipmentIds().stream().filter(subEquipmentCache::containsKey).map(subEquipmentCache::get)
         )
-        .flatMap(identity())
+        .flatMap(x -> x)
         .map(Supervised::getStateTagId)
         .collect(toList());
 
