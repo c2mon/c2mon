@@ -1,6 +1,7 @@
 package cern.c2mon.server.elasticsearch.util;
 
 import cern.c2mon.server.elasticsearch.client.ElasticsearchClientRest;
+import cern.c2mon.server.elasticsearch.client.ElasticsearchClientType;
 import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.ElasticsearchStatusException;
@@ -31,7 +32,9 @@ public class ElasticsearchTestClient {
 
   @Autowired
   public ElasticsearchTestClient(ElasticsearchProperties properties) {
-    this.esClient = new ElasticsearchClientRest(properties.withPort(9200));
+    this.esClient = new ElasticsearchClientRest(
+      properties.withPort(ElasticsearchClientType.REST.getDefaultPort())
+    );
   }
 
   public void refreshIndices() {
