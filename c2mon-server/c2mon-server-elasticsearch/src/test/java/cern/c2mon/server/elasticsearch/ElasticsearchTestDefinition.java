@@ -100,7 +100,7 @@ public abstract class ElasticsearchTestDefinition {
       esContainer = new FixedHostPortGenericContainer<>("docker.elastic.co/elasticsearch/elasticsearch:6.8.9")
         .withEnv("discovery.type", "single-node")
         .withFixedExposedPort(
-          ElasticsearchClientType.REST.getDefaultPort(),
+          properties.getPort(),
           ElasticsearchClientType.REST.getDefaultPort()
         )
         .waitingFor(
