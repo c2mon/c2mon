@@ -16,10 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch.config;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.With;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
@@ -29,9 +26,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @author Serhiy Boychenko
  */
 @Data
-@With
-@NoArgsConstructor
-@AllArgsConstructor
 @ConfigurationProperties(prefix = "c2mon.server.elasticsearch")
 public class ElasticsearchProperties {
 
