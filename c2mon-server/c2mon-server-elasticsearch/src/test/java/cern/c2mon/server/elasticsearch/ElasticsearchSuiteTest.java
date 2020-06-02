@@ -37,13 +37,13 @@ import cern.c2mon.server.elasticsearch.util.EmbeddedElasticsearchManager;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    ElasticsearchModuleIntegrationTestSuite.class,
-    IndexManagerTestSuite.class,
-    IndexNameManagerTestSuite.class,
-    AlarmDocumentIndexerTestSuite.class,
-    SupervisionEventDocumentIndexerTestSuite.class,
-    TagDocumentIndexerTestSuite.class,
-    TagConfigDocumentIndexerTestSuite.class
+  ElasticsearchModuleIntegrationTestSuite.class,
+  IndexManagerTestSuite.class,
+  IndexNameManagerTestSuite.class,
+  AlarmDocumentIndexerTestSuite.class,
+  SupervisionEventDocumentIndexerTestSuite.class,
+  TagDocumentIndexerTestSuite.class,
+  TagConfigDocumentIndexerTestSuite.class
 })
 public class ElasticsearchSuiteTest {
 
