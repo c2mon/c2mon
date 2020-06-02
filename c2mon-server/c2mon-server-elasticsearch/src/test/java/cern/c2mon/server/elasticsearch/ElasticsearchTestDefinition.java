@@ -53,15 +53,15 @@ import static java.lang.System.currentTimeMillis;
  */
 @Slf4j
 @ContextConfiguration(classes = {
-    CommonModule.class,
-    CacheActionsModuleRef.class,
-    CacheConfigModuleRef.class,
-    CacheDbAccessModule.class,
-    CacheLoadingModuleRef.class,
-    SupervisionModule.class,
-    ElasticsearchModule.class,
-    C2monIgniteConfiguration.class,
-    CachePopulationRule.class
+  CommonModule.class,
+  CacheActionsModuleRef.class,
+  CacheConfigModuleRef.class,
+  CacheDbAccessModule.class,
+  CacheLoadingModuleRef.class,
+  SupervisionModule.class,
+  ElasticsearchModule.class,
+  C2monIgniteConfiguration.class,
+  CachePopulationRule.class
 })
 @RunWith(SpringRunner.class)
 @TestPropertySource(properties = {
