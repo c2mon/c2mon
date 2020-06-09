@@ -139,9 +139,7 @@ public class DataTagValueFilter {
                                 currentValueDesc = "";
                             }
 
-                            // check if the value description has changed, if
-                            // yes - then do
-                            // not apply deadband filtering
+                            // check if the value description has changed, if yes - then do not apply deadband filtering
                             if (tagValueDesc.equals(newValueDesc)) {
                                 filterTag = isRelativeValueDeadband(currentValue, newValue, valueDeadband);
                             }
@@ -191,27 +189,20 @@ public class DataTagValueFilter {
                 FilterType result = isRepeatedValue(currentTag, castedUpdate, newSDQuality);
 
                 if ((result == FilterType.REPEATED_INVALID) || (result == FilterType.REPEATED_VALUE)) {
-                    // The value will be filtered out by result
-                    // (REPEATED_INVALID,
-                    // REPEATED_VALUE)
+                    // The value will be filtered out by result (REPEATED_INVALID, REPEATED_VALUE)
                     return result;
                 } else {
                     // The value will be filtered out by OLD_UPDATE
-                    log.trace("isCandidateForFiltering - Tag " + currentSDValue.getId()
-                            + " - New timestamp is older than the current timestamp. Candidate for filtering");
+                    log.trace("Tag {} - New timestamp is older than the current timestamp. Candidate for filtering", currentSDValue.getId());
                     return FilterType.OLD_UPDATE;
                 }
             }
 
             // Check if the value is
             return isRepeatedValue(currentTag, castedUpdate, newSDQuality);
-        }
-        // in case the SourceDataTag value has never been initialized we don't
-        // want
-        // to filter
-        else {
-            log.trace("isCandidateForFiltering - Tag " + currentTag.getId()
-                    + " - Current Source Data Tag Value null but we have a New value. Not candidate for filtering");
+        } else {
+          // in case the SourceDataTag value has never been initialized we don't want to filter  
+          log.trace("Tag {} - Current Source Data Tag Value null but we have a New value. Not candidate for filtering", currentTag.getId());
         }
 
         // We got a new quality information that we want to send to the server.
@@ -257,16 +248,12 @@ public class DataTagValueFilter {
             return filtering;
         }
 
-        // The two values are both null or equal. Now we check for redundant
-        // Value
-        // Description information
+        // The two values are both null or equal. Now we check for redundant Value Description information
         if ((filtering = isDifferentValueDescription(currentSDValue, update.getValueDescription())) != null) {
             return filtering;
         }
 
-        // Current and new Values and Value Descriptions are both null or equal!
-        // Now
-        // we check for redundant quality information
+        // Current and new Values and Value Descriptions are both null or equal. Now we check for redundant quality information
         if ((filtering = isDifferentDataTagQuality(currentSDValue, newSDQuality)) != null) {
             return filtering;
         }
@@ -281,31 +268,17 @@ public class DataTagValueFilter {
         SourceDataTagValue currentSDValue = currentTag.getCurrentValue();
 
         if (currentSDValue.getValue() == null && update.getValue() != null) {
-            // Got a new value which is initializing our SourceDataTag. Hence we
-            // do
-            // not want to filter it out!
-            log.trace("isCandidateForFiltering - Tag " + currentSDValue.getId()
-                    + " - Current Value null but we have a New value. Not candidate for filtering");
-
+            // Got a new value which is initializing our SourceDataTag. Hence we do not want to filter it out!
+            log.trace("Tag {} - Current Value null but we have a New value. Not candidate for filtering", currentSDValue.getId());
             return FilterType.NO_FILTERING;
         } else if (currentSDValue.getValue() != null && !currentSDValue.getValue().equals(update.getValue())) {
-            // The two value are different, hence we do not want to filter it
-            // out ...
-            // unless the Value dead band filter said the opposite
+            // The two value are different, hence we do not want to filter it out ... unless the Value dead band filter said the opposite
             if (isValueDeadbandFiltered(currentTag, update, newSDQuality)) {
-                log.trace("isCandidateForFiltering - Tag " + currentSDValue.getId()
-                        + " - New value update but within value deadband filter. Candidate for filtering");
-
+                log.trace("Tag {} - New value update but within value deadband filter. Candidate for filtering", currentSDValue.getId());
                 return FilterType.VALUE_DEADBAND;
             }
 
-            // The two values are different, so it is clear we do not want to
-            // filter
-            // it out!
-            log.trace("isCandidateForFiltering - Tag " + currentSDValue.getId()
-                    + " - Both Values are different (Current vs New) = (" + currentSDValue.getValue() + " vs "
-                    + update.getValue() + "). Not candidate for filtering");
-
+            log.trace("Tag {} - Both Values are different (Current vs New) = ({} vs {}). Not candidate for filtering", currentSDValue.getId(), currentSDValue.getValue(), update.getValue());
             return FilterType.NO_FILTERING;
         }
 
@@ -329,39 +302,19 @@ public class DataTagValueFilter {
         SourceDataTagValue currentSDValue = currentTag.getCurrentValue();
 
         if (currentSDValue.getValue() == null && newValue != null) {
-            // Got a new value which is initializing our SourceDataTag. Hence we
-            // do
-            // not want to filter it out!
-            log.trace("isCandidateForFiltering - Tag " + currentSDValue.getId()
-                    + " - Current Value null but we have a New value. Not candidate for filtering");
-
+            // Got a new value which is initializing our SourceDataTag. Hence we do not want to filter it out!
+            log.trace("Tag {} - Current Value null but we have a New value. Not candidate for filtering", currentSDValue.getId());
             return FilterType.NO_FILTERING;
-        }
-        // check if the old value type and the new one are both array.
-        else if (currentSDValue.getValue() != null && currentSDValue.getValue().getClass().isArray()
-                && newValue.getClass().isArray()) {
-
+        } else if (currentSDValue.getValue() != null && currentSDValue.getValue().getClass().isArray() && newValue.getClass().isArray()) {
+            // The old value type and the new one are both arrays.
             if (!Arrays.equals((Object[]) currentSDValue.getValue(), (Object[]) newValue)) {
-
-                log.trace("isCandidateForFiltering - Tag " + currentSDValue.getId()
-                        + " - Both Values are different (Current vs New) = (" + currentSDValue.getValue() + " vs "
-                        + newValue + "). Not candidate for filtering");
-
+                log.trace("Tag {} - Both Values are different (Current vs New) = ({} vs {}). Not candidate for filtering", currentSDValue.getId(), currentSDValue.getValue(), newValue);
                 return FilterType.NO_FILTERING;
             }
-
-            // both values are no array so there must be an arbitrary object.
-        } else if (currentSDValue.getValue() != null) {
-
-            if (!currentSDValue.getValue().equals(newValue)) {
-
-                log.trace("isCandidateForFiltering - Tag " + currentSDValue.getId()
-                        + " - Both Values are different (Current vs New) = (" + currentSDValue.getValue() + " vs "
-                        + newValue + "). Not candidate for filtering");
-
-                return FilterType.NO_FILTERING;
-            }
-
+        // both values are no array so there must be an arbitrary object.
+        } else if (currentSDValue.getValue() != null && !currentSDValue.getValue().equals(newValue)) {
+            log.trace("isCandidateForFiltering - Tag {} - Both Values are different (Current vs New) = ({} vs {}). Not candidate for filtering", currentSDValue.getId(), currentSDValue.getValue(), newValue);
+            return FilterType.NO_FILTERING;
         }
 
         return filtering;
@@ -370,9 +323,7 @@ public class DataTagValueFilter {
     private FilterType isDifferentValueDescription(SourceDataTagValue currentSDValue, final String newTagValueDesc) {
         FilterType filtering = null;
 
-        // The two values are both null or equal. Now we check for redundant
-        // Value
-        // Description information
+        // The two values are both null or equal. Now we check for redundant Value Description information
         if (!currentSDValue.getValueDescription().equalsIgnoreCase(newTagValueDesc)
                 && ((newTagValueDesc != null) || !currentSDValue.getValueDescription().isEmpty())) {
             /*
@@ -404,13 +355,9 @@ public class DataTagValueFilter {
                     log.trace("isCandidateForFiltering - Tag " + currentSDValue.getId()
                             + " - Both Value, Value Description and Quality codes are equal. Check Quality Descriptions to take a decision");
 
-                    // Check if quality description did not change. If it is not
-                    // null we
-                    // compare it with the new one
+                    // Check if quality description did not change. If it is not null we compare it with the new one
                     if (currentSDValue.getQuality().getDescription() == null) {
-                        // If description is null we cannot compare so we check
-                        // directly if
-                        // both are null or not
+                        // If description is null we cannot compare so we check directly if both are null or not
                         if (newSDQuality.getDescription() == null) {
                             // We filter out since both are the same and null
                             log.trace("isCandidateForFiltering - Tag " + currentSDValue.getId()
@@ -420,16 +367,12 @@ public class DataTagValueFilter {
                         } else {
                             log.trace("isCandidateForFiltering - Tag " + currentSDValue.getId()
                                     + " - Current Quality Description null but we have a New Quality Description. Not candidate for filtering");
-
                             // Goes directly to the final return
                         }
                     }
-                    // Description is not null. We can compare it with the new
-                    // description
+                    // Description is not null. We can compare it with the new description
                     else if (currentSDValue.getQuality().getDescription().equals(newSDQuality.getDescription())) {
-                        // If we are here, it means we have received a redundant
-                        // quality
-                        // code and description ==> should be filtered out.
+                        // If we are here, it means we have received a redundant quality code and description ==> should be filtered out.
                         log.trace("isCandidateForFiltering - Tag " + currentSDValue.getId()
                                 + " - Both Value, Value Description, Quality and Quality Descriptions are equal. Candidate for filtering");
 
@@ -437,7 +380,6 @@ public class DataTagValueFilter {
                     } else {
                         log.trace("isCandidateForFiltering - Tag " + currentSDValue.getId()
                                 + " - Current Quality Description and New Quality Description are different. Not candidate for filtering");
-
                         // Goes directly to the final return
                     }
                 } else {
@@ -474,8 +416,7 @@ public class DataTagValueFilter {
         Double delta = null;
         // No filtering if either value is null, as no comparison would be valid
         if (currentValue != null && newValue != null) {
-            // Calculate a sensible delta (as long as incoming values wouldn't
-            // cause a loss of precision when subtracted).
+            // Calculate a sensible delta (as long as incoming values wouldn't cause a loss of precision when subtracted).
             delta = calculateDelta(currentValue, newValue);
         }
         boolean isAbsoluteValueDeadband = delta != null && delta < valueDeadband;
@@ -495,8 +436,7 @@ public class DataTagValueFilter {
      *         loss of precision conversion), a Double with the delta otherwise.
      */
     private Double calculateDelta(final Number currentValue, final Number newValue) {
-        // Note that Integer to Float, and Long to Double require particular
-        // attention, as they can incur a loss of precision
+        // Note that Integer to Float, and Long to Double require particular attention, as they can incur a loss of precision
         if (willCausePrecisionLoss(currentValue, newValue)) {
             log.trace(
                     "Possible loss of precision detected on incoming values when evaluating against a float deadband");
@@ -641,17 +581,12 @@ public class DataTagValueFilter {
         if (newTimestamp < currentTimestamp) {
             log.trace("isOlderUpdate - New timestamp is older or equal than current TS (" + newTimestamp + ", "
                     + currentTimestamp + ")");
-            // New timestamp is older or equal than current TS. Check the
-            // Quality
+            // New timestamp is older or equal than current TS. Check the Quality
             if (currentSDQuality.getQualityCode() == SourceDataTagQualityCode.DATA_UNAVAILABLE) {
                 // Exceptional case for not applying this filter:
-                // If current tag was unavailable we allow sending tag value
-                // with good
-                // quality but old source time stamp
+                // If current tag was unavailable we allow sending tag value with good quality but old source time stamp
                 if (newSDQuality.isValid()) {
-                    // New value has Good Quality. Swapping to valid to invalid
-                    // case. No
-                    // filter
+                    // New value has Good Quality. Swapping to valid to invalid case. No filter
                     log.trace(
                             "isOlderUpdate - The current value has DATA_UNAVAILABLE Quality but new value has Good Quality. Not filter");
                     return false;
@@ -662,8 +597,7 @@ public class DataTagValueFilter {
                     return true;
                 }
             } else {
-                // The current value has any Quality but DATA_UNAVAILABLE.
-                // Filter
+                // The current value has any Quality but DATA_UNAVAILABLE. Filter
                 log.trace("isOlderUpdate - The current value quality is different to DATA_UNAVAILABLE. Filter out ");
                 return true;
             }
