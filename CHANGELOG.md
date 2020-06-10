@@ -13,11 +13,16 @@ For more details on a given release, please check also the [version planning](ht
 
 ### Fixed
 
+## 1.9.7 - 2020-06-10 (Hotfix)
+### Fixed
+- The versions of slf4j and logback were not compatible. This now fixed to support `logback-core-1.2.3` with `slf4j-api-1.7.30`.
+- DAQ Core: An error message was log for out of range values saying that the data is lost. This is not the case and is now corrected. The bug was introduced with version 1.9.5
+
 
 ## 1.9.6 - 2020-05-22 (Hotfix)
-
 ### Fixed
 - Client API: Fixed dependency resolution on `c2mon-client-core`. Accidentially, we removed the test scope flag on `c2mon-server-elasticsearch`
+
 
 ## 1.9.5 - 2020-05-19
 
@@ -42,6 +47,7 @@ This version introduces many improvements to increase the stability of the DAQ C
 ### Removed
 - ActiveMQ config: Removed `setWatchTopicAdvisories()` from C2MON code. Instead, this should be directly configured on the broker URL. (CM-253)
 - DAQ Core: Removed `@Deprecated` methods in EquipmentMessageSender class (CM-259)
+
 
 ## 1.9.4 - 2020-04-15
 
