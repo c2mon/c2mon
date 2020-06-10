@@ -46,14 +46,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Collection;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import static java.lang.Double.doubleToLongBits;
 import static java.util.Collections.emptyList;
@@ -132,85 +127,68 @@ public class ElasticsearchServiceTest {
 
   @Test
   public void testSearchByMetadata() throws InterruptedException {
-    try {
-      Long testUserTagId = doubleToLongBits(Math.random()) % 10000;
-      String testUser = Long.toHexString(doubleToLongBits(Math.random()));
-      String responsible = "responsible";
-      DataTagCacheObject tag = new DataTagCacheObject(testUserTagId);
-      tag.getMetadata().getMetadata().put(responsible, testUser);
-      expect(alarmService.getTagWithAlarmsAtomically(anyLong())).andReturn(new TagWithAlarms<>(tag, emptyList())).times(2);
-      replay(alarmService);
-      tagDocumentListener.onConfigurationEvent(tag, ConfigConstants.Action.CREATE);
-      Long tag1234Id = doubleToLongBits(Math.random()) % 10000;
-      String value1234 = "1234";
-      tag = new DataTagCacheObject(tag1234Id);
-      String key1234 = "1234";
-      tag.getMetadata().getMetadata().put(key1234, value1234);
-      tagDocumentListener.onConfigurationEvent(tag, ConfigConstants.Action.CREATE);
+    Long testUserTagId = doubleToLongBits(Math.random()) % 10000;
+    String testUser = Long.toHexString(doubleToLongBits(Math.random()));
+    String responsible = "responsible";
+    DataTagCacheObject tag = new DataTagCacheObject(testUserTagId);
+    tag.getMetadata().getMetadata().put(responsible, testUser);
+    expect(alarmService.getTagWithAlarmsAtomically(anyLong())).andReturn(new TagWithAlarms<>(tag, emptyList())).times(2);
+    replay(alarmService);
+    tagDocumentListener.onConfigurationEvent(tag, ConfigConstants.Action.CREATE);
+    Long tag1234Id = doubleToLongBits(Math.random()) % 10000;
+    String value1234 = "1234";
+    tag = new DataTagCacheObject(tag1234Id);
+    String key1234 = "1234";
+    tag.getMetadata().getMetadata().put(key1234, value1234);
+    tagDocumentListener.onConfigurationEvent(tag, ConfigConstants.Action.CREATE);
 
-      esTestClient.refreshIndices();
-      Thread.sleep(10000);
+    esTestClient.refreshIndices();
 
-      assertEquals("There should be 2 tags, one for responsible and one for 1234", 2, esService.getDistinctTagMetadataKeys().size());
+    assertEquals("There should be 2 tags, one for responsible and one for 1234", 2, esService.getDistinctTagMetadataKeys().size());
 
-      Collection<Long> tagsForResponsibleUser = esService.findTagsByMetadata(responsible, testUser);
-      assertEquals("There should be one tag with responsible user set to requested value", 1, tagsForResponsibleUser.size());
-      assertEquals(testUserTagId, tagsForResponsibleUser.stream().findFirst().get());
+    Collection<Long> tagsForResponsibleUser = esService.findTagsByMetadata(responsible, testUser);
+    assertEquals("There should be one tag with responsible user set to requested value", 1, tagsForResponsibleUser.size());
+    assertEquals(testUserTagId, tagsForResponsibleUser.stream().findFirst().get());
 
-      Collection<Long> tags1234 = esService.findTagsByMetadata(key1234, value1234);
-      assertEquals("There should be one tag with 1234 parameter set to requested value", 1, tags1234.size());
-      assertEquals(tag1234Id, tags1234.stream().findFirst().get());
-    } catch (Exception e) {
-      e.printStackTrace();
-      throw e;
-    }
+    Collection<Long> tags1234 = esService.findTagsByMetadata(key1234, value1234);
+    assertEquals("There should be one tag with 1234 parameter set to requested value", 1, tags1234.size());
+    assertEquals(tag1234Id, tags1234.stream().findFirst().get());
   }
 
   @Test
   public void testSearchByNameAndMetadata() throws InterruptedException {
-    try {
-      Long testUserTagId = doubleToLongBits(Math.random()) % 10000;
-      String testUser = Long.toHexString(doubleToLongBits(Math.random()));
-      String metadataKey = "metadataKey";
-      DataTagCacheObject tag = new DataTagCacheObject(testUserTagId);
-      String tagname = "tagname";
-      tag.setName(tagname);
-      tag.getMetadata().getMetadata().put(metadataKey, testUser);
-      expect(alarmService.getTagWithAlarmsAtomically(anyLong())).andReturn(new TagWithAlarms<>(tag, emptyList())).times(3);
-      replay(alarmService);
-      tagDocumentListener.onConfigurationEvent(tag, ConfigConstants.Action.CREATE);
+    Long testUserTagId = doubleToLongBits(Math.random()) % 10000;
+    String testUser = Long.toHexString(doubleToLongBits(Math.random()));
+    String metadataKey = "metadataKey";
+    DataTagCacheObject tag = new DataTagCacheObject(testUserTagId);
+    String tagname = "tagname";
+    tag.setName(tagname);
+    tag.getMetadata().getMetadata().put(metadataKey, testUser);
+    expect(alarmService.getTagWithAlarmsAtomically(anyLong())).andReturn(new TagWithAlarms<>(tag, emptyList())).times(3);
+    replay(alarmService);
+    tagDocumentListener.onConfigurationEvent(tag, ConfigConstants.Action.CREATE);
 
-      tag = new DataTagCacheObject(doubleToLongBits(Math.random()) % 10000);
-      tag.setName(tagname);
-      tag.getMetadata().getMetadata().put(metadataKey, "some other metadata value");
-      tagDocumentListener.onConfigurationEvent(tag, ConfigConstants.Action.CREATE);
+    tag = new DataTagCacheObject(doubleToLongBits(Math.random()) % 10000);
+    tag.setName(tagname);
+    tag.getMetadata().getMetadata().put(metadataKey, "some other metadata value");
+    tagDocumentListener.onConfigurationEvent(tag, ConfigConstants.Action.CREATE);
 
-      tag = new DataTagCacheObject(doubleToLongBits(Math.random()) % 10000);
-      tag.setName("other_tagname");
-      tag.getMetadata().getMetadata().put(metadataKey, testUser);
-      tagDocumentListener.onConfigurationEvent(tag, ConfigConstants.Action.CREATE);
+    tag = new DataTagCacheObject(doubleToLongBits(Math.random()) % 10000);
+    tag.setName("other_tagname");
+    tag.getMetadata().getMetadata().put(metadataKey, testUser);
+    tagDocumentListener.onConfigurationEvent(tag, ConfigConstants.Action.CREATE);
 
-      esTestClient.refreshIndices();
-      Thread.sleep(10000);
+    esTestClient.refreshIndices();
 
-      Collection<Long> tagsForResponsibleUser = esService.findTagsByNameAndMetadata(tagname, metadataKey, testUser);
-      assertEquals("There should be one tag with given name and metadata", 1, tagsForResponsibleUser.size());
-      assertEquals(testUserTagId, tagsForResponsibleUser.stream().findFirst().get());
-    } catch (Exception e) {
-      e.printStackTrace();
-      throw e;
-    }
+    Collection<Long> tagsForResponsibleUser = esService.findTagsByNameAndMetadata(tagname, metadataKey, testUser);
+    assertEquals("There should be one tag with given name and metadata", 1, tagsForResponsibleUser.size());
+    assertEquals(testUserTagId, tagsForResponsibleUser.stream().findFirst().get());
   }
 
   @Test
   public void testSearchByName() {
-    try {
-      Collection<Long> tagsForResponsibleUser = esService.findTagsByName("TEST");
-      assertNotNull("The tags collection should not be null", tagsForResponsibleUser);
-      assertEquals("There tags collection should be empty", 0, tagsForResponsibleUser.size());
-    } catch (Exception e) {
-      e.printStackTrace();
-      throw e;
-    }
+    Collection<Long> tagsForResponsibleUser = esService.findTagsByName("TEST");
+    assertNotNull("The tags collection should not be null", tagsForResponsibleUser);
+    assertEquals("There tags collection should be empty", 0, tagsForResponsibleUser.size());
   }
 }
