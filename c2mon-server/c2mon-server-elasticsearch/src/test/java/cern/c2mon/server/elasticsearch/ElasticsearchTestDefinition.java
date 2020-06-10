@@ -23,9 +23,9 @@ import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.cache.loading.config.CacheLoadingModuleRef;
 import cern.c2mon.server.cache.test.CachePopulationRule;
 import cern.c2mon.server.common.config.CommonModule;
-import cern.c2mon.server.elasticsearch.client.ElasticsearchClientType;
 import cern.c2mon.server.elasticsearch.config.ElasticsearchModule;
 import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
+import cern.c2mon.server.elasticsearch.util.ContainerizedElasticsearchManager;
 import cern.c2mon.server.elasticsearch.util.ElasticsearchTestClient;
 import cern.c2mon.server.elasticsearch.util.EmbeddedElasticsearchManager;
 import cern.c2mon.server.supervision.config.SupervisionModule;
@@ -37,10 +37,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.testcontainers.containers.FixedHostPortGenericContainer;
-import org.testcontainers.containers.wait.strategy.HttpWaitStrategy;
-
-import java.time.Duration;
 
 import static java.lang.System.currentTimeMillis;
 
@@ -75,8 +71,6 @@ public abstract class ElasticsearchTestDefinition {
   @Autowired
   protected ElasticsearchTestClient esTestClient;
 
-  static FixedHostPortGenericContainer esContainer;
-
   private static boolean setUpRun = false;
 
   /**
@@ -97,20 +91,7 @@ public abstract class ElasticsearchTestDefinition {
     if (properties.isEmbedded()) {
       EmbeddedElasticsearchManager.start(properties);
     } else {
-      esContainer = new FixedHostPortGenericContainer<>("docker.elastic.co/elasticsearch/elasticsearch:6.8.9")
-        .withEnv("discovery.type", "single-node")
-        .withFixedExposedPort(
-          properties.getPort(),
-          ElasticsearchClientType.REST.getDefaultPort()
-        )
-        .waitingFor(
-          new HttpWaitStrategy()
-            .forPort(ElasticsearchClientType.REST.getDefaultPort())
-            .forStatusCodeMatching(res -> res == 200 || res == 401)
-        )
-        .withStartupTimeout(Duration.ofMinutes(1L));
-
-      esContainer.start();
+      ContainerizedElasticsearchManager.start(properties);
     }
 
     log.info("ElasticSearch server started in {} ms", currentTimeMillis() - start);
