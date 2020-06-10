@@ -29,16 +29,12 @@ import cern.c2mon.server.elasticsearch.util.ContainerizedElasticsearchManager;
 import cern.c2mon.server.elasticsearch.util.ElasticsearchTestClient;
 import cern.c2mon.server.elasticsearch.util.EmbeddedElasticsearchManager;
 import cern.c2mon.server.supervision.config.SupervisionModule;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import static java.lang.System.currentTimeMillis;
 
 /**
  * When running in GitLab CI, these tests will connect to ElasticSearch's service
@@ -47,7 +43,7 @@ import static java.lang.System.currentTimeMillis;
  * turned off by setting {@code c2mon.server.elasticsearch.embedded=false} below,
  * while ensuring Docker is running locally.
  */
-@Slf4j
+// @TestPropertySource(properties = {"c2mon.server.elasticsearch.embedded=false"})
 @ContextConfiguration(classes = {
   CommonModule.class,
   CacheActionsModuleRef.class,
@@ -60,9 +56,6 @@ import static java.lang.System.currentTimeMillis;
   CachePopulationRule.class
 })
 @RunWith(SpringRunner.class)
-@TestPropertySource(properties = {
-  // "c2mon.server.elasticsearch.embedded=false"
-})
 public abstract class ElasticsearchTestDefinition {
 
   @Autowired
@@ -83,15 +76,11 @@ public abstract class ElasticsearchTestDefinition {
     if (!setUpRun) {
       setUpRun = true;
 
-      long start = currentTimeMillis();
-
       if (properties.isEmbedded()) {
         EmbeddedElasticsearchManager.start(properties);
       } else {
         ContainerizedElasticsearchManager.start(properties);
       }
-
-      log.info("ElasticSearch server started in {} ms", currentTimeMillis() - start);
     }
   }
 
