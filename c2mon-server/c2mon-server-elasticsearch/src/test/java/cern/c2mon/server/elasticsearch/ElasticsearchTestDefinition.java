@@ -82,19 +82,17 @@ public abstract class ElasticsearchTestDefinition {
   public void baseSetUp() {
     if (!setUpRun) {
       setUpRun = true;
-    } else {
-      return;
+
+      long start = currentTimeMillis();
+
+      if (properties.isEmbedded()) {
+        EmbeddedElasticsearchManager.start(properties);
+      } else {
+        ContainerizedElasticsearchManager.start(properties);
+      }
+
+      log.info("ElasticSearch server started in {} ms", currentTimeMillis() - start);
     }
-
-    long start = currentTimeMillis();
-
-    if (properties.isEmbedded()) {
-      EmbeddedElasticsearchManager.start(properties);
-    } else {
-      ContainerizedElasticsearchManager.start(properties);
-    }
-
-    log.info("ElasticSearch server started in {} ms", currentTimeMillis() - start);
   }
 
   @After
