@@ -38,6 +38,7 @@
     <org.springframework.boot.version>2.1.0.RELEASE</org.springframework.boot.version>
     <java.version>8</java.version>
     <org.slf4j.version>1.7.30</org.slf4j.version>
+    <logback.version>1.2.3</logback.version>
     <org.apache.activemq.version>5.15.2</org.apache.activemq.version>
     <elasticsearch.version>6.4.3</elasticsearch.version>
     <mockito-all.version>1.10.19</mockito-all.version>
@@ -75,9 +76,24 @@
         <version>${org.slf4j.version}</version>
       </dependency>
       <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-access</artifactId>
+        <version>${logback.version}</version>
+      </dependency>
+        <dependency>
+          <groupId>ch.qos.logback</groupId>
+          <artifactId>logback-classic</artifactId>
+          <version>${logback.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>ch.qos.logback</groupId>
+          <artifactId>logback-core</artifactId>
+          <version>${logback.version}</version>
+        </dependency>
+      <dependency>
         <groupId>org.projectlombok</groupId>
         <artifactId>lombok</artifactId>
-        <version>1.18.10</version>
+        <version>1.18.12</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
