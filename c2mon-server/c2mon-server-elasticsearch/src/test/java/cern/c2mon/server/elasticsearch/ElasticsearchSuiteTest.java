@@ -16,19 +16,19 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch;
 
-import java.util.concurrent.TimeUnit;
-
+import cern.c2mon.server.elasticsearch.alarm.AlarmDocumentIndexerTestSuite;
+import cern.c2mon.server.elasticsearch.supervision.SupervisionEventDocumentIndexerTestSuite;
+import cern.c2mon.server.elasticsearch.tag.TagDocumentIndexerTestSuite;
+import cern.c2mon.server.elasticsearch.tag.config.TagConfigDocumentIndexerTestSuite;
+import cern.c2mon.server.elasticsearch.util.ContainerizedElasticsearchManager;
+import cern.c2mon.server.elasticsearch.util.EmbeddedElasticsearchManager;
 import org.junit.AfterClass;
 import org.junit.ClassRule;
 import org.junit.rules.Timeout;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
-import cern.c2mon.server.elasticsearch.alarm.AlarmDocumentIndexerTestSuite;
-import cern.c2mon.server.elasticsearch.supervision.SupervisionEventDocumentIndexerTestSuite;
-import cern.c2mon.server.elasticsearch.tag.TagDocumentIndexerTestSuite;
-import cern.c2mon.server.elasticsearch.tag.config.TagConfigDocumentIndexerTestSuite;
-import cern.c2mon.server.elasticsearch.util.EmbeddedElasticsearchManager;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Perform the necessary setup to run ES tests
@@ -52,10 +52,7 @@ public class ElasticsearchSuiteTest {
 
   @AfterClass
   public static void cleanup() {
-    if (ElasticsearchTestDefinition.esContainer != null) {
-      ElasticsearchTestDefinition.esContainer.stop();
-    } else {
-      EmbeddedElasticsearchManager.stop();
-    }
+    EmbeddedElasticsearchManager.stop();
+    ContainerizedElasticsearchManager.stop();
   }
 }
