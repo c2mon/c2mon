@@ -116,36 +116,18 @@ public class ElasticsearchServiceTest {
     } else if (elasticsearchProperties.getServiceType().equals("containerized")) {
       ContainerizedElasticsearchManager.start(elasticsearchProperties);
     }
+
+    esTestClient.deleteIndex(elasticsearchProperties.getTagConfigIndex());
+    indexManager.create(
+      IndexMetadata.builder().name(elasticsearchProperties.getTagConfigIndex()).build(),
+      MappingFactory.createTagConfigMapping()
+    );
   }
 
   @AfterClass
   public static void tearDownClass() {
     EmbeddedElasticsearchManager.stop();
     ContainerizedElasticsearchManager.stop();
-  }
-
-  @Before
-  public void setupElasticsearch() throws InterruptedException {
-    try {
-      CompletableFuture<Void> nodeReady = CompletableFuture.runAsync(() -> {
-        esTestClient.deleteIndex(elasticsearchProperties.getTagConfigIndex());
-        indexManager.create(IndexMetadata.builder().name(elasticsearchProperties.getTagConfigIndex()).build(),
-            MappingFactory.createTagConfigMapping());
-        try {
-          Thread.sleep(1000); //it takes some time for the index to be recreated
-        } catch (InterruptedException e) {
-          e.printStackTrace();
-        }
-      });
-      nodeReady.get(120, TimeUnit.SECONDS);
-    } catch (ExecutionException | TimeoutException e) {
-      throw new RuntimeException("Timeout when waiting for elasticsearch node to start!");
-    }
-  }
-
-  @Before
-  public void resetMocks() {
-    reset(alarmService);
   }
 
   @Test
