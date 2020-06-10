@@ -16,6 +16,19 @@
  *****************************************************************************/
 package cern.c2mon.daq.common.impl;
 
+import static cern.c2mon.shared.common.type.TypeConverter.cast;
+import static cern.c2mon.shared.common.type.TypeConverter.getType;
+import static cern.c2mon.shared.common.type.TypeConverter.isKnownClass;
+import static cern.c2mon.shared.common.type.TypeConverter.isNumber;
+import static java.lang.String.format;
+
+import java.io.IOException;
+
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lombok.extern.slf4j.Slf4j;
+
 import cern.c2mon.daq.common.IDynamicTimeDeadbandFilterer;
 import cern.c2mon.daq.common.IEquipmentMessageSender;
 import cern.c2mon.daq.common.messaging.IProcessMessageSender;
@@ -24,14 +37,6 @@ import cern.c2mon.daq.tools.DataTagValueValidator;
 import cern.c2mon.shared.common.datatag.*;
 import cern.c2mon.shared.common.filter.FilteredDataTagValue.FilterType;
 import cern.c2mon.shared.common.type.TypeConverter;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.extern.slf4j.Slf4j;
-
-import java.io.IOException;
-
-import static cern.c2mon.shared.common.type.TypeConverter.*;
-import static java.lang.String.format;
 
 /**
  * This class is used to send valid messages to the server.
@@ -140,7 +145,6 @@ class EquipmentSenderValid {
   private boolean doUpdate(final SourceDataTag currentSourceDataTag, final ValueUpdate update) {
     // do a validation check on the new value:
     if (!checkValidation(currentSourceDataTag, update)) {
-      log.error("Value update for tag #{} could not be sent because it didn't pass the validation. Please check the configuration. Data is lost!: {}", currentSourceDataTag.getId(), update.toString());
       return false;
     }
 
@@ -186,24 +190,25 @@ class EquipmentSenderValid {
    * @return false, if validation was unsuccessful
    */
   private boolean checkValidation(final SourceDataTag currentSourceDataTag, final ValueUpdate update) {
+    
+    boolean isValid = true;
 
     // check if the timestamp is valid.
     if (!isTimestampValid(currentSourceDataTag, update)) {
-      return false;
+      isValid = false;
+    } else if (!isConvertible(currentSourceDataTag, update)) {
+      // If the DataType is not an arbitrary object check if the Type if the value is convertible.
+      isValid = false;
+    } 
+    
+    if (!isValid) {
+      log.error("Value update for tag #{} could not be sent because it did not pass the validation. Please check the configuration. Data is lost!: {}", currentSourceDataTag.getId(), update.toString());
+    } else if (isNumber(currentSourceDataTag.getDataType()) && !isInRange(currentSourceDataTag, update)) {
+      // if the dataType is a number check if the value is convertible and in the defined range.  
+      isValid =  false;
     }
 
-    // If the DataType is not an arbitrary object check if the Type if the value is convertible.
-    if (!isConvertible(currentSourceDataTag, update)) {
-      return false;
-    }
-
-    // if the dataType is a number check if the value is convertible and in the defined range.
-    if (isNumber(currentSourceDataTag.getDataType())
-        && !isInRange(currentSourceDataTag, update)) {
-      return false;
-    }
-
-    return true;
+    return isValid;
   }
 
   /**
@@ -370,15 +375,15 @@ class EquipmentSenderValid {
     boolean result = false;
 
     if (!this.dataTagValueValidator.isInRange(currentSourceDataTag, update.getValue())) {
-      log.warn(format(
-          "\tin range : the value of tag[%d] was out of range and will only be propagated the first time to the server",
-          currentSourceDataTag.getId()));
-      log.debug(format("\tinvalidating tag[%d] with quality OUT_OF_BOUNDS", currentSourceDataTag.getId()));
-      StringBuffer qDesc = new StringBuffer("source value is out of bounds (");
-      if (currentSourceDataTag.getMinValue() != null)
+      log.warn("\tThe value update of tag[{}] is out of range and will be invalidated with quality OUT_OF_BOUNDS", currentSourceDataTag.getId());
+      
+      StringBuilder qDesc = new StringBuilder("source value is out of bounds (");
+      if (currentSourceDataTag.getMinValue() != null) {
         qDesc.append("min: ").append(currentSourceDataTag.getMinValue()).append(" ");
-      if (currentSourceDataTag.getMaxValue() != null)
+      }
+      if (currentSourceDataTag.getMaxValue() != null) {
         qDesc.append("max: ").append(currentSourceDataTag.getMaxValue());
+      }
       qDesc.append(")");
 
       SourceDataTagQuality quality = new SourceDataTagQuality(SourceDataTagQualityCode.OUT_OF_BOUNDS, qDesc.toString());
