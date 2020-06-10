@@ -65,10 +65,10 @@ import static org.junit.Assert.assertNotNull;
  * When running in GitLab CI, these tests will connect to ElasticSearch's service
  * as configured in gitlab-ci.yml and c2mon-server-gitlab-ci.properties. For local
  * testing, an embedded ElasticSearch service is used by default, and can be
- * turned off by setting {@code c2mon.server.elasticsearch.embedded=false} below,
- * while ensuring Docker is running locally.
+ * turned off by setting {@code c2mon.server.elasticsearch.serviceType=containerized}
+ * below, while ensuring Docker is running locally.
  */
-// @TestPropertySource(properties = {"c2mon.server.elasticsearch.embedded=false"})
+// @TestPropertySource(properties = {"c2mon.server.elasticsearch.serviceType=containerized"})
 @ContextConfiguration(classes = {
   CommonModule.class,
   CacheActionsModuleRef.class,
@@ -111,9 +111,9 @@ public class ElasticsearchServiceTest {
     alarmService = createNiceMock(AlarmService.class);
     tagDocumentListener = new TagConfigDocumentListener(elasticsearchProperties, indexer, converter, tagCacheFacade, alarmService);
 
-    if (elasticsearchProperties.isEmbedded()) {
+    if (elasticsearchProperties.getServiceType().equals("embedded")) {
       EmbeddedElasticsearchManager.start(elasticsearchProperties);
-    } else {
+    } else if (elasticsearchProperties.getServiceType().equals("containerized")) {
       ContainerizedElasticsearchManager.start(elasticsearchProperties);
     }
   }
@@ -139,7 +139,7 @@ public class ElasticsearchServiceTest {
       });
       nodeReady.get(120, TimeUnit.SECONDS);
     } catch (ExecutionException | TimeoutException e) {
-      throw new RuntimeException("Timeout when waiting for embedded elasticsearch node to start!");
+      throw new RuntimeException("Timeout when waiting for elasticsearch node to start!");
     }
   }
 

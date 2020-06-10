@@ -40,10 +40,10 @@ import org.springframework.test.context.junit4.SpringRunner;
  * When running in GitLab CI, these tests will connect to ElasticSearch's service
  * as configured in gitlab-ci.yml and c2mon-server-gitlab-ci.properties. For local
  * testing, an embedded ElasticSearch service is used by default, and can be
- * turned off by setting {@code c2mon.server.elasticsearch.embedded=false} below,
- * while ensuring Docker is running locally.
+ * turned off by setting {@code c2mon.server.elasticsearch.serviceType=containerized}
+ * below, while ensuring Docker is running locally.
  */
-// @TestPropertySource(properties = {"c2mon.server.elasticsearch.embedded=false"})
+// @TestPropertySource(properties = {"c2mon.server.elasticsearch.serviceType=containerized"})
 @ContextConfiguration(classes = {
   CommonModule.class,
   CacheActionsModuleRef.class,
@@ -76,9 +76,9 @@ public abstract class ElasticsearchTestDefinition {
     if (!setUpRun) {
       setUpRun = true;
 
-      if (properties.isEmbedded()) {
+      if (properties.getServiceType().equals("embedded")) {
         EmbeddedElasticsearchManager.start(properties);
-      } else {
+      } else if (properties.getServiceType().equals("containerized")) {
         ContainerizedElasticsearchManager.start(properties);
       }
     }

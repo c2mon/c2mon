@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch.client;
 
+import cern.c2mon.server.elasticsearch.util.ContainerizedElasticsearchManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -56,8 +57,10 @@ public class ElasticsearchClientConfiguration {
       return new ElasticsearchClientStub();
     }
 
-    if (properties.isEmbedded()) {
+    if (properties.getServiceType().equals("embedded")) {
       EmbeddedElasticsearchManager.start(properties);
+    } else if (properties.getServiceType().equals("containerized")) {
+      ContainerizedElasticsearchManager.start(properties);
     }
 
     if (ElasticsearchClientType.TRANSPORT.name().equalsIgnoreCase(properties.getClient())) {

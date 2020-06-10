@@ -42,9 +42,12 @@ public class ElasticsearchProperties {
   private boolean enabled = true;
 
   /**
-   * Enable/Disable the initiation of Embedded ES instance (should be used only for tests)
+   # Control how ElasticSearch is started, mainly for testing purposes. Possible values:
+   # - "embedded": start a self-contained service, requiring no manual action
+   # - "containerized": assume Docker is running and pull and start the official image
+   # - "none": take no action, relying on the service being available already
    */
-  private boolean embedded = true;
+  private String serviceType = "embedded";
 
   /**
    * Host name or IP address pointing to the Elasticsearch cluster
