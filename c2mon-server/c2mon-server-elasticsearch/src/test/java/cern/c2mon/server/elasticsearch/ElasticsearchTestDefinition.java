@@ -61,7 +61,7 @@ import static java.lang.System.currentTimeMillis;
 })
 @RunWith(SpringRunner.class)
 @TestPropertySource(properties = {
-  "c2mon.server.elasticsearch.embedded=true"
+  // "c2mon.server.elasticsearch.embedded=false"
 })
 public abstract class ElasticsearchTestDefinition {
 
