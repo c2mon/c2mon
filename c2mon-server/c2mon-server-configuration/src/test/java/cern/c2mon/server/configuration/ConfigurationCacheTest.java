@@ -41,7 +41,7 @@ import java.util.concurrent.TimeUnit;
 public abstract class ConfigurationCacheTest {
 
   @Rule
-  public Timeout forceTimeout = new Timeout(1_500, TimeUnit.MILLISECONDS);
+  public Timeout forceTimeout = new Timeout(2, TimeUnit.SECONDS);
 
   @Inject
   protected JmsContainerManagerImpl jmsContainerManager;
