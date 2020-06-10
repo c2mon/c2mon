@@ -68,6 +68,7 @@ import static org.junit.Assert.assertNotNull;
  * turned off by setting {@code c2mon.server.elasticsearch.embedded=false} below,
  * while ensuring Docker is running locally.
  */
+// @TestPropertySource(properties = {"c2mon.server.elasticsearch.embedded=false"})
 @ContextConfiguration(classes = {
   CommonModule.class,
   CacheActionsModuleRef.class,
@@ -79,9 +80,6 @@ import static org.junit.Assert.assertNotNull;
   C2monIgniteConfiguration.class
 })
 @RunWith(SpringRunner.class)
-@TestPropertySource(properties = {
-  // "c2mon.server.elasticsearch.embedded=false"
-})
 public class ElasticsearchServiceTest {
 
   @Autowired
