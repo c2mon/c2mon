@@ -587,7 +587,7 @@
     <profile>
       <id>gitlab-ci</id>
       <activation>
-         <property><name>${env.CI}</name></property>
+         <property><name>env.CI</name></property>
       </activation>
       <build>
         <plugins>
