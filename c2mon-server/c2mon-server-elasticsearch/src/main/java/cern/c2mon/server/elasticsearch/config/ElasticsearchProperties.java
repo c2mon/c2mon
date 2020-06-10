@@ -45,7 +45,7 @@ public class ElasticsearchProperties {
    # Control how ElasticSearch is started, mainly for testing purposes. Possible values:
    # - "embedded": start a self-contained service, requiring no manual action
    # - "containerized": assume Docker is running and pull and start the official image
-   # - "none": take no action, relying on the service being available already
+   # - "external": take no action, relying on the service being available already
    */
   private String serviceType = "embedded";
 
