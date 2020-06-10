@@ -126,7 +126,7 @@ public class ElasticsearchServiceTest {
   }
 
   @Test
-  public void testSearchByMetadata() throws InterruptedException {
+  public void testSearchByMetadata() {
     Long testUserTagId = doubleToLongBits(Math.random()) % 10000;
     String testUser = Long.toHexString(doubleToLongBits(Math.random()));
     String responsible = "responsible";
@@ -156,7 +156,7 @@ public class ElasticsearchServiceTest {
   }
 
   @Test
-  public void testSearchByNameAndMetadata() throws InterruptedException {
+  public void testSearchByNameAndMetadata() {
     Long testUserTagId = doubleToLongBits(Math.random()) % 10000;
     String testUser = Long.toHexString(doubleToLongBits(Math.random()));
     String metadataKey = "metadataKey";
