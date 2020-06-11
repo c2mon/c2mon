@@ -14,14 +14,10 @@ For more details on a given release, please check also the [version planning](ht
 ### Fixed
 
 
-## 1.9.8 - 2020-06-11 (Hotfix)
+## 1.9.7 - 2020-06-10 (Hotfix)
 ### Fixed
 - The versions of slf4j and logback were not compatible. This now fixed to support `logback-core-1.2.3` with `slf4j-api-1.7.30`.
 - DAQ Core: An error message was log for out of range values saying that the data is lost. This is not the case and is now corrected. The bug was introduced with version 1.9.5
-
-
-## 1.9.7 - 2020-06-10 
-**Broken build**
 
 
 ## 1.9.6 - 2020-05-22 (Hotfix)
