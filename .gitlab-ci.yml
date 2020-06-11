@@ -3,6 +3,7 @@ stages:
   - test
   - qa
   - publish
+  - trigger_tim
 
 image: 
   name: gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-maven:jdk-11-mvn-3.6-1
@@ -72,7 +73,6 @@ Test:
     reports:
       junit: reports/*.xml
   except:
-    - master
     - tags
 
 #  =========================
@@ -104,21 +104,13 @@ Test:
 Publish:
   stage: publish
   script:
-    - mvn $MAVEN_CLI_OPTS deploy
+    - mvn $MAVEN_CLI_OPTS -DskipTests deploy
   only:
     - master
 
 # Publish docker images?
 
 
-"Trigger TIM build":
-  stage: publish                            
-  image: appropriate/curl:3.1
-  dependencies: []
-  script:
-    - "curl --insecure -X POST -F token=$TIM_SERVER_TOKEN -F ref=master https://gitlab.cern.ch/api/v4/projects/9859/trigger/pipeline"
-  only:
-  - master
 
 "Deploy docs":
   stage: publish
@@ -134,3 +126,12 @@ Publish:
     - deploy-eos
   only:
     - master
+
+"Trigger TIM build":
+  stage: trigger_tim                            
+  image: appropriate/curl:3.1
+  dependencies: []
+  script:
+    - "curl --insecure -X POST -F token=$TIM_SERVER_TOKEN -F ref=master https://gitlab.cern.ch/api/v4/projects/9859/trigger/pipeline"
+  only:
+  - master
