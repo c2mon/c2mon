@@ -21,20 +21,5 @@ public class ConfigurationProperties {
    */
   private boolean allowRunningProcessRemoval = true;
 
-  /**
-   * JDBC properties
-   */
-  private Jdbc jdbc = new Jdbc();
 
-  @Data
-  public class Jdbc {
-
-    private String url = "jdbc:hsqldb:mem:config;sql.syntax_ora=true";
-
-    private String username = "sa";
-
-    private String password = "";
-
-    // TODO: add other JDBC properties (validationQuery etc.)
-  }
 }

@@ -8,15 +8,18 @@ import cern.c2mon.shared.client.command.CommandRecord;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.context.annotation.Bean;
 
 /**
  * @author Justin Lewis Salmon
  */
 public class CommandHistoryConfig {
-
   @Autowired
   private HistoryProperties properties;
+  
+  @Autowired
+  private DataSourceProperties historyDataSourceProperties;
 
   @Autowired
   @Qualifier("historySqlSessionFactory")
@@ -31,6 +34,6 @@ public class CommandHistoryConfig {
   @Bean
   public LoggerDAO<CommandRecord> commandLoggerDAO() throws Exception {
     return new LoggerDAO<>(historySqlSessionFactory.getObject(), CommandRecordMapper.class.getCanonicalName(),
-        properties.getJdbc().getUrl());
+    		historyDataSourceProperties.getUrl());
   }
 }

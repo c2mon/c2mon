@@ -1,6 +1,12 @@
 package cern.c2mon.server.history.config;
 
 
+import org.mybatis.spring.SqlSessionFactoryBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
+import org.springframework.context.annotation.Bean;
+
 import cern.c2mon.pmanager.persistence.impl.PersistenceManager;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.history.alarm.AlarmListener;
@@ -10,16 +16,15 @@ import cern.c2mon.server.history.logger.DefaultLogger;
 import cern.c2mon.server.history.mapper.AlarmRecordMapper;
 import cern.c2mon.server.history.structure.AlarmRecord;
 import cern.c2mon.server.history.structure.AlarmRecordConverter;
-import org.mybatis.spring.SqlSessionFactoryBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Bean;
 
 /**
  * @author Justin Lewis Salmon
  */
 public class AlarmHistoryConfig {
 
+  @Autowired
+  private DataSourceProperties historyDataSourceProperties;
+	
   @Autowired
   private HistoryProperties properties;
 
@@ -41,6 +46,6 @@ public class AlarmHistoryConfig {
   @Bean
   public LoggerDAO<AlarmRecord> alarmLoggerDAO() throws Exception {
     return new LoggerDAO<>(historySqlSessionFactory.getObject(), AlarmRecordMapper.class.getCanonicalName(),
-        properties.getJdbc().getUrl());
+    		historyDataSourceProperties.getUrl());
   }
 }

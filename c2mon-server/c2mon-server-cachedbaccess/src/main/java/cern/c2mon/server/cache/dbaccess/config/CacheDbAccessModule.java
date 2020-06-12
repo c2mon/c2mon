@@ -14,5 +14,4 @@ import org.springframework.context.annotation.Import;
 @Import({
     CacheDataSourceConfig.class
 })
-@EnableConfigurationProperties(CacheDbAccessProperties.class)
 public class CacheDbAccessModule {}

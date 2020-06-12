@@ -30,18 +30,4 @@ public class HistoryProperties {
    */
   private String commandFallbackFile = "/tmp/command-fallback.txt";
 
-  private Jdbc jdbc = new Jdbc();
-
-  @Data
-  public class Jdbc {
-
-    /** JDBC URL pointing to a database containing the data history */
-    private String url = "jdbc:hsqldb:mem:history;sql.syntax_ora=true";
-
-    /** History database account username */
-    private String username = "sa";
-
-    /** History database account password */
-    private String password = "";
-  }
 }
