@@ -441,8 +441,10 @@ public class SourceDataTag implements Cloneable, ISourceDataTag {
         convertedPriority =  DataTagConstants.PRIORITY_LOW;
       }
       
-      log.trace("Adjust JMS priority of tag #{}: {} --> {}", id, priority, convertedPriority);
-      address.setPriority(convertedPriority);
+      if (priority != convertedPriority) {
+        log.trace("Adjust JMS priority of tag #{}: {} --> {}", id, priority, convertedPriority);
+        address.setPriority(convertedPriority);
+      }
     }
   }
 }
