@@ -27,15 +27,17 @@ import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.core.Commit;
 
+import lombok.NoArgsConstructor;
+
 import cern.c2mon.shared.common.command.ISourceCommandTag;
 import cern.c2mon.shared.common.command.SourceCommandTag;
-import cern.c2mon.shared.common.datatag.DataTagConstants;
 import cern.c2mon.shared.common.datatag.ISourceDataTag;
 import cern.c2mon.shared.common.datatag.SourceDataTag;
 
 /**
  * This class is responsible for keeping equipment configuration parameters
  */
+@NoArgsConstructor
 public class EquipmentConfiguration implements IEquipmentConfiguration, Cloneable {
 
   /**
@@ -155,47 +157,12 @@ public class EquipmentConfiguration implements IEquipmentConfiguration, Cloneabl
     }
 
     for (SourceDataTag tag : sourceDataTagList) {
-      adjustJmsPriority(tag);
       sourceDataTags.put(tag.getId(), tag);
     }
 
     for (SourceCommandTag tag : sourceCommandTagList) {
       sourceCommandTags.put(tag.getId(), tag);
     }
-  }
-  
-  /**
-   * The DAQ only supports four JMS priorities which are further described
-   * by the given constants. This has influence also on the local message buffering
-   * which is used to send value update in bunches.
-   * <p>
-   * This adjustment is necessary as the initial design has slightly changed over the
-   * years to improve the overall sending performance.
-   * 
-   * @param tag The tag configuration received by the server
-   * @see DataTagConstants
-   */
-  private void adjustJmsPriority(SourceDataTag tag) {
-    int priority = tag.getCurrentValue().getPriority();
-    int convertedPriority;
-    
-    if (tag.isControl()) {
-      convertedPriority = DataTagConstants.PRIORITY_HIGHEST;
-    } else if (priority > DataTagConstants.PRIORITY_MEDIUM) {
-      convertedPriority = DataTagConstants.PRIORITY_HIGH;
-    } else if (priority == DataTagConstants.PRIORITY_MEDIUM) {
-      convertedPriority =  DataTagConstants.PRIORITY_MEDIUM;
-    } else {
-      // priority < DataTagConstants.PRIORITY_MEDIUM
-      convertedPriority =  DataTagConstants.PRIORITY_LOW;
-    }
-    tag.getCurrentValue().setPriority(convertedPriority);
-  }
-
-  /**
-   * The default constructor
-   */
-  public EquipmentConfiguration() {
   }
 
   /**
