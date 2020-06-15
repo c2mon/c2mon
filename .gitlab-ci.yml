@@ -38,22 +38,6 @@ Compile:
   except:
     - master
     - tags
-    
-"Build docs":
-  stage: build
-  image: jekyll/builder:3.8.5
-  script:
-    - cd docs
-    - jekyll build --config "_config.yml,_overwrite_url.yml"
-  artifacts:
-    name: site
-    when: on_success
-    expire_in: 2 days
-    paths:
-      - docs/_site
-  only:
-    - master
-
 
 #  =========================
 #  ===== Stage: test =======
@@ -74,6 +58,21 @@ Test:
       junit: reports/*.xml
   except:
     - tags
+    
+"Build docs":
+  stage: test
+  image: jekyll/builder:3.8.5
+  script:
+    - cd docs
+    - jekyll build --config "_config.yml,_overwrite_url.yml"
+  artifacts:
+    name: site
+    when: on_success
+    expire_in: 2 days
+    paths:
+      - docs/_site
+  only:
+    - master
 
 #  =========================
 #  ====== Stage: QA ========
