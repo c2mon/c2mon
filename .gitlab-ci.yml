@@ -64,7 +64,7 @@ Test:
   script:
     - export MAVEN_OPTS=""
     - mkdir reports
-    - mvn $MAVEN_CLI_OPTS surefire:test 
+    - mvn $MAVEN_CLI_OPTS install
     - find -iname 'TEST-*.xml' -exec cp {} ./reports/ \;
   artifacts:
     name: "$CI_COMMIT_REF_NAME-$CI_COMMIT_SHORT_SHA"
