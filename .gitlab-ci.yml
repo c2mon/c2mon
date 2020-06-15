@@ -89,13 +89,6 @@ Test:
     - master
     - tags
 
-"Sonar master QA":
-  stage: qa                                                     
-  script:
-    - mvn $MAVEN_CLI_OPTS package sonar:sonar -Dmaven.test.skip=true -DskipDocker=true -Dsonar.host.url=${SONAR_URL} -Dsonar.dependencyCheck.reportPath=target/dependency-check-report.xml
-  only:                                                    
-    - master
-
 #  =========================
 #  ===== Stage: Publish ====
 #  =========================
@@ -110,7 +103,12 @@ Publish:
 
 # Publish docker images?
 
-
+"Sonar master QA":
+  stage: publish                                                     
+  script:
+    - mvn $MAVEN_CLI_OPTS package sonar:sonar -Dmaven.test.skip=true -DskipDocker=true -Dsonar.host.url=${SONAR_URL} -Dsonar.dependencyCheck.reportPath=target/dependency-check-report.xml
+  only:                                                    
+    - master
 
 "Deploy docs":
   stage: publish
@@ -126,6 +124,10 @@ Publish:
     - deploy-eos
   only:
     - master
+    
+#  =========================
+#  === Stage: trigger_tim ==
+#  =========================
 
 "Trigger TIM build":
   stage: trigger_tim                            
