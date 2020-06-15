@@ -14,6 +14,15 @@ For more details on a given release, please check also the [version planning](ht
 ### Fixed
 
 
+## 1.9.8 - 2020-06-15
+### Changed
+- Changed GitLab CI pipeline to improve release management
+- Server: Switched to Spring `DataSourceProperties` class for full jdbc properties support. This fixes Spring autowiring issues noticed on client applications (CM-223)
+
+### Fixed
+- Fixed problem in the JMS priority adjustment introduced with v1.9.5 (CM-252)
+
+
 ## 1.9.7 - 2020-06-10 (Hotfix)
 ### Fixed
 - The versions of slf4j and logback were not compatible. This now fixed to support `logback-core-1.2.3` with `slf4j-api-1.7.30`.
