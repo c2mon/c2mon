@@ -19,7 +19,7 @@ services:
 "Check ElasticSearch health":
   stage: build
   script:
-    - curl "http://elasticsearch:9200/_cat/health"
+    - curl "http://elasticsearch:3333/_cat/health"
 
 variables:
   # Instruct TestContainers to use the daemon of Docker-in-Docker
