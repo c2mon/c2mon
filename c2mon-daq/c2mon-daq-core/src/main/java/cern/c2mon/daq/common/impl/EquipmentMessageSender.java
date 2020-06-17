@@ -315,7 +315,6 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
   private void setEquipmentConfiguration(final EquipmentConfiguration equipmentConfiguration) {
     this.equipmentConfiguration = equipmentConfiguration;
     Map<Long, SourceDataTag> sourceDataTags = equipmentConfiguration.getDataTags();
-    this.dynamicTimeDeadbandFilterActivator.clearDataTags();
     for (SourceDataTag sdt : sourceDataTags.values()) {
       if (isDynamicTimeDeadband(sdt)) {
         this.dynamicTimeDeadbandFilterActivator.addDataTag(sdt);
