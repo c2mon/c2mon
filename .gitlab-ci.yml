@@ -12,7 +12,6 @@ image:
 services:
   - name: elasticsearch:6.8.9
     alias: elasticsearch
-    command: ["bin/elasticsearch", "-Ediscovery.type=single-node"]
 
 variables:
   # This will suppress any download for dependencies and plugins or upload messages which would clutter the console log.
