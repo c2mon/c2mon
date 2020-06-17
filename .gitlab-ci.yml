@@ -12,7 +12,7 @@ image:
 services:
   - name: docker.elastic.co/elasticsearch/elasticsearch:6.8.9
     alias: elasticsearch
-    command: ["bin/elasticsearch", "-Expack.security.enabled=false", "-Ediscovery.type=single-node"]
+    command: ["bin/elasticsearch", "-Ediscovery.type=single-node"]
   # - elasticsearch:6.8.9
   # Docker-in-Docker service is required for TestContainers
   # - docker:dind
