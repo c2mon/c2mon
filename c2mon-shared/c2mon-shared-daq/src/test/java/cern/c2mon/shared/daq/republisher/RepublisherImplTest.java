@@ -16,11 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.shared.daq.republisher;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.util.concurrent.CountDownLatch;
-
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.After;
@@ -29,6 +24,10 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.jms.UncategorizedJmsException;
 
+import java.util.concurrent.CountDownLatch;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Unit test of RepublisherImpl.
@@ -51,7 +50,7 @@ public class RepublisherImplTest {
   public void setUp() {
     control.reset();
     publisher = control.createMock(Publisher.class);
-    republisher = new RepublisherImpl<Object>(publisher, "event-name");
+    republisher = new RepublisherImpl<>(publisher, "event-name");
     republisher.setRepublicationDelay(100);
   }
 
@@ -166,8 +165,8 @@ public class RepublisherImplTest {
 
     republisher.publicationFailed(publishedObject1);
 
-    //Thread.sleep(2000);
     latch.await();
+    Thread.sleep(100);
 
     assertEquals(11, republisher.getNumberFailedPublications());
     assertEquals(0, republisher.getSizeUnpublishedList());
@@ -176,7 +175,6 @@ public class RepublisherImplTest {
   }
 
   @Test
-  @Ignore("This test is flaky!")
   public void testMultiplePublicationsWithExceptions() throws InterruptedException {
     republisher.start();
 
@@ -208,8 +206,8 @@ public class RepublisherImplTest {
     republisher.publicationFailed(publishedObject2);
     republisher.publicationFailed(publishedObject3);
 
-    // Thread.sleep(2000);
     latch.await();
+    Thread.sleep(100);
 
     assertEquals(11 + 6 + 1, republisher.getNumberFailedPublications());
     assertEquals(0, republisher.getSizeUnpublishedList());
@@ -308,6 +306,5 @@ public class RepublisherImplTest {
 
     control.verify();
   }
-
 
 }
