@@ -108,9 +108,12 @@ public class ElasticsearchServiceTest {
     tagDocumentListener = new TagConfigDocumentListener(elasticsearchProperties, indexer, converter, tagCacheFacade, alarmService);
     esService = new ElasticsearchService(apply(new C2monClientProperties(), p -> {
       C2monClientProperties.Elasticsearch es = p.getElasticsearch();
-      es.setUrl(elasticsearchProperties.getScheme() + "://" + elasticsearchProperties.getHost() + ":" + elasticsearchProperties.getPort());
-      es.setUsername(elasticsearchProperties.getUsername());
-      es.setPassword(elasticsearchProperties.getPassword());
+      es.setUrl(
+        elasticsearchProperties.getScheme() + "://" +
+          elasticsearchProperties.getHost() + ":" + elasticsearchProperties.getPort()
+      );
+      if (elasticsearchProperties.getUsername() != null) es.setUsername(elasticsearchProperties.getUsername());
+      if (elasticsearchProperties.getPassword() != null) es.setPassword(elasticsearchProperties.getPassword());
     }), "c2mon");
 
     if (elasticsearchProperties.getServiceType().equals("embedded")) {
