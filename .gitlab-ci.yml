@@ -10,11 +10,8 @@ image:
   entrypoint: [""]
 
 services:
-  - name: docker.elastic.co/elasticsearch/elasticsearch:6.8.9
-    alias: elasticsearch
-    command: ["bin/elasticsearch", "-Ediscovery.type=single-node"]
   - name: elasticsearch:6.8.9
-    alias: elasticsearch2
+    alias: elasticsearch
     command: ["bin/elasticsearch", "-Ediscovery.type=single-node"]
   # Docker-in-Docker service is required for TestContainers
   # - docker:dind
@@ -23,11 +20,6 @@ services:
   stage: build
   script:
     - curl "http://elasticsearch:9200/_cat/health"
-
-"Check ElasticSearch2 health":
-  stage: build
-  script:
-    - curl "http://elasticsearch2:9200/_cat/health"
 
 variables:
   # Instruct TestContainers to use the daemon of Docker-in-Docker
