@@ -10,18 +10,18 @@ image:
   entrypoint: [""]
 
 services:
-  - name: docker.elastic.co/elasticsearch/elasticsearch:6.8.9
-    alias: elasticsearch
+  # - name: docker.elastic.co/elasticsearch/elasticsearch:6.8.9
+  #   alias: elasticsearch
   # - elasticsearch:6.8.9
   # Docker-in-Docker service is required for TestContainers
-  # - docker:dind
+  - docker:dind
 
 variables:
-  ELASTICSEARCH_URL: 'http://elasticsearch:9200'
+  # ELASTICSEARCH_URL: 'http://elasticsearch:9200'
   # Instruct TestContainers to use the daemon of Docker-in-Docker
-  # DOCKER_HOST: "tcp://docker:2375"
+  DOCKER_HOST: "tcp://docker:2375"
   # Improve performance with OverlayFS
-  # DOCKER_DRIVER: overlay2
+  DOCKER_DRIVER: overlay2
   # This will suppress any download for dependencies and plugins or upload messages which would clutter the console log.
   # `showDateTime` will show the passed time in milliseconds. You need to specify `--batch-mode` to make this work.
   # As of Maven 3.3.0 instead of this you may define these options in `.mvn $MAVEN_CLI_OPTS/maven.config` so the same config is used
