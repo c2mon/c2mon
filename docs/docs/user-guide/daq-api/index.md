@@ -46,9 +46,23 @@ Before the data is send to the server the DAQ core is applying several data vali
 
 # Data filtering
 
-Guaranteeing the availability of a monitoring system and its applications involves protecting it from overload during data avalanches. C2MON archives this through data filtering on the DAQ level without loosing any important events.
+Guaranteeing the availability of a monitoring system and its applications involves protecting it from overload during data avalanches. 
+C2MON archives this through data filtering on the DAQ level without loosing any important events.
 
-Beside filtering out redundant values (default behaviour) the DAQ layer provides a dynamic-filtering option for noise rejection. This is configurable per DAQ process and imposes time deadbands on individual Tags detected as feeding too much data to the C2MON server cluster. Various strategies on measuring the data throughput are provided.
+## Dynamic time-deadband filtering
+
+Beside filtering out redundant values (default behaviour) the DAQ layer provides a dynamic time-deadband filtering option for noise rejection. 
+This is configurable per DAQ process and imposes time-deadbands on individual Tags detected as feeding too much data to the C2MON server cluster. 
+
+The dynamic time-deadband filtering is disabled by default. To enabled this feature (recommended in bigger scenarios) the following property has to be set for the DAQ process:
+```
+c2mon.daq.filter.dynamicDeadband.enabled = true
+```
+
+A tag will now be throttled to send only every 30 sec and update, if its value is changing more often than 20 times per minute over a moving time window period of 6 minutes.
+All these parameters can of course also be adjusted (see [c2mon-daq.properties]).
+
+## Static filtering
 
 Moreover, the following static filters can be configured on individual tags. This provides in addition to the dynamic time-deadband filtering a very fine grained filtering control.
 
@@ -73,4 +87,10 @@ A few DAQ modules are provided on [GitHub](https://github.com/c2mon?utf8=%E2%9C%
 
 To configure a new a DAQ Processes or just Tags on a given DAQ module make use of the [C2MON Configuration API]({{ site.baseurl }}{% link docs/user-guide/client-api/configuration-api.md %}).
 
-Every tarball contains a [c2mon-daq.properties](https://github.com/c2mon/c2mon/blob/master/c2mon-daq/distribution/src/main/resources/tar/conf/c2mon-daq.properties) file in the `/conf` directory for changing the default setup to your needs. The properties listed in the file can just as well be set as Java system properties with the `-D` option.
+Every tarball contains a [c2mon-daq.properties] file in the `/conf` directory for changing the default setup to your needs. The properties listed in the file can just as well be set as Java system properties with the `-D` option.
+
+
+
+
+
+[c2mon-daq.properties]: https://github.com/c2mon/c2mon/blob/master/c2mon-daq/distribution/src/main/resources/tar/conf/c2mon-daq.properties
