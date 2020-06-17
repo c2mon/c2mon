@@ -95,7 +95,7 @@ public class ElasticsearchServiceTest {
   @Autowired
   private TagCacheCollection tagCacheFacade;
 
-  private final ElasticsearchService esService = new ElasticsearchService(new C2monClientProperties(), "c2mon");
+  private ElasticsearchService esService;
 
   private AlarmService alarmService;
 
@@ -105,6 +105,13 @@ public class ElasticsearchServiceTest {
   public void setUp() {
     alarmService = createNiceMock(AlarmService.class);
     tagDocumentListener = new TagConfigDocumentListener(elasticsearchProperties, indexer, converter, tagCacheFacade, alarmService);
+
+    C2monClientProperties c2monClientProperties = new C2monClientProperties();
+    c2monClientProperties
+      .getElasticsearch()
+      .setUrl(elasticsearchProperties.getScheme() + "://" +
+        elasticsearchProperties.getHost() + ":" + elasticsearchProperties.getPort());
+    esService = new ElasticsearchService(c2monClientProperties, "c2mon");
 
     if (elasticsearchProperties.getServiceType().equals("embedded")) {
       EmbeddedElasticsearchManager.start(elasticsearchProperties);
