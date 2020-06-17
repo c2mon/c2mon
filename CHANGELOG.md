@@ -13,6 +13,13 @@ For more details on a given release, please check also the [version planning](ht
 
 ### Fixed
 
+## 1.9.9 - 2020-06-17
+### Changed
+- Documentation: Improved documentation about [dynamic time-deadband filtering](http://c2mon.web.cern.ch/c2mon/docs/user-guide/daq-api/)
+
+### Fixed
+- DAQ Core: Fixed configuration problem of dynamic time-deadband filter in multi-equipment scenario (CM-268)
+
 
 ## 1.9.8 - 2020-06-15
 ### Changed
