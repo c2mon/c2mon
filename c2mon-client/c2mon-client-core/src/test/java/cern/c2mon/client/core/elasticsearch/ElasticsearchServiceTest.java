@@ -50,6 +50,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Collection;
 
+import static cern.c2mon.server.common.util.KotlinAPIs.apply;
 import static java.lang.Double.doubleToLongBits;
 import static java.util.Collections.emptyList;
 import static org.easymock.EasyMock.*;
@@ -105,13 +106,12 @@ public class ElasticsearchServiceTest {
   public void setUp() {
     alarmService = createNiceMock(AlarmService.class);
     tagDocumentListener = new TagConfigDocumentListener(elasticsearchProperties, indexer, converter, tagCacheFacade, alarmService);
-
-    C2monClientProperties c2monClientProperties = new C2monClientProperties();
-    c2monClientProperties
-      .getElasticsearch()
-      .setUrl(elasticsearchProperties.getScheme() + "://" +
-        elasticsearchProperties.getHost() + ":" + elasticsearchProperties.getPort());
-    esService = new ElasticsearchService(c2monClientProperties, "c2mon");
+    esService = new ElasticsearchService(apply(new C2monClientProperties(), p -> {
+      C2monClientProperties.Elasticsearch es = p.getElasticsearch();
+      es.setUrl(elasticsearchProperties.getScheme() + "://" + elasticsearchProperties.getHost() + ":" + elasticsearchProperties.getPort());
+      es.setUsername(elasticsearchProperties.getUsername());
+      es.setPassword(elasticsearchProperties.getPassword());
+    }), "c2mon");
 
     if (elasticsearchProperties.getServiceType().equals("embedded")) {
       EmbeddedElasticsearchManager.start(elasticsearchProperties);
