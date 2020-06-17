@@ -16,11 +16,6 @@ services:
   # Docker-in-Docker service is required for TestContainers
   # - docker:dind
 
-"Check ElasticSearch health":
-  stage: build
-  script:
-    - curl "http://elasticsearch:3333/_cat/health"
-
 variables:
   # Instruct TestContainers to use the daemon of Docker-in-Docker
   # DOCKER_HOST: "tcp://docker:2375"
@@ -53,6 +48,29 @@ Compile:
   except:
     - master
     - tags
+
+"Check ElasticSearch health":
+  stage: build
+  script:
+    - curl "http://elasticsearch:9200/_cat/health"
+  only:
+    - branches
+
+"Build docs":
+  stage: build
+  image: jekyll/builder:3.8.5
+  script:
+    - cd docs
+    - jekyll build --config "_config.yml,_overwrite_url.yml"
+  artifacts:
+    name: site
+    when: on_success
+    expire_in: 2 days
+    paths:
+      - docs/_site
+  only:
+    - master
+
 
 #  =========================
 #  ===== Stage: test =======
