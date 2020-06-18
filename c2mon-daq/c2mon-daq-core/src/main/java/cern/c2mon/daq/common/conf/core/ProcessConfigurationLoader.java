@@ -206,7 +206,7 @@ public class ProcessConfigurationLoader extends XMLTagValueExtractor implements 
       }
 
       String pik;
-      if (processConfiguration.getprocessPIK() == ProcessConfigurationRequest.NO_PIK) {
+      if (ProcessConfigurationRequest.NO_PIK.equals(processConfiguration.getprocessPIK())) {
         pik = "NOPIK";
       }
       else {

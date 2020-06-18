@@ -237,7 +237,7 @@ public class ProcessEvents extends SupervisionEventHandler<Process> {
 
       Process process;
       // (2) Check if the process exists (get methods throw exception otherwise) //check if id was sent - if not use name field
-      if (processDisconnectionRequest.getProcessId() != ProcessDisconnectionRequest.NO_ID) {
+      if (!ProcessDisconnectionRequest.NO_ID.equals(processDisconnectionRequest.getProcessId())) {
         process = cache.get(processDisconnectionRequest.getProcessId());
       } else {
         process = ((ProcessService) service).getProcessIdFromName(processDisconnectionRequest.getProcessName());
