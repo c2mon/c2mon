@@ -20,6 +20,8 @@ import java.io.File;
 import java.io.IOException;
 
 import cern.c2mon.daq.common.timer.FreshnessMonitor;
+import cern.c2mon.daq.config.DaqProperties;
+
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Builder;
@@ -72,7 +74,7 @@ public class EquipmentMessageSenderTest {
     processMessageSenderMock = createStrictMock(IProcessMessageSender.class);
     dynamicTimeDeadbandFilterActivatorMock = createStrictMock(IDynamicTimeDeadbandFilterActivator.class);
     freshnessMonitorMock = createMock(FreshnessMonitor.class);
-    equipmentMessageSender = new EquipmentMessageSender(filterMessageSenderMock, processMessageSenderMock, dynamicTimeDeadbandFilterActivatorMock, freshnessMonitorMock);
+    equipmentMessageSender = new EquipmentMessageSender(filterMessageSenderMock, processMessageSenderMock, dynamicTimeDeadbandFilterActivatorMock, freshnessMonitorMock, new DaqProperties());
     freshnessMonitorMock.setIEquipmentMessageSender(equipmentMessageSender);
     EasyMock.expectLastCall();
 

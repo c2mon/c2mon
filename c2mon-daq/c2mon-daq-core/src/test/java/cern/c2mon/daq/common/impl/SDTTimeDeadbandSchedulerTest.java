@@ -20,6 +20,8 @@ import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.Timer;
 
 import cern.c2mon.daq.common.timer.FreshnessMonitor;
+import cern.c2mon.daq.config.DaqProperties;
+
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
@@ -86,7 +88,7 @@ public class SDTTimeDeadbandSchedulerTest {
     IDynamicTimeDeadbandFilterActivator activatorMock = createMock(IDynamicTimeDeadbandFilterActivator.class);
     freshnessMonitorMock = createMock(FreshnessMonitor.class);
     this.equipmentMessageSender = new EquipmentMessageSender(this.filterMessageSenderMock,
-        this.processMessageSenderMock, activatorMock, freshnessMonitorMock);
+        this.processMessageSenderMock, activatorMock, freshnessMonitorMock, new DaqProperties());
 
     freshnessMonitorMock.setIEquipmentMessageSender(equipmentMessageSender);
     EasyMock.expectLastCall();

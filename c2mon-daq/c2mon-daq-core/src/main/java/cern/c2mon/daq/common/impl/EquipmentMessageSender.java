@@ -31,6 +31,7 @@ import cern.c2mon.daq.common.IEquipmentMessageSender;
 import cern.c2mon.daq.common.conf.equipment.ICoreDataTagChanger;
 import cern.c2mon.daq.common.messaging.IProcessMessageSender;
 import cern.c2mon.daq.common.timer.FreshnessMonitor;
+import cern.c2mon.daq.config.DaqProperties;
 import cern.c2mon.daq.filter.IFilterMessageSender;
 import cern.c2mon.daq.filter.dynamic.IDynamicTimeDeadbandFilterActivator;
 import cern.c2mon.shared.common.datatag.*;
@@ -97,6 +98,8 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
 
   private final FreshnessMonitor freshnessMonitor;
   
+  private final DaqProperties daqProperties;
+  
   private EquipmentStateSender equipmentStateSender;
 
   /**
@@ -111,12 +114,14 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
   public EquipmentMessageSender(final IFilterMessageSender filterMessageSender,
                                 final IProcessMessageSender processMessageSender,
                                 final IDynamicTimeDeadbandFilterActivator dynamicTimeDeadbandFilterActivator,
-                                FreshnessMonitor freshnessMonitor) {
+                                final FreshnessMonitor freshnessMonitor,
+                                final DaqProperties daqProperties) {
     super();
     this.filterMessageSender = filterMessageSender;
     this.processMessageSender = processMessageSender;
     this.dynamicTimeDeadbandFilterActivator = dynamicTimeDeadbandFilterActivator;
     this.freshnessMonitor = freshnessMonitor;
+    this.daqProperties = daqProperties;
   }
 
   /**
@@ -145,7 +150,8 @@ public class EquipmentMessageSender implements ICoreDataTagChanger, IEquipmentMe
             this.equipmentTimeDeadband, this);
 
     // Alive Sender
-    this.equipmentAliveSender = new EquipmentAliveSender(this.processMessageSender, this.equipmentConfiguration.getAliveTagId());
+    boolean aliveFilteringEnabled = daqProperties.getEquipment().getAlive().isFiltering();
+    this.equipmentAliveSender = new EquipmentAliveSender(this.processMessageSender, this.equipmentConfiguration.getAliveTagId(), aliveFilteringEnabled);
     this.equipmentAliveSender.init(this.equipmentConfiguration.getAliveTagInterval(), this.equipmentConfiguration.getName());
     this.freshnessMonitor.setIEquipmentMessageSender(this);
   }

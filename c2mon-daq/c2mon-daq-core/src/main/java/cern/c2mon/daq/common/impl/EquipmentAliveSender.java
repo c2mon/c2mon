@@ -38,7 +38,7 @@ class EquipmentAliveSender {
   /**
    * Constant to prevent from frequent equipment alives
    */
-  private static final boolean PREVENT_TOO_FREQUENT_EQUIPMENT_ALIVES = Boolean.getBoolean("c2mon.daq.equipment.alive.filtering");
+  private final boolean aliveFilteringEnabled;
 
   /**
    * The process message sender takes the messages actually send to the server.
@@ -75,10 +75,12 @@ class EquipmentAliveSender {
    *
    * @param processMessageSender Process Message Sender
    * @param aliveTagId           The equipment supervision alive tag id
+   * @param aliveFilteringEnabled If true, then not necessary alive updates are filtered out 
    */
-  public EquipmentAliveSender(final IProcessMessageSender processMessageSender, final Long aliveTagId) {
+  public EquipmentAliveSender(final IProcessMessageSender processMessageSender, final Long aliveTagId, boolean aliveFilteringEnabled) {
     this.processMessageSender = processMessageSender;
     this.aliveTagId = aliveTagId;
+    this.aliveFilteringEnabled = aliveFilteringEnabled;
   }
 
   /**
@@ -175,7 +177,7 @@ class EquipmentAliveSender {
    */
   private boolean sendEquipmentAliveFiltered(final SourceDataTagValue aliveTagValue, final long timestamp) {
 
-    if (PREVENT_TOO_FREQUENT_EQUIPMENT_ALIVES) {
+    if (aliveFilteringEnabled) {
       Long lastEquipmentAliveTimestamp = this.lastEquipmentAlives.get(aliveTagValue.getId());
       boolean isSendEquipmentAlive = true;
       if (lastEquipmentAliveTimestamp != null) {

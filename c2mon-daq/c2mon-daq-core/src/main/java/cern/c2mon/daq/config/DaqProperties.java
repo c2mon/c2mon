@@ -64,6 +64,11 @@ public class DaqProperties {
    * JMS properties
    */
   private final Jms jms = new Jms();
+  
+  /**
+   * Defines equipment specific properties.
+   */
+  private final EquipmentProperties equipment = new EquipmentProperties();
 
   @Data
   public static class Jms extends DaqJmsProperties {
@@ -201,5 +206,22 @@ public class DaqProperties {
      * Filtered data JMS settings
      */
     private final CommonJmsProperties jms = new CommonJmsProperties();
+  }
+  
+  /**
+   * Defines equipment specific properties.
+   */
+  @Data
+  public static class EquipmentProperties {
+    EquipmentAliveProperties alive = new EquipmentAliveProperties();
+  
+    @Data
+    public static class EquipmentAliveProperties {
+      /**
+       * Enable this to option to prevent sending more alive message updates to the 
+       * server than actually required by the configured frequency.
+       */
+      boolean filtering = false;
+    }
   }
 }
