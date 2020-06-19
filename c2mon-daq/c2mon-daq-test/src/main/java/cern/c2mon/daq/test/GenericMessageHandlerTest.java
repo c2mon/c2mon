@@ -143,7 +143,7 @@ public abstract class GenericMessageHandlerTest {
 
       dynamicTimeDeadbandFilterActivator = new TimeDifferenceMovingAverageTimeDeadbandActivator(10, 110, 150, 30000);
 
-      equipmentMessageSender = new EquipmentMessageSender(filterMessageSender, messageSender, dynamicTimeDeadbandFilterActivator, freshnessMonitorMock);
+      equipmentMessageSender = new EquipmentMessageSender(filterMessageSender, messageSender, dynamicTimeDeadbandFilterActivator, freshnessMonitorMock, new DaqProperties());
 
       configurationController = new ConfigurationController();
       configurationController.setProcessConfiguration(pconf);
