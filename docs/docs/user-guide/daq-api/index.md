@@ -59,7 +59,7 @@ The dynamic time-deadband filtering is disabled by default. To enabled this feat
 c2mon.daq.filter.dynamicDeadband.enabled = true
 ```
 
-A tag will now be throttled to send only every 30 sec and update, if its value is changing more often than 20 times per minute over a moving time window period of 6 minutes.
+C2MON uses a Moving Average Counter strategy. A tag will now be throttled to send only every 30 secs an update, if its value is changing more often than 20 times per minute over a moving time window period of 5 minutes.
 All these parameters can of course also be adjusted (see [c2mon-daq.properties]).
 
 ## Static filtering

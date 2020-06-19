@@ -150,39 +150,45 @@ public class DaqProperties {
     public static class DynamicDeadband {
 
       /**
-       * Enable/disable the dynamic deadband support
+       * Enable/disable the dynamic time-deadband support. C2MON uses therefore a
+       * Moving Average Counter strategy. 
        */
       private boolean enabled = false;
 
       /**
-       * Size of the moving average counter window
+       * The number of counters used per tag
        */
-      private int windowSize = 6;
+      private int windowSize = 5;
 
       /**
-       * Interval (in ms) at which the dynamic deadband will be checked
+       * The time [ms] in which the average number of tag updates is checked and the next counter is used.
+       * <p>
+       * Default is 1 minute.
        */
-      private int checkInterval = 600000;
+      private int checkInterval = 60_000;
 
       /**
-       * Threshold at which the dynamic deadband will be activated. If there
-       * are more than this number of updates within the window, the deadband
-       * will activate
+       * The maximum number of tag updates per check interval averaged over the counters (windowSize).
+       * If there are more than this number of updates within the window, the time deadband
+       * is activated for the given tag.
        */
       private int activationThreshold = 20;
 
       /**
        * Threshold at which the dynamic deadband will be deactivated. If there
-       * are fewer than this number of updates within the window, the deadband
-       * will deactivate
+       * are fewer than this number of updates within the window, the time deadband
+       * will deactivate for the given tag.
        */
       private int deactivationThreshold = 15;
 
       /**
-       * The deadband interval that will be forced if the activation threshold
-       * is exceeded
+       * The time deadband interval (ms) that will be forced if the activation threshold
+       * is exceeded. Only the latest value will be sent to the sever at the given interval rate. 
+       * All other value updates are filtered out.
+       * <p>
+       * Default is 30 sec.
        */
-      private int forcedDeadbandInterval = 30000;
+      private int forcedDeadbandInterval = 30_000;
     }
 
     /**
