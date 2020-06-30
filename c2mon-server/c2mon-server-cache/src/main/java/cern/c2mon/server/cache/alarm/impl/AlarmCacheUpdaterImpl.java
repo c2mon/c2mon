@@ -122,7 +122,7 @@ public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
     boolean alarmStateHasChanged = alarmCacheObject.isInternalActive() != newState;
 
     // We only allow activating the alarm if the tag is valid.
-    if(tag.isValid()){
+    if(tag.isValid() || resetOscillationStatus){
       alarmCacheObject.setActive(newState);
       alarmCacheObject.setInternalActive(newState);
     }
