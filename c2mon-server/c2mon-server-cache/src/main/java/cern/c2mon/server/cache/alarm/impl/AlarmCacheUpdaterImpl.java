@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2019 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2020 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -34,7 +34,10 @@ import cern.c2mon.server.common.tag.Tag;
  * Contains the routing logic for the alarm cache update. The alarm cache listeners will get informed depending, if it
  * is an oscillating alarm or not.
  *
- * @author Mark Brightwell, Emiliano Piselli, Brice Copy, Matthias Braeger
+ * @author Mark Brightwell
+ * @author Emiliano Piselli
+ * @author Brice Copy
+ * @author Matthias Braeger
  */
 @Service
 @Slf4j
@@ -127,13 +130,54 @@ public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
       alarmCacheObject.setInternalActive(newState);
     }
 
-    // Default case: change the alarm's state
-    // (1) if the alarm has never been initialised OR
-    // (2) if tag is VALID and the alarm changes from ACTIVE->TERMINATE or TERMINATE->ACTIVE
-    if (isAlarmUninitialised(alarmCacheObject) || (tag.isValid() && (alarmStateHasChanged || resetOscillationStatus)) ) {
-      return commitAlarmStateChange(alarmCacheObject, tag, resetOscillationStatus);
+    if (commitAlarmStateChange(alarmCacheObject, tag, resetOscillationStatus, alarmStateHasChanged)) {
+      return doCommitAlarmStateChange(alarmCacheObject, tag, resetOscillationStatus);
     }
 
+    if (!commitInfoFieldChanges(alarmCacheObject, tag, resetOscillationStatus)) {
+      // In all other cases, the value of the alarm related to the DataTag has
+      // not changed. No need to publish an alarm change.
+      log.trace("Alarm #{} has not changed", alarmCacheObject.getId());
+    }
+
+    return alarmCacheObject;
+  }
+  
+  /**
+   * Change the alarm's state in the following cases:
+   * <ol>
+   *   <li>if the alarm has never been initialised OR</li>
+   *   <li>if tag is VALID and the alarm changes from ACTIVE->TERMINATE or TERMINATE->ACTIVE OR</li>
+   *   <li>if oscillation status shall be reset </li>
+   * </ol>
+   * 
+   * <p/>
+   *  This method is only used by {@link #updateAlarmCacheObject(AlarmCacheObject, Tag, boolean)}
+   * 
+   * @param alarmCacheObject The current alarm cache object
+   * @param tag the tag update
+   * @param resetOscillationStatus true, if method is triggered by the Oscillation updater task
+   * @param alarmStateHasChanged true, if the evaluated state differs from the previous one
+   * @return true, if the new alarm state shall be committed.
+   * @see #updateAlarmCacheObject(AlarmCacheObject, Tag, boolean)
+   */
+  private boolean commitAlarmStateChange(final AlarmCacheObject alarmCacheObject, final Tag tag, boolean resetOscillationStatus, boolean alarmStateHasChanged) {
+    return isAlarmUninitialised(alarmCacheObject) || (tag.isValid() && alarmStateHasChanged) || resetOscillationStatus;
+  }
+  
+  /**
+   *  Check, if INFO field has changed and alarm is active. In this case the alarmCacheObject is modified and the
+   *  changes are committed back into the alarm cache.
+   *  <p/>
+   *  This method is only used by {@link #updateAlarmCacheObject(AlarmCacheObject, Tag, boolean)}
+   *  
+   * @param alarmCacheObject The current alarm cache object
+   * @param tag the tag update
+   * @param resetOscillationStatus true, if method is triggered by the Oscillation updater task
+   * @return true, if alarm was modified
+   * @see #updateAlarmCacheObject(AlarmCacheObject, Tag, boolean)
+   */
+  private boolean commitInfoFieldChanges(final AlarmCacheObject alarmCacheObject, final Tag tag, boolean resetOscillationStatus) {
     // Check if INFO field has changed and alarm is active
     String oldAlarmInfo = alarmCacheObject.getInfo();
     changeInfoField(alarmCacheObject, tag);
@@ -141,14 +185,10 @@ public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
       log.trace("Alarm #{} changed INFO to {}", alarmCacheObject.getId(), alarmCacheObject.getInfo());
       changeTimestamps(alarmCacheObject, tag);
       alarmCache.put(alarmCacheObject.getId(), alarmCacheObject);
-      return alarmCacheObject;
+      return true;
     }
-
-    // In all other cases, the value of the alarm related to the DataTag has
-    // not changed. No need to publish an alarm change.
-    log.trace("Alarm #{} has not changed", alarmCacheObject.getId());
-
-    return alarmCacheObject;
+    
+    return false;
   }
 
   boolean isAlarmUninitialised(final AlarmCacheObject alarmCacheObject) {
@@ -167,7 +207,7 @@ public final class AlarmCacheUpdaterImpl implements AlarmCacheUpdater {
     alarmCacheObject.setInfo(AlarmCacheUpdater.evaluateAdditionalInfo(alarmCacheObject, tag));
   }
 
-  protected AlarmCacheObject commitAlarmStateChange(final AlarmCacheObject alarmCacheObject, final Tag tag, boolean resetOscillationStatus) {
+  protected AlarmCacheObject doCommitAlarmStateChange(final AlarmCacheObject alarmCacheObject, final Tag tag, boolean resetOscillationStatus) {
     log.trace("Alarm #{} changed STATE to {}", alarmCacheObject.getId(), alarmCacheObject.isActive());
 
     boolean wasAlreadyOscillating = alarmCacheObject.isOscillating();

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2019 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2020 CERN. All rights not expressly granted are reserved.
  * <p/>
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -16,6 +16,12 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.alarm.impl;
 
+import static org.easymock.EasyMock.createMock;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.sql.Timestamp;
 
 import org.easymock.EasyMock;
@@ -26,17 +32,11 @@ import cern.c2mon.server.cache.AlarmCache;
 import cern.c2mon.server.cache.alarm.config.OscillationProperties;
 import cern.c2mon.server.cache.alarm.oscillation.OscillationUpdater;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
-import cern.c2mon.server.common.alarm.ValueAlarmCondition;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
+import cern.c2mon.shared.client.alarm.condition.ValueAlarmCondition;
 import cern.c2mon.shared.common.datatag.DataTagConstants;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
-
-import static org.easymock.EasyMock.createMock;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
 
 public class AlarmCacheUpdaterImplTest {
 
@@ -88,7 +88,7 @@ public class AlarmCacheUpdaterImplTest {
 
     // start test
     Timestamp oldAlarmTime = alarmCacheObject.getTimestamp();
-    alarmCacheUpdaterImpl.commitAlarmStateChange(alarmCacheObject, tag, false);
+    alarmCacheUpdaterImpl.doCommitAlarmStateChange(alarmCacheObject, tag, false);
 
     // Check result
     EasyMock.verify(alarmCache);
@@ -175,7 +175,7 @@ public class AlarmCacheUpdaterImplTest {
 
     // start test
     Timestamp oldAlarmTime = alarmCacheObject.getTimestamp();
-    alarmCacheUpdaterImpl.commitAlarmStateChange(alarmCacheObject, tag, true);
+    alarmCacheUpdaterImpl.doCommitAlarmStateChange(alarmCacheObject, tag, true);
 
     // Check result
     EasyMock.verify(alarmCache);
@@ -203,7 +203,7 @@ public class AlarmCacheUpdaterImplTest {
 
     // start test
     Timestamp oldAlarmTime = alarmCacheObject.getTimestamp();
-    alarmCacheUpdaterImpl.commitAlarmStateChange(alarmCacheObject, tag, false);
+    alarmCacheUpdaterImpl.doCommitAlarmStateChange(alarmCacheObject, tag, false);
 
     // Check result
     EasyMock.verify(alarmCache);
@@ -232,7 +232,7 @@ public class AlarmCacheUpdaterImplTest {
 
     // start test
     Timestamp oldAlarmTime = alarmCacheObject.getTimestamp();
-    alarmCacheUpdaterImpl.commitAlarmStateChange(alarmCacheObject, tag, false);
+    alarmCacheUpdaterImpl.doCommitAlarmStateChange(alarmCacheObject, tag, false);
 
     // Check result
     EasyMock.verify(alarmCache);
