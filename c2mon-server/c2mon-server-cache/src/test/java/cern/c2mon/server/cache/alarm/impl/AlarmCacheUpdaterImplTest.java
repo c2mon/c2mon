@@ -37,6 +37,7 @@ import cern.c2mon.shared.client.alarm.condition.ValueAlarmCondition;
 import cern.c2mon.shared.common.datatag.DataTagConstants;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
+import cern.c2mon.shared.common.datatag.TagQualityStatus;
 
 public class AlarmCacheUpdaterImplTest {
 
@@ -180,6 +181,36 @@ public class AlarmCacheUpdaterImplTest {
     // Check result
     EasyMock.verify(alarmCache);
     assertEquals("", alarmCacheObject.getInfo());
+    assertFalse(alarmCacheObject.isOscillating());
+    assertEquals(tag.getTimestamp(), alarmCacheObject.getSourceTimestamp());
+    assertNotEquals(oldAlarmTime, alarmCacheObject.getTimestamp());
+    assertTrue(alarmCacheObject.getFifoSourceTimestamps().isEmpty());
+  }
+  
+  /**
+   * Test that the alarm timestamps are correctly changed and the FIFO list is still empty
+   */
+  @Test
+  public void testCommitAlarmStateChangeWithOscillationResetForTagInvalid() {
+    alarmCacheObject.setInfo("[OSC]");
+    tag.setDataTagQuality(new DataTagQualityImpl(TagQualityStatus.UNKNOWN_REASON));
+
+    assertFalse(alarmCacheObject.isOscillating());
+    assertTrue(alarmCacheObject.isActive());
+    assertTrue((Boolean) tag.getValue());
+    assertFalse((Boolean) tag.isValid());
+    assertNotEquals(tag.getTimestamp(), alarmCacheObject.getSourceTimestamp());
+
+    alarmCache.put(alarmCacheObject.getId(), alarmCacheObject);
+    EasyMock.replay(alarmCache);
+
+    // start test
+    Timestamp oldAlarmTime = alarmCacheObject.getTimestamp();
+    alarmCacheUpdaterImpl.doCommitAlarmStateChange(alarmCacheObject, tag, true);
+
+    // Check result
+    EasyMock.verify(alarmCache);
+    assertEquals("[?]", alarmCacheObject.getInfo());
     assertFalse(alarmCacheObject.isOscillating());
     assertEquals(tag.getTimestamp(), alarmCacheObject.getSourceTimestamp());
     assertNotEquals(oldAlarmTime, alarmCacheObject.getTimestamp());
