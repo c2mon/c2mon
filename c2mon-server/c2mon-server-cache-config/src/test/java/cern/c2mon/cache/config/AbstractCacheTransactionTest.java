@@ -185,7 +185,7 @@ public abstract class AbstractCacheTransactionTest<CACHEABLE extends Cacheable> 
     }
 
     try {
-      f2.get(150, TimeUnit.MILLISECONDS);
+      f2.get(500, TimeUnit.MILLISECONDS);
       fail("No deadlock detected (thread 2 completed)");
     } catch (TimeoutException ignored) {
       fail("No deadlock detected (thread 2 timed out)");
