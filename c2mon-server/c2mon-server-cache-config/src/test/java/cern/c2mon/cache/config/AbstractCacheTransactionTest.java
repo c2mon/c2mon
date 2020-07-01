@@ -116,11 +116,13 @@ public abstract class AbstractCacheTransactionTest<CACHEABLE extends Cacheable> 
 
     Future f1 = runInThread(() -> cache.executeTransaction(() -> {
       cache.put(3333L, getSample());
+      sleep(50);
       cache.put(6666L, getSample());
     }));
 
     Future f2 = runInThread(() -> cache.executeTransaction(() -> {
       cache.put(6666L, getSample());
+      sleep(50);
       cache.put(3333L, getSample());
     }));
 
@@ -141,26 +143,36 @@ public abstract class AbstractCacheTransactionTest<CACHEABLE extends Cacheable> 
 
     Future f1 = runInThread(() -> cache.executeTransaction(() -> {
       cache.put(4444L, getSample());
+      sleep(50);
       arbitraryConcreteCache.put(8888L, new AlarmCacheObject(0L));
     }));
 
     Future f2 = runInThread(() -> cache.executeTransaction(() -> {
       arbitraryConcreteCache.put(8888L, new AlarmCacheObject(0L));
+      sleep(50);
       cache.put(4444L, getSample());
     }));
 
     assertDeadlock(f1, f2);
   }
 
-  private Future runInThread(Runnable r) {
+  private static Future runInThread(Runnable r) {
     ExecutorService executor = newSingleThreadExecutor();
     return executor.submit(r);
+  }
+
+  private static void sleep(long time) {
+    try {
+      Thread.sleep(time);
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   /**
    * See https://apacheignite.readme.io/docs/transactions#deadlock-detection.
    */
-  private void assertDeadlock(Future f1, Future f2) {
+  private static void assertDeadlock(Future f1, Future f2) {
     List<Exception> exceptions = new ArrayList<>();
 
     try {
