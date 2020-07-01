@@ -9,6 +9,10 @@ import javax.inject.Named;
 
 /**
  * A joint transaction manager for data consistency in operations that span cache and DB
+ *
+ * TODO Once Spring 5.3 is out, we should take advantage of configurable timeouts
+ *  for faster unit tests. See https://github.com/spring-projects/spring-framework/issues/25052
+ *  and {@code AbstractCacheTransactionTest}.
  */
 @Named
 public class ChainedCacheTransactionManager extends ChainedTransactionManager {

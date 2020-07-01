@@ -1,6 +1,7 @@
 package cern.c2mon.cache.config;
 
 import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.config.transaction.ChainedCacheTransactionManager;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.shared.common.Cacheable;
@@ -173,6 +174,10 @@ public abstract class AbstractCacheTransactionTest<CACHEABLE extends Cacheable> 
 
   /**
    * See https://apacheignite.readme.io/docs/transactions#deadlock-detection.
+   *
+   * TODO Once Spring 5.3 is out, we should take advantage of configurable timeouts
+   *  for faster unit tests. See https://github.com/spring-projects/spring-framework/issues/25052
+   *  and {@link ChainedCacheTransactionManager}.
    */
   private static void assertDeadlock(Future f1, Future f2) {
     List<Exception> exceptions = new ArrayList<>();
