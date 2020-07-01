@@ -111,18 +111,19 @@ public abstract class AbstractCacheTransactionTest<CACHEABLE extends Cacheable> 
 
   @Test
   public void deadlock() {
-    cache.put(3333L, getSample());
-    cache.put(6666L, getSample());
+    CountDownLatch latch = new CountDownLatch(2);
 
     Future f1 = runInThread(() -> cache.executeTransaction(() -> {
       cache.put(3333L, getSample());
-      sleep(150);
+      latch.countDown();
+      await(latch);
       cache.put(6666L, getSample());
     }));
 
     Future f2 = runInThread(() -> cache.executeTransaction(() -> {
       cache.put(6666L, getSample());
-      sleep(150);
+      latch.countDown();
+      await(latch);
       cache.put(3333L, getSample());
     }));
 
@@ -138,18 +139,19 @@ public abstract class AbstractCacheTransactionTest<CACHEABLE extends Cacheable> 
 
   @Test
   public void deadlockTransactionByOtherCache() {
-    cache.put(4444L, getSample());
-    arbitraryConcreteCache.put(8888L, new AlarmCacheObject(0L));
+    CountDownLatch latch = new CountDownLatch(2);
 
     Future f1 = runInThread(() -> cache.executeTransaction(() -> {
       cache.put(4444L, getSample());
-      sleep(150);
+      latch.countDown();
+      await(latch);
       arbitraryConcreteCache.put(8888L, new AlarmCacheObject(0L));
     }));
 
     Future f2 = runInThread(() -> cache.executeTransaction(() -> {
       arbitraryConcreteCache.put(8888L, new AlarmCacheObject(0L));
-      sleep(150);
+      latch.countDown();
+      await(latch);
       cache.put(4444L, getSample());
     }));
 
@@ -161,9 +163,9 @@ public abstract class AbstractCacheTransactionTest<CACHEABLE extends Cacheable> 
     return executor.submit(r);
   }
 
-  private static void sleep(long time) {
+  private static void await(CountDownLatch latch) {
     try {
-      Thread.sleep(time);
+      latch.await(250, TimeUnit.MILLISECONDS);
     } catch (InterruptedException e) {
       throw new RuntimeException(e);
     }
