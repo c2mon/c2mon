@@ -198,6 +198,12 @@ public abstract class AbstractCacheTransactionTest<CACHEABLE extends Cacheable> 
       exceptions.add(e);
     }
 
+    exceptions.forEach(e -> {
+      System.out.println("Cause: " + e.getCause().getClass().getName());
+      System.out.println("Cause's cause: " + e.getCause().getCause().getClass().getName());
+      System.out.println("Cause's cause's cause: " + e.getCause().getCause().getCause().getClass().getName());
+    });
+
     assertTrue(exceptions.size() >= 1);
     exceptions.forEach(e -> {
       assertTrue(e.getCause() instanceof CacheException);
