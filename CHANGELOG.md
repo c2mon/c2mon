@@ -16,6 +16,7 @@ For more details on a given release, please check also the [version planning](ht
 ## 1.9.10 - 2020-07-01
 ### Added
 - DAQ Core: Added option to prevent sending more equipment alive message updates to the server than actually required. See also changes made in [c2mon-daq.properties](https://gitlab.cern.ch/c2mon/c2mon/-/commit/becfd4fc59b030fec1c5f0963e867cfcf6e104f1#bffb1c6c25bf8844d286f833f0c274d44ead423e)
+- Client API: Added property `c2mon.client.jms.requestTimeout` to change the JMS request timeout. Default is 10 seconds.
 
 ### Changed
 -  DAQ Core: Adjusted default values of dynamic time deadband filtering. See also changes made in [c2mon-daq.properties](https://gitlab.cern.ch/c2mon/c2mon/-/commit/574aebf0701ed7904c9932a177345b2f269b445a#bffb1c6c25bf8844d286f833f0c274d44ead423e)
