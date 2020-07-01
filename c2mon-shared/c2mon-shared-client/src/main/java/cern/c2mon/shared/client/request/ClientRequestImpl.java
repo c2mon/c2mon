@@ -99,114 +99,115 @@ public class ClientRequestImpl<T extends ClientRequestResult> implements ClientR
     requestType = null;
     resultType = null;
   }
-
-
+  
   /**
    * Default Constructor needs specifying the result type of the response message.
    * The request type and the requestTimeout are then automatically
-   * determined by the constructor.
-   * <br><br><b>Please note</b>, that the result type needs to be coherent with the
+   * determined by the constructor. The default request timeout is 10 seconds
+   * <p/>
+   * <b>Please note</b>, that the result type needs to be coherent with the
    * interface type <code>T</code>.
    * @param clazz Return type of the request
    * @see ClientRequest.ResultType
    * @see #fromJsonResponse(String)
    */
   public ClientRequestImpl(final Class<T> clazz) {
-    if (clazz == TagUpdate.class) {
-      resultType = ResultType.TRANSFER_TAG_LIST;
-      requestType = RequestType.TAG_REQUEST;
-      requestTimeout = 10000;
-    }
-    else if (clazz == TagValueUpdate.class) {
-      resultType = ResultType.TRANSFER_TAG_VALUE_LIST;
-      requestType = RequestType.TAG_REQUEST;
-      requestTimeout = 10000;
-    }
-    else if (clazz == TagConfig.class) {
-      resultType = ResultType.TRANSFER_TAG_CONFIGURATION_LIST;
-      requestType = RequestType.TAG_CONFIGURATION_REQUEST;
-      requestTimeout = 10000;
-    }
-    else if (clazz == AlarmValue.class) {
-      resultType = ResultType.TRANSFER_ALARM_LIST;
-      requestType = RequestType.ALARM_REQUEST;
-      requestTimeout = 10000;
-    }
-    else if (clazz == CommandTagHandle.class) {
-      resultType = ResultType.TRANSFER_COMMAND_HANDLES_LIST;
-      requestType = RequestType.COMMAND_HANDLE_REQUEST;
-      requestTimeout = 10000;
-    }
-    else if (clazz == CommandReport.class) {
-      resultType = ResultType.TRANSFER_COMMAND_REPORT;
-      requestType = RequestType.EXECUTE_COMMAND_REQUEST;
-      requestTimeout = 10000;
-    }
-    else if (clazz == ConfigurationReport.class) {
-      resultType = ResultType.TRANSFER_CONFIGURATION_REPORT;
-      requestType = RequestType.APPLY_CONFIGURATION_REQUEST;
-      requestTimeout = 300000;
-    }
-    else if (clazz == SupervisionEvent.class) {
-      resultType = ResultType.SUPERVISION_EVENT_LIST;
-      requestType = RequestType.SUPERVISION_REQUEST;
-      requestTimeout = 10000;
-    }
-    else if (clazz == ProcessXmlResponse.class) {
-      resultType = ResultType.TRANSFER_DAQ_XML;
-      requestType = RequestType.DAQ_XML_REQUEST;
-      requestTimeout = 120000;
-    }
-    else if (clazz == ProcessNameResponse.class) {
-      resultType = ResultType.TRANSFER_PROCESS_NAMES;
-      requestType = RequestType.PROCESS_NAMES_REQUEST;
-      requestTimeout = 10000;
-    }
-    else if (clazz == DeviceClassNameResponse.class) {
-      resultType = ResultType.TRANSFER_DEVICE_CLASS_NAMES;
-      requestType = RequestType.DEVICE_CLASS_NAMES_REQUEST;
-      requestTimeout = 10000;
-    }
-    else if (clazz == TransferDevice.class) {
-      resultType = ResultType.TRANSFER_DEVICE_LIST;
-      requestType = RequestType.DEVICE_REQUEST;
-      requestTimeout = 10000;
-    }
-    else if (clazz == TagStatisticsResponse.class) {
-      resultType = ResultType.TRANSFER_TAG_STATISTICS;
-      requestType = RequestType.TAG_STATISTICS_REQUEST;
-      requestTimeout = 10000;
-    }
-    else {
-      throw new UnsupportedOperationException(
-          "The result type " + clazz + " is not supported by this class.");
-    }
+    this(clazz, 10_000);
   }
 
 
-  @Override
-  public Collection<Long> getIds() {
-    return this.tagIds;
+  /**
+   * Default Constructor needs specifying the result type of the response message.
+   * The request type and the requestTimeout are then automatically
+   * determined by the constructor.
+   * <p>
+   * <b>Please note</b>, that the result type needs to be coherent with the
+   * interface type <code>T</code>.
+   * @param clazz Return type of the request
+   * @param requestTimeout Requests from the Client API to the C2MON server have different 
+   *                       timeouts depending on their type. Timeout is set in milliseconds.
+   * @see ClientRequest.ResultType
+   * @see #fromJsonResponse(String)
+   */
+  public ClientRequestImpl(final Class<T> clazz, int requestTimeout) {
+    if (clazz == TagUpdate.class) {
+      this.resultType = ResultType.TRANSFER_TAG_LIST;
+      this.requestType = RequestType.TAG_REQUEST;
+      this.requestTimeout = requestTimeout;
+    } else if (clazz == TagValueUpdate.class) {
+      this.resultType = ResultType.TRANSFER_TAG_VALUE_LIST;
+      this.requestType = RequestType.TAG_REQUEST;
+      this.requestTimeout = requestTimeout;
+    } else if (clazz == TagConfig.class) {
+      this.resultType = ResultType.TRANSFER_TAG_CONFIGURATION_LIST;
+      this.requestType = RequestType.TAG_CONFIGURATION_REQUEST;
+      this.requestTimeout = requestTimeout;
+    } else if (clazz == AlarmValue.class) {
+      this.resultType = ResultType.TRANSFER_ALARM_LIST;
+      this.requestType = RequestType.ALARM_REQUEST;
+      this.requestTimeout = requestTimeout;
+    } else if (clazz == CommandTagHandle.class) {
+      this.resultType = ResultType.TRANSFER_COMMAND_HANDLES_LIST;
+      this.requestType = RequestType.COMMAND_HANDLE_REQUEST;
+      this.requestTimeout = requestTimeout;
+    } else if (clazz == CommandReport.class) {
+      this.resultType = ResultType.TRANSFER_COMMAND_REPORT;
+      this.requestType = RequestType.EXECUTE_COMMAND_REQUEST;
+      this.requestTimeout = requestTimeout;
+    } else if (clazz == ConfigurationReport.class) {
+      this.resultType = ResultType.TRANSFER_CONFIGURATION_REPORT;
+      this.requestType = RequestType.APPLY_CONFIGURATION_REQUEST;
+      this.requestTimeout = 30 * requestTimeout;
+    } else if (clazz == SupervisionEvent.class) {
+      this.resultType = ResultType.SUPERVISION_EVENT_LIST;
+      this.requestType = RequestType.SUPERVISION_REQUEST;
+      this.requestTimeout = requestTimeout;
+    } else if (clazz == ProcessXmlResponse.class) {
+      this.resultType = ResultType.TRANSFER_DAQ_XML;
+      this.requestType = RequestType.DAQ_XML_REQUEST;
+      this.requestTimeout = 12 * requestTimeout;
+    } else if (clazz == ProcessNameResponse.class) {
+      this.resultType = ResultType.TRANSFER_PROCESS_NAMES;
+      this.requestType = RequestType.PROCESS_NAMES_REQUEST;
+      this.requestTimeout = requestTimeout;
+    } else if (clazz == DeviceClassNameResponse.class) {
+      this.resultType = ResultType.TRANSFER_DEVICE_CLASS_NAMES;
+      this.requestType = RequestType.DEVICE_CLASS_NAMES_REQUEST;
+      this.requestTimeout = requestTimeout;
+    } else if (clazz == TransferDevice.class) {
+      this.resultType = ResultType.TRANSFER_DEVICE_LIST;
+      this.requestType = RequestType.DEVICE_REQUEST;
+      this.requestTimeout = requestTimeout;
+    } else if (clazz == TagStatisticsResponse.class) {
+      this.resultType = ResultType.TRANSFER_TAG_STATISTICS;
+      this.requestType = RequestType.TAG_STATISTICS_REQUEST;
+      this.requestTimeout = requestTimeout;
+    } else {
+      throw new UnsupportedOperationException(
+          "The result type " + clazz + " is not supported by this class.");
+    }
   }
 
   /**
    * This constructor can be used when the ResultType of the request is not
    * enough to define the request type (this occurs when two or more requests
    * can have the same ResultType).
-   * @param pResultType Result type of the request.
-   * @param pRequestType Return type of the request.
-   * @param pTimeout Request timeout.
+   * @param resultType Result type of the request.
+   * @param requestType Return type of the request.
+   * @param requestTimeout Request timeout.
    * @see ClientRequest.ResultType
    * @see #fromJsonResponse(String)
    */
-  public ClientRequestImpl(final ResultType pResultType, final RequestType pRequestType
-      ,int pTimeout) {
-
-      resultType = pResultType;
-      requestType = pRequestType;
-      requestTimeout = pTimeout;
+  public ClientRequestImpl(final ResultType resultType, final RequestType requestType ,int requestTimeout) {
+      this.resultType = resultType;
+      this.requestType = requestType;
+      this.requestTimeout = requestTimeout;
   }
-
+  
+  @Override
+  public Collection<Long> getIds() {
+    return this.tagIds;
+  }
 
   /**
    * @return The Gson parser singleton instance
