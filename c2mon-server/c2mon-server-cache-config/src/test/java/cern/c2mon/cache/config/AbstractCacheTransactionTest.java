@@ -116,13 +116,13 @@ public abstract class AbstractCacheTransactionTest<CACHEABLE extends Cacheable> 
 
     Future f1 = runInThread(() -> cache.executeTransaction(() -> {
       cache.put(3333L, getSample());
-      sleep(250);
+      sleep(150);
       cache.put(6666L, getSample());
     }));
 
     Future f2 = runInThread(() -> cache.executeTransaction(() -> {
       cache.put(6666L, getSample());
-      sleep(250);
+      sleep(150);
       cache.put(3333L, getSample());
     }));
 
@@ -143,13 +143,13 @@ public abstract class AbstractCacheTransactionTest<CACHEABLE extends Cacheable> 
 
     Future f1 = runInThread(() -> cache.executeTransaction(() -> {
       cache.put(4444L, getSample());
-      sleep(250);
+      sleep(150);
       arbitraryConcreteCache.put(8888L, new AlarmCacheObject(0L));
     }));
 
     Future f2 = runInThread(() -> cache.executeTransaction(() -> {
       arbitraryConcreteCache.put(8888L, new AlarmCacheObject(0L));
-      sleep(250);
+      sleep(150);
       cache.put(4444L, getSample());
     }));
 
