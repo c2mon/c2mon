@@ -168,7 +168,7 @@ public abstract class AbstractCacheTransactionTest<CACHEABLE extends Cacheable> 
     try {
       latch.await(250, TimeUnit.MILLISECONDS);
     } catch (InterruptedException e) {
-      throw new RuntimeException(e);
+      fail("Waiting for latch for too long. " + e.getMessage());
     }
   }
 
@@ -184,7 +184,6 @@ public abstract class AbstractCacheTransactionTest<CACHEABLE extends Cacheable> 
 
     try {
       f1.get(6, TimeUnit.SECONDS);
-      fail("No deadlock detected (thread 1 completed)");
     } catch (TimeoutException ignored) {
       fail("No deadlock detected (thread 1 timed out)");
     } catch (InterruptedException | ExecutionException e) {
@@ -193,14 +192,13 @@ public abstract class AbstractCacheTransactionTest<CACHEABLE extends Cacheable> 
 
     try {
       f2.get(250, TimeUnit.MILLISECONDS);
-      fail("No deadlock detected (thread 2 completed)");
     } catch (TimeoutException ignored) {
       fail("No deadlock detected (thread 2 timed out)");
     } catch (InterruptedException | ExecutionException e) {
       exceptions.add(e);
     }
 
-    assertEquals(2, exceptions.size());
+    assertTrue(exceptions.size() >= 1);
     exceptions.forEach(e -> {
       assertTrue(e.getCause() instanceof CacheException);
       assertTrue(e.getCause().getCause() instanceof TransactionTimeoutException);
