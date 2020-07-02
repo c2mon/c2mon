@@ -14,6 +14,33 @@ For more details on a given release, please check also the [version planning](ht
 
 ### Fixed
 
+## 1.9.10 - 2020-07-01
+### Added
+- DAQ Core: Added option to prevent sending more equipment alive message updates to the server than actually required. See also changes made in [c2mon-daq.properties](https://gitlab.cern.ch/c2mon/c2mon/-/commit/becfd4fc59b030fec1c5f0963e867cfcf6e104f1#bffb1c6c25bf8844d286f833f0c274d44ead423e)
+- Client API: Added property `c2mon.client.jms.requestTimeout` to change the JMS request timeout. Default is 10 seconds.
+
+### Changed
+-  DAQ Core: Adjusted default values of dynamic time deadband filtering. See also changes made in [c2mon-daq.properties](https://gitlab.cern.ch/c2mon/c2mon/-/commit/574aebf0701ed7904c9932a177345b2f269b445a#bffb1c6c25bf8844d286f833f0c274d44ead423e)
+
+### Fixed
+- Server: Minor bug fix for resetting the alarm oscillating state for tags with invalid quality. In this corner case the alarm state was not correctly reevaluated (CM-271).
+
+## 1.9.9 - 2020-06-17
+### Changed
+- Documentation: Improved documentation about [dynamic time-deadband filtering](http://c2mon.web.cern.ch/c2mon/docs/user-guide/daq-api/)
+
+### Fixed
+- DAQ Core: Fixed configuration problem of dynamic time-deadband filter in multi-equipment scenario (CM-268)
+
+
+## 1.9.8 - 2020-06-15
+### Changed
+- Changed GitLab CI pipeline to improve release management
+- Server: Switched to Spring `DataSourceProperties` class for full jdbc properties support. This fixes Spring autowiring issues noticed on client applications (CM-223)
+
+### Fixed
+- Fixed problem in the JMS priority adjustment introduced with v1.9.5 (CM-252)
+
 
 ## 1.9.7 - 2020-06-10 (Hotfix)
 ### Fixed

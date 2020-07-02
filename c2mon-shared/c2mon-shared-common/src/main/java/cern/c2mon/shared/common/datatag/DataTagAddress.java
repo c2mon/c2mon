@@ -423,12 +423,6 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
     }
   }
 
-  public void setPriority(int priority) {
-    if (priority == DataTagAddress.PRIORITY_HIGH || priority == DataTagAddress.PRIORITY_LOW) {
-      this.priority = priority;
-    }
-  }
-
   public String toConfigXML() {
 
     StringBuilder str = new StringBuilder("      <DataTagAddress>\n");
@@ -570,7 +564,7 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
   public void validate() throws ConfigurationException {
     if (this.priority != PRIORITY_HIGH && this.priority != PRIORITY_MEDIUM && this.priority != PRIORITY_LOW) {
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
-          "Parameter \"priority\" must be either 2 (LOW) or 7 (HIGH)");
+          "Parameter \"priority\" must be either 2 (LOW), 4 (MEDIUM) or 7 (HIGH)");
     }
     switch (this.valueDeadbandType) {
       case DataTagDeadband.DEADBAND_NONE:

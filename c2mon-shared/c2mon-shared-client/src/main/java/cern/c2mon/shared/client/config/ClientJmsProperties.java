@@ -60,4 +60,9 @@ public class ClientJmsProperties extends CommonJmsProperties{
    * Name of the queue on which to make configuration requests to the server
    */
   private String configRequestQueue = "c2mon.client.config";
+  
+  /**
+   * Timeout of client request in milliseconds. 
+   */
+  private int requestTimeout = 10_000;
 }

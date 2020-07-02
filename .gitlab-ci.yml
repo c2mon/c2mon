@@ -38,9 +38,29 @@ Compile:
   except:
     - master
     - tags
+
+#  =========================
+#  ===== Stage: test =======
+#  =========================
+
+Test:
+  stage: test
+  script:
+    - export MAVEN_OPTS=""
+    - mkdir reports
+    - mvn $MAVEN_CLI_OPTS install
+    - find -iname 'TEST-*.xml' -exec cp {} ./reports/ \;
+  artifacts:
+    name: "$CI_COMMIT_REF_NAME-$CI_COMMIT_SHORT_SHA"
+    expire_in: 60 minutes
+    when: always
+    reports:
+      junit: reports/*.xml
+  except:
+    - tags
     
 "Build docs":
-  stage: build
+  stage: test
   image: jekyll/builder:3.8.5
   script:
     - cd docs
@@ -53,27 +73,6 @@ Compile:
       - docs/_site
   only:
     - master
-
-
-#  =========================
-#  ===== Stage: test =======
-#  =========================
-
-Test:
-  stage: test
-  script:
-    - export MAVEN_OPTS=""
-    - mkdir reports
-    - mvn $MAVEN_CLI_OPTS surefire:test 
-    - find -iname 'TEST-*.xml' -exec cp {} ./reports/ \;
-  artifacts:
-    name: "$CI_COMMIT_REF_NAME-$CI_COMMIT_SHORT_SHA"
-    expire_in: 60 minutes
-    when: always
-    reports:
-      junit: reports/*.xml
-  except:
-    - tags
 
 #  =========================
 #  ====== Stage: QA ========
@@ -89,13 +88,6 @@ Test:
     - master
     - tags
 
-"Sonar master QA":
-  stage: qa                                                     
-  script:
-    - mvn $MAVEN_CLI_OPTS package sonar:sonar -Dmaven.test.skip=true -DskipDocker=true -Dsonar.host.url=${SONAR_URL} -Dsonar.dependencyCheck.reportPath=target/dependency-check-report.xml
-  only:                                                    
-    - master
-
 #  =========================
 #  ===== Stage: Publish ====
 #  =========================
@@ -110,7 +102,12 @@ Publish:
 
 # Publish docker images?
 
-
+"Sonar master QA":
+  stage: publish                                                     
+  script:
+    - mvn $MAVEN_CLI_OPTS package sonar:sonar -Dmaven.test.skip=true -DskipDocker=true -Dsonar.host.url=${SONAR_URL} -Dsonar.dependencyCheck.reportPath=target/dependency-check-report.xml
+  only:                                                    
+    - master
 
 "Deploy docs":
   stage: publish
@@ -126,6 +123,10 @@ Publish:
     - deploy-eos
   only:
     - master
+    
+#  =========================
+#  === Stage: trigger_tim ==
+#  =========================
 
 "Trigger TIM build":
   stage: trigger_tim                            
