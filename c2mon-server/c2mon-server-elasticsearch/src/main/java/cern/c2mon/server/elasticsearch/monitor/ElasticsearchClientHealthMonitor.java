@@ -35,25 +35,29 @@ import org.springframework.stereotype.Component;
 @EnableScheduling
 public class ElasticsearchClientHealthMonitor {
 
-  private final ElasticsearchClient client;
-
   private final ElasticsearchProperties properties;
+
+  private final ElasticsearchClient client;
 
   /**
    * Constructs ES client health monitor
    *
+   * @param properties of Elasticsearch instance, to check if enabled
    * @param client to be monitored
-   * @param properties the properties, to check if enabled
    */
   @Autowired
-  public ElasticsearchClientHealthMonitor(ElasticsearchClient client, ElasticsearchProperties properties) {
-    this.client = client;
+  public ElasticsearchClientHealthMonitor(ElasticsearchProperties properties, ElasticsearchClient client) {
     this.properties = properties;
+    this.client = client;
   }
 
   @Scheduled(fixedRate = 10000, initialDelay = ElasticsearchClientConfiguration.CLIENT_SETUP_TIMEOUT)
   private void check() {
-    if (properties.isEnabled() && !client.isClientHealthy()) {
+    if (!properties.isEnabled()) {
+      return;
+    }
+
+    if (!client.isClientHealthy()) {
       log.warn("ES client is not healthy! Setting up a new client . . .");
       client.setup();
       log.info("New ES client set up completed.");

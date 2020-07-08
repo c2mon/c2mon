@@ -150,6 +150,8 @@ public abstract class TransferObjectFactory {
               .faultMemeber(alarm.getFaultMember())
               .faultFamily(alarm.getFaultFamily())
               .info(alarm.getInfo())
+              .alarmConditionDescription(alarm.getCondition().getDescription())
+              .alarmConditionXml(alarm.getCondition().getXMLCondition())
               .tagId(alarm.getTagId())
               .timestamp(alarm.getTriggerTimestamp())
               .active(alarm.isActive())
@@ -254,7 +256,7 @@ public abstract class TransferObjectFactory {
       } else {
         tagConfig.setLogged(Boolean.FALSE);
       }
-      ArrayList<String> processNames = new ArrayList<String>();
+      ArrayList<String> processNames = new ArrayList<>();
       for (Process process : tagProcesses) {
         processNames.add(process.getName());
       }
@@ -292,7 +294,7 @@ public abstract class TransferObjectFactory {
    */
   private static void addAlarmValues(final TransferTagValueImpl tagValue, final Collection<Alarm> alarms) {
     if (alarms != null) {
-      List<AlarmValueImpl> alarmValues = new ArrayList<AlarmValueImpl>(alarms.size());
+      List<AlarmValueImpl> alarmValues = new ArrayList<>(alarms.size());
       for (Alarm alarm : alarms) {
         AlarmValueImpl alarmValue =
                 AlarmValueImpl.builder()

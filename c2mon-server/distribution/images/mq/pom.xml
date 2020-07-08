@@ -5,7 +5,7 @@
   <parent>
     <groupId>cern.c2mon.server</groupId>
     <artifactId>c2mon-docker-parent</artifactId>
-    <version>1.9.3-SNAPSHOT</version>
+    <version>1.9.5-SNAPSHOT</version>
   </parent>
 
   <artifactId>img-mq</artifactId>
@@ -15,7 +15,7 @@
   <properties>
     <image.base>rmohr/activemq:${org.apache.activemq.version}</image.base>
     <image.tag>activemq-${org.apache.activemq.version}-c2mon-${project.version}</image.tag>
-    <gitlab-repo>c2mon-ext</gitlab-repo>
+    <gitlab-repo>c2mon/mq</gitlab-repo>
     <dockerhub-repo>cern/c2mon-ext</dockerhub-repo>
   </properties>
 
@@ -26,7 +26,7 @@
         <artifactId>jib-maven-plugin</artifactId>
         <configuration>
           <container>
-            <entrypoint>INHERIT</entrypoint>
+            <entrypoint><entry>INHERIT</entry></entrypoint>
           </container>
         </configuration>
       </plugin>

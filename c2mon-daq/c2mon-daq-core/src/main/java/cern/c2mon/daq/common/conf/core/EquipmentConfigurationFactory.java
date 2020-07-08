@@ -169,7 +169,7 @@ public class EquipmentConfigurationFactory extends XMLTagValueExtractor implemen
     for (int i = 0; i < dataTags.getLength(); i++) {
       sourceDataTag = SourceDataTag.fromConfigXML((Element) dataTags.item(i));
       log.debug("\tCreating SourceDataTag object for id " + sourceDataTag.getId() + "..");
-      if (sourceDataTag.getAddress().getTimeDeadband() > 0) {
+      if (sourceDataTag.getAddress().isTimeDeadbandEnabled()) {
         sourceDataTag.getAddress().setStaticTimedeadband(true);
       }
       if (sourceDataTag.getId().longValue() == equipmentConfiguration.getAliveTagId()) {

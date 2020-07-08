@@ -6,7 +6,81 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 All issues referenced in parentheses can be consulted under [CERN JIRA](https://its.cern.ch/jira/projects/CM).
 For more details on a given release, please check also the [version planning](https://its.cern.ch/jira/projects/CM/versions).
 
-## [Unreleased]
+## Unreleased
+### Added
+- Support propagation of new server datasource property values amongst C2MON datasources (CM-272)
+
+### Changed
+
+### Fixed
+
+## 1.9.10 - 2020-07-01
+### Added
+- DAQ Core: Added option to prevent sending more equipment alive message updates to the server than actually required. See also changes made in [c2mon-daq.properties](https://gitlab.cern.ch/c2mon/c2mon/-/commit/becfd4fc59b030fec1c5f0963e867cfcf6e104f1#bffb1c6c25bf8844d286f833f0c274d44ead423e)
+- Client API: Added property `c2mon.client.jms.requestTimeout` to change the JMS request timeout. Default is 10 seconds.
+
+### Changed
+-  DAQ Core: Adjusted default values of dynamic time deadband filtering. See also changes made in [c2mon-daq.properties](https://gitlab.cern.ch/c2mon/c2mon/-/commit/574aebf0701ed7904c9932a177345b2f269b445a#bffb1c6c25bf8844d286f833f0c274d44ead423e)
+
+### Fixed
+- Server: Minor bug fix for resetting the alarm oscillating state for tags with invalid quality. In this corner case the alarm state was not correctly reevaluated (CM-271).
+
+## 1.9.9 - 2020-06-17
+### Changed
+- Documentation: Improved documentation about [dynamic time-deadband filtering](http://c2mon.web.cern.ch/c2mon/docs/user-guide/daq-api/)
+
+### Fixed
+- DAQ Core: Fixed configuration problem of dynamic time-deadband filter in multi-equipment scenario (CM-268)
+
+
+## 1.9.8 - 2020-06-15
+### Changed
+- Changed GitLab CI pipeline to improve release management
+- Server: Switched to Spring `DataSourceProperties` class for full jdbc properties support. This fixes Spring autowiring issues noticed on client applications (CM-223)
+
+### Fixed
+- Fixed problem in the JMS priority adjustment introduced with v1.9.5 (CM-252)
+
+
+## 1.9.7 - 2020-06-10 (Hotfix)
+### Fixed
+- The versions of slf4j and logback were not compatible. This now fixed to support `logback-core-1.2.3` with `slf4j-api-1.7.30`.
+- DAQ Core: An error message was log for out of range values saying that the data is lost. This is not the case and is now corrected. The bug was introduced with version 1.9.5
+
+
+## 1.9.6 - 2020-05-22 (Hotfix)
+### Fixed
+- Client API: Fixed dependency resolution on `c2mon-client-core`. Accidentially, we removed the test scope flag on `c2mon-server-elasticsearch`
+
+
+## 1.9.5 - 2020-05-19
+This version introduces many improvements to increase the stability of the DAQ Core communiaction with the server.
+
+### Added
+- Server ES module: Added default non-root user required by Elasticsearch in Embedded mode
+- Server ES module: Reinstated JMX MBean to trigger indexations manually
+- DAQ Core: Values that couldn't be sent to the C2MON server because of JMS exceptions are now kept in the DAQ memory until the problem is resolved. Before the message was lost. (CM-256)
+- ActiveMQ config: A Connection ID prefix got introduced (`ID:c2mon.`) to be able to remove completely Advisory topics on the broker configuration. This works only in a static two-broker redundancy setup! (CM-257)
+
+### Changed
+- DAQ Core: In case dynamic filtering is enabled (`c2mon.daq.filter.dynamicDeadband.enabled=true`) messages of all priorities can be filtered. Before, HIGH_PRIORITY messages were not affected. (CM-174)
+- DAQ Core: Major refactoring of the internal message buffering mechanism, in order to reduce amount of JMS messages produced in case of data avalanches. (CM-252)
+- DAQ Core: COMM_FAULT messages are now filtered if the status message is redundant to the previous one. This improves the overall message load, up to the Client API. (CM-254)
+
+### Fixed
+- DAQ Core: Fixed an ActiveMQ missconfiguration concerning the expiration time of a JMS messages. That is in particular important for alive messages as it could otherwise lead to data accumulation in the JMS message queues, in case the server is down for a while. (CM-251)
+- DAQ Core: Dynamic time-deadband filtering was not applied for tags flipping between valid and invalid messages. (CM-258)
+- DAQ Core: Corrected problem with `c2mon-daq-parent` POM which was introduced with previous version and prevented building DAQ modules.
+
+### Removed
+- ActiveMQ config: Removed `setWatchTopicAdvisories()` from C2MON code. Instead, this should be directly configured on the broker URL. (CM-253)
+- DAQ Core: Removed `@Deprecated` methods in EquipmentMessageSender class (CM-259)
+
+
+## 1.9.4 - 2020-04-15
+
+### DAQ CORE INTEGRATION BROKEN, DUE TO PROBLEM IN C2MON-DAQ-PARENT POM !!! FIXED IN NEXT RELEASE
+
 ### Added
 - Server: Added support for Elasticsearch 6.x (CM-144)
 - Server: Integrated Elasticsearch REST client

@@ -1,27 +1,30 @@
+/*******************************************************************************
+ * Copyright (C) 2010-2020 CERN. All rights not expressly granted are reserved.
+ *
+ * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
+ * C2MON is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation, either version 3 of the license.
+ *
+ * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
 package cern.c2mon.shared.client.config;
 
 import lombok.Data;
+
+import cern.c2mon.shared.common.config.CommonJmsProperties;
 
 /**
  * @author Justin Lewis Salmon
  */
 @Data
-public class ClientJmsProperties {
-
-  /**
-   * URL of the JMS broker
-   */
-  private String url = "tcp://localhost:61616";
-
-  /**
-   * Username to authenticate with the broker
-   */
-  private String username = "";
-
-  /**
-   * Password to authenticate with the broker
-   */
-  private String password = "";
+public class ClientJmsProperties extends CommonJmsProperties{
 
   /**
    * Name of the topic on which the server is publishing supervision events
@@ -57,4 +60,9 @@ public class ClientJmsProperties {
    * Name of the queue on which to make configuration requests to the server
    */
   private String configRequestQueue = "c2mon.client.config";
+  
+  /**
+   * Timeout of client request in milliseconds. 
+   */
+  private int requestTimeout = 10_000;
 }

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2020 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -16,16 +16,22 @@
  *****************************************************************************/
 package cern.c2mon.daq.common.messaging.impl;
 
-import javax.jms.JMSException;
+import org.springframework.jms.JmsException;
+import org.springframework.jms.support.QosSettings;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.jms.core.JmsTemplate;
 
 import cern.c2mon.daq.common.conf.core.ProcessConfigurationHolder;
 import cern.c2mon.daq.common.messaging.JmsSender;
+import cern.c2mon.daq.config.JmsUpdateQueueTemplateFactory;
 import cern.c2mon.shared.common.datatag.DataTagValueUpdate;
 import cern.c2mon.shared.common.datatag.SourceDataTagValue;
 import cern.c2mon.shared.common.process.ProcessConfiguration;
+import cern.c2mon.shared.daq.republisher.Publisher;
+import cern.c2mon.shared.daq.republisher.Republisher;
+import cern.c2mon.shared.daq.republisher.RepublisherFactory;
 
 /**
  * Implementation of the JMSSender interface for sending update messages to
@@ -34,27 +40,33 @@ import cern.c2mon.shared.common.process.ProcessConfiguration;
  * @author mbrightw
  */
 @Slf4j
-public class ActiveJmsSender implements JmsSender {
+public class ActiveJmsSender implements JmsSender, Publisher<DataTagValueUpdate> {
 
   /**
-   * The Spring JmsTemplate managing the calls to JMS.
+   * The JmsTemplateFactory managing the calls to JMS.
    */
-  private JmsTemplate jmsTemplate;
+  private JmsUpdateQueueTemplateFactory jmsUpdateQueueTemplateFactory;
 
   /**
    * Enabling/disabling the action of sending information to the brokers
    */
   private boolean isEnabled = true;
+  
+  /** Used to determine, if this is the primary broker */
+  @Getter @Setter
+  private boolean primaryBroker;
+  
+  /** Contains re-publication logic */
+  private final Republisher<DataTagValueUpdate> republisher;
 
   /**
-   * Unique constructor. Notice the JmsTemplate needs a Qualifier annotation
-   * for correct autowiring as there are several JmsTemplate's in the
-   * container.
+   * Unique constructor.
    *
-   * @param jmsTemplate             The JMS template.
+   * @param jmsUpdateQueueTemplateFactory The JMS template factory
    */
-  public ActiveJmsSender(final JmsTemplate jmsTemplate) {
-    this.jmsTemplate = jmsTemplate;
+  public ActiveJmsSender(final JmsUpdateQueueTemplateFactory jmsUpdateQueueTemplateFactory) {
+    this.jmsUpdateQueueTemplateFactory = jmsUpdateQueueTemplateFactory;
+    this.republisher = RepublisherFactory.createRepublisher(this, "DataTagValueUpdate");
   }
 
   /**
@@ -70,12 +82,14 @@ public class ActiveJmsSender implements JmsSender {
    */
   @Override
   public final void disconnect() {
+    // do nothing
   }
 
   /**
    * Sends a single update value to the brokers.
    *
    * @param sourceDataTagValue the data tag update to be sent
+   * @throws JmsException if there is a problem sending the values
    */
   @Override
   public final void processValue(final SourceDataTagValue sourceDataTagValue) {
@@ -87,90 +101,33 @@ public class ActiveJmsSender implements JmsSender {
     dataTagValueUpdate = new DataTagValueUpdate(processConfiguration.getProcessID(), processConfiguration.getprocessPIK());
 
     dataTagValueUpdate.addValue(sourceDataTagValue);
-    log.trace("value added to value update message");
-
-    // If the sending action is Enabled
-    if (this.isEnabled) {
-
-      log.trace("not in test mode.");
-
-      // set message properties
-      jmsTemplate.setPriority(sourceDataTagValue.getPriority());
-      jmsTemplate.setTimeToLive(sourceDataTagValue.getTimeToLive());
-
-      // set appropriate priority
-      if (sourceDataTagValue.isGuaranteedDelivery()) {
-        log.debug("\t sending PERSISTENT message");
-        // set message delivery mode
-        jmsTemplate.setDeliveryMode(javax.jms.DeliveryMode.PERSISTENT);
-      } else {
-        log.debug("\t sending NON-PERSISTENT message");
-        // send the message (put it into the queue)
-        jmsTemplate.setDeliveryMode(javax.jms.DeliveryMode.NON_PERSISTENT);
-      } // else
-
-      // send the message
-      jmsTemplate.convertAndSend(dataTagValueUpdate);
-    }
-    log.debug("leaving processValue()");
+    processValues(dataTagValueUpdate);
   }
 
   /**
    * Send the collection of updates using the ActiveMQ JmsTemplate.
    *
    * @param dataTagValueUpdate the values to send
-   *
-   * @throws JMSException if problem sending the values
+   * @throws JmsException if there is a problem sending the values
    */
   @Override
-  public final void processValues(final DataTagValueUpdate dataTagValueUpdate) throws JMSException {
-    if (log.isDebugEnabled()) {
-      log.debug("entering processValues()...");
-    }
-
-    // If the sending action is Enabled
-    if (this.isEnabled) {
-      // take the first SourceDataTagValue object from collection and find
-      // out
-      // if it's persistent or not (all those in the collection will have
-      // the same persistence setting).
-      // The message's alive-time will be also set by taking the value
-      SourceDataTagValue sdtValue = dataTagValueUpdate.getValues().iterator().next();
-
-      // set priority and TTL from the first value in the message
-      // (priority is always LOW for values
-      // put in the synchrobuffer)
-      jmsTemplate.setPriority(sdtValue.getPriority());
-      jmsTemplate.setTimeToLive(sdtValue.getTimeToLive());
-
-      if (sdtValue.isGuaranteedDelivery()) {
-        log.debug("\t sending PERSISTENT message");
-
-        // set message delivery mode
-        jmsTemplate.setDeliveryMode(javax.jms.DeliveryMode.PERSISTENT);
-
-      } else {
-        log.debug("\t sending NON-PERSISTENT message");
-
-        // set message delivery NON-PERSISTENT
-        jmsTemplate.setDeliveryMode(javax.jms.DeliveryMode.NON_PERSISTENT);
+  public final void processValues(final DataTagValueUpdate dataTagValueUpdate) {
+      // If the sending action is Enabled
+      if (this.isEnabled && !dataTagValueUpdate.getValues().isEmpty()) {
+        try {
+          publish(dataTagValueUpdate);
+        } catch (JmsException e) {
+          if (primaryBroker) {
+            log.error("Error occured when sending dataTagValueUpdate to primary JMS broker - submitting for republication", e);
+            republisher.publicationFailed(dataTagValueUpdate);
+          } else {
+            log.error("Error occured when sending dataTagValueUpdate to secondary JMS broker - data is lost!", e);
+          }
+        }
+      } else if (!this.isEnabled){
+        log.debug("DAQ in test mode; not sending the value to JMS");
       }
-
-      // convert and send the collection of updates
-      jmsTemplate.convertAndSend(dataTagValueUpdate);
-
-    } else {
-      log.debug("DAQ in test mode; not sending the value to JMS");
-    }
-
-    log.debug("leaving processValues()");
-  }
-
-  /**
-   * @param jmsTemplate the jmsTemplate to set
-   */
-  public final void setJmsTemplate(final JmsTemplate jmsTemplate) {
-    this.jmsTemplate = jmsTemplate;
+    
   }
 
   @Override
@@ -196,5 +153,13 @@ public class ActiveJmsSender implements JmsSender {
   @Override
   public final boolean getEnabled() {
     return this.isEnabled;
+  }
+
+  @Override
+  public void publish(DataTagValueUpdate dataTagValueUpdate) {
+    SourceDataTagValue sdtValue = dataTagValueUpdate.getValues().iterator().next();
+    QosSettings settings = QosSettingsFactory.extractQosSettings(sdtValue);
+    // convert and send the collection of updates
+    jmsUpdateQueueTemplateFactory.getDataTagValueUpdateJmsTemplate(settings).convertAndSend(dataTagValueUpdate);
   }
 }

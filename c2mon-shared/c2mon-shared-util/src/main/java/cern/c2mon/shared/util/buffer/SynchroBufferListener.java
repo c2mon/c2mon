@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2020 CERN. All rights not expressly granted are reserved.
  * 
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -20,14 +20,15 @@ import java.util.EventListener;
 
 /**
  *  SynchroBuffer listener interface.
+ *  @param <T> The object that shall be buffered
  * @author F.Calderini
  */
-public interface SynchroBufferListener extends EventListener {
+public interface SynchroBufferListener<T> extends EventListener {
 
   /** Callback method. Called with respect to the window size management properties. The callback is executed
    * within a single thread of execution.
    * @param event the pulled objects event
    * @throws PullException if the pull action failed
    */
-  public void pull(PullEvent event) throws PullException;
+  public void pull(PullEvent<T> event) throws PullException;
 }

@@ -5,7 +5,7 @@
   <parent>
     <groupId>cern.c2mon.server</groupId>
     <artifactId>c2mon-docker-parent</artifactId>
-    <version>1.9.3-SNAPSHOT</version>
+    <version>1.9.5-SNAPSHOT</version>
   </parent>
 
   <artifactId>img-es</artifactId>
@@ -15,7 +15,7 @@
   <properties>
     <image.base>elasticsearch:${elasticsearch.version}</image.base>
     <image.tag>elasticsearch-${elasticsearch.version}-c2mon-${project.version}</image.tag>
-    <gitlab-repo>c2mon-ext</gitlab-repo>
+    <gitlab-repo>c2mon/es</gitlab-repo>
     <dockerhub-repo>cern/c2mon-ext</dockerhub-repo>
   </properties>
 
@@ -31,7 +31,7 @@
               <TAKE_FILE_OWNERSHIP>1</TAKE_FILE_OWNERSHIP>
               <ES_JAVA_OPTS>-Xms512m -Xmx512m</ES_JAVA_OPTS>
             </environment>
-            <entrypoint>INHERIT</entrypoint>
+            <entrypoint><entry>INHERIT</entry></entrypoint>
           </container>
         </configuration>
       </plugin>

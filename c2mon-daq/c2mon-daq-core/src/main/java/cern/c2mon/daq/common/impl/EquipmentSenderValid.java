@@ -16,6 +16,19 @@
  *****************************************************************************/
 package cern.c2mon.daq.common.impl;
 
+import static cern.c2mon.shared.common.type.TypeConverter.cast;
+import static cern.c2mon.shared.common.type.TypeConverter.getType;
+import static cern.c2mon.shared.common.type.TypeConverter.isKnownClass;
+import static cern.c2mon.shared.common.type.TypeConverter.isNumber;
+import static java.lang.String.format;
+
+import java.io.IOException;
+
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lombok.extern.slf4j.Slf4j;
+
 import cern.c2mon.daq.common.IDynamicTimeDeadbandFilterer;
 import cern.c2mon.daq.common.IEquipmentMessageSender;
 import cern.c2mon.daq.common.messaging.IProcessMessageSender;
@@ -24,14 +37,6 @@ import cern.c2mon.daq.tools.DataTagValueValidator;
 import cern.c2mon.shared.common.datatag.*;
 import cern.c2mon.shared.common.filter.FilteredDataTagValue.FilterType;
 import cern.c2mon.shared.common.type.TypeConverter;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.extern.slf4j.Slf4j;
-
-import java.io.IOException;
-
-import static cern.c2mon.shared.common.type.TypeConverter.*;
-import static java.lang.String.format;
 
 /**
  * This class is used to send valid messages to the server.
@@ -111,29 +116,21 @@ class EquipmentSenderValid {
    * This method decides how the tag should be sent to the server.
    * If the value is an array or an arbitrary object the sending changes as it is not a primitive type.
    *
-   * @param currentTag       The tag to which the value belongs.
-   * @param sourceTimestamp  The timestamp of the tag.
-   * @param newTagValue      The tag value to send.
-   * @param valueDescription A description belonging to the value.
+   * @param currentSourceDataTag       The tag to which the value belongs.
+   * @param update      The tag value to send.
    * @return True if the tag has been send successfully to the server.
    * False if the tag has been invalidated or filtered out.
    */
   public boolean update(final SourceDataTag currentSourceDataTag, final ValueUpdate update) {
     boolean successfullySent = false;
-    log.trace("update - entering update()");
-
     try {
-
       successfullySent = doUpdate(currentSourceDataTag, update);
-
     } catch (Exception ex) {
       log.error("update - Unexpected exception caught for tag " + currentSourceDataTag.getId() + ", " + ex.getStackTrace(), ex);
 
       SourceDataTagQuality quality = new SourceDataTagQuality(SourceDataTagQualityCode.UNKNOWN, "Could not send incoming valid source update to server: " + ex.getMessage());
       this.equipmentSender.update(currentSourceDataTag.getId(), quality, update.getSourceTimestamp());
     }
-
-    log.trace("update - leaving update()");
     return successfullySent;
   }
 
@@ -148,7 +145,7 @@ class EquipmentSenderValid {
   private boolean doUpdate(final SourceDataTag currentSourceDataTag, final ValueUpdate update) {
     // do a validation check on the new value:
     if (!checkValidation(currentSourceDataTag, update)) {
-      return false; //TODO Check, if that case is correctly treated by upper logic
+      return false;
     }
 
     // cast the value to the defined dataType if the type is not 'ArbitraryObject':
@@ -161,17 +158,23 @@ class EquipmentSenderValid {
 
     // do a filtering on the new value:
     if (!checkFiltering(currentSourceDataTag, update)) {
+      log.trace("Value update for tag #{} was filtered out and has not been sent to server. Redundant or old value?: {}", currentSourceDataTag.getId(), update.toString());
       return false;
     }
 
     // check if the new value is in a time deadband:
     if (!checkTimeDeadband(currentSourceDataTag, update)) {
+      log.trace("Value update for tag #{} was passed to the static time deadband scheduler and has not (yet) been sent to server: {}", currentSourceDataTag.getId(), update.toString());
       return false;
     }
 
-    // All checks and filters are successful, send the tag to the server:
+    log.trace("All checks and filters are fine for for tag update of #{}. Sending update to server: {}", currentSourceDataTag.getId(), update.toString());
     SourceDataTagValue tagValue = currentSourceDataTag.update(update);
-    this.processMessageSender.addValue(tagValue);
+    try {
+      this.processMessageSender.addValue(tagValue);
+    } catch (InterruptedException e) {
+      log.error("Data for tag #{} could not be sent and is lost!: {}", currentSourceDataTag.getId(), tagValue.toString());
+    }
 
     // Checks if the dynamic TimeDeadband filter is enabled, Static disable and record it depending on the priority
     this.dynamicTimeDeadbandFilterer.recordTag(currentSourceDataTag);
@@ -187,24 +190,25 @@ class EquipmentSenderValid {
    * @return false, if validation was unsuccessful
    */
   private boolean checkValidation(final SourceDataTag currentSourceDataTag, final ValueUpdate update) {
+    
+    boolean isValid = true;
 
     // check if the timestamp is valid.
     if (!isTimestampValid(currentSourceDataTag, update)) {
-      return false;
+      isValid = false;
+    } else if (!isConvertible(currentSourceDataTag, update)) {
+      // If the DataType is not an arbitrary object check if the Type if the value is convertible.
+      isValid = false;
+    } 
+    
+    if (!isValid) {
+      log.error("Value update for tag #{} could not be sent because it did not pass the validation. Please check the configuration. Data is lost!: {}", currentSourceDataTag.getId(), update.toString());
+    } else if (isNumber(currentSourceDataTag.getDataType()) && !isInRange(currentSourceDataTag, update)) {
+      // if the dataType is a number check if the value is convertible and in the defined range.  
+      isValid =  false;
     }
 
-    // If the DataType is not an arbitrary object check if the Type if the value is convertible.
-    if (!isConvertible(currentSourceDataTag, update)) {
-      return false;
-    }
-
-    // if the dataType is a number check if the value is convertible and in the defined range.
-    if (isNumber(currentSourceDataTag.getDataType())
-        && !isInRange(currentSourceDataTag, update)) {
-      return false;
-    }
-
-    return true;
+    return isValid;
   }
 
   /**
@@ -256,9 +260,7 @@ class EquipmentSenderValid {
         this.equipmentTimeDeadband.removeFromTimeDeadband(currentSourceDataTag);
       }
 
-      // No deadband detected -> DataValue is not okay, return true
       return true;
-
     }
   }
 
@@ -373,15 +375,15 @@ class EquipmentSenderValid {
     boolean result = false;
 
     if (!this.dataTagValueValidator.isInRange(currentSourceDataTag, update.getValue())) {
-      log.warn(format(
-          "\tin range : the value of tag[%d] was out of range and will only be propagated the first time to the server",
-          currentSourceDataTag.getId()));
-      log.debug(format("\tinvalidating tag[%d] with quality OUT_OF_BOUNDS", currentSourceDataTag.getId()));
-      StringBuffer qDesc = new StringBuffer("source value is out of bounds (");
-      if (currentSourceDataTag.getMinValue() != null)
+      log.warn("\tThe value update of tag[{}] is out of range and will be invalidated with quality OUT_OF_BOUNDS", currentSourceDataTag.getId());
+      
+      StringBuilder qDesc = new StringBuilder("source value is out of bounds (");
+      if (currentSourceDataTag.getMinValue() != null) {
         qDesc.append("min: ").append(currentSourceDataTag.getMinValue()).append(" ");
-      if (currentSourceDataTag.getMaxValue() != null)
+      }
+      if (currentSourceDataTag.getMaxValue() != null) {
         qDesc.append("max: ").append(currentSourceDataTag.getMaxValue());
+      }
       qDesc.append(")");
 
       SourceDataTagQuality quality = new SourceDataTagQuality(SourceDataTagQualityCode.OUT_OF_BOUNDS, qDesc.toString());

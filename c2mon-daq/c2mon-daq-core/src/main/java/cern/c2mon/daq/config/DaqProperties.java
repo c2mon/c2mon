@@ -1,8 +1,28 @@
+/*******************************************************************************
+ * Copyright (C) 2010-2020 CERN. All rights not expressly granted are reserved.
+ *
+ * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
+ * C2MON is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation, either version 3 of the license.
+ *
+ * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
 package cern.c2mon.daq.config;
 
-import cern.c2mon.shared.daq.config.DaqJmsProperties;
-import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+
+import lombok.Data;
+
+import cern.c2mon.shared.common.config.CommonJmsProperties;
+import cern.c2mon.shared.common.datatag.DataTagAddress;
+import cern.c2mon.shared.daq.config.DaqJmsProperties;
 
 /**
  * @author Justin Lewis Salmon
@@ -44,6 +64,11 @@ public class DaqProperties {
    * JMS properties
    */
   private final Jms jms = new Jms();
+  
+  /**
+   * Defines equipment specific properties.
+   */
+  private final EquipmentProperties equipment = new EquipmentProperties();
 
   @Data
   public static class Jms extends DaqJmsProperties {
@@ -63,6 +88,48 @@ public class DaqProperties {
      * running in double publication mode)
      */
     private String secondaryUrl = "tcp://0.0.0.0:61617";
+    
+    /**
+     * Set the time-to-live in seconds for all requests that are sent via JMS to the C2MON server.
+     * Default is 60 seconds
+     */
+    private int requestMsgtimeToLive = 60;
+    
+    /**
+     * Maximum number of tag value objects to be packed into a single 
+     * JMS message sent to the server.
+     */
+    private int maxMessageFrameSize = 1000;
+
+    /**
+     * Interval in milliseconds at which High-Priority messages are to be sent to the server, if
+     * there are tag updates to be processed and {@link #maxMessageFrameSize} is not reached.
+     * <p>
+     * Default is 500 ms
+     * 
+     * @see DataTagAddress#PRIORITY_HIGH
+     */
+    private long maxMessageDelayPriorityHigh = 500L;
+    
+    /**
+     * Interval in milliseconds at which messages are to be sent to the server, if
+     * there are tag updates to be processed and {@link #maxMessageFrameSize} is not reached.
+     * <p>
+     * Default is 1000 ms
+     * 
+     * @see DataTagAddress#PRIORITY_MEDIUM
+     */
+    private long maxMessageDelayPriorityMedium = 1000L;
+    
+    /**
+     * Interval in milliseconds at which messages are to be sent to the server, if
+     * there are tag updates to be processed and {@link #maxMessageFrameSize} is not reached.
+     * <p>
+     * Default is 1000 ms
+     * 
+     * @see DataTagAddress#PRIORITY_LOW
+     */
+    private long maxMessageDelayPriorityLow = 1000L;
   }
 
   /**
@@ -88,39 +155,45 @@ public class DaqProperties {
     public static class DynamicDeadband {
 
       /**
-       * Enable/disable the dynamic deadband support
+       * Enable/disable the dynamic time-deadband support. C2MON uses therefore a
+       * Moving Average Counter strategy. 
        */
       private boolean enabled = false;
 
       /**
-       * Size of the moving average counter window
+       * The number of counters used per tag
        */
-      private int windowSize = 6;
+      private int windowSize = 5;
 
       /**
-       * Interval (in ms) at which the dynamic deadband will be checked
+       * The time [ms] in which the average number of tag updates is checked and the next counter is used.
+       * <p>
+       * Default is 1 minute.
        */
-      private int checkInterval = 600000;
+      private int checkInterval = 60_000;
 
       /**
-       * Threshold at which the dynamic deadband will be activated. If there
-       * are more than this number of updates within the window, the deadband
-       * will activate
+       * The maximum number of tag updates per check interval averaged over the counters (windowSize).
+       * If there are more than this number of updates within the window, the time deadband
+       * is activated for the given tag.
        */
       private int activationThreshold = 20;
 
       /**
        * Threshold at which the dynamic deadband will be deactivated. If there
-       * are fewer than this number of updates within the window, the deadband
-       * will deactivate
+       * are fewer than this number of updates within the window, the time deadband
+       * will deactivate for the given tag.
        */
       private int deactivationThreshold = 15;
 
       /**
-       * The deadband interval that will be forced if the activation threshold
-       * is exceeded
+       * The time deadband interval (ms) that will be forced if the activation threshold
+       * is exceeded. Only the latest value will be sent to the sever at the given interval rate. 
+       * All other value updates are filtered out.
+       * <p>
+       * Default is 30 sec.
        */
-      private int forcedDeadbandInterval = 30000;
+      private int forcedDeadbandInterval = 30_000;
     }
 
     /**
@@ -132,16 +205,23 @@ public class DaqProperties {
     /**
      * Filtered data JMS settings
      */
-    private final Jms jms = new Jms();
-
+    private final CommonJmsProperties jms = new CommonJmsProperties();
+  }
+  
+  /**
+   * Defines equipment specific properties.
+   */
+  @Data
+  public static class EquipmentProperties {
+    EquipmentAliveProperties alive = new EquipmentAliveProperties();
+  
     @Data
-    public static class Jms {
-
+    public static class EquipmentAliveProperties {
       /**
-       * URL of the broker to which to publish filtered values. Only relevant
-       * if c2mon.daq.filter.publishFilteredValues=true
+       * Enable this to option to prevent sending more alive message updates to the 
+       * server than actually required by the configured frequency.
        */
-      private String url = "tcp://0.0.0.0:61616";
+      boolean filtering = false;
     }
   }
 }

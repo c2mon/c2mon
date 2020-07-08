@@ -22,6 +22,9 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
 import org.w3c.dom.Node;
@@ -39,6 +42,8 @@ import cern.c2mon.shared.common.type.TypeConverter;
  * @author Jan Stowisek
  */
 @Data
+@Slf4j
+@NoArgsConstructor
 public class SourceDataTag implements Cloneable, ISourceDataTag {
 
     private static ObjectMapper objectMapper = new ObjectMapper();
@@ -117,12 +122,7 @@ public class SourceDataTag implements Cloneable, ISourceDataTag {
         this.mode = mode;
         this.dataType = dataType;
         this.address = address;
-    }
-
-    /**
-     * No-arg constructor (required for XML deserialisation).
-     */
-    public SourceDataTag() {
+        adjustJmsPriority();
     }
 
     /**
@@ -299,6 +299,8 @@ public class SourceDataTag implements Cloneable, ISourceDataTag {
                 }
             }
         }
+        
+        result.adjustJmsPriority();
         return result;
     }
 
@@ -384,11 +386,11 @@ public class SourceDataTag implements Cloneable, ISourceDataTag {
     }
 
   /**
-   * Method for extracting the data from the addressParameters of thos object.
+   * Method for extracting the data from the addressParameters of this object.
    *
    * @param key The key which specify which data should be extracted
    * @param type The type the return value should have
-   * @param <T> gerneic type definition for the method
+   * @param <T> generic type definition for the method
    * @return value with the given type.
    */
   public <T> T getAddressParameter(String key, Class<T> type) {
@@ -401,7 +403,7 @@ public class SourceDataTag implements Cloneable, ISourceDataTag {
    * @param parameters map which holds the data.
    * @param key The key which specify which data should be extracted
    * @param type The type the return value should have
-   * @param <T> gerneic type definition for the method
+   * @param <T> generic type definition for the method
    * @return value with the given type.
    */
   public static <T> T getAddressParameter(Map<String,String> parameters, String key, Class<T> type) {
@@ -410,5 +412,39 @@ public class SourceDataTag implements Cloneable, ISourceDataTag {
 
   public boolean isControlTag() {
     return this.control;
+  }
+  
+  /**
+   * The DAQ only supports four JMS priorities which are further described
+   * by the given constants. This has influence also on the local message buffering
+   * which is used to send value update in bunches.
+   * <p>
+   * This adjustment is necessary as the initial design has slightly changed over the
+   * years to improve the overall sending performance.
+   * 
+   * @param tag The tag configuration received by the server
+   * @see DataTagConstants
+   */
+  public void adjustJmsPriority() {
+    if (address != null) {
+      int priority = address.getPriority();
+      int convertedPriority;
+      
+      if (isControl()) {
+        convertedPriority = DataTagConstants.PRIORITY_HIGHEST;
+      } else if (priority > DataTagConstants.PRIORITY_MEDIUM) {
+        convertedPriority = DataTagConstants.PRIORITY_HIGH;
+      } else if (priority == DataTagConstants.PRIORITY_MEDIUM) {
+        convertedPriority =  DataTagConstants.PRIORITY_MEDIUM;
+      } else {
+        // priority < DataTagConstants.PRIORITY_MEDIUM
+        convertedPriority =  DataTagConstants.PRIORITY_LOW;
+      }
+      
+      if (priority != convertedPriority) {
+        log.trace("Adjust JMS priority of tag #{}: {} --> {}", id, priority, convertedPriority);
+        address.setPriority(convertedPriority);
+      }
+    }
   }
 }

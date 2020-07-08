@@ -5,7 +5,7 @@
   <parent>
     <groupId>cern.c2mon.server</groupId>
     <artifactId>c2mon-docker-parent</artifactId>
-    <version>1.9.3-SNAPSHOT</version>
+    <version>1.9.5-SNAPSHOT</version>
   </parent>
 
   <artifactId>img-grafana</artifactId>
@@ -15,7 +15,7 @@
   <properties>
     <image.base>grafana/grafana:${grafana.version}</image.base>
     <image.name>grafana-${grafana.version}-c2mon-${project.version}</image.name>
-    <gitlab-repo>c2mon-ext</gitlab-repo>
+    <gitlab-repo>c2mon/grafana</gitlab-repo>
     <dockerhub-repo>cern/c2mon-ext</dockerhub-repo>
   </properties>
 
@@ -26,7 +26,7 @@
         <artifactId>jib-maven-plugin</artifactId>
         <configuration>
           <container>
-            <entrypoint>INHERIT</entrypoint>
+            <entrypoint><entry>INHERIT</entry></entrypoint>
           </container>
           <to>
             <tags>
@@ -34,7 +34,7 @@
             </tags>
           </to>
           <extraDirectories>
-            <paths>includes</paths>
+            <paths><path>includes</path></paths>
           </extraDirectories>
         </configuration>
       </plugin>

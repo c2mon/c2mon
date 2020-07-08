@@ -3,10 +3,11 @@ stages:
   - test
   - qa
   - publish
+  - trigger_tim
 
-image: 
+image:
   name: gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-maven:jdk-11-mvn-3.6-1
-  entrypoint: [""]   
+  entrypoint: [""]
 
 
 variables:
@@ -37,9 +38,29 @@ Compile:
   except:
     - master
     - tags
-    
+
+#  =========================
+#  ===== Stage: test =======
+#  =========================
+
+Test:
+  stage: test
+  script:
+    - export MAVEN_OPTS=""
+    - mkdir reports
+    - mvn $MAVEN_CLI_OPTS install
+    - find -iname 'TEST-*.xml' -exec cp {} ./reports/ \;
+  artifacts:
+    name: "$CI_COMMIT_REF_NAME-$CI_COMMIT_SHORT_SHA"
+    expire_in: 60 minutes
+    when: always
+    reports:
+      junit: reports/*.xml
+  except:
+    - tags
+
 "Build docs":
-  stage: build
+  stage: test
   image: jekyll/builder:3.8.5
   script:
     - cd docs
@@ -52,28 +73,6 @@ Compile:
       - docs/_site
   only:
     - master
-
-
-#  =========================
-#  ===== Stage: test =======
-#  =========================
-
-Test:
-  stage: test
-  script:
-    - export MAVEN_OPTS=""
-    - mkdir reports
-    - mvn $MAVEN_CLI_OPTS surefire:test 
-    - find -iname 'TEST-*.xml' -exec cp {} ./reports/ \;
-  artifacts:
-    name: "$CI_COMMIT_REF_NAME-$CI_COMMIT_SHORT_SHA"
-    expire_in: 60 minutes
-    when: always
-    reports:
-      junit: reports/*.xml
-  except:
-    - master
-    - tags
 
 #  =========================
 #  ====== Stage: QA ========
@@ -89,13 +88,6 @@ Test:
     - master
     - tags
 
-"Sonar master QA":
-  stage: qa                                                     
-  script:
-    - mvn $MAVEN_CLI_OPTS package sonar:sonar -Dmaven.test.skip=true -DskipDocker=true -Dsonar.host.url=${SONAR_URL} -Dsonar.dependencyCheck.reportPath=target/dependency-check-report.xml
-  only:                                                    
-    - master
-
 #  =========================
 #  ===== Stage: Publish ====
 #  =========================
@@ -104,29 +96,43 @@ Test:
 Publish:
   stage: publish
   script:
-    - mvn $MAVEN_CLI_OPTS -P ci-deploy deploy
+    - mvn $MAVEN_CLI_OPTS -DskipTests deploy
   only:
     - master
 
 # Publish docker images?
 
-
-"Trigger TIM build":
-  stage: publish                            
-  image: appropriate/curl:3.1
-  dependencies: []
+"Sonar master QA":
+  stage: publish
   script:
-    - "curl -X POST -F token=$TIM_SERVER_TOKEN -F ref=master https://gitlab.cern.ch/api/v4/projects/9859/trigger/pipeline"
+    - mvn $MAVEN_CLI_OPTS package sonar:sonar -Dmaven.test.skip=true -DskipDocker=true -Dsonar.host.url=${SONAR_URL} -Dsonar.dependencyCheck.reportPath=target/dependency-check-report.xml
   only:
-  - master
+    - master
 
 "Deploy docs":
   stage: publish
-  image: gitlab-registry.cern.ch/ci-tools/ci-worker:cc7
   dependencies:
     - "Build docs"
+  image: gitlab-registry.cern.ch/ci-tools/ci-web-deployer
+  variables:
+    EOS_PATH: "/eos/project/c/c2mon/www"
+    CI_OUTPUT_DIR: "docs/_site"
+    EOS_ACCOUNT_USERNAME: "${KRB_USERNAME}"
+    EOS_ACCOUNT_PASSWORD: "${KRB_PASSWORD}"
   script:
-    - echo ${KRB_PASSWORD} | kinit ${KRB_USERNAME}@CERN.CH
-    - scp -o 'StrictHostKeyChecking no' -o 'GSSAPITrustDNS yes' -o 'GSSAPIDelegateCredentials yes' -B -r docs/_site/* ${KRB_USERNAME}@lxplus:/afs/cern.ch/user/c/${KRB_USERNAME}/www/c2mon.web.cern.ch
+    - deploy-eos
   only:
     - master
+
+#  =========================
+#  === Stage: trigger_tim ==
+#  =========================
+
+"Trigger TIM build":
+  stage: trigger_tim
+  image: appropriate/curl:3.1
+  dependencies: []
+  script:
+    - "curl --insecure -X POST -F token=$TIM_SERVER_TOKEN -F ref=master https://gitlab.cern.ch/api/v4/projects/9859/trigger/pipeline"
+  only:
+  - master

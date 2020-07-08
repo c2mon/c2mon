@@ -249,7 +249,6 @@ public class DriverKernel implements ApplicationContextAware {
   public void terminateDAQ() {
     processMessageReceiver.shutdown();
     this.processMessageSender.shutdown();
-    this.processMessageSender.closeSourceDataTagsBuffers();
 
     // disconnect the FilterMessageSender object from JMS
     // and perform and shutdown logic

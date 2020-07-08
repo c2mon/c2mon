@@ -59,7 +59,7 @@ class AliveTimer {
          * The run method of the timer task.
          */
         public void run() {
-            processMessageSender.sendAlive();
+            processMessageSender.sendProcessAlive();
             LOGGER.debug("Alive sent.");
         }
     }

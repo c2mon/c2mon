@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2020 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -16,11 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.daq.common;
 
-import java.sql.Timestamp;
-
-import cern.c2mon.shared.common.datatag.ISourceDataTag;
 import cern.c2mon.shared.common.datatag.SourceDataTagQuality;
-import cern.c2mon.shared.common.datatag.SourceDataTagQualityCode;
 import cern.c2mon.shared.common.datatag.ValueUpdate;
 
 /**
@@ -40,7 +36,7 @@ public interface IEquipmentMessageSender {
    * Sends the value update for the given tag to the server, if not filtered out by the DAQ core
    *
    * @param tagId The unique id of the tag which shall be updated
-   * @param value The tag value update to send
+   * @param update The tag value update to send
    * @return True if the tag has been send successfully to the server. False if
    *         the tag has been invalidated or filtered out.
    */
@@ -50,7 +46,7 @@ public interface IEquipmentMessageSender {
    * Sends the value update for the given tag to the server, if not filtered out by the DAQ core
    *
    * @param tagName The unique name of the tag which shall be updated
-   * @param value The tag value update to send
+   * @param update The tag value update to send
    * @return True if the tag has been send successfully to the server. False if
    *         the tag has been invalidated or filtered out.
    */
@@ -97,9 +93,8 @@ public interface IEquipmentMessageSender {
    * Invalidates the given tag and sends a quality + value update to the server, if not yet done.
    *
    * @param tagId The id of the tag to invalidate
+   * @param update The tag value to send.
    * @param quality the new tag quality
-   * @param valueUpdate The tag value to send.
-   * @param sourceTimestamp time when the SourceDataTag's value became invalid
    */
   void update(Long tagId, ValueUpdate update, SourceDataTagQuality quality);
 
@@ -107,81 +102,11 @@ public interface IEquipmentMessageSender {
    * Invalidates the given tag and sends a quality + value update to the server, if not yet done.
    *
    * @param tagName The unique name of the tag which shall be updated
+   * @param update The tag value to send.
    * @param quality the new tag quality
-   * @param valueUpdate The tag value to send.
-   * @param sourceTimestamp time when the SourceDataTag's value became invalid
    */
   void update(String tagName, ValueUpdate update, SourceDataTagQuality quality);
-
-
-  /**
-   * Tries to send a new value to the server.
-   *
-   * @param currentTag The tag to which the value belongs.
-   * @param sourceTimestamp The source timestamp of the tag in milliseconds.
-   * @param tagValue The tag value to send.
-   * @return True if the tag has been send successfully to the server. False if
-   *         the tag has been invalidated or filtered out.
-   * @deprecated Please use instead {@link #update(Long, Object, long)}
-   */
-  @Deprecated
-  boolean sendTagFiltered(final ISourceDataTag currentTag, final Object tagValue, final long sourceTimestamp);
-
-  /**
-   * Tries to send a new value to the server.
-   *
-   * @param currentTag The tag to which the value belongs.
-   * @param sourceTimestamp The source timestamp of the tag in milliseconds.
-   * @param tagValue The tag value to send.
-   * @param pValueDescr A description belonging to the value.
-   * @return True if the tag has been send successfully to the server. False if
-   *         the tag has been invalidated or filtered out.
-   * @deprecated Please use instead {@link #update(Long, Object, long, String)}
-   */
-  @Deprecated
-  boolean sendTagFiltered(final ISourceDataTag currentTag, final Object tagValue, final long sourceTimestamp, final String pValueDescr);
-
-  /**
-   * Tries to send a new value to the server.
-   *
-   * @param currentTag The tag to which the value belongs.
-   * @param sourceTimestamp The source timestamp of the tag in milliseconds.
-   * @param tagValue The tag value to send.
-   * @param pValueDescr A description belonging to the value.
-   * @param sentByValueCheckMonitor
-   * @return True if the tag has been send successfully to the server. False if
-   *         the tag has been invalidated or filtered out.
-   * @deprecated Not valid anymore. Please don't use it.
-   */
-  @Deprecated
-  boolean sendTagFiltered(final ISourceDataTag currentTag, final Object tagValue, final long sourceTimestamp, final String pValueDescr,
-      boolean sentByValueCheckMonitor);
-
-  /**
-   * This method sends an invalid SourceDataTagValue to the server.
-   *
-   * @param sourceDataTag SourceDataTag object
-   * @param pQualityCode the SourceDataTag's quality see
-   *          {@link SourceDataTagQualityCode} class for details
-   * @param pDescription the quality description (optional)
-   * @deprecated Please use instead {@link #update(Long, short, String)}
-   */
-  @Deprecated
-  void sendInvalidTag(final ISourceDataTag sourceDataTag, final short pQualityCode, final String pDescription);
-
-  /**
-   * This method sends an invalid SourceDataTagValue to the server.
-   *
-   * @param sourceDataTag SourceDataTag object
-   * @param pQualityCode the SourceDataTag's quality see
-   *          {@link SourceDataTagQualityCode} class for details
-   * @param pDescription the quality description (optional)
-   * @param sourceTimestamp time when the SourceDataTag's value became invalid
-   * @deprecated Please use instead {@link #invalidate(Long, short, String, long)}
-   */
-  @Deprecated
-  void sendInvalidTag(final ISourceDataTag sourceDataTag, final short pQualityCode, final String pDescription, final Timestamp sourceTimestamp);
-
+  
   /**
    * Sends a note to the business layer, to confirm that the equipment is not
    * properly configured, or connected to its data source

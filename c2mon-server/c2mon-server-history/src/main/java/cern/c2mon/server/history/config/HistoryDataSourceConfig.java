@@ -5,8 +5,9 @@ import cern.c2mon.server.common.util.KotlinAPIs;
 import org.apache.ibatis.mapping.VendorDatabaseIdProvider;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -36,13 +37,19 @@ public class HistoryDataSourceConfig {
   private HistoryProperties properties;
 
   @Bean
+  @ConfigurationProperties(prefix = "c2mon.server.history.jdbc")
+  public DataSourceProperties historyDataSourceProperties() {
+    return new DataSourceProperties();
+  }
+
+  @Bean
   @ConfigurationProperties("c2mon.server.history.jdbc")
-  public DataSource historyDataSource() {
-    String url = properties.getJdbc().getUrl();
-    String username = properties.getJdbc().getUsername();
-    String password = properties.getJdbc().getPassword();
+  public DataSource historyDataSource(@Autowired DataSourceProperties historyDataSourceProperties) {
+    String url = historyDataSourceProperties.getUrl();
 
     if (url.contains("hsql")) {
+      String username = historyDataSourceProperties.getUsername();
+      String password = historyDataSourceProperties.getPassword();
       return HsqlDatabaseBuilder.builder()
                  .url(url)
                  .username(username)
@@ -50,7 +57,7 @@ public class HistoryDataSourceConfig {
                  .script(new ClassPathResource("sql/history-schema-hsqldb.sql")).build()
                  .toDataSource();
     } else {
-      return DataSourceBuilder.create().build();
+      return historyDataSourceProperties.initializeDataSourceBuilder().build();
     }
   }
 

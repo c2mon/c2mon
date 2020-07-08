@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2020 CERN. All rights not expressly granted are reserved.
  * <p>
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -20,6 +20,8 @@ import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.Timer;
 
 import cern.c2mon.daq.common.timer.FreshnessMonitor;
+import cern.c2mon.daq.config.DaqProperties;
+
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
@@ -86,7 +88,7 @@ public class SDTTimeDeadbandSchedulerTest {
     IDynamicTimeDeadbandFilterActivator activatorMock = createMock(IDynamicTimeDeadbandFilterActivator.class);
     freshnessMonitorMock = createMock(FreshnessMonitor.class);
     this.equipmentMessageSender = new EquipmentMessageSender(this.filterMessageSenderMock,
-        this.processMessageSenderMock, activatorMock, activatorMock, freshnessMonitorMock);
+        this.processMessageSenderMock, activatorMock, freshnessMonitorMock, new DaqProperties());
 
     freshnessMonitorMock.setIEquipmentMessageSender(equipmentMessageSender);
     EasyMock.expectLastCall();

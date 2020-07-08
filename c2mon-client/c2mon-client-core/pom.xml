@@ -5,7 +5,7 @@
   <parent>
     <groupId>cern.c2mon.client</groupId>
     <artifactId>c2mon-client</artifactId>
-    <version>1.9.3-SNAPSHOT</version>
+    <version>1.9.11-SNAPSHOT</version>
   </parent>
 
   <artifactId>c2mon-client-core</artifactId>
@@ -27,18 +27,13 @@
       <groupId>cern.c2mon.client</groupId>
       <artifactId>c2mon-client-common</artifactId>
     </dependency>
-    <dependency>
-      <groupId>cern.c2mon.server</groupId>
-      <artifactId>c2mon-server-elasticsearch</artifactId>
-      <version>${project.parent.version}</version>
-    </dependency>
 
     <!-- 3rd party dependencies -->
     <dependency>
       <groupId>org.apache.activemq</groupId>
       <artifactId>activemq-client</artifactId>
     </dependency>
-    
+
     <!-- Runtime dependencies required to support HTTP via ActiveMQ -->
     <!-- Note that these dependencies are optional, they must be redeclared... -->
     <!-- ...if you wish to deploy them. -->
@@ -109,6 +104,12 @@
       <groupId>org.powermock</groupId>
       <artifactId>powermock-core</artifactId>
       <version>1.6.3</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>cern.c2mon.server</groupId>
+      <artifactId>c2mon-server-elasticsearch</artifactId>
+      <version>${project.parent.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>

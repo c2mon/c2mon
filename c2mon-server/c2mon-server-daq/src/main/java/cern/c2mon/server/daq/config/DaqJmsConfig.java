@@ -23,9 +23,8 @@ public class DaqJmsConfig {
   @Bean
   public ActiveMQConnectionFactory daqInConnectionFactory() {
     String url = properties.getJms().getUrl();
-    ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(url);
+    ActiveMQConnectionFactory connectionFactory = createNewConnectionFactory(url);
     connectionFactory.setClientIDPrefix("C2MON-SERVER-DAQ-IN");
-    connectionFactory.setWatchTopicAdvisories(false);
     return connectionFactory;
   }
 
@@ -60,10 +59,14 @@ public class DaqJmsConfig {
 
   @Bean
   public ActiveMQConnectionFactory daqOutActiveMQConnectionFactory() {
-    ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(properties.getJms().getUrl());
-
+    ActiveMQConnectionFactory connectionFactory = createNewConnectionFactory(properties.getJms().getUrl());
     connectionFactory.setClientIDPrefix("C2MON-DAQ-OUT");
-    connectionFactory.setWatchTopicAdvisories(false);
     return connectionFactory;
+  }
+  
+  private ActiveMQConnectionFactory createNewConnectionFactory(String brokerUrl) {
+    ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory(brokerUrl);
+    factory.setConnectionIDPrefix(properties.getJms().getConnectionIDPrefix() + properties.getJms().getClientIdPrefix());
+    return factory;
   }
 }

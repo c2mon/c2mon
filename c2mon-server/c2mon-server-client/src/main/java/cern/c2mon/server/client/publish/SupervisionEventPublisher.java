@@ -30,14 +30,14 @@ import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
 
-import cern.c2mon.server.common.component.Lifecycle;
 import cern.c2mon.server.common.config.ServerConstants;
-import cern.c2mon.server.common.republisher.Publisher;
-import cern.c2mon.server.common.republisher.Republisher;
-import cern.c2mon.server.common.republisher.RepublisherFactory;
 import cern.c2mon.server.supervision.SupervisionListener;
 import cern.c2mon.server.supervision.SupervisionNotifier;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
+import cern.c2mon.shared.daq.lifecycle.Lifecycle;
+import cern.c2mon.shared.daq.republisher.Publisher;
+import cern.c2mon.shared.daq.republisher.Republisher;
+import cern.c2mon.shared.daq.republisher.RepublisherFactory;
 import cern.c2mon.shared.util.jms.JmsSender;
 import cern.c2mon.shared.util.json.GsonFactory;
 

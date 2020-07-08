@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2020 CERN. All rights not expressly granted are reserved.
  * 
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -27,17 +27,23 @@ import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
 import org.simpleframework.xml.core.Commit;
 
+import cern.c2mon.shared.common.datatag.SourceDataTagValue;
+
 /**
  * This class is responsible for storing DAQ-specific configuration parameters.
  *
  * It accesses the server to retrieve the DAQ XML configuration file (using the
  * ProcessRequestHandler) and loads the associated configuration details. This
  * is done in the configure() method.
- *
- * TODO: the XML naming strategy of this hierarchy does not follow conventions.. Some elements use "TitleCase" and the rest use "dashed-case".
- * This should be refactored to use "camelCase" exclusively. Doing so would remove the need for all the SimpleXML annotations (Jackson's XmlMapper can handle
- * it with no annotations whatsoever). In fact, even 3rd-party {@link cern.c2mon.shared.common.datatag.address.HardwareAddress} implementations are forced to
- * add SimpleXML annotations if they want to view their configs on the web interface, which is ridiculous.
+ * <p>
+ * @TODO the XML naming strategy of this hierarchy does not follow conventions..
+ * Some elements use "TitleCase" and the rest use "dashed-case". This should be
+ * refactored to use "camelCase" exclusively. Doing so would remove the need for
+ * all the SimpleXML annotations (Jackson's XmlMapper can handle it with no
+ * annotations whatsoever). In fact, even 3rd-party
+ * {@link cern.c2mon.shared.common.datatag.address.HardwareAddress}
+ * implementations are forced to add SimpleXML annotations if they want to view
+ * their configs on the web interface, which is ridiculous.
  */
 @Root
 public class ProcessConfiguration {
@@ -83,18 +89,22 @@ public class ProcessConfiguration {
   private int aliveInterval;
 
   /**
-   * Maximum number of tag values to be packed into a single JMS message sent to
+   * Maximum number of {@link SourceDataTagValue} objects to be packed into a single JMS message sent to
    * the server.
+   * @deprecated Not used anymore. Instead, this is now configured locally in the DAQ properties
    */
   @Element(name = "max-message-size")
+  @Deprecated
   private long maxMessageSize;
 
   /**
    * Interval in milliseconds at which messages are to be sent to the server if
    * (1) there are tag updates to be processed (2) the max-message-size is not
    * reached
+   * @deprecated Not used anymore. Instead, this is now configured locally in the DAQ properties
    */
   @Element(name = "max-message-delay")
+  @Deprecated
   private long maxMessageDelay;
 
   /**
@@ -182,7 +192,9 @@ public class ProcessConfiguration {
    * This method sets the maximum allowed size of the SourceDataTag's message
    *
    * @param size the maximum size of the message
+   * @deprecated Not used anymore. Instead, this is now configured locally in the DAQ properties
    */
+  @Deprecated
   public void setMaxMessageSize(final long size) {
     maxMessageSize = size;
   }
@@ -191,7 +203,9 @@ public class ProcessConfiguration {
    * This method gets the maximum allowed size of the SourceDataTag's message
    *
    * @return The maximum size of the source data tag message.
+   * @deprecated Not used anymore. Instead, this is now configured locally in the DAQ properties
    */
+  @Deprecated
   public long getMaxMessageSize() {
     return maxMessageSize;
   }
@@ -200,7 +214,9 @@ public class ProcessConfiguration {
    * This method sets the maximum allowed delay for the SourceDataTag's message
    *
    * @param delay The delay (in milliseconds)
+   * @deprecated Not used anymore. Instead, this is now configured locally in the DAQ properties
    */
+  @Deprecated
   public void setMaxMessageDelay(final long delay) {
     maxMessageDelay = delay;
   }
@@ -209,7 +225,9 @@ public class ProcessConfiguration {
    * This method gets the maximum allowed delay for the SourceDataTag's message
    *
    * @return The maximum delay for a source data tag message.
+   * @deprecated Not used anymore. Instead, this is now configured locally in the DAQ properties
    */
+  @Deprecated
   public long getMaxMessageDelay() {
     return maxMessageDelay;
   }

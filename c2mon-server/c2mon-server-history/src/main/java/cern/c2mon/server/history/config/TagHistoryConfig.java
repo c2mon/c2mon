@@ -11,6 +11,7 @@ import cern.c2mon.server.history.structure.TagRecord;
 import cern.c2mon.server.history.structure.TagRecordConverter;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.context.annotation.Bean;
 
 import javax.inject.Inject;
@@ -19,6 +20,9 @@ import javax.inject.Inject;
  * @author Justin Lewis Salmon
  */
 public class TagHistoryConfig {
+
+  @Inject
+  private DataSourceProperties historyDataSourceProperties;
 
   @Inject
   private HistoryProperties properties;
@@ -41,6 +45,6 @@ public class TagHistoryConfig {
   @Bean
   public LoggerDAO<TagRecord> tagLoggerDAO() throws Exception {
     return new LoggerDAO<>(historySqlSessionFactory.getObject(), TagRecordMapper.class.getCanonicalName(),
-        properties.getJdbc().getUrl());
+    	historyDataSourceProperties.getUrl());
   }
 }

@@ -83,14 +83,17 @@ public class RequestHandlerImpl implements RequestHandler {
   /**
    * Ref to JmsProxy bean.
    */
-  protected JmsProxy jmsProxy;
+  protected final JmsProxy jmsProxy;
 
   /**
    * Name of main client request queue.
    */
-  protected String defaultRequestQueue;
+  protected final String defaultRequestQueue;
 
-  protected String adminRequestQueue;
+  protected final String adminRequestQueue;
+  
+  /** Timeout of client request in milliseconds */
+  private final int requestTimeout;
 
   /**
    * Executor for submitting requests to the server.
@@ -111,13 +114,14 @@ public class RequestHandlerImpl implements RequestHandler {
     this.adminRequestQueue = properties.getJms().getAdminRequestQueue();
     this.maxRequestSize = properties.getMaxTagsPerRequest();
     this.corePoolSize = properties.getMaxRequestThreads();
+    this.requestTimeout = properties.getJms().getRequestTimeout();
     executor.allowCoreThreadTimeOut(true);
   }
 
 
   @Override
   public Collection<SupervisionEvent> getCurrentSupervisionStatus() throws JMSException {
-    ClientRequestImpl<SupervisionEvent> clientRequest = new ClientRequestImpl<>(SupervisionEvent.class);
+    ClientRequestImpl<SupervisionEvent> clientRequest = new ClientRequestImpl<>(SupervisionEvent.class, requestTimeout);
     return jmsProxy.sendRequest(clientRequest, defaultRequestQueue, clientRequest.getTimeout());
   }
 
@@ -151,12 +155,9 @@ public class RequestHandlerImpl implements RequestHandler {
     ClientRequestImpl<AlarmValue> activeAlarmsRequest = new ClientRequestImpl<>(
         ClientRequest.ResultType.TRANSFER_ACTIVE_ALARM_LIST,
           ClientRequest.RequestType.ACTIVE_ALARMS_REQUEST,
-          60000); // == timeout
+          60_000);
 
-    Collection<AlarmValue> c = jmsProxy.sendRequest(activeAlarmsRequest, defaultRequestQueue,
-        activeAlarmsRequest.getTimeout());
-
-    return c;
+    return jmsProxy.sendRequest(activeAlarmsRequest, defaultRequestQueue, activeAlarmsRequest.getTimeout());
   }
 
   @Override
@@ -229,7 +230,7 @@ public class RequestHandlerImpl implements RequestHandler {
       final Collection<Long> ids, final Class<T> clazz, final ClientRequestReportListener reportListener, final String requestQueue) {
 
     log.debug("Initiating client request");
-    ClientRequestImpl<T> clientRequest = new ClientRequestImpl<>(clazz);
+    ClientRequestImpl<T> clientRequest = new ClientRequestImpl<>(clazz, requestTimeout);
     Iterator<Long> it = ids.iterator();
     Collection<Future<Collection<T>>> results = new ArrayList<>();
     int counter = 0;
@@ -240,7 +241,7 @@ public class RequestHandlerImpl implements RequestHandler {
       }
       RequestValuesTask<T> task = new RequestValuesTask<>(clientRequest, reportListener, requestQueue);
       results.add(executor.submit(task));
-      clientRequest = new ClientRequestImpl<>(clazz);
+      clientRequest = new ClientRequestImpl<>(clazz, requestTimeout);
       counter = 0;
     }
     Collection<T> finalCollection = new ArrayList<>();
@@ -275,7 +276,7 @@ public class RequestHandlerImpl implements RequestHandler {
       final Collection<String> regexList, final Class<T> clazz, final ClientRequestReportListener reportListener, final String requestQueue) {
 
     log.debug("Initiating client request");
-    ClientRequestImpl<T> clientRequest = new ClientRequestImpl<>(clazz);
+    ClientRequestImpl<T> clientRequest = new ClientRequestImpl<>(clazz, requestTimeout);
     Iterator<String> it = regexList.iterator();
     Collection<Future<Collection<T>>> results = new ArrayList<>();
     int counter = 0;
@@ -286,7 +287,7 @@ public class RequestHandlerImpl implements RequestHandler {
       }
       RequestValuesTask<T> task = new RequestValuesTask<>(clientRequest, reportListener, requestQueue);
       results.add(executor.submit(task));
-      clientRequest = new ClientRequestImpl<>(clazz);
+      clientRequest = new ClientRequestImpl<>(clazz, requestTimeout);
       counter = 0;
     }
     Collection<T> finalCollection = new ArrayList<>();
@@ -305,19 +306,9 @@ public class RequestHandlerImpl implements RequestHandler {
     return finalCollection;
   }
 
-  /**
-   * Setter method.
-   *
-   * @param requestQueue
-   *          the requestQueue to set
-   */
-  public void setRequestQueue(final String requestQueue) {
-    this.defaultRequestQueue = requestQueue;
-  }
-
   @Override
   public String getProcessXml(final String processName) throws JMSException {
-    ClientRequestImpl<ProcessXmlResponse> xmlRequest = new ClientRequestImpl<>(ProcessXmlResponse.class);
+    ClientRequestImpl<ProcessXmlResponse> xmlRequest = new ClientRequestImpl<>(ProcessXmlResponse.class, requestTimeout);
     xmlRequest.setRequestParameter(processName);
     // response should have a unique element in
     ProcessXmlResponse response = jmsProxy.sendRequest(xmlRequest, defaultRequestQueue, xmlRequest.getTimeout()).iterator().next();
@@ -331,7 +322,7 @@ public class RequestHandlerImpl implements RequestHandler {
   @Override
   public Collection<ProcessNameResponse> getProcessNames() throws JMSException {
 
-    ClientRequestImpl<ProcessNameResponse> namesRequest = new ClientRequestImpl<>(ProcessNameResponse.class);
+    ClientRequestImpl<ProcessNameResponse> namesRequest = new ClientRequestImpl<>(ProcessNameResponse.class, requestTimeout);
 
     return jmsProxy.sendRequest(namesRequest, defaultRequestQueue, namesRequest.getTimeout());
   }
@@ -340,7 +331,7 @@ public class RequestHandlerImpl implements RequestHandler {
   @Override
   public <T> CommandReport executeCommand(final CommandExecuteRequest<T> commandExecuteRequest) throws JMSException {
 
-    ClientRequestImpl clientRequest = new ClientRequestImpl<>(CommandReport.class);
+    ClientRequestImpl clientRequest = new ClientRequestImpl<>(CommandReport.class, requestTimeout);
     clientRequest.setObjectParameter(commandExecuteRequest);
 
     Collection<CommandReport> c = jmsProxy.sendRequest(clientRequest, defaultRequestQueue, commandExecuteRequest.getTimeout());
@@ -353,7 +344,7 @@ public class RequestHandlerImpl implements RequestHandler {
   public Collection<ConfigurationReportHeader> getConfigurationReports() throws JMSException {
 
     ClientRequestImpl<ConfigurationReportHeader> clientRequest = new ClientRequestImpl<>(ResultType.TRANSFER_CONFIGURATION_REPORT_HEADER,
-        RequestType.RETRIEVE_CONFIGURATION_REQUEST, 30000);
+        RequestType.RETRIEVE_CONFIGURATION_REQUEST, 30_000);
     Collection<ConfigurationReportHeader> reports = jmsProxy.sendRequest(clientRequest, defaultRequestQueue, clientRequest.getTimeout());
 
     if (reports.isEmpty()) {
@@ -368,7 +359,7 @@ public class RequestHandlerImpl implements RequestHandler {
   public Collection<ConfigurationReport> getConfigurationReports(Long id) throws JMSException {
 
     ClientRequestImpl<ConfigurationReport> clientRequest = new ClientRequestImpl<>(ResultType.TRANSFER_CONFIGURATION_REPORT,
-        RequestType.RETRIEVE_CONFIGURATION_REQUEST, 10000);
+        RequestType.RETRIEVE_CONFIGURATION_REQUEST, 10_000);
     clientRequest.setRequestParameter(String.valueOf(id));
     Collection<ConfigurationReport> reports = jmsProxy.sendRequest(clientRequest, defaultRequestQueue, clientRequest.getTimeout());
 
@@ -382,7 +373,7 @@ public class RequestHandlerImpl implements RequestHandler {
 
   @Override
   public TagStatisticsResponse requestTagStatistics() throws JMSException {
-    ClientRequestImpl<TagStatisticsResponse> clientRequest = new ClientRequestImpl<>(TagStatisticsResponse.class);
+    ClientRequestImpl<TagStatisticsResponse> clientRequest = new ClientRequestImpl<>(TagStatisticsResponse.class, requestTimeout);
     Collection<TagStatisticsResponse> response = jmsProxy.sendRequest(clientRequest, defaultRequestQueue, clientRequest.getTimeout());
     return response.iterator().next();
   }

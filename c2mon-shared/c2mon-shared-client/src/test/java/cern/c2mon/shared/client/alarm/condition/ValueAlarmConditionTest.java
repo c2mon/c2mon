@@ -78,7 +78,7 @@ public class ValueAlarmConditionTest {
    * @throws ParserConfigurationException
    */
   @Test
-  public void testDeserialization() throws ParserConfigurationException {
+  public void testStringDeserialization() throws ParserConfigurationException {
     AlarmCondition valueAlarmCondition = new ValueAlarmCondition("DOWN");
     String xmlString = valueAlarmCondition.toConfigXML();
 
@@ -87,9 +87,39 @@ public class ValueAlarmConditionTest {
     AlarmCondition condition = AlarmCondition.fromConfigXML(document.getDocumentElement());
 
     SupervisionStatus value = SupervisionStatus.DOWN;
-    Assert.assertEquals(true, condition.evaluateState(value));
+    Assert.assertTrue(condition.evaluateState(value));
 
     SupervisionStatus value2 = SupervisionStatus.RUNNING;
-    Assert.assertEquals(false, condition.evaluateState(value2));
+    Assert.assertFalse(condition.evaluateState(value2));
+  }
+  
+  /**
+   * Tests that Deserialisation of Boolean works as expected
+   * @throws ParserConfigurationException
+   */
+  @Test
+  public void testBooleanDeserialization() throws ParserConfigurationException {
+    AlarmCondition valueAlarmCondition = new ValueAlarmCondition(true);
+    String xmlString = valueAlarmCondition.toConfigXML();
+
+    SimpleXMLParser parser = new SimpleXMLParser();
+    Document document = parser.parse(xmlString);
+    AlarmCondition condition = AlarmCondition.fromConfigXML(document.getDocumentElement());
+
+    Assert.assertEquals(Boolean.class, ((ValueAlarmCondition)condition).getAlarmValue().getClass());
+    Assert.assertTrue(condition.evaluateState(true));
+    Assert.assertFalse(condition.evaluateState(false));
+    
+    
+    valueAlarmCondition = new ValueAlarmCondition(Boolean.FALSE);
+    xmlString = valueAlarmCondition.toConfigXML();
+
+    parser = new SimpleXMLParser();
+    document = parser.parse(xmlString);
+    condition = AlarmCondition.fromConfigXML(document.getDocumentElement());
+
+    Assert.assertEquals(Boolean.class, ((ValueAlarmCondition)condition).getAlarmValue().getClass());
+    Assert.assertFalse(condition.evaluateState(true));
+    Assert.assertTrue(condition.evaluateState(false));
   }
 }

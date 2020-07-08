@@ -29,7 +29,10 @@ import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.daq.config.DaqModule;
 import cern.c2mon.server.supervision.config.SupervisionModule;
 import cern.c2mon.shared.common.datatag.*;
-import org.junit.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -111,15 +114,19 @@ public class TagUpdateTest {
 //    assertEquals(Boolean.TRUE, dataTag.getValue());
 
     //set source update with value
-    SourceDataTagValue sourceDataTagValue = new SourceDataTagValue(dataTag.getId(),
-        dataTag.getName(),
-        false, 1,
-        new SourceDataTagQuality(),
-        timestamp,
-        DataTagConstants.PRIORITY_LOW,
-        false,
-        "test description",
-        DataTagAddress.TTL_FOREVER);
+    SourceDataTagValue sourceDataTagValue = SourceDataTagValue.builder()
+        .id(dataTag.getId())
+        .name(dataTag.getName())
+        .controlTag(false)
+        .value(1)
+        .quality(new SourceDataTagQuality())
+        .timestamp(timestamp)
+        .daqTimestamp(new Timestamp(System.currentTimeMillis()))
+        .priority(DataTagConstants.PRIORITY_LOW)
+        .valueDescription("test description")
+        .timeToLive(DataTagConstants.TTL_FOREVER)
+        .build();
+
     sourceDataTagValue.setDaqTimestamp(daqTimestamp);
     ArrayList<SourceDataTagValue> tagList = new ArrayList<SourceDataTagValue>();
     tagList.add(sourceDataTagValue);
@@ -145,15 +152,18 @@ public class TagUpdateTest {
 //    assertEquals(Boolean.TRUE, dataTag.getValue());
 
     //set source update with value
-    SourceDataTagValue sourceDataTagValue = new SourceDataTagValue(dataTag.getId(),
-        dataTag.getName(),
-        false, 1,
-        new SourceDataTagQuality(SourceDataTagQualityCode.DATA_UNAVAILABLE), //invalid
-        timestamp,
-        DataTagConstants.PRIORITY_LOW,
-        false,
-        "test description",
-        DataTagAddress.TTL_FOREVER);
+    SourceDataTagValue sourceDataTagValue = SourceDataTagValue.builder()
+        .id(dataTag.getId())
+        .name(dataTag.getName())
+        .controlTag(false)
+        .value(1)
+        .quality(new SourceDataTagQuality(SourceDataTagQualityCode.DATA_UNAVAILABLE))
+        .timestamp(timestamp)
+        .daqTimestamp(new Timestamp(System.currentTimeMillis()))
+        .priority(DataTagConstants.PRIORITY_LOW)
+        .valueDescription("test description")
+        .timeToLive(DataTagConstants.TTL_FOREVER)
+        .build();
     sourceDataTagValue.setDaqTimestamp(daqTimestamp);
     ArrayList<SourceDataTagValue> tagList = new ArrayList<SourceDataTagValue>();
     tagList.add(sourceDataTagValue);
@@ -173,36 +183,40 @@ public class TagUpdateTest {
    * Tests that an incoming control tag is correctly saved in the cache and database.
    */
   @Test
-  @Ignore("Control tags are being phased out in favour of individual tags")
+  // TODO(danielma): test was completely commented-out by Alex
+  //  @Ignore("Control tags are being phased out in favour of individual tags")
   public void testIncomingControlTag() throws InterruptedException {
-//    controlTagCache.put(controlTag.getId(), controlTag);
+    controlTagCache.put(controlTag.getId(), controlTag);
 
     //check controltag value is not set to 2000
 //    assertFalse(controlTag.getValue().equals(2000L));
 
     //create a source update for this tag
-//    Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-//    Timestamp daqTimestamp = new Timestamp(System.currentTimeMillis() + 1);
-//    SourceDataTagValue sourceDataTagValue = new SourceDataTagValue(controlTag.getId(),
-//        controlTag.getName(),
-//        true, 2000L,   //CONTROL TAG WITH VALUE 2000
-//        new SourceDataTagQuality(),
-//        timestamp,
-//        DataTagConstants.PRIORITY_LOW,
-//        false,
-//        "test description",
-//        DataTagAddress.TTL_FOREVER);
-//    sourceDataTagValue.setDaqTimestamp(daqTimestamp);
-//    ArrayList<SourceDataTagValue> tagList = new ArrayList<SourceDataTagValue>();
-//    tagList.add(sourceDataTagValue);
-//    DataTagValueUpdate dataTagValueUpdate = new DataTagValueUpdate(90L, tagList); //1000 is invented processId
-//    sourceUpdateManager.processUpdates(dataTagValueUpdate);
+    Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+    Timestamp daqTimestamp = new Timestamp(System.currentTimeMillis() + 1);
+    SourceDataTagValue sourceDataTagValue = SourceDataTagValue.builder()
+        .id(controlTag.getId())
+        .name(controlTag.getName())
+        .controlTag(true)
+        .value(2000)
+        .quality(new SourceDataTagQuality())
+        .timestamp(timestamp)
+        .daqTimestamp(new Timestamp(System.currentTimeMillis()))
+        .priority(DataTagConstants.PRIORITY_LOW)
+        .valueDescription("test description")
+        .timeToLive(DataTagConstants.TTL_FOREVER)
+        .build();
+    sourceDataTagValue.setDaqTimestamp(daqTimestamp);
+    ArrayList<SourceDataTagValue> tagList = new ArrayList<SourceDataTagValue>();
+    tagList.add(sourceDataTagValue);
+    DataTagValueUpdate dataTagValueUpdate = new DataTagValueUpdate(new Long(90L), tagList); //1000 is invented processId
+    sourceUpdateManager.processUpdates(dataTagValueUpdate);
 
     //check update is both in cache and DB
-//    ControlTag cacheObject = (ControlTag) controlTagCache.get(controlTag.getId());
-//    assertEquals(sourceDataTagValue.getValue(), cacheObject.getValue());
-//    assertEquals(sourceDataTagValue.getTimestamp(), cacheObject.getTimestamp());
-//    assertEquals(sourceDataTagValue.getDaqTimestamp(), cacheObject.getDaqTimestamp());
-//    assertEquals(sourceDataTagValue.getTimestamp(), cacheObject.getSourceTimestamp());
+    ControlTag cacheObject = (ControlTag) controlTagCache.get(controlTag.getId());
+    assertEquals(sourceDataTagValue.getValue(), cacheObject.getValue());
+    assertEquals(sourceDataTagValue.getTimestamp(), cacheObject.getTimestamp());
+    assertEquals(sourceDataTagValue.getDaqTimestamp(), cacheObject.getDaqTimestamp());
+    assertEquals(sourceDataTagValue.getTimestamp(), cacheObject.getSourceTimestamp());
   }
 }

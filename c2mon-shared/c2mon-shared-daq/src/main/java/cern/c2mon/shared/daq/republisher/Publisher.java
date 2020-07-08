@@ -14,29 +14,30 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.common.republisher;
+package cern.c2mon.shared.daq.republisher;
+
+import org.springframework.jms.JmsException;
 
 /**
- * Factory for creating a Republisher.
+ * Should be implemented by a service wishing to make use
+ * of the Republisher functionalities.
  * 
  * @author Mark Brightwell
  *
+ * @param <T> type of event that is published
  */
-public class RepublisherFactory {
+public interface Publisher<T> {
 
   /**
-   * Creates a Republisher for use by the past publisher. 
+   * (Re-)publish the event. The calling class should throw a runtime {@link JmsException}
+   * if the publication fails and should be re-attempted. Any other exception
+   * thrown will result in the removal of the event from the re-publication list.
    * 
-   * <p>Life-cycle needs managing externally using Lifecycle methods.
-   * 
-   * @param publisher
-   * @param eventName the name of the event type, used for logging
-   * @return a republisher for this publisher
+   * <p>IMPORTANT: this method should usually NOT call the Republisher publicationFailed
+   * method. Rather, if the publication fails, throw an exception as described above. If
+   * this publish method returns successully, the event will be removed from the re-publication
+   * list!
    */
-  public static <T extends Object> Republisher<T> createRepublisher(Publisher<T> publisher, String eventName) {
-    return new RepublisherImpl<T>(publisher, eventName);
-  }
-  
-  
+  void publish(T event);
   
 }

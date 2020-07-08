@@ -89,10 +89,8 @@ class EquipmentSenderInvalid {
    * server.
    *
    * @param sourceDataTag   SourceDataTag object
-   * @param newValue        The new update value that we want set to the tag
-   * @param newTagValueDesc The new value description
-   * @param newSDQuality    the new SourceDataTag see {@link SourceDataTagQuality}
-   * @param timestamp       time when the SourceDataTag's value has become invalid;
+   * @param update        The new update value that we want set to the tag
+   * @param newSDQuality    the new SourceDataTag {@link SourceDataTagQuality}
    */
   public void invalidate(final SourceDataTag sourceDataTag, final ValueUpdate update, final SourceDataTagQuality newSDQuality) {
 
@@ -109,16 +107,14 @@ class EquipmentSenderInvalid {
       // We check first is the new value has to be filtered out or not
       filterType = this.dataTagValueFilter.isCandidateForFiltering(sourceDataTag, update, newSDQuality);
 
-      log.debug("Filter type: " + filterType);
+      log.debug("Filter type for tag #{}: {}", sourceDataTag.getId(),  filterType);
 
       // The new value will not be filtered out
       if (filterType == FilterType.NO_FILTERING) {
         // Send the value
         sendValueWithTimeDeadbandCheck(sourceDataTag, update, newSDQuality);
-      }
-      // The new value will be filtered out
-      else {
-        // If we are here the new value will be filtered out
+      } else {
+        // The new value will be filtered out
         StringBuilder msgBuf = new StringBuilder();
         msgBuf.append("\tthe tag [" + sourceDataTag.getId() + "] has already been invalidated with quality code : " + newSDQuality.getQualityCode());
         msgBuf.append(" at " + sourceDataTag.getCurrentValue().getTimestamp());
@@ -156,8 +152,7 @@ class EquipmentSenderInvalid {
   private void sendValueWithTimeDeadbandCheck(final SourceDataTag sourceDataTag, final ValueUpdate castedUpdate, final SourceDataTagQuality newSDQuality) {
 
     // TimeDeadband for the current Data Tag (Static or Dynamic since this
-    // variable can be enabled at runtime when the Dynamic
-    // filter gets enabled)
+    // variable can be enabled at runtime when the Dynamic filter gets enabled)
     if (sourceDataTag.getAddress().isTimeDeadbandEnabled()) {
       log.debug("Passing update to time-deadband scheduler for tag #{}", sourceDataTag.getId());
       this.equipmentTimeDeadband.addToTimeDeadband(sourceDataTag, castedUpdate, newSDQuality);
@@ -177,7 +172,11 @@ class EquipmentSenderInvalid {
         log.warn("Method called with 0(OK) quality code for tag #{}. This should normally not happen! " +
             "sendTagFiltered() method should have been called before.", sourceDataTag.getId());
       } else {
-        this.processMessageSender.addValue(newSDValue);
+        try {
+          this.processMessageSender.addValue(newSDValue);
+        } catch (InterruptedException e) {
+          log.error("Data could not be sent and is lost!: {}", newSDQuality);
+        }
 
         // Checks if the dynamic TimeDeadband filter is enabled, Static disable
         // and record it depending on the priority

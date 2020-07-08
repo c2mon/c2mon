@@ -6,9 +6,10 @@ import org.apache.ibatis.mapping.VendorDatabaseIdProvider;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -20,31 +21,30 @@ import java.util.Properties;
  * @author Justin Lewis Salmon
  */
 @EnableTransactionManagement
+@Configuration
 @MapperScan(value = "cern.c2mon.server.cache.dbaccess", sqlSessionFactoryRef = "cacheSqlSessionFactory")
 public class CacheDataSourceConfig {
 
-  @Autowired
-  private CacheDbAccessProperties properties;
-
   @Bean
   @ConfigurationProperties(prefix = "c2mon.server.cachedbaccess.jdbc")
-  public DataSource cacheDataSource() {
-    String url = properties.getJdbc().getUrl();
-    String username = properties.getJdbc().getUsername();
-    String password = properties.getJdbc().getPassword();
+  public DataSourceProperties cacheDataSourceProperties() {
+	  return new DataSourceProperties();
+  }
+
+  @Bean
+  public DataSource cacheDataSource(@Autowired DataSourceProperties cacheDataSourceProperties) {
+    String url = cacheDataSourceProperties.getUrl();
 
     // A simple inspection is done on the JDBC URL to deduce whether to create an in-memory
     // in-process database, start a file-based externally visible database or connect to
     // an external database.
     if (url.contains("hsql")) {
-      return HsqlDatabaseBuilder.builder()
-                 .url(url)
-                 .username(username)
-                 .password(password)
-                 .script(new ClassPathResource("sql/cache-schema-hsqldb.sql"))
-                 .build().toDataSource();
+      String username =  cacheDataSourceProperties.getUsername();
+      String password =  cacheDataSourceProperties.getPassword();
+      return HsqlDatabaseBuilder.builder().url(url).username(username).password(password)
+       .script(new ClassPathResource("sql/cache-schema-hsqldb.sql")).build().toDataSource();
     } else {
-      return DataSourceBuilder.create().build();
+       return cacheDataSourceProperties.initializeDataSourceBuilder().build();
     }
   }
 

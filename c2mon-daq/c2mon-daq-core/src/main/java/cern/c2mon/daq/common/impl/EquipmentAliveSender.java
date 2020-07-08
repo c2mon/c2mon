@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2020 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -16,18 +16,15 @@
  *****************************************************************************/
 package cern.c2mon.daq.common.impl;
 
-import cern.c2mon.daq.common.messaging.IProcessMessageSender;
-import cern.c2mon.shared.common.datatag.DataTagConstants;
-import cern.c2mon.shared.common.datatag.SourceDataTag;
-import cern.c2mon.shared.common.datatag.SourceDataTagValue;
-import cern.c2mon.shared.common.datatag.ValueUpdate;
-import cern.c2mon.shared.common.type.TypeConverter;
-import lombok.extern.slf4j.Slf4j;
-
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
-import static java.lang.String.format;
+import lombok.extern.slf4j.Slf4j;
+
+import cern.c2mon.daq.common.messaging.IProcessMessageSender;
+import cern.c2mon.shared.common.datatag.*;
+import cern.c2mon.shared.common.type.TypeConverter;
 
 /**
  * This class has all methods for sending the Equipment Supervision Alive Tags
@@ -41,7 +38,7 @@ class EquipmentAliveSender {
   /**
    * Constant to prevent from frequent equipment alives
    */
-  private static final boolean PREVENT_TOO_FREQUENT_EQUIPMENT_ALIVES = Boolean.getBoolean("c2mon.daq.equipment.alive.filtering");
+  private final boolean aliveFilteringEnabled;
 
   /**
    * The process message sender takes the messages actually send to the server.
@@ -61,7 +58,7 @@ class EquipmentAliveSender {
    * The Equipment alive tag interval to be used for sending or not the
    * equipment alive
    */
-  private Long aliveTagInterval;
+  private long aliveTagInterval;
 
   /**
    * The Equipment Configuration Name
@@ -78,10 +75,12 @@ class EquipmentAliveSender {
    *
    * @param processMessageSender Process Message Sender
    * @param aliveTagId           The equipment supervision alive tag id
+   * @param aliveFilteringEnabled If true, then not necessary alive updates are filtered out 
    */
-  public EquipmentAliveSender(final IProcessMessageSender processMessageSender, final Long aliveTagId) {
+  public EquipmentAliveSender(final IProcessMessageSender processMessageSender, final Long aliveTagId, boolean aliveFilteringEnabled) {
     this.processMessageSender = processMessageSender;
     this.aliveTagId = aliveTagId;
+    this.aliveFilteringEnabled = aliveFilteringEnabled;
   }
 
   /**
@@ -90,7 +89,7 @@ class EquipmentAliveSender {
    * @param aliveTagInterval Equipment configuration Tag interval
    * @param confName         Equipment configuration name
    */
-  public void init(final Long aliveTagInterval, final String confName) {
+  public void init(final long aliveTagInterval, final String confName) {
     this.aliveTagInterval = aliveTagInterval;
     this.confName = confName;
   }
@@ -123,14 +122,20 @@ class EquipmentAliveSender {
       ValueUpdate update = new ValueUpdate(value, "Auto-generated alive value of Equipment " + confName, currentTimestamp);
       aliveTagValue = aliveTag.update(update);
     } else {
-
-      int ttl = DataTagConstants.TTL_FOREVER;
-      if (aliveTagInterval <= Integer.MAX_VALUE) {
-        ttl = aliveTagInterval.intValue();
-      }
-
-      aliveTagValue = new SourceDataTagValue(this.aliveTagId, "EQUIPMENT_ALIVE_" + confName, true, currentTimestamp, null, currentTimestamp, DataTagConstants.PRIORITY_HIGH, false,
-          "Alive tag for Equipment " + confName, ttl);
+      
+      aliveTagValue = SourceDataTagValue.builder()
+          .id(this.aliveTagId)
+          .name("EQUIPMENT_ALIVE_" + confName)
+          .controlTag(true)
+          .value(currentTimestamp)
+          .valueDescription("Alive tag for Equipment " + confName)
+          .quality(new SourceDataTagQuality())
+          .timestamp(new Timestamp(currentTimestamp))
+          .daqTimestamp(new Timestamp(currentTimestamp))
+          .priority(DataTagAddress.PRIORITY_HIGHEST)
+          .guaranteedDelivery(false)
+          .timeToLive(aliveTagInterval)
+          .build();
     }
 
     log.debug("Sending equipment alive message with timestamp {}", currentTimestamp);
@@ -172,7 +177,7 @@ class EquipmentAliveSender {
    */
   private boolean sendEquipmentAliveFiltered(final SourceDataTagValue aliveTagValue, final long timestamp) {
 
-    if (PREVENT_TOO_FREQUENT_EQUIPMENT_ALIVES) {
+    if (aliveFilteringEnabled) {
       Long lastEquipmentAliveTimestamp = this.lastEquipmentAlives.get(aliveTagValue.getId());
       boolean isSendEquipmentAlive = true;
       if (lastEquipmentAliveTimestamp != null) {
@@ -195,10 +200,8 @@ class EquipmentAliveSender {
       } else {
         return false;
       }
-    }
-
-    // If PREVENT_TOO_FREQUENT_EQUIPMENT_ALIVES is disabled (by default it is)
-    else {
+    } else {
+      // If PREVENT_TOO_FREQUENT_EQUIPMENT_ALIVES is disabled (by default it is)
       doSendEquipmentAlive(aliveTagValue);
       return true;
     }
@@ -206,18 +209,18 @@ class EquipmentAliveSender {
 
   /**
    * Sends that alive tag by adding it to the process message sender queue.
+   * The method assures as well that expired alive tags get discarded from the broker
    *
    * @param aliveTagValue the alive tag value to be sent.
    */
   private void doSendEquipmentAlive(final SourceDataTagValue aliveTagValue) {
-    int ttl = aliveTagValue.getTimeToLive();
-    if (aliveTagInterval <= Integer.MAX_VALUE) {
-      ttl = aliveTagInterval.intValue();
+    aliveTagValue.setTimeToLive(aliveTagInterval);
+    aliveTagValue.setPriority(DataTagConstants.PRIORITY_HIGHEST);
+    aliveTagValue.setGuaranteedDelivery(false);
+    try {
+      this.processMessageSender.addValue(aliveTagValue);
+    } catch (InterruptedException e) {
+      log.error("Equipment Alive tag could not be sent and is lost!: {}", aliveTagValue);
     }
-
-    // Make sure expired alive tags get discarded from the broker
-    aliveTagValue.setTimeToLive(ttl);
-    aliveTagValue.setPriority(DataTagConstants.PRIORITY_HIGH);
-    this.processMessageSender.addValue(aliveTagValue);
   }
 }

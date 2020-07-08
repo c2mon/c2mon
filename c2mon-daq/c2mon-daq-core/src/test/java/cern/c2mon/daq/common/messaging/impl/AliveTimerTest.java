@@ -50,7 +50,7 @@ public class AliveTimerTest {
     
     @Test
     public void testAliveTimer() throws Throwable {
-        sender.sendAlive();
+        sender.sendProcessAlive();
         /*
          *  Execution of alive timer is relative to previous execution.
          *  The range allows some error.

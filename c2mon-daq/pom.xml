@@ -5,7 +5,7 @@
   <parent>
     <groupId>cern.c2mon</groupId>
     <artifactId>c2mon</artifactId>
-    <version>1.9.3-SNAPSHOT</version>
+    <version>1.9.11-SNAPSHOT</version>
   </parent>
 
   <groupId>cern.c2mon.daq</groupId>
@@ -15,30 +15,8 @@
   <modules>
     <module>c2mon-daq-core</module>
     <module>c2mon-daq-test</module>
+    <module>distribution</module>
   </modules>
-
-  <profiles>
-    <profile>
-      <id>ci-deploy</id>
-      <modules>
-        <module>c2mon-daq-core</module>
-        <module>c2mon-daq-test</module>
-        <module>distribution</module>
-      </modules>
-    </profile>
-  </profiles>
-
-  <distributionManagement>
-     <repository>
-       <id>c2mon-releases</id>
-       <url>${repository.releases.url}</url>
-     </repository>
-     <snapshotRepository>
-       <id>c2mon-releases</id>
-       <url>${repository.snapshots.url}</url>
-     </snapshotRepository>
-  </distributionManagement>
-
 
   <properties>
     <image.base>java:8-jdk</image.base>

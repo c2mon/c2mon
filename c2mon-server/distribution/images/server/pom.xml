@@ -5,7 +5,7 @@
   <parent>
     <groupId>cern.c2mon.server</groupId>
     <artifactId>c2mon-docker-parent</artifactId>
-    <version>1.9.3-SNAPSHOT</version>
+    <version>1.9.5-SNAPSHOT</version>
   </parent>
 
   <artifactId>img-server</artifactId>
@@ -73,20 +73,21 @@
               <entrypoint>bin/c2mon.sh</entrypoint>
               <entrypoint>run</entrypoint>
             </entrypoint>
+            <user>1000:0</user>
           </container>
-          <extraDirectory>
-            <path>${project.build.directory}/dependency</path>
-            <permissions>
-              <permission>
-                <file>${c2mon.home}/bin/c2mon.sh</file>
-                <mode>755</mode>
-              </permission>
-              <permission>
-                <file>${c2mon.home}/bin/C2MON-SRV.jvm</file>
-                <mode>755</mode>
-              </permission>
-            </permissions>
-          </extraDirectory>
+          <extraDirectories>
+                <paths>${project.build.directory}/dependency</paths>
+                <permissions>
+                  <permission>
+                    <file>${c2mon.home}/bin/c2mon.sh</file>
+                    <mode>755</mode>
+                  </permission>
+                  <permission>
+                    <file>${c2mon.home}/bin/C2MON-SRV.jvm</file>
+                    <mode>755</mode>
+                  </permission>
+                </permissions>
+           </extraDirectories>
         </configuration>
       </plugin>
     </plugins>

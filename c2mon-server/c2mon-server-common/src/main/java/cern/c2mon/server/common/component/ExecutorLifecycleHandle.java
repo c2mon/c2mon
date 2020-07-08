@@ -18,6 +18,8 @@ package cern.c2mon.server.common.component;
 
 import java.util.concurrent.ExecutorService;
 
+import cern.c2mon.shared.daq.lifecycle.Lifecycle;
+
 /**
  * Allows executor shutdown via the C2MON {@link Lifecycle} interface.
  * Used in particular for listeners to be able to shutdown notification

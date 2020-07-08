@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2020 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -70,17 +70,18 @@ public class DAQResponseSerializationTest {
   }
 
   private SourceDataTagValueResponse createDataTagResponse() {
-    SourceDataTagValue sourceDataTagValue = new SourceDataTagValue(
-        10L,
-        "DataTag name",
-        false,
-        null,
-        new SourceDataTagQuality(SourceDataTagQualityCode.DATA_UNAVAILABLE), //invalid
-        new Timestamp(System.currentTimeMillis()),
-        DataTagConstants.PRIORITY_LOW,
-        false,
-        "test description",
-        DataTagAddress.TTL_FOREVER);
+    SourceDataTagValue sourceDataTagValue = SourceDataTagValue.builder()
+        .id(10L)
+        .name("DataTag name")
+        .controlTag(false)
+        .value(null)
+        .quality(new SourceDataTagQuality(SourceDataTagQualityCode.DATA_UNAVAILABLE))
+        .timestamp(new Timestamp(System.currentTimeMillis()))
+        .daqTimestamp(new Timestamp(System.currentTimeMillis()))
+        .priority(DataTagConstants.PRIORITY_LOW)
+        .valueDescription("test description")
+        .timeToLive(DataTagAddress.TTL_FOREVER)
+        .build();
     ArrayList<SourceDataTagValue> values = new ArrayList<>(Collections.singletonList(sourceDataTagValue));
 
     DataTagValueUpdate update = new DataTagValueUpdate(1L, 2L, values);

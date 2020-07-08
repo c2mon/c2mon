@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2020 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -16,19 +16,19 @@
  *****************************************************************************/
 package cern.c2mon.daq.common.impl;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
+import lombok.extern.slf4j.Slf4j;
+
 import cern.c2mon.daq.common.IDynamicTimeDeadbandFilterer;
 import cern.c2mon.daq.common.messaging.IProcessMessageSender;
 import cern.c2mon.daq.tools.DataTagValueFilter;
 import cern.c2mon.shared.common.datatag.SourceDataTag;
-import cern.c2mon.shared.common.datatag.SourceDataTagQuality;
 import cern.c2mon.shared.common.datatag.SourceDataTagValue;
 import cern.c2mon.shared.common.datatag.ValueUpdate;
 import cern.c2mon.shared.common.filter.FilteredDataTagValue.FilterType;
 import cern.c2mon.shared.common.type.TypeConverter;
-import lombok.extern.slf4j.Slf4j;
-
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * The SourceDataTagTimeDeadbandScheduler class models threads responsible for
@@ -121,14 +121,9 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
   public void start() {
     // create timers
     if (sourceDataTag.getAddress().isTimeDeadbandEnabled()) {
-      if (sourceDataTag.getAddress().getTimeDeadband() > 0) {
-        log.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : setting scheduling interval to : "
-              + this.sourceDataTag.getAddress().getTimeDeadband() + " miliseconds");
-      }
-
+      log.debug("\tscheduler[{}] : setting scheduling interval to : {} miliseconds", this.sourceDataTag.getId(), this.sourceDataTag.getAddress().getTimeDeadband());
       this.timeDeadbandTimer.scheduleAtFixedRate(this, 0, this.sourceDataTag.getAddress().getTimeDeadband());
-
-      log.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : setting scheduled");
+      log.debug("\tscheduler[{}] : setting scheduled", this.sourceDataTag.getId());
     }
   }
 
@@ -137,7 +132,7 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
    */
   public void flushAndCancel() {
     synchronized (this.sourceDataTag) {
-      log.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : flush and reset");
+      log.debug("\tscheduler[{}] : flush and reset", this.sourceDataTag.getId());
 
       // Execute the run method to empty the scheduler
       this.cancel();
@@ -159,7 +154,7 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
    */
   @Override
   public void run() {
-    log.debug("scheduler[" + this.sourceDataTag.getId() + "] : entering run()..");
+    log.debug("scheduler[{}] : entering run()..", this.sourceDataTag.getId());
 
     try {
       synchronized (this.sourceDataTag) {
@@ -171,7 +166,7 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
           // The first time the lastSentSDTagValue is empty
           if (this.lastSourceDataTag == null) {
             filterType = FilterType.NO_FILTERING;
-            log.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : first time running scheduler");
+            log.debug("\tscheduler[{}] : first time running scheduler", this.sourceDataTag.getId() );
           } else {
             // Check the current Source Data tag against the last one sent since
             // they have never been compared
@@ -194,10 +189,9 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
             // Add the value sent
             this.processMessageSender.addValue(currentSDValue);
 
-            log.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : sending value: " + currentSDValue.getValue());
-          }
-          // The new value is filtered out
-          else {
+            log.debug("\tscheduler[{}] : sending value: {}", this.sourceDataTag.getId(), currentSDValue.getValue());
+          } else {
+            // The new value is filtered out
             ValueUpdate update = new ValueUpdate(currentSDValue.getValue(), currentSDValue.getValueDescription(), currentSDValue.getTimestamp().getTime());
 
             // Send to filter module (Dynamic or Static information added)
@@ -217,52 +211,13 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
           // Reset the sendValue variable
           this.sendValue = false;
         } else {
-          log.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : no new value to be sent");
+          log.debug("\tscheduler[#{}] : no new value to be sent", this.sourceDataTag.getId());
         }
       } // synchronized
     } catch (Exception exception) {
-      log.error("Critical error in scheduler for tag " + this.sourceDataTag.getId(), exception);
+      log.error("Critical error in scheduler for tag #{}", this.sourceDataTag.getId(), exception);
     }
-    log.debug("scheduler[" + this.sourceDataTag.getId() + "] : leaving run()");
-  }
-
-  /**
-   * If the quality has changed it means the data tag is swapping from valid to
-   * invalid or the other way round
-   *
-   * @param newSDQuality The new tag quality
-   * @return <code>true</code> if the quality of the last sent Data Tag Value is
-   * not the same as the new one and <code>false</code> in any other
-   * case
-   */
-  public boolean isNewQualityStatus(final SourceDataTagQuality newSDQuality) {
-    // if the scheduler has sent a value before we compare against it
-    if (this.lastSourceDataTag != null) {
-      SourceDataTagValue lastSentSDTagValue = this.lastSourceDataTag.getCurrentValue();
-      if ((lastSentSDTagValue.getValue() != null)
-          && (lastSentSDTagValue.getQuality().getQualityCode() != newSDQuality.getQualityCode())) {
-        log.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : New Quality status. Last Sent Quality [ "
-              + lastSentSDTagValue.getQuality() + "] vs New Quality [" + newSDQuality + "]");
-
-        return true;
-      }
-    }
-    // If there is something scheduled for sending but was not sent yet we compare against the value scheduled
-    else if (isScheduledForSending()) {
-      SourceDataTagValue scheduledValue = sourceDataTag.getCurrentValue();
-
-      if ((scheduledValue != null)
-          && (scheduledValue.getQuality().getQualityCode() != newSDQuality.getQualityCode())) {
-          log.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : New Quality status. Scheduled Quality ["
-              + scheduledValue.getQuality() + "] vs New Quality [" + newSDQuality + "]");
-
-        return true;
-      }
-    }
-
-    log.debug("\tscheduler[" + this.sourceDataTag.getId() + "] : No new Quality status ");
-
-    return false;
+    log.debug("scheduler[#{}] : leaving run()", this.sourceDataTag.getId());
   }
 
 }

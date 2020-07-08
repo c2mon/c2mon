@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2020 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -27,6 +27,8 @@ import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.core.Commit;
 
+import lombok.NoArgsConstructor;
+
 import cern.c2mon.shared.common.command.ISourceCommandTag;
 import cern.c2mon.shared.common.command.SourceCommandTag;
 import cern.c2mon.shared.common.datatag.ISourceDataTag;
@@ -35,6 +37,7 @@ import cern.c2mon.shared.common.datatag.SourceDataTag;
 /**
  * This class is responsible for keeping equipment configuration parameters
  */
+@NoArgsConstructor
 public class EquipmentConfiguration implements IEquipmentConfiguration, Cloneable {
 
   /**
@@ -160,12 +163,6 @@ public class EquipmentConfiguration implements IEquipmentConfiguration, Cloneabl
     for (SourceCommandTag tag : sourceCommandTagList) {
       sourceCommandTags.put(tag.getId(), tag);
     }
-  }
-
-  /**
-   * The default constructor
-   */
-  public EquipmentConfiguration() {
   }
 
   /**

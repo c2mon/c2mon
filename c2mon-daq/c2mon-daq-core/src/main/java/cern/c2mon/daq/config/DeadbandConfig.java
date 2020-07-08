@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2020 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -17,6 +17,8 @@
 package cern.c2mon.daq.config;
 
 import cern.c2mon.daq.filter.dynamic.CounterTimeDeadbandActivator;
+import cern.c2mon.daq.filter.dynamic.IDynamicTimeDeadbandFilterActivator;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 
@@ -32,14 +34,7 @@ public class DeadbandConfig {
   private DaqProperties properties;
 
   @Bean
-  public CounterTimeDeadbandActivator lowDynamicTimeDeadbandFilterActivator() {
-    DaqProperties.Filter.DynamicDeadband deadband = properties.getFilter().getDynamicDeadband();
-    return new CounterTimeDeadbandActivator(deadband.getWindowSize(), deadband.getCheckInterval(),
-        deadband.getActivationThreshold(), deadband.getDeactivationThreshold(), deadband.getForcedDeadbandInterval());
-  }
-
-  @Bean
-  public CounterTimeDeadbandActivator medDynamicTimeDeadbandFilterActivator() {
+  public IDynamicTimeDeadbandFilterActivator dynamicTimeDeadbandFilterActivator() {
     DaqProperties.Filter.DynamicDeadband deadband = properties.getFilter().getDynamicDeadband();
     return new CounterTimeDeadbandActivator(deadband.getWindowSize(), deadband.getCheckInterval(),
         deadband.getActivationThreshold(), deadband.getDeactivationThreshold(), deadband.getForcedDeadbandInterval());

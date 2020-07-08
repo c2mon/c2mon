@@ -33,21 +33,21 @@ function usage {
 
 # check if JAVA_HOME is set
 if [ -z $JAVA_HOME ]; then
-   # try to find java if not
-   export JAVA="$(readlink -f $(which java))"
+  # try to find java if not
+  export JAVA="$(readlink -f $(which java))"
 else
-   export JAVA=$JAVA_HOME/bin/java
+  export JAVA=$JAVA_HOME/bin/java
 fi
 
 # set DAQ home path
 if [ -z "$DAQ_HOME" ] ; then
- # get the current location 
- SCRIPT=`readlink -f $(which $0)`
- SCRIPTPATH=`dirname $SCRIPT`
- DAQ_HOME="$(dirname "$SCRIPTPATH")"
+  # get the current location 
+  SCRIPT=`readlink -f $(which $0)`
+  SCRIPTPATH=`dirname $SCRIPT`
+  DAQ_HOME="$(dirname "$SCRIPTPATH")"
 fi
 
-CLASSPATH=`ls $DAQ_HOME/lib/*.jar | tr -s '\n' ':'`
+CLASSPATH=`ls $DAQ_HOME/lib/*.jar $DAQ_HOME/lib/*.nar | tr -s '\n' ':'`
 cd $DAQ_HOME
 
 
