@@ -13,7 +13,7 @@
   <artifactId>c2mon-server-cache-provider-ignite</artifactId>
 
   <properties>
-    <ignite.version>2.7.5</ignite.version>
+    <ignite.version>2.8.1</ignite.version>
     <jmh.version>1.21</jmh.version>
   </properties>
 
