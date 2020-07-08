@@ -7,34 +7,38 @@ import java.sql.Timestamp;
 
 public final class SourceDataTagValueFactory {
 
-  private SourceDataTagValueFactory(){
-
+  private SourceDataTagValueFactory() {
   }
 
-  public static SourceDataTagValue sampleAlive(){
-    return new SourceDataTagValue(1221L,
-      "test alive",
-      true,
-      0L,
-      new SourceDataTagQuality(),
-      new Timestamp(System.currentTimeMillis()),
-      4,
-      false,
-      "description",
-      10000);
+  public static SourceDataTagValue sampleAlive() {
+    return SourceDataTagValue
+      .builder()
+      .id(1221L)
+      .name("test alive")
+      .controlTag(true)
+      .value(0L)
+      .quality(new SourceDataTagQuality())
+      .timestamp(new Timestamp(System.currentTimeMillis()))
+      .priority(4)
+      .guaranteedDelivery(false)
+      .valueDescription("description")
+      .timeToLive(10000)
+      .build();
   }
 
-  public static SourceDataTagValue sampleCommFault(long updateTime){
-    return new SourceDataTagValue(
-      1223L,
-      "test commfault",
-      true,
-      Boolean.TRUE,
-      new SourceDataTagQuality(),
-      new Timestamp(updateTime),
-      4,
-      false,
-      "description",
-      10000);
+  public static SourceDataTagValue sampleCommFault(long updateTime) {
+    return SourceDataTagValue
+      .builder()
+      .id(1223L)
+      .name("test commfault")
+      .controlTag(true)
+      .value(Boolean.TRUE)
+      .quality(new SourceDataTagQuality())
+      .timestamp(new Timestamp(updateTime))
+      .priority(4)
+      .guaranteedDelivery(false)
+      .valueDescription("description")
+      .timeToLive(10000)
+      .build();
   }
 }

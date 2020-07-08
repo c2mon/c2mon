@@ -21,12 +21,12 @@ import cern.c2mon.cache.config.collections.TagCacheCollection;
 import cern.c2mon.server.client.util.TransferObjectFactory;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.config.ServerConstants;
-import cern.c2mon.server.common.republisher.Publisher;
-import cern.c2mon.server.common.republisher.Republisher;
-import cern.c2mon.server.common.republisher.RepublisherFactory;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.common.CacheEvent;
+import cern.c2mon.shared.daq.republisher.Publisher;
+import cern.c2mon.shared.daq.republisher.Republisher;
+import cern.c2mon.shared.daq.republisher.RepublisherFactory;
 import cern.c2mon.shared.util.jms.JmsSender;
 import cern.c2mon.shared.util.json.GsonFactory;
 import com.google.gson.Gson;
@@ -55,7 +55,7 @@ import javax.annotation.PostConstruct;
 @Slf4j
 @Service
 @ManagedResource(description = "Bean publishing Alarm updates to the clients")
-public class AlarmPublisher implements SmartLifecycle, Publisher<AlarmValue>  {
+public class AlarmPublisher implements SmartLifecycle, Publisher<AlarmValue> {
 
   /** Bean providing for sending JMS messages and waiting for a response */
   private final JmsSender jmsSender;

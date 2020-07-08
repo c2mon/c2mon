@@ -16,18 +16,22 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch.tag.config;
 
-import cern.c2mon.server.cache.TagFacadeGateway;
+import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.config.collections.TagCacheCollection;
+import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.tag.Tag;
+import cern.c2mon.server.elasticsearch.IndexManager;
+import cern.c2mon.server.elasticsearch.MappingFactory;
+import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
+import cern.c2mon.server.elasticsearch.domain.IndexMetadata;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Component;
 
-import cern.c2mon.server.elasticsearch.IndexManager;
-import cern.c2mon.server.elasticsearch.MappingFactory;
-import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
-import cern.c2mon.server.elasticsearch.domain.IndexMetadata;
+import java.util.HashSet;
+import java.util.Map;
 
 /**
  * This class manages the indexing of {@link TagConfigDocument} instances to
@@ -44,23 +48,25 @@ public class TagConfigDocumentIndexer {
 
   private final String configIndex;
   private final IndexManager indexManager;
-  private final TagFacadeGateway tagFacadeGateway;
+  private final TagCacheCollection tagFacadeGateway;
   private final TagConfigDocumentConverter converter;
+  private final C2monCache<Alarm> alarmCache;
 
   /**
    * Tag configuration document constructor
-   *
-   * @param properties   of Elasticsearch server the application is communicating with.
+   *  @param properties   of Elasticsearch server the application is communicating with.
    * @param indexManager to perform index-related operations.
    * @param tagFacadeGateway to locate correct facade bean for re-index operation
    * @param converter to convert tags
+   * @param alarmCache to look up alarms related to a given tag
    */
   @Autowired
-  public TagConfigDocumentIndexer(ElasticsearchProperties properties, IndexManager indexManager, TagFacadeGateway tagFacadeGateway, TagConfigDocumentConverter converter) {
+  public TagConfigDocumentIndexer(ElasticsearchProperties properties, IndexManager indexManager, TagCacheCollection tagFacadeGateway, TagConfigDocumentConverter converter, C2monCache<Alarm> alarmCache) {
     this.indexManager = indexManager;
     this.tagFacadeGateway = tagFacadeGateway;
     this.converter = converter;
     this.configIndex = properties.getTagConfigIndex();
+    this.alarmCache = alarmCache;
   }
 
   /**
@@ -121,8 +127,9 @@ public class TagConfigDocumentIndexer {
     }
 
     for (Long id : tagFacadeGateway.getKeys()) {
-      Tag tag = tagFacadeGateway.getTag(id);
-      converter.convert(tag, tagFacadeGateway.getAlarms(tag)).ifPresent(this::updateTagConfig);
+      Tag tag = tagFacadeGateway.get(id);
+      Map<Long, Alarm> alarms = alarmCache.getAll(new HashSet<>(tag.getAlarmIds()));
+      converter.convert(tag, alarms.values()).ifPresent(this::updateTagConfig);
     }
   }
 }
