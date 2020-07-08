@@ -91,14 +91,13 @@ public abstract class AbstractCacheTransactionTest<CACHEABLE extends Cacheable> 
 
   @Test
   public void deleteRollBack() {
-    CACHEABLE sample = getSample();
-    cache.put(sample.getId(), sample);
-    assertTrue(cache.containsKey(sample.getId()));
+    cache.put(getSample().getId(), getSample());
+    assertTrue(cache.containsKey(getSample().getId()));
 
     try {
       cache.executeTransaction(() -> {
-        cache.remove(sample.getId(), sample);
-        assertFalse(cache.containsKey(sample.getId()));
+        cache.remove(getSample().getId());
+        assertFalse(cache.containsKey(getSample().getId()));
         throw new CacheException("Crash and burn!");
       });
       fail();
@@ -106,7 +105,7 @@ public abstract class AbstractCacheTransactionTest<CACHEABLE extends Cacheable> 
       LOG.trace("Throwing here to shut up compiler warnings", ignored);
     }
 
-    assertEquals(sample, cache.get(sample.getId()));
+    assertEquals(getSample(), cache.get(getSample().getId()));
   }
 
   @Test
