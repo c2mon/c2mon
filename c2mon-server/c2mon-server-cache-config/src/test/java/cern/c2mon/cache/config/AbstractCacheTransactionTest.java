@@ -12,7 +12,9 @@ import org.junit.Test;
 import org.junit.rules.Timeout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.HeuristicCompletionException;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionSystemException;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import javax.cache.CacheException;
@@ -182,7 +184,7 @@ public abstract class AbstractCacheTransactionTest<CACHEABLE extends Cacheable> 
 
     try {
       f1.get(6, TimeUnit.SECONDS);
-      LOG.warn("Deadlock expected in thread 1, but task completed successfully");
+      LOG.warn("Thread 1 expected to be in a deadlock but completed successfully");
     } catch (TimeoutException ignored) {
       fail("No deadlock detected (thread 1 timed out)");
     } catch (InterruptedException | ExecutionException e) {
@@ -191,7 +193,7 @@ public abstract class AbstractCacheTransactionTest<CACHEABLE extends Cacheable> 
 
     try {
       f2.get(250, TimeUnit.MILLISECONDS);
-      LOG.warn("Deadlock expected in thread 2, but task completed successfully");
+      LOG.warn("Thread 2 expected to be in a deadlock but completed successfully");
     } catch (TimeoutException ignored) {
       fail("No deadlock detected (thread 2 timed out)");
     } catch (InterruptedException | ExecutionException e) {
@@ -199,13 +201,29 @@ public abstract class AbstractCacheTransactionTest<CACHEABLE extends Cacheable> 
     }
 
     assertTrue(exceptions.size() >= 1);
+
+    List<TransactionTimeoutException> igniteTimeoutExceptions = new ArrayList<>();
+
     exceptions.forEach(e -> {
       assertTrue(e instanceof ExecutionException);
-      assertTrue(e.getCause() instanceof CacheException);
-      assertTrue(e.getCause().getCause() instanceof TransactionTimeoutException);
+      if (e.getCause() instanceof HeuristicCompletionException) {
+        LOG.info("Spring kicked in before Ignite and captured its exception");
+        assertTrue(e.getCause().getCause() instanceof TransactionSystemException);
+        assertTrue(e.getCause().getCause().getCause() instanceof TransactionTimeoutException);
+        igniteTimeoutExceptions.add((TransactionTimeoutException) e.getCause().getCause().getCause());
+      } else {
+        assertTrue(e.getCause() instanceof CacheException);
+        assertTrue(e.getCause().getCause() instanceof TransactionTimeoutException);
+        igniteTimeoutExceptions.add((TransactionTimeoutException) e.getCause().getCause());
+      }
     });
+
+    assertTrue(igniteTimeoutExceptions.size() >= 1);
     assertTrue(
-      exceptions.stream().filter(e -> e.getCause().getCause().getCause() instanceof TransactionDeadlockException).count() >= 1
+      igniteTimeoutExceptions
+        .stream()
+        .filter(e -> e.getCause() instanceof TransactionDeadlockException)
+        .count() >= 1
     );
   }
 }
