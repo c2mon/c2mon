@@ -72,7 +72,6 @@ public abstract class AbstractCacheTransactionTest<CACHEABLE extends Cacheable> 
 
   @Test
   public void exceptionsRollback() {
-    // Ensure alarm is not in cache
     cache.remove(getSample().getId());
     assertFalse(cache.containsKey(getSample().getId()));
 
@@ -92,14 +91,14 @@ public abstract class AbstractCacheTransactionTest<CACHEABLE extends Cacheable> 
 
   @Test
   public void deleteRollBack() {
-    // Ensure alarm is in cache
-    cache.put(getSample().getId(), getSample());
-    assertTrue(cache.containsKey(getSample().getId()));
+    CACHEABLE sample = getSample();
+    cache.put(sample.getId(), sample);
+    assertTrue(cache.containsKey(sample.getId()));
 
     try {
       cache.executeTransaction(() -> {
-        cache.remove(getSample().getId(), getSample());
-        assertFalse(cache.containsKey(getSample().getId()));
+        cache.remove(sample.getId(), sample);
+        assertFalse(cache.containsKey(sample.getId()));
         throw new CacheException("Crash and burn!");
       });
       fail();
@@ -107,7 +106,7 @@ public abstract class AbstractCacheTransactionTest<CACHEABLE extends Cacheable> 
       LOG.trace("Throwing here to shut up compiler warnings", ignored);
     }
 
-    assertEquals(getSample(), cache.get(getSample().getId()));
+    assertEquals(sample, cache.get(sample.getId()));
   }
 
   @Test
