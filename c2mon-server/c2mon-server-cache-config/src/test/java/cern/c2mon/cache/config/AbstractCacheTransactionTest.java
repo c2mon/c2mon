@@ -182,6 +182,7 @@ public abstract class AbstractCacheTransactionTest<CACHEABLE extends Cacheable> 
 
     try {
       f1.get(6, TimeUnit.SECONDS);
+      LOG.warn("Deadlock expected in thread 1, but task completed successfully");
     } catch (TimeoutException ignored) {
       fail("No deadlock detected (thread 1 timed out)");
     } catch (InterruptedException | ExecutionException e) {
@@ -190,6 +191,7 @@ public abstract class AbstractCacheTransactionTest<CACHEABLE extends Cacheable> 
 
     try {
       f2.get(250, TimeUnit.MILLISECONDS);
+      LOG.warn("Deadlock expected in thread 2, but task completed successfully");
     } catch (TimeoutException ignored) {
       fail("No deadlock detected (thread 2 timed out)");
     } catch (InterruptedException | ExecutionException e) {
@@ -197,13 +199,17 @@ public abstract class AbstractCacheTransactionTest<CACHEABLE extends Cacheable> 
     }
 
     exceptions.forEach(e -> {
-      System.out.println("Cause: " + e.getCause().getClass().getName());
-      System.out.println("Cause's cause: " + e.getCause().getCause().getClass().getName());
-      System.out.println("Cause's cause's cause: " + e.getCause().getCause().getCause().getClass().getName());
+      try {
+        LOG.info("Cause: " + e.getCause().getClass().getName());
+        LOG.info("Cause's cause: " + e.getCause().getCause().getClass().getName());
+        LOG.info("Cause's cause's cause: " + e.getCause().getCause().getCause().getClass().getName());
+        LOG.info("Cause's cause's cause's cause: " + e.getCause().getCause().getCause().getCause().getClass().getName());
+      } catch (NullPointerException ignored) {}
     });
 
     assertTrue(exceptions.size() >= 1);
     exceptions.forEach(e -> {
+      assertTrue(e instanceof ExecutionException);
       assertTrue(e.getCause() instanceof CacheException);
       assertTrue(e.getCause().getCause() instanceof TransactionTimeoutException);
     });
