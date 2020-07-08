@@ -198,15 +198,6 @@ public abstract class AbstractCacheTransactionTest<CACHEABLE extends Cacheable> 
       exceptions.add(e);
     }
 
-    exceptions.forEach(e -> {
-      try {
-        LOG.info("Cause: " + e.getCause().getClass().getName());
-        LOG.info("Cause's cause: " + e.getCause().getCause().getClass().getName());
-        LOG.info("Cause's cause's cause: " + e.getCause().getCause().getCause().getClass().getName());
-        LOG.info("Cause's cause's cause's cause: " + e.getCause().getCause().getCause().getCause().getClass().getName());
-      } catch (NullPointerException ignored) {}
-    });
-
     assertTrue(exceptions.size() >= 1);
     exceptions.forEach(e -> {
       assertTrue(e instanceof ExecutionException);
