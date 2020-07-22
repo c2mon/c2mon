@@ -1,6 +1,6 @@
 package cern.c2mon.cache.actions.supervision;
 
-import cern.c2mon.cache.AbstractCacheTest;
+import cern.c2mon.cache.actions.AbstractCacheTest;
 import cern.c2mon.cache.actions.state.SupervisionStateTagService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.test.CachePopulationRule;
@@ -23,6 +23,8 @@ import java.sql.Timestamp;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import static cern.c2mon.shared.common.CacheEvent.UPDATE_ACCEPTED;
+import static cern.c2mon.shared.common.CacheEvent.UPDATE_REJECTED;
 import static cern.c2mon.shared.common.supervision.SupervisionStatus.*;
 import static org.junit.Assert.*;
 
@@ -68,30 +70,76 @@ public abstract class AbstractSupervisedServiceTest<T extends Supervised, T_IMPL
   public void start() throws InterruptedException {
     cacheSupervision(
       () -> supervisedService.start(sample.getId(), System.currentTimeMillis()),
-      STARTUP);
+      UPDATE_ACCEPTED,
+      STARTUP
+    );
   }
 
   @Test
   public void stop() throws InterruptedException {
-    setAsRunning();
+    setAs(RUNNING);
     cacheSupervision(
       () -> supervisedService.stop(sample.getId(), System.currentTimeMillis()),
-      DOWN);
+      UPDATE_ACCEPTED,
+      DOWN
+    );
+  }
+
+  @Test
+  public void stopDownObject() throws InterruptedException {
+    cacheSupervision(
+      () -> supervisedService.stop(sample.getId(), System.currentTimeMillis()),
+      UPDATE_REJECTED,
+      DOWN
+    );
   }
 
   @Test
   public void suspend() throws InterruptedException {
-    setAsRunning();
+    setAs(RUNNING);
     cacheSupervision(
       () -> supervisedService.suspend(sample.getId(), System.currentTimeMillis(), ""),
-      DOWN);
+      UPDATE_ACCEPTED,
+      DOWN
+    );
+  }
+
+  @Test
+  public void suspendDownObject() throws InterruptedException {
+    cacheSupervision(
+      () -> supervisedService.suspend(sample.getId(), System.currentTimeMillis(), ""),
+      UPDATE_REJECTED,
+      DOWN
+    );
+  }
+
+  @Test
+  public void suspendUncertainObject() throws InterruptedException {
+    setAs(UNCERTAIN);
+    cacheSupervision(
+      () -> supervisedService.suspend(sample.getId(), System.currentTimeMillis(), ""),
+      UPDATE_ACCEPTED,
+      DOWN
+    );
   }
 
   @Test
   public void resume() throws InterruptedException {
     cacheSupervision(
       () -> supervisedService.resume(sample.getId(), System.currentTimeMillis(), ""),
-      RUNNING);
+      UPDATE_ACCEPTED,
+      RUNNING
+    );
+  }
+
+  @Test
+  public void resumeRunningObject() throws InterruptedException {
+    setAs(RUNNING);
+    cacheSupervision(
+      () -> supervisedService.resume(sample.getId(), System.currentTimeMillis(), ""),
+      UPDATE_REJECTED,
+      RUNNING
+    );
   }
 
   @Test
@@ -136,9 +184,10 @@ public abstract class AbstractSupervisedServiceTest<T extends Supervised, T_IMPL
     assertEquals(event, stateTagService.getSupervisionEvent(sample.getStateTagId()));
   }
 
-  private void cacheSupervision(Runnable cacheAction, SupervisionStatus expected) throws InterruptedException {
+  private void cacheSupervision(Runnable cacheAction, CacheEvent cacheEvent, SupervisionStatus expected) throws InterruptedException {
     CountDownLatch latch = new CountDownLatch(1);
-    stateTagService.getCache().getCacheListenerManager().registerListener(i -> latch.countDown(), CacheEvent.UPDATE_ACCEPTED);
+    stateTagService.getCache().getCacheListenerManager().registerListener(__ -> latch.countDown(), cacheEvent);
+
     cache.put(sample.getId(), sample);
 
     cacheAction.run();
@@ -149,7 +198,7 @@ public abstract class AbstractSupervisedServiceTest<T extends Supervised, T_IMPL
     verifySupervisionEvent(expected);
   }
 
-  private void setAsRunning() {
+  private void setAs(SupervisionStatus supervisionStatus) {
     if (sample.getAliveTagId() != null)
       aliveTagCache.computeQuiet(sample.getAliveTagId(), aliveTag -> aliveTag.setValue(true));
     if (sample instanceof AbstractEquipment && ((AbstractEquipment) sample).getCommFaultTagId() != null)
@@ -157,7 +206,7 @@ public abstract class AbstractSupervisedServiceTest<T extends Supervised, T_IMPL
 
     // Should always have a state tag
     stateTagService.getCache().computeQuiet(sample.getStateTagId(), stateTag -> stateTag.setSupervision(
-      RUNNING, "", new Timestamp(1L)
+      supervisionStatus, "", new Timestamp(1L)
     ));
   }
 }
