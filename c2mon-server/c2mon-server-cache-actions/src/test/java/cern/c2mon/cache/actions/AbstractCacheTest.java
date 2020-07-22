@@ -1,6 +1,5 @@
-package cern.c2mon.cache;
+package cern.c2mon.cache.actions;
 
-import cern.c2mon.cache.actions.CacheActionsModuleRef;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.config.CacheConfigModuleRef;
 import cern.c2mon.cache.impl.configuration.C2monIgniteConfiguration;
