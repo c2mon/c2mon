@@ -15,7 +15,6 @@ import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.equipment.EquipmentCacheObject;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.process.ProcessCacheObject;
-import cern.c2mon.server.common.supervision.Supervised;
 import cern.c2mon.server.common.supervision.SupervisionStateTag;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.common.supervision.SupervisionStatus;
@@ -27,7 +26,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.inject.Inject;
-import java.sql.Timestamp;
 
 import static cern.c2mon.server.common.util.KotlinAPIs.apply;
 import static java.lang.System.currentTimeMillis;
@@ -57,47 +55,11 @@ public class SupervisedCacheServiceTest {
 
   @Inject private SupervisionStateTagService stateTagService;
 
-  private SupervisionStateTag stateTag;
-
   @Before
   public void before() {
-    stateTag = new SupervisionStateTagFactory().ofProcess();
-    stateTagService.getCache().put(stateTag.getId(), stateTag);
-  }
-
-  @Test
-  public void getLastSupervisionEvent() {
-    EquipmentCacheObject equipment = apply(getEquipment(SupervisionStatus.RUNNING), e -> {
-      e.setName("test");
-      e.setStatusTime(new Timestamp(currentTimeMillis()));
-      e.setStatusDescription("description");
-    });
-    equipmentCache.put(equipment.getId(), equipment);
-
-    SupervisionEvent supervisionEvent = stateTagService.getSupervisionEvent(equipment.getStateTagId());
-    assertEquals(supervisionEvent.getEntityId(), equipment.getId());
-    assertEquals(supervisionEvent.getName(), equipment.getName());
-    assertEquals(supervisionEvent.getStatus(), equipment.getSupervisionStatus());
-    assertEquals(supervisionEvent.getEventTime(), equipment.getStatusTime());
-    assertEquals(supervisionEvent.getMessage(), equipment.getStatusDescription());
-  }
-
-  @Test
-  @Ignore
-  public void getLastSupervisionEventNullValues() {
-    EquipmentCacheObject equipment = apply(getEquipment(SupervisionStatus.RUNNING), e -> {
-      e.setName("test");
-      e.setStatusTime(null);
-      e.setStatusDescription(null);
-    });
-    equipmentCache.put(equipment.getId(), equipment);
-
-    SupervisionEvent supervisionEvent = stateTagService.getSupervisionEvent(equipment.getStateTagId());
-    assertEquals(supervisionEvent.getEntityId(), equipment.getId());
-    assertEquals(supervisionEvent.getName(), equipment.getName());
-    assertEquals(supervisionEvent.getStatus(), equipment.getSupervisionStatus());
-    assertNotNull(supervisionEvent.getEventTime());
-    assertNotNull(supervisionEvent.getMessage());
+    equipmentCache.clear();
+    processCache.clear();
+    stateTagService.getCache().clear();
   }
 
   @Test
@@ -108,10 +70,11 @@ public class SupervisedCacheServiceTest {
     long timestamp = currentTimeMillis();
     equipmentService.start(equipment.getId(), timestamp);
 
-    assertEquals(SupervisionStatus.STARTUP, getSupervisionStatus(equipment));
-    assertEquals(SupervisionStatus.STARTUP, equipment.getSupervisionStatus());
-    assertNotNull(equipment.getStatusTime());
-    assertTrue(equipment.getStatusDescription().contains("was started"));
+    SupervisionEvent event = stateTagService.getSupervisionEvent(equipment.getStateTagId());
+    assertEquals(SupervisionStatus.STARTUP, event.getStatus());
+    assertNotNull(event.getEventTime());
+    assertEquals(timestamp, event.getEventTime().getTime());
+    assertTrue(event.getMessage().contains("was started"));
   }
 
   @Test
@@ -122,10 +85,10 @@ public class SupervisedCacheServiceTest {
     long timestamp = currentTimeMillis();
     equipmentService.stop(equipment.getId(), timestamp);
 
-    assertEquals(SupervisionStatus.DOWN, getSupervisionStatus(equipment));
-    assertEquals(SupervisionStatus.DOWN, equipment.getSupervisionStatus());
-    assertNotNull(equipment.getStatusTime());
-    assertTrue(equipment.getStatusDescription().contains("was stopped"));
+    SupervisionEvent event = stateTagService.getSupervisionEvent(equipment.getStateTagId());
+    assertEquals(SupervisionStatus.DOWN, event.getStatus());
+    assertEquals(0, event.getEventTime().getTime());
+    assertEquals("", event.getMessage());
   }
 
   @Test
@@ -137,10 +100,10 @@ public class SupervisedCacheServiceTest {
     String message = "test-message";
     equipmentService.resume(equipment.getId(), timestamp, message);
 
-    assertSame(SupervisionStatus.RUNNING, getSupervisionStatus(equipment));
-    assertSame(SupervisionStatus.RUNNING, equipment.getSupervisionStatus());
-    assertNull(equipment.getStatusTime());
-    assertNull(equipment.getStatusDescription());
+    SupervisionEvent event = stateTagService.getSupervisionEvent(equipment.getStateTagId());
+    assertSame(SupervisionStatus.RUNNING, event.getStatus());
+    assertEquals(0, event.getEventTime().getTime());
+    assertEquals("", event.getMessage());
   }
 
   @Test
@@ -152,10 +115,11 @@ public class SupervisedCacheServiceTest {
     String message = "test-message";
     equipmentService.resume(equipment.getId(), timestamp, message);
 
-    assertSame(SupervisionStatus.RUNNING, getSupervisionStatus(equipment));
-    assertSame(SupervisionStatus.RUNNING, equipment.getSupervisionStatus());
-    assertEquals(timestamp, equipment.getStatusTime().getTime());
-    assertEquals(message, equipment.getStatusDescription());
+    SupervisionEvent event = stateTagService.getSupervisionEvent(equipment.getStateTagId());
+    assertSame(SupervisionStatus.RUNNING, event.getStatus());
+    assertNotNull(event.getEventTime());
+    assertEquals(timestamp, event.getEventTime().getTime());
+    assertEquals(message, event.getMessage());
   }
 
   @Test
@@ -167,10 +131,11 @@ public class SupervisedCacheServiceTest {
     String message = "test-message";
     equipmentService.suspend(equipment.getId(), timestamp, message);
 
-    assertEquals(SupervisionStatus.DOWN, getSupervisionStatus(equipment));
-    assertEquals(SupervisionStatus.DOWN, equipment.getSupervisionStatus());
-    assertEquals(timestamp, equipment.getStatusTime().getTime());
-    assertEquals(message, equipment.getStatusDescription());
+    SupervisionEvent event = stateTagService.getSupervisionEvent(equipment.getStateTagId());
+    assertEquals(SupervisionStatus.DOWN, event.getStatus());
+    assertNotNull(event.getEventTime());
+    assertEquals(timestamp, event.getEventTime().getTime());
+    assertEquals(message, event.getMessage());
   }
 
   @Test
@@ -182,13 +147,15 @@ public class SupervisedCacheServiceTest {
     String message = "test-message";
     equipmentService.suspend(equipment.getId(), timestamp, message);
 
-    assertEquals(SupervisionStatus.DOWN, getSupervisionStatus(equipment));
-    assertEquals(SupervisionStatus.DOWN, equipment.getSupervisionStatus());
-    assertEquals(timestamp, equipment.getStatusTime().getTime());
-    assertEquals(message, equipment.getStatusDescription());
+    SupervisionEvent event = stateTagService.getSupervisionEvent(equipment.getStateTagId());
+    assertEquals(SupervisionStatus.DOWN, event.getStatus());
+    assertNotNull(event.getEventTime());
+    assertEquals(timestamp, event.getEventTime().getTime());
+    assertEquals(message, event.getMessage());
   }
 
   @Test
+  @Ignore
   public void suspendDownEquipment() {
     EquipmentCacheObject equipment = getEquipment(SupervisionStatus.DOWN);
     equipmentCache.put(equipment.getId(), equipment);
@@ -197,10 +164,12 @@ public class SupervisedCacheServiceTest {
     String message = "test-message";
     equipmentService.suspend(equipment.getId(), timestamp, message);
 
-    assertEquals(SupervisionStatus.DOWN, getSupervisionStatus(equipment));
-    assertEquals(SupervisionStatus.DOWN, equipment.getSupervisionStatus());
-    assertNull(equipment.getStatusTime());
-    assertNull(equipment.getStatusDescription());
+    SupervisionEvent event = stateTagService.getSupervisionEvent(equipment.getStateTagId());
+    // TODO What should be the correct expectation? @Matthias: Difference between stop and suspend?
+    // TODO @Matthias: Is it OK to remove statusTime, statusDescription and supervisionStatus from AbstractSupervisedCacheObject?
+    assertEquals(SupervisionStatus.DOWN, event.getStatus());
+    assertNull(event.getEventTime());
+    assertNull(event.getMessage());
   }
 
   @Test
@@ -214,27 +183,30 @@ public class SupervisedCacheServiceTest {
     String message = "test-message";
     processService.resume(process.getId(), timestamp, message);
 
-    assertSame(SupervisionStatus.RUNNING_LOCAL, getSupervisionStatus(process));
-    assertSame(SupervisionStatus.RUNNING_LOCAL, process.getSupervisionStatus());
-    assertEquals(timestamp, process.getStatusTime().getTime());
-    assertEquals(message, process.getStatusDescription());
+    SupervisionEvent event = stateTagService.getSupervisionEvent(process.getStateTagId());
+    assertSame(SupervisionStatus.RUNNING_LOCAL, event.getStatus());
+    assertNotNull(event.getEventTime());
+    assertEquals(timestamp, event.getEventTime().getTime());
+    assertEquals(message, event.getMessage());
   }
 
   private EquipmentCacheObject getEquipment(SupervisionStatus supervisionStatus) {
+    SupervisionStateTag stateTag = new SupervisionStateTagFactory().sampleBase();
+    stateTag.setSupervisionStatus(supervisionStatus);
+    stateTagService.getCache().put(stateTag.getId(), stateTag);
+
     EquipmentCacheObject e = new EquipmentCacheObject(101010L);
-    e.setSupervisionStatus(supervisionStatus);
     e.setStateTagId(stateTag.getId());
     return e;
   }
 
   private ProcessCacheObject getProcess(SupervisionStatus supervisionStatus) {
+    SupervisionStateTag stateTag = new SupervisionStateTagFactory().ofProcess();
+    stateTag.setSupervisionStatus(supervisionStatus);
+    stateTagService.getCache().put(stateTag.getId(), stateTag);
+
     ProcessCacheObject p = new ProcessCacheObject(202020L);
-    p.setSupervisionStatus(supervisionStatus);
     p.setStateTagId(stateTag.getId());
     return p;
-  }
-
-  private SupervisionStatus getSupervisionStatus(Supervised supervised) {
-    return stateTagService.getSupervisionEvent(supervised.getStateTagId()).getStatus();
   }
 }
