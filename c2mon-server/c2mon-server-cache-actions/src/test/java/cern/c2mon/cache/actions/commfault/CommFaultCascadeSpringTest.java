@@ -2,13 +2,13 @@ package cern.c2mon.cache.actions.commfault;
 
 import cern.c2mon.cache.actions.AbstractCacheTest;
 import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.server.cache.test.CachePopulationRule;
 import cern.c2mon.server.cache.test.SupervisionCacheResetRule;
 import cern.c2mon.server.cache.test.factory.AbstractCacheObjectFactory;
 import cern.c2mon.server.cache.test.factory.CommFaultTagCacheObjectFactory;
 import cern.c2mon.server.common.commfault.CommFaultTag;
 import cern.c2mon.server.common.supervision.SupervisionStateTag;
 import cern.c2mon.shared.common.supervision.SupervisionStatus;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.test.context.ContextConfiguration;
@@ -24,7 +24,10 @@ import static cern.c2mon.shared.common.CacheEvent.UPDATE_ACCEPTED;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-@ContextConfiguration(classes = SupervisionCacheResetRule.class)
+@ContextConfiguration(classes = {
+  SupervisionCacheResetRule.class,
+  CachePopulationRule.class
+})
 public class CommFaultCascadeSpringTest extends AbstractCacheTest<CommFaultTag, CommFaultTag> {
 
   @Inject
@@ -48,7 +51,6 @@ public class CommFaultCascadeSpringTest extends AbstractCacheTest<CommFaultTag, 
   }
 
   @Test
-  @Ignore("This test is failing in Maven runs")
   public void cascadeToState() throws InterruptedException {
     CountDownLatch stateTagUpdate = new CountDownLatch(1);
 
@@ -61,7 +63,7 @@ public class CommFaultCascadeSpringTest extends AbstractCacheTest<CommFaultTag, 
         commFaultCache.put(commFaultTag.getId(), commFaultTag);
       });
 
-    assertTrue(stateTagUpdate.await(200, TimeUnit.MILLISECONDS));
+    assertTrue(stateTagUpdate.await(1_000, TimeUnit.MILLISECONDS));
     assertEquals(SupervisionStatus.RUNNING, stateTagCache.get(getSample().getStateTagId()).getSupervisionStatus());
   }
 }
