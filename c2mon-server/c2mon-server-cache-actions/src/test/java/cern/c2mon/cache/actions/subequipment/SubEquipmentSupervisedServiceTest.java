@@ -1,6 +1,6 @@
 package cern.c2mon.cache.actions.subequipment;
 
-import cern.c2mon.cache.AbstractSupervisedServiceTest;
+import cern.c2mon.cache.actions.supervision.AbstractSupervisedServiceTest;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.test.factory.AbstractCacheObjectFactory;
 import cern.c2mon.server.cache.test.factory.SubEquipmentCacheObjectFactory;

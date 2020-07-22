@@ -1,5 +1,6 @@
-package cern.c2mon.cache;
+package cern.c2mon.cache.actions.supervision;
 
+import cern.c2mon.cache.AbstractCacheTest;
 import cern.c2mon.cache.actions.state.SupervisionStateTagService;
 import cern.c2mon.cache.actions.supervision.SupervisedCacheService;
 import cern.c2mon.cache.api.C2monCache;
