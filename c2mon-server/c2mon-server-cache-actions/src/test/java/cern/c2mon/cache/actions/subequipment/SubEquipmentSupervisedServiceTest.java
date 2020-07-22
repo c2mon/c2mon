@@ -1,6 +1,6 @@
 package cern.c2mon.cache.actions.subequipment;
 
-import cern.c2mon.cache.SupervisedServiceTest;
+import cern.c2mon.cache.AbstractSupervisedServiceTest;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.test.factory.AbstractCacheObjectFactory;
 import cern.c2mon.server.cache.test.factory.SubEquipmentCacheObjectFactory;
@@ -10,7 +10,7 @@ import lombok.Getter;
 
 import javax.inject.Inject;
 
-public class SubEquipmentSupervisedServiceTest extends SupervisedServiceTest<SubEquipment, SubEquipmentCacheObject> {
+public class SubEquipmentSupervisedServiceTest extends AbstractSupervisedServiceTest<SubEquipment, SubEquipmentCacheObject> {
 
   @Inject
   private C2monCache<SubEquipment> equipmentCacheRef;

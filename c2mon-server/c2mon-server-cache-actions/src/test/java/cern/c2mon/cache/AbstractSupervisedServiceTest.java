@@ -30,7 +30,7 @@ import static org.junit.Assert.*;
   SupervisionCacheResetRule.class,
   CachePopulationRule.class
 })
-public abstract class SupervisedServiceTest<T extends Supervised, T_IMPL extends AbstractSupervisedCacheObject>
+public abstract class AbstractSupervisedServiceTest<T extends Supervised, T_IMPL extends AbstractSupervisedCacheObject>
   extends AbstractCacheTest<T, T_IMPL> {
 
   @Inject
