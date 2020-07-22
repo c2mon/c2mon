@@ -2,7 +2,6 @@ package cern.c2mon.cache.actions.supervision;
 
 import cern.c2mon.cache.AbstractCacheTest;
 import cern.c2mon.cache.actions.state.SupervisionStateTagService;
-import cern.c2mon.cache.actions.supervision.SupervisedCacheService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.test.CachePopulationRule;
 import cern.c2mon.server.cache.test.SupervisionCacheResetRule;
@@ -96,7 +95,7 @@ public abstract class AbstractSupervisedServiceTest<T extends Supervised, T_IMPL
   }
 
   @Test
-  public void resumingStartedObjectChangesTimestamp() throws InterruptedException {
+  public void resumingStartedObjectChangesTimestamp() {
     cache.put(sample.getId(), sample);
 
     supervisedService.start(sample.getId(), System.currentTimeMillis() - 1);
