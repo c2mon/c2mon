@@ -1,6 +1,6 @@
 package cern.c2mon.cache.actions.alive;
 
-import cern.c2mon.cache.AbstractCacheTest;
+import cern.c2mon.cache.actions.AbstractCacheTest;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.cache.test.CachePopulationRule;
 import cern.c2mon.server.cache.test.SupervisionCacheResetRule;

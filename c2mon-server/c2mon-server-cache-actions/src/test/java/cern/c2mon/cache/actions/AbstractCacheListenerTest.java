@@ -1,6 +1,5 @@
 package cern.c2mon.cache.actions;
 
-import cern.c2mon.cache.AbstractCacheTest;
 import cern.c2mon.cache.api.listener.CacheListenerManagerImpl;
 import cern.c2mon.server.common.AbstractCacheableImpl;
 import cern.c2mon.shared.common.Cacheable;
