@@ -18,6 +18,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static cern.c2mon.cache.actions.commfault.CommFaultTagEvaluator.inferSupervisionStatus;
@@ -154,7 +155,7 @@ public class SupervisionStateTagService extends AbstractCacheServiceImpl<Supervi
    * @param stateTagId the stateTag id for the object to be force started
    */
   public void start(long stateTagId, long timestamp) throws NullPointerException {
-    setStateTagAsActive(stateTagId, STARTUP, timestamp);
+    setStateTagAsActive(stateTagId, STARTUP, timestamp, stateTag -> stateTag.getSupervisedEntity() + " was started");
   }
 
   /**
@@ -173,15 +174,15 @@ public class SupervisionStateTagService extends AbstractCacheServiceImpl<Supervi
    * @param stateTagId the stateTag id for the object to be force started
    */
   public void stop(long stateTagId, long timestamp) throws NullPointerException {
-    setStateTagAsActive(stateTagId, DOWN, timestamp);
+    setStateTagAsActive(stateTagId, DOWN, timestamp, stateTag -> stateTag.getSupervisedEntity() + " was stopped");
   }
 
   public void resume(long stateTagId, long timestamp, @NonNull String message) throws NullPointerException {
-    setStateTagAsActive(stateTagId, RUNNING, timestamp);
+    setStateTagAsActive(stateTagId, RUNNING, timestamp, __ -> message);
   }
 
   public void suspend(long stateTagId, long timestamp, @NonNull String message) throws NullPointerException {
-    setStateTagAsActive(stateTagId, DOWN, timestamp);
+    setStateTagAsActive(stateTagId, DOWN, timestamp, __ -> message);
   }
 
   /**
@@ -191,7 +192,7 @@ public class SupervisionStateTagService extends AbstractCacheServiceImpl<Supervi
    * @param newStatus
    * @param timestamp
    */
-  private void setStateTagAsActive(long stateTagId, SupervisionStatus newStatus, long timestamp) {
+  private void setStateTagAsActive(long stateTagId, SupervisionStatus newStatus, long timestamp, Function<SupervisionStateTag, String> message) {
     log.debug("Attempting to set State tag to " + newStatus);
 
     if (!cache.containsKey(stateTagId)) {
@@ -202,7 +203,7 @@ public class SupervisionStateTagService extends AbstractCacheServiceImpl<Supervi
     try {
       cache.compute(stateTagId, stateTag -> {
         if (stateTag.getSupervisionStatus() != newStatus) {
-          stateTag.setSupervision(newStatus, "", new Timestamp(timestamp));
+          stateTag.setSupervision(newStatus, message.apply(stateTag), new Timestamp(timestamp));
           stateTag.setValue(SupervisionStateTagEvaluator.isRunning(stateTag));
           TagController.validate(stateTag);
         }
