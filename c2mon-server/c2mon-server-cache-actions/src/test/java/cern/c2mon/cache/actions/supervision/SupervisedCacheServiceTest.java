@@ -165,8 +165,6 @@ public class SupervisedCacheServiceTest {
     equipmentService.suspend(equipment.getId(), timestamp, message);
 
     SupervisionEvent event = stateTagService.getSupervisionEvent(equipment.getStateTagId());
-    // TODO What should be the correct expectation? @Matthias: Difference between stop and suspend?
-    // TODO @Matthias: Is it OK to remove statusTime, statusDescription and supervisionStatus from AbstractSupervisedCacheObject?
     assertEquals(SupervisionStatus.DOWN, event.getStatus());
     assertNull(event.getEventTime());
     assertNull(event.getMessage());
