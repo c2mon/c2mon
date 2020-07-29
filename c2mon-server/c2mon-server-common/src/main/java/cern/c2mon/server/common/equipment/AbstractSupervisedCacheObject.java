@@ -18,11 +18,11 @@ package cern.c2mon.server.common.equipment;
 
 import cern.c2mon.server.common.AbstractCacheableImpl;
 import cern.c2mon.server.common.supervision.Supervised;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import cern.c2mon.shared.common.supervision.SupervisionStatus;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
+
+import java.sql.Timestamp;
 
 /**
  * Common part of all cache objects that need supervising by the server. Supervision involves an alive timer, with
@@ -53,6 +53,24 @@ public abstract class AbstractSupervisedCacheObject extends AbstractCacheableImp
    * Unique name of the equipment.
    */
   private String name;
+
+  /**
+   * The current status of this supervision equipment.
+   */
+  @NonNull
+  private SupervisionStatus supervisionStatus = SupervisionStatus.DOWN;
+
+  /**
+   * Description/reason for the current status.
+   */
+  @NonNull
+  private String statusDescription;
+
+  /**
+   * The time of the last update of the supervision status.
+   */
+  @NonNull
+  private Timestamp statusTime;
 
   /**
    * Identifier of the equipment's state tag.
@@ -108,6 +126,12 @@ public abstract class AbstractSupervisedCacheObject extends AbstractCacheableImp
    */
   @Override
   public AbstractSupervisedCacheObject clone() {
-    return (AbstractSupervisedCacheObject) super.clone();
+    AbstractSupervisedCacheObject cacheObject = (AbstractSupervisedCacheObject) super.clone();
+
+    if (this.statusTime != null) {
+      cacheObject.statusTime = (Timestamp) this.statusTime.clone();
+    }
+
+    return cacheObject;
   }
 }
