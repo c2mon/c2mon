@@ -26,6 +26,7 @@ import java.util.concurrent.TimeUnit;
 import static cern.c2mon.shared.common.CacheEvent.UPDATE_ACCEPTED;
 import static cern.c2mon.shared.common.CacheEvent.UPDATE_REJECTED;
 import static cern.c2mon.shared.common.supervision.SupervisionStatus.*;
+import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
 
 @ContextConfiguration(classes = {
@@ -128,7 +129,8 @@ public abstract class AbstractSupervisedServiceTest<T extends Supervised, T_IMPL
     cacheSupervision(
       () -> supervisedService.resume(sample.getId(), System.currentTimeMillis(), ""),
       UPDATE_ACCEPTED,
-      RUNNING
+      RUNNING,
+      RUNNING_LOCAL
     );
   }
 
@@ -173,18 +175,18 @@ public abstract class AbstractSupervisedServiceTest<T extends Supervised, T_IMPL
     assertEquals(resumedTime, secondResumedTime);
   }
 
-  private void verifySupervisionEvent(SupervisionStatus expectedStatus) {
+  private void verifySupervisionEvent(SupervisionStatus... expectedStatus) {
     SupervisionEvent event = stateTagService.getSupervisionEvent(sample.getStateTagId());
 
     assertEquals(sample.getId(), event.getEntityId());
     assertEquals(event.getEntity(), sample.getSupervisionEntity());
-    assertEquals(expectedStatus, event.getStatus());
+    assertTrue(asList(expectedStatus).contains(event.getStatus()));
 
     // Repeating the attempt yields an equal result
     assertEquals(event, stateTagService.getSupervisionEvent(sample.getStateTagId()));
   }
 
-  private void cacheSupervision(Runnable cacheAction, CacheEvent cacheEvent, SupervisionStatus expected) throws InterruptedException {
+  private void cacheSupervision(Runnable cacheAction, CacheEvent cacheEvent, SupervisionStatus... expected) throws InterruptedException {
     CountDownLatch latch = new CountDownLatch(1);
     stateTagService.getCache().getCacheListenerManager().registerListener(__ -> latch.countDown(), cacheEvent);
 
