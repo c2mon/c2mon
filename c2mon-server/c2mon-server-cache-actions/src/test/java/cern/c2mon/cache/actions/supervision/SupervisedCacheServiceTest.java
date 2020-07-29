@@ -63,8 +63,7 @@ public class SupervisedCacheServiceTest {
 
   @Test
   public void startDownEquipment() {
-    EquipmentCacheObject equipment = getEquipment(SupervisionStatus.DOWN);
-    equipmentCache.put(equipment.getId(), equipment);
+    EquipmentCacheObject equipment = getCachedEquipment(SupervisionStatus.DOWN);
 
     long timestamp = currentTimeMillis();
     equipmentService.start(equipment.getId(), timestamp);
@@ -78,8 +77,7 @@ public class SupervisedCacheServiceTest {
 
   @Test
   public void stopDownEquipment() {
-    EquipmentCacheObject equipment = getEquipment(SupervisionStatus.DOWN);
-    equipmentCache.put(equipment.getId(), equipment);
+    EquipmentCacheObject equipment = getCachedEquipment(SupervisionStatus.DOWN);
 
     long timestamp = currentTimeMillis();
     equipmentService.stop(equipment.getId(), timestamp);
@@ -92,8 +90,7 @@ public class SupervisedCacheServiceTest {
 
   @Test
   public void resumeRunningEquipment() {
-    EquipmentCacheObject equipment = getEquipment(SupervisionStatus.RUNNING);
-    equipmentCache.put(equipment.getId(), equipment);
+    EquipmentCacheObject equipment = getCachedEquipment(SupervisionStatus.RUNNING);
 
     long timestamp = currentTimeMillis();
     String message = "test-message";
@@ -107,8 +104,7 @@ public class SupervisedCacheServiceTest {
 
   @Test
   public void resumeDownEquipment() {
-    EquipmentCacheObject equipment = getEquipment(SupervisionStatus.DOWN);
-    equipmentCache.put(equipment.getId(), equipment);
+    EquipmentCacheObject equipment = getCachedEquipment(SupervisionStatus.DOWN);
 
     long timestamp = currentTimeMillis();
     String message = "test-message";
@@ -123,8 +119,7 @@ public class SupervisedCacheServiceTest {
 
   @Test
   public void suspendRunningEquipment() {
-    EquipmentCacheObject equipment = getEquipment(SupervisionStatus.RUNNING);
-    equipmentCache.put(equipment.getId(), equipment);
+    EquipmentCacheObject equipment = getCachedEquipment(SupervisionStatus.RUNNING);
 
     long timestamp = currentTimeMillis();
     String message = "test-message";
@@ -139,8 +134,7 @@ public class SupervisedCacheServiceTest {
 
   @Test
   public void suspendUncertainEquipment() {
-    EquipmentCacheObject equipment = getEquipment(SupervisionStatus.UNCERTAIN);
-    equipmentCache.put(equipment.getId(), equipment);
+    EquipmentCacheObject equipment = getCachedEquipment(SupervisionStatus.UNCERTAIN);
 
     long timestamp = currentTimeMillis();
     String message = "test-message";
@@ -155,8 +149,7 @@ public class SupervisedCacheServiceTest {
 
   @Test
   public void suspendDownEquipment() {
-    EquipmentCacheObject equipment = getEquipment(SupervisionStatus.DOWN);
-    equipmentCache.put(equipment.getId(), equipment);
+    EquipmentCacheObject equipment = getCachedEquipment(SupervisionStatus.DOWN);
 
     long timestamp = currentTimeMillis();
     String message = "test-message";
@@ -170,10 +163,9 @@ public class SupervisedCacheServiceTest {
 
   @Test
   public void resumeDownProcess() {
-    ProcessCacheObject process = apply(getProcess(SupervisionStatus.DOWN), p -> {
+    ProcessCacheObject process = apply(getCachedProcess(SupervisionStatus.DOWN), p -> {
       p.setLocalConfig(ProcessCacheObject.LocalConfig.Y);
     });
-    processCache.put(process.getId(), process);
 
     long timestamp = currentTimeMillis();
     String message = "test-message";
@@ -186,23 +178,27 @@ public class SupervisedCacheServiceTest {
     assertEquals(message, event.getMessage());
   }
 
-  private EquipmentCacheObject getEquipment(SupervisionStatus supervisionStatus) {
+  private EquipmentCacheObject getCachedEquipment(SupervisionStatus supervisionStatus) {
     SupervisionStateTag stateTag = new SupervisionStateTagFactory().sampleBase();
     stateTag.setSupervisionStatus(supervisionStatus);
     stateTagService.getCache().put(stateTag.getId(), stateTag);
 
-    EquipmentCacheObject e = new EquipmentCacheObject(101010L);
-    e.setStateTagId(stateTag.getId());
-    return e;
+    EquipmentCacheObject equipment = new EquipmentCacheObject(101010L);
+    equipment.setStateTagId(stateTag.getId());
+    equipmentCache.put(equipment.getId(), equipment);
+
+    return equipment;
   }
 
-  private ProcessCacheObject getProcess(SupervisionStatus supervisionStatus) {
+  private ProcessCacheObject getCachedProcess(SupervisionStatus supervisionStatus) {
     SupervisionStateTag stateTag = new SupervisionStateTagFactory().ofProcess();
     stateTag.setSupervisionStatus(supervisionStatus);
     stateTagService.getCache().put(stateTag.getId(), stateTag);
 
-    ProcessCacheObject p = new ProcessCacheObject(202020L);
-    p.setStateTagId(stateTag.getId());
-    return p;
+    ProcessCacheObject process = new ProcessCacheObject(202020L);
+    process.setStateTagId(stateTag.getId());
+    processCache.put(process.getId(), process);
+
+    return process;
   }
 }
