@@ -46,46 +46,5 @@ public class AliveTagEvents {
 
     // TODO (Alex) Consider try-catching this?
     SupervisionEventHandler.getEventHandlers().get(supervisedEntity).onAliveTimerDown(aliveTimer.getSupervisedId());
-
-//    try {
-//      final Long processId = processFacade.getProcessIdFromAlive(aliveTimer.getId());
-//      if (aliveTimer.isProcessAliveType()) {
-//        final Long processId = processService.getProcessIdFromAlive(aliveTimerId);
-//        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-//        processEvents.onDown(processId, timestamp, msg);
-//      } else if (aliveTimer.isEquipmentAliveType()) {
-//        Long equipmentId = aliveTimer.getRelatedId();
-//        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-//        equipmentEvents.onDown(equipmentId, timestamp, msg);
-//
-//         Manually set the CommFaultTag (TIMS-972)
-//        ControlTag commFaultTag = controlTagCache.getCopy(equipmentCache.getCopy(equipmentId).getCommFaultTagId());
-//        setCommFaultTag(commFaultTag.getId(), false, commFaultTag.getValueDescription(), timestamp);
-//
-    // Bring down all SubEquipments
-//        for (Long subEquipmentId : equipmentCache.get(equipmentId).getSubEquipmentIds()) {
-//          String message = "Alive timer for parent Equipment expired: " + msg;
-//          subEquipmentEvents.onDown(subEquipmentId, timestamp, message);
-//
-//          commFaultTag = controlTagCache.getCopy(subEquipmentCache.getCopy(subEquipmentId).getCommFaultTagId());
-//          setCommFaultTag(commFaultTag.getId(), false, commFaultTag.getValueDescription(), timestamp);
-//        }
-//      } else {
-//        Long subEquipmentId = aliveTimer.getRelatedId();
-//        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-//        subEquipmentEvents.onDown(subEquipmentId, timestamp, msg);
-//
-    // Manually set the CommFaultTag (TIMS-972)
-//        ControlTag commFaultTag = controlTagCache.getCopy(subEquipmentCache.getCopy(subEquipmentId).getCommFaultTagId());
-//        setCommFaultTag(commFaultTag.getId(), false, commFaultTag.getValueDescription(), timestamp);
-//      }
-//    } catch (CacheElementNotFoundException cacheEx) {
-//      log.error("Unable to locate a required element within the cache on Alive Timer expiration.", cacheEx);
-//    } catch (NullPointerException nullEx) {
-//      log.error("NullPointer exception caught on Alive Timer expiration.", nullEx);
-//    } catch (IllegalArgumentException argEx) {
-//      log.error("IllegalArgument exception caught on Aliver Timer expiration", argEx);
-//    }
-
   }
 }
