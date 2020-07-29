@@ -19,7 +19,6 @@ import cern.c2mon.server.common.supervision.SupervisionStateTag;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.common.supervision.SupervisionStatus;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -155,7 +154,6 @@ public class SupervisedCacheServiceTest {
   }
 
   @Test
-  @Ignore
   public void suspendDownEquipment() {
     EquipmentCacheObject equipment = getEquipment(SupervisionStatus.DOWN);
     equipmentCache.put(equipment.getId(), equipment);
@@ -166,8 +164,8 @@ public class SupervisedCacheServiceTest {
 
     SupervisionEvent event = stateTagService.getSupervisionEvent(equipment.getStateTagId());
     assertEquals(SupervisionStatus.DOWN, event.getStatus());
-    assertNull(event.getEventTime());
-    assertNull(event.getMessage());
+    assertEquals(0, event.getEventTime().getTime());
+    assertEquals("", event.getMessage());
   }
 
   @Test
