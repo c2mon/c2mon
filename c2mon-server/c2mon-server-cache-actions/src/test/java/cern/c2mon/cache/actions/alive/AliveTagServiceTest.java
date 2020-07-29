@@ -44,19 +44,6 @@ public class AliveTagServiceTest {
   }
 
   @Test
-  public void startTest() {
-    AliveTag aliveTimer = factory.sampleBase();
-    aliveTimer.setValue(false);
-
-    aliveTimerCacheRef.put(aliveTimer.getId(), aliveTimer);
-
-    aliveTimerService.start(aliveTimer.getId(), System.currentTimeMillis());
-
-    assertTrue("Test if AliveTimer is started, set as active", aliveTimerCacheRef.get(aliveTimer.getId()).getValue());
-    assertTrue("Test if last update is set up", aliveTimerCacheRef.get(aliveTimer.getId()).getLastUpdate() != 0);
-  }
-
-  @Test
   public void startForcedAliveTimer() throws InterruptedException {
     AliveTag aliveTimer = factory.sampleBase();
     aliveTimer.setValue(true);
