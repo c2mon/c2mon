@@ -74,7 +74,7 @@ public class ProcessService extends AbstractSupervisedService<Process> implement
         properties.isTestMode() ? "- TEST Mode " : "", process.getName(), process.getProcessPIK());
 
       ((ProcessCacheObject) process).setRequiresReboot(false);
-      start(processId, startupTime.getTime());
+      super.start(processId, startupTime.getTime());
       setSupervisionIfLocalConfig(process, "Process was started locally", startupTime);
     });
   }
