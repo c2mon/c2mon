@@ -77,6 +77,16 @@ public abstract class AbstractSupervisedServiceTest<T extends Supervised, T_IMPL
   }
 
   @Test
+  public void startRunningObject() throws InterruptedException {
+    setAs(RUNNING);
+    cacheSupervision(
+      () -> supervisedService.start(sample.getId(), System.currentTimeMillis()),
+      UPDATE_REJECTED,
+      RUNNING
+    );
+  }
+
+  @Test
   public void stop() throws InterruptedException {
     setAs(RUNNING);
     cacheSupervision(
