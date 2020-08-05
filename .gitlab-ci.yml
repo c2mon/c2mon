@@ -10,11 +10,8 @@ image:
   entrypoint: [""]
 
 before_script:
-  - mvn help:evaluate -Dexpression=project.version -Doutput=.POM_VERSION
   - mvn help:evaluate -Dexpression=elasticsearch.version -Doutput=.POM_ES_VERSION
-  - export POM_VERSION=`cat .POM_VERSION`
   - export POM_ES_VERSION=`cat .POM_ES_VERSION`
-  - echo $POM_VERSION
   - echo $POM_ES_VERSION
 
 #services:
