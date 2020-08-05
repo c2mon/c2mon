@@ -20,11 +20,11 @@ import cern.c2mon.server.elasticsearch.client.ElasticsearchClientRest;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.ElasticsearchStatusException;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
-import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
 import org.elasticsearch.action.admin.indices.refresh.RefreshResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.rest.RestStatus;
 import org.elasticsearch.search.SearchHit;
@@ -71,7 +71,7 @@ public class ElasticsearchTestClient {
 
   public void deleteIndex(String index) {
     try {
-      DeleteIndexResponse res = esClient
+      AcknowledgedResponse res = esClient
         .getClient()
         .indices()
         .delete(new DeleteIndexRequest(index), RequestOptions.DEFAULT);

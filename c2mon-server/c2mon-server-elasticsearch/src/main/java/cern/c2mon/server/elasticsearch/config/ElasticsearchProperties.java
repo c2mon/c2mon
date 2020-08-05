@@ -17,6 +17,7 @@
 package cern.c2mon.server.elasticsearch.config;
 
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
@@ -28,6 +29,12 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Data
 @ConfigurationProperties(prefix = "c2mon.server.elasticsearch")
 public class ElasticsearchProperties {
+
+  /**
+   * Version of ElasticSearch as read from the POM, mainly for testing purposes.
+   */
+  @Value("${elasticsearch.version}")
+  private String version;
 
   /**
    * Type is being removed in Elasticsearch 6.x (check

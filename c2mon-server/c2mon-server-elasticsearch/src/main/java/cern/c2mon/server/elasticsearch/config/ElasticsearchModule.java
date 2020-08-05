@@ -20,6 +20,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.PropertySource;
 
 /**
  * This class is responsible for configuring the Spring context for the
@@ -32,6 +33,5 @@ import org.springframework.context.annotation.Import;
 @Import(ElasticsearchPersistenceConfig.class)
 @EnableConfigurationProperties(ElasticsearchProperties.class)
 @ComponentScan("cern.c2mon.server.elasticsearch")
-public class ElasticsearchModule {
-  // Module definition.
-}
+@PropertySource("classpath:c2mon-elasticsearch.properties")
+public class ElasticsearchModule {}

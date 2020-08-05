@@ -16,7 +16,7 @@ public final class ContainerizedElasticsearchManager {
   public static void start(ElasticsearchProperties properties) {
     synchronized (ContainerizedElasticsearchManager.class) {
       if (esContainer == null) {
-        esContainer = new FixedHostPortGenericContainer<>("docker.elastic.co/elasticsearch/elasticsearch:6.8.9")
+        esContainer = new FixedHostPortGenericContainer<>("docker.elastic.co/elasticsearch/elasticsearch:" + properties.getVersion())
           .withEnv("discovery.type", "single-node")
           .withFixedExposedPort(
             properties.getPort(),
