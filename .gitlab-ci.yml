@@ -10,7 +10,7 @@ image:
   entrypoint: [""]
 
 services:
-  - name: elasticsearch:6
+  - name: elasticsearch:6.8.11
     alias: elasticsearch
     command: ["bin/elasticsearch", "-Ediscovery.type=single-node"]
 
