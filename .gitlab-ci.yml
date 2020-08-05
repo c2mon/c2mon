@@ -14,8 +14,8 @@ before_script:
   - mvn help:evaluate -Dexpression=elasticsearch.version -Doutput=.POM_ES_VERSION
   - export POM_VERSION=`cat .POM_VERSION`
   - export POM_ES_VERSION=`cat .POM_ES_VERSION`
-  - echo "POM_VERSION: $POM_VERSION"
-  - echo "POM_ES_VERSION: $POM_ES_VERSION"
+  - echo $POM_VERSION
+  - echo $POM_ES_VERSION
 
 services:
   - name: elasticsearch:$POM_ES_VERSION
