@@ -22,13 +22,15 @@ import cern.c2mon.server.elasticsearch.tag.TagDocumentIndexerTestSuite;
 import cern.c2mon.server.elasticsearch.tag.config.TagConfigDocumentIndexerTestSuite;
 import cern.c2mon.server.elasticsearch.util.ContainerizedElasticsearchManager;
 import cern.c2mon.server.elasticsearch.util.EmbeddedElasticsearchManager;
-import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.rules.Timeout;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 import java.util.concurrent.TimeUnit;
+
+import static java.lang.Runtime.getRuntime;
 
 /**
  * Perform the necessary setup to run ES tests
@@ -50,9 +52,11 @@ public class ElasticsearchSuiteTest {
   @ClassRule
   public static Timeout classTimeout = new Timeout(2, TimeUnit.MINUTES);
 
-  @AfterClass
-  public static void cleanup() {
-    EmbeddedElasticsearchManager.stop();
-    ContainerizedElasticsearchManager.stop();
+  @BeforeClass
+  public static void beforeClass() {
+    getRuntime().addShutdownHook(new Thread(() -> {
+      EmbeddedElasticsearchManager.stop();
+      ContainerizedElasticsearchManager.stop();
+    }));
   }
 }

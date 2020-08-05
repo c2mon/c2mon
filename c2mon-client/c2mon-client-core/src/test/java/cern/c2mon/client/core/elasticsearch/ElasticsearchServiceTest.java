@@ -40,7 +40,7 @@ import cern.c2mon.server.elasticsearch.util.ElasticsearchTestClient;
 import cern.c2mon.server.elasticsearch.util.EmbeddedElasticsearchManager;
 import cern.c2mon.server.supervision.config.SupervisionModule;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
-import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -52,6 +52,7 @@ import java.util.Collection;
 
 import static cern.c2mon.server.common.util.KotlinAPIs.apply;
 import static java.lang.Double.doubleToLongBits;
+import static java.lang.Runtime.getRuntime;
 import static java.util.Collections.emptyList;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.assertEquals;
@@ -102,6 +103,14 @@ public class ElasticsearchServiceTest {
 
   private TagConfigDocumentListener tagDocumentListener;
 
+  @BeforeClass
+  public static void beforeClass() {
+    getRuntime().addShutdownHook(new Thread(() -> {
+      EmbeddedElasticsearchManager.stop();
+      ContainerizedElasticsearchManager.stop();
+    }));
+  }
+
   @Before
   public void setUp() {
     alarmService = createNiceMock(AlarmService.class);
@@ -116,23 +125,11 @@ public class ElasticsearchServiceTest {
       if (elasticsearchProperties.getPassword() != null) es.setPassword(elasticsearchProperties.getPassword());
     }), "c2mon");
 
-    if (elasticsearchProperties.getServiceType().equals("embedded")) {
-      EmbeddedElasticsearchManager.start(elasticsearchProperties);
-    } else if (elasticsearchProperties.getServiceType().equals("containerized")) {
-      ContainerizedElasticsearchManager.start(elasticsearchProperties);
-    }
-
     esTestClient.deleteIndex(elasticsearchProperties.getTagConfigIndex());
     indexManager.create(
       IndexMetadata.builder().name(elasticsearchProperties.getTagConfigIndex()).build(),
       MappingFactory.createTagConfigMapping()
     );
-  }
-
-  @AfterClass
-  public static void tearDownClass() {
-    EmbeddedElasticsearchManager.stop();
-    ContainerizedElasticsearchManager.stop();
   }
 
   @Test

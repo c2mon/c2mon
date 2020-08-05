@@ -44,6 +44,18 @@ public class ElasticsearchClientConfiguration {
   @Autowired
   public ElasticsearchClientConfiguration(ElasticsearchProperties properties) {
     this.properties = properties;
+
+    switch (properties.getServiceType()) {
+    case "embedded":
+      EmbeddedElasticsearchManager.start(properties);
+      break;
+    case "containerized":
+      ContainerizedElasticsearchManager.start(properties);
+      break;
+    case "external":
+      // Service assumed to have been started externally: nothing to be done.
+      break;
+    }
   }
 
   /**
@@ -55,12 +67,6 @@ public class ElasticsearchClientConfiguration {
   public ElasticsearchClient getClient() {
     if (!properties.isEnabled()) {
       return new ElasticsearchClientStub();
-    }
-
-    if (properties.getServiceType().equals("embedded")) {
-      EmbeddedElasticsearchManager.start(properties);
-    } else if (properties.getServiceType().equals("containerized")) {
-      ContainerizedElasticsearchManager.start(properties);
     }
 
     if (ElasticsearchClientType.TRANSPORT.name().equalsIgnoreCase(properties.getClient())) {
