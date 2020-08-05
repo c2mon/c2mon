@@ -34,6 +34,8 @@ variables:
 
 Compile:
   stage: build
+  tags:
+    - docker-privileged
   script:
     - export MAVEN_OPTS=""
     - mvn $MAVEN_CLI_OPTS install
