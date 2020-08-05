@@ -43,12 +43,12 @@ Compile:
     - master
     - tags
 
-#"Check ElasticSearch health":
-#  stage: build
-#  script:
-#    - curl "http://elasticsearch:9200/_cat/health"
-#  only:
-#    - branches
+"Check ElasticSearch health":
+  stage: build
+  script:
+    - curl "http://elasticsearch:9200/_cat/health"
+  only:
+    - branches
 
 "Build docs":
   stage: build
