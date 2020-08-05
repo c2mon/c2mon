@@ -9,8 +9,16 @@ image:
   name: gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-maven:jdk-11-mvn-3.6-1
   entrypoint: [""]
 
+before_script:
+  - mvn help:evaluate -Dexpression=project.version -Doutput=.POM_VERSION
+  - mvn help:evaluate -Dexpression=elasticsearch.version -Doutput=.POM_ES_VERSION
+  - export POM_VERSION=`cat .POM_VERSION`
+  - export POM_ES_VERSION=`cat .POM_ES_VERSION`
+  - echo "POM_VERSION: $POM_VERSION"
+  - echo "POM_ES_VERSION: $POM_ES_VERSION"
+
 services:
-  - name: elasticsearch:6.8.9
+  - name: elasticsearch:$POM_ES_VERSION
     alias: elasticsearch
     command: ["bin/elasticsearch", "-Ediscovery.type=single-node"]
 
