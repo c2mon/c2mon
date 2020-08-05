@@ -9,18 +9,17 @@ image:
   name: gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-maven:jdk-11-mvn-3.6-1
   entrypoint: [""]
 
-before_script:
-  - echo $ES_VERSION
-  - export POM_ES_VERSION=$(mvn help:evaluate -Dexpression=elasticsearch.version -q -DforceStdout)
-  - echo $POM_ES_VERSION
-
 services:
-  - name: elasticsearch:$ES_VERSION
-    alias: elasticsearch
-    command: ["bin/elasticsearch", "-Ediscovery.type=single-node"]
+  - docker:dind
+  # - name: elasticsearch:$POM_ES_VERSION
+  #   alias: elasticsearch
+  #   command: ["bin/elasticsearch", "-Ediscovery.type=single-node"]
 
 variables:
-  ES_VERSION: $(mvn help:evaluate -Dexpression=elasticsearch.version -q -DforceStdout)
+  # Instruct TestContainers to use the daemon of DinD.
+  DOCKER_HOST: "tcp://docker:2375"
+  # Improve performance with overlayfs.
+  DOCKER_DRIVER: overlay2
   # This will suppress any download for dependencies and plugins or upload messages which would clutter the console log.
   # `showDateTime` will show the passed time in milliseconds. You need to specify `--batch-mode` to make this work.
   # As of Maven 3.3.0 instead of this you may define these options in `.mvn $MAVEN_CLI_OPTS/maven.config` so the same config is used
@@ -49,12 +48,12 @@ Compile:
     - master
     - tags
 
-"Check ElasticSearch health":
-  stage: build
-  script:
-    - curl "http://elasticsearch:9200/_cat/health"
-  only:
-    - branches
+#"Check ElasticSearch health":
+#  stage: build
+#  script:
+#    - curl "http://elasticsearch:9200/_cat/health"
+#  only:
+#    - branches
 
 "Build docs":
   stage: build
