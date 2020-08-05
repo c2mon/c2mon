@@ -10,14 +10,13 @@ image:
   entrypoint: [""]
 
 before_script:
-  - mvn help:evaluate -Dexpression=elasticsearch.version -Doutput=.POM_ES_VERSION
-  - export POM_ES_VERSION=`cat .POM_ES_VERSION`
+  - export POM_ES_VERSION=$(mvn help:evaluate -Dexpression=elasticsearch.version -q -DforceStdout)
   - echo $POM_ES_VERSION
 
-#services:
-#  - name: elasticsearch:$POM_ES_VERSION
-#    alias: elasticsearch
-#    command: ["bin/elasticsearch", "-Ediscovery.type=single-node"]
+services:
+  - name: elasticsearch:$(mvn help:evaluate -Dexpression=elasticsearch.version -q -DforceStdout)
+    alias: elasticsearch
+    command: ["bin/elasticsearch", "-Ediscovery.type=single-node"]
 
 variables:
   # This will suppress any download for dependencies and plugins or upload messages which would clutter the console log.
