@@ -10,14 +10,11 @@ image:
   entrypoint: [""]   
 
 services:
-  - docker:dind
-  # - name: elasticsearch:$POM_ES_VERSION
-  #   alias: elasticsearch
-  #   command: ["bin/elasticsearch", "-Ediscovery.type=single-node"]
+  - name: elasticsearch:6.8.11
+    alias: elasticsearch
+    command: ["bin/elasticsearch", "-Ediscovery.type=single-node"]
 
 variables:
-  DOCKER_TLS_CERTDIR: ""
-  DOCKER_HOST: "tcp://docker:2375"
   # This will suppress any download for dependencies and plugins or upload messages which would clutter the console log.
   # `showDateTime` will show the passed time in milliseconds. You need to specify `--batch-mode` to make this work.
   # As of Maven 3.3.0 instead of this you may define these options in `.mvn $MAVEN_CLI_OPTS/maven.config` so the same config is used
