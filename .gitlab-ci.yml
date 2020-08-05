@@ -5,16 +5,19 @@ stages:
   - publish
   - trigger_tim
 
-image: 
-  name: gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-maven:jdk-11-mvn-3.6-1
-  entrypoint: [""]   
+image:
+  name: gitlab-registry.cern.ch/industrial-controls/sw-infra/mvn-dind:3.6.2-19.3.0-jdk11
+  entrypoint: [""]
 
 services:
-  - name: elasticsearch:6.8.11
-    alias: elasticsearch
-    command: ["bin/elasticsearch", "-Ediscovery.type=single-node"]
+  - docker:19.03.11-dind
+#  - name: elasticsearch:6.8.11
+#    alias: elasticsearch
+#    command: ["bin/elasticsearch", "-Ediscovery.type=single-node"]
 
 variables:
+  DOCKER_TLS_CERTDIR: ""
+  DOCKER_HOST: "tcp://docker:2375"
   # This will suppress any download for dependencies and plugins or upload messages which would clutter the console log.
   # `showDateTime` will show the passed time in milliseconds. You need to specify `--batch-mode` to make this work.
   # As of Maven 3.3.0 instead of this you may define these options in `.mvn $MAVEN_CLI_OPTS/maven.config` so the same config is used
@@ -43,12 +46,12 @@ Compile:
     - master
     - tags
 
-"Check ElasticSearch health":
-  stage: build
-  script:
-    - curl "http://elasticsearch:9200/_cat/health"
-  only:
-    - branches
+#"Check ElasticSearch health":
+#  stage: build
+#  script:
+#    - curl "http://elasticsearch:9200/_cat/health"
+#  only:
+#    - branches
 
 "Build docs":
   stage: build
@@ -72,6 +75,8 @@ Compile:
 
 Test:
   stage: test
+  tags:
+    - docker-privileged
   script:
     - export MAVEN_OPTS=""
     - mkdir reports
@@ -85,7 +90,7 @@ Test:
       junit: reports/*.xml
   only:
     - master
-    
+
 "Build docs":
   stage: test
   image: jekyll/builder:3.8.5
@@ -130,10 +135,10 @@ Publish:
 # Publish docker images?
 
 "Sonar master QA":
-  stage: publish                                                     
+  stage: publish
   script:
     - mvn $MAVEN_CLI_OPTS package sonar:sonar -Dmaven.test.skip=true -DskipDocker=true -Dsonar.host.url=${SONAR_URL} -Dsonar.dependencyCheck.reportPath=target/dependency-check-report.xml
-  only:                                                    
+  only:
     - master
 
 "Deploy docs":
@@ -150,13 +155,13 @@ Publish:
     - deploy-eos
   only:
     - master
-    
+
 #  =========================
 #  === Stage: trigger_tim ==
 #  =========================
 
 "Trigger TIM build":
-  stage: trigger_tim                            
+  stage: trigger_tim
   image: appropriate/curl:3.1
   dependencies: []
   script:
