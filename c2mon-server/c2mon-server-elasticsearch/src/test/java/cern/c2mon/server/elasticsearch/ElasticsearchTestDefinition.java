@@ -25,12 +25,9 @@ import cern.c2mon.server.cache.test.CachePopulationRule;
 import cern.c2mon.server.common.config.CommonModule;
 import cern.c2mon.server.elasticsearch.config.ElasticsearchModule;
 import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
-import cern.c2mon.server.elasticsearch.util.ContainerizedElasticsearchManager;
 import cern.c2mon.server.elasticsearch.util.ElasticsearchTestClient;
-import cern.c2mon.server.elasticsearch.util.EmbeddedElasticsearchManager;
 import cern.c2mon.server.supervision.config.SupervisionModule;
 import org.junit.After;
-import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -63,26 +60,6 @@ public abstract class ElasticsearchTestDefinition {
 
   @Autowired
   protected ElasticsearchTestClient esTestClient;
-
-  private static boolean setUpRun = false;
-
-  /**
-   * NOTE Running this method multiple times will have no effect. The setup happens
-   * here because access to the common ElasticSearch properties is desired. The
-   * cleanup is done once at {@link ElasticsearchSuiteTest#cleanup}.
-   */
-  @Before
-  public void baseSetUp() {
-    if (!setUpRun) {
-      setUpRun = true;
-
-      if (properties.getServiceType().equals("embedded")) {
-        EmbeddedElasticsearchManager.start(properties);
-      } else if (properties.getServiceType().equals("containerized")) {
-        ContainerizedElasticsearchManager.start(properties);
-      }
-    }
-  }
 
   @After
   public void tearDown() {
