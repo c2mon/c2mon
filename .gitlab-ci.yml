@@ -10,6 +10,7 @@ image:
   entrypoint: [""]
 
 before_script:
+  - echo $ES_VERSION
   - export POM_ES_VERSION=$(mvn help:evaluate -Dexpression=elasticsearch.version -q -DforceStdout)
   - echo $POM_ES_VERSION
 
@@ -19,7 +20,7 @@ services:
     command: ["bin/elasticsearch", "-Ediscovery.type=single-node"]
 
 variables:
-  ES_VERSION: 6.8.11
+  ES_VERSION: $(mvn help:evaluate -Dexpression=elasticsearch.version -q -DforceStdout)
   # This will suppress any download for dependencies and plugins or upload messages which would clutter the console log.
   # `showDateTime` will show the passed time in milliseconds. You need to specify `--batch-mode` to make this work.
   # As of Maven 3.3.0 instead of this you may define these options in `.mvn $MAVEN_CLI_OPTS/maven.config` so the same config is used
