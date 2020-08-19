@@ -31,6 +31,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import cern.c2mon.shared.common.rule.RuleInputValue;
 import cern.c2mon.shared.common.type.TypeConverter;
 
 public abstract class RuleExpression 
@@ -96,7 +97,7 @@ public abstract class RuleExpression
    * @return The casted rule result for the given input values
    * @throws RuleEvaluationException In case of errors during the rule evaluation
    */
-  public final <T> T evaluate(final Map<Long, Object> pInputParams, Class<T> resultType)
+  public final <T> T evaluate(final Map<Long, RuleInputValue> pInputParams, Class<T> resultType)
       throws RuleEvaluationException {
     
     try {
@@ -114,8 +115,7 @@ public abstract class RuleExpression
    * @param pInputParams Map of value objects related to the input tag ids
    * @param resultType The result type class to which the rule result shall be casted
    */
-  public final <T> T forceEvaluate(final Map<Long, Object> pInputParams, Class<T> resultType) {
-    
+  public final <T> T forceEvaluate(final Map<Long, RuleInputValue> pInputParams, Class<T> resultType) {
     return TypeConverter.castToType(forceEvaluate(pInputParams), resultType);
   }
 

@@ -32,6 +32,7 @@ import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
+import cern.c2mon.shared.common.rule.RuleInputValue;
 import cern.c2mon.shared.rule.RuleEvaluationException;
 import cern.c2mon.shared.rule.RuleExpression;
 
@@ -288,7 +289,7 @@ public class ClientRuleTag<T> implements Tag, BaseTagListener {
           this.ruleMode = newRuleMode;
 
           try {
-            this.ruleResult = rule.evaluate(new Hashtable<Long, Object>(ruleInputValues), resultType);
+            this.ruleResult = rule.evaluate(new Hashtable<Long, RuleInputValue>(ruleInputValues), resultType);
           }
           catch (RuleEvaluationException e) {
             LOG.debug("computeRule() - \"" + rule.getExpression()
@@ -296,7 +297,7 @@ public class ClientRuleTag<T> implements Tag, BaseTagListener {
 
             ruleError = null;
             this.ruleQuality = getInvalidTagQuality();
-            this.ruleResult = rule.forceEvaluate(new Hashtable<Long, Object>(ruleInputValues), resultType);
+            this.ruleResult = rule.forceEvaluate(new Hashtable<Long, RuleInputValue>(ruleInputValues), resultType);
           }
           catch (Exception e) {
             this.ruleQuality.setInvalidStatus(TagQualityStatus.UNKNOWN_REASON, RULE_ERROR_MESSAGE);
@@ -304,7 +305,7 @@ public class ClientRuleTag<T> implements Tag, BaseTagListener {
             LOG.debug("computeRule() - \"" + rule.getExpression()
                 + "\" could not be evaluated.", e);
 
-            this.ruleResult = rule.forceEvaluate(new Hashtable<Long, Object>(ruleInputValues), resultType);
+            this.ruleResult = rule.forceEvaluate(new Hashtable<Long, RuleInputValue>(ruleInputValues), resultType);
           }
           // Update the time stamp of the ClientRuleTag
           this.timestamp = new Timestamp(System.currentTimeMillis());

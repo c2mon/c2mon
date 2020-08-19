@@ -150,7 +150,7 @@ public class RuleValidationTest {
       Set<Long> inputTags = rule.getInputTagIds();
       Iterator<Long> i = inputTags.iterator();
 
-      Map<Long, Object> inputTagsMap = new HashMap<Long, Object>();
+      Map<Long, RuleInputValue> inputTagsMap = new HashMap<>();
       while (i.hasNext()) {
         inputTagsMap.put(i.next(), validTag);
       }

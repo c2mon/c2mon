@@ -19,6 +19,8 @@ package cern.c2mon.shared.rule;
 import java.util.Map;
 import java.util.Set;
 
+import cern.c2mon.shared.common.rule.RuleInputValue;
+
 
 public class GTPMRuleCondition extends RuleExpression implements IRuleCondition, Cloneable {
 
@@ -81,7 +83,7 @@ public class GTPMRuleCondition extends RuleExpression implements IRuleCondition,
      * </OL>
      */
     @Override
-    public Object evaluate(Map<Long, Object> pInputParams) throws RuleEvaluationException {
+    public Object evaluate(Map<Long, RuleInputValue> pInputParams) throws RuleEvaluationException {
         Object result;
         try {
             result = this.condition.evaluate(pInputParams);
@@ -115,7 +117,7 @@ public class GTPMRuleCondition extends RuleExpression implements IRuleCondition,
     
 
     @Override
-    public Object forceEvaluate(final Map<Long, Object> pInputParams) {
+    public Object forceEvaluate(final Map<Long, RuleInputValue> pInputParams) {
       
       Object result;
       result = this.condition.forceEvaluate(pInputParams);
@@ -135,7 +137,7 @@ public class GTPMRuleCondition extends RuleExpression implements IRuleCondition,
     }
     
     @Override
-    public RuleValidationReport validate(final Map<Long, Object> pInputParams) {
+    public RuleValidationReport validate(final Map<Long, RuleInputValue> pInputParams) {
 
       // Running evaluate() and checking for exceptions,
       // is sufficient for testing whether a rule is valid ONLY IF

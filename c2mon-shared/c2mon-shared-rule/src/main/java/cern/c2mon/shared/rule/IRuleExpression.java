@@ -19,6 +19,8 @@ package cern.c2mon.shared.rule;
 import java.io.Serializable;
 import java.util.Map;
 
+import cern.c2mon.shared.common.rule.RuleInputValue;
+
 /**
  * Describes the methods of a rule expression.
  *
@@ -34,7 +36,7 @@ public interface IRuleExpression extends Cloneable, Serializable{
    * @return The rule result for the given input values
    * @throws RuleEvaluationException In case of errors during the rule evaluation
    */
-  Object evaluate(final Map<Long, Object> pInputParams) throws RuleEvaluationException;
+  Object evaluate(final Map<Long, RuleInputValue> pInputParams) throws RuleEvaluationException;
 
   /**
    * Tries to calculate a value for a rule even if it is marked as Invalid
@@ -47,14 +49,14 @@ public interface IRuleExpression extends Cloneable, Serializable{
    * @param pInputParams Map of value objects related to the input tag ids
    * @return The rule result for the given input values.
    */
-  Object forceEvaluate(final Map<Long, Object> pInputParams);
+  Object forceEvaluate(final Map<Long, RuleInputValue> pInputParams);
 
   
   /**
    * @return A report containing information on whether the Rule is valid or not,
    * and the errors found (if any).
    */
-  RuleValidationReport validate(final Map<Long, Object> pInputParams);
+  RuleValidationReport validate(final Map<Long, RuleInputValue> pInputParams);
   
   /**
    * Public Clone

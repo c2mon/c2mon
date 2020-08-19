@@ -266,7 +266,7 @@ public class MultipleReturnValueRuleExpressionTest {
     Set<Long> inputTags = rule.getInputTagIds();
     Iterator<Long> i = inputTags.iterator();
 
-    Map<Long, Object> inputTagsMap = new HashMap<Long, Object>();
+    Map<Long, RuleInputValue> inputTagsMap = new HashMap<>();
 
     while (i.hasNext()) {
       final Long id = i.next();
