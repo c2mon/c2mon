@@ -233,9 +233,8 @@ public class RuleEvaluatorImpl implements C2monCacheListener<Tag>, SmartLifecycl
       log.trace("Problem evaluating expresion for rule #{} - Force rule evaluation and set invalid quality UNKNOWN_REASON ({})", rule.getId(), re.getMessage());
       
       DataTagQuality ruleQuality = getInvalidTagQuality(tags);
-      rule.getRuleExpression().forceEvaluate(new Hashtable<Long, RuleInputValue>(tags), ruleResultClass);
-      ruleUpdateBuffer.invalidate(rule.getId(), TagQualityStatus.UNKNOWN_REASON, ruleQuality.getDescription(), ruleResultTimestamp);
-      
+      Object value = rule.getRuleExpression().forceEvaluate(new Hashtable<Long, RuleInputValue>(tags), ruleResultClass);
+      ruleUpdateBuffer.invalidate(rule.getId(), value, TagQualityStatus.UNKNOWN_REASON, ruleQuality.getDescription(), ruleResultTimestamp);
     } catch (Exception e) {
       log.error("Unexpected Error evaluating expresion of rule #{} - invalidating rule with quality UNKNOWN_REASON", rule.getId(), e);
       ruleUpdateBuffer.invalidate(rule.getId(), TagQualityStatus.UNKNOWN_REASON, e.getMessage(), ruleResultTimestamp);
