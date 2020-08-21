@@ -11,6 +11,7 @@ For more details on a given release, please check also the [version planning](ht
 - Support propagation of new server datasource property values amongst C2MON datasources (CM-272)
 
 ### Changed
+- Improved Rule evaluation for scenario with invalid input tags (CM-276)
 
 ### Fixed
 
