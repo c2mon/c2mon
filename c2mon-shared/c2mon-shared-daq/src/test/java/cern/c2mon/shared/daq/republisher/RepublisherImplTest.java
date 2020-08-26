@@ -16,10 +16,10 @@
  *****************************************************************************/
 package cern.c2mon.shared.daq.republisher;
 
-import java.util.concurrent.CountDownLatch;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
+import java.util.concurrent.CountDownLatch;
 
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
@@ -28,6 +28,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.jms.UncategorizedJmsException;
+
 
 /**
  * Unit test of RepublisherImpl.
