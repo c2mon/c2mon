@@ -59,11 +59,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 /**
- * When running in GitLab CI, these tests will connect to ElasticSearch's service
- * as configured in gitlab-ci.yml and c2mon-server-gitlab-ci.properties. For local
- * testing, an embedded ElasticSearch service is used by default, and can be
- * turned off by setting {@code c2mon.server.elasticsearch.serviceType=containerized}
- * below, while ensuring Docker is running locally.
+ * When running in GitLab CI, Docker-in-Docker is set up so that Testcontainers pull
+ * and run the necessary Elasticsearch image, as configured in {@code .gitlab-ci.yml}
+ * and {@code c2mon-server-gitlab-ci.properties}. For local testing, an embedded
+ * Elasticsearch service is used by default, while a setup similar to that of the
+ * pipelines can be achieved by running Docker locally and changing the property
+ * {@code c2mon.server.elasticsearch.serviceType} to {@code containerized}.
  */
 // @TestPropertySource(properties = {"c2mon.server.elasticsearch.serviceType=containerized"})
 @ContextConfiguration(classes = {

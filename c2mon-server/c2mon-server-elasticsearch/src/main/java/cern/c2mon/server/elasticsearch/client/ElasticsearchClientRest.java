@@ -201,7 +201,7 @@ public final class ElasticsearchClientRest implements ElasticsearchClient {
       DeleteResponse deleteResponse = client.delete(deleteRequest, RequestOptions.DEFAULT);
       return deleteResponse.status().equals(RestStatus.OK);
     } catch (IOException e) {
-      log.error("Error deleting '{}' index from ElasticSearch.", indexMetadata.getName(), e);
+      log.error("Error deleting '{}' index from Elasticsearch.", indexMetadata.getName(), e);
     }
     return false;
   }
