@@ -155,7 +155,7 @@ public class ActiveRequestSender implements ProcessRequestSender {
     }
 
     // We don't care if there is NO_PIK or NO_PROCESS. The server will take care
-    if (processConfiguration.getProcessID() != ProcessDisconnectionRequest.NO_ID) {
+    if (!ProcessDisconnectionRequest.NO_ID.equals(processConfiguration.getProcessID())) {
       processDisconnectionRequest = new ProcessDisconnectionRequest(processConfiguration.getProcessID(), processConfiguration.getProcessName(),
           processConfiguration.getprocessPIK(), startupTime);
     } else {
