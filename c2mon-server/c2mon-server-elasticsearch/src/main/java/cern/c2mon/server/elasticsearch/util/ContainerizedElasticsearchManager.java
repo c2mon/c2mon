@@ -9,7 +9,7 @@ import java.time.Duration;
 
 public final class ContainerizedElasticsearchManager {
 
-  private static FixedHostPortGenericContainer esContainer;
+  private static FixedHostPortGenericContainer<?> esContainer;
 
   private ContainerizedElasticsearchManager() {}
 
