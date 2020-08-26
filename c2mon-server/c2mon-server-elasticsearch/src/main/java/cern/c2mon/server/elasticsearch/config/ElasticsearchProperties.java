@@ -31,7 +31,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class ElasticsearchProperties {
 
   /**
-   * Version of ElasticSearch as read from the POM, mainly for testing purposes.
+   * Version of Elasticsearch as read from the POM, mainly for testing purposes.
    */
   @Value("${elasticsearch.version}")
   private String version;
@@ -49,7 +49,7 @@ public class ElasticsearchProperties {
   private boolean enabled = true;
 
   /**
-   # Control how ElasticSearch is started, mainly for testing purposes. Possible values:
+   # Control how Elasticsearch is started, mainly for testing purposes. Possible values:
    # - "embedded": start a self-contained service, requiring no manual action
    # - "containerized": assume Docker is running and pull and start the official image
    # - "external": take no action, relying on the service being available already
