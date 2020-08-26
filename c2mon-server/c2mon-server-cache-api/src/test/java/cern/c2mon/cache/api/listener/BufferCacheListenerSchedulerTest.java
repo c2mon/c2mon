@@ -37,7 +37,7 @@ public class BufferCacheListenerSchedulerTest {
       assertEquals(MAX_OVERFLOW, sortedResults.size());
     });
 
-    Thread.sleep(100);
+    Thread.sleep(250);
 
     bufferedCacheListener.run();
   }
