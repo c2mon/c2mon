@@ -31,7 +31,7 @@ public class ProcessEvents extends SupervisionEventHandler<Process> {
   private ProcessXMLProvider processXMLProvider;
 
   @Resource
-  private ServerProperties properties;;
+  private ServerProperties properties;
 
   @Inject
   public ProcessEvents(ProcessService processService,
