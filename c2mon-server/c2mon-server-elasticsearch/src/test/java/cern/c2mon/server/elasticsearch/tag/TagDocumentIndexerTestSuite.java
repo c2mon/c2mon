@@ -35,6 +35,7 @@ import cern.c2mon.server.elasticsearch.IndexNameManager;
 import cern.c2mon.server.elasticsearch.util.EntityUtils;
 import cern.c2mon.server.elasticsearch.util.IndexUtils;
 
+import static org.awaitility.Awaitility.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -78,7 +79,7 @@ public class TagDocumentIndexerTestSuite extends ElasticsearchTestDefinition {
     indexer.storeData(document);
 
     // Bulk flush operation seem to require more time
-    Awaitility.await().until(() -> IndexUtils.countDocuments(indexName, properties) == 1);
+    await().until(() -> IndexUtils.countDocuments(indexName, properties) == 1);
 
     esTestClient.refreshIndices();
 
@@ -95,7 +96,7 @@ public class TagDocumentIndexerTestSuite extends ElasticsearchTestDefinition {
     indexer.storeData(document);
 
     // Bulk flush operation seem to require more time
-    Awaitility.await().until(() -> IndexUtils.countDocuments(indexName, properties) == 2);
+    await().until(() -> IndexUtils.countDocuments(indexName, properties) == 2);
 
     esTestClient.refreshIndices();
 
