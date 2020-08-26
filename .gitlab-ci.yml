@@ -6,13 +6,15 @@ stages:
   - trigger_tim
 
 image:
-  name: gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-maven:jdk-11-mvn-3.6-1
+  name: gitlab-registry.cern.ch/industrial-controls/sw-infra/mvn-dind:3.6.2-19.3.0-jdk11
+  # name: gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-maven:jdk-11-mvn-3.6-1
   entrypoint: [""]
 
 services:
-  - name: elasticsearch:6.8.11
-    alias: elasticsearch
-    command: ["bin/elasticsearch", "-Ediscovery.type=single-node"]
+  - docker:19.03.11-dind
+  # - name: elasticsearch:6.8.11
+  #   alias: elasticsearch
+  #   command: ["bin/elasticsearch", "-Ediscovery.type=single-node"]
 
 variables:
   DOCKER_TLS_CERTDIR: ""
@@ -45,12 +47,12 @@ Compile:
     - master
     - tags
 
-"Check ElasticSearch health":
-  stage: build
-  script:
-    - curl "http://elasticsearch:9200/_cat/health"
-  only:
-    - branches
+# "Check ElasticSearch health":
+#   stage: build
+#   script:
+#     - curl "http://elasticsearch:9200/_cat/health"
+#   only:
+#     - branches
 
 
 #  =========================
@@ -59,7 +61,10 @@ Compile:
 
 Test:
   stage: test
+  tags:
+    - docker-privileged
   script:
+    - docker info
     - export MAVEN_OPTS=""
     - mkdir reports
     - mvn $MAVEN_CLI_OPTS install
@@ -149,4 +154,4 @@ Publish:
   script:
     - "curl --insecure -X POST -F token=$TIM_SERVER_TOKEN -F ref=master https://gitlab.cern.ch/api/v4/projects/9859/trigger/pipeline"
   only:
-  - master
+    - master
