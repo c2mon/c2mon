@@ -511,4 +511,9 @@ public abstract class AbstractTagFacade<T extends Tag> extends AbstractFacade<T>
   public T getTag(Long id) {
     return this.tagCache.get(id);
   }
+  
+  @Override
+  public T getCopy(Long id) {
+    return this.tagCache.getCopy(id);
+  }
 }

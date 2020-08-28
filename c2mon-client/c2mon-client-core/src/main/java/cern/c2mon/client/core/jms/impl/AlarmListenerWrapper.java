@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2018 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2020 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -24,11 +24,12 @@ import javax.jms.Message;
 import javax.jms.TextMessage;
 
 import com.google.gson.Gson;
+
 import lombok.extern.slf4j.Slf4j;
 
 import cern.c2mon.client.core.jms.AlarmListener;
-import cern.c2mon.shared.client.alarm.AlarmValue;
-import cern.c2mon.shared.client.alarm.AlarmValueImpl;
+import cern.c2mon.shared.client.tag.TagUpdate;
+import cern.c2mon.shared.client.tag.TransferTagImpl;
 import cern.c2mon.shared.util.json.GsonFactory;
 
 /**
@@ -37,7 +38,7 @@ import cern.c2mon.shared.util.json.GsonFactory;
  * <br/>
  */
 @Slf4j
-class AlarmListenerWrapper extends AbstractListenerWrapper<AlarmListener, AlarmValue> {
+class AlarmListenerWrapper extends AbstractListenerWrapper<AlarmListener, TagUpdate> {
 
   /** Json message serializer/deserializer */
   private static final Gson GSON = GsonFactory.createGson();
@@ -58,25 +59,25 @@ class AlarmListenerWrapper extends AbstractListenerWrapper<AlarmListener, AlarmV
   }
 
   @Override
-  protected AlarmValue convertMessage(final Message message) throws JMSException {
-    return GSON.fromJson(((TextMessage) message).getText(), AlarmValueImpl.class);
+  protected TagUpdate convertMessage(final Message message) throws JMSException {
+    return GSON.fromJson(((TextMessage) message).getText(), TransferTagImpl.class);
   }
 
   @Override
-  protected void invokeListener(final AlarmListener listener, final AlarmValue alarm) {
-    log.debug("invoke listener class {} for alarm id: {}", listener.getClass(), alarm.getId());
-    listener.onAlarmUpdate(alarm);
+  protected void invokeListener(final AlarmListener listener, final TagUpdate tagWithAlarmChange) {
+    log.debug("invoke listener class {} for tag id: {}", listener.getClass(), tagWithAlarmChange.getId());
+    listener.onAlarmUpdate(tagWithAlarmChange);
   }
 
   @Override
-  protected String getDescription(AlarmValue event) {
-    return "AlarmValue for alarm " + event.getId();
+  protected String getDescription(TagUpdate event) {
+    return "Tag #" + event.getId() + " got alarm value change";
   }
 
   @Override
-  protected boolean filterout(AlarmValue event) {
+  protected boolean filterout(TagUpdate event) {
     Long oldTime = eventTimes.get(event.getId());
-    Long newTime = event.getTimestamp().getTime();
+    Long newTime = event.getServerTimestamp().getTime();
     if (oldTime == null || oldTime <= newTime) {
       eventTimes.put(event.getId(), newTime);
       return false;

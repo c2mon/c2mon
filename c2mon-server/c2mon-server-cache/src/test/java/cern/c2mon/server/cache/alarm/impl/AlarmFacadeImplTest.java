@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2020 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -16,6 +16,10 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.alarm.impl;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.sql.Timestamp;
 
 import org.easymock.EasyMock;
@@ -23,6 +27,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import cern.c2mon.server.cache.AlarmCache;
+import cern.c2mon.server.cache.TagFacadeGateway;
 import cern.c2mon.server.cache.TagLocationService;
 import cern.c2mon.server.cache.alarm.config.OscillationProperties;
 import cern.c2mon.server.cache.alarm.oscillation.OscillationUpdater;
@@ -31,10 +36,6 @@ import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.test.CacheObjectCreation;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Junit test of AlarmFacade implementation
@@ -52,6 +53,8 @@ public class AlarmFacadeImplTest {
   private TagLocationService tagLocationService;
 
   private AlarmCacheUpdaterImpl alarmCacheUpdater;
+  
+  private AlarmAggregatorNotifier notifier;
 
   @Before
   public void setup() {
@@ -59,7 +62,8 @@ public class AlarmFacadeImplTest {
     tagLocationService = EasyMock.createStrictMock(TagLocationService.class);
     OscillationUpdater oscillationUpdater = new OscillationUpdater(alarmCache, new OscillationProperties());
     alarmCacheUpdater = new AlarmCacheUpdaterImpl(alarmCache, oscillationUpdater);
-    alarmFacadeImpl = new AlarmFacadeImpl(alarmCache, tagLocationService, alarmCacheUpdater);
+    notifier = EasyMock.createNiceMock(AlarmAggregatorNotifier.class);
+    alarmFacadeImpl = new AlarmFacadeImpl(alarmCache, tagLocationService, alarmCacheUpdater, notifier);
   }
 
   /**

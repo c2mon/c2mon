@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2020 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -16,13 +16,13 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.handler.impl;
 
-import java.sql.Timestamp;
 import java.util.Properties;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.UnexpectedRollbackException;
+
+import lombok.extern.slf4j.Slf4j;
 
 import cern.c2mon.server.cache.AlarmCache;
 import cern.c2mon.server.cache.AlarmFacade;
@@ -43,18 +43,12 @@ import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 @Service
 public class AlarmConfigHandlerImpl implements AlarmConfigHandler {
 
-  /**
-   * Transacted bean.
-   */
   @Autowired
   private AlarmConfigTransacted alarmConfigTransacted;
 
-  /**
-   * Cache.
-   */
-  private AlarmCache alarmCache;
+  private final AlarmCache alarmCache;
 
-  private AlarmFacade alarmFacade;
+  private final AlarmFacade alarmFacade;
 
   @Autowired
   public AlarmConfigHandlerImpl(AlarmCache alarmCache,
@@ -79,13 +73,9 @@ public class AlarmConfigHandlerImpl implements AlarmConfigHandler {
     try {
       AlarmCacheObject alarm = (AlarmCacheObject) alarmCache.getCopy(alarmId);
       alarmConfigTransacted.doRemoveAlarm(alarmId, alarmReport);
-      alarmCache.remove(alarmId); //will be skipped if rollback exception thrown in do method
-
-      alarm.setActive(false);
-      alarm.setInfo("Alarm was removed");
-      alarm.setTimestamp(new Timestamp(System.currentTimeMillis()));
-
-      alarmCache.notifyListenersOfUpdate(alarm);
+      // will be skipped if rollback exception thrown in do method
+      alarmCache.remove(alarmId);
+      alarmFacade.notifyOnAlarmRemoval(alarm);
     } catch (CacheElementNotFoundException e) {
       alarmReport.setWarning("Alarm " + alarmId + " is not know by the system ==> Nothing to be removed from the Alarm cache.");
     }

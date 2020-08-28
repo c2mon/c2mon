@@ -152,4 +152,12 @@ public interface CommonTagFacade<T extends Tag> extends ConfigurableCacheFacade<
    * @return the Tag
    */
   T getTag(Long id);
+  
+  /**
+   * Returns a tag copy by ID.
+   *
+   * @param id the ID
+   * @return the Tag
+   */
+  T getCopy(Long id);
 }

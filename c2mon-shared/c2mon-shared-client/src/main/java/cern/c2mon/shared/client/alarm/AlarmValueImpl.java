@@ -21,17 +21,18 @@ import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.Root;
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.convert.AnnotationStrategy;
 import org.simpleframework.xml.core.Persister;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 
 import cern.c2mon.shared.client.alarm.condition.AlarmCondition;
 import cern.c2mon.shared.client.request.ClientRequestReport;
@@ -49,7 +50,6 @@ import cern.c2mon.shared.client.request.ClientRequestReport;
  */
 @Root(name = "AlarmValue")
 @Data
-@Slf4j
 @AllArgsConstructor
 @Builder
 public final class AlarmValueImpl extends ClientRequestReport implements AlarmValue, Cloneable {
@@ -88,8 +88,12 @@ public final class AlarmValueImpl extends ClientRequestReport implements AlarmVa
   @Element
   private Long tagId;
 
-  /** Description for the Tag to which the alarm is attached */
+  /** 
+   * Description for the Tag to which the alarm is attached 
+   * @deprecated Please use instead the `Tag` of the alarm.
+   */
   @Element(required = false)
+  @Deprecated
   private String tagDescription;
 
   /** UTC timestamp of the alarm's last state change */

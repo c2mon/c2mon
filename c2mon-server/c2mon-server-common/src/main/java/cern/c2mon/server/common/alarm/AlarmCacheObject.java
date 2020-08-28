@@ -96,11 +96,6 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
    **/
   private String info;
 
-  /**
-   * Name of the JMS topic on which the alarm will be distributed to clients.
-   */
-  private String topic = "c2mon.client.alarm";
-
   ///////////////////////////////////////////////////////////////////////////////
   /////////// VARIABLES REQUIRED FOR DETECTING ALARM OSCILLATION ////////////////
   ///////////////////////////////////////////////////////////////////////////////

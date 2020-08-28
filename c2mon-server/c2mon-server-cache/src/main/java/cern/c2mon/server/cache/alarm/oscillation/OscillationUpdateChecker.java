@@ -28,10 +28,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Service;
 
-import cern.c2mon.server.cache.AlarmCache;
-import cern.c2mon.server.cache.AliveTimerFacade;
-import cern.c2mon.server.cache.ClusterCache;
-import cern.c2mon.server.cache.TagFacadeGateway;
+import cern.c2mon.server.cache.*;
+import cern.c2mon.server.cache.alarm.AlarmAggregatorListener;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.AlarmCacheUpdater;
@@ -96,29 +94,39 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
   private final TagFacadeGateway tagFacadeGateway;
 
   protected final AlarmQuery alarmCacheQuery = AlarmQuery.builder().oscillating(true).build();
+  
+  private final AlarmFacade alarmFacade;
 
   /**
    * Constructor.
    *
    * @param alarmCache
    *          the alarm cache to retrieve and update alarm cache objects.
-   * @param dataTagCache
-   *          the data tag cache to retrieve data tag objects and check their original values.
    * @param clusterCache
    *          the cluster cache to synchronize checks.
    * @param oscillationUpdater
    *          the instance that check oscillation statuses.
-   * @param AlarmCacheUpdater
+   * @param alarmCacheUpdater
    *          the alarm cache updater.
+   * @param tagFacadeGateway 
+   *          Required to get the Tag instance for a given Tag id
+   * @param alarmFacade 
+   *          Required to notify {@link AlarmAggregatorListener} on alarm oscillation reset
    */
   @Autowired
-  public OscillationUpdateChecker(final AlarmCache alarmCache, final ClusterCache clusterCache, final OscillationUpdater oscillationUpdater, final AlarmCacheUpdater alarmCacheUpdater, final TagFacadeGateway tagFacadeGateway) {
+  public OscillationUpdateChecker(final AlarmCache alarmCache, 
+                                  final ClusterCache clusterCache, 
+                                  final OscillationUpdater oscillationUpdater, 
+                                  final AlarmCacheUpdater alarmCacheUpdater, 
+                                  final TagFacadeGateway tagFacadeGateway,
+                                  final AlarmFacade alarmFacade) {
     super();
     this.alarmCache = alarmCache;
     this.clusterCache = clusterCache;
     this.oscillationUpdater = oscillationUpdater;
     this.alarmCacheUpdater = alarmCacheUpdater;
     this.tagFacadeGateway = tagFacadeGateway;
+    this.alarmFacade = alarmFacade;
   }
 
 
@@ -208,6 +216,7 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
           Tag tag = tagFacadeGateway.getTag(alarmCopy.getDataTagId());
           if(tag != null) {
             alarmCacheUpdater.resetOscillationStatus(alarmCopy, tag);
+            alarmFacade.notifyOnAlarmOscillationReset(tag);
           } else {
             log.error("Cannot locate data tag #{} for alarm #{} - unable to reset oscillation status", alarmCopy.getDataTagId(), alarmId);
           }

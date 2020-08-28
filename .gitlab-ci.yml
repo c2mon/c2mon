@@ -29,7 +29,7 @@ Compile:
   stage: build
   script:
     - export MAVEN_OPTS=""
-    - mvn $MAVEN_CLI_OPTS -DskipTests install
+    - mvn $MAVEN_CLI_OPTS install
   artifacts:
     name: "$CI_COMMIT_REF_NAME-$CI_COMMIT_SHORT_SHA"
     untracked: true
@@ -56,8 +56,8 @@ Test:
     when: always
     reports:
       junit: reports/*.xml
-  except:
-    - tags
+  only:
+    - master
     
 "Build docs":
   stage: test

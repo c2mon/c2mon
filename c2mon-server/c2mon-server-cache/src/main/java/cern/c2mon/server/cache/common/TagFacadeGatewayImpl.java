@@ -145,6 +145,11 @@ public class TagFacadeGatewayImpl implements TagFacadeGateway {
   public Tag getTag(Long id) {
     return this.getFacade(id).getTag(id);
   }
+  
+  @Override
+  public Tag getCopy(Long id) {
+    return this.getFacade(id).getCopy(id);
+  }
 
   @Override
   public Collection<TagWithAlarms> getTagsWithAlarms(String regex) {

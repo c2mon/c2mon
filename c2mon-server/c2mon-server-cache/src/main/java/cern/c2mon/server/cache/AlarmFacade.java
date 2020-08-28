@@ -16,8 +16,10 @@
  *****************************************************************************/
 package cern.c2mon.server.cache;
 
+import cern.c2mon.server.cache.alarm.AlarmAggregatorListener;
 import cern.c2mon.server.cache.common.ConfigurableCacheFacade;
 import cern.c2mon.server.common.alarm.Alarm;
+import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.tag.Tag;
 
 /**
@@ -41,14 +43,6 @@ import cern.c2mon.server.common.tag.Tag;
  */
 public interface AlarmFacade extends ConfigurableCacheFacade<Alarm> {
 
-  /**
-   * Returns the name of the JMS topic on which the Alarms
-   * must be published.
-   * @param alarm for which the topic is required
-   * @return the topic name
-   */
-  String getTopicForAlarm(Alarm alarm);
-  
   /**
    * Updates the Alarm in the cache using the passed Tag value.
    * Listeners will only be notified of an update if the Alarm state
@@ -86,4 +80,16 @@ public interface AlarmFacade extends ConfigurableCacheFacade<Alarm> {
    */
   void evaluateAlarm(Long alarmId);
 
+  /**
+   * Notifies {@link AlarmCache} listeners and {@link AlarmAggregatorListener} about the removal
+   * @param removedAlarm A copy of the alarm that got removed
+   */
+  void notifyOnAlarmRemoval(AlarmCacheObject removedAlarm);
+  
+  /**
+   * Notifies {@link AlarmAggregatorListener} about the reset of an alarm oscillation on the
+   * given tag. We assume that at this stage the required alarm cache update took already place. 
+   * @param tag The Tag on which the alarm oscillation flag was reset
+   */
+  void notifyOnAlarmOscillationReset(final Tag tag);
 }

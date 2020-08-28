@@ -17,7 +17,10 @@
 package cern.c2mon.server.cache.alarm.impl;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,9 +30,7 @@ import cern.c2mon.server.cache.AlarmFacade;
 import cern.c2mon.server.cache.TagLocationService;
 import cern.c2mon.server.cache.common.AbstractFacade;
 import cern.c2mon.server.cache.util.MetadataUtils;
-import cern.c2mon.server.common.alarm.Alarm;
-import cern.c2mon.server.common.alarm.AlarmCacheObject;
-import cern.c2mon.server.common.alarm.AlarmCacheUpdater;
+import cern.c2mon.server.common.alarm.*;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.client.alarm.condition.AlarmCondition;
 import cern.c2mon.shared.common.ConfigurationException;
@@ -72,45 +73,19 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
   private final TagLocationService tagLocationService;
 
   private final AlarmCacheUpdater alarmCacheUpdater;
+  
+  private final AlarmAggregatorNotifier alarmAggregatorNotifier;
 
-
-  /**
-   * Autowired constructor.
-   *
-   * @param alarmCache
-   *          the alarm cache
-   */
   @Autowired
-  public AlarmFacadeImpl(final AlarmCache alarmCache, final TagLocationService tagLocationService, AlarmCacheUpdater alarmCacheUpdater) {
+  public AlarmFacadeImpl(final AlarmCache alarmCache, 
+                         final TagLocationService tagLocationService, 
+                         final AlarmCacheUpdater alarmCacheUpdater, 
+                         final AlarmAggregatorNotifier alarmAggregatorNotifier) {
     super();
     this.alarmCache = alarmCache;
     this.tagLocationService = tagLocationService;
     this.alarmCacheUpdater = alarmCacheUpdater;
-  }
-
-  /**
-   * Derives a valid JMS topic name for distributing the alarm's values to
-   * clients (currently the same for all alarms, so returns a constant).
-   *
-   * @param alarm
-   *          the alarm for which the topic should be provided
-   * @return a valid JMS topic name for the alarm
-   */
-  @Override
-  public String getTopicForAlarm(final Alarm alarm) {
-
-    /*
-     * StringBuffer str = new StringBuffer("tim.alarm.");
-     * str.append(pFaultFamily); str.append("."); str.append(pFaultMember);
-     * str.append("."); str.append(pFaultCode); String topic = str.toString();
-     * topic = topic.replace('$', 'X'); topic = topic.replace('*', 'X'); topic =
-     * topic.replace('#', 'X'); return topic;
-     */
-
-    // we decided to distribute all alarms on the same topic in order to reduce
-    // the number of topics for SonicMQ, the client has to make the decision if
-    // the received alarm is useful for it, otherwise it will discard the alarm
-    return "tim.alarm";
+    this.alarmAggregatorNotifier = alarmAggregatorNotifier;
   }
 
   /**
@@ -238,8 +213,6 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
     cern.c2mon.server.common.metadata.Metadata newMetadata = MetadataUtils.parseMetadataConfiguration(alarmProperties, alarmCacheObject.getMetadata());
     alarmCacheObject.setMetadata(newMetadata);
 
-    // set the JMS topic
-    alarmCacheObject.setTopic(getTopicForAlarm(alarmCacheObject));
     return null;
   }
 
@@ -255,17 +228,40 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
       alarmCache.releaseWriteLockOnKey(alarmId);
     }
   }
+  
+  @Override
+  public void notifyOnAlarmRemoval(AlarmCacheObject removedAlarm) {
+    removedAlarm.setActive(false);
+    removedAlarm.setInfo("Alarm was removed");
+    removedAlarm.setTimestamp(new Timestamp(System.currentTimeMillis()));
+
+    alarmCache.notifyListenersOfUpdate(removedAlarm);
+    
+    TagWithAlarms tagWithAlarms = getTagWithAlarms(removedAlarm.getDataTagId());
+    List<Alarm> alarmList = new ArrayList<Alarm>(tagWithAlarms.getAlarms());
+    alarmList.add(removedAlarm);
+    alarmAggregatorNotifier.notifyOnUpdate(tagWithAlarms.getTag(), alarmList);
+  }
 
   @Override
   public void evaluateAlarm(Long alarmId) {
     alarmCache.acquireWriteLockOnKey(alarmId);
+    Tag tagCopy;
     try {
       Alarm alarm = alarmCache.getCopy(alarmId);
-      Tag tag = tagLocationService.getCopy(alarm.getTagId());
-      alarmCacheUpdater.update(alarm, tag);
+      tagCopy = tagLocationService.getCopy(alarm.getTagId());
+      
+      alarmCacheUpdater.update(alarm, tagCopy);
     } finally {
       alarmCache.releaseWriteLockOnKey(alarmId);
     }
+    
+    alarmAggregatorNotifier.notifyOnUpdate(tagCopy, getAlarms(tagCopy));
+  }
+  
+  @Override
+  public void notifyOnAlarmOscillationReset(final Tag tag) {
+    alarmAggregatorNotifier.notifyOnUpdate(tag, getAlarms(tag));
   }
 
   /**
@@ -304,5 +300,33 @@ public class AlarmFacadeImpl extends AbstractFacade<Alarm> implements AlarmFacad
     if (alarm.getCondition() == null) {
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"alarmCondition\" cannot be null");
     }
+  }
+  
+  /**
+   * Return the Tag with associated evaluated Alarms corresponding
+   * to the Tag value. A frozen copy is returned.
+   * 
+   * @param id the Tag id
+   * @return Tag and Alarms, with corresponding values (no longer residing in cache)
+   */
+  private TagWithAlarms getTagWithAlarms(Long tagId) {
+    Tag tag = tagLocationService.getCopy(tagId);
+    List<Alarm> alarms = getAlarms(tag);
+    
+    return new TagWithAlarmsImpl(tag, alarms);
+  }
+  
+  /**
+   * Given a tag, get it's alarms.
+   *
+   * @param tag The tag.
+   * @return A list of alarms
+   */
+  private List<Alarm> getAlarms(Tag tag) {
+    if (tag.getAlarmIds() == null || tag.getAlarmIds().isEmpty()) {
+      return new ArrayList<Alarm>();
+    }
+    
+    return tag.getAlarmIds().stream().map(id -> alarmCache.get(id)).collect(Collectors.toList());
   }
 }

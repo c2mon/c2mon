@@ -17,13 +17,12 @@
 package cern.c2mon.server.cache.alarm;
 
 /**
- * The AlarmAggregator bean listens for Tag updates,
- * evaluates all associated alarms and passes the result
- * to registered {@link AlarmAggregatorListener}s.
+ * This interface is used to register a listener alarm & tag update 
+ * notifications
  * 
  * <p>Standard usage involves wiring it into your class and
- * calling the registerForUpdates method to register your
- * listener.
+ * calling the {@link #registerForTagUpdates(AlarmAggregatorListener)} 
+ * method to register your listener.
  * 
  * <p>Listeners are notified on the cache notification threads
  * (i.e. this aggregator does not create any extra threads).
@@ -31,7 +30,7 @@ package cern.c2mon.server.cache.alarm;
  * @author Mark Brightwell
  *
  */
-public interface AlarmAggregator {
+public interface AlarmAggregatorRegistration {
 
   /**
    * Register this listener to received alarm & tag update notifications.

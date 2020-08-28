@@ -25,6 +25,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import cern.c2mon.server.cache.AlarmCache;
+import cern.c2mon.server.cache.AlarmFacade;
 import cern.c2mon.server.cache.ClusterCache;
 import cern.c2mon.server.cache.TagFacadeGateway;
 import cern.c2mon.server.cache.alarm.config.OscillationProperties;
@@ -59,7 +60,8 @@ public class OscillationUpdateCheckerTest {
     oscillationProperties = new OscillationProperties();
     OscillationUpdater oscillationUpdater = new OscillationUpdater(alarmCache, oscillationProperties);
     AlarmCacheUpdater alarmCacheUpdater = new AlarmCacheUpdaterImpl(alarmCache, oscillationUpdater);
-    oscillationUpdateChecker = new OscillationUpdateChecker(alarmCache, clusterCache, oscillationUpdater, alarmCacheUpdater, tagFacadeGateway);
+    AlarmFacade alarmFacade = EasyMock.createNiceMock(AlarmFacade.class);
+    oscillationUpdateChecker = new OscillationUpdateChecker(alarmCache, clusterCache, oscillationUpdater, alarmCacheUpdater, tagFacadeGateway, alarmFacade);
 
     tag = new DataTagCacheObject();
     tag.setId(987L);

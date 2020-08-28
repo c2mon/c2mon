@@ -285,23 +285,7 @@ public abstract class TransferObjectFactory {
     if (alarms != null) {
       List<AlarmValueImpl> alarmValues = new ArrayList<>(alarms.size());
       for (Alarm alarm : alarms) {
-        AlarmValueImpl alarmValue =
-                AlarmValueImpl.builder()
-                .id(alarm.getId())
-                .faultCode(alarm.getFaultCode())
-                .faultMemeber(alarm.getFaultMember())
-                .faultFamily(alarm.getFaultFamily())
-                .info(alarm.getInfo())
-                .tagId(alarm.getTagId())
-                .timestamp(alarm.getTimestamp())
-                .active(alarm.isActive())
-                .oscillating(alarm.isOscillating())
-                .sourceTimestamp(alarm.getSourceTimestamp()).build();
-
-        if (alarm.getMetadata()!= null){
-          alarmValue.setMetadata(alarm.getMetadata().getMetadata());
-        }
-        alarmValues.add(alarmValue);
+        alarmValues.add(createAlarmValue(alarm));
       }
       tagValue.addAlarmValues(alarmValues);
     }

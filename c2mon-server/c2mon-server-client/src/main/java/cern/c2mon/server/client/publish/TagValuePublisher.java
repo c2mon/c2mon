@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2020 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -35,7 +35,7 @@ import org.springframework.stereotype.Service;
 import cern.c2mon.server.cache.AliveTimerFacade;
 import cern.c2mon.server.cache.TagFacadeGateway;
 import cern.c2mon.server.cache.TagLocationService;
-import cern.c2mon.server.cache.alarm.AlarmAggregator;
+import cern.c2mon.server.cache.alarm.AlarmAggregatorRegistration;
 import cern.c2mon.server.cache.alarm.AlarmAggregatorListener;
 import cern.c2mon.server.client.util.TransferObjectFactory;
 import cern.c2mon.server.common.alarm.Alarm;
@@ -81,7 +81,7 @@ public class TagValuePublisher implements AlarmAggregatorListener, Configuration
   private final ConfigurationUpdate configurationUpdate;
 
   /** Listens for Tag updates, evaluates all associated alarms and passes the result */
-  private final AlarmAggregator alarmAggregator;
+  private final AlarmAggregatorRegistration alarmAggregatorRegistration;
 
   /** Contains re-publication logic */
   private Republisher<TagWithAlarms> republisher;
@@ -107,14 +107,14 @@ public class TagValuePublisher implements AlarmAggregatorListener, Configuration
    * Default Constructor
    * @param jmsSender Used for sending JMS messages and waiting for a response
    * @param aliveTimerFacade Used to determine, whether a given tag is an AliveTag
-   * @param alarmAggregator Used to register this <code>AlarmAggregatorListener</code>
+   * @param alarmAggregatorRegistration Used to register this <code>AlarmAggregatorListener</code>
    * @param configurationUpdate Used to register this <code>ConfigurationUpdateListener</code>
    * @param pTagFacadeGateway Reference to the tag facade gateway singleton
    * @param tagLocationService Reference to the tag location service
    */
   @Autowired
   public TagValuePublisher(@Qualifier("clientTopicPublisher") final JmsSender jmsSender,
-                           final AlarmAggregator alarmAggregator,
+                           final AlarmAggregatorRegistration alarmAggregatorRegistration,
                            final AliveTimerFacade aliveTimerFacade,
                            final ConfigurationUpdate configurationUpdate,
                            final TagFacadeGateway pTagFacadeGateway,
@@ -122,7 +122,7 @@ public class TagValuePublisher implements AlarmAggregatorListener, Configuration
                            final ClientProperties properties) {
     this.aliveTimerFacade = aliveTimerFacade;
     this.jmsSender = jmsSender;
-    this.alarmAggregator = alarmAggregator;
+    this.alarmAggregatorRegistration = alarmAggregatorRegistration;
     this.configurationUpdate = configurationUpdate;
     this.tagFacadeGateway = pTagFacadeGateway;
     this.tagLocationService = tagLocationService;
@@ -138,7 +138,7 @@ public class TagValuePublisher implements AlarmAggregatorListener, Configuration
     log.info("init - Starting Tag publisher.");
     log.trace("init - Registering for Tag Updates.");
 
-    this.alarmAggregator.registerForTagUpdates(this);
+    this.alarmAggregatorRegistration.registerForTagUpdates(this);
 
     log.trace("init - Registering for Configuration Updates.");
 
@@ -175,6 +175,11 @@ public class TagValuePublisher implements AlarmAggregatorListener, Configuration
       log.error("notifyOnUpdate - Error publishing tag update to topic for tag " + tagWithAlarms.getTag().getId() + " - submitting for republication", e);
       republisher.publicationFailed(tagWithAlarms);
     }
+  }
+  
+  @Override
+  public void notifyOnSupervisionChange(Tag tag, List<Alarm> alarms) {
+    // Do nothing with this information, as C2MON Client API is treating that event locally    
   }
 
   @Override
