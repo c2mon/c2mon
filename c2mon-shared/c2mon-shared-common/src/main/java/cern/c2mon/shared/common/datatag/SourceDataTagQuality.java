@@ -18,6 +18,9 @@ package cern.c2mon.shared.common.datatag;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+
+import cern.c2mon.shared.common.datatag.util.SourceDataTagQualityCode;
+
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

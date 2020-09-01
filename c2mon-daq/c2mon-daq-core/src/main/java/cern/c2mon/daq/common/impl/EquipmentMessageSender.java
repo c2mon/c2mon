@@ -35,6 +35,7 @@ import cern.c2mon.daq.config.DaqProperties;
 import cern.c2mon.daq.filter.IFilterMessageSender;
 import cern.c2mon.daq.filter.dynamic.IDynamicTimeDeadbandFilterActivator;
 import cern.c2mon.shared.common.datatag.*;
+import cern.c2mon.shared.common.datatag.util.SourceDataTagQualityCode;
 import cern.c2mon.shared.common.process.EquipmentConfiguration;
 import cern.c2mon.shared.common.process.SubEquipmentConfiguration;
 import cern.c2mon.shared.daq.config.ChangeReport;

@@ -42,7 +42,7 @@ import cern.c2mon.server.rule.RuleEvaluator;
 import cern.c2mon.server.rule.config.RuleProperties;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
-import cern.c2mon.shared.common.datatag.TagQualityStatus;
+import cern.c2mon.shared.common.datatag.util.TagQualityStatus;
 import cern.c2mon.shared.common.rule.RuleInputValue;
 import cern.c2mon.shared.daq.lifecycle.Lifecycle;
 import cern.c2mon.shared.rule.RuleEvaluationException;

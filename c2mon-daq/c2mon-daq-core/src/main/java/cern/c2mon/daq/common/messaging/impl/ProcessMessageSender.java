@@ -30,7 +30,11 @@ import cern.c2mon.daq.common.conf.core.ProcessConfigurationHolder;
 import cern.c2mon.daq.common.messaging.IProcessMessageSender;
 import cern.c2mon.daq.common.messaging.JmsSender;
 import cern.c2mon.daq.config.DaqProperties;
-import cern.c2mon.shared.common.datatag.*;
+import cern.c2mon.shared.common.datatag.DataTagConstants;
+import cern.c2mon.shared.common.datatag.DataTagValueUpdate;
+import cern.c2mon.shared.common.datatag.SourceDataTagQuality;
+import cern.c2mon.shared.common.datatag.SourceDataTagValue;
+import cern.c2mon.shared.common.datatag.util.JmsMessagePriority;
 import cern.c2mon.shared.common.process.ProcessConfiguration;
 
 /**
@@ -120,7 +124,7 @@ public class ProcessMessageSender implements IProcessMessageSender {
         .quality(new SourceDataTagQuality())
         .timestamp(new Timestamp(timestamp))
         .daqTimestamp(new Timestamp(timestamp))
-        .priority(DataTagAddress.PRIORITY_HIGHEST)
+        .priority(JmsMessagePriority.PRIORITY_HIGHEST.getPriority())
         .guaranteedDelivery(false)
         .valueDescription("")
         .timeToLive(processConfiguration.getAliveInterval())
@@ -142,7 +146,7 @@ public class ProcessMessageSender implements IProcessMessageSender {
         .quality(new SourceDataTagQuality())
         .timestamp(new Timestamp(timestamp))
         .daqTimestamp(new Timestamp(timestamp))
-        .priority(DataTagAddress.PRIORITY_HIGHEST)
+        .priority(JmsMessagePriority.PRIORITY_HIGHEST.getPriority())
         .timeToLive(DataTagConstants.TTL_FOREVER)
         .valueDescription(pDescription)
         .build();
@@ -152,7 +156,7 @@ public class ProcessMessageSender implements IProcessMessageSender {
 
   @Override
   public final void addValue(final SourceDataTagValue dataTagValue) throws InterruptedException {
-    if (dataTagValue.getPriority() == DataTagConstants.PRIORITY_HIGHEST) {
+    if (dataTagValue.getPriority() == JmsMessagePriority.PRIORITY_HIGHEST.getPriority()) {
       distributeValue(dataTagValue);
     } else {
       QosSettings settings = QosSettingsFactory.extractQosSettings(dataTagValue);

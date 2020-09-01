@@ -21,12 +21,13 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import cern.c2mon.shared.common.datatag.DataTagAddress;
+import cern.c2mon.shared.common.datatag.util.TagQualityStatus;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
-import cern.c2mon.shared.common.datatag.TagQualityStatus;
 
 import java.sql.Timestamp;
 import java.util.HashMap;

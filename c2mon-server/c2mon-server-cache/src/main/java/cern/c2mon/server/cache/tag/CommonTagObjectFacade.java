@@ -19,7 +19,7 @@ package cern.c2mon.server.cache.tag;
 import java.sql.Timestamp;
 
 import cern.c2mon.server.common.tag.Tag;
-import cern.c2mon.shared.common.datatag.TagQualityStatus;
+import cern.c2mon.shared.common.datatag.util.TagQualityStatus;
 
 /**
  * Interface exposing common methods for modifying Tag objects 

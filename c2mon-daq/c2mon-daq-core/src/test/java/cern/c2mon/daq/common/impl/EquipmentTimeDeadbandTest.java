@@ -24,6 +24,9 @@ import cern.c2mon.daq.common.IDynamicTimeDeadbandFilterer;
 import cern.c2mon.daq.common.messaging.IProcessMessageSender;
 import cern.c2mon.daq.filter.impl.DummyFilterSender;
 import cern.c2mon.shared.common.datatag.*;
+import cern.c2mon.shared.common.datatag.util.JmsMessagePriority;
+import cern.c2mon.shared.common.datatag.util.SourceDataTagQualityCode;
+import cern.c2mon.shared.common.datatag.util.ValueDeadbandType;
 import cern.c2mon.shared.common.filter.FilteredDataTagValue.FilterType;
 import cern.c2mon.shared.common.process.EquipmentConfiguration;
 import cern.c2mon.shared.common.process.ProcessConfiguration;
@@ -66,7 +69,7 @@ public class EquipmentTimeDeadbandTest {
     equipmentConfiguration.setCommFaultTagValue(false);
 
     // No Time Deadband (we will call directly the addToTimeDeadband. Not needed)
-    this.sdt1 = createSourceDataTag(1L, "sdt1", "Boolean", DataTagDeadband.DEADBAND_PROCESS_RELATIVE, 0, DataTagConstants.PRIORITY_LOW,
+    this.sdt1 = createSourceDataTag(1L, "sdt1", "Boolean", ValueDeadbandType.PROCESS_RELATIVE, 0, JmsMessagePriority.PRIORITY_LOW,
             false);
 
     equipmentConfiguration.getDataTags().put(1L, this.sdt1);
@@ -276,8 +279,8 @@ public class EquipmentTimeDeadbandTest {
    * @param guaranteed
    * @return
    */
-  private SourceDataTag createSourceDataTag(long id, String name, String dataType, short deadBandType,  int timeDeadband,
-      int priority, boolean guaranteed) {
+  private SourceDataTag createSourceDataTag(long id, String name, String dataType, ValueDeadbandType deadBandType,  int timeDeadband,
+      JmsMessagePriority priority, boolean guaranteed) {
   DataTagAddress address = new DataTagAddress(null, 100, deadBandType, VALUE_DEADBAND, timeDeadband, priority, guaranteed);
   return new SourceDataTag(id, name, false, DataTagConstants.MODE_OPERATIONAL, dataType, address);
 }

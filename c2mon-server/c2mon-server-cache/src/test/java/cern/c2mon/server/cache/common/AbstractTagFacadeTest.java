@@ -34,7 +34,7 @@ import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.TagWithAlarms;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
-import cern.c2mon.shared.common.datatag.TagQualityStatus;
+import cern.c2mon.shared.common.datatag.util.TagQualityStatus;
 import cern.c2mon.shared.daq.config.Change;
 
 /**

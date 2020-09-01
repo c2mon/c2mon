@@ -18,12 +18,13 @@ package cern.c2mon.server.benchmark;
 
 import javax.annotation.PostConstruct;
 
-import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Service;
+
+import lombok.extern.slf4j.Slf4j;
 
 import cern.c2mon.server.cache.C2monCacheListener;
 import cern.c2mon.server.cache.CacheRegistrationService;
@@ -31,7 +32,7 @@ import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.common.tag.Tag;
-import cern.c2mon.shared.common.datatag.DataTagAddress;
+import cern.c2mon.shared.common.datatag.util.JmsMessagePriority;
 import cern.c2mon.shared.daq.lifecycle.Lifecycle;
 
 @Slf4j
@@ -90,7 +91,7 @@ public class BenchmarkListener implements C2monCacheListener<Tag>, SmartLifecycl
       long currentTime = System.currentTimeMillis();
       long toServer = (serverTime - daqTime);
       long toListener = (currentTime - daqTime);
-      if (dataTag.getAddress() != null && dataTag.getAddress().getPriority() == DataTagAddress.PRIORITY_HIGH) {
+      if (dataTag.getAddress() != null && dataTag.getAddress().getPriority() == JmsMessagePriority.PRIORITY_HIGH.getPriority()) {
         priorityLogger.debug("DAQ to server(ms): " + toServer + "; DAQ to listener: " +  toListener + " (Id: " + tag.getId() + ")");
         if (toServer > maxPriorityToServer) {
           maxPriorityToServer = toServer;

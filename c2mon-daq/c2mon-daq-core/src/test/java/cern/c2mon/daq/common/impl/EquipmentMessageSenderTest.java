@@ -34,6 +34,9 @@ import cern.c2mon.daq.common.messaging.IProcessMessageSender;
 import cern.c2mon.daq.filter.IFilterMessageSender;
 import cern.c2mon.daq.filter.dynamic.IDynamicTimeDeadbandFilterActivator;
 import cern.c2mon.shared.common.datatag.*;
+import cern.c2mon.shared.common.datatag.util.JmsMessagePriority;
+import cern.c2mon.shared.common.datatag.util.SourceDataTagQualityCode;
+import cern.c2mon.shared.common.datatag.util.ValueDeadbandType;
 import cern.c2mon.shared.common.filter.FilteredDataTagValue;
 import cern.c2mon.shared.common.process.EquipmentConfiguration;
 import cern.c2mon.shared.common.process.ProcessConfiguration;
@@ -84,14 +87,14 @@ public class EquipmentMessageSenderTest {
     equipmentConfiguration.setCommFaultTagValue(false);
     equipmentConfiguration.setName("EQ");
 
-    sdt1 = createSourceDataTag(1L, "sdt1", "Boolean", DataTagDeadband.DEADBAND_NONE, DataTagConstants.PRIORITY_LOW, false);
-    sdt2 = createSourceDataTag(2L, "sdt2", "Float", DataTagDeadband.DEADBAND_PROCESS_ABSOLUTE, DataTagConstants.PRIORITY_MEDIUM, false);
-    sdt3 = createSourceDataTag(3L, "sdt3", "Integer", DataTagDeadband.DEADBAND_PROCESS_RELATIVE_VALUE_DESCR_CHANGE, DataTagConstants.PRIORITY_LOW, false);
-    sdt4 = createSourceDataTag(4L, "sdt4", Integer[].class.getName(), DataTagDeadband.DEADBAND_NONE, DataTagConstants.PRIORITY_LOW, false);
-    sdt5 = createSourceDataTag(5L, "sdt5", ArbitraryObject.class.getName(), DataTagDeadband.DEADBAND_NONE, DataTagConstants.PRIORITY_LOW, false);
-    sdt6 = createSourceDataTag(6L, "sdt6", "my.random.own.MyObject", DataTagDeadband.DEADBAND_NONE, DataTagConstants.PRIORITY_LOW, false);
+    sdt1 = createSourceDataTag(1L, "sdt1", "Boolean", ValueDeadbandType.NONE, JmsMessagePriority.PRIORITY_LOW, false);
+    sdt2 = createSourceDataTag(2L, "sdt2", "Float", ValueDeadbandType.PROCESS_ABSOLUTE, JmsMessagePriority.PRIORITY_MEDIUM, false);
+    sdt3 = createSourceDataTag(3L, "sdt3", "Integer", ValueDeadbandType.PROCESS_RELATIVE_VALUE_DESCR_CHANGE, JmsMessagePriority.PRIORITY_LOW, false);
+    sdt4 = createSourceDataTag(4L, "sdt4", Integer[].class.getName(), ValueDeadbandType.NONE, JmsMessagePriority.PRIORITY_LOW, false);
+    sdt5 = createSourceDataTag(5L, "sdt5", ArbitraryObject.class.getName(), ValueDeadbandType.NONE, JmsMessagePriority.PRIORITY_LOW, false);
+    sdt6 = createSourceDataTag(6L, "sdt6", "my.random.own.MyObject", ValueDeadbandType.NONE, JmsMessagePriority.PRIORITY_LOW, false);
 
-    alive = createSourceDataTag(EQ_ALIVE_ID, "eqalive", "String", DataTagDeadband.DEADBAND_NONE, DataTagConstants.PRIORITY_HIGH, false);
+    alive = createSourceDataTag(EQ_ALIVE_ID, "eqalive", "String", ValueDeadbandType.NONE, JmsMessagePriority.PRIORITY_HIGH, false);
 
     equipmentConfiguration.getDataTags().put(1L, sdt1);
     equipmentConfiguration.getDataTags().put(2L, sdt2);
@@ -174,9 +177,9 @@ public class EquipmentMessageSenderTest {
 
   @Test
   public void testOnAddDataTag() {
-    SourceDataTag sdtLow = createSourceDataTag(5324L, "", "Float", DataTagDeadband.DEADBAND_NONE, DataTagConstants.PRIORITY_LOW, false);
-    SourceDataTag sdtMed = createSourceDataTag(5325L, "", "Float", DataTagDeadband.DEADBAND_NONE, DataTagConstants.PRIORITY_MEDIUM, false);
-    SourceDataTag sdtHigh = createSourceDataTag(5326L, "", "Float", DataTagDeadband.DEADBAND_NONE, DataTagConstants.PRIORITY_HIGH, false);
+    SourceDataTag sdtLow = createSourceDataTag(5324L, "", "Float", ValueDeadbandType.NONE, JmsMessagePriority.PRIORITY_LOW, false);
+    SourceDataTag sdtMed = createSourceDataTag(5325L, "", "Float", ValueDeadbandType.NONE, JmsMessagePriority.PRIORITY_MEDIUM, false);
+    SourceDataTag sdtHigh = createSourceDataTag(5326L, "", "Float", ValueDeadbandType.NONE, JmsMessagePriority.PRIORITY_HIGH, false);
 
     dynamicTimeDeadbandFilterActivatorMock.addDataTag(sdtHigh);
     dynamicTimeDeadbandFilterActivatorMock.addDataTag(sdtLow);
@@ -199,9 +202,9 @@ public class EquipmentMessageSenderTest {
     sdt3Clone.getAddress().setStaticTimedeadband(true);
     
     sdt1.setDataType("Float");
-    sdt2.getAddress().setPriority(DataTagConstants.PRIORITY_LOW);
+    sdt2.getAddress().setPriority(JmsMessagePriority.PRIORITY_LOW);
     sdt2.getAddress().setStaticTimedeadband(true);
-    sdt3.getAddress().setPriority(DataTagConstants.PRIORITY_HIGH);
+    sdt3.getAddress().setPriority(JmsMessagePriority.PRIORITY_HIGH);
     sdt3.getAddress().setStaticTimedeadband(false);
 
     dynamicTimeDeadbandFilterActivatorMock.removeDataTag(sdt2);
@@ -1180,7 +1183,7 @@ public class EquipmentMessageSenderTest {
     equipmentMessageSender.update(sdt2.getId(), new ValueUpdate(9.2f, System.currentTimeMillis() + 10L));
     // should be sent, because value descr. is different from the previous one.
     // Deadband filtering skipped
-    this.sdt2.getAddress().setValueDeadbandType(DataTagDeadband.DEADBAND_PROCESS_ABSOLUTE_VALUE_DESCR_CHANGE);
+    this.sdt2.getAddress().setValueDeadbandType(ValueDeadbandType.PROCESS_ABSOLUTE_VALUE_DESCR_CHANGE);
     equipmentMessageSender.update(sdt2.getId(), new ValueUpdate(9.3f, "value description 3", System.currentTimeMillis() + 11L));
 
     verify(filterMessageSenderMock);
@@ -1463,7 +1466,7 @@ public class EquipmentMessageSenderTest {
     verify(this.processMessageSenderMock, this.filterMessageSenderMock);
   }
 
-  private SourceDataTag createSourceDataTag(long id, String name, String dataType, short deadBandType, int priority, boolean guaranteed) {
+  private SourceDataTag createSourceDataTag(long id, String name, String dataType, ValueDeadbandType deadBandType, JmsMessagePriority priority, boolean guaranteed) {
     DataTagAddress address = new DataTagAddress(null, 100, deadBandType, VALUE_DEADBAND, 0, priority, guaranteed);
     return new SourceDataTag(id, name, false, DataTagConstants.MODE_OPERATIONAL, dataType, address);
   }

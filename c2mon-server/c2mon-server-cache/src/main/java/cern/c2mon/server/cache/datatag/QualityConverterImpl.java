@@ -19,6 +19,7 @@ package cern.c2mon.server.cache.datatag;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.shared.common.datatag.*;
+import cern.c2mon.shared.common.datatag.util.TagQualityStatus;
 
 /**
  * Implementation of the QualityConverter service.

@@ -25,7 +25,7 @@ import cern.c2mon.server.cache.common.ConfigurableCacheFacade;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.TagWithAlarms;
 import cern.c2mon.server.common.tag.Tag;
-import cern.c2mon.shared.common.datatag.TagQualityStatus;
+import cern.c2mon.shared.common.datatag.util.TagQualityStatus;
 
 /**
  * Methods implemented by all Tag facade beans.

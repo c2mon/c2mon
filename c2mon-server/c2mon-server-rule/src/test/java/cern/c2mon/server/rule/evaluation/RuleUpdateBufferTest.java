@@ -20,7 +20,7 @@ import java.sql.Timestamp;
 
 import org.junit.Before;
 
-import cern.c2mon.shared.common.datatag.TagQualityStatus;
+import cern.c2mon.shared.common.datatag.util.TagQualityStatus;
 
 import static org.junit.Assert.*;
 

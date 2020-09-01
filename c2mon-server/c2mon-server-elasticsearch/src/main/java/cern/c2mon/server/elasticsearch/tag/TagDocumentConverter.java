@@ -29,7 +29,7 @@ import cern.c2mon.server.cache.SubEquipmentCache;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
-import cern.c2mon.shared.common.datatag.TagQualityStatus;
+import cern.c2mon.shared.common.datatag.util.TagQualityStatus;
 import cern.c2mon.shared.common.type.TypeConverter;
 
 /**

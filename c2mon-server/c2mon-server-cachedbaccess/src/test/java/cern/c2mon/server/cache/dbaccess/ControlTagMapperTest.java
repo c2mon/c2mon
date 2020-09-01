@@ -33,7 +33,7 @@ import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.control.ControlTagCacheObject;
 import cern.c2mon.server.test.CacheObjectCreation;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
-import cern.c2mon.shared.common.datatag.TagQualityStatus;
+import cern.c2mon.shared.common.datatag.util.TagQualityStatus;
 
 public class ControlTagMapperTest extends AbstractMapperTest {
 

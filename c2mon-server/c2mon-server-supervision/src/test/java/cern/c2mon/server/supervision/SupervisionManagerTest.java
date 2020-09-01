@@ -51,6 +51,7 @@ import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.common.datatag.DataTagConstants;
 import cern.c2mon.shared.common.datatag.SourceDataTagQuality;
 import cern.c2mon.shared.common.datatag.SourceDataTagValue;
+import cern.c2mon.shared.common.datatag.util.JmsMessagePriority;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
 
 /**
@@ -161,7 +162,7 @@ public class SupervisionManagerTest {
         .quality(new SourceDataTagQuality())
         .timestamp(new Timestamp(updateTime))
         .daqTimestamp(new Timestamp(System.currentTimeMillis()))
-        .priority(DataTagConstants.PRIORITY_MEDIUM)
+        .priority(JmsMessagePriority.PRIORITY_MEDIUM.getPriority())
         .valueDescription("description")
         .timeToLive(10000)
         .build();
@@ -207,7 +208,7 @@ public class SupervisionManagerTest {
         .quality(new SourceDataTagQuality())
         .timestamp(new Timestamp(System.currentTimeMillis()))
         .daqTimestamp(new Timestamp(System.currentTimeMillis() - 130_000L))
-        .priority(DataTagConstants.PRIORITY_MEDIUM)
+        .priority(JmsMessagePriority.PRIORITY_MEDIUM.getPriority())
         .valueDescription("description")
         .timeToLive(10000)
         .build();
@@ -256,7 +257,7 @@ public class SupervisionManagerTest {
         .quality(new SourceDataTagQuality())
         .timestamp(new Timestamp(updateTime))
         .daqTimestamp(new Timestamp(System.currentTimeMillis()))
-        .priority(DataTagConstants.PRIORITY_MEDIUM)
+        .priority(JmsMessagePriority.PRIORITY_MEDIUM.getPriority())
         .valueDescription("description")
         .timeToLive(10000)
         .build();
@@ -317,7 +318,7 @@ public class SupervisionManagerTest {
         .quality(new SourceDataTagQuality())
         .timestamp(new Timestamp(updateTime))
         .daqTimestamp(new Timestamp(System.currentTimeMillis()))
-        .priority(DataTagConstants.PRIORITY_MEDIUM)
+        .priority(JmsMessagePriority.PRIORITY_MEDIUM.getPriority())
         .valueDescription("description")
         .timeToLive(10000)
         .build();
@@ -355,7 +356,7 @@ public class SupervisionManagerTest {
         .quality(new SourceDataTagQuality())
         .timestamp(new Timestamp(updateTime2))
         .daqTimestamp(new Timestamp(System.currentTimeMillis()))
-        .priority(DataTagConstants.PRIORITY_MEDIUM)
+        .priority(JmsMessagePriority.PRIORITY_MEDIUM.getPriority())
         .valueDescription("description")
         .timeToLive(10000)
         .build();
@@ -409,7 +410,7 @@ public class SupervisionManagerTest {
         .quality(new SourceDataTagQuality())
         .timestamp(new Timestamp(updateTime))
         .daqTimestamp(new Timestamp(System.currentTimeMillis()))
-        .priority(DataTagConstants.PRIORITY_MEDIUM)
+        .priority(JmsMessagePriority.PRIORITY_MEDIUM.getPriority())
         .valueDescription("description")
         .timeToLive(10000)
         .build();
@@ -447,7 +448,7 @@ public class SupervisionManagerTest {
         .quality(new SourceDataTagQuality())
         .timestamp(new Timestamp(updateTime2))
         .daqTimestamp(new Timestamp(System.currentTimeMillis()))
-        .priority(DataTagConstants.PRIORITY_MEDIUM)
+        .priority(JmsMessagePriority.PRIORITY_MEDIUM.getPriority())
         .valueDescription("description")
         .timeToLive(10000)
         .build();

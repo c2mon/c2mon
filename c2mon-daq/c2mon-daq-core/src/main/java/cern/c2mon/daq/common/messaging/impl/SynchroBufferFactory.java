@@ -25,10 +25,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import cern.c2mon.daq.common.conf.core.ProcessConfigurationHolder;
 import cern.c2mon.daq.config.DaqProperties;
-import cern.c2mon.shared.common.datatag.DataTagAddress;
-import cern.c2mon.shared.common.datatag.DataTagConstants;
-import cern.c2mon.shared.common.datatag.DataTagValueUpdate;
-import cern.c2mon.shared.common.datatag.SourceDataTagValue;
+import cern.c2mon.shared.common.datatag.*;
+import cern.c2mon.shared.common.datatag.util.JmsMessagePriority;
 import cern.c2mon.shared.common.process.ProcessConfiguration;
 import cern.c2mon.shared.util.buffer.SynchroBufferQueue;
 
@@ -76,16 +74,16 @@ class SynchroBufferFactory {
     String name = "LOW-MSG-BUFFER-";
     long timeout = daqProperties.getJms().getMaxMessageDelayPriorityLow();
     
-    switch (settings.getPriority()) {
-      case DataTagConstants.PRIORITY_HIGH:
+    switch (JmsMessagePriority.getJmsMessagePriority(settings.getPriority())) {
+      case PRIORITY_HIGH:
         timeout = daqProperties.getJms().getMaxMessageDelayPriorityHigh();
         name = "HIGH-MSG-BUFFER-";
         break;
-      case DataTagConstants.PRIORITY_MEDIUM:
+      case PRIORITY_MEDIUM:
         timeout = daqProperties.getJms().getMaxMessageDelayPriorityMedium();
         name = "MEDIUM-MSG-BUFFER-";
         break;
-      case DataTagConstants.PRIORITY_LOW:
+      case PRIORITY_LOW:
         timeout = daqProperties.getJms().getMaxMessageDelayPriorityLow();
         name = "LOW-MSG-BUFFER-";
         break;
@@ -149,7 +147,7 @@ class SynchroBufferFactory {
    * @return <code>true</code>, if the message has expired
    */
   private boolean isMessageExpired(final SourceDataTagValue sdtValue) {
-    return sdtValue.getTimeToLive() != DataTagAddress.TTL_FOREVER 
+    return sdtValue.getTimeToLive() != DataTagConstants.TTL_FOREVER 
         && (sdtValue.getDaqTimestamp().getTime() + sdtValue.getTimeToLive()) < System.currentTimeMillis();
   }
 }

@@ -23,7 +23,7 @@ import org.springframework.stereotype.Service;
 import cern.c2mon.server.cache.tag.AbstractTagObjectFacade;
 import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.rule.RuleTagCacheObject;
-import cern.c2mon.shared.common.datatag.TagQualityStatus;
+import cern.c2mon.shared.common.datatag.util.TagQualityStatus;
 
 @Service
 public class RuleTagCacheObjectFacade extends AbstractTagObjectFacade<RuleTag> {

@@ -24,7 +24,7 @@ import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.alarm.AlarmValueImpl;
 import cern.c2mon.shared.client.serializer.TransferTagSerializer;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
-import cern.c2mon.shared.common.datatag.TagQualityStatus;
+import cern.c2mon.shared.common.datatag.util.TagQualityStatus;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

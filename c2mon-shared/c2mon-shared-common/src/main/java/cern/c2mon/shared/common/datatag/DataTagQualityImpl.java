@@ -25,6 +25,8 @@ import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementMap;
 import org.simpleframework.xml.core.Persist;
 
+import cern.c2mon.shared.common.datatag.util.TagQualityStatus;
+
 /**
  * The DataTagQuality is used to represent the quality attribute of a DataTag. The most important information a
  * DataTagQuality object provides is whether a tag's value is valid (<code>isValid()</code>) or not. In addition to

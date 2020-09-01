@@ -41,7 +41,7 @@ import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.supervision.SupervisionEventImpl;
 import cern.c2mon.shared.client.tag.*;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
-import cern.c2mon.shared.common.datatag.TagQualityStatus;
+import cern.c2mon.shared.common.datatag.util.TagQualityStatus;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionEntity;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
 import cern.c2mon.shared.util.json.GsonFactory;

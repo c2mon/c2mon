@@ -34,7 +34,7 @@ import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.rule.RuleTagCacheObject;
 import cern.c2mon.shared.common.ConfigurationException;
-import cern.c2mon.shared.common.datatag.TagQualityStatus;
+import cern.c2mon.shared.common.datatag.util.TagQualityStatus;
 import cern.c2mon.shared.daq.config.Change;
 import cern.c2mon.shared.rule.RuleExpression;
 

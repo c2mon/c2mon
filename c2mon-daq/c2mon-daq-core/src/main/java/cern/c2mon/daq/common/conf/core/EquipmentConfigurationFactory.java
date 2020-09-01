@@ -22,15 +22,16 @@ import org.springframework.stereotype.Component;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import lombok.extern.slf4j.Slf4j;
+
 import cern.c2mon.shared.common.command.SourceCommandTag;
-import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.SourceDataTag;
+import cern.c2mon.shared.common.datatag.util.JmsMessagePriority;
 import cern.c2mon.shared.common.process.EquipmentConfiguration;
 import cern.c2mon.shared.common.process.IEquipmentConfiguration;
 import cern.c2mon.shared.common.process.SubEquipmentConfiguration;
 import cern.c2mon.shared.daq.config.ConfigurationXMLConstants;
 import cern.c2mon.shared.util.parser.SimpleXMLParser;
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
@@ -173,9 +174,9 @@ public class EquipmentConfigurationFactory extends XMLTagValueExtractor implemen
         sourceDataTag.getAddress().setStaticTimedeadband(true);
       }
       if (sourceDataTag.getId().longValue() == equipmentConfiguration.getAliveTagId()) {
-        if (sourceDataTag.getAddress().getPriority() != DataTagAddress.PRIORITY_HIGH) {
+        if (sourceDataTag.getAddress().getPriority() != JmsMessagePriority.PRIORITY_HIGH.getPriority()) {
           log.warn("\tPriority on equipment alive tag " + sourceDataTag.getId() + " is wrongly configured! Adjusting priority to HIGH (7)");
-          sourceDataTag.getAddress().setPriority(DataTagAddress.PRIORITY_HIGH);
+          sourceDataTag.getAddress().setPriority(JmsMessagePriority.PRIORITY_HIGH);
         }
         if (!sourceDataTag.isControl()) {
           log.warn("\tEquipment alive tag " + sourceDataTag.getId() + " is not configured as control tag! Please correct this in the configuration.");

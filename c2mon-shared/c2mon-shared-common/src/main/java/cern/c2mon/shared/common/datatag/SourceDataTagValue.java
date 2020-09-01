@@ -30,6 +30,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import cern.c2mon.shared.common.datatag.util.JmsMessagePriority;
+
 /**
  * Objects of the SourceDataTagValue class represent the current value of a
  * SourceDataTag. They are created within the TIM DAQ process whenever a
@@ -138,9 +140,9 @@ public final class SourceDataTagValue implements Cloneable {
     this.valueDescription = "";
     this.quality = null;
     this.timestamp = null;
-    this.priority = DataTagAddress.PRIORITY_LOW;
+    this.priority = JmsMessagePriority.PRIORITY_LOW.getPriority();
     this.guaranteedDelivery = false;
-    this.timeToLive = DataTagAddress.TTL_FOREVER;
+    this.timeToLive = DataTagConstants.TTL_FOREVER;
     this.simulated = false;
     daqTimestamp = new Timestamp(System.currentTimeMillis());
   }

@@ -22,7 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import cern.c2mon.server.common.tag.AbstractTagCacheObject;
 import cern.c2mon.server.common.tag.Tag;
-import cern.c2mon.shared.common.datatag.TagQualityStatus;
+import cern.c2mon.shared.common.datatag.util.TagQualityStatus;
 
 /**
  * Implementation of the common functionality for modifying Tag objects.

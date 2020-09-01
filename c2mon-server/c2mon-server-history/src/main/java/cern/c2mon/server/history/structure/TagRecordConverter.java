@@ -20,7 +20,7 @@ package cern.c2mon.server.history.structure;
 import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.tag.Tag;
-import cern.c2mon.shared.common.datatag.TagQualityStatus;
+import cern.c2mon.shared.common.datatag.util.TagQualityStatus;
 import cern.c2mon.shared.common.type.TypeConverter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;

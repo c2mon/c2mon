@@ -31,7 +31,7 @@ import cern.c2mon.server.common.rule.RuleTagCacheObject;
 import cern.c2mon.server.rule.config.RuleProperties;
 import cern.c2mon.server.rule.evaluation.RuleUpdateBuffer.RuleBufferObject;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
-import cern.c2mon.shared.common.datatag.TagQualityStatus;
+import cern.c2mon.shared.common.datatag.util.TagQualityStatus;
 
 public class RuleEvaluatorImplTest {
   private RuleEvaluatorImpl ruleEvaluator;

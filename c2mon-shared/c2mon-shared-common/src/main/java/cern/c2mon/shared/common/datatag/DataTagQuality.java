@@ -19,6 +19,8 @@ package cern.c2mon.shared.common.datatag;
 import java.io.Serializable;
 import java.util.Map;
 
+import cern.c2mon.shared.common.datatag.util.TagQualityStatus;
+
 
 /**
  * The <code>DataTagQuality</code> interface is used to represent the quality

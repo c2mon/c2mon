@@ -22,7 +22,7 @@ import cern.c2mon.server.common.alarm.TagWithAlarms;
 import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.tag.Tag;
-import cern.c2mon.shared.common.datatag.TagQualityStatus;
+import cern.c2mon.shared.common.datatag.util.TagQualityStatus;
 import cern.c2mon.shared.daq.config.Change;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

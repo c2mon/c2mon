@@ -32,6 +32,8 @@ import org.w3c.dom.NodeList;
 
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.datatag.address.HardwareAddress;
+import cern.c2mon.shared.common.datatag.util.JmsMessagePriority;
+import cern.c2mon.shared.common.datatag.util.ValueDeadbandType;
 import cern.c2mon.shared.common.type.TypeConverter;
 
 /**
@@ -363,7 +365,7 @@ public class SourceDataTag implements Cloneable, ISourceDataTag {
      */
     @Override
     public short getValueDeadbandType() {
-        short valueDeadbandType = DataTagDeadband.DEADBAND_NONE;
+        short valueDeadbandType = ValueDeadbandType.NONE.getId().shortValue();
         if (address != null) {
             valueDeadbandType = address.getValueDeadbandType();
         }
@@ -428,20 +430,20 @@ public class SourceDataTag implements Cloneable, ISourceDataTag {
   public void adjustJmsPriority() {
     if (address != null) {
       int priority = address.getPriority();
-      int convertedPriority;
+      JmsMessagePriority convertedPriority;
       
       if (isControl()) {
-        convertedPriority = DataTagConstants.PRIORITY_HIGHEST;
-      } else if (priority > DataTagConstants.PRIORITY_MEDIUM) {
-        convertedPriority = DataTagConstants.PRIORITY_HIGH;
-      } else if (priority == DataTagConstants.PRIORITY_MEDIUM) {
-        convertedPriority =  DataTagConstants.PRIORITY_MEDIUM;
+        convertedPriority = JmsMessagePriority.PRIORITY_HIGHEST;
+      } else if (priority > JmsMessagePriority.PRIORITY_MEDIUM.getPriority()) {
+        convertedPriority = JmsMessagePriority.PRIORITY_HIGH;
+      } else if (priority == JmsMessagePriority.PRIORITY_MEDIUM.getPriority()) {
+        convertedPriority =  JmsMessagePriority.PRIORITY_MEDIUM;
       } else {
         // priority < DataTagConstants.PRIORITY_MEDIUM
-        convertedPriority =  DataTagConstants.PRIORITY_LOW;
+        convertedPriority =  JmsMessagePriority.PRIORITY_LOW;
       }
       
-      if (priority != convertedPriority) {
+      if (priority != convertedPriority.getPriority()) {
         log.trace("Adjust JMS priority of tag #{}: {} --> {}", id, priority, convertedPriority);
         address.setPriority(convertedPriority);
       }

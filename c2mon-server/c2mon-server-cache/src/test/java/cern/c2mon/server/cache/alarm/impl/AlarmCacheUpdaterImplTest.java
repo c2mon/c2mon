@@ -37,7 +37,7 @@ import cern.c2mon.shared.client.alarm.condition.ValueAlarmCondition;
 import cern.c2mon.shared.common.datatag.DataTagConstants;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
-import cern.c2mon.shared.common.datatag.TagQualityStatus;
+import cern.c2mon.shared.common.datatag.util.TagQualityStatus;
 
 public class AlarmCacheUpdaterImplTest {
 

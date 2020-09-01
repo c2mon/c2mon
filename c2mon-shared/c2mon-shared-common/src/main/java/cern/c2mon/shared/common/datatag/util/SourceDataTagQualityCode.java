@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.shared.common.datatag;
+package cern.c2mon.shared.common.datatag.util;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -99,29 +99,12 @@ public enum SourceDataTagQualityCode {
    */
   @Deprecated
   public static final SourceDataTagQualityCode getEnum(short code) {
-    switch (code) {
-      case 0:
-        return SourceDataTagQualityCode.OK;
-      case 1:
-        return SourceDataTagQualityCode.OUT_OF_BOUNDS;
-      case 2:
-        return SourceDataTagQualityCode.VALUE_CORRUPTED;
-      case 3:
-        return SourceDataTagQualityCode.CONVERSION_ERROR;
-      case 4:
-        return SourceDataTagQualityCode.DATA_UNAVAILABLE;
-      case 5:
-        return SourceDataTagQualityCode.UNKNOWN;
-      case 6:
-        return SourceDataTagQualityCode.UNSUPPORTED_TYPE;
-      case 7:
-        return SourceDataTagQualityCode.INCORRECT_NATIVE_ADDRESS;
-      case 8:
-        return SourceDataTagQualityCode.FUTURE_SOURCE_TIMESTAMP;
-      case 9:
-        return SourceDataTagQualityCode.STALE;
-      default:
-        return SourceDataTagQualityCode.UNKNOWN;
+    for (SourceDataTagQualityCode codeEnum : SourceDataTagQualityCode.values()) {
+      if (codeEnum.qualityCode == (int) code) {
+        return codeEnum;
+      }
     }
+    
+    return SourceDataTagQualityCode.UNKNOWN;
   }
 }

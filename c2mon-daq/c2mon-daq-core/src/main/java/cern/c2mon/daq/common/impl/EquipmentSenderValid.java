@@ -35,6 +35,7 @@ import cern.c2mon.daq.common.messaging.IProcessMessageSender;
 import cern.c2mon.daq.tools.DataTagValueFilter;
 import cern.c2mon.daq.tools.DataTagValueValidator;
 import cern.c2mon.shared.common.datatag.*;
+import cern.c2mon.shared.common.datatag.util.SourceDataTagQualityCode;
 import cern.c2mon.shared.common.filter.FilteredDataTagValue.FilterType;
 import cern.c2mon.shared.common.type.TypeConverter;
 

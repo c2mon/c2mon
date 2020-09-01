@@ -27,7 +27,7 @@ import cern.c2mon.server.cache.ProcessCache;
 import cern.c2mon.server.cache.ProcessFacade;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
-import cern.c2mon.shared.common.datatag.TagQualityStatus;
+import cern.c2mon.shared.common.datatag.util.TagQualityStatus;
 
 /**
  * Helper bean for adding the supervision status to

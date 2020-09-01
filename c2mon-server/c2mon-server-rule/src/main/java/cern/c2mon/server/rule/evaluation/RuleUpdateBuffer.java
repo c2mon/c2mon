@@ -26,7 +26,7 @@ import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.cache.RuleTagFacade;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
-import cern.c2mon.shared.common.datatag.TagQualityStatus;
+import cern.c2mon.shared.common.datatag.util.TagQualityStatus;
 
 /**
  * This temporary buffer is used to filter out intermediate rule evaluation results.

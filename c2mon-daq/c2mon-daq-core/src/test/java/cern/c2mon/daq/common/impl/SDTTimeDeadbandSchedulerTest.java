@@ -33,6 +33,8 @@ import cern.c2mon.daq.filter.IFilterMessageSender;
 import cern.c2mon.daq.filter.dynamic.IDynamicTimeDeadbandFilterActivator;
 import cern.c2mon.daq.tools.DataTagValueFilter;
 import cern.c2mon.shared.common.datatag.*;
+import cern.c2mon.shared.common.datatag.util.JmsMessagePriority;
+import cern.c2mon.shared.common.datatag.util.ValueDeadbandType;
 import cern.c2mon.shared.common.filter.FilteredDataTagValue;
 import cern.c2mon.shared.common.process.EquipmentConfiguration;
 import cern.c2mon.shared.common.process.ProcessConfiguration;
@@ -92,7 +94,7 @@ public class SDTTimeDeadbandSchedulerTest {
 
     freshnessMonitorMock.setIEquipmentMessageSender(equipmentMessageSender);
     EasyMock.expectLastCall();
-    this.tag = createSourceDataTag(1L, "sdt1", "Boolean", DataTagDeadband.DEADBAND_NONE, DataTagConstants.PRIORITY_LOW, false);
+    this.tag = createSourceDataTag(1L, "sdt1", "Boolean", ValueDeadbandType.NONE, JmsMessagePriority.PRIORITY_LOW, false);
     this.tag.getAddress().setTimeDeadband(30);
 
     this.conf.getDataTags().put(1L, tag);
@@ -308,7 +310,7 @@ public class SDTTimeDeadbandSchedulerTest {
    *
    * @return
    */
-  private SourceDataTag createSourceDataTag(long id, String name, String dataType, short deadBandType, int priority, boolean guaranteed) {
+  private SourceDataTag createSourceDataTag(long id, String name, String dataType, ValueDeadbandType deadBandType, JmsMessagePriority priority, boolean guaranteed) {
     DataTagAddress address = new DataTagAddress(null, 100, deadBandType, VALUE_DEADBAND, 0, priority, guaranteed);
     return new SourceDataTag(id, name, false, DataTagConstants.MODE_OPERATIONAL, dataType, address);
   }

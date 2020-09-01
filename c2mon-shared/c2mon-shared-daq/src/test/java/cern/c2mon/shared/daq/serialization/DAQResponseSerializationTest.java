@@ -24,6 +24,8 @@ import java.util.Collections;
 import org.junit.Test;
 
 import cern.c2mon.shared.common.datatag.*;
+import cern.c2mon.shared.common.datatag.util.JmsMessagePriority;
+import cern.c2mon.shared.common.datatag.util.SourceDataTagQualityCode;
 import cern.c2mon.shared.daq.command.SourceCommandTagReport;
 import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
@@ -78,9 +80,9 @@ public class DAQResponseSerializationTest {
         .quality(new SourceDataTagQuality(SourceDataTagQualityCode.DATA_UNAVAILABLE))
         .timestamp(new Timestamp(System.currentTimeMillis()))
         .daqTimestamp(new Timestamp(System.currentTimeMillis()))
-        .priority(DataTagConstants.PRIORITY_LOW)
+        .priority(JmsMessagePriority.PRIORITY_LOW.getPriority())
         .valueDescription("test description")
-        .timeToLive(DataTagAddress.TTL_FOREVER)
+        .timeToLive(DataTagConstants.TTL_FOREVER)
         .build();
     ArrayList<SourceDataTagValue> values = new ArrayList<>(Collections.singletonList(sourceDataTagValue));
 

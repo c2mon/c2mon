@@ -14,7 +14,7 @@ import cern.c2mon.daq.common.IEquipmentMessageSender;
 import cern.c2mon.daq.config.DaqProperties;
 import cern.c2mon.shared.common.datatag.SourceDataTag;
 import cern.c2mon.shared.common.datatag.SourceDataTagQuality;
-import cern.c2mon.shared.common.datatag.SourceDataTagQualityCode;
+import cern.c2mon.shared.common.datatag.util.SourceDataTagQualityCode;
 
 /**
  * @author Franz Ritter

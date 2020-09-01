@@ -12,6 +12,9 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import cern.c2mon.shared.common.datatag.*;
+import cern.c2mon.shared.common.datatag.util.JmsMessagePriority;
+import cern.c2mon.shared.common.datatag.util.SourceDataTagQualityCode;
+import cern.c2mon.shared.common.datatag.util.ValueDeadbandType;
 import cern.c2mon.shared.common.filter.FilteredDataTagValue.FilterType;
 
 public class DataTagValueFilterTest {
@@ -88,7 +91,7 @@ public class DataTagValueFilterTest {
 
   @Test
   public void testIsCandidateForFiltering() {
-    SourceDataTag sdt1 = createSourceDataTag(1L, "sdt1", "Boolean", DataTagDeadband.DEADBAND_PROCESS_RELATIVE, 0, DataTagConstants.PRIORITY_LOW, false);
+    SourceDataTag sdt1 = createSourceDataTag(1L, "sdt1", "Boolean", ValueDeadbandType.PROCESS_RELATIVE, 0, JmsMessagePriority.PRIORITY_LOW, false);
     ValueUpdate currentValue = new ValueUpdate(false, System.currentTimeMillis() - 100);
     sdt1.update(currentValue);
     
@@ -115,8 +118,8 @@ public class DataTagValueFilterTest {
     assertEquals(FilterType.NO_FILTERING, filterReason);
   }
   
-  private SourceDataTag createSourceDataTag(long id, String name, String dataType, short deadBandType, int timeDeadband, int priority, boolean guaranteed) {
-    DataTagAddress address = new DataTagAddress(null, 100, deadBandType, VALUE_DEADBAND, timeDeadband, priority, guaranteed);
+  private SourceDataTag createSourceDataTag(long id, String name, String dataType, ValueDeadbandType deadBandType, int timeDeadband, JmsMessagePriority priority, boolean guaranteed) {
+    DataTagAddress address = new DataTagAddress(100, deadBandType, VALUE_DEADBAND, timeDeadband, priority, guaranteed);
     SourceDataTagValue sdtValue = new SourceDataTagValue(id, name, false);
     sdtValue.setTimestamp(new Timestamp(System.currentTimeMillis() - 1000));
     SourceDataTag sdt = new SourceDataTag(id, name, false, DataTagConstants.MODE_OPERATIONAL, dataType, address);

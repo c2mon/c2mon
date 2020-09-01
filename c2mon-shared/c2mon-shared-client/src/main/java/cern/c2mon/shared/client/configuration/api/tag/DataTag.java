@@ -101,7 +101,7 @@ public class DataTag extends Tag {
   public DataTag() {
   }
 
-  public static CreateBuilder create(String name, Class dataType, DataTagAddress address) {
+  public static CreateBuilder create(String name, Class<?> dataType, DataTagAddress address) {
     Assert.hasText(name, "Data tag name is required!");
     Assert.notNull(dataType, "Data type is required!");
     Assert.notNull(address, "Data tag address is required!");
@@ -121,7 +121,7 @@ public class DataTag extends Tag {
 
     private DataTag tagToBuild = new DataTag();
 
-    private CreateBuilder(String name, Class dataType, DataTagAddress address) {
+    private CreateBuilder(String name, Class<?> dataType, DataTagAddress address) {
       tagToBuild.setName(name);
       tagToBuild.setDataType(dataType.getName());
       tagToBuild.setAddress(address);

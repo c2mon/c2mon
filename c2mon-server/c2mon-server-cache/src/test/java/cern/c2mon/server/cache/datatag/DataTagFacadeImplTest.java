@@ -16,6 +16,10 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.datatag;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.sql.Timestamp;
 import java.util.Properties;
 
@@ -30,11 +34,9 @@ import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.test.CacheObjectCreation;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.datatag.*;
-import org.springframework.mock.env.MockEnvironment;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import cern.c2mon.shared.common.datatag.util.JmsMessagePriority;
+import cern.c2mon.shared.common.datatag.util.SourceDataTagQualityCode;
+import cern.c2mon.shared.common.datatag.util.TagQualityStatus;
 
 /**
  * JUnit class for unit testing the DataTagFacade implementation. Also instantiates
@@ -256,7 +258,7 @@ public class DataTagFacadeImplTest {
         .quality(new SourceDataTagQuality())
         .timestamp(sourceTime)
         .daqTimestamp(new Timestamp(System.currentTimeMillis()))
-        .priority(DataTagConstants.PRIORITY_HIGH)
+        .priority(JmsMessagePriority.PRIORITY_HIGH.getPriority())
         .valueDescription("value desc")
         .timeToLive(DataTagConstants.TTL_FOREVER)
         .build();

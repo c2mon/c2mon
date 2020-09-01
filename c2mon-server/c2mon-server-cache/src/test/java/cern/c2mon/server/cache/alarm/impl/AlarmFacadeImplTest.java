@@ -35,7 +35,7 @@ import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.test.CacheObjectCreation;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
-import cern.c2mon.shared.common.datatag.TagQualityStatus;
+import cern.c2mon.shared.common.datatag.util.TagQualityStatus;
 
 /**
  * Junit test of AlarmFacade implementation

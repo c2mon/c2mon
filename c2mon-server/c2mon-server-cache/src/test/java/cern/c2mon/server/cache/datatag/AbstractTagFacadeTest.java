@@ -23,7 +23,7 @@ import org.junit.Test;
 
 import cern.c2mon.server.cache.rule.RuleTagFacadeImpl;
 import cern.c2mon.server.common.rule.RuleTagCacheObject;
-import cern.c2mon.shared.common.datatag.TagQualityStatus;
+import cern.c2mon.shared.common.datatag.util.TagQualityStatus;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;

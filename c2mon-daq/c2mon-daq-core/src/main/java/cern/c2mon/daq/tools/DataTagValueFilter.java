@@ -20,12 +20,9 @@ import static java.lang.String.format;
 
 import java.util.Arrays;
 
-import cern.c2mon.shared.common.datatag.DataTagDeadband;
-import cern.c2mon.shared.common.datatag.SourceDataTag;
-import cern.c2mon.shared.common.datatag.SourceDataTagQuality;
-import cern.c2mon.shared.common.datatag.SourceDataTagQualityCode;
-import cern.c2mon.shared.common.datatag.SourceDataTagValue;
-import cern.c2mon.shared.common.datatag.ValueUpdate;
+import cern.c2mon.shared.common.datatag.*;
+import cern.c2mon.shared.common.datatag.util.SourceDataTagQualityCode;
+import cern.c2mon.shared.common.datatag.util.ValueDeadbandType;
 import cern.c2mon.shared.common.filter.FilteredDataTagValue.FilterType;
 import cern.c2mon.shared.common.type.TypeConverter;
 import lombok.extern.slf4j.Slf4j;
@@ -91,12 +88,14 @@ public class DataTagValueFilter {
                     if (isCurrentValueAvailable(currentTag)) {
                         Number currentValue = (Number) currentTag.getCurrentValue().getValue();
                         Number newValue = update.getValue() == null ? null : (Number) update.getValue();
+                        
+                        ValueDeadbandType valueDeadbandType = ValueDeadbandType.getValueDeadbandType((int) currentTag.getAddress().getValueDeadbandType());
                         // Switch between absolute and relative value deadband
-                        switch (currentTag.getAddress().getValueDeadbandType()) {
-                        case DataTagDeadband.DEADBAND_PROCESS_ABSOLUTE:
+                        switch (valueDeadbandType) {
+                        case PROCESS_ABSOLUTE:
                             filterTag = isAbsoluteValueDeadband(currentValue, newValue, valueDeadband);
                             break;
-                        case DataTagDeadband.DEADBAND_PROCESS_ABSOLUTE_VALUE_DESCR_CHANGE:
+                        case PROCESS_ABSOLUTE_VALUE_DESCR_CHANGE:
 
                             String tagValueDesc = currentTag.getCurrentValue().getValueDescription();
                             if (tagValueDesc == null) {
@@ -120,10 +119,10 @@ public class DataTagValueFilter {
                             }
                             break;
 
-                        case DataTagDeadband.DEADBAND_PROCESS_RELATIVE:
+                        case PROCESS_RELATIVE:
                             filterTag = isRelativeValueDeadband(currentValue, newValue, valueDeadband);
                             break;
-                        case DataTagDeadband.DEADBAND_PROCESS_RELATIVE_VALUE_DESCR_CHANGE:
+                        case PROCESS_RELATIVE_VALUE_DESCR_CHANGE:
 
                             tagValueDesc = currentTag.getCurrentValue().getValueDescription();
                             if (tagValueDesc == null) {

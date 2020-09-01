@@ -40,7 +40,7 @@ import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.SourceDataTag;
 import cern.c2mon.shared.common.datatag.SourceDataTagValue;
-import cern.c2mon.shared.common.datatag.TagQualityStatus;
+import cern.c2mon.shared.common.datatag.util.TagQualityStatus;
 import cern.c2mon.shared.common.type.TypeConverter;
 import cern.c2mon.shared.daq.config.DataTagUpdate;
 
