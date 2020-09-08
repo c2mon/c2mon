@@ -10,7 +10,6 @@ import cern.c2mon.shared.client.configuration.api.tag.CommandTag;
 import cern.c2mon.shared.client.configuration.api.tag.DataTag;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.address.HardwareAddress;
-import cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -72,12 +71,7 @@ public abstract class TagConfigStrategy {
         this.queryObj = new QueryObj(uri, keys);
     }
 
-    /**
-     * Create appropriate preliminary command tag configurations with a @{@link OPCHardwareAddressImpl} which can then
-     * be passed to the C2MON server for creation.
-     * @return the preliminary CommandTags to pass on to the C2MON server for creation.
-     */
-    public CommandTag toCommandConfiguration(HardwareAddress hwAddress) {
+    protected CommandTag toCommandConfiguration(HardwareAddress hwAddress) {
         /* Parameter "name" of commandTag must be 1 to 60 characters long (see cern.c2mon.server.cache.command.CommandTagFacadeImpl.CommandTagFacadeImpl) */
         int maxLength = 60;
         return CommandTag.create(
@@ -109,5 +103,5 @@ public abstract class TagConfigStrategy {
      * nonstandard method calls
      */
 
-    public enum TagType {Data, Command}
+    public enum TagType {DATA, COMMAND}
 }

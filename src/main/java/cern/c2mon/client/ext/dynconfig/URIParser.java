@@ -42,15 +42,15 @@ public class URIParser {
      */
     public static TagConfigStrategy.TagType getTagType(URI uri) {
         if (uri.getQuery() != null && uri.getQuery().contains(TAG_TYPE.getKeyName() + "=")) {
-            for (String tagValue : splitQuery(uri).get(TAG_TYPE.getKeyName())) {
-                for (TagConfigStrategy.TagType tagType : TagConfigStrategy.TagType.values()) {
-                    if (tagValue.equalsIgnoreCase(tagType.name())) {
-                        return tagType;
-                    }
-                }
+            final Optional<TagConfigStrategy.TagType> tagType = splitQuery(uri).get(TAG_TYPE.getKeyName()).stream()
+                    .flatMap(tagValue -> Arrays.stream(TagConfigStrategy.TagType.values())
+                            .filter(t -> tagValue.equalsIgnoreCase(t.name())))
+                    .findFirst();
+            if (tagType.isPresent()) {
+                return tagType.get();
             }
         }
-        return TagConfigStrategy.TagType.Data;
+        return TagConfigStrategy.TagType.DATA;
     }
 
     /**

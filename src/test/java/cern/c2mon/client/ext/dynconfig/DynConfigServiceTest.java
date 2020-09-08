@@ -88,7 +88,7 @@ class DynConfigServiceTest {
 
     @Test
     void getTagsForURIShouldCreateTagIfNotFound() throws DynConfigException {
-        setupMockForCreateTagWithReport(new ConfigurationReport(), TagConfigStrategy.TagType.Data);
+        setupMockForCreateTagWithReport(new ConfigurationReport(), TagConfigStrategy.TagType.DATA);
 
         replay(tagService, configurationService);
         Collection<Tag> tagsForURI = dcs.getTagsForURI(Collections.singletonList(dataTag));
@@ -99,7 +99,7 @@ class DynConfigServiceTest {
 
     @Test
     void getTagsForCommandURIShouldCreateTagIfNotFound() throws DynConfigException {
-        setupMockForCreateTagWithReport(new ConfigurationReport(), TagConfigStrategy.TagType.Command);
+        setupMockForCreateTagWithReport(new ConfigurationReport(), TagConfigStrategy.TagType.COMMAND);
 
         replay(tagService, configurationService);
         Collection<Tag> tagsForURI = dcs.getTagsForURI(Collections.singletonList(commandTag));
@@ -122,7 +122,7 @@ class DynConfigServiceTest {
 
     @Test
     void getSingleTagForURIShouldCreateTagIfNotFound() throws DynConfigException {
-        setupMockForCreateTagWithReport(new ConfigurationReport(), TagConfigStrategy.TagType.Data);
+        setupMockForCreateTagWithReport(new ConfigurationReport(), TagConfigStrategy.TagType.DATA);
         replay(tagService, configurationService);
         Tag tagsForURI = dcs.getTagForURI(dataTag);
         verify(tagService, configurationService);
@@ -133,7 +133,7 @@ class DynConfigServiceTest {
 
     @Test
     void getSingleTagForURIShouldThrowErrorWhenCreateTagReportsError() {
-        setupMockForCreateTagWithReport(new ConfigurationReport(false, "fail"), TagConfigStrategy.TagType.Data);
+        setupMockForCreateTagWithReport(new ConfigurationReport(false, "fail"), TagConfigStrategy.TagType.DATA);
         replay(tagService, configurationService);
         Assertions.assertThrows(DynConfigException.class, () -> dcs.getTagForURI(dataTag));
         verify(tagService, configurationService);
@@ -162,7 +162,7 @@ class DynConfigServiceTest {
         expect(tagService.findByName(anyString()))
                 .andReturn(tags)
                 .once();
-        expect(type.equals(TagConfigStrategy.TagType.Data) ?
+        expect(type.equals(TagConfigStrategy.TagType.DATA) ?
                     configurationService.createDataTag(anyString(), anyObject()) :
                     configurationService.createCommandTag(anyString(), anyObject()))
                 .andReturn(report)

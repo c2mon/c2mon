@@ -49,27 +49,27 @@ class URIParserTest {
     @Test
     void emptyTagTypeShouldReturnDataTag() {
         URI uri = URI.create("opc.tcp://host:500/path?tagType=");
-        assertEquals(TagConfigStrategy.TagType.Data, URIParser.getTagType(uri));
+        assertEquals(TagConfigStrategy.TagType.DATA, URIParser.getTagType(uri));
     }
 
     @Test
     void noTagTypeShouldReturnDataTag() {
         URI uri = URI.create("opc.tcp://host:500/path");
-        assertEquals(TagConfigStrategy.TagType.Data, URIParser.getTagType(uri));
+        assertEquals(TagConfigStrategy.TagType.DATA, URIParser.getTagType(uri));
     }
 
 
     @Test
     void falseTagTypeShouldReturnDataTag() {
         URI uri = URI.create("opc.tcp://host:500/path?tagType=XXX");
-        assertEquals(TagConfigStrategy.TagType.Data, URIParser.getTagType(uri));
+        assertEquals(TagConfigStrategy.TagType.DATA, URIParser.getTagType(uri));
     }
 
 
     @Test
     void commandTypeShouldReturnCommandTag() {
         URI uri = URI.create("opc.tcp://host:500/path?tagType=COMMAND");
-        assertEquals(TagConfigStrategy.TagType.Command, URIParser.getTagType(uri));
+        assertEquals(TagConfigStrategy.TagType.COMMAND, URIParser.getTagType(uri));
     }
 
     @Test

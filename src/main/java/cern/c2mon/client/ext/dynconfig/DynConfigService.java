@@ -90,39 +90,42 @@ public class DynConfigService {
             Collection<Tag> tagsForUri = tagService.findByName(tagName);
             if (tagsForUri.isEmpty()) {
                 log.info("No tag could be found for  URI {}. Creating... ", uri);
+                ConfigurationReport report;
                 try {
                     final Map.Entry<Long, ConfigurationReport> idReport = createTagsAndReport(uri, tagName);
-                    final ConfigurationReport report = idReport.getValue();
-                    reports.add(report);
-                    if (report.getStatus() == ConfigConstants.Status.RESTART) {
-                        log.info("Tag created successfully, process restart required. Report \"{}\" with ID \"{}\", status \"{}\", description \"{}\", elements: ",
-                                report.getName(), report.getId(), report.getStatus(), report.getStatusDescription());
-                        report.getElementReports().forEach(r -> log.info("ID {}, Status \"{}\", StatusMessage \"{}\".", r.getId(), r.getStatus(), r.getStatusMessage()));
-                    } else if (report.getStatus() != ConfigConstants.Status.OK) {
-                        log.info("Creation of tag {} yielded report \"{}\" with ID \"{}\", status \"{}\", description \"{}\", elements: .",
-                                tagsForUri, report.getName(), report.getId(), report.getStatus(), report.getStatusDescription());
-                        report.getElementReports().forEach(r -> log.info("ID {}, Status \"{}\", StatusMessage \"{}\".", r.getId(), r.getStatus(), r.getStatusMessage()));
-                    } else {
-                        log.info("Tag {} has been created with report ID \"{}\", status \"{}\", description \"{}\".",
-                                tagsForUri, report.getId(), report.getStatus(), report.getStatusDescription());
-                    }
-                    tagsForUri = tagService.findByName(tagName);
+                    report = idReport.getValue();
                 } catch (DynConfigException e) {
-                    log.error("Could not associate the URI {} to a mapping. Proceed to next URI...", uri.toString());
+                    log.error("Could not associate the URI {} to a mapping. Proceed to next URI...", uri.toString(), e);
+                    continue;
                 }
+                reports.add(report);
+                logReports(report, tagsForUri);
+                tagsForUri = tagService.findByName(tagName);
             } else {
                 log.info("Tag {} already exists", tagsForUri);
             }
             if (tagsForUri.iterator().hasNext()) {
                 tags.add(tagsForUri.iterator().next());
-            } else {
-                tags.add(null);
             }
         }
-
         handleConfigurationReport(reports, DynConfigException.Context.CREATE_TAG);
         log.info("Completed creating tags {}.", tags);
         return tags;
+    }
+
+    private void logReports(ConfigurationReport report, Collection<Tag> tags) {
+        if (report.getStatus() == ConfigConstants.Status.RESTART) {
+            log.info("Tag created successfully, process restart required. Report \"{}\" with ID \"{}\", status \"{}\", description \"{}\", elements: ",
+                    report.getName(), report.getId(), report.getStatus(), report.getStatusDescription());
+            report.getElementReports().forEach(r -> log.info("ID {}, Status \"{}\", StatusMessage \"{}\".", r.getId(), r.getStatus(), r.getStatusMessage()));
+        } else if (report.getStatus() != ConfigConstants.Status.OK) {
+            log.info("Creation of tag {} yielded report \"{}\" with ID \"{}\", status \"{}\", description \"{}\", elements: .",
+                    tags, report.getName(), report.getId(), report.getStatus(), report.getStatusDescription());
+            report.getElementReports().forEach(r -> log.info("ID {}, Status \"{}\", StatusMessage \"{}\".", r.getId(), r.getStatus(), r.getStatusMessage()));
+        } else {
+            log.info("Tag {} has been created with report ID \"{}\", status \"{}\", description \"{}\".",
+                    tags, report.getId(), report.getStatus(), report.getStatusDescription());
+        }
     }
 
     private void deleteTags(Collection<? extends Tag> dataTags) throws DynConfigException {
@@ -146,7 +149,7 @@ public class DynConfigService {
             createEquipment(mapping, strategy);
         }
         final TagConfigStrategy.TagType tagType = URIParser.getTagType(uri);
-        if (tagType.equals(TagConfigStrategy.TagType.Command)) {
+        if (tagType.equals(TagConfigStrategy.TagType.COMMAND)) {
             final CommandTag commandTag = strategy.prepareCommandTagConfigurations();
             return new AbstractMap.SimpleEntry<>(commandTag.getId(), configurationService.createCommandTag(mapping.getEquipmentName(), commandTag));
         } else {
