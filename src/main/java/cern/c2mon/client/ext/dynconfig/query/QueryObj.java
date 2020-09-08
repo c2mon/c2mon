@@ -81,10 +81,13 @@ public class QueryObj implements IQueryObj {
      * @return A List of values of class c corresponding to the transformed query property values.
      */
     public <T> List<T> get(QueryKey<? extends T> key, Class<? extends T> c) {
-        if (!contains(key) || !properties.get(key.getKeyName()).stream().allMatch(key::isValid)) {
+        if (!contains(key) || properties.get(key.getKeyName()).stream().anyMatch(s -> !key.isValid(s))) {
             return Collections.singletonList(key.getDefaultValue());
         }
-        return properties.get(key.getKeyName()).stream().map(k -> ObjectConverter.convert(c, k)).collect(Collectors.toList());
+        return properties.get(key.getKeyName())
+                .stream()
+                .map(k -> ObjectConverter.convert(c, k))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -104,15 +107,19 @@ public class QueryObj implements IQueryObj {
      */
     @Override
     public void applyQueryPropertiesTo(Object applyToObj) throws DynConfigException {
+        log.info("Applying to object of class {}.", applyToObj.getClass().getName());
         final Method[] declaredMethods = applyToObj.getClass().getDeclaredMethods();
         for (Map.Entry<String, List<String>> targetMap : properties.entrySet()) {
             Optional<Method> matchingMethod = Arrays.stream(declaredMethods)
                     .filter(m -> m.getName().equalsIgnoreCase(targetMap.getKey()) && m.getParameterTypes().length == 1)
                     .findFirst();
             if (matchingMethod.isPresent()) {
+                log.info("Apply property  with key {} and value {} to method {}.", targetMap.getKey(), targetMap.getValue(), matchingMethod.get());
                 for (String s : targetMap.getValue()) {
                     transformAndInvoke(matchingMethod.get(), s, applyToObj);
                 }
+            } else {
+                log.info("No method for property  with key {} and value {}.", targetMap.getKey(), targetMap.getValue());
             }
         }
     }

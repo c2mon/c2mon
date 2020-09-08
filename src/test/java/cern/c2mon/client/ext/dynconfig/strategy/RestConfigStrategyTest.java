@@ -46,7 +46,7 @@ public class RestConfigStrategyTest {
 
         URI uri = URI.create("http://host/path?url=xxx&mode=POST&getFrequency=5&postFrequency=3&jsonPathExpression=aa");
         strategy = new RestConfigStrategy(uri);
-        DataTagAddress actual = this.strategy.prepareTagConfigurations().getAddress();
+        DataTagAddress actual = this.strategy.prepareDataTagConfigurations().getAddress();
 
         assertEquals(expected, actual);
     }

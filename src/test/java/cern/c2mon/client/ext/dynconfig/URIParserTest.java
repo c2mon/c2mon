@@ -1,5 +1,6 @@
 package cern.c2mon.client.ext.dynconfig;
 
+import cern.c2mon.client.ext.dynconfig.strategy.TagConfigStrategy;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -43,6 +44,32 @@ class URIParserTest {
     void escapedCharInTagNameShouldBeDecoded() {
         URI uri = URI.create("opc.tcp://host:500/path?tagName=%20");
         assertEquals(" ", URIParser.toTagName(uri));
+    }
+
+    @Test
+    void emptyTagTypeShouldReturnDataTag() {
+        URI uri = URI.create("opc.tcp://host:500/path?tagType=");
+        assertEquals(TagConfigStrategy.TagType.Data, URIParser.getTagType(uri));
+    }
+
+    @Test
+    void noTagTypeShouldReturnDataTag() {
+        URI uri = URI.create("opc.tcp://host:500/path");
+        assertEquals(TagConfigStrategy.TagType.Data, URIParser.getTagType(uri));
+    }
+
+
+    @Test
+    void falseTagTypeShouldReturnDataTag() {
+        URI uri = URI.create("opc.tcp://host:500/path?tagType=XXX");
+        assertEquals(TagConfigStrategy.TagType.Data, URIParser.getTagType(uri));
+    }
+
+
+    @Test
+    void commandTypeShouldReturnCommandTag() {
+        URI uri = URI.create("opc.tcp://host:500/path?tagType=COMMAND");
+        assertEquals(TagConfigStrategy.TagType.Command, URIParser.getTagType(uri));
     }
 
     @Test

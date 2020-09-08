@@ -35,6 +35,6 @@ class DipConfigStrategyTest {
     static HardwareAddress createHardwareAddressFrom(String queries) throws DynConfigException {
         URI uri = URI.create("dip://host/path?"+ queries);
         ITagConfigStrategy strategy = new DipConfigStrategy(uri);
-        return strategy.prepareTagConfigurations().getAddress().getHardwareAddress();
+        return strategy.prepareDataTagConfigurations().getAddress().getHardwareAddress();
     }
 }

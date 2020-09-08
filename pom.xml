@@ -5,7 +5,8 @@
     <parent>
         <groupId>cern.c2mon.client</groupId>
         <artifactId>c2mon-client</artifactId>
-        <version>1.9.3-SNAPSHOT</version>
+        <version>1.9.7-SNAPSHOT</version>
+        <relativePath />
     </parent>
 
     <artifactId>c2mon-client-ext-dynconfig</artifactId>
@@ -91,6 +92,12 @@
                     <artifactId>junit</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-yaml</artifactId>
+            <version>2.9.8</version>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>

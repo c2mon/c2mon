@@ -27,7 +27,8 @@ import java.util.Collections;
 @RunWith(SpringRunner.class)
 public class DynConfigServiceIT {
 
-	private static final URI dipUri = URI.create("dip://dip/acc/LHC/RunControl/Page1?publicationName=Page1");
+	private static final URI dipTagUri = URI.create("dip://dip/acc/LHC/RunControl/Page1?publicationName=Page1");
+	private static final URI opcCommandUri = URI.create("opc.tcp://dip?tagType=COMMAND&commandPulseLength=2&setCommandType=CLASSIC&itemName=test");
 	private static final int JMS_PORT = 61616;
 
 	@Autowired
@@ -53,34 +54,43 @@ public class DynConfigServiceIT {
 
 	@After
 	public void clean() throws DynConfigException {
-		dcs.deleteTagForURI(dipUri);
+		dcs.deleteTagForURI(dipTagUri);
+	}
+
+	@Test
+	public void getCommandTagForURIWithUnknownTagShouldCreateTag() throws Exception {
+		String tagName = URIParser.toTagName(opcCommandUri);
+
+		Assert.assertTrue(ts.findByName(tagName).isEmpty());
+		dcs.getTagForURI(opcCommandUri);
+		Assert.assertFalse(ts.findByName(tagName).isEmpty());
 	}
 
 	@Test
 	public void getTagForURIWithUnknownTagShouldCreateTag() throws Exception {
-		String tagName = URIParser.toTagName(dipUri);
+		String tagName = URIParser.toTagName(dipTagUri);
 
 		Assert.assertTrue(ts.findByName(tagName).isEmpty());
-		dcs.getTagForURI(dipUri);
+		dcs.getTagForURI(dipTagUri);
 		Assert.assertFalse(ts.findByName(tagName).isEmpty());
 	}
 
 	@Test
 	public void getTagForURIWithUnknownTagShouldReturnCreatedTag() throws Exception {
-		Tag tag = dcs.getTagForURI(dipUri);
-		Assert.assertEquals(Collections.singletonList(tag), ts.findByName(URIParser.toTagName(dipUri)));
+		Tag tag = dcs.getTagForURI(dipTagUri);
+		Assert.assertEquals(Collections.singletonList(tag), ts.findByName(URIParser.toTagName(dipTagUri)));
 	}
 
 	@Test
 	public void deleteTagForURIWithExistingTagShouldRemoveTag() throws Exception {
-		dcs.getTagForURI(dipUri);
-		dcs.deleteTagForURI(dipUri);
-		Assert.assertTrue(ts.findByName(URIParser.toTagName(dipUri)).isEmpty());
+		dcs.getTagForURI(dipTagUri);
+		dcs.deleteTagForURI(dipTagUri);
+		Assert.assertTrue(ts.findByName(URIParser.toTagName(dipTagUri)).isEmpty());
 	}
 
 	@Test
 	public void deleteTagForURIWithoutTagShouldDoNothing() throws Exception {
-		dcs.deleteTagForURI(dipUri);
-		Assert.assertTrue(ts.findByName(URIParser.toTagName(dipUri)).isEmpty());
+		dcs.deleteTagForURI(dipTagUri);
+		Assert.assertTrue(ts.findByName(URIParser.toTagName(dipTagUri)).isEmpty());
 	}
 }

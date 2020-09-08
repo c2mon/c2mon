@@ -4,6 +4,7 @@ import cern.c2mon.client.ext.dynconfig.DynConfigException;
 import cern.c2mon.client.ext.dynconfig.config.ProcessEquipmentURIMapping;
 import cern.c2mon.client.ext.dynconfig.query.QueryObj;
 import cern.c2mon.shared.client.configuration.api.equipment.Equipment;
+import cern.c2mon.shared.client.configuration.api.tag.CommandTag;
 import cern.c2mon.shared.client.configuration.api.tag.DataTag;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -77,40 +78,51 @@ class TagConfigStrategyTest {
     void toTagConfigurationWithoutTagNameShouldResortToDefault() throws DynConfigException {
         URI uri = URI.create("dip://host/path?publicationName=1");
         strategy = new DipConfigStrategy(uri);
-        DataTag dt = strategy.prepareTagConfigurations();
+        DataTag dt = strategy.prepareDataTagConfigurations();
         assertEquals(uri.toASCIIString(), dt.getName());
     }
 
     @Test
     void toTagConfigurationWithTagNameShouldHaveName() throws DynConfigException {
-        DataTag tag = getTag("publicationName=1&tagName=1");
+        DataTag tag = getDataTag("publicationName=1&tagName=1");
         assertEquals("1", tag.getName());
     }
 
     @Test
     void toTagConfigurationWithoutTagDescriptionShouldResortToDefault() throws DynConfigException {
-        DataTag tag = getTag("publicationName=1&tagName=1");
+        DataTag tag = getDataTag("publicationName=1&tagName=1");
         assertEquals("dynamically configured tag", tag.getDescription());
     }
 
     @Test
     void toTagConfigurationWithNonStandardAddressParameterShouldBeSet() throws DynConfigException {
-        DataTag tag = getTag("publicationName=1&tagName=1&setTimeToLive=67");
+        DataTag tag = getDataTag("publicationName=1&tagName=1&setTimeToLive=67");
         assertEquals(67, tag.getAddress().getTimeToLive());
     }
 
     @Test
     void toTagConfigurationWithDataTypeShouldSetType() throws DynConfigException {
-        DataTag tag = getTag("publicationName=1&tagName=1&dataType="+ Exception.class.getName());
+        DataTag tag = getDataTag("publicationName=1&tagName=1&dataType="+ Exception.class.getName());
         assertEquals(Exception.class.getName(), tag.getDataType());
     }
 
     @Test
     void toTagConfigurationWithNonStandardTagParameterShouldBeSet() throws DynConfigException {
-        DataTag tag = getTag("publicationName=1&tagName=1&minValue=67");
+        DataTag tag = getDataTag("publicationName=1&tagName=1&minValue=67");
         assertEquals(67, tag.getMinValue());
     }
 
+    @Test
+    void toCommandTagConfigurationWithDataTypeShouldSetType() throws DynConfigException {
+        CommandTag tag = getCommandTag("publicationName=1&tagName=1&dataType="+ Exception.class.getName());
+        assertEquals(Exception.class.getName(), tag.getDataType());
+    }
+
+    @Test
+    void toCommandTagConfigurationWithNonStandardTagParameterShouldBeSet() throws DynConfigException {
+        CommandTag tag = getCommandTag("publicationName=1&tagName=1&minValue=67&setClientTimeout=5000");
+        assertEquals(5000, tag.getClientTimeout());
+    }
 
     @Test
     void strategyShouldMatchIfQueryObjectMatches() throws DynConfigException {
@@ -119,10 +131,16 @@ class TagConfigStrategyTest {
         }
     }
 
-    DataTag getTag(String queries) throws DynConfigException {
+    CommandTag getCommandTag(String queries) throws DynConfigException {
+        URI uri = URI.create("dip://host/path?tagType=COMMAND&" + queries);
+        strategy = new DipConfigStrategy(uri);
+        return strategy.prepareCommandTagConfigurations();
+    }
+
+    DataTag getDataTag(String queries) throws DynConfigException {
         URI uri = URI.create("dip://host/path?" + queries);
         strategy = new DipConfigStrategy(uri);
-        return strategy.prepareTagConfigurations();
+        return strategy.prepareDataTagConfigurations();
     }
 
     void assertQueryAndStrategyMatch(String regex) throws DynConfigException {
