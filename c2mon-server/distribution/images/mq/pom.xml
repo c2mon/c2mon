@@ -69,6 +69,7 @@
 								<delete file="${project.build.directory}/output/apache-activemq-${org.apache.activemq.version}/conf/activemq.xml"/>
 								<patchFile src="${project.build.directory}/output/apache-activemq-${org.apache.activemq.version}/conf/temp.xml" patch="${project.basedir}/src/main/patches/patch.xml" dest="${project.build.directory}/output/apache-activemq-${org.apache.activemq.version}/conf/activemq.xml"/>
 								<delete file="${project.build.directory}/output/apache-activemq-${org.apache.activemq.version}/conf/temp.xml"/>
+								<replaceregexp file="${project.build.directory}/output/apache-activemq-${org.apache.activemq.version}/conf/activemq.xml" match='transportConnector xmlns=""' replace="transportConnector" byline="true"/>
 							</target>
 						</configuration>
 						<goals>
