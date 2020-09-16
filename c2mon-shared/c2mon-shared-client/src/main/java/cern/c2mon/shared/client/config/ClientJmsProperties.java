@@ -51,7 +51,7 @@ public class ClientJmsProperties extends CommonJmsProperties{
    * Name of the topic on which the server is publishing the full {@link TransferTagImpl} object, 
    * including the nested {@link AlarmValue} objects that have changed.
    */
-  private String alarmWithTagTopic = "c2mon.client.tagWithAlarmsTopic";
+  private String alarmWithTagTopic = "c2mon.client.alarmWithTagTopic";
 
   /**
    * Topic on which all control tags are published
