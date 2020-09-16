@@ -16,7 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.client.core.jms;
 
-import cern.c2mon.shared.client.tag.TagUpdate;
+import cern.c2mon.client.common.tag.Tag;
 
 /**
  * Interface that needs implementing by classes wishing to listen to alarm updates 
@@ -27,8 +27,7 @@ public interface AlarmListener {
    * Called when an alarm update is received from the topic
    * 
    * @param tagWithAlarmChange the tag with the updated alarm
-   *          
    */
-  void onAlarmUpdate(TagUpdate tagWithAlarmChange);
+  void onAlarmUpdate(Tag tagWithAlarmChange);
 
 }
