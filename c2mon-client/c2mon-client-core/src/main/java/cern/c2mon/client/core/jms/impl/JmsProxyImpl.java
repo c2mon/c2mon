@@ -63,10 +63,10 @@ import cern.c2mon.shared.client.supervision.SupervisionEvent;
 public final class JmsProxyImpl implements JmsProxy, JmsSubscriptionHandler {
 
   /**
-   * Timeout used for all messages sent to the server: notice this needs to be
+   * Time-to-live used for all messages sent to the server: notice this needs to be
    * quite large to account for unsynchronized clients.
    */
-  private static final int JMS_MESSAGE_TIMEOUT = 600000;
+  private final long messageTimeToLive;
   
   private final JmsConnectionHandler jmsConnectionHandler;
   
@@ -91,6 +91,7 @@ public final class JmsProxyImpl implements JmsProxy, JmsSubscriptionHandler {
     supervisionTopicWrapper = new SupervisionTopicWrapper(slowConsumerListener, topicPollingExecutor, properties);
     broadcastTopicWrapper = new BroadcastTopicWrapper(slowConsumerListener, topicPollingExecutor, properties);
     alarmTopicWrapper = new AlarmTopicWrapper(slowConsumerListener, topicPollingExecutor, properties);
+    messageTimeToLive = properties.getJms().getMessageTimeToLive();
   }
   
   @Override
@@ -114,7 +115,7 @@ public final class JmsProxyImpl implements JmsProxy, JmsSubscriptionHandler {
   }
 
   @Override
-  public void publish(final String message, final String topicName, final long timeToLive) throws JMSException {
+  public void publish(final String message, final String topicName) throws JMSException {
     if (topicName == null) {
       throw new NullPointerException("publish(..) method called with null queue name argument");
     }
@@ -128,7 +129,7 @@ public final class JmsProxyImpl implements JmsProxy, JmsSubscriptionHandler {
 
         final MessageProducer producer = session.createProducer(new ActiveMQTopic(topicName));
         producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
-        producer.setTimeToLive(JMS_MESSAGE_TIMEOUT);
+        producer.setTimeToLive(messageTimeToLive);
         producer.send(messageObj);
       } finally {
         session.close();
@@ -174,7 +175,7 @@ public final class JmsProxyImpl implements JmsProxy, JmsSubscriptionHandler {
           message.setJMSReplyTo(replyQueue);
           MessageProducer producer = session.createProducer(new ActiveMQQueue(queueName));
           producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
-          producer.setTimeToLive(JMS_MESSAGE_TIMEOUT);
+          producer.setTimeToLive(messageTimeToLive);
           producer.send(message);
 
           while (jmsConnectionHandler.isConnected() && !jmsConnectionHandler.isShutdownRequested()) { 

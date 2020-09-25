@@ -27,12 +27,12 @@ import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
 
+import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.core.jms.AlarmListener;
 import cern.c2mon.client.core.jms.JmsProxy;
 import cern.c2mon.client.core.jms.RequestHandler;
 import cern.c2mon.client.core.service.AlarmService;
 import cern.c2mon.shared.client.alarm.AlarmValue;
-import cern.c2mon.shared.client.tag.TagUpdate;
 
 /**
  * Singleton implementation of {@link AlarmService} interface
@@ -133,7 +133,7 @@ public class AlarmServiceImpl implements AlarmService, AlarmListener {
   }
   
   @Override
-  public void onAlarmUpdate(final TagUpdate tagWithAlarmChange) {
+  public void onAlarmUpdate(final Tag tagWithAlarmChange) {
     alarmListenersLock.readLock().lock();
 
     try {
@@ -148,7 +148,7 @@ public class AlarmServiceImpl implements AlarmService, AlarmListener {
    * Private method, notifies all listeners for an alarmUpdate.
    * @param tagWithAlarmChange the updated Alarm
    */
-  private void notifyAlarmListeners(final TagUpdate tagWithAlarmChange) {
+  private void notifyAlarmListeners(final Tag tagWithAlarmChange) {
 
     log.trace("There are {} listeners waiting to be notified!", alarmListeners.size());
 

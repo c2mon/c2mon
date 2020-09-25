@@ -28,8 +28,10 @@ import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 
 import cern.c2mon.client.core.jms.AlarmListener;
+import cern.c2mon.client.core.tag.TagController;
 import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.c2mon.shared.client.tag.TransferTagImpl;
+import cern.c2mon.shared.rule.RuleFormatException;
 import cern.c2mon.shared.util.json.GsonFactory;
 
 /**
@@ -66,7 +68,16 @@ class AlarmListenerWrapper extends AbstractListenerWrapper<AlarmListener, TagUpd
   @Override
   protected void invokeListener(final AlarmListener listener, final TagUpdate tagWithAlarmChange) {
     log.debug("invoke listener class {} for tag id: {}", listener.getClass(), tagWithAlarmChange.getId());
-    listener.onAlarmUpdate(tagWithAlarmChange);
+    
+    TagController controller = new TagController(tagWithAlarmChange.getId());
+    try {
+      controller.update(tagWithAlarmChange);
+      listener.onAlarmUpdate(controller.getTagImpl());
+    } catch (RuleFormatException e) {
+      log.error("Rule format error. Cannot inform listeners about alarm change on tag #{}", tagWithAlarmChange.getId(), e);
+    } catch (Exception ex) {
+      log.error("Error caught on alarm notification!", ex);
+    }
   }
 
   @Override

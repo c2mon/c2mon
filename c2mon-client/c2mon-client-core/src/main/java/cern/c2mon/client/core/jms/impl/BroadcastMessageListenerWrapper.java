@@ -59,7 +59,7 @@ class BroadcastMessageListenerWrapper extends AbstractListenerWrapper<BroadcastM
 
   @Override
   protected String getDescription(BroadcastMessage event) {
-    return "Admin message: " + event.getMessage();
+    return "Message: " + event.getMessage();
   }
 
   @Override
