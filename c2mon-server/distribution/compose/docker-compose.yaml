@@ -2,11 +2,16 @@ version: "3.8"
 services:
 
   c2mon:
-    image: cern/c2mon:1.9.3-SNAPSHOT
+    image: cern/c2mon:${C2MON_TAG}
     ports:
       - "9001:9001"
     environment:
-      - C2MON_SERVER_ELASTICSEARCH_ENABLED=false
+      - C2MON_SERVER_ELASTICSEARCH_ENABLED=true
+      - C2MON_SERVER_ELASTICSEARCH_HOST=elasticsearch
+      - C2MON_SERVER_ELASTICSEARCH_PORT=9200
+      - C2MON_SERVER_ELASTICSEARCH_EMBEDDED=false
+      - C2MON_SERVER_ELASTICSEARCH_CLIENT=rest
+      - C2MON_SERVER_ELASTICSEARCH_SCHEME=http
       - C2MON_SERVER_JMS_EMBEDDED=false
       - C2MON_SERVER_JMS_URL=tcp://mq:61616
       - C2MON_SERVER_CACHEDBACCESS_JDBC_VALIDATION-QUERY=SELECT 1
@@ -20,29 +25,46 @@ services:
     restart: on-failure
     
   mq:
-    image: cern/c2mon-ext:activemq-5.15.6-c2mon-1.9.0
+    image: gitlab-registry.cern.ch/c2mon/c2mon/mq:${ACTIVEMQ_TAG}
     ports:
       - "61616:61616"
       - "61614:61614"
+      - "1883:1883"
+      - "8086:8086"
+      - "8161:8161"
 
   db:
-    image: cern/c2mon-ext:mysql-5.7.15-c2mon-1.9.0
+    image: gitlab-registry.cern.ch/c2mon/c2mon/mysql:${MYSQL_TAG}
     ports:
       - "3306:3306"
     environment:
       - MYSQL_ALLOW_EMPTY_PASSWORD="yes"
-
+      
   grafana:
-    image: cern/c2mon-ext:grafana-6.1.2-c2mon-1.9.0
+    image: gitlab-registry.cern.ch/c2mon/c2mon/grafana:${GRAFANA_TAG}
     ports:
       - "3000:3000"
     environment:
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_ANONYMOUS_ORG_NAME=Main Org.
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Editor
+      
+  elasticsearch:
+    image: gitlab-registry.cern.ch/c2mon/c2mon/es:${ELASTICSEARCH_TAG}
+    ports:
+      - "9200:9200"
+    environment:
+      - cluster.name=c2mon
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - TAKE_FILE_OWNERSHIP="1"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
 
-  c2mon-web:
-    image: cern/c2mon-web-ui:0.1.14-SNAPSHOT
+  web-ui:
+    image: cern/c2mon-web-ui:${WEB_UI_TAG}
     ports:
       - "3306"
       - target: 8080
@@ -54,3 +76,8 @@ services:
       - C2MON_CLIENT_HISTORY_JDBC_URL=jdbc:mysql://db/tim
       - C2MON_CLIENT_HISTORY_JDBC_USERNAME=root
       - C2MON_CLIENT_HISTORY_JDBC_VALIDATION-QUERY=SELECT 1
+    
+  daq:
+    image: gitlab-registry.cern.ch/c2mon/c2mon-daq-hostmetrics:${DAQ_TAG}
+    environment:
+      - "_JAVA_OPTIONS=-Dc2mon.daq.name=P_DAQ04 -Dc2mon.daq.jms.url=tcp://mq:61616 -Dc2mon.client.jms.url=tcp://mq:61616"
