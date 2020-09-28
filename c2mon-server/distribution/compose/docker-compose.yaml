@@ -34,7 +34,7 @@ services:
       - "8161:8161"
 
   db:
-    image: cern/c2mon-ext:${MYSQL_TAG}
+    image: gitlab-registry.cern.ch/c2mon/c2mon/mysql:${MYSQL_TAG}
     ports:
       - "3306:3306"
     environment:
@@ -54,10 +54,14 @@ services:
     ports:
       - "9200:9200"
     environment:
-      - cluster.name="c2mon"
+      - cluster.name=c2mon
       - bootstrap.memory_lock=true
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
       - TAKE_FILE_OWNERSHIP="1"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
 
   web-ui:
     image: cern/c2mon-web-ui:${WEB_UI_TAG}
@@ -76,4 +80,4 @@ services:
   daq:
     image: gitlab-registry.cern.ch/c2mon/c2mon-daq-hostmetrics:${DAQ_TAG}
     environment:
-      - "_JAVA_OPTIONS=-Dc2mon.daq.name=P_DAQ01 -Dc2mon.daq.jms.url=tcp://mq:61616 -Dc2mon.client.jms.url=tcp://mq:61616"
+      - "_JAVA_OPTIONS=-Dc2mon.daq.name=P_DAQ04 -Dc2mon.daq.jms.url=tcp://mq:61616 -Dc2mon.client.jms.url=tcp://mq:61616"
