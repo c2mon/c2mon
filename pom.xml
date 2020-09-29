@@ -39,7 +39,7 @@
     <java.version>8</java.version>
     <org.slf4j.version>1.7.30</org.slf4j.version>
     <logback.version>1.2.3</logback.version>
-    <org.apache.activemq.version>5.15.2</org.apache.activemq.version>
+    <org.apache.activemq.version>5.15.12</org.apache.activemq.version>
     <elasticsearch.version>6.4.3</elasticsearch.version>
     <mockito-all.version>1.10.19</mockito-all.version>
     <com.fasterxml.jackson.core>2.9.2</com.fasterxml.jackson.core>
