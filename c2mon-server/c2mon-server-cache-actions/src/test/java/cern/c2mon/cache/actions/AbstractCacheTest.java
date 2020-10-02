@@ -53,6 +53,7 @@ public abstract class AbstractCacheTest<CACHEABLE extends Cacheable, CACHEABLE_I
     if (cache == null)
       cache = initCache();
     cache.clear();
+    cache.removeAll();
     assertEquals(0, cache.getAll(cache.getKeys()).size());
     cache.init();
   }

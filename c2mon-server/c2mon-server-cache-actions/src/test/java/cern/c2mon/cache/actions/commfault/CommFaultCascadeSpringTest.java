@@ -52,7 +52,6 @@ public class CommFaultCascadeSpringTest extends AbstractCacheTest<CommFaultTag, 
   }
 
   @Test
-  @Ignore // FIXME Fails if run after other tests.
   public void cascadeToState() throws InterruptedException {
     CountDownLatch stateTagUpdate = new CountDownLatch(1);
 

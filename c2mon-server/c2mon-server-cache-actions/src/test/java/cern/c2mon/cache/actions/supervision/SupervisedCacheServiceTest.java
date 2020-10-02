@@ -164,7 +164,7 @@ public class SupervisedCacheServiceTest {
   @Test
   public void resumeDownProcess() {
     ProcessCacheObject process = apply(getCachedProcess(SupervisionStatus.DOWN), p -> {
-      p.setLocalConfig(ProcessCacheObject.LocalConfig.Y);
+      processService.setLocalConfig(p.getId(), ProcessCacheObject.LocalConfig.Y);
     });
 
     long timestamp = currentTimeMillis();
