@@ -32,7 +32,7 @@ public class ProcessCacheObjectFactory extends AbstractCacheObjectFactory<Proces
     processCacheObject.setCurrentHost("test host");
     processCacheObject.setRequiresReboot(false);
     processCacheObject.setProcessPIK(12345L);
-    processCacheObject.setLocalConfig(ProcessCacheObject.LocalConfig.Y);
+    processCacheObject.setLocalConfig(ProcessCacheObject.LocalConfig.N);
 
     return processCacheObject;
   }

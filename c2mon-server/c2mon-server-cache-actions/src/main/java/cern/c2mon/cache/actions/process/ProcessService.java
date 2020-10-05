@@ -81,10 +81,6 @@ public class ProcessService extends AbstractSupervisedService<Process> implement
 
   @Override
   public void resume(long processId, long timestamp, String message) {
-    if (isRunning(processId)) {
-      return;
-    }
-
     cache.compute(processId, process -> {
       super.resume(processId, timestamp, message);
       setSupervisionIfLocalConfig(process, message, new Timestamp(timestamp));
