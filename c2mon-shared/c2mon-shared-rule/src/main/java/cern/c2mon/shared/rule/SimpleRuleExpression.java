@@ -26,7 +26,9 @@ import cern.c2mon.shared.common.rule.RuleInputValue;
 import cern.c2mon.shared.rule.parser.InvalidExpressionParser;
 import cern.c2mon.shared.rule.parser.Parser;
 import cern.c2mon.shared.rule.parser.RuleConstant;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class SimpleRuleExpression extends RuleExpression implements Cloneable {
 
     private static final long serialVersionUID = 93178070585316435L;
@@ -585,7 +587,7 @@ public class SimpleRuleExpression extends RuleExpression implements Cloneable {
             System.out.println(exp.toString());
         } catch (Exception e) {
             System.out.println("--> error: " + e.getMessage());
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
         System.out.println();
     }
