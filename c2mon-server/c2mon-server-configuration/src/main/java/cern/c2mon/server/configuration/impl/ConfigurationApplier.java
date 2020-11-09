@@ -4,6 +4,7 @@ import cern.c2mon.cache.actions.process.ProcessService;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.configuration.ConfigProgressMonitor;
+import cern.c2mon.server.configuration.config.ConfigurationProperties;
 import cern.c2mon.server.configuration.dao.ConfigurationDAO;
 import cern.c2mon.server.daq.out.ProcessCommunicationManager;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
@@ -50,12 +51,14 @@ final class ConfigurationApplier {
   ConfigurationApplier(ProcessCommunicationManager processCommunicationManager,
                               ConfigurationHandlerSelector configurationHandlerSelector, ConfigurationDAO configurationDAO,
                               ProcessService processService,
-                              C2monCache<Process> processCache) {
+                              C2monCache<Process> processCache,
+                              ConfigurationProperties properties) {
     this.processCommunicationManager = processCommunicationManager;
     this.configurationHandlerSelector = configurationHandlerSelector;
     this.configurationDAO = configurationDAO;
     this.processService = processService;
     this.processCache = processCache;
+    this.daqConfigEnabled = properties.isDaqConfigEnabled();
   }
 
   /**
