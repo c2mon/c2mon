@@ -1,7 +1,7 @@
 version: "3.8"
 services:
   c2mon:
-    image: cern/c2mon:1.9.3-SNAPSHOT
+    image: img-server:1.9.11-SNAPSHOT
     ports:
       - "9001:9001"
     environment:
@@ -17,6 +17,9 @@ services:
       - C2MON_SERVER_CONFIGURATION_JDBC_JDBC-URL=jdbc:mysql://db/tim
       - C2MON_SERVER_TESTMODE=false
     restart: on-failure
+    depends_on:
+      db:
+        condition: service_healthy
 
   mq:
     image: img-mq:1.9.11-SNAPSHOT
@@ -33,10 +36,16 @@ services:
       - "3306:3306"
     environment:
       - MYSQL_ALLOW_EMPTY_PASSWORD="yes"
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      timeout: 20s
+      retries: 10
 
   daq-rest:
-    image: gitlab-registry.cern.ch/c2mon/c2mon-daq-rest:latest
+    image: gitlab-registry.cern.ch/c2mon/c2mon-daq-rest:1.9.11-SNAPSHOT
     ports:
       - "8080:8080"
     environment:
       - "_JAVA_OPTIONS=-Dc2mon.daq.name=P_DAQ_REST_13 -Dc2mon.daq.jms.url=tcp://mq:61616 -Dc2mon.client.jms.url=tcp://mq:61616"
+    depends_on:
+      - c2mon

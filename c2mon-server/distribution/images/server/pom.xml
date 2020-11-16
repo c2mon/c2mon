@@ -69,6 +69,7 @@
               <volume>/log</volume>
               <volume>/conf</volume>
               <volume>/elasticsearch</volume>
+              <volume>/reports</volume>
             </volumes>
             <entrypoint>
               <entrypoint>bin/c2mon.sh</entrypoint>
@@ -86,6 +87,10 @@
                   <permission>
                     <file>${c2mon.home}/bin/C2MON-SRV.jvm</file>
                     <mode>755</mode>
+                  </permission>
+                  <permission>
+                    <file>${c2mon.home}/reports</file>
+                    <mode>777</mode>
                   </permission>
                 </permissions>
            </extraDirectories>
