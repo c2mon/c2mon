@@ -81,10 +81,13 @@ public class QueryObj implements IQueryObj {
      * @return A List of values of class c corresponding to the transformed query property values.
      */
     public <T> List<T> get(QueryKey<? extends T> key, Class<? extends T> c) {
-        if (!contains(key) || !properties.get(key.getKeyName()).stream().allMatch(key::isValid)) {
+        if (!contains(key) || properties.get(key.getKeyName()).stream().anyMatch(s -> !key.isValid(s))) {
             return Collections.singletonList(key.getDefaultValue());
         }
-        return properties.get(key.getKeyName()).stream().map(k -> ObjectConverter.convert(c, k)).collect(Collectors.toList());
+        return properties.get(key.getKeyName())
+                .stream()
+                .map(k -> ObjectConverter.convert(c, k))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -110,6 +113,7 @@ public class QueryObj implements IQueryObj {
                     .filter(m -> m.getName().equalsIgnoreCase(targetMap.getKey()) && m.getParameterTypes().length == 1)
                     .findFirst();
             if (matchingMethod.isPresent()) {
+                log.info("Call method [{}] with value {} on object {}.", targetMap.getKey(), targetMap.getValue(), applyToObj.getClass().getName());
                 for (String s : targetMap.getValue()) {
                     transformAndInvoke(matchingMethod.get(), s, applyToObj);
                 }
@@ -173,7 +177,7 @@ public class QueryObj implements IQueryObj {
         Class<?> c = applyToObj.getClass();
         if (key.isPresent() && key.get().appliesTo(c) && key.get().isRequired()) {
             throw new DynConfigException(INVALID_URI_PROPERTY,
-                    "Parameter " + c + "." + m.getName() + " with value " + s + " is mandatory. Aborting. ",
+                    "Parameter " + c + "." + m.getName() + " with value " + s + " is mandatory. Aborting procedure. ",
                     e.getCause());
         } else if (!key.isPresent() || key.get().appliesTo(c)) {
             log.error("An error occurred processing parameter value {}. Resorting to default.", s);

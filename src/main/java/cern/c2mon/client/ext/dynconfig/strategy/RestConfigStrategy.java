@@ -2,6 +2,7 @@ package cern.c2mon.client.ext.dynconfig.strategy;
 
 import cern.c2mon.client.ext.dynconfig.DynConfigException;
 import cern.c2mon.client.ext.dynconfig.query.QueryKey;
+import cern.c2mon.shared.client.configuration.api.tag.CommandTag;
 import cern.c2mon.shared.client.configuration.api.tag.DataTag;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.address.HardwareAddress;
@@ -46,7 +47,7 @@ public class RestConfigStrategy extends TagConfigStrategy implements ITagConfigS
      * @throws DynConfigException if a value in the query cannot be converted to the necessary class, but is mandatory.
      * @return the preliminary DataTags to pass on to the C2MON server for creation.
      */
-    public DataTag prepareTagConfigurations() throws DynConfigException {
+    public DataTag prepareDataTagConfigurations() throws DynConfigException {
         HardwareAddress restHardwareAddress = new HardwareAddressImpl();
         DataTag dataTag = super.toTagConfiguration(restHardwareAddress);
 
@@ -55,5 +56,11 @@ public class RestConfigStrategy extends TagConfigStrategy implements ITagConfigS
         dataTag.getAddress().setAddressParameters(params);
 
         return dataTag;
+    }
+
+    @Override
+    public CommandTag prepareCommandTagConfigurations() throws DynConfigException {
+        HardwareAddress restHardwareAddress = new HardwareAddressImpl();
+        return super.toCommandConfiguration(restHardwareAddress);
     }
 }

@@ -21,30 +21,56 @@ class OpcUaConfigStrategyTest {
     }
 
     @Test
-    void prepareTagConfigurationsShouldReturnProperAddressClass() throws DynConfigException {
-        HardwareAddress actual = createHardwareAddressFrom("itemName=x&commandPulseLength=2");
+    void prepareDataTagConfigurationsShouldReturnProperAddressClass() throws DynConfigException {
+        HardwareAddress actual = createDataTagHardwareAddressFrom("itemName=x&commandPulseLength=2");
         assertTrue(actual instanceof OPCHardwareAddress);
     }
 
-
     @Test
-    void prepareTagConfigurationsWithPulseShouldSetPulse() throws DynConfigException {
-        OPCHardwareAddressImpl expected = new OPCHardwareAddressImpl("x", 2);
-        HardwareAddress actual = createHardwareAddressFrom("itemName=x&commandPulseLength=2");
+    void prepareDataTagConfigurationsWithPulseShouldIgnorePulse() throws DynConfigException {
+        OPCHardwareAddressImpl expected = new OPCHardwareAddressImpl("x");
+        HardwareAddress actual = createDataTagHardwareAddressFrom("itemName=x&commandPulseLength=2");
         assertEquals(expected, actual);
     }
 
     @Test
-    void prepareTagConfigurationsWithNonStandardKeyShouldSetValue() throws DynConfigException {
+    void prepareDataTagConfigurationsWithNonStandardKeyShouldSetValue() throws DynConfigException {
         OPCHardwareAddressImpl expected = new OPCHardwareAddressImpl("x");
         expected.setNamespace(5);
-        HardwareAddress actual = createHardwareAddressFrom("itemName=x&setNamespace=5");
+        HardwareAddress actual = createDataTagHardwareAddressFrom("itemName=x&setNamespace=5");
         assertEquals(expected, actual);
     }
 
-    HardwareAddress createHardwareAddressFrom(String queries) throws DynConfigException {
+    @Test
+    void prepareCommandTagConfigurationsShouldReturnProperAddressClass() throws DynConfigException {
+        HardwareAddress actual = createCommandTagHardwareAddressFrom("itemName=x&commandPulseLength=2");
+        assertTrue(actual instanceof OPCHardwareAddress);
+    }
+
+    @Test
+    void prepareCommandTagConfigurationsWithPulseSetPulse() throws DynConfigException {
+        OPCHardwareAddressImpl expected = new OPCHardwareAddressImpl("x",2);
+        HardwareAddress actual = createCommandTagHardwareAddressFrom("itemName=x&commandPulseLength=2");
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void prepareCommandTagConfigurationsWithNonStandardKeyShouldSetValue() throws DynConfigException {
+        OPCHardwareAddressImpl expected = new OPCHardwareAddressImpl("x");
+        expected.setNamespace(5);
+        HardwareAddress actual = createCommandTagHardwareAddressFrom("itemName=x&setNamespace=5");
+        assertEquals(expected, actual);
+    }
+
+    HardwareAddress createDataTagHardwareAddressFrom(String queries) throws DynConfigException {
         URI uri = URI.create("opc.tcp://host/path?"+ queries);
         strategy = new OpcUaConfigStrategy(uri);
-        return this.strategy.prepareTagConfigurations().getAddress().getHardwareAddress();
+        return this.strategy.prepareDataTagConfigurations().getAddress().getHardwareAddress();
+    }
+
+    HardwareAddress createCommandTagHardwareAddressFrom(String queries) throws DynConfigException {
+        URI uri = URI.create("opc.tcp://host/path?tagType=COMMAND&"+ queries);
+        strategy = new OpcUaConfigStrategy(uri);
+        return this.strategy.prepareCommandTagConfigurations().getHardwareAddress();
     }
 }
