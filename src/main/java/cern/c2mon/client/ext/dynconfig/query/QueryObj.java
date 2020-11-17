@@ -107,19 +107,16 @@ public class QueryObj implements IQueryObj {
      */
     @Override
     public void applyQueryPropertiesTo(Object applyToObj) throws DynConfigException {
-        log.info("Applying to object of class {}.", applyToObj.getClass().getName());
         final Method[] declaredMethods = applyToObj.getClass().getDeclaredMethods();
         for (Map.Entry<String, List<String>> targetMap : properties.entrySet()) {
             Optional<Method> matchingMethod = Arrays.stream(declaredMethods)
                     .filter(m -> m.getName().equalsIgnoreCase(targetMap.getKey()) && m.getParameterTypes().length == 1)
                     .findFirst();
             if (matchingMethod.isPresent()) {
-                log.info("Apply property  with key {} and value {} to method {}.", targetMap.getKey(), targetMap.getValue(), matchingMethod.get());
+                log.info("Call method [{}] with value {} on object {}.", targetMap.getKey(), targetMap.getValue(), applyToObj.getClass().getName());
                 for (String s : targetMap.getValue()) {
                     transformAndInvoke(matchingMethod.get(), s, applyToObj);
                 }
-            } else {
-                log.info("No method for property  with key {} and value {}.", targetMap.getKey(), targetMap.getValue());
             }
         }
     }
@@ -180,7 +177,7 @@ public class QueryObj implements IQueryObj {
         Class<?> c = applyToObj.getClass();
         if (key.isPresent() && key.get().appliesTo(c) && key.get().isRequired()) {
             throw new DynConfigException(INVALID_URI_PROPERTY,
-                    "Parameter " + c + "." + m.getName() + " with value " + s + " is mandatory. Aborting. ",
+                    "Parameter " + c + "." + m.getName() + " with value " + s + " is mandatory. Aborting procedure. ",
                     e.getCause());
         } else if (!key.isPresent() || key.get().appliesTo(c)) {
             log.error("An error occurred processing parameter value {}. Resorting to default.", s);

@@ -7,6 +7,7 @@ import cern.c2mon.client.core.tag.TagImpl;
 import cern.c2mon.client.ext.dynconfig.config.DynConfiguration;
 import cern.c2mon.client.ext.dynconfig.config.ProcessEquipmentURIMapping;
 import cern.c2mon.client.ext.dynconfig.strategy.TagConfigStrategy;
+import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.api.equipment.Equipment;
 import cern.c2mon.shared.client.process.ProcessNameResponse;
@@ -60,7 +61,9 @@ class DynConfigServiceTest {
 
     @Test
     void deleteExistingTagShouldCallRemoveAndReturnReport() throws DynConfigException {
-        setupMockForDeleteWithReport(new ConfigurationReport());
+        ConfigurationReport report = new ConfigurationReport();
+        report.setStatus(ConfigConstants.Status.OK);
+        setupMockForDeleteWithReport(report);
         replay(tagService, configurationService);
         dcs.deleteTagForURI(dataTag);
         verify(tagService, configurationService);
@@ -68,14 +71,16 @@ class DynConfigServiceTest {
 
     @Test
     void deleteExistingTagWithBadReportShouldThrowError() {
-        setupMockForDeleteWithReport(new ConfigurationReport(false, "fail"));
+        ConfigurationReport report = new ConfigurationReport(false, "fail");
+        report.setStatus(ConfigConstants.Status.FAILURE);
+        setupMockForDeleteWithReport(report);
         replay(tagService, configurationService);
         Assertions.assertThrows(DynConfigException.class, () -> dcs.deleteTagForURI(dataTag));
         verify(tagService, configurationService);
     }
 
     @Test
-    void getTagsForURIShouldOnlyReturnExistingTagIfFound() throws DynConfigException {
+    void getTagsForURIShouldOnlyReturnExistingTagIfFound() {
         expect(tagService.findByName(anyString()))
                 .andReturn(tags)
                 .once();
@@ -87,9 +92,10 @@ class DynConfigServiceTest {
     }
 
     @Test
-    void getTagsForURIShouldCreateTagIfNotFound() throws DynConfigException {
-        setupMockForCreateTagWithReport(new ConfigurationReport(), TagConfigStrategy.TagType.DATA);
-
+    void getTagsForURIShouldCreateTagIfNotFound() {
+        ConfigurationReport report = new ConfigurationReport();
+        report.setStatus(ConfigConstants.Status.OK);
+        setupMockForCreateTagWithReport(report, TagConfigStrategy.TagType.DATA);
         replay(tagService, configurationService);
         Collection<Tag> tagsForURI = dcs.getTagsForURI(Collections.singletonList(dataTag));
         verify(tagService, configurationService);
@@ -98,8 +104,10 @@ class DynConfigServiceTest {
     }
 
     @Test
-    void getTagsForCommandURIShouldCreateTagIfNotFound() throws DynConfigException {
-        setupMockForCreateTagWithReport(new ConfigurationReport(), TagConfigStrategy.TagType.COMMAND);
+    void getTagsForCommandURIShouldCreateTagIfNotFound() {
+        ConfigurationReport report = new ConfigurationReport();
+        report.setStatus(ConfigConstants.Status.OK);
+        setupMockForCreateTagWithReport(report, TagConfigStrategy.TagType.COMMAND);
 
         replay(tagService, configurationService);
         Collection<Tag> tagsForURI = dcs.getTagsForURI(Collections.singletonList(commandTag));
@@ -122,7 +130,9 @@ class DynConfigServiceTest {
 
     @Test
     void getSingleTagForURIShouldCreateTagIfNotFound() throws DynConfigException {
-        setupMockForCreateTagWithReport(new ConfigurationReport(), TagConfigStrategy.TagType.DATA);
+        ConfigurationReport report = new ConfigurationReport();
+        report.setStatus(ConfigConstants.Status.OK);
+        setupMockForCreateTagWithReport(report, TagConfigStrategy.TagType.DATA);
         replay(tagService, configurationService);
         Tag tagsForURI = dcs.getTagForURI(dataTag);
         verify(tagService, configurationService);
@@ -133,7 +143,9 @@ class DynConfigServiceTest {
 
     @Test
     void getSingleTagForURIShouldThrowErrorWhenCreateTagReportsError() {
-        setupMockForCreateTagWithReport(new ConfigurationReport(false, "fail"), TagConfigStrategy.TagType.DATA);
+        ConfigurationReport report = new ConfigurationReport(false, "fail");
+        report.setStatus(ConfigConstants.Status.FAILURE);
+        setupMockForCreateTagWithReport(report, TagConfigStrategy.TagType.DATA);
         replay(tagService, configurationService);
         Assertions.assertThrows(DynConfigException.class, () -> dcs.getTagForURI(dataTag));
         verify(tagService, configurationService);
@@ -168,7 +180,6 @@ class DynConfigServiceTest {
                 .andReturn(report)
                 .anyTimes();
     }
-
 
     static List<ProcessEquipmentURIMapping> loadMappings(String name) throws IOException {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
