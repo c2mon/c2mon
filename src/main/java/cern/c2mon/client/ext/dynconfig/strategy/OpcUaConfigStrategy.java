@@ -4,7 +4,9 @@ import cern.c2mon.client.ext.dynconfig.DynConfigException;
 import cern.c2mon.client.ext.dynconfig.query.QueryKey;
 import cern.c2mon.shared.client.configuration.api.tag.CommandTag;
 import cern.c2mon.shared.client.configuration.api.tag.DataTag;
+import cern.c2mon.shared.common.datatag.address.OPCHardwareAddress;
 import cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl;
+import lombok.extern.slf4j.Slf4j;
 
 import java.net.URI;
 import java.util.Arrays;
@@ -12,10 +14,12 @@ import java.util.Arrays;
 /**
  * Implements a configuration strategy for OPC UA.
  */
+@Slf4j
 public class OpcUaConfigStrategy extends TagConfigStrategy implements ITagConfigStrategy {
 
     private static final QueryKey<String> ITEM_NAME = new QueryKey<>("itemName", null, true);
     private static final QueryKey<Integer> COMMAND_PULSE = new QueryKey<>("commandPulseLength");
+    private static final QueryKey<String> ADDRESS_TYPE = new QueryKey<>("addressType", "STRING", false);
 
     /**
      * Creates a new configuration strategy addressing the cern.c2mon.daq.opcua.OPCUAMessageHandler.
@@ -35,6 +39,7 @@ public class OpcUaConfigStrategy extends TagConfigStrategy implements ITagConfig
      */
     public DataTag prepareDataTagConfigurations() throws DynConfigException {
         OPCHardwareAddressImpl hwAddr = new OPCHardwareAddressImpl(queryObj.get(ITEM_NAME).get(0));
+        applyAddressType(hwAddr);
         queryObj.applyQueryPropertiesTo(hwAddr);
         return super.toTagConfiguration(hwAddr);
     }
@@ -49,8 +54,16 @@ public class OpcUaConfigStrategy extends TagConfigStrategy implements ITagConfig
         OPCHardwareAddressImpl hwAddr = (queryObj.contains(COMMAND_PULSE))
                 ? new OPCHardwareAddressImpl(queryObj.get(ITEM_NAME).get(0), queryObj.get(COMMAND_PULSE, Integer.class).get(0))
                 : new OPCHardwareAddressImpl(queryObj.get(ITEM_NAME).get(0));
+        applyAddressType(hwAddr);
         queryObj.applyQueryPropertiesTo(hwAddr);
         return super.toCommandConfiguration(hwAddr);
+    }
+
+    private void applyAddressType(OPCHardwareAddressImpl hwAddr) {
+        if (queryObj.contains(ADDRESS_TYPE)) {
+            hwAddr.setAddressType(OPCHardwareAddress.ADDRESS_TYPE.valueOf(queryObj.get(ADDRESS_TYPE, String.class).get(0)));
+            log.info("Set addressType to {}", hwAddr.getAddressType());
+        }
     }
 
 }
