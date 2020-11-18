@@ -13,17 +13,17 @@ class ObjectConverterTest {
 
     @Test
     public void convertNonStringObjectToIntShouldThrowException() {
-        assertThrows(UnsupportedOperationException.class, () -> ObjectConverter.convert(int.class, new int[]{}));
+        assertThrows(ClassCastException.class, () -> ObjectConverter.convert(int.class, new int[]{}));
     }
 
     @Test
     public void convertStringToRandomObjShouldThrowException() {
-        assertThrows(UnsupportedOperationException.class, () -> ObjectConverter.convert(Random.class, "Random"));
+        assertThrows(ClassCastException.class, () -> ObjectConverter.convert(Random.class, "Random"));
     }
 
     @Test
     public void convertNullShouldThrowException() {
-        assertThrows(UnsupportedOperationException.class, () -> ObjectConverter.convert(Random.class, null));
+        assertThrows(ClassCastException.class, () -> ObjectConverter.convert(Random.class, null));
     }
 
     @Test
@@ -34,10 +34,6 @@ class ObjectConverterTest {
     @Test
     public void convertStringToIntegerShouldReturnInt() {
         random.ints(10).forEach(i -> ObjectConverterTest.convertAndAssert(i, String.valueOf(i)));
-    }
-    @Test
-    public void convertStringToLongShouldReturnInt() {
-        random.longs(10).forEach(i -> ObjectConverterTest.convertAndAssert(i, String.valueOf(i)));
     }
 
     @Test

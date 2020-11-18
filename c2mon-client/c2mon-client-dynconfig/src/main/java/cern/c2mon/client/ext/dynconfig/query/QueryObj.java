@@ -74,19 +74,19 @@ public class QueryObj implements IQueryObj {
     }
 
     /**
-     * Transform the string values of a query property whose key matches the given one to the c, and return them. If the key is not contained in the query, return a default value.
+     * Transform the string values of a query property whose key matches the given one to the clazz, and return them. If the key is not contained in the query, return a default value.
      * @param key the key whose value to get
-     * @param c the class into which the values shall be transformed
+     * @param clazz the class into which the values shall be transformed
      * @param <T> the generic type of the key.
-     * @return A List of values of class c corresponding to the transformed query property values.
+     * @return A List of values of class clazz corresponding to the transformed query property values.
      */
-    public <T> List<T> get(QueryKey<? extends T> key, Class<? extends T> c) {
+    public <T> List<T> get(QueryKey<? extends T> key, Class<? extends T> clazz) {
         if (!contains(key) || properties.get(key.getKeyName()).stream().anyMatch(s -> !key.isValid(s))) {
             return Collections.singletonList(key.getDefaultValue());
         }
         return properties.get(key.getKeyName())
                 .stream()
-                .map(k -> ObjectConverter.convert(c, k))
+                .map(k -> ObjectConverter.convert(clazz, k))
                 .collect(Collectors.toList());
     }
 
@@ -165,7 +165,7 @@ public class QueryObj implements IQueryObj {
         try {
             Object o = ObjectConverter.convert(m.getParameterTypes()[0], s);
             m.invoke(applyToObj, o);
-        } catch (IllegalAccessException | InvocationTargetException | UnsupportedOperationException e) {
+        } catch (IllegalAccessException | InvocationTargetException | ClassCastException e) {
            handle(m, s, applyToObj, e);
         }
     }
