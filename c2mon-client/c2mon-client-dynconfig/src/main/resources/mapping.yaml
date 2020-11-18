@@ -1,0 +1,16 @@
+  -
+    processId: 10001
+    processName: "P_DYNDIP"
+    equipmentName: "E_DYNDIP"
+    processDescription: "DIP test process"
+    equipmentDescription: "DIP test equipment"
+    uriPattern: "^dip.*"
+    metadata: null
+  -
+    processId: 10002
+    processName: "P_DYNOPCUA"
+    equipmentName: "E_OPCUA"
+    processDescription: "OPC UA test process"
+    equipmentDescription: "OPC UA test equipment"
+    uriPattern: "^opc.tcp.*"
+    metadata: null

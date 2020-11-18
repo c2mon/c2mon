@@ -15,6 +15,7 @@
   <modules>
     <module>c2mon-client-common</module>
     <module>c2mon-client-core</module>
+    <module>c2mon-client-dynconfig</module>
   </modules>
 
   <dependencies>
