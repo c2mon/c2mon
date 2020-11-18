@@ -10,6 +10,7 @@ For more details on a given release, please check also the [version planning](ht
 ### Added
 
 ### Changed
+- Update managed dependencies of Oracle (ojdbc8 v19.8.0.0) and MyBatis Spring (v2.0.6)
 
 ### Fixed
 
