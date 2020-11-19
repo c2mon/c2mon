@@ -10,8 +10,7 @@ import java.net.URI;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static cern.c2mon.client.ext.dynconfig.strategy.TagConfigStrategy.TAG_NAME;
-import static cern.c2mon.client.ext.dynconfig.strategy.TagConfigStrategy.TAG_TYPE;
+import static cern.c2mon.client.ext.dynconfig.strategy.TagConfigStrategy.*;
 
 /**
  * Utility class to extract information from an URI in a structured form.
@@ -30,7 +29,7 @@ public class URIParser {
         if (uri.getQuery() != null && uri.getQuery().contains(TAG_NAME.getKeyName() + "=")) {
             return StringUtils.join(splitQuery(uri).get(TAG_NAME.getKeyName()), ", ");
         }
-        return uri.toASCIIString();
+        return StringUtils.left(uri.toASCIIString(), MAX_COMMAND_TAG_NAME_LENGTH);
     }
 
     /**

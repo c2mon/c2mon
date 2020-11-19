@@ -1,8 +1,8 @@
 package cern.c2mon.client.ext.dynconfig.strategy;
 
 import cern.c2mon.client.ext.dynconfig.DynConfigException;
-import cern.c2mon.client.ext.dynconfig.config.ProcessEquipmentURIMapping;
-import cern.c2mon.client.ext.dynconfig.config.Protocols;
+import cern.c2mon.client.core.config.C2monClientDynConfigProperties.ProcessEquipmentURIMapping;
+import cern.c2mon.client.ext.dynconfig.Protocols;
 import cern.c2mon.shared.client.configuration.api.equipment.Equipment;
 import cern.c2mon.shared.client.configuration.api.tag.CommandTag;
 import cern.c2mon.shared.client.configuration.api.tag.DataTag;
@@ -10,7 +10,7 @@ import cern.c2mon.shared.client.configuration.api.tag.DataTag;
 import java.net.URI;
 
 import static cern.c2mon.client.ext.dynconfig.DynConfigException.Context.UNSUPPORTED_SCHEME;
-import static cern.c2mon.client.ext.dynconfig.config.Protocols.getEnumForScheme;
+import static cern.c2mon.client.ext.dynconfig.Protocols.getEnumForScheme;
 
 /**
  * An interface for strategies on how a specific protocol or standard is handled in the C2MON subscription process.

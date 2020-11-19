@@ -1,7 +1,7 @@
 package cern.c2mon.client.ext.dynconfig.strategy;
 
 import cern.c2mon.client.ext.dynconfig.DynConfigException;
-import cern.c2mon.client.ext.dynconfig.config.ProcessEquipmentURIMapping;
+import cern.c2mon.client.core.config.C2monClientDynConfigProperties.ProcessEquipmentURIMapping;
 import cern.c2mon.client.ext.dynconfig.query.IQueryObj;
 import cern.c2mon.client.ext.dynconfig.query.QueryKey;
 import cern.c2mon.client.ext.dynconfig.query.QueryObj;
@@ -28,6 +28,8 @@ import java.util.stream.Stream;
 @Slf4j
 @NoArgsConstructor
 public abstract class TagConfigStrategy {
+    public final static int MAX_COMMAND_TAG_NAME_LENGTH = 60;
+
     public static final QueryKey<String> TAG_NAME = new QueryKey<>("tagName");
     public static final QueryKey<String> TAG_TYPE = new QueryKey<>("tagType");
     private static final QueryKey<String> TAG_DESCRIPTION = new QueryKey<>("tagDescription", "dynamically configured tag", false);
@@ -40,6 +42,7 @@ public abstract class TagConfigStrategy {
     private static final QueryKey<String> RBAC_CLASS = new QueryKey<>("rbacClass", "no class configured");
     private static final QueryKey<String> RBAC_DEVICE = new QueryKey<>("rbacDevice", "no device configured");
     private static final QueryKey<String> RBAC_PROPERTY = new QueryKey<>("rbacProperty", "no property configured");
+
     protected String messageHandler;
     protected IQueryObj queryObj;
 
@@ -73,9 +76,8 @@ public abstract class TagConfigStrategy {
 
     protected CommandTag toCommandConfiguration(HardwareAddress hwAddress) {
         /* Parameter "name" of commandTag must be 1 to 60 characters long (see cern.c2mon.server.cache.command.CommandTagFacadeImpl.CommandTagFacadeImpl) */
-        int maxLength = 60;
         return CommandTag.create(
-                StringUtils.left(queryObj.get(TAG_NAME).get(0), maxLength),
+                StringUtils.left(queryObj.get(TAG_NAME).get(0), MAX_COMMAND_TAG_NAME_LENGTH),
                 queryObj.get(DATA_TYPE, Class.class).get(0),
                 hwAddress,
                 queryObj.get(CLIENT_TIMEOUT, Integer.class).get(0),

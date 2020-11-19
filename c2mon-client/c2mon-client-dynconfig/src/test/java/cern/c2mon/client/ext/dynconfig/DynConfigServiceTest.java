@@ -4,8 +4,8 @@ import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.core.service.ConfigurationService;
 import cern.c2mon.client.core.service.TagService;
 import cern.c2mon.client.core.tag.TagImpl;
-import cern.c2mon.client.ext.dynconfig.config.DynConfiguration;
-import cern.c2mon.client.ext.dynconfig.config.ProcessEquipmentURIMapping;
+import cern.c2mon.client.core.config.C2monClientDynConfigProperties;
+import cern.c2mon.client.core.config.C2monClientDynConfigProperties.ProcessEquipmentURIMapping;
 import cern.c2mon.client.ext.dynconfig.strategy.TagConfigStrategy;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
@@ -38,7 +38,7 @@ class DynConfigServiceTest {
 
     @BeforeEach
     void setUp() throws IOException {
-        DynConfiguration config = new DynConfiguration();
+        C2monClientDynConfigProperties config = new C2monClientDynConfigProperties();
         config.setMappings(loadMappings("mapping.yaml"));
 
         dcs.setConfigurationService(configurationService);

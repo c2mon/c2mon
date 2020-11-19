@@ -1,6 +1,5 @@
-package cern.c2mon.client.ext.dynconfig.config;
+package cern.c2mon.client.ext.dynconfig;
 
-import cern.c2mon.client.ext.dynconfig.DynConfigException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;

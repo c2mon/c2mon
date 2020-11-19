@@ -1,7 +1,7 @@
 package cern.c2mon.client.ext.dynconfig.strategy;
 
 import cern.c2mon.client.ext.dynconfig.DynConfigException;
-import cern.c2mon.client.ext.dynconfig.config.ProcessEquipmentURIMapping;
+import cern.c2mon.client.core.config.C2monClientDynConfigProperties;
 import cern.c2mon.client.ext.dynconfig.query.QueryObj;
 import cern.c2mon.shared.client.configuration.api.equipment.Equipment;
 import cern.c2mon.shared.client.configuration.api.tag.CommandTag;
@@ -19,12 +19,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class TagConfigStrategyTest {
 
     ITagConfigStrategy strategy;
-    ProcessEquipmentURIMapping m;
+    C2monClientDynConfigProperties.ProcessEquipmentURIMapping m;
 
     @BeforeEach
     public void setUp() {
         strategy = null;
-        m = new ProcessEquipmentURIMapping();
+        m = new C2monClientDynConfigProperties.ProcessEquipmentURIMapping();
         m.setEquipmentName("name");
     }
 

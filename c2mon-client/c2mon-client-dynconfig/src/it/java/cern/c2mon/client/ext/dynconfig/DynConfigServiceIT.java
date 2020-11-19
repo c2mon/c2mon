@@ -2,9 +2,10 @@ package cern.c2mon.client.ext.dynconfig;
 
 import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.core.C2monServiceGateway;
+import cern.c2mon.client.core.config.C2monAutoConfiguration;
 import cern.c2mon.client.core.service.ConfigurationService;
 import cern.c2mon.client.core.service.TagService;
-import cern.c2mon.client.ext.dynconfig.config.DynConfiguration;
+import cern.c2mon.client.core.config.C2monClientDynConfigProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
 import org.junit.Assert;
@@ -22,8 +23,8 @@ import java.net.URI;
 import java.util.Collections;
 
 @Slf4j
-@SpringBootTest(classes = {DynConfigService.class, DynConfiguration.class})
-@TestPropertySource(locations = "classpath:mapping.properties")
+@SpringBootTest(classes = {C2monAutoConfiguration.class, DynConfigService.class})
+@TestPropertySource(properties = {"c2mon.client.dynconfig.active=true"}, locations = "classpath:c2mon-client-default.properties")
 @RunWith(SpringRunner.class)
 public class DynConfigServiceIT {
 

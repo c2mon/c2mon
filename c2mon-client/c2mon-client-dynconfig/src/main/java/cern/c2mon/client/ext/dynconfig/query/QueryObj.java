@@ -38,7 +38,7 @@ public class QueryObj implements IQueryObj {
         checkForMissingKeys();
 
         // Hack for a non-static default value
-        this.properties.putIfAbsent(TagConfigStrategy.TAG_NAME.getKeyName(), Collections.singletonList(uri.toASCIIString()));
+        this.properties.putIfAbsent(TagConfigStrategy.TAG_NAME.getKeyName(), Collections.singletonList(URIParser.toTagName(uri)));
     }
 
     /**

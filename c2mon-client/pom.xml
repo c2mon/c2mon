@@ -39,6 +39,11 @@
         <artifactId>c2mon-client-core</artifactId>
         <version>${project.parent.version}</version>
       </dependency>
+      <dependency>
+        <groupId>cern.c2mon.client</groupId>
+        <artifactId>c2mon-client-dynconfig</artifactId>
+        <version>${project.parent.version}</version>
+      </dependency>
 
       <!-- C2MON shared libraries -->
       <dependency>

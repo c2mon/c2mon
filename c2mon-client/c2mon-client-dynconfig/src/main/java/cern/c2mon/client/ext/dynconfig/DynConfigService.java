@@ -3,8 +3,8 @@ package cern.c2mon.client.ext.dynconfig;
 import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.core.service.ConfigurationService;
 import cern.c2mon.client.core.service.TagService;
-import cern.c2mon.client.ext.dynconfig.config.DynConfiguration;
-import cern.c2mon.client.ext.dynconfig.config.ProcessEquipmentURIMapping;
+import cern.c2mon.client.core.config.C2monClientDynConfigProperties;
+import cern.c2mon.client.core.config.C2monClientDynConfigProperties.ProcessEquipmentURIMapping;
 import cern.c2mon.client.ext.dynconfig.strategy.ITagConfigStrategy;
 import cern.c2mon.client.ext.dynconfig.strategy.TagConfigStrategy;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
@@ -18,7 +18,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
@@ -29,8 +28,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Setter
 @Component
-@ConditionalOnProperty(prefix = "c2mon.dynconfig.component", name = "active", havingValue = "true", matchIfMissing = true)
-@EnableAutoConfiguration
+@ConditionalOnProperty(prefix = "c2mon.client.dynconfig", name = "active", havingValue = "true")
 @NoArgsConstructor
 public class DynConfigService {
 
@@ -41,7 +39,7 @@ public class DynConfigService {
     private TagService tagService;
 
     @Autowired
-    private DynConfiguration config;
+    private C2monClientDynConfigProperties config;
 
     /**
      * Delete the C2MON tag corresponding to a given URI if it exists.
