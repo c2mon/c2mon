@@ -1,7 +1,6 @@
 package cern.c2mon.client.core.config.dynamic;
 
 import cern.c2mon.client.common.tag.Tag;
-import cern.c2mon.client.core.config.C2monClientDynConfigProperties;
 import cern.c2mon.client.core.config.dynamic.strategy.TagConfigStrategy;
 import cern.c2mon.client.core.service.ConfigurationService;
 import cern.c2mon.client.core.service.TagService;
@@ -22,8 +21,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
-import static cern.c2mon.client.core.config.C2monClientDynConfigProperties.ProcessEquipmentURIMapping;
+import static cern.c2mon.client.core.config.dynamic.C2monClientDynConfigProperties.ProcessEquipmentURIMapping;
 import static org.easymock.EasyMock.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 class DynConfigServiceTest {
 
@@ -91,7 +91,7 @@ class DynConfigServiceTest {
         report.setStatus(ConfigConstants.Status.FAILURE);
         setupMockForDeleteWithReport(report);
         replay(tagService, configurationService);
-        Assertions.assertThrows(DynConfigException.class, () -> dcs.deleteTagForURI(dataTag));
+        assertThrows(DynConfigException.class, () -> dcs.deleteTagForURI(dataTag));
         verify(tagService, configurationService);
     }
 
@@ -104,7 +104,7 @@ class DynConfigServiceTest {
         Collection<Tag> tagsForURI = dcs.getTagsForURI(Collections.singletonList(dataTag));
         verify(tagService, configurationService);
 
-        Assertions.assertEquals(tags, tagsForURI);
+        assertEquals(tags, tagsForURI);
     }
 
     @Test
@@ -116,7 +116,29 @@ class DynConfigServiceTest {
         Collection<Tag> tagsForURI = dcs.getTagsForURI(Collections.singletonList(dataTag));
         verify(tagService, configurationService);
 
-        Assertions.assertEquals(tags, tagsForURI);
+        assertEquals(tags, tagsForURI);
+    }
+
+    @Test
+    void getTagsForURIShouldFailIfNotConfigured() {
+        config.setMappings(new ArrayList<>());
+        expect(tagService.findByName(anyString()))
+                .andReturn(new ArrayList<>())
+                .anyTimes();
+        replay(tagService);
+        assertThrows(DynConfigException.class,
+                () -> dcs.getTagForURI(dataTag),
+                DynConfigException.Context.NO_MATCHING_MAPPING.message);
+    }
+
+    @Test
+    void getTagsForEmptyURIsShouldSkipUris() {
+        ConfigurationReport report = new ConfigurationReport();
+        report.setStatus(ConfigConstants.Status.OK);
+        setupMockForCreateTagWithReport(report, TagConfigStrategy.TagType.DATA);
+        replay(tagService, configurationService);
+
+        assertDoesNotThrow(() -> dcs.getTagsForURI(Arrays.asList(dataTag, null)));
     }
 
     @Test
@@ -129,7 +151,7 @@ class DynConfigServiceTest {
         Collection<Tag> tagsForURI = dcs.getTagsForURI(Collections.singletonList(commandTag));
         verify(tagService, configurationService);
 
-        Assertions.assertEquals(tags, tagsForURI);
+        assertEquals(tags, tagsForURI);
     }
 
     @Test
@@ -141,7 +163,7 @@ class DynConfigServiceTest {
         Tag tagsForURI = dcs.getTagForURI(dataTag);
         verify(tagService, configurationService);
 
-        Assertions.assertEquals(tags.iterator().next(), tagsForURI);
+        assertEquals(tags.iterator().next(), tagsForURI);
     }
 
     @Test
@@ -153,7 +175,7 @@ class DynConfigServiceTest {
         Tag tagsForURI = dcs.getTagForURI(dataTag);
         verify(tagService, configurationService);
 
-        Assertions.assertEquals(tags.iterator().next(), tagsForURI);
+        assertEquals(tags.iterator().next(), tagsForURI);
     }
 
 
@@ -163,7 +185,7 @@ class DynConfigServiceTest {
         report.setStatus(ConfigConstants.Status.FAILURE);
         setupMockForCreateTagWithReport(report, TagConfigStrategy.TagType.DATA);
         replay(tagService, configurationService);
-        Assertions.assertThrows(DynConfigException.class, () -> dcs.getTagForURI(dataTag));
+        assertThrows(DynConfigException.class, () -> dcs.getTagForURI(dataTag));
         verify(tagService, configurationService);
     }
 

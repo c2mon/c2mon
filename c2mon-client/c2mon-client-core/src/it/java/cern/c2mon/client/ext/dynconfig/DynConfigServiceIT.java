@@ -3,7 +3,6 @@ package cern.c2mon.client.ext.dynconfig;
 import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.core.C2monServiceGateway;
 import cern.c2mon.client.core.config.C2monAutoConfiguration;
-import cern.c2mon.client.core.config.C2monClientDynConfigProperties;
 import cern.c2mon.client.core.config.dynamic.DynConfigException;
 import cern.c2mon.client.core.config.dynamic.DynConfigService;
 import cern.c2mon.client.core.config.dynamic.URIParser;

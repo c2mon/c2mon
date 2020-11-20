@@ -1,4 +1,4 @@
-package cern.c2mon.client.core.config;
+package cern.c2mon.client.core.config.dynamic;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

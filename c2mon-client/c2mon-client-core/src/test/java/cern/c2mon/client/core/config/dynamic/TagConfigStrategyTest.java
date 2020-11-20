@@ -1,6 +1,5 @@
 package cern.c2mon.client.core.config.dynamic;
 
-import cern.c2mon.client.core.config.C2monClientDynConfigProperties;
 import cern.c2mon.client.core.config.dynamic.query.QueryObj;
 import cern.c2mon.client.core.config.dynamic.strategy.DipConfigStrategy;
 import cern.c2mon.client.core.config.dynamic.strategy.ITagConfigStrategy;

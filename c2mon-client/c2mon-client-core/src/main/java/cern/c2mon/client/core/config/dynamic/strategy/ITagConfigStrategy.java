@@ -1,7 +1,7 @@
 package cern.c2mon.client.core.config.dynamic.strategy;
 
 import cern.c2mon.client.core.config.dynamic.DynConfigException;
-import cern.c2mon.client.core.config.C2monClientDynConfigProperties.ProcessEquipmentURIMapping;
+import cern.c2mon.client.core.config.dynamic.C2monClientDynConfigProperties.ProcessEquipmentURIMapping;
 import cern.c2mon.client.core.config.dynamic.Protocols;
 import cern.c2mon.shared.client.configuration.api.equipment.Equipment;
 import cern.c2mon.shared.client.configuration.api.tag.CommandTag;

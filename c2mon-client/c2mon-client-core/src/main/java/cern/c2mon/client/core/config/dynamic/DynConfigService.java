@@ -3,8 +3,7 @@ package cern.c2mon.client.core.config.dynamic;
 import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.core.service.ConfigurationService;
 import cern.c2mon.client.core.service.TagService;
-import cern.c2mon.client.core.config.C2monClientDynConfigProperties;
-import cern.c2mon.client.core.config.C2monClientDynConfigProperties.ProcessEquipmentURIMapping;
+import cern.c2mon.client.core.config.dynamic.C2monClientDynConfigProperties.ProcessEquipmentURIMapping;
 import cern.c2mon.client.core.config.dynamic.strategy.ITagConfigStrategy;
 import cern.c2mon.client.core.config.dynamic.strategy.TagConfigStrategy;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
@@ -47,6 +46,7 @@ public class DynConfigService {
      * @throws DynConfigException if the Tag exists but could not be deleted.
      */
     public void deleteTagForURI(URI uri) throws DynConfigException {
+        Objects.requireNonNull(uri);
         String tagName = URIParser.toTagName(uri);
         Collection<Tag> tags = tagService.findByName(tagName);
         if (!tags.isEmpty()) {
@@ -64,6 +64,7 @@ public class DynConfigService {
      * @throws DynConfigException if the URI cannot be parsed or the tag cannot be created.
      */
     public Tag getTagForURI(URI uri) throws DynConfigException {
+        Objects.requireNonNull(uri);
         String tagName = URIParser.toTagName(uri);
         Collection<Tag> tagsForUri = tagService.findByName(tagName);
         if (tagsForUri.isEmpty()) {
@@ -90,6 +91,10 @@ public class DynConfigService {
     public List<Tag> getTagsForURI(Collection<URI> uris) {
         List<Tag> tags = new ArrayList<>();
         for (URI uri : uris) {
+            if (uri == null) {
+                log.info("Null URI is skipped.");
+                continue;
+            }
             try {
                 tags.add(getTagForURI(uri));
             } catch (DynConfigException e) {
@@ -161,6 +166,6 @@ public class DynConfigService {
         return config.getMappings().stream()
                 .filter(m -> strategy.matches(m.getUriPattern()))
                 .findFirst()
-                .orElseThrow(() -> new DynConfigException(DynConfigException.Context.NO_MAPPING, tagName));
+                .orElseThrow(() -> new DynConfigException(DynConfigException.Context.NO_MATCHING_MAPPING, tagName));
     }
 }

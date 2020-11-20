@@ -10,8 +10,6 @@ import java.net.URI;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static cern.c2mon.client.core.config.dynamic.strategy.TagConfigStrategy.*;
-
 /**
  * Utility class to extract information from an URI in a structured form.
  */

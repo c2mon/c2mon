@@ -18,7 +18,7 @@ public class DynConfigException extends Exception {
         DELETE_TAG("Error deleting the data tag. "),
         URI_MISSING_REQUIRED_PROPERTIES("URI is missing required property: "),
         UNSUPPORTED_SCHEME("The protocol is not supported: "),
-        NO_MAPPING( "URI does not match any known DAQ process: "),
+        NO_MATCHING_MAPPING( "No matching Process could be found for URI: "),
         INVALID_URI_PROPERTY("Invalid value for property:");
 
         String message;
