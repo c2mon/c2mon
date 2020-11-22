@@ -27,7 +27,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import cern.c2mon.server.cache.AlarmCache;
-import cern.c2mon.server.cache.TagFacadeGateway;
 import cern.c2mon.server.cache.TagLocationService;
 import cern.c2mon.server.cache.alarm.config.OscillationProperties;
 import cern.c2mon.server.cache.alarm.oscillation.OscillationUpdater;
@@ -60,7 +59,7 @@ public class AlarmFacadeImplTest {
   public void setup() {
     alarmCache = EasyMock.createNiceMock(AlarmCache.class);
     tagLocationService = EasyMock.createStrictMock(TagLocationService.class);
-    OscillationUpdater oscillationUpdater = new OscillationUpdater(alarmCache, new OscillationProperties());
+    OscillationUpdater oscillationUpdater = new OscillationUpdater(new OscillationProperties());
     alarmCacheUpdater = new AlarmCacheUpdaterImpl(alarmCache, oscillationUpdater);
     notifier = EasyMock.createNiceMock(AlarmAggregatorNotifier.class);
     alarmFacadeImpl = new AlarmFacadeImpl(alarmCache, tagLocationService, alarmCacheUpdater, notifier);

@@ -17,16 +17,16 @@
 package cern.c2mon.server.cache.alarm.oscillation;
 
 import java.util.Collection;
-import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.annotation.PostConstruct;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Service;
+
+import lombok.extern.slf4j.Slf4j;
 
 import cern.c2mon.server.cache.*;
 import cern.c2mon.server.cache.alarm.AlarmAggregatorListener;

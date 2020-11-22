@@ -16,12 +16,18 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.alarm.oscillation;
 
+import static org.easymock.EasyMock.createMock;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.sql.Timestamp;
 
-import lombok.extern.slf4j.Slf4j;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
+
+import lombok.extern.slf4j.Slf4j;
 
 import cern.c2mon.server.cache.AlarmCache;
 import cern.c2mon.server.cache.alarm.config.OscillationProperties;
@@ -32,11 +38,6 @@ import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.shared.client.alarm.condition.AlarmCondition;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
-
-import static org.easymock.EasyMock.createMock;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 @Slf4j
 public class OscillationUpdaterTest {
@@ -57,7 +58,7 @@ public class OscillationUpdaterTest {
     oscillationProperties.setOscNumbers(3);
     oscillationProperties.setTimeRange(50);
 
-    oscUpdater = new OscillationUpdater(alarmCache, oscillationProperties);
+    oscUpdater = new OscillationUpdater(oscillationProperties);
     dataTagCacheObject = new DataTagCacheObject();
 
 
