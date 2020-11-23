@@ -13,6 +13,7 @@ public class DynConfigException extends Exception {
      */
     @AllArgsConstructor
     public enum Context {
+        COMMAND_NOT_SUPPORTED("Dynamic configuration is not currently supported for CommandTags. "),
         CREATE_TAG("Error creating the data tag. "),
         DELETE_TAG("Error deleting the data tag. "),
         URI_MISSING_REQUIRED_PROPERTIES("URI is missing required property: "),

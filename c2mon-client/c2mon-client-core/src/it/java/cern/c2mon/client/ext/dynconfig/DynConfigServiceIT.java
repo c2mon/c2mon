@@ -58,7 +58,7 @@ public class DynConfigServiceIT {
         dcs.deleteTagForURI(dipTagUri);
     }
 
-    @Ignore
+    @Ignore("Support for command tags not yet implemented")
     public void getCommandTagForURIWithUnknownTagShouldCreateTag() throws Exception {
         String tagName = URIParser.toTagName(opcCommandUri);
 

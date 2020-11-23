@@ -70,6 +70,9 @@ public class DynConfigService {
     public Tag getTagForURI(URI uri) throws DynConfigException {
         Objects.requireNonNull(uri);
         String tagName = URIParser.toTagName(uri);
+        if (URIParser.getTagType(uri).equals(TagConfigStrategy.TagType.COMMAND)) {
+            throw new DynConfigException(DynConfigException.Context.COMMAND_NOT_SUPPORTED);
+        }
         Collection<Tag> tagsForUri = tagService.findByName(tagName);
         if (tagsForUri.isEmpty()) {
             log.info("No tag could be found for  URI {}. Creating... ", uri);
