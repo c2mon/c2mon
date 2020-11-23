@@ -31,11 +31,16 @@ class TagConfigStrategyTest {
     }
 
     @Test
+    void createConfigStrategyForBadUriShouldThrowError() throws DynConfigException {
+        assertThrows(DynConfigException.class, () -> ITagConfigStrategy.of(URI.create("host?publicationName=a")));
+    }
+
+    @Test
     void prepareEquipmentConfigurationShouldContainRelevantFields() throws DynConfigException {
         Equipment expected = Equipment.create("name", "cern.c2mon.daq.dip.DIPMessageHandler")
                 .description("default").address("dip://host/path").build();
         m.setEquipmentDescription("default");
-        strategy = new DipConfigStrategy(URI.create("dip://host/path?publicationName=x1"));
+        strategy = ITagConfigStrategy.of(URI.create("dip://host/path?publicationName=x1"));
         Equipment actual = strategy.prepareEquipmentConfiguration(m);
         assertEquals(expected, actual);
     }
@@ -44,34 +49,28 @@ class TagConfigStrategyTest {
     void prepareEquipmentConfigurationWithoutDescriptionShouldPass() throws DynConfigException {
         Equipment expected = Equipment.create("name", "cern.c2mon.daq.dip.DIPMessageHandler")
                 .address("dip://host/path").build();
-        strategy = new DipConfigStrategy(URI.create("dip://host/path?publicationName=x1"));
+        strategy = ITagConfigStrategy.of(URI.create("dip://host/path?publicationName=x1"));
         Equipment actual = strategy.prepareEquipmentConfiguration(m);
         assertEquals(expected, actual);
     }
 
     @Test
-    void prepareEquipmentConfigurationForBadUriShouldThrowError() throws DynConfigException {
-        strategy = new DipConfigStrategy(URI.create("host?publicationName=a"));
-        assertThrows(DynConfigException.class, () -> strategy.prepareEquipmentConfiguration(m));
-    }
-
-    @Test
     void opcEquipmentShouldHaveProtocolSpecificMessageHandler() throws DynConfigException {
-        strategy = new OpcUaConfigStrategy(URI.create("opc.tcp://host/path?itemName=1"));
+        strategy = ITagConfigStrategy.of(URI.create("opc.tcp://host/path?itemName=1"));
         Equipment actual = strategy.prepareEquipmentConfiguration(m);
         assertEquals("cern.c2mon.daq.opcua.OPCUAMessageHandler", actual.getHandlerClass());
     }
 
     @Test
     void dipEquipmentShouldHaveProtocolSpecificMessageHandler() throws DynConfigException {
-        strategy = new DipConfigStrategy(URI.create("dip://host/path?publicationName=a"));
+        strategy = ITagConfigStrategy.of(URI.create("dip://host/path?publicationName=a"));
         Equipment actual = strategy.prepareEquipmentConfiguration(m);
         assertEquals("cern.c2mon.daq.dip.DIPMessageHandler", actual.getHandlerClass());
     }
 
     @Test
     void restEquipmentShouldHaveProtocolSpecificMessageHandler() throws DynConfigException {
-        strategy = new RestConfigStrategy(URI.create("http://host/path?url=bla&mode=GET"));
+        strategy = ITagConfigStrategy.of(URI.create("http://host/path?url=bla&mode=GET"));
         Equipment actual = strategy.prepareEquipmentConfiguration(m);
         assertEquals("cern.c2mon.daq.rest.RestMessageHandler", actual.getHandlerClass());
     }
@@ -79,7 +78,7 @@ class TagConfigStrategyTest {
     @Test
     void toTagConfigurationWithoutTagNameShouldResortToDefault() throws DynConfigException {
         URI uri = URI.create("dip://host/path?publicationName=1");
-        strategy = new DipConfigStrategy(uri);
+        strategy = ITagConfigStrategy.of(uri);
         DataTag dt = strategy.prepareDataTagConfigurations();
         assertEquals(uri.toASCIIString(), dt.getName());
     }
@@ -135,20 +134,20 @@ class TagConfigStrategyTest {
 
     CommandTag getCommandTag(String queries) throws DynConfigException {
         URI uri = URI.create("dip://host/path?tagType=COMMAND&" + queries);
-        strategy = new DipConfigStrategy(uri);
+        strategy = ITagConfigStrategy.of(uri);
         return strategy.prepareCommandTagConfigurations();
     }
 
     DataTag getDataTag(String queries) throws DynConfigException {
         URI uri = URI.create("dip://host/path?" + queries);
-        strategy = new DipConfigStrategy(uri);
+        strategy = ITagConfigStrategy.of(uri);
         return strategy.prepareDataTagConfigurations();
     }
 
     void assertQueryAndStrategyMatch(String regex) throws DynConfigException {
         URI uri = URI.create("dip://host/path?publicationName=x1");
         QueryObj queryObj = new QueryObj(uri, Collections.emptyList());
-        strategy = new DipConfigStrategy(uri);
+        strategy = ITagConfigStrategy.of(uri);
         assertEquals(queryObj.matches(regex), strategy.matches(regex));
     }
 }

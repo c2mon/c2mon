@@ -19,6 +19,9 @@ public class C2monClientDynConfigProperties {
      */
     private List<ProcessEquipmentURIMapping> mappings = new ArrayList<>();
 
+    /**
+     * A class associating a regular expression with exactly one C2MON Process and Equipment.
+     */
     @Data
     public static class ProcessEquipmentURIMapping {
         /**

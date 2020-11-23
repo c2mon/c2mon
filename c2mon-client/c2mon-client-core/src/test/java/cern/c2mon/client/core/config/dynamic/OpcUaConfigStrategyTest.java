@@ -18,7 +18,7 @@ class OpcUaConfigStrategyTest {
     @Test
     void createStrategyWithoutItemNameShouldThrowError() {
         URI uri = URI.create("opc.tcp://host/path?commandPulseLength=2");
-        assertThrows(DynConfigException.class, () -> new OpcUaConfigStrategy(uri));
+        assertThrows(DynConfigException.class, () -> ITagConfigStrategy.of(uri));
     }
 
     @Test
@@ -65,13 +65,13 @@ class OpcUaConfigStrategyTest {
 
     HardwareAddress createDataTagHardwareAddressFrom(String queries) throws DynConfigException {
         URI uri = URI.create("opc.tcp://host/path?" + queries);
-        strategy = new OpcUaConfigStrategy(uri);
+        strategy = ITagConfigStrategy.of(uri);
         return this.strategy.prepareDataTagConfigurations().getAddress().getHardwareAddress();
     }
 
     HardwareAddress createCommandTagHardwareAddressFrom(String queries) throws DynConfigException {
         URI uri = URI.create("opc.tcp://host/path?tagType=COMMAND&" + queries);
-        strategy = new OpcUaConfigStrategy(uri);
+        strategy = ITagConfigStrategy.of(uri);
         return this.strategy.prepareCommandTagConfigurations().getHardwareAddress();
     }
 }

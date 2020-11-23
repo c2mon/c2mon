@@ -19,19 +19,19 @@ public class RestConfigStrategyTest {
     @Test
     void createStrategyWithoutUrlShouldThrowError() {
         URI uri = URI.create("http://host/path?mode=GET");
-        assertThrows(DynConfigException.class, () -> new RestConfigStrategy(uri));
+        assertThrows(DynConfigException.class, () -> ITagConfigStrategy.of(uri));
     }
 
     @Test
     void createStrategyWithoutModeShouldThrowError() {
         URI uri = URI.create("http://host/path?url=xxx");
-        assertThrows(DynConfigException.class, () -> new RestConfigStrategy(uri));
+        assertThrows(DynConfigException.class, () -> ITagConfigStrategy.of(uri));
     }
 
     @Test
     void invalidModeShouldThrowError() {
         URI uri = URI.create("http://host/path?url=xxx&mode=---&getFrequency=5&postFrequency=3&jsonPathExpression=aa");
-        assertThrows(DynConfigException.class, () -> new RestConfigStrategy(uri));
+        assertThrows(DynConfigException.class, () -> ITagConfigStrategy.of(uri));
     }
 
     @Test
@@ -46,7 +46,7 @@ public class RestConfigStrategyTest {
         expected.setAddressParameters(parameters);
 
         URI uri = URI.create("http://host/path?url=xxx&mode=POST&getFrequency=5&postFrequency=3&jsonPathExpression=aa");
-        strategy = new RestConfigStrategy(uri);
+        strategy = ITagConfigStrategy.of(uri);
         DataTagAddress actual = this.strategy.prepareDataTagConfigurations().getAddress();
 
         assertEquals(expected, actual);

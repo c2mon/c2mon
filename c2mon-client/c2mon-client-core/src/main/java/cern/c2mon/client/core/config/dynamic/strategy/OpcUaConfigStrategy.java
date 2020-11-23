@@ -26,7 +26,7 @@ public class OpcUaConfigStrategy extends TagConfigStrategy implements ITagConfig
      * @param uri The request URI specifying the Tags to configure
      * @throws DynConfigException if the uri lacks required keys.
      */
-    public OpcUaConfigStrategy(URI uri) throws DynConfigException {
+    protected OpcUaConfigStrategy(URI uri) throws DynConfigException {
         messageHandler = "cern.c2mon.daq.opcua.OPCUAMessageHandler";
         super.createQueryObj(uri, Arrays.asList(ITEM_NAME, COMMAND_PULSE));
     }

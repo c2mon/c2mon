@@ -35,7 +35,7 @@ public class RestConfigStrategy extends TagConfigStrategy implements ITagConfigS
         keys.add(new QueryKey<>("jsonPathExpression"));
     }
 
-    public RestConfigStrategy(URI uri) throws DynConfigException {
+    protected RestConfigStrategy(URI uri) throws DynConfigException {
         messageHandler = "cern.c2mon.daq.rest.RestMessageHandler";
         super.createQueryObj(uri, keys);
     }

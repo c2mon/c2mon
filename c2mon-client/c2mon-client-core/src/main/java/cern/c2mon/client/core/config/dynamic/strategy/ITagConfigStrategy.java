@@ -9,6 +9,7 @@ import cern.c2mon.shared.client.configuration.api.tag.DataTag;
 
 import java.net.URI;
 
+import static cern.c2mon.client.core.config.dynamic.DynConfigException.Context.MISSING_SCHEME;
 import static cern.c2mon.client.core.config.dynamic.DynConfigException.Context.UNSUPPORTED_SCHEME;
 import static cern.c2mon.client.core.config.dynamic.Protocols.getEnumForScheme;
 
@@ -40,8 +41,11 @@ public interface ITagConfigStrategy {
      *                            keys.
      */
     static ITagConfigStrategy of(URI uri) throws DynConfigException {
-        Protocols protocol = getEnumForScheme(uri.getScheme());
-        switch (protocol) {
+        String scheme = uri.getScheme();
+        if (scheme == null) {
+            throw new DynConfigException(MISSING_SCHEME);
+        }
+        switch (getEnumForScheme(scheme)) {
             case PROTOCOL_OPCUA:
                 return new OpcUaConfigStrategy(uri);
             case PROTOCOL_DIP:
@@ -49,7 +53,7 @@ public interface ITagConfigStrategy {
             case PROTOCOL_REST:
                 return new RestConfigStrategy(uri);
             default:
-                throw new DynConfigException(UNSUPPORTED_SCHEME, uri.getScheme());
+                throw new DynConfigException(UNSUPPORTED_SCHEME, scheme);
         }
     }
 

@@ -16,7 +16,7 @@ class DipConfigStrategyTest {
     @Test
     void createStrategyWithoutPublicationNameShouldThrowError() {
         URI uri = URI.create("dip://host/path");
-        assertThrows(DynConfigException.class, () -> new DipConfigStrategy(uri));
+        assertThrows(DynConfigException.class, () -> ITagConfigStrategy.of(uri));
     }
 
     @Test
@@ -35,7 +35,7 @@ class DipConfigStrategyTest {
 
     static HardwareAddress createHardwareAddressFrom(String queries) throws DynConfigException {
         URI uri = URI.create("dip://host/path?" + queries);
-        ITagConfigStrategy strategy = new DipConfigStrategy(uri);
+        ITagConfigStrategy strategy = ITagConfigStrategy.of(uri);
         return strategy.prepareDataTagConfigurations().getAddress().getHardwareAddress();
     }
 }

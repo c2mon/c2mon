@@ -22,7 +22,7 @@ public class DipConfigStrategy extends TagConfigStrategy implements ITagConfigSt
     private static final QueryKey<String> FIELD_NAME = new QueryKey<>("fieldName");
     private static final QueryKey<Integer> FIELD_INDEX = new QueryKey<>("fieldIndex", -1);
 
-    public DipConfigStrategy(URI uri) throws DynConfigException {
+    protected DipConfigStrategy(URI uri) throws DynConfigException {
         messageHandler = "cern.c2mon.daq.dip.DIPMessageHandler";
         super.createQueryObj(uri, Arrays.asList(PUBLICATION_NAME, FIELD_NAME, FIELD_NAME));
     }

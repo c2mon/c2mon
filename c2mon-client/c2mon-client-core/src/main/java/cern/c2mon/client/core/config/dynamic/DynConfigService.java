@@ -24,6 +24,10 @@ import java.net.URI;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * A service providing means to request a Process or Equipment reconfiguration at runtime of the C2MON server through
+ * the C2MON Configuration API by creating or deleting DataTags.
+ */
 @Slf4j
 @Setter
 @Component
