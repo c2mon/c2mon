@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 /**
  * A custom wrapper for exceptions occurring within the C2MON DynConfig module to allow a generic handling outside the class.
  */
-@AllArgsConstructor
 public class DynConfigException extends Exception {
 
     /**

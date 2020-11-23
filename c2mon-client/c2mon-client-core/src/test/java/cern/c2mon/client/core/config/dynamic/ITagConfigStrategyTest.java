@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ITagConfigStrategyTest {
 
     @Test
-    void nonSupportedUriShouldThrowException() {
+    void unsupportedUriShouldThrowException() {
         URI uri = URI.create("abc://host/path");
         assertThrows(DynConfigException.class, () -> ITagConfigStrategy.of(uri));
     }
