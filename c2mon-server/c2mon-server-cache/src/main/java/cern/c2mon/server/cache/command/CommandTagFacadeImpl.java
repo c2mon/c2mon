@@ -275,9 +275,6 @@ public class CommandTagFacadeImpl extends AbstractFacade<CommandTag> implements 
     if (commandTag.getName() == null) {
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"name\" cannot be null");
     }
-    /**
-     * TODO: CONSTANT FOR
-     */
     if (commandTag.getName().length() == 0 || commandTag.getName().length() > 60) {
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "Parameter \"name\" must be 1 to 60 characters long");
     }
