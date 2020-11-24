@@ -19,6 +19,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.jmx.export.annotation.ManagedOperation;
+import org.springframework.jmx.export.annotation.ManagedOperationParameter;
+import org.springframework.jmx.export.annotation.ManagedOperationParameters;
 import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Component;
 
@@ -71,6 +73,7 @@ public class DynConfigService {
      * @param uri the uri describing the address for which the corresponding C2MON tag shall be deleted
      */
     @ManagedOperation(description = "Deletes a DataTag corresponding to the given URI.")
+    @ManagedOperationParameter(name = "uri", description = "A URI describing the DataTag to be deleted in the form: scheme://host[:port][/path][optionalAttribute=value].")
     public String deleteTagForURI(String uri) {
         try {
             if (deleteTagForURI(URI.create(uri))) {
@@ -83,6 +86,26 @@ public class DynConfigService {
         }
     }
 
+     /**
+     * For a set of URIs, query the corresponding tag, or create the tags if not found. If a Tag with a given itemName
+     * already exists, the Tag the existing Tag is returned unchanged and no properties are overwritten.
+     * @param uris the uris describing the address for which the corresponding C2MON tag shall be fetched or deleted
+     * @return A C2MON tag that can be used to subscribe to data.
+     */
+    @ManagedOperation(description = "Create one or more DataTags corresponding to the given URI.")
+    @ManagedOperationParameter(name = "uris", description = "A URI describing the DataTag to be created in the form: scheme://host[:port][/path][optionalAttribute=value]. Multiple URIs can be given using a semicolons a separator.")
+    public String getTagsForURI(String uris) {
+        return Arrays.stream(uris.split(";"))
+                .map(uri -> {
+                    try {
+                        Tag tag = getTagForURI(URI.create(uri));
+                        return tag.toString();
+                    } catch (DynConfigException e) {
+                        log.info("Failed",  e);
+                        return "Could not fetch or create a Tag at " + uri + ": \n" + e;
+                    }
+                }).collect(Collectors.joining("\n"));
+    }
 
     /**
      * Delete the C2MON tag corresponding to a given URI if it exists.
@@ -103,37 +126,10 @@ public class DynConfigService {
         }
     }
 
-    /**
-     * For a given URI, query the corresponding tag. Create tag if not found.
-     * @param uri the uri describing the address for which the corresponding C2MON tag shall be fetches ordeleted
-     * @return A C2MON tag that can be used to subscribe to data.
-     */
-    @ManagedOperation(description = "Create a DataTag corresponding to the given URI. Multiple URIs can be given using a semicolonas a separator.")
-    public String getTagForURI(String uri) {
-        try {
-            Tag tag = getTagForURI(URI.create(uri));
-            return tag.toString();
-        } catch (DynConfigException e) {
-            log.info("Failed",  e);
-            return "Could not fetch or create a Tag at " + uri + ": \n" + e;
-        }
-    }
 
     /**
-     * For a given URI, query the corresponding tag. Create tag if not found.
-     * @param uri the uri describing the address for which the corresponding C2MON tag shall be fetches ordeleted
-     * @return A C2MON tag that can be used to subscribe to data.
-     */
-    @ManagedOperation(description = "Create a DataTag corresponding to the given URI. Multiple URIs can be given when separated by a semicolon.")
-    public String getTagsForURI(String uri) {
-
-        String[] uris = uri.split(";");
-        return Arrays.stream(uris).map(this::getTagForURI).collect(Collectors.joining("\n"));
-    }
-
-
-    /**
-     * /** For a given URI, query the corresponding tag. Create tag if not found.
+     * For a given URI, query the corresponding tag, or create tag if not found. If a Tag with a given itemName already
+     * exists, the Tag the existing Tag is returned unchanged and no properties are overwritten.
      * @param uri describes the hardware address for which a C2MON tag shall be fetched or created.
      * @return A C2MON tag that can be used to subscribe to data.
      * @throws DynConfigException if the URI cannot be parsed or the tag cannot be created.
@@ -147,7 +143,7 @@ public class DynConfigService {
         Collection<Tag> tagsForUri = tagService.findByName(tagName);
         if (tagsForUri.isEmpty()) {
             log.info("No tag could be found for  URI {}. Creating... ", uri);
-            final ConfigurationReport report = createTags(uri, tagName);
+            final ConfigurationReport report = createTags(uri);
             String tagIds = tagsForUri.stream().map(t -> String.valueOf(t.getId())).collect(Collectors.joining(", "));
             log.info("Tags {} processed with status {}: {}", tagIds, report.getStatus(), report.getStatusDescription());
             tagsForUri = tagService.findByName(tagName);
@@ -161,7 +157,8 @@ public class DynConfigService {
     }
 
     /**
-     * For a set of URIs, query the corresponding tag. Create tags if not found.
+     * For a set of URIs, query the corresponding tag, or create the tags if not found. If a Tag with a given itemName
+     * already exists, the Tag the existing Tag is returned unchanged and no properties are overwritten.
      * @param uris a collection of uris each describing a hardware address for which a C2MON tag shall be fetched or
      *             created
      * @return A C2MON tag per uri that can be used to subscribe to data.
@@ -192,10 +189,10 @@ public class DynConfigService {
         }
     }
 
-    private ConfigurationReport createTags(URI uri, String tagName) throws DynConfigException {
+    private ConfigurationReport createTags(URI uri) throws DynConfigException {
         ITagConfigStrategy strategy = ITagConfigStrategy.of(uri);
         log.info("Using strategy {}", strategy);
-        ProcessEquipmentURIMapping mapping = findMappingFor(strategy, tagName);
+        ProcessEquipmentURIMapping mapping = findMappingFor(strategy);
         log.info("Using mapping {}", mapping.toString());
         final Optional<ProcessNameResponse> processCandidate = anyRunningProcesses(mapping);
         if (!processCandidate.isPresent()) {
@@ -241,7 +238,7 @@ public class DynConfigService {
         log.info("Equipment created: {}", equipment.getName());
     }
 
-    private ProcessEquipmentURIMapping findMappingFor(ITagConfigStrategy strategy, String tagName) throws DynConfigException {
+    private ProcessEquipmentURIMapping findMappingFor(ITagConfigStrategy strategy) throws DynConfigException {
         return config.getMappings().stream()
                 .filter(m -> strategy.matches(m.getUriPattern()))
                 .findFirst()

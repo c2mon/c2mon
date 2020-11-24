@@ -21,6 +21,8 @@ import org.testcontainers.containers.wait.strategy.Wait;
 import java.net.URI;
 import java.util.Collections;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 @Slf4j
 @SpringBootTest(classes = {C2monAutoConfiguration.class, DynConfigService.class})
 @TestPropertySource(properties = {"c2mon.client.dynconfig.active=true"},
@@ -29,7 +31,7 @@ import java.util.Collections;
 public class DynConfigServiceIT {
 
     private static final URI dipTagUri = URI.create("dip://dip/acc/LHC/RunControl/Page1?publicationName=Page1");
-    private static final URI opcCommandUri = URI.create("opc.tcp://dip?tagType=COMMAND&commandPulseLength=2&setCommandType=CLASSIC&itemName=test");
+    private static final URI opcCommandUri = URI.create("opc.tcp://dip?commandPulseLength=2&setCommandType=CLASSIC&itemName=test");
     private static final int JMS_PORT = 61616;
 
     @Autowired
@@ -74,6 +76,20 @@ public class DynConfigServiceIT {
         Assert.assertTrue(ts.findByName(tagName).isEmpty());
         dcs.getTagForURI(dipTagUri);
         Assert.assertFalse(ts.findByName(tagName).isEmpty());
+    }
+
+    @Test
+    public void getTagForExistingUriWithNewPropertiesShouldReturnOldTag() throws DynConfigException {
+        Tag expected = dcs.getTagForURI(URI.create("opc.tcp://host:500/path?itemName=x1&namespace=1&tagName=TAG1"));
+        Tag actual = dcs.getTagForURI(URI.create("opc.tcp://host:500/path?itemName=x2&namespace=2&tagName=TAG1"));
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void getTagForExistingUriWithNewPropertiesShouldNotOverwriteProperties() throws DynConfigException {
+        dcs.getTagForURI(URI.create("opc.tcp://host:500/path?itemName=x1&namespace=1&description=EXPECTED&tagName=TAG1"));
+        Tag actual = dcs.getTagForURI(URI.create("opc.tcp://host:500/path?description=SHOULDNOTCHANGE&tagName=TAG1"));
+        assertEquals("EXPECTED", actual.getDescription());
     }
 
     @Test
