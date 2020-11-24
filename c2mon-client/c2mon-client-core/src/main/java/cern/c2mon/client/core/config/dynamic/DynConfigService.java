@@ -18,6 +18,8 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.jmx.export.annotation.ManagedOperation;
+import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Component;
 
 import java.net.URI;
@@ -26,13 +28,33 @@ import java.util.stream.Collectors;
 
 /**
  * A service providing means to request a Process or Equipment reconfiguration at runtime of the C2MON server through
- * the C2MON Configuration API by creating or deleting DataTags.
+ * the C2MON Configuration API by creating or deleting DataTags. The service methods are called through URIs which must
+ * follow the form:
+ *                     scheme://host[:port][/path]
+ *                     [tagName=tag name]
+ *                     [dataType=java class name]
+ *                     [tagDescription=tag description]
+ * for OPC UA queries: [&itemName=opc ua item name]
+ *                     [&commandType=method|classic]
+ * for REST queries:   [&url=url]
+ *                     [&mode=get|post]
+ *                     [&getFrequency=integer value]
+ *                     [&postFrequency=integer value]
+ * for DIP queries:    [&publicationName=publication name]
+ *                     [&fieldName=name of an array field within the structured publication]
+ *                     [&fieldIndex=array index of the desired value within the field]
+ * Note that the parts in brackets are optional. Additionally to the here listed query keys, it is possible to pass any
+ * query corresponding to a setter method of the {@link DataTag.CreateBuilder}, the
+ * {@link cern.c2mon.shared.common.datatag.DataTagAddress}, and the protocol-specific
+ * {@link cern.c2mon.shared.common.datatag.address.HardwareAddress} class. For example, to set namespace of a OPC UA
+ * tag, one may append ""&hw.setNamespace=namespace"
  */
 @Slf4j
 @Setter
 @Component
 @ConditionalOnProperty(prefix = "c2mon.client.dynconfig", name = "active", havingValue = "true")
 @NoArgsConstructor
+@ManagedResource(objectName = "cern.c2mon:type=Config,name=DynConfigService")
 public class DynConfigService {
 
     @Autowired
@@ -47,23 +69,72 @@ public class DynConfigService {
     /**
      * Delete the C2MON tag corresponding to a given URI if it exists.
      * @param uri the uri describing the address for which the corresponding C2MON tag shall be deleted
+     */
+    @ManagedOperation(description = "Deletes a DataTag corresponding to the given URI.")
+    public String deleteTagForURI(String uri) {
+        try {
+            if (deleteTagForURI(URI.create(uri))) {
+                return "Successfully deleted the Tag at " + uri;
+            } else {
+                return "No tag could be found at " + uri + ".";
+            }
+        } catch (DynConfigException e) {
+            return "An exception occurred during the operation: " + e.getMessage();
+        }
+    }
+
+
+    /**
+     * Delete the C2MON tag corresponding to a given URI if it exists.
+     * @param uri the uri describing the address for which the corresponding C2MON tag shall be deleted
      * @throws DynConfigException if the Tag exists but could not be deleted.
      */
-    public void deleteTagForURI(URI uri) throws DynConfigException {
+    public boolean deleteTagForURI(URI uri) throws DynConfigException {
         Objects.requireNonNull(uri);
         String tagName = URIParser.toTagName(uri);
         Collection<Tag> tags = tagService.findByName(tagName);
         if (!tags.isEmpty()) {
-            log.info("Deleting tags");
+            log.info("Deleting tags.");
             deleteTags(tags);
+            return true;
         } else {
-            log.info("No data tags to delete");
+            log.info("No data tags to delete.");
+            return false;
         }
     }
 
     /**
+     * For a given URI, query the corresponding tag. Create tag if not found.
+     * @param uri the uri describing the address for which the corresponding C2MON tag shall be fetches ordeleted
+     * @return A C2MON tag that can be used to subscribe to data.
+     */
+    @ManagedOperation(description = "Create a DataTag corresponding to the given URI. Multiple URIs can be given using a semicolonas a separator.")
+    public String getTagForURI(String uri) {
+        try {
+            Tag tag = getTagForURI(URI.create(uri));
+            return tag.toString();
+        } catch (DynConfigException e) {
+            log.info("Failed",  e);
+            return "Could not fetch or create a Tag at " + uri + ": \n" + e;
+        }
+    }
+
+    /**
+     * For a given URI, query the corresponding tag. Create tag if not found.
+     * @param uri the uri describing the address for which the corresponding C2MON tag shall be fetches ordeleted
+     * @return A C2MON tag that can be used to subscribe to data.
+     */
+    @ManagedOperation(description = "Create a DataTag corresponding to the given URI. Multiple URIs can be given when separated by a semicolon.")
+    public String getTagsForURI(String uri) {
+
+        String[] uris = uri.split(";");
+        return Arrays.stream(uris).map(this::getTagForURI).collect(Collectors.joining("\n"));
+    }
+
+
+    /**
      * /** For a given URI, query the corresponding tag. Create tag if not found.
-     * @param uri describes hardware address for which a C2MON tag shall be fetched or created.
+     * @param uri describes the hardware address for which a C2MON tag shall be fetched or created.
      * @return A C2MON tag that can be used to subscribe to data.
      * @throws DynConfigException if the URI cannot be parsed or the tag cannot be created.
      */
@@ -123,6 +194,7 @@ public class DynConfigService {
 
     private ConfigurationReport createTags(URI uri, String tagName) throws DynConfigException {
         ITagConfigStrategy strategy = ITagConfigStrategy.of(uri);
+        log.info("Using strategy {}", strategy);
         ProcessEquipmentURIMapping mapping = findMappingFor(strategy, tagName);
         log.info("Using mapping {}", mapping.toString());
         final Optional<ProcessNameResponse> processCandidate = anyRunningProcesses(mapping);
@@ -173,6 +245,6 @@ public class DynConfigService {
         return config.getMappings().stream()
                 .filter(m -> strategy.matches(m.getUriPattern()))
                 .findFirst()
-                .orElseThrow(() -> new DynConfigException(DynConfigException.Context.NO_MATCHING_MAPPING, tagName));
+                .orElseThrow(() -> new DynConfigException(DynConfigException.Context.NO_MATCHING_MAPPING));
     }
 }
