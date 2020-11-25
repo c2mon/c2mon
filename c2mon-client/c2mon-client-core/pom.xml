@@ -75,11 +75,6 @@
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.jolokia</groupId>
-      <artifactId>jolokia-spring</artifactId>
-      <version>1.1.0</version>
-    </dependency>
 
 
     <!-- Test dependencies -->

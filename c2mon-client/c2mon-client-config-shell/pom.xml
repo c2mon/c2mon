@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <artifactId>c2mon</artifactId>
+        <groupId>cern.c2mon</groupId>
+        <version>1.9.11-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>c2mon-client-config-shell</artifactId>
+    <packaging>jar</packaging>
+
+    <description>The C2MON Client Config Shell can be used as an autonomous command line to access methods to access the
+        C2MON Service Gateway via JMX and HTTP.
+    </description>
+
+    <dependencies>
+        <!-- Internal C2MON dependencies -->
+        <dependency>
+            <groupId>cern.c2mon.client</groupId>
+            <artifactId>c2mon-client-core</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+
+        <!-- 3rd-party dependencies -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
+            <version>${org.springframework.boot.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+            <version>${org.springframework.boot.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jolokia</groupId>
+            <artifactId>jolokia-spring</artifactId>
+            <version>1.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+    </dependencies>
+
+</project>
