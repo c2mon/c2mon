@@ -10,8 +10,10 @@ import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.api.equipment.Equipment;
 import cern.c2mon.shared.client.process.ProcessNameResponse;
 import cern.c2mon.shared.client.process.ProcessNameResponseImpl;
+import org.junit.Ignore;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -142,6 +144,7 @@ class DynConfigServiceTest {
     }
 
     @Test
+    @Disabled("Support for commands is not yet implemented")
     void getTagsForCommandURIShouldCreateTagIfNotFound() {
         ConfigurationReport report = new ConfigurationReport();
         report.setStatus(ConfigConstants.Status.OK);
