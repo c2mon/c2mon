@@ -1,11 +1,11 @@
 package cern.c2mon.client.core.config.dynamic;
 
 import cern.c2mon.client.common.tag.Tag;
-import cern.c2mon.client.core.service.ConfigurationService;
-import cern.c2mon.client.core.service.TagService;
 import cern.c2mon.client.core.config.dynamic.C2monClientDynConfigProperties.ProcessEquipmentURIMapping;
 import cern.c2mon.client.core.config.dynamic.strategy.ITagConfigStrategy;
 import cern.c2mon.client.core.config.dynamic.strategy.TagConfigStrategy;
+import cern.c2mon.client.core.service.ConfigurationService;
+import cern.c2mon.client.core.service.TagService;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.api.equipment.Equipment;
@@ -18,10 +18,6 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.jmx.export.annotation.ManagedOperation;
-import org.springframework.jmx.export.annotation.ManagedOperationParameter;
-import org.springframework.jmx.export.annotation.ManagedOperationParameters;
-import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Component;
 
 import java.net.URI;
@@ -56,7 +52,6 @@ import java.util.stream.Collectors;
 @Component
 @ConditionalOnProperty(prefix = "c2mon.client.dynconfig", name = "active", havingValue = "true")
 @NoArgsConstructor
-@ManagedResource(objectName = "cern.c2mon:type=Config,name=DynConfigService")
 public class DynConfigService {
 
     @Autowired
@@ -68,44 +63,6 @@ public class DynConfigService {
     @Autowired
     private C2monClientDynConfigProperties config;
 
-    /**
-     * Delete the C2MON tag corresponding to a given URI if it exists.
-     * @param uri the uri describing the address for which the corresponding C2MON tag shall be deleted
-     */
-    @ManagedOperation(description = "Deletes a DataTag corresponding to the given URI.")
-    @ManagedOperationParameter(name = "uri", description = "A URI describing the DataTag to be deleted in the form: scheme://host[:port][/path][optionalAttribute=value].")
-    public String deleteTagForURI(String uri) {
-        try {
-            if (deleteTagForURI(URI.create(uri))) {
-                return "Successfully deleted the Tag at " + uri;
-            } else {
-                return "No tag could be found at " + uri + ".";
-            }
-        } catch (DynConfigException e) {
-            return "An exception occurred during the operation: " + e.getMessage();
-        }
-    }
-
-     /**
-     * For a set of URIs, query the corresponding tag, or create the tags if not found. If a Tag with a given itemName
-     * already exists, the Tag the existing Tag is returned unchanged and no properties are overwritten.
-     * @param uris the uris describing the address for which the corresponding C2MON tag shall be fetched or deleted
-     * @return A C2MON tag that can be used to subscribe to data.
-     */
-    @ManagedOperation(description = "Create one or more DataTags corresponding to the given URI.")
-    @ManagedOperationParameter(name = "uris", description = "A URI describing the DataTag to be created in the form: scheme://host[:port][/path][optionalAttribute=value]. Multiple URIs can be given using a semicolons a separator.")
-    public String getTagsForURI(String uris) {
-        return Arrays.stream(uris.split(";"))
-                .map(uri -> {
-                    try {
-                        Tag tag = getTagForURI(URI.create(uri));
-                        return tag.toString();
-                    } catch (DynConfigException e) {
-                        log.info("Failed",  e);
-                        return "Could not fetch or create a Tag at " + uri + ": \n" + e;
-                    }
-                }).collect(Collectors.joining("\n"));
-    }
 
     /**
      * Delete the C2MON tag corresponding to a given URI if it exists.
