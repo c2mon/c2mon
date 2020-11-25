@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedOperationParameter;
 import org.springframework.jmx.export.annotation.ManagedResource;
+import org.springframework.shell.standard.ShellComponent;
+import org.springframework.shell.standard.ShellMethod;
 import org.springframework.stereotype.Component;
 
 import java.net.URI;
@@ -15,11 +17,12 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 /**
- * Exposes methods to dynamically configure the C2MON server at runtime through JMX.
+ * Exposes methods to dynamically configure the C2MON server at runtime through the Spring Shell, JMX, or HTTP.
  */
 @Slf4j
 @Component
-@ManagedResource(objectName = "cern.c2mon:type=Config,name=DynConfigServiceConnector")
+@ShellComponent
+@ManagedResource(objectName = "cern.c2mon:type=Config,name=ClientConfigurationShell")
 public class DynConfigServiceConnector {
 
     @Autowired
@@ -29,6 +32,7 @@ public class DynConfigServiceConnector {
      * Delete the C2MON tag corresponding to a given URI if it exists.
      * @param uri the uri describing the address for which the corresponding C2MON tag shall be deleted
      */
+    @ShellMethod(value = "Deletes a DataTag corresponding to the given URI.", key = "delete-tag")
     @ManagedOperation(description = "Deletes a DataTag corresponding to the given URI.")
     @ManagedOperationParameter(name = "uri", description = "A URI describing the DataTag to be deleted in the form: scheme://host[:port][/path][optionalAttribute=value].")
     public String deleteTagForURI(String uri) {
@@ -49,7 +53,8 @@ public class DynConfigServiceConnector {
      * @param uris the uris describing the address for which the corresponding C2MON tag shall be fetched or deleted
      * @return A C2MON tag that can be used to subscribe to data.
      */
-    @ManagedOperation(description = "Create one or more DataTags corresponding to the given URI.")
+    @ShellMethod(value = "Creates or displays a DataTag corresponding to the given URI.", key = "get-tags")
+    @ManagedOperation(description = "Create or display one or more DataTags corresponding to the given URI.")
     @ManagedOperationParameter(name = "uris", description = "A URI describing the DataTag to be created in the form: scheme://host[:port][/path][optionalAttribute=value]. Multiple URIs can be given using a semicolons a separator.")
     public String getTagsForURI(String uris) {
         return Arrays.stream(uris.split(";"))

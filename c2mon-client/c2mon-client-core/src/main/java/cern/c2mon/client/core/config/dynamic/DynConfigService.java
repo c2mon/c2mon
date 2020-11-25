@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
  *                     scheme://host[:port][/path]
  *                     [tagName=tag name]
  *                     [dataType=java class name]
- *                     [tagDescription=tag description]
+ *                     [description=tag description]
  * for OPC UA queries: [&itemName=opc ua item name]
  *                     [&commandType=method|classic]
  * for REST queries:   [&url=url]
@@ -45,7 +45,7 @@ import java.util.stream.Collectors;
  * query corresponding to a setter method of the {@link DataTag.CreateBuilder}, the
  * {@link cern.c2mon.shared.common.datatag.DataTagAddress}, and the protocol-specific
  * {@link cern.c2mon.shared.common.datatag.address.HardwareAddress} class. For example, to set namespace of a OPC UA
- * tag, one may append ""&hw.setNamespace=namespace"
+ * tag, one may append ""&setNamespace=namespace"
  */
 @Slf4j
 @Setter

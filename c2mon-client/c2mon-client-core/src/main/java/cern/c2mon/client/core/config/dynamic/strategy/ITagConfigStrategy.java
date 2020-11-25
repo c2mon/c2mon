@@ -21,21 +21,6 @@ public interface ITagConfigStrategy {
     /**
      * Return the protocol specific factory appropriate for the scheme.
      * @param uri uri must contain at least the scheme and authority, so the address where the equipment is reachable.
-     *            Other mandatory query values may be possible depending on the protocol / scheme. Refer to the class
-     *            corresponding to the protocol of {@link ITagConfigStrategy} for specifics.
-     *            <p>
-     *            Therefore, the URI must follow the form: scheme://host[:port][/path] [tagName=tag name] [dataType=
-     *            java class name] [tagType=DATA|COMMAND] [tagDescription=tag description] for OPC UA queries:
-     *            &itemName=opc ua item name] [&commandType=method|classic] for REST queries: &url=url] &mode=get|post
-     *            [&getFrequency=integer value] [&postFrequency=integer value] for DIP queries:
-     *            &publicationName=publication name] [&fieldName=name of an array field within the structured
-     *            publication] [&fieldIndex=array index of the desired value within the field] Note that the parts in
-     *            brackets are optional, and that tagType defaults to Data.
-     *            <p>
-     *            Additionally to the here listed query keys, it is possible to pass any query corresponding to a setter
-     *            method of the {@link DataTag.CreateBuilder}, the {@link cern.c2mon.shared.common.datatag.DataTagAddress},
-     *            and the protocol-specific {@link cern.c2mon.shared.common.datatag.address.HardwareAddress} class. For
-     *            example, to set namespace of a OPC UA tag, one may append ""&hw.setNamespace=namespace"
      * @return A concrete implementation of a {@link ITagConfigStrategy} to fit the scheme of the uri
      * @throws DynConfigException is thrown is the scheme is not supported or the URI does not contain mandatory query
      *                            keys.

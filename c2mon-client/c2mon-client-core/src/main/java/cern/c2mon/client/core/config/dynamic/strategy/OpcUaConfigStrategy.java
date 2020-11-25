@@ -19,7 +19,7 @@ public class OpcUaConfigStrategy extends TagConfigStrategy implements ITagConfig
 
     private static final QueryKey<String> ITEM_NAME = new QueryKey<>("itemName", null, true);
     private static final QueryKey<Integer> COMMAND_PULSE = new QueryKey<>("commandPulseLength");
-    private static final QueryKey<String> ADDRESS_TYPE = new QueryKey<>("addressType", "STRING", false);
+    private static final QueryKey<String> ADDRESS_TYPE = new QueryKey<>("setAddressType", "STRING", false);
 
     /**
      * Creates a new configuration strategy addressing the cern.c2mon.daq.opcua.OPCUAMessageHandler.

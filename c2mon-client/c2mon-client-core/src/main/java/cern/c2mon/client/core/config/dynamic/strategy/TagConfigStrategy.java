@@ -32,7 +32,7 @@ public abstract class TagConfigStrategy {
 
     public static final QueryKey<String> TAG_NAME = new QueryKey<>("tagName");
     public static final QueryKey<String> TAG_TYPE = new QueryKey<>("tagType");
-    private static final QueryKey<String> TAG_DESCRIPTION = new QueryKey<>("tagDescription", "dynamically configured tag", false);
+    private static final QueryKey<String> TAG_DESCRIPTION = new QueryKey<>("description", "dynamically configured tag", false);
     private static final QueryKey<Class<?>> DATA_TYPE = new QueryKey<>("dataType", Object.class, false);
     /**
      * CommandTag Keys
