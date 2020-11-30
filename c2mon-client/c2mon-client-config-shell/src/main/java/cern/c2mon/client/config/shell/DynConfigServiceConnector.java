@@ -1,8 +1,8 @@
 package cern.c2mon.client.config.shell;
 
 import cern.c2mon.client.common.tag.Tag;
-import cern.c2mon.client.core.config.dynamic.DynConfigException;
-import cern.c2mon.client.core.config.dynamic.DynConfigService;
+import cern.c2mon.client.core.configuration.dynamic.DynConfigException;
+import cern.c2mon.client.core.configuration.dynamic.DynConfigService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jmx.export.annotation.ManagedOperation;

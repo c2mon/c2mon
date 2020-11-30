@@ -1,8 +1,8 @@
-package cern.c2mon.client.core.config.dynamic;
+package cern.c2mon.client.core.configuration.dynamic;
 
-import cern.c2mon.client.core.config.dynamic.query.QueryKey;
-import cern.c2mon.client.core.config.dynamic.query.QueryObj;
-import cern.c2mon.client.core.config.dynamic.strategy.TagConfigStrategy;
+import cern.c2mon.client.core.configuration.dynamic.query.QueryKey;
+import cern.c2mon.client.core.configuration.dynamic.query.QueryObj;
+import cern.c2mon.client.core.configuration.dynamic.strategy.TagConfigStrategy;
 import cern.c2mon.shared.client.configuration.api.tag.DataTag;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.address.impl.HardwareAddressImpl;

@@ -1,6 +1,6 @@
-package cern.c2mon.client.core.config.dynamic.query;
+package cern.c2mon.client.core.configuration.dynamic.query;
 
-import cern.c2mon.client.core.config.dynamic.DynConfigException;
+import cern.c2mon.client.core.configuration.dynamic.DynConfigException;
 
 import java.util.List;
 

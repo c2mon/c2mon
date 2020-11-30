@@ -1,4 +1,4 @@
-package cern.c2mon.client.core.config.dynamic;
+package cern.c2mon.client.core.configuration.dynamic;
 
 import java.util.Arrays;
 import java.util.List;

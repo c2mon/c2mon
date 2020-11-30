@@ -1,17 +1,16 @@
-package cern.c2mon.client.core.config.dynamic.strategy;
+package cern.c2mon.client.core.configuration.dynamic.strategy;
 
-import cern.c2mon.client.core.config.dynamic.DynConfigException;
-import cern.c2mon.client.core.config.dynamic.C2monClientDynConfigProperties.ProcessEquipmentURIMapping;
-import cern.c2mon.client.core.config.dynamic.Protocols;
+import cern.c2mon.client.core.configuration.dynamic.DynConfigException;
+import cern.c2mon.client.core.config.C2monClientDynConfigProperties.ProcessEquipmentURIMapping;
 import cern.c2mon.shared.client.configuration.api.equipment.Equipment;
 import cern.c2mon.shared.client.configuration.api.tag.CommandTag;
 import cern.c2mon.shared.client.configuration.api.tag.DataTag;
 
 import java.net.URI;
 
-import static cern.c2mon.client.core.config.dynamic.DynConfigException.Context.MISSING_SCHEME;
-import static cern.c2mon.client.core.config.dynamic.DynConfigException.Context.UNSUPPORTED_SCHEME;
-import static cern.c2mon.client.core.config.dynamic.Protocols.getEnumForScheme;
+import static cern.c2mon.client.core.configuration.dynamic.DynConfigException.Context.MISSING_SCHEME;
+import static cern.c2mon.client.core.configuration.dynamic.DynConfigException.Context.UNSUPPORTED_SCHEME;
+import static cern.c2mon.client.core.configuration.dynamic.Protocols.getEnumForScheme;
 
 /**
  * An interface for strategies on how a specific protocol or standard is handled in the C2MON subscription process.

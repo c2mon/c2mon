@@ -1,4 +1,4 @@
-package cern.c2mon.client.core.config.dynamic.query;
+package cern.c2mon.client.core.configuration.dynamic.query;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

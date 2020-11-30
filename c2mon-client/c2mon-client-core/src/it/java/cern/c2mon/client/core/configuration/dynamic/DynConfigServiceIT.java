@@ -1,11 +1,8 @@
-package cern.c2mon.client.ext.dynconfig;
+package cern.c2mon.client.core.configuration.dynamic;
 
 import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.core.C2monServiceGateway;
 import cern.c2mon.client.core.config.C2monAutoConfiguration;
-import cern.c2mon.client.core.config.dynamic.DynConfigException;
-import cern.c2mon.client.core.config.dynamic.DynConfigService;
-import cern.c2mon.client.core.config.dynamic.URIParser;
 import cern.c2mon.client.core.service.ConfigurationService;
 import cern.c2mon.client.core.service.TagService;
 import lombok.extern.slf4j.Slf4j;
@@ -80,15 +77,15 @@ public class DynConfigServiceIT {
 
     @Test
     public void getTagForExistingUriWithNewPropertiesShouldReturnOldTag() throws DynConfigException {
-        Tag expected = dcs.getTagForURI(URI.create("opc.tcp://host:500/path?itemName=x1&namespace=1&tagName=TAG1"));
-        Tag actual = dcs.getTagForURI(URI.create("opc.tcp://host:500/path?itemName=x2&namespace=2&tagName=TAG1"));
+        Tag expected = dcs.getTagForURI(URI.create("opc.tcp://host:500/path?itemName=x1&namespace=1&tagName=getTagForExistingUriWithNewPropertiesShouldReturnOldTag"));
+        Tag actual = dcs.getTagForURI(URI.create("opc.tcp://host:500/path?itemName=x2&namespace=2&tagName=getTagForExistingUriWithNewPropertiesShouldReturnOldTag"));
         assertEquals(expected, actual);
     }
 
     @Test
     public void getTagForExistingUriWithNewPropertiesShouldNotOverwriteProperties() throws DynConfigException {
-        dcs.getTagForURI(URI.create("opc.tcp://host:500/path?itemName=x1&namespace=1&description=EXPECTED&tagName=TAG1"));
-        Tag actual = dcs.getTagForURI(URI.create("opc.tcp://host:500/path?description=SHOULDNOTCHANGE&tagName=TAG1"));
+        dcs.getTagForURI(URI.create("opc.tcp://host:500/path?itemName=x1&namespace=1&description=EXPECTED&tagName=getTagForExistingUriWithNewPropertiesShouldNotOverwriteProperties"));
+        Tag actual = dcs.getTagForURI(URI.create("opc.tcp://host:500/path?description=SHOULDNOTCHANGE&tagName=getTagForExistingUriWithNewPropertiesShouldNotOverwriteProperties"));
         assertEquals("EXPECTED", actual.getDescription());
     }
 

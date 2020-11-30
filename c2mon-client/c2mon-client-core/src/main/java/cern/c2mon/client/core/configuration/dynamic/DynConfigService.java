@@ -1,9 +1,10 @@
-package cern.c2mon.client.core.config.dynamic;
+package cern.c2mon.client.core.configuration.dynamic;
 
 import cern.c2mon.client.common.tag.Tag;
-import cern.c2mon.client.core.config.dynamic.C2monClientDynConfigProperties.ProcessEquipmentURIMapping;
-import cern.c2mon.client.core.config.dynamic.strategy.ITagConfigStrategy;
-import cern.c2mon.client.core.config.dynamic.strategy.TagConfigStrategy;
+import cern.c2mon.client.core.config.C2monClientDynConfigProperties;
+import cern.c2mon.client.core.config.C2monClientDynConfigProperties.ProcessEquipmentURIMapping;
+import cern.c2mon.client.core.configuration.dynamic.strategy.ITagConfigStrategy;
+import cern.c2mon.client.core.configuration.dynamic.strategy.TagConfigStrategy;
 import cern.c2mon.client.core.service.ConfigurationService;
 import cern.c2mon.client.core.service.TagService;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
@@ -108,7 +109,7 @@ public class DynConfigService {
                 throw new DynConfigException(DynConfigException.Context.CREATE_TAG);
             }
         } else {
-            log.info("Tag {} already exists. ", tagsForUri);
+            log.info("Tag already exists.");
         }
         return tagsForUri.iterator().next();
     }
@@ -148,9 +149,8 @@ public class DynConfigService {
 
     private ConfigurationReport createTags(URI uri) throws DynConfigException {
         ITagConfigStrategy strategy = ITagConfigStrategy.of(uri);
-        log.info("Using strategy {}", strategy);
         ProcessEquipmentURIMapping mapping = findMappingFor(strategy);
-        log.info("Using mapping {}", mapping.toString());
+        log.debug("With {} and {}", strategy.getClass().getSimpleName(), mapping.toString());
         final Optional<ProcessNameResponse> processCandidate = anyRunningProcesses(mapping);
         if (!processCandidate.isPresent()) {
             log.info("No compatible process is running. Creating process and equipment. ");

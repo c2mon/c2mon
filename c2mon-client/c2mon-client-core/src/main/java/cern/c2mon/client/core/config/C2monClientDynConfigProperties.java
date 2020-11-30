@@ -1,6 +1,7 @@
-package cern.c2mon.client.core.config.dynamic;
+package cern.c2mon.client.core.config;
 
 import lombok.Data;
+import lombok.ToString;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.util.ArrayList;
@@ -43,12 +44,12 @@ public class C2monClientDynConfigProperties {
         /**
          * The description of the C2MON process
          */
-        private String processDescription = "DynConfig Process";
+        @ToString.Exclude private String processDescription = "DynConfig Process";
 
         /**
          * The description of the C2MON equipment
          */
-        private String equipmentDescription;
+        @ToString.Exclude private String equipmentDescription;
 
         /**
          * The regular expression associated to the process and equipment
@@ -58,6 +59,6 @@ public class C2monClientDynConfigProperties {
         /**
          * Optional metadata for the process and equipment.
          */
-        private Map<String, String> metadata;
+        @ToString.Exclude private Map<String, String> metadata;
     }
 }

@@ -1,9 +1,9 @@
-package cern.c2mon.client.core.config.dynamic;
+package cern.c2mon.client.core.configuration.dynamic;
 
-import cern.c2mon.client.core.config.dynamic.strategy.DipConfigStrategy;
-import cern.c2mon.client.core.config.dynamic.strategy.ITagConfigStrategy;
-import cern.c2mon.client.core.config.dynamic.strategy.OpcUaConfigStrategy;
-import cern.c2mon.client.core.config.dynamic.strategy.RestConfigStrategy;
+import cern.c2mon.client.core.configuration.dynamic.strategy.DipConfigStrategy;
+import cern.c2mon.client.core.configuration.dynamic.strategy.ITagConfigStrategy;
+import cern.c2mon.client.core.configuration.dynamic.strategy.OpcUaConfigStrategy;
+import cern.c2mon.client.core.configuration.dynamic.strategy.RestConfigStrategy;
 import org.junit.jupiter.api.Test;
 
 import java.net.URI;

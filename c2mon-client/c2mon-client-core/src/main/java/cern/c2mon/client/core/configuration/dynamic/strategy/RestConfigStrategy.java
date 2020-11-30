@@ -1,7 +1,7 @@
-package cern.c2mon.client.core.config.dynamic.strategy;
+package cern.c2mon.client.core.configuration.dynamic.strategy;
 
-import cern.c2mon.client.core.config.dynamic.DynConfigException;
-import cern.c2mon.client.core.config.dynamic.query.QueryKey;
+import cern.c2mon.client.core.configuration.dynamic.DynConfigException;
+import cern.c2mon.client.core.configuration.dynamic.query.QueryKey;
 import cern.c2mon.shared.client.configuration.api.tag.CommandTag;
 import cern.c2mon.shared.client.configuration.api.tag.DataTag;
 import cern.c2mon.shared.common.datatag.DataTagAddress;

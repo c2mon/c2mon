@@ -1,9 +1,9 @@
-package cern.c2mon.client.core.config.dynamic.query;
+package cern.c2mon.client.core.configuration.dynamic.query;
 
-import cern.c2mon.client.core.config.dynamic.DynConfigException;
-import cern.c2mon.client.core.config.dynamic.ObjectConverter;
-import cern.c2mon.client.core.config.dynamic.URIParser;
-import cern.c2mon.client.core.config.dynamic.strategy.TagConfigStrategy;
+import cern.c2mon.client.core.configuration.dynamic.DynConfigException;
+import cern.c2mon.client.core.configuration.dynamic.ObjectConverter;
+import cern.c2mon.client.core.configuration.dynamic.URIParser;
+import cern.c2mon.client.core.configuration.dynamic.strategy.TagConfigStrategy;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.InvocationTargetException;
@@ -12,8 +12,8 @@ import java.net.URI;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static cern.c2mon.client.core.config.dynamic.DynConfigException.Context.INVALID_URI_PROPERTY;
-import static cern.c2mon.client.core.config.dynamic.DynConfigException.Context.URI_MISSING_REQUIRED_PROPERTIES;
+import static cern.c2mon.client.core.configuration.dynamic.DynConfigException.Context.INVALID_URI_PROPERTY;
+import static cern.c2mon.client.core.configuration.dynamic.DynConfigException.Context.URI_MISSING_REQUIRED_PROPERTIES;
 
 /**
  * The QueryObj holds the information contained in a query uri in a structured form and contains query-specific logic
@@ -113,7 +113,7 @@ public class QueryObj implements IQueryObj {
                     .filter(m -> m.getName().equalsIgnoreCase(targetMap.getKey()) && m.getParameterTypes().length == 1)
                     .findFirst();
             if (matchingMethod.isPresent()) {
-                log.info("Call method [{}] with value {} on object {}.", targetMap.getKey(), targetMap.getValue(), applyToObj.getClass().getName());
+                log.debug("Call method [{}] with argument {} on object {}.", targetMap.getKey(), targetMap.getValue(), applyToObj.getClass());
                 for (String s : targetMap.getValue()) {
                     transformAndInvoke(matchingMethod.get(), s, applyToObj);
                 }

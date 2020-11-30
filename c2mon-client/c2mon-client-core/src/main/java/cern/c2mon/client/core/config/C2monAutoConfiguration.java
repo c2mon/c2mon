@@ -16,7 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.client.core.config;
 
-import cern.c2mon.client.core.config.dynamic.C2monClientDynConfigProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;

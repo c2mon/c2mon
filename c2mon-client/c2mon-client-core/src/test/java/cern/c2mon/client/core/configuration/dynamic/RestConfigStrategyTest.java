@@ -1,7 +1,6 @@
-package cern.c2mon.client.core.config.dynamic;
+package cern.c2mon.client.core.configuration.dynamic;
 
-import cern.c2mon.client.core.config.dynamic.strategy.ITagConfigStrategy;
-import cern.c2mon.client.core.config.dynamic.strategy.RestConfigStrategy;
+import cern.c2mon.client.core.configuration.dynamic.strategy.ITagConfigStrategy;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.address.impl.HardwareAddressImpl;
 import org.junit.jupiter.api.Test;

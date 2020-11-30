@@ -1,6 +1,6 @@
-package cern.c2mon.client.core.config.dynamic;
+package cern.c2mon.client.core.configuration.dynamic;
 
-import cern.c2mon.client.core.config.dynamic.strategy.TagConfigStrategy;
+import cern.c2mon.client.core.configuration.dynamic.strategy.TagConfigStrategy;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

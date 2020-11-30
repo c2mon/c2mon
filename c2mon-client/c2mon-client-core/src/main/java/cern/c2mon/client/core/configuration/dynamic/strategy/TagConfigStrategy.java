@@ -1,10 +1,10 @@
-package cern.c2mon.client.core.config.dynamic.strategy;
+package cern.c2mon.client.core.configuration.dynamic.strategy;
 
-import cern.c2mon.client.core.config.dynamic.C2monClientDynConfigProperties.ProcessEquipmentURIMapping;
-import cern.c2mon.client.core.config.dynamic.DynConfigException;
-import cern.c2mon.client.core.config.dynamic.query.IQueryObj;
-import cern.c2mon.client.core.config.dynamic.query.QueryKey;
-import cern.c2mon.client.core.config.dynamic.query.QueryObj;
+import cern.c2mon.client.core.config.C2monClientDynConfigProperties.ProcessEquipmentURIMapping;
+import cern.c2mon.client.core.configuration.dynamic.DynConfigException;
+import cern.c2mon.client.core.configuration.dynamic.query.IQueryObj;
+import cern.c2mon.client.core.configuration.dynamic.query.QueryKey;
+import cern.c2mon.client.core.configuration.dynamic.query.QueryObj;
 import cern.c2mon.shared.client.configuration.api.equipment.Equipment;
 import cern.c2mon.shared.client.configuration.api.tag.CommandTag;
 import cern.c2mon.shared.client.configuration.api.tag.DataTag;

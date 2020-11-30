@@ -1,6 +1,6 @@
-package cern.c2mon.client.core.config.dynamic;
+package cern.c2mon.client.core.configuration.dynamic;
 
-import cern.c2mon.client.core.config.dynamic.strategy.TagConfigStrategy;
+import cern.c2mon.client.core.configuration.dynamic.strategy.TagConfigStrategy;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +32,7 @@ public class URIParser {
 
     /**
      * A utility method that extracts the type of the Tag to be processed from an URI. Possible types are listed in
-     * {@link cern.c2mon.client.core.config.dynamic.strategy.TagConfigStrategy.TagType}.
+     * {@link cern.c2mon.client.core.configuration.dynamic.strategy.TagConfigStrategy.TagType}.
      * @param uri the uri to extract the tagType from
      * @return the type of the Tag to be processed. If no type is specified, {@link cern.c2mon.shared.client.configuration.api.tag.DataTag}
      * is used as default.

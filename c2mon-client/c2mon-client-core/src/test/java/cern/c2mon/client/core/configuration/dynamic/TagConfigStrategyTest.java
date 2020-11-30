@@ -1,10 +1,8 @@
-package cern.c2mon.client.core.config.dynamic;
+package cern.c2mon.client.core.configuration.dynamic;
 
-import cern.c2mon.client.core.config.dynamic.query.QueryObj;
-import cern.c2mon.client.core.config.dynamic.strategy.DipConfigStrategy;
-import cern.c2mon.client.core.config.dynamic.strategy.ITagConfigStrategy;
-import cern.c2mon.client.core.config.dynamic.strategy.OpcUaConfigStrategy;
-import cern.c2mon.client.core.config.dynamic.strategy.RestConfigStrategy;
+import cern.c2mon.client.core.config.C2monClientDynConfigProperties;
+import cern.c2mon.client.core.configuration.dynamic.query.QueryObj;
+import cern.c2mon.client.core.configuration.dynamic.strategy.ITagConfigStrategy;
 import cern.c2mon.shared.client.configuration.api.equipment.Equipment;
 import cern.c2mon.shared.client.configuration.api.tag.CommandTag;
 import cern.c2mon.shared.client.configuration.api.tag.DataTag;
