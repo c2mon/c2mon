@@ -31,6 +31,7 @@ public class DynConfigServiceConnector {
     /**
      * Delete the C2MON tag corresponding to a given URI if it exists.
      * @param uri the uri describing the address for which the corresponding C2MON tag shall be deleted
+     * @return a description of operation result or error
      */
     @ShellMethod(value = "Deletes a DataTag corresponding to the given URI.", key = "delete-tag")
     @ManagedOperation(description = "Deletes a DataTag corresponding to the given URI.")
@@ -43,6 +44,7 @@ public class DynConfigServiceConnector {
                 return "No tag could be found at " + uri + ".";
             }
         } catch (DynConfigException e) {
+            log.error("An exception occurred during the operation: ", e);
             return "An exception occurred during the operation: " + e.getMessage();
         }
     }

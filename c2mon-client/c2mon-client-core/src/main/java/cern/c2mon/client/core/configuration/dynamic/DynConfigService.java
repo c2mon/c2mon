@@ -68,6 +68,7 @@ public class DynConfigService {
     /**
      * Delete the C2MON tag corresponding to a given URI if it exists.
      * @param uri the uri describing the address for which the corresponding C2MON tag shall be deleted
+     * @return true if the tag existed previously
      * @throws DynConfigException if the Tag exists but could not be deleted.
      */
     public boolean deleteTagForURI(URI uri) throws DynConfigException {

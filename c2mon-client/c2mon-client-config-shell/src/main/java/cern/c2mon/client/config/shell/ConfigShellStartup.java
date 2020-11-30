@@ -5,8 +5,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import java.io.IOException;
-
 /**
  * Bootstraps the C2MON Client Configuration Shell.
  **/
@@ -15,6 +13,10 @@ import java.io.IOException;
 @Slf4j
 public class ConfigShellStartup {
 
+    /**
+     * Entry point to the Client Shell.
+     * @param args no specific treatment of any arguments.
+     */
     public static void main(final String[] args) {
         SpringApplication.run(ConfigShellStartup.class, args);
 
