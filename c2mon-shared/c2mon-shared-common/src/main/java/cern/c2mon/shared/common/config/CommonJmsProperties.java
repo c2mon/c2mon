@@ -56,7 +56,7 @@ public class CommonJmsProperties {
    * 
    * @see ActiveMQConnectionFactory#setConnectionIDPrefix(String)
    */
-  private String connectionIDPrefix = "ID:c2mon.";
+  private String connectionIDPrefix = "ID:c2mon";
   
   /**
    * Creates a unique client ID string consisting of the user name, host name and process ID.
@@ -74,7 +74,7 @@ public class CommonJmsProperties {
       log.warn("Couldn't get hostname", e);
     }
     
-    StringBuilder clientIdPrefix = new StringBuilder(System.getProperty("user.name"));
+    StringBuilder clientIdPrefix = new StringBuilder();
     if (!hostname.isEmpty()) {
       clientIdPrefix.append('@');
       clientIdPrefix.append(hostname);
