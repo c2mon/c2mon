@@ -19,7 +19,5 @@ public class ConfigShellStartup {
      */
     public static void main(final String[] args) {
         SpringApplication.run(ConfigShellStartup.class, args);
-
-        log.info("C2MON Client Config Shell is now initialised.");
     }
 }

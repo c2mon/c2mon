@@ -36,7 +36,7 @@ public class DynConfigServiceConnector {
     @ShellMethod(value = "Deletes a DataTag corresponding to the given URI.", key = "delete-tag")
     @ManagedOperation(description = "Deletes a DataTag corresponding to the given URI.")
     @ManagedOperationParameter(name = "uri", description = "A URI describing the DataTag to be deleted in the form: scheme://host[:port][/path][optionalAttribute=value].")
-    public String deleteTagForURI(String uri) {
+    public String deleteTag(String uri) {
         try {
             if (dynConfigService.deleteTagForURI(URI.create(uri))) {
                 return "Successfully deleted the Tag at " + uri;
@@ -58,7 +58,7 @@ public class DynConfigServiceConnector {
     @ShellMethod(value = "Creates or displays a DataTag corresponding to the given URI.", key = "get-tags")
     @ManagedOperation(description = "Create or display one or more DataTags corresponding to the given URI.")
     @ManagedOperationParameter(name = "uris", description = "A URI describing the DataTag to be created in the form: scheme://host[:port][/path][optionalAttribute=value]. Multiple URIs can be given using a semicolons a separator.")
-    public String getTagsForURI(String uris) {
+    public String getTags(String uris) {
         return Arrays.stream(uris.split(";"))
                 .map(uri -> {
                     try {
