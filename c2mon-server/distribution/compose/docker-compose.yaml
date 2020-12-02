@@ -1,7 +1,9 @@
 version: "3.8"
 services:
 
+  # the C2MON server
   c2mon:
+    container_name: c2mon
     image: cern/c2mon:${C2MON_TAG}
     ports:
       - "9001:9001"
@@ -17,14 +19,38 @@ services:
       - C2MON_SERVER_CACHEDBACCESS_JDBC_VALIDATION-QUERY=SELECT 1
       - C2MON_SERVER_JDBC_DRIVER-CLASS-NAME=com.mysql.jdbc.Driver
       - C2MON_SERVER_JDBC_URL=jdbc:mysql://db/tim
-      - C2MON_SERVER_JDBC_USERNAME=root
+      - C2MON_SERVER_JDBC_USERNAME=user
+      - C2MON_SERVER_JDBC_PASSWORD=user-pwd
       - C2MON_SERVER_CACHEDBACCESS_JDBC_JDBC-URL=jdbc:mysql://db/tim
       - C2MON_SERVER_HISTORY_JDBC_JDBC-URL=jdbc:mysql://db/tim
       - C2MON_SERVER_CONFIGURATION_JDBC_JDBC-URL=jdbc:mysql://db/tim
       - C2MON_SERVER_TESTMODE=false
     restart: on-failure
-    
+
+  # a search and analytics engine with integrated persistence
+  elasticsearch:
+    container_name: elasticsearch
+    image: gitlab-registry.cern.ch/c2mon/c2mon/es:${ELASTICSEARCH_TAG}
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      - cluster.name=c2mon
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - TAKE_FILE_OWNERSHIP="1"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    # uncomment to persist your data
+    # volumes:
+      # - ./elasticsearch/data:/usr/share/elasticsearch/data
+
+  # a message broker providing communication in between the different levels of the C2MON tiers (client applications, daqs, and server)
   mq:
+    container_name: mq
     image: gitlab-registry.cern.ch/c2mon/c2mon/mq:${ACTIVEMQ_TAG}
     ports:
       - "61616:61616"
@@ -33,51 +59,88 @@ services:
       - "8086:8086"
       - "8161:8161"
 
+  # simple MySQL database for C2MON to store its data
   db:
+    container_name: db
     image: gitlab-registry.cern.ch/c2mon/c2mon/mysql:${MYSQL_TAG}
-    ports:
-      - "3306:3306"
     environment:
-      - MYSQL_ALLOW_EMPTY_PASSWORD="yes"
-      
+      - MYSQL_ROOT_PASSWORD=root-pwd
+      - MYSQL_DATABASE=tim
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=user-pwd
+    # uncomment to persist your data
+    # volumes:
+      # - ./mysql/data:/var/lib/mysql
+
+  # simple interface to browse your C2MON configuration and data
+  web-ui:
+    container_name: web-ui
+    image: cern/c2mon-web-ui:${WEB_UI_TAG}
+    ports:
+      - "8080:8080"
+    environment:
+      - C2MON_CLIENT_JMS_URL=tcp://mq:61616
+      - C2MON_CLIENT_HISTORY_JDBC_URL=jdbc:mysql://db/tim
+      - C2MON_CLIENT_HISTORY_JDBC_USERNAME=root
+      - C2MON_CLIENT_HISTORY_JDBC_PASSWORD=root-pwd
+      - C2MON_CLIENT_HISTORY_JDBC_VALIDATION-QUERY=SELECT 1
+
+  # visualize your data and metrics
   grafana:
-    image: gitlab-registry.cern.ch/c2mon/c2mon/grafana:${GRAFANA_TAG}
+    container_name: grafana
+    image: grafana/grafana:latest
     ports:
       - "3000:3000"
     environment:
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_ANONYMOUS_ORG_NAME=Main Org.
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Editor
-      
-  elasticsearch:
-    image: gitlab-registry.cern.ch/c2mon/c2mon/es:${ELASTICSEARCH_TAG}
-    ports:
-      - "9200:9200"
-    environment:
-      - cluster.name=c2mon
-      - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-      - TAKE_FILE_OWNERSHIP="1"
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
+      - GF_INSTALL_PLUGINS=grafana-piechart-panel
+      - GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH=/etc/grafana/provisioning/dashboards/dashboard-hostmetrics.json
+    volumes:
+      # 'elasticsearch', 'prometheus' and 'db' as data sources
+      # default dashboards for 'daq-opc-ua' and 'daq-hostmetrics'
+      - ./grafana/provisioning:/etc/grafana/provisioning
 
-  web-ui:
-    image: cern/c2mon-web-ui:${WEB_UI_TAG}
+  prometheus:
+    # collect relevant metrics about 'daq-opc-ua'
+    container_name: prometheus
+    image: prom/prometheus:latest
     ports:
-      - "3306"
-      - target: 8080
-        published: 8080
-        protocol: tcp
-        mode: host
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    command: --config.file=/etc/prometheus/prometheus.yml
+
+  # Collect data from OPC UA servers
+  daq-opc-ua:
+    container_name: daq-opc-ua
+    image: gitlab-registry.cern.ch/c2mon/c2mon-daq-opcua
+    ports:
+      - "8912:8912"
+      - "8913:8913"
     environment:
-      - C2MON_CLIENT_JMS_URL=tcp://mq:61616 
-      - C2MON_CLIENT_HISTORY_JDBC_URL=jdbc:mysql://db/tim
-      - C2MON_CLIENT_HISTORY_JDBC_USERNAME=root
-      - C2MON_CLIENT_HISTORY_JDBC_VALIDATION-QUERY=SELECT 1
-    
-  daq:
-    image: gitlab-registry.cern.ch/c2mon/c2mon-daq-hostmetrics:${DAQ_TAG}
+      - "_JAVA_OPTIONS=-Dc2mon.daq.name=P_OPC_UA -Dc2mon.daq.jms.mode=single -Dc2mon.daq.jms.url=tcp://mq:61616 -Dc2mon.client.jms.url=tcp://mq:61616"
+      - C2MON_DAQ_OPCUA_TRUSTALLSERVERS=true
+      - C2MON_DAQ_OPCUA_CERTIFIERPRIORITY_NOSECURITY=3
+      - C2MON_DAQ_OPCUA_PORTSUBSTITUTIONMODE=NONE
+      - C2MON_DAQ_OPCUA_HOSTSUBSTITUTIONMODE=SUBSTITUTE_LOCAL
+      - LOG_PATH=/c2mon-daq-opcua-1.9.11-SNAPSHOT/tmp
+      - SPRING_JMX_ENABLED=true
+      - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=*,jolokia,prometheus
+      - MANAGEMENT_SERVER_PORT=8912
+
+  # A simple, exemplary C2MON DAQ module for publishing metrics about the current host 
+  daq-hostmetrics:
+    container_name: daq-hostmetrics
+    image: gitlab-registry.cern.ch/c2mon/c2mon-daq-hostmetrics:latest
     environment:
-      - "_JAVA_OPTIONS=-Dc2mon.daq.name=P_DAQ04 -Dc2mon.daq.jms.url=tcp://mq:61616 -Dc2mon.client.jms.url=tcp://mq:61616"
+      - "_JAVA_OPTIONS=-Dc2mon.daq.name=P_HOSTMETRICS -Dc2mon.daq.jms.url=tcp://mq:61616 -Dc2mon.client.jms.url=tcp://mq:61616"
+
+  # A possible data source for 'daq-opc-ua'. Tags on this server must be configured on 'c2mon' before the 'daq-opc-ua' will acquire data.
+  edge:
+    container_name: edge
+    image: mcr.microsoft.com/iotedge/opc-plc
+    ports:
+      - "50000:50000"
+    command: --unsecuretransport
