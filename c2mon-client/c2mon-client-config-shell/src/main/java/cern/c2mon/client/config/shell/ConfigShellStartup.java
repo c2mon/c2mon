@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 
 /**
  * Bootstraps the C2MON Client Configuration Shell.
@@ -18,6 +19,8 @@ public class ConfigShellStartup {
      * @param args no specific treatment of any arguments.
      */
     public static void main(final String[] args) {
-        SpringApplication.run(ConfigShellStartup.class, args);
+        ConfigurableApplicationContext ctx = SpringApplication.run(ConfigShellStartup.class, args);
+        ctx.close();
+        System.exit(0);
     }
 }

@@ -33,7 +33,7 @@ public class DynConfigServiceConnector {
      * @param uri the uri describing the address for which the corresponding C2MON tag shall be deleted
      * @return a description of operation result or error
      */
-    @ShellMethod(value = "Deletes a DataTag corresponding to the given URI.", key = "delete-tag")
+    @ShellMethod(value = "Deletes a DataTag corresponding to the given URI.")
     @ManagedOperation(description = "Deletes a DataTag corresponding to the given URI.")
     @ManagedOperationParameter(name = "uri", description = "A URI describing the DataTag to be deleted in the form: scheme://host[:port][/path][optionalAttribute=value].")
     public String deleteTag(String uri) {
@@ -55,7 +55,7 @@ public class DynConfigServiceConnector {
      * @param uris the uris describing the address for which the corresponding C2MON tag shall be fetched or deleted
      * @return A C2MON tag that can be used to subscribe to data.
      */
-    @ShellMethod(value = "Creates or displays a DataTag corresponding to the given URI.", key = "get-tags")
+    @ShellMethod(value = "Creates or displays a DataTag corresponding to the given URI.")
     @ManagedOperation(description = "Create or display one or more DataTags corresponding to the given URI.")
     @ManagedOperationParameter(name = "uris", description = "A URI describing the DataTag to be created in the form: scheme://host[:port][/path][optionalAttribute=value]. Multiple URIs can be given using a semicolons a separator.")
     public String getTags(String uris) {
