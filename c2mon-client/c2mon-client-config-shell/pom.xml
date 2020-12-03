@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>c2mon</artifactId>
-        <groupId>cern.c2mon</groupId>
+        <groupId>cern.c2mon.client</groupId>
+        <artifactId>c2mon-client</artifactId>
         <version>1.9.11-SNAPSHOT</version>
     </parent>
 
