@@ -20,6 +20,7 @@ import java.util.*;
 
 import javax.jms.JMSException;
 
+import cern.c2mon.shared.client.configuration.api.device.DeviceClass;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -67,10 +68,13 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
   private CommandTagConfigurationManager commandTagConfigurationManager;
 
+  private DeviceClassConfigurationManager deviceClassConfigurationManager;
+
   @Autowired
   protected ConfigurationServiceImpl(final @Qualifier("coreRequestHandler") RequestHandler requestHandler,
                                      final ConfigurationRequestSender configurationRequestSender,
                                      ProcessConfigurationManager processConfigurationManager,
+                                     DeviceClassConfigurationManager deviceClassConfigurationManager,
                                      EquipmentConfigurationManager equipmentConfigurationManager,
                                      SubEquipmentConfigurationManager subEquipmentConfigurationManager,
                                      DataTagConfigurationManager dataTagConfigurationManager,
@@ -81,6 +85,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     this.clientRequestHandler = requestHandler;
     this.configurationRequestSender = configurationRequestSender;
     this.processConfigurationManager = processConfigurationManager;
+    this.deviceClassConfigurationManager = deviceClassConfigurationManager;
     this.equipmentConfigurationManager = equipmentConfigurationManager;
     this.subEquipmentConfigurationManager = subEquipmentConfigurationManager;
     this.dataTagConfigurationManager = dataTagConfigurationManager;
@@ -487,5 +492,30 @@ public class ConfigurationServiceImpl implements ConfigurationService {
   @Override
   public ConfigurationReport removeAlarms(Set<Long> ids) {
     return alarmConfigurationManager.removeAlarms(ids);
+  }
+
+  @Override
+  public ConfigurationReport createDeviceClass(String deviceClassName) {
+    return deviceClassConfigurationManager.createDeviceClass(deviceClassName);
+  }
+
+  @Override
+  public ConfigurationReport createDeviceClass(DeviceClass deviceClass) {
+    return deviceClassConfigurationManager.createDeviceClass(deviceClass);
+  }
+
+  @Override
+  public ConfigurationReport updateDeviceClass(DeviceClass deviceClass) {
+    return deviceClassConfigurationManager.updateDeviceClass(deviceClass);
+  }
+
+  @Override
+  public ConfigurationReport removeDeviceClassById(Long id) {
+    return deviceClassConfigurationManager.removeDeviceClassById(id);
+  }
+
+  @Override
+  public ConfigurationReport removeDeviceClass(String name) {
+    return deviceClassConfigurationManager.removeDeviceClass(name);
   }
 }

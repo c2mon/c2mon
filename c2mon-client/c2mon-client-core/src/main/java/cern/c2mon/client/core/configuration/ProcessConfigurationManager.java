@@ -52,7 +52,7 @@ public interface ProcessConfigurationManager {
    * Note: You have to use {@link Process#create(String)} to instantiate the
    * parameter of this method.
    *
-   * @param process The {@linkk Process} configuration for the 'create'.
+   * @param process The {@link Process} configuration for the 'create'.
    * @return A {@link ConfigurationReport} containing all details of the
    * Process configuration, including if it was successful or not.
    * @see ProcessConfigurationManager#createProcess(String)
