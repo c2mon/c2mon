@@ -16,12 +16,11 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.dbaccess;
 
-import org.apache.ibatis.annotations.Param;
-
 import cern.c2mon.server.common.device.Command;
 import cern.c2mon.server.common.device.DeviceClass;
 import cern.c2mon.server.common.device.DeviceClassCacheObject;
 import cern.c2mon.server.common.device.Property;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * MyBatis mapper for for accessing and updating {@link DeviceClassCacheObject}s
@@ -29,7 +28,7 @@ import cern.c2mon.server.common.device.Property;
  *
  * @author Justin Lewis Salmon
  */
-public interface DeviceClassMapper extends LoaderMapper<DeviceClass> {
+public interface DeviceClassMapper extends LoaderMapper<DeviceClass>, PersistenceMapper<DeviceClass> {
 
   /**
    * Insert a device class object from the cache into the db.
