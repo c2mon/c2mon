@@ -161,11 +161,11 @@ public class RuleEvaluatorImpl implements RuleEvaluator {
             ruleUpdateBuffer.invalidate(pRuleId, TagQualityStatus.UNDEFINED_TAG,
                     "Unable to evaluate rule as cannot find required Tag in cache: " + cacheEx.getMessage(), ruleResultTimestamp);
         } catch (RuleEvaluationException re) {
-            log.trace("Problem evaluating expresion for rule #{} - Force rule evaluation and set invalid quality UNKNOWN_REASON ({})", rule.getId(), re.getMessage());
+            log.trace("Problem evaluating expression for rule #{} - Force rule evaluation and set invalid quality UNKNOWN_REASON ({})", rule.getId(), re.getMessage());
 
             DataTagQuality ruleQuality = getInvalidTagQuality(tags);
-            rule.getRuleExpression().forceEvaluate(new Hashtable<Long, RuleInputValue>(tags), ruleResultClass);
-            ruleUpdateBuffer.invalidate(rule.getId(), TagQualityStatus.UNKNOWN_REASON, ruleQuality.getDescription(), ruleResultTimestamp);
+            Object value = rule.getRuleExpression().forceEvaluate(new Hashtable<Long, RuleInputValue>(tags), ruleResultClass);
+            ruleUpdateBuffer.invalidate(rule.getId(), value, TagQualityStatus.UNKNOWN_REASON, ruleQuality.getDescription(), ruleResultTimestamp);
 
         } catch (Exception e) {
             log.error("Unexpected Error evaluating expresion of rule #{} - invalidating rule with quality UNKNOWN_REASON", pRuleId, e);

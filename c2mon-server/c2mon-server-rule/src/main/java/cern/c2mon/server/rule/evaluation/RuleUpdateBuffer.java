@@ -53,7 +53,7 @@ public final class RuleUpdateBuffer {
   static final Object BUFFER_LOCK = new Object();
   
   /** The internal buffer used for the */
-  static final Map<Long, RuleBufferObject> RULE_OBJECT_BUF = new Hashtable<>(INITIAL_BUFFER_SIZE);
+  protected static final Map<Long, RuleBufferObject> RULE_OBJECT_BUF = new Hashtable<Long, RuleBufferObject>(INITIAL_BUFFER_SIZE);
   
   /** 
    * Map containing the flags which indicates that an update was received
@@ -73,7 +73,7 @@ public final class RuleUpdateBuffer {
    * Constructor 
    */
   @Autowired
-  private RuleUpdateBuffer(C2monCache<RuleTag> ruleTagCache) {
+  protected RuleUpdateBuffer(C2monCache<RuleTag> ruleTagCache) {
     this.ruleTagCache = ruleTagCache;
     this.timer = new Timer("RuleUpdater");
   }
@@ -112,7 +112,7 @@ public final class RuleUpdateBuffer {
    */
   public void invalidate(final Long pId, final TagQualityStatus pReason, final String pDescription, final Timestamp pTimestamp) {
     final RuleBufferObject bufferObj;
-    
+
     log.trace(pId + " entering invalidate()");
     synchronized (BUFFER_LOCK) {
       if (!RULE_OBJECT_BUF.containsKey(pId)) {
@@ -120,9 +120,37 @@ public final class RuleUpdateBuffer {
         RULE_OBJECT_BUF.put(pId, bufferObj);
       }
       else {
-        bufferObj = RULE_OBJECT_BUF.get(pId);
+        bufferObj = (RuleBufferObject) RULE_OBJECT_BUF.get(pId);
         bufferObj.invalidate(pReason, pDescription, pTimestamp);
       }
+      scheduleCacheUpdaterTask(pId);
+    }
+    log.trace(pId + " leaving invalidate()");
+  }
+
+  /**
+   * Updates the internal rule buffer with an invalidation message
+   * @param pId rule data tag id
+   * @param value rule value update
+   * @param pReason quality flag
+   * @param pDescription error description
+   * @param pTimestamp the timestamp of the rule evaluation
+   */
+  public void invalidate(final Long pId, final Object value, final TagQualityStatus pReason, final String pDescription, final Timestamp pTimestamp) {
+    final RuleBufferObject bufferObj;
+
+    log.trace(pId + " entering invalidate()");
+    synchronized (BUFFER_LOCK) {
+      if (!RULE_OBJECT_BUF.containsKey(pId)) {
+        bufferObj = new RuleBufferObject(pId, null, pReason, pDescription, null, pTimestamp);
+        RULE_OBJECT_BUF.put(pId, bufferObj);
+      } else {
+        bufferObj = (RuleBufferObject) RULE_OBJECT_BUF.get(pId);
+        bufferObj.invalidate(pReason, pDescription, pTimestamp);
+      }
+
+      bufferObj.setValue(value);
+
       scheduleCacheUpdaterTask(pId);
     }
     log.trace(pId + " leaving invalidate()");
