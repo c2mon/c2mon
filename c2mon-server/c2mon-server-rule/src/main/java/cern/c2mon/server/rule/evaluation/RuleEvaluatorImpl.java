@@ -24,6 +24,8 @@ import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.rule.RuleEvaluator;
 import cern.c2mon.server.rule.config.RuleProperties;
 import cern.c2mon.shared.common.CacheEvent;
+import cern.c2mon.shared.common.datatag.DataTagQuality;
+import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
 import cern.c2mon.shared.common.rule.RuleInputValue;
 import cern.c2mon.shared.rule.RuleEvaluationException;
@@ -33,9 +35,10 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.sql.Timestamp;
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
+import java.util.Set;
 
 import static cern.c2mon.shared.common.type.TypeConverter.getType;
 
@@ -90,17 +93,9 @@ public class RuleEvaluatorImpl implements RuleEvaluator {
     }
 
     /**
-     * TODO rewrite javadoc
-     * NB:
-     * <UL>
-     * <LI>This method DOES NOT CHECK whether the tag passed as a parameter is null.
-     * The caller has to ensure that this method is always called with a
-     * non-null parameter.
-     * <LI>This method ASSUMES that the tag.getRuleIds() never returns null. This is
-     * to be ensured by the DataTagCacheObject
-     * </UL>
-     * <p>
-     * evaluates rules that depend on tag
+     * Triggers an evaluation of all rules that depend on the given tag.
+     *
+     * @param tag the tag for which all depending rules shall be triggered.
      */
     public void evaluateRules(final Tag tag) {
         // For each rule id related to the tag
@@ -114,9 +109,7 @@ public class RuleEvaluatorImpl implements RuleEvaluator {
 
     /**
      * Performs the rule evaluation for a given tag id. In case that
-     * the id does not belong to a rule a warning message is logged to
-     * log4j. Please note, that the rule will always use the time stamp
-     * of the latest incoming data tag update.
+     * the id does not belong to a rule a warning message is logged.
      *
      * @param pRuleId The id of a rule.
      */
@@ -143,29 +136,24 @@ public class RuleEvaluatorImpl implements RuleEvaluator {
         }
     }
 
+    /**
+     * Performs the actual rule evaluation
+     *
+     * @param pRuleId             The id of a rule.
+     * @param ruleResultTimestamp The timestamp that shall be used for updating the rule cache.
+     * @param rule                The rule that need evaluating
+     */
     private void doEvaluateRule(Long pRuleId, Timestamp ruleResultTimestamp, RuleTag rule) {
-        final Collection<Long> ruleInputTagIds = rule.getRuleExpression().getInputTagIds();
 
-        // Retrieve all input tags for the rule
-        final Map<Long, Tag> tags = new HashMap<>(ruleInputTagIds.size());
+        Map<Long, Tag> tags = new HashMap<>();
 
-        Tag tag = null;
-        Long actualTag = null;
+        // Retrieve class type of resulting value, in order to cast correctly
+        // the evaluation result
+        Class<?> ruleResultClass = getRuleResultClass(rule);
+
         try {
-            for (Long inputTagId : ruleInputTagIds) {
-                actualTag = inputTagId;
-                // We don't use a read lock here, because a tag change would anyway
-                // result in another rule evaluation
-                // look for tag in datatag, rule and control caches
-                tag = unifiedTagCacheFacade.get(inputTagId);
-
-                // put reference to cache object in map
-                tags.put(inputTagId, tag);
-            }
-
-            // Retrieve class type of resulting value, in order to cast correctly
-            // the evaluation result
-            Class<?> ruleResultClass = getType(rule.getDataType());
+            // Can throw CacheElementNotFoundException
+            tags = getRuleInputTags(rule);
 
             Object value = rule.getRuleExpression().evaluate(new HashMap<Long, RuleInputValue>(tags), ruleResultClass);
             ruleUpdateBuffer.update(pRuleId, value, "Rule result", ruleResultTimestamp);
@@ -173,12 +161,82 @@ public class RuleEvaluatorImpl implements RuleEvaluator {
             ruleUpdateBuffer.invalidate(pRuleId, TagQualityStatus.UNDEFINED_TAG,
                     "Unable to evaluate rule as cannot find required Tag in cache: " + cacheEx.getMessage(), ruleResultTimestamp);
         } catch (RuleEvaluationException re) {
-            // TODO change in rule engine: this should NOT be done using an exception since it is normal behavior switched to trace
-            log.trace("Problem evaluating expresion for rule #{} - invalidating rule with quality UNKNOWN_REASON ({})", pRuleId, re.getMessage());
-            ruleUpdateBuffer.invalidate(pRuleId, TagQualityStatus.UNKNOWN_REASON, re.getMessage(), ruleResultTimestamp);
+            log.trace("Problem evaluating expresion for rule #{} - Force rule evaluation and set invalid quality UNKNOWN_REASON ({})", rule.getId(), re.getMessage());
+
+            DataTagQuality ruleQuality = getInvalidTagQuality(tags);
+            rule.getRuleExpression().forceEvaluate(new Hashtable<Long, RuleInputValue>(tags), ruleResultClass);
+            ruleUpdateBuffer.invalidate(rule.getId(), TagQualityStatus.UNKNOWN_REASON, ruleQuality.getDescription(), ruleResultTimestamp);
+
         } catch (Exception e) {
             log.error("Unexpected Error evaluating expresion of rule #{} - invalidating rule with quality UNKNOWN_REASON", pRuleId, e);
             ruleUpdateBuffer.invalidate(pRuleId, TagQualityStatus.UNKNOWN_REASON, e.getMessage(), ruleResultTimestamp);
         }
     }
+
+    /**
+     * Retrieves from the cache all required input tags to evaluate the given rule
+     *
+     * @param rule The rule tag
+     * @return Map of Tag objects with tag id as key
+     */
+    private Map<Long, Tag> getRuleInputTags(RuleTag rule) {
+        final Set<Long> ruleInputTagIds = rule.getRuleExpression().getInputTagIds();
+
+        // Retrieve all input tags for the rule
+        final Map<Long, Tag> tags = new HashMap<>(ruleInputTagIds.size());
+        Tag tag = null;
+        Long actualTag = null;
+        for (Long inputTagId : ruleInputTagIds) {
+            actualTag = inputTagId;
+            // We don't use a read lock here, because a tag change would anyway
+            // result in another rule evaluation
+            // look for tag in datatag, rule and control caches
+            tag = unifiedTagCacheFacade.get(inputTagId);
+
+            // put reference to cache object in map
+            tags.put(inputTagId, tag);
+        }
+        return tags;
+    }
+
+    private Class<?> getRuleResultClass(RuleTag rule) {
+        Class<?> ruleResultClass = getType(rule.getDataType());
+        if (ruleResultClass == null) {
+            ruleResultClass = String.class;
+        }
+
+        return ruleResultClass;
+    }
+
+    /**
+     * In case a tag is invalid, the invalidity can be a result of multiple
+     * invalid tags that belong to the rule.
+     * <p/>
+     * IMPORTANT! <br/>
+     * This should only be called if we know that the Rule is Invalid.
+     * <p>
+     * This is because a rule can be VALID, even though it contains INVALID tags. In such a case
+     * calling this method will give the wrong result.
+     *
+     * @param ruleInputValues the rule input values.
+     * @return an overall Datatag quality from all the Tags belonging to this rule
+     */
+    private DataTagQuality getInvalidTagQuality(Map<Long, Tag> ruleInputValues) {
+
+        DataTagQuality invalidRuleQuality = new DataTagQualityImpl();
+        invalidRuleQuality.validate();
+
+        for (Tag inputValue : ruleInputValues.values()) {
+            // Check, if value tag is valid or not
+            if (!inputValue.isValid()) {
+                // Add Invalidations flags to the the rule
+                Map<TagQualityStatus, String> qualityStatusMap = inputValue.getDataTagQuality().getInvalidQualityStates();
+                for (Map.Entry<TagQualityStatus, String> entry : qualityStatusMap.entrySet()) {
+                    invalidRuleQuality.addInvalidStatus(entry.getKey(), entry.getValue());
+                }
+            }
+        }
+        return invalidRuleQuality;
+    }
+
 }
