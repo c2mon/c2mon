@@ -182,6 +182,8 @@ public abstract class AbstractSupervisedServiceTest<T extends Supervised, T_IMPL
     assertEquals(event.getEntity(), sample.getSupervisionEntity());
     assertTrue(asList(expectedStatus).contains(event.getStatus()));
 
+    System.out.println("EQUALS: " + event.equals(stateTagService.getSupervisionEvent(sample.getStateTagId())));
+
     // Repeating the attempt yields an equal result
     assertEquals(event, stateTagService.getSupervisionEvent(sample.getStateTagId()));
   }

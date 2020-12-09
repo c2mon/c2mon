@@ -29,6 +29,8 @@ import java.sql.Timestamp;
 import java.util.Map;
 
 import static junit.framework.TestCase.assertEquals;
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * Tests for {@link AlarmValueDocumentConverter}, executed by {@link cern.c2mon.server.elasticsearch.ElasticsearchSuiteTest}.
@@ -58,7 +60,7 @@ public class AlarmDocumentConverterTestSuite {
     // Deserialize
     document = (AlarmDocument) document.getObject(json);
 
-    assertEquals((int) alarm.getId(), document.get("id"));
+    assertEquals(alarm.getId().intValue(), document.get("id"));
     assertEquals(alarm.getTagId().intValue(), document.get("tagId"));
     assertEquals(alarm.getFaultFamily(), document.get("faultFamily"));
     assertEquals(alarm.getFaultMember(), document.get("faultMember"));

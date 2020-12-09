@@ -18,12 +18,12 @@ import java.sql.Timestamp;
 @EqualsAndHashCode
 public abstract class AbstractCacheableImpl implements Cacheable {
 
-  protected final long id;
+  protected final Long id;
 
   @EqualsAndHashCode.Exclude
   protected Timestamp cacheTimestamp = new Timestamp(0);
 
-  public AbstractCacheableImpl(long id) {
+  public AbstractCacheableImpl(Long id) {
     this.id = id;
   }
 

@@ -16,12 +16,9 @@
  *****************************************************************************/
 package cern.c2mon.shared.rule;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+
+import cern.c2mon.shared.common.rule.RuleInputValue;
 
 
 public class GTPMRuleExpression extends RuleExpression implements IConditionedRule, Cloneable {
@@ -63,7 +60,7 @@ public class GTPMRuleExpression extends RuleExpression implements IConditionedRu
      * @param pInputParams values for all input tags as a Hashtable.
      */
     @Override
-    public Object evaluate(final Map<Long, Object> pInputParams) throws RuleEvaluationException {
+    public Object evaluate(final Map<Long, RuleInputValue> pInputParams) throws RuleEvaluationException {
         Object result = null;
         Iterator<IRuleCondition> i = conditions.iterator();
         while (result == null && i.hasNext()) {
@@ -76,7 +73,7 @@ public class GTPMRuleExpression extends RuleExpression implements IConditionedRu
     }
     
     @Override
-    public RuleValidationReport validate(final Map<Long, Object> pInputParams)  {
+    public RuleValidationReport validate(final Map<Long, RuleInputValue> pInputParams)  {
       
       Object result = null;
       for (final IRuleCondition condition: this.conditions) {
@@ -134,7 +131,7 @@ public class GTPMRuleExpression extends RuleExpression implements IConditionedRu
     }
 
     @Override
-    public Object forceEvaluate(final Map<Long, Object> pInputParams) {
+    public Object forceEvaluate(final Map<Long, RuleInputValue> pInputParams) {
       
       Object result = null;
       Iterator<IRuleCondition> i = conditions.iterator();

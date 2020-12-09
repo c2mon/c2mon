@@ -16,15 +16,11 @@
  *****************************************************************************/
 package cern.c2mon.shared.rule;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.commons.lang.StringUtils;
+
+import cern.c2mon.shared.common.rule.RuleInputValue;
 
 /**
  * Rule expression consisting of OR statements 
@@ -79,7 +75,7 @@ public class MultipleReturnValueRuleExpression extends RuleExpression
   }
 
   @Override
-  public Object evaluate(final Map<Long, Object> pInputParams) throws RuleEvaluationException {
+  public Object evaluate(final Map<Long, RuleInputValue> pInputParams) throws RuleEvaluationException {
 
     Object result = null;
     Iterator<IRuleCondition> i = conditions.iterator();
@@ -101,7 +97,7 @@ public class MultipleReturnValueRuleExpression extends RuleExpression
   }
 
   @Override
-  public Object forceEvaluate(final Map<Long, Object> pInputParams) {
+  public Object forceEvaluate(final Map<Long, RuleInputValue> pInputParams) {
 
     try {
       return evaluate(pInputParams);
@@ -111,7 +107,7 @@ public class MultipleReturnValueRuleExpression extends RuleExpression
   }
 
   @Override
-  public RuleValidationReport validate(final Map<Long, Object> pInputParams) {
+  public RuleValidationReport validate(final Map<Long, RuleInputValue> pInputParams) {
 
     try {
 

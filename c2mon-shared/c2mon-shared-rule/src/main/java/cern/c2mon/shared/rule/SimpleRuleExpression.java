@@ -302,7 +302,7 @@ public class SimpleRuleExpression extends RuleExpression implements Cloneable {
      * 
      * @param pInputParams Map of value objects related to the input tag ids
      */
-    public final boolean isAlwaysTrue(final Map<Long, Object> pInputParams) throws RuleEvaluationException {
+    public final boolean isAlwaysTrue(final Map<Long, RuleInputValue> pInputParams) throws RuleEvaluationException {
 
         final Object[] valueTokens = splitToTokens(pInputParams);
         return Parser.getInstance().isAlwaysTrue(valueTokens);
@@ -313,7 +313,7 @@ public class SimpleRuleExpression extends RuleExpression implements Cloneable {
      * 
      * @param pInputParams Map of value objects related to the input tag ids
      */
-    public final boolean hasInvalidTags(final Map<Long, Object> pInputParams) {
+    public final boolean hasInvalidTags(final Map<Long, RuleInputValue> pInputParams) {
 
       RuleInputValue tag = null;
       
@@ -363,7 +363,7 @@ public class SimpleRuleExpression extends RuleExpression implements Cloneable {
      * @throws RuleEvaluationException in case the DataTags contained in the Rule
      * are Null, or non-existent.
      */
-    private Object[] splitToTokensAndAllowInvalidTags(final Map<Long, Object> pInputParams) 
+    private Object[] splitToTokensAndAllowInvalidTags(final Map<Long, RuleInputValue> pInputParams) 
         throws RuleEvaluationException {
       
       Object[] valueTokens = new Object[tokens.length];
@@ -447,7 +447,7 @@ public class SimpleRuleExpression extends RuleExpression implements Cloneable {
      * @throws RuleEvaluationException in case the DataTags contained in the Rule
      * are Invalid, Null, or non-existent.
      */
-    private Object[] splitToTokens(final Map<Long, Object> pInputParams) 
+    private Object[] splitToTokens(final Map<Long, RuleInputValue> pInputParams) 
         throws RuleEvaluationException {
       
       Object[] valueTokens = new Object[tokens.length];
@@ -506,7 +506,7 @@ public class SimpleRuleExpression extends RuleExpression implements Cloneable {
      * @param pInputParams Map of value objects related to the input tag ids
      * @throws RuleEvaluationException
      */
-    private Object handleRuleWithInvalidTags(final Map<Long, Object> pInputParams)
+    private Object handleRuleWithInvalidTags(final Map<Long, RuleInputValue> pInputParams)
         throws RuleEvaluationException {
 
       final Object result = tryToIgnoreInvalidTags(pInputParams);
@@ -522,7 +522,7 @@ public class SimpleRuleExpression extends RuleExpression implements Cloneable {
      * @param pInputParams Map of value objects related to the input tag ids
      * @throws RuleEvaluationException
      */
-    private Object handleRuleWithNoInvalidTags(final Map<Long, Object> pInputParams)
+    private Object handleRuleWithNoInvalidTags(final Map<Long, RuleInputValue> pInputParams)
         throws RuleEvaluationException {
 
       final Object[] valueTokens = splitToTokens(pInputParams);
@@ -531,7 +531,7 @@ public class SimpleRuleExpression extends RuleExpression implements Cloneable {
     }
     
     @Override
-    public final Object evaluate(final Map<Long, Object> pInputParams) throws RuleEvaluationException {
+    public final Object evaluate(final Map<Long, RuleInputValue> pInputParams) throws RuleEvaluationException {
 
       if (hasInvalidTags(pInputParams) || usesTheInvalidKeyword()) {
         // invalid tags found!  =>
@@ -542,7 +542,7 @@ public class SimpleRuleExpression extends RuleExpression implements Cloneable {
     }
     
     @Override
-    public final Object forceEvaluate(final Map<Long, Object> pInputParams)  {
+    public final Object forceEvaluate(final Map<Long, RuleInputValue> pInputParams)  {
       try {
         return handleRuleWithNoInvalidTags(pInputParams);
       } catch (Exception e) {
@@ -557,7 +557,7 @@ public class SimpleRuleExpression extends RuleExpression implements Cloneable {
      * @return The result of the expression (if possible), RuleConstant.INVALID otherwise.
      * @throws RuleEvaluationException In case the Expression could not be evaluated.
      */
-    private Object tryToIgnoreInvalidTags(final Map<Long, Object> pInputParams) 
+    private Object tryToIgnoreInvalidTags(final Map<Long, RuleInputValue> pInputParams) 
         throws RuleEvaluationException {
       
       final Object[] valueTokens = splitToTokensAndAllowInvalidTags(pInputParams);
@@ -593,7 +593,7 @@ public class SimpleRuleExpression extends RuleExpression implements Cloneable {
     }
 
     @Override
-    public RuleValidationReport validate(final Map<Long, Object> pInputParams) {
+    public RuleValidationReport validate(final Map<Long, RuleInputValue> pInputParams) {
       
       try {       
         final Object[] valueTokens = splitToTokensAndAllowInvalidTags(pInputParams);

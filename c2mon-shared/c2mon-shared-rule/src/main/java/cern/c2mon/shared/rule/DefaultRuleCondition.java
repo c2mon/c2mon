@@ -19,6 +19,8 @@ package cern.c2mon.shared.rule;
 import java.util.Map;
 import java.util.Set;
 
+import cern.c2mon.shared.common.rule.RuleInputValue;
+
 
 /**
  * This class is used internally by {@link ConditionedRuleExpression} 
@@ -115,7 +117,7 @@ class DefaultRuleCondition extends RuleExpression implements IRuleCondition, Clo
      *  does not evaluate TRUE or FALSE
      */
     @Override
-    public Object evaluate(final Map<Long, Object> pInputParams) throws RuleEvaluationException {
+    public Object evaluate(final Map<Long, RuleInputValue> pInputParams) throws RuleEvaluationException {
         Object result;
         try {
             result = this.condition.evaluate(pInputParams);
@@ -166,7 +168,7 @@ class DefaultRuleCondition extends RuleExpression implements IRuleCondition, Clo
     }
     
     @Override
-    public Object forceEvaluate(final Map<Long, Object> pInputParams) {
+    public Object forceEvaluate(final Map<Long, RuleInputValue> pInputParams) {
         Object result;
         
         result = this.condition.forceEvaluate(pInputParams);
@@ -202,7 +204,7 @@ class DefaultRuleCondition extends RuleExpression implements IRuleCondition, Clo
 
 
     @Override
-    public RuleValidationReport validate(final Map<Long, Object> pInputParams) {
+    public RuleValidationReport validate(final Map<Long, RuleInputValue> pInputParams) {
 
       try {
         RuleValidationReport conditionReport = this.condition.validate(pInputParams);

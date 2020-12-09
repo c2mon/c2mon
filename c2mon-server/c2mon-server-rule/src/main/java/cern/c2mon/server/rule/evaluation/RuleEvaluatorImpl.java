@@ -25,6 +25,7 @@ import cern.c2mon.server.rule.RuleEvaluator;
 import cern.c2mon.server.rule.config.RuleProperties;
 import cern.c2mon.shared.common.CacheEvent;
 import cern.c2mon.shared.common.datatag.TagQualityStatus;
+import cern.c2mon.shared.common.rule.RuleInputValue;
 import cern.c2mon.shared.rule.RuleEvaluationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -126,7 +127,7 @@ public class RuleEvaluatorImpl implements RuleEvaluator {
     try {
       ruleTagCache.compute(pRuleId, rule -> {
         if (rule.getRuleExpression() != null) {
-          evaluateRuleExpression(pRuleId, ruleResultTimestamp, rule);
+          doEvaluateRule(pRuleId, ruleResultTimestamp, rule);
         }
       });
     } catch (CacheElementNotFoundException cacheEx) {
@@ -138,11 +139,11 @@ public class RuleEvaluatorImpl implements RuleEvaluator {
     }
   }
 
-  private void evaluateRuleExpression(Long pRuleId, Timestamp ruleResultTimestamp, RuleTag rule) {
+  private void doEvaluateRule(Long pRuleId, Timestamp ruleResultTimestamp, RuleTag rule) {
     final Collection<Long> ruleInputTagIds = rule.getRuleExpression().getInputTagIds();
 
     // Retrieve all input tags for the rule
-    final Map<Long, Object> tags = new HashMap<>(ruleInputTagIds.size());
+    final Map<Long, Tag> tags = new HashMap<>(ruleInputTagIds.size());
 
     Tag tag = null;
     Long actualTag = null;
@@ -162,7 +163,7 @@ public class RuleEvaluatorImpl implements RuleEvaluator {
       // the evaluation result
       Class<?> ruleResultClass = getType(rule.getDataType());
 
-      Object value = rule.getRuleExpression().evaluate(tags, ruleResultClass);
+      Object value = rule.getRuleExpression().evaluate(new HashMap<Long, RuleInputValue>(tags), ruleResultClass);
       ruleUpdateBuffer.update(pRuleId, value, "Rule result", ruleResultTimestamp);
     } catch (CacheElementNotFoundException cacheEx) {
       log.warn("evaluateRule #{} - Failed to locate tag with id {} in any tag cache (during rule evaluation) - unable to evaluate rule.", pRuleId, actualTag, cacheEx);

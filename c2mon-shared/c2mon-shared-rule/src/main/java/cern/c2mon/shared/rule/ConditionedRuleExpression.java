@@ -17,16 +17,9 @@
 package cern.c2mon.shared.rule;
 
 import java.io.Serializable;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-import org.apache.commons.lang.StringUtils;
+import cern.c2mon.shared.common.rule.RuleInputValue;
 
 /**
  * The conditioned rule expression class uses internally {@link DefaultRuleCondition} 
@@ -89,7 +82,7 @@ public final class ConditionedRuleExpression extends RuleExpression
    * @param pInputParams values for all input tags as a Hashtable.
    */
   @Override
-  public Object evaluate(final Map<Long, Object> pInputParams) throws RuleEvaluationException {
+  public Object evaluate(final Map<Long, RuleInputValue> pInputParams) throws RuleEvaluationException {
     
     Object result = null;
     
@@ -104,7 +97,7 @@ public final class ConditionedRuleExpression extends RuleExpression
   }
 
   @Override
-  public Object forceEvaluate(final Map<Long, Object> pInputParams) {
+  public Object forceEvaluate(final Map<Long, RuleInputValue> pInputParams) {
     Object result = null;
     
     Iterator<IRuleCondition> i = conditions.iterator();
@@ -167,7 +160,7 @@ public final class ConditionedRuleExpression extends RuleExpression
    * 
    *         IF a condition is always true AND other conditions have to be evaluated after it, THEN those conditions are unreachable!
    */
-  private boolean hasUnreachableStatements(final Map<Long, Object> pInputParams) {
+  private boolean hasUnreachableStatements(final Map<Long, RuleInputValue> pInputParams) {
 
     int currentConditionCount = 0;
     final int conditionCount = this.conditions.size();
@@ -195,7 +188,7 @@ public final class ConditionedRuleExpression extends RuleExpression
    * @param condition The condition to be checked
    * @param pInputParams Map of value objects related to the input tag ids
    */
-  private boolean isConditionAlwaysTrue(final String condition, final Map<Long, Object> pInputParams) {
+  private boolean isConditionAlwaysTrue(final String condition, final Map<Long, RuleInputValue> pInputParams) {
 
     RuleExpression expr = null;
     try {
@@ -213,7 +206,7 @@ public final class ConditionedRuleExpression extends RuleExpression
    * @param expr The Expression to be checked
    * @param pInputParams Map of value objects related to the input tag ids
    */
-  private boolean isExpressionAlwaysTrue(final RuleExpression expr, final Map<Long, Object> pInputParams) {
+  private boolean isExpressionAlwaysTrue(final RuleExpression expr, final Map<Long, RuleInputValue> pInputParams) {
 
     if (expr instanceof SimpleRuleExpression) {
       SimpleRuleExpression simpleExpr = (SimpleRuleExpression) expr;
@@ -229,7 +222,7 @@ public final class ConditionedRuleExpression extends RuleExpression
   }
 
   @Override
-  public RuleValidationReport validate(final Map<Long, Object> pInputParams) {
+  public RuleValidationReport validate(final Map<Long, RuleInputValue> pInputParams) {
 
     Object result = null;
 

@@ -84,7 +84,7 @@ public class EquipmentConfigTest extends ConfigurationCacheLoaderTest<Equipment>
     // the alivetimer and commfault have overriden those already in the cache
     // (check reference to the equipment has changed)
     assertNotNull(commFaultTagCache.get(expectedObject.getCommFaultTagId()));
-    assertEquals(expectedObject.getId(), (long) commFaultTagCache.get(expectedObject.getCommFaultTagId()).getSupervisedId());
+    assertEquals(expectedObject.getId(), commFaultTagCache.get(expectedObject.getCommFaultTagId()).getSupervisedId());
   }
 
   @Test
@@ -219,7 +219,7 @@ public class EquipmentConfigTest extends ConfigurationCacheLoaderTest<Equipment>
     cern.c2mon.server.common.process.Process processObj = processCache.get(expectedObject.getProcessId());
     assertTrue(processObj.getEquipmentIds().contains(expectedObject.getId()));
     assertNotNull(commFaultTagCache.get(expectedObject.getCommFaultTagId()));
-    assertEquals(expectedObject.getId(), (long) commFaultTagCache.get(cacheObject.getCommFaultTagId()).getSupervisedId());
+    assertEquals(expectedObject.getId(), commFaultTagCache.get(cacheObject.getCommFaultTagId()).getSupervisedId());
     assertNotNull(equipmentMapper.getItem(10L));
   }
 

@@ -88,7 +88,7 @@ public class TagImpl implements Tag, TopicRegistrationDetails, Cloneable {
    * Unique identifier for a DataTag
    */
   @Attribute
-  protected long id;
+  protected Long id;
 
   /**
    * Containing all process id's which are relevant to compute the

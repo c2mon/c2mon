@@ -77,7 +77,7 @@ public class HistoryModuleTest extends MapperTest {
 
     CommandRecord retrievedLog = retrievedLogList.get(0);
 
-    assertEquals(commandTag.getId(), retrievedLog.getTagId().longValue());
+    assertEquals(commandTag.getId(), retrievedLog.getTagId());
     assertEquals(commandTag.getId()+"", retrievedLog.getId());
     assertEquals(commandTag.getName(), retrievedLog.getName());
     assertEquals(commandTag.getDataType(), retrievedLog.getDataType());

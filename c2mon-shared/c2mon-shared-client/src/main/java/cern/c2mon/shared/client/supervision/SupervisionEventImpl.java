@@ -53,7 +53,7 @@ public class SupervisionEventImpl implements SupervisionEvent {
   /**
    * The id of the entity (unique for the entity).
    */
-  private long entityId;
+  private Long entityId;
 
   /** The name of the entity */
   private String name;
@@ -168,7 +168,7 @@ public class SupervisionEventImpl implements SupervisionEvent {
         return false;
     } else if (!entity.equals(other.entity))
       return false;
-    if (entityId != other.entityId)
+    if (!entityId.equals(other.entityId))
       return false;
     if (status == null) {
       if (other.status != null)
