@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2020 CERN. All rights not expressly granted are reserved.
  * 
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -17,7 +17,6 @@
 package cern.c2mon.shared.rule;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
@@ -92,11 +91,11 @@ public class SimpleRuleExpression extends RuleExpression implements Cloneable {
     protected static Object[] tokenize(String pExpression) throws RuleFormatException {
         char[] chars = pExpression.toCharArray();
         char currentChar;
-        StringBuffer tempStr = null;
+        StringBuilder tempStr = null;
         // Compute the length of the rule expression
         int len = chars.length;
         // Create a buffer for storing the list of tokens
-        ArrayList buffer = new ArrayList(len);
+        ArrayList<Object> buffer = new ArrayList<>(len);
         // Iterate over formula and cut it into tokens, stored in a buffer
         int i = 0;
         while (i < len) {
@@ -195,7 +194,7 @@ public class SimpleRuleExpression extends RuleExpression implements Cloneable {
             case '7':
             case '8':
             case '9':
-                tempStr = new StringBuffer();
+                tempStr = new StringBuilder();
                 tempStr.append(currentChar);
                 i++;
                 while (i < len && Character.isDigit(chars[i])) {
@@ -221,7 +220,7 @@ public class SimpleRuleExpression extends RuleExpression implements Cloneable {
                 buffer.add(Double.valueOf(tempStr.toString()));
                 break;
             case '.':
-                tempStr = new StringBuffer();
+                tempStr = new StringBuilder();
                 tempStr.append(currentChar);
                 i++;
                 while (i < len && Character.isDigit(chars[i])) {
@@ -231,7 +230,7 @@ public class SimpleRuleExpression extends RuleExpression implements Cloneable {
                 buffer.add(Double.valueOf(tempStr.toString()));
                 break;
             case '$':
-                tempStr = new StringBuffer("$");
+                tempStr = new StringBuilder("$");
                 i++;
                 while (i < len && Character.isLetter(chars[i])) {
                     tempStr.append(chars[i]);
@@ -243,7 +242,7 @@ public class SimpleRuleExpression extends RuleExpression implements Cloneable {
                 }
                 break;    
             case '#':
-                tempStr = new StringBuffer();
+                tempStr = new StringBuilder();
                 i++;
                 while (i < len && Character.isDigit(chars[i])) {
                     tempStr.append(chars[i]);
@@ -253,7 +252,7 @@ public class SimpleRuleExpression extends RuleExpression implements Cloneable {
                 break;
             case 't':
             case 'f':
-                tempStr = new StringBuffer();
+                tempStr = new StringBuilder();
                 tempStr.append(currentChar);
                 i++;
                 while (i < len && Character.isLetter(chars[i])) {
@@ -270,7 +269,7 @@ public class SimpleRuleExpression extends RuleExpression implements Cloneable {
                 }
                 break;
             case '\"':
-                tempStr = new StringBuffer();
+                tempStr = new StringBuilder();
                 i++;
                 while (i < len && chars[i] != '\"') {
                     tempStr.append(chars[i]);
@@ -322,13 +321,10 @@ public class SimpleRuleExpression extends RuleExpression implements Cloneable {
 
             final RuleInputTagId tagInput = (RuleInputTagId) tokens[i];
             final long tagId = tagInput.getId();
-            final Object val = pInputParams.get(tagId);
+            tag = pInputParams.get(tagId);
             
-            if (val != null && val instanceof RuleInputValue) {
-              tag = (RuleInputValue) val;
-              if (!tag.isValid()) {
-                return true;
-              }
+            if (tag != null) {
+              return !tag.isValid();
             }
           }
       }
@@ -373,21 +369,17 @@ public class SimpleRuleExpression extends RuleExpression implements Cloneable {
             
               RuleInputTagId tagInput = (RuleInputTagId) tokens[i];
               long tagId = tagInput.getId();
-              Object val = pInputParams.get(tagId);
-              if (val != null && val instanceof RuleInputValue) {
-                  tag = (RuleInputValue) val;
+              tag = pInputParams.get(tagId);
+              if (tag != null) {
                   if (!tag.isValid()) {
                     valueTokens[i] = RuleConstant.INTERNAL_INVALID.toString();
-                  }
-                  else if (tag.getValue() == null) {
-                      throw new RuleEvaluationException("Cannot evaluate rule: tag " + ((RuleInputValue) val).getId()
+                  } else if (tag.getValue() == null) {
+                      throw new RuleEvaluationException("Cannot evaluate rule: tag " + ((RuleInputValue) tag).getId()
                               + " is null.");
                   } else {
-                      valueTokens[i] = ((RuleInputValue) val).getValue();
+                      valueTokens[i] = ((RuleInputValue) tag).getValue();
                   }
 
-              } else if (val != null) {
-                  valueTokens[i] = val;
               } else {
                   throw new RuleEvaluationException("Cannot evaluate rule: input tag missing "
                           + ((RuleInputTagId) tokens[i]).getId());
@@ -398,47 +390,7 @@ public class SimpleRuleExpression extends RuleExpression implements Cloneable {
       }
       return valueTokens;
     }
-    
-    /**
-     * Same as {@link #splitToTokens(Map)} but Invalid tags are replaced with their values
-     * and the Invalid Status is ignored.
-     * 
-     * @return The rule in token format
-     * 
-     * @see RuleExpression#forceEvaluate(Map)
-     * @see http://issues/browse/TIMS-835
-     * 
-     * @param pInputParams Map of value objects related to the input tag ids
-     */
-    private Object[] splitToTokensAndReplaceInvalidTags(final Map<Long, Object> pInputParams) {
-        
-      Object[] valueTokens = new Object[tokens.length];
-      RuleInputValue tag = null;
-      for (int i = 0; i < tokens.length; i++) {
-          if (tokens[i] instanceof RuleInputTagId) {
-            
-              RuleInputTagId tagInput = (RuleInputTagId) tokens[i];
-              long tagId = tagInput.getId();
-              Object val = pInputParams.get(tagId);
-              if (val != null && val instanceof RuleInputValue) {
-                  tag = (RuleInputValue) val;
-                  if (tag.getValue() == null) {
-                      valueTokens[i] = RuleConstant.INTERNAL_INVALID.toString();
-                  } else {
-                      valueTokens[i] = ((RuleInputValue) val).getValue();
-                  }
-              } else if (val != null) {
-                  valueTokens[i] = val;
-              } else {
-                valueTokens[i] = RuleConstant.INTERNAL_INVALID.toString();
-              }
-          } else {
-              valueTokens[i] = tokens[i];
-          }
-      }
-      return valueTokens;
-    }
-    
+
     /**
      * @return The rule in token format
      * 
@@ -457,19 +409,16 @@ public class SimpleRuleExpression extends RuleExpression implements Cloneable {
             
               RuleInputTagId tagInput = (RuleInputTagId) tokens[i];
               long tagId = tagInput.getId();
-              Object val = pInputParams.get(tagId);
-              if (val != null && val instanceof RuleInputValue) {
-                  tag = (RuleInputValue) val;
+              tag = pInputParams.get(tagId);
+              if (tag != null) {
                   if (tag.getValue() == null) {
                       throw new RuleEvaluationException("Cannot evaluate rule: tag " 
-                          + ((RuleInputValue) val).getId()
+                          + ((RuleInputValue) tag).getId()
                               + " is null.");
                   } else {
-                      valueTokens[i] = ((RuleInputValue) val).getValue();
+                      valueTokens[i] = ((RuleInputValue) tag).getValue();
                   }
 
-              } else if (val != null) {
-                  valueTokens[i] = val;
               } else {
                   throw new RuleEvaluationException("Cannot evaluate rule: input tag missing "
                           + ((RuleInputTagId) tokens[i]).getId());
@@ -575,21 +524,6 @@ public class SimpleRuleExpression extends RuleExpression implements Cloneable {
             }
         }
         return ids;
-    }
-
-    public static void testExpression(final String pExpression) {
-        System.out.println("Rule to evaluate: " + pExpression);
-        try {
-            SimpleRuleExpression exp = new SimpleRuleExpression(pExpression);
-            Object result = exp.evaluate(new Hashtable());
-            System.out.println("--> result type:  " + result.getClass().getName());
-            System.out.println("--> result value: " + result.toString());
-            System.out.println(exp.toString());
-        } catch (Exception e) {
-            System.out.println("--> error: " + e.getMessage());
-            log.error(e.getMessage(), e);
-        }
-        System.out.println();
     }
 
     @Override
