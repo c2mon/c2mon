@@ -29,6 +29,8 @@ public interface SequenceMapper {
 
   Long getNextProcessId();
 
+  Long getNextDeviceClassId();
+
   Long getNextEquipmentId();
 
   Long getNextTagId();

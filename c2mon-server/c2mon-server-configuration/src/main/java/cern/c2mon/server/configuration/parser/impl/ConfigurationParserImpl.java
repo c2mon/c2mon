@@ -21,6 +21,7 @@ import java.util.List;
 
 import cern.c2mon.server.configuration.parser.exception.EntityDoesNotExistException;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
+import cern.c2mon.shared.client.configuration.api.device.DeviceClass;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -56,12 +57,13 @@ public class ConfigurationParserImpl implements ConfigurationParser {
   private ProcessFactory processFactory;
   private RuleTagFactory ruleTagFactory;
   private SubEquipmentFactory subEquipmentFactory;
+  private DeviceClassFactory deviceClassFactory;
 
   @Autowired
   public ConfigurationParserImpl(
       AlarmFactory alarmFactory, CommandTagFactory commandTagFactory, ControlTagFactory controlTagFactory,
       DataTagFactory dataTagFactory, EquipmentFactory equipmentFactory, ProcessFactory processFactory, RuleTagFactory ruleTagFactory,
-      SubEquipmentFactory subEquipmentFactory) {
+      SubEquipmentFactory subEquipmentFactory, DeviceClassFactory deviceClassFactory) {
     this.alarmFactory = alarmFactory;
     this.commandTagFactory = commandTagFactory;
     this.controlTagFactory = controlTagFactory;
@@ -70,6 +72,7 @@ public class ConfigurationParserImpl implements ConfigurationParser {
     this.processFactory = processFactory;
     this.ruleTagFactory = ruleTagFactory;
     this.subEquipmentFactory = subEquipmentFactory;
+    this.deviceClassFactory = deviceClassFactory;
   }
 
   @Override
@@ -157,6 +160,9 @@ public class ConfigurationParserImpl implements ConfigurationParser {
     }
     if (entity instanceof CommandTag) {
       return commandTagFactory;
+    }
+    if (entity instanceof DeviceClass) {
+      return deviceClassFactory;
     }
     throw new IllegalArgumentException("No EntityFactory for class " + entity.getClass() + " could be determined!");
   }

@@ -31,4 +31,6 @@ public interface DeviceClassDAO extends CacheLoaderDAO<DeviceClass>, Configurabl
    * @param deviceClass the device class to remove
    */
   void deleteItem(DeviceClass deviceClass);
+
+  Long getIdByName(String name);
 }

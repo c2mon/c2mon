@@ -82,4 +82,17 @@
     SELECT NEXTVAL('ALARM_ID');
   </select>
 
+  <select id="getNextDeviceClassId" databaseId="hsql" resultType="java.lang.Long">
+    CALL NEXT VALUE FOR DEVCLASS_ID_SEQUENCE
+  </select>
+
+  <select id="getNextDeviceClassId" databaseId="oracle" resultType="java.lang.Long">
+    SELECT DEVLASS_ID_SEQUENCE.NEXTVAL FROM DUAL
+  </select>
+
+  <select id="getNextDeviceClassId" databaseId="mysql" resultType="java.lang.Long">
+    SELECT NEXTVAL('DEVLASS_ID');
+  </select>
+
+
 </mapper>
