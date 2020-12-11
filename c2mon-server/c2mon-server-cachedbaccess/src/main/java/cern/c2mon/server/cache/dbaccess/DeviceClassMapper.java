@@ -96,4 +96,13 @@ public interface DeviceClassMapper extends LoaderMapper<DeviceClass> {
    * @param id the ID of the device class from which to delete commands
    */
   void deleteCommands(Long id);
+
+
+  /**
+   * Retrieve the id of the cache object with the given name.
+   *
+   * @param name the unique name of the cache object
+   * @return the id of the cache object
+   */
+  Long getIdByName(String name);
 }
