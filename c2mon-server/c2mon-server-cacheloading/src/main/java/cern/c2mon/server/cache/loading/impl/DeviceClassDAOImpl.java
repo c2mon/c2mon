@@ -68,6 +68,11 @@ public class DeviceClassDAOImpl extends AbstractDefaultLoaderDAO<DeviceClass> im
   }
 
   @Override
+  public Long getIdByName(String name) {
+    return deviceClassMapper.getIdByName(name);
+  }
+
+  @Override
   public void updateConfig(DeviceClass deviceClass) {
     deviceClassMapper.updateDeviceClassConfig(deviceClass);
   }
@@ -93,5 +98,6 @@ public class DeviceClassDAOImpl extends AbstractDefaultLoaderDAO<DeviceClass> im
 
   @Override
   public void deleteItem(Long id) {
+    deviceClassMapper.deleteDeviceClass(id);
   }
 }

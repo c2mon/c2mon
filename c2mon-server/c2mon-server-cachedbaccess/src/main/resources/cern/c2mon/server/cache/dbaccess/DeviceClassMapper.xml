@@ -136,6 +136,12 @@
     WHERE DEVCLASSID = #{id}
   </select>
 
+  <select id="getIdByName" resultType="Long" parameterType="String">
+    SELECT DEVCLASSID
+    FROM DEVICECLASS
+    WHERE DEVCLASSNAME = #{name}
+  </select>
+
   <select id="getNumberItems" resultType="Integer">
     SELECT COUNT(DISTINCT DEVCLASSID)
       FROM DEVICECLASS
