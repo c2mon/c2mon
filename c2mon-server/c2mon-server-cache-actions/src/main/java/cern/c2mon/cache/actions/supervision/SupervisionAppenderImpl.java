@@ -21,7 +21,7 @@ import cern.c2mon.cache.actions.process.ProcessService;
 import cern.c2mon.cache.api.SupervisionAppender;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
-import cern.c2mon.shared.common.datatag.TagQualityStatus;
+import cern.c2mon.shared.common.datatag.util.TagQualityStatus;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Inject;

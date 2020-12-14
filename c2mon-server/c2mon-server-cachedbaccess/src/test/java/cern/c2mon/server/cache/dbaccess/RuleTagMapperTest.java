@@ -22,7 +22,9 @@ import cern.c2mon.server.common.rule.RuleTagCacheObject;
 import cern.c2mon.shared.common.datatag.DataTagConstants;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
-import cern.c2mon.shared.common.datatag.TagQualityStatus;
+import cern.c2mon.shared.common.datatag.util.TagQualityStatus;
+
+import org.junit.Rule;
 import org.junit.Test;
 
 import javax.inject.Inject;

@@ -24,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import cern.c2mon.daq.common.messaging.IProcessMessageSender;
 import cern.c2mon.shared.common.datatag.*;
+import cern.c2mon.shared.common.datatag.util.JmsMessagePriority;
 import cern.c2mon.shared.common.type.TypeConverter;
 
 /**
@@ -132,7 +133,7 @@ class EquipmentAliveSender {
           .quality(new SourceDataTagQuality())
           .timestamp(new Timestamp(currentTimestamp))
           .daqTimestamp(new Timestamp(currentTimestamp))
-          .priority(DataTagAddress.PRIORITY_HIGHEST)
+          .priority(JmsMessagePriority.PRIORITY_HIGHEST.getPriority())
           .guaranteedDelivery(false)
           .timeToLive(aliveTagInterval)
           .build();
@@ -147,9 +148,7 @@ class EquipmentAliveSender {
    * description.
    *
    * @param aliveTag         the alive tag to send
-   * @param tagValue         the tag value
-   * @param sourceTimestamp  the source timestamp (in milliseconds)
-   * @param valueDescription the description of the value
+   * @param update         the tag value update
    * @return true if the alive was sent, false otherwise
    */
   public boolean sendEquipmentAlive(final SourceDataTag aliveTag, ValueUpdate update) {
@@ -215,7 +214,7 @@ class EquipmentAliveSender {
    */
   private void doSendEquipmentAlive(final SourceDataTagValue aliveTagValue) {
     aliveTagValue.setTimeToLive(aliveTagInterval);
-    aliveTagValue.setPriority(DataTagConstants.PRIORITY_HIGHEST);
+    aliveTagValue.setPriority(JmsMessagePriority.PRIORITY_HIGHEST.getPriority());
     aliveTagValue.setGuaranteedDelivery(false);
     try {
       this.processMessageSender.addValue(aliveTagValue);

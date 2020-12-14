@@ -11,7 +11,8 @@ import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.PropertiesAccessor;
 import cern.c2mon.shared.common.SimpleTypeReflectionHandler;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
-import cern.c2mon.shared.common.datatag.DataTagDeadband;
+import cern.c2mon.shared.common.datatag.DataTagConstants;
+import cern.c2mon.shared.common.datatag.util.ValueDeadbandType;
 import cern.c2mon.shared.common.type.TypeConverter;
 import cern.c2mon.shared.common.validation.MicroValidator;
 import cern.c2mon.shared.daq.config.Change;
@@ -156,17 +157,17 @@ public class DataTagCacheObjectFactory extends AbstractTagCacheObjectFactory<Dat
     dataTagUpdate.setDataTagAddressUpdate(dataTagAddressUpdate);
     dataTagAddressUpdate.setGuaranteedDelivery(dataTagAddress.isGuaranteedDelivery());
     dataTagAddressUpdate.setPriority(dataTagAddress.getPriority());
-    if (dataTagAddress.getTimeToLive() != DataTagAddress.TTL_FOREVER) {
+    if (dataTagAddress.getTimeToLive() != DataTagConstants.TTL_FOREVER) {
       dataTagAddressUpdate.setTimeToLive(dataTagAddress.getTimeToLive());
     }
-    if (dataTagAddress.getValueDeadbandType() != DataTagDeadband.DEADBAND_NONE) {
+    if (dataTagAddress.getValueDeadbandType() != ValueDeadbandType.NONE.getId().shortValue()) {
       dataTagAddressUpdate.setValueDeadbandType(dataTagAddress.getValueDeadbandType());
       dataTagAddressUpdate.setValueDeadband(dataTagAddress.getValueDeadband());
     } else {
       dataTagAddressUpdate.addFieldToRemove("valueDeadbandType");
       dataTagAddressUpdate.addFieldToRemove("valueDeadband");
     }
-    if (dataTagAddress.getTimeDeadband() != DataTagDeadband.DEADBAND_NONE) {
+    if (dataTagAddress.getTimeDeadband() != 0) {
       dataTagAddressUpdate.setTimeDeadband(dataTagAddress.getTimeDeadband());
     } else {
       dataTagAddressUpdate.addFieldToRemove("timeDeadband");

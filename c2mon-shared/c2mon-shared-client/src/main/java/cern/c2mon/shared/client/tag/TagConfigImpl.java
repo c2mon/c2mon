@@ -29,7 +29,7 @@ import lombok.Data;
 
 import cern.c2mon.shared.client.request.ClientRequestReport;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
-import cern.c2mon.shared.common.datatag.DataTagDeadband;
+import cern.c2mon.shared.common.datatag.util.ValueDeadbandType;
 import cern.c2mon.shared.util.json.GsonFactory;
 
 @Root(name = "TagConfig")
@@ -262,8 +262,7 @@ public class TagConfigImpl extends ClientRequestReport implements TagConfig {
 
   @org.simpleframework.xml.core.Persist
   public void prepare() {
-
-    valueDeadbandLabel = DataTagDeadband.toString(valueDeadbandType);
+    valueDeadbandLabel = ValueDeadbandType.getValueDeadbandType((int) valueDeadbandType).toString();
   }
 
   public static TagConfigImpl fromXml(final String xml) throws Exception {

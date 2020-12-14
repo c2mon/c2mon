@@ -23,6 +23,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import cern.c2mon.shared.common.datatag.*;
+import cern.c2mon.shared.common.datatag.util.SourceDataTagQualityCode;
 
 /**
  * Unit test of SourceDataTag class.

@@ -21,13 +21,14 @@ import java.sql.Timestamp;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+
+import cern.c2mon.shared.common.datatag.util.SourceDataTagQualityCode;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import cern.c2mon.shared.common.datatag.SourceDataTagQualityCode;
 
 /**
  * does not allow null values for attributes (empty strings only)

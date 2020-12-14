@@ -1,6 +1,6 @@
 package cern.c2mon.server.rule.evaluation;
 
-import cern.c2mon.shared.common.datatag.TagQualityStatus;
+import cern.c2mon.shared.common.datatag.util.TagQualityStatus;
 import lombok.Data;
 
 import java.sql.Timestamp;

@@ -4,7 +4,7 @@ import cern.c2mon.cache.actions.tag.TagController;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.shared.common.datatag.SourceDataTagValue;
-import cern.c2mon.shared.common.datatag.TagQualityStatus;
+import cern.c2mon.shared.common.datatag.util.TagQualityStatus;
 import cern.c2mon.shared.common.type.TypeConverter;
 import lombok.extern.slf4j.Slf4j;
 

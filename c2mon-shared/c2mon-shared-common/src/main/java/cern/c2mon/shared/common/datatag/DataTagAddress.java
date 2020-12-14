@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2020 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -16,23 +16,31 @@
  *****************************************************************************/
 package cern.c2mon.shared.common.datatag;
 
-import cern.c2mon.shared.common.ConfigurationException;
-import cern.c2mon.shared.common.datatag.address.HardwareAddress;
-import cern.c2mon.shared.common.datatag.address.HardwareAddressFactory;
-import cern.c2mon.shared.util.parser.ParserException;
-import cern.c2mon.shared.util.parser.SimpleXMLParser;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+
+import cern.c2mon.shared.common.ConfigurationException;
+import cern.c2mon.shared.common.datatag.address.HardwareAddress;
+import cern.c2mon.shared.common.datatag.address.HardwareAddressFactory;
+import cern.c2mon.shared.common.datatag.util.JmsMessagePriority;
+import cern.c2mon.shared.common.datatag.util.ValueDeadbandType;
+import cern.c2mon.shared.util.parser.ParserException;
+import cern.c2mon.shared.util.parser.SimpleXMLParser;
+
+import static cern.c2mon.shared.common.datatag.DataTagConstants.*;
 
 /**
  * Address associated with a DataTag DataTags are linked to data sources (e.g.
@@ -42,12 +50,11 @@ import java.util.Map;
  * parameters, the DataTagAddress object also configures deadband
  * filtering and transformation factors for a given tag.
  *
- * @author Jan Stowisek
- * @version $Revision: 1.19 $ ($Date: 2007/07/04 12:38:55 $ - $State: Exp $)
+ * @author Jan Stowisek, Matthias Braeger
  */
 @Slf4j
 @Data
-public class DataTagAddress implements Serializable, Cloneable, DataTagConstants {
+public class DataTagAddress implements Serializable, Cloneable {
 
   /**
    * Version number of the class used during serialization/deserialization.
@@ -90,21 +97,20 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
   private int timeToLive;
 
   /**
-   * Several types of value-based deadband filtering are possible and must be
-   * supported by all TIM drivers :
+   * Determines which type of value-related deadband filtering is applied.
+   * <p/>
+   * Several types of value-based deadband filtering are possible which are
+   * further explained in {@link ValueDeadbandType} Enum
    *
-   * <PRE>
-   * DEADBAND_ABSOLUTE, DEADBAND_RELATIVE,
-   * DEADBAND_NONE
-   * </PRE>
+   * @see ValueDeadbandType
    */
   @Element(name = "value-deadband-type", required = false)
   private short valueDeadbandType;
 
   /**
-   * Determines which type of value-related deadband filtering is applied.
+   * Determines the value deadband for the chosen {@link #valueDeadbandType}
    *
-   * @see cern.c2mon.shared.common.datatag.DataTagDeadband
+   * @see ValueDeadbandType
    */
   @Element(name = "value-deadband", required = false)
   private float valueDeadband;
@@ -160,12 +166,11 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
    * is PRIORITY_LOW.
    */
   public DataTagAddress() {
-    this(null, // no hardware address
-        TTL_FOREVER, // maximum time-to-live
-        DataTagDeadband.DEADBAND_NONE, // no deadband filtering
+    this(TTL_FOREVER, // maximum time-to-live
+        ValueDeadbandType.NONE, // no deadband filtering
         0f, // no value deadband
         0, // no time deadband
-        DataTagAddress.PRIORITY_LOW, // low priority on delivery
+        JmsMessagePriority.PRIORITY_LOW, // low priority on delivery
         false // no guaranteed message delivery
     );
   }
@@ -178,13 +183,8 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
    * @param hardwareAddress the hardware address for the DataTagAddress object
    */
   public DataTagAddress(HardwareAddress hardwareAddress) {
-    this(hardwareAddress, TTL_FOREVER, // maximum time-to-live
-        DataTagDeadband.DEADBAND_NONE, // no value deadband filtering
-        0f, // no value deadband
-        0, // no time deadband filtering
-        DataTagAddress.PRIORITY_LOW, // low JMS priority on delivery
-        false // no guaranteed message delivery
-    );
+    this();
+    this.hardwareAddress = hardwareAddress;
   }
 
   /**
@@ -197,7 +197,9 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
    * @see #timeToLive
    */
   public DataTagAddress(HardwareAddress hardwareAddress, int timeToLive) {
-    this(hardwareAddress, timeToLive, DataTagDeadband.DEADBAND_NONE, 0f, 0, DataTagAddress.PRIORITY_LOW, false);
+    this();
+    this.hardwareAddress = hardwareAddress;
+    this.timeToLive = timeToLive;
   }
 
   /**
@@ -208,19 +210,14 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
    * @param valueDeadbandType   type of value-based deadband filtering
    * @param valueDeadband       parameter for value-based deadband filtering
    * @param timeDeadband        parameter for time-based deadband filtering
-   * @param priority            priority of the tag.
+   * @param priority            priority of the tag value update message transmission.
    * @param pGuaranteedDelivery JMS guaranteed delivery flag The deadband is
    *                            set to DEADBAND_NONE.
    */
-  public DataTagAddress(HardwareAddress hardwareAddress, int timeToLive, short valueDeadbandType,
-                        float valueDeadband, int timeDeadband, int priority, boolean pGuaranteedDelivery) {
+  public DataTagAddress(HardwareAddress hardwareAddress, int timeToLive, ValueDeadbandType valueDeadbandType,
+                        float valueDeadband, int timeDeadband, JmsMessagePriority priority, boolean pGuaranteedDelivery) {
+    this(timeToLive, valueDeadbandType, valueDeadband, timeDeadband, priority, pGuaranteedDelivery);
     this.hardwareAddress = hardwareAddress;
-    this.timeToLive = timeToLive;
-    this.valueDeadbandType = valueDeadbandType;
-    this.valueDeadband = valueDeadband;
-    this.timeDeadband = timeDeadband;
-    this.priority = priority;
-    this.guaranteedDelivery = pGuaranteedDelivery;
   }
 
   /**
@@ -231,14 +228,7 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
    * @param addressParameters the address parameters the DataTagAddress object
    */
   public DataTagAddress(HashMap<String, String> addressParameters) {
-    this(TTL_FOREVER, // maximum time-to-live
-        DataTagDeadband.DEADBAND_NONE, // no value deadband filtering
-        0f, // no value deadband
-        0, // no time deadband filtering
-        DataTagAddress.PRIORITY_LOW, // low JMS priority on delivery
-        false // no guaranteed message delivery
-    );
-
+    this();
     setAddressParameters(addressParameters);
   }
 
@@ -251,8 +241,9 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
    * @see #timeToLive
    */
   public DataTagAddress(HashMap<String, String> addressParameters, int timeToLive) {
-    this(timeToLive, DataTagDeadband.DEADBAND_NONE, 0f, 0, DataTagAddress.PRIORITY_LOW, false);
+    this();
     setAddressParameters(addressParameters);
+    this.timeToLive = timeToLive;
   }
 
   /**
@@ -264,16 +255,16 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
    * @param valueDeadbandType   type of value-based deadband filtering
    * @param valueDeadband       parameter for value-based deadband filtering
    * @param timeDeadband        parameter for time-based deadband filtering
-   * @param priority            priority of the tag.
+   * @param priority            priority of the tag value update message transmission.
    * @param pGuaranteedDelivery JMS guaranteed delivery flag The deadband is set to DEADBAND_NONE.
    */
-  public DataTagAddress(int timeToLive, short valueDeadbandType,
-                        float valueDeadband, int timeDeadband, int priority, boolean pGuaranteedDelivery) {
+  public DataTagAddress(int timeToLive, ValueDeadbandType valueDeadbandType,
+                        float valueDeadband, int timeDeadband, JmsMessagePriority priority, boolean pGuaranteedDelivery) {
     this.timeToLive = timeToLive;
-    this.valueDeadbandType = valueDeadbandType;
+    this.valueDeadbandType = valueDeadbandType.getId().shortValue();
     this.valueDeadband = valueDeadband;
     this.timeDeadband = timeDeadband;
-    this.priority = priority;
+    this.priority = priority.getPriority();
     this.guaranteedDelivery = pGuaranteedDelivery;
   }
 
@@ -304,28 +295,12 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
   }
 
   /**
-   * Returns the hardware address for this DataTagAddress object. This value MUST NOT be null, otherwise the tag's
-   * value cannot be acquired by the driver.
-   */
-  public HardwareAddress getHardwareAddress() {
-    return this.hardwareAddress;
-  }
-
-  /**
    * Returns the address parameters for the given DataTag.
    *
    * @return address parameters.
    */
   public Map<String, String> getAddressParameters() {
     return this.addressParameters;
-  }
-
-  /**
-   * Set the hardware address for the DataTag This is the central element of the DataTagAddress class. The hardware
-   * address is a free-text string that can only be interpreted by the EquipmentMessageHandler class of the driver.
-   */
-  public void setHardwareAddress(HardwareAddress address) {
-    this.hardwareAddress = address;
   }
 
   /**
@@ -347,7 +322,7 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
    */
   @JsonIgnore
   public boolean isValueDeadbandEnabled() {
-    return this.valueDeadbandType != DataTagDeadband.DEADBAND_NONE;
+    return this.valueDeadbandType != ValueDeadbandType.NONE.getId().shortValue();
   }
 
   /**
@@ -355,14 +330,12 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
    */
   @JsonIgnore
   public boolean isProcessValueDeadbandEnabled() {
-    if (valueDeadbandType == DataTagDeadband.DEADBAND_PROCESS_ABSOLUTE
-        || valueDeadbandType == DataTagDeadband.DEADBAND_PROCESS_RELATIVE
-        || valueDeadbandType == DataTagDeadband.DEADBAND_PROCESS_ABSOLUTE_VALUE_DESCR_CHANGE
-        || valueDeadbandType == DataTagDeadband.DEADBAND_PROCESS_RELATIVE_VALUE_DESCR_CHANGE) {
-      return true;
-    } else {
-      return false;
-    }
+    ValueDeadbandType enumType = ValueDeadbandType.getValueDeadbandType((int) this.valueDeadbandType);
+
+    return (enumType == ValueDeadbandType.PROCESS_ABSOLUTE
+         || enumType == ValueDeadbandType.PROCESS_RELATIVE
+         || enumType == ValueDeadbandType.PROCESS_ABSOLUTE_VALUE_DESCR_CHANGE
+         || enumType == ValueDeadbandType.PROCESS_RELATIVE_VALUE_DESCR_CHANGE);
   }
 
   /**
@@ -382,16 +355,19 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
   }
 
   /**
+   * Method required for internal deserialization.
+   */
+  @SuppressWarnings("unused")
+  private void setValueDeadbandType(short type) {
+    this.valueDeadbandType = type;
+  }
+
+  /**
    * Set the type of deadband filter for this DataTagAddress object. If an
    * invalid value is specified, deadband filtering is disabled.
    */
-  public void setValueDeadbandType(final short type) {
-    if (DataTagDeadband.isValidType(type)) {
-      this.valueDeadbandType = type;
-    } else {
-      this.valueDeadbandType = DataTagDeadband.DEADBAND_NONE;
-      this.valueDeadband = 0f;
-    }
+  public void setValueDeadbandType(ValueDeadbandType type) {
+    this.valueDeadbandType = type.getId().shortValue();
   }
 
   /**
@@ -406,6 +382,26 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
     } else {
       this.valueDeadband = 0f;
     }
+  }
+
+  /**
+   * Internal usage only, required for deserialization
+   *
+   * @param priority The JMS message priority for a given tag
+   */
+  @SuppressWarnings("unused")
+  private void setPriority(int priority) {
+    this.priority = priority;
+  }
+
+  /**
+   * Set the {@link JmsMessagePriority} level for the given tag, which shall be applied
+   * to all value updates that are sent from the DAQ layer to the C2MON server.
+   *
+   * @param priority The JMS message priority for a given tag
+   */
+  public void setPriority(JmsMessagePriority priority) {
+    this.priority = priority.getPriority();
   }
 
   /**
@@ -440,7 +436,7 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
       str.append("</time-to-live>\n");
     }
 
-    if (valueDeadbandType != DataTagDeadband.DEADBAND_NONE) {
+    if (isValueDeadbandEnabled()) {
       str.append("        <value-deadband-type>");
       str.append(this.valueDeadbandType);
       str.append("</value-deadband-type>\n");
@@ -450,7 +446,7 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
       str.append("</value-deadband>\n");
     }
 
-    if (timeDeadband != DataTagDeadband.DEADBAND_NONE) {
+    if (isTimeDeadbandEnabled()) {
       str.append("        <time-deadband>");
       str.append(timeDeadband);
       str.append("</time-deadband>\n");
@@ -525,7 +521,7 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
             try {
               result.valueDeadbandType = Short.parseShort(fieldValueString);
             } catch (NumberFormatException nfe) {
-              result.valueDeadbandType = DataTagDeadband.DEADBAND_NONE;
+              result.valueDeadbandType = ValueDeadbandType.NONE.getId().shortValue();
             }
           } else if (fieldName.equals("value-deadband")) {
             result.valueDeadband = Float.parseFloat(fieldValueString);
@@ -545,26 +541,15 @@ public class DataTagAddress implements Serializable, Cloneable, DataTagConstants
   }
 
   public void validate() throws ConfigurationException {
-    if (this.priority != PRIORITY_HIGH && this.priority != PRIORITY_MEDIUM && this.priority != PRIORITY_LOW) {
+    JmsMessagePriority msgPrio = JmsMessagePriority.getJmsMessagePriority(priority);
+
+    if (this.priority != msgPrio.getPriority()) {
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
           "Parameter \"priority\" must be either 2 (LOW), 4 (MEDIUM) or 7 (HIGH)");
     }
-    switch (this.valueDeadbandType) {
-      case DataTagDeadband.DEADBAND_NONE:
-        break;
-      case DataTagDeadband.DEADBAND_EQUIPMENT_ABSOLUTE:
-        break;
-      case DataTagDeadband.DEADBAND_EQUIPMENT_RELATIVE:
-        break;
-      case DataTagDeadband.DEADBAND_PROCESS_ABSOLUTE:
-        break;
-      case DataTagDeadband.DEADBAND_PROCESS_ABSOLUTE_VALUE_DESCR_CHANGE:
-        break;
-      case DataTagDeadband.DEADBAND_PROCESS_RELATIVE:
-        break;
-      case DataTagDeadband.DEADBAND_PROCESS_RELATIVE_VALUE_DESCR_CHANGE:
-        break;
-      default:
+
+    ValueDeadbandType type = ValueDeadbandType.getValueDeadbandType((int) this.valueDeadbandType);
+    if (type == ValueDeadbandType.NONE && this.valueDeadbandType != 0) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
             "Invalid value for parameter  \"deadbandType\".");
     }

@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.shared.common.datatag;
+package cern.c2mon.shared.common.datatag.util;
 
 /**
  * Tag Quality status enumeration which is used by the <code>TagQuality</code>

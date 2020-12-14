@@ -45,7 +45,7 @@ import cern.c2mon.shared.client.supervision.Heartbeat;
 import cern.c2mon.shared.client.tag.TagUpdate;
 import cern.c2mon.shared.client.tag.TagValueUpdate;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
-import cern.c2mon.shared.common.datatag.TagQualityStatus;
+import cern.c2mon.shared.common.datatag.util.TagQualityStatus;
 import cern.c2mon.shared.rule.RuleFormatException;
 
 /**
@@ -352,7 +352,7 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
   /**
    * Gets the list of tags out of the live cache and synchronizes them again with
    * the server.
-   * @param tagId the list of tags to be synchronized
+   * @param tagIds the list of tags to be synchronized
    * @return the tags that could actually be synchronized.
    */
   private Set<Long> synchronizeTags(Set<Long> tagIds) throws JMSException {

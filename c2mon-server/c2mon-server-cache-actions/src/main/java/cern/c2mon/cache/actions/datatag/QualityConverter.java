@@ -4,7 +4,7 @@ import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.shared.common.datatag.SourceDataTagQuality;
 
-import static cern.c2mon.shared.common.datatag.TagQualityStatus.*;
+import static cern.c2mon.shared.common.datatag.util.TagQualityStatus.*;
 
 /**
  * Provides methods for calculating the quality of a DataTag

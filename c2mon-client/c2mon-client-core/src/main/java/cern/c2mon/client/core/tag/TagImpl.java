@@ -25,7 +25,7 @@ import cern.c2mon.shared.client.supervision.SupervisionEvent;
 import cern.c2mon.shared.client.tag.TagMode;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
-import cern.c2mon.shared.common.datatag.TagQualityStatus;
+import cern.c2mon.shared.common.datatag.util.TagQualityStatus;
 import cern.c2mon.shared.rule.RuleExpression;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -235,7 +235,7 @@ public class TagImpl implements Tag, TopicRegistrationDetails, Cloneable {
    * Sets the tag name to "Not.initialized" and the quality to UNINITIALIZED.
    *
    * @param tagId the unique identifier for the DataTag
-   * @param If    true, it will set the quality to UNDEFINED_TAG instead of UNINITIALIZED
+   * @param unknown   if true, it will set the quality to UNDEFINED_TAG instead of UNINITIALIZED
    */
   public TagImpl(final Long tagId, boolean unknown) {
     id = tagId;

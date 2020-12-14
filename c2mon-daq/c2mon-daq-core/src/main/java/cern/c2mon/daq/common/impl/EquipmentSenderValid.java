@@ -35,6 +35,7 @@ import cern.c2mon.daq.common.messaging.IProcessMessageSender;
 import cern.c2mon.daq.tools.DataTagValueFilter;
 import cern.c2mon.daq.tools.DataTagValueValidator;
 import cern.c2mon.shared.common.datatag.*;
+import cern.c2mon.shared.common.datatag.util.SourceDataTagQualityCode;
 import cern.c2mon.shared.common.filter.FilteredDataTagValue.FilterType;
 import cern.c2mon.shared.common.type.TypeConverter;
 
@@ -92,7 +93,7 @@ class EquipmentSenderValid {
   /**
    * Creates a new EquipmentValidSender.
    *
-   * @param filterMessageSender         The filter message sender to send filtered tag values.
+   * @param equipmentSenderFilterModule         The filter message sender to send filtered tag values.
    * @param processMessageSender        The process message sender to send tags to the server.
    * @param dynamicTimeDeadbandFilterer
    */
@@ -240,9 +241,7 @@ class EquipmentSenderValid {
    * Helper method which checks if there is a time deadband according to the new value.
    *
    * @param currentSourceDataTag The tag to which the value belongs.
-   * @param newValueCasted       The casted new value of the tag.
-   * @param sourceTimestamp      The timestamp of the new value.
-   * @param pValueDescr          A description belonging to the value.
+   * @param castedUpdate       The casted new value of the tag.
    * @return If there is an deadBand according to the value the method returns false.
    */
   private boolean checkTimeDeadband(final SourceDataTag currentSourceDataTag, final ValueUpdate castedUpdate) {
@@ -339,8 +338,7 @@ class EquipmentSenderValid {
    * If both fail, the value is invalid and the method returns false.
    *
    * @param currentSourceDataTag The current {@link SourceDataTag} known by the daq.
-   * @param newTagValue          the new tag value.
-   * @param sourceTimestamp      actual sourceTimeStamp.
+   * @param update          the new tag value.
    * @return True if the new value is Convertible.
    */
   private boolean isConvertible(final SourceDataTag currentSourceDataTag, final ValueUpdate update) {

@@ -17,8 +17,8 @@
 package cern.c2mon.daq.common.conf.equipment;
 
 
-import cern.c2mon.shared.common.datatag.DataTagDeadband;
 import cern.c2mon.shared.common.datatag.ISourceDataTag;
+import cern.c2mon.shared.common.datatag.util.ValueDeadbandType;
 
 /**
  * Helper class for SourceDataTag changers. It has a some helper methods
@@ -75,8 +75,8 @@ public abstract class DataTagChangerHelper extends TagChangerHelper
      */
     public static boolean hasEquipmentValueDeadbandChanged(final ISourceDataTag sourceDataTag,
             final ISourceDataTag oldSourceDataTag) {
-        return sourceDataTag.getValueDeadbandType() == DataTagDeadband.DEADBAND_EQUIPMENT_ABSOLUTE 
-                || sourceDataTag.getValueDeadbandType() == DataTagDeadband.DEADBAND_EQUIPMENT_RELATIVE 
+        return sourceDataTag.getValueDeadbandType() == ValueDeadbandType.EQUIPMENT_ABSOLUTE.getId().shortValue()
+                || sourceDataTag.getValueDeadbandType() == ValueDeadbandType.EQUIPMENT_RELATIVE.getId().shortValue()
                 && sourceDataTag.getValueDeadband() != oldSourceDataTag.getValueDeadband();
     }
     

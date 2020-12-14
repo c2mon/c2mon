@@ -16,6 +16,19 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.dbaccess;
 
+import java.sql.Timestamp;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Builder;
+import lombok.Data;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import cern.c2mon.server.cache.dbaccess.structure.DBBatch;
 import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
@@ -23,25 +36,13 @@ import cern.c2mon.server.common.metadata.Metadata;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.DataTagConstants;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
-import cern.c2mon.shared.common.datatag.TagQualityStatus;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.Builder;
-import lombok.Data;
-import org.junit.Test;
-
-import javax.inject.Inject;
-import java.sql.Timestamp;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import cern.c2mon.shared.common.datatag.util.TagQualityStatus;
 
 import static org.junit.Assert.*;
 
 public class DataTagMapperTest extends AbstractMapperTest {
 
-  @Inject
+  @Autowired
   private DataTagMapper dataTagMapper;
 
   @Test
@@ -181,7 +182,7 @@ public class DataTagMapperTest extends AbstractMapperTest {
 
     dataTagMapper.updateCacheable(cacheObject);
 
-    DataTagCacheObject retrievedObject = (DataTagCacheObject) dataTagMapper.getItem(150000L);
+    DataTagCacheObject retrievedObject = (DataTagCacheObject) dataTagMapper.getItem(new Long(150000));
 
     // updated values are changed
     assertEquals(cacheObject.getValue(), retrievedObject.getValue());

@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 
 import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
-import cern.c2mon.shared.common.datatag.TagQualityStatus;
+import cern.c2mon.shared.common.datatag.util.TagQualityStatus;
 
 /**
  * iBatis TypeHandler for converting the VARCHAR Tag quality

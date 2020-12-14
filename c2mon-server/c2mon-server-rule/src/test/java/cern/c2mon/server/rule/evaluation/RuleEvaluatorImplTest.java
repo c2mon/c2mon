@@ -25,7 +25,7 @@ import cern.c2mon.server.common.rule.RuleTag;
 import cern.c2mon.server.common.rule.RuleTagCacheObject;
 import cern.c2mon.server.rule.config.RuleProperties;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
-import cern.c2mon.shared.common.datatag.TagQualityStatus;
+import cern.c2mon.shared.common.datatag.util.TagQualityStatus;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

@@ -20,6 +20,7 @@ import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.SourceDataTag;
 import cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl;
+import cern.c2mon.shared.common.datatag.util.JmsMessagePriority;
 import cern.c2mon.shared.daq.config.*;
 import org.junit.Test;
 
@@ -144,7 +145,7 @@ public class ChangeRequestSerializationTest {
     dataTag.setMaxValue(10);
     try {
       DataTagAddress dataTagAddress = new DataTagAddress();
-      dataTagAddress.setPriority(5);
+      dataTagAddress.setPriority(JmsMessagePriority.PRIORITY_MEDIUM);
       OPCHardwareAddressImpl opcHardwareAddressImpl = new OPCHardwareAddressImpl("lala", 12);
       dataTagAddress.setHardwareAddress(opcHardwareAddressImpl);
       dataTag.setAddress(dataTagAddress);

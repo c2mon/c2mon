@@ -1,36 +1,38 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- *
+ * 
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- *
+ * 
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.shared.common.datatag;
-
-import org.simpleframework.xml.Element;
-import org.simpleframework.xml.ElementMap;
-import org.simpleframework.xml.core.Persist;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.simpleframework.xml.Element;
+import org.simpleframework.xml.ElementMap;
+import org.simpleframework.xml.core.Persist;
+
+import cern.c2mon.shared.common.datatag.util.TagQualityStatus;
+
 /**
  * The DataTagQuality is used to represent the quality attribute of a DataTag. The most important information a
  * DataTagQuality object provides is whether a tag's value is valid (<code>isValid()</code>) or not. In addition to
  * that, more fine grain information about the reason for invalidity (e.g. an acquisition error, a range-check failure
  * etc.) is available.
- *
+ * 
  * @author Matthias Braeger
  */
 
@@ -62,17 +64,17 @@ public final class DataTagQualityImpl implements DataTagQuality {
 
     /**
      * Constructor
-     *
+     * 
      * @param status the quality code that shall be used for the new DataTagQuality object. For example,
      *            DataTagQuality.UNINITIALISED
      */
     public DataTagQualityImpl(final TagQualityStatus status) {
         this(status, "");
     }
-
+    
     /**
      * Constructor
-     *
+     * 
      * @param status The quality status to be initially set
      * @param description free-text description of the quality condition.
      */
@@ -84,7 +86,7 @@ public final class DataTagQualityImpl implements DataTagQuality {
 
     /**
      * Copy constructor
-     *
+     * 
      * @param oldQualityTag the <code>DataTagQuality</code> object serving as a "template" for the object to be created.
      * @throws NullPointerException In case that <code>oldQualityTag</code> is null
      */
@@ -119,7 +121,7 @@ public final class DataTagQualityImpl implements DataTagQuality {
         clone.invalidQualityStates = new ConcurrentHashMap<>(invalidQualityStates);
         return clone;
       } catch (CloneNotSupportedException e) {
-        throw new RuntimeException(e);
+          throw new RuntimeException(e);
       }
     }
 
@@ -144,7 +146,7 @@ public final class DataTagQualityImpl implements DataTagQuality {
         } else {
             nonNullQualityDescription = qualityDescription;
         }
-
+        
         return invalidQualityStates.containsKey(status)
                     && nonNullQualityDescription.equalsIgnoreCase(invalidQualityStates.get(status));
     }
@@ -291,7 +293,7 @@ public final class DataTagQualityImpl implements DataTagQuality {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see java.lang.Object#hashCode()
      */
     @Override
@@ -304,7 +306,7 @@ public final class DataTagQualityImpl implements DataTagQuality {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
