@@ -142,7 +142,7 @@ public class TagValuePublisherTest {
 
     EasyMock.replay();
     Thread.sleep(500);
-    this.tagValuePublisher.notifyOnUpdate(new TagWithAlarms<>(tag, alarms));
+    this.tagValuePublisher.notifyOnUpdate(tag, alarms);
 
     listenerThread.join(1000);
 
@@ -282,7 +282,7 @@ public class TagValuePublisherTest {
     Thread listenerThread = startListenerThread(tag); //will throw exception
 
     EasyMock.replay();
-    tagValuePublisher.notifyOnUpdate(new TagWithAlarms<>(tag, alarms));
+    tagValuePublisher.notifyOnUpdate(tag, alarms);
     listenerThread.join(1000); //will fail after 100ms (failover timeout)
     synchronized (updateLock) {
       assertTrue(this.update == null); //update failed as broker stopped

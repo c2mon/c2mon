@@ -28,108 +28,109 @@ import static cern.c2mon.cache.actions.alarm.AlarmEvaluator.createAdditionalInfo
 @Slf4j
 @Named
 @Singleton
-public class AlarmService extends AbstractCacheServiceImpl<Alarm> implements AlarmAggregator {
+public class AlarmService extends AbstractCacheServiceImpl<Alarm> implements AlarmAggregator{
 
-  private List<AlarmAggregatorListener> alarmUpdateObservable = new ArrayList<>();
+    private List<AlarmAggregatorListener> alarmUpdateObservable = new ArrayList<>();
 
-  private TagCacheCollection tagCacheCollection;
+    private TagCacheCollection tagCacheCollection;
 
-  private OscillationUpdater oscillationUpdater;
-
-  @Inject
-  public AlarmService(final C2monCache<Alarm> cache, final TagCacheCollection tagCacheCollection,
-                      final OscillationUpdater oscillationUpdater) {
-    super(cache, new AlarmCacheFlow());
-    // TODO (Alex) We probably want to increase the number of threads in the CacheListenerManager here
-    this.tagCacheCollection = tagCacheCollection;
-    this.oscillationUpdater = oscillationUpdater;
-  }
-
-  @PostConstruct
-  public void init() {
-    tagCacheCollection.registerListener(this::supervisionChangeListener, CacheEvent.SUPERVISION_CHANGE);
-    tagCacheCollection.registerListener(this::updateAcceptedListener, CacheEvent.UPDATE_ACCEPTED);
-  }
-
-  /**
-   * Atomically get an alarm, get the connected tag, evaluate them,
-   * then put any changes back into the cache if needed
-   *
-   * @param alarmId the id of an alarm in cache
-   * @return the alarm with the given ID, after the update has happened
-   * @throws CacheElementNotFoundException if no alarm exists with the given id
-   */
-  public Alarm evaluateAlarm(Long alarmId) {
-    return cache.executeTransaction(() -> {
-      Alarm alarm = cache.get(alarmId);
-      Tag tag = tagCacheCollection.get(alarm.getTagId());
-      update((AlarmCacheObject) alarm, tag, true);
-      return alarm;
-    });
-  }
-
-  /**
-   * Atomically evaluate all alarms connected to this tag,
-   * then put any changes back into the cache if needed
-   *
-   * @return A list of successfully evaluated alarms
-   */
-  public List<Alarm> evaluateAlarms(final Tag tag) {
-    return cache.executeTransaction(() -> {
-      Set<Long> keys = new HashSet<>(tag.getAlarmIds());
-
-      return cache.getAll(keys).values().stream().map(
-        alarm -> {
-          try {
-            update((AlarmCacheObject) alarm, tag, true);
-            return alarm;
-          } catch (Exception e) {
-            cache.getCacheListenerManager().notifyListenersOf(CacheEvent.UPDATE_FAILED, alarm);
-            log.error("Exception caught when attempting to evaluate alarm ID " + alarm.getId() + "  for tag " + tag.getId() + " - publishing to the client with no attached alarms.", e);
-            return null;
-          }
-        }).filter(Objects::nonNull).collect(Collectors.toList());
-    });
-  }
+    private OscillationUpdater oscillationUpdater;
 
 
-  /**
-   * If the alarm started (or restarted now), the timestamp will be set to now.
-   * Otherwise, it will use the timestamp of the previous alarm
-   * <p>
-   * If the alarm was oscillating, listeners will NOT be notified
-   * <p>
-   * The alarm will only be put in the cache if changes would be made to the current one
-   */
-  public boolean update(final AlarmCacheObject alarmCacheObject, final Tag tag, boolean updateOscillation) {
-    if (updateOscillation) {
-      oscillationUpdater.updateOscillationStatus(alarmCacheObject, tag.getTimestamp().getTime());
+    @Inject
+    public AlarmService(final C2monCache<Alarm> cache, final TagCacheCollection tagCacheCollection,
+                        final OscillationUpdater oscillationUpdater) {
+        super(cache, new AlarmCacheFlow());
+        // TODO (Alex) We probably want to increase the number of threads in the CacheListenerManager here
+        this.tagCacheCollection = tagCacheCollection;
+        this.oscillationUpdater = oscillationUpdater;
     }
 
-    boolean isOscillating = alarmCacheObject.isOscillating();
+    @PostConstruct
+    public void init() {
+        tagCacheCollection.registerListener(this::supervisionChangeListener, CacheEvent.SUPERVISION_CHANGE);
+        tagCacheCollection.registerListener(this::updateAcceptedListener, CacheEvent.UPDATE_ACCEPTED);
+    }
 
-    boolean alarmShouldBeUpdated = AlarmEvaluator.alarmShouldBeUpdated(alarmCacheObject, tag);
+    /**
+     * Atomically get an alarm, get the connected tag, evaluate them,
+     * then put any changes back into the cache if needed
+     *
+     * @param alarmId the id of an alarm in cache
+     * @return the alarm with the given ID, after the update has happened
+     * @throws CacheElementNotFoundException if no alarm exists with the given id
+     */
+    public Alarm evaluateAlarm(Long alarmId) {
+        return cache.executeTransaction(() -> {
+            Alarm alarm = cache.get(alarmId);
+            Tag tag = tagCacheCollection.get(alarm.getTagId());
+            update((AlarmCacheObject) alarm, tag, true);
+            return alarm;
+        });
+    }
 
-    if (alarmShouldBeUpdated) {
-      mutateAlarmUsingTag(alarmCacheObject, tag);
+    /**
+     * Atomically evaluate all alarms connected to this tag,
+     * then put any changes back into the cache if needed
+     *
+     * @return A list of successfully evaluated alarms
+     */
+    public List<Alarm> evaluateAlarms(final Tag tag) {
+        return cache.executeTransaction(() -> {
+            Set<Long> keys = new HashSet<>(tag.getAlarmIds());
 
-      if (isOscillating) {
-        cache.putQuiet(alarmCacheObject.getId(), alarmCacheObject);
-      } else {
-        cache.put(alarmCacheObject.getId(), alarmCacheObject);
-      }
-      return true;
-    } else
-      return false;
-  }
+            return cache.getAll(keys).values().stream().map(
+                    alarm -> {
+                        try {
+                            update((AlarmCacheObject) alarm, tag, true);
+                            return alarm;
+                        } catch (Exception e) {
+                            cache.getCacheListenerManager().notifyListenersOf(CacheEvent.UPDATE_FAILED, alarm);
+                            log.error("Exception caught when attempting to evaluate alarm ID " + alarm.getId() + "  for tag " + tag.getId() + " - publishing to the client with no attached alarms.", e);
+                            return null;
+                        }
+                    }).filter(Objects::nonNull).collect(Collectors.toList());
+        });
+    }
 
-  public TagWithAlarms getTagWithAlarmsAtomically(Long tagId) {
-    return cache.executeTransaction(() -> {
-      Tag tag = tagCacheCollection.get(tagId);
-      Set<Long> alarms = new HashSet<>(tag.getAlarmIds());
-      return new TagWithAlarms<>(tag, cache.getAll(alarms).values());
-    });
-  }
+
+    /**
+     * If the alarm started (or restarted now), the timestamp will be set to now.
+     * Otherwise, it will use the timestamp of the previous alarm
+     * <p>
+     * If the alarm was oscillating, listeners will NOT be notified
+     * <p>
+     * The alarm will only be put in the cache if changes would be made to the current one
+     */
+    public boolean update(final AlarmCacheObject alarmCacheObject, final Tag tag, boolean updateOscillation) {
+        if (updateOscillation) {
+            oscillationUpdater.updateOscillationStatus(alarmCacheObject, tag.getTimestamp().getTime());
+        }
+
+        boolean isOscillating = alarmCacheObject.isOscillating();
+
+        boolean alarmShouldBeUpdated = AlarmEvaluator.alarmShouldBeUpdated(alarmCacheObject, tag);
+
+        if (alarmShouldBeUpdated) {
+            mutateAlarmUsingTag(alarmCacheObject, tag);
+
+            if (isOscillating) {
+                cache.putQuiet(alarmCacheObject.getId(), alarmCacheObject);
+            } else {
+                cache.put(alarmCacheObject.getId(), alarmCacheObject);
+            }
+            return true;
+        } else
+            return false;
+    }
+
+    public TagWithAlarms getTagWithAlarmsAtomically(Long tagId) {
+        return cache.executeTransaction(() -> {
+            Tag tag = tagCacheCollection.get(tagId);
+            Set<Long> alarms = new HashSet<>(tag.getAlarmIds());
+            return new TagWithAlarms<>(tag, cache.getAll(alarms).values());
+        });
+    }
 
   @Override
   public void registerForTagUpdates(AlarmAggregatorListener aggregatorObserver) {
@@ -149,46 +150,46 @@ public class AlarmService extends AbstractCacheServiceImpl<Alarm> implements Ala
     update(alarmCacheObject, tag, false);
   }
 
-  private void mutateAlarmUsingTag(final AlarmCacheObject alarmCacheObject, Tag tag) {
-    alarmCacheObject.setInfo(createAdditionalInfoString(alarmCacheObject, tag));
+    private void mutateAlarmUsingTag(final AlarmCacheObject alarmCacheObject, Tag tag) {
+        alarmCacheObject.setInfo(createAdditionalInfoString(alarmCacheObject, tag));
 
-    boolean newState = alarmCacheObject.getCondition().evaluateState(tag.getValue());
-    if (newState && !alarmCacheObject.isActive()) {
-      // TODO Potentially set this to previous, during preInsertValidate, using the previous Alarm in cache?
-      alarmCacheObject.setTriggerTimestamp(new Timestamp(System.currentTimeMillis()));
+        boolean newState = alarmCacheObject.getCondition().evaluateState(tag.getValue());
+        if (newState && !alarmCacheObject.isActive()) {
+            // TODO Potentially set this to previous, during preInsertValidate, using the previous Alarm in cache?
+            alarmCacheObject.setTriggerTimestamp(new Timestamp(System.currentTimeMillis()));
+        }
+
+        alarmCacheObject.setSourceTimestamp(tag.getTimestamp());
+
+        alarmCacheObject.setInternalActive(newState);
+
+        if (alarmCacheObject.isOscillating()) {
+            // When oscillating we force the alarm to *active*
+            // (only the *internalActive* property reflects the true status)
+            alarmCacheObject.setActive(true);
+        } else {
+            alarmCacheObject.setActive(newState);
+        }
+        log.trace("Alarm #{} changed STATE to {}", alarmCacheObject.getId(), alarmCacheObject.isActive());
     }
 
-    alarmCacheObject.setSourceTimestamp(tag.getTimestamp());
-
-    alarmCacheObject.setInternalActive(newState);
-
-    if (alarmCacheObject.isOscillating()) {
-      // When oscillating we force the alarm to *active*
-      // (only the *internalActive* property reflects the true status)
-      alarmCacheObject.setActive(true);
-    } else {
-      alarmCacheObject.setActive(newState);
+    /**
+     * Notify the listeners of a tag update with associated alarms.
+     */
+    private void notifyListeners(final Tag tag, final List<Alarm> alarms) {
+        for (AlarmAggregatorListener listener : alarmUpdateObservable) {
+            listener.notifyOnUpdate(tag, alarms);
+        }
     }
-    log.trace("Alarm #{} changed STATE to {}", alarmCacheObject.getId(), alarmCacheObject.isActive());
-  }
 
-  /**
-   * Notify the listeners of a tag update with associated alarms.
-   */
-  private void notifyListeners(final TagWithAlarms tagWithAlarms) {
-    for (AlarmAggregatorListener listener : alarmUpdateObservable) {
-      listener.notifyOnUpdate(tagWithAlarms);
+    private void supervisionChangeListener(Tag tag) {
+        log.trace("Evaluating alarm for tag " + tag.getId() + " due to supervision status notification.");
+        evaluateAlarms(tag);
     }
-  }
 
-  private void supervisionChangeListener(Tag tag) {
-    log.trace("Evaluating alarm for tag " + tag.getId() + " due to supervision status notification.");
-    evaluateAlarms(tag);
-  }
-
-  private void updateAcceptedListener(Tag tag) {
-    log.trace("Evaluating alarm for tag " + tag.getId() + " due to update notification.");
-    List<Alarm> alarmList = evaluateAlarms(tag);
-    notifyListeners(new TagWithAlarms<>(tag.clone(), alarmList));
-  }
+    private void updateAcceptedListener(Tag tag) {
+        log.trace("Evaluating alarm for tag " + tag.getId() + " due to update notification.");
+        List<Alarm> alarmList = evaluateAlarms(tag);
+        notifyListeners(tag.clone(), alarmList);
+    }
 }

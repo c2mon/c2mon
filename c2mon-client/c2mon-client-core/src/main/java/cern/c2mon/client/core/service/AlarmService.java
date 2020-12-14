@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2010-2019 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2020 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -24,11 +24,18 @@ import javax.jms.JMSException;
 import cern.c2mon.client.core.jms.AlarmListener;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 
+/**
+ * The AlarmService allows subscribing to alarm updates as well as requesting
+ * the list of all active alarms from the server.
+ *  
+ * @author Matthias Braeger
+ */
 public interface AlarmService {
 
   /**
    * Registers an <code>AlarmListener</code> to receive updates about alarm changes
-   * @throws JMSException
+   * @param listener The listener that shall be registered
+   * @throws JMSException In case of JMS problems during the registration
    */
   void addAlarmListener(AlarmListener listener) throws JMSException;
   
@@ -62,7 +69,7 @@ public interface AlarmService {
   
   /**
    * Unregisters the given <code>AlarmListener</code> instance from receiving alarm updates.
-   * @throws JMSException
+   * @param listener The listener that shall be registered
    */
-  void removeAlarmListener(AlarmListener listener) throws JMSException;
+  void removeAlarmListener(AlarmListener listener);
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2010-2019 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2020 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -25,13 +25,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import lombok.extern.slf4j.Slf4j;
+
 import cern.c2mon.client.core.jms.AlarmListener;
 import cern.c2mon.client.core.jms.JmsProxy;
 import cern.c2mon.client.core.jms.RequestHandler;
 import cern.c2mon.client.core.service.AlarmService;
 import cern.c2mon.shared.client.alarm.AlarmValue;
-import lombok.extern.slf4j.Slf4j;
+import cern.c2mon.shared.client.tag.TagUpdate;
 
+/**
+ * Singleton implementation of {@link AlarmService} interface
+ * 
+ * @author Matthias Braeger
+ */
 @Service("alarmService")
 @Slf4j
 public class AlarmServiceImpl implements AlarmService, AlarmListener {
@@ -67,7 +74,7 @@ public class AlarmServiceImpl implements AlarmService, AlarmListener {
     alarmListenersLock.writeLock().lock();
 
     try {
-      if (alarmListeners.size() == 0) {
+      if (alarmListeners.isEmpty()) {
         jmsProxy.registerAlarmListener(this);
       }
 
@@ -79,7 +86,7 @@ public class AlarmServiceImpl implements AlarmService, AlarmListener {
   }
 
   @Override
-  public void removeAlarmListener(final AlarmListener listener) throws JMSException {
+  public void removeAlarmListener(final AlarmListener listener) {
     alarmListenersLock.writeLock().lock();
     try {
       log.debug("removeAlarmListener() : removing alarm listener");
@@ -126,30 +133,27 @@ public class AlarmServiceImpl implements AlarmService, AlarmListener {
   }
   
   @Override
-  public void onAlarmUpdate(final AlarmValue alarm) {
+  public void onAlarmUpdate(final TagUpdate tagWithAlarmChange) {
     alarmListenersLock.readLock().lock();
 
     try {
-      log.debug("onAlarmUpdate() -  received alarm update for alarmId:" + alarm.getId());
-      notifyAlarmListeners(alarm);
-    }
-    finally {
+      log.debug("Received alarm update for tag id #{}", tagWithAlarmChange.getId());
+      notifyAlarmListeners(tagWithAlarmChange);
+    } finally {
       alarmListenersLock.readLock().unlock();
     }
   }
   
   /**
    * Private method, notifies all listeners for an alarmUpdate.
-   * @param alarm the updated Alarm
+   * @param tagWithAlarmChange the updated Alarm
    */
-  private void notifyAlarmListeners(final AlarmValue alarm) {
+  private void notifyAlarmListeners(final TagUpdate tagWithAlarmChange) {
 
-    log.debug("onAlarmUpdate() -  there is:" + alarmListeners.size()
-        + " listeners waiting to be notified!");
+    log.trace("There are {} listeners waiting to be notified!", alarmListeners.size());
 
     for (AlarmListener listener : alarmListeners) {
-
-      listener.onAlarmUpdate(alarm);
+      listener.onAlarmUpdate(tagWithAlarmChange);
     }
   }
 }

@@ -5,9 +5,9 @@ stages:
   - publish
   - trigger_tim
 
-image:
+image: 
   name: gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-maven:jdk-11-mvn-3.6-1
-  entrypoint: [""]
+  entrypoint: [""]   
 
 
 variables:
@@ -29,7 +29,7 @@ Compile:
   stage: build
   script:
     - export MAVEN_OPTS=""
-    - mvn $MAVEN_CLI_OPTS -DskipTests install
+    - mvn $MAVEN_CLI_OPTS install
   artifacts:
     name: "$CI_COMMIT_REF_NAME-$CI_COMMIT_SHORT_SHA"
     untracked: true
@@ -56,9 +56,9 @@ Test:
     when: always
     reports:
       junit: reports/*.xml
-  except:
-    - tags
-
+  only:
+    - master
+    
 "Build docs":
   stage: test
   image: jekyll/builder:3.8.5
@@ -103,10 +103,10 @@ Publish:
 # Publish docker images?
 
 "Sonar master QA":
-  stage: publish
+  stage: publish                                                     
   script:
     - mvn $MAVEN_CLI_OPTS package sonar:sonar -Dmaven.test.skip=true -DskipDocker=true -Dsonar.host.url=${SONAR_URL} -Dsonar.dependencyCheck.reportPath=target/dependency-check-report.xml
-  only:
+  only:                                                    
     - master
 
 "Deploy docs":
@@ -123,13 +123,13 @@ Publish:
     - deploy-eos
   only:
     - master
-
+    
 #  =========================
 #  === Stage: trigger_tim ==
 #  =========================
 
 "Trigger TIM build":
-  stage: trigger_tim
+  stage: trigger_tim                            
   image: appropriate/curl:3.1
   dependencies: []
   script:

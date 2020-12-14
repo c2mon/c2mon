@@ -16,32 +16,29 @@
  *****************************************************************************/
 package cern.c2mon.cache.actions.alarm;
 
-import java.util.Observer;
-
 /**
- * The AlarmAggregator bean listens for Tag updates,
- * evaluates all associated alarms and passes the result
- * to registered {@link Observer}s.
+ * This interface is used to register a listener alarm & tag update
+ * notifications
  *
  * <p>Standard usage involves wiring it into your class and
- * calling the registerForUpdates method to register your
- * listener.
+ * calling the {@link #registerForTagUpdates(AlarmAggregatorListener)}
+ * method to register your listener.
  *
  * <p>Listeners are notified on the cache notification threads
  * (i.e. this aggregator does not create any extra threads).
  *
  * @author Mark Brightwell
+ *
  */
 public interface AlarmAggregator {
 
   /**
    * Register this listener to received alarm & tag update notifications.
+   * Notice that supervision changes are not taken into account here. For
+   * these, a module should register directly with the cache.
    *
-   * You can use the lambda syntax to declare the listener argument like so:
-   *
-   * {@code (tag, alarms) -> { ... } }
-   *
-   * @param aggregatorObserver the listener that should be notified
+   * @param aggregatorListener the listener that should be notified
    */
-  void registerForTagUpdates(AlarmAggregatorListener aggregatorObserver);
+  void registerForTagUpdates(AlarmAggregatorListener aggregatorListener);
+
 }

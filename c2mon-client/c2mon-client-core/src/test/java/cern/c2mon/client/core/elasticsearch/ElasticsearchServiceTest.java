@@ -17,11 +17,9 @@
 package cern.c2mon.client.core.elasticsearch;
 
 import cern.c2mon.cache.actions.alarm.AlarmService;
-import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.impl.SimpleCache;
 import cern.c2mon.cache.config.collections.TagCacheCollection;
 import cern.c2mon.client.core.config.C2monClientProperties;
-import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.TagWithAlarms;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.elasticsearch.IndexManager;

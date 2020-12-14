@@ -14,13 +14,16 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.client.core.jms;
+package cern.c2mon.client.core.jms.impl;
 
 import cern.c2mon.client.common.listener.ClientRequestReportListener;
 import cern.c2mon.client.core.config.C2monAutoConfiguration;
 import cern.c2mon.client.core.config.C2monClientProperties;
 import cern.c2mon.client.core.config.mock.MockServerConfig;
-import cern.c2mon.client.core.jms.impl.JmsProxyImpl;
+import cern.c2mon.client.core.jms.ConnectionListener;
+import cern.c2mon.client.core.jms.JmsProxy;
+import cern.c2mon.client.core.jms.SupervisionListener;
+import cern.c2mon.client.core.jms.TopicRegistrationDetails;
 import cern.c2mon.client.core.listener.TagUpdateListener;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.request.*;
@@ -78,6 +81,9 @@ public class JmsProxyTest {
    */
   @Autowired
   private JmsProxy jmsProxy;
+
+  @Autowired
+  private JmsConnectionHandler topicPollingExecutor;
 
   @Autowired
   private C2monClientProperties properties;
@@ -284,7 +290,7 @@ public class JmsProxyTest {
       public void onConnection() { latch.countDown(); }
       public void onDisconnection() { latch.countDown(); }
     });
-    ((JmsProxyImpl) jmsProxy).getConnection().getTransport().getTransportListener().transportInterupted();
+    topicPollingExecutor.getConnection().getTransport().getTransportListener().transportInterupted();
 
     latch.await();
 

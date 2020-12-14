@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2020 CERN. All rights not expressly granted are reserved.
  * 
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -15,27 +15,9 @@
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.client.core.jms;
-/******************************************************************************
- * This file is part of the Technical Infrastructure Monitoring (TIM) project.
- * See http://ts-project-tim.web.cern.ch
- * 
- * Copyright (C) 2005-2011 CERN.
- * 
- * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation; either version 2 of the License, or (at your option) any later
- * version. This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details. You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software Foundation, Inc.,
- * 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- * 
- * Author: TIM team, tim.support@cern.ch
- *****************************************************************************/
+
 import java.util.Collection;
 
-import javax.jms.Destination;
 import javax.jms.JMSException;
 
 import cern.c2mon.client.common.listener.ClientRequestReportListener;
@@ -211,25 +193,15 @@ public interface JmsProxy {
    * Unregister the listener from receiving supervision updates.
    * 
    * @param supervisionListener the listener to remove
-   * @throws NullPointerException if argument is null
    */
   void unregisterSupervisionListener(SupervisionListener supervisionListener);
-  
-  /**
-   * Sets the admin message topic on which admin messages will be received.
-   * This method can only be called once!
-   * 
-   * @param adminMessageTopic the adminMessageTopic to set
-   * @throws IllegalStateException if trying to set the admin message topic a second time
-   */
-  void setBroadcastMessageTopic(final Destination adminMessageTopic);
   
   /**
    * Register a listener to be notified of alarm messages received
    * from the server.
    * 
    * @param alarmListener the listener to register
-   * @throws JMSException 
+   * @throws JMSException In case of JMS problems 
    */
   void registerAlarmListener(final AlarmListener alarmListener) throws JMSException;
    
@@ -237,9 +209,8 @@ public interface JmsProxy {
    * Unregister the listener from receiving alarm updates.
    * 
    * @param alarmListener the listener to remove
-   * @throws JMSException 
    */
-  void unregisterAlarmListener(final AlarmListener alarmListener) throws JMSException;
+  void unregisterAlarmListener(final AlarmListener alarmListener);
   
   /**
    * Register a listener to be notified of BroadcastMessage events received
@@ -255,7 +226,6 @@ public interface JmsProxy {
    * Unregister the listener from receiving BroadcastMessage updates.
    * 
    * @param broadcastMessageListener the listener to remove
-   * @throws NullPointerException if argument is null
    */
   void unregisterBroadcastMessageListener(BroadcastMessageListener broadcastMessageListener);
 
@@ -272,8 +242,7 @@ public interface JmsProxy {
   /**
    * Unregister the listener from receiving heartbeat updates.
    * 
-   * @param supervisionListener the listener to remove
-   * @throws NullPointerException if argument is null
+   * @param heartbeatListener the listener to remove
    */
   void unregisterHeartbeatListener(HeartbeatListener heartbeatListener);
 }

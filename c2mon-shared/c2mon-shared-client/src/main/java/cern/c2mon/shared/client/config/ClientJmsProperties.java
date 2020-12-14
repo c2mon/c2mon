@@ -35,11 +35,23 @@ public class ClientJmsProperties extends CommonJmsProperties{
    * Name of the topic on which the server is publishing its heartbeat
    */
   private String heartbeatTopic = "c2mon.client.heartbeat";
+  
+  /**
+   * The broadcast topic channel to which the messages shall be sent
+   */
+  private String broadcastTopic = "c2mon.client.broadcastmessage";
 
   /**
-   * Name of the topic on which the server is publishing alarms
+   * Name of the topic on which the server is publishing {@link AlarmValue} objects as JSON string
    */
   private String alarmTopic = "c2mon.client.alarm";
+
+  
+  /**
+   * Name of the topic on which the server is publishing the full {@link TransferTagImpl} object, 
+   * including the nested {@link AlarmValue} objects that have changed.
+   */
+  private String alarmWithTagTopic = "c2mon.client.alarmWithTagTopic";
 
   /**
    * Topic on which all control tags are published
