@@ -1,10 +1,7 @@
 package cern.c2mon.server.configuration.parser.configuration;
 
 import cern.c2mon.server.cache.*;
-import cern.c2mon.server.cache.loading.EquipmentDAO;
-import cern.c2mon.server.cache.loading.ProcessDAO;
-import cern.c2mon.server.cache.loading.SequenceDAO;
-import cern.c2mon.server.cache.loading.SubEquipmentDAO;
+import cern.c2mon.server.cache.loading.*;
 import org.easymock.EasyMock;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -21,6 +18,11 @@ public class ConfigurationParserTestMocks {
   @Bean
   public ProcessCache processCache() {
     return EasyMock.createStrictMock(ProcessCache.class);
+  }
+
+  @Bean
+  public DeviceClassCache deviceClassCacheCache() {
+    return EasyMock.createStrictMock(DeviceClassCache.class);
   }
 
   @Bean
@@ -76,6 +78,11 @@ public class ConfigurationParserTestMocks {
   @Bean
   public ProcessDAO processDAO() {
     return EasyMock.createStrictMock(ProcessDAO.class);
+  }
+
+  @Bean
+  public DeviceClassDAO deviceClassDAO() {
+    return EasyMock.createStrictMock(DeviceClassDAO.class);
   }
 
   @Bean
