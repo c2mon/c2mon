@@ -18,11 +18,9 @@ package cern.c2mon.client.core.configuration.impl;
 
 import cern.c2mon.client.core.configuration.ConfigurationRequestSender;
 import cern.c2mon.client.core.configuration.DeviceClassConfigurationManager;
-import cern.c2mon.client.core.configuration.ProcessConfigurationManager;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.api.Configuration;
 import cern.c2mon.shared.client.configuration.api.device.DeviceClass;
-import cern.c2mon.shared.client.configuration.api.process.Process;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
