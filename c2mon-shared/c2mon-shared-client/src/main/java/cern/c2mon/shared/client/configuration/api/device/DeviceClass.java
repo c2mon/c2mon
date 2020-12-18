@@ -3,11 +3,14 @@ package cern.c2mon.shared.client.configuration.api.device;
 import cern.c2mon.shared.client.configuration.api.util.ConfigurationEntity;
 import cern.c2mon.shared.client.configuration.api.util.DefaultValue;
 import cern.c2mon.shared.client.configuration.api.util.IgnoreProperty;
+import cern.c2mon.shared.client.device.Property;
+import cern.c2mon.shared.client.device.PropertyList;
 import lombok.Data;
 import org.springframework.util.Assert;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Data
 public class DeviceClass implements ConfigurationEntity {
@@ -22,32 +25,20 @@ public class DeviceClass implements ConfigurationEntity {
     private boolean deleted = false;
 
     /**
-     * Unique identifier of the equipment.
+     * Unique identifier of the device class.
      */
     @IgnoreProperty
     private Long id;
 
     private String name;
 
-
     /**
-     * Free-text description of the equipment.
+     * Free-text description of the device class.
      */
     @DefaultValue("<no description provided>")
     private String description;
 
-    /**
-     * names for properties that compose the Device Class
-     */
-    @IgnoreProperty
-    private List<String> properties = new ArrayList<>();
-
-    /**
-     * names for commands that compose the Device Class
-     */
-    @IgnoreProperty
-    private List<String> commands = new ArrayList<>();
-
+    private PropertyList properties;
 
     public static CreateBuilder create(String name) {
         Assert.hasText(name, "Device Class name is required!");
@@ -63,7 +54,8 @@ public class DeviceClass implements ConfigurationEntity {
     }
 
     public static class CreateBuilder {
-        private DeviceClass deviceClassToBuild = new DeviceClass();
+        private final DeviceClass deviceClassToBuild = new DeviceClass();
+        private final Set<Property> properties = new HashSet<>();
 
         public CreateBuilder(String name) {
             deviceClassToBuild.setName(name);
@@ -80,14 +72,32 @@ public class DeviceClass implements ConfigurationEntity {
             return this;
         }
 
+        public DeviceClass.CreateBuilder addProperty(String name, String description) {
+            Assert.isTrue(properties.stream().map(Property::getName).noneMatch(s -> s.equals(name)),
+                    "A property with this name was already added configured for the Device Class.");
+            this.properties.add(new Property(name, description));
+            return this;
+        }
+        public DeviceClass.CreateBuilder addProperty(Property... properties) {
+            long singleOccurrences = Stream.of(Arrays.stream(properties), this.properties.stream())
+                    .flatMap(o -> o)
+                    .map(Property::getName)
+                    .distinct().count();
+            Assert.isTrue(singleOccurrences == properties.length,
+                    "Attempting to add property with same name twice to the Device Class.");
+            this.properties.addAll(Arrays.asList(properties));
+            return this;
+        }
+
         public DeviceClass build() {
+            this.deviceClassToBuild.setProperties(new PropertyList(properties));
             return this.deviceClassToBuild;
         }
     }
 
     public static class UpdateBuilder {
 
-        private DeviceClass deviceClassToBuild = new DeviceClass();
+        private final DeviceClass deviceClassToBuild = new DeviceClass();
 
         public UpdateBuilder(String name) {
             deviceClassToBuild.setName(name);
@@ -106,6 +116,7 @@ public class DeviceClass implements ConfigurationEntity {
             this.deviceClassToBuild.setDescription(description);
             return this;
         }
+
         public DeviceClass build() {
             deviceClassToBuild.setUpdated(true);
             return this.deviceClassToBuild;

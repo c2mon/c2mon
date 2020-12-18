@@ -27,7 +27,7 @@ import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.server.common.device.Command;
 import cern.c2mon.server.common.device.DeviceCacheObject;
 import cern.c2mon.server.common.device.DeviceClassCacheObject;
-import cern.c2mon.server.common.device.Property;
+import cern.c2mon.shared.client.device.Property;
 import cern.c2mon.server.common.equipment.AbstractEquipmentCacheObject;
 import cern.c2mon.server.common.equipment.EquipmentCacheObject;
 import cern.c2mon.server.common.process.ProcessCacheObject;
