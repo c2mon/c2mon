@@ -62,15 +62,25 @@ public class ConfigurationServiceDeviceClassTest {
     @Test
     @DirtiesContext
     public void testCreateDeviceClassByName() {
-        ConfigurationReport report = configurationService.createDeviceClass("deviceName1");
+        String deviceClassName = String.valueOf(System.currentTimeMillis());
+        ConfigurationReport report = configurationService.createDeviceClass(deviceClassName);
         Assert.assertEquals(ConfigConstants.Status.OK, report.getStatus());
-
     }
 
     @Test
     @DirtiesContext
     public void testCreateDeviceClassByDeviceClass() {
         DeviceClass deviceClass = new DeviceClass.CreateBuilder("deviceName2").build();
+        ConfigurationReport report = configurationService.createDeviceClass(deviceClass);
+        Assert.assertEquals(ConfigConstants.Status.OK, report.getStatus());
+    }
+
+    @Test
+    @DirtiesContext
+    public void testCreateDeviceClassByDeviceClassWithProperties() {
+        DeviceClass deviceClass = new DeviceClass.CreateBuilder(String.valueOf(System.currentTimeMillis()))
+                .addProperty("intjtestprop", "intjtestpropdesc")
+                .build();
         ConfigurationReport report = configurationService.createDeviceClass(deviceClass);
         Assert.assertEquals(ConfigConstants.Status.OK, report.getStatus());
     }

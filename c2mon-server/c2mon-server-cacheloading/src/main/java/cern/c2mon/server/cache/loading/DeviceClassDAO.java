@@ -33,4 +33,6 @@ public interface DeviceClassDAO extends CacheLoaderDAO<DeviceClass>, Configurabl
   void deleteItem(DeviceClass deviceClass);
 
   Long getIdByName(String name);
+
+  Long getPropertyIdByNameAndDeviceClassId(String name, Long deviceClassID);
 }

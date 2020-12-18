@@ -10,17 +10,17 @@
       <arg column="device_class_name" javaType="String" />
       <arg column="device_class_description" javaType="String" />
     </constructor>
-    <collection property="properties" ofType="cern.c2mon.server.common.device.Property" javaType="java.util.ArrayList" resultMap="propertyResultMap" />
+    <collection property="properties" ofType="cern.c2mon.shared.client.device.Property" javaType="java.util.ArrayList" resultMap="propertyResultMap" />
     <collection property="commands" ofType="cern.c2mon.server.common.device.Command" javaType="java.util.ArrayList" resultMap="commandResultMap" />
     <collection property="deviceIds" ofType="Long" javaType="java.util.ArrayList" resultMap="deviceIdsResultMap" />
   </resultMap>
 
-  <resultMap id="propertyResultMap" type="cern.c2mon.server.common.device.Property">
+  <resultMap id="propertyResultMap" type="cern.c2mon.shared.client.device.Property">
     <id column="property_id" property="id" jdbcType="NUMERIC" javaType="java.lang.Long"/>
     <result column="property_name" property="name" />
     <result column="property_description" property="description" />
 
-    <collection property="fields" ofType="cern.c2mon.server.common.device.Property" javaType="java.util.ArrayList">
+    <collection property="fields" ofType="cern.c2mon.shared.client.device.Property" javaType="java.util.ArrayList">
       <id column="field_id" property="id" jdbcType="NUMERIC" javaType="java.lang.Long"/>
       <result column="field_name" property="name" />
     </collection>
@@ -140,6 +140,13 @@
     SELECT DEVCLASSID
     FROM DEVICECLASS
     WHERE DEVCLASSNAME = #{name}
+  </select>
+
+  <select id="getPropertyIdByNameAndDeviceClassId" resultType="Long">
+    SELECT PROPID
+    FROM   PROPERTY
+    WHERE  PROPDEVCLASSID = #{device_class_id}
+    AND    PROPNAME = #{name}
   </select>
 
   <select id="getNumberItems" resultType="Integer">

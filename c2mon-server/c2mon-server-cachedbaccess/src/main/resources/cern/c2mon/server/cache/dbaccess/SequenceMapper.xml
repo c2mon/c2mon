@@ -94,5 +94,17 @@
     SELECT NEXTVAL('DEVLASS_ID');
   </select>
 
+  <select id="getNextPropertyId" databaseId="hsql" resultType="java.lang.Long">
+    CALL NEXT VALUE FOR PROPERTY_ID_SEQUENCE
+  </select>
+
+  <select id="getNextPropertyId" databaseId="oracle" resultType="java.lang.Long">
+    SELECT PROPERTY_ID_SEQUENCE.NEXTVAL FROM DUAL
+  </select>
+
+  <select id="getNextPropertyId" databaseId="mysql" resultType="java.lang.Long">
+    SELECT NEXTVAL('PROPERTY_ID');
+  </select>
+
 
 </mapper>

@@ -24,6 +24,7 @@ import cern.c2mon.server.configuration.parser.exception.ConfigurationParseExcept
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.api.device.DeviceClass;
+import cern.c2mon.shared.client.device.Property;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,8 +39,8 @@ import java.util.List;
 @Slf4j
 public class DeviceClassFactory extends EntityFactory<DeviceClass> {
 
-  private DeviceClassDAO deviceClassDAO;
-  private SequenceDAO sequenceDAO;
+  private final DeviceClassDAO deviceClassDAO;
+  private final SequenceDAO sequenceDAO;
 
   @Autowired
   public DeviceClassFactory(DeviceClassCache deviceClassCache, SequenceDAO sequenceDAO, DeviceClassDAO deviceClassDAO) {
@@ -71,8 +72,9 @@ public class DeviceClassFactory extends EntityFactory<DeviceClass> {
   Long createId(DeviceClass entity) {
     if (entity.getName() != null && deviceClassDAO.getIdByName(entity.getName()) != null) {
       throw new ConfigurationParseException("Error creating deviceClass " + entity.getName() + ": " +
-          "Name already exists");
+              "Name already exists");
     } else {
+      createAndSetPropertyIds(entity);
       return entity.getId() != null ? entity.getId() : sequenceDAO.getNextDeviceClassId();
     }
   }
@@ -80,5 +82,17 @@ public class DeviceClassFactory extends EntityFactory<DeviceClass> {
   @Override
   ConfigConstants.Entity getEntity() {
     return ConfigConstants.Entity.DEVICECLASS;
+  }
+
+  private void createAndSetPropertyIds(DeviceClass entity) {
+    for (Property property : entity.getProperties().getProperties()) {
+      if (property.getName() != null && entity.getId() != null &&
+              deviceClassDAO.getPropertyIdByNameAndDeviceClassId(property.getName(), entity.getId()) != null) {
+        throw new ConfigurationParseException("Error creating property " + property.getName() +
+                " for deviceClass " + entity.getName() + ": " + "Name already exists within deviceClass.");
+      } else if (property.getId() == null) {
+        property.setId(sequenceDAO.getNextPropertyId());
+      }
+    }
   }
 }

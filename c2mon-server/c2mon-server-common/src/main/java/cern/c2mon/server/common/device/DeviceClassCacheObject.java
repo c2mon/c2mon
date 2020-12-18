@@ -16,6 +16,8 @@
  *****************************************************************************/
 package cern.c2mon.server.common.device;
 
+import cern.c2mon.shared.client.device.Property;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,7 +55,7 @@ public class DeviceClassCacheObject implements DeviceClass, Cloneable {
   private List<Property> properties = new ArrayList<>();
 
   /**
-   * The list of commands that belong o this device class.
+   * The list of commands that belong to this device class.
    */
   private List<Command> commands = new ArrayList<>();
 

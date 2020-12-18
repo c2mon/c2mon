@@ -14,12 +14,13 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.common.device;
+package cern.c2mon.shared.client.device;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import cern.c2mon.shared.client.configuration.api.util.IgnoreProperty;
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementList;
@@ -78,6 +79,30 @@ public class Property implements Serializable {
   }
 
   public Property() {
+  }
+
+  /**
+   * Constructor to use during property creation requests.
+   *
+   * @param name the name of the property
+   * @param description the property description
+   */
+  public Property(String name, String description) {
+    this.name = name;
+    this.description = description;
+  }
+
+  /**
+   * Constructor to use during property creation requests which will optionally set the fields of the property.
+   *
+   * @param name the name of the property
+   * @param description the property description
+   * @param fields the property fields
+   */
+  public Property(String name, String description, List<Property> fields) {
+    this.name = name;
+    this.description = description;
+    this.fields = fields;
   }
 
   public Long getId() {
