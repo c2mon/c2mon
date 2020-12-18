@@ -18,6 +18,7 @@ package cern.c2mon.server.common.device;
 
 import java.util.List;
 
+import cern.c2mon.shared.client.device.Property;
 import cern.c2mon.shared.common.Cacheable;
 
 /**

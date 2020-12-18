@@ -14,13 +14,20 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.common.device;
+package cern.c2mon.shared.client.device;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
+import org.simpleframework.xml.Serializer;
+import org.simpleframework.xml.convert.AnnotationStrategy;
+import org.simpleframework.xml.core.Persister;
 
 /**
  * Simple XML mapper bean representing a list of device class properties. Used
@@ -32,9 +39,9 @@ import org.simpleframework.xml.Root;
 public class PropertyList {
 
   @ElementList(entry = "Property", inline = true, required = false)
-  private List<Property> properties = new ArrayList<>();
+  private Set<Property> properties = new HashSet<>();
 
-  public PropertyList(List<Property> properties) {
+  public PropertyList(Set<Property> properties) {
     this.properties = properties;
   }
 
@@ -43,6 +50,29 @@ public class PropertyList {
   }
 
   public List<Property> getProperties() {
-    return properties;
+    return new ArrayList<>(properties);
+  }
+
+
+  public String toConfigXml() {
+    Serializer serializer = new Persister(new AnnotationStrategy());
+    StringWriter fw = null;
+    String result = null;
+    try {
+      fw = new StringWriter();
+      serializer.write(this, fw);
+      result = fw.toString();
+    } catch (Exception e) {
+      e.printStackTrace();
+    } finally {
+      if (fw != null) {
+        try {
+          fw.close();
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+      }
+    }
+    return result;
   }
 }

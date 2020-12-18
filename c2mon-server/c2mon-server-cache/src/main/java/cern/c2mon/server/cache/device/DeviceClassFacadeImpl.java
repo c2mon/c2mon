@@ -32,8 +32,8 @@ import cern.c2mon.server.common.device.Command;
 import cern.c2mon.server.common.device.CommandList;
 import cern.c2mon.server.common.device.DeviceClass;
 import cern.c2mon.server.common.device.DeviceClassCacheObject;
-import cern.c2mon.server.common.device.Property;
-import cern.c2mon.server.common.device.PropertyList;
+import cern.c2mon.shared.client.device.Property;
+import cern.c2mon.shared.client.device.PropertyList;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.daq.config.Change;
 

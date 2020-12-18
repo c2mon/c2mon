@@ -18,6 +18,7 @@ package cern.c2mon.server.cache.device;
 
 import java.util.*;
 
+import cern.c2mon.shared.client.device.Property;
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;

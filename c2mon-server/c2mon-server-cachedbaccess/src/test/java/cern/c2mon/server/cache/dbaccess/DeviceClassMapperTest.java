@@ -19,7 +19,7 @@ package cern.c2mon.server.cache.dbaccess;
 import cern.c2mon.server.common.device.Command;
 import cern.c2mon.server.common.device.DeviceClass;
 import cern.c2mon.server.common.device.DeviceClassCacheObject;
-import cern.c2mon.server.common.device.Property;
+import cern.c2mon.shared.client.device.Property;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;

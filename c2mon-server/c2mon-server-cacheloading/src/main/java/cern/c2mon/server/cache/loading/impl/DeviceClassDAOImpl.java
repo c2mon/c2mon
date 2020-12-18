@@ -25,7 +25,7 @@ import cern.c2mon.server.cache.loading.common.AbstractDefaultLoaderDAO;
 import cern.c2mon.server.common.device.Command;
 import cern.c2mon.server.common.device.DeviceClass;
 import cern.c2mon.server.common.device.DeviceClassCacheObject;
-import cern.c2mon.server.common.device.Property;
+import cern.c2mon.shared.client.device.Property;
 
 /**
  * DeviceClass loader DAO implementation.
@@ -70,6 +70,11 @@ public class DeviceClassDAOImpl extends AbstractDefaultLoaderDAO<DeviceClass> im
   @Override
   public Long getIdByName(String name) {
     return deviceClassMapper.getIdByName(name);
+  }
+
+  @Override
+  public Long getPropertyIdByNameAndDeviceClassId(String name, Long deviceClassID) {
+    return deviceClassMapper.getPropertyIdByNameAndDeviceClassId(name, deviceClassID);
   }
 
   @Override
