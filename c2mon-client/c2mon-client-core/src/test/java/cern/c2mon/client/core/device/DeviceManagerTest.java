@@ -1,6 +1,5 @@
-package cern.c2mon.client.core.device;
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2020 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -15,7 +14,7 @@ package cern.c2mon.client.core.device;
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-
+package cern.c2mon.client.core.device;
 
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
@@ -34,12 +33,9 @@ import org.easymock.IAnswer;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import lombok.extern.slf4j.Slf4j;
@@ -54,6 +50,7 @@ import cern.c2mon.client.core.device.config.DeviceManagerTestConfig;
 import cern.c2mon.client.core.device.exception.DeviceNotFoundException;
 import cern.c2mon.client.core.device.listener.DeviceInfoUpdateListener;
 import cern.c2mon.client.core.device.property.*;
+import cern.c2mon.client.core.device.property.Property;
 import cern.c2mon.client.core.device.request.DeviceRequestHandler;
 import cern.c2mon.client.core.device.util.DeviceTestUtils;
 import cern.c2mon.client.core.service.CommandService;
