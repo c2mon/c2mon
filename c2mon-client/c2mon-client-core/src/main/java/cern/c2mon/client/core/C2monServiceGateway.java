@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2019 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2020 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -39,7 +39,6 @@ import cern.c2mon.client.core.service.*;
  * only use functionality which are provided by these classes.
  * <p>
  *
- *
  * @author Matthias Braeger
  * @author Justin Lewis Salmon
  */
@@ -76,6 +75,9 @@ public class C2monServiceGateway implements ApplicationContextAware {
 
   /** Static reference to the <code>ElasticsearchService</code> singleton instance */
   private static ElasticsearchService elasticsearchService;
+  
+  /** Static reference to the <code>DeviceService</code> singleton instance */
+  private static DeviceService deviceService;
 
   /**
    * Protected default constructor
@@ -158,6 +160,19 @@ public class C2monServiceGateway implements ApplicationContextAware {
     startC2monClientSynchronous();
     return elasticsearchService;
   }
+  
+  /**
+   * The C2MON {@link DeviceService} provides methods
+   * to retrieve Device configurations. Please note that this is an
+   * advanced C2MON concept and requires server side configuration.
+   * For simple use cases this additional layer should not be required.
+   * 
+   * @return Instance of the {@link DeviceService}
+   */
+  public static DeviceService getDeviceService() {
+    startC2monClientSynchronous();
+    return deviceService;
+  }
 
   /**
    * Starts the C2MON core. Must be called at application start-up.
@@ -184,8 +199,7 @@ public class C2monServiceGateway implements ApplicationContextAware {
       initiateGatewayFields(context);
 
       ((AbstractApplicationContext) context).registerShutdownHook();
-    }
-    else {
+    } else {
       log.debug("startC2monClient() - C2MON client core already started.");
     }
   }
@@ -243,6 +257,7 @@ public class C2monServiceGateway implements ApplicationContextAware {
     statisticsService = context.getBean(StatisticsService.class);
     tagService = context.getBean(TagService.class);
     elasticsearchService = context.getBean(ElasticsearchService.class);
+    deviceService = context.getBean(DeviceService.class);
   }
 
   /**
