@@ -17,11 +17,9 @@
 package cern.c2mon.client.core.device.config;
 
 import org.easymock.EasyMock;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.*;
 
 import cern.c2mon.client.core.cache.BasicCacheHandler;
 import cern.c2mon.client.core.config.C2monClientProperties;
@@ -31,6 +29,7 @@ import cern.c2mon.client.core.service.CommandService;
 import cern.c2mon.client.core.service.TagService;
 
 @Configuration
+@ConditionalOnProperty(prefix= "c2mon.client.device.test", name="mock")
 @EnableConfigurationProperties(C2monClientProperties.class)
 @ComponentScan({
     "cern.c2mon.client.core.device"

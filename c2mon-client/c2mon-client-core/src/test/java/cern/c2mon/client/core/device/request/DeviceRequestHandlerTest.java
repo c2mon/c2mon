@@ -16,44 +16,50 @@
  *****************************************************************************/
 package cern.c2mon.client.core.device.request;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import javax.jms.JMSException;
-
+import cern.c2mon.client.core.config.C2monClientProperties;
+import cern.c2mon.client.core.config.mock.JmsProxyMock;
+import cern.c2mon.client.core.jms.JmsProxy;
+import cern.c2mon.shared.client.device.*;
+import cern.c2mon.shared.client.request.ClientRequestResult;
+import cern.c2mon.shared.client.request.JsonRequest;
 import org.easymock.EasyMock;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import cern.c2mon.client.core.jms.JmsProxy;
-import cern.c2mon.shared.client.device.DeviceClassNameResponse;
-import cern.c2mon.shared.client.device.DeviceClassNameResponseImpl;
-import cern.c2mon.shared.client.device.DeviceCommand;
-import cern.c2mon.shared.client.device.DeviceProperty;
-import cern.c2mon.shared.client.device.TransferDevice;
-import cern.c2mon.shared.client.device.TransferDeviceImpl;
-import cern.c2mon.shared.client.request.ClientRequestResult;
-import cern.c2mon.shared.client.request.JsonRequest;
+import javax.jms.JMSException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * @author Justin Lewis Salmon
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({ "classpath:test-config/c2mon-devicerequesthandler-test.xml" })
+@ContextConfiguration(classes = {
+        JmsProxyMock.class,
+        C2monClientProperties.class
+})
+@TestPropertySource("classpath:device-request-handler-test.properties")
 public class DeviceRequestHandlerTest {
 
-  /** Component to test */
   @Autowired
-  DeviceRequestHandler requestHandler;
+  C2monClientProperties properties;
 
-  /** Mocked components */
   @Autowired
   JmsProxy jmsProxyMock;
+
+  DeviceRequestHandler requestHandler;
+
+  @Before
+  public void setup() {
+    requestHandler = new DeviceRequestHandler(jmsProxyMock, properties);
+  }
 
   @Test
   public void testGetAllDeviceClassNames() throws JMSException {
