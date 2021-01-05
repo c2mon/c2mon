@@ -74,7 +74,13 @@ public class ClientJmsProperties extends CommonJmsProperties{
   private String configRequestQueue = "c2mon.client.config";
   
   /**
-   * Timeout of client request in milliseconds. 
+   * Timeout of client request in milliseconds for waiting for an answer. 
    */
-  private int requestTimeout = 10_000;
+  private int requestTimeout = 15_000;
+  
+  /**
+   * Time to live in milliseconds used for all topic and queue messages sent with the Client API.
+   * Default is 10 seconds
+   */
+  private long messageTimeToLive = 10_000L;
 }

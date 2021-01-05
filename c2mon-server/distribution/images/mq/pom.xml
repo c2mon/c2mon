@@ -11,8 +11,7 @@
 	<name>c2mon-server :: activemq image</name>
 	<packaging>jar</packaging>
 	<properties>
-		<image.base>gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-openjdk:jre-8
-		</image.base>
+		<image.base>gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-openjdk:jre-8</image.base>
 		<image.tag>activemq-${org.apache.activemq.version}-c2mon-${project.version}</image.tag>
 		<gitlab-repo>c2mon/mq</gitlab-repo>
 		<dockerhub-repo>cern/c2mon-ext</dockerhub-repo>

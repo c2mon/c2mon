@@ -124,13 +124,12 @@ public interface JmsProxy {
    * Sends a message to the given topic.
    * 
    * @param message the message to send
-   * @param queueName the name of the queue on which to send this request
-   * @param timeToLive how long the message will live on the broker !!This now overridden with default 10 minutes!!
+   * @param topicName the name of the topic on which to send this request
    * @throws JMSException if not currently connected or 
    *                      if a JMS problem occurs while making the request (reconnection is handled by the JmsProxy)
    * @throws NullPointerException thrown if either argument is null
    */
-  void publish(final String message, final String queueName, final long timeToLive) throws JMSException;
+  void publish(final String message, final String topicName) throws JMSException;
   
   /**
    * Send a request to the server and wait "timeout" milliseconds for a response.
