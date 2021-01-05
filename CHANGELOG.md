@@ -11,6 +11,7 @@ For more details on a given release, please check also the [version planning](ht
 - Support propagation of new server datasource property values amongst C2MON datasources (CM-272)
 
 ### Changed
+- Client: Changed interface of `AlarmListener` to receive `Tag` + `AlarmValue` instead of just the `AlarmValue` update (CM-246)
 - Server: Improved Rule evaluation for scenario with invalid input tags (CM-276)
 - Configuration API: Improved [DataTagAddress](https://gitlab.cern.ch/c2mon/c2mon/-/blob/issue-CM-278/c2mon-shared/c2mon-shared-common/src/main/java/cern/c2mon/shared/common/datatag/DataTagAddress.java) configuration API for defining Value Deadband type and JMS priority (CM-278). 
 
