@@ -16,18 +16,23 @@
  *****************************************************************************/
 package cern.c2mon.client.core.jms.impl;
 
-import cern.c2mon.client.core.jms.AlarmListener;
-import cern.c2mon.shared.client.tag.TagUpdate;
-import cern.c2mon.shared.client.tag.TransferTagImpl;
-import cern.c2mon.shared.util.json.GsonFactory;
-import com.google.gson.Gson;
-import lombok.extern.slf4j.Slf4j;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.TextMessage;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
+
+import com.google.gson.Gson;
+
+import lombok.extern.slf4j.Slf4j;
+
+import cern.c2mon.client.core.jms.AlarmListener;
+import cern.c2mon.client.core.tag.TagController;
+import cern.c2mon.shared.client.tag.TagUpdate;
+import cern.c2mon.shared.client.tag.TransferTagImpl;
+import cern.c2mon.shared.rule.RuleFormatException;
+import cern.c2mon.shared.util.json.GsonFactory;
 
 /**
  * Wrapper JMS listener to register to the alarm messages topic. This
@@ -62,13 +67,22 @@ class AlarmListenerWrapper extends AbstractListenerWrapper<AlarmListener, TagUpd
 
   @Override
   protected void invokeListener(final AlarmListener listener, final TagUpdate tagWithAlarmChange) {
-      log.debug("invoke listener class {} for tag id: {}", listener.getClass(), tagWithAlarmChange.getId());
-      listener.onAlarmUpdate(tagWithAlarmChange);
+    log.debug("invoke listener class {} for tag id: {}", listener.getClass(), tagWithAlarmChange.getId());
+
+    TagController controller = new TagController(tagWithAlarmChange.getId());
+    try {
+      controller.update(tagWithAlarmChange);
+      listener.onAlarmUpdate(controller.getTagImpl());
+    } catch (RuleFormatException e) {
+      log.error("Rule format error. Cannot inform listeners about alarm change on tag #{}", tagWithAlarmChange.getId(), e);
+    } catch (Exception ex) {
+      log.error("Error caught on alarm notification!", ex);
+    }
   }
 
   @Override
   protected String getDescription(TagUpdate event) {
-      return "Tag #" + event.getId() + " got alarm value change";
+    return "Tag #" + event.getId() + " got alarm value change";
   }
 
   @Override
