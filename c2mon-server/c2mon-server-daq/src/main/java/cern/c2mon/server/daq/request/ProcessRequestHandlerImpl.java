@@ -87,7 +87,7 @@ public class ProcessRequestHandlerImpl implements SessionAwareMessageListener<Me
       // ProcessDisconnectionRequest
       if (processRequest instanceof ProcessDisconnectionRequest) {
         processEvents.onDisconnection((ProcessDisconnectionRequest) processRequest);
-        LOGGER.debug("onMessage() - Process disconnection completed for DAQ " + ((ProcessDisconnectionRequest) processRequest).getProcessName());
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("onMessage() - Process disconnection completed for DAQ " + ((ProcessDisconnectionRequest) processRequest).getProcessName());
       } else if (processRequest instanceof ProcessConnectionRequest) {
         ProcessConnectionRequest processConnectionRequest = (ProcessConnectionRequest)processRequest;
         LOGGER.info("onMessage - DAQ Connection request received from DAQ " + processConnectionRequest.getProcessName());
@@ -96,12 +96,17 @@ public class ProcessRequestHandlerImpl implements SessionAwareMessageListener<Me
         String processConnectionResponse = processEvents.onConnection(processConnectionRequest);
 
         // Send reply to DAQ on reply queue
-        LOGGER.debug("onMessage - Sending Connection response to DAQ " + processConnectionRequest.getProcessName());
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug("onMessage - Sending Connection response to DAQ " + processConnectionRequest.getProcessName());
+        }
 
-        try (MessageProducer messageProducer = session.createProducer(message.getJMSReplyTo())) {
+        MessageProducer messageProducer = session.createProducer(message.getJMSReplyTo());
+        try {
           TextMessage replyMessage = session.createTextMessage();
           replyMessage.setText(processConnectionResponse);
           messageProducer.send(replyMessage);
+        } finally {
+          messageProducer.close();
         }
       } else if (processRequest instanceof ProcessConfigurationRequest) {
         ProcessConfigurationRequest processConfigurationRequest = (ProcessConfigurationRequest) processRequest;
@@ -111,7 +116,7 @@ public class ProcessRequestHandlerImpl implements SessionAwareMessageListener<Me
         String processConfiguration = processEvents.onConfiguration(processConfigurationRequest);
 
         //send reply to DAQ on reply queue
-        LOGGER.debug("onMessage - Sending Configuration Response to DAQ " + processConfigurationRequest.getProcessName());
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("onMessage - Sending Configuration Response to DAQ " + processConfigurationRequest.getProcessName());
 
         try (MessageProducer messageProducer = session.createProducer(message.getJMSReplyTo())) {
           requireNonNull(messageProducer, "Failed to create message producer.");
