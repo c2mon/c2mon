@@ -1,5 +1,5 @@
 <diff xmlns:beans="http://www.springframework.org/schema/beans"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:broker="http://activemq.apache.org/schema/core">
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:broker="http://activemq.apache.org/schema/core">
     <add sel="beans:beans/broker:broker/broker:transportConnectors">	<transportConnector name="http" uri="http://0.0.0.0:8086?maximumConnections=1000&amp;wireFormat.maxFrameSize=104857600"/>
     </add>
 </diff>
