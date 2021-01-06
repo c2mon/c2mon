@@ -118,11 +118,13 @@ public class ProcessRequestHandlerImpl implements SessionAwareMessageListener<Me
         //send reply to DAQ on reply queue
         if (LOGGER.isDebugEnabled()) LOGGER.debug("onMessage - Sending Configuration Response to DAQ " + processConfigurationRequest.getProcessName());
 
-        try (MessageProducer messageProducer = session.createProducer(message.getJMSReplyTo())) {
-          requireNonNull(messageProducer, "Failed to create message producer.");
+        MessageProducer messageProducer = session.createProducer(message.getJMSReplyTo());
+        try{
           TextMessage replyMessage = session.createTextMessage();
           replyMessage.setText(processConfiguration);
           messageProducer.send(replyMessage);
+        } finally {
+          messageProducer.close();
         }
       } else {
         LOGGER.error("onMessage - Incoming ProcessRequest object not recognized! - ignoring the request");
