@@ -99,7 +99,6 @@ public class ProcessRequestHandlerImpl implements SessionAwareMessageListener<Me
         LOGGER.debug("onMessage - Sending Connection response to DAQ " + processConnectionRequest.getProcessName());
 
         try (MessageProducer messageProducer = session.createProducer(message.getJMSReplyTo())) {
-          requireNonNull(messageProducer, "Failed to create message producer.");
           TextMessage replyMessage = session.createTextMessage();
           replyMessage.setText(processConnectionResponse);
           messageProducer.send(replyMessage);
