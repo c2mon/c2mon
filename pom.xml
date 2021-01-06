@@ -43,6 +43,7 @@
     <elasticsearch.version>6.4.3</elasticsearch.version>
     <mockito-all.version>1.10.19</mockito-all.version>
     <com.fasterxml.jackson.core>2.9.2</com.fasterxml.jackson.core>
+    <com.oracle.version>19.8.0.0</com.oracle.version>
     <!-- Start: Used for K8S distributions -->
     <grafana.version>6.1.2</grafana.version>
     <mysql.version>5.7.15</mysql.version>
@@ -179,23 +180,23 @@
       </dependency>
       <dependency>
         <groupId>com.oracle</groupId>
-        <artifactId>ojdbc</artifactId>
-        <version>11.2.0.3</version>
+        <artifactId>ojdbc8</artifactId>
+        <version>${com.oracle.version}</version>
       </dependency>
       <dependency>
         <groupId>com.oracle</groupId>
         <artifactId>orai18n</artifactId>
-        <version>11.2.0.3</version>
+        <version>${com.oracle.version}</version>
       </dependency>
       <dependency>
         <groupId>org.mybatis</groupId>
         <artifactId>mybatis</artifactId>
-        <version>3.4.1</version>
+        <version>3.5.6</version>
       </dependency>
       <dependency>
         <groupId>org.mybatis</groupId>
         <artifactId>mybatis-spring</artifactId>
-        <version>1.3.0</version>
+        <version>2.0.6</version>
       </dependency>
       <dependency>
         <groupId>org.apache.geronimo.specs</groupId>
