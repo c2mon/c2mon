@@ -24,6 +24,7 @@ import cern.c2mon.server.configuration.parser.exception.ConfigurationParseExcept
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.api.device.DeviceClass;
+import cern.c2mon.shared.client.device.Command;
 import cern.c2mon.shared.client.device.Property;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,6 +76,7 @@ public class DeviceClassFactory extends EntityFactory<DeviceClass> {
               "Name already exists");
     } else {
       createAndSetPropertyIds(entity);
+      createAndSetCommandIds(entity);
       return entity.getId() != null ? entity.getId() : sequenceDAO.getNextDeviceClassId();
     }
   }
@@ -86,8 +88,7 @@ public class DeviceClassFactory extends EntityFactory<DeviceClass> {
 
   private void createAndSetPropertyIds(DeviceClass entity) {
     for (Property property : entity.getProperties().getProperties()) {
-      if (property.getName() != null && entity.getId() != null &&
-              deviceClassDAO.getPropertyIdByNameAndDeviceClassId(property.getName(), entity.getId()) != null) {
+      if (isPropertyNameInDeviceClass(property.getName(), entity.getId())) {
         throw new ConfigurationParseException("Error creating property " + property.getName() +
                 " for deviceClass " + entity.getName() + ": " + "Name already exists within deviceClass.");
       } else if (property.getId() == null) {
@@ -95,4 +96,26 @@ public class DeviceClassFactory extends EntityFactory<DeviceClass> {
       }
     }
   }
+
+  private void createAndSetCommandIds(DeviceClass entity) {
+    for (Command command : entity.getCommands().getCommands()) {
+      if (isCommandNameInDeviceClass(command.getName(), entity.getId())) {
+        throw new ConfigurationParseException("Error creating command " + command.getName() +
+                " for deviceClass " + entity.getName() + ": " + "Name already exists within deviceClass.");
+      } else if (command.getId() == null) {
+        command.setId(sequenceDAO.getNextPropertyId());
+      }
+    }
+  }
+
+  private boolean isPropertyNameInDeviceClass(String propertyName, Long deviceClassId) {
+    return propertyName != null && deviceClassId != null &&
+            deviceClassDAO.getPropertyIdByPropertyNameAndDeviceClassId(propertyName, deviceClassId) != null;
+  }
+
+  private boolean isCommandNameInDeviceClass(String propertyName, Long deviceClassId) {
+    return propertyName != null && deviceClassId != null &&
+            deviceClassDAO.getCommandIdByCommandNameAndDeviceClassId(propertyName, deviceClassId) != null;
+  }
+
 }

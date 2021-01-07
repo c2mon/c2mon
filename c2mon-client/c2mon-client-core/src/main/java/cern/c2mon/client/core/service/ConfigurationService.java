@@ -37,7 +37,7 @@ import java.util.Collection;
 public interface ConfigurationService extends ProcessConfigurationManager,
     EquipmentConfigurationManager, SubEquipmentConfigurationManager, DataTagConfigurationManager,
     RuleTagConfigurationManager, AlarmConfigurationManager, ControlTagConfigurationManager,
-    CommandTagConfigurationManager, DeviceClassConfigurationManager {
+    CommandTagConfigurationManager, DeviceClassConfigurationManager, DeviceConfigurationManager {
 
   /**
    * Returns a TagConfiguration object for every valid id on the list. The

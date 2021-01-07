@@ -18,7 +18,7 @@ package cern.c2mon.server.cache.device;
 
 import java.util.*;
 
-import org.simpleframework.xml.Serializer;
+import cern.c2mon.shared.client.device.*;
 import org.simpleframework.xml.core.Persister;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,9 +31,6 @@ import cern.c2mon.server.cache.DeviceFacade;
 import cern.c2mon.server.cache.common.AbstractFacade;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.device.*;
-import cern.c2mon.shared.client.device.DeviceCommand;
-import cern.c2mon.shared.client.device.DeviceInfo;
-import cern.c2mon.shared.client.device.DeviceProperty;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.daq.config.Change;
 
@@ -276,8 +273,8 @@ public class DeviceFacadeImpl extends AbstractFacade<Device> implements DeviceFa
   private List<DeviceProperty> parseDevicePropertiesXML(String xmlString) throws Exception {
     List<DeviceProperty> deviceProperties = new ArrayList<>();
 
-    Serializer serializer = new Persister();
-    DevicePropertyList devicePropertyList = serializer.read(DevicePropertyList.class, xmlString);
+    Persister persister = new Persister();
+    DevicePropertyList devicePropertyList = persister.read(DevicePropertyList.class, xmlString);
 
     for (DeviceProperty deviceProperty : devicePropertyList.getDeviceProperties()) {
 
@@ -304,8 +301,8 @@ public class DeviceFacadeImpl extends AbstractFacade<Device> implements DeviceFa
   private List<DeviceCommand> parseDeviceCommandsXML(String xmlString) throws Exception {
     List<DeviceCommand> deviceCommands = new ArrayList<>();
 
-    Serializer serializer = new Persister();
-    DeviceCommandList deviceCommandList = serializer.read(DeviceCommandList.class, xmlString);
+    Persister persister = new Persister();
+    DeviceCommandList deviceCommandList = persister.read(DeviceCommandList.class, xmlString);
 
     for (DeviceCommand deviceCommand : deviceCommandList.getDeviceCommands()) {
       deviceCommands.add(deviceCommand);

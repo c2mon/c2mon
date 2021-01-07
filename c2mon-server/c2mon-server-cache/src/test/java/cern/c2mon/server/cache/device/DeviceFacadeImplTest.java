@@ -18,7 +18,7 @@ package cern.c2mon.server.cache.device;
 
 import java.util.*;
 
-import cern.c2mon.shared.client.device.Property;
+import cern.c2mon.shared.client.device.*;
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;
@@ -36,9 +36,6 @@ import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.cache.loading.config.CacheLoadingModule;
 import cern.c2mon.server.common.config.CommonModule;
 import cern.c2mon.server.common.device.*;
-import cern.c2mon.shared.client.device.DeviceCommand;
-import cern.c2mon.shared.client.device.DeviceInfo;
-import cern.c2mon.shared.client.device.DeviceProperty;
 import cern.c2mon.shared.common.ConfigurationException;
 
 import static cern.c2mon.server.test.device.ObjectComparison.*;

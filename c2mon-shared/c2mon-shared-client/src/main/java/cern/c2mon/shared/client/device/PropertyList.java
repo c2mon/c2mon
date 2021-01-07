@@ -54,25 +54,11 @@ public class PropertyList {
   }
 
 
-  public String toConfigXml() {
-    Serializer serializer = new Persister(new AnnotationStrategy());
-    StringWriter fw = null;
-    String result = null;
-    try {
-      fw = new StringWriter();
+  public String toConfigXml() throws Exception {
+    Persister serializer = new Persister(new AnnotationStrategy());
+    try (StringWriter fw = new StringWriter()) {
       serializer.write(this, fw);
-      result = fw.toString();
-    } catch (Exception e) {
-      e.printStackTrace();
-    } finally {
-      if (fw != null) {
-        try {
-          fw.close();
-        } catch (IOException e) {
-          e.printStackTrace();
-        }
-      }
+      return fw.toString();
     }
-    return result;
   }
 }
