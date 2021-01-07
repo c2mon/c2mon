@@ -14,35 +14,39 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.common.device;
+package cern.c2mon.shared.client.device;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
 
+import cern.c2mon.shared.client.device.DeviceCommand;
+
 /**
- * Simple XML mapper bean representing a list of device class commands. Used
- * when deserialising device class commands during configuration.
+ * Simple XML mapper bean representing a list of device commands. Used when
+ * deserialising device commands during configuration.
  *
  * @author Justin Lewis Salmon
  */
-@Root(name = "Commands")
-public class CommandList {
+@Root(name = "DeviceCommands")
+public class DeviceCommandList {
 
-  @ElementList(entry = "Command", inline = true, required = false)
-  private List<Command> commands = new ArrayList<>();
+  @ElementList(entry = "DeviceCommand", inline = true, required = false)
+  private Set<DeviceCommand> deviceCommands = new HashSet<>();
 
-  public CommandList(List<Command> commands) {
-    this.commands = commands;
+  public DeviceCommandList(Set<DeviceCommand> deviceCommands) {
+    this.deviceCommands = deviceCommands;
   }
 
-  public CommandList() {
+  public DeviceCommandList() {
     super();
   }
 
-  public List<Command> getCommands() {
-    return commands;
+  public List<DeviceCommand> getDeviceCommands() {
+    return new ArrayList<>(deviceCommands);
   }
 }

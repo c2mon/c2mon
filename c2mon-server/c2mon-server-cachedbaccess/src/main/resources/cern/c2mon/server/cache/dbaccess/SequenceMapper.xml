@@ -87,11 +87,11 @@
   </select>
 
   <select id="getNextDeviceClassId" databaseId="oracle" resultType="java.lang.Long">
-    SELECT DEVLASS_ID_SEQUENCE.NEXTVAL FROM DUAL
+    SELECT DEVCLASS_ID_SEQUENCE.NEXTVAL FROM DUAL
   </select>
 
   <select id="getNextDeviceClassId" databaseId="mysql" resultType="java.lang.Long">
-    SELECT NEXTVAL('DEVLASS_ID');
+    SELECT NEXTVAL('DEVCLASS_ID');
   </select>
 
   <select id="getNextPropertyId" databaseId="hsql" resultType="java.lang.Long">
@@ -104,6 +104,19 @@
 
   <select id="getNextPropertyId" databaseId="mysql" resultType="java.lang.Long">
     SELECT NEXTVAL('PROPERTY_ID');
+  </select>
+
+
+  <select id="getNextCommandId" databaseId="hsql" resultType="java.lang.Long">
+    CALL NEXT VALUE FOR COMMAND_ID_SEQUENCE
+  </select>
+
+  <select id="getNextCommandId" databaseId="oracle" resultType="java.lang.Long">
+    SELECT COMMAND_ID_SEQUENCE.NEXTVAL FROM DUAL
+  </select>
+
+  <select id="getNextCommandId" databaseId="mysql" resultType="java.lang.Long">
+    SELECT NEXTVAL('COMMAND_ID');
   </select>
 
 

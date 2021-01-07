@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.common.device;
+package cern.c2mon.shared.client.device;
 
 import java.io.Serializable;
 
@@ -47,6 +47,17 @@ public class Command implements Serializable {
   }
 
   public Command() {
+  }
+  /**
+   * Constructor to use during command creation requests.
+   *
+   * @param name the name of the command
+   * @param description the command description
+   */
+
+  public Command(final String name, final String description) {
+    this.name = name;
+    this.description = description;
   }
 
   public String getName() {

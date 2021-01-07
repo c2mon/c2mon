@@ -14,37 +14,48 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.server.common.device;
+package cern.c2mon.shared.client.device;
 
+import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
-
-import cern.c2mon.shared.client.device.DeviceProperty;
+import org.simpleframework.xml.convert.AnnotationStrategy;
+import org.simpleframework.xml.core.Persister;
 
 /**
- * Simple XML mapper bean representing a list of device properties. Used when
- * deserialising device properties during configuration.
+ * Simple XML mapper bean representing a list of device class commands. Used
+ * when deserialising device class commands during configuration.
  *
  * @author Justin Lewis Salmon
  */
-@Root(name = "DeviceProperties")
-public class DevicePropertyList {
+@Root(name = "Commands")
+public class CommandList {
 
-  @ElementList(entry = "DeviceProperty", inline = true, required = false)
-  private List<DeviceProperty> deviceProperties = new ArrayList<>();
+  @ElementList(entry = "Command", inline = true, required = false)
+  private Set<Command> commands = new HashSet<>();
 
-  public DevicePropertyList(List<DeviceProperty> deviceProperties) {
-    this.deviceProperties = deviceProperties;
+  public CommandList(Set<Command> commands) {
+    this.commands = commands;
   }
 
-  public DevicePropertyList() {
+  public CommandList() {
     super();
   }
 
-  public List<DeviceProperty> getDeviceProperties() {
-    return deviceProperties;
+  public List<Command> getCommands() {
+    return new ArrayList<>(commands);
+  }
+
+  public String toConfigXml() throws Exception {
+    Persister serializer = new Persister(new AnnotationStrategy());
+    try (StringWriter fw = new StringWriter()) {
+      serializer.write(this, fw);
+      return fw.toString();
+    }
   }
 }

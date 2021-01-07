@@ -16,16 +16,20 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.loading.impl;
 
+import cern.c2mon.server.common.exception.SubEquipmentException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.cache.dbaccess.DeviceClassMapper;
 import cern.c2mon.server.cache.loading.DeviceClassDAO;
 import cern.c2mon.server.cache.loading.common.AbstractDefaultLoaderDAO;
-import cern.c2mon.server.common.device.Command;
+import cern.c2mon.shared.client.device.Command;
 import cern.c2mon.server.common.device.DeviceClass;
 import cern.c2mon.server.common.device.DeviceClassCacheObject;
 import cern.c2mon.shared.client.device.Property;
+
+import java.util.List;
 
 /**
  * DeviceClass loader DAO implementation.
@@ -73,8 +77,27 @@ public class DeviceClassDAOImpl extends AbstractDefaultLoaderDAO<DeviceClass> im
   }
 
   @Override
-  public Long getPropertyIdByNameAndDeviceClassId(String name, Long deviceClassID) {
-    return deviceClassMapper.getPropertyIdByNameAndDeviceClassId(name, deviceClassID);
+  public DeviceClass getByName(String name) {
+    DeviceClass eq = null;
+    try {
+      List<DeviceClass> deviceClasses = deviceClassMapper.getByName(name);
+      if (!deviceClasses.isEmpty()) {
+        eq = deviceClasses.get(0);
+      }
+    } catch (DataAccessException e) {
+      throw new SubEquipmentException(e.getMessage());
+    }
+    return eq;
+  }
+
+  @Override
+  public Long getPropertyIdByPropertyNameAndDeviceClassId(String propertyName, Long deviceClassID) {
+    return deviceClassMapper.getPropertyIdByPropertyNameAndDevClassId(propertyName, deviceClassID);
+  }
+
+  @Override
+  public Long getCommandIdByCommandNameAndDeviceClassId(String commandName, Long deviceClassId) {
+    return deviceClassMapper.getCommandIdByCommandNameAndDevClassId(commandName, deviceClassId);
   }
 
   @Override
