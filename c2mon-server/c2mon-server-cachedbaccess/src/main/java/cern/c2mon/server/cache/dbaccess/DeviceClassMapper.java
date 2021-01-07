@@ -30,7 +30,7 @@ import java.util.List;
  *
  * @author Justin Lewis Salmon
  */
-public interface DeviceClassMapper extends LoaderMapper<DeviceClass>, PersistenceMapper<DeviceClass> {
+public interface DeviceClassMapper extends LoaderMapper<DeviceClass> {
 
   /**
    * Insert a device class object from the cache into the db.
