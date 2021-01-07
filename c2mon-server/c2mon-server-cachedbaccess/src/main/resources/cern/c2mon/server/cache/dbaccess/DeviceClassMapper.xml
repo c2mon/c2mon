@@ -202,7 +202,4 @@
     DELETE FROM COMMAND WHERE CMDDEVCLASSID = #{id}
   </delete>
 
-  <update id="updateCacheable" parameterType="cern.c2mon.server.common.device.DeviceClassCacheObject">
-  </update>
-
 </mapper>
