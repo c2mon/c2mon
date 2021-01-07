@@ -23,14 +23,12 @@ import java.util.stream.Collectors;
 import static cern.c2mon.cache.actions.alarm.AlarmEvaluator.createAdditionalInfoString;
 
 /**
+ * Service containing the required methods to interact with Alarms in the cache
  * @author Szymon Halastra, Alexandros Papageorgiou, Brice Copy
  */
 @Slf4j
 @Named
 @Singleton
-/**
- * Service containing the required methods to interact with Alarms in the cache
- */
 public class AlarmService extends AbstractCacheServiceImpl<Alarm> implements AlarmAggregator{
 
     private List<AlarmAggregatorListener> alarmUpdateObservable = new ArrayList<>();

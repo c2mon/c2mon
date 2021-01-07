@@ -47,36 +47,36 @@ class AlarmEvaluator {
 
   private static boolean isTagMissingCriticalInformation(Tag tag) {
     boolean tagExistWithValue = tag == null || tag.getValue() == null;
-    boolean tagIsInvalid = !tag.isValid() || !tag.getDataTagQuality().isInitialised();
 
     return tagExistWithValue
-            || tagIsInvalid
+            || !tag.isValid()
+            || !tag.getDataTagQuality().isInitialised()
             || tag.getTimestamp() == null;
   }
 
   static String createAdditionalInfoString(final Alarm alarm, final Tag tag) {
-    StringBuilder additionalInfo = new StringBuilder();
+    String additionalInfo = "";
 
     if (tag != null) {
       switch (tag.getMode()) {
         case DataTagConstants.MODE_MAINTENANCE:
-          additionalInfo.append(tag.isValid() ? "[M]" : "[M][?]");
+          additionalInfo = tag.isValid() ? "[M]" : "[M][?]";
           break;
         case DataTagConstants.MODE_TEST:
-          additionalInfo.append(tag.isValid() ? "[T]" : "[T][?]");
+          additionalInfo = tag.isValid() ? "[T]" : "[T][?]";
           break;
         default:
-          additionalInfo.append(tag.isValid() ? "" : "[?]");
+          additionalInfo = tag.isValid() ? "" : "[?]";
       }
     }
 
     if (alarm != null && alarm.isOscillating()) {
-      additionalInfo.append(additionalInfo + Alarm.ALARM_INFO_OSC);
+      additionalInfo = additionalInfo + Alarm.ALARM_INFO_OSC;
     }
 
     // Add another flag to the info if the value is simulated
     if (tag != null && tag.isSimulated()) {
-        additionalInfo.append(additionalInfo + "[SIM]");
+      additionalInfo = additionalInfo + "[SIM]";
     }
 
     return additionalInfo.toString();
