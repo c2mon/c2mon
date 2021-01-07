@@ -28,6 +28,9 @@ import static cern.c2mon.cache.actions.alarm.AlarmEvaluator.createAdditionalInfo
 @Slf4j
 @Named
 @Singleton
+/**
+ * Service containing the required methods to interact with Alarms in the cache
+ */
 public class AlarmService extends AbstractCacheServiceImpl<Alarm> implements AlarmAggregator{
 
     private List<AlarmAggregatorListener> alarmUpdateObservable = new ArrayList<>();

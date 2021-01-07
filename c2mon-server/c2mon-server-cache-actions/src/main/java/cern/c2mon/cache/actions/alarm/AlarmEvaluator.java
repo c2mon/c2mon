@@ -55,7 +55,7 @@ class AlarmEvaluator {
   }
 
   static String createAdditionalInfoString(final Alarm alarm, final Tag tag) {
-    StringBuffer additionalInfo = new StringBuffer();
+    StringBuilder additionalInfo = new StringBuilder();
 
     if (tag != null) {
       switch (tag.getMode()) {
@@ -74,12 +74,11 @@ class AlarmEvaluator {
       additionalInfo.append(additionalInfo + Alarm.ALARM_INFO_OSC);
     }
 
-    //if (tag != null) {
-      // Add another flag to the info if the value is simulated
-      if (tag.isSimulated()) {
+    // Add another flag to the info if the value is simulated
+    if (tag != null && tag.isSimulated()) {
         additionalInfo.append(additionalInfo + "[SIM]");
-      }
-    //}
+    }
+
     return additionalInfo.toString();
   }
 
@@ -87,8 +86,9 @@ class AlarmEvaluator {
     AlarmCacheObject alarmCacheObject = (AlarmCacheObject) alarm;
 
     // If the alarm has not been initialized, we need to update it
-    if (isAlarmUninitialised(alarmCacheObject))
+    if (isAlarmUninitialised(alarmCacheObject)) {
       return true;
+    }
 
     boolean newState = alarmCacheObject.getCondition().evaluateState(tag.getValue());
     if (newState != alarmCacheObject.isActive() || newState != alarmCacheObject.isInternalActive()) {

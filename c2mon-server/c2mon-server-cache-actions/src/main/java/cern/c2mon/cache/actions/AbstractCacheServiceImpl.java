@@ -11,7 +11,7 @@ import java.util.function.BiPredicate;
 /**
  * Abstract implementation of the abstract cache service
  *
- * @param <T>
+ * @param <T> Generic type
  */
 public abstract class AbstractCacheServiceImpl<T extends Cacheable> implements AbstractCacheService<T> {
 
@@ -20,8 +20,8 @@ public abstract class AbstractCacheServiceImpl<T extends Cacheable> implements A
 
   /**
    * Implementation of the abstract cache service using the C2monCache and a predicate of two arguments
-   * @param cache
-   * @param c2monCacheFlow
+   * @param cache c2mon cache
+   * @param c2monCacheFlow predicate of two arguments
    */
   public AbstractCacheServiceImpl(C2monCache<T> cache, BiPredicate<T, T> c2monCacheFlow) {
     this(cache, new DefaultCacheFlow<>(c2monCacheFlow));
@@ -30,8 +30,8 @@ public abstract class AbstractCacheServiceImpl<T extends Cacheable> implements A
   /**
    * Implementation of the abstract cache service using the C2monCache and the interface containing
    * business logic methods related to putting an object in the cache
-   * @param cache
-   * @param c2monCacheFlow
+   * @param cache c2mon cache
+   * @param c2monCacheFlow interface containing business logic methods related to putting an object in the cache
    */
   public AbstractCacheServiceImpl(C2monCache<T> cache, CacheUpdateFlow<T> c2monCacheFlow) {
     this.cache = cache;
