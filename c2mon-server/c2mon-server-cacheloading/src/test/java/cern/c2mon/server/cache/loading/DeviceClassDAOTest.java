@@ -16,8 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.loading;
 
-import static org.junit.Assert.assertNotNull;
-
 import java.util.List;
 
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
@@ -34,6 +32,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.server.common.device.DeviceClass;
 import cern.c2mon.server.common.device.DeviceClassCacheObject;
+
+import static org.junit.Assert.*;
 
 /**
  * @author Justin Lewis Salmon
@@ -65,4 +65,53 @@ public class DeviceClassDAOTest {
     DeviceClass device2 = deviceClassDAO.getItem(401L);
     assertNotNull(device2);
   }
+  @Test
+  public void testGetByName() {
+    String name = "TEST_DEVICE_CLASS_1";
+    DeviceClassCacheObject device1 = (DeviceClassCacheObject) deviceClassDAO.getByName(name);
+    assertNotNull(device1);
+    assertEquals(name, device1.getName());
+    List<Long> deviceIds = device1.getDeviceIds();
+    Assert.assertFalse(deviceIds.isEmpty());
+
+    name = "TEST_DEVICE_CLASS_2";
+    DeviceClass device2 = deviceClassDAO.getByName(name);
+    assertNotNull(device2);
+    assertEquals(name, device2.getName());
+  }
+
+
+  @Test
+  public void getByNameShouldReturnNullIfNoObjectExists() {
+    DeviceClassCacheObject device1 = (DeviceClassCacheObject) deviceClassDAO.getByName("DOES_NOT_EXIST");
+    assertNull(device1);
+  }
+
+  @Test
+  public void testGetIdByName() {
+    long deviceId1 = deviceClassDAO.getIdByName("TEST_DEVICE_CLASS_1");
+    assertEquals(400L, deviceId1);
+
+    long deviceId2 = deviceClassDAO.getIdByName("TEST_DEVICE_CLASS_2");
+    assertEquals(401L, deviceId2);
+  }
+
+
+  @Test
+  public void getIdByNameShouldReturnNullIfNoObjectExists() {
+    Long deviceId1 = deviceClassDAO.getIdByName("DOES_NOT_EXIST");
+    assertNull(deviceId1);
+  }
+
+  @Test
+  public void getPropertyIdByNameAndDeviceClassId() {
+    DeviceClassCacheObject device1 = (DeviceClassCacheObject) deviceClassDAO.getItem(400L);
+    assertNotNull(device1);
+    List<Long> deviceIds = device1.getDeviceIds();
+    Assert.assertFalse(deviceIds.isEmpty());
+
+    DeviceClass device2 = deviceClassDAO.getItem(401L);
+    assertNotNull(device2);
+  }
+
 }

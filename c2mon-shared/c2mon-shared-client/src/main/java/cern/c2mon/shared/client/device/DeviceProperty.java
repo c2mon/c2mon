@@ -98,6 +98,28 @@ public class DeviceProperty implements Cloneable, Serializable {
       this.resultType = resultType;
     }
   }
+  /**
+   * Constructor to use during command creation requests. A <code>DeviceProperty</code> can be a tag ID, a client rule,
+   * a constant value, or something else. For client rules and constant values, it is possible to specify the type of
+   * the resulting value.
+   *
+   * @param id the unique ID of the property
+   * @param name the unique name of this property
+   * @param value the actual value of this property
+   * @param category the category of this property (e.g. "tagId", "clientRule",
+   *          "constantValue")
+   * @param resultType the result type of this property (for rules and constant
+   *          values). Defaults to {@link String}.
+   */
+  public DeviceProperty(final String name, final String value, final String category, final String resultType) {
+    this.name = name;
+    this.value = value;
+    this.category = category;
+
+    if (resultType != null) {
+      this.resultType = resultType;
+    }
+  }
 
   /**
    * Constructor that creates a mapped property.
@@ -109,6 +131,18 @@ public class DeviceProperty implements Cloneable, Serializable {
    */
   public DeviceProperty(final Long id, final String name, final String category, final List<DeviceProperty> fields) {
     this.id = id;
+    this.name = name;
+    this.category = category;
+    this.fields = fields;
+  }
+  /**
+   * Constructor to use during command creation requests that creates a mapped property.
+   *
+   * @param name name the unique name of this property
+   * @param category category the category of this property (should be "mappedProperty")
+   * @param fields the nested property fields
+   */
+  public DeviceProperty(final String name, final String category, final List<DeviceProperty> fields) {
     this.name = name;
     this.category = category;
     this.fields = fields;

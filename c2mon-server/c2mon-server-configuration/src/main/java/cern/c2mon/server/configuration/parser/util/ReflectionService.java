@@ -28,6 +28,7 @@ import cern.c2mon.shared.client.alarm.condition.ValueAlarmCondition;
 import cern.c2mon.shared.client.configuration.api.util.ConfigurationEntity;
 import cern.c2mon.shared.client.configuration.api.util.DefaultValue;
 import cern.c2mon.shared.client.configuration.api.util.IgnoreProperty;
+import cern.c2mon.shared.client.device.CommandList;
 import cern.c2mon.shared.client.device.PropertyList;
 import cern.c2mon.shared.client.metadata.Metadata;
 import cern.c2mon.shared.client.tag.TagMode;
@@ -99,6 +100,8 @@ public class ReflectionService {
             } else if (pd.getPropertyType().equals(PropertyList.class)) {
               tempProp = String.valueOf(((PropertyList) pd.getReadMethod().invoke(obj)).toConfigXml());
 
+            } else if (pd.getPropertyType().equals(CommandList.class)) {
+              tempProp = String.valueOf(((CommandList) pd.getReadMethod().invoke(obj)).toConfigXml());
 
             } else {
               // default call of all properties. Returns the standard toStringValue of the given Type

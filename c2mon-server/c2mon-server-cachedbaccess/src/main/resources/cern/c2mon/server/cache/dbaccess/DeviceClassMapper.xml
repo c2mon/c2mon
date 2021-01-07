@@ -11,7 +11,7 @@
       <arg column="device_class_description" javaType="String" />
     </constructor>
     <collection property="properties" ofType="cern.c2mon.shared.client.device.Property" javaType="java.util.ArrayList" resultMap="propertyResultMap" />
-    <collection property="commands" ofType="cern.c2mon.server.common.device.Command" javaType="java.util.ArrayList" resultMap="commandResultMap" />
+    <collection property="commands" ofType="cern.c2mon.shared.client.device.Command" javaType="java.util.ArrayList" resultMap="commandResultMap" />
     <collection property="deviceIds" ofType="Long" javaType="java.util.ArrayList" resultMap="deviceIdsResultMap" />
   </resultMap>
 
@@ -26,7 +26,7 @@
     </collection>
   </resultMap>
 
-  <resultMap id="commandResultMap" type="cern.c2mon.server.common.device.Command">
+  <resultMap id="commandResultMap" type="cern.c2mon.shared.client.device.Command">
     <id column="command_id" property="id" jdbcType="NUMERIC" javaType="java.lang.Long"/>
     <result column="command_name" property="name" />
     <result column="command_description" property="description" />
@@ -142,11 +142,43 @@
     WHERE DEVCLASSNAME = #{name}
   </select>
 
-  <select id="getPropertyIdByNameAndDeviceClassId" resultType="Long">
+  <select id="getByName" resultMap="deviceClassResultMap" parameterType="String">
+    SELECT DEVICECLASS.DEVCLASSID as device_class_id,
+           DEVICECLASS.DEVCLASSNAME as device_class_name,
+           DEVICECLASS.DEVCLASSDESC as device_class_description,
+           PROPERTY.PROPID as property_id,
+           PROPERTY.PROPNAME as property_name,
+           PROPERTY.PROPDESC as property_description,
+           FIELD.FIELDID as field_id,
+           FIELD.FIELDNAME as field_name,
+           COMMAND.CMDID as command_id,
+           COMMAND.CMDNAME as command_name,
+           COMMAND.CMDDESC as command_description,
+           DEVICE.DEVID as device_id
+    FROM   DEVICECLASS
+           LEFT OUTER JOIN PROPERTY
+    ON     DEVICECLASS.DEVCLASSID = PROPERTY.PROPDEVCLASSID
+           LEFT OUTER JOIN FIELD
+    ON     PROPERTY.PROPID = FIELD.FIELDPROPID
+           LEFT OUTER JOIN COMMAND
+    ON     DEVICECLASS.DEVCLASSID = COMMAND.CMDDEVCLASSID
+           LEFT OUTER JOIN DEVICE
+    ON     DEVICECLASS.DEVCLASSID = DEVICE.DEVCLASSID
+    WHERE  DEVICECLASS.DEVCLASSNAME = #{name}
+  </select>
+
+  <select id="getPropertyIdByPropertyNameAndDevClassId" resultType="Long">
     SELECT PROPID
     FROM   PROPERTY
     WHERE  PROPDEVCLASSID = #{device_class_id}
-    AND    PROPNAME = #{name}
+    AND    PROPNAME = #{property_name}
+  </select>
+
+  <select id="getCommandIdByCommandNameAndDevClassId" resultType="Long">
+    SELECT CMDID
+    FROM   COMMAND
+      WHERE  CMDDEVCLASSID = #{device_class_id}
+      AND    CMDNAME = #{command_name}
   </select>
 
   <select id="getNumberItems" resultType="Integer">
@@ -169,5 +201,8 @@
   <delete id="deleteCommands" parameterType="Long">
     DELETE FROM COMMAND WHERE CMDDEVCLASSID = #{id}
   </delete>
+
+  <update id="updateCacheable" parameterType="cern.c2mon.server.common.device.DeviceClassCacheObject">
+  </update>
 
 </mapper>

@@ -34,5 +34,10 @@ public interface DeviceClassDAO extends CacheLoaderDAO<DeviceClass>, Configurabl
 
   Long getIdByName(String name);
 
-  Long getPropertyIdByNameAndDeviceClassId(String name, Long deviceClassID);
+  Long getPropertyIdByPropertyNameAndDeviceClassId(String propertyName, Long deviceClassId);
+
+  Long getCommandIdByCommandNameAndDeviceClassId(String propertyName, Long deviceClassId);
+
+  DeviceClass getByName(String name);
+
 }

@@ -18,11 +18,9 @@ package cern.c2mon.client.core.configuration;
 
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.api.device.DeviceClass;
-import cern.c2mon.shared.client.configuration.api.process.Process;
 
 /**
- * The ProcessConfigurationManager allows to apply create, update and delete
- * configurations for Devices.
+ * The DeviceClassConfigurationManager allows to apply create, update and delete configurations for device classes.
  */
 public interface DeviceClassConfigurationManager {
 
@@ -31,7 +29,7 @@ public interface DeviceClassConfigurationManager {
    * <p>
    * The DeviceClass is created with default parameters.
    *
-   * @param deviceClassName The name of the device to be created.
+   * @param deviceClassName The name of the device class to be created.
    * @return A {@link ConfigurationReport} containing all details of the
    * DeviceClass configuration, including if it was successful or not.
    * @see DeviceClassConfigurationManager#createDeviceClass(DeviceClass)
@@ -39,42 +37,25 @@ public interface DeviceClassConfigurationManager {
   ConfigurationReport createDeviceClass(String deviceClassName);
 
   /**
-   * Creates a new 'DeviceClass' with the given parameters in the
-   * {@link DeviceClass} object.
+   * Creates a new 'DeviceClass' with the given parameters in the {@link DeviceClass} object.
    * <p>
-   * Next to the specified parameters the DeviceClass is created with default
-   * parameters.
+   * Next to the specified parameters the DeviceClass is created with default  parameters.
    * <p>
-   * Note: You have to use {@link Process#create(String)} to instantiate the
-   * parameter of this method.
+   * Note: You have to use {@link DeviceClass#create(String)} to instantiate the parameter of this method.
    *
    * @param deviceClass The {@link DeviceClass} configuration for the 'create'.
-   * @return A {@link ConfigurationReport} containing all details of the
-   * Process configuration, including if it was successful or not.
+   * @return A {@link ConfigurationReport} containing all details of the Process configuration, including if it was
+   * successful or not.
    * @see DeviceClassConfigurationManager#createDeviceClass(String)
    */
   ConfigurationReport createDeviceClass(DeviceClass deviceClass);
 
   /**
-   * Updates a existing 'DeviceClass' with the given parameters in the
-   * {@link DeviceClass} object.
-   * <p>
-   * Note: You have to use {@link DeviceClass#update(Long)} or
-   * {@link DeviceClass#update(String)} to instantiate the parameter of this
-   * method.
-   *
-   * @param deviceClass The {@link DeviceClass} configuration for the 'update'.
-   * @return A {@link ConfigurationReport} containing all details of the
-   * DeviceClass configuration, including if it was successful or not.
-   */
-  ConfigurationReport updateDeviceClass(DeviceClass deviceClass);
-
-  /**
    * Removes a existing 'DeviceClass' with the given id.
    *
    * @param id The id of the DeviceClass which needs to be removed.
-   * @return A {@link ConfigurationReport} containing all details of the
-   * DeviceClass configuration, including if it was successful or not.
+   * @return A {@link ConfigurationReport} containing all details of the DeviceClass configuration, including if it was
+   * successful or not.
    */
   ConfigurationReport removeDeviceClassById(Long id);
 
@@ -82,8 +63,8 @@ public interface DeviceClassConfigurationManager {
    * Removes a existing 'DeviceClass' with the given name.
    *
    * @param name The name of the DeviceClass which needs to be removed.
-   * @return A {@link ConfigurationReport} containing all details of the
-   * DeviceClass configuration, including if it was successful or not.
+   * @return A {@link ConfigurationReport} containing all details of the DeviceClass configuration, including if it was
+   * successful or not.
    */
   ConfigurationReport removeDeviceClass(String name);
 }

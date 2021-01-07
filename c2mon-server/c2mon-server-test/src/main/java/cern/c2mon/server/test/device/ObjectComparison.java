@@ -21,7 +21,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
 import java.util.List;
 
-import cern.c2mon.server.common.device.Command;
+import cern.c2mon.shared.client.device.Command;
 import cern.c2mon.shared.client.device.Property;
 import cern.c2mon.shared.client.device.DeviceCommand;
 import cern.c2mon.shared.client.device.DeviceProperty;

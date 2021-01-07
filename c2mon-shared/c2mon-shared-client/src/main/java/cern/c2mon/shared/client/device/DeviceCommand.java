@@ -82,6 +82,25 @@ public class DeviceCommand implements Cloneable, Serializable {
       this.resultType = resultType;
     }
   }
+  /**
+   * Constructor to use during command creation requests. A <code>DeviceCommand</code> is usually just a command
+   * tag ID.
+   *
+   * @param name the unique name of this command
+   * @param value the actual value of this command
+   * @param category the category of this command
+   * @param resultType the result type of this command. Defaults to
+   *          {@link String}.
+   */
+  public DeviceCommand(final String name, final String value, final String category, final String resultType) {
+    this.name = name;
+    this.value = value;
+    this.category = category;
+
+    if (resultType != null) {
+      this.resultType = resultType;
+    }
+  }
 
   /**
    * Constructor not used (needed for SimpleXML).

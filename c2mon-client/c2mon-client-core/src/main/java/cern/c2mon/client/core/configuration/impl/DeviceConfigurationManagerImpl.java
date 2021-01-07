@@ -17,10 +17,10 @@
 package cern.c2mon.client.core.configuration.impl;
 
 import cern.c2mon.client.core.configuration.ConfigurationRequestSender;
-import cern.c2mon.client.core.configuration.DeviceClassConfigurationManager;
+import cern.c2mon.client.core.configuration.DeviceConfigurationManager;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.api.Configuration;
-import cern.c2mon.shared.client.configuration.api.device.DeviceClass;
+import cern.c2mon.shared.client.configuration.api.device.Device;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,59 +31,63 @@ import java.util.List;
 import static cern.c2mon.client.core.configuration.util.ConfigurationUtil.validateIsCreate;
 import static cern.c2mon.client.core.configuration.util.ConfigurationUtil.validateIsUpdate;
 
-@Service("deviceClassConfigurationManager")
-public class DeviceClassConfigurationManagerImpl implements DeviceClassConfigurationManager {
+@Service("deviceConfigurationManager")
+public class DeviceConfigurationManagerImpl implements DeviceConfigurationManager {
 
   private ConfigurationRequestSender configurationRequestSender;
 
   @Autowired
-  DeviceClassConfigurationManagerImpl(ConfigurationRequestSender configurationRequestSender) {
+  DeviceConfigurationManagerImpl(ConfigurationRequestSender configurationRequestSender) {
     this.configurationRequestSender = configurationRequestSender;
   }
 
-  public ConfigurationReport createDeviceClass(String deviceClassName) {
+  public ConfigurationReport createDevice(String deviceName, String deviceClassName) {
 
-    return createDeviceClass(DeviceClass.create(deviceClassName).build());
+    return createDevice(Device.create(deviceName, deviceClassName).build());
   }
 
-  public ConfigurationReport createDeviceClass(DeviceClass deviceClass) {
+  public ConfigurationReport createDevice(String deviceName, long deviceClassId) {
 
-    List<DeviceClass> deviceClasses = new ArrayList<>();
-    deviceClasses.add(deviceClass);
+    return createDevice(Device.create(deviceName, deviceClassId).build());
+  }
 
-    validateIsCreate(deviceClasses);
+  public ConfigurationReport createDevice(Device device) {
+
+    List<Device> devices = new ArrayList<>();
+    devices.add(device);
+
+    validateIsCreate(devices);
 
     Configuration config = new Configuration();
-    config.setEntities(deviceClasses);
+    config.setEntities(devices);
 
     return configurationRequestSender.applyConfiguration(config, null);
   }
 
   @Override
-  public ConfigurationReport removeDeviceClassById(Long id) {
+  public ConfigurationReport removeDeviceById(Long id) {
 
-    DeviceClass deleteDeviceClass = new DeviceClass();
-    deleteDeviceClass.setId(id);
-    deleteDeviceClass.setDeleted(true);
+    Device deleteDevice = new Device();
+    deleteDevice.setId(id);
+    deleteDevice.setDeleted(true);
 
     Configuration config = new Configuration();
-    config.setEntities(Collections.singletonList(deleteDeviceClass));
+    config.setEntities(Collections.singletonList(deleteDevice));
 
     return configurationRequestSender.applyConfiguration(config, null);
   }
 
   @Override
-  public ConfigurationReport removeDeviceClass(String name) {
+  public ConfigurationReport removeDevice(String name) {
 
-    DeviceClass deleteDeviceClass = new DeviceClass();
-    deleteDeviceClass.setName(name);
-    deleteDeviceClass.setDeleted(true);
+    Device deleteDevice = new Device();
+    deleteDevice.setName(name);
+    deleteDevice.setDeleted(true);
 
     Configuration config = new Configuration();
-    config.setEntities(Collections.singletonList(deleteDeviceClass));
+    config.setEntities(Collections.singletonList(deleteDevice));
 
     return configurationRequestSender.applyConfiguration(config, null);
   }
-
 
 }

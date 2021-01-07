@@ -33,6 +33,8 @@ public interface SequenceMapper {
 
   Long getNextPropertyId();
 
+  Long getNextCommandId();
+
   Long getNextEquipmentId();
 
   Long getNextTagId();

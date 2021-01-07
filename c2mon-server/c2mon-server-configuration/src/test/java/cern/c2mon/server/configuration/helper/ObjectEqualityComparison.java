@@ -24,7 +24,7 @@ import cern.c2mon.server.common.alive.AliveTimerCacheObject;
 import cern.c2mon.server.common.command.CommandTagCacheObject;
 import cern.c2mon.server.common.commfault.CommFaultTagCacheObject;
 import cern.c2mon.server.common.datatag.DataTagCacheObject;
-import cern.c2mon.server.common.device.Command;
+import cern.c2mon.shared.client.device.Command;
 import cern.c2mon.server.common.device.DeviceCacheObject;
 import cern.c2mon.server.common.device.DeviceClassCacheObject;
 import cern.c2mon.shared.client.device.Property;

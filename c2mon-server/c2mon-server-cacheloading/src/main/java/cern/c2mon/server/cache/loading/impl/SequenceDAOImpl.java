@@ -57,6 +57,11 @@ public class SequenceDAOImpl implements SequenceDAO {
   }
 
   @Override
+  public Long getNextCommandId() {
+    return sequenceMapper.getNextCommandId();
+  }
+
+  @Override
   public Long getNextEquipmentId() {
     return sequenceMapper.getNextEquipmentId();
   }

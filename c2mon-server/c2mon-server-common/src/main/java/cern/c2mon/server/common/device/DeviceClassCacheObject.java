@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.common.device;
 
+import cern.c2mon.shared.client.device.Command;
 import cern.c2mon.shared.client.device.Property;
 
 import java.util.ArrayList;
