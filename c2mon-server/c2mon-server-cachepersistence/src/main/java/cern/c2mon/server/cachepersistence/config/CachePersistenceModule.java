@@ -39,8 +39,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
     DataTagPersistenceConfig.class,
     ControlTagPersistenceConfig.class,
     RuleTagPersistenceConfig.class,
-    AlarmPersistenceConfig.class,
-    DeviceClassPersistenceConfig.class
+    AlarmPersistenceConfig.class
 })
 @ComponentScan("cern.c2mon.server.cachepersistence")
 public class CachePersistenceModule {
