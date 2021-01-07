@@ -38,6 +38,12 @@ public class AlarmService extends AbstractCacheServiceImpl<Alarm> implements Ala
     private OscillationUpdater oscillationUpdater;
 
 
+    /**
+     *
+     * @param cache the alarm cache
+     * @param tagCacheCollection aggregates [Control,Data,Rule] tag caches
+     * @param oscillationUpdater contains the logic for evaluating, if an alarm is oscillating
+     */
     @Inject
     public AlarmService(final C2monCache<Alarm> cache, final TagCacheCollection tagCacheCollection,
                         final OscillationUpdater oscillationUpdater) {
@@ -47,6 +53,9 @@ public class AlarmService extends AbstractCacheServiceImpl<Alarm> implements Ala
         this.oscillationUpdater = oscillationUpdater;
     }
 
+    /**
+     * Initialization method that registers the tag cache collection listeners
+     */
     @PostConstruct
     public void init() {
         tagCacheCollection.registerListener(this::supervisionChangeListener, CacheEvent.SUPERVISION_CHANGE);
@@ -74,6 +83,7 @@ public class AlarmService extends AbstractCacheServiceImpl<Alarm> implements Ala
      * Atomically evaluate all alarms connected to this tag,
      * then put any changes back into the cache if needed
      *
+     * @param tag the tag to be evaluated
      * @return A list of successfully evaluated alarms
      */
     public List<Alarm> evaluateAlarms(final Tag tag) {
@@ -102,6 +112,11 @@ public class AlarmService extends AbstractCacheServiceImpl<Alarm> implements Ala
      * If the alarm was oscillating, listeners will NOT be notified
      * <p>
      * The alarm will only be put in the cache if changes would be made to the current one
+     *
+     * @param alarmCacheObject Alarm object held in the cache
+     * @param tag the tag interface
+     * @param updateOscillation oscillation status
+     * @return alarm updated
      */
     public boolean update(final AlarmCacheObject alarmCacheObject, final Tag tag, boolean updateOscillation) {
         if (updateOscillation) {
@@ -121,10 +136,16 @@ public class AlarmService extends AbstractCacheServiceImpl<Alarm> implements Ala
                 cache.put(alarmCacheObject.getId(), alarmCacheObject);
             }
             return true;
-        } else
+        } else {
             return false;
+        }
     }
 
+    /**
+     * Retrieves the tag and all the corresponding alarms
+     * @param tagId the Tag id
+     * @return tag with associated alarms
+     */
     public TagWithAlarms getTagWithAlarmsAtomically(Long tagId) {
         return cache.executeTransaction(() -> {
             Tag tag = tagCacheCollection.get(tagId);
@@ -144,7 +165,6 @@ public class AlarmService extends AbstractCacheServiceImpl<Alarm> implements Ala
    *
    * @param alarmCacheObject The current alarm object in the cache
    * @param tag              The tag update
-   * @return The updated alarm object
    */
   public void stopOscillatingAndUpdate(final AlarmCacheObject alarmCacheObject, final Tag tag) {
     alarmCacheObject.setOscillating(false);

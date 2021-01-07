@@ -24,6 +24,10 @@ import javax.inject.Singleton;
 @Singleton
 public class AliveTagService extends AbstractBooleanControlTagService<AliveTag> implements SupervisedCacheService<AliveTag> {
 
+  /**
+   * Manages AliveTag operations
+   * @param aliveTimerCacheRef Alive tag cache
+   */
   @Inject
   public AliveTagService(C2monCache<AliveTag> aliveTimerCacheRef) {
     super(aliveTimerCacheRef, new AliveTagCacheFlow());
