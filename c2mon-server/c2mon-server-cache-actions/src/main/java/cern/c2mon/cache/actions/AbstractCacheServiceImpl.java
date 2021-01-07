@@ -8,15 +8,31 @@ import lombok.Getter;
 
 import java.util.function.BiPredicate;
 
+/**
+ * Abstract implementation of the abstract cache service
+ *
+ * @param <T>
+ */
 public abstract class AbstractCacheServiceImpl<T extends Cacheable> implements AbstractCacheService<T> {
 
   @Getter
   protected C2monCache<T> cache;
 
+  /**
+   * Implementation of the abstract cache service using the C2monCache and a predicate of two arguments
+   * @param cache
+   * @param c2monCacheFlow
+   */
   public AbstractCacheServiceImpl(C2monCache<T> cache, BiPredicate<T, T> c2monCacheFlow) {
     this(cache, new DefaultCacheFlow<>(c2monCacheFlow));
   }
 
+  /**
+   * Implementation of the abstract cache service using the C2monCache and the interface containing
+   * business logic methods related to putting an object in the cache
+   * @param cache
+   * @param c2monCacheFlow
+   */
   public AbstractCacheServiceImpl(C2monCache<T> cache, CacheUpdateFlow<T> c2monCacheFlow) {
     this.cache = cache;
     cache.setCacheUpdateFlow(c2monCacheFlow);

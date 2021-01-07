@@ -45,7 +45,7 @@ public class ContainerizedTest {
      * Create a new data tag by making a POST request to the daq-rest service and subscribe to it with the tagService
      */
     @BeforeClass
-    public static void setup() {
+    public static void setUp() {
 
         String address = String.format("http://%s:%d/update",
                 environment.getServiceHost("daq-rest_1", 8080),

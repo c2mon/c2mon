@@ -46,40 +46,41 @@ class AlarmEvaluator {
   }
 
   private static boolean isTagMissingCriticalInformation(Tag tag) {
-    return tag == null
-      || tag.getValue() == null
-      || !tag.isValid()
-      || !tag.getDataTagQuality().isInitialised()
-      || tag.getTimestamp() == null;
+    boolean tagExistWithValue = tag == null || tag.getValue() == null;
+    boolean tagIsInvalid = !tag.isValid() || !tag.getDataTagQuality().isInitialised();
+
+    return tagExistWithValue
+            || tagIsInvalid
+            || tag.getTimestamp() == null;
   }
 
   static String createAdditionalInfoString(final Alarm alarm, final Tag tag) {
-    String additionalInfo = "";
+    StringBuffer additionalInfo = new StringBuffer();
 
     if (tag != null) {
       switch (tag.getMode()) {
         case DataTagConstants.MODE_MAINTENANCE:
-          additionalInfo = tag.isValid() ? "[M]" : "[M][?]";
+          additionalInfo.append(tag.isValid() ? "[M]" : "[M][?]");
           break;
         case DataTagConstants.MODE_TEST:
-          additionalInfo = tag.isValid() ? "[T]" : "[T][?]";
+          additionalInfo.append(tag.isValid() ? "[T]" : "[T][?]");
           break;
         default:
-          additionalInfo = tag.isValid() ? "" : "[?]";
+          additionalInfo.append(tag.isValid() ? "" : "[?]");
       }
     }
 
     if (alarm != null && alarm.isOscillating()) {
-      additionalInfo = additionalInfo + Alarm.ALARM_INFO_OSC;
+      additionalInfo.append(additionalInfo + Alarm.ALARM_INFO_OSC);
     }
 
-    if (tag != null) {
+    //if (tag != null) {
       // Add another flag to the info if the value is simulated
       if (tag.isSimulated()) {
-        additionalInfo = additionalInfo + "[SIM]";
+        additionalInfo.append(additionalInfo + "[SIM]");
       }
-    }
-    return additionalInfo;
+    //}
+    return additionalInfo.toString();
   }
 
   private static boolean isAlarmChangedBasedOnTag(final Alarm alarm, final Tag tag) {
