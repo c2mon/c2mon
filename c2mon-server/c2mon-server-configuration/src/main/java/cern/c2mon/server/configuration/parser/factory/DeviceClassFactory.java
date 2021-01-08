@@ -34,14 +34,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author Franz Ritter
+ * @author Elisabeth Stockinger
  */
 @Service
 @Slf4j
 public class DeviceClassFactory extends EntityFactory<DeviceClass> {
 
-  private final DeviceClassDAO deviceClassDAO;
-  private final SequenceDAO sequenceDAO;
+  private DeviceClassDAO deviceClassDAO;
+  private SequenceDAO sequenceDAO;
 
   @Autowired
   public DeviceClassFactory(DeviceClassCache deviceClassCache, SequenceDAO sequenceDAO, DeviceClassDAO deviceClassDAO) {

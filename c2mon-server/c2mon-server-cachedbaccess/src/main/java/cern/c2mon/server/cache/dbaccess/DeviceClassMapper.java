@@ -97,38 +97,4 @@ public interface DeviceClassMapper extends LoaderMapper<DeviceClass> {
    * @param id the ID of the device class from which to delete commands
    */
   void deleteCommands(Long id);
-
-
-  /**
-   * Retrieve the id of the cache object with the given name.
-   *
-   * @param name the unique name of the cache object
-   * @return the id of the cache object
-   */
-  Long getIdByName(String name);
-  /**
-   * Retrieve the cache object with the given name.
-   *
-   * @param name the unique name of the cache object
-   * @return a list containing the cache object if one is found, else null. The list has at most a size of 1, as device class names are unique.
-   */
-  List<DeviceClass> getByName(String name);
-
-  /**
-   * Retrieve the ID of a property using the property's name and the associated device class ID.
-   *
-   * @param name          the name of the property to retrieve. The name is unique only within the device class.
-   * @param deviceClassID the id of the device class for whom the property is defined
-   * @return the id of the property if one is found, else null.
-   */
-  Long getPropertyIdByPropertyNameAndDevClassId(@Param("property_name") String name, @Param("device_class_id") Long deviceClassID);
-
-  /**
-   * Retrieve the ID of a command using the command's name and the associated device class ID.
-   *
-   * @param name          the name of the command to retrieve. The name is unique only within the device class.
-   * @param deviceClassID the id of the device class for whom the property is defined
-   * @return the id of the command if one is found, else null.
-   */
-  Long getCommandIdByCommandNameAndDevClassId(@Param("command_name") String name, @Param("device_class_id") Long deviceClassID);
 }
