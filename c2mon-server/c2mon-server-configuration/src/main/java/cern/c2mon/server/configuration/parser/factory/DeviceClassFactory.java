@@ -40,8 +40,8 @@ import java.util.List;
 @Slf4j
 public class DeviceClassFactory extends EntityFactory<DeviceClass> {
 
-  private DeviceClassDAO deviceClassDAO;
-  private SequenceDAO sequenceDAO;
+  private final DeviceClassDAO deviceClassDAO;
+  private final SequenceDAO sequenceDAO;
 
   @Autowired
   public DeviceClassFactory(DeviceClassCache deviceClassCache, SequenceDAO sequenceDAO, DeviceClassDAO deviceClassDAO) {
@@ -88,10 +88,7 @@ public class DeviceClassFactory extends EntityFactory<DeviceClass> {
 
   private void createAndSetPropertyIds(DeviceClass entity) {
     for (Property property : entity.getProperties().getProperties()) {
-      if (isPropertyNameInDeviceClass(property.getName(), entity.getId())) {
-        throw new ConfigurationParseException("Error creating property " + property.getName() +
-                " for deviceClass " + entity.getName() + ": " + "Name already exists within deviceClass.");
-      } else if (property.getId() == null) {
+      if (property.getId() == null) {
         property.setId(sequenceDAO.getNextPropertyId());
       }
     }
@@ -99,23 +96,9 @@ public class DeviceClassFactory extends EntityFactory<DeviceClass> {
 
   private void createAndSetCommandIds(DeviceClass entity) {
     for (Command command : entity.getCommands().getCommands()) {
-      if (isCommandNameInDeviceClass(command.getName(), entity.getId())) {
-        throw new ConfigurationParseException("Error creating command " + command.getName() +
-                " for deviceClass " + entity.getName() + ": " + "Name already exists within deviceClass.");
-      } else if (command.getId() == null) {
-        command.setId(sequenceDAO.getNextPropertyId());
+      if (command.getId() == null) {
+        command.setId(sequenceDAO.getNextCommandId());
       }
     }
   }
-
-  private boolean isPropertyNameInDeviceClass(String propertyName, Long deviceClassId) {
-    return propertyName != null && deviceClassId != null &&
-            deviceClassDAO.getPropertyIdByPropertyNameAndDeviceClassId(propertyName, deviceClassId) != null;
-  }
-
-  private boolean isCommandNameInDeviceClass(String propertyName, Long deviceClassId) {
-    return propertyName != null && deviceClassId != null &&
-            deviceClassDAO.getCommandIdByCommandNameAndDeviceClassId(propertyName, deviceClassId) != null;
-  }
-
 }
