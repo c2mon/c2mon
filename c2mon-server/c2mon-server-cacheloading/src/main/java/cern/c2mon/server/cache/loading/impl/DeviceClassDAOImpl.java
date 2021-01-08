@@ -73,12 +73,13 @@ public class DeviceClassDAOImpl extends AbstractDefaultLoaderDAO<DeviceClass> im
 
   @Override
   public Long getIdByName(String name) {
-    return deviceClassMapper.getIdByName(name);
+    return 0L; //deviceClassMapper.getIdByName(name);
   }
 
   @Override
   public DeviceClass getByName(String name) {
     DeviceClass eq = null;
+    /*
     try {
       List<DeviceClass> deviceClasses = deviceClassMapper.getByName(name);
       if (!deviceClasses.isEmpty()) {
@@ -86,18 +87,18 @@ public class DeviceClassDAOImpl extends AbstractDefaultLoaderDAO<DeviceClass> im
       }
     } catch (DataAccessException e) {
       throw new SubEquipmentException(e.getMessage());
-    }
+    }*/
     return eq;
   }
 
   @Override
   public Long getPropertyIdByPropertyNameAndDeviceClassId(String propertyName, Long deviceClassID) {
-    return deviceClassMapper.getPropertyIdByPropertyNameAndDevClassId(propertyName, deviceClassID);
+    return 0L; //deviceClassMapper.getPropertyIdByPropertyNameAndDevClassId(propertyName, deviceClassID);
   }
 
   @Override
   public Long getCommandIdByCommandNameAndDeviceClassId(String commandName, Long deviceClassId) {
-    return deviceClassMapper.getCommandIdByCommandNameAndDevClassId(commandName, deviceClassId);
+    return 0L; // deviceClassMapper.getCommandIdByCommandNameAndDevClassId(commandName, deviceClassId);
   }
 
   @Override

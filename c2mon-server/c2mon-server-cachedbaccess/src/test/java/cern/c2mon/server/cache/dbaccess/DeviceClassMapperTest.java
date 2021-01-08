@@ -49,7 +49,7 @@ public class DeviceClassMapperTest extends AbstractMapperTest {
     DeviceClassCacheObject deviceClass2 = (DeviceClassCacheObject) deviceClassMapper.getItem(401L);
     testDeviceClass2Completeness(deviceClass2);
   }
-
+/*
   @Test
   public void getByName() throws ClassNotFoundException {
     List<DeviceClass> deviceClasses = deviceClassMapper.getByName("TEST_DEVICE_CLASS_1");
@@ -68,7 +68,7 @@ public class DeviceClassMapperTest extends AbstractMapperTest {
   public void getByNameShouldReturnEmptyListIfClassDoesNotExist() {
     List<DeviceClass> deviceClasses = deviceClassMapper.getByName("DOES_NOT_EXIST");
     Assert.assertTrue(deviceClasses.isEmpty());
-  }
+  }*/
 
   @Test
   public void testGetAll() {
@@ -149,28 +149,28 @@ public class DeviceClassMapperTest extends AbstractMapperTest {
     Assert.assertFalse(deviceClassMapper.isInDb(402L));
   }
 
-  @Test
-  public void getPropertyIdByPropertyNameAndDevClassIdShouldReturnIdIfExists() {
-    long property = deviceClassMapper.getPropertyIdByPropertyNameAndDevClassId("cpuLoadInPercent", 400L);
-    Assert.assertEquals(1L, property);
-    property = deviceClassMapper.getPropertyIdByPropertyNameAndDevClassId("responsiblePerson", 400L);
-    Assert.assertEquals(2L, property);
-    property = deviceClassMapper.getPropertyIdByPropertyNameAndDevClassId("TEST_PROPERTY_1", 401L);
-    Assert.assertEquals(5L, property);
-  }
-
-  @Test
-  public void getPropertyIdByPropertyNameAndDevClassIdShouldReturnNullIfPropertyNameDoesNotExist() {
-    Long property = deviceClassMapper.getPropertyIdByPropertyNameAndDevClassId("DOES_NOT_EXIST", 400L);
-    Assert.assertNull(property);
-  }
-
-  @Test
-  public void getPropertyIdByPropertyNameAndDevClassIdShouldReturnNullIfDeviceClassIdDoesNotExist() {
-    long idDoesNotExist = 0L;
-    Long property = deviceClassMapper.getPropertyIdByPropertyNameAndDevClassId("cpuLoadInPercent", idDoesNotExist);
-    Assert.assertNull(property);
-  }
+//  @Test
+//  public void getPropertyIdByPropertyNameAndDevClassIdShouldReturnIdIfExists() {
+//    long property = deviceClassMapper.getPropertyIdByPropertyNameAndDevClassId("cpuLoadInPercent", 400L);
+//    Assert.assertEquals(1L, property);
+//    property = deviceClassMapper.getPropertyIdByPropertyNameAndDevClassId("responsiblePerson", 400L);
+//    Assert.assertEquals(2L, property);
+//    property = deviceClassMapper.getPropertyIdByPropertyNameAndDevClassId("TEST_PROPERTY_1", 401L);
+//    Assert.assertEquals(5L, property);
+//  }
+//
+//  @Test
+//  public void getPropertyIdByPropertyNameAndDevClassIdShouldReturnNullIfPropertyNameDoesNotExist() {
+//    Long property = deviceClassMapper.getPropertyIdByPropertyNameAndDevClassId("DOES_NOT_EXIST", 400L);
+//    Assert.assertNull(property);
+//  }
+//
+//  @Test
+//  public void getPropertyIdByPropertyNameAndDevClassIdShouldReturnNullIfDeviceClassIdDoesNotExist() {
+//    long idDoesNotExist = 0L;
+//    Long property = deviceClassMapper.getPropertyIdByPropertyNameAndDevClassId("cpuLoadInPercent", idDoesNotExist);
+//    Assert.assertNull(property);
+//  }
 
   private void testDeviceClass1Completeness(DeviceClassCacheObject deviceClass1) throws ClassNotFoundException {
     Assert.assertNotNull(deviceClass1);
