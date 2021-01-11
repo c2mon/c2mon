@@ -87,35 +87,14 @@ public class DeviceClassFactory extends EntityFactory<DeviceClass> {
   }
 
   private void createAndSetPropertyIds(DeviceClass entity) {
-    for (Property property : entity.getProperties().getProperties()) {
-      if (isPropertyNameInDeviceClass(property.getName(), entity.getId())) {
-        throw new ConfigurationParseException("Error creating property " + property.getName() +
-                " for deviceClass " + entity.getName() + ": " + "Name already exists within deviceClass.");
-      } else if (property.getId() == null) {
-        property.setId(sequenceDAO.getNextPropertyId());
-      }
-    }
+    entity.getProperties().getProperties().stream()
+            .filter(property -> property.getId() != null)
+            .forEach(property -> property.setId(sequenceDAO.getNextPropertyId()));
   }
 
   private void createAndSetCommandIds(DeviceClass entity) {
-    for (Command command : entity.getCommands().getCommands()) {
-      if (isCommandNameInDeviceClass(command.getName(), entity.getId())) {
-        throw new ConfigurationParseException("Error creating command " + command.getName() +
-                " for deviceClass " + entity.getName() + ": " + "Name already exists within deviceClass.");
-      } else if (command.getId() == null) {
-        command.setId(sequenceDAO.getNextPropertyId());
-      }
-    }
+    entity.getCommands().getCommands().stream()
+            .filter(command -> command.getId() != null)
+            .forEach(command -> command.setId(sequenceDAO.getNextCommandId()));
   }
-
-  private boolean isPropertyNameInDeviceClass(String propertyName, Long deviceClassId) {
-    return propertyName != null && deviceClassId != null &&
-            deviceClassDAO.getPropertyIdByPropertyNameAndDeviceClassId(propertyName, deviceClassId) != null;
-  }
-
-  private boolean isCommandNameInDeviceClass(String propertyName, Long deviceClassId) {
-    return propertyName != null && deviceClassId != null &&
-            deviceClassDAO.getCommandIdByCommandNameAndDeviceClassId(propertyName, deviceClassId) != null;
-  }
-
 }
