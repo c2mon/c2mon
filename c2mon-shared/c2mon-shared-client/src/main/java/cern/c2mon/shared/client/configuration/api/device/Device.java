@@ -40,16 +40,19 @@ public class Device implements ConfigurationEntity {
     private boolean deleted = false;
 
     /**
-     * Unique identifier of the device class.
+     * Unique identifier of the device class that this Device belongs to. Either deviceClassName or deviceClassId have to be specified.
      */
     @IgnoreProperty
     private Long id;
 
+    /**
+     * Name of the device class that this Device belongs to. Either deviceClassName or deviceClassId have to be specified.
+     */
     private String name;
 
     private String deviceClassName;
 
-    private long deviceClassId;
+    private Long deviceClassId;
 
     private DevicePropertyList deviceProperties;
 
@@ -60,6 +63,7 @@ public class Device implements ConfigurationEntity {
         Assert.hasText(deviceClassName, "Device Class name is required!");
         return new CreateBuilder(name, deviceClassName);
     }
+
     public static CreateBuilder create(String name, Long deviceClassId) {
         Assert.hasText(name, "Device name is required!");
         Assert.notNull(deviceClassId, "Device Class ID is required!");
@@ -84,6 +88,7 @@ public class Device implements ConfigurationEntity {
             deviceToBuild.setDeviceClassName(deviceClassName);
             deviceToBuild.setCreated(true);
         }
+
         public CreateBuilder(String name, long deviceClassId) {
             deviceToBuild.setName(name);
             deviceToBuild.setDeviceClassId(deviceClassId);
@@ -101,6 +106,7 @@ public class Device implements ConfigurationEntity {
             this.deviceProperties.add(new DeviceProperty(name, value, category, resultType));
             return this;
         }
+
         public Device.CreateBuilder addDeviceProperty(DeviceProperty... properties) {
             long singleOccurrences = Stream.of(Arrays.stream(properties), this.deviceProperties.stream())
                     .flatMap(o -> o)
@@ -118,6 +124,7 @@ public class Device implements ConfigurationEntity {
             this.deviceCommands.add(new DeviceCommand(name, value, category, resultType));
             return this;
         }
+
         public Device.CreateBuilder addDeviceCommand(DeviceCommand... commands) {
             long singleOccurrences = Stream.of(Arrays.stream(commands), this.deviceCommands.stream())
                     .flatMap(o -> o)
