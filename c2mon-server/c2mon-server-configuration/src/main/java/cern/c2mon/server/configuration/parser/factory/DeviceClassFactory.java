@@ -18,6 +18,7 @@
 package cern.c2mon.server.configuration.parser.factory;
 
 import cern.c2mon.server.cache.DeviceClassCache;
+import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.cache.loading.DeviceClassDAO;
 import cern.c2mon.server.cache.loading.SequenceDAO;
 import cern.c2mon.server.configuration.parser.exception.ConfigurationParseException;
@@ -66,12 +67,12 @@ public class DeviceClassFactory extends EntityFactory<DeviceClass> {
 
   @Override
   Long getId(DeviceClass entity) {
-    return entity.getId() != null ? entity.getId() : deviceClassCache.getDeviceClassIdByName(entity.getName());
+    return entity.getId() != null ? entity.getId() : getIdFromCache(entity);
   }
 
   @Override
   Long createId(DeviceClass entity) {
-    if (entity.getName() != null && deviceClassCache.getDeviceClassIdByName(entity.getName()) != null) {
+    if (entity.getName() != null && getIdFromCache(entity) != null) {
       throw new ConfigurationParseException("Error creating deviceClass " + entity.getName() + ": " +
               "Name already exists");
     } else {
@@ -88,13 +89,21 @@ public class DeviceClassFactory extends EntityFactory<DeviceClass> {
 
   private void createAndSetPropertyIds(DeviceClass entity) {
     entity.getProperties().getProperties().stream()
-            .filter(property -> property.getId() != null)
+            .filter(property -> property.getId() == null)
             .forEach(property -> property.setId(sequenceDAO.getNextPropertyId()));
   }
 
   private void createAndSetCommandIds(DeviceClass entity) {
     entity.getCommands().getCommands().stream()
-            .filter(command -> command.getId() != null)
+            .filter(command -> command.getId() == null)
             .forEach(command -> command.setId(sequenceDAO.getNextCommandId()));
+  }
+
+  private Long getIdFromCache(DeviceClass entity) {
+    try {
+      return deviceClassCache.getDeviceClassIdByName(entity.getName());
+    } catch (CacheElementNotFoundException e) {
+      return null;
+    }
   }
 }

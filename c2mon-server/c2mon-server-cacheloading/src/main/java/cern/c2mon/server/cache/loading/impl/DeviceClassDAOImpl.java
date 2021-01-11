@@ -1,35 +1,30 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 package cern.c2mon.server.cache.loading.impl;
 
-import cern.c2mon.server.common.exception.SubEquipmentException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
-import org.springframework.stereotype.Service;
-
 import cern.c2mon.server.cache.dbaccess.DeviceClassMapper;
 import cern.c2mon.server.cache.loading.DeviceClassDAO;
 import cern.c2mon.server.cache.loading.common.AbstractDefaultLoaderDAO;
-import cern.c2mon.shared.client.device.Command;
 import cern.c2mon.server.common.device.DeviceClass;
 import cern.c2mon.server.common.device.DeviceClassCacheObject;
+import cern.c2mon.shared.client.device.Command;
 import cern.c2mon.shared.client.device.Property;
-
-import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * DeviceClass loader DAO implementation.
@@ -69,36 +64,6 @@ public class DeviceClassDAOImpl extends AbstractDefaultLoaderDAO<DeviceClass> im
     deviceClassMapper.deleteProperties(deviceClass.getId());
     deviceClassMapper.deleteCommands(deviceClass.getId());
     deviceClassMapper.deleteDeviceClass(deviceClass.getId());
-  }
-
-  @Override
-  public Long getIdByName(String name) {
-    return 0L; //deviceClassMapper.getIdByName(name);
-  }
-
-  @Override
-  public DeviceClass getByName(String name) {
-    DeviceClass eq = null;
-    /*
-    try {
-      List<DeviceClass> deviceClasses = deviceClassMapper.getByName(name);
-      if (!deviceClasses.isEmpty()) {
-        eq = deviceClasses.get(0);
-      }
-    } catch (DataAccessException e) {
-      throw new SubEquipmentException(e.getMessage());
-    }*/
-    return eq;
-  }
-
-  @Override
-  public Long getPropertyIdByPropertyNameAndDeviceClassId(String propertyName, Long deviceClassID) {
-    return 0L; //deviceClassMapper.getPropertyIdByPropertyNameAndDevClassId(propertyName, deviceClassID);
-  }
-
-  @Override
-  public Long getCommandIdByCommandNameAndDeviceClassId(String commandName, Long deviceClassId) {
-    return 0L; // deviceClassMapper.getCommandIdByCommandNameAndDevClassId(commandName, deviceClassId);
   }
 
   @Override

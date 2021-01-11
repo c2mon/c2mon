@@ -19,6 +19,7 @@ package cern.c2mon.server.configuration.parser.factory;
 
 import cern.c2mon.server.cache.DeviceCache;
 import cern.c2mon.server.cache.DeviceClassCache;
+import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.cache.loading.SequenceDAO;
 import cern.c2mon.server.configuration.parser.exception.ConfigurationParseException;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
@@ -38,9 +39,9 @@ import java.util.List;
 @Slf4j
 public class DeviceFactory extends EntityFactory<Device> {
 
-  private DeviceCache deviceCache;
-  private DeviceClassCache deviceClassCache;
-  private SequenceDAO sequenceDAO;
+  private final DeviceCache deviceCache;
+  private final DeviceClassCache deviceClassCache;
+  private final SequenceDAO sequenceDAO;
 
   @Autowired
   public DeviceFactory(DeviceCache deviceCache, DeviceClassCache deviceClassCache, SequenceDAO sequenceDAO) {
@@ -56,8 +57,8 @@ public class DeviceFactory extends EntityFactory<Device> {
     List<ConfigurationElement> configurationElements = new ArrayList<>();
 
     // Build the process configuration element. This also sets the device class id
-    ConfigurationElement createDeviceClass = doCreateInstance(entity);
-    configurationElements.add(createDeviceClass);
+    ConfigurationElement createDevice = doCreateInstance(entity);
+    configurationElements.add(createDevice);
 
     return configurationElements;
   }
@@ -68,38 +69,42 @@ public class DeviceFactory extends EntityFactory<Device> {
     if (entity.getId() != null) {
       return entity.getId();
     }
-    return getIdFromCache(entity);
+    return loadIdFromCache(entity);
   }
 
   @Override
   Long createId(Device entity) {
-    if (entity.getName() != null && getIdFromCache(entity) != null) {
+    if (entity.getName() != null && loadIdFromCache(entity) != null) {
       throw new ConfigurationParseException("Error creating deviceClass " + entity.getName() + ": " +
               "Name already exists");
     } else {
-      return entity.getId() != null ? entity.getId() : sequenceDAO.getNextDeviceClassId();
+      return entity.getId() != null ? entity.getId() : sequenceDAO.getNextDeviceId();
     }
   }
 
   @Override
   ConfigConstants.Entity getEntity() {
-    return ConfigConstants.Entity.DEVICECLASS;
+    return ConfigConstants.Entity.DEVICE;
   }
 
-  private Long getIdFromCache(Device entity) {
-    Long deviceClassId = entity.getDeviceClassId() == null ?
-            deviceClassCache.getDeviceClassIdByName(entity.getDeviceClassName()) :
+  private Long loadIdFromCache(Device entity) {
+    Long deviceClassId = entity.getClassId() == null ?
+            deviceClassCache.getDeviceClassIdByName(entity.getClassName()) :
             entity.getId();
     if (deviceClassId == null) {
       throw new ConfigurationParseException("Error creating device " + entity.getName() + ": " +
-              "No deviceClass with name " + entity.getDeviceClassName() + " exists.");
+              "No deviceClass with name " + entity.getClassName() + " exists.");
     }
-    List<cern.c2mon.server.common.device.Device> devices = deviceCache.getByDeviceClassId(deviceClassId);
-    return devices.stream()
-            .filter(d -> d.getName().equalsIgnoreCase(entity.getName()))
-            .findFirst()
-            .map(cern.c2mon.server.common.device.Device::getId)
-            .orElse(null);
+    entity.setClassId(deviceClassId);
+    try {
+      List<cern.c2mon.server.common.device.Device> devices = deviceCache.getByDeviceClassId(deviceClassId);
+      return devices.stream()
+              .filter(d -> d.getName().equalsIgnoreCase(entity.getName()))
+              .findFirst()
+              .map(cern.c2mon.server.common.device.Device::getId)
+              .orElse(null);
+    } catch (CacheElementNotFoundException e) {
+      return null;
+    }
   }
-
 }

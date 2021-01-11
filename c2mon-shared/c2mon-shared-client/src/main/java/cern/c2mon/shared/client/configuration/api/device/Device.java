@@ -50,9 +50,9 @@ public class Device implements ConfigurationEntity {
      */
     private String name;
 
-    private String deviceClassName;
+    private String className;
 
-    private Long deviceClassId;
+    private Long classId;
 
     private DevicePropertyList deviceProperties;
 
@@ -85,13 +85,13 @@ public class Device implements ConfigurationEntity {
 
         public CreateBuilder(String name, String deviceClassName) {
             deviceToBuild.setName(name);
-            deviceToBuild.setDeviceClassName(deviceClassName);
+            deviceToBuild.setClassName(deviceClassName);
             deviceToBuild.setCreated(true);
         }
 
         public CreateBuilder(String name, long deviceClassId) {
             deviceToBuild.setName(name);
-            deviceToBuild.setDeviceClassId(deviceClassId);
+            deviceToBuild.setClassId(deviceClassId);
             deviceToBuild.setCreated(true);
         }
 
