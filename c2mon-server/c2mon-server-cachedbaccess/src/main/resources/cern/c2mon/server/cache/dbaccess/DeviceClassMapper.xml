@@ -141,12 +141,6 @@
       FROM DEVICECLASS
   </select>
 
-  <select id="getIdByName" resultType="Long" parameterType="String">
-    SELECT DEVCLASSID
-      FROM DEVICECLASS
-     WHERE DEVCLASSNAME = #{name}
-  </select>
-
   <delete id="deleteDeviceClass" parameterType="Long">
     DELETE FROM DEVICECLASS WHERE DEVCLASSID = #{id}
   </delete>
