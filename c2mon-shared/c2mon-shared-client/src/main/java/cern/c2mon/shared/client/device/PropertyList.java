@@ -16,8 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.shared.client.device;
 
-import java.io.IOException;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -25,9 +23,6 @@ import java.util.Set;
 
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
-import org.simpleframework.xml.Serializer;
-import org.simpleframework.xml.convert.AnnotationStrategy;
-import org.simpleframework.xml.core.Persister;
 
 /**
  * Simple XML mapper bean representing a list of device class properties. Used
@@ -36,7 +31,7 @@ import org.simpleframework.xml.core.Persister;
  * @author Justin Lewis Salmon
  */
 @Root(name = "Properties")
-public class PropertyList {
+public class PropertyList extends DeviceClassOrDeviceSerializableElement {
 
   @ElementList(entry = "Property", inline = true, required = false)
   private Set<Property> properties = new HashSet<>();
@@ -51,14 +46,5 @@ public class PropertyList {
 
   public List<Property> getProperties() {
     return new ArrayList<>(properties);
-  }
-
-
-  public String toConfigXml() throws Exception {
-    Persister serializer = new Persister(new AnnotationStrategy());
-    try (StringWriter fw = new StringWriter()) {
-      serializer.write(this, fw);
-      return fw.toString();
-    }
   }
 }
