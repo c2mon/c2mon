@@ -52,6 +52,11 @@ public class SequenceDAOImpl implements SequenceDAO {
   }
 
   @Override
+  public Long getNextDeviceId() {
+    return sequenceMapper.getNextDeviceId();
+  }
+
+  @Override
   public Long getNextPropertyId() {
     return sequenceMapper.getNextPropertyId();
   }
