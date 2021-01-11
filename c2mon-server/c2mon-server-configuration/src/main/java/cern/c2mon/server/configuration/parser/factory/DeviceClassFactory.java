@@ -40,14 +40,14 @@ import java.util.List;
 @Slf4j
 public class DeviceClassFactory extends EntityFactory<DeviceClass> {
 
-  private DeviceClassDAO deviceClassDAO;
-  private SequenceDAO sequenceDAO;
+  private final DeviceClassCache deviceClassCache;
+  private final SequenceDAO sequenceDAO;
 
   @Autowired
-  public DeviceClassFactory(DeviceClassCache deviceClassCache, SequenceDAO sequenceDAO, DeviceClassDAO deviceClassDAO) {
+  public DeviceClassFactory(DeviceClassCache deviceClassCache, SequenceDAO sequenceDAO) {
     super(deviceClassCache);
+    this.deviceClassCache = deviceClassCache;
     this.sequenceDAO = sequenceDAO;
-    this.deviceClassDAO = deviceClassDAO;
   }
 
 
@@ -66,12 +66,12 @@ public class DeviceClassFactory extends EntityFactory<DeviceClass> {
 
   @Override
   Long getId(DeviceClass entity) {
-    return entity.getId() != null ? entity.getId() : deviceClassDAO.getIdByName(entity.getName());
+    return entity.getId() != null ? entity.getId() : deviceClassCache.getDeviceClassIdByName(entity.getName());
   }
 
   @Override
   Long createId(DeviceClass entity) {
-    if (entity.getName() != null && deviceClassDAO.getIdByName(entity.getName()) != null) {
+    if (entity.getName() != null && deviceClassCache.getDeviceClassIdByName(entity.getName()) != null) {
       throw new ConfigurationParseException("Error creating deviceClass " + entity.getName() + ": " +
               "Name already exists");
     } else {
