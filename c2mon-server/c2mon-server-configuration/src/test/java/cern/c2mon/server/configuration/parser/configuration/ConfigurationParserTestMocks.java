@@ -24,6 +24,10 @@ public class ConfigurationParserTestMocks {
   public DeviceClassCache deviceClassCacheCache() {
     return EasyMock.createStrictMock(DeviceClassCache.class);
   }
+  @Bean
+  public DeviceCache deviceCacheCache() {
+    return EasyMock.createStrictMock(DeviceCache.class);
+  }
 
   @Bean
   public EquipmentCache equipmentCache() {
@@ -83,6 +87,10 @@ public class ConfigurationParserTestMocks {
   @Bean
   public DeviceClassDAO deviceClassDAO() {
     return EasyMock.createStrictMock(DeviceClassDAO.class);
+  }
+  @Bean
+  public DeviceDAO deviceDAO() {
+    return EasyMock.createStrictMock(DeviceDAO.class);
   }
 
   @Bean

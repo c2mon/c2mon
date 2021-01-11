@@ -55,7 +55,6 @@ public class DeviceClassFacadeImpl extends AbstractFacade<DeviceClass> implement
    * Default constructor used by Spring to autowire the device and device class
    * cache beans.
    *
-   * @param pDeviceCache reference to the Device cache bean
    * @param pDeviceClassCache reference to the DeviceClass cache bean
    */
   @Autowired
