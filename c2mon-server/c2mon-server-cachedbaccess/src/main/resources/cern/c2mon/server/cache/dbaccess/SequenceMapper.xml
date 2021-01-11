@@ -94,6 +94,19 @@
     SELECT NEXTVAL('DEVCLASS_ID');
   </select>
 
+
+  <select id="getNextDeviceId" databaseId="hsql" resultType="java.lang.Long">
+    CALL NEXT VALUE FOR DEV_ID_SEQUENCE
+  </select>
+
+  <select id="getNextDeviceId" databaseId="oracle" resultType="java.lang.Long">
+    SELECT DEV_ID_SEQUENCE.NEXTVAL FROM DUAL
+  </select>
+
+  <select id="getNextDeviceId" databaseId="mysql" resultType="java.lang.Long">
+    SELECT NEXTVAL('DEV_ID');
+  </select>
+
   <select id="getNextPropertyId" databaseId="hsql" resultType="java.lang.Long">
     CALL NEXT VALUE FOR PROPERTY_ID_SEQUENCE
   </select>
@@ -105,7 +118,6 @@
   <select id="getNextPropertyId" databaseId="mysql" resultType="java.lang.Long">
     SELECT NEXTVAL('PROPERTY_ID');
   </select>
-
 
   <select id="getNextCommandId" databaseId="hsql" resultType="java.lang.Long">
     CALL NEXT VALUE FOR COMMAND_ID_SEQUENCE
