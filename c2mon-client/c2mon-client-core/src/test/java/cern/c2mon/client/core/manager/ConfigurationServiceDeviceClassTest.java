@@ -24,6 +24,7 @@ import cern.c2mon.client.core.config.mock.RequestHandlerMock;
 import cern.c2mon.client.core.service.ConfigurationService;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
+import cern.c2mon.shared.client.configuration.api.device.Device;
 import cern.c2mon.shared.client.configuration.api.device.DeviceClass;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
@@ -36,6 +37,9 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+
 @Slf4j
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {
@@ -45,6 +49,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
         CoreSupervisionServiceMock.class
 })
 public class ConfigurationServiceDeviceClassTest {
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 
     /**
      * Component to test
@@ -64,7 +69,7 @@ public class ConfigurationServiceDeviceClassTest {
     @Ignore
     @DirtiesContext
     public void testCreateDeviceClassByName() {
-        String deviceClassName = String.valueOf(System.currentTimeMillis());
+        String deviceClassName = LocalTime.now().format(formatter);
         ConfigurationReport report = configurationService.createDeviceClass(deviceClassName);
         Assert.assertEquals(ConfigConstants.Status.OK, report.getStatus());
     }
@@ -73,8 +78,8 @@ public class ConfigurationServiceDeviceClassTest {
     @Ignore
     @DirtiesContext
     public void testCreateDeviceClassByDeviceClass() {
-        String deviceClassName = String.valueOf(System.currentTimeMillis());
-        DeviceClass deviceClass = new DeviceClass.CreateBuilder(deviceClassName).build();
+        String deviceClassName = LocalTime.now().format(formatter);
+        DeviceClass deviceClass = DeviceClass.create(deviceClassName).build();
         ConfigurationReport report = configurationService.createDeviceClass(deviceClass);
         Assert.assertEquals(ConfigConstants.Status.OK, report.getStatus());
     }
@@ -83,17 +88,20 @@ public class ConfigurationServiceDeviceClassTest {
     @Ignore
     @DirtiesContext
     public void testCreateDeviceClassByDeviceClassWithProperties() {
-        DeviceClass deviceClass = new DeviceClass.CreateBuilder(String.valueOf(System.currentTimeMillis()))
+        String deviceClassName = LocalTime.now().format(formatter);
+        DeviceClass deviceClass = DeviceClass.create(deviceClassName)
                 .addProperty("testprop", "testpropdesc")
                 .build();
         ConfigurationReport report = configurationService.createDeviceClass(deviceClass);
         Assert.assertEquals(ConfigConstants.Status.OK, report.getStatus());
     }
+
     @Test
     @Ignore
     @DirtiesContext
     public void testCreateDeviceClassByDeviceClassWithCommands() {
-        DeviceClass deviceClass = new DeviceClass.CreateBuilder(String.valueOf(System.currentTimeMillis()))
+        String deviceClassName = LocalTime.now().format(formatter);
+        DeviceClass deviceClass = DeviceClass.create(deviceClassName)
                 .addCommand("testcmd", "testcmddesc")
                 .build();
         ConfigurationReport report = configurationService.createDeviceClass(deviceClass);
@@ -103,9 +111,23 @@ public class ConfigurationServiceDeviceClassTest {
     @Test
     @Ignore
     @DirtiesContext
+    public void testCreateDevice() {
+        String date = LocalTime.now().format(formatter);
+        DeviceClass deviceClass = DeviceClass.create("devClass: " + date)
+                .addCommand("testcmd", "testcmddesc")
+                .build();
+        configurationService.createDeviceClass(deviceClass);
+        Device device = Device.create("device: " + date, "devClass: " + date).build();
+        ConfigurationReport report = configurationService.createDevice(device);
+        Assert.assertEquals(ConfigConstants.Status.OK, report.getStatus());
+    }
+
+    @Test
+    @Ignore
+    @DirtiesContext
     public void testRemoveDeviceClassByName() {
         String tmpName = "testRemoveDeviceClass";
-        DeviceClass deviceClass = new DeviceClass.CreateBuilder(tmpName)
+        DeviceClass deviceClass = DeviceClass.create(tmpName)
                 .addCommand("removeCommand", "description")
                 .addProperty("removeProperty", "description")
                 .build();
@@ -120,7 +142,7 @@ public class ConfigurationServiceDeviceClassTest {
     @Ignore
     @DirtiesContext
     public void testRemoveDeviceClassById() {
-        DeviceClass deviceClass = new DeviceClass.CreateBuilder("testRemoveDeviceClass")
+        DeviceClass deviceClass = DeviceClass.create("testRemoveDeviceClass")
                 .id(444L)
                 .addCommand("removeCommand", "description")
                 .addProperty("removeProperty", "description")

@@ -24,8 +24,6 @@ import java.util.Set;
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
 
-import cern.c2mon.shared.client.device.DeviceProperty;
-
 /**
  * Simple XML mapper bean representing a list of device properties. Used when
  * deserialising device properties during configuration.
@@ -33,7 +31,7 @@ import cern.c2mon.shared.client.device.DeviceProperty;
  * @author Justin Lewis Salmon
  */
 @Root(name = "DeviceProperties")
-public class DevicePropertyList {
+public class DevicePropertyList extends DeviceClassOrDeviceSerializableElement {
 
   @ElementList(entry = "DeviceProperty", inline = true, required = false)
   private Set<DeviceProperty> deviceProperties = new HashSet<>();

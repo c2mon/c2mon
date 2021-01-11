@@ -22,8 +22,6 @@ import cern.c2mon.server.common.device.DeviceClassCacheObject;
 import cern.c2mon.shared.client.device.Property;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.List;
-
 /**
  * MyBatis mapper for for accessing and updating {@link DeviceClassCacheObject}s
  * in the cache database.

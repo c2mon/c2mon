@@ -24,8 +24,6 @@ import java.util.Set;
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
 
-import cern.c2mon.shared.client.device.DeviceCommand;
-
 /**
  * Simple XML mapper bean representing a list of device commands. Used when
  * deserialising device commands during configuration.
@@ -33,7 +31,7 @@ import cern.c2mon.shared.client.device.DeviceCommand;
  * @author Justin Lewis Salmon
  */
 @Root(name = "DeviceCommands")
-public class DeviceCommandList {
+public class DeviceCommandList extends DeviceClassOrDeviceSerializableElement {
 
   @ElementList(entry = "DeviceCommand", inline = true, required = false)
   private Set<DeviceCommand> deviceCommands = new HashSet<>();
