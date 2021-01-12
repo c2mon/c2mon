@@ -21,16 +21,20 @@ import cern.c2mon.server.cache.DeviceCache;
 import cern.c2mon.server.cache.DeviceClassCache;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.cache.loading.SequenceDAO;
+import cern.c2mon.server.common.device.DeviceClass;
 import cern.c2mon.server.configuration.parser.exception.ConfigurationParseException;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.api.device.Device;
+import cern.c2mon.shared.client.device.DeviceCommand;
+import cern.c2mon.shared.client.device.DeviceProperty;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Elisabeth Stockinger
@@ -56,7 +60,6 @@ public class DeviceFactory extends EntityFactory<Device> {
   public List<ConfigurationElement> createInstance(Device entity) {
     List<ConfigurationElement> configurationElements = new ArrayList<>();
 
-    // Build the process configuration element. This also sets the device class id
     ConfigurationElement createDevice = doCreateInstance(entity);
     configurationElements.add(createDevice);
 
@@ -66,20 +69,21 @@ public class DeviceFactory extends EntityFactory<Device> {
 
   @Override
   Long getId(Device entity) {
-    if (entity.getId() != null) {
-      return entity.getId();
-    }
-    return loadIdFromCache(entity);
+    return entity.getId() != null ? entity.getId() : loadIdFromCache(entity);
   }
 
   @Override
   Long createId(Device entity) {
     if (entity.getName() != null && loadIdFromCache(entity) != null) {
-      throw new ConfigurationParseException("Error creating deviceClass " + entity.getName() + ": " +
+      throw new ConfigurationParseException("Error creating device " + entity.getName() + ": " +
               "Name already exists");
-    } else {
-      return entity.getId() != null ? entity.getId() : sequenceDAO.getNextDeviceId();
+    } else if (!entity.getDeviceCommands().getDeviceCommands().isEmpty() &&
+            !entity.getDeviceProperties().getDeviceProperties().isEmpty()) {
+      DeviceClass deviceClass = deviceClassCache.get(entity.getClassId());
+      setDevicePropertyIds(entity, deviceClass);
+      setDeviceCommandIds(entity, deviceClass);
     }
+    return entity.getId() != null ? entity.getId() : sequenceDAO.getNextDeviceId();
   }
 
   @Override
@@ -105,6 +109,32 @@ public class DeviceFactory extends EntityFactory<Device> {
               .orElse(null);
     } catch (CacheElementNotFoundException e) {
       return null;
+    }
+  }
+
+  private void setDevicePropertyIds(Device entity, DeviceClass deviceClass) {
+    for (DeviceProperty deviceProperty : entity.getDeviceProperties().getDeviceProperties()) {
+      if (deviceProperty.getId() == null) {
+        Long propertyId = deviceClass.getPropertyId(deviceProperty.getName());
+        if (propertyId == null) {
+          throw new ConfigurationParseException("Error creating device " + entity.getName() + ": " +
+                  "DeviceProperty \"" + deviceProperty.getName() + "\" must refer to a property defined in parent class");
+        }
+        deviceProperty.setId(propertyId);
+      }
+    }
+  }
+
+  private void setDeviceCommandIds(Device entity, DeviceClass deviceClass) {
+    for (DeviceCommand deviceCommand : entity.getDeviceCommands().getDeviceCommands()) {
+      if (deviceCommand.getId() == null) {
+        Long commandId = deviceClass.getCommandId(deviceCommand.getName());
+        if (commandId == null) {
+          throw new ConfigurationParseException("Error creating device " + entity.getName() + ": " +
+                  "deviceCommand \"" + deviceCommand.getName() + "\" must refer to a command defined in parent class");
+        }
+        deviceCommand.setId(commandId);
+      }
     }
   }
 }

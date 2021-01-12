@@ -114,11 +114,31 @@ public class ConfigurationServiceDeviceClassTest {
     public void testCreateDevice() {
         String date = LocalTime.now().format(formatter);
         DeviceClass deviceClass = DeviceClass.create("devClass: " + date)
-                .addCommand("testcmd", "testcmddesc")
                 .build();
         configurationService.createDeviceClass(deviceClass);
-        Device device = Device.create("device: " + date, "devClass: " + date).build();
+        Device device = Device.create("device: " + date, "devClass: " + date)
+                .build();
         ConfigurationReport report = configurationService.createDevice(device);
+        log.info("Report: {}, {}", report.getStatus(), report.getStatusDescription());
+        Assert.assertEquals(ConfigConstants.Status.OK, report.getStatus());
+    }
+
+    @Test
+    @Ignore
+    @DirtiesContext
+    public void testCreateDeviceWithPropertyAndCommand() {
+        String date = LocalTime.now().format(formatter);
+        DeviceClass deviceClass = DeviceClass.create("devClass: " + date)
+                .addCommand("testcmd", "testcmddesc")
+                .addProperty("testprop", "testpropdesc")
+                .build();
+        configurationService.createDeviceClass(deviceClass);
+        Device device = Device.create("device: " + date, "devClass: " + date)
+                .addDeviceCommand("testcmd", "1", "testdevcmd", null)
+                .addDeviceProperty("testprop", "2", "testdevprop", null)
+                .build();
+        ConfigurationReport report = configurationService.createDevice(device);
+        log.info("Report: {}, {}", report.getStatus(), report.getStatusDescription());
         Assert.assertEquals(ConfigConstants.Status.OK, report.getStatus());
     }
 

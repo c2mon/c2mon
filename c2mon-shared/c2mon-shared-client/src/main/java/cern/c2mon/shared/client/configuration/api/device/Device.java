@@ -39,19 +39,19 @@ public class Device implements ConfigurationEntity {
     @IgnoreProperty
     private boolean deleted = false;
 
-    /**
-     * Unique identifier of the device class that this Device belongs to. Either deviceClassName or deviceClassId have to be specified.
-     */
     @IgnoreProperty
     private Long id;
+
+    private String name;
 
     /**
      * Name of the device class that this Device belongs to. Either deviceClassName or deviceClassId have to be specified.
      */
-    private String name;
-
     private String className;
 
+    /**
+     * Unique identifier of the device class that this Device belongs to. Either deviceClassName or deviceClassId have to be specified.
+     */
     private Long classId;
 
     private DevicePropertyList deviceProperties;
@@ -102,7 +102,7 @@ public class Device implements ConfigurationEntity {
 
         public Device.CreateBuilder addDeviceProperty(String name, String value, String category, String resultType) {
             Assert.isTrue(deviceProperties.stream().map(DeviceProperty::getName).noneMatch(s -> s.equals(name)),
-                    "A property with this name was already added configured for the Device Class.");
+                    "A property with this name was already added configured for the Device.");
             this.deviceProperties.add(new DeviceProperty(name, value, category, resultType));
             return this;
         }
@@ -113,14 +113,16 @@ public class Device implements ConfigurationEntity {
                     .map(DeviceProperty::getName)
                     .distinct().count();
             Assert.isTrue(singleOccurrences == properties.length,
-                    "Attempting to add property with same name twice to the Device Class.");
+                    "Attempting to add property with same name twice to the Device.");
             this.deviceProperties.addAll(Arrays.asList(properties));
             return this;
         }
 
         public Device.CreateBuilder addDeviceCommand(String name, String value, String category, String resultType) {
-            Assert.isTrue(deviceCommands.stream().map(DeviceCommand::getName).noneMatch(s -> s.equals(name)),
-                    "A property with this name was already added configured for the Device Class.");
+            Assert.isTrue(deviceCommands.stream()
+                            .map(DeviceCommand::getName)
+                            .noneMatch(s -> s.equals(name)),
+                    "A property with this name was already added configured for the Device.");
             this.deviceCommands.add(new DeviceCommand(name, value, category, resultType));
             return this;
         }
@@ -131,7 +133,7 @@ public class Device implements ConfigurationEntity {
                     .map(DeviceCommand::getName)
                     .distinct().count();
             Assert.isTrue(singleOccurrences == commands.length,
-                    "Attempting to add property with same name twice to the Device Class.");
+                    "Attempting to add property with same name twice to the Device.");
             this.deviceCommands.addAll(Arrays.asList(commands));
             return this;
         }
