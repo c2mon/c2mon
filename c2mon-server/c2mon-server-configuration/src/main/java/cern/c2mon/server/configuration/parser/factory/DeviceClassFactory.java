@@ -58,7 +58,6 @@ public class DeviceClassFactory extends EntityFactory<DeviceClass> {
 
     // Build the process configuration element. This also sets the device class id
     ConfigurationElement createDeviceClass = doCreateInstance(entity);
-    // TODO: should properties / commands go here?
     configurationElements.add(createDeviceClass);
 
     return configurationElements;

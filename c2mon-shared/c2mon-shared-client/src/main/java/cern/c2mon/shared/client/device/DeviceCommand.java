@@ -116,6 +116,14 @@ public class DeviceCommand implements Cloneable, Serializable {
   public Long getId() {
     return id;
   }
+  /**
+   * Sets the unique ID of the command. This should only be done during element creation requests.
+   *
+   * @param id the name of the command
+   */
+  public void setId(Long id) {
+    this.id = id;
+  }
 
   /**
    * Get the unique name of the command.

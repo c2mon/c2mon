@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import cern.c2mon.shared.client.configuration.api.util.IgnoreProperty;
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementList;
@@ -164,6 +165,13 @@ public class DeviceProperty implements Cloneable, Serializable {
   }
 
   /**
+   * Set the unique ID of the property. This should only be done during element creation requests.
+   *
+   * @param id the id of the property
+   */
+  public void setId(Long id) { this.id = id; }
+
+  /**
    * Get the unique name of the property.
    *
    * @return the name of the property
@@ -224,7 +232,9 @@ public class DeviceProperty implements Cloneable, Serializable {
    * @param field the field to set
    */
   public void setFields(DeviceProperty field) {
-    this.fields.add(field);
+    if (field.getName() != null || field.getId() != null) {
+      this.fields.add(field);
+    }
   }
 
   /**
