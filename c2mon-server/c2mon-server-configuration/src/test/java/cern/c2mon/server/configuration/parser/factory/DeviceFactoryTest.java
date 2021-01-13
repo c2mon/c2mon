@@ -8,7 +8,6 @@ import cern.c2mon.server.common.device.DeviceCacheObject;
 import cern.c2mon.server.common.device.DeviceClassCacheObject;
 import cern.c2mon.server.configuration.parser.exception.ConfigurationParseException;
 import cern.c2mon.shared.client.configuration.api.device.Device;
-import cern.c2mon.shared.client.configuration.api.device.DeviceClass;
 import cern.c2mon.shared.client.device.Command;
 import cern.c2mon.shared.client.device.DeviceCommand;
 import cern.c2mon.shared.client.device.DeviceProperty;
