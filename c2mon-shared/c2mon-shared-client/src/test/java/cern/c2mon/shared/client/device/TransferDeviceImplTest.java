@@ -22,10 +22,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import cern.c2mon.shared.client.device.DeviceCommand;
-import cern.c2mon.shared.client.device.DeviceProperty;
-import cern.c2mon.shared.client.device.TransferDevice;
-import cern.c2mon.shared.client.device.TransferDeviceImpl;
 import org.junit.Assert;
 import org.junit.Test;
 
