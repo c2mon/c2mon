@@ -194,11 +194,4 @@ public class DeviceClassFactoryTest {
         assertEquals(1, elements.size());
     }
 
-    @Test
-    public void createInstanceShould() {
-        List<ConfigurationElement> elements = factory.createInstance(minimalDeviceClass);
-        ConfigurationElement configurationElement = elements.get(0);
-        assertEquals(null, configurationElement.getElementProperties());
-    }
-
 }
