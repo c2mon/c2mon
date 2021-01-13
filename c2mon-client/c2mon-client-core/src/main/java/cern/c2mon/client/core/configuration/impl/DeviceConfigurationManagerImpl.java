@@ -31,6 +31,10 @@ import java.util.List;
 import static cern.c2mon.client.core.configuration.util.ConfigurationUtil.validateIsCreate;
 import static cern.c2mon.client.core.configuration.util.ConfigurationUtil.validateIsUpdate;
 
+
+/**
+ * Implementation of the DeviceConfigurationManager which allows to apply create, update and delete configurations for Devices.
+ */
 @Service("deviceConfigurationManager")
 public class DeviceConfigurationManagerImpl implements DeviceConfigurationManager {
 

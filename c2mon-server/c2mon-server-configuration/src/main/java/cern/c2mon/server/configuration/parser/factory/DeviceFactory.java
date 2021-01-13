@@ -36,11 +36,15 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
+
 
 /**
- * @author Elisabeth Stockinger
+ * Checks {@link Device} objects for correctness, and creates appropriate {@link ConfigurationElement}s. IDs are
+ * created dynamically for new devices. If required the {@link DeviceClass} corresponding to a configued device class
+ * name is fetched from the {@link DeviceClassCache}. Similarly, the appropriate {@link Property} and {@link Command}
+ * IDs are read from the cache and used as {@link DeviceProperty} and {@link DeviceCommand} when required. The device
+ * ID is dynamically generated is necessary.
+ *
  */
 @Service
 @Slf4j
@@ -83,8 +87,8 @@ public class DeviceFactory extends EntityFactory<Device> {
     } else if (!entity.getDeviceCommands().getDeviceCommands().isEmpty() ||
             !entity.getDeviceProperties().getDeviceProperties().isEmpty()) {
       DeviceClass deviceClass = deviceClassCache.get(entity.getClassId());
-      setDevicePropertyIds(entity, deviceClass);
-      setDeviceCommandIds(entity, deviceClass);
+      checkAndSetDevicePropertyIds(entity, deviceClass);
+      checkAndSetDeviceCommandIds(entity, deviceClass);
     }
     return entity.getId() != null ? entity.getId() : sequenceDAO.getNextDeviceId();
   }
@@ -119,7 +123,13 @@ public class DeviceFactory extends EntityFactory<Device> {
     return null;
   }
 
-  private void setDevicePropertyIds(Device entity, DeviceClass deviceClass) {
+  /**
+   * Each {@link DeviceProperty} must correspond to a {@link Property} defined in the Device's device class, meaning
+   * that both name and ID must match. The ID is here fetched from the cache.
+   * @param entity the device to be created
+   * @param deviceClass the device class which the entity is created for
+   */
+  private void checkAndSetDevicePropertyIds(Device entity, DeviceClass deviceClass) {
     // fetch associated property instead of ID so that we can later associate field ID and device field name
     for (DeviceProperty deviceProperty : entity.getDeviceProperties().getDeviceProperties()) {
       Optional<Property> property = deviceClass.getProperties()
@@ -134,12 +144,18 @@ public class DeviceFactory extends EntityFactory<Device> {
         deviceProperty.setId(property.get().getId());
       }
       if(deviceProperty.getFields() != null) {
-        setFieldIds(property.get(), deviceProperty, entity.getName());
+        checkAndSetFieldIds(property.get(), deviceProperty, entity.getName());
       }
     }
   }
 
-  private void setFieldIds(Property property, DeviceProperty deviceProperty, String deviceName) {
+  /**
+   * Each field in a {@link DeviceProperty} must correspond to a field defined in the {@link Property}, meaning that
+   * both name and ID must match. The ID is here fetched from the cache.
+   * @param entity the device to be created
+   * @param deviceClass the device class which the entity is created for
+   */
+  private void checkAndSetFieldIds(Property property, DeviceProperty deviceProperty, String deviceName) {
     if (property.getFields() == null && !deviceProperty.getFields().isEmpty()) {
       throw new ConfigurationParseException("Error creating device " + deviceName + ": " +
               "DeviceFields \"" + String.join(", ", deviceProperty.getFields().keySet()) + "\" must refer to fields defined in parent class");
@@ -158,7 +174,13 @@ public class DeviceFactory extends EntityFactory<Device> {
     }
   }
 
-  private void setDeviceCommandIds(Device entity, DeviceClass deviceClass) {
+  /**
+   * Each {@link DeviceCommand} must correspond to a {@link Command} defined in the Device's device class, meaning
+   * that both name and ID must match. The ID is here fetched from the cache.
+   * @param entity the device to be created
+   * @param deviceClass the device class which the entity is created for
+   */
+  private void checkAndSetDeviceCommandIds(Device entity, DeviceClass deviceClass) {
     for (DeviceCommand deviceCommand : entity.getDeviceCommands().getDeviceCommands()) {
       if (deviceCommand.getId() == null) {
         Long commandId = deviceClass.getCommandId(deviceCommand.getName());
