@@ -119,6 +119,18 @@
     SELECT NEXTVAL('PROPERTY_ID');
   </select>
 
+  <select id="getNextFieldId" databaseId="hsql" resultType="java.lang.Long">
+    CALL NEXT VALUE FOR FIELD_ID_SEQUENCE
+  </select>
+
+  <select id="getNextFieldId" databaseId="oracle" resultType="java.lang.Long">
+    SELECT FIELD_ID_SEQUENCE.NEXTVAL FROM DUAL
+  </select>
+
+  <select id="getNextFieldId" databaseId="mysql" resultType="java.lang.Long">
+    SELECT NEXTVAL('FIELD_ID');
+  </select>
+
   <select id="getNextCommandId" databaseId="hsql" resultType="java.lang.Long">
     CALL NEXT VALUE FOR COMMAND_ID_SEQUENCE
   </select>

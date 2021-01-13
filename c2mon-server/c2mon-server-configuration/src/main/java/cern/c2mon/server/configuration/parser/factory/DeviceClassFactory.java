@@ -92,10 +92,10 @@ public class DeviceClassFactory extends EntityFactory<DeviceClass> {
       if (property1.getId() == null) {
         property1.setId(sequenceDAO.getNextPropertyId());
       }
-      if (!property1.getFields().isEmpty()) {
+      if (property1.getFields() != null && !property1.getFields().isEmpty()) {
         property1.getFields().stream()
                 .filter(property -> property.getId() == null)
-                .forEach(property -> property.setId(sequenceDAO.getNextPropertyId()));
+                .forEach(property -> property.setId(sequenceDAO.getNextFieldId()));
       }
     }
   }

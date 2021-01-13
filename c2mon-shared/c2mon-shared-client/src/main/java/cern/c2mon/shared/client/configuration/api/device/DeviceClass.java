@@ -100,11 +100,13 @@ public class DeviceClass implements ConfigurationEntity {
             return this;
         }
         public DeviceClass.CreateBuilder addProperty(Property... properties) {
-            long singleOccurrences = Stream.of(Arrays.stream(properties), this.properties.stream())
-                    .flatMap(o -> o)
+            long duplicateOld = Arrays.stream(properties)
+                    .filter(this.properties::contains)
+                    .count();
+            long distinctNew = Arrays.stream(properties)
                     .map(Property::getName)
                     .distinct().count();
-            Assert.isTrue(singleOccurrences == properties.length,
+            Assert.isTrue(duplicateOld == 0 && distinctNew == properties.length,
                     "Attempting to add property with same name twice to the Device Class.");
             this.properties.addAll(Arrays.asList(properties));
             return this;
