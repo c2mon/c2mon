@@ -74,6 +74,9 @@ public class DeviceDAOImpl extends AbstractDefaultLoaderDAO<Device> implements D
 
     for (DeviceProperty property : ((DeviceCacheObject) device).getDeviceProperties()) {
       deviceMapper.insertDeviceProperty(device.getId(), property);
+      for (DeviceProperty field : property.getFieldList()) {
+        deviceMapper.insertPropertyField(property.getId(), device.getId(), field);
+      }
     }
 
     for (DeviceCommand command : ((DeviceCacheObject) device).getDeviceCommands()) {
