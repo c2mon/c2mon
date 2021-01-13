@@ -32,6 +32,8 @@ public interface SequenceDAO {
 
   Long getNextPropertyId();
 
+  Long getNextFieldId();
+
   Long getNextCommandId();
 
   Long getNextEquipmentId();

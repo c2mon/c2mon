@@ -115,6 +115,19 @@ public class DeviceProperty implements Cloneable, Serializable {
     this(null, name, value, category, resultType);
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof DeviceProperty)) return false;
+    DeviceProperty that = (DeviceProperty) o;
+    return Objects.equals(getId(), that.getId()) && Objects.equals(getName(), that.getName()) && Objects.equals(getValue(), that.getValue()) && Objects.equals(getCategory(), that.getCategory()) && Objects.equals(getResultType(), that.getResultType()) && Objects.equals(getFields(), that.getFields());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(getId(), getName(), getValue(), getCategory(), getResultType(), getFields());
+  }
+
   /**
    * Constructor that creates a mapped property.
    *

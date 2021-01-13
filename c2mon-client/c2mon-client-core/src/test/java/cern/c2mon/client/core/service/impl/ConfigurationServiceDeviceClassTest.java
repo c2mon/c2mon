@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
-package cern.c2mon.client.core.manager;
+package cern.c2mon.client.core.service.impl;
 
 import cern.c2mon.client.core.C2monServiceGateway;
 import cern.c2mon.client.core.config.C2monAutoConfiguration;
@@ -150,8 +150,8 @@ public class ConfigurationServiceDeviceClassTest {
         Assert.assertEquals(ConfigConstants.Status.OK, report.getStatus());
     }
 
-
     @Test
+    @Ignore
     @DirtiesContext
     public void testCreateDeviceWithFields() {
         String date = LocalTime.now().format(formatter);
