@@ -29,6 +29,16 @@ import org.springframework.util.Assert;
 import java.util.*;
 import java.util.stream.Stream;
 
+/**
+ * Configuration object for a DeviceClass.
+ * Holds the information to create a {@link cern.c2mon.shared.client.configuration.ConfigurationElement}
+ * related to a DeviceClass.
+ * <p/>
+ * For further information how to use instances of this for server configurations read <a
+ * href="http://c2mon.web.cern.ch/c2mon/docs/#_offline_configuration_via_c2mon_database_test_purpose_only">this</a> documentation.
+ * <p/>
+ *
+ */
 @Data
 public class DeviceClass implements ConfigurationEntity {
 
@@ -42,11 +52,14 @@ public class DeviceClass implements ConfigurationEntity {
     private boolean deleted = false;
 
     /**
-     * Unique identifier of the device class.
+     * Unique identifier of the {@link cern.c2mon.server.common.device.DeviceClassCacheObject}.
      */
     @IgnoreProperty
     private Long id;
 
+    /**
+     * Name of the {@link cern.c2mon.server.common.device.DeviceClassCacheObject}
+     */
     private String name;
 
     /**
@@ -55,22 +68,25 @@ public class DeviceClass implements ConfigurationEntity {
     @DefaultValue("<no description provided>")
     private String description;
 
+    /**
+     * Mapper bean representing a list of properties.
+     */
     private PropertyList properties;
 
+    /**
+     * Mapper bean representing a list of device commands.
+     */
     private CommandList commands;
 
 
+    /**
+     * Use this method to obtain a Builder for a new DeviceClass configuration object.
+     * @param name the name of the deviceClass
+     * @return a new DeviceClass.CreateBuilder with the specified name.
+     */
     public static CreateBuilder create(String name) {
         Assert.hasText(name, "Device Class name is required!");
         return new CreateBuilder(name);
-    }
-
-    public static UpdateBuilder update(Long id) {
-        return new UpdateBuilder(id);
-    }
-
-    public static DeviceClass.UpdateBuilder update(String name) {
-        return new DeviceClass.UpdateBuilder(name);
     }
 
     public static class CreateBuilder {
@@ -99,6 +115,7 @@ public class DeviceClass implements ConfigurationEntity {
             this.properties.add(new Property(name, description));
             return this;
         }
+
         public DeviceClass.CreateBuilder addProperty(Property... properties) {
             long duplicateOld = Arrays.stream(properties)
                     .filter(this.properties::contains)
@@ -118,6 +135,7 @@ public class DeviceClass implements ConfigurationEntity {
             this.commands.add(new Command(name, description));
             return this;
         }
+
         public DeviceClass.CreateBuilder addCommand(Command... commands) {
             long singleOccurrences = Stream.of(Arrays.stream(commands), this.commands.stream())
                     .flatMap(o -> o)
@@ -129,38 +147,9 @@ public class DeviceClass implements ConfigurationEntity {
             return this;
         }
 
-
         public DeviceClass build() {
             this.deviceClassToBuild.setProperties(new PropertyList(properties));
             this.deviceClassToBuild.setCommands(new CommandList(commands));
-            return this.deviceClassToBuild;
-        }
-    }
-
-    public static class UpdateBuilder {
-
-        private final DeviceClass deviceClassToBuild = new DeviceClass();
-
-        public UpdateBuilder(String name) {
-            deviceClassToBuild.setName(name);
-        }
-
-        public UpdateBuilder(Long id) {
-            deviceClassToBuild.setId(id);
-        }
-
-        public DeviceClass.UpdateBuilder id(Long id) {
-            this.deviceClassToBuild.setId(id);
-            return this;
-        }
-
-        public DeviceClass.UpdateBuilder description(String description) {
-            this.deviceClassToBuild.setDescription(description);
-            return this;
-        }
-
-        public DeviceClass build() {
-            deviceClassToBuild.setUpdated(true);
             return this.deviceClassToBuild;
         }
     }
