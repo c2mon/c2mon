@@ -31,59 +31,63 @@ import java.util.List;
 import static cern.c2mon.client.core.configuration.util.ConfigurationUtil.validateIsCreate;
 import static cern.c2mon.client.core.configuration.util.ConfigurationUtil.validateIsUpdate;
 
+
+/**
+ * Implementation of the DeviceClassConfigurationManager which allows to apply create, update and delete configurations for device classes.
+ */
 @Service("deviceClassConfigurationManager")
 public class DeviceClassConfigurationManagerImpl implements DeviceClassConfigurationManager {
 
-  private ConfigurationRequestSender configurationRequestSender;
+    private final ConfigurationRequestSender configurationRequestSender;
 
-  @Autowired
-  DeviceClassConfigurationManagerImpl(ConfigurationRequestSender configurationRequestSender) {
-    this.configurationRequestSender = configurationRequestSender;
-  }
+    @Autowired
+    DeviceClassConfigurationManagerImpl(ConfigurationRequestSender configurationRequestSender) {
+        this.configurationRequestSender = configurationRequestSender;
+    }
 
-  public ConfigurationReport createDeviceClass(String deviceClassName) {
+    public ConfigurationReport createDeviceClass(String deviceClassName) {
 
-    return createDeviceClass(DeviceClass.create(deviceClassName).build());
-  }
+        return createDeviceClass(DeviceClass.create(deviceClassName).build());
+    }
 
-  public ConfigurationReport createDeviceClass(DeviceClass deviceClass) {
+    public ConfigurationReport createDeviceClass(DeviceClass deviceClass) {
 
-    List<DeviceClass> deviceClasses = new ArrayList<>();
-    deviceClasses.add(deviceClass);
+        List<DeviceClass> deviceClasses = new ArrayList<>();
+        deviceClasses.add(deviceClass);
 
-    validateIsCreate(deviceClasses);
+        validateIsCreate(deviceClasses);
 
-    Configuration config = new Configuration();
-    config.setEntities(deviceClasses);
+        Configuration config = new Configuration();
+        config.setEntities(deviceClasses);
 
-    return configurationRequestSender.applyConfiguration(config, null);
-  }
+        return configurationRequestSender.applyConfiguration(config, null);
+    }
 
-  @Override
-  public ConfigurationReport removeDeviceClassById(Long id) {
+    @Override
+    public ConfigurationReport removeDeviceClassById(Long id) {
 
-    DeviceClass deleteDeviceClass = new DeviceClass();
-    deleteDeviceClass.setId(id);
-    deleteDeviceClass.setDeleted(true);
+        DeviceClass deleteDeviceClass = new DeviceClass();
+        deleteDeviceClass.setId(id);
+        deleteDeviceClass.setDeleted(true);
 
-    Configuration config = new Configuration();
-    config.setEntities(Collections.singletonList(deleteDeviceClass));
+        Configuration config = new Configuration();
+        config.setEntities(Collections.singletonList(deleteDeviceClass));
 
-    return configurationRequestSender.applyConfiguration(config, null);
-  }
+        return configurationRequestSender.applyConfiguration(config, null);
+    }
 
-  @Override
-  public ConfigurationReport removeDeviceClass(String name) {
+    @Override
+    public ConfigurationReport removeDeviceClass(String name) {
 
-    DeviceClass deleteDeviceClass = new DeviceClass();
-    deleteDeviceClass.setName(name);
-    deleteDeviceClass.setDeleted(true);
+        DeviceClass deleteDeviceClass = new DeviceClass();
+        deleteDeviceClass.setName(name);
+        deleteDeviceClass.setDeleted(true);
 
-    Configuration config = new Configuration();
-    config.setEntities(Collections.singletonList(deleteDeviceClass));
+        Configuration config = new Configuration();
+        config.setEntities(Collections.singletonList(deleteDeviceClass));
 
-    return configurationRequestSender.applyConfiguration(config, null);
-  }
+        return configurationRequestSender.applyConfiguration(config, null);
+    }
 
 
 }

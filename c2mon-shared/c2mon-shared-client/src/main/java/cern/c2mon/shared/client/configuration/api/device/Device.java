@@ -27,6 +27,16 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Stream;
 
+/**
+ * Configuration object for a Device.
+ * Holds the information to create a {@link cern.c2mon.shared.client.configuration.ConfigurationElement}
+ * related to a Device.
+ * <p/>
+ * For further information how to use instances of this for server configurations read <a
+ * href="http://c2mon.web.cern.ch/c2mon/docs/#_offline_configuration_via_c2mon_database_test_purpose_only">this</a> documentation.
+ * <p/>
+ *
+ */
 @Data
 public class Device implements ConfigurationEntity {
 
@@ -39,9 +49,16 @@ public class Device implements ConfigurationEntity {
     @IgnoreProperty
     private boolean deleted = false;
 
+    /**
+     * Internal identifier of the {@link cern.c2mon.server.common.device.DeviceCacheObject}. Created dynamically by the
+     * server if null.
+     */
     @IgnoreProperty
     private Long id;
 
+    /**
+     * Name of the {@link cern.c2mon.server.common.device.DeviceCacheObject}
+     */
     private String name;
 
     /**
@@ -54,28 +71,39 @@ public class Device implements ConfigurationEntity {
      */
     private Long classId;
 
+
+    /**
+     * Mapper bean representing a list of device properties.
+     */
     private DevicePropertyList deviceProperties;
 
+    /**
+     * Mapper bean representing a list of device commands.
+     */
     private DeviceCommandList deviceCommands;
 
+    /**
+     * Use this method to obtain a Builder for a new Device configuration object.
+     * @param name the name of the device
+     * @param deviceClassName the name of the device class that this Device belongs to.
+     * @return a new Device.CreateBuilder with the specified name and device class name
+     */
     public static CreateBuilder create(String name, String deviceClassName) {
         Assert.hasText(name, "Device name is required!");
         Assert.hasText(deviceClassName, "Device Class name is required!");
         return new CreateBuilder(name, deviceClassName);
     }
 
+    /**
+     * Use this method to obtain a Builder for a new Device configuration object.
+     * @param name the name of the device
+     * @param deviceClassId the identifier of the device class that this Device belongs to.
+     * @return a new Device.CreateBuilder with the specified name and device class ID
+     */
     public static CreateBuilder create(String name, Long deviceClassId) {
         Assert.hasText(name, "Device name is required!");
         Assert.notNull(deviceClassId, "Device Class ID is required!");
         return new CreateBuilder(name, deviceClassId);
-    }
-
-    public static UpdateBuilder update(Long id) {
-        return new UpdateBuilder(id);
-    }
-
-    public static Device.UpdateBuilder update(String name) {
-        return new Device.UpdateBuilder(name);
     }
 
     public static class CreateBuilder {
@@ -141,30 +169,6 @@ public class Device implements ConfigurationEntity {
         public Device build() {
             this.deviceToBuild.setDeviceProperties(new DevicePropertyList(deviceProperties));
             this.deviceToBuild.setDeviceCommands(new DeviceCommandList(deviceCommands));
-            return this.deviceToBuild;
-        }
-    }
-
-    public static class UpdateBuilder {
-
-        private final Device deviceToBuild = new Device();
-
-        public UpdateBuilder(String name) {
-            deviceToBuild.setName(name);
-        }
-
-        public UpdateBuilder(Long id) {
-            deviceToBuild.setId(id);
-        }
-
-        public Device.UpdateBuilder id(Long id) {
-            this.deviceToBuild.setId(id);
-            return this;
-        }
-
-
-        public Device build() {
-            deviceToBuild.setUpdated(true);
             return this.deviceToBuild;
         }
     }
