@@ -95,7 +95,7 @@ public class DeviceFactory extends EntityFactory<Device> {
   private Long loadIdFromCache(Device entity) {
     Long deviceClassId = entity.getClassId() == null ?
             deviceClassCache.getDeviceClassIdByName(entity.getClassName()) :
-            entity.getId();
+            entity.getClassId();
     if (deviceClassId == null) {
       throw new ConfigurationParseException("Error creating device " + entity.getName() + ": " +
               "No deviceClass with name " + entity.getClassName() + " exists.");
@@ -103,14 +103,18 @@ public class DeviceFactory extends EntityFactory<Device> {
     entity.setClassId(deviceClassId);
     try {
       List<cern.c2mon.server.common.device.Device> devices = deviceCache.getByDeviceClassId(deviceClassId);
-      return devices.stream()
-              .filter(d -> d.getName().equalsIgnoreCase(entity.getName()))
-              .findFirst()
-              .map(cern.c2mon.server.common.device.Device::getId)
-              .orElse(null);
-    } catch (CacheElementNotFoundException e) {
-      return null;
+      if (devices != null) {
+        Optional<cern.c2mon.server.common.device.Device> existingDevice = devices.stream()
+                .filter(d -> d.getName().equalsIgnoreCase(entity.getName()))
+                .findFirst();
+        if (existingDevice.isPresent()) {
+          return existingDevice.get().getId();
+        }
+      }
+    } catch (CacheElementNotFoundException ignored) {
+      // new device, not in cache
     }
+    return null;
   }
 
   private void setDevicePropertyIds(Device entity, DeviceClass deviceClass) {
