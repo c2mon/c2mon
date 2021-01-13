@@ -221,22 +221,18 @@ public class DeviceProperty implements Cloneable, Serializable {
    *
    * @return the property fields if they exist, null otherwise
    */
-  @JsonGetter("fields")
   public List<DeviceProperty> getFieldList() {
     return fields;
   }
 
-
   /**
-   * Set a fields of this property.
+   * Set a field of this property.
    *
-   * @param fields the fields to set
+   * @param field the field to set
    */
-  public void setFields(DeviceProperty... fields) {
-    for (DeviceProperty field : fields) {
-      if (field.getName() != null || field.getId() != null) {
-        this.fields.add(field);
-      }
+  public void setFields(DeviceProperty field) {
+    if (field.getName() != null || field.getId() != null) {
+      this.fields.add(field);
     }
   }
 

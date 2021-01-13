@@ -114,29 +114,29 @@ public class DeviceFactory extends EntityFactory<Device> {
   }
 
   private void setDevicePropertyIds(Device entity, DeviceClass deviceClass) {
+    // fetch associated property instead of ID so that we can later associate field ID and device field name
     for (DeviceProperty deviceProperty : entity.getDeviceProperties().getDeviceProperties()) {
       Optional<Property> property = deviceClass.getProperties()
               .stream()
               .filter(p -> p.getName().equals(deviceProperty.getName()))
               .findFirst();
+
       if (!property.isPresent() || property.get().getId() == null) {
         throw new ConfigurationParseException("Error creating device " + entity.getName() + ": " +
                 "DeviceProperty \"" + deviceProperty.getName() + "\" must refer to a property defined in parent class");
       } else if (deviceProperty.getId() == null) {
         deviceProperty.setId(property.get().getId());
       }
-      if (!deviceProperty.getFields().isEmpty()) {
-        List<Property> fields = property.get().getFields();
-        for (DeviceProperty deviceField : deviceProperty.getFields().values()) {
-          Optional<Property> field = fields.stream()
-                  .filter(p -> p.getName().equals(deviceField.getName()))
-                  .findFirst();
-          if (!field.isPresent()) {
-            throw new ConfigurationParseException("Error creating device " + entity.getName() + ": " +
-                    "DeviceProperty \"" + deviceProperty.getName() + "\" must refer to a property defined in parent class");
-          } else {
-            deviceField.setId(field.get().getId());
-          }
+
+      for (DeviceProperty deviceField : deviceProperty.getFields().values()) {
+        Optional<Property> field = property.get().getFields().stream()
+                .filter(p -> p.getName().equals(deviceField.getName()))
+                .findFirst();
+        if (!field.isPresent()) {
+          throw new ConfigurationParseException("Error creating device " + entity.getName() + ": " +
+                  "DeviceProperty \"" + deviceProperty.getName() + "\" must refer to a property defined in parent class");
+        } else {
+          deviceField.setId(field.get().getId());
         }
       }
     }
