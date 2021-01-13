@@ -17,12 +17,11 @@
 package cern.c2mon.shared.client.device;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import cern.c2mon.shared.client.configuration.api.util.IgnoreProperty;
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementList;
@@ -33,6 +32,7 @@ import org.simpleframework.xml.ElementList;
  *
  * @author Justin Lewis Salmon
  */
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class DeviceProperty implements Cloneable, Serializable {
 
   /**
@@ -104,7 +104,6 @@ public class DeviceProperty implements Cloneable, Serializable {
    * a constant value, or something else. For client rules and constant values, it is possible to specify the type of
    * the resulting value.
    *
-   * @param id the unique ID of the property
    * @param name the unique name of this property
    * @param value the actual value of this property
    * @param category the category of this property (e.g. "tagId", "clientRule",
@@ -113,13 +112,7 @@ public class DeviceProperty implements Cloneable, Serializable {
    *          values). Defaults to {@link String}.
    */
   public DeviceProperty(final String name, final String value, final String category, final String resultType) {
-    this.name = name;
-    this.value = value;
-    this.category = category;
-
-    if (resultType != null) {
-      this.resultType = resultType;
-    }
+    this(null, name, value, category, resultType);
   }
 
   /**
@@ -144,9 +137,7 @@ public class DeviceProperty implements Cloneable, Serializable {
    * @param fields the nested property fields
    */
   public DeviceProperty(final String name, final String category, final List<DeviceProperty> fields) {
-    this.name = name;
-    this.category = category;
-    this.fields = fields;
+    this(null, name, category, fields);
   }
 
   /**
@@ -225,15 +216,27 @@ public class DeviceProperty implements Cloneable, Serializable {
 
     return fields;
   }
+  /**
+   * Retrieve the raw fields of this property (if they exist).
+   *
+   * @return the property fields if they exist, null otherwise
+   */
+  @JsonGetter("fields")
+  public List<DeviceProperty> getFieldList() {
+    return fields;
+  }
+
 
   /**
-   * Set a field of this property.
+   * Set a fields of this property.
    *
-   * @param field the field to set
+   * @param fields the fields to set
    */
-  public void setFields(DeviceProperty field) {
-    if (field.getName() != null || field.getId() != null) {
-      this.fields.add(field);
+  public void setFields(DeviceProperty... fields) {
+    for (DeviceProperty field : fields) {
+      if (field.getName() != null || field.getId() != null) {
+        this.fields.add(field);
+      }
     }
   }
 

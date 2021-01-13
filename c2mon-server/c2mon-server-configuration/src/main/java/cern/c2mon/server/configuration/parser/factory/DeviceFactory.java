@@ -28,13 +28,14 @@ import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.api.device.Device;
 import cern.c2mon.shared.client.device.DeviceCommand;
 import cern.c2mon.shared.client.device.DeviceProperty;
+import cern.c2mon.shared.client.device.Property;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author Elisabeth Stockinger
@@ -77,7 +78,7 @@ public class DeviceFactory extends EntityFactory<Device> {
     if (entity.getName() != null && loadIdFromCache(entity) != null) {
       throw new ConfigurationParseException("Error creating device " + entity.getName() + ": " +
               "Name already exists");
-    } else if (!entity.getDeviceCommands().getDeviceCommands().isEmpty() &&
+    } else if (!entity.getDeviceCommands().getDeviceCommands().isEmpty() ||
             !entity.getDeviceProperties().getDeviceProperties().isEmpty()) {
       DeviceClass deviceClass = deviceClassCache.get(entity.getClassId());
       setDevicePropertyIds(entity, deviceClass);
@@ -114,13 +115,29 @@ public class DeviceFactory extends EntityFactory<Device> {
 
   private void setDevicePropertyIds(Device entity, DeviceClass deviceClass) {
     for (DeviceProperty deviceProperty : entity.getDeviceProperties().getDeviceProperties()) {
-      if (deviceProperty.getId() == null) {
-        Long propertyId = deviceClass.getPropertyId(deviceProperty.getName());
-        if (propertyId == null) {
-          throw new ConfigurationParseException("Error creating device " + entity.getName() + ": " +
-                  "DeviceProperty \"" + deviceProperty.getName() + "\" must refer to a property defined in parent class");
+      Optional<Property> property = deviceClass.getProperties()
+              .stream()
+              .filter(p -> p.getName().equals(deviceProperty.getName()))
+              .findFirst();
+      if (!property.isPresent() || property.get().getId() == null) {
+        throw new ConfigurationParseException("Error creating device " + entity.getName() + ": " +
+                "DeviceProperty \"" + deviceProperty.getName() + "\" must refer to a property defined in parent class");
+      } else if (deviceProperty.getId() == null) {
+        deviceProperty.setId(property.get().getId());
+      }
+      if (!deviceProperty.getFields().isEmpty()) {
+        List<Property> fields = property.get().getFields();
+        for (DeviceProperty deviceField : deviceProperty.getFields().values()) {
+          Optional<Property> field = fields.stream()
+                  .filter(p -> p.getName().equals(deviceField.getName()))
+                  .findFirst();
+          if (!field.isPresent()) {
+            throw new ConfigurationParseException("Error creating device " + entity.getName() + ": " +
+                    "DeviceProperty \"" + deviceProperty.getName() + "\" must refer to a property defined in parent class");
+          } else {
+            deviceField.setId(field.get().getId());
+          }
         }
-        deviceProperty.setId(propertyId);
       }
     }
   }

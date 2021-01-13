@@ -26,6 +26,8 @@ import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.api.device.Device;
 import cern.c2mon.shared.client.configuration.api.device.DeviceClass;
+import cern.c2mon.shared.client.device.DeviceProperty;
+import cern.c2mon.shared.client.device.Property;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -39,6 +41,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Slf4j
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -138,6 +146,31 @@ public class ConfigurationServiceDeviceClassTest {
                 .addDeviceProperty("testprop", "2", "testdevprop", null)
                 .build();
         ConfigurationReport report = configurationService.createDevice(device);
+        log.info("Report: {}, {}", report.getStatus(), report.getStatusDescription());
+        Assert.assertEquals(ConfigConstants.Status.OK, report.getStatus());
+    }
+
+
+    @Test
+    @DirtiesContext
+    public void testCreateDeviceWithFields() {
+        String date = LocalTime.now().format(formatter);
+        Property field = new Property("field1", "field");
+        Property property = new Property("prop1", "property with field", Collections.singletonList(field));
+        DeviceClass deviceClass = DeviceClass.create("devClass: " + date)
+                .addProperty(property)
+                .build();
+        ConfigurationReport report = configurationService.createDeviceClass(deviceClass);
+
+        log.info("Report: {}, {}", report.getStatus(), report.getStatusDescription());
+
+        DeviceProperty deviceField = new DeviceProperty("field1", "5", "", null);
+        DeviceProperty deviceProperty = new DeviceProperty("prop1", "9", Collections.singletonList(deviceField));
+        Device device = Device.create("device: " + date, "devClass: " + date)
+                .addDeviceProperty(deviceProperty)
+                .build();
+        report = configurationService.createDevice(device);
+
         log.info("Report: {}, {}", report.getStatus(), report.getStatusDescription());
         Assert.assertEquals(ConfigConstants.Status.OK, report.getStatus());
     }

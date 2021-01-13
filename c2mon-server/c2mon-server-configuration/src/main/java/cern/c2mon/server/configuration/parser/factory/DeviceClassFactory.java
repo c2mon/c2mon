@@ -33,6 +33,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * @author Elisabeth Stockinger
@@ -87,9 +88,16 @@ public class DeviceClassFactory extends EntityFactory<DeviceClass> {
   }
 
   private void createAndSetPropertyIds(DeviceClass entity) {
-    entity.getProperties().getProperties().stream()
-            .filter(property -> property.getId() == null)
-            .forEach(property -> property.setId(sequenceDAO.getNextPropertyId()));
+    for (Property property1 : entity.getProperties().getProperties()) {
+      if (property1.getId() == null) {
+        property1.setId(sequenceDAO.getNextPropertyId());
+      }
+      if (!property1.getFields().isEmpty()) {
+        property1.getFields().stream()
+                .filter(property -> property.getId() == null)
+                .forEach(property -> property.setId(sequenceDAO.getNextPropertyId()));
+      }
+    }
   }
 
   private void createAndSetCommandIds(DeviceClass entity) {
