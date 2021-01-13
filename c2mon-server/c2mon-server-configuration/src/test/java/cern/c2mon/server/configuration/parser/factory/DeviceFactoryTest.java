@@ -245,6 +245,68 @@ public class DeviceFactoryTest {
 
 
     @Test(expected = ConfigurationParseException.class)
+    public void createIdShouldThrowExceptionForDevicePropertyWithoutProperty() {
+
+        DeviceClassCacheObject classWithProperty = new DeviceClassCacheObject(100L);
+        classWithProperty.setName("device class");
+
+        DeviceProperty deviceProperty = new DeviceProperty( "property", "1001", "", "");
+        Device device = Device.create("device", "class name")
+                .addDeviceProperty(deviceProperty)
+                .build();
+
+        expect(devClassCacheMock.get(anyLong()))
+                .andReturn(classWithProperty)
+                .once();
+        replay(sequenceDAOMock, devClassCacheMock, devCacheMock);
+
+        factory.createId(device);
+    }
+
+    @Test(expected = ConfigurationParseException.class)
+    public void createIdShouldThrowExceptionForDeviceFieldWithoutField() {
+        Property property = new Property( 50L, "property", "desc");
+
+        DeviceClassCacheObject classWithProperty = new DeviceClassCacheObject(100L);
+        classWithProperty.setName("device class");
+        classWithProperty.setProperties(Collections.singletonList(property));
+
+        DeviceProperty deviceField = new DeviceProperty( "field", "1001", "tagId", null);
+        DeviceProperty deviceProperty = new DeviceProperty( "property", "1001", Collections.singletonList(deviceField));
+        Device device = Device.create("device", "class name")
+                .addDeviceProperty(deviceProperty)
+                .build();
+
+        expect(devClassCacheMock.get(anyLong()))
+                .andReturn(classWithProperty)
+                .once();
+        replay(sequenceDAOMock, devClassCacheMock, devCacheMock);
+
+        factory.createId(device);
+    }
+
+
+    @Test(expected = ConfigurationParseException.class)
+    public void createIdShouldThrowExceptionForDeviceCommandWithoutCommand() {
+
+        DeviceClassCacheObject classWithProperty = new DeviceClassCacheObject(100L);
+        classWithProperty.setName("device class");
+
+        DeviceCommand deviceCommand = new DeviceCommand( "command", "1001", "", "");
+        Device device = Device.create("device", "class name")
+                .addDeviceCommand(deviceCommand)
+                .build();
+
+        expect(devClassCacheMock.get(anyLong()))
+                .andReturn(classWithProperty)
+                .once();
+        replay(sequenceDAOMock, devClassCacheMock, devCacheMock);
+
+        factory.createId(device);
+    }
+
+
+    @Test(expected = ConfigurationParseException.class)
     public void createIdShouldThrowExceptionIfFieldDoesNotExsit() {
         Property property = new Property( "property", "desc");
 

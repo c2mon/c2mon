@@ -36,6 +36,8 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 /**
  * @author Elisabeth Stockinger
@@ -131,14 +133,24 @@ public class DeviceFactory extends EntityFactory<Device> {
       } else if (deviceProperty.getId() == null) {
         deviceProperty.setId(property.get().getId());
       }
+      if(deviceProperty.getFields() != null) {
+        setFieldIds(property.get(), deviceProperty, entity.getName());
+      }
+    }
+  }
 
+  private void setFieldIds(Property property, DeviceProperty deviceProperty, String deviceName) {
+    if (property.getFields() == null && !deviceProperty.getFields().isEmpty()) {
+      throw new ConfigurationParseException("Error creating device " + deviceName + ": " +
+              "DeviceFields \"" + String.join(", ", deviceProperty.getFields().keySet()) + "\" must refer to fields defined in parent class");
+    } else if (deviceProperty.getFields() != null) {
       for (DeviceProperty deviceField : deviceProperty.getFields().values()) {
-        Optional<Property> field = property.get().getFields().stream()
+        Optional<Property> field = property.getFields().stream()
                 .filter(p -> p.getName().equals(deviceField.getName()))
                 .findFirst();
         if (!field.isPresent()) {
-          throw new ConfigurationParseException("Error creating device " + entity.getName() + ": " +
-                  "DeviceProperty \"" + deviceProperty.getName() + "\" must refer to a property defined in parent class");
+          throw new ConfigurationParseException("Error creating device " + deviceName + ": " +
+                  "PropertyField \"" + deviceField.getName() + "\" must refer to a field defined in parent class");
         } else {
           deviceField.setId(field.get().getId());
         }
