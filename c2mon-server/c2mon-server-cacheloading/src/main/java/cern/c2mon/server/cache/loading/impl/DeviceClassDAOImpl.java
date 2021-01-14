@@ -92,6 +92,6 @@ public class DeviceClassDAOImpl extends AbstractDefaultLoaderDAO<DeviceClass> im
 
   @Override
   public void deleteItem(Long id) {
-    deviceClassMapper.deleteDeviceClass(id);
+    deleteItem(deviceClassMapper.getItem(id));
   }
 }
