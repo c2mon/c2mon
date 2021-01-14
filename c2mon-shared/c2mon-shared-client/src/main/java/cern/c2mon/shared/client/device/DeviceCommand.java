@@ -27,7 +27,7 @@ import org.simpleframework.xml.Element;
  *
  * @author Justin Lewis Salmon
  */
-public class DeviceCommand implements Cloneable, Serializable {
+public class DeviceCommand implements Cloneable, Serializable, DeviceElement {
 
   private static final long serialVersionUID = 7331198531306903558L;
 
@@ -108,30 +108,24 @@ public class DeviceCommand implements Cloneable, Serializable {
   public DeviceCommand() {
   }
 
-  /**
-   * Get the unique ID of the command.
-   *
-   * @return the name of the command
-   */
+  @Override
   public Long getId() {
     return id;
   }
-  /**
-   * Sets the unique ID of the command. This should only be done during element creation requests.
-   *
-   * @param id the name of the command
-   */
+
+  @Override
   public void setId(Long id) {
     this.id = id;
   }
 
-  /**
-   * Get the unique name of the command.
-   *
-   * @return the name of the command
-   */
+  @Override
   public String getName() {
     return name;
+  }
+
+  @Override
+  public void setName(String name) {
+    this.name = name;
   }
 
   /**
