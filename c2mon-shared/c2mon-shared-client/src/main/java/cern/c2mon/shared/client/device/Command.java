@@ -27,7 +27,7 @@ import org.simpleframework.xml.Element;
  *
  * @author Justin Lewis Salmon
  */
-public class Command implements Serializable {
+public class Command implements Serializable, DeviceClassElement {
 
   private static final long serialVersionUID = -6943334662697273304L;
 

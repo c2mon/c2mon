@@ -132,8 +132,8 @@ public class DeviceFactoryTest {
     }
 
 
-    @Test
-    public void createIdShouldNotSetDevicePropertyIdsIfConfigured() {
+    @Test(expected = ConfigurationParseException.class)
+    public void mismatchingIdsShouldThrowException() {
         Property property = new Property(50L, "property", "desc");
         DeviceClassCacheObject classWithProperty = new DeviceClassCacheObject(100L);
         classWithProperty.setName("device class");
@@ -150,7 +150,26 @@ public class DeviceFactoryTest {
         replay(sequenceDAOMock, devClassCacheMock, devCacheMock);
 
         factory.createId(device);
-        assertEquals(44L, (long)deviceProperty.getId());
+    }
+
+    @Test(expected = ConfigurationParseException.class)
+    public void mismatchingNamesShouldThrowException() {
+        Property property = new Property(50L, "property", "desc");
+        DeviceClassCacheObject classWithProperty = new DeviceClassCacheObject(100L);
+        classWithProperty.setName("device class");
+        classWithProperty.setProperties(Collections.singletonList(property));
+
+        DeviceProperty deviceProperty = new DeviceProperty( 50L,"bad name", "1001", "tagId", null);
+        Device device = Device.create("device", "class name")
+                .addDeviceProperty(deviceProperty)
+                .build();
+
+        expect(devClassCacheMock.get(anyLong()))
+                .andReturn(classWithProperty)
+                .once();
+        replay(sequenceDAOMock, devClassCacheMock, devCacheMock);
+
+        factory.createId(device);
     }
 
     @Test(expected = ConfigurationParseException.class)
@@ -307,8 +326,8 @@ public class DeviceFactoryTest {
 
 
     @Test(expected = ConfigurationParseException.class)
-    public void createIdShouldThrowExceptionIfFieldDoesNotExsit() {
-        Property property = new Property( "property", "desc");
+    public void createIdShouldThrowExceptionIfFieldDoesNotExist() {
+        Property property = new Property( 40L,"property", "desc");
 
         DeviceClassCacheObject classWithProperty = new DeviceClassCacheObject(100L);
         classWithProperty.setName("device class");
