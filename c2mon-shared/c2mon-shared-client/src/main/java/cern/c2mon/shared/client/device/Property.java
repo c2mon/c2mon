@@ -31,7 +31,7 @@ import org.simpleframework.xml.ElementList;
  *
  * @author Justin Lewis Salmon
  */
-public class Property implements Serializable {
+public class Property implements Serializable, DeviceClassElement {
 
   private static final long serialVersionUID = 779255306056735769L;
 
