@@ -80,8 +80,7 @@ public class DeviceFactory extends EntityFactory<Device> {
   @Override
   Long createId(Device entity) {
     if (entity.getName() != null && loadIdFromCache(entity) != null) {
-      throw new ConfigurationParseException("Error creating device " + entity.getName() + ": " +
-              "Name already exists");
+      throw createConfigurationException(entity.getName(), "Name already exists");
     } else if (!entity.getDeviceCommands().getDeviceCommands().isEmpty() ||
             !entity.getDeviceProperties().getDeviceProperties().isEmpty()) {
 
@@ -101,8 +100,7 @@ public class DeviceFactory extends EntityFactory<Device> {
             deviceClassCache.getDeviceClassIdByName(entity.getClassName()) :
             entity.getClassId();
     if (deviceClassId == null) {
-      throw new ConfigurationParseException("Error creating device " + entity.getName() + ": " +
-              "No deviceClass with name " + entity.getClassName() + " exists.");
+      throw createConfigurationException(entity.getName(), "No deviceClass with name " + entity.getClassName() + " exists.");
     }
     entity.setClassId(deviceClassId);
     try {
@@ -132,9 +130,9 @@ public class DeviceFactory extends EntityFactory<Device> {
       Property property = getDevClassElementAndConfigure(deviceProperty, deviceClass.getProperties(), entity.getName());
 
       if (deviceProperty.getFields() != null && property.getFields() == null && !deviceProperty.getFields().isEmpty()) {
-        throw new ConfigurationParseException("Error creating device " + entity.getName() + ": " +
-                "DeviceFields \"" + String.join(", ", deviceProperty.getFields().keySet()) + "\" must refer to fields defined in parent class");
-      } else if (deviceProperty.getFields() != null && deviceProperty.getFields() != null) {
+        String fieldNames = String.join(", ", deviceProperty.getFields().keySet());
+        throw createConfigurationException(entity.getName(), "DeviceFields \"" + fieldNames + "\" must refer to fields defined in parent class");
+      } else if (deviceProperty.getFields() != null && property.getFields() != null) {
         for (DeviceProperty deviceField : deviceProperty.getFields().values()) {
           getDevClassElementAndConfigure(deviceField, property.getFields(), entity.getName());
         }
@@ -163,14 +161,17 @@ public class DeviceFactory extends EntityFactory<Device> {
       deviceElement.setName(devClassElement.get().getName());
       return devClassElement.get();
     } else {
-      throw new ConfigurationParseException("Error creating device " + deviceName + ": " +
-              deviceElement.getClass().getSimpleName() + " \"" + deviceElement.getName() +
-              "\" must refer to a corresponding element defined in parent class");
+      throw createConfigurationException(deviceName, deviceElement.getClass().getSimpleName() + "" +
+              " \"" + deviceElement.getName() + "\" must refer to a corresponding element defined in parent class");
     }
   }
 
   private boolean elementsCorrespond(DeviceElement deviceElement, DeviceClassElement deviceClassElement) {
-    return deviceClassElement.getName().equals(deviceElement.getName()) && deviceClassElement.getId().equals(deviceElement.getId());
+    return deviceClassElement.getName().equals(deviceElement.getName()) &&
+            deviceClassElement.getId().equals(deviceElement.getId());
   }
 
+  private ConfigurationParseException createConfigurationException(String deviceName, String cause) {
+    return new ConfigurationParseException("Error creating device " + deviceName + ": " + cause);
+  }
 }
