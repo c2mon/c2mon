@@ -39,7 +39,7 @@ To reduce the boiler plate code we make use of the latest [Lombok](https://proje
 `git clone git@github.com:c2mon/c2mon.git`
 
 ### Compile and test; build all jars, distribution tarball, and docs
-`./mvnw package -pl \!docs -DskipDocker=true`
+`./mvnw package`
 
 ## Contributing
 [Pull requests][] are welcome; see the [contributor guidelines][] for details.

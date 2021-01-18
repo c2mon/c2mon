@@ -5,7 +5,7 @@ summary:  How to configure and start the C2MON server.
 ---
 
 
-How to deploy and start C2MON server with Docker or the distribution tarball is described in the [Getting Started]({{ site.baseurl }}{% link docs/getting-started.md %}) Guide
+How to deploy and start C2MON server with Docker or the distribution tarball is described in the [Getting Started]({{ site.baseurl }}{% link docs/getting-started.md %}) Guide.
 
 However, it is also possible to run C2MON from within your favourite IDE. For this you have to:
 

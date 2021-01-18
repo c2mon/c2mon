@@ -1,0 +1,10 @@
+c2mon:
+    client:
+        dynconfig:
+            mappings:
+            -   processName: P_OPC_UA
+                processID: 10000
+                processDescription: OPC UA Process
+                equipmentName: MS_IOT_SERVER
+                equipmentDescription: OPC UA Equipment
+                uriPattern: ^opc.tcp.*

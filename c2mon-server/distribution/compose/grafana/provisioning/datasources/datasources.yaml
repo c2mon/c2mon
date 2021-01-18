@@ -1,0 +1,31 @@
+apiVersion: 1
+
+datasources:
+  # <string, required> name of the datasource. Required
+- name: TIM tags
+    # <string, required> datasource type. Required
+  type: elasticsearch
+    # <string, required> access mode. proxy or direct (Server or Browser in the UI). Required
+  access: proxy
+    # <string> url
+  url: http://elasticsearch:9200
+  database: "*"
+    # <bool> allow users to edit datasources from the UI.
+  editable: true
+    # <map> fields that will be converted to json and stored in jsonData
+  jsonData:
+    interval: Hourly
+    timeField: "timestamp"
+    esVersion: 60
+
+- name: Prometheus
+  type: prometheus
+  access: proxy
+  url: http://prometheus:9090
+
+- name: MySQL Tim
+  type: mysql
+  url: db:3306
+  database: tim
+  user: user
+  password: user-pwd

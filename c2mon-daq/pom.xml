@@ -4,7 +4,7 @@
     <parent>
         <groupId>cern.c2mon</groupId>
         <artifactId>c2mon</artifactId>
-        <version>1.9.11-SNAPSHOT</version>
+        <version>1.10.1-SNAPSHOT</version>
     </parent>
     <groupId>cern.c2mon.daq</groupId>
     <artifactId>c2mon-daq-parent</artifactId>
@@ -18,9 +18,9 @@
         <image.base>java:8-jdk</image.base>
         <image.name>${project.artifactId}</image.name>
         <gitlab>gitlab-registry.cern.ch/c2mon</gitlab>
-        <gitlab-repo/>
+        <gitlab-repo />
         <dockerhub>registry.hub.docker.com</dockerhub>
-        <dockerhub-repo/>
+        <dockerhub-repo />
         <repository>cern/c2mon-daq</repository>
         <daq.home>/opt/${project.artifactId}-${project.version}</daq.home>
     </properties>
@@ -126,11 +126,11 @@
                             <phase>install</phase>
                             <configuration>
                                 <target>
-                                    <gunzip src="${project.build.directory}/${project.artifactId}-${project.version}-dist.tar.gz"/>
-                                    <untar src="${project.build.directory}/${project.artifactId}-${project.version}-dist.tar" dest="${project.build.directory}/distribution${daq.home}"/>
+                                    <gunzip src="${project.build.directory}/${project.artifactId}-${project.version}-dist.tar.gz" />
+                                    <untar src="${project.build.directory}/${project.artifactId}-${project.version}-dist.tar" dest="${project.build.directory}/distribution${daq.home}" />
                                     <copy todir="${project.build.directory}/distribution${daq.home}" overwrite="true">
-                                        <fileset dir="${project.build.directory}/distribution/tar"/>
-                                        <fileset dir="${project.build.directory}/distribution/docker"/>
+                                        <fileset dir="${project.build.directory}/distribution/tar" />
+                                        <fileset dir="${project.build.directory}/distribution/docker" />
                                     </copy>
                                 </target>
                             </configuration>

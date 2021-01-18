@@ -5,7 +5,7 @@
   <parent>
     <groupId>cern.c2mon.server</groupId>
     <artifactId>c2mon-server-parent</artifactId>
-    <version>1.9.11-SNAPSHOT</version>
+    <version>1.10.1-SNAPSHOT</version>
   </parent>
 
   <artifactId>c2mon-server-command</artifactId>

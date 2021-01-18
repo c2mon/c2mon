@@ -38,10 +38,14 @@
       - text: Class/Device/Property
   - text: User Guide
     subitems:
+      - text: Acquiring Data
+        subitems:
+          - text: Using OPC UA
       - text: Client API
         subitems:
           - text: Data Subscription
           - text: Configuration API
+          - text: Client Configuration Shell
           - text: Accessing Historical Data
       - text: Server
         subitems:
@@ -52,6 +56,7 @@
         subitems:
           - text: DAQ module developer guide
           - text: DAQ module testing guide
+          - text: OPC UA DAQ
       - text: Kubernetes Configuration
   - text: License
   # Jekyll seems to have the /license page occupied by default

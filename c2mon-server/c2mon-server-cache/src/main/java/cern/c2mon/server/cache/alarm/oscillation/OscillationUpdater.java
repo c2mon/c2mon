@@ -19,12 +19,12 @@ package cern.c2mon.server.cache.alarm.oscillation;
 import java.sql.Timestamp;
 import java.util.LinkedList;
 
-import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import cern.c2mon.server.cache.AlarmCache;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+
 import cern.c2mon.server.cache.alarm.config.OscillationProperties;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 
@@ -38,13 +38,10 @@ import cern.c2mon.server.common.alarm.AlarmCacheObject;
 @Slf4j
 public final class OscillationUpdater {
 
-    private final AlarmCache alarmCache;
-
     private final OscillationProperties oscillationProperties;
 
     @Autowired
-    public OscillationUpdater(AlarmCache alarmCache, OscillationProperties oscillationProperties) {
-      this.alarmCache = alarmCache;
+    public OscillationUpdater(OscillationProperties oscillationProperties) {
       this.oscillationProperties = oscillationProperties;
     }
 

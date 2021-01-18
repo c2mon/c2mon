@@ -16,6 +16,11 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.alarm.oscillation;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,11 +42,6 @@ import cern.c2mon.server.common.datatag.DataTagCacheObject;
 import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
-
 public class OscillationUpdateCheckerTest {
 
   private ClusterCache clusterCache;
@@ -58,7 +58,7 @@ public class OscillationUpdateCheckerTest {
     clusterCache = EasyMock.createNiceMock(ClusterCache.class);
     tagFacadeGateway = EasyMock.createStrictMock(TagFacadeGateway.class);
     oscillationProperties = new OscillationProperties();
-    OscillationUpdater oscillationUpdater = new OscillationUpdater(alarmCache, oscillationProperties);
+    OscillationUpdater oscillationUpdater = new OscillationUpdater(oscillationProperties);
     AlarmCacheUpdater alarmCacheUpdater = new AlarmCacheUpdaterImpl(alarmCache, oscillationUpdater);
     AlarmFacade alarmFacade = EasyMock.createNiceMock(AlarmFacade.class);
     oscillationUpdateChecker = new OscillationUpdateChecker(alarmCache, clusterCache, oscillationUpdater, alarmCacheUpdater, tagFacadeGateway, alarmFacade);

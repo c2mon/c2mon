@@ -53,7 +53,7 @@ public class AlarmCacheUpdaterImplTest {
     oscillationProperties = new OscillationProperties();
     oscillationProperties.setOscNumbers(3);
     oscillationProperties.setTimeRange(50);
-    oscUpdater = new OscillationUpdater(alarmCache, oscillationProperties);
+    oscUpdater = new OscillationUpdater(oscillationProperties);
     alarmCacheUpdaterImpl = new AlarmCacheUpdaterImpl(alarmCache, oscUpdater);
 
     alarmCacheObject = new AlarmCacheObject();
