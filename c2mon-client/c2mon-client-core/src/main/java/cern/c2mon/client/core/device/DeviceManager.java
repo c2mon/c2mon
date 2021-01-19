@@ -59,7 +59,7 @@ public class DeviceManager implements DeviceService, TagListener {
   /** Reference to the <code>TagManager</code> singleton */
   private final TagService tagService;
 
-  /** Reference to the <code>TagManager</code> singleton */
+  /** Reference to the <code>CommandService</code> singleton */
   private final CommandService commandService;
 
   /** Reference to the <code>DeviceCache</code> singleton */
@@ -78,10 +78,10 @@ public class DeviceManager implements DeviceService, TagListener {
    * Default Constructor, used by Spring to instantiate the Singleton service.
    *
    * @param tagService the TagService singleton reference
-   * @param pDataTagCache the data tag cache handler singleton reference
    * @param pDeviceCache the device cache handler singleton reference
    * @param pRequestHandler provides methods for requesting information from the
    *          C2MON server
+   * @param commandService the command service singleton, allows to retrieve command information from the server
    */
   @Autowired
   protected DeviceManager(final TagService tagService,
@@ -200,7 +200,7 @@ public class DeviceManager implements DeviceService, TagListener {
       }
     }
 
-    if (commandTagIds.size() > 0) {
+    if (!commandTagIds.isEmpty()) {
       Set<CommandTag<Object>> commandTags = commandService.getCommandTags(commandTagIds);
       for (CommandTag<Object> commandTag : commandTags) {
 
@@ -314,7 +314,7 @@ public class DeviceManager implements DeviceService, TagListener {
 
       // If there were unknown devices in the request list, we need to notify
       // the client by invoking the onDeviceNotFound() method of the listener.
-      if (unknownDevices.size() > 0) {
+      if (!unknownDevices.isEmpty()) {
         listener.onDevicesNotFound(unknownDevices);
       }
 
@@ -353,11 +353,9 @@ public class DeviceManager implements DeviceService, TagListener {
 
     // Invoke the listeners that are interested in these tags/devices
     for (ListenerWrapper wrapper : deviceUpdateListeners) {
-      if (updatedDevices.equals(wrapper.getDevices())) {
-        if (wrapper.isInitialUpdateRequired()) {
-          wrapper.getListener().onInitialUpdate(new ArrayList<>(updatedDevices));
-          wrapper.setInitialUpdateRequired(false);
-        }
+      if (updatedDevices.equals(wrapper.getDevices()) && wrapper.isInitialUpdateRequired()) {
+        wrapper.getListener().onInitialUpdate(new ArrayList<>(updatedDevices));
+        wrapper.setInitialUpdateRequired(false);
       }
     }
   }
