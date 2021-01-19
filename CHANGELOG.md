@@ -8,6 +8,8 @@ For more details on a given release, please check also the [version planning](ht
 
 ## Unreleased
 ### Added
+- Support for dynamic configuration (processes and equipments created on the fly based on regular expressions) (CM-288)
+- Client configuration shell module allows to configure C2MON data tags via a script (CM-288)
 
 ### Changed
 - Update managed dependencies of Oracle (ojdbc8 v19.8.0.0) and MyBatis Spring (v2.0.6)
