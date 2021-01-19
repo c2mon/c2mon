@@ -17,6 +17,7 @@
 package cern.c2mon.client.core.device;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import javax.jms.JMSException;
 
@@ -124,10 +125,8 @@ public class DeviceManager implements DeviceService, TagListener {
       for (TransferDevice transferDevice : serverResponse) {
         if (transferDevice.getDeviceClassName().equals(info.getClassName()) && transferDevice.getName().equals(info.getDeviceName())) {
           device = createClientDevice(transferDevice, info.getClassName());
-          if (device != null) {
             // Add the device to the cache
             deviceCache.add(device);
-          }
         }
       }
 
@@ -161,9 +160,7 @@ public class DeviceManager implements DeviceService, TagListener {
 
         for (TransferDevice transferDevice : serverResponse) {
           Device device = createClientDevice(transferDevice, deviceClassName);
-          if (device != null) {
             devices.add(device);
-          }
         }
 
         // Retrieve and set commands of all devices at once
@@ -192,13 +189,10 @@ public class DeviceManager implements DeviceService, TagListener {
    * @param transferDevices the list of transfer devices containing the command information
    */
   private void getDeviceCommands(Collection<Device> devices, Collection<TransferDevice> transferDevices) {
-    Set<Long> commandTagIds = new HashSet<>();
-
-    for (TransferDevice transferDevice : transferDevices) {
-      for (DeviceCommand deviceCommand : transferDevice.getDeviceCommands()) {
-        commandTagIds.add(Long.valueOf(deviceCommand.getValue().replace("\"", "")));
-      }
-    }
+    Set<Long> commandTagIds = transferDevices.stream()
+            .flatMap(transferDevice -> transferDevice.getDeviceCommands().stream())
+            .map(DeviceManager::parseToCommandId)
+            .collect(Collectors.toSet());
 
     if (!commandTagIds.isEmpty()) {
       Set<CommandTag<Object>> commandTags = commandService.getCommandTags(commandTagIds);
@@ -207,15 +201,10 @@ public class DeviceManager implements DeviceService, TagListener {
         // Find the device command to which this command tag belongs
         for (TransferDevice transferDevice : transferDevices) {
           for (DeviceCommand deviceCommand : transferDevice.getDeviceCommands()) {
-            if (commandTag.getId().equals(Long.valueOf(deviceCommand.getValue().replace("\"", "")))) {
-
-              // Find the device that maps to this transfer device
-              for (Device device : devices) {
-                if (device.getName().equals(transferDevice.getName())) {
-                  // Set the command tag on the device
-                  device.addCommand(deviceCommand.getName(), commandTag);
-                }
-              }
+            if (commandTag.getId().equals(parseToCommandId(deviceCommand))) {
+              devices.stream()
+                      .filter(device -> device.getName().equals(transferDevice.getName()))
+                      .forEach(device -> device.addCommand(deviceCommand.getName(), commandTag));
             }
           }
         }
@@ -267,21 +256,9 @@ public class DeviceManager implements DeviceService, TagListener {
       return;
     }
 
-    Set<Device> devices = new HashSet<>();
-
-    // Check if any of the devices are cached
-    Set<DeviceInfo> devicesToRetrieve = new HashSet<>();
-    for (DeviceInfo info : deviceInfoList) {
-      Device device = deviceCache.get(info.getDeviceName());
-      if (device == null) {
-        devicesToRetrieve.add(info);
-      } else {
-        devices.add(device);
-      }
-    }
-
-    // Copy the list into a HashSet to make sure it's serialisable
-    devicesToRetrieve = new HashSet<>(devicesToRetrieve);
+    // Copy into a HashSet to make sure it's serialisable and mutable
+    HashSet<DeviceInfo> devicesToRetrieve = new HashSet<>(deviceInfoList);
+    Set<Device> devices = readOutCachedDevices(devicesToRetrieve);
 
     try {
       // Ask the server for the devices
@@ -297,9 +274,7 @@ public class DeviceManager implements DeviceService, TagListener {
         for (TransferDevice transferDevice : serverResponse) {
           if (transferDevice.getDeviceClassName().equals(deviceInfo.getClassName()) && transferDevice.getName().equals(deviceInfo.getDeviceName())) {
             device = createClientDevice(transferDevice, deviceInfo.getClassName());
-            if (device != null) {
-              devices.add(device);
-            }
+            devices.add(device);
           }
         }
 
@@ -324,7 +299,7 @@ public class DeviceManager implements DeviceService, TagListener {
         deviceCache.add(device);
       }
 
-      if (devices.size() > 0) {
+      if (!devices.isEmpty()) {
         // Make the subscription
         subscribeDevices(devices, listener);
       }
@@ -436,6 +411,30 @@ public class DeviceManager implements DeviceService, TagListener {
       }
     }
 
+    return devices;
+  }
+
+  private static Long parseToCommandId(DeviceCommand deviceCommand) {
+    return Long.valueOf(deviceCommand.getValue().replace("\"", ""));
+  }
+
+  /**
+   * Private helper method to retrieve the Device corresponding to the entries of the deviceInfos from the cache where
+   * possible.
+   * @param deviceInfos The {@link DeviceInfo}s for which to retrieve the corresponding {@link Device} elements from the
+   *                    cache. The elements for which this is possible will be removed from the set.
+   * @return The set of {@link Device} elements which could be retrieved from the cache.
+   */
+  private Set<Device> readOutCachedDevices(HashSet<DeviceInfo> deviceInfos) {
+
+    Set<Device> devices = new HashSet<>();
+    for (DeviceInfo info : deviceInfos) {
+      Device device = deviceCache.get(info.getDeviceName());
+      if (device != null) {
+        deviceInfos.remove(info);
+        devices.add(device);
+      }
+    }
     return devices;
   }
 
