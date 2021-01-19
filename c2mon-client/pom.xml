@@ -14,6 +14,7 @@
 
   <modules>
     <module>c2mon-client-common</module>
+    <module>c2mon-client-config-shell</module>
     <module>c2mon-client-core</module>
   </modules>
 

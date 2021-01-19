@@ -1,17 +1,13 @@
 package cern.c2mon.shared.rule;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.annotation.Generated;
-
+import cern.c2mon.shared.common.rule.RuleInputValue;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.junit.Assert;
 import org.junit.Test;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-
-import cern.c2mon.shared.common.rule.RuleInputValue;
+import java.util.HashMap;
+import java.util.Map;
 
 public class RuleExpressionTest {
 

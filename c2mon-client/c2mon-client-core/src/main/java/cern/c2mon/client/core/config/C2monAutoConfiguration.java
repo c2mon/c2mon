@@ -26,7 +26,7 @@ import org.springframework.context.annotation.PropertySources;
  * @author Justin Lewis Salmon
  */
 @Configuration
-@EnableConfigurationProperties(C2monClientProperties.class)
+@EnableConfigurationProperties({C2monClientProperties.class, C2monClientDynConfigProperties.class})
 @ComponentScan({
     "cern.c2mon.client.core",
     "cern.c2mon.client.ext"
