@@ -165,7 +165,7 @@ public interface DeviceService {
    *
    * <p>
    * If the device is not found on the server, the
-   * {@link DeviceUpdateListener#onDevicesNotFound(List)} method of the listener
+   * {@link DeviceInfoUpdateListener#onDevicesNotFound(List)} method of the listener
    * will be called.
    * </p>
    *
@@ -232,7 +232,7 @@ public interface DeviceService {
   /**
    * Unsubscribe from a previously subscribed-to device.
    *
-   * @param devices the device you want to unsubscribe from
+   * @param device the device you want to unsubscribe from
    * @param listener the listener that was previously registered
    */
   void unsubscribeDevice(final Device device, final DeviceUpdateListener listener);

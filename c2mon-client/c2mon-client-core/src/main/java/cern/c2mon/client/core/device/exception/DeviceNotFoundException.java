@@ -26,9 +26,13 @@ import cern.c2mon.client.core.device.Device;
  */
 public class DeviceNotFoundException extends Exception {
 
- private static final long serialVersionUID = 5716954272685824112L;
+    private static final long serialVersionUID = 5716954272685824112L;
 
- public DeviceNotFoundException(String message) {
-   super(message);
- }
+    /**
+     * Constructs a new DeviceNotFoundException with the specified detail message.
+     * @param   message   the detail message
+     */
+    public DeviceNotFoundException(String message) {
+        super(message);
+    }
 }

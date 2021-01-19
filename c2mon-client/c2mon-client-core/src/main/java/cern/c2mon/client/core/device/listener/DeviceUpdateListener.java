@@ -44,7 +44,6 @@ public interface DeviceUpdateListener {
    * @param devices the list of devices containing the initial values of the
    *          tags to which the listener subscribed to.
    *
-   * @param device
    */
   void onInitialUpdate(List<Device> devices);
 

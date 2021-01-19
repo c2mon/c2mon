@@ -181,10 +181,9 @@ public class BasePropertyImpl implements BaseProperty {
     // If the internal value is a Long, then we lazy load the data tag
     if (isDataTag() && !isValueLoaded()) {
       value = tagService.get(getTagId());
-    }
 
-    // If it is a rule tag, we evaluate the rule (if it isn't subscribed)
-    else if (isRuleTag() && !tagService.isSubscribed((BaseTagListener) this.tag)) {
+      // If it is a rule tag, we evaluate the rule (if it isn't subscribed)
+    } else if (isRuleTag() && !tagService.isSubscribed((BaseTagListener) this.tag)) {
 
       // Get the data tag values from inside the rule
       Set<Long> tagIds = value.getRuleExpression().getInputTagIds();
