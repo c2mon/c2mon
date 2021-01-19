@@ -16,7 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.client.core.device.listener;
 
-import java.util.HashSet;
+import java.util.Set;
 
 import cern.c2mon.client.core.device.Device;
 
@@ -43,7 +43,7 @@ public class ListenerWrapper {
   /**
    * Reference to the set of {@link Device} objects.
    */
-  private HashSet<Device> devices;
+  private Set<Device> devices;
 
   /**
    * Flag indicating whether this listener/device set combo has received its
@@ -57,7 +57,7 @@ public class ListenerWrapper {
    * @param listener the {@link DeviceUpdateListener} to wrap
    * @param devices the set of {@link Device} objects to wrap
    */
-  public ListenerWrapper(DeviceUpdateListener listener, HashSet<Device> devices) {
+  public ListenerWrapper(DeviceUpdateListener listener, Set<Device> devices) {
     this.listener = listener;
     this.devices = devices;
   }
@@ -76,7 +76,7 @@ public class ListenerWrapper {
    *
    * @return the devices
    */
-  public HashSet<Device> getDevices() {
+  public Set<Device> getDevices() {
     return devices;
   }
 
