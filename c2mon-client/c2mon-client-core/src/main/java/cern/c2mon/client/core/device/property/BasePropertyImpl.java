@@ -82,14 +82,14 @@ public class BasePropertyImpl implements BaseProperty {
    *
    * @param name the name of the property
    * @param category the category of this property
-   * @param Tag the client device property to set
+   * @param tag the client device property to set
    */
-  public BasePropertyImpl(final String name, final Category category, final Tag Tag) {
+  public BasePropertyImpl(final String name, final Category category, final Tag tag) {
     this.name = name;
     this.category = category;
-    this.tag = Tag;
+    this.tag = tag;
     if (isDataTag()) {
-      this.tagId = Tag.getId();
+      this.tagId = tag.getId();
     }
   }
 

@@ -57,7 +57,7 @@ public class DeviceRequestHandlerTest {
   DeviceRequestHandler requestHandler;
 
   @Before
-  public void setup() {
+  public void setUp() {
     requestHandler = new DeviceRequestHandler(jmsProxyMock, properties);
   }
 

@@ -86,6 +86,10 @@ public class DeviceImpl implements Device, Cloneable {
 
   /**
    * Default constructor.
+   * @param id the unique ID of the device
+   * @param name the he name of the device (unique within the device class)
+   * @param deviceClassId the ID of the class to which this device belongs
+   * @param deviceClassName the unique name of the class to which this device belongs
    */
   public DeviceImpl(final Long id,
                     final String name,
