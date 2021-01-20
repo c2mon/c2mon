@@ -22,6 +22,7 @@ import cern.c2mon.client.core.service.DeviceService;
 import cern.c2mon.shared.client.device.DeviceInfo;
 
 /**
+ * Common interface for notifying listeners when devices that should be subscribed could not be found on the server.
  * @author Justin Lewis Salmon
  */
 public interface DeviceInfoUpdateListener extends DeviceUpdateListener {
