@@ -42,6 +42,11 @@ import cern.c2mon.shared.client.request.ClientRequestImpl;
 @Service
 public class DeviceRequestHandler extends RequestHandlerImpl {
 
+  /**
+   * Constructor for use during bean creation
+   * @param jmsProxy the JMS proxy bean
+   * @param properties the client property bean
+   */
   @Autowired
   public DeviceRequestHandler(JmsProxy jmsProxy, C2monClientProperties properties) {
     super(jmsProxy, properties);
