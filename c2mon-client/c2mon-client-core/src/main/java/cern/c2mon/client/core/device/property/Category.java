@@ -53,7 +53,7 @@ public enum Category {
   /**
    * The actual category string itself, taken from the original configuration.
    */
-  private final String category;
+  private final String configurationCategory;
 
   /**
    * Constructor.
@@ -62,7 +62,7 @@ public enum Category {
    *          configuration.
    */
   Category(String category) {
-    this.category = category;
+    this.configurationCategory = category;
   }
 
   /**
@@ -71,6 +71,6 @@ public enum Category {
    * @return the category string
    */
   public String getCategory() {
-    return category;
+    return configurationCategory;
   }
 }
