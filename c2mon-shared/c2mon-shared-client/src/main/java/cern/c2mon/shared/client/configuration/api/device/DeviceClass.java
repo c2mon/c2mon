@@ -19,10 +19,7 @@ package cern.c2mon.shared.client.configuration.api.device;
 import cern.c2mon.shared.client.configuration.api.util.ConfigurationEntity;
 import cern.c2mon.shared.client.configuration.api.util.DefaultValue;
 import cern.c2mon.shared.client.configuration.api.util.IgnoreProperty;
-import cern.c2mon.shared.client.device.Command;
-import cern.c2mon.shared.client.device.CommandList;
-import cern.c2mon.shared.client.device.Property;
-import cern.c2mon.shared.client.device.PropertyList;
+import cern.c2mon.shared.client.device.*;
 import lombok.Data;
 import org.springframework.util.Assert;
 
@@ -43,22 +40,22 @@ import java.util.stream.Stream;
 public class DeviceClass implements ConfigurationEntity {
 
     @IgnoreProperty
-    private boolean updated = false;
+    private boolean updated;
 
     @IgnoreProperty
-    private boolean created = false;
+    private boolean created;
 
     @IgnoreProperty
-    private boolean deleted = false;
+    private boolean deleted;
 
     /**
-     * Unique identifier of the {@link cern.c2mon.server.common.device.DeviceClassCacheObject}.
+     * Unique identifier of the device class.
      */
     @IgnoreProperty
     private Long id;
 
     /**
-     * Name of the {@link cern.c2mon.server.common.device.DeviceClassCacheObject}
+     * Name of the device class.
      */
     private String name;
 
@@ -74,14 +71,14 @@ public class DeviceClass implements ConfigurationEntity {
     private PropertyList properties;
 
     /**
-     * Mapper bean representing a list of device commands.
+     * Mapper bean representing a list of commands.
      */
     private CommandList commands;
 
 
     /**
-     * Use this method to obtain a Builder for a new DeviceClass configuration object.
-     * @param name the name of the deviceClass
+     * Use this method to obtain a builder for a new device class configuration object.
+     * @param name the name of the device class
      * @return a new DeviceClass.CreateBuilder with the specified name.
      */
     public static CreateBuilder create(String name) {
@@ -89,26 +86,51 @@ public class DeviceClass implements ConfigurationEntity {
         return new CreateBuilder(name);
     }
 
+    /**
+     * Builder class for device class configuration objects which should be newly created on the server
+     */
     public static class CreateBuilder {
         private final DeviceClass deviceClassToBuild = new DeviceClass();
         private final Set<Property> properties = new HashSet<>();
         private final Set<Command> commands = new HashSet<>();
 
-        public CreateBuilder(String name) {
+        /**
+         * Create a new device class
+         * @param name the name of the new device class, must be unique on the server
+         */
+        CreateBuilder(String name) {
             deviceClassToBuild.setName(name);
             deviceClassToBuild.setCreated(true);
         }
 
+
+        /**
+         * Explicitly set the ID of the device class. If no ID is given, it will be created dynamically by the server.
+         * An exception will be thrown when applying the configuration if the ID already exists on the server.
+         * @param id the unique identifier of the device class
+         * @return the DeviceClass.CreateBuilder with the specified device id
+         */
         public DeviceClass.CreateBuilder id(Long id) {
             this.deviceClassToBuild.setId(id);
             return this;
         }
 
+        /**
+         * Adds a description to the new device class
+         * @param description a description of the new device class
+         * @return  the DeviceClass.CreateBuilder with the specified description
+         */
         public DeviceClass.CreateBuilder description(String description) {
             this.deviceClassToBuild.setDescription(description);
             return this;
         }
 
+        /**
+         * Creates a {@link Property} and adds it to the device class
+         * @param name the name of the property, must be unique within the device class
+         * @param description a description of the property
+         * @return  the DeviceClass.CreateBuilder with the new property
+         */
         public DeviceClass.CreateBuilder addProperty(String name, String description) {
             Assert.isTrue(properties.stream().map(Property::getName).noneMatch(s -> s.equals(name)),
                     "A property with this name was already added configured for the Device Class.");
@@ -116,6 +138,12 @@ public class DeviceClass implements ConfigurationEntity {
             return this;
         }
 
+        /**
+         * Adds a number of {@link Property} objects to the device class, potentially containing fields
+         * @param properties a number of properties to add to the device
+         * @return the Device.CreateBuilder with the specified properties
+         * @see this#addProperty(String, String)
+         */
         public DeviceClass.CreateBuilder addProperty(Property... properties) {
             long duplicateOld = Arrays.stream(properties)
                     .filter(this.properties::contains)
@@ -129,6 +157,12 @@ public class DeviceClass implements ConfigurationEntity {
             return this;
         }
 
+        /**
+         * Creates a {@link Command} and adds it to the device class.
+         * @param name the name of the command, must be unique within the device class
+         * @param description a description of the command
+         * @return  the DeviceClass.CreateBuilder with the new command
+         */
         public DeviceClass.CreateBuilder addCommand(String name, String description) {
             Assert.isTrue(commands.stream().map(Command::getName).noneMatch(s -> s.equals(name)),
                     "A command with this name was already added configured for the Device Class.");
@@ -136,6 +170,12 @@ public class DeviceClass implements ConfigurationEntity {
             return this;
         }
 
+        /**
+         * Adds a number of {@link Command} objects to the device class
+         * @param commands a number of commands to add to the device
+         * @return the Device.CreateBuilder with the specified commands
+         * @see this#addCommand(String, String)
+         */
         public DeviceClass.CreateBuilder addCommand(Command... commands) {
             long singleOccurrences = Stream.of(Arrays.stream(commands), this.commands.stream())
                     .flatMap(o -> o)
@@ -147,6 +187,10 @@ public class DeviceClass implements ConfigurationEntity {
             return this;
         }
 
+        /**
+         * Creates a concrete device class object from the builder information
+         * @return the device class configuration object
+         */
         public DeviceClass build() {
             this.deviceClassToBuild.setProperties(new PropertyList(properties));
             this.deviceClassToBuild.setCommands(new CommandList(commands));

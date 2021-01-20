@@ -42,136 +42,145 @@ import java.util.Optional;
  * name is fetched from the {@link DeviceClassCache}. Similarly, the appropriate {@link Property} and {@link Command}
  * IDs are read from the cache and used as {@link DeviceProperty} and {@link DeviceCommand} when required. The device
  * ID is dynamically generated is necessary.
- *
  */
 @Service
 @Slf4j
 public class DeviceFactory extends EntityFactory<Device> {
 
-  private final DeviceCache deviceCache;
-  private final DeviceClassCache deviceClassCache;
-  private final SequenceDAO sequenceDAO;
+    private final DeviceCache deviceCache;
+    private final DeviceClassCache deviceClassCache;
+    private final SequenceDAO sequenceDAO;
 
-  @Autowired
-  public DeviceFactory(DeviceCache deviceCache, DeviceClassCache deviceClassCache, SequenceDAO sequenceDAO) {
-    super(deviceCache);
-    this.deviceCache = deviceCache;
-    this.sequenceDAO = sequenceDAO;
-    this.deviceClassCache = deviceClassCache;
-  }
-
-
-  @Override
-  public List<ConfigurationElement> createInstance(Device entity) {
-    List<ConfigurationElement> configurationElements = new ArrayList<>();
-
-    ConfigurationElement createDevice = doCreateInstance(entity);
-    configurationElements.add(createDevice);
-
-    return configurationElements;
-  }
-
-
-  @Override
-  Long getId(Device entity) {
-    return entity.getId() != null ? entity.getId() : loadIdFromCache(entity);
-  }
-
-  @Override
-  Long createId(Device entity) {
-    if (entity.getName() != null && loadIdFromCache(entity) != null) {
-      throw createConfigurationException(entity.getName(), "Name already exists");
-    } else if (!entity.getDeviceCommands().getDeviceCommands().isEmpty() ||
-            !entity.getDeviceProperties().getDeviceProperties().isEmpty()) {
-
-      DeviceClass deviceClass = deviceClassCache.get(entity.getClassId());
-      configureChildElements(entity, deviceClass);
+    /**
+     * Constructor for bean creation
+     *
+     * @param deviceCache      the device cache reference
+     * @param deviceClassCache the device class cache reference, needed to access the device class associated with the
+     *                         device to be created
+     * @param sequenceDAO      the sequence data access object, used to generate Device, DeviceProperty and DeviceCommand
+     *                         IDs dynamically
+     */
+    @Autowired
+    public DeviceFactory(DeviceCache deviceCache, DeviceClassCache deviceClassCache, SequenceDAO sequenceDAO) {
+        super(deviceCache);
+        this.deviceCache = deviceCache;
+        this.sequenceDAO = sequenceDAO;
+        this.deviceClassCache = deviceClassCache;
     }
-    return entity.getId() != null ? entity.getId() : sequenceDAO.getNextDeviceId();
-  }
 
-  @Override
-  ConfigConstants.Entity getEntity() {
-    return ConfigConstants.Entity.DEVICE;
-  }
+    @Override
+    public List<ConfigurationElement> createInstance(Device entity) {
+        List<ConfigurationElement> configurationElements = new ArrayList<>();
 
-  private Long loadIdFromCache(Device entity) {
-    Long deviceClassId = entity.getClassId() == null ?
-            deviceClassCache.getDeviceClassIdByName(entity.getClassName()) :
-            entity.getClassId();
-    if (deviceClassId == null) {
-      throw createConfigurationException(entity.getName(), "No deviceClass with name " + entity.getClassName() + " exists.");
+        ConfigurationElement createDevice = doCreateInstance(entity);
+        configurationElements.add(createDevice);
+
+        return configurationElements;
     }
-    entity.setClassId(deviceClassId);
-    try {
-      List<cern.c2mon.server.common.device.Device> devices = deviceCache.getByDeviceClassId(deviceClassId);
-      if (devices != null) {
-        Optional<cern.c2mon.server.common.device.Device> existingDevice = devices.stream()
-                .filter(d -> d.getName().equalsIgnoreCase(entity.getName()))
+
+
+    @Override
+    Long getId(Device entity) {
+        return entity.getId() != null ? entity.getId() : loadIdFromCache(entity);
+    }
+
+    @Override
+    Long createId(Device entity) {
+        if (entity.getName() != null && loadIdFromCache(entity) != null) {
+            throw createConfigurationException(entity.getName(), "Name already exists");
+        } else if (!entity.getDeviceCommands().getDeviceCommands().isEmpty() ||
+                !entity.getDeviceProperties().getDeviceProperties().isEmpty()) {
+
+            DeviceClass deviceClass = deviceClassCache.get(entity.getClassId());
+            configureChildElements(entity, deviceClass);
+        }
+        return entity.getId() != null ? entity.getId() : sequenceDAO.getNextDeviceId();
+    }
+
+    @Override
+    ConfigConstants.Entity getEntity() {
+        return ConfigConstants.Entity.DEVICE;
+    }
+
+    private Long loadIdFromCache(Device entity) {
+        Long deviceClassId = entity.getClassId() == null ?
+                deviceClassCache.getDeviceClassIdByName(entity.getClassName()) :
+                entity.getClassId();
+        if (deviceClassId == null) {
+            throw createConfigurationException(entity.getName(), "No deviceClass with name " + entity.getClassName() + " exists.");
+        }
+        entity.setClassId(deviceClassId);
+        try {
+            List<cern.c2mon.server.common.device.Device> devices = deviceCache.getByDeviceClassId(deviceClassId);
+            if (devices != null) {
+                Optional<cern.c2mon.server.common.device.Device> existingDevice = devices.stream()
+                        .filter(d -> d.getName().equalsIgnoreCase(entity.getName()))
+                        .findFirst();
+                if (existingDevice.isPresent()) {
+                    return existingDevice.get().getId();
+                }
+            }
+        } catch (CacheElementNotFoundException e) {
+          log.debug("A device with name {} does not exist yet on the server: ", entity.getName(), e);
+            // new device, not in cache
+        }
+        return null;
+    }
+
+    /**
+     * Each {@link DeviceProperty} must correspond to a {@link Property} defined in the Device's device class, meaning
+     * that both name and ID must match. The ID is here fetched from the cache.
+     *
+     * @param entity      the device to be created
+     * @param deviceClass the device class which the entity is created for
+     */
+    private void configureChildElements(Device entity, DeviceClass deviceClass) {
+        for (DeviceProperty deviceProperty : entity.getDeviceProperties().getDeviceProperties()) {
+            Property property = getDevClassElementAndConfigure(deviceProperty, deviceClass.getProperties(), entity.getName());
+
+            if (deviceProperty.getFields() != null && property.getFields() == null && !deviceProperty.getFields().isEmpty()) {
+                String fieldNames = String.join(", ", deviceProperty.getFields().keySet());
+                throw createConfigurationException(entity.getName(), "DeviceFields \"" + fieldNames + "\" must refer to fields defined in parent class");
+            } else if (deviceProperty.getFields() != null && property.getFields() != null) {
+                for (DeviceProperty deviceField : deviceProperty.getFields().values()) {
+                    getDevClassElementAndConfigure(deviceField, property.getFields(), entity.getName());
+                }
+            }
+        }
+
+        for (DeviceCommand deviceCommand : entity.getDeviceCommands().getDeviceCommands()) {
+            getDevClassElementAndConfigure(deviceCommand, deviceClass.getCommands(), entity.getName());
+        }
+    }
+
+    private <T extends DeviceClassElement> T getDevClassElementAndConfigure(DeviceElement deviceElement, List<T> deviceClassElements, String deviceName) {
+        Optional<T> devClassElement;
+        if (deviceElement.getId() == null) {
+            devClassElement = deviceClassElements
+                    .stream()
+                    .filter(p -> p.getName().equals(deviceElement.getName()))
+                    .findFirst();
+            devClassElement.ifPresent(value -> deviceElement.setId(value.getId()));
+        }
+        devClassElement = deviceClassElements
+                .stream()
+                .filter(p -> p.getId().equals(deviceElement.getId()))
                 .findFirst();
-        if (existingDevice.isPresent()) {
-          return existingDevice.get().getId();
+        if (devClassElement.isPresent() && elementsCorrespond(deviceElement, devClassElement.get())) {
+            deviceElement.setName(devClassElement.get().getName());
+            return devClassElement.get();
+        } else {
+            throw createConfigurationException(deviceName, deviceElement.getClass().getSimpleName() + "" +
+                    " \"" + deviceElement.getName() + "\" must refer to a corresponding element defined in parent class");
         }
-      }
-    } catch (CacheElementNotFoundException ignored) {
-      // new device, not in cache
-    }
-    return null;
-  }
-
-  /**
-   * Each {@link DeviceProperty} must correspond to a {@link Property} defined in the Device's device class, meaning
-   * that both name and ID must match. The ID is here fetched from the cache.
-   * @param entity the device to be created
-   * @param deviceClass the device class which the entity is created for
-   */
-  private void configureChildElements(Device entity, DeviceClass deviceClass) {
-    for (DeviceProperty deviceProperty : entity.getDeviceProperties().getDeviceProperties()) {
-      Property property = getDevClassElementAndConfigure(deviceProperty, deviceClass.getProperties(), entity.getName());
-
-      if (deviceProperty.getFields() != null && property.getFields() == null && !deviceProperty.getFields().isEmpty()) {
-        String fieldNames = String.join(", ", deviceProperty.getFields().keySet());
-        throw createConfigurationException(entity.getName(), "DeviceFields \"" + fieldNames + "\" must refer to fields defined in parent class");
-      } else if (deviceProperty.getFields() != null && property.getFields() != null) {
-        for (DeviceProperty deviceField : deviceProperty.getFields().values()) {
-          getDevClassElementAndConfigure(deviceField, property.getFields(), entity.getName());
-        }
-      }
     }
 
-    for (DeviceCommand deviceCommand : entity.getDeviceCommands().getDeviceCommands()) {
-      getDevClassElementAndConfigure(deviceCommand, deviceClass.getCommands(), entity.getName());
+    private boolean elementsCorrespond(DeviceElement deviceElement, DeviceClassElement deviceClassElement) {
+        return deviceClassElement.getName().equals(deviceElement.getName()) &&
+                deviceClassElement.getId().equals(deviceElement.getId());
     }
-  }
 
-  private <T extends DeviceClassElement> T getDevClassElementAndConfigure(DeviceElement deviceElement, List<T> deviceClassElements, String deviceName) {
-    Optional<T> devClassElement;
-    if (deviceElement.getId() == null) {
-      devClassElement = deviceClassElements
-              .stream()
-              .filter(p -> p.getName().equals(deviceElement.getName()))
-              .findFirst();
-      devClassElement.ifPresent(value -> deviceElement.setId(value.getId()));
+    private ConfigurationParseException createConfigurationException(String deviceName, String cause) {
+        return new ConfigurationParseException("Error creating device " + deviceName + ": " + cause);
     }
-    devClassElement = deviceClassElements
-            .stream()
-            .filter(p -> p.getId().equals(deviceElement.getId()))
-            .findFirst();
-    if (devClassElement.isPresent() && elementsCorrespond(deviceElement, devClassElement.get())) {
-      deviceElement.setName(devClassElement.get().getName());
-      return devClassElement.get();
-    } else {
-      throw createConfigurationException(deviceName, deviceElement.getClass().getSimpleName() + "" +
-              " \"" + deviceElement.getName() + "\" must refer to a corresponding element defined in parent class");
-    }
-  }
-
-  private boolean elementsCorrespond(DeviceElement deviceElement, DeviceClassElement deviceClassElement) {
-    return deviceClassElement.getName().equals(deviceElement.getName()) &&
-            deviceClassElement.getId().equals(deviceElement.getId());
-  }
-
-  private ConfigurationParseException createConfigurationException(String deviceName, String cause) {
-    return new ConfigurationParseException("Error creating device " + deviceName + ": " + cause);
-  }
 }
