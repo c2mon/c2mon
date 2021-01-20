@@ -18,6 +18,7 @@ package cern.c2mon.client.core.device.property;
 
 import java.sql.Timestamp;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 
 import cern.c2mon.client.common.tag.Tag;
@@ -29,10 +30,10 @@ import cern.c2mon.shared.common.datatag.DataTagQuality;
 import cern.c2mon.shared.common.type.TypeConverter;
 import cern.c2mon.shared.rule.RuleExpression;
 
-/**
- * This class represents a constant value object, which is used as a static
- * property of a {@link Device}.
+ /**
+ * This class represents a constant value object, which is used as a static property of a {@link Device}.
  *
+ * @param <T> The type of the value
  * @author Justin Lewis Salmon
  */
 public class ClientConstantValue<T> implements Tag {
@@ -115,27 +116,27 @@ public class ClientConstantValue<T> implements Tag {
 
   @Override
   public Collection<AlarmValue> getAlarms() {
-    return null;
+    return Collections.emptyList();
   }
 
   @Override
   public Collection<Long> getAlarmIds() {
-    return null;
+    return Collections.emptyList();
   }
 
   @Override
   public Collection<Long> getEquipmentIds() {
-    return null;
+    return Collections.emptyList();
   }
 
   @Override
   public Collection<Long> getSubEquipmentIds() {
-    return null;
+    return Collections.emptyList();
   }
 
   @Override
   public Collection<Long> getProcessIds() {
-    return null;
+    return Collections.emptyList();
   }
 
   @Override

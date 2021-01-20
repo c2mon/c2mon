@@ -34,7 +34,7 @@ import cern.c2mon.client.core.device.Device;
 public class DeviceCacheImpl implements DeviceCache {
 
   /** The actual cached devices are stored here */
-  private Map<Long, Device> cache = new HashMap<Long, Device>();
+  private Map<Long, Device> cache = new HashMap<>();
 
   @Override
   public void add(Device device) {
@@ -59,7 +59,7 @@ public class DeviceCacheImpl implements DeviceCache {
 
   @Override
   public List<Device> getAllDevices(String deviceClassName) {
-    List<Device> devices = new ArrayList<Device>();
+    List<Device> devices = new ArrayList<>();
 
     // TODO: clone the devices here?
     for (Device device : cache.values()) {
@@ -73,7 +73,7 @@ public class DeviceCacheImpl implements DeviceCache {
 
   @Override
   public List<Device> getAllDevices() {
-    return new ArrayList<Device>(cache.values());
+    return new ArrayList<>(cache.values());
   }
 
   @Override
