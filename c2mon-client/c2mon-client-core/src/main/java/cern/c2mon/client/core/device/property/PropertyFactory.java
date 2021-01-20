@@ -34,6 +34,11 @@ import cern.c2mon.shared.rule.RuleFormatException;
 public class PropertyFactory {
 
   /**
+   * Private constructor to hide implicit public one.
+   */
+  private PropertyFactory() {}
+
+  /**
    * Factory method to create an appropriate {@link Property} instance from a
    * {@link DeviceProperty}, based on its category.
    *
