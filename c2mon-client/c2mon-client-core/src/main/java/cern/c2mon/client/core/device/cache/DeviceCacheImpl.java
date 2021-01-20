@@ -17,9 +17,9 @@
 package cern.c2mon.client.core.device.cache;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Service;
 
@@ -34,7 +34,7 @@ import cern.c2mon.client.core.device.Device;
 public class DeviceCacheImpl implements DeviceCache {
 
   /** The actual cached devices are stored here */
-  private final Map<Long, Device> cache = new HashMap<>();
+  private final Map<Long, Device> cache = new ConcurrentHashMap<>();
 
   @Override
   public void add(Device device) {

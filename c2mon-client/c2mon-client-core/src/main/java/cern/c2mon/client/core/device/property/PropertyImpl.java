@@ -55,7 +55,7 @@ public class PropertyImpl extends BasePropertyImpl implements Property {
    *
    * @param name the name of the property
    * @param category the property category
-   * @param clientDataTag the internal data tag of the property
+   * @param dataTag the internal data tag of the property
    */
   public PropertyImpl(String name, Category category, Tag dataTag) {
     super(name, category, dataTag);
