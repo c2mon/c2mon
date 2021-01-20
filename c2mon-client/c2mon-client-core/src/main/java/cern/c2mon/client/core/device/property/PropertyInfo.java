@@ -16,6 +16,8 @@
  *****************************************************************************/
 package cern.c2mon.client.core.device.property;
 
+import java.util.Objects;
+
 /**
  * Simple bean used for retrieving properties/fields from a device.
  *
@@ -23,7 +25,7 @@ package cern.c2mon.client.core.device.property;
  */
 public class PropertyInfo {
 
-  private String propertyName;
+  private final String propertyName;
 
   private String fieldName;
 
@@ -41,8 +43,8 @@ public class PropertyInfo {
    * Constructor. Creates a <code>PropertyInfo</code> representing a field
    * within a mapped property.
    *
-   * @param propertyName
-   * @param fieldName
+   * @param propertyName the name of the parent property
+   * @param fieldName the name of the field, unique within the parent property
    */
   public PropertyInfo(String propertyName, String fieldName) {
     this.propertyName = propertyName;
@@ -68,42 +70,20 @@ public class PropertyInfo {
   }
 
   @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((fieldName == null) ? 0 : fieldName.hashCode());
-    result = prime * result + ((propertyName == null) ? 0 : propertyName.hashCode());
-    return result;
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    PropertyInfo that = (PropertyInfo) o;
+    return Objects.equals(propertyName, that.propertyName) &&
+            Objects.equals(fieldName, that.fieldName);
   }
 
   @Override
-  public boolean equals(Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (obj == null) {
-      return false;
-    }
-    if (!(obj instanceof PropertyInfo)) {
-      return false;
-    }
-    PropertyInfo other = (PropertyInfo) obj;
-    if (fieldName == null) {
-      if (other.fieldName != null) {
-        return false;
-      }
-    }
-    else if (!fieldName.equals(other.fieldName)) {
-      return false;
-    }
-    if (propertyName == null) {
-      if (other.propertyName != null) {
-        return false;
-      }
-    }
-    else if (!propertyName.equals(other.propertyName)) {
-      return false;
-    }
-    return true;
+  public int hashCode() {
+    return Objects.hash(propertyName, fieldName);
   }
 }
