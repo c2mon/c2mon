@@ -43,6 +43,11 @@ public class DeviceClassFactory extends EntityFactory<DeviceClass> {
     private final DeviceClassCache deviceClassCache;
     private final SequenceDAO sequenceDAO;
 
+    /**
+     * Constructor for bean creation
+     * @param deviceClassCache the device class cache reference
+     * @param sequenceDAO the sequence data access object, used to generate DeviceClass, Property and Command IDs dynamically
+     */
     @Autowired
     public DeviceClassFactory(DeviceClassCache deviceClassCache, SequenceDAO sequenceDAO) {
         super(deviceClassCache);
