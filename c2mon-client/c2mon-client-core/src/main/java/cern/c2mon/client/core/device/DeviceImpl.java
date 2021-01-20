@@ -353,8 +353,12 @@ public class DeviceImpl implements Device, Cloneable {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
     DeviceImpl device = (DeviceImpl) o;
     return id.equals(device.id) &&
             deviceClassId.equals(device.deviceClassId);
