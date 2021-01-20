@@ -107,7 +107,8 @@ public class DeviceClassFactory extends EntityFactory<DeviceClass> {
     private Long getIdFromCache(DeviceClass entity) {
         try {
             return deviceClassCache.getDeviceClassIdByName(entity.getName());
-        } catch (CacheElementNotFoundException ignored) {
+        } catch (CacheElementNotFoundException e) {
+            log.debug("A device class with name {} does not exist yet on the server: ", entity.getName(), e);
             return null;
         }
     }

@@ -34,7 +34,7 @@ import cern.c2mon.client.core.device.Device;
 public class DeviceCacheImpl implements DeviceCache {
 
   /** The actual cached devices are stored here */
-  private Map<Long, Device> cache = new HashMap<>();
+  private final Map<Long, Device> cache = new HashMap<>();
 
   @Override
   public void add(Device device) {

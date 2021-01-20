@@ -55,7 +55,7 @@ public class PropertyFactory {
 
     // If the property has nested fields, create them all here
     if ((deviceProperty.getCategory() == null && !deviceProperty.getFields().isEmpty())
-        || deviceProperty.getCategory().equals(Category.MAPPED_PROPERTY.getCategory())) {
+            || deviceProperty.getCategory().equals(Category.MAPPED_PROPERTY.getCategory())) {
       Map<String, DeviceProperty> fields = deviceProperty.getFields();
       Map<String, Field> clientFields = new HashMap<>();
 
@@ -72,20 +72,18 @@ public class PropertyFactory {
     }
 
     // If we have a client rule, that comes next in the hierarchy.
-    else if (deviceProperty.getCategory().equals(Category.CLIENT_RULE.getCategory())) {
+    if (deviceProperty.getCategory().equals(Category.CLIENT_RULE.getCategory())) {
       ClientRuleTag ruleTag = new ClientRuleTag(RuleExpression.createExpression(deviceProperty.getValue()), deviceProperty.getResultTypeClass());
       return new PropertyImpl(deviceProperty.getName(), Category.CLIENT_RULE, ruleTag);
     }
 
     // If we have a constant value, it comes last in the hierarchy.
-    else if (deviceProperty.getCategory().equals(Category.CONSTANT_VALUE.getCategory())) {
+    if (deviceProperty.getCategory().equals(Category.CONSTANT_VALUE.getCategory())) {
       ClientConstantValue constantValueTag = new ClientConstantValue(deviceProperty.getValue(), deviceProperty.getResultTypeClass());
       return new PropertyImpl(deviceProperty.getName(), Category.CONSTANT_VALUE, constantValueTag);
     }
 
-    else {
-      throw new RuntimeException("Property \"" + deviceProperty.getName() + "\" must specify at least one of (tagId, clientRule, constantValue)");
-    }
+    throw new RuntimeException("Property \"" + deviceProperty.getName() + "\" must specify at least one of (tagId, clientRule, constantValue)");
   }
 
   /**
