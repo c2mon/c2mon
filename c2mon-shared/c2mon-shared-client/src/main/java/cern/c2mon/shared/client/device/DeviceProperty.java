@@ -18,10 +18,9 @@ package cern.c2mon.shared.client.device;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
-import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonSetter;
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementList;
@@ -116,19 +115,6 @@ public class DeviceProperty implements Cloneable, Serializable, DeviceElement {
         this(null, name, value, category, resultType);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof DeviceProperty)) return false;
-        DeviceProperty that = (DeviceProperty) o;
-        return Objects.equals(getId(), that.getId()) && Objects.equals(getName(), that.getName()) && Objects.equals(getValue(), that.getValue()) && Objects.equals(getCategory(), that.getCategory()) && Objects.equals(getResultType(), that.getResultType()) && Objects.equals(getFields(), that.getFields());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getId(), getName(), getValue(), getCategory(), getResultType(), getFields());
-    }
-
     /**
      * Constructor that creates a mapped property.
      *
@@ -142,17 +128,6 @@ public class DeviceProperty implements Cloneable, Serializable, DeviceElement {
         this.name = name;
         this.category = category;
         this.fields = fields;
-    }
-
-    /**
-     * Constructor to use during command creation requests that creates a mapped property.
-     *
-     * @param name     name the unique name of this property
-     * @param category category the category of this property (should be "mappedProperty")
-     * @param fields   the nested property fields
-     */
-    public DeviceProperty(final String name, final String category, final List<DeviceProperty> fields) {
-        this(null, name, category, fields);
     }
 
     /**
@@ -181,11 +156,7 @@ public class DeviceProperty implements Cloneable, Serializable, DeviceElement {
         this.name = name;
     }
 
-    /**
-     * Get the value of this property.
-     *
-     * @return the property value
-     */
+    @Override
     public String getValue() {
         return value;
     }
@@ -199,38 +170,34 @@ public class DeviceProperty implements Cloneable, Serializable, DeviceElement {
         this.value = value;
     }
 
-    /**
-     * Get the category of this property.
-     *
-     * @return the property category
-     */
+    @Override
     public String getCategory() {
         return category;
     }
 
     /**
-     * Retrieve the raw fields of this property (if they exist).
+     * Retrieve the raw property fields of this device property (if they exist).
      *
-     * @return the property fields if they exist, null otherwise
+     * @return the property fields if they exist
      */
     public Map<String, DeviceProperty> getFields() {
         if (this.fields == null) {
             return null;
         }
 
-        Map<String, DeviceProperty> fields = new HashMap<>();
+        Map<String, DeviceProperty> fieldMap = new ConcurrentHashMap<>();
 
         for (DeviceProperty field : this.fields) {
-            fields.put(field.getName(), field);
+            fieldMap.put(field.getName(), field);
         }
 
-        return fields;
+        return fieldMap;
     }
 
     /**
-     * Retrieve the raw fields of this property (if they exist).
+     * Retrieve the raw fields of this property
      *
-     * @return the property fields if they exist, null otherwise
+     * @return the property fields
      */
     public List<DeviceProperty> getFieldList() {
         return fields;
@@ -247,11 +214,7 @@ public class DeviceProperty implements Cloneable, Serializable, DeviceElement {
         }
     }
 
-    /**
-     * Get the raw result type string of this property.
-     *
-     * @return the result type
-     */
+    @Override
     public String getResultType() {
         return resultType;
     }
@@ -267,4 +230,18 @@ public class DeviceProperty implements Cloneable, Serializable, DeviceElement {
     public Class<?> getResultTypeClass() throws ClassNotFoundException {
         return Class.forName("java.lang." + resultType);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof DeviceProperty)) return false;
+        DeviceProperty that = (DeviceProperty) o;
+        return Objects.equals(getId(), that.getId()) && Objects.equals(getName(), that.getName()) && Objects.equals(getValue(), that.getValue()) && Objects.equals(getCategory(), that.getCategory()) && Objects.equals(getResultType(), that.getResultType()) && Objects.equals(getFields(), that.getFields());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getName(), getValue(), getCategory(), getResultType(), getFields());
+    }
+
 }

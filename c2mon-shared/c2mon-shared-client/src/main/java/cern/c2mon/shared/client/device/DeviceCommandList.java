@@ -33,14 +33,25 @@ public class DeviceCommandList extends DeviceClassOrDeviceSerializableElement {
   @ElementList(entry = "DeviceCommand", inline = true, required = false)
   private Collection<DeviceCommand> deviceCommands = new HashSet<>();
 
+  /**
+   * Create a new wrapper bean for the referenced device commands
+   * @param deviceCommands the device commands to wrap
+   */
   public DeviceCommandList(Collection<DeviceCommand> deviceCommands) {
     this.deviceCommands = deviceCommands;
   }
 
+  /**
+   * Default constructor used during deserialization
+   */
   public DeviceCommandList() {
     super();
   }
 
+  /**
+   * Get the unwrapped device commands in a mutable list
+   * @return the unwrapped device commands in a mutable list
+   */
   public List<DeviceCommand> getDeviceCommands() {
     return new ArrayList<>(deviceCommands);
   }

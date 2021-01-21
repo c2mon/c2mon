@@ -90,7 +90,6 @@ public class DeviceFactory extends EntityFactory<Device> {
             throw createConfigurationException(entity.getName(), "Name already exists");
         } else if (!entity.getDeviceCommands().getDeviceCommands().isEmpty() ||
                 !entity.getDeviceProperties().getDeviceProperties().isEmpty()) {
-
             DeviceClass deviceClass = deviceClassCache.get(entity.getClassId());
             configureChildElements(entity, deviceClass);
         }
