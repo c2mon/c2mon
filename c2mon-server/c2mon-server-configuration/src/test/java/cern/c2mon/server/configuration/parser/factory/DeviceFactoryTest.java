@@ -8,15 +8,13 @@ import cern.c2mon.server.common.device.DeviceCacheObject;
 import cern.c2mon.server.common.device.DeviceClassCacheObject;
 import cern.c2mon.server.configuration.parser.exception.ConfigurationParseException;
 import cern.c2mon.shared.client.configuration.api.device.Device;
-import cern.c2mon.shared.client.device.Command;
-import cern.c2mon.shared.client.device.DeviceCommand;
-import cern.c2mon.shared.client.device.DeviceProperty;
-import cern.c2mon.shared.client.device.Property;
+import cern.c2mon.shared.client.device.*;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
@@ -117,9 +115,8 @@ public class DeviceFactoryTest {
         classWithProperty.setName("device class");
         classWithProperty.setProperties(Collections.singletonList(property));
 
-        DeviceProperty deviceProperty = new DeviceProperty("property", "1001", "tagId", null);
         Device device = Device.create("device", "class name")
-                .addDeviceProperty(deviceProperty)
+                .addDeviceProperty("property", "1001", "tagId", null)
                 .build();
 
         expect(devClassCacheMock.get(anyLong()))
@@ -128,57 +125,15 @@ public class DeviceFactoryTest {
         replay(sequenceDAOMock, devClassCacheMock, devCacheMock);
 
         factory.createId(device);
-        assertEquals(50L, (long)deviceProperty.getId());
-    }
-
-
-    @Test(expected = ConfigurationParseException.class)
-    public void mismatchingIdsShouldThrowException() {
-        Property property = new Property(50L, "property", "desc");
-        DeviceClassCacheObject classWithProperty = new DeviceClassCacheObject(100L);
-        classWithProperty.setName("device class");
-        classWithProperty.setProperties(Collections.singletonList(property));
-
-        DeviceProperty deviceProperty = new DeviceProperty( 44L,"property", "1001", "tagId", null);
-        Device device = Device.create("device", "class name")
-                .addDeviceProperty(deviceProperty)
-                .build();
-
-        expect(devClassCacheMock.get(anyLong()))
-                .andReturn(classWithProperty)
-                .once();
-        replay(sequenceDAOMock, devClassCacheMock, devCacheMock);
-
-        factory.createId(device);
-    }
-
-    @Test(expected = ConfigurationParseException.class)
-    public void mismatchingNamesShouldThrowException() {
-        Property property = new Property(50L, "property", "desc");
-        DeviceClassCacheObject classWithProperty = new DeviceClassCacheObject(100L);
-        classWithProperty.setName("device class");
-        classWithProperty.setProperties(Collections.singletonList(property));
-
-        DeviceProperty deviceProperty = new DeviceProperty( 50L,"bad name", "1001", "tagId", null);
-        Device device = Device.create("device", "class name")
-                .addDeviceProperty(deviceProperty)
-                .build();
-
-        expect(devClassCacheMock.get(anyLong()))
-                .andReturn(classWithProperty)
-                .once();
-        replay(sequenceDAOMock, devClassCacheMock, devCacheMock);
-
-        factory.createId(device);
+        assertEquals(50L, (long)getElementWithName(device.getDeviceProperties().getDeviceProperties(), "property").getId());
     }
 
     @Test(expected = ConfigurationParseException.class)
     public void createIdShouldThrowExceptionIfNoAppropriatePropertyExistsForDeviceProperty() {
         DeviceClassCacheObject classWithoutProperty = new DeviceClassCacheObject(100L);
         classWithoutProperty.setName("device class");
-        DeviceProperty deviceProperty = new DeviceProperty(50L, "property", "1001", "tagId", null);
         Device device = Device.create("device", "class name")
-                .addDeviceProperty(deviceProperty)
+                .addDeviceProperty("property", "1001", "tagId", null)
                 .build();
 
         expect(devClassCacheMock.get(anyLong()))
@@ -197,9 +152,8 @@ public class DeviceFactoryTest {
         classWithProperty.setName("device class");
         classWithProperty.setProperties(Collections.singletonList(property));
 
-        DeviceProperty deviceProperty = new DeviceProperty(50L, "property", "1001", "tagId", null);
         Device device = Device.create("device", "class name")
-                .addDeviceProperty(deviceProperty)
+                .addDeviceProperty("property", "1001", "tagId", null)
                 .addDeviceProperty("no", "corresponding", "property", null)
                 .build();
 
@@ -220,10 +174,9 @@ public class DeviceFactoryTest {
         classWithProperty.setName("device class");
         classWithProperty.setProperties(Collections.singletonList(property));
 
-        DeviceProperty deviceField = new DeviceProperty( "field", "1001", "tagId", null);
-        DeviceProperty deviceProperty = new DeviceProperty( "property", "1001", Collections.singletonList(deviceField));
         Device device = Device.create("device", "class name")
-                .addDeviceProperty(deviceProperty)
+                .addDeviceProperty("property", "parentValue", "parentCategory", "parentResultType")
+                .addPropertyField("property", "field", "1001", "tagId", null)
                 .build();
 
         expect(devClassCacheMock.get(anyLong()))
@@ -232,7 +185,9 @@ public class DeviceFactoryTest {
         replay(sequenceDAOMock, devClassCacheMock, devCacheMock);
 
         factory.createId(device);
-        assertEquals(40L, (long) deviceField.getId());
+
+        DeviceProperty parentProperty = getElementWithName(device.getDeviceProperties().getDeviceProperties(), "property");
+        assertEquals(40L, (long) parentProperty.getFields().get("field").getId());
     }
 
     @Test
@@ -245,11 +200,10 @@ public class DeviceFactoryTest {
         classWithProperty.setName("device class");
         classWithProperty.setProperties(Collections.singletonList(property));
 
-        DeviceProperty deviceField1 = new DeviceProperty( "field1", "1001", "tagId", null);
-        DeviceProperty deviceField2 = new DeviceProperty( "field2", "1001", "tagId", null);
-        DeviceProperty deviceProperty = new DeviceProperty( "property", "1001", Arrays.asList(deviceField1, deviceField2));
         Device device = Device.create("device", "class name")
-                .addDeviceProperty(deviceProperty)
+                .addDeviceProperty("property", "parentValue", "parentCategory", "parentResultType")
+                .addPropertyField("property", "field1", "1001", "tagId", null)
+                .addPropertyField("property", "field2", "1001", "tagId", null)
                 .build();
 
         expect(devClassCacheMock.get(anyLong()))
@@ -258,8 +212,10 @@ public class DeviceFactoryTest {
         replay(sequenceDAOMock, devClassCacheMock, devCacheMock);
 
         factory.createId(device);
-        assertEquals(40L, (long) deviceField1.getId());
-        assertEquals(41L, (long) deviceField2.getId());
+
+        DeviceProperty parentProperty = getElementWithName(device.getDeviceProperties().getDeviceProperties(), "property");
+        assertEquals(40L, (long) parentProperty.getFields().get("field1").getId());
+        assertEquals(41L, (long) parentProperty.getFields().get("field2").getId());
     }
 
 
@@ -269,9 +225,8 @@ public class DeviceFactoryTest {
         DeviceClassCacheObject classWithProperty = new DeviceClassCacheObject(100L);
         classWithProperty.setName("device class");
 
-        DeviceProperty deviceProperty = new DeviceProperty( "property", "1001", "", "");
         Device device = Device.create("device", "class name")
-                .addDeviceProperty(deviceProperty)
+                .addDeviceProperty("property", "1001", "", "")
                 .build();
 
         expect(devClassCacheMock.get(anyLong()))
@@ -290,10 +245,9 @@ public class DeviceFactoryTest {
         classWithProperty.setName("device class");
         classWithProperty.setProperties(Collections.singletonList(property));
 
-        DeviceProperty deviceField = new DeviceProperty( "field", "1001", "tagId", null);
-        DeviceProperty deviceProperty = new DeviceProperty( "property", "1001", Collections.singletonList(deviceField));
         Device device = Device.create("device", "class name")
-                .addDeviceProperty(deviceProperty)
+                .addDeviceProperty("property", "parentValue", "parentCategory", "parentResultType")
+                .addPropertyField("property", "field", "1001", "tagId", null)
                 .build();
 
         expect(devClassCacheMock.get(anyLong()))
@@ -311,9 +265,8 @@ public class DeviceFactoryTest {
         DeviceClassCacheObject classWithProperty = new DeviceClassCacheObject(100L);
         classWithProperty.setName("device class");
 
-        DeviceCommand deviceCommand = new DeviceCommand( "command", "1001", "", "");
         Device device = Device.create("device", "class name")
-                .addDeviceCommand(deviceCommand)
+                .addDeviceCommand("command", "1001", "", "")
                 .build();
 
         expect(devClassCacheMock.get(anyLong()))
@@ -333,10 +286,9 @@ public class DeviceFactoryTest {
         classWithProperty.setName("device class");
         classWithProperty.setProperties(Collections.singletonList(property));
 
-        DeviceProperty deviceField = new DeviceProperty( "field", "1001", "tagId", null);
-        DeviceProperty deviceProperty = new DeviceProperty( "property", "1001", Collections.singletonList(deviceField));
         Device device = Device.create("device", "class name")
-                .addDeviceProperty(deviceProperty)
+                .addDeviceProperty("property", "parentValue", "parentCategory", "parentResultType")
+                .addPropertyField("property", "field", "1001", "tagId", null)
                 .build();
 
         expect(devClassCacheMock.get(anyLong()))
@@ -355,9 +307,8 @@ public class DeviceFactoryTest {
         classWithProperty.setName("device class");
         classWithProperty.setCommands(Collections.singletonList(command));
 
-        DeviceCommand deviceCommand = new DeviceCommand("command", "value", "category", null);
         Device device = Device.create("device", "class name")
-                .addDeviceCommand(deviceCommand)
+                .addDeviceCommand("command", "value", "category", null)
                 .build();
 
         expect(devClassCacheMock.get(anyLong()))
@@ -366,7 +317,12 @@ public class DeviceFactoryTest {
         replay(sequenceDAOMock, devClassCacheMock, devCacheMock);
 
         factory.createId(device);
-        assertEquals(50L, (long) deviceCommand.getId());
+        assertEquals(50L, (long) getElementWithName(device.getDeviceCommands().getDeviceCommands(), "command").getId());
     }
 
+    private <T extends DeviceElement> T getElementWithName(List<T> elements, String name) {
+        return elements.stream()
+                .filter(e -> e.getName().equals(name))
+                .findFirst().orElse(null);
+    }
 }
