@@ -5,13 +5,12 @@ import cern.c2mon.client.core.configuration.DeviceConfigurationManager;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.api.Configuration;
 import cern.c2mon.shared.client.configuration.api.device.Device;
-import cern.c2mon.shared.client.device.DeviceCommand;
-import cern.c2mon.shared.client.device.DeviceProperty;
+import cern.c2mon.shared.client.device.DeviceElement;
 import org.easymock.Capture;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Arrays;
+import java.util.List;
 
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.assertEquals;
@@ -40,6 +39,7 @@ public class DeviceConfigurationManagerTest {
 
         assertTrue(c.getValue().getEntities().get(0).isCreated());
     }
+
     @Test
     public void createDeviceByNameAndDeviceClassNameShouldCreateDeviceObject() {
         String devName = String.valueOf(System.currentTimeMillis());
@@ -97,9 +97,8 @@ public class DeviceConfigurationManagerTest {
 
     @Test
     public void createDeviceWithDevicePropertyShouldReturnDeviceProperty() {
-        DeviceProperty prop = new DeviceProperty("name", "value", "category", null);
         Device expected = Device.create(String.valueOf(System.currentTimeMillis()), "devClassName")
-                .addDeviceProperty(prop)
+                .addDeviceProperty("name", "value", "category", null)
                 .build();
         Capture<Configuration> c = newCapture();
         expect(configurationRequestSenderMock.applyConfiguration(and(capture(c), isA(Configuration.class)), anyObject()))
@@ -109,16 +108,15 @@ public class DeviceConfigurationManagerTest {
 
         configurationService.createDevice(expected);
         Device entity = (Device) c.getValue().getEntities().get(0);
-        assertTrue(entity.getDeviceProperties().getDeviceProperties().contains(prop));
+        assertTrue(containsElementWithName(entity.getDeviceProperties().getDeviceProperties(), "name"));
     }
 
     @Test
     public void createDeviceWithMultipleDevicePropertiesShouldReturnDeviceProperties() {
-        DeviceProperty p1 = new DeviceProperty("name1", "value1", "category1", null);
-        DeviceProperty p2 = new DeviceProperty("name2", "value1", "category1", null);
-        DeviceProperty p3 = new DeviceProperty("name3", "value1", "category1", null);
         Device expected = Device.create(String.valueOf(System.currentTimeMillis()), "devClassName")
-                .addDeviceProperty(p1, p2, p3)
+                .addDeviceProperty("name1", "value1", "category1", null)
+                .addDeviceProperty("name2", "value2", "category2", null)
+                .addDeviceProperty("name3", "value3", "category3", null)
                 .build();
         Capture<Configuration> c = newCapture();
         expect(configurationRequestSenderMock.applyConfiguration(and(capture(c), isA(Configuration.class)), anyObject()))
@@ -128,14 +126,15 @@ public class DeviceConfigurationManagerTest {
 
         configurationService.createDevice(expected);
         Device entity = (Device) c.getValue().getEntities().get(0);
-        assertTrue(entity.getDeviceProperties().getDeviceProperties().containsAll(Arrays.asList(p1, p2, p3)));
+        assertTrue(containsElementWithName(entity.getDeviceProperties().getDeviceProperties(), "name1"));
+        assertTrue(containsElementWithName(entity.getDeviceProperties().getDeviceProperties(), "name2"));
+        assertTrue(containsElementWithName(entity.getDeviceProperties().getDeviceProperties(), "name3"));
     }
 
     @Test
     public void createDeviceWithDeviceCommandShouldReturnDeviceCommand() {
-        DeviceCommand cmd = new DeviceCommand("name", "value", "category", null);
         Device expected = Device.create(String.valueOf(System.currentTimeMillis()), "devClassName")
-                .addDeviceCommand(cmd)
+                .addDeviceCommand("name", "value", "category", null)
                 .build();
         Capture<Configuration> c = newCapture();
         expect(configurationRequestSenderMock.applyConfiguration(and(capture(c), isA(Configuration.class)), anyObject()))
@@ -145,16 +144,15 @@ public class DeviceConfigurationManagerTest {
 
         configurationService.createDevice(expected);
         Device entity = (Device) c.getValue().getEntities().get(0);
-        assertTrue(entity.getDeviceCommands().getDeviceCommands().contains(cmd));
+        assertTrue(containsElementWithName(entity.getDeviceCommands().getDeviceCommands(), "name"));
     }
 
     @Test
     public void createDeviceWithMultipleDeviceCommandsShouldReturnDeviceCommands() {
-        DeviceCommand p1 = new DeviceCommand("name1", "value1", "category1", null);
-        DeviceCommand p2 = new DeviceCommand("name2", "value1", "category1", null);
-        DeviceCommand p3 = new DeviceCommand("name3", "value1", "category1", null);
         Device expected = Device.create(String.valueOf(System.currentTimeMillis()), "devClassName")
-                .addDeviceCommand(p1, p2, p3)
+                .addDeviceCommand("name1", "value1", "category1", null)
+                .addDeviceCommand("name2", "value2", "category2", null)
+                .addDeviceCommand("name3", "value3", "category3", null)
                 .build();
         Capture<Configuration> c = newCapture();
         expect(configurationRequestSenderMock.applyConfiguration(and(capture(c), isA(Configuration.class)), anyObject()))
@@ -164,7 +162,9 @@ public class DeviceConfigurationManagerTest {
 
         configurationService.createDevice(expected);
         Device entity = (Device) c.getValue().getEntities().get(0);
-        assertTrue(entity.getDeviceCommands().getDeviceCommands().containsAll(Arrays.asList(p1, p2, p3)));
+        assertTrue(containsElementWithName(entity.getDeviceCommands().getDeviceCommands(), "name1"));
+        assertTrue(containsElementWithName(entity.getDeviceCommands().getDeviceCommands(), "name2"));
+        assertTrue(containsElementWithName(entity.getDeviceCommands().getDeviceCommands(), "name3"));
     }
 
     @Test
@@ -192,4 +192,8 @@ public class DeviceConfigurationManagerTest {
         assertTrue(entity.isDeleted());
     }
 
+    private <T extends DeviceElement> boolean containsElementWithName(List<T> elements, String name) {
+        return elements.stream()
+                .anyMatch(e -> e.getName().equals(name));
+    }
 }

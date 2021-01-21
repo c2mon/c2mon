@@ -6,12 +6,11 @@ import cern.c2mon.server.cache.loading.SequenceDAO;
 import cern.c2mon.server.configuration.parser.exception.ConfigurationParseException;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.api.device.DeviceClass;
-import cern.c2mon.shared.client.device.Command;
+import cern.c2mon.shared.client.device.DeviceClassElement;
 import cern.c2mon.shared.client.device.Property;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static org.easymock.EasyMock.*;
@@ -27,6 +26,7 @@ public class DeviceClassFactoryTest {
     DeviceClass deviceClassWithId = DeviceClass.create("device Class with ID")
             .id(10L)
             .build();
+
     @Before
     public void setUp() {
         reset(devClassCacheMock, sequenceDAOMock);
@@ -61,10 +61,11 @@ public class DeviceClassFactoryTest {
         expect(devClassCacheMock.getDeviceClassIdByName(anyString()))
                 .andReturn(0L)
                 .once();
-        replay(devClassCacheMock,sequenceDAOMock);
+        replay(devClassCacheMock, sequenceDAOMock);
         try {
             factory.createId(minimalDeviceClass);
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
         verify(sequenceDAOMock);
     }
 
@@ -73,6 +74,7 @@ public class DeviceClassFactoryTest {
         reset(sequenceDAOMock);
         replay(sequenceDAOMock);
         factory.createId(deviceClassWithId);
+        verify(sequenceDAOMock);
     }
 
     @Test
@@ -83,47 +85,43 @@ public class DeviceClassFactoryTest {
 
     @Test
     public void createDevClassShouldCreateAndReturnId() {
-        replay(devClassCacheMock,sequenceDAOMock);
+        replay(devClassCacheMock, sequenceDAOMock);
         assertEquals(1L, (long) factory.createId(minimalDeviceClass));
     }
 
     @Test
     public void createDevClassShouldCreateAndSetPropertyIdIfNeeded() {
-        Property property = new Property("property", "desc");
         DeviceClass classWithProperties = DeviceClass.create("device with properties")
-                .addProperty(property)
+                .addProperty("property", "desc")
                 .build();
         expect(sequenceDAOMock.getNextPropertyId())
                 .andReturn(2L)
                 .once();
-        replay(devClassCacheMock,sequenceDAOMock);
+        replay(devClassCacheMock, sequenceDAOMock);
         factory.createId(classWithProperties);
-        assertEquals(2L, (long) property.getId());
+        assertEquals(2L, ( long) getElementWithName(classWithProperties.getProperties().getProperties(), "property").getId());
     }
 
     @Test
     public void createDevClassShouldCreatePropertyIdForAllProperties() {
-        Property property1 = new Property("property1", "desc");
-        Property property2 = new Property("property2", "desc");
         DeviceClass classWithProperties = DeviceClass.create("device with properties")
-                .addProperty(property1)
-                .addProperty(property2)
+                .addProperty("property1", "desc")
+                .addProperty("property2", "desc")
                 .build();
         expect(sequenceDAOMock.getNextPropertyId())
                 .andReturn(2L)
                 .times(2);
-        replay(devClassCacheMock,sequenceDAOMock);
+        replay(devClassCacheMock, sequenceDAOMock);
         factory.createId(classWithProperties);
-        assertEquals(2L, (long) property1.getId());
-        assertEquals(2L, (long) property2.getId());
+        assertEquals(2L, (long) getElementWithName(classWithProperties.getProperties().getProperties(), "property1").getId());
+        assertEquals(2L, (long) getElementWithName(classWithProperties.getProperties().getProperties(), "property2").getId());
     }
 
     @Test
     public void createDevClassShouldCreateFieldIdIfNeeded() {
-        Property field = new Property("field", "description");
-        Property property = new Property("property1", "desc", Arrays.asList(field));
         DeviceClass classWithProperties = DeviceClass.create("device with properties")
-                .addProperty(property)
+                .addProperty("property1", "desc")
+                .addField("property1", "field", "description")
                 .build();
         expect(sequenceDAOMock.getNextPropertyId())
                 .andReturn(2L)
@@ -131,38 +129,37 @@ public class DeviceClassFactoryTest {
         expect(sequenceDAOMock.getNextFieldId())
                 .andReturn(3L)
                 .times(1);
-        replay(devClassCacheMock,sequenceDAOMock);
+        replay(devClassCacheMock, sequenceDAOMock);
         factory.createId(classWithProperties);
-        assertEquals(2L, (long) property.getId());
-        assertEquals(3L, (long) field.getId());
+        Property parentProperty = getElementWithName(classWithProperties.getProperties().getProperties(), "property1");
+        assertEquals(2L, (long) parentProperty.getId());
+        assertEquals(3L, (long) getElementWithName(parentProperty.getFields(), "field").getId());
+
     }
 
     @Test
     public void createDevClassShouldCreateCommandIfNeeded() {
-        Command command = new Command("command", "desc");
         DeviceClass classWithCommand = DeviceClass.create("device with properties")
-                .addCommand(command)
+                .addCommand("command", "desc")
                 .build();
         expect(sequenceDAOMock.getNextCommandId())
                 .andReturn(4L)
                 .times(1);
-        replay(devClassCacheMock,sequenceDAOMock);
+        replay(devClassCacheMock, sequenceDAOMock);
         factory.createId(classWithCommand);
-        assertEquals(4L, (long) command.getId());
+        assertEquals(4L, (long) getElementWithName(classWithCommand.getCommands().getCommands(), "command").getId());
     }
 
     @Test
     public void createDevClassShouldOnlyCreateNeededProperties() {
-        Property property1 = new Property("property1", "desc");
-        Property property2 = new Property("property2", "desc");
         DeviceClass classWithProperties = DeviceClass.create("device with properties")
-                .addProperty(property1)
-                .addProperty(property2)
+                .addProperty("property1", "desc")
+                .addProperty("property2", "desc")
                 .build();
         expect(sequenceDAOMock.getNextPropertyId())
                 .andReturn(2L)
                 .times(2);
-        replay(devClassCacheMock,sequenceDAOMock);
+        replay(devClassCacheMock, sequenceDAOMock);
         factory.createId(classWithProperties);
         verify(sequenceDAOMock);
     }
@@ -192,6 +189,12 @@ public class DeviceClassFactoryTest {
     public void createInstanceShouldContainOneElementOnly() {
         List<ConfigurationElement> elements = factory.createInstance(minimalDeviceClass);
         assertEquals(1, elements.size());
+    }
+
+    private <T extends DeviceClassElement> T getElementWithName(List<T> elements, String name) {
+        return elements.stream()
+                .filter(e -> e.getName().equals(name))
+                .findFirst().orElse(null);
     }
 
 }

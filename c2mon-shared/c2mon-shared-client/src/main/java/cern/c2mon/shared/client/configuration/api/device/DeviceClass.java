@@ -24,7 +24,7 @@ import lombok.Data;
 import org.springframework.util.Assert;
 
 import java.util.*;
-import java.util.stream.Stream;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Configuration object for a DeviceClass.
@@ -75,7 +75,6 @@ public class DeviceClass implements ConfigurationEntity {
      */
     private CommandList commands;
 
-
     /**
      * Use this method to obtain a builder for a new device class configuration object.
      * @param name the name of the device class
@@ -91,8 +90,8 @@ public class DeviceClass implements ConfigurationEntity {
      */
     public static class CreateBuilder {
         private final DeviceClass deviceClassToBuild = new DeviceClass();
-        private final Set<Property> properties = new HashSet<>();
-        private final Set<Command> commands = new HashSet<>();
+        private final Map<String, Property> properties = new ConcurrentHashMap<>();
+        private final Map<String, Command> commands = new ConcurrentHashMap<>();
 
         /**
          * Create a new device class
@@ -132,28 +131,28 @@ public class DeviceClass implements ConfigurationEntity {
          * @return  the DeviceClass.CreateBuilder with the new property
          */
         public DeviceClass.CreateBuilder addProperty(String name, String description) {
-            Assert.isTrue(properties.stream().map(Property::getName).noneMatch(s -> s.equals(name)),
-                    "A property with this name was already added configured for the Device Class.");
-            this.properties.add(new Property(name, description));
+            Assert.isNull(properties.get(name),
+                    "A property with name " + name + " was already added to the Device Class.");
+            this.properties.put(name, new Property(name, description));
             return this;
         }
 
         /**
-         * Adds a number of {@link Property} objects to the device class, potentially containing fields
-         * @param properties a number of properties to add to the device
-         * @return the Device.CreateBuilder with the specified properties
-         * @see this#addProperty(String, String)
+         * Creates a {@link Property} from the given name and description, and adds it as a field to the property with
+         * the given propertyName. Fields are optional single-depth nested properties.
+         * @param propertyName the name of the parent property, must be unique within the device class. A property with
+         *                     this name must already have been added to the device class
+         * @param name the name of the field, must be unique within the property and device class
+         * @param description a description of the field
+         * @return the Device.CreateBuilder with the specified field added to the parent property
          */
-        public DeviceClass.CreateBuilder addProperty(Property... properties) {
-            long duplicateOld = Arrays.stream(properties)
-                    .filter(this.properties::contains)
-                    .count();
-            long distinctNew = Arrays.stream(properties)
-                    .map(Property::getName)
-                    .distinct().count();
-            Assert.isTrue(duplicateOld == 0 && distinctNew == properties.length,
-                    "Attempting to add property with same name twice to the Device Class.");
-            this.properties.addAll(Arrays.asList(properties));
+        public DeviceClass.CreateBuilder addField(String propertyName, String name, String description) {
+            Property parentProperty = properties.get(propertyName);
+            Assert.notNull(parentProperty,
+                    "No property with the name {} has been added to the Device Class.");
+            Assert.isTrue(parentProperty.getFields().stream().map(Property::getName).noneMatch(s -> s.equals(name)),
+                    "A field with name " + name + " was already added to the property " + propertyName);
+            parentProperty.getFields().add(new Property(name, description));
             return this;
         }
 
@@ -164,26 +163,9 @@ public class DeviceClass implements ConfigurationEntity {
          * @return  the DeviceClass.CreateBuilder with the new command
          */
         public DeviceClass.CreateBuilder addCommand(String name, String description) {
-            Assert.isTrue(commands.stream().map(Command::getName).noneMatch(s -> s.equals(name)),
-                    "A command with this name was already added configured for the Device Class.");
-            this.commands.add(new Command(name, description));
-            return this;
-        }
-
-        /**
-         * Adds a number of {@link Command} objects to the device class
-         * @param commands a number of commands to add to the device
-         * @return the Device.CreateBuilder with the specified commands
-         * @see this#addCommand(String, String)
-         */
-        public DeviceClass.CreateBuilder addCommand(Command... commands) {
-            long singleOccurrences = Stream.of(Arrays.stream(commands), this.commands.stream())
-                    .flatMap(o -> o)
-                    .map(Command::getName)
-                    .distinct().count();
-            Assert.isTrue(singleOccurrences == commands.length,
-                    "Attempting to add property with same name twice to the Device Class.");
-            this.commands.addAll(Arrays.asList(commands));
+            Assert.isNull(commands.get(name),
+                    "A command with name " + name + " was already added to the Device Class.");
+            this.commands.put(name, new Command(name, description));
             return this;
         }
 
@@ -192,8 +174,8 @@ public class DeviceClass implements ConfigurationEntity {
          * @return the device class configuration object
          */
         public DeviceClass build() {
-            this.deviceClassToBuild.setProperties(new PropertyList(properties));
-            this.deviceClassToBuild.setCommands(new CommandList(commands));
+            this.deviceClassToBuild.setProperties(new PropertyList(properties.values()));
+            this.deviceClassToBuild.setCommands(new CommandList(commands.values()));
             return this.deviceClassToBuild;
         }
     }

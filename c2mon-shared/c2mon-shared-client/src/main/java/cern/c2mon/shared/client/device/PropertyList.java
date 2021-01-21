@@ -16,10 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.shared.client.device;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
@@ -34,9 +31,9 @@ import org.simpleframework.xml.Root;
 public class PropertyList extends DeviceClassOrDeviceSerializableElement {
 
   @ElementList(entry = "Property", inline = true, required = false)
-  private Set<Property> properties = new HashSet<>();
+  private Collection<Property> properties = new HashSet<>();
 
-  public PropertyList(Set<Property> properties) {
+  public PropertyList(Collection<Property> properties) {
     this.properties = properties;
   }
 

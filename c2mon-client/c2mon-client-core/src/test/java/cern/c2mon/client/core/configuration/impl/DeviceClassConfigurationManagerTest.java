@@ -5,13 +5,12 @@ import cern.c2mon.client.core.configuration.DeviceClassConfigurationManager;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.api.Configuration;
 import cern.c2mon.shared.client.configuration.api.device.DeviceClass;
-import cern.c2mon.shared.client.device.Command;
-import cern.c2mon.shared.client.device.Property;
+import cern.c2mon.shared.client.device.DeviceClassElement;
 import org.easymock.Capture;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Arrays;
+import java.util.List;
 
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.assertEquals;
@@ -26,6 +25,7 @@ public class DeviceClassConfigurationManagerTest {
     public void setupServer() {
         reset(configurationRequestSenderMock);
     }
+
     @Test
     public void createDeviceClassByNameShouldSendCreateRequest() {
         Capture<Configuration> c = newCapture();
@@ -96,9 +96,8 @@ public class DeviceClassConfigurationManagerTest {
 
     @Test
     public void createDeviceClassWithPropertyShouldReturnProperty() {
-        Property p = new Property("name", "description");
         DeviceClass expected = DeviceClass.create(String.valueOf(System.currentTimeMillis()))
-                .addProperty(p)
+                .addProperty("name", "description")
                 .build();
         Capture<Configuration> c = newCapture();
         expect(configurationRequestSenderMock.applyConfiguration(and(capture(c), isA(Configuration.class)), anyObject()))
@@ -108,16 +107,15 @@ public class DeviceClassConfigurationManagerTest {
 
         configurationService.createDeviceClass(expected);
         DeviceClass entity = (DeviceClass) c.getValue().getEntities().get(0);
-        assertTrue(entity.getProperties().getProperties().contains(p));
+        assertTrue(containsElementWithName(entity.getProperties().getProperties(), "name"));
     }
 
     @Test
     public void createDeviceClassWithMultiplePropertiesShouldReturnProperties() {
-        Property p1 = new Property("name1", "description");
-        Property p2 = new Property("name2", "description");
-        Property p3 = new Property("name3", "description");
         DeviceClass expected = DeviceClass.create(String.valueOf(System.currentTimeMillis()))
-                .addProperty(p1, p2, p3)
+                .addProperty("name1", "description")
+                .addProperty("name2", "description")
+                .addProperty("name3", "description")
                 .build();
         Capture<Configuration> c = newCapture();
         expect(configurationRequestSenderMock.applyConfiguration(and(capture(c), isA(Configuration.class)), anyObject()))
@@ -127,14 +125,15 @@ public class DeviceClassConfigurationManagerTest {
 
         configurationService.createDeviceClass(expected);
         DeviceClass entity = (DeviceClass) c.getValue().getEntities().get(0);
-        assertTrue(entity.getProperties().getProperties().containsAll(Arrays.asList(p1, p2, p3)));
+        assertTrue(containsElementWithName(entity.getProperties().getProperties(), "name1"));
+        assertTrue(containsElementWithName(entity.getProperties().getProperties(), "name2"));
+        assertTrue(containsElementWithName(entity.getProperties().getProperties(), "name3"));
     }
 
     @Test
     public void createDeviceClassWithCommandShouldReturnCommand() {
-        Command cmd = new Command("name", "description");
         DeviceClass expected = DeviceClass.create(String.valueOf(System.currentTimeMillis()))
-                .addCommand(cmd)
+                .addCommand("name", "description")
                 .build();
         Capture<Configuration> c = newCapture();
         expect(configurationRequestSenderMock.applyConfiguration(and(capture(c), isA(Configuration.class)), anyObject()))
@@ -144,16 +143,15 @@ public class DeviceClassConfigurationManagerTest {
 
         configurationService.createDeviceClass(expected);
         DeviceClass entity = (DeviceClass) c.getValue().getEntities().get(0);
-        assertTrue(entity.getCommands().getCommands().contains(cmd));
+        assertTrue(containsElementWithName(entity.getCommands().getCommands(), "name"));
     }
 
     @Test
     public void createDeviceClassWithMultipleCommandsShouldReturnCommands() {
-        Command p1 = new Command("name1", "description");
-        Command p2 = new Command("name2", "description");
-        Command p3 = new Command("name3", "description");
         DeviceClass expected = DeviceClass.create(String.valueOf(System.currentTimeMillis()))
-                .addCommand(p1, p2, p3)
+                .addCommand("name1", "description")
+                .addCommand("name2", "description")
+                .addCommand("name3", "description")
                 .build();
         Capture<Configuration> c = newCapture();
         expect(configurationRequestSenderMock.applyConfiguration(and(capture(c), isA(Configuration.class)), anyObject()))
@@ -163,7 +161,9 @@ public class DeviceClassConfigurationManagerTest {
 
         configurationService.createDeviceClass(expected);
         DeviceClass entity = (DeviceClass) c.getValue().getEntities().get(0);
-        assertTrue(entity.getCommands().getCommands().containsAll(Arrays.asList(p1, p2, p3)));
+        assertTrue(containsElementWithName(entity.getCommands().getCommands(), "name1"));
+        assertTrue(containsElementWithName(entity.getCommands().getCommands(), "name2"));
+        assertTrue(containsElementWithName(entity.getCommands().getCommands(), "name3"));
     }
 
     @Test
@@ -191,4 +191,9 @@ public class DeviceClassConfigurationManagerTest {
         assertTrue(entity.isDeleted());
     }
 
+
+    private <T extends DeviceClassElement> boolean containsElementWithName(List<T> elements, String name) {
+        return elements.stream()
+                .anyMatch(e -> e.getName().equals(name));
+    }
 }

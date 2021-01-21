@@ -48,7 +48,7 @@ public class Property implements Serializable, DeviceClassElement {
    * The list of nested fields of this property.
    */
   @ElementList(required = false, name = "Fields")
-  private List<Property> fields;
+  private List<Property> fields = new ArrayList<>();
 
   /**
    * Default constructor.

@@ -21,16 +21,34 @@ public interface DeviceElement {
     void setId(Long id);
 
     /**
-     * Set the unique name of the Device element.
+     * Fet the unique name of the Device element.
      *
      * @return the name of the element
      */
     String getName();
 
     /**
-     * Get the unique name of the Device element.
+     * Set the unique name of the Device element.
      *
-     * @param the name of the element
+     * @param name the name of the element
      */
     void setName(String name);
+
+    /**
+     * Get the actual value of this Device element
+     * @return the actual value of this Device element
+     */
+    String getValue();
+
+    /**
+     * Get the category of this Device element (e.g "tagId", "clientRule", "constantValue", "commandTagId")
+     * @return the category of the Device element
+     */
+    String getCategory();
+
+    /**
+     * Get the result type of this Device element
+     * @return the result type of the Device element
+     */
+    String getResultType();
 }

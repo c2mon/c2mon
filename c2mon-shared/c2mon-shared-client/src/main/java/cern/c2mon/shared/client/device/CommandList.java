@@ -16,10 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.shared.client.device;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
@@ -34,9 +31,9 @@ import org.simpleframework.xml.Root;
 public class CommandList extends DeviceClassOrDeviceSerializableElement {
 
   @ElementList(entry = "Command", inline = true, required = false)
-  private Set<Command> commands = new HashSet<>();
+  private Collection<Command> commands = new HashSet<>();
 
-  public CommandList(Set<Command> commands) {
+  public CommandList(Collection<Command> commands) {
     this.commands = commands;
   }
 
