@@ -1,16 +1,16 @@
 /******************************************************************************
  * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
- * 
+ *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Lesser General Public License as published by the Free
  * Software Foundation, either version 3 of the license.
- * 
+ *
  * C2MON is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
  * more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import cern.c2mon.client.common.tag.Tag;
+import cern.c2mon.client.core.device.exception.ImproperDeviceException;
 import cern.c2mon.client.core.tag.ClientRuleTag;
 import cern.c2mon.shared.client.device.DeviceProperty;
 import cern.c2mon.shared.rule.RuleExpression;
@@ -45,13 +46,11 @@ public class PropertyFactory {
    * @param deviceProperty the property object received from the server
    * @return the appropriate client device property
    *
-   * @throws ClassNotFoundException if the {@link DeviceProperty} contains an
-   *           invalid result type field
-   * @throws RuleFormatException if the {@link DeviceProperty} contains an
-   *           invalid client rule field
+   * @throws ImproperDeviceException if the {@link DeviceProperty} is malformed (either invalid result type field or
+   *                                 an invalid client rule field
    */
   @SuppressWarnings({ "unchecked", "rawtypes" })
-  public static Property createProperty(DeviceProperty deviceProperty) throws ClassNotFoundException, RuleFormatException {
+  public static Property createProperty(DeviceProperty deviceProperty) throws ImproperDeviceException {
 
     // If the property has nested fields, create them all here
     if ((deviceProperty.getCategory() == null && !deviceProperty.getFields().isEmpty())
@@ -71,19 +70,32 @@ public class PropertyFactory {
       return new PropertyImpl(deviceProperty.getName(), Category.DATATAG, Long.parseLong(deviceProperty.getValue()));
     }
 
+    Class<?> resultTypeClass;
+    try {
+      resultTypeClass = deviceProperty.getResultTypeClass();
+    } catch (ClassNotFoundException e) {
+      throw new ImproperDeviceException("The device property result type \"" + deviceProperty.getResultType() + "\" is invalid.", e);
+    }
+
     // If we have a client rule, that comes next in the hierarchy.
     if (deviceProperty.getCategory().equals(Category.CLIENT_RULE.getCategory())) {
-      ClientRuleTag ruleTag = new ClientRuleTag(RuleExpression.createExpression(deviceProperty.getValue()), deviceProperty.getResultTypeClass());
-      return new PropertyImpl(deviceProperty.getName(), Category.CLIENT_RULE, ruleTag);
+      ClientRuleTag ruleTag;
+      try {
+        ruleTag = new ClientRuleTag(RuleExpression.createExpression(deviceProperty.getValue()), resultTypeClass);
+        return new PropertyImpl(deviceProperty.getName(), Category.CLIENT_RULE, ruleTag);
+      } catch (RuleFormatException e) {
+        throw new ImproperDeviceException("The device property contains an invalid client rule field.", e);
+      }
     }
 
     // If we have a constant value, it comes last in the hierarchy.
     if (deviceProperty.getCategory().equals(Category.CONSTANT_VALUE.getCategory())) {
-      ClientConstantValue constantValueTag = new ClientConstantValue(deviceProperty.getValue(), deviceProperty.getResultTypeClass());
+      ClientConstantValue constantValueTag = new ClientConstantValue(deviceProperty.getValue(), resultTypeClass);
       return new PropertyImpl(deviceProperty.getName(), Category.CONSTANT_VALUE, constantValueTag);
     }
 
-    throw new RuntimeException("Property \"" + deviceProperty.getName() + "\" must specify at least one of (tagId, clientRule, constantValue)");
+    throw new ImproperDeviceException("Property \"" + deviceProperty.getName() +
+            "\" must specify at least one of (tagId, clientRule, constantValue)");
   }
 
   /**
