@@ -28,7 +28,7 @@ import org.simpleframework.xml.Root;
  * @author Justin Lewis Salmon
  */
 @Root(name = "DeviceProperties")
-public class DevicePropertyList extends DeviceClassOrDeviceSerializableElement {
+public class DevicePropertyList implements DeviceClassOrDeviceSerializableElement {
 
   @ElementList(entry = "DeviceProperty", inline = true, required = false)
   private Collection<DeviceProperty> deviceProperties = new HashSet<>();

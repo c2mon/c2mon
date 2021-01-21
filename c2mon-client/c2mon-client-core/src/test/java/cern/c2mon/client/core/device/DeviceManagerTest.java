@@ -27,6 +27,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.jms.JMSException;
 
+import cern.c2mon.client.core.device.exception.ImproperDeviceException;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
@@ -298,7 +299,7 @@ public class DeviceManagerTest {
   }
 
   @Test
-  public void testSubscribeLazyDevice() throws RuleFormatException, ClassNotFoundException {
+  public void testSubscribeLazyDevice() throws ImproperDeviceException {
     // Reset the mock
     EasyMock.reset(tagServiceMock, deviceCacheMock, dataTagCacheMock, commandManagerMock);
     reset(requestHandlerMock);
