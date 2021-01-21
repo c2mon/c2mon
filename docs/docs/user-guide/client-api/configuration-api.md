@@ -160,3 +160,97 @@ configurationService.createRuleTag("RULE_EXAMPLE", "(#1000 < 0)|(#1000 > 200)[1]
 ```
 
 `RuleTag#create` and `RuleTag#update` methods also exist in a similar manner as for the `DataTag`.
+
+# Configuring DeviceClasses
+
+The following code shows the simplest way to create a `DeviceClass`:
+
+```java
+configurationService.createDeviceClass("DEV_CLASS_EXAMPLE");
+```
+
+A device class ID will be generated automatically. However, this device class will not contain any properties, fields 
+or commands. To add these entities and for more control, use the `DeviceClass#create` builder method:
+
+```java
+
+DeviceClass deviceClass = DeviceClass.create("DEV_CLASS_EXAMPLE")
+        .id(234L)
+        .description("A short description")
+        .addProperty("PROPERTY", "Description of the property")
+        .addField("PROPERTY", "FIELD", "This field is added to the property with name PROPERTY")
+        .addCommand("COMMAND", "Description of the command")
+        .build();
+
+configurationService.createEquipment(deviceClass);
+```
+
+To add a field to a device class, you must reference its parent property by name. The parent property must be added to 
+the device class already!
+
+Finally, remember that no two properties or commands may have the same name, and field names must be unique within the
+parent property.
+
+
+## Deleting DeviceClasses
+
+You can easily remove a device class by its name or ID:
+
+```java
+configurationService.removeDeviceClass("DEV_CLASS_EXAMPLE");
+configurationService.removeDeviceClassById(1245);
+```
+
+Take care when executing such a command: Deleting a device class will also remove all devices associated with this class!
+
+
+
+# Configuring Devices
+
+The following code shows the simplest way to create a `DeviceClass`:
+
+```java
+configurationService.createDevice("DEVICE_EXAMPLE", "PARENT_DEVICE_CLASS");
+```
+
+Alternatively, you can reference the parent device class by ID:
+
+```java
+configurationService.createDevice("DEVICE_EXAMPLE", 1234);
+```
+
+A device ID will be generated automatically. As when configuring the device class, use one of the `Device#create` 
+builder methods  in order to add device properties, device commands or property fields: 
+
+```java
+
+DeviceClass deviceClass1 = DeviceClass.create("DEVICE_EXAMPLE_1", "PARENT_DEVICE_CLASS")
+        .id(234L)
+        .addDeviceProperty("PROPERTY", "value", "category", "result type")
+        .addPropertyField("PROPERTY","FIELD", "value", "category", "result type")
+        .addDeviceCommand("COMMAND", "value", "category", "result type")
+        .build();
+
+DeviceClass deviceClass2 = DeviceClass.create("DEVICE_EXAMPLE_2", 1234)
+        .id(235L)
+        .addDeviceProperty("PROPERTY", "4", "constantValue", "Integer")
+        .addPropertyField("PROPERTY","FIELD", "(#123 + #234) / 2", "clientRule", "Float")
+        .build();
+
+configurationService.createEquipment(deviceClass1);
+configurationService.createEquipment(deviceClass2);
+```
+
+Each device property, device command and property field must correspond by name to a property, command or field of the 
+parent device class. However, not all properties, commands and fields or the parent class need to be implemented in all
+devices. As when adding fields to device classes, adding property fields required the parent device 
+properties to be set already.
+
+## Deleting Devices
+
+You can also delete a device by its name or ID:
+
+```java
+configurationService.removeDevice("DEVICE_EXAMPLE_1");
+configurationService.removeDeviceById(235L);
+```

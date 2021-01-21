@@ -189,10 +189,10 @@ public class DeviceManagerTest {
     List<TransferDevice> devicesReturnList = new ArrayList<>();
     final TransferDeviceImpl device1 = new TransferDeviceImpl(1000L, "test_device_1", 1L, "test_device_class");
     final TransferDeviceImpl device2 = new TransferDeviceImpl(1000L, "test_device_2", 1L, "test_device_class");
-    device1.addDeviceProperty(new DeviceProperty(1L, "TEST_PROPERTY_1", "100430", "tagId", null));
-    device2.addDeviceProperty(new DeviceProperty(2L, "TEST_PROPERTY_2", "100431", "tagId", null));
-    device1.addDeviceCommand(new DeviceCommand(1L, "TEST_COMMAND_1", "4287", "commandTagId", null));
-    device2.addDeviceCommand(new DeviceCommand(2L, "TEST_COMMAND_2", "4288", "commandTagId", null));
+    device1.addDeviceProperty(DeviceProperty.forTagId(1L, "TEST_PROPERTY_1", 100430L));
+    device2.addDeviceProperty(DeviceProperty.forTagId(2L, "TEST_PROPERTY_2", 100431L));
+    device1.addDeviceCommand(DeviceCommand.forCommandTagId(1L, "TEST_COMMAND_1", 4287L));
+    device2.addDeviceCommand(DeviceCommand.forCommandTagId(2L, "TEST_COMMAND_2", 4288L));
     devicesReturnList.add(device1);
     devicesReturnList.add(device2);
 
@@ -305,8 +305,8 @@ public class DeviceManagerTest {
     reset(requestHandlerMock);
 
     List<DeviceProperty> sparsePropertyMap = new ArrayList<>();
-    sparsePropertyMap.add(new DeviceProperty(1L, "test_property_name_1", "100000", "tagId", null));
-    sparsePropertyMap.add(new DeviceProperty(2L, "test_property_name_2", "200000", "tagId", null));
+    sparsePropertyMap.add(DeviceProperty.forTagId(1L, "test_property_name_1", 100000L));
+    sparsePropertyMap.add(DeviceProperty.forTagId(2L, "test_property_name_2", 200000L));
 
     final DeviceImpl device1 = new DeviceImpl(1L, "test_device", 1L, "test_device_class");
     device1.setDeviceProperties(sparsePropertyMap);
@@ -449,8 +449,8 @@ public class DeviceManagerTest {
 
     List<TransferDevice> devicesReturnList = new ArrayList<>();
     final TransferDeviceImpl transferDevice = new TransferDeviceImpl(1000L, "test_device_1", 1L, "test_device_class");
-    transferDevice.addDeviceProperty(new DeviceProperty(1L, "TEST_PROPERTY_1", "100430", "tagId", null));
-    transferDevice.addDeviceCommand(new DeviceCommand(1L, "TEST_COMMAND_1", "4287", "commandTagId", null));
+    transferDevice.addDeviceProperty(DeviceProperty.forTagId(1L, "TEST_PROPERTY_1", 100430L));
+    transferDevice.addDeviceCommand(DeviceCommand.forCommandTagId(1L, "TEST_COMMAND_1", 4287L));
     devicesReturnList.add(transferDevice);
 
     Set<CommandTag<Object>> returnedCommandTags = new HashSet<>();
@@ -571,7 +571,7 @@ public class DeviceManagerTest {
 
     List<TransferDevice> devicesReturnList = new ArrayList<>();
     final TransferDeviceImpl transferDevice = new TransferDeviceImpl(1000L, "test_device_1", 1L, "test_device_class");
-    transferDevice.addDeviceProperty(new DeviceProperty(1L, "TEST_PROPERTY_1", "100430", "tagId", null));
+    transferDevice.addDeviceProperty(DeviceProperty.forTagId(1L, "TEST_PROPERTY_1", 100430L));
     devicesReturnList.add(transferDevice);
 
     DeviceInfo known = new DeviceInfo("test_device_class", "test_device_1");

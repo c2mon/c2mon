@@ -116,7 +116,7 @@ public class DeviceFactoryTest {
         classWithProperty.setProperties(Collections.singletonList(property));
 
         Device device = Device.create("device", "class name")
-                .addDeviceProperty("property", "1001", "tagId", null)
+                .addPropertyForTagId("property", 1001L)
                 .build();
 
         expect(devClassCacheMock.get(anyLong()))
@@ -133,7 +133,7 @@ public class DeviceFactoryTest {
         DeviceClassCacheObject classWithoutProperty = new DeviceClassCacheObject(100L);
         classWithoutProperty.setName("device class");
         Device device = Device.create("device", "class name")
-                .addDeviceProperty("property", "1001", "tagId", null)
+                .addPropertyForTagId("property", 1001L)
                 .build();
 
         expect(devClassCacheMock.get(anyLong()))
@@ -153,8 +153,8 @@ public class DeviceFactoryTest {
         classWithProperty.setProperties(Collections.singletonList(property));
 
         Device device = Device.create("device", "class name")
-                .addDeviceProperty("property", "1001", "tagId", null)
-                .addDeviceProperty("no", "corresponding", "property", null)
+                .addPropertyForTagId("property", 1001L)
+                .addPropertyForClientRule("invalid", "no corresponding property", null)
                 .build();
 
         expect(devClassCacheMock.get(anyLong()))
@@ -168,15 +168,15 @@ public class DeviceFactoryTest {
     @Test
     public void createIdShouldSetFieldIds() {
         Property field = new Property(40L, "field", "desc");
-        Property property = new Property( 50L, "property", "desc", Collections.singletonList(field));
+        Property property = new Property( 50L, "mapped property", "desc", Collections.singletonList(field));
 
         DeviceClassCacheObject classWithProperty = new DeviceClassCacheObject(100L);
         classWithProperty.setName("device class");
         classWithProperty.setProperties(Collections.singletonList(property));
 
         Device device = Device.create("device", "class name")
-                .addDeviceProperty("property", "parentValue", "parentCategory", "parentResultType")
-                .addPropertyField("property", "field", "1001", "tagId", null)
+                .createMappedProperty("mapped property")
+                .addFieldForTagId( "field", 1001L)
                 .build();
 
         expect(devClassCacheMock.get(anyLong()))
@@ -186,7 +186,7 @@ public class DeviceFactoryTest {
 
         factory.createId(device);
 
-        DeviceProperty parentProperty = getElementWithName(device.getDeviceProperties().getDeviceProperties(), "property");
+        DeviceProperty parentProperty = getElementWithName(device.getDeviceProperties().getDeviceProperties(), "mapped property");
         assertEquals(40L, (long) parentProperty.getFields().get("field").getId());
     }
 
@@ -201,9 +201,9 @@ public class DeviceFactoryTest {
         classWithProperty.setProperties(Collections.singletonList(property));
 
         Device device = Device.create("device", "class name")
-                .addDeviceProperty("property", "parentValue", "parentCategory", "parentResultType")
-                .addPropertyField("property", "field1", "1001", "tagId", null)
-                .addPropertyField("property", "field2", "1001", "tagId", null)
+                .createMappedProperty("property")
+                .addFieldForTagId("field1", 1001L)
+                .addFieldForTagId("field2", 1002L)
                 .build();
 
         expect(devClassCacheMock.get(anyLong()))
@@ -226,7 +226,7 @@ public class DeviceFactoryTest {
         classWithProperty.setName("device class");
 
         Device device = Device.create("device", "class name")
-                .addDeviceProperty("property", "1001", "", "")
+                .addPropertyForTagId("property", 1001L)
                 .build();
 
         expect(devClassCacheMock.get(anyLong()))
@@ -239,15 +239,15 @@ public class DeviceFactoryTest {
 
     @Test(expected = ConfigurationParseException.class)
     public void createIdShouldThrowExceptionForDeviceFieldWithoutField() {
-        Property property = new Property( 50L, "property", "desc");
+        Property property = new Property( 50L, "mapped property", "desc");
 
         DeviceClassCacheObject classWithProperty = new DeviceClassCacheObject(100L);
         classWithProperty.setName("device class");
         classWithProperty.setProperties(Collections.singletonList(property));
 
         Device device = Device.create("device", "class name")
-                .addDeviceProperty("property", "parentValue", "parentCategory", "parentResultType")
-                .addPropertyField("property", "field", "1001", "tagId", null)
+                .createMappedProperty("mapped property")
+                .addPropertyForTagId("field", 1001L)
                 .build();
 
         expect(devClassCacheMock.get(anyLong()))
@@ -266,7 +266,7 @@ public class DeviceFactoryTest {
         classWithProperty.setName("device class");
 
         Device device = Device.create("device", "class name")
-                .addDeviceCommand("command", "1001", "", "")
+                .addCommand("command", 1001L)
                 .build();
 
         expect(devClassCacheMock.get(anyLong()))
@@ -280,15 +280,15 @@ public class DeviceFactoryTest {
 
     @Test(expected = ConfigurationParseException.class)
     public void createIdShouldThrowExceptionIfFieldDoesNotExist() {
-        Property property = new Property( 40L,"property", "desc");
+        Property property = new Property( 40L,"mapped property", "desc");
 
         DeviceClassCacheObject classWithProperty = new DeviceClassCacheObject(100L);
         classWithProperty.setName("device class");
         classWithProperty.setProperties(Collections.singletonList(property));
 
         Device device = Device.create("device", "class name")
-                .addDeviceProperty("property", "parentValue", "parentCategory", "parentResultType")
-                .addPropertyField("property", "field", "1001", "tagId", null)
+                .createMappedProperty("mapped property")
+                .addPropertyForTagId("field", 1001L)
                 .build();
 
         expect(devClassCacheMock.get(anyLong()))
@@ -308,7 +308,7 @@ public class DeviceFactoryTest {
         classWithProperty.setCommands(Collections.singletonList(command));
 
         Device device = Device.create("device", "class name")
-                .addDeviceCommand("command", "value", "category", null)
+                .addCommand("command", 1L)
                 .build();
 
         expect(devClassCacheMock.get(anyLong()))

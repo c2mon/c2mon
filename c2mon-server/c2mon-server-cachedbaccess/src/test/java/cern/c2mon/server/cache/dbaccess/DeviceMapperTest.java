@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import cern.c2mon.shared.client.device.ResultType;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,37 +52,37 @@ public class DeviceMapperTest extends AbstractMapperTest {
     List<DeviceProperty> deviceProperties = device1.getDeviceProperties();
     Assert.assertNotNull(deviceProperties);
     Assert.assertTrue(deviceProperties.size() == 4);
-    assertDevicePropertyListContains(deviceProperties, new DeviceProperty(1L, "cpuLoadInPercent", "210000", "tagId", null));
-    assertDevicePropertyListContains(deviceProperties, new DeviceProperty(2L, "responsiblePerson", "Mr. Administrator", "constantValue", null));
-    assertDevicePropertyListContains(deviceProperties, new DeviceProperty(3L, "someCalculations", "(#123 + #234) / 2", "clientRule", "Float"));
-    assertDevicePropertyListContains(deviceProperties, new DeviceProperty(4L, "numCores", "4", "constantValue", "Integer"));
+    assertDevicePropertyListContains(deviceProperties, DeviceProperty.forTagId(1L, "cpuLoadInPercent", 210000L));
+    assertDevicePropertyListContains(deviceProperties, DeviceProperty.forConstantValue(2L, "responsiblePerson", "Mr. Administrator"));
+    assertDevicePropertyListContains(deviceProperties, DeviceProperty.forClientRule(3L, "someCalculations", "(#123 + #234) / 2", ResultType.Float));
+    assertDevicePropertyListContains(deviceProperties, DeviceProperty.forConstantValue(4L, "numCores", 4, ResultType.Integer));
 
     List<DeviceCommand> deviceCommands = device1.getDeviceCommands();
     Assert.assertNotNull(deviceCommands);
     Assert.assertTrue(deviceCommands.size() == 1);
-    assertDeviceCommandEquals(new DeviceCommand(1L, "TEST_COMMAND_1", "210004", "commandTagId", null), deviceCommands.get(0));
+    assertDeviceCommandEquals(DeviceCommand.forCommandTagId(1L, "TEST_COMMAND_1", 210004L), deviceCommands.get(0));
 
     Device device2 = deviceMapper.getItem(301L); // getDevice(301L);
     Assert.assertNotNull(device2);
     deviceProperties = device2.getDeviceProperties();
     Assert.assertNotNull(deviceProperties);
     Assert.assertTrue(deviceProperties.size() == 2);
-    assertDevicePropertyListContains(deviceProperties, new DeviceProperty(5L, "TEST_PROPERTY_1", "210001", "tagId", null));
-    assertDevicePropertyListContains(deviceProperties, new DeviceProperty(9L, "TEST_PROPERTY_WITH_FIELDS", null, "mappedProperty", null));
+    assertDevicePropertyListContains(deviceProperties, DeviceProperty.forTagId(5L, "TEST_PROPERTY_1", 210001L));
+    assertDevicePropertyListContains(deviceProperties, DeviceProperty.forMappedProperty(9L, "TEST_PROPERTY_WITH_FIELDS", null));
 
     List<DeviceProperty> expectedFields = new ArrayList<>();
-    expectedFields.add(new DeviceProperty(1L, "FIELD_CPULOAD", "210008", "tagId", null));
-    expectedFields.add(new DeviceProperty(2L, "FIELD_RESPONSIBLE_PERSON", "Mr. Administrator", "constantValue", null));
-    expectedFields.add(new DeviceProperty(3L, "FIELD_SOME_CALCULATIONS", "(#123 + #234) / 2", "clientRule", "Float"));
-    expectedFields.add(new DeviceProperty(4L, "FIELD_NUM_CORES", "2", "constantValue", "Integer"));
+    expectedFields.add(DeviceProperty.forTagId(1L, "FIELD_CPULOAD",  210008L));
+    expectedFields.add(DeviceProperty.forConstantValue(2L, "FIELD_RESPONSIBLE_PERSON", "Mr. Administrator"));
+    expectedFields.add(DeviceProperty.forClientRule(3L, "FIELD_SOME_CALCULATIONS", "(#123 + #234) / 2", ResultType.Float));
+    expectedFields.add(DeviceProperty.forConstantValue(4L, "FIELD_NUM_CORES", 2, ResultType.Integer));
 
-    DeviceProperty expectedMappedProperty = new DeviceProperty(9L, "TEST_PROPERTY_WITH_FIELDS", "mappedProperty", expectedFields);
+    DeviceProperty expectedMappedProperty = DeviceProperty.forMappedProperty(9L, "TEST_PROPERTY_WITH_FIELDS", expectedFields);
     assertDevicePropertyListContains(deviceProperties, expectedMappedProperty);
 
     deviceCommands = device2.getDeviceCommands();
     Assert.assertNotNull(deviceCommands);
     Assert.assertTrue(deviceCommands.size() == 1);
-    assertDeviceCommandEquals(new DeviceCommand(2L, "TEST_COMMAND_2", "210005", "commandTagId", null), deviceCommands.get(0));
+    assertDeviceCommandEquals(DeviceCommand.forCommandTagId(2L, "TEST_COMMAND_2", 210005L), deviceCommands.get(0));
   }
 
   @Test
@@ -95,22 +96,22 @@ public class DeviceMapperTest extends AbstractMapperTest {
   public void testInsertDevice() throws ClassNotFoundException {
     DeviceCacheObject device = new DeviceCacheObject(304L, "TEST_DEVICE_5", 400L);
 
-    DeviceProperty dvp1 = new DeviceProperty(1L, "cpuLoadInPercent", "210005", "tagId", null);
-    DeviceProperty dvp2 = new DeviceProperty(2L, "responsiblePerson", "Mr. Administrator", "constantValue", null);
-    DeviceProperty dvp3 = new DeviceProperty(3L, "someCalculations", "(#123 + #234) / 2", "clientRule", "Float");
-    DeviceProperty dvp4 = new DeviceProperty(4L, "numCores", "4", "constantValue", "Integer");
+    DeviceProperty dvp1 = DeviceProperty.forTagId(1L, "cpuLoadInPercent", 210005L);
+    DeviceProperty dvp2 = DeviceProperty.forConstantValue(2L, "responsiblePerson", "Mr. Administrator");
+    DeviceProperty dvp3 = DeviceProperty.forClientRule(3L, "someCalculations", "(#123 + #234) / 2", ResultType.Float);
+    DeviceProperty dvp4 = DeviceProperty.forConstantValue(4L, "numCores", 4, ResultType.Integer);
 
     List<DeviceProperty> fields = new ArrayList<>();
-    fields.add(new DeviceProperty(1L, "FIELD_CPULOAD", "210008", "tagId", null));
-    fields.add(new DeviceProperty(2L, "FIELD_RESPONSIBLE_PERSON", "Mr. Administrator", "constantValue", null));
-    fields.add(new DeviceProperty(3L, "FIELD_SOME_CALCULATIONS", "(#123 + #234) / 2", "clientRule", "Float"));
-    fields.add(new DeviceProperty(4L, "FIELD_NUM_CORES", "2", "constantValue", "Integer"));
-    DeviceProperty dvp5 = new DeviceProperty(9L, "TEST_PROPERTY_WITH_FIELDS", null, fields);
+    fields.add(DeviceProperty.forTagId(1L, "FIELD_CPULOAD", 210008L));
+    fields.add(DeviceProperty.forConstantValue(2L, "FIELD_RESPONSIBLE_PERSON", "Mr. Administrator"));
+    fields.add(DeviceProperty.forClientRule(3L, "FIELD_SOME_CALCULATIONS", "(#123 + #234) / 2", ResultType.Float));
+    fields.add(DeviceProperty.forConstantValue(4L, "FIELD_NUM_CORES", 2, ResultType.Integer));
+    DeviceProperty dvp5 = DeviceProperty.forMappedProperty(9L, "TEST_PROPERTY_WITH_FIELDS", fields);
     List<DeviceProperty> properties = new ArrayList<>(Arrays.asList(dvp1, dvp2, dvp3, dvp4, dvp5));
 
     device.setDeviceProperties(properties);
 
-    DeviceCommand dvc1 = new DeviceCommand(1L, "TEST_COMMAND_1", "20", "commandTagId", null);
+    DeviceCommand dvc1 = DeviceCommand.forCommandTagId(1L, "TEST_COMMAND_1", 20L);
     device.setDeviceCommands(new ArrayList<>(Arrays.asList(dvc1)));
 
     deviceMapper.insertDevice(device);

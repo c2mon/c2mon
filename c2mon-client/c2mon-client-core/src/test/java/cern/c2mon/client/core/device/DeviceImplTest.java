@@ -20,6 +20,7 @@ package cern.c2mon.client.core.device;
 import java.util.*;
 
 import cern.c2mon.client.core.device.exception.ImproperDeviceException;
+import cern.c2mon.shared.client.device.ResultType;
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;
@@ -64,7 +65,7 @@ public class DeviceImplTest {
     DeviceImpl device = getTestDevice();
 
     List<DeviceProperty> deviceProperties = new ArrayList<>();
-    deviceProperties.add(new DeviceProperty(1L, "test_property_1", "100000", "tagId", null));
+    deviceProperties.add(DeviceProperty.forTagId(1L, "test_property_1", 100000L));
 
     device.setDeviceProperties(deviceProperties);
 
@@ -152,18 +153,18 @@ public class DeviceImplTest {
     DeviceImpl device = getTestDevice();
 
     List<DeviceProperty> deviceProperties = new ArrayList<>();
-    deviceProperties.add(new DeviceProperty(1L, "cpuLoadInPercent", "10000", "tagId", null));
-    deviceProperties.add(new DeviceProperty(2L, "responsiblePerson", "Mr. Administrator", "constantValue", null));
-    deviceProperties.add(new DeviceProperty(3L, "someCalculations", "(#123 + #234) / 2", "clientRule", "Float"));
-    deviceProperties.add(new DeviceProperty(4L, "numCores", "4", "constantValue", "Integer"));
+    deviceProperties.add(DeviceProperty.forTagId(1L, "cpuLoadInPercent", 10000L));
+    deviceProperties.add(DeviceProperty.forConstantValue(2L, "responsiblePerson", "Mr. Administrator"));
+    deviceProperties.add(DeviceProperty.forClientRule(3L, "someCalculations", "(#123 + #234) / 2", ResultType.Float));
+    deviceProperties.add(DeviceProperty.forConstantValue(4L, "numCores", 4, ResultType.Integer));
 
     List<DeviceProperty> fields = new ArrayList<>();
-    fields.add(new DeviceProperty(1L, "cpuLoadInPercent2", "10001", "tagId", null));
-    fields.add(new DeviceProperty(2L, "responsiblePerson2", "Mr. Administrator", "constantValue", null));
-    fields.add(new DeviceProperty(3L, "someCalculations2", "(#123 + #234) / 2", "clientRule", "Float"));
-    fields.add(new DeviceProperty(4L, "numCores2", "4", "constantValue", "Integer"));
+    fields.add(DeviceProperty.forTagId(1L, "cpuLoadInPercent2", 10001L));
+    fields.add(DeviceProperty.forConstantValue(2L, "responsiblePerson2", "Mr. Administrator"));
+    fields.add(DeviceProperty.forClientRule(3L, "someCalculations2", "(#123 + #234) / 2", ResultType.Float));
+    fields.add(DeviceProperty.forConstantValue(4L, "numCores2", 4, ResultType.Integer));
 
-    DeviceProperty propertyWithFields = new DeviceProperty(5L, "acquisition", "mappedProperty", fields);
+    DeviceProperty propertyWithFields = DeviceProperty.forMappedProperty(5L, "acquisition", fields);
     deviceProperties.add(propertyWithFields);
 
     TagImpl cdt1 = new TagImpl(10000L);
@@ -282,7 +283,7 @@ public class DeviceImplTest {
     EasyMock.replay(tagServiceMock);
 
     final List<DeviceProperty> deviceProperties = new ArrayList<>();
-    deviceProperties.add(new DeviceProperty(1L, "test_property_rule_name", "(#234 + #345) / 2", "clientRule", "Float"));
+    deviceProperties.add(DeviceProperty.forClientRule(1L, "test_property_rule_name", "(#234 + #345) / 2", ResultType.Float));
     device.setDeviceProperties(deviceProperties);
 
     for (Property property : device.getProperties()) {
@@ -360,10 +361,10 @@ public class DeviceImplTest {
     DeviceImpl device = getTestDevice();
 
     List<DeviceProperty> deviceFields = new ArrayList<>();
-    deviceFields.add(new DeviceProperty(1L, "cpuLoadInPercent", "100000", "tagId", null));
-    deviceFields.add(new DeviceProperty(2L, "responsiblePerson", "Mr. Administrator", "constantValue", null));
-    deviceFields.add(new DeviceProperty(3L, "someCalculations", "(#123 + #234) / 2", "clientRule", "Float"));
-    deviceFields.add(new DeviceProperty(4L, "numCores", "4", "constantValue", "Integer"));
+    deviceFields.add(DeviceProperty.forTagId(1L, "cpuLoadInPercent", 100000L));
+    deviceFields.add(DeviceProperty.forConstantValue(2L, "responsiblePerson", "Mr. Administrator"));
+    deviceFields.add(DeviceProperty.forClientRule(3L, "someCalculations", "(#123 + #234) / 2", ResultType.Float));
+    deviceFields.add(DeviceProperty.forConstantValue(4L, "numCores", 4, ResultType.Integer));
 
     TagImpl cdt = new TagImpl(100000L);
     ClientConstantValue ccv1 = new ClientConstantValue("Mr. Administrator", null);
@@ -389,7 +390,7 @@ public class DeviceImplTest {
     EasyMock.replay(tagServiceMock);
 
     List<DeviceProperty> deviceProperties = new ArrayList<>();
-    deviceProperties.add(new DeviceProperty(5L, "acquisition", "mappedProperty", deviceFields));
+    deviceProperties.add(DeviceProperty.forMappedProperty(5L, "acquisition", deviceFields));
     device.setDeviceProperties(deviceProperties);
 
     for (Property property : device.getProperties()) {

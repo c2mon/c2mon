@@ -95,10 +95,10 @@ public class DeviceRequestHandlerTest {
     Collection<ClientRequestResult> mockResponse = new ArrayList<>();
     TransferDeviceImpl dti1 = new TransferDeviceImpl(1000L, "test_device_1", 1L, "test_class_name");
     TransferDeviceImpl dti2 = new TransferDeviceImpl(2000L, "test_device_2", 1L, "test_class_name");
-    dti1.addDeviceProperty(new DeviceProperty(1L, "TEST_PROPERTY_1", "100430", "tagId", null));
-    dti2.addDeviceProperty(new DeviceProperty(1L, "TEST_PROPERTY_2", "100430", "tagId", null));
-    dti1.addDeviceCommand(new DeviceCommand(1L, "TEST_COMMAND_1", "4287", "commandTagId", null));
-    dti2.addDeviceCommand(new DeviceCommand(1L, "TEST_COMMAND_1", "4287", "commandTagId", null));
+    dti1.addDeviceProperty(DeviceProperty.forTagId(1L, "TEST_PROPERTY_1", 100430L));
+    dti2.addDeviceProperty(DeviceProperty.forTagId(1L, "TEST_PROPERTY_2", 100430L));
+    dti1.addDeviceCommand(DeviceCommand.forCommandTagId(1L, "TEST_COMMAND_1", 4287L));
+    dti2.addDeviceCommand(DeviceCommand.forCommandTagId(1L, "TEST_COMMAND_1", 4287L));
     mockResponse.add(dti1);
     mockResponse.add(dti2);
 
