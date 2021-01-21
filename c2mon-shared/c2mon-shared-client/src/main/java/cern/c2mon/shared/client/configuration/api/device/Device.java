@@ -22,10 +22,8 @@ import cern.c2mon.shared.client.device.*;
 import lombok.Data;
 import org.springframework.util.Assert;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Stream;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Configuration object for a Device.
@@ -35,7 +33,6 @@ import java.util.stream.Stream;
  * For further information how to use instances of this for server configurations read <a
  * href="http://c2mon.web.cern.ch/c2mon/docs/#_offline_configuration_via_c2mon_database_test_purpose_only">this</a> documentation.
  * <p/>
- *
  */
 @Data
 public class Device implements ConfigurationEntity {
@@ -84,7 +81,8 @@ public class Device implements ConfigurationEntity {
 
     /**
      * Use this method to obtain a builder for a new device configuration object.
-     * @param name the name of the device
+     *
+     * @param name            the name of the device
      * @param deviceClassName the name of the device class that this device belongs to.
      * @return a new Device.CreateBuilder with the specified name and device class name
      */
@@ -96,7 +94,8 @@ public class Device implements ConfigurationEntity {
 
     /**
      * Use this method to obtain a Builder for a new Device configuration object.
-     * @param name the name of the device
+     *
+     * @param name          the name of the device
      * @param deviceClassId the identifier of the device class that this Device belongs to.
      * @return a new Device.CreateBuilder with the specified name and device class ID
      */
@@ -111,12 +110,13 @@ public class Device implements ConfigurationEntity {
      */
     public static class CreateBuilder {
         private final Device deviceToBuild = new Device();
-        private final Set<DeviceProperty> deviceProperties = new HashSet<>();
-        private final Set<DeviceCommand> deviceCommands = new HashSet<>();
+        private final Map<String, DeviceProperty> deviceProperties = new ConcurrentHashMap<>();
+        private final Map<String, DeviceCommand> deviceCommands = new ConcurrentHashMap<>();
 
         /**
          * Create a new device with the given device class
-         * @param name the name of the new device, must be unique within the device class
+         *
+         * @param name            the name of the new device, must be unique within the device class
          * @param deviceClassName the name uniquely identifying the device class on the server
          */
         CreateBuilder(String name, String deviceClassName) {
@@ -127,7 +127,8 @@ public class Device implements ConfigurationEntity {
 
         /**
          * Create a new device with the given device class
-         * @param name the name of the new device, must be unique within the device class
+         *
+         * @param name          the name of the new device, must be unique within the device class
          * @param deviceClassId the unique identifier of the device class on the server
          */
         CreateBuilder(String name, long deviceClassId) {
@@ -139,6 +140,7 @@ public class Device implements ConfigurationEntity {
         /**
          * Explicitly set the ID of the device. If no ID is given, it will be created dynamically by the server. An
          * exception will be thrown when applying the configuration if the ID already exists on the server.
+         *
          * @param id the unique identifier of the device
          * @return the Device.CreateBuilder with the specified device id
          */
@@ -150,34 +152,41 @@ public class Device implements ConfigurationEntity {
         /**
          * Creates a {@link DeviceProperty} adds it to the device. A device can implement only those properties
          * contained in the parent class, but is not required to do so.
-         * @param name the name of the device property. It must be unique within the device and correspond to a
-         *             {@link Property} defined in the parent device class
-         * @param value the concrete value of the property
-         * @param category the category of this property (e.g. "tagId", "clientRule", "constantValue")
+         *
+         * @param name       the name of the device property. It must be unique within the device and correspond to a
+         *                   {@link Property} defined in the parent device class
+         * @param value      the concrete value of the property
+         * @param category   the category of this property (e.g. "tagId", "clientRule", "constantValue")
          * @param resultType the result type of this property (for rules and constant values, defaults to String)
          * @return the Device.CreateBuilder with the specified device property
          */
         public Device.CreateBuilder addDeviceProperty(String name, String value, String category, String resultType) {
-            Assert.isTrue(deviceProperties.stream().map(DeviceProperty::getName).noneMatch(s -> s.equals(name)),
-                    "A property with this name was already added configured for the Device.");
-            this.deviceProperties.add(new DeviceProperty(name, value, category, resultType));
+            Assert.isNull(deviceProperties.get(name),
+                    "A device property with name " + name + " was already added to the Device.");
+            this.deviceProperties.put(name, new DeviceProperty(name, value, category, resultType));
             return this;
         }
 
         /**
-         * Adds a number of {@link DeviceProperty} objects to the device, potentially containing fields.
-         * @param properties a number of device properties to add to the device
-         * @return the Device.CreateBuilder with the specified device properties
-         * @see this#addDeviceProperty(String, String, String, String)
+         * Creates a {@link DeviceProperty} from the given name and description, and adds it as a property field to the
+         * device property with the given propertyName. Property fields are concrete instances of fields, which are
+         * optional single-depth nested properties.
+         *
+         * @param propertyName the name of the parent property, must be unique within the device class. A device
+         *                     property with this name must already have been added to the device
+         * @param name         the name of the property field, must be unique within the property and device class
+         * @param value        the concrete value of the property
+         * @param category     the category of this property (e.g. "tagId", "clientRule", "constantValue")
+         * @param resultType   the result type of this property (for rules and constant values, defaults to String)
+         * @return the Device.CreateBuilder with the specified property field added to the parent device property
          */
-        public Device.CreateBuilder addDeviceProperty(DeviceProperty... properties) {
-            long singleOccurrences = Stream.of(Arrays.stream(properties), this.deviceProperties.stream())
-                    .flatMap(o -> o)
-                    .map(DeviceProperty::getName)
-                    .distinct().count();
-            Assert.isTrue(singleOccurrences == properties.length,
-                    "Attempting to add property with same name twice to the Device.");
-            this.deviceProperties.addAll(Arrays.asList(properties));
+        public Device.CreateBuilder addPropertyField(String propertyName, String name, String value, String category, String resultType) {
+            DeviceProperty parentProperty = deviceProperties.get(propertyName);
+            Assert.notNull(parentProperty,
+                    "No device property with the name {} has been added to the Device.");
+            Assert.isNull(parentProperty.getFields().get(name),
+                    "A property field with name " + name + " was already added to the device property " + propertyName);
+            parentProperty.setFields(new DeviceProperty(name, value, category, resultType));
             return this;
         }
 
@@ -185,46 +194,29 @@ public class Device implements ConfigurationEntity {
         /**
          * Creates a {@link DeviceCommand} and adds it to the device. A device can implement only those commands
          * contained in the parent class, but is not required to do so.
-         * @param name the name of the device command. It must be unique within the device and correspond to a
-         *             {@link Command} defined in the parent device class
-         * @param value the concrete value of the command
-         * @param category category of this command (usually just "commandTagId")
+         *
+         * @param name       the name of the device command. It must be unique within the device and correspond to a
+         *                   {@link Command} defined in the parent device class
+         * @param value      the concrete value of the command
+         * @param category   category of this command (usually just "commandTagId")
          * @param resultType the result type of this command (defaults to String)
          * @return the Device.CreateBuilder with the specified device command
          */
         public Device.CreateBuilder addDeviceCommand(String name, String value, String category, String resultType) {
-            Assert.isTrue(deviceCommands.stream()
-                            .map(DeviceCommand::getName)
-                            .noneMatch(s -> s.equals(name)),
-                    "A property with this name was already added configured for the Device.");
-            this.deviceCommands.add(new DeviceCommand(name, value, category, resultType));
-            return this;
-        }
-
-        /**
-         * Adds a number of {@link DeviceCommand} objects to the device, potentially containing fields.
-         * @param commands a number of device commands to add to the device
-         * @return the Device.CreateBuilder with the specified device commands
-         * @see this#addDeviceCommand(String, String, String, String)
-         */
-        public Device.CreateBuilder addDeviceCommand(DeviceCommand... commands) {
-            long singleOccurrences = Stream.of(Arrays.stream(commands), this.deviceCommands.stream())
-                    .flatMap(o -> o)
-                    .map(DeviceCommand::getName)
-                    .distinct().count();
-            Assert.isTrue(singleOccurrences == commands.length,
-                    "Attempting to add property with same name twice to the Device.");
-            this.deviceCommands.addAll(Arrays.asList(commands));
+            Assert.isNull(deviceCommands.get(name),
+                    "A device command with name " + name + " was already added to the Device.");
+            this.deviceCommands.put(name, new DeviceCommand(name, value, category, resultType));
             return this;
         }
 
         /**
          * Creates a concrete device object from the builder information
+         *
          * @return the device configuration object
          */
         public Device build() {
-            this.deviceToBuild.setDeviceProperties(new DevicePropertyList(deviceProperties));
-            this.deviceToBuild.setDeviceCommands(new DeviceCommandList(deviceCommands));
+            this.deviceToBuild.setDeviceProperties(new DevicePropertyList(deviceProperties.values()));
+            this.deviceToBuild.setDeviceCommands(new DeviceCommandList(deviceCommands.values()));
             return this.deviceToBuild;
         }
     }

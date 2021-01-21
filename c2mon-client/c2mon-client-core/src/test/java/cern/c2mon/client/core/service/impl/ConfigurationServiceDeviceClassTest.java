@@ -64,7 +64,7 @@ public class ConfigurationServiceDeviceClassTest {
 
     @BeforeClass
     public static void setupServer() {
-        String jmsUrl = "tcp://localhost:9200";
+        String jmsUrl = "tcp://127.0.0.1:61616";
         log.info("JMS URL:{} ", jmsUrl);
         System.setProperty("c2mon.client.jms.url", jmsUrl);
         C2monServiceGateway.startC2monClientSynchronous();
@@ -147,18 +147,17 @@ public class ConfigurationServiceDeviceClassTest {
     public void testCreateDeviceWithFields() {
         String date = LocalTime.now().format(formatter);
         Property field = new Property("field1", "field");
-        Property property = new Property("prop1", "property with field", Collections.singletonList(field));
         DeviceClass deviceClass = DeviceClass.create("devClass: " + date)
-                .addProperty(property)
+                .addProperty("prop1", "property with field")
+                .addField("prop1", "field1", "field")
                 .build();
         ConfigurationReport report = configurationService.createDeviceClass(deviceClass);
 
         log.info("Report: {}, {}", report.getStatus(), report.getStatusDescription());
 
-        DeviceProperty deviceField = new DeviceProperty("field1", "5", "", null);
-        DeviceProperty deviceProperty = new DeviceProperty("prop1", "9", Collections.singletonList(deviceField));
         Device device = Device.create("device: " + date, "devClass: " + date)
-                .addDeviceProperty(deviceProperty)
+                .addDeviceProperty("prop1", "9", "category", null)
+                .addPropertyField("prop1","field1", "5", "", null)
                 .build();
         report = configurationService.createDevice(device);
 
