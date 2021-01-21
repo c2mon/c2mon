@@ -154,29 +154,18 @@ public class DeviceFactory extends EntityFactory<Device> {
 
     private <T extends DeviceClassElement> T getDevClassElementAndConfigure(DeviceElement deviceElement, List<T> deviceClassElements, String deviceName) {
         Optional<T> devClassElement;
-        if (deviceElement.getId() == null) {
-            devClassElement = deviceClassElements
-                    .stream()
-                    .filter(p -> p.getName().equals(deviceElement.getName()))
-                    .findFirst();
-            devClassElement.ifPresent(value -> deviceElement.setId(value.getId()));
-        }
         devClassElement = deviceClassElements
                 .stream()
-                .filter(p -> p.getId().equals(deviceElement.getId()))
+                .filter(p -> p.getName().equals(deviceElement.getName()))
                 .findFirst();
-        if (devClassElement.isPresent() && elementsCorrespond(deviceElement, devClassElement.get())) {
-            deviceElement.setName(devClassElement.get().getName());
+        devClassElement.ifPresent(value -> deviceElement.setId(value.getId()));
+
+        if (devClassElement.isPresent()) {
             return devClassElement.get();
         } else {
             throw createConfigurationException(deviceName, deviceElement.getClass().getSimpleName() + "" +
                     " \"" + deviceElement.getName() + "\" must refer to a corresponding element defined in parent class");
         }
-    }
-
-    private boolean elementsCorrespond(DeviceElement deviceElement, DeviceClassElement deviceClassElement) {
-        return deviceClassElement.getName().equals(deviceElement.getName()) &&
-                deviceClassElement.getId().equals(deviceElement.getId());
     }
 
     private ConfigurationParseException createConfigurationException(String deviceName, String cause) {

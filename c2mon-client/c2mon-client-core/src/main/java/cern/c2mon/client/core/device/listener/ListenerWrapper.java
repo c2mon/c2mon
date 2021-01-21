@@ -38,12 +38,12 @@ public class ListenerWrapper {
   /**
    * Reference to the {@link DeviceUpdateListener}.
    */
-  private DeviceUpdateListener listener;
+  private final DeviceUpdateListener listener;
 
   /**
    * Reference to the set of {@link Device} objects.
    */
-  private Set<Device> devices;
+  private final Set<Device> devices;
 
   /**
    * Flag indicating whether this listener/device set combo has received its
