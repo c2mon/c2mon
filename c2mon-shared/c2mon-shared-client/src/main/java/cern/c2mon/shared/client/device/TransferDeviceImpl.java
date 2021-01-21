@@ -49,10 +49,10 @@ public class TransferDeviceImpl implements TransferDevice {
   private final String deviceClassName;
 
   /** The device properties */
-  private List<DeviceProperty> deviceProperties = new ArrayList<>();
+  private final List<DeviceProperty> deviceProperties = new ArrayList<>();
 
   /** The device commands */
-  private List<DeviceCommand> deviceCommands = new ArrayList<>();
+  private final List<DeviceCommand> deviceCommands = new ArrayList<>();
 
   /**
    * @return The Gson parser singleton instance to serialise/deserialise Json

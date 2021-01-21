@@ -6,6 +6,7 @@ import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.api.Configuration;
 import cern.c2mon.shared.client.configuration.api.device.Device;
 import cern.c2mon.shared.client.device.DeviceElement;
+import cern.c2mon.shared.client.device.ResultType;
 import org.easymock.Capture;
 import org.junit.Before;
 import org.junit.Test;
@@ -98,7 +99,7 @@ public class DeviceConfigurationManagerTest {
     @Test
     public void createDeviceWithDevicePropertyShouldReturnDeviceProperty() {
         Device expected = Device.create(String.valueOf(System.currentTimeMillis()), "devClassName")
-                .addDeviceProperty("name", "value", "category", null)
+                .addPropertyForTagId("name", 1L)
                 .build();
         Capture<Configuration> c = newCapture();
         expect(configurationRequestSenderMock.applyConfiguration(and(capture(c), isA(Configuration.class)), anyObject()))
@@ -114,9 +115,9 @@ public class DeviceConfigurationManagerTest {
     @Test
     public void createDeviceWithMultipleDevicePropertiesShouldReturnDeviceProperties() {
         Device expected = Device.create(String.valueOf(System.currentTimeMillis()), "devClassName")
-                .addDeviceProperty("name1", "value1", "category1", null)
-                .addDeviceProperty("name2", "value2", "category2", null)
-                .addDeviceProperty("name3", "value3", "category3", null)
+                .addPropertyForClientRule("name1", "value1", ResultType.String)
+                .addPropertyForTagId("name2",2L)
+                .addPropertyForConstantValue("name3", 3, ResultType.Integer)
                 .build();
         Capture<Configuration> c = newCapture();
         expect(configurationRequestSenderMock.applyConfiguration(and(capture(c), isA(Configuration.class)), anyObject()))
@@ -134,7 +135,7 @@ public class DeviceConfigurationManagerTest {
     @Test
     public void createDeviceWithDeviceCommandShouldReturnDeviceCommand() {
         Device expected = Device.create(String.valueOf(System.currentTimeMillis()), "devClassName")
-                .addDeviceCommand("name", "value", "category", null)
+                .addCommand("name", 4L)
                 .build();
         Capture<Configuration> c = newCapture();
         expect(configurationRequestSenderMock.applyConfiguration(and(capture(c), isA(Configuration.class)), anyObject()))
@@ -150,9 +151,9 @@ public class DeviceConfigurationManagerTest {
     @Test
     public void createDeviceWithMultipleDeviceCommandsShouldReturnDeviceCommands() {
         Device expected = Device.create(String.valueOf(System.currentTimeMillis()), "devClassName")
-                .addDeviceCommand("name1", "value1", "category1", null)
-                .addDeviceCommand("name2", "value2", "category2", null)
-                .addDeviceCommand("name3", "value3", "category3", null)
+                .addCommand("name1", 1L)
+                .addCommand("name2", 2L)
+                .addCommand("name3", 3L)
                 .build();
         Capture<Configuration> c = newCapture();
         expect(configurationRequestSenderMock.applyConfiguration(and(capture(c), isA(Configuration.class)), anyObject()))

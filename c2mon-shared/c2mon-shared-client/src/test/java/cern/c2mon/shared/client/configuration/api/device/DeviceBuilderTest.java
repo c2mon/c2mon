@@ -9,29 +9,22 @@ import java.util.List;
 
 public class DeviceBuilderTest {
 
-    @Test
-    public void addDevicePropertyToBuilderShouldAddPropertyToEntity() {
-        Device entity = Device.create("device", "deviceClass")
-                .addDeviceProperty("name", "value", "category", null)
-                .build();
-        Assert.assertTrue(deviceElementListContains(entity.getDeviceProperties().getDeviceProperties(), "name", "value", "category"));
-    }
 
     @Test
     public void addDevicePropertiesToBuilderShouldAddAllPropertiesToEntity() {
         Device entity = Device.create("device", "deviceClass")
-                .addDeviceProperty("name1", "value", "category", null)
-                .addDeviceProperty("name2", "value", "category", null)
+                .addPropertyForTagId("name1", 2L)
+                .addPropertyForTagId("name2", 3L)
                 .build();
-        Assert.assertTrue(deviceElementListContains(entity.getDeviceProperties().getDeviceProperties(), "name1", "value", "category"));
-        Assert.assertTrue(deviceElementListContains(entity.getDeviceProperties().getDeviceProperties(), "name2", "value", "category"));
+        Assert.assertTrue(deviceElementListContains(entity.getDeviceProperties().getDeviceProperties(), "name1", String.valueOf(2L), "tagId"));
+        Assert.assertTrue(deviceElementListContains(entity.getDeviceProperties().getDeviceProperties(), "name2", String.valueOf(3L), "tagId"));
     }
 
     @Test
     public void entityShouldOnlyContainDevicePropertiesPreviouslyAddedToBuilder() {
         Device entity = Device.create("device", "deviceClass")
-                .addDeviceProperty("name1", "value", "category", null)
-                .addDeviceProperty("name2", "value", "category", null)
+                .addPropertyForTagId("name1", 2L)
+                .addPropertyForTagId("name2", 3L)
                 .build();
         Assert.assertEquals(2, entity.getDeviceProperties().getDeviceProperties().size());
     }
@@ -40,15 +33,15 @@ public class DeviceBuilderTest {
     @Test(expected = IllegalArgumentException.class)
     public void addingTwoDevicePropertiesWithSameNameShouldThrowError() {
         Device.create("device", "deviceClass")
-                .addDeviceProperty("name", "value", "category", null)
-                .addDeviceProperty("name", "value", "category", null);
+                .addPropertyForTagId("name", 2L)
+                .addPropertyForTagId("name", 3L);
     }
 
     @Test
-    public void addPropertyFieldToDevicePropertyShouldAddPrpertyFieldsToEntity() {
+    public void addPropertyFieldToDevicePropertyShouldAddPropertyFieldsToEntity() {
         Device entity = Device.create("device", "deviceClass")
-                .addDeviceProperty("parentName", "value", "category", null)
-                .addPropertyField("parentName", "fieldName", "fieldValue", "fieldCategory", "fieldResultType")
+                .createMappedProperty("parentName")
+                .addFieldForTagId("fieldName", 4L)
                 .build();
         DeviceProperty parentProperty = getDevicePropertyWithName(entity, "parentName");
         Assert.assertTrue(parentProperty.getFields().containsKey("fieldName"));
@@ -57,54 +50,37 @@ public class DeviceBuilderTest {
     @Test
     public void addPropertyFieldsToBuilderShouldAddAllPropertyFieldsToEntity() {
         Device entity = Device.create("device", "deviceClass")
-                .addDeviceProperty("parentName", "value", "category", null)
-                .addPropertyField("parentName", "fieldName1", "fieldValue", "fieldCategory", "fieldResultType")
-                .addPropertyField("parentName", "fieldName2", "fieldValue", "fieldCategory", "fieldResultType")
+                .createMappedProperty("parentName")
+                .addFieldForTagId("fieldName1", 1L)
+                .addFieldForTagId("fieldName2", 2L)
                 .build();
         DeviceProperty parentProperty = getDevicePropertyWithName(entity, "parentName");
         Assert.assertTrue(parentProperty.getFields().containsKey("fieldName1") && parentProperty.getFields().containsKey("fieldName2"));
     }
 
     @Test
-    public void addPropertyFieldsToBuilderShouldAddOnlyAddedPropertyFieldsToEntity() {
-        Device entity = Device.create("device", "deviceClass")
-                .addDeviceProperty("parentName", "value", "category", null)
-                .addPropertyField("parentName", "fieldName1", "fieldValue", "fieldCategory", "fieldResultType")
-                .addPropertyField("parentName", "fieldName2", "fieldValue", "fieldCategory", "fieldResultType")
-                .build();
-        DeviceProperty parentProperty = getDevicePropertyWithName(entity, "parentName");
-        Assert.assertEquals(2, parentProperty.getFields().size());
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void addPropertyFieldToNonExistentDevicePropertyShouldThrowError() {
-        Device.create("device", "deviceClass")
-                .addPropertyField("parentName", "fieldName", "fieldValue", "fieldCategory", "fieldResultType");
-    }
-
-    @Test
     public void addDeviceCommandToBuilderShouldAddCommandToEntity() {
         Device entity = Device.create("device", "deviceClass")
-                .addDeviceCommand("name", "value", "category", null)
+                .addCommand("name", 1L)
                 .build();
-        Assert.assertTrue(deviceElementListContains(entity.getDeviceCommands().getDeviceCommands(), "name", "value", "category"));
+        Assert.assertTrue(deviceElementListContains(entity.getDeviceCommands().getDeviceCommands(), "name", String.valueOf(1L), "commandTagId"));
     }
 
     @Test
     public void addCommandsToBuilderShouldAddAllCommandsToEntity() {
         Device entity = Device.create("device", "deviceClass")
-                .addDeviceCommand("name1", "value", "category", null)
-                .addDeviceCommand("name2", "value", "category", null)
+                .addCommand("name1", 1L)
+                .addCommand("name2", 2L)
                 .build();
-        Assert.assertTrue(deviceElementListContains(entity.getDeviceCommands().getDeviceCommands(), "name1", "value", "category"));
-        Assert.assertTrue(deviceElementListContains(entity.getDeviceCommands().getDeviceCommands(), "name2", "value", "category"));
+        Assert.assertTrue(deviceElementListContains(entity.getDeviceCommands().getDeviceCommands(), "name1", String.valueOf(1L), "commandTagId"));
+        Assert.assertTrue(deviceElementListContains(entity.getDeviceCommands().getDeviceCommands(), "name2", String.valueOf(2L), "commandTagId"));
     }
 
     @Test
     public void entityShouldOnlyContainCommandsPreviouslyAddedToBuilder() {
         Device entity = Device.create("device", "deviceClass")
-                .addDeviceCommand("name1", "value", "category", null)
-                .addDeviceCommand("name2", "value", "category", null)
+                .addCommand("name1", 1L)
+                .addCommand("name2", 2L)
                 .build();
         Assert.assertEquals(2, entity.getDeviceCommands().getDeviceCommands().size());
     }
@@ -113,8 +89,8 @@ public class DeviceBuilderTest {
     @Test(expected = IllegalArgumentException.class)
     public void addingTwoCommandsWithSameNameShouldThrowError() {
         Device.create("device", "deviceClass")
-                .addDeviceCommand("name", "value", "category", null)
-                .addDeviceCommand("name", "value", "category", null);
+                .addCommand("name", 1L)
+                .addCommand("name", 2L);
     }
 
     private <T extends DeviceElement> boolean deviceElementListContains(List<T> elements, final String name, final String value, final String category) {

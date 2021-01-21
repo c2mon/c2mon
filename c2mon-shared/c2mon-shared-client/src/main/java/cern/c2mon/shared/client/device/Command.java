@@ -18,8 +18,7 @@ package cern.c2mon.shared.client.device;
 
 import java.io.Serializable;
 
-import org.simpleframework.xml.Attribute;
-import org.simpleframework.xml.Element;
+import lombok.NoArgsConstructor;
 
 /**
  * Simple XML mapper bean representing a device class command. Used when
@@ -27,18 +26,21 @@ import org.simpleframework.xml.Element;
  *
  * @author Justin Lewis Salmon
  */
-public class Command implements Serializable, DeviceClassElement {
+@NoArgsConstructor
+public class Command extends DeviceClassElement implements Serializable {
 
   private static final long serialVersionUID = -6943334662697273304L;
 
-  @Attribute
-  private Long id;
-
-  @Attribute
-  private String name;
-
-  @Element(required = false)
-  private String description;
+  /**
+   * Constructor to use during command creation requests.
+   *
+   * @param name the name of the command
+   * @param description the command description
+   */
+  public Command(final String name, final String description) {
+    this.name = name;
+    this.description = description;
+  }
 
   /**
    * Create a new Command
@@ -53,40 +55,4 @@ public class Command implements Serializable, DeviceClassElement {
     this.description = description;
   }
 
-  /**
-   * Default constructor used during deserialization
-   */
-  public Command() {
-  }
-
-  /**
-   * Constructor to use during command creation requests.
-   *
-   * @param name the name of the command
-   * @param description the command description
-   */
-  public Command(final String name, final String description) {
-    this.name = name;
-    this.description = description;
-  }
-
-  @Override
-  public String getName() {
-    return name;
-  }
-
-  @Override
-  public String getDescription() {
-    return description;
-  }
-
-  @Override
-  public Long getId() {
-    return id;
-  }
-
-  @Override
-  public void setId(Long id) {
-    this.id = id;
-  }
 }

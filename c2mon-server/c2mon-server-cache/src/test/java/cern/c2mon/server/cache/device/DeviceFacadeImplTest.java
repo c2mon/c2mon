@@ -114,8 +114,8 @@ public class DeviceFacadeImplTest {
     deviceClassReturn.setDeviceIds(deviceIds);
 
     DeviceCacheObject device1 = new DeviceCacheObject(1000L, "test_device_1", 1L);
-    device1.setDeviceProperties(new ArrayList<>(Arrays.asList(new DeviceProperty(10L, "test_property", "10", "tagId", null))));
-    device1.setDeviceCommands(new ArrayList<>(Arrays.asList(new DeviceCommand(10L, "test_command", "20", "commandTagId", null))));
+    device1.setDeviceProperties(new ArrayList<>(Arrays.asList(DeviceProperty.forTagId(10L, "test_property", 10L))));
+    device1.setDeviceCommands(new ArrayList<>(Arrays.asList(DeviceCommand.forCommandTagId(10L, "test_command", 20L))));
     Device device2 = new DeviceCacheObject(2000L, "test_device_2", 1L);
 
     List<Device> deviceReturn = new ArrayList<>();
@@ -264,19 +264,19 @@ public class DeviceFacadeImplTest {
     Assert.assertTrue(device.getDeviceClassId() == 400L);
 
     Assert.assertTrue(device.getDeviceProperties().size() == 3);
-    assertDevicePropertyListContains(device.getDeviceProperties(), new DeviceProperty(1L, "TEST_PROPERTY_1", "100430", "tagId", null));
-    assertDevicePropertyListContains(device.getDeviceProperties(), new DeviceProperty(2L, "TEST_PROPERTY_2", "100431", "tagId", null));
+    assertDevicePropertyListContains(device.getDeviceProperties(), DeviceProperty.forTagId(1L, "TEST_PROPERTY_1", 100430L));
+    assertDevicePropertyListContains(device.getDeviceProperties(), DeviceProperty.forTagId(2L, "TEST_PROPERTY_2", 100431L));
 
     List<DeviceProperty> expectedFields = new ArrayList<>();
-    expectedFields.add(new DeviceProperty(1L, "field1", "987654", "tagId", "String"));
-    expectedFields.add(new DeviceProperty(2L, "field2", "Mr. Administrator", "constantValue", "String"));
-    expectedFields.add(new DeviceProperty(3L, "field3", "(#123 + #234) / 2", "clientRule", "Float"));
-    expectedFields.add(new DeviceProperty(4L, "field4", "4", "constantValue", "Integer"));
-    assertDevicePropertyListContains(device.getDeviceProperties(), new DeviceProperty(3L, "TEST_PROPERTY_WITH_FIELDS", "mappedProperty", expectedFields));
+    expectedFields.add(DeviceProperty.forTagId(1L, "field1", 987654L));
+    expectedFields.add(DeviceProperty.forConstantValue(2L, "field2", "Mr. Administrator"));
+    expectedFields.add(DeviceProperty.forClientRule(3L, "field3", "(#123 + #234) / 2", ResultType.Float));
+    expectedFields.add(DeviceProperty.forConstantValue(4L, "field4", 4, ResultType.Integer));
+    assertDevicePropertyListContains(device.getDeviceProperties(), DeviceProperty.forMappedProperty(3L, "TEST_PROPERTY_WITH_FIELDS", expectedFields));
 
     Assert.assertTrue(device.getDeviceCommands().size() == 2);
-    assertDeviceCommandListContains(device.getDeviceCommands(), new DeviceCommand(1L, "TEST_COMMAND_1", "4287", "commandTagId", null));
-    assertDeviceCommandListContains(device.getDeviceCommands(), new DeviceCommand(2L, "TEST_COMMAND_2", "4288", "commandTagId", null));
+    assertDeviceCommandListContains(device.getDeviceCommands(), DeviceCommand.forCommandTagId(1L, "TEST_COMMAND_1", 4287L));
+    assertDeviceCommandListContains(device.getDeviceCommands(), DeviceCommand.forCommandTagId(2L, "TEST_COMMAND_2", 4288L));
 
     // Test XML parser throws exception with invalid XML
     deviceProperties.put("deviceProperties", "invalid XML string");

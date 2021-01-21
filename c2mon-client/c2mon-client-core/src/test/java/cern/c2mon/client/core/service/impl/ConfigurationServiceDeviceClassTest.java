@@ -23,8 +23,7 @@ import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.api.device.Device;
 import cern.c2mon.shared.client.configuration.api.device.DeviceClass;
-import cern.c2mon.shared.client.device.DeviceProperty;
-import cern.c2mon.shared.client.device.Property;
+import cern.c2mon.shared.client.device.ResultType;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -37,7 +36,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
 
 /**
  * These integrations tests require the current branch's C2MON server to be running in the background.
@@ -129,13 +127,23 @@ public class ConfigurationServiceDeviceClassTest {
     public void testCreateDeviceWithPropertyAndCommand() {
         String date = LocalTime.now().format(formatter);
         DeviceClass deviceClass = DeviceClass.create("devClass: " + date)
-                .addCommand("testcmd", "testcmddesc")
-                .addProperty("testprop", "testpropdesc")
+                .addCommand("command", "a command")
+                .addProperty("constant_value_property", "a property for constant values")
+                .addProperty("mapped_property", "a mapped property")
+                .addField("mapped_property", "client_rule_field", "client rule field for mapped_property")
+                .addField("mapped_property", "tag_id_field", "tag ID field for mapped_property")
+                .addProperty("mapped_property_2", "another mapped property")
+                .addField("mapped_property_2", "constant_value_field", "constant value field for mapped_property_2")
                 .build();
         configurationService.createDeviceClass(deviceClass);
         Device device = Device.create("device: " + date, "devClass: " + date)
-                .addDeviceCommand("testcmd", "1", "testdevcmd", null)
-                .addDeviceProperty("testprop", "2", "testdevprop", null)
+                .addCommand("command", 1L)
+                .addPropertyForConstantValue("constant_value_property", "2L", ResultType.Long)
+                .createMappedProperty("mapped_property")
+                .addFieldForClientRule("client_rule_field", "A RULE", ResultType.Integer)
+                .addFieldForTagId("tag_id_field", 3L)
+                .createMappedProperty("mapped_property_2")
+                .addFieldForConstantValue("constant_value_field", "A VALUE", ResultType.String)
                 .build();
         ConfigurationReport report = configurationService.createDevice(device);
         log.info("Report: {}, {}", report.getStatus(), report.getStatusDescription());
@@ -146,18 +154,17 @@ public class ConfigurationServiceDeviceClassTest {
     @Ignore
     public void testCreateDeviceWithFields() {
         String date = LocalTime.now().format(formatter);
-        Property field = new Property("field1", "field");
         DeviceClass deviceClass = DeviceClass.create("devClass: " + date)
-                .addProperty("prop1", "property with field")
-                .addField("prop1", "field1", "field")
+                .addProperty("parent property", "property with field")
+                .addField("parent property", "field1", "field")
                 .build();
         ConfigurationReport report = configurationService.createDeviceClass(deviceClass);
 
         log.info("Report: {}, {}", report.getStatus(), report.getStatusDescription());
 
         Device device = Device.create("device: " + date, "devClass: " + date)
-                .addDeviceProperty("prop1", "9", "category", null)
-                .addPropertyField("prop1","field1", "5", "", null)
+                .createMappedProperty("parent property")
+                .addFieldForTagId("field1", 5L)
                 .build();
         report = configurationService.createDevice(device);
 
@@ -176,6 +183,22 @@ public class ConfigurationServiceDeviceClassTest {
         configurationService.createDeviceClass(deviceClass);
 
         ConfigurationReport report = configurationService.removeDeviceClass(tmpName);
+        Assert.assertEquals(ConfigConstants.Status.OK, report.getStatus());
+    }
+
+    @Test
+    @Ignore
+    public void testCascadingRemove() {
+        String deviceClassName = "testRemoveDeviceClass";
+        DeviceClass deviceClass = DeviceClass.create(deviceClassName)
+                .addCommand("removeCommand", "description")
+                .addProperty("removeProperty", "description")
+                .build();
+        configurationService.createDeviceClass(deviceClass);
+        configurationService.createDevice("DEVICE_1", deviceClassName);
+        configurationService.createDevice("DEVICE_2", deviceClassName);
+
+        ConfigurationReport report = configurationService.removeDeviceClass(deviceClassName);
         Assert.assertEquals(ConfigConstants.Status.OK, report.getStatus());
     }
 

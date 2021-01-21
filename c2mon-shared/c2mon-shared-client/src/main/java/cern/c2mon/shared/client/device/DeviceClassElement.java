@@ -1,35 +1,34 @@
 package cern.c2mon.shared.client.device;
 
+import lombok.Getter;
+import lombok.Setter;
+import org.simpleframework.xml.Attribute;
+import org.simpleframework.xml.Element;
+
 /**
  * Interface defining a DeviceProperty, PropertyField or DeviceCommand.
  */
-public interface DeviceClassElement {
+public abstract class DeviceClassElement {
 
     /**
-     * Get the unique ID of the Device Class element.
-     *
-     * @return the name of the element
+     * The unique ID of the property, command or field.
      */
-    Long getId();
+    @Attribute
+    @Getter
+    @Setter
+    protected Long id;
 
     /**
-     * Sets the unique ID of the Device Class element.
-     *
-     * @param id the name of the element
+     * The name of the command, property or field. It must be unique within the DeviceClass.
      */
-    void setId(Long id);
+    @Attribute
+    @Getter
+    protected String name;
 
     /**
-     * Get the unique name of the Device Class element.
-     *
-     * @return the name of the element
+     * An optional description of the command, property or field.
      */
-    String getName();
-
-    /**
-     * Get the description of the Device Class element.
-     *
-     * @return the description of the element
-     */
-    String getDescription();
+    @Element(required = false)
+    @Getter
+    protected String description;
 }

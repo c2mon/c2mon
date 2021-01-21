@@ -16,164 +16,124 @@
  *****************************************************************************/
 package cern.c2mon.shared.client.device;
 
-import java.io.Serializable;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.simpleframework.xml.Attribute;
-import org.simpleframework.xml.Element;
+import lombok.NoArgsConstructor;
 import org.simpleframework.xml.ElementList;
 
 /**
- * Simple XML mapper bean representing a device property. Used when
- * deserialising device properties during configuration.
- *
- * @author Justin Lewis Salmon
+ * Simple XML mapper bean representing a device property. Used when serializing and deserialising device properties
+ * during configuration.
  */
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-public class DeviceProperty implements Cloneable, Serializable, DeviceElement {
+@NoArgsConstructor
+public class DeviceProperty extends DeviceElement {
 
-    /**
-     * ID, since serializable.
-     */
-    private static final long serialVersionUID = -3714996315363505073L;
-
-    /**
-     * The unique ID of the property (matches ID from parent device class property).
-     */
-    @Attribute
-    private Long id;
-
-    /**
-     * The unique name of the property (matches name from parent device class).
-     */
-    @Attribute
-    private String name;
-
-    /**
-     * The actual value of this property.
-     */
-    @Element(required = false, name = "value")
-    private String value;
-
-    /**
-     * The category of this property (e.g. "tagId", "clientRule", "constantValue").
-     */
-    @Element(required = false, name = "category")
-    private String category;
-
-    /**
-     * The result type of this property (for rules and constant values)
-     */
-    @Element(required = false, name = "result-type")
-    private String resultType = "String";
-
+    private static final long serialVersionUID = 889764022662498560L;
     /**
      * The list of nested fields of this property.
      */
     @ElementList(required = false, name = "PropertyFields")
     private List<DeviceProperty> fields = new ArrayList<>();
 
+
     /**
-     * Default constructor. A <code>DeviceProperty</code> can be a tag ID, a
-     * client rule, a constant value, or something else. For client rules and
-     * constant values, it is possible to specify the type of the resulting value.
+     * Creates a device property with the category "tagId". The result type of device property defaults to String.
      *
-     * @param id         the unique ID of the property
-     * @param name       the unique name of this property
-     * @param value      the actual value of this property
-     * @param category   the category of this property (e.g. "tagId", "clientRule",
-     *                   "constantValue")
-     * @param resultType the result type of this property (for rules and constant
-     *                   values). Defaults to {@link String}.
+     * @param id    the unique ID of the parent command.
+     * @param name  the unique name of the parent property.
+     * @param value the ID of the Tag references by this device property
+     * @return the newly created device property of category "tagId".
      */
-    public DeviceProperty(final Long id, final String name, final String value, final String category, final String resultType) {
+    public static DeviceProperty forTagId(Long id, String name, Long value) {
+        return new DeviceProperty(id, name, String.valueOf(value), Category.tagId, null);
+    }
+
+    /**
+     * Create a new device property with the category "constantValue" of type "String".
+     *
+     * @param id    unique ID of the parent property. Can be null during configuration requests, in which case the server
+     *              will assign the appropriate ID by name.
+     * @param name  the name of the parent property.
+     * @param value the real constant value string.
+     * @return a new device property of category "constantValue".
+     */
+    public static DeviceProperty forConstantValue(Long id, String name, String value) {
+        return new DeviceProperty(id, name, value, Category.constantValue, null);
+    }
+
+    /**
+     * Create a new device property with the category "constantValue".
+     *
+     * @param id         unique ID of the parent property. Can be null during configuration requests, in which case the server
+     *                   will assign the appropriate ID by name.
+     * @param name       the name of the parent property.
+     * @param value      the real constant value
+     * @param resultType the result type of the constant value
+     * @param <T>        the java class corresponding to the result type.
+     * @return a new device property of category "constantValue".
+     */
+    public static <T> DeviceProperty forConstantValue(Long id, String name, T value, ResultType resultType) {
+        return new DeviceProperty(id, name, String.valueOf(value), Category.constantValue, resultType);
+    }
+
+    /**
+     * Create a new device property with the category "clientRule".
+     *
+     * @param id         unique ID of the parent property. Can be null during configuration requests, in which case the server
+     *                   will assign the appropriate ID by name.
+     * @param name       the name of the parent property.
+     * @param value      the real value of the client rule
+     * @param resultType the result type of the client rule
+     * @return a new device property of category "clientRule".
+     */
+    public static DeviceProperty forClientRule(Long id, String name, String value, ResultType resultType) {
+        return new DeviceProperty(id, name, value, Category.clientRule, resultType);
+    }
+
+    /**
+     * Create a new device property with the category "mappedProperty" and the default result type 'String'.
+     *
+     * @param id     unique ID of the parent property. Can be null during configuration requests, in which case the server
+     *               will assign the appropriate ID by name.
+     * @param name   the name of the parent property.
+     * @param fields An optional single-depth collections of nested properties which will be added as fields to the
+     *               mapped property.
+     * @return a new device property of category "mappedProperty".
+     */
+    public static DeviceProperty forMappedProperty(Long id, String name, List<DeviceProperty> fields) {
+        return new DeviceProperty(id, name, fields);
+    }
+
+    private DeviceProperty(final Long id, final String name, final String value, final Category category, final ResultType resultType) {
         this.id = id;
         this.name = name;
         this.value = value;
         this.category = category;
-
         if (resultType != null) {
             this.resultType = resultType;
         }
     }
 
+    private DeviceProperty(final Long id, final String name, final List<DeviceProperty> fields) {
+        this(id, name, null, Category.mappedProperty, null);
+        if (fields != null) {
+            this.fields = fields;
+        }
+    }
+
     /**
-     * Constructor to use during command creation requests. A <code>DeviceProperty</code> can be a tag ID, a client rule,
-     * a constant value, or something else. For client rules and constant values, it is possible to specify the type of
-     * the resulting value.
+     * Attempts to convert the string representation of the result type into a
+     * class object of the corresponding type.
      *
-     * @param name       the unique name of this property
-     * @param value      the actual value of this property
-     * @param category   the category of this property (e.g. "tagId", "clientRule",
-     *                   "constantValue")
-     * @param resultType the result type of this property (for rules and constant
-     *                   values). Defaults to {@link String}.
+     * @return the class of the result type
      */
-    public DeviceProperty(final String name, final String value, final String category, final String resultType) {
-        this(null, name, value, category, resultType);
-    }
-
-    /**
-     * Constructor that creates a mapped property.
-     *
-     * @param id       the unique ID of the property
-     * @param name     name the unique name of this property
-     * @param category category the category of this property (should be "mappedProperty")
-     * @param fields   the nested property fields
-     */
-    public DeviceProperty(final Long id, final String name, final String category, final List<DeviceProperty> fields) {
-        this.id = id;
-        this.name = name;
-        this.category = category;
-        this.fields = fields;
-    }
-
-    /**
-     * Constructor not used (needed for SimpleXML).
-     */
-    public DeviceProperty() {
-    }
-
-    @Override
-    public Long getId() {
-        return id;
-    }
-
-    @Override
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public String getValue() {
-        return value;
-    }
-
-    /**
-     * Set the value of this property.
-     *
-     * @param value the value to set
-     */
-    public void setValue(String value) {
-        this.value = value;
-    }
-
-    @Override
-    public String getCategory() {
-        return category;
+    public Class<?> getResultTypeClass() throws ClassNotFoundException {
+        // TODO: remove exception
+        return resultType.resultClass;
     }
 
     /**
@@ -210,26 +170,9 @@ public class DeviceProperty implements Cloneable, Serializable, DeviceElement {
      * @param field the field to set
      */
     public void setFields(DeviceProperty field) {
-        if (field.getName() != null || field.getId() != null) {
+        if (field != null && (field.getName() != null || field.getId() != null)) {
             this.fields.add(field);
         }
-    }
-
-    @Override
-    public String getResultType() {
-        return resultType;
-    }
-
-    /**
-     * Attempts to convert the string representation of the result type into a
-     * class object of the corresponding type.
-     *
-     * @return the class of the result type
-     * @throws ClassNotFoundException if the class cannot be created from the
-     *                                result type string
-     */
-    public Class<?> getResultTypeClass() throws ClassNotFoundException {
-        return Class.forName("java.lang." + resultType);
     }
 
     @Override

@@ -70,8 +70,8 @@ public class DeviceDAOTest {
     deviceToInsert.setId(9999L);
     deviceToInsert.setDeviceClassId(400L);
     deviceToInsert.setName("test_device_with_property");
-    DeviceProperty devFieldToInsert = new DeviceProperty(1L, "cpu_load", "220000", "tagId", null);
-    DeviceProperty devPropToInsert = new DeviceProperty(9L, "TEST_PROPERTY_WITH_FIELDS", null, Collections.singletonList(devFieldToInsert));
+    DeviceProperty devFieldToInsert = DeviceProperty.forTagId(1L, "cpu_load", 220000L);
+    DeviceProperty devPropToInsert = DeviceProperty.forMappedProperty(9L, "TEST_PROPERTY_WITH_FIELDS", Collections.singletonList(devFieldToInsert));
     deviceToInsert.setDeviceProperties(Collections.singletonList(devPropToInsert));
     deviceDAO.insert(deviceToInsert);
 
