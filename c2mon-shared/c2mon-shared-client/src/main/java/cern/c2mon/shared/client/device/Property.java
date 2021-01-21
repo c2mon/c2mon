@@ -20,7 +20,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import cern.c2mon.shared.client.configuration.api.util.IgnoreProperty;
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementList;
@@ -92,39 +91,40 @@ public class Property implements Serializable, DeviceClassElement {
     this.description = description;
   }
 
-  /**
-   * Constructor to use during property creation requests which will optionally set the fields of the property.
-   *
-   * @param name the name of the property
-   * @param description the property description
-   * @param fields the property fields
-   */
-  public Property(String name, String description, List<Property> fields) {
-    this.name = name;
-    this.description = description;
-    this.fields = fields;
-  }
-
+  @Override
   public Long getId() {
     return id;
   }
 
+  @Override
   public void setId(Long id) {
     this.id = id;
   }
 
+  @Override
   public String getName() {
     return name;
   }
 
+  @Override
   public String getDescription() {
     return description;
   }
 
+  /**
+   * Retrieve the raw fields of this property
+   *
+   * @return the raw fields
+   */
   public List<Property> getFields() {
     return fields;
   }
 
+  /**
+   * Retrieve the fields IDs of this property
+   *
+   * @return the field IDs
+   */
   public List<Long> getFieldIds() {
     List<Long> fieldIds = new ArrayList<>();
 

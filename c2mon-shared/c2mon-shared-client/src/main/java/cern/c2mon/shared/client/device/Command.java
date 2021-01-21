@@ -40,38 +40,52 @@ public class Command implements Serializable, DeviceClassElement {
   @Element(required = false)
   private String description;
 
+  /**
+   * Create a new Command
+   *
+   * @param id the unique ID of the command
+   * @param name the name of the command
+   * @param description the command description
+   */
   public Command(final Long id, final String name, final String description) {
     this.id = id;
     this.name = name;
     this.description = description;
   }
 
+  /**
+   * Default constructor used during deserialization
+   */
   public Command() {
   }
+
   /**
    * Constructor to use during command creation requests.
    *
    * @param name the name of the command
    * @param description the command description
    */
-
   public Command(final String name, final String description) {
     this.name = name;
     this.description = description;
   }
 
+  @Override
   public String getName() {
     return name;
   }
 
+  @Override
   public String getDescription() {
     return description;
   }
 
+  @Override
   public Long getId() {
     return id;
   }
 
+  @Override
   public void setId(Long id) {
     this.id = id;
   }

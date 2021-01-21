@@ -33,14 +33,25 @@ public class DevicePropertyList extends DeviceClassOrDeviceSerializableElement {
   @ElementList(entry = "DeviceProperty", inline = true, required = false)
   private Collection<DeviceProperty> deviceProperties = new HashSet<>();
 
+  /**
+   * Create a new wrapper bean for the referenced device properties
+   * @param deviceProperties the device properties to wrap
+   */
   public DevicePropertyList(Collection<DeviceProperty> deviceProperties) {
     this.deviceProperties = deviceProperties;
   }
 
+  /**
+   * Default constructor used during deserialization
+   */
   public DevicePropertyList() {
     super();
   }
 
+  /**
+   * Get the unwrapped device properties in a mutable list
+   * @return the unwrapped device properties in a mutable list
+   */
   public List<DeviceProperty> getDeviceProperties() {
     return new ArrayList<>(deviceProperties);
   }
