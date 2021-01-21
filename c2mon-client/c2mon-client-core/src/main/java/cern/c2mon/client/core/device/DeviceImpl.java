@@ -19,6 +19,7 @@ package cern.c2mon.client.core.device;
 import java.util.*;
 import java.util.Map.Entry;
 
+import cern.c2mon.client.core.device.exception.ImproperDeviceException;
 import lombok.extern.slf4j.Slf4j;
 
 import cern.c2mon.client.common.tag.CommandTag;
@@ -27,7 +28,6 @@ import cern.c2mon.client.core.device.listener.DeviceUpdateListener;
 import cern.c2mon.client.core.device.property.*;
 import cern.c2mon.client.core.tag.ClientRuleTag;
 import cern.c2mon.shared.client.device.DeviceProperty;
-import cern.c2mon.shared.rule.RuleFormatException;
 
 /**
  * This class represents the <code>Device</code> aspect of the
@@ -233,11 +233,10 @@ public class DeviceImpl implements Device, Cloneable {
    *
    * @param deviceProperties the properties to set
    *
-   * @throws RuleFormatException if a property is a client rule and is malformed
-   * @throws ClassNotFoundException if the result type of a property cannot be
-   *           found
+   * @throws ImproperDeviceException if the {@link DeviceProperty} is malformed (either invalid result type field or
+   *                                 an invalid client rule field
    */
-  protected void setDeviceProperties(List<DeviceProperty> deviceProperties) throws RuleFormatException, ClassNotFoundException {
+  protected void setDeviceProperties(List<DeviceProperty> deviceProperties) throws ImproperDeviceException {
     for (DeviceProperty deviceProperty : deviceProperties) {
       this.deviceProperties.put(deviceProperty.getName(), PropertyFactory.createProperty(deviceProperty));
     }
@@ -275,7 +274,7 @@ public class DeviceImpl implements Device, Cloneable {
   /**
    * Manually set the commands of this device.
    *
-   * @param commands
+   * @param commands the commands to set for the device
    */
   public void setDeviceCommands(Map<String, CommandTag<?>> commands) {
     this.deviceCommands = commands;

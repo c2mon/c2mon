@@ -28,7 +28,7 @@ import org.simpleframework.xml.Root;
  * @author Justin Lewis Salmon
  */
 @Root(name = "DeviceCommands")
-public class DeviceCommandList extends DeviceClassOrDeviceSerializableElement {
+public class DeviceCommandList implements DeviceClassOrDeviceSerializableElement {
 
   @ElementList(entry = "DeviceCommand", inline = true, required = false)
   private Collection<DeviceCommand> deviceCommands = new HashSet<>();

@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 
 import javax.jms.JMSException;
 
+import cern.c2mon.client.core.device.exception.ImproperDeviceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -73,7 +74,7 @@ public class DeviceManager implements DeviceService, TagListener {
    * Set of {@link ListenerWrapper} objects which wrap a
    * {@link DeviceUpdateListener} and a set of {@link Device}s.
    */
-  private Set<ListenerWrapper> deviceUpdateListeners = new ConcurrentSet<>();
+  private final Set<ListenerWrapper> deviceUpdateListeners = new ConcurrentSet<>();
 
   /**
    * Default Constructor, used by Spring to instantiate the Singleton service.
@@ -119,7 +120,7 @@ public class DeviceManager implements DeviceService, TagListener {
 
     try {
       // Ask the server for the device
-      Collection<TransferDevice> serverResponse = requestHandler.getDevices(new HashSet<>(Arrays.asList(info)));
+      Collection<TransferDevice> serverResponse = requestHandler.getDevices(new HashSet<>(Collections.singletonList(info)));
 
       // Convert the response object into a client device
       for (TransferDevice transferDevice : serverResponse) {
@@ -484,7 +485,7 @@ public class DeviceManager implements DeviceService, TagListener {
     try {
       // Set the properties
       device.setDeviceProperties(transferDevice.getDeviceProperties());
-    } catch (Exception e) {
+    } catch (ImproperDeviceException e) {
       log.error("Received property containing incorrect result type from the server. The device {} with with id {} could not be added to the list.", device.getName(), device.getId(), e);
     }
 

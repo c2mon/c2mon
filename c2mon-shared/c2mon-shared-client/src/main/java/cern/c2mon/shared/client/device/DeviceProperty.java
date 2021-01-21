@@ -18,6 +18,7 @@ package cern.c2mon.shared.client.device;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -233,10 +234,19 @@ public class DeviceProperty implements Cloneable, Serializable, DeviceElement {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof DeviceProperty)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof DeviceProperty)) {
+            return false;
+        }
         DeviceProperty that = (DeviceProperty) o;
-        return Objects.equals(getId(), that.getId()) && Objects.equals(getName(), that.getName()) && Objects.equals(getValue(), that.getValue()) && Objects.equals(getCategory(), that.getCategory()) && Objects.equals(getResultType(), that.getResultType()) && Objects.equals(getFields(), that.getFields());
+        return Objects.equals(getId(), that.getId()) &&
+                Objects.equals(getName(), that.getName()) &&
+                Objects.equals(getValue(), that.getValue()) &&
+                Objects.equals(getCategory(), that.getCategory()) &&
+                Objects.equals(getResultType(), that.getResultType()) &&
+                Objects.equals(getFields(), that.getFields());
     }
 
     @Override

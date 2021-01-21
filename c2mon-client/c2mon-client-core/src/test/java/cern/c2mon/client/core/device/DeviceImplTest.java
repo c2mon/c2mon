@@ -19,6 +19,7 @@ package cern.c2mon.client.core.device;
 
 import java.util.*;
 
+import cern.c2mon.client.core.device.exception.ImproperDeviceException;
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;
@@ -56,7 +57,7 @@ public class DeviceImplTest {
   }
 
   @Test
-  public void testLazyLoadDeviceProperty() throws RuleFormatException, ClassNotFoundException {
+  public void testLazyLoadDeviceProperty() throws ImproperDeviceException {
     // Reset the mock
     EasyMock.reset(tagServiceMock);
 
@@ -144,7 +145,7 @@ public class DeviceImplTest {
   }
 
   @Test
-  public void testLazyLoadDeviceProperties() throws RuleFormatException, ClassNotFoundException {
+  public void testLazyLoadDeviceProperties() throws RuleFormatException, ImproperDeviceException {
     // Reset the mock
     EasyMock.reset(tagServiceMock);
 
@@ -258,7 +259,7 @@ public class DeviceImplTest {
   }
 
   @Test
-  public void testRuleUpdate() throws RuleFormatException, ClassNotFoundException, InterruptedException {
+  public void testRuleUpdate() throws RuleFormatException, ImproperDeviceException {
     // Reset the mock
     EasyMock.reset(tagServiceMock);
 
@@ -352,7 +353,7 @@ public class DeviceImplTest {
   }
 
   @Test
-  public void testLazyLoadDevicePropertyFields() throws RuleFormatException, ClassNotFoundException {
+  public void testLazyLoadDevicePropertyFields() throws RuleFormatException, ImproperDeviceException {
     // Reset the mock
     EasyMock.reset(tagServiceMock);
 

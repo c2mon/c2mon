@@ -38,7 +38,7 @@ import static cern.c2mon.client.core.configuration.util.ConfigurationUtil.valida
 @Service("deviceConfigurationManager")
 public class DeviceConfigurationManagerImpl implements DeviceConfigurationManager {
 
-  private ConfigurationRequestSender configurationRequestSender;
+  private final ConfigurationRequestSender configurationRequestSender;
 
   @Autowired
   DeviceConfigurationManagerImpl(ConfigurationRequestSender configurationRequestSender) {
