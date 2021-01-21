@@ -128,29 +128,17 @@ public class DeviceCommand implements Cloneable, Serializable, DeviceElement {
     this.name = name;
   }
 
-  /**
-   * Get the value of this command.
-   *
-   * @return the client rule string
-   */
+  @Override
   public String getValue() {
     return value;
   }
 
-  /**
-   * Get the category of this command.
-   *
-   * @return the constant value
-   */
+  @Override
   public String getCategory() {
     return category;
   }
 
-  /**
-   * Get the raw result type string of this command.
-   *
-   * @return the result type
-   */
+  @Override
   public String getResultType() {
     return resultType;
   }

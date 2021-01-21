@@ -33,14 +33,25 @@ public class CommandList extends DeviceClassOrDeviceSerializableElement {
   @ElementList(entry = "Command", inline = true, required = false)
   private Collection<Command> commands = new HashSet<>();
 
+  /**
+   * Create a new wrapper bean for the referenced commands
+   * @param commands the commands to wrap
+   */
   public CommandList(Collection<Command> commands) {
     this.commands = commands;
   }
 
+  /**
+   * Default constructor used during deserialization
+   */
   public CommandList() {
     super();
   }
 
+  /**
+   * Get the unwrapped commands in a mutable list
+   * @return the unwrapped commands in a mutable list
+   */
   public List<Command> getCommands() {
     return new ArrayList<>(commands);
   }
