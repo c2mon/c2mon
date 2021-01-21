@@ -70,7 +70,7 @@ public class DeviceConfigurationManagerTest {
 
     @Test
     public void createDeviceByDeviceShouldReturnSameObject() {
-        Device expected = new Device.CreateBuilder(String.valueOf(System.currentTimeMillis()), "devClassName").build();
+        Device expected = Device.create(String.valueOf(System.currentTimeMillis()), "devClassName").build();
         Capture<Configuration> c = newCapture();
         expect(configurationRequestSenderMock.applyConfiguration(and(capture(c), isA(Configuration.class)), anyObject()))
                 .andReturn(new ConfigurationReport())
@@ -83,7 +83,7 @@ public class DeviceConfigurationManagerTest {
 
     @Test
     public void createDeviceShouldCreateOnlyOneDeviceObject() {
-        Device deviceClass = new Device.CreateBuilder(String.valueOf(System.currentTimeMillis()), "devClassName").build();
+        Device deviceClass = Device.create(String.valueOf(System.currentTimeMillis()), "devClassName").build();
         Capture<Configuration> c = newCapture();
         expect(configurationRequestSenderMock.applyConfiguration(and(capture(c), isA(Configuration.class)), anyObject()))
                 .andReturn(new ConfigurationReport())
@@ -98,7 +98,7 @@ public class DeviceConfigurationManagerTest {
     @Test
     public void createDeviceWithDevicePropertyShouldReturnDeviceProperty() {
         DeviceProperty prop = new DeviceProperty("name", "value", "category", null);
-        Device expected = new Device.CreateBuilder(String.valueOf(System.currentTimeMillis()), "devClassName")
+        Device expected = Device.create(String.valueOf(System.currentTimeMillis()), "devClassName")
                 .addDeviceProperty(prop)
                 .build();
         Capture<Configuration> c = newCapture();
@@ -117,7 +117,7 @@ public class DeviceConfigurationManagerTest {
         DeviceProperty p1 = new DeviceProperty("name1", "value1", "category1", null);
         DeviceProperty p2 = new DeviceProperty("name2", "value1", "category1", null);
         DeviceProperty p3 = new DeviceProperty("name3", "value1", "category1", null);
-        Device expected = new Device.CreateBuilder(String.valueOf(System.currentTimeMillis()), "devClassName")
+        Device expected = Device.create(String.valueOf(System.currentTimeMillis()), "devClassName")
                 .addDeviceProperty(p1, p2, p3)
                 .build();
         Capture<Configuration> c = newCapture();
@@ -134,7 +134,7 @@ public class DeviceConfigurationManagerTest {
     @Test
     public void createDeviceWithDeviceCommandShouldReturnDeviceCommand() {
         DeviceCommand cmd = new DeviceCommand("name", "value", "category", null);
-        Device expected = new Device.CreateBuilder(String.valueOf(System.currentTimeMillis()), "devClassName")
+        Device expected = Device.create(String.valueOf(System.currentTimeMillis()), "devClassName")
                 .addDeviceCommand(cmd)
                 .build();
         Capture<Configuration> c = newCapture();
@@ -153,7 +153,7 @@ public class DeviceConfigurationManagerTest {
         DeviceCommand p1 = new DeviceCommand("name1", "value1", "category1", null);
         DeviceCommand p2 = new DeviceCommand("name2", "value1", "category1", null);
         DeviceCommand p3 = new DeviceCommand("name3", "value1", "category1", null);
-        Device expected = new Device.CreateBuilder(String.valueOf(System.currentTimeMillis()), "devClassName")
+        Device expected = Device.create(String.valueOf(System.currentTimeMillis()), "devClassName")
                 .addDeviceCommand(p1, p2, p3)
                 .build();
         Capture<Configuration> c = newCapture();
