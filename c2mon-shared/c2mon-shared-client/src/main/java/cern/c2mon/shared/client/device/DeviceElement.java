@@ -1,54 +1,90 @@
 package cern.c2mon.shared.client.device;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.Setter;
+import org.simpleframework.xml.Attribute;
+import org.simpleframework.xml.Element;
+
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Optional;
+
 /**
  * Interface defining a DeviceProperty, PropertyField or DeviceCommand. Each DeviceElement must correspond to a
  * {@link DeviceClassElement} by ID and name.
  */
-public interface DeviceElement {
+public abstract class DeviceElement implements Cloneable, Serializable {
+
+    private static final long serialVersionUID = -6865580729113685166L;
 
     /**
-     * Get the unique ID of the Device element.
-     *
-     * @return the name of the element
+     * The category of the command, property or field. The constants are spelt as they are stored in the database.
      */
-    Long getId();
+    enum Category { tagId, commandTagId, clientRule, constantValue, mappedProperty }
 
     /**
-     * Sets the unique ID of the Device element.
-     *
-     * @param id the name of the element
+     * The unique ID of the parent command, property or field.
      */
-    void setId(Long id);
+    @Attribute
+    @Setter
+    @Getter
+    protected Long id;
 
     /**
-     * Fet the unique name of the Device element.
-     *
-     * @return the name of the element
+     * The unique name of the parent command, property or field to whom the device element gives values.
      */
-    String getName();
+    @Attribute
+    @Getter
+    protected String name;
 
     /**
-     * Set the unique name of the Device element.
-     *
-     * @param name the name of the element
+     * The real value of this device command, device property or property field.
      */
-    void setName(String name);
+    @Element(required = false, name = "value")
+    @Getter
+    @Setter
+    protected String value;
 
     /**
-     * Get the actual value of this Device element
-     * @return the actual value of this Device element
+     * The category of this device command, device property or property field.
      */
-    String getValue();
+    @Element(required = false, name = "category")
+    protected Category category = Category.tagId;
+
 
     /**
-     * Get the category of this Device element (e.g "tagId", "clientRule", "constantValue", "commandTagId")
-     * @return the category of the Device element
+     * The resulting value type of this device command, device property or property field. Defaults to String.
      */
-    String getCategory();
+    @Element(required = false, name = "result-type")
+    protected ResultType resultType = ResultType.String;
+
+    @JsonProperty("result-type")
+    public String getResultType() {
+        return resultType.name();
+    }
+
+    @JsonProperty("result-type")
+    public void setResultType(String label) {
+        resultType = ResultType.getOrDefault(label);
+    }
 
     /**
-     * Get the result type of this Device element
-     * @return the result type of the Device element
+     * Get the String name of the category instead of the enum for reasons of serialization.
+     * @return the category name as it shall be saved in the database.
      */
-    String getResultType();
+    public String getCategory() {
+        return category.toString();
+    }
+
+    public void setCategory(String category) {
+        Optional<Category> matchingCategory = Arrays.stream(Category.values())
+                .filter(c -> c.toString().equalsIgnoreCase(category))
+                .findFirst();
+        if (matchingCategory.isPresent()) {
+            this.category = matchingCategory.get();
+        } else {
+            throw new IllegalArgumentException("No category found for name " + category + ".");
+        }
+    }
 }

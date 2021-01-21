@@ -19,9 +19,12 @@ package cern.c2mon.shared.client.configuration.api.device;
 import cern.c2mon.shared.client.configuration.api.util.ConfigurationEntity;
 import cern.c2mon.shared.client.configuration.api.util.IgnoreProperty;
 import cern.c2mon.shared.client.device.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.util.Assert;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -108,22 +111,12 @@ public class Device implements ConfigurationEntity {
     /**
      * Builder class for device configuration objects which should be newly created on the server
      */
+    @AllArgsConstructor(access = AccessLevel.PROTECTED)
     public static class CreateBuilder {
-        private final Device deviceToBuild = new Device();
-        private final Map<String, DeviceProperty> deviceProperties = new ConcurrentHashMap<>();
-        private final Map<String, DeviceCommand> deviceCommands = new ConcurrentHashMap<>();
+        private Device deviceToBuild = new Device();
+        private Map<String, DeviceProperty> deviceProperties = new ConcurrentHashMap<>();
+        private Map<String, DeviceCommand> deviceCommands = new ConcurrentHashMap<>();
 
-        /**
-         * Create a new device with the given device class
-         *
-         * @param name            the name of the new device, must be unique within the device class
-         * @param deviceClassName the name uniquely identifying the device class on the server
-         */
-        CreateBuilder(String name, String deviceClassName) {
-            deviceToBuild.setName(name);
-            deviceToBuild.setClassName(deviceClassName);
-            deviceToBuild.setCreated(true);
-        }
 
         /**
          * Create a new device with the given device class
@@ -134,6 +127,18 @@ public class Device implements ConfigurationEntity {
         CreateBuilder(String name, long deviceClassId) {
             deviceToBuild.setName(name);
             deviceToBuild.setClassId(deviceClassId);
+            deviceToBuild.setCreated(true);
+        }
+
+        /**
+         * Create a new device with the given device class
+         *
+         * @param name            the name of the new device, must be unique within the device class
+         * @param deviceClassName the name uniquely identifying the device class on the server
+         */
+        CreateBuilder(String name, String deviceClassName) {
+            deviceToBuild.setName(name);
+            deviceToBuild.setClassName(deviceClassName);
             deviceToBuild.setCreated(true);
         }
 
@@ -150,63 +155,81 @@ public class Device implements ConfigurationEntity {
         }
 
         /**
-         * Creates a {@link DeviceProperty} adds it to the device. A device can implement only those properties
-         * contained in the parent class, but is not required to do so.
-         *
-         * @param name       the name of the device property. It must be unique within the device and correspond to a
-         *                   {@link Property} defined in the parent device class
-         * @param value      the concrete value of the property
-         * @param category   the category of this property (e.g. "tagId", "clientRule", "constantValue")
-         * @param resultType the result type of this property (for rules and constant values, defaults to String)
-         * @return the Device.CreateBuilder with the specified device property
-         */
-        public Device.CreateBuilder addDeviceProperty(String name, String value, String category, String resultType) {
-            Assert.isNull(deviceProperties.get(name),
-                    "A device property with name " + name + " was already added to the Device.");
-            this.deviceProperties.put(name, new DeviceProperty(name, value, category, resultType));
-            return this;
-        }
-
-        /**
-         * Creates a {@link DeviceProperty} from the given name and description, and adds it as a property field to the
-         * device property with the given propertyName. Property fields are concrete instances of fields, which are
-         * optional single-depth nested properties.
-         *
-         * @param propertyName the name of the parent property, must be unique within the device class. A device
-         *                     property with this name must already have been added to the device
-         * @param name         the name of the property field, must be unique within the property and device class
-         * @param value        the concrete value of the property
-         * @param category     the category of this property (e.g. "tagId", "clientRule", "constantValue")
-         * @param resultType   the result type of this property (for rules and constant values, defaults to String)
-         * @return the Device.CreateBuilder with the specified property field added to the parent device property
-         */
-        public Device.CreateBuilder addPropertyField(String propertyName, String name, String value, String category, String resultType) {
-            DeviceProperty parentProperty = deviceProperties.get(propertyName);
-            Assert.notNull(parentProperty,
-                    "No device property with the name {} has been added to the Device.");
-            Assert.isNull(parentProperty.getFields().get(name),
-                    "A property field with name " + name + " was already added to the device property " + propertyName);
-            parentProperty.setFields(new DeviceProperty(name, value, category, resultType));
-            return this;
-        }
-
-
-        /**
-         * Creates a {@link DeviceCommand} and adds it to the device. A device can implement only those commands
-         * contained in the parent class, but is not required to do so.
+         * Creates a {@link DeviceCommand} with the category "commandTagId"  adds it to the device. A device can
+         * implement only those commands contained in the parent class, but is not required to do so.
          *
          * @param name       the name of the device command. It must be unique within the device and correspond to a
          *                   {@link Command} defined in the parent device class
          * @param value      the concrete value of the command
-         * @param category   category of this command (usually just "commandTagId")
-         * @param resultType the result type of this command (defaults to String)
          * @return the Device.CreateBuilder with the specified device command
          */
-        public Device.CreateBuilder addDeviceCommand(String name, String value, String category, String resultType) {
-            Assert.isNull(deviceCommands.get(name),
-                    "A device command with name " + name + " was already added to the Device.");
-            this.deviceCommands.put(name, new DeviceCommand(name, value, category, resultType));
+        public Device.CreateBuilder addCommand(String name, Long value) {
+            assertUniqueName(deviceCommands, name);
+            this.deviceCommands.put(name, DeviceCommand.forCommandTagId(null, name, value));
             return this;
+        }
+
+        /**
+         * Creates a {@link DeviceProperty} with the category "tagId" and adds it to the device. The corresponding
+         * {@link Property} with the same name must be defined in the parent class already.
+         *
+         * @param name       the name of the device property. It must be unique within the device and correspond to a
+         *                   {@link Property} defined in the parent device class
+         * @param value      the concrete tag ID which this DeviceProperty references.
+         * @return the Device.CreateBuilder with the specified device property
+         */
+        public Device.CreateBuilder addPropertyForTagId(String name, Long value) {
+            assertUniqueName(deviceProperties, name);
+            this.deviceProperties.put(name, DeviceProperty.forTagId(null, name, value));
+            return this;
+        }
+
+        /**
+         * Creates a {@link DeviceProperty} with the category "clientRule" and adds it to the device. The corresponding
+         * {@link Property} with the same name must be defined in the parent class already.
+         *
+         * @param name       the name of the device property. It must be unique within the device and correspond to a
+         *                   {@link Property} defined in the parent device class
+         * @param value      the concrete client rule
+         * @param resultType the resulting value type
+         * @return the Device.CreateBuilder with the specified device property
+         */
+        public Device.CreateBuilder addPropertyForClientRule(String name, String value, ResultType resultType) {
+            assertUniqueName(deviceProperties, name);
+            this.deviceProperties.put(name, DeviceProperty.forClientRule(null, name, value, resultType));
+            return this;
+        }
+
+        /**
+         * Creates a {@link DeviceProperty} with the category "constantValue" and adds it to the device. The
+         * corresponding {@link Property} with the same name must be defined in the parent class already.
+         *
+         * @param name       the name of the device property. It must be unique within the device and correspond to a
+         *                   {@link Property} defined in the parent device class
+         * @param value      the concrete constant value
+         * @param resultType the resulting value type
+         * @return the Device.CreateBuilder with the specified device property
+         */
+        public <T> Device.CreateBuilder addPropertyForConstantValue(String name, T value, ResultType resultType) {
+            assertUniqueName(deviceProperties, name);
+            this.deviceProperties.put(name, DeviceProperty.forConstantValue(null, name, value, resultType));
+            return this;
+        }
+
+        /**
+         * Creates a {@link DeviceProperty} with the category "mappedProperty" and adds it to the device. A
+         * corresponding {@link Property} with the same name must be defined in the parent class already. Mapped
+         * properties allow to add property fields. These are optional single-depth collections of nested properties.
+         * They can be added to this mapped property subsequently to the returned builder.
+         *
+         * @param name       the name of the device property. It must be unique within the device and correspond to a
+         *                   {@link Property} defined in the parent device class
+         * @return a Device.MappedPropertyBuilder which extends the Device.CreateBuilder by the methods to add fields
+         * to this particular mapped property.
+         */
+        public Device.MappedPropertyBuilder createMappedProperty(String name) {
+            assertUniqueName(deviceProperties, name);
+            return new MappedPropertyBuilder(deviceToBuild, deviceProperties, deviceCommands, name);
         }
 
         /**
@@ -219,5 +242,74 @@ public class Device implements ConfigurationEntity {
             this.deviceToBuild.setDeviceCommands(new DeviceCommandList(deviceCommands.values()));
             return this.deviceToBuild;
         }
+    }
+
+
+    /**
+     * Builder class for device configuration objects with mapped properties which should be newly created on the server.
+     * An instance of this class allows to add property fields to the most recently added mapped property.
+     */
+    public static class MappedPropertyBuilder extends CreateBuilder {
+        private final DeviceProperty propertyToBuild;
+
+        protected MappedPropertyBuilder(Device device, Map<String, DeviceProperty> properties, Map<String, DeviceCommand> commands, String name) {
+            super(device, properties, commands);
+            propertyToBuild = DeviceProperty.forMappedProperty(null, name, new ArrayList<>());
+            properties.put(name, propertyToBuild);
+        }
+
+        /**
+         * Creates a {@link DeviceProperty} with the category "tagId" and adds it as a field to the mapped property.
+         * The corresponding {@link Property} with the same name must be defined in the parent class already as a field
+         * to the mapped property.
+         *
+         * @param name       the name of the property field. It must be unique within the mapped property and correspond
+         *                   to a {@link Property} defined as a field to the mapped property.
+         * @param value      the concrete tag ID which this property field references.
+         * @return the Device.MappedPropertyBuilder with the specified property field.
+         */
+        public Device.MappedPropertyBuilder addFieldForTagId(String name, Long value) {
+            assertUniqueName(propertyToBuild.getFields(), name);
+            this.propertyToBuild.setFields(DeviceProperty.forTagId(null, name, value));
+            return this;
+        }
+
+        /**
+         * Creates a {@link DeviceProperty} with the category "clientRule" and adds it as a field to the mapped
+         * property. The corresponding {@link Property} with the same name must be defined in the parent class already
+         * as a field to the mapped property.
+         *
+         * @param name       the name of the property field. It must be unique within the mapped property and correspond
+         *                   to a {@link Property} defined as a field to the mapped property.
+         * @param value      the concrete client rule
+         * @param resultType the resulting value type
+         * @return the Device.MappedPropertyBuilder with the specified property field.
+         */
+        public Device.MappedPropertyBuilder addFieldForClientRule(String name, String value, ResultType resultType) {
+            assertUniqueName(propertyToBuild.getFields(), name);
+            this.propertyToBuild.setFields(DeviceProperty.forClientRule(null, name, value, resultType));
+            return this;
+        }
+
+        /**
+         * Creates a {@link DeviceProperty} with the category "constantValue" and adds it as a field to the mapped
+         * property. The corresponding {@link Property} with the same name must be defined in the parent class already
+         * as a field to the mapped property.
+         *
+         * @param name       the name of the property field. It must be unique within the mapped property and correspond
+         *                   to a {@link Property} defined as a field to the mapped property.
+         * @param value      the concrete constant value
+         * @param resultType the resulting value type
+         * @return the Device.MappedPropertyBuilder with the specified property field.
+         */
+        public <T> Device.MappedPropertyBuilder addFieldForConstantValue(String name, T value, ResultType resultType) {
+            assertUniqueName(propertyToBuild.getFields(), name);
+            this.propertyToBuild.setFields(DeviceProperty.forConstantValue(null, name, value, resultType));
+            return this;
+        }
+    }
+
+    private static <T extends DeviceElement> void assertUniqueName(Map<String, T> elementMap, String name) {
+        Assert.isNull(elementMap.get(name), "A device element with name " + name + " was already added.");
     }
 }

@@ -23,8 +23,7 @@ import java.util.*;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import cern.c2mon.shared.client.device.Command;
-import cern.c2mon.shared.client.device.Property;
+import cern.c2mon.shared.client.device.*;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.junit.*;
@@ -73,8 +72,6 @@ import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.ConfigurationReportHeader;
 import cern.c2mon.shared.client.configuration.converter.ProcessListConverter;
-import cern.c2mon.shared.client.device.DeviceCommand;
-import cern.c2mon.shared.client.device.DeviceProperty;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.common.NoSimpleValueParseException;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
@@ -1286,18 +1283,18 @@ public class ConfigurationLoaderTest {
     DeviceCacheObject expectedObject = new DeviceCacheObject(20L, "TEST_DEVICE_20", 400L);
 
     List<DeviceProperty> expectedProperties = new ArrayList<>();
-    expectedProperties.add(new DeviceProperty(1L, "cpuLoadInPercent", "987654", "tagId", null));
-    expectedProperties.add(new DeviceProperty(2L, "responsiblePerson", "Mr. Administrator", "constantValue", null));
-    expectedProperties.add(new DeviceProperty(3L, "someCalculations", "(#123 + #234) / 2", "clientRule", "Float"));
+    expectedProperties.add(DeviceProperty.forTagId(1L, "cpuLoadInPercent", 987654L));
+    expectedProperties.add(DeviceProperty.forConstantValue(2L, "responsiblePerson", "Mr. Administrator"));
+    expectedProperties.add(DeviceProperty.forClientRule(3L, "someCalculations", "(#123 + #234) / 2", ResultType.Float));
 
     List<DeviceProperty> expectedFields = new ArrayList<>();
-    expectedFields.add(new DeviceProperty(1L, "field1", "987654", "tagId", null));
-    expectedFields.add(new DeviceProperty(2L, "field2", "(#123 + #234) / 2", "clientRule", null));
-    expectedProperties.add(new DeviceProperty(9L, "TEST_PROPERTY_WITH_FIELDS", "mappedProperty", expectedFields));
+    expectedFields.add(DeviceProperty.forTagId(1L, "field1", 987654L));
+    expectedFields.add(DeviceProperty.forClientRule(2L, "field2", "(#123 + #234) / 2", null));
+    expectedProperties.add(DeviceProperty.forMappedProperty(9L, "TEST_PROPERTY_WITH_FIELDS", expectedFields));
 
     List<DeviceCommand> expectedCommands = new ArrayList<>();
-    expectedCommands.add(new DeviceCommand(1L, "TEST_COMMAND_1", "4287", "commandTagId", null));
-    expectedCommands.add(new DeviceCommand(2L, "TEST_COMMAND_2", "4288", "commandTagId", null));
+    expectedCommands.add(DeviceCommand.forCommandTagId(1L, "TEST_COMMAND_1", 4287L));
+    expectedCommands.add(DeviceCommand.forCommandTagId(2L, "TEST_COMMAND_2", 4288L));
 
     expectedObject.setDeviceProperties(expectedProperties);
     expectedObject.setDeviceCommands(expectedCommands);
@@ -1310,7 +1307,7 @@ public class ConfigurationLoaderTest {
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
     cacheObject = (DeviceCacheObject) deviceCache.get(20L);
 
-    expectedProperties.add(new DeviceProperty(4L, "numCores", "4", "constantValue", "Integer"));
+    expectedProperties.add(DeviceProperty.forConstantValue(4L, "numCores", 4, ResultType.Integer));
     expectedObject.setDeviceProperties(expectedProperties);
     ObjectEqualityComparison.assertDeviceEquals(expectedObject, cacheObject);
 

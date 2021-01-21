@@ -45,13 +45,13 @@ public class TransferDeviceImplTest {
   public void testAddDeviceProperties() throws ClassNotFoundException {
     TransferDeviceImpl dti = new TransferDeviceImpl(1L, "test_device_name", 1L, "test_class_name");
     List<DeviceProperty> properties = new ArrayList<>();
-    DeviceProperty p1 = new DeviceProperty(1L, "cpuLoadInPercent", "987654", "tagId", null);
-    DeviceProperty p2 = new DeviceProperty(2L, "responsiblePerson", "Mr. Administrator", "constantValue", null);
-    DeviceProperty p3 = new DeviceProperty(3L, "someCalculations", "(#123 + #234) / 2", "clientRule", "Float");
-    DeviceProperty p4 =new DeviceProperty(4L, "numCores", "4", "constantValue", "Integer");
+    DeviceProperty p1 = DeviceProperty.forTagId(1L, "cpuLoadInPercent", 987654L);
+    DeviceProperty p2 = DeviceProperty.forConstantValue(2L, "responsiblePerson", "Mr. Administrator");
+    DeviceProperty p3 = DeviceProperty.forClientRule(3L, "someCalculations", "(#123 + #234) / 2", ResultType.Float);
+    DeviceProperty p4 = DeviceProperty.forConstantValue(4L, "numCores", 4, ResultType.Integer);
     properties.addAll(Arrays.asList(p1, p2, p3, p4));
 
-    DeviceProperty propertyWithFields = new DeviceProperty(5L, "TEST_PROPERTY_WITH_FIELDS", "mappedProperty", new ArrayList<>(properties));
+    DeviceProperty propertyWithFields = DeviceProperty.forMappedProperty(5L, "TEST_PROPERTY_WITH_FIELDS", new ArrayList<>(properties));
     properties.add(propertyWithFields);
 
     dti.addDeviceProperties(properties);
@@ -70,12 +70,12 @@ public class TransferDeviceImplTest {
   @Test
   public void testAddDeviceCommands() {
     TransferDeviceImpl dti = new TransferDeviceImpl(1L, "test_device_name", 1L, "test_class_name");
-    dti.addDeviceCommand(new DeviceCommand(1L, "TEST_COMMAND_1", "1000", "commandTagId", null));
-    dti.addDeviceCommand(new DeviceCommand(1L, "TEST_COMMAND_1", "2000", "commandTagId", null));
+    dti.addDeviceCommand(DeviceCommand.forCommandTagId(1L, "TEST_COMMAND_1", 1000L));
+    dti.addDeviceCommand(DeviceCommand.forCommandTagId(1L, "TEST_COMMAND_1", 2000L));
     dti.addDeviceCommands(new ArrayList<DeviceCommand>() {
       {
-        add(new DeviceCommand(1L, "TEST_COMMAND_1", "3000", "commandTagId", null));
-        add(new DeviceCommand(1L, "TEST_COMMAND_1", "4000", "commandTagId", null));
+        add(DeviceCommand.forCommandTagId(1L, "TEST_COMMAND_1", 3000L));
+        add(DeviceCommand.forCommandTagId(1L, "TEST_COMMAND_1", 4000L));
       }
     });
 

@@ -20,8 +20,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.simpleframework.xml.Attribute;
-import org.simpleframework.xml.Element;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.simpleframework.xml.ElementList;
 
 /**
@@ -30,22 +30,12 @@ import org.simpleframework.xml.ElementList;
  *
  * @author Justin Lewis Salmon
  */
-public class Property implements Serializable, DeviceClassElement {
+@NoArgsConstructor
+public class Property extends DeviceClassElement implements Serializable {
 
   private static final long serialVersionUID = 779255306056735769L;
 
-  @Attribute
-  private Long id;
-
-  @Attribute
-  private String name;
-
-  @Element(required = false)
-  private String description;
-
-  /**
-   * The list of nested fields of this property.
-   */
+  @Getter
   @ElementList(required = false, name = "Fields")
   private List<Property> fields = new ArrayList<>();
 
@@ -77,9 +67,6 @@ public class Property implements Serializable, DeviceClassElement {
     this.fields = fields;
   }
 
-  public Property() {
-  }
-
   /**
    * Constructor to use during property creation requests.
    *
@@ -91,35 +78,6 @@ public class Property implements Serializable, DeviceClassElement {
     this.description = description;
   }
 
-  @Override
-  public Long getId() {
-    return id;
-  }
-
-  @Override
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  @Override
-  public String getName() {
-    return name;
-  }
-
-  @Override
-  public String getDescription() {
-    return description;
-  }
-
-  /**
-   * Retrieve the raw fields of this property
-   *
-   * @return the raw fields
-   */
-  public List<Property> getFields() {
-    return fields;
-  }
-
   /**
    * Retrieve the fields IDs of this property
    *
@@ -128,7 +86,7 @@ public class Property implements Serializable, DeviceClassElement {
   public List<Long> getFieldIds() {
     List<Long> fieldIds = new ArrayList<>();
 
-    if (this.fields != null) {
+    if (fields != null) {
       for (Property field : fields) {
         if (field.getId() != null) {
           fieldIds.add(field.getId());
