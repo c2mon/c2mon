@@ -3,8 +3,6 @@ package cern.c2mon.shared.rule;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.Generated;
-
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -46,7 +44,7 @@ public class RuleExpressionTest {
   @Data
   @AllArgsConstructor
   private class RuleInputValueImpl implements RuleInputValue {
-    private Long id;
+    private long id;
     private Object value;
     private boolean valid;
   }

@@ -149,7 +149,7 @@ public class ClientRuleTag<T> implements Tag, BaseTagListener {
    * to differentiate between RuleTags.
    */
   @Override
-  public Long getId() {
+  public long getId() {
     return id;
   }
 

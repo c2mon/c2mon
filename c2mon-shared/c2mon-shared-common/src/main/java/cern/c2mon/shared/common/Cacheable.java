@@ -35,7 +35,7 @@ public interface Cacheable extends Serializable, Cloneable {
    *
    * @return the id of the cache object
    */
-  Long getId();
+  long getId();
 
   /**
    * Needed for cache listeners, which always clone the object before

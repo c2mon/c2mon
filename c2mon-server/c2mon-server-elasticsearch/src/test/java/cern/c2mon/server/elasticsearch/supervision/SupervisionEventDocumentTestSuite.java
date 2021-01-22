@@ -50,7 +50,7 @@ public class SupervisionEventDocumentTestSuite {
     document = (SupervisionEventDocument) document.getObject(json);
 
     assertEquals(event.getEntity().name(), document.get("entity"));
-    assertEquals(event.getEntityId().intValue(), document.get("id"));
+    assertEquals(event.getEntityId(), document.get("id"));
     assertEquals(event.getEventTime().getTime(), document.get("timestamp"));
     assertEquals(event.getName(), document.get("name"));
     assertEquals(event.getStatus().name(), document.get("status"));

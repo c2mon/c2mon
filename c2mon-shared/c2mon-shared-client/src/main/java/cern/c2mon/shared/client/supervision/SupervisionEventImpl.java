@@ -21,6 +21,7 @@ import cern.c2mon.shared.common.supervision.SupervisionStatus;
 import cern.c2mon.shared.util.json.GsonFactory;
 import com.google.gson.Gson;
 import lombok.Data;
+import lombok.NonNull;
 
 import java.sql.Timestamp;
 
@@ -53,7 +54,7 @@ public class SupervisionEventImpl implements SupervisionEvent {
   /**
    * The id of the entity (unique for the entity).
    */
-  private Long entityId;
+  private long entityId;
 
   /** The name of the entity */
   private String name;
@@ -168,7 +169,7 @@ public class SupervisionEventImpl implements SupervisionEvent {
         return false;
     } else if (!entity.equals(other.entity))
       return false;
-    if (!entityId.equals(other.entityId))
+    if (entityId != other.entityId)
       return false;
     if (status == null) {
       if (other.status != null)

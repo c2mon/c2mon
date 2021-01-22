@@ -49,7 +49,7 @@ public abstract class BaseTagDocumentConverterTest {
   protected DataTag tag = EntityUtils.createDataTag();
 
   protected void assertBaseFieldsMatch(DataTag tag, Map<String, Object> document) {
-    assertEquals(tag.getId().intValue(), document.get("id"));
+    assertEquals(tag.getId(), document.get("id"));
     assertEquals(tag.getName(), document.get("name"));
     assertEquals(tag.getDescription(), document.get("description"));
     assertEquals(tag.getUnit(), document.get("unit"));

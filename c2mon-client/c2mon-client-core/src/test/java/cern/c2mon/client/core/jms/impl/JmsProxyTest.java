@@ -104,7 +104,7 @@ public class JmsProxyTest {
     }
 
     @Override
-    public Long getId() {
+    public long getId() {
       return 1L;
     }
   };

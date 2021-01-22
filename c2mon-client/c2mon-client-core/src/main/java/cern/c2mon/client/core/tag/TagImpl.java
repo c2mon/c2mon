@@ -88,7 +88,7 @@ public class TagImpl implements Tag, TopicRegistrationDetails, Cloneable {
    * Unique identifier for a DataTag
    */
   @Attribute
-  protected Long id;
+  protected long id;
 
   /**
    * Containing all process id's which are relevant to compute the
@@ -578,7 +578,7 @@ public class TagImpl implements Tag, TopicRegistrationDetails, Cloneable {
   @Override
   public boolean equals(Object pRight) {
     if (pRight instanceof TagImpl) {
-      if (this.id.equals(((TagImpl) pRight).id)) {
+      if (this.id == ((TagImpl) pRight).id) {
         return true;
       }
     }

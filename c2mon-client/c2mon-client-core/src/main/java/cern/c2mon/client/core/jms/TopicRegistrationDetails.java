@@ -36,7 +36,7 @@ public interface TopicRegistrationDetails {
    * 
    * @return the id of the TransferTagValues of interest
    */
-  Long getId();
+  long getId();
   
   /**
    * The topic name on which these updates are expected.

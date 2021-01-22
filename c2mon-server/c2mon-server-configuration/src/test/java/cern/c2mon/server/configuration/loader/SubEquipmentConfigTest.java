@@ -88,11 +88,11 @@ public class SubEquipmentConfigTest extends ConfigurationCacheLoaderTest<SubEqui
     // also check that the commfault and alive cache were updated
     // the alivetimer, commfault, state caches should reflect the changes
     assertNotNull(aliveTimerCache.get(expectedObject.getAliveTagId()));
-    assertEquals(expectedObject.getId(), aliveTimerCache.get(cacheObject.getAliveTagId()).getSupervisedId());
+    assertEquals(expectedObject.getId(), aliveTimerCache.get(cacheObject.getAliveTagId()).getSupervisedId().longValue());
     assertNotNull(commFaultTagCache.get(expectedObject.getCommFaultTagId()));
-    assertEquals(expectedObject.getId(), commFaultTagCache.get(cacheObject.getCommFaultTagId()).getSupervisedId());
+    assertEquals(expectedObject.getId(), commFaultTagCache.get(cacheObject.getCommFaultTagId()).getSupervisedId().longValue());
     assertNotNull(stateTagCache.get(expectedObject.getStateTagId()));
-    assertEquals(expectedObject.getId(), stateTagCache.get(cacheObject.getStateTagId()).getSupervisedId());
+    assertEquals(expectedObject.getId(), stateTagCache.get(cacheObject.getStateTagId()).getSupervisedId().longValue());
 
     report = configurationLoader.applyConfiguration(20);
 
@@ -225,7 +225,7 @@ public class SubEquipmentConfigTest extends ConfigurationCacheLoaderTest<SubEqui
     // Check if all caches are updated
     assertTrue(subEquipmentService.getSubEquipmentIdsFor(expectedObject.getParentId()).contains(expectedObject.getId()));
     assertNotNull(commFaultTagCache.get(expectedObject.getCommFaultTagId()));
-    assertEquals(expectedObject.getId(), commFaultTagCache.get(cacheObject.getCommFaultTagId()).getSupervisedId());
+    assertEquals(expectedObject.getId(), commFaultTagCache.get(cacheObject.getCommFaultTagId()).getSupervisedId().longValue());
     assertNotNull(subEquipmentMapper.getItem(20L));
   }
 

@@ -31,7 +31,7 @@ public interface RuleInputValue {
    * Returns the unique id of the input value.
    * @return the id
    */
-  Long getId();
+  long getId();
   
   /**
    * Returns the value that will be fed into the rule.

@@ -21,6 +21,7 @@ import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.config.collections.TagCacheCollection;
 import cern.c2mon.server.cache.loading.SequenceDAO;
 import cern.c2mon.server.common.datatag.DataTag;
+import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.configuration.parser.exception.ConfigurationParseException;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
@@ -29,6 +30,7 @@ import cern.c2mon.shared.client.configuration.api.alarm.Alarm;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -54,7 +56,7 @@ class AlarmFactory extends EntityFactory<Alarm> {
   @Override
   public List<ConfigurationElement> createInstance(Alarm alarm) {
     long tagId = alarm.getDataTagId() != null
-        ? alarm.getDataTagId() : dataTagCache.get(alarm.getDataTagId()).getId();
+        ? alarm.getDataTagId() : findTagIdByName(alarm.getDataTagName());
 
     // Check if the parent id exists
     if (tagFacadeGateway.containsKey(tagId)) {
@@ -66,6 +68,15 @@ class AlarmFactory extends EntityFactory<Alarm> {
       throw new ConfigurationParseException("Error creating alarm #" + alarm.getId() + ": " +
           "Specified parent datatag #" + tagId + " does not exist!");
     }
+  }
+
+  private Long findTagIdByName(String alarmName) {
+    Collection<Tag> results = tagFacadeGateway.findByNameRegex(alarmName);
+
+    for (Tag tag : results) {
+      return tag.getId();
+    }
+    return null;
   }
 
   @Override

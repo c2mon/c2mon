@@ -39,12 +39,27 @@ public class TagCacheCollection extends CacheCollection<Tag> {
   }
 
   public Collection<Tag> findByNameRegex(String regex) {
-    return caches
-      .parallelStream()
-      .flatMap(cache -> ClientQueryProvider.queryByClientInput(cache, Tag::getName, regex).stream())
-      .collect(Collectors.toSet());
+    if (regex == null || regex.equalsIgnoreCase("")) {
+      throw new IllegalArgumentException("Attempting to retrieve a Tag from the cache with a NULL or empty name parameter.");
+    }
+
+    // This will prevent wildcard searches
+    if (regex.contains("*")) {
+      regex = regex.replace("*", "\\*");
+    }
+    if (regex.contains("?")) {
+      regex = regex.replace("?", "\\?");
+    }
+
+    return findTagsByNameRegex(regex);
   }
 
+  private Collection<Tag> findTagsByNameRegex(String regex) {
+    return caches
+            .parallelStream()
+            .flatMap(cache -> ClientQueryProvider.queryByClientInput(cache, Tag::getName, regex).stream())
+            .collect(Collectors.toSet());
+  }
 
   /**
    * Adds the alarm to the list of alarms associated to this

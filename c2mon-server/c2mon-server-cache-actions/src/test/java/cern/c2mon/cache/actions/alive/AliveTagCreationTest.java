@@ -52,7 +52,7 @@ public class AliveTagCreationTest {
 
     assertEquals("AliveTimer should have Equipment type set", SupervisionEntity.EQUIPMENT, cachedAliveTimer.getSupervisedEntity());
     assertEquals("AliveTimer should have interval set", equipmentCacheObject.getAliveInterval(), cachedAliveTimer.getAliveInterval());
-    assertEquals("AliveTimer should have relatedId set", equipmentCacheObject.getId(), cachedAliveTimer.getSupervisedId());
+    assertEquals("AliveTimer should have relatedId set", equipmentCacheObject.getId(), cachedAliveTimer.getSupervisedId().longValue());
     assertEquals("AliveTimer should have relatedName set", equipmentCacheObject.getName(), cachedAliveTimer.getSupervisedName());
     assertEquals("AliveTimer should have stateTagId set", equipmentCacheObject.getStateTagId(), cachedAliveTimer.getStateTagId());
   }
@@ -71,7 +71,7 @@ public class AliveTagCreationTest {
 
     assertEquals("AliveTimer should have SubEquipment type set", SupervisionEntity.SUBEQUIPMENT, cachedAliveTimer.getSupervisedEntity());
     assertEquals("AliveTimer should have interval set", subEquipmentCacheObject.getAliveInterval(), cachedAliveTimer.getAliveInterval());
-    assertEquals("AliveTimer should have relatedId set", subEquipmentCacheObject.getId(), cachedAliveTimer.getSupervisedId());
+    assertEquals("AliveTimer should have relatedId set", subEquipmentCacheObject.getId(), cachedAliveTimer.getSupervisedId().longValue());
     assertEquals("AliveTimer should have relatedName set", subEquipmentCacheObject.getName(), cachedAliveTimer.getSupervisedName());
     assertEquals("AliveTimer should have stateTagId set", subEquipmentCacheObject.getStateTagId(), cachedAliveTimer.getStateTagId());
   }
@@ -90,7 +90,7 @@ public class AliveTagCreationTest {
 
     assertEquals("AliveTimer should have Process type set", SupervisionEntity.PROCESS, cachedAliveTimer.getSupervisedEntity());
     assertEquals("AliveTimer should have interval set", processCacheObject.getAliveInterval(), cachedAliveTimer.getAliveInterval());
-    assertEquals("AliveTimer should have relatedId set", processCacheObject.getId(), cachedAliveTimer.getSupervisedId());
+    assertEquals("AliveTimer should have relatedId set", processCacheObject.getId(), cachedAliveTimer.getSupervisedId().longValue());
     assertEquals("AliveTimer should have relatedName set", processCacheObject.getName(), cachedAliveTimer.getSupervisedName());
     assertEquals("AliveTimer should have stateTagId set", processCacheObject.getStateTagId(), cachedAliveTimer.getStateTagId());
   }

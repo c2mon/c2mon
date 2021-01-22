@@ -33,7 +33,7 @@ import static org.junit.Assert.assertTrue;
 public abstract class CompareClientRequestResult {
 
   public static void compareTagUpdateWithDataTagCacheObject(TagUpdate valueClient, DataTagCacheObject valueServer) {
-    assertEquals(valueClient.getId(), valueServer.getId());
+    assertEquals(valueClient.getId().longValue(), valueServer.getId());
     assertEquals(valueClient.getValue(), valueServer.getValue());
     assertEquals(valueClient.getValueDescription(), valueServer.getValueDescription());
     assertEquals(valueClient.getDataTagQuality(), valueServer.getDataTagQuality());
@@ -46,7 +46,7 @@ public abstract class CompareClientRequestResult {
   }
 
   public static void compareAlarmValuesWithAlarCacheObject(AlarmValue valueClient, AlarmCacheObject valueServer) {
-    assertEquals(valueClient.getId(), valueServer.getId());
+    assertEquals(valueClient.getId().longValue(), valueServer.getId());
     assertEquals(valueClient.getFaultCode(), valueServer.getFaultCode());
     assertEquals(valueClient.getFaultMember(), valueServer.getFaultMember());
     assertEquals(valueClient.getFaultFamily(), valueServer.getFaultFamily());

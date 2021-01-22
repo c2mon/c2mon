@@ -254,7 +254,7 @@ public class TagImplTest {
     assertEquals(tagUpdate.getDataTagQuality(), tag.getDataTagQuality());
     assertEquals(tagUpdate.getDescription(), tag.getDescription());
     tagUpdate.getEquipmentIds().stream().forEach(id -> assertTrue(tag.getEquipmentIds().contains(id)));
-    assertEquals(tagUpdate.getId(), tag.getId());
+    assertEquals(tagUpdate.getId().longValue(), tag.getId());
 
     for (Entry<String, Object> entrySet : tag.getMetadata().entrySet()) {
       assertEquals(entrySet.getValue(), tag.getMetadata().get(entrySet.getKey()));
