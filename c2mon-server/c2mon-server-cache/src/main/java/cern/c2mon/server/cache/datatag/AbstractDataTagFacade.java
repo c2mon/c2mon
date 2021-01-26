@@ -411,16 +411,20 @@ public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractT
   }
 
   /**
-   * To be called internally only within a dataTag synchronized block. Shou ould not be made public.
+   * To be called internally only within a dataTag synchronized block. Should not be made public.
+   * The actual Cache put is not made within this method.
+   * 
+   *  @return true, if the passed dataTag was successfully updated. 
+   *          Returns false, if this is a repeated updated which should not be put into the cache
    */
-  private void updateAndValidate(final T dataTag, final Object value, final String valueDescription, final Timestamp timestamp) {
-    if (!filteroutValid(dataTag, value, valueDescription, timestamp)) {
-      updateAndValidateQuietly(dataTag, value, valueDescription, null, null, timestamp);
-    } else {
-      if (log.isTraceEnabled()) {
-        log.trace("Filtering out repeated update for datatag " + dataTag.getId());
-      }
+  private boolean updateAndValidate(final T dataTag, final Object value, final String valueDescription, final Timestamp timestamp) {
+    if (filteroutValid(dataTag, value, valueDescription)) {
+      log.trace("Filtering out repeated update for datatag {}", dataTag.getId());
+      return false;
     }
+    
+    updateAndValidateQuietly(dataTag, value, valueDescription, null, null, timestamp);
+    return true;
   }
 
   /**
@@ -459,16 +463,16 @@ public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractT
       tagCache.acquireWriteLockOnKey(dataTagId);
       try {
         T dataTag = tagCache.get(dataTagId);
-        updateAndValidate(dataTag, value, valueDescription, timestamp);
-        tagCache.put(dataTag.getId(), dataTag);
+        if (updateAndValidate(dataTag, value, valueDescription, timestamp)) {
+          tagCache.put(dataTag.getId(), dataTag);
+        }
       } catch (CacheElementNotFoundException cacheEx) {
         log.error("Unable to locate tag in cache (id " + dataTagId + ") - no update performed.", cacheEx);
       } finally {
         tagCache.releaseWriteLockOnKey(dataTagId);
       }
-    }
-    else {
-      log.error("Unable to locate tag in conrolTag and dataTag cache (id " + dataTagId + ") - no update performed.");
+    } else {
+      log.error("Unable to locate tag in conrolTag and dataTag cache (id {}) - no update performed.", dataTagId);
     }
   }
 

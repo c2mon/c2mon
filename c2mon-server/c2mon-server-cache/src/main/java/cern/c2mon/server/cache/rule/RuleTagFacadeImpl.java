@@ -150,7 +150,7 @@ public class RuleTagFacadeImpl extends AbstractTagFacade<RuleTag> implements Rul
       tagCache.releaseWriteLockOnKey(id);
     }
 
-    if (!filterout(ruleTagCopy, value, valueDescription, null, null, timestamp)) {
+    if (!filteroutValid(ruleTagCopy, value, valueDescription)) {
       ruleTagCacheObjectFacade.validate(ruleTagCopy);
       ruleTagCacheObjectFacade.update(ruleTagCopy, value, valueDescription, timestamp);
       tagCache.put(id, ruleTagCopy);

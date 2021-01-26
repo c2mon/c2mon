@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2020 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -435,7 +435,6 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
 
     AliveTimer aliveTimer = aliveTimerCache.getCopy(aliveTimerId);
 
-    // Build up a meaningful invalidation message -- USED TO DECIDE WHETHER TO REQUEST VALUES FROM DAQ WHEN UP AGAIN (SEE onProcessUp)
     StringBuffer msg = new StringBuffer("Alive of ");
     msg.append(aliveTimer.getAliveTypeDescription() + " ");
     msg.append(aliveTimer.getRelatedName());
@@ -447,40 +446,29 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
     log.debug(msg.toString());
 
     if (aliveTimer.getRelatedId() == null) {
-      log.error("AliveTimer has not relatedId - unable to take any action on alive reception.");
+      log.error("AliveTimer {} has not relatedId - unable to take any action on alive reception.", aliveTimerId);
     } else {
+      Timestamp timestamp = new Timestamp(System.currentTimeMillis());
       try {
         final Long processId = processFacade.getProcessIdFromAlive(aliveTimer.getId());
         if (aliveTimer.isProcessAliveType()) {
-          onProcessDown(processId, new Timestamp(System.currentTimeMillis()), msg.toString());
-        } else {
-          if (aliveTimer.isEquipmentAliveType()) {
-            Long equipmentId = aliveTimer.getRelatedId();
-            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-            onEquipmentDown(equipmentId, timestamp, msg.toString());
+          onProcessDown(processId, timestamp, msg.toString());
+        } else if (aliveTimer.isEquipmentAliveType()) {
+          Long equipmentId = aliveTimer.getRelatedId();
+          onEquipmentDown(equipmentId, timestamp, msg.toString());
+          updateCommFaultTag(equipmentCache.getCopy(equipmentId).getCommFaultTagId(), false, msg.toString(), timestamp);
 
-            // Manually set the CommFaultTag (TIMS-972)
-            ControlTag commFaultTag = controlTagCache.getCopy(equipmentCache.getCopy(equipmentId).getCommFaultTagId());
-            setCommFaultTag(commFaultTag.getId(), false, commFaultTag.getValueDescription(), timestamp);
-
-            // Bring down all SubEquipments
-            for (Long subEquipmentId : equipmentCache.get(equipmentId).getSubEquipmentIds()) {
-              String message = "Alive timer for parent Equipment expired: " + msg.toString();
-              onSubEquipmentDown(subEquipmentId, timestamp, message);
-
-              commFaultTag = controlTagCache.getCopy(subEquipmentCache.getCopy(subEquipmentId).getCommFaultTagId());
-              setCommFaultTag(commFaultTag.getId(), false, commFaultTag.getValueDescription(), timestamp);
-            }
-
-          } else {
-            Long subEquipmentId = aliveTimer.getRelatedId();
-            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-            onSubEquipmentDown(subEquipmentId, timestamp, msg.toString());
-
-            // Manually set the CommFaultTag (TIMS-972)
-            ControlTag commFaultTag = controlTagCache.getCopy(subEquipmentCache.getCopy(subEquipmentId).getCommFaultTagId());
-            setCommFaultTag(commFaultTag.getId(), false, commFaultTag.getValueDescription(), timestamp);
+          // Bring down all SubEquipments
+          for (Long subEquipmentId : equipmentCache.get(equipmentId).getSubEquipmentIds()) {
+            String message = "Alive timer for parent Equipment expired: " + msg.toString();
+            onSubEquipmentDown(subEquipmentId, timestamp, message);
+            updateCommFaultTag(subEquipmentCache.getCopy(subEquipmentId).getCommFaultTagId(), false, message, timestamp);
           }
+
+        } else {
+          Long subEquipmentId = aliveTimer.getRelatedId();
+          onSubEquipmentDown(subEquipmentId, timestamp, msg.toString());
+          updateCommFaultTag(subEquipmentCache.getCopy(subEquipmentId).getCommFaultTagId(), false, msg.toString(), timestamp);
         }
       } catch (CacheElementNotFoundException cacheEx) {
         log.error("Unable to locate a required element within the cache on Alive Timer expiration.", cacheEx);
@@ -498,15 +486,19 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
    * each other.
    *
    * @param commFaultTagId the ID of the tag to set
-   * @param value the value of the tag
-   * @param message the value description to set for the tag
+   * @param value the value of the commfault tag
+   * @param valueDescription Reason for value change
+   * @param timestamp the timestamp of the update
    */
-  private void setCommFaultTag(final Long commFaultTagId, final boolean value, final String message, final Timestamp timestamp) {
+  private void updateCommFaultTag(final Long commFaultTagId, final boolean value, String valueDescription, final Timestamp timestamp) {
     try {
-      controlTagFacade.updateAndValidate(commFaultTagId, value, message, timestamp);
-
+      ControlTag tag = controlTagCache.getCopy(commFaultTagId);
+      // Avoids to update the commfault tag just because of a new value description
+      if (tag.getValue() == null || ((Boolean) tag.getValue()) != value) {
+        controlTagFacade.updateAndValidate(commFaultTagId, value, valueDescription, timestamp);
+      }
     } catch (CacheElementNotFoundException e) {
-      log.error("Could not locate CommFaultTag (id: " + commFaultTagId + ") in cache");
+      log.error("Could not locate CommFaultTag (id: {}) in cache", commFaultTagId);
     }
   }
 
@@ -520,28 +512,20 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
    * @param string
    */
   private void onEquipmentDown(final Long equipmentId, final Timestamp timestamp, final String message) {
-    if (log.isDebugEnabled()) {
-      StringBuffer str = new StringBuffer("onEquipmentDown(");
-      str.append("Equipment with id " + equipmentId);
-      str.append(", ");
-      str.append(timestamp);
-      str.append(", ");
-      str.append(message);
-      log.debug(str.toString());
-    }
+    log.trace("onEquipmentDown({}, {}, {})", equipmentId, timestamp, message);
 
     equipmentFacade.suspend(equipmentId, timestamp, message);
 
     final Equipment equipmentCopy = equipmentCache.getCopy(equipmentId);
-    Long stateTagId = equipmentCopy.getStateTagId();
-    if (stateTagId == null) {
-      log.error("Could not find any state tag for equipment " + equipmentCopy.getId() + " - this should never happen.");
+    Long statusTagId = equipmentCopy.getStateTagId();
+    if (statusTagId == null) {
+      log.error("Could not find any status tag for equipment " + equipmentCopy.getId() + " - this should never happen.");
     } else {
       try {
-        controlTagFacade.updateAndValidate(stateTagId, SupervisionStatus.DOWN.toString(), message, timestamp);
+        controlTagFacade.updateAndValidate(statusTagId, SupervisionStatus.DOWN.toString(), message, timestamp);
 
       } catch (CacheElementNotFoundException cacheEx) {
-        log.error("Could not locate state tag (Id is " + stateTagId + ") in cache for equipment " + equipmentCopy.getId());
+        log.error("Could not locate state tag (Id is " + statusTagId + ") in cache for equipment " + equipmentCopy.getId());
       }
     }
   }
@@ -551,16 +535,9 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
    * reception of commfault tag).
    */
   private void onSubEquipmentDown(final Long subEquipmentId, final Timestamp timestamp, final String message) {
-    SubEquipment subEquipmentCopy = subEquipmentCache.getCopy(subEquipmentId);
-    if (log.isDebugEnabled()) {
-      StringBuffer str = new StringBuffer("onSubEquipmentDown(");
-      str.append(subEquipmentCopy.getName());
-      str.append(", ");
-      str.append(timestamp);
-      str.append(", ");
-      str.append(message);
-      log.debug(str.toString());
-    }
+    log.trace("onSubEquipmentDown({}, {}, {})", subEquipmentId, timestamp, message);
+    
+    SubEquipment subEquipmentCopy = subEquipmentCache.getCopy(subEquipmentId);    
     subEquipmentFacade.suspend(subEquipmentId, timestamp, message);
     Long stateTagId = subEquipmentCopy.getStateTagId();
     if (stateTagId == null) {
@@ -568,7 +545,6 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
     } else {
       try {
         controlTagFacade.updateAndValidate(stateTagId, SupervisionStatus.DOWN.toString(), message, timestamp);
-
       } catch (CacheElementNotFoundException cacheEx) {
         log.error("Could not locate state tag (Id is " + stateTagId + ") in cache for subequipment " + subEquipmentCopy.getId());
       }
@@ -585,26 +561,18 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
    * <p>Call within block synchronized on Process.
    */
   private void onProcessDown(final Long processId, final Timestamp pTimestamp, final String pMessage) {
-    if (log.isDebugEnabled()) {
-      StringBuffer str = new StringBuffer("onProcessDown(");
-      str.append(processId);
-      str.append(", ");
-      str.append(pTimestamp);
-      str.append(", ");
-      str.append(pMessage);
-      log.debug(str.toString());
-    }
+    log.trace("onProcessDown({}, {}, {})", processId, pTimestamp, pMessage);
 
     processFacade.suspend(processId, pTimestamp, pMessage);
     final Process processCopy = processCache.getCopy(processId);
 
-    //try to update the stateTag of the Process
+    //try to update the statusTag of the Process
     try {
-      Long stateTagId = processCopy.getStateTagId();
-      if (stateTagId == null) {
-        log.error("State tag Id is set to null for Process + " + processCopy.getId() + " - unable to update it.");
+      Long statusTagId = processCopy.getStateTagId();
+      if (statusTagId == null) {
+        log.error("Status tag Id is set to null for Process + " + processCopy.getId() + " - unable to update it.");
       } else {
-        controlTagFacade.updateAndValidate(stateTagId, SupervisionStatus.DOWN.toString(), pMessage, pTimestamp);
+        controlTagFacade.updateAndValidate(statusTagId, SupervisionStatus.DOWN.toString(), pMessage, pTimestamp);
       }
     } catch (CacheElementNotFoundException cacheEx) {
       log.error("Cannot locate the Process State tag in the cache - unable to update it.", cacheEx);
@@ -662,33 +630,26 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
                                        > 2 * timerCopy.getAliveInterval()) {
           log.debug("Rejecting alive #{} of {} as delayed arrival at server.", tagId, timerCopy.getRelatedName());
         } else {
-       // The tag is an alive tag -> we rewind the corresponding alive timer
+          // The tag is an alive tag -> we rewind the corresponding alive timer
           //TODO sychronization on alive timers... needed? use id here, so not possible around update
           aliveTimerFacade.update(tagId);
 
           Timestamp supervisionTimestamp = new Timestamp(System.currentTimeMillis());
           if (timerCopy.isProcessAliveType()) {
             Long processId = processFacade.getProcessIdFromAlive(tagId);
-            onProcessUp(processId, supervisionTimestamp, "Process Alive tag received.");
+            onProcessUp(processId, supervisionTimestamp);
+          } else if (timerCopy.isEquipmentAliveType()) {
+            onEquipmentUp(timerCopy.getRelatedId(), supervisionTimestamp, "Equipment Alive tag received.");
           } else {
-            if (timerCopy.isEquipmentAliveType()) {
-              onEquipmentUp(timerCopy.getRelatedId(), supervisionTimestamp, "Equipment Alive tag received.");
-            } else {
-              // It is a subequipment
-              onSubEquipmentUp(timerCopy.getRelatedId(), supervisionTimestamp, "Subequipment Alive tag received.");
-            }
+            // It is a subequipment
+            onSubEquipmentUp(timerCopy.getRelatedId(), supervisionTimestamp, "Subequipment Alive tag received.");
           }
         }
       } else {
         // The tag is NOT an alive tag -> we check if it is a communication fault tag
 
         CommFaultTag commFaultTagCopy = commFaultTagCache.getCopy(tagId);
-        if (log.isDebugEnabled()) {
-          StringBuilder str = new StringBuilder("processControlTag() : tag ");
-          str.append(tagId);
-          str.append(" is a commfault tag.");
-          log.debug(str.toString());
-        }
+        log.debug("processControlTag() : tag {} is a commfault tag", tagId);
 
         if (equipmentCache.hasKey(commFaultTagCopy.getEquipmentId())) { //check if equipment
 
@@ -753,13 +714,25 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
     }
   }
 
-
-
-
+  private boolean isProcessOnLocalConfiguration(Process process) {
+    return process.getLocalConfig() != null && process.getLocalConfig().equals(LocalConfig.Y);
+  }
+  
+  /**
+   * With an incoming alive tag the status tag has to set to either RUNNING or RUNNING_LOCAL. The method
+   * will return true, if this is not the case, yet.
+   * @param statusTag The status tag corresponding to the incoming Alive tag
+   * @return true, if the status tag shall be updated
+   */
+  private boolean statusTagNeedsUpdating(final ControlTag statusTag) {
+    return statusTag.getValue() == null
+        || !statusTag.isValid()
+        || !(statusTag.getValue().equals(SupervisionStatus.RUNNING.toString()) 
+            || statusTag.getValue().equals(SupervisionStatus.RUNNING_LOCAL.toString()));
+  }
 
   /**
-   * TODO write...
-   * The onUp() method is called in one of the following cases:
+   * The private method is called in one of the following cases:
    * <UL>
    *   <LI>an alive tag attached to a process/equipment has been received
    *   <LI>a communication fault indicating an equipment is running has been received.
@@ -770,46 +743,37 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
    *
    * FURTHER DETAILS:
    *
-   * If the state tag is valid and not "RUNNING", it is updated to "RUNNING" (as is the associated
+   * If the status tag is valid and not "RUNNING", it is updated to "RUNNING" (as is the associated
    * process field). In addition, if the state is DOWN due to an alive expiration,
    * then a request is made to the DAQ to send the latest values.
    *
    * Notice that the process alive is of course revalidated on reception of a new alive.
    */
-  private void onProcessUp(final Long processId, final Timestamp pTimestamp, final String pMessage) {
-    if (log.isDebugEnabled()) {
-      StringBuffer str = new StringBuffer("onProcessUp(");
-      str.append("Process with Id " + processId);
-      str.append(", ");
-      str.append(pTimestamp);
-      str.append(") called.");
-      log.debug(str.toString());
-    }
-    processFacade.resume(processId, pTimestamp, pMessage);
-
+  private void onProcessUp(final Long processId, final Timestamp pTimestamp) {
+    log.trace("onProcessUp({}, {})", processId, pTimestamp);
     final Process process = processCache.getCopy(processId);
+    String message = "Received alive tag for Process " + process.getName();
+    
+    processFacade.resume(processId, pTimestamp, message);
+
     //check state tag is correctly set
-    Long stateTagId = process.getStateTagId(); //never null
-    controlTagCache.acquireWriteLockOnKey(stateTagId);
+    Long statusTagId = process.getStateTagId();
+    controlTagCache.acquireWriteLockOnKey(statusTagId);
     try {
-      ControlTag stateTag = controlTagCache.get(stateTagId);
+      ControlTag stateTag = controlTagCache.get(statusTagId);
 
-      if (stateTag.getValue() == null || !stateTag.getValue().equals(SupervisionStatus.RUNNING.toString()) || !stateTag.isValid()) {
-
-        // If the process is running under a local configuration, set the status
-        // tag to RUNNING_LOCAL
-        if (process.getLocalConfig() != null && process.getLocalConfig().equals(LocalConfig.Y)) {
-          log.debug("onProcessUp(): Process is running on a local configuration, setting status to RUNNING_LOCAL");
-          controlTagFacade.updateAndValidate(stateTagId, SupervisionStatus.RUNNING_LOCAL.toString(), pMessage, pTimestamp);
-
-        } else if (stateTag.getValue() == null || !stateTag.getValue().equals(SupervisionStatus.RUNNING.toString())) {
-          controlTagFacade.updateAndValidate(stateTagId, SupervisionStatus.RUNNING.toString(), pMessage, pTimestamp);
+      if (statusTagNeedsUpdating(stateTag)) {
+        SupervisionStatus status = SupervisionStatus.RUNNING;
+        if (isProcessOnLocalConfiguration(process)) {
+          log.debug("Process is running on a local configuration, setting status to RUNNING_LOCAL");
+          status =  SupervisionStatus.RUNNING_LOCAL;
         }
+        controlTagFacade.updateAndValidate(statusTagId, status.toString(), message, pTimestamp);
       }
     } catch (CacheElementNotFoundException  controlCacheEx) {
-      log.error("Unable to locate state tag in cache (id is " + stateTagId + ")", controlCacheEx);
+      log.error("Unable to locate status tag in cache (id is " + statusTagId + ")", controlCacheEx);
     } finally {
-      controlTagCache.releaseWriteLockOnKey(stateTagId);
+      controlTagCache.releaseWriteLockOnKey(statusTagId);
     }
   }
 
@@ -827,16 +791,9 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
    * @param pTimestamp time when the equipment was detected to be "up"
    * @param pMessage custom message with more information of why the equipment is believed to be up.
    */
-  private void onEquipmentUp(final Long pId, final Timestamp pTimestamp, final String pMessage) {
-    if (log.isDebugEnabled()) {
-      StringBuffer str = new StringBuffer("onEquipmentUp(");
-      str.append(pId);
-      str.append(", ");
-      str.append(pTimestamp);
-      str.append(", ");
-      str.append(pMessage);
-      log.debug(str.toString());
-    }
+  private void onEquipmentUp(final Long pId, final Timestamp pTimestamp, String pMessage) {
+    log.debug("onEquipmentUp({}, {}, {})", pId, pTimestamp, pMessage);
+    
     // Try to obtain a copy of the state tag with its current value
     try {
       equipmentFacade.resume(pId, pTimestamp, pMessage);
@@ -846,8 +803,8 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
       Long commFaultId = equipmentCopy.getCommFaultTagId();
       controlTagCache.acquireWriteLockOnKey(stateTagId);
       try {
-        ControlTag stateTag = controlTagCache.get(stateTagId);
-        if (stateTag.getValue() == null || !stateTag.getValue().equals(SupervisionStatus.RUNNING.toString()) || !stateTag.isValid()) {
+        ControlTag statusTag = controlTagCache.get(stateTagId);
+        if (statusTagNeedsUpdating(statusTag)) {
           controlTagFacade.updateAndValidate(stateTagId, SupervisionStatus.RUNNING.toString(), pMessage, pTimestamp);
         }
       } catch (CacheElementNotFoundException controlCacheEx) {
@@ -856,8 +813,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
         controlTagCache.releaseWriteLockOnKey(stateTagId);
       }
 
-      ControlTag commFaultTag = controlTagCache.getCopy(commFaultId);
-      setCommFaultTag(commFaultId, true, commFaultTag.getValueDescription(), pTimestamp);
+      updateCommFaultTag(commFaultId, true, pMessage, pTimestamp);
     } catch (CacheElementNotFoundException equipmentCacheEx) {
       log.error("Unable to locate equipment in cache (id is " + pId + ") - not taking any invalidation action.", equipmentCacheEx);
     }
@@ -881,39 +837,29 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
    */
 
   private void onSubEquipmentUp(final Long pId, final Timestamp pTimestamp, final String pMessage) {
-
-    if (log.isDebugEnabled()) {
-      StringBuffer str = new StringBuffer("onSubEquipmentUp(");
-      str.append(pId);
-      str.append(", ");
-      str.append(pTimestamp);
-      str.append(", ");
-      str.append(pMessage);
-      log.debug(str.toString());
-    }
+    log.trace("onSubEquipmentUp({}, {}, {})", pId, pTimestamp, pMessage);
 
     try {
       // Try to obtain a copy of the state tag with its current value
       subEquipmentFacade.resume(pId, pTimestamp, pMessage);
       SubEquipment subEquipmentCopy = subEquipmentCache.getCopy(pId);
-      Long stateTagId = subEquipmentCopy.getStateTagId();
+      Long statusTagId = subEquipmentCopy.getStateTagId();
       Long commFaultId = subEquipmentCopy.getCommFaultTagId();
-      controlTagCache.acquireWriteLockOnKey(stateTagId);
+      controlTagCache.acquireWriteLockOnKey(statusTagId);
       try {
-        ControlTag stateTag = controlTagCache.get(stateTagId);
-        if (stateTag.getValue() == null  || !stateTag.getValue().equals(SupervisionStatus.RUNNING.toString()) || !stateTag.isValid()) {
-          controlTagFacade.updateAndValidate(stateTagId, SupervisionStatus.RUNNING.toString(), pMessage, pTimestamp);
+        ControlTag statusTag = controlTagCache.get(statusTagId);
+        if (statusTagNeedsUpdating(statusTag)) {
+          controlTagFacade.updateAndValidate(statusTagId, SupervisionStatus.RUNNING.toString(), pMessage, pTimestamp);
         }
       } catch (CacheElementNotFoundException controlCacheEx) {
-        log.error("Unable to locate subequipment state tag in control tag cache (id is " + stateTagId + ")", controlCacheEx);
+        log.error("Unable to locate subequipment state tag in control tag cache (id is {})", statusTagId, controlCacheEx);
       } finally {
-        controlTagCache.releaseWriteLockOnKey(stateTagId);
+        controlTagCache.releaseWriteLockOnKey(statusTagId);
       }
 
-      ControlTag commFaultTag = controlTagCache.getCopy(commFaultId);
-      setCommFaultTag(commFaultId, true, commFaultTag.getValueDescription(), pTimestamp);
+      updateCommFaultTag(commFaultId, true, pMessage, pTimestamp);
     } catch (CacheElementNotFoundException subEquipmentCacheEx) {
-      log.error("Unable to locate subequipment in cache (id is " + pId + ")", subEquipmentCacheEx);
+      log.error("Unable to locate subequipment in cache (id is {})", pId, subEquipmentCacheEx);
     }
   }
 

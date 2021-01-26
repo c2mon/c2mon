@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2020 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -16,7 +16,8 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.datatag;
 
-import java.sql.Timestamp;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -24,9 +25,6 @@ import org.junit.Test;
 import cern.c2mon.server.cache.rule.RuleTagFacadeImpl;
 import cern.c2mon.server.common.rule.RuleTagCacheObject;
 import cern.c2mon.shared.common.datatag.util.TagQualityStatus;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 /**
  * JUnit test of AbstractTagFacade class.
@@ -56,7 +54,7 @@ public class AbstractTagFacadeTest {
     rule.getDataTagQuality().addInvalidStatus(TagQualityStatus.VALUE_EXPIRED, "quality description");
 
     //should be filterout out
-    assertTrue(ruleTagFacade.filterout(rule, 20L, "value description", TagQualityStatus.VALUE_EXPIRED, "quality description", new Timestamp(System.currentTimeMillis())));
+    assertTrue(ruleTagFacade.filterout(rule, 20L, "value description", TagQualityStatus.VALUE_EXPIRED, "quality description"));
   }
 
   @Test
@@ -66,7 +64,7 @@ public class AbstractTagFacadeTest {
     rule.setValueDescription("value description");
 
     //should be filterout out
-    assertFalse(ruleTagFacade.filterout(rule, 20L, "value description", null, null, new Timestamp(System.currentTimeMillis())));
+    assertFalse(ruleTagFacade.filteroutValid(rule, 20L, "value description"));
   }
 
   @Test
@@ -77,7 +75,7 @@ public class AbstractTagFacadeTest {
     rule.getDataTagQuality().addInvalidStatus(TagQualityStatus.VALUE_EXPIRED, "quality description");
 
     //should be filterout out
-    assertFalse(ruleTagFacade.filterout(rule, 20L, "new value description", TagQualityStatus.VALUE_EXPIRED, "quality description", new Timestamp(System.currentTimeMillis())));
+    assertFalse(ruleTagFacade.filterout(rule, 20L, "new value description", TagQualityStatus.VALUE_EXPIRED, "quality description"));
   }
 
   @Test(expected=IllegalArgumentException.class)
@@ -87,7 +85,7 @@ public class AbstractTagFacadeTest {
     rule.setValueDescription("value description");
 
     //should be filterout out
-    assertTrue(ruleTagFacade.filterout(rule, 20L, "new value description", null, "quality description", new Timestamp(System.currentTimeMillis())));
+    assertTrue(ruleTagFacade.filterout(rule, 20L, "new value description", null, "quality description"));
   }
 
   /**
@@ -100,7 +98,7 @@ public class AbstractTagFacadeTest {
     rule.getDataTagQuality().addInvalidStatus(TagQualityStatus.VALUE_EXPIRED, null);
 
     //should be filterout out
-    assertTrue(ruleTagFacade.filterout(rule, 20L, null, TagQualityStatus.VALUE_EXPIRED, null, new Timestamp(System.currentTimeMillis())));
+    assertTrue(ruleTagFacade.filterout(rule, 20L, null, TagQualityStatus.VALUE_EXPIRED, null));
   }
 
   @Test
@@ -110,12 +108,12 @@ public class AbstractTagFacadeTest {
     rule.getDataTagQuality().addInvalidStatus(TagQualityStatus.VALUE_EXPIRED, null);
 
     //should be filterout out
-    assertTrue(ruleTagFacade.filterout(rule, null, null, TagQualityStatus.VALUE_EXPIRED, null, new Timestamp(System.currentTimeMillis())));
+    assertTrue(ruleTagFacade.filterout(rule, null, null, TagQualityStatus.VALUE_EXPIRED, null));
   }
 
   @Test(expected=NullPointerException.class)
   public void testFilteroutWithNullTag() {
-    ruleTagFacade.filterout(null, null, null, null, null, new Timestamp(System.currentTimeMillis()));
+    ruleTagFacade.filteroutValid(null, null, null);
   }
 
   @Test
@@ -126,7 +124,7 @@ public class AbstractTagFacadeTest {
     rule.getDataTagQuality().addInvalidStatus(TagQualityStatus.VALUE_EXPIRED, "quality description");
 
     //should be filterout out
-    assertTrue(ruleTagFacade.filteroutInvalidation(rule, TagQualityStatus.VALUE_EXPIRED, "quality description", new Timestamp(System.currentTimeMillis())));
+    assertTrue(ruleTagFacade.filteroutInvalidation(rule, TagQualityStatus.VALUE_EXPIRED, "quality description"));
   }
 
 }

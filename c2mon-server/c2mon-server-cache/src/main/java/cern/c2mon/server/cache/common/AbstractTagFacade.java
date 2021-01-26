@@ -420,6 +420,7 @@ public abstract class AbstractTagFacade<T extends Tag> extends AbstractFacade<T>
       dataTagAddressUpdate.setFreshnessInterval(dataTagAddress.getFreshnessInterval());
     }
   }
+  
   /**
    * Checks if the new Tag value should be filtered out or updated.
    * Is filtered out if value, value description and quality are
@@ -436,7 +437,7 @@ public abstract class AbstractTagFacade<T extends Tag> extends AbstractFacade<T>
    * @throws IllegalArgumentException if status description is not null but statusToAdd is (does not make any sense!) or the same for the value
    */
   public boolean filterout(Tag tag, Object value, String valueDescription,
-                            TagQualityStatus statusToAdd, String statusDescription, Timestamp timestamp) {
+                            TagQualityStatus statusToAdd, String statusDescription) {
     if (statusToAdd == null && statusDescription != null) {
       throw new IllegalArgumentException("Filterout method called with non-null status description but null status");
     }
@@ -481,8 +482,8 @@ public abstract class AbstractTagFacade<T extends Tag> extends AbstractFacade<T>
    * @param timestamp the invalidation time
    * @return true if should be filtered
    */
-  public boolean filteroutInvalidation(T tag, TagQualityStatus statusToAdd, String statusDescription, Timestamp timestamp) {
-    return filterout(tag, tag.getValue(), tag.getValueDescription(), statusToAdd, statusDescription, timestamp);
+  public boolean filteroutInvalidation(T tag, TagQualityStatus statusToAdd, String statusDescription) {
+    return filterout(tag, tag.getValue(), tag.getValueDescription(), statusToAdd, statusDescription);
   }
 
   /**
@@ -490,11 +491,10 @@ public abstract class AbstractTagFacade<T extends Tag> extends AbstractFacade<T>
    * @param tag the current tag
    * @param value the new value
    * @param valueDescription the new value description
-   * @param timestamp the update time
    * @return true if should be filtered
    */
-  public boolean filteroutValid(T tag, Object value, String valueDescription, Timestamp timestamp) {
-    return filterout(tag, value, valueDescription, null, null, timestamp);
+  public boolean filteroutValid(T tag, Object value, String valueDescription) {
+    return filterout(tag, value, valueDescription, null, null);
   }
 
   @Override
