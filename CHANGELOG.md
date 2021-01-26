@@ -15,6 +15,7 @@ For more details on a given release, please check also the [version planning](ht
 - Update managed dependencies of Oracle (ojdbc8 v19.8.0.0) and MyBatis Spring (v2.0.6)
 
 ### Fixed
+- Fixed problem of redundant Control tag updates (and archiving) triggered by Alive tag changes (CM-274)
 
 ## 1.10.0 - 2020-11-17
 
