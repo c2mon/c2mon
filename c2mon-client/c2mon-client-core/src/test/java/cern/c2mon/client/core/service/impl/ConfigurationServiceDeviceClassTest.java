@@ -123,6 +123,7 @@ public class ConfigurationServiceDeviceClassTest {
     }
 
     @Test
+    @Ignore
     public void testCreateDeviceWithPropertiesFieldsAndCommand() {
         String date = "1"; //LocalTime.now().format(formatter);
         DeviceClass deviceClass = DeviceClass.create("devClass: " + date)
