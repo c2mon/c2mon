@@ -115,9 +115,9 @@ public class DeviceConfigurationManagerTest {
     @Test
     public void createDeviceWithMultipleDevicePropertiesShouldReturnDeviceProperties() {
         Device expected = Device.create(String.valueOf(System.currentTimeMillis()), "devClassName")
-                .addPropertyForClientRule("name1", "value1", ResultType.String)
+                .addPropertyForClientRule("name1", "value1", ResultType.STRING)
                 .addPropertyForTagId("name2",2L)
-                .addPropertyForConstantValue("name3", 3, ResultType.Integer)
+                .addPropertyForConstantValue("name3", 3, ResultType.INTEGER)
                 .build();
         Capture<Configuration> c = newCapture();
         expect(configurationRequestSenderMock.applyConfiguration(and(capture(c), isA(Configuration.class)), anyObject()))

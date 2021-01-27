@@ -18,6 +18,7 @@ package cern.c2mon.shared.client.device;
 
 import java.util.*;
 
+import lombok.NoArgsConstructor;
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
 
@@ -28,7 +29,8 @@ import org.simpleframework.xml.Root;
  * @author Justin Lewis Salmon
  */
 @Root(name = "Properties")
-public class PropertyList implements DeviceClassOrDeviceSerializableElement {
+@NoArgsConstructor
+public class PropertyList implements SerializableDeviceElement {
 
   @ElementList(entry = "Property", inline = true, required = false)
   private Collection<Property> properties = new HashSet<>();
@@ -39,13 +41,6 @@ public class PropertyList implements DeviceClassOrDeviceSerializableElement {
    */
   public PropertyList(Collection<Property> properties) {
     this.properties = properties;
-  }
-
-  /**
-   * Default constructor used during deserialization
-   */
-  public PropertyList() {
-    super();
   }
 
   /**

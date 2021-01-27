@@ -103,18 +103,18 @@
   <insert id="insertDeviceProperty">
     INSERT INTO DEVICEPROPERTY (DVPPROPID, DVPNAME, DVPVALUE, DVPCATEGORY, DVPRESULTTYPE, DVPDEVID)
     VALUES (#{property.id}, #{property.name}, #{property.value,javaType=String ,jdbcType=VARCHAR}, #{property.category,javaType=String, jdbcType=VARCHAR},
-            #{property.resultType}, #{id})
+            #{property.resultType.label,javaType=String, jdbcType=VARCHAR}, #{id})
   </insert>
 
   <insert id="insertPropertyField">
     INSERT INTO PROPERTYFIELD (PRFFIELDID, PRFFIELDNAME, PRFVALUE, PRFCATEGORY, PRFRESULTTYPE, PRFPROPID, PRFDEVID)
     VALUES (#{field.id}, #{field.name}, #{field.value,javaType=String, jdbcType=VARCHAR}, #{field.category},
-            #{field.resultType}, #{propertyId}, #{deviceId})
+            #{field.resultType.label,javaType=String, jdbcType=VARCHAR}, #{propertyId}, #{deviceId})
   </insert>
 
   <insert id="insertDeviceCommand">
     INSERT INTO DEVICECOMMAND (DVCCMDID, DVCNAME, DVCVALUE, DVCCATEGORY, DVCRESULTTYPE, DVCDEVID)
-    VALUES (#{command.id}, #{command.name}, #{command.value}, #{command.category}, #{command.resultType},
+    VALUES (#{command.id}, #{command.name}, #{command.value}, #{command.category}, #{command.resultType.label,javaType=String, jdbcType=VARCHAR},
             #{id})
   </insert>
 

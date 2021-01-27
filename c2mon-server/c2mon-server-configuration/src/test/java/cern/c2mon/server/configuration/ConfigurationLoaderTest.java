@@ -1285,7 +1285,7 @@ public class ConfigurationLoaderTest {
     List<DeviceProperty> expectedProperties = new ArrayList<>();
     expectedProperties.add(DeviceProperty.forTagId(1L, "cpuLoadInPercent", 987654L));
     expectedProperties.add(DeviceProperty.forConstantValue(2L, "responsiblePerson", "Mr. Administrator"));
-    expectedProperties.add(DeviceProperty.forClientRule(3L, "someCalculations", "(#123 + #234) / 2", ResultType.Float));
+    expectedProperties.add(DeviceProperty.forClientRule(3L, "someCalculations", "(#123 + #234) / 2", ResultType.FLOAT));
 
     List<DeviceProperty> expectedFields = new ArrayList<>();
     expectedFields.add(DeviceProperty.forTagId(1L, "field1", 987654L));
@@ -1307,7 +1307,7 @@ public class ConfigurationLoaderTest {
     assertFalse(report.toXML().contains(Status.FAILURE.toString()));
     cacheObject = (DeviceCacheObject) deviceCache.get(20L);
 
-    expectedProperties.add(DeviceProperty.forConstantValue(4L, "numCores", 4, ResultType.Integer));
+    expectedProperties.add(DeviceProperty.forConstantValue(4L, "numCores", 4, ResultType.INTEGER));
     expectedObject.setDeviceProperties(expectedProperties);
     ObjectEqualityComparison.assertDeviceEquals(expectedObject, cacheObject);
 

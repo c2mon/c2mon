@@ -155,14 +155,14 @@ public class DeviceImplTest {
     List<DeviceProperty> deviceProperties = new ArrayList<>();
     deviceProperties.add(DeviceProperty.forTagId(1L, "cpuLoadInPercent", 10000L));
     deviceProperties.add(DeviceProperty.forConstantValue(2L, "responsiblePerson", "Mr. Administrator"));
-    deviceProperties.add(DeviceProperty.forClientRule(3L, "someCalculations", "(#123 + #234) / 2", ResultType.Float));
-    deviceProperties.add(DeviceProperty.forConstantValue(4L, "numCores", 4, ResultType.Integer));
+    deviceProperties.add(DeviceProperty.forClientRule(3L, "someCalculations", "(#123 + #234) / 2", ResultType.FLOAT));
+    deviceProperties.add(DeviceProperty.forConstantValue(4L, "numCores", 4, ResultType.INTEGER));
 
     List<DeviceProperty> fields = new ArrayList<>();
     fields.add(DeviceProperty.forTagId(1L, "cpuLoadInPercent2", 10001L));
     fields.add(DeviceProperty.forConstantValue(2L, "responsiblePerson2", "Mr. Administrator"));
-    fields.add(DeviceProperty.forClientRule(3L, "someCalculations2", "(#123 + #234) / 2", ResultType.Float));
-    fields.add(DeviceProperty.forConstantValue(4L, "numCores2", 4, ResultType.Integer));
+    fields.add(DeviceProperty.forClientRule(3L, "someCalculations2", "(#123 + #234) / 2", ResultType.FLOAT));
+    fields.add(DeviceProperty.forConstantValue(4L, "numCores2", 4, ResultType.INTEGER));
 
     DeviceProperty propertyWithFields = DeviceProperty.forMappedProperty(5L, "acquisition", fields);
     deviceProperties.add(propertyWithFields);
@@ -283,7 +283,7 @@ public class DeviceImplTest {
     EasyMock.replay(tagServiceMock);
 
     final List<DeviceProperty> deviceProperties = new ArrayList<>();
-    deviceProperties.add(DeviceProperty.forClientRule(1L, "test_property_rule_name", "(#234 + #345) / 2", ResultType.Float));
+    deviceProperties.add(DeviceProperty.forClientRule(1L, "test_property_rule_name", "(#234 + #345) / 2", ResultType.FLOAT));
     device.setDeviceProperties(deviceProperties);
 
     for (Property property : device.getProperties()) {
@@ -363,8 +363,8 @@ public class DeviceImplTest {
     List<DeviceProperty> deviceFields = new ArrayList<>();
     deviceFields.add(DeviceProperty.forTagId(1L, "cpuLoadInPercent", 100000L));
     deviceFields.add(DeviceProperty.forConstantValue(2L, "responsiblePerson", "Mr. Administrator"));
-    deviceFields.add(DeviceProperty.forClientRule(3L, "someCalculations", "(#123 + #234) / 2", ResultType.Float));
-    deviceFields.add(DeviceProperty.forConstantValue(4L, "numCores", 4, ResultType.Integer));
+    deviceFields.add(DeviceProperty.forClientRule(3L, "someCalculations", "(#123 + #234) / 2", ResultType.FLOAT));
+    deviceFields.add(DeviceProperty.forConstantValue(4L, "numCores", 4, ResultType.INTEGER));
 
     TagImpl cdt = new TagImpl(100000L);
     ClientConstantValue ccv1 = new ClientConstantValue("Mr. Administrator", null);

@@ -68,8 +68,7 @@ public class ReflectionService {
 
       // add all fields without annotation to the Properties
       for (PropertyDescriptor pd : props) {
-        if (!ignoreFields.contains(pd.getName())) {
-          if (pd.getReadMethod().invoke(obj) != null) {
+        if (!ignoreFields.contains(pd.getName()) && pd.getReadMethod().invoke(obj) != null) {
             String tempProp;
 
             // check if the property is a TagMode. If so we have to call the ordinal() method manual because the enum toString method don't return the needed
@@ -90,15 +89,15 @@ public class ReflectionService {
             } else if (pd.getPropertyType().equals(ValueAlarmCondition.class)) {
               // check if the property is a AlarmCondition. If so we have to call the getXMLCondition() method because the server expect the xml string of an
               // AlarmCondition.
-              tempProp = String.valueOf(((ValueAlarmCondition) pd.getReadMethod().invoke(obj)).getXMLCondition());
+              tempProp = ((ValueAlarmCondition) pd.getReadMethod().invoke(obj)).getXMLCondition();
 
             } else if (pd.getPropertyType().equals(Metadata.class)) {
               tempProp = String.valueOf(Metadata.toJSON((Metadata) pd.getReadMethod().invoke(obj)));
 
-            } else if (DeviceClassOrDeviceSerializableElement.class.isAssignableFrom(pd.getPropertyType())) {
+            } else if (SerializableDeviceElement.class.isAssignableFrom(pd.getPropertyType())) {
               // check if the property is or type PropertyList, CommandList, DevicePropertyList or DeviceCommandList. If so,
               // the server expects the xml string as serialized in toConfigXml()
-              tempProp = String.valueOf(((DeviceClassOrDeviceSerializableElement) pd.getReadMethod().invoke(obj)).toConfigXml());
+              tempProp = String.valueOf(((SerializableDeviceElement) pd.getReadMethod().invoke(obj)).toConfigXml());
 
             } else {
               // default call of all properties. Returns the standard toStringValue of the given Type
@@ -107,7 +106,6 @@ public class ReflectionService {
 
             properties.setProperty(pd.getName(), tempProp);
           }
-        }
       }
     } catch (Exception e) {
       throw new ConfigurationParseException("Error extracting values from the configuration " + object + ": ", e);

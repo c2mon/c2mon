@@ -18,6 +18,7 @@ package cern.c2mon.shared.client.device;
 
 import java.util.*;
 
+import lombok.NoArgsConstructor;
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
 
@@ -28,7 +29,8 @@ import org.simpleframework.xml.Root;
  * @author Justin Lewis Salmon
  */
 @Root(name = "Commands")
-public class CommandList implements DeviceClassOrDeviceSerializableElement {
+@NoArgsConstructor
+public class CommandList implements SerializableDeviceElement {
 
   @ElementList(entry = "Command", inline = true, required = false)
   private Collection<Command> commands = new HashSet<>();
@@ -41,12 +43,6 @@ public class CommandList implements DeviceClassOrDeviceSerializableElement {
     this.commands = commands;
   }
 
-  /**
-   * Default constructor used during deserialization
-   */
-  public CommandList() {
-    super();
-  }
 
   /**
    * Get the unwrapped commands in a mutable list
