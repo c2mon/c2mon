@@ -178,16 +178,27 @@ DeviceClass deviceClass = DeviceClass.create("DEV_CLASS_EXAMPLE")
         .id(234L)
         .description("A short description")
         .addProperty("PROPERTY", "Description of the property")
-        .addField("PROPERTY", "FIELD", "This field is added to the property with name PROPERTY")
+            .addField("FIELD", "This field is added to the property with name PROPERTY")
         .addCommand("COMMAND", "Description of the command")
         .build();
 
-configurationService.createEquipment(deviceClass);
+configurationService.createDeviceClass(deviceClass);
 ```
 
-To add a field to a device class, you must reference its parent property by name. The parent property must be added to 
-the device class already!
+Fields are always appended to the most recently added Property. So in the example below of `DEV_CLASS_2`, 
+only `PROPERTY_2` will have fields, but not `PROPERTY_1` or `PROPERTY_3`:
 
+```java
+
+DeviceClass deviceClass = DeviceClass.create("DEV_CLASS_2")
+        .addProperty("PROPERTY_1", "A property without fields")
+        .addProperty("PROPERTY_2", "A property with fields")
+            .addField("FIELD", "This field is added to the most recently added property, here PROPERTY_2")
+        .addProperty("PROPERTY_3", "Another property without fields")
+        .build();
+```
+
+ 
 Finally, remember that no two properties or commands may have the same name, and field names must be unique within the
 parent property.
 
@@ -220,37 +231,51 @@ configurationService.createDevice("DEVICE_EXAMPLE", 1234);
 ```
 
 A device ID will be generated automatically. As when configuring the device class, use one of the `Device#create` 
-builder methods  in order to add device properties, device commands or property fields: 
+builder methods  in order to add device properties, device commands or property fields.
+
+There are several different types of device properties which can be configured: Properties or fields can reference Tag IDs, 
+client rules, or constant values. 
+Devices properties which contain fields are called "mapped properties" and do not have a specific value of their own. 
+Rather, they can be considered to purely be containers for their fields. 
+
+Device commands, on the other hand, reference Command Tag IDs.
+  
+The device builder offers dedicated methods for the individual types, as evident from the following example:
 
 ```java
 
-DeviceClass deviceClass1 = DeviceClass.create("DEVICE_EXAMPLE_1", "PARENT_DEVICE_CLASS")
-        .id(234L)
-        .addDeviceProperty("PROPERTY", "value", "category", "result type")
-        .addPropertyField("PROPERTY","FIELD", "value", "category", "result type")
-        .addDeviceCommand("COMMAND", "value", "category", "result type")
+DeviceClass deviceClass = DeviceClass.create("DEV_CLASS")
+        .addProperty("CPU_LOAD", "The cpu load on server XYZ in percent.")
+        .addProperty("SERVER_XYZ", "Information regarding a certain server")
+                .addField("RESPONSIBLE_PERSON", "The person responsible for server XYZ")
+                .addField("SOME_CALCULATION", "Some calculation on server XYZ")
+        .addCommand("LIGHT_OFF", "Turn off the automatic light sensor in lab XYZ")
         .build();
 
-DeviceClass deviceClass2 = DeviceClass.create("DEVICE_EXAMPLE_2", 1234)
-        .id(235L)
-        .addDeviceProperty("PROPERTY", "4", "constantValue", "Integer")
-        .addPropertyField("PROPERTY","FIELD", "(#123 + #234) / 2", "clientRule", "Float")
+configurationService.createDeviceClass(deviceClass);
+
+Device device = Device.create("DEVICE_EXAMPLE", "DEV_CLASS")
+        .addPropertyForTagId("CPU_LOAD", 302254L)
+        .createMappedProperty("SERVER_XYZ")
+                .addFieldForConstantValue("RESPONSIBLE_PERSON", "Ms. Administrator", ResultType.STRING)
+                .addFieldForClientRule("SOME_CALCULATION", "(#123 + #234) / 2", ResultType.INTEGER)
+        .addPropertyForConstantValue("constant_value_property: " + date, 2L, ResultType.LONG)
+        .addCommand("LIGHT_OFF", 100548L)
         .build();
 
-configurationService.createEquipment(deviceClass1);
-configurationService.createEquipment(deviceClass2);
+configurationService.createDevice(device);
 ```
+
+The type of resulting values relevant for constant values and client rules. Possible result types are `Boolean`, `Double`, `Float`, `Integer`, `Long`, `Numeric` or `String`.
 
 Each device property, device command and property field must correspond by name to a property, command or field of the 
 parent device class. However, not all properties, commands and fields or the parent class need to be implemented in all
-devices. As when adding fields to device classes, adding property fields required the parent device 
-properties to be set already.
+devices.
 
 ## Deleting Devices
 
-You can also delete a device by its name or ID:
+You can delete a device by its ID:
 
 ```java
-configurationService.removeDevice("DEVICE_EXAMPLE_1");
 configurationService.removeDeviceById(235L);
 ```
