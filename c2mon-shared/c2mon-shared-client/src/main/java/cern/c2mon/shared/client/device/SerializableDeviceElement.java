@@ -8,7 +8,7 @@ import java.io.StringWriter;
 /**
  * An interface providing a convenience method for serializing object to an XML string using the SimpleXML framework.
  */
-public interface DeviceClassOrDeviceSerializableElement {
+public interface SerializableDeviceElement {
 
     /**
      * Serializes the implementing object into an XML string using SimpleXML
@@ -21,5 +21,14 @@ public interface DeviceClassOrDeviceSerializableElement {
             serializer.write(this, fw);
             return fw.toString();
         }
+    }
+    /**
+     * Deserializes the implementing object into an XML string using SimpleXML
+     * @return a String of the serialized object
+     * @throws Exception if the serialization fails
+     */
+    static <T extends SerializableDeviceElement> T fromConfigXml(String xmlString, Class<T> clazz) throws Exception {
+        Persister serializer = new Persister(new AnnotationStrategy());
+        return serializer.read(clazz, xmlString);
     }
 }

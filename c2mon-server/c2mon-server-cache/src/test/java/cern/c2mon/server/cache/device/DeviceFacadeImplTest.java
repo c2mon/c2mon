@@ -270,8 +270,8 @@ public class DeviceFacadeImplTest {
     List<DeviceProperty> expectedFields = new ArrayList<>();
     expectedFields.add(DeviceProperty.forTagId(1L, "field1", 987654L));
     expectedFields.add(DeviceProperty.forConstantValue(2L, "field2", "Mr. Administrator"));
-    expectedFields.add(DeviceProperty.forClientRule(3L, "field3", "(#123 + #234) / 2", ResultType.Float));
-    expectedFields.add(DeviceProperty.forConstantValue(4L, "field4", 4, ResultType.Integer));
+    expectedFields.add(DeviceProperty.forClientRule(3L, "field3", "(#123 + #234) / 2", ResultType.FLOAT));
+    expectedFields.add(DeviceProperty.forConstantValue(4L, "field4", 4, ResultType.INTEGER));
     assertDevicePropertyListContains(device.getDeviceProperties(), DeviceProperty.forMappedProperty(3L, "TEST_PROPERTY_WITH_FIELDS", expectedFields));
 
     Assert.assertTrue(device.getDeviceCommands().size() == 2);

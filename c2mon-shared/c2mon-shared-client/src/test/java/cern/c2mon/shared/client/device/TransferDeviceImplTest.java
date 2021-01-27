@@ -47,8 +47,8 @@ public class TransferDeviceImplTest {
     List<DeviceProperty> properties = new ArrayList<>();
     DeviceProperty p1 = DeviceProperty.forTagId(1L, "cpuLoadInPercent", 987654L);
     DeviceProperty p2 = DeviceProperty.forConstantValue(2L, "responsiblePerson", "Mr. Administrator");
-    DeviceProperty p3 = DeviceProperty.forClientRule(3L, "someCalculations", "(#123 + #234) / 2", ResultType.Float);
-    DeviceProperty p4 = DeviceProperty.forConstantValue(4L, "numCores", 4, ResultType.Integer);
+    DeviceProperty p3 = DeviceProperty.forClientRule(3L, "someCalculations", "(#123 + #234) / 2", ResultType.FLOAT);
+    DeviceProperty p4 = DeviceProperty.forConstantValue(4L, "numCores", 4, ResultType.INTEGER);
     properties.addAll(Arrays.asList(p1, p2, p3, p4));
 
     DeviceProperty propertyWithFields = DeviceProperty.forMappedProperty(5L, "TEST_PROPERTY_WITH_FIELDS", new ArrayList<>(properties));

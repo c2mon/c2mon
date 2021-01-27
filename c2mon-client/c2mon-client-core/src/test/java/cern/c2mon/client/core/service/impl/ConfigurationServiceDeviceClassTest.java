@@ -123,9 +123,8 @@ public class ConfigurationServiceDeviceClassTest {
     }
 
     @Test
-    @Ignore
-    public void testCreateDeviceWithPropertyAndCommand() {
-        String date = LocalTime.now().format(formatter);
+    public void testCreateDeviceWithPropertiesFieldsAndCommand() {
+        String date = "1"; //LocalTime.now().format(formatter);
         DeviceClass deviceClass = DeviceClass.create("devClass: " + date)
                 .addCommand("command", "a command")
                 .addProperty("constant_value_property", "a property for constant values")
@@ -138,12 +137,12 @@ public class ConfigurationServiceDeviceClassTest {
         configurationService.createDeviceClass(deviceClass);
         Device device = Device.create("device: " + date, "devClass: " + date)
                 .addCommand("command", 1L)
-                .addPropertyForConstantValue("constant_value_property", "2L", ResultType.Long)
+                .addPropertyForConstantValue("constant_value_property", 2L, ResultType.LONG)
                 .createMappedProperty("mapped_property")
-                .addFieldForClientRule("client_rule_field", "A RULE", ResultType.Integer)
+                .addFieldForClientRule("client_rule_field", "A RULE", ResultType.INTEGER)
                 .addFieldForTagId("tag_id_field", 3L)
                 .createMappedProperty("mapped_property_2")
-                .addFieldForConstantValue("constant_value_field", "A VALUE", ResultType.String)
+                .addFieldForConstantValue("constant_value_field", "A VALUE", ResultType.STRING)
                 .build();
         ConfigurationReport report = configurationService.createDevice(device);
         log.info("Report: {}, {}", report.getStatus(), report.getStatusDescription());
