@@ -40,16 +40,12 @@ public enum ResultType {
     Class<?> resultClass;
 
     /**
-     * Fetch the result type by its label, or fall back to the default result type 'String', if the label does not
-     * correspond to a result type.
+     * Fetch the result type by its label
      * @param label the label of the result type
-     * @return the result type corresponding to the label, or the default result type 'String' if none could be found.
+     * @return the result type corresponding to the label it it exists, or null if no match could be found.
      */
-    public static ResultType getOrDefault(String label) {
-        if (label == null) {
-            return STRING;
-        }
-        return BY_LABEL.getOrDefault(label, STRING);
+    public static ResultType getByLabel(String label) {
+        return label == null ?  null : BY_LABEL.get(label);
     }
 
 }

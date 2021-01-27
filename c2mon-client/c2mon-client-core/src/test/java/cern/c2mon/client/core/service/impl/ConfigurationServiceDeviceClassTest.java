@@ -125,25 +125,25 @@ public class ConfigurationServiceDeviceClassTest {
     @Test
     @Ignore
     public void testCreateDeviceWithPropertiesFieldsAndCommand() {
-        String date = "1"; //LocalTime.now().format(formatter);
+        String date = LocalTime.now().format(formatter);
         DeviceClass deviceClass = DeviceClass.create("devClass: " + date)
-                .addCommand("command", "a command")
-                .addProperty("constant_value_property", "a property for constant values")
-                .addProperty("mapped_property", "a mapped property")
-                .addField("mapped_property", "client_rule_field", "client rule field for mapped_property")
-                .addField("mapped_property", "tag_id_field", "tag ID field for mapped_property")
-                .addProperty("mapped_property_2", "another mapped property")
-                .addField("mapped_property_2", "constant_value_field", "constant value field for mapped_property_2")
+                .addCommand("command: " + date, "a command")
+                .addProperty("constant_value_property: " + date, "a property for constant values")
+                .addProperty("mapped_property: "  + date, "a mapped property")
+                .addField("client_rule_field: " + date, "client rule field for mapped_property")
+                .addField("tag_id_field: " + date, "tag ID field for mapped_property")
+                .addProperty("mapped_property_2: " + date, "another mapped property")
+                .addField("constant_value_field: " + date, "constant value field for mapped_property_2")
                 .build();
         configurationService.createDeviceClass(deviceClass);
         Device device = Device.create("device: " + date, "devClass: " + date)
-                .addCommand("command", 1L)
-                .addPropertyForConstantValue("constant_value_property", 2L, ResultType.LONG)
-                .createMappedProperty("mapped_property")
-                .addFieldForClientRule("client_rule_field", "A RULE", ResultType.INTEGER)
-                .addFieldForTagId("tag_id_field", 3L)
-                .createMappedProperty("mapped_property_2")
-                .addFieldForConstantValue("constant_value_field", "A VALUE", ResultType.STRING)
+                .addCommand("command: " + date, 1L)
+                .addPropertyForConstantValue("constant_value_property: " + date, 2L, ResultType.LONG)
+                .createMappedProperty("mapped_property: " + date)
+                .addFieldForClientRule("client_rule_field: " + date, "A RULE", ResultType.INTEGER)
+                .addFieldForTagId("tag_id_field: " + date, 3L)
+                .createMappedProperty("mapped_property_2: " + date)
+                .addFieldForConstantValue("constant_value_field: " + date, "A VALUE", ResultType.STRING)
                 .build();
         ConfigurationReport report = configurationService.createDevice(device);
         log.info("Report: {}, {}", report.getStatus(), report.getStatusDescription());
@@ -156,7 +156,7 @@ public class ConfigurationServiceDeviceClassTest {
         String date = LocalTime.now().format(formatter);
         DeviceClass deviceClass = DeviceClass.create("devClass: " + date)
                 .addProperty("parent property", "property with field")
-                .addField("parent property", "field1", "field")
+                .addField("field1", "field")
                 .build();
         ConfigurationReport report = configurationService.createDeviceClass(deviceClass);
 

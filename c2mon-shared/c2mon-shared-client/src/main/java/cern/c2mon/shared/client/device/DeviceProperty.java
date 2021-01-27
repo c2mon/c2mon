@@ -108,11 +108,11 @@ public class DeviceProperty extends DeviceElement {
         return new DeviceProperty(id, name, fields);
     }
 
-    private DeviceProperty(final Long id, final String name, final String value, final String category, final ResultType resultType) {
+    private DeviceProperty(final Long id, final String name, final String value, final Category category, final ResultType resultType) {
         this.id = id;
         this.name = name;
         this.value = value;
-        this.category = category;
+        this.category = category.label;
         if (resultType != null) {
             this.resultType = resultType;
         }
@@ -125,14 +125,17 @@ public class DeviceProperty extends DeviceElement {
         }
     }
 
-    /**
+     /**
      * Attempts to convert the string representation of the result type into a
      * class object of the corresponding type.
      *
      * @return the class of the result type
+     * @throws ClassNotFoundException if the result type is null and therefore does not correspond to a class.
      */
     public Class<?> getResultTypeClass() throws ClassNotFoundException {
-        // TODO: remove exception
+        if (resultType == null) {
+            throw new ClassNotFoundException("The result type does not correspond to a class");
+        }
         return resultType.resultClass;
     }
 
