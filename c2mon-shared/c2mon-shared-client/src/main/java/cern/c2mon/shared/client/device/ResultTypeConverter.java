@@ -12,7 +12,7 @@ public class ResultTypeConverter implements Converter<ResultType> {
     @Override
     public ResultType read(InputNode inputNode) throws Exception {
         String value = inputNode.getValue();
-        return ResultType.getOrDefault(value);
+        return ResultType.getByLabel(value);
     }
 
     @Override

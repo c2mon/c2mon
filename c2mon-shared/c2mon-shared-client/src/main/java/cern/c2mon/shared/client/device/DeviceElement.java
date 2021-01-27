@@ -1,9 +1,6 @@
 package cern.c2mon.shared.client.device;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.convert.Convert;
@@ -20,15 +17,20 @@ public abstract class DeviceElement implements Cloneable, Serializable {
     private static final long serialVersionUID = -6865580729113685166L;
 
     /**
-     * The category constants in the nomenclature of the database.
+     * The possible categories of device properties, device commands or property fields
      */
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    protected static class Category {
-        protected static final String TAG_ID = "tagId";
-        protected static final String COMMAND_TAG_ID = "commandTagId";
-        protected static final String CLIENT_RULE = "clientRule";
-        protected static final String CONSTANT_VALUE = "constantValue";
-        protected static final String MAPPED_PROPERTY = "mappedProperty";
+    @AllArgsConstructor
+    protected enum Category {
+        TAG_ID("tagId"),
+        COMMAND_TAG_ID("commandTagId"),
+        CLIENT_RULE("clientRule"),
+        CONSTANT_VALUE("constantValue"),
+        MAPPED_PROPERTY("mappedProperty");
+
+        /**
+         * The category name in the nomenclature of the database.
+         */
+        protected String label;
     }
 
     /**

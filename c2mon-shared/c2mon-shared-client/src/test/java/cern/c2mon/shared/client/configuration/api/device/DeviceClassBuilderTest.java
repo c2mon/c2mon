@@ -48,7 +48,7 @@ public class DeviceClassBuilderTest {
     public void addFieldToPropertyShouldAddFieldsToEntity() {
         DeviceClass entity = DeviceClass.create("test")
                 .addProperty("parentName", "description")
-                .addField("parentName", "fieldName", "fieldDescription")
+                .addField("fieldName", "fieldDescription")
                 .build();
         Property parentProperty = getPropertyWithName(entity, "parentName");
         Assert.assertTrue(deviceClassElementListContains(parentProperty.getFields(), "fieldName", "fieldDescription"));
@@ -58,8 +58,8 @@ public class DeviceClassBuilderTest {
     public void addFieldsToBuilderShouldAddAllFieldsToEntity() {
         DeviceClass entity = DeviceClass.create("test")
                 .addProperty("parentName", "description")
-                .addField("parentName", "fieldName1", "fieldDescription")
-                .addField("parentName", "fieldName2", "fieldDescription")
+                .addField("fieldName1", "fieldDescription")
+                .addField( "fieldName2", "fieldDescription")
                 .build();
         Property parentProperty = getPropertyWithName(entity, "parentName");
         Assert.assertTrue(deviceClassElementListContains(parentProperty.getFields(), "fieldName1", "fieldDescription"));
@@ -70,17 +70,34 @@ public class DeviceClassBuilderTest {
     public void addFieldsToBuilderShouldAddOnlyAddedFieldsToEntity() {
         DeviceClass entity = DeviceClass.create("test")
                 .addProperty("parentName", "description")
-                .addField("parentName", "fieldName1", "fieldDescription")
-                .addField("parentName", "fieldName2", "fieldDescription")
+                .addField("fieldName1", "fieldDescription")
+                .addField( "fieldName2", "fieldDescription")
                 .build();
         Property parentProperty = getPropertyWithName(entity, "parentName");
         Assert.assertEquals(2, parentProperty.getFields().size());
     }
 
+
+    @Test
+    public void fieldsShouldOnlyBeAddedToPreviousProperty() {
+        DeviceClass entity = DeviceClass.create("test")
+                .addProperty("shouldHaveFields", "description")
+                .addField("fieldName1", "fieldDescription")
+                .addField( "fieldName2", "fieldDescription")
+                .addProperty("shouldBeEmpty", "description")
+                .build();
+        Property parentProperty = getPropertyWithName(entity, "shouldHaveFields");
+        Property singleProperty = getPropertyWithName(entity, "shouldBeEmpty");
+        Assert.assertEquals(2, parentProperty.getFields().size());
+        Assert.assertTrue(singleProperty.getFields().isEmpty());
+    }
+
     @Test(expected = IllegalArgumentException.class)
-    public void addFieldToNonExistentPropertyShouldThrowError() {
+    public void fieldsWithSameNameShouldThrowException() {
         DeviceClass.create("test")
-                .addField("parentName", "fieldName", "fieldDescription");
+                .addProperty("parentProperty", "description")
+                .addField("fieldName", "fieldDescription")
+                .addField( "fieldName", "fieldDescription");
     }
 
     @Test

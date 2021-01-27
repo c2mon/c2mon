@@ -21,7 +21,7 @@ public class DevicePropertyResultTypeHandler implements TypeHandler<ResultType> 
     @Override
     public ResultType getResult(ResultSet resultSet, String columnName) throws SQLException {
         String label = resultSet.getString(columnName);
-        return ResultType.getOrDefault(label);
+        return label == null ? null : ResultType.getByLabel(label);
     }
 
     @Override
@@ -37,9 +37,9 @@ public class DevicePropertyResultTypeHandler implements TypeHandler<ResultType> 
     @Override
     public void setParameter(PreparedStatement preparedStatement, int i, ResultType field, JdbcType jdbcType) throws SQLException {
         if (field != null) {
-            preparedStatement.setString(i, field.toString());
+            preparedStatement.setString(i, field.getLabel());
         } else {
-            preparedStatement.setString(i, ResultType.getOrDefault("").toString());
+            preparedStatement.setString(i, "");
         }
     }
 }
