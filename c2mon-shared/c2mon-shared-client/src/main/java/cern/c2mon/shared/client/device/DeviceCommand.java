@@ -44,7 +44,7 @@ public class DeviceCommand extends DeviceElement {
         this.id = id;
         this.name = name;
         this.value = value;
-        this.category = Category.commandTagId;
+        this.category = Category.COMMAND_TAG_ID;
     }
 
 }

@@ -16,23 +16,23 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.device;
 
-import java.util.*;
-
-import cern.c2mon.shared.client.device.*;
-import org.simpleframework.xml.core.Persister;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import cern.c2mon.server.cache.DeviceCache;
 import cern.c2mon.server.cache.DeviceClassCache;
 import cern.c2mon.server.cache.DeviceFacade;
 import cern.c2mon.server.cache.common.AbstractFacade;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
-import cern.c2mon.server.common.device.*;
+import cern.c2mon.server.common.device.Device;
+import cern.c2mon.server.common.device.DeviceCacheObject;
+import cern.c2mon.server.common.device.DeviceClass;
+import cern.c2mon.shared.client.device.*;
 import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.shared.daq.config.Change;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.*;
 
 /**
  * Implementation of the Device facade which defines the methods provided for
@@ -46,17 +46,17 @@ public class DeviceFacadeImpl extends AbstractFacade<Device> implements DeviceFa
   /**
    * Static class logger.
    */
-  private static final Logger LOG = LoggerFactory.getLogger(DeviceCacheImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DeviceFacadeImpl.class);
 
   /**
    * Reference to the <code>Device</code> cache
    */
-  private DeviceCache deviceCache;
+  private final DeviceCache deviceCache;
 
   /**
    * Reference to the <code>DeviceClass</code> cache.
    */
-  private DeviceClassCache deviceClassCache;
+  private final DeviceClassCache deviceClassCache;
 
   /**
    * Default constructor used by Spring to autowire the device and device class
@@ -98,7 +98,7 @@ public class DeviceFacadeImpl extends AbstractFacade<Device> implements DeviceFa
     Map<String, Set<String>> classNamesToDeviceNames = new HashMap<>();
     for (DeviceInfo deviceInfo : deviceInfoList) {
       if (!classNamesToDeviceNames.containsKey(deviceInfo.getClassName())) {
-        classNamesToDeviceNames.put(deviceInfo.getClassName(), new HashSet<>(Arrays.asList(deviceInfo.getDeviceName())));
+        classNamesToDeviceNames.put(deviceInfo.getClassName(), new HashSet<>(Collections.singletonList(deviceInfo.getDeviceName())));
       } else {
         classNamesToDeviceNames.get(deviceInfo.getClassName()).add(deviceInfo.getDeviceName());
       }
@@ -121,7 +121,7 @@ public class DeviceFacadeImpl extends AbstractFacade<Device> implements DeviceFa
         }
 
       } catch (CacheElementNotFoundException e) {
-        LOG.warn("Didn't find any devices of class " + className, e);
+        LOG.warn("Didn't find any devices of class {}.", className, e);
       }
     }
 
@@ -142,7 +142,7 @@ public class DeviceFacadeImpl extends AbstractFacade<Device> implements DeviceFa
   }
 
   @Override
-  protected Change configureCacheObject(Device cacheObject, Properties properties) throws IllegalAccessException {
+  protected Change configureCacheObject(Device cacheObject, Properties properties) {
     DeviceCacheObject deviceCacheObject = (DeviceCacheObject) cacheObject;
 
     if (properties.getProperty("name") != null) {
@@ -238,12 +238,12 @@ public class DeviceFacadeImpl extends AbstractFacade<Device> implements DeviceFa
             + "\" must specify a value category");
       }
 
-      /* try {
+       try {
         deviceProperty.getResultTypeClass();
       } catch (ClassNotFoundException e) {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE, "DeviceProperty \"" + deviceProperty.getName()
             + "\" specifies invalid result type");
-      }*/
+      }
     }
 
     // Cross-check commands
@@ -273,9 +273,7 @@ public class DeviceFacadeImpl extends AbstractFacade<Device> implements DeviceFa
   private List<DeviceProperty> parseDevicePropertiesXML(String xmlString) throws Exception {
     List<DeviceProperty> deviceProperties = new ArrayList<>();
 
-    Persister persister = new Persister();
-    DevicePropertyList devicePropertyList = persister.read(DevicePropertyList.class, xmlString);
-
+    DevicePropertyList devicePropertyList = SerializableDeviceElement.fromConfigXml(xmlString, DevicePropertyList.class);
     for (DeviceProperty deviceProperty : devicePropertyList.getDeviceProperties()) {
 
       // Remove all whitespace and control characters
@@ -299,16 +297,10 @@ public class DeviceFacadeImpl extends AbstractFacade<Device> implements DeviceFa
    * @throws Exception if the XML could not be parsed
    */
   private List<DeviceCommand> parseDeviceCommandsXML(String xmlString) throws Exception {
-    List<DeviceCommand> deviceCommands = new ArrayList<>();
 
-    Persister persister = new Persister();
-    DeviceCommandList deviceCommandList = persister.read(DeviceCommandList.class, xmlString);
+    DeviceCommandList deviceCommandList = SerializableDeviceElement.fromConfigXml(xmlString, DeviceCommandList.class);
 
-    for (DeviceCommand deviceCommand : deviceCommandList.getDeviceCommands()) {
-      deviceCommands.add(deviceCommand);
-    }
-
-    return deviceCommands;
+    return new ArrayList<>(deviceCommandList.getDeviceCommands());
   }
 
 }

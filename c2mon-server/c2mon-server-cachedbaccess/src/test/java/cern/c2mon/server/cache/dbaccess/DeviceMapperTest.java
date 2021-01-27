@@ -54,8 +54,8 @@ public class DeviceMapperTest extends AbstractMapperTest {
     Assert.assertTrue(deviceProperties.size() == 4);
     assertDevicePropertyListContains(deviceProperties, DeviceProperty.forTagId(1L, "cpuLoadInPercent", 210000L));
     assertDevicePropertyListContains(deviceProperties, DeviceProperty.forConstantValue(2L, "responsiblePerson", "Mr. Administrator"));
-    assertDevicePropertyListContains(deviceProperties, DeviceProperty.forClientRule(3L, "someCalculations", "(#123 + #234) / 2", ResultType.Float));
-    assertDevicePropertyListContains(deviceProperties, DeviceProperty.forConstantValue(4L, "numCores", 4, ResultType.Integer));
+    assertDevicePropertyListContains(deviceProperties, DeviceProperty.forClientRule(3L, "someCalculations", "(#123 + #234) / 2", ResultType.FLOAT));
+    assertDevicePropertyListContains(deviceProperties, DeviceProperty.forConstantValue(4L, "numCores", 4, ResultType.INTEGER));
 
     List<DeviceCommand> deviceCommands = device1.getDeviceCommands();
     Assert.assertNotNull(deviceCommands);
@@ -73,8 +73,8 @@ public class DeviceMapperTest extends AbstractMapperTest {
     List<DeviceProperty> expectedFields = new ArrayList<>();
     expectedFields.add(DeviceProperty.forTagId(1L, "FIELD_CPULOAD",  210008L));
     expectedFields.add(DeviceProperty.forConstantValue(2L, "FIELD_RESPONSIBLE_PERSON", "Mr. Administrator"));
-    expectedFields.add(DeviceProperty.forClientRule(3L, "FIELD_SOME_CALCULATIONS", "(#123 + #234) / 2", ResultType.Float));
-    expectedFields.add(DeviceProperty.forConstantValue(4L, "FIELD_NUM_CORES", 2, ResultType.Integer));
+    expectedFields.add(DeviceProperty.forClientRule(3L, "FIELD_SOME_CALCULATIONS", "(#123 + #234) / 2", ResultType.FLOAT));
+    expectedFields.add(DeviceProperty.forConstantValue(4L, "FIELD_NUM_CORES", 2, ResultType.INTEGER));
 
     DeviceProperty expectedMappedProperty = DeviceProperty.forMappedProperty(9L, "TEST_PROPERTY_WITH_FIELDS", expectedFields);
     assertDevicePropertyListContains(deviceProperties, expectedMappedProperty);
@@ -98,14 +98,14 @@ public class DeviceMapperTest extends AbstractMapperTest {
 
     DeviceProperty dvp1 = DeviceProperty.forTagId(1L, "cpuLoadInPercent", 210005L);
     DeviceProperty dvp2 = DeviceProperty.forConstantValue(2L, "responsiblePerson", "Mr. Administrator");
-    DeviceProperty dvp3 = DeviceProperty.forClientRule(3L, "someCalculations", "(#123 + #234) / 2", ResultType.Float);
-    DeviceProperty dvp4 = DeviceProperty.forConstantValue(4L, "numCores", 4, ResultType.Integer);
+    DeviceProperty dvp3 = DeviceProperty.forClientRule(3L, "someCalculations", "(#123 + #234) / 2", ResultType.FLOAT);
+    DeviceProperty dvp4 = DeviceProperty.forConstantValue(4L, "numCores", 4, ResultType.INTEGER);
 
     List<DeviceProperty> fields = new ArrayList<>();
     fields.add(DeviceProperty.forTagId(1L, "FIELD_CPULOAD", 210008L));
     fields.add(DeviceProperty.forConstantValue(2L, "FIELD_RESPONSIBLE_PERSON", "Mr. Administrator"));
-    fields.add(DeviceProperty.forClientRule(3L, "FIELD_SOME_CALCULATIONS", "(#123 + #234) / 2", ResultType.Float));
-    fields.add(DeviceProperty.forConstantValue(4L, "FIELD_NUM_CORES", 2, ResultType.Integer));
+    fields.add(DeviceProperty.forClientRule(3L, "FIELD_SOME_CALCULATIONS", "(#123 + #234) / 2", ResultType.FLOAT));
+    fields.add(DeviceProperty.forConstantValue(4L, "FIELD_NUM_CORES", 2, ResultType.INTEGER));
     DeviceProperty dvp5 = DeviceProperty.forMappedProperty(9L, "TEST_PROPERTY_WITH_FIELDS", fields);
     List<DeviceProperty> properties = new ArrayList<>(Arrays.asList(dvp1, dvp2, dvp3, dvp4, dvp5));
 

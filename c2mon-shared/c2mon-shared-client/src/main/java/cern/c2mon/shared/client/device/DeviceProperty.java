@@ -49,7 +49,7 @@ public class DeviceProperty extends DeviceElement {
      * @return the newly created device property of category "tagId".
      */
     public static DeviceProperty forTagId(Long id, String name, Long value) {
-        return new DeviceProperty(id, name, String.valueOf(value), Category.tagId, null);
+        return new DeviceProperty(id, name, String.valueOf(value), Category.TAG_ID, null);
     }
 
     /**
@@ -62,7 +62,7 @@ public class DeviceProperty extends DeviceElement {
      * @return a new device property of category "constantValue".
      */
     public static DeviceProperty forConstantValue(Long id, String name, String value) {
-        return new DeviceProperty(id, name, value, Category.constantValue, null);
+        return new DeviceProperty(id, name, value, Category.CONSTANT_VALUE, null);
     }
 
     /**
@@ -77,7 +77,7 @@ public class DeviceProperty extends DeviceElement {
      * @return a new device property of category "constantValue".
      */
     public static <T> DeviceProperty forConstantValue(Long id, String name, T value, ResultType resultType) {
-        return new DeviceProperty(id, name, String.valueOf(value), Category.constantValue, resultType);
+        return new DeviceProperty(id, name, String.valueOf(value), Category.CONSTANT_VALUE, resultType);
     }
 
     /**
@@ -91,7 +91,7 @@ public class DeviceProperty extends DeviceElement {
      * @return a new device property of category "clientRule".
      */
     public static DeviceProperty forClientRule(Long id, String name, String value, ResultType resultType) {
-        return new DeviceProperty(id, name, value, Category.clientRule, resultType);
+        return new DeviceProperty(id, name, value, Category.CLIENT_RULE, resultType);
     }
 
     /**
@@ -108,7 +108,7 @@ public class DeviceProperty extends DeviceElement {
         return new DeviceProperty(id, name, fields);
     }
 
-    private DeviceProperty(final Long id, final String name, final String value, final Category category, final ResultType resultType) {
+    private DeviceProperty(final Long id, final String name, final String value, final String category, final ResultType resultType) {
         this.id = id;
         this.name = name;
         this.value = value;
@@ -119,7 +119,7 @@ public class DeviceProperty extends DeviceElement {
     }
 
     private DeviceProperty(final Long id, final String name, final List<DeviceProperty> fields) {
-        this(id, name, null, Category.mappedProperty, null);
+        this(id, name, null, Category.MAPPED_PROPERTY, null);
         if (fields != null) {
             this.fields = fields;
         }
