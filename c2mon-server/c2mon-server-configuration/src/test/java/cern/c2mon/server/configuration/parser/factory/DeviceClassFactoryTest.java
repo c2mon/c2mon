@@ -121,7 +121,7 @@ public class DeviceClassFactoryTest {
     public void createDevClassShouldCreateFieldIdIfNeeded() {
         DeviceClass classWithProperties = DeviceClass.create("device with properties")
                 .addProperty("property1", "desc")
-                .addField("property1", "field", "description")
+                .addField("field", "description")
                 .build();
         expect(sequenceDAOMock.getNextPropertyId())
                 .andReturn(2L)
