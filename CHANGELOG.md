@@ -8,14 +8,20 @@ For more details on a given release, please check also the [version planning](ht
 
 ## Unreleased
 ### Added
-- Support for dynamic configuration (processes and equipments created on the fly based on regular expressions) (CM-288)
-- Client configuration shell module allows to configure C2MON data tags via a script (CM-288)
 
 ### Changed
-- Update managed dependencies of Oracle (ojdbc8 v19.8.0.0) and MyBatis Spring (v2.0.6)
 
 ### Fixed
-- Fixed problem of redundant Control tag updates (and archiving) triggered by Alive tag changes (CM-274)
+
+## 1.10.1 - 2021-01-29
+### Added
+- [Client Configuration Shell](https://c2mon.web.cern.ch/c2mon/docs/user-guide/client-api/client-configuration-shell.html): Support for dynamic configuration (processes and equipments created on the fly based on regular expressions). The new Client Configuration Shell module allows also to configure Tags via a script (CM-288).
+
+### Changed
+- Server: Update managed dependencies of Oracle (ojdbc8 v19.8.0.0) and MyBatis Spring (v2.0.6)
+
+### Fixed
+- Server: Fixed problem of redundant Control tag updates (and archiving) triggered by Alive tag changes (CM-274)
 
 ## 1.10.0 - 2020-11-17
 
