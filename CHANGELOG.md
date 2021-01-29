@@ -16,6 +16,7 @@ For more details on a given release, please check also the [version planning](ht
 ## 1.10.1 - 2021-01-29
 ### Added
 - [Client Configuration Shell](https://c2mon.web.cern.ch/c2mon/docs/user-guide/client-api/client-configuration-shell.html): Support for dynamic configuration (processes and equipments created on the fly based on regular expressions). The new Client Configuration Shell module allows also to configure Tags via a script (CM-288).
+- Documentation: Added [documentation](https://c2mon.web.cern.ch/c2mon/docs/user-guide/acquiring-data/using-opc-ua.html) about how to make use of the OPC UA DAQ
 
 ### Changed
 - Server: Update managed dependencies of Oracle (ojdbc8 v19.8.0.0) and MyBatis Spring (v2.0.6)
