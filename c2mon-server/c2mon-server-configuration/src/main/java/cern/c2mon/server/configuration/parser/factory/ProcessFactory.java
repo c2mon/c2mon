@@ -24,6 +24,8 @@ import cern.c2mon.server.configuration.parser.exception.ConfigurationParseExcept
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.api.process.Process;
+import cern.c2mon.shared.client.configuration.api.tag.AliveTag;
+import cern.c2mon.shared.client.configuration.api.tag.StatusTag;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -61,19 +63,60 @@ class ProcessFactory extends EntityFactory<Process> {
     // build the process configuration element. This also set the id of the process
     ConfigurationElement createProcess = doCreateInstance(entity);
 
+    // build the configuration entities for the control tags.
+    // This need to be done after the process id is create (see above)
+    entity = setDefaultControlTags(entity);
+
+    configurationElements.addAll(aliveTagFactory.createInstance(entity.getAliveTag()));
+    configurationElements.addAll(stateTagFactory.createInstance(entity.getStatusTag()));
+
+    createProcess.getElementProperties().setProperty("aliveTagId", entity.getAliveTag().getId().toString());
+    createProcess.getElementProperties().setProperty("statusTagId", entity.getStatusTag().getId().toString());
+
     // If the user specified any custom tag info, use it (otherwise it will be created by the handler
-    if (entity.getAliveTag() != null) {
+    /*if (entity.getAliveTag() != null) {
       configurationElements.addAll(aliveTagFactory.createInstance(entity.getAliveTag()));
       createProcess.getElementProperties().setProperty("aliveTagId", entity.getAliveTag().getId().toString());
     }
     if (entity.getStatusTag() != null) {
       configurationElements.addAll(stateTagFactory.createInstance(entity.getStatusTag()));
       createProcess.getElementProperties().setProperty("stateTagId", entity.getStatusTag().getId().toString());
-    }
+    }*/
 
     configurationElements.add(createProcess);
 
     return configurationElements;
+  }
+
+  /**
+   * Checks if the Process has a defined {@link AliveTag} or {@link StatusTag}.
+   * If not a automatic Status tag will be created and attached to the process configuration.
+   *
+   * @param process The Process which contains the information of an create.
+   * @return The same process from the parameters attached with the status tag information.
+   */
+  public static Process setDefaultControlTags(Process process) {
+
+    if (process.getAliveTag() == null) {
+
+      AliveTag aliveTag = AliveTag.create(process.getName() + ":ALIVE")
+              .description("Alive tag for process " + process.getName())
+              .build();
+      process.setAliveTag(aliveTag);
+    }
+
+    if (process.getStatusTag() == null) {
+
+      StatusTag statusTag = StatusTag.create(process.getName() + ":STATUS")
+              .description("Status tag for process " + process.getName())
+              .build();
+      process.setStatusTag(statusTag);
+    }
+
+    process.getAliveTag().setProcessId(process.getId());
+    process.getStatusTag().setProcessId(process.getId());
+
+    return process;
   }
 
   @Override

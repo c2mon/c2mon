@@ -26,6 +26,8 @@ import cern.c2mon.server.configuration.parser.exception.ConfigurationParseExcept
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.api.equipment.Equipment;
+import cern.c2mon.shared.client.configuration.api.tag.CommFaultTag;
+import cern.c2mon.shared.client.configuration.api.tag.StatusTag;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -78,7 +80,23 @@ class EquipmentFactory extends EntityFactory<Equipment> {
 
     ConfigurationElement createEquipment = doCreateInstance(equipment);
 
-    // If the user specified any custom tag info, use it (otherwise it will be created by the handler
+    equipment = setDefaultControlTags(equipment);
+
+    configurationElements.addAll(commFaultTagFactory.createInstance(equipment.getCommFaultTag()));
+    configurationElements.addAll(stateTagFactory.createInstance(equipment.getStatusTag()));
+
+    if (equipment.getAliveTag() != null) {
+      configurationElements.addAll(aliveTagFactory.createInstance(equipment.getAliveTag()));
+      createEquipment.getElementProperties().setProperty("aliveTagId", equipment.getAliveTag().getId().toString());
+    }
+
+    createEquipment.getElementProperties().setProperty("statusTagId", equipment.getStatusTag().getId().toString());
+    createEquipment.getElementProperties().setProperty("commFaultTagId", equipment.getCommFaultTag().getId().toString());
+
+
+    configurationElements.add(createEquipment);
+
+/*    // If the user specified any custom tag info, use it (otherwise it will be created by the handler
     if (equipment.getAliveTag() != null && equipment.getAliveTag().getId() != null) {
 //      configurationElements.addAll(aliveTagFactory.createInstance(equipment.getAliveTag()));
       createEquipment.getElementProperties().setProperty("aliveTagId", equipment.getAliveTag().getId().toString());
@@ -92,9 +110,44 @@ class EquipmentFactory extends EntityFactory<Equipment> {
       createEquipment.getElementProperties().setProperty("stateTagId", equipment.getStatusTag().getId().toString());
     }
 
-    configurationElements.add(createEquipment);
+    configurationElements.add(createEquipment);*/
 
     return configurationElements;
+  }
+
+  /**
+   * Checks if the Equipment has a defined {@link CommFaultTag} or {@link StatusTag}.
+   * If not a automatic ControlTag tag will be created and attached to the equipment configuration.
+   *
+   * @param equipment The Equipment which contains the information of an create.
+   * @return The same equipment from the parameters attached with the controlTag tag information.
+   */
+  protected static Equipment setDefaultControlTags(Equipment equipment) {
+
+    if (equipment.getCommFaultTag() == null) {
+
+      CommFaultTag commfaultTag = CommFaultTag.create(equipment.getName() + ":COMM_FAULT")
+              .description("Communication fault tag for equipment " + equipment.getName())
+              .build();
+      equipment.setCommFaultTag(commfaultTag);
+    }
+
+    if (equipment.getStatusTag() == null) {
+
+      StatusTag statusTag = StatusTag.create(equipment.getName() + ":STATUS")
+              .description("Status tag for equipment " + equipment.getName())
+              .build();
+      equipment.setStatusTag(statusTag);
+    }
+
+    equipment.getCommFaultTag().setProcessId(equipment.getId());
+    equipment.getStatusTag().setProcessId(equipment.getId());
+
+    if (equipment.getAliveTag() != null) {
+      equipment.getAliveTag().setProcessId(equipment.getId());
+    }
+
+    return equipment;
   }
 
   @Override
