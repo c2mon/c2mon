@@ -219,7 +219,7 @@ public final class ElasticsearchClientRest implements ElasticsearchClient {
     try {
       CompletableFuture<Void> nodeReady = CompletableFuture.runAsync(() -> {
         while (true) {
-          log.info("Waiting for yellow status of Elasticsearch cluster...");
+          log.debug("Waiting for yellow status of Elasticsearch cluster...");
 
           if (isClusterYellow()) {
             break;
@@ -227,7 +227,7 @@ public final class ElasticsearchClientRest implements ElasticsearchClient {
 
           sleep(1000L);
         }
-        log.info("Elasticsearch cluster is yellow");
+        log.debug("Elasticsearch cluster is yellow");
       });
       nodeReady.get(ElasticsearchClientConfiguration.CLIENT_SETUP_TIMEOUT, TimeUnit.MILLISECONDS);
     } catch (InterruptedException | ExecutionException | TimeoutException e) {
