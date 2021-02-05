@@ -86,7 +86,10 @@ public final class TagRecordConverter implements LoggerConverter<Tag> {
           tagRecord.setTagValue(null);
       }
 
-      tagRecord.setTagValueDesc(tag.getValueDescription());
+      if(tag.getValueDescription() != null){
+          tagRecord.setTagValueDesc(tag.getValueDescription().replace("\n", ""));
+      }
+
       tagRecord.setTagDataType(tag.getDataType());
 
       if (tag instanceof DataTag || tag instanceof ControlTag) {
