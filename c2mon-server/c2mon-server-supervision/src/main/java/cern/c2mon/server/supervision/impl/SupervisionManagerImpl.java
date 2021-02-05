@@ -494,7 +494,7 @@ public class SupervisionManagerImpl implements SupervisionManager, SmartLifecycl
     try {
       ControlTag tag = controlTagCache.getCopy(commFaultTagId);
       // Avoids to update the commfault tag just because of a new value description
-      if (tag.getValue() == null || ((Boolean) tag.getValue()) != value) {
+      if (tag.getValue() == null || !tag.getValue().equals(Boolean.valueOf(value))) {
         controlTagFacade.updateAndValidate(commFaultTagId, value, valueDescription, timestamp);
       }
     } catch (CacheElementNotFoundException e) {
