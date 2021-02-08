@@ -18,8 +18,7 @@ package cern.c2mon.pmanager.fallback.manager;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import cern.c2mon.pmanager.IFallback;
 import cern.c2mon.pmanager.fallback.FallbackFileController;
@@ -33,14 +32,14 @@ import cern.c2mon.pmanager.fallback.util.SystemResourcesParameters;
  * used as a fallback, in this case a logfile. It works as a facade, making
  * totally independent the application logic from the final log system that is
  * used.
+ * 
+ * @param <T> The cache object to log
  *
  * @author mruizgar
  *
  */
-public class FallbackFileManager {
-
-    /** Log4j Logger for tags that cannot be logged to the database (emergency) */
-    public static final Logger LOG = LoggerFactory.getLogger("HistoryFallbackLogger");
+@Slf4j
+public class FallbackFileManager<T extends IFallback> {
 
     /** FallbackFileController instance */
     private final FallbackFileController fFileController;
@@ -97,21 +96,20 @@ public class FallbackFileManager {
      *             An exception is thrown in case something wrongs happens while
      *             writing in the file
      */
-    public final void fallback(final List data) throws DataFallbackException {
+    public final void fallback(final List<T> data) throws DataFallbackException {
 
         // If the file is empty we close the reading descriptor since it means
         // that a new file is going to be created
-        if (isFallbackFileEmpty())
+        if (isFallbackFileEmpty()) {
             fFileController.closeFallbackInputStream();
+        }
         // open the fallback log file output stream
         fFileController.openFallbackOutputStream();
-        final int size = data.size();
-        // Iterate through all the datatags and logged all the info that
-        // contains into the fallback log file
-        for (int i = 0; i != size; i++) {
-            fFileController.writeLine((IFallback) data.get(i));
+        // Iterate through all the datatags and logged all the info that contains into the fallback log file
+        for (IFallback line : data) {
+          fFileController.writeLine(line);
         }
-        fFileController.setNumberOfLines(fFileController.getNumberOfLines() + size);
+        fFileController.setNumberOfLines(fFileController.getNumberOfLines() + data.size());
     }
 
     /**
@@ -124,20 +122,15 @@ public class FallbackFileManager {
      *             writing the object
      */
     public final void fallback(final IFallback fallbackObj) throws DataFallbackException {
-
-        try {
-            // If the file is empty we close the reading descriptor since it
-            // means that
-            // a new file is going to be created
-            if (isFallbackFileEmpty())
-                fFileController.closeFallbackInputStream();
-            // open the fallback log file output stream
-            fFileController.openFallbackOutputStream();
-            fFileController.writeLine(fallbackObj);
-            fFileController.setNumberOfLines(fFileController.getNumberOfLines() + 1);
-        } catch (DataFallbackException e) {
-            throw new DataFallbackException(e.getMessage());
+        // If the file is empty we close the reading descriptor since it
+        // means that a new file is going to be created
+        if (isFallbackFileEmpty()) {
+          fFileController.closeFallbackInputStream();
         }
+        // open the fallback log file output stream
+        fFileController.openFallbackOutputStream();
+        fFileController.writeLine(fallbackObj);
+        fFileController.setNumberOfLines(fFileController.getNumberOfLines() + 1);
     }
 
     /**
@@ -160,12 +153,12 @@ public class FallbackFileManager {
 
         if (fFileController.getNumberOfLines() > nextCheckFallbackData) {
             checkDone = true;
-            if (LOG.isDebugEnabled())
-                LOG
-                        .debug("isDiskSpaceCheckDone() : Doing the check since the number of lines are "
+            if (log.isDebugEnabled()) {
+                log.debug("isDiskSpaceCheckDone() : Doing the check since the number of lines are "
                                 + fFileController.getNumberOfLines()
                                 + " and the current value for nextcheck is "
                                 + nextCheckFallbackData);
+            }
             long freeSpace = SystemResourcesParameters.getFreeSpace();
             if (freeSpace < minimumFreeSpace
                     && freeSpace != FallbackProperties.CMD_FREE_SPACE_ERROR) {
@@ -174,9 +167,10 @@ public class FallbackFileManager {
             } else {
                 nextCheckFallbackData = fFileController.getNumberOfLines()
                         + fProperties.getFreeSpaceCheckFrequency();
-                if (LOG.isDebugEnabled())
-                    LOG.debug("isDiskSpaceCheckDone() : New value of nextCheckDataTags is "
+                if (log.isDebugEnabled()) {
+                    log.debug("isDiskSpaceCheckDone() : New value of nextCheckDataTags is "
                             + nextCheckFallbackData);
+                }
             }
         }
         return checkDone;
@@ -207,9 +201,7 @@ public class FallbackFileManager {
         fFileController.closeFallbackOutputStream();
         fFileController.openFallbackInputStream();
         // read from the fallback log mechanism the indicated number of lines
-        final FallbackObjectContainer data = fFileController.readLines(numberOfLines, fallbackObj);
-        // dtFallback.closeFallbackInputStream();
-        return data;
+        return  fFileController.readLines(numberOfLines, fallbackObj);
     }
 
     /**
@@ -236,17 +228,17 @@ public class FallbackFileManager {
         try {
             fFileController.updateNumberOfProcessedLines();
         } catch (DataFallbackException e) {
+            log.warn("Exception caught while trying to update number of processed lines", e);
             removed = false;
         }
         try {
             // Physically remove all the contents from the file once all the
             // datatags have been committed to the DB
-            if (LOG.isDebugEnabled()) {
-                LOG
-                        .debug("removeReadData : Checking if the file can be removed the number of read lines is: "
-                                + fFileController.getReadBackLines()
-                                + " and the file's lines is "
-                                + fFileController.getNumberOfLines());
+            if (log.isDebugEnabled()) {
+                log.debug("removeReadData : Checking if the file can be removed the number of read lines is: "
+                          + fFileController.getReadBackLines()
+                          + " and the file's lines is "
+                          + fFileController.getNumberOfLines());
             }
             if (fFileController.getReadBackLines() == fFileController.getNumberOfLines()) {
                 // Close the reading descriptor
@@ -259,7 +251,7 @@ public class FallbackFileManager {
             }
         } catch (DataFallbackException e) {
             removed = false;
-            LOG.error("Exception caught while attempting to remove lines from the Fallback file", e);
+            log.error("Exception caught while attempting to remove lines from the Fallback file", e);
         }
         return removed;
     }
@@ -299,6 +291,7 @@ public class FallbackFileManager {
     /**
      * It releases the object memory
      */
+    @Override
     public final void finalize() {
         this.fFileController.finalize();
     }
