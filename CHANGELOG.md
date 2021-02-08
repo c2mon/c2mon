@@ -10,8 +10,10 @@ For more details on a given release, please check also the [version planning](ht
 ### Added
 
 ### Changed
+- Server: Lowered log level to `Debug` for Elasticsearch waitForYellowStatus() notifications
 
 ### Fixed
+- Server: Fixed a problem that got introduced accidentially with patch for CM-274 in v10.0.1 and which only could be detected in operation with huge amount of alarm configurations.
 
 ## 1.10.1 - 2021-01-29
 ### Added

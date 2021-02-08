@@ -26,10 +26,7 @@ import java.util.concurrent.CountDownLatch;
 
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -40,15 +37,15 @@ import cern.c2mon.server.cache.config.CacheModule;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.common.alive.AliveTimer;
 import cern.c2mon.server.common.config.CommonModule;
+import cern.c2mon.server.common.control.ControlTag;
+import cern.c2mon.server.common.control.ControlTagCacheObject;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.subequipment.SubEquipment;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.supervision.config.SupervisionModule;
-import cern.c2mon.server.supervision.impl.SupervisionTagNotifier;
 import cern.c2mon.server.supervision.junit.SupervisionCachePopulationRule;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
-import cern.c2mon.shared.common.datatag.DataTagConstants;
 import cern.c2mon.shared.common.datatag.SourceDataTagQuality;
 import cern.c2mon.shared.common.datatag.SourceDataTagValue;
 import cern.c2mon.shared.common.datatag.util.JmsMessagePriority;
@@ -101,9 +98,6 @@ public class SupervisionManagerTest {
   private SupervisionNotifier supervisionNotifier;
 
   @Autowired
-  private SupervisionTagNotifier supervisionTagNotifier;
-
-  @Autowired
   private CacheRegistrationService cacheRegistrationService;
 
   /**
@@ -123,6 +117,69 @@ public class SupervisionManagerTest {
     supervisionNotifier.registerAsListener(supervisionListener);
     cacheSupervisionListener = controller.createMock(CacheSupervisionListener.class);
     cacheRegistrationService.registerForSupervisionChanges(cacheSupervisionListener);
+  }
+  
+  @Test
+  public void testUpdateCommFaultTagOnAliveTimerExpiration() {
+    // E_TESTHANDLER_TESTHANDLER03:ALIVE
+    Long aliveTimerId = 1224L;
+    ControlTagCacheObject eqCommFaultTag = (ControlTagCacheObject) controlTagCache.getCopy(1223L);
+    ControlTagCacheObject subEqCommFaultTag = (ControlTagCacheObject) controlTagCache.getCopy(1232L);
+    
+    Assert.assertNull(eqCommFaultTag.getValue());
+    Assert.assertNull(eqCommFaultTag.getValueDescription());
+    Assert.assertNull(subEqCommFaultTag.getValue());
+    Assert.assertNull(subEqCommFaultTag.getValueDescription());
+    
+    // TEST 1
+    supervisionManager.onAliveTimerExpiration(aliveTimerId);
+    eqCommFaultTag = (ControlTagCacheObject) controlTagCache.getCopy(1223L);
+    subEqCommFaultTag = (ControlTagCacheObject) controlTagCache.getCopy(1232L);
+    String expectedValueDescription = "Alive of Equipment E_TESTHANDLER_TESTHANDLER03 (alive tag: 1224) has expired.";
+    Assert.assertFalse((Boolean) eqCommFaultTag.getValue());
+    Assert.assertEquals("Value description was not set", expectedValueDescription, eqCommFaultTag.getValueDescription());
+    Assert.assertFalse((Boolean) subEqCommFaultTag.getValue());
+    Assert.assertEquals("Value description was not set", "Alive timer for parent Equipment expired: " + expectedValueDescription, subEqCommFaultTag.getValueDescription());
+    
+    
+    // SETUP for TEST 2
+    long oldEqTimestamp = eqCommFaultTag.getTimestamp().getTime();
+    long oldSubEqTimestamp = subEqCommFaultTag.getTimestamp().getTime();
+    eqCommFaultTag.setValue(true);
+    controlTagCache.putQuiet(eqCommFaultTag);
+    subEqCommFaultTag.setValue(true);
+    controlTagCache.putQuiet(subEqCommFaultTag);
+    
+    
+    // TEST 2
+    supervisionManager.onAliveTimerExpiration(aliveTimerId);
+    eqCommFaultTag = (ControlTagCacheObject) controlTagCache.getCopy(1223L);
+    subEqCommFaultTag = (ControlTagCacheObject) controlTagCache.getCopy(1232L);
+    Assert.assertFalse((Boolean) eqCommFaultTag.getValue());
+    Assert.assertEquals("Value description was not set", expectedValueDescription, eqCommFaultTag.getValueDescription());
+    Assert.assertNotEquals("Timestamp was not changed", oldEqTimestamp, eqCommFaultTag.getTimestamp().getTime());
+    Assert.assertFalse((Boolean) subEqCommFaultTag.getValue());
+    Assert.assertEquals("Value description was not set", "Alive timer for parent Equipment expired: " + expectedValueDescription, subEqCommFaultTag.getValueDescription());
+    Assert.assertNotEquals("Timestamp was not changed", oldSubEqTimestamp, subEqCommFaultTag.getTimestamp().getTime());
+    
+    
+    // SETUP for TEST 3
+    oldEqTimestamp = eqCommFaultTag.getTimestamp().getTime();
+    oldSubEqTimestamp = subEqCommFaultTag.getTimestamp().getTime();
+    String ignoreUpdate = "Ignore update";
+    eqCommFaultTag.setValueDescription(ignoreUpdate);
+    controlTagCache.putQuiet(eqCommFaultTag);
+    subEqCommFaultTag.setValueDescription(ignoreUpdate);
+    controlTagCache.putQuiet(subEqCommFaultTag);
+    
+    // TEST 3
+    supervisionManager.onAliveTimerExpiration(aliveTimerId);
+    eqCommFaultTag = (ControlTagCacheObject) controlTagCache.getCopy(1223L);
+    subEqCommFaultTag = (ControlTagCacheObject) controlTagCache.getCopy(1232L);
+    Assert.assertEquals(ignoreUpdate, eqCommFaultTag.getValueDescription());
+    Assert.assertEquals(ignoreUpdate, subEqCommFaultTag.getValueDescription());
+    Assert.assertEquals(oldEqTimestamp, eqCommFaultTag.getTimestamp().getTime());
+    Assert.assertEquals(oldSubEqTimestamp, subEqCommFaultTag.getTimestamp().getTime());
   }
 
   /**
