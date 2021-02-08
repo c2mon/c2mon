@@ -77,15 +77,6 @@ public class TagRecordConverterTest {
   }
 
   @Test
-  public void testNewLinesInDescriptionRemoval(){
-    DataTagCacheObject tag = new DataTagCacheObject(10L);
-    tag.setValueDescription("value\ndesc");
-    TagRecord tagRecord = (TagRecord) converter.convertToLogged(tag);
-
-    assertEquals("valuedesc", tagRecord.getTagValueDesc());
-  }
-
-  @Test
   public void testTagConversionIntegerType(){
     DataTagCacheObject cacheObject = createTestCacheTag(1337, Integer.class);
     Loggable expectedObject = createHistoricTag(1337, Integer.class);

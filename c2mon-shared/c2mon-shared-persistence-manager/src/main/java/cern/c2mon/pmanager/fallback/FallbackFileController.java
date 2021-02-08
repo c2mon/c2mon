@@ -515,7 +515,7 @@ public class FallbackFileController {
 
     public final void writeLine(final IFallback object) throws DataFallbackException {
 
-        String str = object.toString();
+        String str = object.toString().replaceAll("\n", "");
         try {
             output.write(str);
             output.newLine();
