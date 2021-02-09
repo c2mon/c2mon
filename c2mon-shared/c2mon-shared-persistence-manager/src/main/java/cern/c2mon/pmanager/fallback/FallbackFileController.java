@@ -275,7 +275,9 @@ public class FallbackFileController {
                 counter = Integer.parseInt(line);
                 // Put the reading descriptor in the first line that has not
                 // been yet processed
-                if(moveReadingDescriptor) goToLine(counter);
+                if(moveReadingDescriptor){
+                    goToLine(counter);
+                }
                 if (LOG.isDebugEnabled())
                     LOG.debug("The counter file " + counterFile.getName() + " has been read");
             } else {
