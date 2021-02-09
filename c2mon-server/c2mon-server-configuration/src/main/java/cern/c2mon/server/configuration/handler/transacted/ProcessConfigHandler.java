@@ -69,7 +69,7 @@ public class ProcessConfigHandler extends BaseConfigHandlerImpl<Process> {
 
   @Override
   public List<ProcessChange> create(ConfigurationElement element) {
-    //controlTagHandlerCollection.createIfMissing(element);
+    controlTagHandlerCollection.createIfMissing(element);
     return super.create(element);
   }
 

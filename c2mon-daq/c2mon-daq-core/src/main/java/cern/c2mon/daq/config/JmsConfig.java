@@ -24,6 +24,10 @@ import org.springframework.jms.connection.SingleConnectionFactory;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+
 /**
  * Creates all Beans required for the JMS communication
  * @author Justin Lewis Salmon
@@ -145,4 +149,24 @@ public class JmsConfig {
     factory.setConnectionIDPrefix(properties.getJms().getConnectionIDPrefix() + properties.getJms().getClientIdPrefix());
     return factory;
   }
+
+  /**
+   * Threads used for polling topic queues.
+   * @return The topic polling Executor Service
+   */
+  @Bean
+  public ExecutorService topicPollingExecutor() {
+    return Executors.newCachedThreadPool(new ThreadFactory() {
+
+      ThreadFactory defaultFactory = Executors.defaultThreadFactory();
+
+      @Override
+      public Thread newThread(final Runnable r) {
+        Thread returnThread = defaultFactory.newThread(r);
+        returnThread.setDaemon(true);
+        return returnThread;
+      }
+    });
+  }
+
 }

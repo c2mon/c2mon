@@ -72,7 +72,7 @@ public abstract class AbstractEquipmentConfigHandler<T extends AbstractEquipment
 
   @Override
   public List<ProcessChange> create(ConfigurationElement element) {
-    //controlTagHandlerCollection.createIfMissing(element);
+    controlTagHandlerCollection.createIfMissing(element);
     return super.create(element);
   }
 

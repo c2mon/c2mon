@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2020 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -29,11 +29,12 @@ import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.shared.client.serializer.TransferTagSerializer;
 import cern.c2mon.shared.client.tag.TransferTagValueImpl;
-import cern.c2mon.shared.common.CacheEvent;
 import cern.c2mon.shared.daq.republisher.Publisher;
 import cern.c2mon.shared.daq.republisher.Republisher;
 import cern.c2mon.shared.daq.republisher.RepublisherFactory;
 import cern.c2mon.shared.util.jms.JmsSender;
+import cern.c2mon.shared.util.json.GsonFactory;
+import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -48,76 +49,69 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Publishes active alarms and the corresponding tag value to the C2MON client applications on the
- * alarm publication topic.
+ * Publishes active alarms to the C2MON client applications on the
+ * alarm publication topic, specified using the property
+ * jms.client.alarm.topic
  *
  * <p>Will attempt re-publication of alarms if JMS connection fails.
  *
- * @author Matthias Braeger
+ *
+ * @author Manos, Mark Brightwell
+ *
  */
 @Slf4j
 @Service
-@ManagedResource(description = "Bean publishing Alarm updates (TagWithAlarms) to the clients")
+@ManagedResource(description = "Bean publishing Alarm updates to the clients")
 public class AlarmPublisher implements SmartLifecycle, AlarmAggregatorListener, Publisher<TagWithAlarms> {
 
-    /**
-     * Bean providing for sending JMS messages and waiting for a response
-     */
+    /** Bean providing for sending JMS messages and waiting for a response */
     private final JmsSender jmsSender;
 
     private final C2monCache<Alarm> alarmCache;
 
-    /**
-     * Reference to the tag location service to check whether a tag exists
-     */
+    /** Reference to the tag location service to check whether a tag exists */
     private final TagCacheCollection unifiedTagCacheFacade;
 
-    /**
-     * The configured JMS alarm topic, extracted from {@link ClientProperties}
-     */
-    private final String alarmWithTagTopic;
+    /** Json message serializer/deserializer */
+    private static final Gson GSON = GsonFactory.createGson();
 
-    /**
-     * Listens for Tag updates, evaluates all associated alarms and passes the result
-     */
+    /** Contains re-publication logic */
+    private Republisher<TagWithAlarms> republisher;
+
+    private AliveTagService aliveTagService;
+
+    /** Listens for Tag updates, evaluates all associated alarms and passes the result */
     private final AlarmAggregator alarmAggregator;
 
-    /**
-     * Contains re-publication logic
-     */
-    private final Republisher<TagWithAlarms> republisher;
+    /** The configured JMS alarm topic, extracted from {@link ClientProperties} */
+    private final String alarmWithTagTopic;
 
-    private final AliveTagService aliveTagService;
 
-    /**
-     * Lifecycle flag
-     */
-    private boolean running;
+
+    /** Lifecycle flag */
+    private volatile boolean running = false;
 
     /**
      * Default Constructor
-     *
-     * @param jmsSender             Used for sending JMS messages and waiting for a response.
-     * @param alarmCache            Used to register to Alarm updates.
+     * @param jmsSender Used for sending JMS messages and waiting for a response.
+     * @param alarmCache Used to register to Alarm updates.
      * @param unifiedTagCacheFacade Reference to the tag location service singleton.
-     * @param alarmAggregator       Required to receive notifications when a tag has changed
-     * @param properties            The configured {@link ClientProperties}. Required to determine the JMS alarm topic.
+     * Used to add tag information to the AlarmValue object.
      */
     @Autowired
-    public AlarmPublisher(@Qualifier("alarmTopicPublisher") final JmsSender jmsSender,
-                          final C2monCache<Alarm> alarmCache,
-                          final TagCacheCollection unifiedTagCacheFacade,
-                          final AlarmAggregator alarmAggregator,
-                          final AliveTagService aliveTagService,
-                          final ClientProperties properties) {
+    public AlarmPublisher(@Qualifier("alarmTopicPublisher") final JmsSender jmsSender
+            ,final AlarmAggregator alarmAggregator
+            , final C2monCache<Alarm> alarmCache
+            , final TagCacheCollection unifiedTagCacheFacade
+            , final AliveTagService aliveTagService
+            , final ClientProperties properties) {
 
         this.jmsSender = jmsSender;
         this.alarmCache = alarmCache;
-        this.alarmAggregator = alarmAggregator;
+        this.alarmWithTagTopic = properties.getJms().getAlarmWithTagTopic();
         this.unifiedTagCacheFacade = unifiedTagCacheFacade;
         this.aliveTagService = aliveTagService;
-        this.alarmWithTagTopic = properties.getJms().getAlarmWithTagTopic();
-
+        this.alarmAggregator = alarmAggregator;
         republisher = RepublisherFactory.createRepublisher(this, "TagWithAlarms");
     }
 
@@ -126,13 +120,19 @@ public class AlarmPublisher implements SmartLifecycle, AlarmAggregatorListener, 
      */
     @PostConstruct
     void init() {
-        //TODO next line required?
-        //alarmCache.getCacheListenerManager().registerListener(this::notifyElementUpdated
-        //    , CacheEvent.UPDATE_ACCEPTED, CacheEvent.CONFIRM_STATUS);
         this.alarmAggregator.registerForTagUpdates(this);
     }
 
+    @Override
+    public boolean isAutoStartup() {
+        return true;
+    }
 
+    @Override
+    public void stop(Runnable runnable) {
+        stop();
+        runnable.run();
+    }
 
     @Override
     public boolean isRunning() {
@@ -141,24 +141,28 @@ public class AlarmPublisher implements SmartLifecycle, AlarmAggregatorListener, 
 
     @Override
     public void start() {
-        log.debug("Starting Alarm publisher for TagWithAlarms");
+        log.debug("Starting Alarm publisher");
         running = true;
         republisher.start();
     }
 
     @Override
     public void stop() {
-        log.debug("Stopping Alarm publisher for TagWithAlarms");
+        log.debug("Stopping Alarm publisher");
         republisher.stop();
         running = false;
     }
 
     /**
-     * @return the number of current tag updates awaiting publication to the clients
+     * Only publish, if it contains an active alarm. This is important to not flood
+     * the client with irrelevant alarm information. Depending on the setup there can be thousands
+     * of tags with alarms that will be invalidated at the same time.
      */
-    @ManagedOperation(description = "Returns the current number of alarms awaiting re-publication (should be 0 in normal operation)")
-    public int getSizeUnpublishedList() {
-        return republisher.getSizeUnpublishedList();
+    @Override
+    public void notifyOnSupervisionChange(Tag tag, List<Alarm> alarms) {
+        if (alarms != null && alarms.stream().anyMatch(a -> a.isActive())) {
+            publish(new TagWithAlarms(tag, alarms));
+        }
     }
 
     /**
@@ -171,9 +175,14 @@ public class AlarmPublisher implements SmartLifecycle, AlarmAggregatorListener, 
                     .filter(a -> a.getSourceTimestamp().equals(tag.getTimestamp())).collect(Collectors.toList());
 
             if (!changedAlarms.isEmpty()) {
-                publish(new TagWithAlarms<>(tag, changedAlarms));
+                publish(new TagWithAlarms(tag, changedAlarms));
             }
         }
+    }
+
+    @Override
+    public int getPhase() {
+        return ServerConstants.PHASE_STOP_LAST - 1;
     }
 
     @Override
@@ -192,5 +201,21 @@ public class AlarmPublisher implements SmartLifecycle, AlarmAggregatorListener, 
             republisher.publicationFailed(tagWithAlarms);
         }
 
+    }
+
+    /**
+     * @return the total number of failed publications since the publisher start
+     */
+    @ManagedOperation(description = "Returns the total number of failed alarm publication attempts since the application started")
+    public long getNumberFailedPublications() {
+        return republisher.getNumberFailedPublications();
+    }
+
+    /**
+     * @return the number of current tag updates awaiting publication to the clients
+     */
+    @ManagedOperation(description = "Returns the current number of alarms awaiting re-publication (should be 0 in normal operation)")
+    public int getSizeUnpublishedList() {
+        return republisher.getSizeUnpublishedList();
     }
 }

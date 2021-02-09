@@ -4,8 +4,10 @@ import cern.c2mon.server.common.equipment.AbstractEquipment;
 import cern.c2mon.server.common.supervision.Supervised;
 import cern.c2mon.server.common.util.KotlinAPIs;
 import cern.c2mon.server.configuration.impl.ProcessChange;
+import cern.c2mon.server.configuration.parser.exception.ConfigurationParseException;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
+import cern.c2mon.shared.common.PropertiesAccessor;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Inject;
@@ -31,9 +33,14 @@ public class ControlTagHandlerCollection {
   public List<ProcessChange> createIfMissing(ConfigurationElement element) {
     List<ProcessChange> changes = new ArrayList<>();
 
-    changes.addAll(aliveTagConfigHandler.createBySupervised(element));
-    changes.addAll(commFaultConfigHandler.createBySupervised(element));
-    changes.addAll(stateTagConfigHandler.createBySupervised(element));
+    if(element.getElementProperties().getProperty("aliveTagId") != null)
+      changes.addAll(aliveTagConfigHandler.createBySupervised(element));
+
+    if(element.getElementProperties().getProperty("commFaultTagId") != null)
+      changes.addAll(commFaultConfigHandler.createBySupervised(element));
+
+    if(element.getElementProperties().getProperty("stateTagId") != null)
+      changes.addAll(stateTagConfigHandler.createBySupervised(element));
 
     return changes;
   }

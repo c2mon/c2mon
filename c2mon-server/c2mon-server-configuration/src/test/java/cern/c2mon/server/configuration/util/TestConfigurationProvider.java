@@ -82,7 +82,7 @@ public class TestConfigurationProvider {
     Configuration configuration = new Configuration();
     Equipment equipment = Equipment.create("E_INI_TEST", "handlerClass").id(15L)
         .statusTag(StatusTag.create("E:STATUS").id(200L).build())
-        .commFaultTag(CommFaultTag.create("E:Comm").id(201L).build()).build();
+        .commFaultTag(CommFaultTag.create("E_INI_TEST:COMM_FAULT").id(201L).build()).build();
     equipment.setProcessId(5L);
 
     configuration.addEntity(equipment);

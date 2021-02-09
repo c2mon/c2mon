@@ -11,6 +11,7 @@ import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.common.process.ProcessCacheObject;
 import cern.c2mon.server.configuration.parser.util.ConfigurationEquipmentUtil;
+import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Status;
 import cern.c2mon.shared.client.configuration.ConfigurationReport;
 import cern.c2mon.shared.client.configuration.api.Configuration;
@@ -20,7 +21,7 @@ import org.junit.Test;
 import javax.inject.Inject;
 import java.util.Properties;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 public class ConfigurationHandlerRollbackTest extends ConfigurationCacheTest {
 
@@ -54,10 +55,13 @@ public class ConfigurationHandlerRollbackTest extends ConfigurationCacheTest {
 
     Configuration configuration = createEquipmentConfiguration();
 
+    ConfigurationReport configurationReport = configurationLoader.applyConfiguration(configuration);
+
     //apply the configuration to the server - exception should be gulped,
     // but the configuration fails after inserting the control tags, because
     // the process ID provided above is missing
-    expectSuccess(false, configurationLoader.applyConfiguration(configuration));
+    //expectSuccess(false, configurationReport);
+    assertTrue(configurationReport.toXML().contains(ConfigConstants.Status.FAILURE.toString()));
   }
 
   @Test

@@ -21,13 +21,13 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.jms.JMSException;
 
+import cern.c2mon.shared.client.tag.TagUpdate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
 
-import cern.c2mon.client.common.tag.Tag;
 import cern.c2mon.client.core.jms.AlarmListener;
 import cern.c2mon.client.core.jms.JmsProxy;
 import cern.c2mon.client.core.jms.RequestHandler;
@@ -131,28 +131,31 @@ public class AlarmServiceImpl implements AlarmService, AlarmListener {
     }
     return new ArrayList<AlarmValue>();
   }
-  
+
   @Override
-  public void onAlarmUpdate(final Tag tagWithAlarmChange) {
+  public void onAlarmUpdate(final TagUpdate tagWithAlarmChange) {
     alarmListenersLock.readLock().lock();
 
     try {
-      log.debug("Received alarm update for tag id #{}", tagWithAlarmChange.getId());
+      log.debug("onAlarmUpdate() -  received alarm update for alarmId:" + tagWithAlarmChange.getId());
       notifyAlarmListeners(tagWithAlarmChange);
-    } finally {
+    }
+    finally {
       alarmListenersLock.readLock().unlock();
     }
   }
-  
+
   /**
    * Private method, notifies all listeners for an alarmUpdate.
-   * @param tagWithAlarmChange the updated Alarm
+   * @param tagWithAlarmChange the updated Tag with Alarm Change
    */
-  private void notifyAlarmListeners(final Tag tagWithAlarmChange) {
+  private void notifyAlarmListeners(final TagUpdate tagWithAlarmChange) {
 
-    log.trace("There are {} listeners waiting to be notified!", alarmListeners.size());
+    log.debug("onAlarmUpdate() -  there is:" + alarmListeners.size()
+            + " listeners waiting to be notified!");
 
     for (AlarmListener listener : alarmListeners) {
+
       listener.onAlarmUpdate(tagWithAlarmChange);
     }
   }

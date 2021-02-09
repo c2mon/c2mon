@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2020 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -53,13 +53,14 @@ import java.util.List;
  * interface for sending tag value updates to the tag JMS destination
  * topics. The update information is transmitted as GSON message
  * with the <code>TransferTagValue</code> class.
- * <p>
+ *
  * This class implements the <code>ConfigurationUpdateListener</code>
  * interface for sending configuration updates to the tag JMS destination
  * topics. The update information is transmitted as GSON message
  * with the <code>TransferTag</code> class.
  *
  * @author Matthias Braeger, Mark Brightwell, Ignacio Vilches
+ *
  * @see AlarmAggregatorListener
  * @see ConfigurationUpdateListener
  * @see TagValueUpdate
@@ -69,29 +70,19 @@ import java.util.List;
 @ManagedResource(description = "Bean publishing tag updates to the clients")
 public class TagValuePublisher implements AlarmAggregatorListener, ConfigurationUpdateListener, Publisher<TagWithAlarms> {
 
-    /**
-     * Bean providing for sending JMS messages and waiting for a response
-     */
+    /** Bean providing for sending JMS messages and waiting for a response */
     private final JmsSender jmsSender;
 
-    /**
-     * Listens for Configuration changes
-     */
+    /** Listens for Configuration changes */
     private final ConfigurationUpdate configurationUpdate;
 
-    /**
-     * Listens for Tag updates, evaluates all associated alarms and passes the result
-     */
+    /** Listens for Tag updates, evaluates all associated alarms and passes the result */
     private final AlarmAggregator alarmAggregator;
 
-    /**
-     * Contains re-publication logic
-     */
+    /** Contains re-publication logic */
     private Republisher<TagWithAlarms> republisher;
 
-    /**
-     * Time between republicaton attempts
-     */
+    /** Time between republicaton attempts */
     private int republicationDelay;
 
     /**
@@ -100,27 +91,22 @@ public class TagValuePublisher implements AlarmAggregatorListener, Configuration
      */
     private final AlarmService alarmService;
 
-    /**
-     * Reference to the tag location service
-     */
+    /** Reference to the tag location service */
     private TagCacheCollection tagLocationService;
 
-    /**
-     * Used to determine, whether a given tag is an AliveTag
-     */
+    /** Used to determine, whether a given tag is an AliveTag */
     private AliveTagService aliveTimerFacade;
 
     private ClientProperties properties;
 
     /**
      * Default Constructor
-     *
-     * @param jmsSender           Used for sending JMS messages and waiting for a response
-     * @param aliveTimerFacade    Used to determine, whether a given tag is an AliveTag
-     * @param alarmAggregator     Used to register this <code>AlarmAggregatorListener</code>
+     * @param jmsSender Used for sending JMS messages and waiting for a response
+     * @param aliveTimerFacade Used to determine, whether a given tag is an AliveTag
+     * @param alarmAggregator Used to register this <code>AlarmAggregatorListener</code>
      * @param configurationUpdate Used to register this <code>ConfigurationUpdateListener</code>
-     * @param alarmService        Reference to the tag facade gateway singleton
-     * @param tagLocationService  Reference to the tag location service
+     * @param alarmService Reference to the tag facade gateway singleton
+     * @param tagLocationService Reference to the tag location service
      */
     @Autowired
     public TagValuePublisher(@Qualifier("clientTopicPublisher") final JmsSender jmsSender,
@@ -172,20 +158,22 @@ public class TagValuePublisher implements AlarmAggregatorListener, Configuration
      * Generates for every notification a <code>TransferTagValue</code>
      * object which is then sent as serialized GSON message trough the
      * dedicated JMS client tag topic.
-     *
-     * @param tag    the updated tag
-     * @param alarms the new values of the associated alarms; this list
-     *               is null if no alarms are associated to the tag
+     * @param alarms the tag with attached alarms
      */
     @Override
-    public void notifyOnUpdate(Tag tag, List<Alarm> alarms) {
-        TagWithAlarms tagWithAlarms = new TagWithAlarms<>(tag, alarms);
+    public void notifyOnUpdate(final Tag tag, final List<Alarm> alarms) {
+        TagWithAlarms tagWithAlarms = new TagWithAlarms(tag, alarms);
         try {
             publish(tagWithAlarms);
         } catch (JmsException e) {
             log.error("notifyOnUpdate - Error publishing tag update to topic for tag " + tagWithAlarms.getTag().getId() + " - submitting for republication", e);
             republisher.publicationFailed(tagWithAlarms);
         }
+    }
+
+    @Override
+    public void notifyOnSupervisionChange(Tag tag, List<Alarm> alarms) {
+        // Do nothing with this information, as C2MON Client API is treating that event locally
     }
 
     @Override

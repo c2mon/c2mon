@@ -199,7 +199,7 @@ public class AlarmService extends AbstractCacheServiceImpl<Alarm> implements Ala
      */
     private void notifyListeners(final Tag tag, final List<Alarm> alarms) {
         for (AlarmAggregatorListener listener : alarmUpdateObservable) {
-            listener.notifyOnUpdate(tag, alarms);
+            listener.notifyOnUpdate(tag.clone(), alarms);
         }
     }
 

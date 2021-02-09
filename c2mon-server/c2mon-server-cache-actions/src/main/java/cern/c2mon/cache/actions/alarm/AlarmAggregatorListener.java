@@ -16,14 +16,14 @@
  *****************************************************************************/
 package cern.c2mon.cache.actions.alarm;
 
-import java.util.List;
-
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.tag.Tag;
 
+import java.util.List;
+
 /**
  * Interface that must be implemented by classes wishing
- * to received Tag and Supervision updates together with all associated
+ * to received Tag updates together with all associated
  * <b>evaluated</b> alarms.
  *
  * @author Mark Brightwell
@@ -40,4 +40,14 @@ public interface AlarmAggregatorListener {
      */
     void notifyOnUpdate(Tag tag, List<Alarm> alarms);
 
+    /**
+     * Call is triggered by a supervision change event (Process up/down, (Sub-)Equipment up/down),
+     * which is changing the quality of the tag and adding/removing the '[?]' from the additional
+     * info field of the alarm.
+     *
+     * @param tag the Tag that is affected by the supervision event
+     * @param alarms The alarms of corresponding tag;
+     *               this list is <b>null</b> if no alarms are associated to the tag
+     */
+    void notifyOnSupervisionChange(Tag tag, List<Alarm> alarms);
 }
