@@ -680,8 +680,8 @@ public class FallbackFileController {
         try {
             new PrintWriter(dataFile).close();
         } catch (FileNotFoundException e) {
-            LOG.error("clearFileContents() - The contents of the file could not be deleted");
-            throw new DataFallbackException("The contents of the file " + dataFile.getAbsolutePath()
+            LOG.error("clearFileContents() - The contents of the fallback log file {} could not be deleted", dataFile.getAbsolutePath());
+            throw new DataFallbackException("The contents of the fallback log file " + dataFile.getAbsolutePath()
                     + " could not be deleted");
         }
         initializeCounterFile();
