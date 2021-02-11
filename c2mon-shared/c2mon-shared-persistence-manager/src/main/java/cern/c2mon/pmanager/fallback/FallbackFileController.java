@@ -265,7 +265,7 @@ public class FallbackFileController {
      *             An exception is thrown when the counter cannot be read from
      *             the file
      */
-    private int readCounter(boolean moveReadingDescriptor) throws DataFallbackException {
+    protected int readCounter(boolean moveReadingDescriptor) throws DataFallbackException {
         final int counter;
         openCounterDataInputStream();
         try {

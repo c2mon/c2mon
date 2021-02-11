@@ -22,7 +22,9 @@ import cern.c2mon.pmanager.mock.FallbackImpl;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 
 import static org.junit.Assert.*;
@@ -37,18 +39,54 @@ import static org.junit.Assert.*;
  */
 public class FallbackFileControllerTest {
 
+  private static final String FALLBACK_FILE_NAME = "DataTagFallback.log";
+  private static final String COUNTER_FILE_NAME = ".Counter" + FALLBACK_FILE_NAME;
+
   /**
    * The fallback file path
    */
   private static File fallbackFile;
 
   /**
+   * The counter fallback file path
+   */
+  private static File counterFallbackFile;
+
+  /**
+   * The Fallback file controller instance
+   */
+  private static FallbackFileController fFileController;
+
+  /**
    * It sets up the class for the test
    */
   @BeforeClass
   public static void setUp() throws IOException {
-    fallbackFile = File.createTempFile("DataTagFallback", ".log");
-    fallbackFile.deleteOnExit();
+    ClassLoader classLoader = FallbackFileControllerTest.class.getClassLoader();
+
+    fallbackFile = new File(classLoader.getResource(FALLBACK_FILE_NAME).getFile());
+    counterFallbackFile = new File(classLoader.getResource(COUNTER_FILE_NAME).getFile());
+
+    //Initialize the counter file with a random number
+    BufferedWriter counterFileWriter = new BufferedWriter(new FileWriter(counterFallbackFile));
+    counterFileWriter.write("3000");
+    counterFileWriter.close();
+
+    fFileController = new FallbackFileController(fallbackFile.getAbsolutePath());
+  }
+
+  /**
+   * Tests the counter reset when the current counter is bigger than the number of lines in the fallback file
+   */
+  @Test
+  public final void testCounterReset(){
+    int counter = 0;
+    try {
+      counter = fFileController.readCounter(false);
+    } catch (DataFallbackException e) {
+      fail("Exception should not be thrown");
+    }
+    assertEquals(0, counter);
   }
 
   /**
@@ -56,7 +94,6 @@ public class FallbackFileControllerTest {
    */
   @Test
   public final void testOpenOutputStream() {
-    FallbackFileController fFileController = new FallbackFileController(fallbackFile.getAbsolutePath());
     try {
 
       fFileController.openFallbackOutputStream();
@@ -72,7 +109,6 @@ public class FallbackFileControllerTest {
    */
   @Test
   public final void testOpenInputStream() {
-    FallbackFileController fFileController = new FallbackFileController(fallbackFile.getAbsolutePath());
     try {
       fFileController.openFallbackInputStream();
     } catch (DataFallbackException e) {
@@ -86,7 +122,6 @@ public class FallbackFileControllerTest {
    */
   @Test
   public final void testWriteLine() {
-    FallbackFileController fFileController = new FallbackFileController(fallbackFile.getAbsolutePath());
 
     FallbackImpl fallbackImpl = new FallbackImpl();
     try {
@@ -106,7 +141,6 @@ public class FallbackFileControllerTest {
    */
   @Test
   public final void testCloseInputStream() {
-    FallbackFileController fFileController = new FallbackFileController(fallbackFile.getAbsolutePath());
     try {
       fFileController.closeFallbackInputStream();
     } catch (DataFallbackException e) {
@@ -121,7 +155,6 @@ public class FallbackFileControllerTest {
    */
   @Test
   public final void testCloseOutputStream() {
-    FallbackFileController fFileController = new FallbackFileController(fallbackFile.getAbsolutePath());
     try {
       fFileController.closeFallbackOutputStream();
     } catch (DataFallbackException e) {
