@@ -19,12 +19,7 @@ package cern.c2mon.pmanager.fallback;
 import cern.c2mon.pmanager.IFallback;
 import cern.c2mon.pmanager.fallback.exception.DataFallbackException;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -242,10 +237,16 @@ public class FallbackFileController {
         try {
             // initialize the lines counter
             setNumberOfLines(calcNumberOfLines());
+
+            //The counter file can't have a bigger number than the number of lines present in the fallback file
+            if(readCounter(false) > numberOfLines){
+                initializeCounterFile();
+            }
+
             // Initialize the counter for the number of lines already proccessed
             // and prepared the
             // file descriptor to point to the next line to read
-            setReadBackLines(readCounter());
+            setReadBackLines(readCounter(true));
             LOG.info("FallbackFileController() - The number of lines of the "
                     + dataFile.getName() + " file is " + getNumberOfLines());
         } catch (Exception e) {
@@ -258,22 +259,25 @@ public class FallbackFileController {
      * Reads the number that is stored in the counter file and which represents
      * the already committed data
      *
+     * @param moveReadingDescriptor If true move the reading descriptor to the first line that has yet to be processed
      * @return The counter stored in the counter file
      * @throws DataFallbackException
      *             An exception is thrown when the counter cannot be read from
      *             the file
      */
-    private int readCounter() throws DataFallbackException {
+    protected int readCounter(boolean moveReadingDescriptor) throws DataFallbackException {
         final int counter;
         openCounterDataInputStream();
         try {
             String line;
             line = dInput.readLine();
             if (line != null) {
-                counter = new Integer(line).intValue();
+                counter = Integer.parseInt(line);
                 // Put the reading descriptor in the first line that has not
                 // been yet processed
-                goToLine(counter);
+                if(moveReadingDescriptor){
+                    goToLine(counter);
+                }
                 if (LOG.isDebugEnabled())
                     LOG.debug("The counter file " + counterFile.getName() + " has been read");
             } else {
@@ -515,7 +519,7 @@ public class FallbackFileController {
 
     public final void writeLine(final IFallback object) throws DataFallbackException {
 
-        String str = object.toString();
+        String str = object.toString().replaceAll("\n", "");
         try {
             output.write(str);
             output.newLine();
@@ -664,38 +668,23 @@ public class FallbackFileController {
     }
 
     /**
-     * Removes the contents of the fallback log file by deleting the file and
-     * creating it again and it also updates the counter stored in the
-     * counterfile
+     * Removes the contents of the fallback log file and updates the counter stored in the
+     * counter file
      *
      * @throws DataFallbackException
      *             An exception is thrown if the fallback file cannot be deleted
      */
     public final void clearFileContents() throws DataFallbackException {
 
-        // Delete the original file
-        if (!dataFile.delete()) {
-            LOG.error("clearFileContents() - The original file could not be deleted");
-            throw new DataFallbackException("The file " + dataFile.getAbsolutePath()
+        // Delete the content of the original file
+        try {
+            new PrintWriter(dataFile).close();
+        } catch (FileNotFoundException e) {
+            LOG.error("clearFileContents() - The contents of the fallback log file {} could not be deleted", dataFile.getAbsolutePath());
+            throw new DataFallbackException("The contents of the fallback log file " + dataFile.getAbsolutePath()
                     + " could not be deleted");
-        } else {
-            LOG.info("clearFileContents() - The " + dataFile.getAbsolutePath()
-                    + " has been deleted");
-            try {
-                // Create again the fallback log file
-                if (dataFile.createNewFile()) {
-                    if (LOG.isDebugEnabled())
-                        LOG.debug("clearFileContents() - The " + dataFile.getAbsolutePath()
-                                + " has been created");
-                }
-            } catch (IOException e) {
-                LOG.error("clearFileContents() : Error while creating the fallback file "
-                        + e.getMessage());
-            }
-            // Reset the fallback counters
-            initializeCounterFile();
-
         }
+        initializeCounterFile();
     }
 
     /**

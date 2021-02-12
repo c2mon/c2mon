@@ -14,6 +14,7 @@ For more details on a given release, please check also the [version planning](ht
 
 ### Fixed
 - Server: Fixed a problem that got introduced accidentially with patch for CM-274 in v10.0.1 and which only could be detected in operation with huge amount of alarm configurations.
+- Server: Fixed a problem with new line characters (`\n`) preventing a correct readback from the fallback file into the Tag history DB table (CM-275)
 
 ## 1.10.1 - 2021-01-29
 ### Added
