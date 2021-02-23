@@ -10,6 +10,12 @@ For more details on a given release, please check also the [version planning](ht
 ### Added
 
 ### Changed
+
+### Fixed
+
+
+## 1.10.2 - 2021-02-23
+### Changed
 - Server: Lowered log level to `Debug` for Elasticsearch waitForYellowStatus() notifications
 
 ### Fixed
