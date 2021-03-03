@@ -83,9 +83,11 @@ public class IgniteC2monCache<V extends Cacheable> extends AbstractCache<V> {
 
   @Override
   public Collection<V> query(CacheQuery<V> providedQuery) {
-    return cache.query(
-            // Convert the provided query into Ignite query, keep only the values
-            new ScanQuery<>(new IgniteC2monPredicateWrapper<>(providedQuery)), new IgniteValueClosure()).getAll();
+    return StreamSupport.stream(Spliterators
+            .spliteratorUnknownSize(cache.query(
+                    // Convert the provided query into Ignite query, keep only the values
+                    new ScanQuery<>(new IgniteC2monPredicateWrapper<>(providedQuery)), new IgniteValueClosure<>()).iterator(), Spliterator.ORDERED), false)
+            .limit(providedQuery.maxResults()).collect(Collectors.toList());
   }
 
   @Override

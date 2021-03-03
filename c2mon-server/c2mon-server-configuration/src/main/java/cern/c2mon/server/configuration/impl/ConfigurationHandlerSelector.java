@@ -74,8 +74,6 @@ class ConfigurationHandlerSelector {
   public List<ProcessChange> applyConfigElement(final ConfigurationElement element,
                                                 final ConfigurationElementReport elementReport) {
 
-      System.out.println("ConfigurationHandlerSelector " + element.toString());
-
     //initialize the DAQ config event
     final List<ProcessChange> daqConfigEvents = new ArrayList<>();
     log.trace(element.getConfigId() + " Applying configuration element with sequence id " + element.getSequenceId());
