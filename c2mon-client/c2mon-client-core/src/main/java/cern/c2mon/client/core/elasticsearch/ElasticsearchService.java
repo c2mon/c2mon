@@ -18,9 +18,10 @@ package cern.c2mon.client.core.elasticsearch;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.function.Function;
+
 import java.util.stream.Collectors;
 
+import cern.c2mon.shared.common.SerializableFunction;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import io.searchbox.client.JestClient;
@@ -234,7 +235,7 @@ public class ElasticsearchService {
    * @param <T>             type of output format
    * @return converted query results
    */
-  public <T> T findTagsByQuery(String query, Function<SearchResult, T> outputConverter, String indexName, String errorMessage) {
+  public <T> T findTagsByQuery(String query, SerializableFunction<SearchResult, T> outputConverter, String indexName, String errorMessage) {
     Search search = new Search.Builder(query).addIndex(indexName).build();
     try {
       SearchResult result = client.execute(search);
@@ -266,7 +267,7 @@ public class ElasticsearchService {
         "    }\n" +
         "  }\n" +
         "}", size);
-    Function<SearchResult, List<Long>> converter = result ->
+    SerializableFunction<SearchResult, List<Long>> converter = result ->
         new ArrayList<>(result.getAggregations().getTermsAggregation("group-by-id").getBuckets()
             .stream()
             .map(bucket -> Long.valueOf(bucket.getKey()))
@@ -282,7 +283,7 @@ public class ElasticsearchService {
    * @return list of tag ids returned from elasticsearch
    */
   public Collection<Long> findTagsByQuery(String query, String errorMessage) {
-    Function<SearchResult, Collection<Long>> converter =
+    SerializableFunction<SearchResult, Collection<Long>> converter =
         result -> {
           if (!result.isSucceeded()) {
             return new ArrayList<>();
@@ -468,7 +469,7 @@ public class ElasticsearchService {
         "    }\n" +
         "  }\n" +
         "}", size);
-    Function<SearchResult, List<Long>> converter = result ->
+    SerializableFunction<SearchResult, List<Long>> converter = result ->
         new ArrayList<>(result.getAggregations().getTermsAggregation("group-by-id").getBuckets()
             .stream()
             .map(bucket -> Long.valueOf(bucket.getKey()))
@@ -503,7 +504,7 @@ public class ElasticsearchService {
         "    }\n" +
         "  } ]\n" +
         "}", id, min, max);
-    Function<SearchResult,List<Object[]>> converter = result ->
+    SerializableFunction<SearchResult,List<Object[]>> converter = result ->
         new ArrayList<>(result.getHits(Map.class)
         .stream()
         .map(hit -> new Object[]{hit.source.get("timestamp"), hit.source.get("active")})
@@ -539,7 +540,7 @@ public class ElasticsearchService {
         "    }\n" +
         "  } ]\n" +
         "}", name, name);
-    Function<SearchResult, Collection<Long>> converter = result ->
+    SerializableFunction<SearchResult, Collection<Long>> converter = result ->
         new ArrayList<>(result.getHits(Map.class)
         .stream()
         .map(hit -> (long) hit.source.get("id"))

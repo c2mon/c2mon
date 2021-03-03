@@ -9,6 +9,7 @@ import cern.c2mon.server.cache.test.CachePopulationRule;
 import cern.c2mon.server.common.config.CommonModule;
 import cern.c2mon.server.supervision.config.SupervisionModule;
 import cern.c2mon.server.supervision.impl.event.ProcessEvents;
+import cern.c2mon.shared.common.SerializableFunction;
 import cern.c2mon.shared.daq.process.ProcessRequest;
 import cern.c2mon.shared.daq.process.XMLConverter;
 import org.junit.Rule;
@@ -18,7 +19,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.inject.Inject;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import static org.junit.Assert.assertNotNull;
 
@@ -51,7 +51,7 @@ public abstract class AbstractProcessEventsTest<REQ extends ProcessRequest, RES>
 
   protected XMLConverter xmlConverter = new XMLConverter();
 
-  protected void doAndVerify(REQ request, Function<REQ,String> action, Consumer<RES> tests) throws Exception {
+  protected void doAndVerify(REQ request, SerializableFunction<REQ,String> action, Consumer<RES> tests) throws Exception {
     String xmlProcessConfigurationResponse = action.apply(request);
     assertNotNull(xmlProcessConfigurationResponse);
 

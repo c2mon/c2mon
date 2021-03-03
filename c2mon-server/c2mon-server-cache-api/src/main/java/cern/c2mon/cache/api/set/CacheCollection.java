@@ -7,12 +7,12 @@ import cern.c2mon.cache.api.listener.CacheListener;
 import cern.c2mon.server.common.util.KotlinAPIs;
 import cern.c2mon.shared.common.CacheEvent;
 import cern.c2mon.shared.common.Cacheable;
+import cern.c2mon.shared.common.SerializableFunction;
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -139,7 +139,7 @@ public class CacheCollection<T extends Cacheable> {
    * @throws CacheElementNotFoundException If no cache contains the provided key
    * @apiNote Terminates early as soon as it finds a cache that contains the given key
    */
-  protected <R> R doAcrossCaches(long id, Function<C2monCache<? extends T>, R> cacheAction) {
+  protected <R> R doAcrossCaches(long id, SerializableFunction<C2monCache<? extends T>, R> cacheAction) {
     for (C2monCache<? extends T> cache : caches) {
       if (cache.containsKey(id)) {
         return cacheAction.apply(cache);

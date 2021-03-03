@@ -17,6 +17,7 @@
 package cern.c2mon.server.common.device;
 
 import cern.c2mon.server.common.AbstractCacheableImpl;
+import cern.c2mon.shared.common.SerializableFunction;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,7 +26,6 @@ import lombok.ToString;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -153,7 +153,7 @@ public class DeviceClassCacheObject extends AbstractCacheableImpl implements Dev
   }
 
 
-  private <T> List<T> mapPropertyFields(String propertyName, Function<Property, T> mapper) {
+  private <T> List<T> mapPropertyFields(String propertyName, SerializableFunction<Property, T> mapper) {
     return properties
       .stream()
       .filter(prop -> prop.getName().equals(propertyName))

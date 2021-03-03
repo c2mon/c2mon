@@ -171,7 +171,7 @@ public class DataTagValueUpdateTest {
   }
 
   /*
-   *  Function for reading the DataTagValueUpdate from a XMML file
+   *  Function for reading the DataTagValueUpdate from a XML file
    */
   public void readFromXML() {
     Document doc = null;

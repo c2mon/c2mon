@@ -156,7 +156,7 @@ Once you are done you have to add the code in a separate jar to the classpath, b
 The following code shows the simplest way to create a `RuleTag`:
 
 ```java
-configurationService.createRuleTag("RULE_EXAMPLE", "(#1000 < 0)|(#1000 > 200)[1],true[0]", Integer.class);
+configurationService.createRuleTag("(#1000 < 0)|(#1000 > 200)[1],true[0]", "RULE_EXAMPLE", Integer.class);
 ```
 
 `RuleTag#create` and `RuleTag#update` methods also exist in a similar manner as for the `DataTag`.

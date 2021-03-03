@@ -1,7 +1,8 @@
 package cern.c2mon.server.common.util;
 
+import cern.c2mon.shared.common.SerializableFunction;
+
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 /**
  * This class provides some of the APIs of Kotlin for quality of life in development
@@ -42,7 +43,7 @@ public final class KotlinAPIs {
   /**
    * Takes the object as argument, then returns whatever the transformer function returns
    */
-  public static <OUT, IN> OUT let(IN object, Function<IN, OUT> transformer) {
+  public static <OUT, IN> OUT let(IN object, SerializableFunction<IN, OUT> transformer) {
     return transformer.apply(object);
   }
 
@@ -51,7 +52,7 @@ public final class KotlinAPIs {
    * if it is non null, applies the function on it,
    * then returns whatever the transformer function returns
    */
-  public static <OUT, IN> OUT letNotNull(IN object, Function<IN, OUT> transformer) {
+  public static <OUT, IN> OUT letNotNull(IN object, SerializableFunction<IN, OUT> transformer) {
     return object == null ? null : transformer.apply(object);
   }
 

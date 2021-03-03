@@ -3,6 +3,7 @@ package cern.c2mon.cache.impl;
 import cern.c2mon.cache.api.impl.AbstractCache;
 import cern.c2mon.cache.api.spi.CacheQuery;
 import cern.c2mon.shared.common.Cacheable;
+import cern.c2mon.shared.common.SerializableFunction;
 import lombok.Getter;
 import org.apache.ignite.Ignite;
 import org.apache.ignite.IgniteCache;
@@ -19,7 +20,6 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.Spliterator;
 import java.util.Spliterators;
-import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -74,24 +74,22 @@ public class IgniteC2monCache<V extends Cacheable> extends AbstractCache<V> {
   @Override
   public Set<Long> getKeys() {
     return StreamSupport.stream(Spliterators
-      .spliteratorUnknownSize(cache.query(
-        // Convert the provided query into Ignite query, keep only the keys to save on memory
-        // Null passed to ScanQuery gives us all results back
-        new ScanQuery<>(null), Entry::getKey).iterator(), Spliterator.ORDERED), false)
-      .limit(CacheQuery.DEFAULT_MAX_RESULTS).map(i -> (long) i).collect(Collectors.toSet());
+            .spliteratorUnknownSize(cache.query(
+                    // Convert the provided query into Ignite query, keep only the keys to save on memory
+                    // Null passed to ScanQuery gives us all results back
+                    new ScanQuery<>(null), Entry::getKey).iterator(), Spliterator.ORDERED), false)
+            .limit(CacheQuery.DEFAULT_MAX_RESULTS).map(i -> (long) i).collect(Collectors.toSet());
   }
 
   @Override
   public Collection<V> query(CacheQuery<V> providedQuery) {
-    return StreamSupport.stream(Spliterators
-      .spliteratorUnknownSize(cache.query(
-        // Convert the provided query into Ignite query, keep only the values
-        new ScanQuery<>(new IgniteC2monPredicateWrapper<>(providedQuery)), Entry::getValue).iterator(), Spliterator.ORDERED), false)
-      .limit(providedQuery.maxResults()).collect(Collectors.toList());
+    return cache.query(
+            // Convert the provided query into Ignite query, keep only the values
+            new ScanQuery<>(new IgniteC2monPredicateWrapper<>(providedQuery)), new IgniteValueClosure()).getAll();
   }
 
   @Override
-  public Collection<V> query(Function<V, Boolean> filter) {
+  public Collection<V> query(SerializableFunction<V, Boolean> filter) {
     return query(new CacheQuery<>(filter));
   }
 

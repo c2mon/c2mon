@@ -1,12 +1,12 @@
 package cern.c2mon.cache.api.spi;
 
 import cern.c2mon.shared.common.Cacheable;
+import cern.c2mon.shared.common.SerializableFunction;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import java.util.Comparator;
-import java.util.function.Function;
 
 import static java.util.Objects.requireNonNull;
 
@@ -23,10 +23,10 @@ import static java.util.Objects.requireNonNull;
 @Getter
 @Setter
 @Accessors(fluent = true)
-public class CacheQuery<V extends Cacheable> implements Function<V, Boolean> {
+public class CacheQuery<V extends Cacheable> implements SerializableFunction<V, Boolean> {
   public static final int DEFAULT_MAX_RESULTS = 100_000;
 
-  private final Function<V, Boolean> filter;
+  private final SerializableFunction<V, Boolean> filter;
 
   /**
    * Kept to maintain compatibility with previous default, but this could definitely be reduced
@@ -46,7 +46,7 @@ public class CacheQuery<V extends Cacheable> implements Function<V, Boolean> {
    */
   private Comparator<V> sortBy;
 
-  public CacheQuery(Function<V, Boolean> filter) {
+  public CacheQuery(SerializableFunction<V, Boolean> filter) {
     requireNonNull(filter);
     this.filter = filter;
   }

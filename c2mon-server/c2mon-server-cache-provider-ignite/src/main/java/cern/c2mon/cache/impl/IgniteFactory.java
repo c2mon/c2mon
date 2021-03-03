@@ -3,7 +3,6 @@ package cern.c2mon.cache.impl;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.factory.AbstractCacheFactory;
 import cern.c2mon.shared.common.Cacheable;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.ignite.cache.CacheAtomicityMode;
 import org.apache.ignite.cache.CacheMode;
 import org.apache.ignite.configuration.CacheConfiguration;
@@ -17,7 +16,6 @@ import javax.inject.Singleton;
  *
  * @author Szymon Halastra, Alexander Papageorgiou
  */
-@Slf4j
 @Named
 @Singleton
 public class IgniteFactory extends AbstractCacheFactory {

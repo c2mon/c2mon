@@ -5,13 +5,13 @@ import cern.c2mon.server.configuration.handler.transacted.*;
 import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
+import cern.c2mon.shared.common.SerializableFunction;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 
 import static cern.c2mon.server.common.util.KotlinAPIs.apply;
 import static cern.c2mon.server.common.util.KotlinAPIs.applyNotNull;
@@ -74,6 +74,8 @@ class ConfigurationHandlerSelector {
   public List<ProcessChange> applyConfigElement(final ConfigurationElement element,
                                                 final ConfigurationElementReport elementReport) {
 
+      System.out.println("ConfigurationHandlerSelector " + element.toString());
+
     //initialize the DAQ config event
     final List<ProcessChange> daqConfigEvents = new ArrayList<>();
     log.trace(element.getConfigId() + " Applying configuration element with sequence id " + element.getSequenceId());
@@ -113,7 +115,7 @@ class ConfigurationHandlerSelector {
     return daqConfigEvents;
   }
 
-  private List<ProcessChange> chooseHandlerThenDo(ConfigConstants.Entity entity, Function<BaseConfigHandler, List<ProcessChange>> action) {
+  private List<ProcessChange> chooseHandlerThenDo(ConfigConstants.Entity entity, SerializableFunction<BaseConfigHandler, List<ProcessChange>> action) {
     if (!handlerMap.containsKey(entity)) {
       log.warn("Unrecognized reconfiguration entity: {} ", entity);
     }

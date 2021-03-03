@@ -6,6 +6,7 @@ import cern.c2mon.cache.api.listener.CacheListenerManager;
 import cern.c2mon.cache.api.loader.CacheLoader;
 import cern.c2mon.cache.api.spi.CacheQuery;
 import cern.c2mon.shared.common.Cacheable;
+import cern.c2mon.shared.common.SerializableFunction;
 import lombok.NonNull;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Collection;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 
@@ -118,15 +118,15 @@ public interface C2monCache<CACHEABLE extends Cacheable> extends CacheDelegator<
    * @return a {@code Collection} of results, may be empty, never null
    * @throws NullPointerException when {@code filter} is null
    */
-  Collection<CACHEABLE> query(@NonNull Function<CACHEABLE, Boolean> filter);
+  Collection<CACHEABLE> query(@NonNull SerializableFunction<CACHEABLE, Boolean> filter);
 
   /**
-   * Overload of {@link C2monCache#query(Function)} allowing the user to provide additional search parameters
+   * Overload of {@link C2monCache#query(SerializableFunction)} allowing the user to provide additional search parameters
    *
    * @param providedQuery must not be null, a CacheQuery to execute on the cache
    * @return a {@code Collection} of results, may be empty, never null
    * @throws NullPointerException when {@code providedQuery} is null
-   * @see C2monCache#query(Function)
+   * @see C2monCache#query(SerializableFunction)
    */
   Collection<CACHEABLE> query(@NonNull CacheQuery<CACHEABLE> providedQuery);
 

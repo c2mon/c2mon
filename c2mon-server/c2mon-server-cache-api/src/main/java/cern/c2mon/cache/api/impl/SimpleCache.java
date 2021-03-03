@@ -2,11 +2,11 @@ package cern.c2mon.cache.api.impl;
 
 import cern.c2mon.cache.api.spi.CacheQuery;
 import cern.c2mon.shared.common.Cacheable;
+import cern.c2mon.shared.common.SerializableFunction;
 import lombok.Getter;
 
 import java.util.Collection;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -42,7 +42,7 @@ public class SimpleCache<V extends Cacheable> extends AbstractCache<V> {
   }
 
   @Override
-  public Collection<V> query(Function<V, Boolean> filter) {
+  public Collection<V> query(SerializableFunction<V, Boolean> filter) {
     return getKeys().stream().map(this::get).filter(filter::apply).collect(Collectors.toList());
   }
 

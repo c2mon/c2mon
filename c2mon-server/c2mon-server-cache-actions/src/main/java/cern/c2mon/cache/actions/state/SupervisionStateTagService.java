@@ -8,6 +8,7 @@ import cern.c2mon.cache.api.exception.CacheElementNotFoundException;
 import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.supervision.SupervisionStateTag;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
+import cern.c2mon.shared.common.SerializableFunction;
 import cern.c2mon.shared.common.supervision.SupervisionEntity;
 import cern.c2mon.shared.common.supervision.SupervisionStatus;
 import lombok.NonNull;
@@ -18,7 +19,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static cern.c2mon.cache.actions.commfault.CommFaultTagEvaluator.inferSupervisionStatus;
@@ -192,7 +192,7 @@ public class SupervisionStateTagService extends AbstractCacheServiceImpl<Supervi
    * @param newStatus
    * @param timestamp
    */
-  private void setStateTagAsActive(long stateTagId, SupervisionStatus newStatus, long timestamp, Function<SupervisionStateTag, String> message) {
+  private void setStateTagAsActive(long stateTagId, SupervisionStatus newStatus, long timestamp, SerializableFunction<SupervisionStateTag, String> message) {
     log.debug("Attempting to set State tag to " + newStatus);
 
     if (!cache.containsKey(stateTagId)) {
