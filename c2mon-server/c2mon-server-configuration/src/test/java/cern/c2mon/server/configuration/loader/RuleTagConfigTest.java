@@ -1,6 +1,7 @@
 package cern.c2mon.server.configuration.loader;
 
 import cern.c2mon.cache.api.C2monCache;
+import cern.c2mon.cache.config.collections.TagCacheCollection;
 import cern.c2mon.server.cache.dbaccess.DataTagMapper;
 import cern.c2mon.server.cache.dbaccess.RuleTagMapper;
 import cern.c2mon.server.common.datatag.DataTag;
@@ -91,7 +92,7 @@ public class RuleTagConfigTest extends ConfigurationCacheLoaderTest<RuleTag> {
     configurationLoader.applyConfiguration(10);
 
     // Reregister evaluation listeners, because the ConfigRuleChain nuked them
-    ruleTagService.init();
+    //ruleTagService.init();
 
     // Expecting 2 value changes (one for the update and for the eval)
     final CountDownLatch latch = new CountDownLatch(2);
@@ -132,7 +133,7 @@ public class RuleTagConfigTest extends ConfigurationCacheLoaderTest<RuleTag> {
   public void updateRuleTag() throws InterruptedException {
     setUp();
     configurationLoader.applyConfiguration(TestConfigurationProvider.createRuleTag());
-    ruleTagService.init();
+    //ruleTagService.init();
 
     final CountDownLatch latch = new CountDownLatch(1);
     ruleTagCache.getCacheListenerManager().registerListener(ruleTag -> {

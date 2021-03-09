@@ -62,20 +62,17 @@ public class RuleEvaluatorImpl implements RuleEvaluator {
      */
     private final RuleUpdateBuffer ruleUpdateBuffer;
 
-    private final TagCacheCollection unifiedTagCacheFacade;
-
-    private final RuleProperties properties;
+    private final TagCacheCollection tagCacheCollection;
 
     @Autowired
     public RuleEvaluatorImpl(C2monCache<RuleTag> ruleTagCache,
                              RuleUpdateBuffer ruleUpdateBuffer,
-                             TagCacheCollection unifiedTagCacheFacade,
+                             TagCacheCollection tagCacheCollection,
                              RuleProperties properties) {
         super();
         this.ruleTagCache = ruleTagCache;
         this.ruleUpdateBuffer = ruleUpdateBuffer;
-        this.unifiedTagCacheFacade = unifiedTagCacheFacade;
-        this.properties = properties;
+        this.tagCacheCollection = tagCacheCollection;
     }
 
     /**
@@ -83,7 +80,7 @@ public class RuleEvaluatorImpl implements RuleEvaluator {
      */
     @PostConstruct
     public void init() {
-        unifiedTagCacheFacade.registerListener(tag -> {
+        tagCacheCollection.registerListener(tag -> {
             try {
                 evaluateRules(tag);
             } catch (Exception e) {
@@ -191,7 +188,7 @@ public class RuleEvaluatorImpl implements RuleEvaluator {
             // We don't use a read lock here, because a tag change would anyway
             // result in another rule evaluation
             // look for tag in datatag, rule and control caches
-            tag = unifiedTagCacheFacade.get(inputTagId);
+            tag = tagCacheCollection.get(inputTagId);
 
             // put reference to cache object in map
             tags.put(inputTagId, tag);

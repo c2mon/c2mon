@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.handler.transacted;
 
+import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.config.collections.TagCacheCollection;
 import cern.c2mon.cache.config.rule.RuleTagCacheObjectFactory;
 import cern.c2mon.server.cache.loading.RuleTagLoaderDAO;
@@ -52,17 +53,20 @@ public class RuleTagConfigHandler extends AbstractTagConfigHandler<RuleTag> {
 
   private final RuleTagService ruleTagService;
   private final RuleEvaluator ruleEvaluator;
+  private final TagCacheCollection tagCacheCollection;
 
   @Inject
-  public RuleTagConfigHandler(RuleTagService ruleTagService,
-                              RuleTagCacheObjectFactory ruleTagCacheObjectFactory,
-                              RuleTagLoaderDAO ruleTagLoaderDAO,
-                              GenericApplicationContext context,
-                              AlarmConfigHandler alarmConfigHandler,
-                              TagCacheCollection tagCacheCollection,
+  public RuleTagConfigHandler(final C2monCache<RuleTag> ruleTagCache,
+                              final RuleTagService ruleTagService,
+                              final RuleTagCacheObjectFactory ruleTagCacheObjectFactory,
+                              final RuleTagLoaderDAO ruleTagLoaderDAO,
+                              final GenericApplicationContext context,
+                              final AlarmConfigHandler alarmConfigHandler,
+                              final TagCacheCollection tagCacheCollection,
                               RuleEvaluator ruleEvaluator) {
-    super(ruleTagService.getCache(), ruleTagLoaderDAO, ruleTagCacheObjectFactory, tagCacheCollection, context, alarmConfigHandler);
+    super(ruleTagCache, ruleTagLoaderDAO, ruleTagCacheObjectFactory, tagCacheCollection, context, alarmConfigHandler);
     this.ruleTagService = ruleTagService;
+    this.tagCacheCollection = tagCacheCollection;
     this.ruleEvaluator = ruleEvaluator;
   }
 
@@ -71,7 +75,7 @@ public class RuleTagConfigHandler extends AbstractTagConfigHandler<RuleTag> {
     for (Long tagId : ruleTag.getRuleInputTagIds()) {
       tagCacheCollection.addRuleToTag(tagId, ruleTag.getId());
     }
-
+    ruleEvaluator.evaluateRule(ruleTag.getId());
     super.doPostCreate(ruleTag);
   }
 

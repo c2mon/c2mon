@@ -150,23 +150,5 @@ public class JmsConfig {
     return factory;
   }
 
-  /**
-   * Threads used for polling topic queues.
-   * @return The topic polling Executor Service
-   */
-  @Bean
-  public ExecutorService topicPollingExecutor() {
-    return Executors.newCachedThreadPool(new ThreadFactory() {
-
-      ThreadFactory defaultFactory = Executors.defaultThreadFactory();
-
-      @Override
-      public Thread newThread(final Runnable r) {
-        Thread returnThread = defaultFactory.newThread(r);
-        returnThread.setDaemon(true);
-        return returnThread;
-      }
-    });
-  }
 
 }

@@ -116,7 +116,7 @@ public class TagCacheCollection extends CacheCollection<Tag> {
   public void addRuleToTag(final long tagId, final Long ruleTagId) {
     log.trace("Adding RuleTag {} reference to Tag {}",ruleTagId, tagId);
     doAcrossCaches(tagId, cache ->
-      cache.compute(tagId, tag -> {
+      cache.computeQuiet(tagId, tag -> {
         if (!tag.getRuleIds().contains(ruleTagId)) {
           tag.getRuleIds().add(ruleTagId);
           updateRuleIdsString(tag);
