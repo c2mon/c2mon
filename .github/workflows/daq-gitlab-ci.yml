@@ -1,3 +1,7 @@
+##
+# This Gitlab pipeline is usesd as parent for all DAQ flavours, like OPC-UA, REST, etc
+##
+
 stages:
 - build
 - deploy
