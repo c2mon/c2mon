@@ -1,0 +1,97 @@
+version: "3.8"
+services:
+  c2mon:
+    image: gitlab-registry.cern.ch/c2mon/c2mon:1.0.0-IGNITE
+    ports:
+      - "9001:9001"
+    environment:
+      - C2MON_SERVER_ELASTICSEARCH_ENABLED=false
+      - C2MON_SERVER_JMS_EMBEDDED=false
+      - C2MON_SERVER_JMS_URL=tcp://mq:61616
+      - C2MON_SERVER_CACHEDBACCESS_JDBC_VALIDATION-QUERY=SELECT 1
+      - C2MON_SERVER_JDBC_DRIVER-CLASS-NAME=com.mysql.jdbc.Driver
+      - C2MON_SERVER_JDBC_URL=jdbc:mysql://db/tim
+      - C2MON_SERVER_JDBC_USERNAME=root
+      - C2MON_SERVER_CACHEDBACCESS_JDBC_JDBC-URL=jdbc:mysql://db/tim
+      - C2MON_SERVER_HISTORY_JDBC_JDBC-URL=jdbc:mysql://db/tim
+      - C2MON_SERVER_CONFIGURATION_JDBC_JDBC-URL=jdbc:mysql://db/tim
+      - C2MON_SERVER_TESTMODE=false
+    restart: on-failure
+    depends_on:
+      db:
+        condition: service_healthy
+        
+  ignite:
+    image: gitlab-registry.cern.ch/c2mon/c2mon/apacheignite:2.7.5
+    environment:
+      - OPTION_LIBS=ignite-rest-http
+      - IGNITE_QUIET=false
+      - OPTION_LIBS=ignite-slf4j
+    ports:
+      - 11211:11211
+      - 47100:47100
+      - 47500:47500
+      - 49112:49112
+
+  mq:
+    image: gitlab-registry.cern.ch/c2mon/c2mon/mq:1.0.0-IGNITE
+    ports:
+      - "61616:61616"
+      - "61614:61614"
+      - "1883:1883"
+      - "8086:8086"
+      - "8161:8161"
+
+  db:
+    image: gitlab-registry.cern.ch/c2mon/c2mon/mysql:1.0.0-IGNITE
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD="yes"
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      timeout: 20s
+      retries: 10
+
+  daq-rest:
+    image: gitlab-registry.cern.ch/c2mon/c2mon-daq-rest:1.0.0-IGNITE
+    ports:
+      - "8080:8080"
+    environment:
+      - "_JAVA_OPTIONS=-Dc2mon.daq.name=P_DAQ_REST_13 -Dc2mon.daq.jms.url=tcp://mq:61616 -Dc2mon.client.jms.url=tcp://mq:61616"
+    depends_on:
+      - c2mon
+
+  grafana:
+    image: gitlab-registry.cern.ch/c2mon/c2mon/grafana:grafana-6.1.2-c2mon-1.0.0-IGNITE
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_NAME=Main Org.
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Editor
+      - GF_INSTALL_PLUGINS=grafana-piechart-panel
+      - GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH=/etc/grafana/provisioning/dashboards/dashboard-hostmetrics.json
+    volumes:
+      # 'elasticsearch', 'prometheus' and 'db' as data sources
+      # default dashboards for 'daq-opc-ua' and 'daq-hostmetrics'
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      
+  elasticsearch:
+    image: gitlab-registry.cern.ch/c2mon/c2mon/es:elasticsearch-6.4.3-c2mon-1.0.0-IGNITE
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      - cluster.name=c2mon
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - TAKE_FILE_OWNERSHIP="1"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    # uncomment to persist your data
+    # volumes:
+      # - ./elasticsearch/data:/usr/share/elasticsearch/data
