@@ -40,7 +40,7 @@ public class ElasticsearchModuleIntegrationTestSuite extends ElasticsearchTestDe
 
   @Test
   public void testModuleStartup() throws IOException {
-    List<String> indexData = EmbeddedElasticsearchManager.getEmbeddedNode().fetchAllDocuments();
+    List<String> indexData = ElasticsearchSuiteTest.getElasticsearchClient().fetchAllDocuments();
     assertEquals("Embedded node should not contain any documents before each test and start successfully.",
         0, indexData.size());
   }

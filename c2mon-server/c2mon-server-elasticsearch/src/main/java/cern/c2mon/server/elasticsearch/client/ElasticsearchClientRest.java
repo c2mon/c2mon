@@ -17,6 +17,8 @@
 package cern.c2mon.server.elasticsearch.client;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -36,6 +38,7 @@ import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
+import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
 import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
@@ -47,10 +50,9 @@ import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.action.update.UpdateResponse;
-import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.client.RestClient;
-import org.elasticsearch.client.RestClientBuilder;
-import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.*;
+import org.elasticsearch.client.indices.GetIndexRequest;
+import org.elasticsearch.client.indices.GetIndexResponse;
 import org.elasticsearch.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.ByteSizeUnit;
@@ -287,6 +289,29 @@ public final class ElasticsearchClientRest implements ElasticsearchClient {
     }
 
     client = new RestHighLevelClient(restClientBuilder);
+  }
+
+  public void refreshIndices(){
+    try {
+      client.indices().refresh(new RefreshRequest(), RequestOptions.DEFAULT);
+    } catch (IOException e) {
+      log.error("An error occurred refreshing the indices");
+    }
+  }
+
+  public List<String> fetchAllDocuments() {
+    return fetchAllDocuments("*");
+  }
+
+  public List<String> fetchAllDocuments(String index) {
+    GetIndexRequest request = new GetIndexRequest(index);
+    GetIndexResponse response = null;
+    try {
+      response = client.indices().get(request, RequestOptions.DEFAULT);
+    } catch (IOException e) {
+      log.error("An error occurred fetching all documents");
+    }
+    return Arrays.asList(response.getIndices());
   }
 
   @Override

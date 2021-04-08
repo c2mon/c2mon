@@ -23,6 +23,9 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.testcontainers.elasticsearch.ElasticsearchContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -37,6 +40,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 @NotThreadSafe
+@Testcontainers
 public class ElasticsearchServiceTest {
 
   private static ElasticsearchProperties elasticsearchProperties = new ElasticsearchProperties();
@@ -45,6 +49,9 @@ public class ElasticsearchServiceTest {
   private C2monClientProperties properties = new C2monClientProperties();
   private ElasticsearchClientRest client;
   private IndexManager indexManager;
+
+  @Container
+  private static ElasticsearchContainer elasticsearchContainer;
 
   @Mock
   private TagFacadeGateway tagFacadeGateway;
@@ -63,21 +70,21 @@ public class ElasticsearchServiceTest {
 
   @BeforeClass
   public static void setUpClass() throws IOException, InterruptedException {
-    EmbeddedElasticsearchManager.start(elasticsearchProperties);
+    elasticsearchContainer.start();
   }
 
   @AfterClass
   public static void tearDownClass() {
-    EmbeddedElasticsearchManager.stop();
+    elasticsearchContainer.stop();
   }
 
   @Before
   public void setupElasticsearch() throws InterruptedException, NodeValidationException {
     try {
       CompletableFuture<Void> nodeReady = CompletableFuture.runAsync(() -> {
-        EmbeddedElasticsearchManager.getEmbeddedNode().deleteIndex(elasticsearchProperties.getTagConfigIndex());
-        indexManager.create(IndexMetadata.builder().name(elasticsearchProperties.getTagConfigIndex()).build(),
-            MappingFactory.createTagConfigMapping());
+        IndexMetadata indexMetadata = IndexMetadata.builder().name(elasticsearchProperties.getTagConfigIndex()).build();
+        client.deleteIndex(indexMetadata);
+        indexManager.create(indexMetadata, MappingFactory.createTagConfigMapping());
         try {
           Thread.sleep(1000); //it takes some time for the index to be recreated
         } catch (InterruptedException e) {
@@ -113,7 +120,7 @@ public class ElasticsearchServiceTest {
       tag.getMetadata().getMetadata().put(key1234, value1234);
       tagDocumentListener.onConfigurationEvent(tag, ConfigConstants.Action.CREATE);
 
-      EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
+      client.refreshIndices();
       Thread.sleep(10000);
 
       ElasticsearchService service = new ElasticsearchService(properties, "c2mon");
@@ -157,7 +164,7 @@ public class ElasticsearchServiceTest {
       tag.getMetadata().getMetadata().put(metadataKey, testUser);
       tagDocumentListener.onConfigurationEvent(tag, ConfigConstants.Action.CREATE);
 
-      EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
+      client.refreshIndices();
       Thread.sleep(10000);
 
       ElasticsearchService service = new ElasticsearchService(properties, "c2mon");

@@ -18,6 +18,8 @@ package cern.c2mon.server.elasticsearch;
 
 import java.util.concurrent.TimeUnit;
 
+import cern.c2mon.server.elasticsearch.client.ElasticsearchClient;
+import cern.c2mon.server.elasticsearch.client.ElasticsearchClientRest;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -35,6 +37,9 @@ import cern.c2mon.server.elasticsearch.tag.TagDocumentIndexerTestSuite;
 import cern.c2mon.server.elasticsearch.tag.config.TagConfigDocumentConverterTestSuite;
 import cern.c2mon.server.elasticsearch.tag.config.TagConfigDocumentIndexerTestSuite;
 import cern.c2mon.server.elasticsearch.util.EmbeddedElasticsearchManager;
+import org.testcontainers.elasticsearch.ElasticsearchContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 /**
  * Perform the necessary setup to run ES tests
@@ -55,7 +60,11 @@ import cern.c2mon.server.elasticsearch.util.EmbeddedElasticsearchManager;
     TagConfigDocumentConverterTestSuite.class,
     TagConfigDocumentIndexerTestSuite.class
 })
+@Testcontainers
 public class ElasticsearchSuiteTest {
+
+  @Container
+  private static ElasticsearchContainer elasticsearchContainer;
 
   @ClassRule
   public static Timeout classTimeout = new Timeout(2, TimeUnit.MINUTES);
@@ -66,13 +75,18 @@ public class ElasticsearchSuiteTest {
     return properties;
   }
 
+  private static ElasticsearchClientRest client;
+
+  public static ElasticsearchClientRest getElasticsearchClient(){ return client; }
+
   @BeforeClass
   public static void setUpClass() {
-    EmbeddedElasticsearchManager.start(properties);
+    elasticsearchContainer.start();
+    client = new ElasticsearchClientRest(properties);
   }
 
   @AfterClass
   public static void cleanup() {
-    EmbeddedElasticsearchManager.stop();
+    elasticsearchContainer.stop();
   }
 }

@@ -56,10 +56,10 @@ public class ElasticsearchClientConfiguration {
       return new ElasticsearchClientStub();
     }
 
-    if (properties.isEmbedded()) {
+    /*if (properties.isEmbedded()) {
       EmbeddedElasticsearchManager.start(properties);
       return new ElasticsearchClientRest(properties);
-    }
+    }*/
 
     if (ElasticsearchClientType.TRANSPORT.name().equalsIgnoreCase(properties.getClient())) {
       return new ElasticsearchClientTransport(properties);

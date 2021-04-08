@@ -79,12 +79,12 @@ public class TagDocumentIndexerTestSuite extends ElasticsearchTestDefinition {
     // Bulk flush operation seem to require more time
     Awaitility.await().until(() -> IndexUtils.countDocuments(indexName, ElasticsearchSuiteTest.getProperties()) == 1);
 
-    EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
+    ElasticsearchSuiteTest.getElasticsearchClient().refreshIndices();
 
     assertTrue("Index should have been created.",
         IndexUtils.doesIndexExist(indexName, ElasticsearchSuiteTest.getProperties()));
 
-    List<String> indexData = EmbeddedElasticsearchManager.getEmbeddedNode().fetchAllDocuments(indexName);
+    List<String> indexData = ElasticsearchSuiteTest.getElasticsearchClient().fetchAllDocuments(indexName);
     assertEquals("Index should have one document inserted.", 1, indexData.size());
   }
 
@@ -96,12 +96,12 @@ public class TagDocumentIndexerTestSuite extends ElasticsearchTestDefinition {
     // Bulk flush operation seem to require more time
     Awaitility.await().until(() -> IndexUtils.countDocuments(indexName, ElasticsearchSuiteTest.getProperties()) == 2);
 
-    EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
+    ElasticsearchSuiteTest.getElasticsearchClient().refreshIndices();
 
     assertTrue("Index should have been created.",
         IndexUtils.doesIndexExist(indexName, ElasticsearchSuiteTest.getProperties()));
 
-    List<String> indexData = EmbeddedElasticsearchManager.getEmbeddedNode().fetchAllDocuments(indexName);
+    List<String> indexData = ElasticsearchSuiteTest.getElasticsearchClient().fetchAllDocuments(indexName);
     assertEquals("Index should have two documents inserted.", 2, indexData.size());
   }
 }

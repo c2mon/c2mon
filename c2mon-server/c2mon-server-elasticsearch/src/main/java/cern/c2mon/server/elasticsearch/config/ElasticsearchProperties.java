@@ -44,7 +44,7 @@ public class ElasticsearchProperties {
   /**
    * Enable/Disable the initiation of Embedded ES instance (should be used only for tests)
    */
-  private boolean embedded = true;
+//  private boolean embedded = true;
 
   /**
    * Host name or IP address pointing to the Elasticsearch cluster

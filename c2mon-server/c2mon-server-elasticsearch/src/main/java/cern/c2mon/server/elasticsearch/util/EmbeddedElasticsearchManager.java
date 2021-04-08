@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import lombok.extern.slf4j.Slf4j;
+import org.testcontainers.utility.DockerImageName;
 import pl.allegro.tech.embeddedelasticsearch.EmbeddedElastic;
 import pl.allegro.tech.embeddedelasticsearch.PopularProperties;
 
@@ -34,19 +35,19 @@ import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 @Slf4j
 public final class EmbeddedElasticsearchManager {
 
-  private static final String ELASTICSEARCH_VERSION = "6.4.0";
+  /*private static final String ELASTICSEARCH_VERSION = "6.4.0";
 
   private static EmbeddedElastic embeddedNode;
 
   private EmbeddedElasticsearchManager() {
-    /* Only static methods below. */
+    *//* Only static methods below. *//*
   }
 
-  /**
+  *//**
    * Starts embedded Elasticsearch server (if it is not already running, does nothing otherwise).
    *
    * @param properties to setup the instance.
-   */
+   *//*
   public static void start(ElasticsearchProperties properties) {
     synchronized (EmbeddedElasticsearchManager.class) {
       if (embeddedNode == null) {
@@ -70,9 +71,9 @@ public final class EmbeddedElasticsearchManager {
     }
   }
 
-  /**
+  *//**
    * Stops embedded Elasticsearch server.
-   */
+   *//*
   public static void stop() {
     synchronized (EmbeddedElasticsearchManager.class) {
       if (embeddedNode != null) {
@@ -81,13 +82,13 @@ public final class EmbeddedElasticsearchManager {
     }
   }
 
-  /**
+  *//**
    * @return an instance of running embedded Elasticsearch server.
-   */
+   *//*
   public static EmbeddedElastic getEmbeddedNode() {
     if (embeddedNode == null) {
       throw new IllegalStateException("Embedded Elasticsearh instance must be started first!");
     }
     return embeddedNode;
-  }
+  }*/
 }

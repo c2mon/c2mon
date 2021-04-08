@@ -104,8 +104,8 @@ public class IndexManagerTestSuite {
 
   @After
   public void tearDown() {
-    EmbeddedElasticsearchManager.getEmbeddedNode().deleteIndex(indexName);
-    EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
+    ElasticsearchSuiteTest.getElasticsearchClient().deleteIndex(IndexMetadata.builder().name(indexName).routing("1").build());
+    ElasticsearchSuiteTest.getElasticsearchClient().refreshIndices();
   }
 
   @Test
@@ -124,14 +124,14 @@ public class IndexManagerTestSuite {
 
     indexManager.create(IndexMetadata.builder().name(indexName).build(), mapping);
 
-    EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
+    ElasticsearchSuiteTest.getElasticsearchClient().refreshIndices();
 
     indexManager.index(IndexMetadata.builder().name(indexName).routing("1").build(), TEST_JSON);
 
-    EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
+    ElasticsearchSuiteTest.getElasticsearchClient().refreshIndices();
 
     assertEquals("Index should have one document inserted.", 1,
-        EmbeddedElasticsearchManager.getEmbeddedNode().fetchAllDocuments(indexName).size());
+            ElasticsearchSuiteTest.getElasticsearchClient().fetchAllDocuments(indexName).size());
   }
 
   @Test
@@ -140,14 +140,14 @@ public class IndexManagerTestSuite {
 
     indexManager.create(IndexMetadata.builder().name(indexName).build(), mapping);
 
-    EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
+    ElasticsearchSuiteTest.getElasticsearchClient().refreshIndices();
 
     indexManager.index(IndexMetadata.builder().name(indexName).id("1").routing("1").build(), TEST_JSON);
 
-    EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
+    ElasticsearchSuiteTest.getElasticsearchClient().refreshIndices();
 
     assertEquals("Index should have one document inserted.", 1,
-        EmbeddedElasticsearchManager.getEmbeddedNode().fetchAllDocuments(indexName).size());
+            ElasticsearchSuiteTest.getElasticsearchClient().fetchAllDocuments(indexName).size());
   }
 
   @Test
@@ -156,7 +156,7 @@ public class IndexManagerTestSuite {
 
     indexManager.create(IndexMetadata.builder().name(indexName).build(), mapping);
 
-    EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
+    ElasticsearchSuiteTest.getElasticsearchClient().refreshIndices();
 
     assertTrue("'exists()' method should report index as exiting.",
         indexManager.exists(IndexMetadata.builder().name(indexName).build()));
@@ -168,7 +168,7 @@ public class IndexManagerTestSuite {
 
     indexManager.create(IndexMetadata.builder().name(indexName).build(), mapping);
 
-    EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
+    ElasticsearchSuiteTest.getElasticsearchClient().refreshIndices();
 
     indexManager.purgeIndexCache();
 
@@ -182,7 +182,7 @@ public class IndexManagerTestSuite {
 
     indexManager.create(IndexMetadata.builder().name(indexName).build(), mapping);
 
-    EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
+    ElasticsearchSuiteTest.getElasticsearchClient().refreshIndices();
 
     assertTrue("'exists()' method should report index as exiting.",
         indexManager.exists(IndexMetadata.builder().name(indexName).routing("1").build()));
@@ -194,13 +194,13 @@ public class IndexManagerTestSuite {
 
     indexManager.create(IndexMetadata.builder().name(indexName).build(), mapping);
 
-    EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
+    ElasticsearchSuiteTest.getElasticsearchClient().refreshIndices();
 
     indexManager.update(IndexMetadata.builder().name(indexName).id("1").build(), TEST_JSON_2);
 
-    EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
+    ElasticsearchSuiteTest.getElasticsearchClient().refreshIndices();
 
-    List<String> indexData = EmbeddedElasticsearchManager.getEmbeddedNode().fetchAllDocuments(indexName);
+    List<String> indexData = ElasticsearchSuiteTest.getElasticsearchClient().fetchAllDocuments(indexName);
     assertEquals("Upsert should create document which does not exist.", 1, indexData.size());
 
     ObjectMapper objectMapper = new ObjectMapper();
@@ -215,17 +215,17 @@ public class IndexManagerTestSuite {
 
     indexManager.create(IndexMetadata.builder().name(indexName).build(), mapping);
 
-    EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
+    ElasticsearchSuiteTest.getElasticsearchClient().refreshIndices();
 
     indexManager.index(IndexMetadata.builder().name(indexName).id("1").routing("1").build(), TEST_JSON);
 
-    EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
+    ElasticsearchSuiteTest.getElasticsearchClient().refreshIndices();
 
     indexManager.update(IndexMetadata.builder().name(indexName).id("1").build(), TEST_JSON_2);
 
-    EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
+    ElasticsearchSuiteTest.getElasticsearchClient().refreshIndices();
 
-    List<String> indexData = EmbeddedElasticsearchManager.getEmbeddedNode().fetchAllDocuments(indexName);
+    List<String> indexData = ElasticsearchSuiteTest.getElasticsearchClient().fetchAllDocuments(indexName);
 
     ObjectMapper objectMapper = new ObjectMapper();
     JsonNode jsonNode = objectMapper.readTree(indexData.get(0));
@@ -237,10 +237,10 @@ public class IndexManagerTestSuite {
   public void updateNonExistingIndex() throws UnknownHostException {
     indexManager.update(IndexMetadata.builder().name(indexName).id("1").build(), TEST_JSON_2);
 
-    EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
+    ElasticsearchSuiteTest.getElasticsearchClient().refreshIndices();
 
     assertEquals("Index should be created if updating non-existing index.", 1,
-        EmbeddedElasticsearchManager.getEmbeddedNode().fetchAllDocuments(indexName).size());
+            ElasticsearchSuiteTest.getElasticsearchClient().fetchAllDocuments(indexName).size());
   }
 
   private String loadMapping(String source) throws IOException {

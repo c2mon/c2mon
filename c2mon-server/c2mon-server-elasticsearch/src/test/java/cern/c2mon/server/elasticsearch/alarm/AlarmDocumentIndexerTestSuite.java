@@ -68,11 +68,11 @@ public class AlarmDocumentIndexerTestSuite extends ElasticsearchTestDefinition {
   public void indexSingleAlarmTest() throws IDBPersistenceException, IOException {
     indexer.storeData(document);
 
-    EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
+    ElasticsearchSuiteTest.getElasticsearchClient().refreshIndices();
 
     assertTrue("Index should have been created.", IndexUtils.doesIndexExist(indexName, ElasticsearchSuiteTest.getProperties()));
 
-    List<String> indexData = EmbeddedElasticsearchManager.getEmbeddedNode().fetchAllDocuments(indexName);
+    List<String> indexData = ElasticsearchSuiteTest.getElasticsearchClient().fetchAllDocuments(indexName);
     Assert.assertEquals("Index should have one document inserted.", 1, indexData.size());
   }
 
@@ -81,11 +81,11 @@ public class AlarmDocumentIndexerTestSuite extends ElasticsearchTestDefinition {
     indexer.storeData(document);
     indexer.storeData(document);
 
-    EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
+    ElasticsearchSuiteTest.getElasticsearchClient().refreshIndices();
 
     assertTrue("Index should have been created.", IndexUtils.doesIndexExist(indexName, ElasticsearchSuiteTest.getProperties()));
 
-    List<String> indexData = EmbeddedElasticsearchManager.getEmbeddedNode().fetchAllDocuments(indexName);
+    List<String> indexData = ElasticsearchSuiteTest.getElasticsearchClient().fetchAllDocuments(indexName);
     Assert.assertEquals("Index should have two documents inserted.", 2, indexData.size());
   }
 }
