@@ -15,7 +15,7 @@
  * along with C2MON. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package cern.c2mon.shared.client.serialize;
+package cern.c2mon.shared.client.serializer;
 
 import cern.c2mon.shared.client.request.ClientRequestResult;
 import cern.c2mon.shared.client.tag.TransferTagValueImpl;
@@ -29,13 +29,18 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 
-import static cern.c2mon.shared.client.serializer.TransferTagSerializer.*;
+import static cern.c2mon.shared.client.serializer.TransferTagSerializer.fromCollectionJson;
+import static cern.c2mon.shared.client.serializer.TransferTagSerializer.fromJson;
+import static cern.c2mon.shared.client.serializer.TransferTagSerializer.isJsonString;
+import static cern.c2mon.shared.client.serializer.TransferTagSerializer.toJson;
 import static cern.c2mon.shared.client.tag.TransferTagValueImplTest.createTagForValue;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Created by fritter on 23/03/16.
@@ -149,5 +154,17 @@ public class Serializer {
     } catch (IOException e) {
       assertTrue(false);
     }
+  }
+
+  @Test
+  public void isJsonStringTest() {
+    assertFalse(isJsonString("42"));
+    assertFalse(isJsonString("true"));
+    assertFalse(isJsonString("{}"));
+    assertFalse(isJsonString("[]"));
+    assertFalse(isJsonString("some_invalid_json"));
+    assertTrue(isJsonString("\"\""));
+    assertTrue(isJsonString("\"some_valid_json\""));
+    assertTrue(isJsonString("\"some_valid_json_string_\\\"_\\\"_with_escaped_quotes_inside\""));
   }
 }

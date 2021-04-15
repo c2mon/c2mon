@@ -1,11 +1,9 @@
-package cern.c2mon.shared.client.serialize;
+package cern.c2mon.shared.client.serializer;
 
 import cern.c2mon.shared.client.tag.TagConfigImpl;
-import cern.c2mon.shared.common.datatag.address.SimpleHardwareAddress;
 import cern.c2mon.shared.common.datatag.address.impl.SimpleHardwareAddressImpl;
 import cern.c2mon.shared.util.json.GsonFactory;
 import com.google.gson.Gson;
-import junit.framework.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;

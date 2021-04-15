@@ -193,15 +193,15 @@ public class TransferTagSerializer {
    * @param json String value which needs to be checked if its a json String.
    * @return True if the string is in the json format
    */
-  private static boolean isJsonString(final Object json) {
-    boolean valid = false;
+  static boolean isJsonString(final Object json) {
+    if (!(json instanceof String)) {
+      return false;
+    }
+
     try {
-      if (json instanceof String) {
-        final JsonParser parser = mapper.getFactory().createParser((String) json);
-        while (parser.nextToken() != null) {}
-        valid = true;
-      }
-    } catch (IOException ignored) {}
-    return valid;
+      return mapper.readTree((String) json).isTextual();
+    } catch (IOException ignored) {
+      return false;
+    }
   }
 }
