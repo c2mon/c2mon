@@ -18,6 +18,7 @@
 package cern.c2mon.shared.client.serialize;
 
 import cern.c2mon.shared.client.request.ClientRequestResult;
+import cern.c2mon.shared.client.serializer.TransferTagSerializer;
 import cern.c2mon.shared.client.tag.TransferTagValueImpl;
 import cern.c2mon.shared.util.json.GsonFactory;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -31,8 +32,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 
-import static cern.c2mon.shared.client.serializer.TransferTagSerializer.*;
+import static cern.c2mon.shared.client.serializer.TransferTagSerializer.fromCollectionJson;
+import static cern.c2mon.shared.client.serializer.TransferTagSerializer.fromJson;
+import static cern.c2mon.shared.client.serializer.TransferTagSerializer.toJson;
 import static cern.c2mon.shared.client.tag.TransferTagValueImplTest.createTagForValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -149,5 +154,46 @@ public class Serializer {
     } catch (IOException e) {
       assertTrue(false);
     }
+  }
+
+  @Test
+  public void convertTagValueTest() {
+    assertEquals("", convertTagValue("", "java.lang.String"));
+    assertEquals("42", convertTagValue("42", "java.lang.String"));
+    assertEquals("{}", convertTagValue("{}", "java.lang.String"));
+    assertEquals("...\"...", convertTagValue("...\"...", "java.lang.String"));
+    assertEquals("\"...\"", convertTagValue("\"...\"", "java.lang.String"));
+
+    assertEquals(true, convertTagValue("true", "java.lang.Boolean"));
+    assertEquals(42, convertTagValue("42", "java.lang.Integer"));
+    assertEquals(42L, convertTagValue("42", "java.lang.Long"));
+    assertEquals(0.5F, convertTagValue("0.5", "java.lang.Float"));
+    assertEquals(0.5, convertTagValue("0.5", "java.lang.Double"));
+    assertEquals(0.5, convertTagValue("0.5", "java.lang.Number"));
+
+    ArrayList<Object> arrayList = new ArrayList<>();
+    arrayList.add(4);
+    arrayList.add(2);
+    assertEquals(arrayList, convertTagValue("[4, 2]", "java.util.ArrayList"));
+
+    HashMap<String, Integer> hashMap = new HashMap<>();
+    hashMap.put("4", 2);
+    assertEquals(hashMap, convertTagValue("{ \"4\": 2 }", "java.util.HashMap"));
+
+    LinkedHashMap<String, Integer> linkedHashMap = new LinkedHashMap<>();
+    linkedHashMap.put("4", 2);
+    assertEquals(linkedHashMap, convertTagValue(linkedHashMap, "java.util.LinkedHashMap"));
+
+    class Custom {}
+    Custom custom = new Custom();
+
+    assertEquals(custom, convertTagValue(custom, "a custom class"));
+  }
+
+  private static Object convertTagValue(Object tagValue, String tagClass) {
+    TransferTagValueImpl tagValueUpdate = new TransferTagValueImpl(null, null, null, null, null, null, null, null, null);
+    tagValueUpdate.setValue(tagValue);
+    tagValueUpdate.setValueClassName(tagClass);
+    return TransferTagSerializer.convertTagValue(tagValueUpdate);
   }
 }

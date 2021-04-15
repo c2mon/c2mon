@@ -125,30 +125,24 @@ public class TransferTagSerializer {
    * @return The converted value.
    */
   public static Object convertTagValue(TagValueUpdate tag) {
-    Object newTagValue = tag.getValue();
-
-    if (isKnownClass(tag.getValueClassName())
-        && getType(tag.getValueClassName()) != String.class
-        && newTagValue != null
-        && (newTagValue.getClass() == LinkedHashMap.class)
-        || isJsonString(newTagValue)) {
-      // determine which type the value have and try to convert the value to the correct type:
-      if(newTagValue.getClass() == LinkedHashMap.class){
-        newTagValue = hashMapToObject((LinkedHashMap) tag.getValue(), getType(tag.getValueClassName()));
-
-      } else {
-        newTagValue = stringToObject((String) tag.getValue(), getType(tag.getValueClassName()));
-      }
-
-      // if convention fails call the type converter cast method, because this mus be a normal type:
-      newTagValue = newTagValue == null ? cast(tag.getValue(), tag.getValueClassName()) : newTagValue;
-
-    } else if (isKnownClass(tag.getValueClassName())) {
-      newTagValue = cast(newTagValue, tag.getValueClassName());
+    if (tag.getValue() == null || !isKnownClass(tag.getValueClassName())) {
+      return tag.getValue();
     }
 
-    return newTagValue;
+    Class<?> tagClass = getType(tag.getValueClassName());
+    if (tagClass == String.class) {
+      return tag.getValue().toString();
+    }
 
+    if (tag.getValue().getClass() == LinkedHashMap.class) {
+      Object result = hashMapToObject((LinkedHashMap<?, ?>) tag.getValue(), tagClass);
+      if (result != null) return result;
+    } else if (isJsonString(tag.getValue())) {
+      Object result = stringToObject((String) tag.getValue(), tagClass);
+      if (result != null) return result;
+    }
+
+    return cast(tag.getValue(), tag.getValueClassName());
   }
 
   /**
