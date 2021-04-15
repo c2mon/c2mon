@@ -165,7 +165,7 @@ public class Serializer {
     assertEquals("...\"...", convertTagValue("...\"...", "java.lang.String"));
     assertEquals("\"...\"", convertTagValue("\"...\"", "java.lang.String"));
 
-    assertEquals(true, convertTagValue("true", "java.lang.Boolean"));
+    assertTrue((boolean) convertTagValue("true", "java.lang.Boolean"));
     assertEquals(42, convertTagValue("42", "java.lang.Integer"));
     assertEquals(42L, convertTagValue("42", "java.lang.Long"));
     assertEquals(0.5F, convertTagValue("0.5", "java.lang.Float"));

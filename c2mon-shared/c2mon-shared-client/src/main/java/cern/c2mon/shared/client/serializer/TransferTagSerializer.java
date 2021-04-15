@@ -136,10 +136,14 @@ public class TransferTagSerializer {
 
     if (tag.getValue().getClass() == LinkedHashMap.class) {
       Object result = hashMapToObject((LinkedHashMap<?, ?>) tag.getValue(), tagClass);
-      if (result != null) return result;
+      if (result != null) {
+        return result;
+      }
     } else if (isJsonString(tag.getValue())) {
       Object result = stringToObject((String) tag.getValue(), tagClass);
-      if (result != null) return result;
+      if (result != null) {
+        return result;
+      }
     }
 
     return cast(tag.getValue(), tag.getValueClassName());
