@@ -40,6 +40,7 @@ import static cern.c2mon.shared.client.serializer.TransferTagSerializer.fromJson
 import static cern.c2mon.shared.client.serializer.TransferTagSerializer.toJson;
 import static cern.c2mon.shared.client.tag.TransferTagValueImplTest.createTagForValue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -170,6 +171,8 @@ public class Serializer {
     assertEquals(0.5F, convertTagValue("0.5", "java.lang.Float"));
     assertEquals(0.5, convertTagValue("0.5", "java.lang.Double"));
     assertEquals(0.5, convertTagValue("0.5", "java.lang.Number"));
+
+    assertNull(convertTagValue(null, "it should not matter"));
 
     ArrayList<Object> arrayList = new ArrayList<>();
     arrayList.add(4);
