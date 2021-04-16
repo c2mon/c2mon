@@ -60,7 +60,7 @@ public class ElasticsearchSuiteTest {
 
   private static final DockerImageName ELASTICSEARCH_IMAGE = DockerImageName.parse("docker.elastic.co/elasticsearch/elasticsearch");
 
-  private static final String ELASTICSEARCH_TAG = "7.0.0";
+  private static final String ELASTICSEARCH_TAG = "7.12.0";
 
   @ClassRule
   public static ElasticsearchContainer elasticsearchContainer =
