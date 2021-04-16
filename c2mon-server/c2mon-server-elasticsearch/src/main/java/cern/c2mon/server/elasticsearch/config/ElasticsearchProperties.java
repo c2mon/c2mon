@@ -30,21 +30,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class ElasticsearchProperties {
 
   /**
-   * Type is being removed in Elasticsearch 6.x (check
-   * <a href="https://www.elastic.co/guide/en/elasticsearch/reference/master/removal-of-types.html">Elasticsearch
-   * documentation</a> for more details).
-   */
-  public static final String TYPE = "doc";
-
-  /**
    * Enable/Disable writing to Elasticsearch
    */
   private boolean enabled = true;
-
-  /**
-   * Enable/Disable the initiation of Embedded ES instance (should be used only for tests)
-   */
-//  private boolean embedded = true;
 
   /**
    * Host name or IP address pointing to the Elasticsearch cluster

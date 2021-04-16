@@ -16,13 +16,11 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch;
 
-import java.io.IOException;
-import java.util.List;
-
+import cern.c2mon.server.elasticsearch.util.IndexUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 
-import cern.c2mon.server.elasticsearch.util.EmbeddedElasticsearchManager;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
@@ -36,11 +34,11 @@ import static org.junit.Assert.assertEquals;
  * @author Serhiy Boychenko
  */
 @Slf4j
-public class ElasticsearchModuleIntegrationTestSuite extends ElasticsearchTestDefinition {
+public class ElasticsearchModuleIntegrationTestSuite {
 
   @Test
-  public void testModuleStartup() throws IOException {
-    List<String> indexData = ElasticsearchSuiteTest.getElasticsearchClient().fetchAllDocuments();
+  public void testModuleStartup() {
+    List<String> indexData = IndexUtils.fetchAllDocuments();
     assertEquals("Embedded node should not contain any documents before each test and start successfully.",
         0, indexData.size());
   }

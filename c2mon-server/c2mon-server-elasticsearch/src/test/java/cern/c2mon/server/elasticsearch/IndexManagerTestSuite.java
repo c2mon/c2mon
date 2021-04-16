@@ -71,8 +71,8 @@ public class IndexManagerTestSuite {
   @Parameters
   public static Collection<IndexManager> getIndexManagerClass() {
     return Arrays.asList(
-        new IndexManager(new ElasticsearchClientRest(getClientProperties(ElasticsearchClientType.REST))),
-        new IndexManager(new ElasticsearchClientTransport(getClientProperties(ElasticsearchClientType.TRANSPORT))));
+            new IndexManager(new ElasticsearchClientRest(getClientProperties(ElasticsearchClientType.REST))),
+            new IndexManager(new ElasticsearchClientTransport(getClientProperties(ElasticsearchClientType.TRANSPORT))));
   }
 
   private static ElasticsearchProperties getClientProperties(ElasticsearchClientType type) {
@@ -104,7 +104,7 @@ public class IndexManagerTestSuite {
 
   @After
   public void tearDown() {
-    ElasticsearchSuiteTest.getElasticsearchClient().deleteIndex(IndexMetadata.builder().name(indexName).routing("1").build());
+    ElasticsearchSuiteTest.getElasticsearchClient().deleteDocumentByIndex(IndexMetadata.builder().name(indexName).build());
     ElasticsearchSuiteTest.getElasticsearchClient().refreshIndices();
   }
 
@@ -115,7 +115,7 @@ public class IndexManagerTestSuite {
     indexManager.create(IndexMetadata.builder().name(indexName).build(), mapping);
 
     assertTrue("Index should have been created.",
-        IndexUtils.doesIndexExist(indexName, ElasticsearchSuiteTest.getProperties()));
+        IndexUtils.doesIndexExist(indexName));
   }
 
   @Test
@@ -131,7 +131,7 @@ public class IndexManagerTestSuite {
     ElasticsearchSuiteTest.getElasticsearchClient().refreshIndices();
 
     assertEquals("Index should have one document inserted.", 1,
-            ElasticsearchSuiteTest.getElasticsearchClient().fetchAllDocuments(indexName).size());
+            IndexUtils.fetchAllDocuments(indexName).size());
   }
 
   @Test
@@ -147,7 +147,7 @@ public class IndexManagerTestSuite {
     ElasticsearchSuiteTest.getElasticsearchClient().refreshIndices();
 
     assertEquals("Index should have one document inserted.", 1,
-            ElasticsearchSuiteTest.getElasticsearchClient().fetchAllDocuments(indexName).size());
+            IndexUtils.fetchAllDocuments(indexName).size());
   }
 
   @Test
@@ -200,7 +200,7 @@ public class IndexManagerTestSuite {
 
     ElasticsearchSuiteTest.getElasticsearchClient().refreshIndices();
 
-    List<String> indexData = ElasticsearchSuiteTest.getElasticsearchClient().fetchAllDocuments(indexName);
+    List<String> indexData = IndexUtils.fetchAllDocuments(indexName);
     assertEquals("Upsert should create document which does not exist.", 1, indexData.size());
 
     ObjectMapper objectMapper = new ObjectMapper();
@@ -225,7 +225,7 @@ public class IndexManagerTestSuite {
 
     ElasticsearchSuiteTest.getElasticsearchClient().refreshIndices();
 
-    List<String> indexData = ElasticsearchSuiteTest.getElasticsearchClient().fetchAllDocuments(indexName);
+    List<String> indexData = IndexUtils.fetchAllDocuments(indexName);
 
     ObjectMapper objectMapper = new ObjectMapper();
     JsonNode jsonNode = objectMapper.readTree(indexData.get(0));
@@ -240,7 +240,7 @@ public class IndexManagerTestSuite {
     ElasticsearchSuiteTest.getElasticsearchClient().refreshIndices();
 
     assertEquals("Index should be created if updating non-existing index.", 1,
-            ElasticsearchSuiteTest.getElasticsearchClient().fetchAllDocuments(indexName).size());
+            IndexUtils.fetchAllDocuments(indexName).size());
   }
 
   private String loadMapping(String source) throws IOException {

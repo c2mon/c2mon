@@ -47,7 +47,7 @@ public abstract class ElasticsearchTestDefinition {
 
   @After
   public void tearDown() {
-    ElasticsearchSuiteTest.getElasticsearchClient().deleteIndex(IndexMetadata.builder().name(indexName).routing("1").build());
+    ElasticsearchSuiteTest.getElasticsearchClient().deleteDocumentByIndex(IndexMetadata.builder().name(indexName).build());
     ElasticsearchSuiteTest.getElasticsearchClient().refreshIndices();
   }
 }

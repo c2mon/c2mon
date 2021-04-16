@@ -16,23 +16,21 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch.alarm;
 
-import java.io.IOException;
-import java.sql.Timestamp;
-import java.util.List;
-
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.elasticsearch.ElasticsearchSuiteTest;
 import cern.c2mon.server.elasticsearch.ElasticsearchTestDefinition;
+import cern.c2mon.server.elasticsearch.IndexManager;
 import cern.c2mon.server.elasticsearch.IndexNameManager;
-import cern.c2mon.server.elasticsearch.util.EmbeddedElasticsearchManager;
 import cern.c2mon.server.elasticsearch.util.EntityUtils;
 import cern.c2mon.server.elasticsearch.util.IndexUtils;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.List;
 
 import static junit.framework.TestCase.assertTrue;
 
@@ -48,11 +46,11 @@ import static junit.framework.TestCase.assertTrue;
  */
 public class AlarmDocumentIndexerTestSuite extends ElasticsearchTestDefinition {
 
-  @Autowired
-  private IndexNameManager indexNameManager;
+  private IndexNameManager indexNameManager = new IndexNameManager(ElasticsearchSuiteTest.getProperties());
 
-  @Autowired
-  private AlarmDocumentIndexer indexer;
+  private IndexManager indexManager = new IndexManager(ElasticsearchSuiteTest.getElasticsearchClient());
+
+  private AlarmDocumentIndexer indexer = new AlarmDocumentIndexer(indexNameManager, indexManager);
 
   private AlarmDocument document;
 
@@ -70,9 +68,9 @@ public class AlarmDocumentIndexerTestSuite extends ElasticsearchTestDefinition {
 
     ElasticsearchSuiteTest.getElasticsearchClient().refreshIndices();
 
-    assertTrue("Index should have been created.", IndexUtils.doesIndexExist(indexName, ElasticsearchSuiteTest.getProperties()));
+    assertTrue("Index should have been created.", IndexUtils.doesIndexExist(indexName));
 
-    List<String> indexData = ElasticsearchSuiteTest.getElasticsearchClient().fetchAllDocuments(indexName);
+    List<String> indexData = IndexUtils.fetchAllDocuments(indexName);
     Assert.assertEquals("Index should have one document inserted.", 1, indexData.size());
   }
 
@@ -83,9 +81,9 @@ public class AlarmDocumentIndexerTestSuite extends ElasticsearchTestDefinition {
 
     ElasticsearchSuiteTest.getElasticsearchClient().refreshIndices();
 
-    assertTrue("Index should have been created.", IndexUtils.doesIndexExist(indexName, ElasticsearchSuiteTest.getProperties()));
+    assertTrue("Index should have been created.", IndexUtils.doesIndexExist(indexName));
 
-    List<String> indexData = ElasticsearchSuiteTest.getElasticsearchClient().fetchAllDocuments(indexName);
+    List<String> indexData = IndexUtils.fetchAllDocuments(indexName);
     Assert.assertEquals("Index should have two documents inserted.", 2, indexData.size());
   }
 }
