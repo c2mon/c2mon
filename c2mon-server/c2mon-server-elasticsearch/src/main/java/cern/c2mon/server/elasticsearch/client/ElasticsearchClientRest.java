@@ -204,6 +204,11 @@ public final class ElasticsearchClientRest implements ElasticsearchClient {
     return false;
   }
 
+  /**
+   * Removes a JSON document from the specified index. (Used for testing)
+   * @param indexMetadata Allows to defined index metadata
+   * @return
+   */
   public boolean deleteDocumentByIndex(IndexMetadata indexMetadata) {
     try {
       DeleteIndexRequest deleteRequest = new DeleteIndexRequest(indexMetadata.getName());
@@ -300,11 +305,14 @@ public final class ElasticsearchClientRest implements ElasticsearchClient {
     client = new RestHighLevelClient(restClientBuilder);
   }
 
+  /**
+   * Refreshes all indices (Used in testing)
+   */
   public void refreshIndices(){
     try {
       client.indices().refresh(new RefreshRequest(), RequestOptions.DEFAULT);
     } catch (IOException e) {
-      log.error("An error occurred refreshing the indices");
+      log.error("An error occurred refreshing the indices ", e);
     }
   }
 

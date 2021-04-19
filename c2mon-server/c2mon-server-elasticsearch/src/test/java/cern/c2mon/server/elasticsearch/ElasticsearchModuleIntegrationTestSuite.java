@@ -25,7 +25,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Test the startup of embedded ES instance
+ * Test the startup of the ES test instance
  *
  * NOTE: The naming convention (&lt;class name&gt;TestSuite) is used specifically to prevent test execution plugins
  * (like Surefire) to execute the tests individually.
@@ -39,7 +39,7 @@ public class ElasticsearchModuleIntegrationTestSuite {
   @Test
   public void testModuleStartup() {
     List<String> indexData = IndexUtils.fetchAllDocuments();
-    assertEquals("Embedded node should not contain any documents before each test and start successfully.",
+    assertEquals("Test node should not contain any documents before each test and start successfully.",
         0, indexData.size());
   }
 }

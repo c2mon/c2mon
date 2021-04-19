@@ -115,7 +115,7 @@ public class IndexManager {
           return true;
         }
       }catch(ElasticsearchException e){
-        log.error("An error ocurred checking if a given index exists", e.getMessage());
+        log.error("An error ocurred checking if a given index exists", e);
       }
 
       return false;

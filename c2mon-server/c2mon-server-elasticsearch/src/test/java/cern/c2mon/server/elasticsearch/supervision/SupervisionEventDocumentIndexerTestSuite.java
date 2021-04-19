@@ -20,11 +20,9 @@ import java.io.IOException;
 import java.util.List;
 
 import cern.c2mon.server.elasticsearch.IndexManager;
-import cern.c2mon.server.elasticsearch.alarm.AlarmDocumentIndexer;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
 import cern.c2mon.server.elasticsearch.ElasticsearchSuiteTest;

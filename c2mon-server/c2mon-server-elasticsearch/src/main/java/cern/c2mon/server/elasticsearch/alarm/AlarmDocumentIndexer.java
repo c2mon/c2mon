@@ -46,6 +46,11 @@ public class AlarmDocumentIndexer implements IDBPersistenceHandler<AlarmDocument
 
   private IndexManager indexManager;
 
+  /**
+   * AlarmDocumentIndexer constructor
+   * @param indexNameManager Manages index name definitions.
+   * @param indexManager Manages index operations
+   */
   @Autowired
   public AlarmDocumentIndexer(IndexNameManager indexNameManager, IndexManager indexManager){
     this.indexNameManager = indexNameManager;
