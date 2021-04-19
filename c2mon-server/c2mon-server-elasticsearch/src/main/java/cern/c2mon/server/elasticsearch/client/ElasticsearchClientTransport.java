@@ -261,8 +261,7 @@ public final class ElasticsearchClientTransport implements ElasticsearchClient {
     final Settings.Builder settingsBuilder = Settings.builder();
 
     settingsBuilder.put("node.name", properties.getNodeName())
-        .put("cluster.name", properties.getClusterName())
-        .put("http.cors.enabled", properties.isHttpEnabled());
+        .put("cluster.name", properties.getClusterName());
 
     client = new PreBuiltTransportClient(settingsBuilder.build());
     try {

@@ -71,18 +71,6 @@ public class ElasticsearchProperties {
   private String nodeName = "c2mon";
 
   /**
-   * Absolute path where Elasticsearch will store its data (only relevant
-   * when running an embedded node)
-   */
-  private String embeddedStoragePath = "/tmp/elasticsearch-node/";
-
-  /**
-   * Enable/disable HTTP transport (only relevant when running an embedded
-   * node)
-   */
-  private boolean httpEnabled = false;
-
-  /**
    * Prefix used for all C2MON indices. The final index format becomes:
    * <p>
    * indexPrefix + "-" entity + "_" + bucket

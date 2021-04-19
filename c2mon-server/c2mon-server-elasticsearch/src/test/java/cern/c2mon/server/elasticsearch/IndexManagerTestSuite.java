@@ -40,7 +40,6 @@ import cern.c2mon.server.elasticsearch.client.ElasticsearchClientTransport;
 import cern.c2mon.server.elasticsearch.client.ElasticsearchClientType;
 import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
 import cern.c2mon.server.elasticsearch.domain.IndexMetadata;
-import cern.c2mon.server.elasticsearch.util.EmbeddedElasticsearchManager;
 import cern.c2mon.server.elasticsearch.util.IndexUtils;
 
 import static org.junit.Assert.assertEquals;

@@ -21,7 +21,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
-import cern.c2mon.server.elasticsearch.util.EmbeddedElasticsearchManager;
 
 /**
  * Configures the {@link ElasticsearchClient} bean instance based on provided configuration
