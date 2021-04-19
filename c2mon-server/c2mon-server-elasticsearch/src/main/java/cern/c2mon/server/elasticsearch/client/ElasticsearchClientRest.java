@@ -207,7 +207,7 @@ public final class ElasticsearchClientRest implements ElasticsearchClient {
   /**
    * Removes a JSON document from the specified index. (Used for testing)
    * @param indexMetadata Allows to defined index metadata
-   * @return
+   * @return true on success
    */
   public boolean deleteDocumentByIndex(IndexMetadata indexMetadata) {
     try {
