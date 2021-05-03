@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.ElasticsearchException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -86,6 +85,7 @@ public class IndexManager {
   public boolean index(IndexMetadata indexMetadata, String data) {
     synchronized (IndexManager.class) {
       boolean indexed = client.indexData(indexMetadata, data);
+
       client.waitForYellowStatus();
 
       return indexed;
@@ -109,12 +109,10 @@ public class IndexManager {
 
       IndexMetadata.builder().name(indexMetadata.getName()).routing(indexMetadata.getRouting()).build();
 
-        if (client.isIndexExisting(indexMetadata)) {
-
-          indexCache.add(indexMetadata.getName());
-
-          return true;
-        }
+      if (client.isIndexExisting(indexMetadata)) {
+        indexCache.add(indexMetadata.getName());
+        return true;
+      }
 
       return false;
     }
