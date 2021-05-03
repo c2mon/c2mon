@@ -109,14 +109,12 @@ public class IndexManager {
 
       IndexMetadata.builder().name(indexMetadata.getName()).routing(indexMetadata.getRouting()).build();
 
-      try {
         if (client.isIndexExisting(indexMetadata)) {
+
           indexCache.add(indexMetadata.getName());
+
           return true;
         }
-      }catch(ElasticsearchException e){
-        log.error("An error ocurred checking if a given index exists", e);
-      }
 
       return false;
     }

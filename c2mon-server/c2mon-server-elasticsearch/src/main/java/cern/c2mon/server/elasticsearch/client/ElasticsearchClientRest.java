@@ -312,7 +312,7 @@ public final class ElasticsearchClientRest implements ElasticsearchClient {
     try {
       client.indices().refresh(new RefreshRequest(), RequestOptions.DEFAULT);
     } catch (IOException e) {
-      log.error("An error occurred refreshing the indices ", e);
+      log.warn("An error occurred refreshing the indices ", e);
     }
   }
 
