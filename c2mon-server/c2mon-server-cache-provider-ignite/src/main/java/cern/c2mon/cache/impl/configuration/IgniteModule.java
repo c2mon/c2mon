@@ -7,10 +7,8 @@ import org.springframework.context.annotation.Import;
 
 /**
  * This class is responsible for configuring the Spring context for the
- * Elasticsearch module.
+ * Ignite module.
  *
- * @author Justin Lewis Salmon
- * @author Alban Marguet
  */
 @Configuration
 @Import(C2monIgniteConfiguration.class)
