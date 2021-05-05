@@ -18,7 +18,7 @@ package cern.c2mon.server.elasticsearch;
 
 import cern.c2mon.cache.actions.CacheActionsModuleRef;
 import cern.c2mon.cache.config.CacheConfigModuleRef;
-import cern.c2mon.cache.impl.configuration.C2monIgniteConfiguration;
+import cern.c2mon.cache.impl.configuration.IgniteModule;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.cache.loading.config.CacheLoadingModuleRef;
 import cern.c2mon.server.cache.test.CachePopulationRule;
@@ -39,7 +39,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
     CacheLoadingModuleRef.class,
     SupervisionModule.class,
     ElasticsearchModule.class,
-    C2monIgniteConfiguration.class,
+    IgniteModule.class,
     CachePopulationRule.class
 })
 @RunWith(SpringJUnit4ClassRunner.class)

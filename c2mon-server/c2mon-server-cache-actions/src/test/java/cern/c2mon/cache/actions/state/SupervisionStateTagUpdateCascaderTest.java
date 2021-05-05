@@ -3,7 +3,7 @@ package cern.c2mon.cache.actions.state;
 import cern.c2mon.cache.actions.CacheActionsModuleRef;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.config.CacheConfigModuleRef;
-import cern.c2mon.cache.impl.configuration.C2monIgniteConfiguration;
+import cern.c2mon.cache.impl.configuration.IgniteModule;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.cache.loading.config.CacheLoadingModuleRef;
 import cern.c2mon.server.cache.test.factory.AliveTagCacheObjectFactory;
@@ -36,7 +36,7 @@ import static org.junit.Assert.assertTrue;
   CacheConfigModuleRef.class,
   CacheDbAccessModule.class,
   CacheLoadingModuleRef.class,
-  C2monIgniteConfiguration.class
+  IgniteModule.class,
 })
 public class SupervisionStateTagUpdateCascaderTest {
 

@@ -3,7 +3,7 @@ package cern.c2mon.server.history;
 
 import cern.c2mon.cache.actions.CacheActionsModuleRef;
 import cern.c2mon.cache.config.CacheConfigModuleRef;
-import cern.c2mon.cache.impl.configuration.C2monIgniteConfiguration;
+import cern.c2mon.cache.impl.configuration.IgniteModule;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.cache.loading.config.CacheLoadingModuleRef;
 import cern.c2mon.server.command.config.CommandModule;
@@ -22,7 +22,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
   CacheConfigModuleRef.class,
   CacheDbAccessModule.class,
   CacheLoadingModuleRef.class,
-  C2monIgniteConfiguration.class,
+  IgniteModule.class,
   CommandModule.class,
   SupervisionModule.class,
   DaqModule.class,

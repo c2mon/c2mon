@@ -4,7 +4,7 @@ import cern.c2mon.cache.actions.CacheActionsModuleRef;
 import cern.c2mon.cache.actions.state.SupervisionStateTagService;
 import cern.c2mon.cache.api.flow.CacheUpdateFlow;
 import cern.c2mon.cache.config.CacheConfigModuleRef;
-import cern.c2mon.cache.impl.configuration.C2monIgniteConfiguration;
+import cern.c2mon.cache.impl.configuration.IgniteModule;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.cache.loading.config.CacheLoadingModuleRef;
 import cern.c2mon.server.cache.test.factory.SupervisionStateTagFactory;
@@ -35,7 +35,7 @@ import static org.junit.Assert.*;
   CacheConfigModuleRef.class,
   CacheDbAccessModule.class,
   CacheLoadingModuleRef.class,
-  C2monIgniteConfiguration.class,
+  IgniteModule.class,
   CacheActionsModuleRef.class
 })
 public class SupervisedCacheObjectTest {

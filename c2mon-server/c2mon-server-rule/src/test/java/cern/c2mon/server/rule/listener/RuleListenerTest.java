@@ -22,7 +22,7 @@ import cern.c2mon.cache.actions.tag.TagController;
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.api.listener.CacheListenerManagerImpl;
 import cern.c2mon.cache.config.CacheConfigModuleRef;
-import cern.c2mon.cache.impl.configuration.C2monIgniteConfiguration;
+import cern.c2mon.cache.impl.configuration.IgniteModule;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.cache.loading.config.CacheLoadingModuleRef;
 import cern.c2mon.server.cache.test.CacheObjectCreation;
@@ -63,7 +63,7 @@ import static org.junit.Assert.assertTrue;
     CacheActionsModuleRef.class,
     CacheConfigModuleRef.class,
     CacheDbAccessModule.class,
-    C2monIgniteConfiguration.class,
+    IgniteModule.class,
     CacheLoadingModuleRef.class,
     RuleModule.class
 })

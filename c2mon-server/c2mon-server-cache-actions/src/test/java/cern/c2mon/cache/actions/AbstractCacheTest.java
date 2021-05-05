@@ -2,7 +2,7 @@ package cern.c2mon.cache.actions;
 
 import cern.c2mon.cache.api.C2monCache;
 import cern.c2mon.cache.config.CacheConfigModuleRef;
-import cern.c2mon.cache.impl.configuration.C2monIgniteConfiguration;
+import cern.c2mon.cache.impl.configuration.IgniteModule;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.cache.loading.config.CacheLoadingModuleRef;
 import cern.c2mon.server.cache.test.factory.AbstractCacheObjectFactory;
@@ -33,7 +33,7 @@ import static org.junit.Assert.assertEquals;
   CacheDbAccessModule.class,
   CacheLoadingModuleRef.class,
   DatabasePopulationRule.class,
-  C2monIgniteConfiguration.class,
+  IgniteModule.class,
   CacheActionsModuleRef.class
 })
 public abstract class AbstractCacheTest<CACHEABLE extends Cacheable, CACHEABLE_IMPL extends AbstractCacheableImpl> {
