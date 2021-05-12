@@ -96,7 +96,8 @@ public class IndexNameManager {
    */
   public String indexFor(SupervisionEventDocument supervisionEvent) {
     String prefix = properties.getIndexPrefix() + "-supervision_";
-    return getTagIndexName(prefix, Instant.now(clock));
+    String indexType = properties.getIndexTypeSupervision();
+    return getIndexName(indexType, prefix, Instant.now(clock));
   }
 
   /**
