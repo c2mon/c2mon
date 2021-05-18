@@ -47,8 +47,9 @@ import cern.c2mon.server.elasticsearch.domain.IndexMetadata;
 @Component
 public class TagDocumentIndexer implements IDBPersistenceHandler<TagDocument> {
 
-  private final IndexManager indexManager;
-  private final IndexNameManager indexNameManager;
+  private IndexNameManager indexNameManager;
+
+  private IndexManager indexManager;
 
   private BulkProcessorProxy bulkProcessor;
 
@@ -88,9 +89,9 @@ public class TagDocumentIndexer implements IDBPersistenceHandler<TagDocument> {
   private void indexTag(TagDocument tag) {
     String index = getOrCreateIndex(tag);
 
-    log.trace("Indexing tag (#{}, index={}, type={})", tag.getId(), index, ElasticsearchProperties.TYPE);
+    log.trace("Indexing tag (#{}, index={})", tag.getId(), index);
 
-    IndexRequest indexNewTag = new IndexRequest(index, ElasticsearchProperties.TYPE)
+    IndexRequest indexNewTag = new IndexRequest(index)
         .source(tag.toString(), XContentType.JSON)
         .routing(tag.getId());
 

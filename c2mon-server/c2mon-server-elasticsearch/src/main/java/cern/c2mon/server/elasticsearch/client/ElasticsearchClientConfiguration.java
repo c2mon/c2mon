@@ -21,7 +21,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
-import cern.c2mon.server.elasticsearch.util.EmbeddedElasticsearchManager;
 
 /**
  * Configures the {@link ElasticsearchClient} bean instance based on provided configuration
@@ -54,11 +53,6 @@ public class ElasticsearchClientConfiguration {
   public ElasticsearchClient getClient() {
     if (!properties.isEnabled()) {
       return new ElasticsearchClientStub();
-    }
-
-    if (properties.isEmbedded()) {
-      EmbeddedElasticsearchManager.start(properties);
-      return new ElasticsearchClientRest(properties);
     }
 
     if (ElasticsearchClientType.TRANSPORT.name().equalsIgnoreCase(properties.getClient())) {

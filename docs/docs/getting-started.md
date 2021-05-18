@@ -20,10 +20,9 @@ You can run a server by downloading and executing a tarball distribution, or by 
 For convenience and fast development the server is by default starting with:
 
 - embedded [ActiveMQ v5.15.2](http://activemq.apache.org/) JMS broker,
-- embedded [Elasticsearch v5.6.0](https://www.elastic.co/products/elasticsearch) node,
 - embedded [HSQLDB v2.3.2](http://hsqldb.org/) database.
 
-**For production usage we strongly advice to run all these products separately!** In particular Elasticsearch is very resource hungry and can cause memory problems when running for longer together with C2MON in the same JVM.  
+**For production usage we strongly advice to run all these products separately!** 
 
 Alternatively to HSQLDB you can also use [MySQL v5.1.38](https://www.mysql.com/) or [Oracle v11.2.0.3](http://www.oracle.com/technetwork/database/database-technologies/express-edition/downloads/index.html).
 

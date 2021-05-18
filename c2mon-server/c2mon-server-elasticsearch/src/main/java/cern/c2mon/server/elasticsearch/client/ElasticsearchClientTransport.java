@@ -105,7 +105,7 @@ public final class ElasticsearchClientTransport implements ElasticsearchClient {
         .build());
 
     if (mapping != null) {
-      builder.addMapping(TYPE, mapping, XContentType.JSON);
+      builder.addMapping(mapping, XContentType.JSON);
     }
 
     log.debug("Creating new index with name {}", indexMetadata.getName());
@@ -122,7 +122,7 @@ public final class ElasticsearchClientTransport implements ElasticsearchClient {
 
   @Override
   public boolean indexData(IndexMetadata indexMetadata, String data) {
-    IndexRequest indexRequest = new IndexRequest(indexMetadata.getName(), TYPE);
+    IndexRequest indexRequest = new IndexRequest(indexMetadata.getName());
     if (indexMetadata.getId() != null && !indexMetadata.getId().isEmpty()) {
       indexRequest.id(indexMetadata.getId());
     }
@@ -142,7 +142,6 @@ public final class ElasticsearchClientTransport implements ElasticsearchClient {
   @Override
   public boolean isIndexExisting(IndexMetadata indexMetadata) {
     SearchRequest searchRequest = new SearchRequest(indexMetadata.getName());
-    searchRequest.types(TYPE);
     searchRequest.routing(indexMetadata.getRouting());
 
     try {
@@ -157,11 +156,11 @@ public final class ElasticsearchClientTransport implements ElasticsearchClient {
 
   @Override
   public boolean updateIndex(IndexMetadata indexMetadata, String data) {
-    UpdateRequest updateRequest = new UpdateRequest(indexMetadata.getName(), TYPE, indexMetadata.getId());
+    UpdateRequest updateRequest = new UpdateRequest(indexMetadata.getName(), indexMetadata.getId());
     updateRequest.doc(data, XContentType.JSON);
     updateRequest.routing(indexMetadata.getId());
 
-    IndexRequest indexRequest = new IndexRequest(indexMetadata.getName(), TYPE, indexMetadata.getId());
+    IndexRequest indexRequest = new IndexRequest(indexMetadata.getName(), indexMetadata.getId());
     indexRequest.source(data, XContentType.JSON);
     indexRequest.routing(indexMetadata.getId());
 
@@ -179,7 +178,7 @@ public final class ElasticsearchClientTransport implements ElasticsearchClient {
 
   @Override
   public boolean deleteIndex(IndexMetadata indexMetadata) {
-    DeleteRequest deleteRequest = new DeleteRequest(indexMetadata.getName(), TYPE, indexMetadata.getId());
+    DeleteRequest deleteRequest = new DeleteRequest(indexMetadata.getName(), indexMetadata.getId());
     deleteRequest.routing(indexMetadata.getRouting());
 
     try {
@@ -262,8 +261,7 @@ public final class ElasticsearchClientTransport implements ElasticsearchClient {
     final Settings.Builder settingsBuilder = Settings.builder();
 
     settingsBuilder.put("node.name", properties.getNodeName())
-        .put("cluster.name", properties.getClusterName())
-        .put("http.enabled", properties.isHttpEnabled());
+        .put("cluster.name", properties.getClusterName());
 
     client = new PreBuiltTransportClient(settingsBuilder.build());
     try {

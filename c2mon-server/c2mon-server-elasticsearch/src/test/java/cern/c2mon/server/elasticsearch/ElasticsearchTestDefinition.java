@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch;
 
+import cern.c2mon.server.elasticsearch.domain.IndexMetadata;
 import org.junit.After;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -27,7 +28,6 @@ import cern.c2mon.server.cache.loading.config.CacheLoadingModule;
 import cern.c2mon.server.common.config.CommonModule;
 import cern.c2mon.server.elasticsearch.config.ElasticsearchModule;
 import cern.c2mon.server.elasticsearch.junit.CachePopulationRule;
-import cern.c2mon.server.elasticsearch.util.EmbeddedElasticsearchManager;
 import cern.c2mon.server.supervision.config.SupervisionModule;
 
 @ContextConfiguration(classes = {
@@ -46,7 +46,7 @@ public abstract class ElasticsearchTestDefinition {
 
   @After
   public void tearDown() {
-    EmbeddedElasticsearchManager.getEmbeddedNode().deleteIndex(indexName);
-    EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
+    ElasticsearchSuiteTest.getElasticsearchClient().deleteDocumentByIndex(IndexMetadata.builder().name(indexName).build());
+    ElasticsearchSuiteTest.getElasticsearchClient().refreshIndices();
   }
 }

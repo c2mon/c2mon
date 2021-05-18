@@ -16,24 +16,23 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch.tag;
 
-import java.io.IOException;
-import java.util.List;
-
+import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
+import cern.c2mon.server.common.datatag.DataTagCacheObject;
+import cern.c2mon.server.elasticsearch.ElasticsearchSuiteTest;
+import cern.c2mon.server.elasticsearch.ElasticsearchTestDefinition;
+import cern.c2mon.server.elasticsearch.IndexManager;
+import cern.c2mon.server.elasticsearch.IndexNameManager;
+import cern.c2mon.server.elasticsearch.junit.CachePopulationRule;
+import cern.c2mon.server.elasticsearch.util.EntityUtils;
+import cern.c2mon.server.elasticsearch.util.IndexUtils;
 import org.awaitility.Awaitility;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import cern.c2mon.pmanager.persistence.exception.IDBPersistenceException;
-import cern.c2mon.server.common.datatag.DataTagCacheObject;
-import cern.c2mon.server.elasticsearch.ElasticsearchSuiteTest;
-import cern.c2mon.server.elasticsearch.ElasticsearchTestDefinition;
-import cern.c2mon.server.elasticsearch.IndexNameManager;
-import cern.c2mon.server.elasticsearch.junit.CachePopulationRule;
-import cern.c2mon.server.elasticsearch.util.EmbeddedElasticsearchManager;
-import cern.c2mon.server.elasticsearch.util.EntityUtils;
-import cern.c2mon.server.elasticsearch.util.IndexUtils;
+import java.io.IOException;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -50,11 +49,11 @@ import static org.junit.Assert.assertTrue;
  */
 public class TagDocumentIndexerTestSuite extends ElasticsearchTestDefinition {
 
-  @Autowired
-  private TagDocumentIndexer indexer;
+  private IndexNameManager indexNameManager = new IndexNameManager(ElasticsearchSuiteTest.getProperties());
 
-  @Autowired
-  private IndexNameManager indexNameManager;
+  private IndexManager indexManager = new IndexManager(ElasticsearchSuiteTest.getElasticsearchClient());
+
+  private TagDocumentIndexer indexer = new TagDocumentIndexer(ElasticsearchSuiteTest.getElasticsearchClient(), ElasticsearchSuiteTest.getProperties(), indexNameManager, indexManager);
 
   @Rule
   @Autowired
@@ -77,14 +76,14 @@ public class TagDocumentIndexerTestSuite extends ElasticsearchTestDefinition {
     indexer.storeData(document);
 
     // Bulk flush operation seem to require more time
-    Awaitility.await().until(() -> IndexUtils.countDocuments(indexName, ElasticsearchSuiteTest.getProperties()) == 1);
+    Awaitility.await().until(() -> IndexUtils.countDocuments(indexName) == 1);
 
-    EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
+    ElasticsearchSuiteTest.getElasticsearchClient().refreshIndices();
 
     assertTrue("Index should have been created.",
-        IndexUtils.doesIndexExist(indexName, ElasticsearchSuiteTest.getProperties()));
+        IndexUtils.doesIndexExist(indexName));
 
-    List<String> indexData = EmbeddedElasticsearchManager.getEmbeddedNode().fetchAllDocuments(indexName);
+    List<String> indexData = IndexUtils.fetchAllDocuments(indexName);
     assertEquals("Index should have one document inserted.", 1, indexData.size());
   }
 
@@ -94,14 +93,14 @@ public class TagDocumentIndexerTestSuite extends ElasticsearchTestDefinition {
     indexer.storeData(document);
 
     // Bulk flush operation seem to require more time
-    Awaitility.await().until(() -> IndexUtils.countDocuments(indexName, ElasticsearchSuiteTest.getProperties()) == 2);
+    Awaitility.await().until(() -> IndexUtils.countDocuments(indexName) == 2);
 
-    EmbeddedElasticsearchManager.getEmbeddedNode().refreshIndices();
+    ElasticsearchSuiteTest.getElasticsearchClient().refreshIndices();
 
     assertTrue("Index should have been created.",
-        IndexUtils.doesIndexExist(indexName, ElasticsearchSuiteTest.getProperties()));
+        IndexUtils.doesIndexExist(indexName));
 
-    List<String> indexData = EmbeddedElasticsearchManager.getEmbeddedNode().fetchAllDocuments(indexName);
+    List<String> indexData = IndexUtils.fetchAllDocuments(indexName);
     assertEquals("Index should have two documents inserted.", 2, indexData.size());
   }
 }

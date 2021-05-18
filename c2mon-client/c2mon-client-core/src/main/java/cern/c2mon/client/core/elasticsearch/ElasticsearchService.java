@@ -436,8 +436,7 @@ public class ElasticsearchService {
       JestResult result = client.execute(get);
       for (Map.Entry<String, JsonElement> index : result.getJsonObject().entrySet()) {
         for (Map.Entry<String, JsonElement> mapping : index.getValue().getAsJsonObject().entrySet()) {
-          for (Map.Entry<String, JsonElement> type : mapping.getValue().getAsJsonObject().entrySet()) {
-            JsonObject metadata = type.getValue().getAsJsonObject()
+            JsonObject metadata = mapping.getValue().getAsJsonObject()
                 .getAsJsonObject("properties")
                 .getAsJsonObject("metadata")
                 .getAsJsonObject("properties");
@@ -448,7 +447,6 @@ public class ElasticsearchService {
                 .stream()
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toList()));
-          }
         }
       }
       return keys;
