@@ -8,16 +8,17 @@ For more details on a given release, please check also the [version planning](ht
 
 ## Unreleased
 ### Added
+- Server ES module: Added possibility to adapt separately the timeseries index bucketing strategies for Alarm and Supervision documents (CM-308)
+- Server ES module: Introduced yearly bucketing strategy option for all indices (CM-308)
 
 ### Changed
+- Server ES module: Migrated Elasticsearch 6 (6.4.3) to Elasticsearch 7 (7.12.0) (CM-297)
 
 ### Fixed
 
-## 1.10.4 - 2021-04-19
-### Changed
-- Server: Migrated Elasticsearch 6 (6.4.3) to Elasticsearch 7 (7.12.0)
-- Server: Embedded Elasticsearch no longer supported
-- Server: Elasticsearch [Mapping Types](https://www.elastic.co/guide/en/elasticsearch/reference/current/removal-of-types.html) removed
+### Removed
+- Server ES module: Embedded Elasticsearch no longer supported
+- Server ES module: Elasticsearch [Mapping Types](https://www.elastic.co/guide/en/elasticsearch/reference/current/removal-of-types.html) removed
 
 ## 1.10.2 - 2021-02-23
 ### Changed
