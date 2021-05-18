@@ -87,13 +87,39 @@ public class ElasticsearchProperties {
   }
 
   /**
-   * Timeseries index bucketing strategy. Possible values:
+   * Timeseries index bucketing strategy for tags. Possible values:
+   * <li>Y (or y): yearly indices (YYY)</li>
+   * <li>M (or m): monthly indices (YYYY-MM)</li>
+   * <li>W (or w): weekly indices (YYYY-ww)</li>
+   * <li>D (or d): daily indices (YYYY-MM-DD)</li>
    * <p>
-   * - M (or m): monthly indices (YYYY-MM)
-   * - D (or d): daily indices (YYYY-MM-DD)
-   * - W (or w): weekly indices (YYYY-ww)
+   * Default strategy is monthly.
    */
   private String indexType = "M";
+  
+  /**
+   * Timeseries index bucketing strategy for alarms. Possible values:
+   * 
+   * <li>Y (or y): yearly indices (YYY)</li>
+   * <li>M (or m): monthly indices (YYYY-MM)</li>
+   * <li>W (or w): weekly indices (YYYY-ww)</li>
+   * <li>D (or d): daily indices (YYYY-MM-DD)</li>
+   * <p>
+   * Default strategy is monthly.
+   */
+  private String indexTypeAlarm = "M";
+  
+  /**
+   * Timeseries index bucketing strategy for supervision documents. Possible values:
+   * 
+   * <li>Y (or y): yearly indices (YYY)</li>
+   * <li>M (or m): monthly indices (YYYY-MM)</li>
+   * <li>W (or w): weekly indices (YYYY-ww)</li>
+   * <li>D (or d): daily indices (YYYY-MM-DD)</li>
+   * <p>
+   * Default strategy is monthly.
+   */
+  private String indexTypeSupervision = "M";
 
   /**
    * Number of shards per index
