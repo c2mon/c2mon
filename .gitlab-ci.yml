@@ -2,7 +2,7 @@ stages:
   - build
   - test
   - publish
-  - trigger_tim
+  - trigger_and_qa
 
 image: 
   name: gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-maven:jdk-11-mvn-3.6-1
@@ -81,7 +81,7 @@ Test:
 
 # These tasks may need to override MAVEN_OPTS manually
 "Sonar QA":
-  stage: publish
+  stage: trigger_and_qa
   script:
     - test -e $CI_PROJECT_DIR/.m2/repository/cern/c2mon && find $CI_PROJECT_DIR/.m2/repository/cern/c2mon
     - mvn $MAVEN_CLI_OPTS sonar:sonar -Dsonar.host.url=${SONAR_URL} -Dsonar.analysis.mode=preview -Dsonar.gitlab.commit_sha=$CI_BUILD_REF -Dsonar.gitlab.ref_name=$CI_BUILD_REF_NAME -Dsonar.gitlab.project_id=$CI_PROJECT_ID -Dsonar.gitlab.max_major_issues_gate=0
@@ -131,7 +131,7 @@ Publish:
 #  =========================
 
 "Trigger TIM build":
-  stage: trigger_tim                            
+  stage: trigger_and_qa                            
   image: appropriate/curl:3.1
   dependencies: []
   script:
