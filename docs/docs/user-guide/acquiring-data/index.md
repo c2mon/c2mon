@@ -32,10 +32,6 @@ Not all services are strictly required: they represent a selection of services f
 * [MySQL](https://www.mysql.com/de) is a database we use here to store our data
 * [ActiveMQ](http://activemq.apache.org) is used as a message broker in between the different tiers of the C2MON 
   infrastructure: client applications, server, and data acquisition processes.
-* We use an external [Elasticsearch](https://www.elastic.co) service as a search and analytics engine to allow us a 
-  quicker and more convenient access to our data later in this walk-through. You can choose to use an Elasticsearch 
-  engine that is embedded in C2MON by setting `C2MON_SERVER_ELASTICSEARCH_EMBEDDED` to `true`, or to disable it completely 
-  by setting `C2MON_SERVER_ELASTICSEARCH_ENABLED` to `false`.
 
 The relevant service definitions in our docker-compose file:
 ```yaml
@@ -50,7 +46,6 @@ The relevant service definitions in our docker-compose file:
       - C2MON_SERVER_ELASTICSEARCH_ENABLED=true
       - C2MON_SERVER_ELASTICSEARCH_HOST=elasticsearch
       - C2MON_SERVER_ELASTICSEARCH_PORT=9200
-      - C2MON_SERVER_ELASTICSEARCH_EMBEDDED=false
       - C2MON_SERVER_ELASTICSEARCH_CLIENT=rest
       - C2MON_SERVER_ELASTICSEARCH_SCHEME=http
       - C2MON_SERVER_JMS_EMBEDDED=false

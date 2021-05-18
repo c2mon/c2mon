@@ -42,11 +42,19 @@ import cern.c2mon.server.elasticsearch.domain.IndexMetadata;
 @Component
 public class SupervisionEventDocumentIndexer implements IDBPersistenceHandler<SupervisionEventDocument> {
 
-  @Autowired
   private IndexNameManager indexNameManager;
-
-  @Autowired
   private IndexManager indexManager;
+
+  /**
+   * SupervisionEventDocumentIndexer constructor
+   * @param indexNameManager Manages index name definitions.
+   * @param indexManager Manages index operations
+   */
+  @Autowired
+  public SupervisionEventDocumentIndexer(IndexNameManager indexNameManager, IndexManager indexManager){
+    this.indexNameManager = indexNameManager;
+    this.indexManager = indexManager;
+  }
 
   @Override
   public void storeData(SupervisionEventDocument supervisionEvent) throws IDBPersistenceException {

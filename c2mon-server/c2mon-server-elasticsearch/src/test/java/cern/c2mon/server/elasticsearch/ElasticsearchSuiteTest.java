@@ -18,7 +18,7 @@ package cern.c2mon.server.elasticsearch;
 
 import java.util.concurrent.TimeUnit;
 
-import org.junit.AfterClass;
+import cern.c2mon.server.elasticsearch.client.ElasticsearchClientRest;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.rules.Timeout;
@@ -34,7 +34,8 @@ import cern.c2mon.server.elasticsearch.tag.TagDocumentConverterTestSuite;
 import cern.c2mon.server.elasticsearch.tag.TagDocumentIndexerTestSuite;
 import cern.c2mon.server.elasticsearch.tag.config.TagConfigDocumentConverterTestSuite;
 import cern.c2mon.server.elasticsearch.tag.config.TagConfigDocumentIndexerTestSuite;
-import cern.c2mon.server.elasticsearch.util.EmbeddedElasticsearchManager;
+import org.testcontainers.elasticsearch.ElasticsearchContainer;
+import org.testcontainers.utility.DockerImageName;
 
 /**
  * Perform the necessary setup to run ES tests
@@ -44,7 +45,6 @@ import cern.c2mon.server.elasticsearch.util.EmbeddedElasticsearchManager;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
     ElasticsearchModuleIntegrationTestSuite.class,
-    IndexManagerTestSuite.class,
     IndexNameManagerTestSuite.class,
     AlarmDocumentConverterTestSuite.class,
     AlarmDocumentIndexerTestSuite.class,
@@ -55,24 +55,39 @@ import cern.c2mon.server.elasticsearch.util.EmbeddedElasticsearchManager;
     TagConfigDocumentConverterTestSuite.class,
     TagConfigDocumentIndexerTestSuite.class
 })
+
 public class ElasticsearchSuiteTest {
+
+  private static final DockerImageName ELASTICSEARCH_IMAGE = DockerImageName.parse("docker.elastic.co/elasticsearch/elasticsearch");
+
+  private static final String ELASTICSEARCH_TAG = "7.12.0";
+
+  @ClassRule
+  public static ElasticsearchContainer elasticsearchContainer =
+          new ElasticsearchContainer(ELASTICSEARCH_IMAGE.withTag(ELASTICSEARCH_TAG)).withExposedPorts(9200,9300);
 
   @ClassRule
   public static Timeout classTimeout = new Timeout(2, TimeUnit.MINUTES);
 
-  private static final ElasticsearchProperties properties = new ElasticsearchProperties();
+  public static IndexManager indexManager;
 
-  public static ElasticsearchProperties getProperties() {
-    return properties;
-  }
+  private static ElasticsearchClientRest client;
+
+  public static ElasticsearchClientRest getElasticsearchClient(){ return client; }
+
+  private static final ElasticsearchProperties properties = new ElasticsearchProperties();
 
   @BeforeClass
   public static void setUpClass() {
-    EmbeddedElasticsearchManager.start(properties);
+
+    properties.setHost(elasticsearchContainer.getHost());
+    properties.setPort(elasticsearchContainer.getMappedPort(9200));
+
+    client = new ElasticsearchClientRest(properties);
+    indexManager = new IndexManager(client);
   }
 
-  @AfterClass
-  public static void cleanup() {
-    EmbeddedElasticsearchManager.stop();
+  public static ElasticsearchProperties getProperties() {
+    return properties;
   }
 }

@@ -16,13 +16,8 @@
  *****************************************************************************/
 package cern.c2mon.server.elasticsearch.client;
 
-import java.io.IOException;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import java.util.function.BiConsumer;
-
+import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
+import cern.c2mon.server.elasticsearch.domain.IndexMetadata;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpHost;
@@ -34,8 +29,8 @@ import org.elasticsearch.ElasticsearchStatusException;
 import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
-import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
-import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
+import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
 import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
@@ -45,12 +40,15 @@ import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.indices.CreateIndexRequest;
+import org.elasticsearch.client.indices.CreateIndexResponse;
 import org.elasticsearch.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.ByteSizeUnit;
@@ -60,10 +58,13 @@ import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.rest.RestStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import cern.c2mon.server.elasticsearch.config.ElasticsearchProperties;
-import cern.c2mon.server.elasticsearch.domain.IndexMetadata;
+import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.function.BiConsumer;
 
-import static cern.c2mon.server.elasticsearch.config.ElasticsearchProperties.TYPE;
 
 /**
  * Wrapper around {@link RestHighLevelClient}. Connects asynchronously, but also provides
@@ -115,7 +116,7 @@ public final class ElasticsearchClientRest implements ElasticsearchClient {
     );
 
     if (properties.isAutoTemplateMapping()) {
-      request.mapping(TYPE, mapping, XContentType.JSON);
+      request.mapping(mapping, XContentType.JSON);
     }
 
     try {
@@ -130,7 +131,7 @@ public final class ElasticsearchClientRest implements ElasticsearchClient {
 
   @Override
   public boolean indexData(IndexMetadata indexMetadata, String data) {
-    IndexRequest indexRequest = new IndexRequest(indexMetadata.getName(), TYPE);
+    IndexRequest indexRequest = new IndexRequest(indexMetadata.getName());
     if (indexMetadata.getId() != null && !indexMetadata.getId().isEmpty()) {
       indexRequest.id(indexMetadata.getId());
     }
@@ -149,7 +150,6 @@ public final class ElasticsearchClientRest implements ElasticsearchClient {
   @Override
   public boolean isIndexExisting(IndexMetadata indexMetadata) {
     SearchRequest searchRequest = new SearchRequest(indexMetadata.getName());
-    searchRequest.types(TYPE);
     searchRequest.routing(indexMetadata.getName());
 
     try {
@@ -169,11 +169,11 @@ public final class ElasticsearchClientRest implements ElasticsearchClient {
 
   @Override
   public boolean updateIndex(IndexMetadata indexMetadata, String data) {
-    UpdateRequest updateRequest = new UpdateRequest(indexMetadata.getName(), TYPE, indexMetadata.getId());
+    UpdateRequest updateRequest = new UpdateRequest(indexMetadata.getName(), indexMetadata.getId());
     updateRequest.doc(data, XContentType.JSON);
     updateRequest.routing(indexMetadata.getId());
 
-    IndexRequest indexRequest = new IndexRequest(indexMetadata.getName(), TYPE);
+    IndexRequest indexRequest = new IndexRequest(indexMetadata.getName());
     if (indexMetadata.getId() != null && !indexMetadata.getId().isEmpty()) {
       indexRequest.id(indexMetadata.getId());
     }
@@ -193,11 +193,27 @@ public final class ElasticsearchClientRest implements ElasticsearchClient {
   @Override
   public boolean deleteIndex(IndexMetadata indexMetadata) {
     try {
-      DeleteRequest deleteRequest = new DeleteRequest(indexMetadata.getName(), TYPE, indexMetadata.getId());
+      DeleteRequest deleteRequest = new DeleteRequest(indexMetadata.getName(), indexMetadata.getId());
       deleteRequest.routing(indexMetadata.getRouting());
 
       DeleteResponse deleteResponse = client.delete(deleteRequest, RequestOptions.DEFAULT);
       return deleteResponse.status().equals(RestStatus.OK);
+    } catch (IOException e) {
+      log.error("Error deleting '{}' index from ElasticSearch.", indexMetadata.getName(), e);
+    }
+    return false;
+  }
+
+  /**
+   * Removes a JSON document from the specified index. (Used for testing)
+   * @param indexMetadata Allows to defined index metadata
+   * @return true on success
+   */
+  public boolean deleteDocumentByIndex(IndexMetadata indexMetadata) {
+    try {
+      DeleteIndexRequest deleteRequest = new DeleteIndexRequest(indexMetadata.getName());
+      AcknowledgedResponse deleteIndexResponse = client.indices().delete(deleteRequest, RequestOptions.DEFAULT);
+      return deleteIndexResponse.isAcknowledged();
     } catch (IOException e) {
       log.error("Error deleting '{}' index from ElasticSearch.", indexMetadata.getName(), e);
     }
@@ -287,6 +303,17 @@ public final class ElasticsearchClientRest implements ElasticsearchClient {
     }
 
     client = new RestHighLevelClient(restClientBuilder);
+  }
+
+  /**
+   * Refreshes all indices (Used in testing)
+   */
+  public void refreshIndices(){
+    try {
+      client.indices().refresh(new RefreshRequest(), RequestOptions.DEFAULT);
+    } catch (IOException e) {
+      log.warn("An error occurred refreshing the indices ", e);
+    }
   }
 
   @Override

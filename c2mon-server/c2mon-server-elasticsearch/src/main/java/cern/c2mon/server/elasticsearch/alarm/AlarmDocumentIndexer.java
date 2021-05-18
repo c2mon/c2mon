@@ -42,11 +42,20 @@ import cern.c2mon.server.elasticsearch.domain.IndexMetadata;
 @Component
 public class AlarmDocumentIndexer implements IDBPersistenceHandler<AlarmDocument> {
 
-  @Autowired
   private IndexNameManager indexNameManager;
 
-  @Autowired
   private IndexManager indexManager;
+
+  /**
+   * AlarmDocumentIndexer constructor
+   * @param indexNameManager Manages index name definitions.
+   * @param indexManager Manages index operations
+   */
+  @Autowired
+  public AlarmDocumentIndexer(IndexNameManager indexNameManager, IndexManager indexManager){
+    this.indexNameManager = indexNameManager;
+    this.indexManager = indexManager;
+  }
 
   @Override
   public void storeData(AlarmDocument alarm) throws IDBPersistenceException {
@@ -57,7 +66,6 @@ public class AlarmDocumentIndexer implements IDBPersistenceHandler<AlarmDocument
   public void storeData(List<AlarmDocument> alarms) throws IDBPersistenceException {
     try {
       long failed = alarms.stream().filter(alarm -> !this.indexAlarm(alarm)).count();
-
       if (failed > 0) {
         throw new IDBPersistenceException("Failed to index " + failed + " of " + alarms.size() + " alarms");
       }

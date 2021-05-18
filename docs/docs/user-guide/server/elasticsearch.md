@@ -12,8 +12,7 @@ and the bulk API to achieve highly performant indexing speeds.
 
 # Connecting to Elasticsearch
 
-By default, an embedded Elasticsearch node is started within the JVM. To
-connect to an external cluster, set `c2mon.server.elasticsearch.embedded` to `false`
+To connect to an external cluster, set `c2mon.server.elasticsearch.enabled` to `true`
 and point `c2mon.server.elasticsearch.host` and `c2mon.server.elasticsearch.port`
 to the required values.
 

@@ -13,6 +13,11 @@ For more details on a given release, please check also the [version planning](ht
 
 ### Fixed
 
+## 1.10.4 - 2021-04-19
+### Changed
+- Server: Migrated Elasticsearch 6 (6.4.3) to Elasticsearch 7 (7.12.0)
+- Server: Embedded Elasticsearch no longer supported
+- Server: Elasticsearch [Mapping Types](https://www.elastic.co/guide/en/elasticsearch/reference/current/removal-of-types.html) removed
 
 ## 1.10.2 - 2021-02-23
 ### Changed
