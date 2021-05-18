@@ -61,7 +61,7 @@ public class IndexNameManager {
    */
   public String indexFor(TagDocument tag) {
     String prefix = properties.getIndexPrefix() + "-tag_";
-    return getIndexName(prefix, Instant.now(clock));
+    return getTagIndexName(prefix, Instant.now(clock));
   }
 
   /**
@@ -83,7 +83,8 @@ public class IndexNameManager {
    */
   public String indexFor(AlarmDocument alarm) {
     String prefix = properties.getIndexPrefix() + "-alarm_";
-    return getIndexName(prefix, Instant.now(clock));
+    String indexType = properties.getIndexTypeAlarm();
+    return getIndexName(indexType, prefix, Instant.now(clock));
   }
 
   /**
@@ -95,19 +96,20 @@ public class IndexNameManager {
    */
   public String indexFor(SupervisionEventDocument supervisionEvent) {
     String prefix = properties.getIndexPrefix() + "-supervision_";
-    return getIndexName(prefix, Instant.now(clock));
+    String indexType = properties.getIndexTypeSupervision();
+    return getIndexName(indexType, prefix, Instant.now(clock));
   }
 
   /**
    * Generate an index for the given prefix and timestamp, based on the current
    * time series indexing strategy.
    *
+   * @param indexType The chosen index type (daily, weekly, monthly, yearly)
    * @param prefix  the index prefix
    * @param instant the instant which will be used to generate the index
    * @return the generated index name
    */
-  private String getIndexName(String prefix, Instant instant) {
-    String indexType = properties.getIndexType();
+  private String getIndexName(String indexType, String prefix, Instant instant) {
     String dateFormat;
 
     switch (indexType.toLowerCase(Locale.getDefault())) {
@@ -117,6 +119,9 @@ public class IndexNameManager {
       case "w":
         dateFormat = "yyyy-'W'ww";
         break;
+      case "y":
+        dateFormat = "yyyy";
+        break;
       case "m":
       default:
         dateFormat = "yyyy-MM";
@@ -124,6 +129,12 @@ public class IndexNameManager {
     }
 
     return prefix + new SimpleDateFormat(dateFormat, Locale.getDefault()).format(Date.from(instant));
+  }
+  
+  
+  private String getTagIndexName(String prefix, Instant instant) {
+    String indexType = properties.getIndexType();
+    return getIndexName(indexType, prefix, instant);
   }
 
   /**
