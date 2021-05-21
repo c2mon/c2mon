@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2021 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -20,6 +20,8 @@ import java.awt.Color;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -472,6 +474,8 @@ public final class TypeConverter  {
         Array.set(result, i, cast(Array.get(inputValue, i), elementTargetType.getName()));
       }
       return result;
+    } else if (inputType.isArray() && ArrayList.class == pTargetType) {
+      return new ArrayList<Object>(Arrays.asList((Object[])inputValue));
     }
 
     // SQL Timestamp handling:
