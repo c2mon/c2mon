@@ -47,7 +47,7 @@ public class ElasticsearchProperties {
   /**
    * Optional path prefix for Elasticsearch
    */
-  private String pathPrefix = "/es";
+  private String pathPrefix;
 
   /**
    * Scheme to be used to communicate with Elasticsearch server (only application for REST client)

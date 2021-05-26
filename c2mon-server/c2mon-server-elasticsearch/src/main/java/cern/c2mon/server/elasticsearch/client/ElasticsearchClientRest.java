@@ -285,8 +285,11 @@ public final class ElasticsearchClientRest implements ElasticsearchClient {
   @Override
   public void setup() {
     RestClientBuilder restClientBuilder =
-        RestClient.builder(new HttpHost(properties.getHost(), properties.getPort(), properties.getScheme()))
-            .setPathPrefix(properties.getPathPrefix());
+        RestClient.builder(new HttpHost(properties.getHost(), properties.getPort(), properties.getScheme()));
+
+    if(StringUtils.isNotEmpty(properties.getPathPrefix())){
+      restClientBuilder.setPathPrefix(properties.getPathPrefix());
+    }
 
     if (StringUtils.isNotEmpty(properties.getUsername()) && StringUtils.isNotEmpty(properties.getPassword())) {
       UsernamePasswordCredentials credentials =
