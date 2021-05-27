@@ -225,7 +225,7 @@ public final class ElasticsearchClientRest implements ElasticsearchClient {
         properties.getClusterName(), properties.getHost(), properties.getPort());
 
     new Thread(() -> {
-      log.info("Connected to Elasticsearch cluster {}", properties.getClusterName());
+      log.info("Connecting to Elasticsearch cluster {}", properties.getClusterName());
       waitForYellowStatus();
     }, "EsClusterFinder").start();
   }
@@ -286,6 +286,10 @@ public final class ElasticsearchClientRest implements ElasticsearchClient {
   public void setup() {
     RestClientBuilder restClientBuilder =
         RestClient.builder(new HttpHost(properties.getHost(), properties.getPort(), properties.getScheme()));
+
+    if(StringUtils.isNotEmpty(properties.getPathPrefix())){
+      restClientBuilder.setPathPrefix(properties.getPathPrefix());
+    }
 
     if (StringUtils.isNotEmpty(properties.getUsername()) && StringUtils.isNotEmpty(properties.getPassword())) {
       UsernamePasswordCredentials credentials =
