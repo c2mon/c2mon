@@ -23,7 +23,11 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import com.google.gson.Gson;
+
 import lombok.extern.slf4j.Slf4j;
+
+import cern.c2mon.shared.util.json.GsonFactory;
 
 /**
  * This helper class provides methods to cast a given raw type object into
@@ -36,12 +40,26 @@ import lombok.extern.slf4j.Slf4j;
 public final class TypeConverter  {
 
   private static final String JAVA_LANG_PREFIX = "java.lang.";
+  
+  /** Gson instance */
+  private static transient Gson gson = null;
 
   /**
    * Hidden default constructor
    */
   private TypeConverter() {
     // Do nothing
+  }
+  
+  /**
+   * @return The Gson parser singleton instance
+   */
+  private static synchronized Gson getGson() {
+    if (gson == null) {
+      gson = GsonFactory.createGson();
+    }
+
+    return gson;
   }
 
   /**
@@ -476,8 +494,10 @@ public final class TypeConverter  {
       return result;
     } else if (inputType.isArray() && ArrayList.class == pTargetType) {
       return new ArrayList<Object>(Arrays.asList((Object[])inputValue));
+    } else if (String.class == inputType && ArrayList.class == pTargetType && pValue.toString().startsWith("[")) {
+      return getGson().fromJson((String) pValue, pTargetType);
     }
-
+      
     // SQL Timestamp handling:
     else if (inputType == java.sql.Timestamp.class) {
       return cast(((java.sql.Timestamp) inputValue).getTime(), pTargetType);
