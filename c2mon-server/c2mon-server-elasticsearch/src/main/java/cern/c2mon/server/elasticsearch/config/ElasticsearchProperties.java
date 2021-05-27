@@ -45,6 +45,11 @@ public class ElasticsearchProperties {
   private int port = 9200;
 
   /**
+   * Optional path prefix for Elasticsearch
+   */
+  private String pathPrefix;
+
+  /**
    * Scheme to be used to communicate with Elasticsearch server (only application for REST client)
    */
   private String scheme = "http";
