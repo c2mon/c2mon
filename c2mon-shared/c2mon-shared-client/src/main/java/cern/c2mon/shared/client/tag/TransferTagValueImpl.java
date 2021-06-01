@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2019 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2021 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -31,7 +31,6 @@ import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.alarm.AlarmValueImpl;
 import cern.c2mon.shared.client.request.ClientRequestReport;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
-import cern.c2mon.shared.common.type.TypeConverter;
 
 
 /**
@@ -53,10 +52,6 @@ public class TransferTagValueImpl extends ClientRequestReport implements TagValu
 
   /** The class type of the tag value as String representation */
   private String valueClassName;
-
-  /** The value of the tag. Parameter is only used for backward compatibly to the old server */
-  @Deprecated
-  private String tagValue;
 
   /** The value of the tag */
   private Object value;
@@ -131,8 +126,6 @@ public class TransferTagValueImpl extends ClientRequestReport implements TagValu
                               final String pDescription) {
     tagId = pTagId;
     value = pTagValue;
-    tagValue = value != null ? value.toString() : null;
-
     tagQuality = pTagQuality;
     this.mode = pMode;
     sourceTimestamp = pSourceTimestamp;
@@ -152,32 +145,6 @@ public class TransferTagValueImpl extends ClientRequestReport implements TagValu
   @JsonIgnore
   public DataTagQualityImpl getDataTagQuality(){
     return this.tagQuality;
-  }
-
-  /**
-   * Automatically called through the jackson deserialization procedure.
-   * Parses the value representation from the 1.6.7. Server version to the correct type.
-   *
-   * @param tagValueAsString Tag value represented in String format.
-   */
-  @Deprecated
-  public void setTagValue(String tagValueAsString) {
-    try {
-      if (valueClassName != null) {
-        if (tagValueAsString != null) {
-          value = valueClassName.equals(String.class.getName()) ? tagValueAsString : TypeConverter.cast(tagValueAsString, valueClassName);
-        }
-      } else {
-        log.warn("Set tagValue not possible: value class name not given");
-      }
-    } catch (Exception e) {
-      log.error("Set tagValue not possible: Error while parsing occurred - " + e);
-    }
-  }
-
-  public void setValue(Object value ){
-    this.value = value;
-    this.tagValue = value != null ? value.toString() : null;
   }
 
   /**
