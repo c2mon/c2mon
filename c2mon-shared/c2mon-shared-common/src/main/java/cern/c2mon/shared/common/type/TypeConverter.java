@@ -496,7 +496,9 @@ public final class TypeConverter  {
       return new ArrayList<Object>(Arrays.asList((Object[])inputValue));
     } else if (String.class == inputType && ArrayList.class == pTargetType && pValue.toString().startsWith("[")) {
       return getGson().fromJson((String) pValue, pTargetType);
-    }
+    } else if (ArrayList.class == inputType && pTargetType.isArray()) {
+      return ((ArrayList<Object>) inputValue).toArray((Object[]) Array.newInstance(pTargetType.getComponentType(), 0));
+    } 
       
     // SQL Timestamp handling:
     else if (inputType == java.sql.Timestamp.class) {

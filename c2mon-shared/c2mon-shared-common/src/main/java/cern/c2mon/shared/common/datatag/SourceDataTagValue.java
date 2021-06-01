@@ -17,6 +17,7 @@
 package cern.c2mon.shared.common.datatag;
 
 import java.sql.Timestamp;
+import java.util.Arrays;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -426,7 +427,11 @@ public final class SourceDataTagValue implements Cloneable {
     str.append('\t');
     str.append(getTimestamp());
     str.append('\t');
-    str.append(getValue());
+    if (getValue() != null && getValue().getClass().isArray()) {
+      str.append(Arrays.toString((Object[]) getValue()));
+    } else {
+      str.append(getValue());
+    }
     str.append('\t');
     str.append(getDataType());
     str.append('\t');
