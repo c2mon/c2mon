@@ -10,11 +10,14 @@ For more details on a given release, please check also the [version planning](ht
 ### Added
 - Server ES module: Added possibility to adapt separately the timeseries index bucketing strategies for Alarm and Supervision documents (CM-308)
 - Server ES module: Introduced yearly bucketing strategy option for all indices (CM-308)
+- Server ES module: Added optional path prefix variable (`c2mon.server.elasticsearch.pathPrefix`) which is now releavant to connect to ES7
 
 ### Changed
 - Server ES module: Migrated Elasticsearch 6 (6.4.3) to Elasticsearch 7 (7.12.0) (CM-297)
+- Reviewed and improved support for tag values of type array and added support for class `ArrayList`. This is the default when using the REST DAQ auto configuration (CM-309).
 
 ### Fixed
+- DAQ: For DAQs making use of the Client API it is now possible to declare all properties in the `c2mon.daq.properties` file (CM-242)
 
 ### Removed
 - Server ES module: Embedded Elasticsearch no longer supported
