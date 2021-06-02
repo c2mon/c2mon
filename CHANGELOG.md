@@ -22,6 +22,7 @@ For more details on a given release, please check also the [version planning](ht
 ### Removed
 - Server ES module: Embedded Elasticsearch no longer supported
 - Server ES module: Elasticsearch [Mapping Types](https://www.elastic.co/guide/en/elasticsearch/reference/current/removal-of-types.html) removed
+- Removed server code assuring compatibility to C2MON Client API v1.6.7 and older (CM-309)
 
 ## 1.10.2 - 2021-02-23
 ### Changed
