@@ -33,6 +33,7 @@ import org.springframework.context.annotation.PropertySources;
 })
 @PropertySources({
     @PropertySource("classpath:c2mon-client-default.properties"),
+    @PropertySource(value = "${c2mon.daq.properties}", ignoreResourceNotFound = true),
     @PropertySource(value = "${c2mon.client.properties}", ignoreResourceNotFound = true)
 })
 public class C2monAutoConfiguration {}
