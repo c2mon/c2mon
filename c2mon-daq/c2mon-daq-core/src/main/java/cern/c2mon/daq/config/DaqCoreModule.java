@@ -16,10 +16,11 @@
  ******************************************************************************/
 package cern.c2mon.daq.config;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.*;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * This configuration class is responsible for importing an externalised
@@ -39,6 +40,8 @@ import org.springframework.context.annotation.*;
 @EnableConfigurationProperties(DaqProperties.class)
 @PropertySources({
     @PropertySource(value = "classpath:c2mon-daq-default.properties"),
+    @PropertySource(value = "classpath:c2mon-client-default.properties", ignoreResourceNotFound = true),
+    @PropertySource(value = "${c2mon.properties}", ignoreResourceNotFound = true),
     @PropertySource(value = "${c2mon.daq.properties}", ignoreResourceNotFound = true)
 })
 @Slf4j
