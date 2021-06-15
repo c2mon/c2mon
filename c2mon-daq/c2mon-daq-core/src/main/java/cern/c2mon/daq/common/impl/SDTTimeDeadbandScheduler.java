@@ -221,7 +221,7 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
   }
   
   private String createValueDescription(SourceDataTag sdt) {
-    StringBuilder valueDescription = new StringBuilder();
+    StringBuilder valueDescription = new StringBuilder(40);
     String originalValueDescription = sdt.getCurrentValue().getValueDescription();
     
     if (this.dynamicTimeDeadbandFilterer.isDynamicTimeDeadband(sdt)) {
@@ -234,7 +234,7 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
     valueDescription.append("time-deadband filtering enabled.");
     
     if (originalValueDescription != null && !originalValueDescription.isEmpty()) {
-      valueDescription.append(" ");
+      valueDescription.append(' ');
       valueDescription.append(sdt.getCurrentValue().getValueDescription());
     }
     
