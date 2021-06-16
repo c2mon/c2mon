@@ -42,9 +42,9 @@ import cern.c2mon.server.elasticsearch.domain.IndexMetadata;
 @Component
 public class AlarmDocumentIndexer implements IDBPersistenceHandler<AlarmDocument> {
 
-  private IndexNameManager indexNameManager;
+  private final IndexNameManager indexNameManager;
 
-  private IndexManager indexManager;
+  private final IndexManager indexManager;
 
   /**
    * AlarmDocumentIndexer constructor

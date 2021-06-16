@@ -47,9 +47,9 @@ import cern.c2mon.server.elasticsearch.domain.IndexMetadata;
 @Component
 public class TagDocumentIndexer implements IDBPersistenceHandler<TagDocument> {
 
-  private IndexNameManager indexNameManager;
+  private final IndexNameManager indexNameManager;
 
-  private IndexManager indexManager;
+  private final IndexManager indexManager;
 
   private BulkProcessorProxy bulkProcessor;
 

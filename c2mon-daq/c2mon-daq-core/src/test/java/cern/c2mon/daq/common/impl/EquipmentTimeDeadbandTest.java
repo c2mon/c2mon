@@ -249,6 +249,7 @@ public class EquipmentTimeDeadbandTest {
 
     this.dynamicTimeDeadbandFiltererMock.recordTag(isA(SourceDataTag.class));
     expectLastCall().times(1);
+    EasyMock.expect(this.dynamicTimeDeadbandFiltererMock.isDynamicTimeDeadband(this.sdt1)).andReturn(true);
 
     // Lets figure out the Time Deadband is enabled (in this case would be the Static)
     this.sdt1.getAddress().setTimeDeadband(1);
