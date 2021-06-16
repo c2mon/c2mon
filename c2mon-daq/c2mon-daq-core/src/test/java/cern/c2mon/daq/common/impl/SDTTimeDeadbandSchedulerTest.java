@@ -166,7 +166,7 @@ public class SDTTimeDeadbandSchedulerTest {
     EasyMock.expect(this.processConfigurationMock.getProcessName()).andReturn("TEST_PROCESS_NAME");
 
     // No Dymanic Time Deadband
-    EasyMock.expect(this.dynamicTimeDeadbandFiltererMock.isDynamicTimeDeadband(tag)).andReturn(false);
+    EasyMock.expect(this.dynamicTimeDeadbandFiltererMock.isDynamicTimeDeadband(tag)).andReturn(false).times(2);
 
     // This message will be sent since it is the first one
     this.processMessageSenderMock.addValue(isA(SourceDataTagValue.class));
@@ -214,7 +214,7 @@ public class SDTTimeDeadbandSchedulerTest {
     EasyMock.expect(this.processConfigurationMock.getProcessName()).andReturn("TEST_PROCESS_NAME");
 
     // No Dymanic Time Deadband
-    EasyMock.expect(this.dynamicTimeDeadbandFiltererMock.isDynamicTimeDeadband(tag)).andReturn(false);
+    EasyMock.expect(this.dynamicTimeDeadbandFiltererMock.isDynamicTimeDeadband(tag)).andReturn(false).times(2);
 
     // This message will be sent since it is the first one
     this.processMessageSenderMock.addValue(isA(SourceDataTagValue.class));
@@ -262,7 +262,7 @@ public class SDTTimeDeadbandSchedulerTest {
     EasyMock.expect(this.processConfigurationMock.getProcessName()).andReturn("TEST_PROCESS_NAME");
 
     // No Dymanic Time Deadband
-    EasyMock.expect(this.dynamicTimeDeadbandFiltererMock.isDynamicTimeDeadband(tag)).andReturn(false);
+    EasyMock.expect(this.dynamicTimeDeadbandFiltererMock.isDynamicTimeDeadband(tag)).andReturn(false).times(2);
 
     // This message will be sent 2 times to the server since the timer is cancelled and started again
     this.processMessageSenderMock.addValue(isA(SourceDataTagValue.class));

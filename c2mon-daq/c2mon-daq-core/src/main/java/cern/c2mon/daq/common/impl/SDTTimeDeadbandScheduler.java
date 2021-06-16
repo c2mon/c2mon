@@ -185,7 +185,7 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
             // Clone the last value sent to the server
             this.lastSourceDataTag = this.sourceDataTag.clone();
 
-            currentSDValue.setValueDescription("Time-deadband filtering enabled. " + currentSDValue.getValueDescription());
+            currentSDValue.setValueDescription(createValueDescription(this.lastSourceDataTag));
             // Add the value sent
             this.processMessageSender.addValue(currentSDValue);
 
@@ -218,6 +218,27 @@ public class SDTTimeDeadbandScheduler extends TimerTask {
       log.error("Critical error in scheduler for tag #{}", this.sourceDataTag.getId(), exception);
     }
     log.debug("scheduler[#{}] : leaving run()", this.sourceDataTag.getId());
+  }
+  
+  private String createValueDescription(SourceDataTag sdt) {
+    StringBuilder valueDescription = new StringBuilder(40);
+    String originalValueDescription = sdt.getCurrentValue().getValueDescription();
+    
+    if (this.dynamicTimeDeadbandFilterer.isDynamicTimeDeadband(sdt)) {
+      valueDescription.append("Dynamic ");
+    } else if (sdt.getAddress().isStaticTimedeadband()){
+      valueDescription.append("Static ");
+    } else {
+      return originalValueDescription;
+    }
+    valueDescription.append("time-deadband filtering enabled.");
+    
+    if (originalValueDescription != null && !originalValueDescription.isEmpty()) {
+      valueDescription.append(' ');
+      valueDescription.append(sdt.getCurrentValue().getValueDescription());
+    }
+    
+    return valueDescription.toString();
   }
 
 }
