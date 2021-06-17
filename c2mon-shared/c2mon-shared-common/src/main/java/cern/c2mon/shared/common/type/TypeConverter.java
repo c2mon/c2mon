@@ -42,24 +42,13 @@ public final class TypeConverter  {
   private static final String JAVA_LANG_PREFIX = "java.lang.";
   
   /** Gson instance */
-  private static transient Gson gson = null;
+  private static transient Gson gson = GsonFactory.createGson();
 
   /**
    * Hidden default constructor
    */
   private TypeConverter() {
     // Do nothing
-  }
-  
-  /**
-   * @return The Gson parser singleton instance
-   */
-  private static synchronized Gson getGson() {
-    if (gson == null) {
-      gson = GsonFactory.createGson();
-    }
-
-    return gson;
   }
 
   /**
@@ -110,6 +99,7 @@ public final class TypeConverter  {
    * @return The resulting cast object.
    * @throws ClassCastException In case of a cast exception
    */
+  @SuppressWarnings("unchecked")
   private static final Object cast(final Object pValue, final Class< ? > pTargetType) throws ClassCastException {
     if (pValue == null || pTargetType == null) {
       return null;
@@ -494,8 +484,8 @@ public final class TypeConverter  {
       return result;
     } else if (inputType.isArray() && ArrayList.class == pTargetType) {
       return new ArrayList<Object>(Arrays.asList((Object[])inputValue));
-    } else if (String.class == inputType && ArrayList.class == pTargetType && pValue.toString().startsWith("[")) {
-      return getGson().fromJson((String) pValue, pTargetType);
+    } else if (String.class == inputType && ArrayList.class == pTargetType && pValue.toString().charAt(0) == '[') {
+      return gson.fromJson((String) pValue, pTargetType);
     } else if (ArrayList.class == inputType && pTargetType.isArray()) {
       return ((ArrayList<Object>) inputValue).toArray((Object[]) Array.newInstance(pTargetType.getComponentType(), 0));
     } 
