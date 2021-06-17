@@ -75,14 +75,15 @@ public class TagDocumentIndexer implements IDBPersistenceHandler<TagDocument> {
 
   @Override
   public void storeData(List<TagDocument> tags) throws IDBPersistenceException {
-    try {
-      log.debug("Trying to send a batch of size {}", tags.size());
-      tags.forEach(this::indexTag);
-
-      bulkProcessor.flush();
-    } catch (Exception e) {
-      log.warn("Error indexing batch", e);
-      throw new IDBPersistenceException(e);
+    for(TagDocument tag : tags){
+      try {
+        indexTag(tag);
+      } catch (Exception e) {
+        log.warn("Error indexing batch for the following tag {}", tag.toString(), e);
+        throw new IDBPersistenceException(e);
+      }finally {
+        bulkProcessor.flush();
+      }
     }
   }
 
