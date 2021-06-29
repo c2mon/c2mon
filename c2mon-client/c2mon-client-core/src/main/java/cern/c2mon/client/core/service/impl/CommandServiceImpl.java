@@ -99,7 +99,7 @@ public class CommandServiceImpl implements CommandService {
         return new CommandReportImpl(commandId, CommandExecutionStatus.STATUS_CMD_UNKNOWN, "The command with tagId '" + commandId + "' is not known to the server");
     }
 
-    CommandExecuteRequest<Object> executeRequest = createCommandExecuteRequest(cct, value);
+    CommandExecuteRequest<Object> executeRequest = createCommandExecuteRequest(cct, userName, value);
 
     if (sessionService != null && !isAuthorized(userName, commandId)) {
         return new CommandReportImpl(commandId,
@@ -200,7 +200,7 @@ public class CommandServiceImpl implements CommandService {
    * @return An instance of {@link CommandExecuteRequest}
    * @throws CommandTagValueException Thrown in case an incompatible value type.
    */
-  private <T> CommandExecuteRequest<T> createCommandExecuteRequest(final CommandTagImpl<T> commandTag, T value) throws CommandTagValueException {
+  private <T> CommandExecuteRequest<T> createCommandExecuteRequest(final CommandTagImpl<T> commandTag, String username, T value) throws CommandTagValueException {
     // Check if value is NOT NULL
     if (value == null) {
       throw new CommandTagValueException("Null value : command values cannot be set to null");
@@ -247,7 +247,7 @@ public class CommandServiceImpl implements CommandService {
     }
 
     return new CommandExecuteRequestImpl<>(commandTag.getId(), value,
-                                  commandTag.getClientTimeout(), System.getProperty("user.home"), hostname);
+                                  commandTag.getClientTimeout(), username, hostname);
   }
 
   @Override
