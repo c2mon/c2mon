@@ -79,7 +79,7 @@ public class CommandRecordListener implements CommandPersistenceListener {
     commandLog.setDataType(commandTag.getDataType());
     commandLog.setExecutionTime(commandTag.getCommandExecutionDetails().getExecutionStartTime());
     commandLog.setValue(commandTag.getCommandExecutionDetails().getValue().toString());
-    //log.setHost(commandTag.getCommandExecutionDetails()) TODO host
+    commandLog.setHost(commandTag.getCommandExecutionDetails().getHost());
     commandLog.setUser(commandTag.getCommandExecutionDetails().getUsername());
     commandLog.setReportStatus(report.getStatus());
     commandLog.setReportTime(report.getTimestamp());

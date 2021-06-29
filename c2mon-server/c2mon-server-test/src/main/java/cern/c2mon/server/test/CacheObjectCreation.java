@@ -498,6 +498,7 @@ public final class CacheObjectCreation {
 
       CommandExecutionDetails<Long> commandExecutionDetails = new CommandExecutionDetails<>();
       commandExecutionDetails.setUsername("john");
+      commandExecutionDetails.setHost("host");
       commandExecutionDetails.setExecutionStartTime(new Timestamp(System.currentTimeMillis() - 1000));
       commandExecutionDetails.setExecutionEndTime(new Timestamp(System.currentTimeMillis()));
       commandExecutionDetails.setValue(10L);
