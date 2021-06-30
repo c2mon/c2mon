@@ -21,6 +21,7 @@ build_and_publish:
     - mvn -B deploy -Djavax.net.ssl.trustStore=${CACERTS} --settings settings.xml
   only:
     - master
+    - develop
     
 # Just run tests on feature branches
 build:
@@ -29,6 +30,7 @@ build:
     - mvn -B test --settings settings.xml
   except:
     - master
+    - develop
 
 sonar_preview:
   type: sonar
