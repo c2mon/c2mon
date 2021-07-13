@@ -106,7 +106,7 @@ Publish:
 # Publish docker images?
 
 "Sonar master QA":
-  stage: publish                                                     
+  stage: trigger_and_qa
   script:
     - mvn $MAVEN_CLI_OPTS package sonar:sonar -Dmaven.test.skip=true -DskipDocker=true -Dsonar.host.url=${SONAR_URL} -Dsonar.dependencyCheck.reportPath=target/dependency-check-report.xml
   only:                                                    
