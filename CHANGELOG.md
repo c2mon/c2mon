@@ -14,7 +14,9 @@ For more details on a given release, please check also the [version planning](ht
 ### Fixed
 
 
-## 1.10.3 - 2021-07-13
+## 1.11.0 - 2021-07-13
+Please note that this version requires to upgrade to Elasticsearch 7. Backward compatibility with ES6 clusters cannot be guaranteed. We also had to remove the embedded Elasticsearch cluster, because it's no longer supported by ES.
+
 ### Added
 - Server ES module: Added possibility to adapt separately the timeseries index bucketing strategies for Alarm and Supervision documents (CM-308)
 - Server ES module: Introduced yearly bucketing strategy option for all indices (CM-308)
