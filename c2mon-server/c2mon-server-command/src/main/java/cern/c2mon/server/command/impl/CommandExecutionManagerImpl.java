@@ -21,24 +21,18 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-import cern.c2mon.server.daq.out.ProcessCommunicationManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import lombok.extern.slf4j.Slf4j;
 
 import cern.c2mon.server.cache.CommandTagCache;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.command.CommandExecutionManager;
 import cern.c2mon.server.command.CommandPersistenceListener;
-import cern.c2mon.shared.client.command.CommandExecuteRequest;
-import cern.c2mon.shared.client.command.CommandExecutionStatus;
-import cern.c2mon.shared.client.command.CommandReport;
-import cern.c2mon.shared.client.command.CommandReportImpl;
-import cern.c2mon.shared.client.command.CommandTagHandle;
-import cern.c2mon.shared.client.command.CommandTagHandleImpl;
+import cern.c2mon.server.daq.out.ProcessCommunicationManager;
+import cern.c2mon.shared.client.command.*;
 import cern.c2mon.shared.client.command.CommandTagHandleImpl.Builder;
-import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
 import cern.c2mon.shared.common.command.CommandExecutionDetails;
 import cern.c2mon.shared.common.command.CommandTag;
 
@@ -49,12 +43,8 @@ import cern.c2mon.shared.common.command.CommandTag;
  *
  */
 @Service
+@Slf4j
 public class CommandExecutionManagerImpl implements CommandExecutionManager {
-
-  /**
-   * Private class logger.
-   */
-  private static final Logger LOGGER = LoggerFactory.getLogger(CommandExecutionManagerImpl.class);
 
   /**
    * Reference to the bean for sending to the DAQ layer.
@@ -92,14 +82,13 @@ public class CommandExecutionManagerImpl implements CommandExecutionManager {
 
     if (request == null) {
       String message = "execute() : called with null parameter.";
-      LOGGER.error(message);
+      log.error(message);
       throw new NullPointerException(message);
     }
 
-    // TODO add RBAC check once token is passed with JMS call
-
     /* Try to execute the command */
     try {
+      @SuppressWarnings("unchecked")
       CommandTag<T> commandTag = commandTagCache.getCopy(request.getId());
       CommandExecutionDetails<T> details = new CommandExecutionDetails<T>();
       details.setExecutionStartTime(new Timestamp(System.currentTimeMillis()));
@@ -109,40 +98,27 @@ public class CommandExecutionManagerImpl implements CommandExecutionManager {
       report = processCommunicationManager.executeCommand(commandTag, request.getValue());
       details.setExecutionEndTime(new Timestamp(System.currentTimeMillis()));
       //log if listener registered
-      commandTag.setCommandExecutionDetails(details); // only for logging
+      commandTag.setCommandExecutionDetails(details);
       if (commandPersistenceListener != null) {
-        if (LOGGER.isDebugEnabled()) {
-          LOGGER.debug("execute() : logging command tag.");
-        }
+        log.debug("execute() : logging command tag #{}", commandTag.getId());
         try {
           commandPersistenceListener.log(commandTag, report);
         } catch (Exception e) {
-          LOGGER.error("Error while logging commands to DB", e);
+          log.error("Error while logging commands to DB", e);
         }
       }
 
     } catch (CacheElementNotFoundException cacheEx) {
-      LOGGER.error("Unable to locate CommandTag with id " + request.getId() + " in the cache.", cacheEx);
+      log.error("Unable to locate CommandTag #{} in the cache.", request.getId(), cacheEx);
       report = new CommandReportImpl(request.getId(),
                                   CommandExecutionStatus.STATUS_EXECUTION_FAILED,
                                    "Unable to locate the Command tag in the server cache.");
     } catch (Exception e) {
-      LOGGER.error("Exception caught while executing command", e);
+      log.error("Exception caught while executing command", e);
       report = new CommandReportImpl(request.getId(),
                                   CommandExecutionStatus.STATUS_EXECUTION_FAILED,
                                    e.getMessage());
     }
-
-//TODO re-enable once RBAC check is done on server
-//      } else {
-//        if (LOGGER.isDebugEnabled()) {
-//          LOGGER.debug("execute() : not authorized.");
-//        }
-//        report =
-//            new CommandReport(handle.getId(),
-//                              CommandReport.STATUS_AUTHORISATION_FAILED,
-//                              "This CommandTagHandle has not been authorised by the server");
-//      }
 
     return report;
   }
@@ -155,7 +131,7 @@ public class CommandExecutionManagerImpl implements CommandExecutionManager {
     Collection<CommandTagHandle<T>> commandTagHandles = new ArrayList<CommandTagHandle<T>>();
 
     if (commandIds.isEmpty()) {
-      LOGGER.warn("processRequest(Collection<Long> commandIds) method called with an empty collection argument - returning empty result");
+      log.warn("processRequest(Collection<Long> commandIds) method called with an empty collection argument - returning empty result");
       return commandTagHandles;
     }
 
@@ -164,7 +140,7 @@ public class CommandExecutionManagerImpl implements CommandExecutionManager {
     while (it.hasNext()) {
       id = it.next();
       if (id == null) {
-        LOGGER.warn("Received request for command with null id - ignoring this request. Check your client code!");
+        log.warn("Received request for command with null id - ignoring this request. Check your client code!");
       } else {
         try {
           commandTagCopy = commandTagCache.getCopy(id);
@@ -183,7 +159,7 @@ public class CommandExecutionManagerImpl implements CommandExecutionManager {
         } catch (CacheElementNotFoundException cacheEx) {
           /* The specified CommandTag is not defined in the system. */
           commandTagHandles.add(new CommandTagHandleImpl<T>(id, null));
-          LOGGER.warn("Unable to locate requested command in the cache (Id is " + id + ") - will not be returned to client. ", cacheEx);
+          log.warn("Unable to locate requested command #{} in the cache - will not be returned to client. ", id, cacheEx);
         }
       }
     }

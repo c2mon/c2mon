@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2010-2016 CERN. All rights not expressly granted are reserved.
+ * Copyright (C) 2010-2021 CERN. All rights not expressly granted are reserved.
  *
  * This file is part of the CERN Control and Monitoring Platform 'C2MON'.
  * C2MON is free software: you can redistribute it and/or modify it under the
@@ -23,6 +23,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import lombok.extern.slf4j.Slf4j;
+
 import cern.c2mon.pmanager.persistence.IPersistenceManager;
 import cern.c2mon.server.command.CommandExecutionManager;
 import cern.c2mon.server.command.CommandPersistenceListener;
@@ -37,12 +39,13 @@ import cern.c2mon.shared.common.command.CommandTag;
  *
  */
 @Service
+@Slf4j
 public class CommandRecordListener implements CommandPersistenceListener {
 
   /**
    * The fallback persistence manager.
    */
-  private IPersistenceManager persistenceManager;
+  private IPersistenceManager<CommandRecord> persistenceManager;
 
   /**
    * For registering for command execution callbacks.
@@ -63,7 +66,7 @@ public class CommandRecordListener implements CommandPersistenceListener {
    * @param commandExecutionManager from command module
    */
   @Autowired
-  public CommandRecordListener(@Qualifier("commandHistoryPersistenceManager") final IPersistenceManager persistenceManager,
+  public CommandRecordListener(@Qualifier("commandHistoryPersistenceManager") final IPersistenceManager<CommandRecord> persistenceManager,
                                final CommandExecutionManager commandExecutionManager) {
     super();
     this.persistenceManager = persistenceManager;
@@ -84,6 +87,9 @@ public class CommandRecordListener implements CommandPersistenceListener {
     commandLog.setReportStatus(report.getStatus());
     commandLog.setReportTime(report.getTimestamp());
     commandLog.setReportDescription(report.getReportText());
+    
+    log.info("Storing command execution result to DB: {}", commandLog.toString());
+    
     persistenceManager.storeData(commandLog);
   }
 
