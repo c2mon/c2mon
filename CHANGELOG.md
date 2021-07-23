@@ -13,6 +13,9 @@ For more details on a given release, please check also the [version planning](ht
 
 ### Fixed
 
+## 1.11.1 - 2021-07-23
+### Changed
+- JMS: Revert domain support for JMS connectionIDPrefix added in last version as this does not bring any added value, but rather additional broker configuration complexity.
 
 ## 1.11.0 - 2021-07-13
 Please note that this version requires to upgrade to Elasticsearch 7. Backward compatibility with ES6 clusters cannot be guaranteed. We also had to remove the embedded Elasticsearch cluster, because it's no longer supported by ES.
