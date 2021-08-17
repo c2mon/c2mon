@@ -350,19 +350,42 @@ public class SupervisionServiceImpl implements CoreSupervisionService, Supervisi
       refreshSupervisionStatus();
     }
   }
+  
+  private void clearSupervisionCaches() {
+    processEventCache.clear();
+    equipmentEventCache.clear();
+    subEquipmentSupervisionListeners.clear();
+  }
+  
+  private void refreshSupervisionStatusCaches() {
+    try {
+      Collection<SupervisionEvent> allCurrentEvents = clientRequestHandler.getCurrentSupervisionStatus();
+      clearSupervisionCaches();
+      for (SupervisionEvent event : allCurrentEvents) {
+        updateEventCache(event);
+      }
+      c2monConnectionEstablished = true;
+      log.info("Supervision event cache was successfully updated with " + allCurrentEvents.size() + " events.");
+    }
+    catch (Exception e) {
+      log.error("Could not initialize/update the supervision event cache. Reason: " + e.getMessage(), e);
+      c2monConnectionEstablished = false;
+    }
+  }
 
   @Override
   public void refreshSupervisionStatus() {
     try {
       Collection<SupervisionEvent> allCurrentEvents = clientRequestHandler.getCurrentSupervisionStatus();
+      clearSupervisionCaches();
       for (SupervisionEvent event : allCurrentEvents) {
         onSupervisionUpdate(event);
       }
       c2monConnectionEstablished = true;
-      log.info("refreshSupervisionStatus() - supervision event cache was successfully updated with " + allCurrentEvents.size() + " events.");
+      log.info("Supervision event cache was successfully updated with " + allCurrentEvents.size() + " events.");
     }
     catch (Exception e) {
-      log.error("refreshSupervisionStatus() - Could not initialize/update the supervision event cache. Reason: " + e.getMessage(), e);
+      log.error("Could not initialize/update the supervision event cache. Reason: " + e.getMessage(), e);
       c2monConnectionEstablished = false;
     }
   }
@@ -431,16 +454,19 @@ public class SupervisionServiceImpl implements CoreSupervisionService, Supervisi
 
   @Override
   public Collection<String> getAllProcessNames() {
+    refreshSupervisionStatusCaches();
     return processEventCache.values().stream().map(SupervisionEvent::getName).collect(Collectors.toList());
   }
 
   @Override
   public Collection<String> getAllEquipmentNames() {
+    refreshSupervisionStatusCaches();
     return equipmentEventCache.values().stream().map(SupervisionEvent::getName).collect(Collectors.toList());
   }
 
   @Override
   public Collection<String> getAllSubEquipmentNames() {
+    refreshSupervisionStatusCaches();
     return subEquipmentEventCache.values().stream().map(SupervisionEvent::getName).collect(Collectors.toList());
   }
 
