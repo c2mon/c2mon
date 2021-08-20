@@ -2,66 +2,84 @@ stages:
   - build
   - test
   - publish
-  - trigger_and_qa
+  - trigger_and_qa 
 
-image: 
+image:
   name: gitlab-registry.cern.ch/industrial-controls/sw-infra/cc7-maven:jdk-11-mvn-3.6-1
-  entrypoint: [""]   
+  entrypoint: [ "" ]
 
 
 variables:
-  # This will suppress any download for dependencies and plugins or upload messages which would clutter the console log.
-  # `showDateTime` will show the passed time in milliseconds. You need to specify `--batch-mode` to make this work.
-  # As of Maven 3.3.0 instead of this you may define these options in `.mvn $MAVEN_CLI_OPTS/maven.config` so the same config is used
-  # when running from the command line.
-  MAVEN_CLI_OPTS:
-    -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository
-      --batch-mode --errors --show-version --settings $CI_PROJECT_DIR/settings.xml
-# It would be good to get the certs for this one
+  MAVEN_CLI_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository --batch-mode --show-version -U --settings $CI_PROJECT_DIR/settings.xml"
 
+default:
+  cache:
+    key: "$CI_PROJECT_NAME"
+    paths:
+      - "$CI_PROJECT_DIR/.m2"
 
 #  =========================
 #  === Stage: build      ===
 #  =========================
 
-Compile:
+compile:
   stage: build
   script:
-    - export MAVEN_OPTS=""
-    - mvn $MAVEN_CLI_OPTS install
+    - echo "MAVEN_CLI_OPTS=$MAVEN_CLI_OPTS"
+    - echo "MAVEN_BUILD_ARGS=$MAVEN_BUILD_ARGS"
+    - mvn $MAVEN_CLI_OPTS $MAVEN_BUILD_ARGS -DskipTests=true clean package
   artifacts:
-    name: "$CI_COMMIT_REF_NAME-$CI_COMMIT_SHORT_SHA"
-    untracked: true
-    when: on_success
-    expire_in: 60 minutes
-  except:
-    - master
-    - develop
-    - tags
+    paths:
+      - "target"
 
 #  =========================
-#  ===== Stage: test =======
+#  ====== Stage: TEST ======
 #  =========================
 
-Test:
+test:
   stage: test
+  cache:
+    key: "$CI_PROJECT_NAME"
+    paths:
+      - "$CI_PROJECT_DIR/.m2"
+    policy: pull
   script:
-    - export MAVEN_OPTS=""
-    - mkdir reports
-    - mvn $MAVEN_CLI_OPTS install
-    - find -iname 'TEST-*.xml' -exec cp {} ./reports/ \;
+    - echo "MAVEN_CLI_OPTS=$MAVEN_CLI_OPTS"
+    - echo "MAVEN_TEST_ARGS=$MAVEN_TEST_ARGS"
+    - mvn $MAVEN_CLI_OPTS $MAVEN_TEST_ARGS verify
   artifacts:
-    name: "$CI_COMMIT_REF_NAME-$CI_COMMIT_SHORT_SHA"
-    expire_in: 60 minutes
-    when: always
+    paths:
+      - "*/*/target/*-reports"
+
+#  =========================
+#  ===== Stage: Publish ====
+#  =========================
+
+reports:
+  stage: publish
+  cache: { }
+  script:
+    - echo "Publish reports to GitLab"
+  artifacts:
     reports:
-      junit: reports/*.xml
+      junit:
+        - "*/*/target/*-reports/TEST-*.xml"
+
+publish image:
+  stage: publish
+  cache:
+    key: "$CI_PROJECT_NAME"
+    paths:
+      - "$CI_PROJECT_DIR/.m2"
+    policy: pull
+  script:
+    - mvn $MAVEN_CLI_OPTS deploy -DskipTests=true
   only:
-    - develop
     - master
-    
+    - develop
+
 "Build docs":
-  stage: test
+  stage: publish
   image: jekyll/builder:3.8.5
   script:
     - cd docs
@@ -75,61 +93,9 @@ Test:
   only:
     - master
 
-#  =========================
-#  ====== Stage: QA ========
-#  =========================
-
-# These tasks may need to override MAVEN_OPTS manually
-"Sonar QA":
-  stage: trigger_and_qa
-  script:
-    - test -e $CI_PROJECT_DIR/.m2/repository/cern/c2mon && find $CI_PROJECT_DIR/.m2/repository/cern/c2mon
-    - mvn $MAVEN_CLI_OPTS sonar:sonar -Dsonar.host.url=${SONAR_URL} -Dsonar.analysis.mode=preview -Dsonar.gitlab.commit_sha=$CI_BUILD_REF -Dsonar.gitlab.ref_name=$CI_BUILD_REF_NAME -Dsonar.gitlab.project_id=$CI_PROJECT_ID -Dsonar.gitlab.max_major_issues_gate=0
-  except:
-    - master
-    - tags
-
-#  =========================
-#  ===== Stage: Publish ====
-#  =========================
-
-# Fully build and publish master branch
-Publish:
-  stage: publish
-  script:
-    - mvn $MAVEN_CLI_OPTS -DskipTests deploy
-  only:
-    - master
-    - ignite-branch-update-with-master
-    - develop
-
-# Publish docker images?
-
-"Sonar master QA":
-  stage: trigger_and_qa
-  script:
-    - mvn $MAVEN_CLI_OPTS package sonar:sonar -Dmaven.test.skip=true -DskipDocker=true -Dsonar.host.url=${SONAR_URL} -Dsonar.dependencyCheck.reportPath=target/dependency-check-report.xml
-  only:                                                    
-    - master
-
-"Deploy docs":
-  stage: publish
-  dependencies:
-    - "Build docs"
-  image: gitlab-registry.cern.ch/ci-tools/ci-web-deployer
-  variables:
-    EOS_PATH: "/eos/project/c/c2mon/www"
-    CI_OUTPUT_DIR: "docs/_site"
-    EOS_ACCOUNT_USERNAME: "${KRB_USERNAME}"
-    EOS_ACCOUNT_PASSWORD: "${KRB_PASSWORD}"
-  script:
-    - deploy-eos
-  only:
-    - master
-    
-#  =========================
-#  === Stage: trigger_tim ==
-#  =========================
+#  ==========================
+#  === Stage: TRIGGER & QA ==
+#  ==========================
 
 "Trigger TIM build":
   stage: trigger_and_qa                            
@@ -138,5 +104,48 @@ Publish:
   script:
     - "curl --insecure -X POST -F token=$TIM_SERVER_TOKEN -F ref=master https://gitlab.cern.ch/api/v4/projects/9859/trigger/pipeline"
   only:
-  - master
-  - develop
+    - master
+    - develop
+
+
+# These tasks may need to override MAVEN_OPTS manually
+"Sonar QA":
+  stage: trigger_and_qa
+  allow_failure: true
+  cache:
+    key: "$CI_PROJECT_NAME"
+    paths:
+      - "$CI_PROJECT_DIR/.m2"
+    policy: pull
+  script:
+    - >-
+      mvn $MAVEN_CLI_OPTS package sonar:sonar
+      -Dmaven.test.skip=true
+      -DskipDocker=true
+      -Dsonar.host.url=${SONAR_URL} 
+      -Dsonar.analysis.mode=preview 
+      -Dsonar.gitlab.commit_sha=$CI_BUILD_REF 
+      -Dsonar.gitlab.ref_name=$CI_BUILD_REF_NAME 
+      -Dsonar.gitlab.project_id=$CI_PROJECT_ID 
+      -Dsonar.gitlab.max_major_issues_gate=0
+  except:
+    - master
+    - tags
+
+"Sonar master QA":
+  stage: trigger_and_qa
+  allow_failure: true
+  cache:
+    key: "$CI_PROJECT_NAME"
+    paths:
+      - "$CI_PROJECT_DIR/.m2"
+    policy: pull
+  script:
+    - >-
+      mvn $MAVEN_CLI_OPTS package sonar:sonar
+      -Dmaven.test.skip=true
+      -DskipDocker=true  
+      -Dsonar.host.url=${SONAR_URL} 
+      -Dsonar.dependencyCheck.reportPath=target/dependency-check-report.xml
+  only:                                                    
+    - master
