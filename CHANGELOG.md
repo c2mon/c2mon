@@ -10,8 +10,11 @@ For more details on a given release, please check also the [version planning](ht
 ### Added
 
 ### Changed
+- Changes on the GitLab CI to speedup the pipeline
 
 ### Fixed
+- CM-317: Client API: Updates now local cache of `SupervisionService` before retrieving supervision entities. This is important to remove any deleted equipments from the list.
+
 
 ## 1.11.1 - 2021-07-23
 ### Changed
