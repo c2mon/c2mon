@@ -16,6 +16,8 @@
  *****************************************************************************/
 package cern.c2mon.shared.common.type;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import org.junit.Test;
@@ -651,6 +653,23 @@ public class TypeConverterTest {
     castTest(new Float[]{new Float(0), new Float(1), new Float(25.5d)}, Float[].class.getName(), new Float[]{new Float(0), new Float(1), new Float(25.5f)});
     castTest(new Integer[]{new Integer(0), new Integer(1), new Integer(25)}, Float[].class.getName(), new Float[]{new Float(0), new Float(1), new Float(25)});
     castTest(new Long[]{new Long(0), new Long(1), new Long(25L)}, Float[].class.getName(), new Float[]{new Float(0), new Float(1), new Float(25)});
+    
+    // Input list contains Double type objects. This is a real use case of the REST DAQ
+    List<Object> inputList = new ArrayList<Object>();
+    inputList.add(1.2d);
+    inputList.add(4.2d);
+    castTest(inputList, Float[].class.getName(), new Float[]{Float.valueOf(1.2f), Float.valueOf(4.2f)});
+  }
+  
+  /**
+   * Primitive arrays are currently not supported by the {@link TypeConverter}
+   */
+  @Test(expected = ClassCastException.class)
+  public void testUnsupportedArrayCast() {
+    List<Object> inputList = new ArrayList<Object>();
+    inputList.add(1.2d);
+    inputList.add(4.2d);
+    castTest(inputList, float[].class.getName(), new float[]{1.2f, 4.2f});
   }
 
   @Test
@@ -672,6 +691,12 @@ public class TypeConverterTest {
     castTest(new Integer[]{new Integer(0), new Integer(1), new Integer(25)}, Double[].class.getName(), new Double[]{new Double(0), new Double(1), new Double(25)});
     castTest(new Long[]{new Long(0), new Long(1), new Long(25L)}, Double[].class.getName(), new Double[]{new Double(0), new Double(1), new Double(25)});
     castTest(new Float[]{new Float(0), new Float(1), new Float(25.5d)}, Double[].class.getName(), new Double[]{new Double(0), new Double(1), new Double(25.5d)});
+    
+    // Input list contains Float type objects.
+    List<Object> inputList = new ArrayList<Object>();
+    inputList.add(1.2f);
+    inputList.add(4.2f);
+    castTest(inputList, Double[].class.getName(), new Double[]{Double.valueOf(1.2d), Double.valueOf(4.2d)});
   }
 
   @Test

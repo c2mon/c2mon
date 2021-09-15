@@ -13,8 +13,9 @@ For more details on a given release, please check also the [version planning](ht
 - Changes on the GitLab CI to speedup the pipeline
 
 ### Fixed
-- CM-317: Client API: Updates now local cache of `SupervisionService` before retrieving supervision entities. This is important to remove any deleted equipments from the list.
+- Client API: Updates now local cache of `SupervisionService` before retrieving supervision entities. This is important to remove any deleted equipments from the list (CM-317).
 
+- Enhanced support for Array type casting, in particular from Float to Double and vice-versa. This issue appeared on the REST DAQ when submitting arrays for `Float[]` tags (CM-319).
 
 ## 1.11.1 - 2021-07-23
 ### Changed

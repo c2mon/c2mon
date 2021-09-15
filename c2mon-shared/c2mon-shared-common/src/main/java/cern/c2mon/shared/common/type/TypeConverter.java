@@ -22,6 +22,7 @@ import java.lang.reflect.Field;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import com.google.gson.Gson;
 
@@ -361,7 +362,7 @@ public final class TypeConverter  {
             || String.class.isAssignableFrom(inputType)
             || Boolean.class.isAssignableFrom(inputType))) {
       if (Number.class.isAssignableFrom(inputType)) {
-        return new Double(((Number)inputValue).doubleValue());
+        return Double.valueOf(((Number)inputValue).toString());
       }
       else if (String.class.isAssignableFrom(inputType)) {
         if (((String)inputValue).trim().equalsIgnoreCase("false")) {
@@ -487,7 +488,16 @@ public final class TypeConverter  {
     } else if (String.class == inputType && ArrayList.class == pTargetType && pValue.toString().charAt(0) == '[') {
       return gson.fromJson((String) pValue, pTargetType);
     } else if (ArrayList.class == inputType && pTargetType.isArray()) {
-      return ((ArrayList<Object>) inputValue).toArray((Object[]) Array.newInstance(pTargetType.getComponentType(), 0));
+      List<Object> inputList = (ArrayList<Object>) inputValue;
+      int inputArrayLength = inputList.size();
+      final Class< ? > elementTargetType = pTargetType.getComponentType();
+      final Object result = Array.newInstance(elementTargetType, inputArrayLength);
+      int i = 0;
+      for (Object value : inputList) {
+        Array.set(result, i++, cast(value, elementTargetType.getName()));
+      }
+      
+      return result;
     } 
       
     // SQL Timestamp handling:
