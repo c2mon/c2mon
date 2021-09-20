@@ -14,8 +14,9 @@ For more details on a given release, please check also the [version planning](ht
 
 ### Fixed
 - Client API: Updates now local cache of `SupervisionService` before retrieving supervision entities. This is important to remove any deleted equipments from the list (CM-317).
-
 - Enhanced support for Array type casting, in particular from Float to Double and vice-versa. This issue appeared on the REST DAQ when submitting arrays for `Float[]` tags (CM-319).
+- DAQ Core: Change report was previously not set to success in DAQ Core, if only core configuration changes were applied. This could result in not storing the changes on the DAQ side (CM-311).
+
 
 ## 1.11.1 - 2021-07-23
 ### Changed

@@ -539,20 +539,20 @@ public class ConfigurationController {
         }
         try {
           sourceDataTag.validate();
+          changeReport.appendInfo("Core Data Tag update successfully applied.");
+          changeReport.setState(CHANGE_STATE.SUCCESS);
         } catch (ConfigurationException e) {
           sourceDataTags.put(dataTagId, oldSourceDataTag);
           changeReport.appendError("Error validating data tag");
           changeReport.appendError(StackTraceHelper.getStackTrace(e));
           return changeReport;
         }
-        changeReport.appendInfo("Core Data Tag update successfully applied.");
         IDataTagChanger dataTagChanger = dataTagChangers.get(equipmentId);
         dataTagChanger.onUpdateDataTag(sourceDataTag, oldSourceDataTag, changeReport);
         if (changeReport.getState().equals(CHANGE_STATE.SUCCESS)) {
           List<ICoreDataTagChanger> coreChangers = coreDataTagChangers.get(equipmentId);
           if (coreChangers != null) {
-            // I do it here to avoid putting them back in the old state after an
-            // error
+            // I do it here to avoid putting them back in the old state after an error
             for (ICoreDataTagChanger coreDataTagChanger : coreChangers) {
               coreDataTagChanger.onUpdateDataTag(sourceDataTag, oldSourceDataTag, changeReport);
             }

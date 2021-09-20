@@ -133,13 +133,6 @@ public class ChangeReport {
     }
 
     /**
-     * @return the changeId
-     */
-    public long getChangeId() {
-        return changeId;
-    }
-
-    /**
      * @return true if success else false
      */
     public boolean isSuccess() {
@@ -165,42 +158,6 @@ public class ChangeReport {
      */
     public boolean isReboot() {
         return state == CHANGE_STATE.REBOOT;
-    }
-
-    /**
-     * @param state the state to set
-     */
-    public void setState(final CHANGE_STATE state) {
-        this.state = state;
-    }
-
-    /**
-     * Returns the state of this object.
-     * @return The state of the report.
-     */
-    public CHANGE_STATE getState() {
-        return state;
-    }
-
-    /**
-     * @return the errorMessage
-     */
-    public String getErrorMessage() {
-        return errorMessage;
-    }
-
-    /**
-     * @return the warnMessage
-     */
-    public String getWarnMessage() {
-        return warnMessage;
-    }
-
-    /**
-     * @return the infoMessage
-     */
-    public String getInfoMessage() {
-        return infoMessage;
     }
 
     /**
