@@ -128,7 +128,6 @@ public class DataTagConfigTransactedImplTest {
     DataTagUpdate update = new DataTagUpdate();
     update.setDataTagId(dataTag.getId());
     update.setEquipmentId(dataTag.getEquipmentId());
-    update.setName("new name");
     dataTagCache.acquireWriteLockOnKey(dataTag.getId());
     EasyMock.expect(dataTagCache.getCopy(dataTag.getId())).andReturn(dataTag);
     dataTagCache.putQuiet(dataTag);
@@ -191,12 +190,10 @@ public class DataTagConfigTransactedImplTest {
     DataTagUpdate update = new DataTagUpdate();
     update.setDataTagId(dataTag.getId());
     update.setEquipmentId(dataTag.getEquipmentId());
-    update.setName("new name");
 
     // Update all properties that do not require DAQ reconfiguration
     Properties properties = new Properties();
     properties.put("id", dataTag.getId());
-    properties.put("name", "new name");
     properties.put("description", "new description");
     properties.put("mode", "new mode");
     properties.put("isLogged", "new logged");
