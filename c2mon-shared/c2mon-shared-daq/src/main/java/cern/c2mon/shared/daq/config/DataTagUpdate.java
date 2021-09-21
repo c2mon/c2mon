@@ -109,6 +109,16 @@ public class DataTagUpdate extends Change implements ITagChange {
         this.dataTagId = dataTagId;
         this.equipmentId = equipmentId;
     }
+    
+    /**
+     * Registers an update of the tag name. The change will also be propagated
+     * to the DAQ layer.
+     * @param name The new tag name
+     */
+    public void setName(String name) {
+      this.name = name;
+      setEmpty(false);
+    }
 
     /**
      * @param dataTagAddressUpdate the dataTagAddressUpdate to set

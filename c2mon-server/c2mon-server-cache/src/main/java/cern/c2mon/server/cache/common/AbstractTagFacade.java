@@ -133,7 +133,7 @@ public abstract class AbstractTagFacade<T extends Tag> extends AbstractFacade<T>
       String tmpStr = null;
 
       // TAG name and topic derived from name
-      if ((tmpStr = properties.getProperty("name")) != null) {
+      if ((tmpStr = properties.getProperty("name")) != null && !tmpStr.equals(tag.getName())) {
         tag.setName(tmpStr);
         dataTagUpdate.setName(tmpStr);
       }
