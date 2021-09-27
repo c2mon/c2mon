@@ -10,6 +10,11 @@ For more details on a given release, please check also the [version planning](ht
 ### Added
 
 ### Changed
+
+### Fixed
+
+## 1.11.2 - 2021-09-27
+### Changed
 - Changes on the GitLab CI to speedup the pipeline
 
 ### Fixed
