@@ -23,6 +23,7 @@ import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
@@ -307,11 +308,11 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
     ConfigurationReport report = new ConfigurationReport(configId, configName, "");
 
     //map of element reports that need a DAQ child report adding
-    Map<Long, ConfigurationElementReport> daqReportPlaceholder = new HashMap<>();
+    Map<Long, ConfigurationElementReport> daqReportPlaceholder = new ConcurrentHashMap<>();
     //map of elements themselves elt_seq_id -> element
-    Map<Long, ConfigurationElement> elementPlaceholder = new HashMap<>();
+    Map<Long, ConfigurationElement> elementPlaceholder = new ConcurrentHashMap<>();
     //map of lists, where each list needs sending to a particular DAQ (processId -> List of events)
-    Map<Long, List<Change>> processLists = new HashMap<>();
+    Map<Long, List<Change>> processLists = new ConcurrentHashMap<>();
 
     if (configProgressMonitor != null){
       configProgressMonitor.serverTotalParts(configElements.size());
