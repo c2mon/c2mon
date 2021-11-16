@@ -1,0 +1,68 @@
+{
+  "dynamic_templates": [
+    {
+      "nested_metadata_template": {
+        "mapping": {
+          "type": "keyword",
+          "index": true
+        },
+        "match_mapping_type": "string",
+        "path_match": "metadata.*"
+      }
+    },
+    {
+      "strings": {
+        "match_mapping_type": "string",
+        "mapping": {
+          "type": "keyword",
+          "ignore_above": 256,
+          "norms": "false"
+        }
+      }
+    }
+  ],
+  "properties": {
+    "active": {
+      "type": "boolean"
+    },
+    "activeNumeric": {
+      "type": "integer"
+    },
+    "faultCode": {
+      "type": "integer"
+    },
+    "faultFamily": {
+      "type": "keyword",
+      "index": true
+    },
+    "faultMember": {
+      "type": "keyword",
+      "index": true
+    },
+    "id": {
+      "type": "long"
+    },
+    "info": {
+      "type": "keyword",
+      "index": true
+    },
+    "metadata": {
+      "type": "object",
+      "dynamic": "true"
+    },
+    "oscillating": {
+      "type": "boolean"
+    },
+    "tagId": {
+      "type": "long"
+    },
+    "timestamp": {
+      "type": "date",
+      "format": "epoch_millis"
+    },
+    "sourceTimestamp": {
+      "type": "date",
+      "format": "epoch_millis"
+    }
+  }
+}

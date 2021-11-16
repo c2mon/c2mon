@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ConfigurationChangeEvent
+  xmlns="http://timweb.cern.ch/schemas/c2mon-daq/Configuration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://timweb.cern.ch/schemas/c2mon-daq/Configuration http://timweb.cern.ch/schemas/c2mon-daq/ConfigurationChangeEvent.xsd">
+  <DataTagUpdate change-id="1" data-tag-id="5"
+    equipment-id="1">
+    <data-type>Integer</data-type>
+    <min-value data-type="Integer">2</min-value>
+    <max-value data-type="Integer">4</max-value>
+    <mode update-type="remove">0</mode>
+    <DataTagAddress>
+      <priority>7</priority>
+      <HardwareAddress
+        class="cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl">
+        <opc-item-name>asd</opc-item-name>
+        <command-pulse-length>1</command-pulse-length>
+        <namespace>2</namespace>
+        <address-type>STRING</address-type>
+        <command-type>CLASSIC</command-type>
+      </HardwareAddress>
+    </DataTagAddress>
+  </DataTagUpdate>
+  <CommandTagUpdate change-id="123" command-tag-id="10"
+    equipment-id="1">
+    <source-retries>10</source-retries>
+    <source-timeout update-type="remove">0</source-timeout>
+    <HardwareAddress
+      class="cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl">
+      <address-type>STRING</address-type>
+      <command-type>CLASSIC</command-type>
+      <opc-item-name>asd</opc-item-name>
+      <command-pulse-length>2</command-pulse-length>
+      <namespace>2</namespace>
+    </HardwareAddress>
+  </CommandTagUpdate>
+  <CommandTagRemove change-id="1" command-tag-id="23"
+    equipment-id="324" />
+  <DataTagRemove change-id="2" data-tag-id="34"
+    equipment-id="324" />
+  <CommandTagAdd change-id="3" equipment-id="324">
+    <CommandTag id="3" name="tag">
+      <source-timeout>1000</source-timeout>
+      <source-retries>100</source-retries>
+      <HardwareAddress
+        class="cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl">
+        <opc-item-name>asd</opc-item-name>
+        <address-type>STRING</address-type>
+        <command-type>CLASSIC</command-type>
+        <command-pulse-length>5</command-pulse-length>
+        <namespace>2</namespace>
+      </HardwareAddress>
+    </CommandTag>
+  </CommandTagAdd>
+  <DataTagAdd change-id="23" equipment-id="324">
+    <DataTag control="false" id="10" name="HALLO">
+      <mode>0</mode>
+      <data-type>Boolean</data-type>
+      <DataTagAddress>
+        <time-to-live>0</time-to-live>
+        <value-deadband-type>0</value-deadband-type>
+        <value-deadband>0.0</value-deadband>
+        <time-deadband>0</time-deadband>
+        <priority>2</priority>
+        <guaranteed-delivery>false</guaranteed-delivery>
+        <HardwareAddress
+          class="cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl">
+          <opc-item-name>asd</opc-item-name>
+          <command-pulse-length>22</command-pulse-length>
+          <namespace>2</namespace>
+          <address-type>STRING</address-type>
+          <command-type>CLASSIC</command-type>
+        </HardwareAddress>
+      </DataTagAddress>
+    </DataTag>
+  </DataTagAdd>
+  <EquipmentConfigurationUpdate change-id="123423"
+    equipment-id="5000">
+    <alive-interval>60001</alive-interval>
+  </EquipmentConfigurationUpdate>
+  <ProcessConfigurationUpdate process-id="32943274"
+    change-id="32894823" />
+  <DataTagUpdate change-id="1" data-tag-id="5"
+    equipment-id="1">
+    <data-type>Integer</data-type>
+    <min-value data-type="Integer">2</min-value>
+    <max-value data-type="Integer">4</max-value>
+    <mode update-type="remove">0</mode>
+    <DataTagAddress>
+      <priority>7</priority>
+      <HardwareAddress
+        class="cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl">
+        <opc-item-name>asd</opc-item-name>
+        <address-type>STRING</address-type>
+        <command-type>CLASSIC</command-type>
+        <command-pulse-length>0</command-pulse-length>
+        <namespace>2</namespace>
+      </HardwareAddress>
+    </DataTagAddress>
+  </DataTagUpdate>
+  <CommandTagUpdate change-id="123" command-tag-id="10"
+    equipment-id="1">
+    <source-retries>10</source-retries>
+    <source-timeout update-type="remove">0</source-timeout>
+    <HardwareAddress
+      class="cern.c2mon.shared.common.datatag.address.impl.OPCHardwareAddressImpl">
+      <opc-item-name>asd</opc-item-name>
+      <address-type>STRING</address-type>
+      <command-type>CLASSIC</command-type>
+      <command-pulse-length>23</command-pulse-length>
+      <namespace>2</namespace>
+    </HardwareAddress>
+  </CommandTagUpdate>
+  <CommandTagRemove change-id="1" command-tag-id="23"
+    equipment-id="324" />
+  <DataTagRemove change-id="2" data-tag-id="34"
+    equipment-id="324" />
+</ConfigurationChangeEvent>

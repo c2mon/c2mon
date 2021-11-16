@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema
+	targetNamespace="http://timweb.cern.ch/schemas/c2mon-daq/Configuration"
+	xmlns="http://timweb.cern.ch/schemas/c2mon-daq/Configuration"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+	elementFormDefault="qualified">
+	<xs:include schemaLocation="http://timweb.cern.ch/schemas/c2mon-daq/C2monConfigTypes.xsd" />
+	<xs:element name="ProcessConfiguration">
+		<xs:complexType>
+			<xs:all minOccurs="1">
+				<xs:element minOccurs="1" name="jms-user" type="xs:string" />
+				<xs:element minOccurs="1" name="jms-password" type="xs:string" />
+				<xs:element minOccurs="1" name="jms-qcf-jndi-name" type="xs:string" />
+				<xs:element minOccurs="1" name="jms-queue-jndi-name" type="xs:string" />
+				<xs:element minOccurs="1" name="jms-listener-topic" type="xs:string" />
+				<xs:element minOccurs="1" name="alive-tag-id" type="xs:long" />
+				<xs:element minOccurs="1" name="alive-interval" type="xs:long" />
+				<xs:element minOccurs="1" name="max-message-size" type="xs:int" />
+				<xs:element minOccurs="1" name="max-message-delay" type="xs:int" />
+				<xs:element minOccurs="1" name="EquipmentUnits">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element minOccurs="1" maxOccurs="unbounded" name="EquipmentUnit" type="equipmentUnit"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:all>
+			<xs:attribute use="required" name="process-id" type="xs:long" />
+			<xs:attribute use="required" name="type" type="xs:string" />
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

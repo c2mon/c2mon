@@ -1,13 +1,16 @@
 package cern.c2mon.server.supervision.config;
 
-import cern.c2mon.server.cache.common.DefaultCacheImpl;
-import cern.c2mon.server.cache.config.CacheProperties;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Ehcache;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.ehcache.EhCacheFactoryBean;
+// import org.springframework.cache.ehcache.EhCacheFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import cern.c2mon.server.cache.common.DefaultCacheImpl;
+import cern.c2mon.server.cache.config.CacheProperties;
+import cern.c2mon.server.ehcache.CacheFactory;
+import cern.c2mon.server.ehcache.CacheManager;
+import cern.c2mon.server.ehcache.Ehcache;
 
 /**
  * @author Justin Lewis Salmon
@@ -15,48 +18,56 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SupervisionCacheConfig {
 
-  @Autowired
-  private CacheProperties properties;
+    @Autowired
+    private CacheProperties properties;
 
-  @Autowired
-  private CacheManager cacheManager;
+    @Autowired
+    private CacheManager cacheManager;
 
-  @Bean
-  public EhCacheFactoryBean processEventEhcache() {
-    EhCacheFactoryBean factory = new EhCacheFactoryBean();
-    factory.setCacheName("processEventCache");
-    factory.setCacheManager(cacheManager);
-    return factory;
-  }
+    // @Bean
+    // public EhCacheFactoryBean processEventEhcache() {
+    // EhCacheFactoryBean factory = new EhCacheFactoryBean();
+    // factory.setCacheName("processEventCache");
+    // factory.setCacheManager(cacheManager);
+    // return factory;
+    // }
 
-  @Bean
-  public DefaultCacheImpl processEventCache(Ehcache processEventEhcache) {
-    return new DefaultCacheImpl(processEventEhcache, properties);
-  }
+    @Bean
+    public CacheFactory processEventEhcache() {
+        CacheFactory factory = new CacheFactory();
+        factory.setCacheName("processEventCache");
+        factory.setCacheManager(cacheManager);
+        return factory;
+    }
 
-  @Bean
-  public EhCacheFactoryBean equipmentEventEhcache() {
-    EhCacheFactoryBean factory = new EhCacheFactoryBean();
-    factory.setCacheName("equipmentEventCache");
-    factory.setCacheManager(cacheManager);
-    return factory;
-  }
+    @Bean
+    public DefaultCacheImpl processEventCache(Ehcache processEventEhcache) {
+        return new DefaultCacheImpl(processEventEhcache, properties);
+    }
 
-  @Bean
-  public DefaultCacheImpl equipmentEventCache(Ehcache equipmentEventEhcache) {
-    return new DefaultCacheImpl(equipmentEventEhcache, properties);
-  }
+    @Bean
+    public CacheFactory equipmentEventEhcache() {
+        CacheFactory factory = new CacheFactory();
+        factory.setCacheName("equipmentEventCache");
+        factory.setCacheManager(cacheManager);
+        return factory;
+    }
 
-  @Bean
-  public EhCacheFactoryBean subEquipmentEventEhcache() {
-    EhCacheFactoryBean factory = new EhCacheFactoryBean();
-    factory.setCacheName("subEquipmentEventCache");
-    factory.setCacheManager(cacheManager);
-    return factory;
-  }
+    @Bean
+    public DefaultCacheImpl equipmentEventCache(Ehcache equipmentEventEhcache) {
+        return new DefaultCacheImpl(equipmentEventEhcache, properties);
+    }
 
-  @Bean
-  public DefaultCacheImpl subEquipmentEventCache(Ehcache subEquipmentEventEhcache) {
-    return new DefaultCacheImpl(subEquipmentEventEhcache, properties);
-  }
+    @Bean
+    public CacheFactory subEquipmentEventEhcache() {
+        CacheFactory factory = new CacheFactory();
+        factory.setCacheName("subEquipmentEventCache");
+        factory.setCacheManager(cacheManager);
+        return factory;
+    }
+
+    @Bean
+    public DefaultCacheImpl subEquipmentEventCache(Ehcache subEquipmentEventEhcache) {
+        return new DefaultCacheImpl(subEquipmentEventEhcache, properties);
+    }
 }

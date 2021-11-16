@@ -1,13 +1,14 @@
 package cern.c2mon.server.cache.config;
 
-import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
-import cern.c2mon.server.cache.loading.common.EhcacheLoaderImpl;
+import org.springframework.context.annotation.Bean;
+
 import cern.c2mon.server.cache.common.SimpleC2monCacheLoader;
 import cern.c2mon.server.cache.loading.AliveTimerDAO;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Ehcache;
-import org.springframework.cache.ehcache.EhCacheFactoryBean;
-import org.springframework.context.annotation.Bean;
+import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
+import cern.c2mon.server.cache.loading.common.EhcacheLoaderImpl;
+import cern.c2mon.server.ehcache.CacheFactory;
+import cern.c2mon.server.ehcache.CacheManager;
+import cern.c2mon.server.ehcache.Ehcache;
 
 /**
  * @author Justin Lewis Salmon
@@ -15,8 +16,8 @@ import org.springframework.context.annotation.Bean;
 public class AliveTimerCacheConfig {
 
   @Bean
-  public EhCacheFactoryBean aliveTimerEhcache(CacheManager cacheManager) {
-    EhCacheFactoryBean factory = new EhCacheFactoryBean();
+  public CacheFactory aliveTimerEhcache(CacheManager cacheManager) {
+    CacheFactory factory = new CacheFactory();
     factory.setCacheName("aliveTimerCache");
     factory.setCacheManager(cacheManager);
     return factory;

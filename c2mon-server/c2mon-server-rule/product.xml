@@ -9,7 +9,7 @@
                 <dep groupId="junit" product="junit" version="4.12" scope="test"/>
                 <dep groupId="org.easymock" product="easymock" version="3.4" scope="test"/>
                 <dep groupId="org.easymock" product="easymockclassextension" version="3.0" scope="test"/>
-                <dep groupId="net.sf.ehcache" product="ehcache-core" version="2.6.6" scope="test"/>
+<!--                  <dep groupId="net.sf.ehcache" product="ehcache-core" version="2.6.6" scope="test"/> -->
             </dependencies>
 
     </product>

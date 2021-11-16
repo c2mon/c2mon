@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema 
+	targetNamespace="http://timweb.cern.ch/schemas/c2mon-daq/Configuration"
+	xmlns="http://timweb.cern.ch/schemas/c2mon-daq/Configuration" 
+	xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:element name="ConfigurationChangeEventReport">
+    <xs:complexType>
+      <xs:choice>
+      	<xs:sequence>
+      		<xs:element name="ChangeReport" type="changeReport" maxOccurs="unbounded"/>
+      	</xs:sequence>
+        <xs:element name="error" type="xs:string"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="changeReport">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="1" name="error-message" type="xs:string"/>
+      <xs:element minOccurs="0" maxOccurs="1" name="info-message" type="xs:string"/>
+      <xs:element minOccurs="0" maxOccurs="1" name="warn-message" type="xs:string"/>
+    </xs:sequence>
+    <xs:attribute name="change-id" use="required" type="xs:int"/>
+    <xs:attribute name="state" use="required" type="changeState"/>
+  </xs:complexType>
+  <xs:simpleType name="changeState">
+  	<xs:restriction base="xs:string">
+  		<xs:enumeration value="SUCCESS"></xs:enumeration>
+  		<xs:enumeration value="FAIL"></xs:enumeration>
+  		<xs:enumeration value="REBOOT"></xs:enumeration>
+  	</xs:restriction>
+  </xs:simpleType>
+</xs:schema>

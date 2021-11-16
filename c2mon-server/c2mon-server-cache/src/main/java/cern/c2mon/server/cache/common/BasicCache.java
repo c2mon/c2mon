@@ -21,18 +21,14 @@ import java.util.List;
 
 import javax.annotation.PreDestroy;
 
-import lombok.extern.slf4j.Slf4j;
-import net.sf.ehcache.CacheException;
-import net.sf.ehcache.Ehcache;
-import net.sf.ehcache.Element;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.support.ApplicationObjectSupport;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
+import cern.c2mon.server.ehcache.CacheException;
+import cern.c2mon.server.ehcache.Ehcache;
+import cern.c2mon.server.ehcache.Element;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Provides all core functionalities that are required to manage a cache. This

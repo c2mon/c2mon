@@ -9,7 +9,7 @@
                 <dep groupId="mysql" product="mysql-connector-java" version="5.1.38"/>
                 <dep groupId="org.aspectj" product="aspectjweaver" version="1.8.8"/>
                 <dep groupId="org.projectlombok" product="lombok" version="1.18.12"/>
-                <dep groupId="net.sf.ehcache" product="ehcache-core" version="2.6.6"/>
+<!--                 <dep groupId="net.sf.ehcache" product="ehcache-core" version="2.6.6"/>  -->
                 <dep groupId="org.springframework" product="spring-jms" version="5.1.2.RELEASE"/>
                 <dep groupId="org.springframework.boot" product="spring-boot-starter-test" version="2.1.0.RELEASE" scope="test"/>
                 <dep groupId="junit" product="junit" version="4.12" scope="test"/>

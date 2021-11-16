@@ -25,11 +25,11 @@ import org.slf4j.LoggerFactory;
 import cern.c2mon.server.cache.loading.SimpleCacheLoaderDAO;
 import cern.c2mon.shared.common.Cacheable;
 
-import net.sf.ehcache.CacheException;
-import net.sf.ehcache.Ehcache;
-import net.sf.ehcache.Element;
-import net.sf.ehcache.Status;
-import net.sf.ehcache.loader.CacheLoader;
+import cern.c2mon.server.ehcache.CacheException;
+import cern.c2mon.server.ehcache.Ehcache;
+import cern.c2mon.server.ehcache.Element;
+import cern.c2mon.server.ehcache.Status;
+import cern.c2mon.server.ehcache.loader.CacheLoader;
 
 /**
  * Implementation of Ehcache CacheLoader interface. Each cache registers

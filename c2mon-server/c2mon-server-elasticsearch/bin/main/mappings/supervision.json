@@ -1,0 +1,47 @@
+{
+  "properties": {
+    "entity": {
+      "type": "keyword",
+      "index": true
+    },
+    "id": {
+      "type": "long"
+    },
+    "message": {
+      "type": "keyword",
+      "index": true
+    },
+    "name": {
+      "type": "keyword",
+      "index": true
+    },
+    "status": {
+      "type": "keyword",
+      "index": true
+    },
+    "timestamp": {
+      "type": "date",
+      "format": "epoch_millis"
+    },
+    "value": {
+      "type": "double"
+    },
+    "valueFloat": {
+      "type": "float"
+    },
+    "valueLong": {
+      "type": "long"
+    },
+    "valueBoolean": {
+      "type": "boolean"
+    },
+    "valueString": {
+      "type": "keyword",
+      "index": "true"
+    },
+    "valueObject": {
+      "type": "object",
+      "dynamic": "true"
+    }
+  }
+}

@@ -1,16 +1,17 @@
 package cern.c2mon.server.cache.config;
 
-import cern.c2mon.server.cache.loading.common.BatchCacheLoader;
-import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
-import cern.c2mon.server.cache.loading.common.EhcacheLoaderImpl;
-import cern.c2mon.server.cache.loading.AlarmLoaderDAO;
-import cern.c2mon.server.cache.loading.config.CacheLoadingProperties;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Ehcache;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.ehcache.EhCacheFactoryBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.env.Environment;
+
+import cern.c2mon.server.cache.loading.AlarmLoaderDAO;
+import cern.c2mon.server.cache.loading.common.BatchCacheLoader;
+import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
+import cern.c2mon.server.cache.loading.common.EhcacheLoaderImpl;
+import cern.c2mon.server.cache.loading.config.CacheLoadingProperties;
+import cern.c2mon.server.ehcache.CacheFactory;
+import cern.c2mon.server.ehcache.CacheManager;
+import cern.c2mon.server.ehcache.Ehcache;
 
 /**
  * @author Justin Lewis Salmon
@@ -21,8 +22,8 @@ public class AlarmCacheConfig {
   private CacheLoadingProperties properties;
 
   @Bean
-  public EhCacheFactoryBean alarmEhcache(CacheManager cacheManager) {
-    EhCacheFactoryBean factory = new EhCacheFactoryBean();
+  public CacheFactory alarmEhcache(CacheManager cacheManager) {
+    CacheFactory factory = new CacheFactory();
     factory.setCacheName("alarmCache");
     factory.setCacheManager(cacheManager);
     return factory;

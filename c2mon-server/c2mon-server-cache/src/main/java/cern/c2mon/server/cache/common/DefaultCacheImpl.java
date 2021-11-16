@@ -26,7 +26,7 @@ import javax.annotation.PostConstruct;
 
 import cern.c2mon.server.cache.config.CacheProperties;
 import lombok.extern.slf4j.Slf4j;
-import net.sf.ehcache.Ehcache;
+import cern.c2mon.server.ehcache.Ehcache;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -21,10 +21,10 @@ import java.net.InetAddress;
 import javax.annotation.PostConstruct;
 
 import lombok.extern.slf4j.Slf4j;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.cluster.CacheCluster;
-import net.sf.ehcache.cluster.ClusterNode;
-import net.sf.ehcache.cluster.ClusterScheme;
+import cern.c2mon.server.ehcache.CacheManager;
+import cern.c2mon.server.ehcache.cluster.CacheCluster;
+import cern.c2mon.server.ehcache.cluster.ClusterNode;
+import cern.c2mon.server.ehcache.cluster.ClusterScheme;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +46,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  */
 @Slf4j
-public class ClusterTopologyListener implements net.sf.ehcache.cluster.ClusterTopologyListener {
+public class ClusterTopologyListener implements cern.c2mon.server.ehcache.cluster.ClusterTopologyListener {
 
   private final static Logger SMS_LOGGER = LoggerFactory.getLogger("AdminSmsLogger");
 

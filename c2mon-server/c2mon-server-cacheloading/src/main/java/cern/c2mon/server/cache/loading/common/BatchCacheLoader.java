@@ -18,16 +18,18 @@ package cern.c2mon.server.cache.loading.common;
 
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.concurrent.*;
-
-import cern.c2mon.server.cache.loading.BatchCacheLoaderDAO;
-import cern.c2mon.shared.common.Cacheable;
-import lombok.extern.slf4j.Slf4j;
-import net.sf.ehcache.Ehcache;
-import net.sf.ehcache.Element;
+import java.util.concurrent.Callable;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+
+import cern.c2mon.server.cache.loading.BatchCacheLoaderDAO;
+import cern.c2mon.server.ehcache.Ehcache;
+import cern.c2mon.server.ehcache.Element;
+import cern.c2mon.shared.common.Cacheable;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Cache loader implementation that loads the cache on multiple threads. The cache

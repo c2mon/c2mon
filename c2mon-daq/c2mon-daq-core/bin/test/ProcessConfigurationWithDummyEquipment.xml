@@ -1,0 +1,22 @@
+<ProcessConfiguration process-id="4092" type="initialise">
+  <alive-tag-id>100730</alive-tag-id>
+  <alive-interval>60000</alive-interval>
+  <max-message-size>100</max-message-size>
+  <max-message-delay>1000</max-message-delay>
+  <EquipmentUnits>
+	<EquipmentUnit id="1" name="E_TEST_DUMMY">
+	  <handler-class-name>cern.c2mon.daq.common.conf.DummyMessageHandler</handler-class-name>
+	  <commfault-tag-id>47014</commfault-tag-id>
+	  <commfault-tag-value>false</commfault-tag-value>
+	  <alive-tag-id>47321</alive-tag-id>
+	  <alive-interval>120000</alive-interval>
+	  <address></address>
+	  <SubEquipmentUnits>
+	  </SubEquipmentUnits>
+	  <DataTags>
+	  </DataTags>
+	  <CommandTags>
+	  </CommandTags>
+	</EquipmentUnit> 
+</EquipmentUnits>
+</ProcessConfiguration>

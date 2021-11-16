@@ -18,7 +18,6 @@ package cern.c2mon.server.elasticsearch.junit;
 
 import java.sql.SQLException;
 
-import net.sf.ehcache.CacheManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,6 +33,7 @@ import cern.c2mon.server.cache.equipment.EquipmentCacheImpl;
 import cern.c2mon.server.cache.process.ProcessCacheImpl;
 import cern.c2mon.server.cache.rule.RuleTagCacheImpl;
 import cern.c2mon.server.cache.subequipment.SubEquipmentCacheImpl;
+import cern.c2mon.server.ehcache.CacheManager;
 import cern.c2mon.server.test.DatabasePopulationRule;
 
 /**
