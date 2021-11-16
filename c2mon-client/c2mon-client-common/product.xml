@@ -1,0 +1,15 @@
+<products>
+    <product name="c2mon-client-common" directory="c2mon/client/c2mon-client-common">
+        <desc>Classes shared across the C2MON client API.</desc>
+        <dependencies>
+
+            <!-- 3rd party dependencies -->
+            <dep groupId="org.springframework.boot" product="spring-boot-configuration-processor" version="2.1.0.RELEASE"/>
+            <dep groupId="org.springframework.boot" product="spring-boot-autoconfigure" version="2.1.0.RELEASE"/>
+            <dep groupId="org.projectlombok" product="lombok" version="1.18.12"/>
+
+            <!-- Test dependencies -->
+            <dep groupId="junit" product="junit" scope="test"/>
+        </dependencies>
+    </product>
+</products>

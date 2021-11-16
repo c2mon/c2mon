@@ -1,0 +1,18 @@
+<products>
+    <product name="c2mon-server-cache" directory="c2mon/server/c2mon-server-cache">
+        <desc>
+            C2MON server cache module        </desc>
+            <dependencies>
+                <dep groupId="org.projectlombok" product="lombok" version="1.18.12"/>
+                <dep groupId="org.springframework" product="spring-tx" version="5.1.2.RELEASE"/>
+                <dep groupId="org.springframework" product="spring-context-support" version="5.1.2.RELEASE"/>
+                <dep groupId="net.sf.ehcache" product="ehcache-core" version="2.6.6"/>
+                <dep groupId="org.springframework" product="spring-test" version="5.1.2.RELEASE" scope="test"/>
+                <dep groupId="junit" product="junit" version="4.12" scope="test"/>
+                <dep groupId="org.easymock" product="easymock" version="3.4" scope="test"/>
+                <dep groupId="org.easymock" product="easymockclassextension" version="3.0" scope="test"/>
+                <dep groupId="org.awaitility" product="awaitility" version="3.1.5" scope="test"/>
+            </dependencies>
+
+    </product>
+</products>

@@ -1,0 +1,11 @@
+<products>
+    <product name="c2mon-server-benchmark" directory="c2mon/server/c2mon-server-benchmark" >
+        <desc>C2MON server module used to measure performance</desc>
+            <dependencies>
+                <dep groupId="org.springframework" product="spring-tx" version="5.1.2.RELEASE"/>
+                <dep groupId="org.projectlombok" product="lombok" version="1.18.12"/>
+                <dep groupId="junit" product="junit" version="4.12" scope="test"/>
+            </dependencies>
+
+    </product>
+</products>

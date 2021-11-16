@@ -2,10 +2,12 @@ package cern.c2mon.server.common.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Primary;
 
 /**
  * @author Justin Lewis Salmon
  */
+@Primary
 @Data
 @ConfigurationProperties(prefix = "c2mon.server")
 public class ServerProperties {

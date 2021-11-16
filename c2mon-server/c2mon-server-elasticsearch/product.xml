@@ -1,0 +1,31 @@
+<products>
+    <product name="c2mon-server-elasticsearch" directory="c2mon/server/c2mon-server-elasticsearch">
+        <desc></desc>
+            <dependencies>
+                <dep groupId="org.elasticsearch" product="elasticsearch" version="7.12.0"/>
+                <dep groupId="org.elasticsearch.client" product="transport" version="7.12.0"/>
+                <dep groupId="org.elasticsearch.client" product="elasticsearch-rest-client" version="7.12.0"/>
+                <dep groupId="org.elasticsearch.client" product="elasticsearch-rest-high-level-client" version="7.12.0"/>
+                <dep groupId="org.apache.httpcomponents" product="httpcore-nio" version="4.4.12"/>
+                <dep groupId="org.apache.httpcomponents" product="httpcore" version="4.4.12"/>
+                <dep groupId="org.apache.logging.log4j" product="log4j-core" version="2.9.0"/>
+                <dep groupId="org.slf4j" product="slf4j-api" version="1.7.30"/>
+                <dep groupId="ch.qos.logback" product="logback-classic" version="1.2.3"/>
+                <dep groupId="org.springframework" product="spring-context" version="5.1.2.RELEASE"/>
+                <dep groupId="org.springframework" product="spring-beans" version="5.1.2.RELEASE"/>
+                <dep groupId="org.springframework" product="spring-test" version="5.1.2.RELEASE" scope="test"/>
+                <dep groupId="org.projectlombok" product="lombok" version="1.18.12"/>
+                <dep groupId="com.google.guava" product="guava" version="20.0"/>
+                <dep groupId="net.sf.ehcache" product="ehcache-core" version="2.6.6" scope="test"/>
+                <dep groupId="junit" product="junit" version="4.12" scope="test"/>
+                <dep groupId="org.awaitility" product="awaitility" version="3.1.5" scope="test"/>
+                <dep groupId="org.hamcrest" product="hamcrest-library" version="1.3" scope="test"/>
+                <dep groupId="org.mockito" product="mockito-all" version="1.10.19" scope="test"/>
+                <dep groupId="org.apache.httpcomponents" product="httpclient" version="4.5.10" />
+                <dep groupId="org.testcontainers" product="testcontainers" version="1.15.2" scope="test"/>
+                <dep groupId="org.testcontainers" product="junit-jupiter" version="1.15.2" scope="test"/>
+                <dep groupId="org.testcontainers" product="elasticsearch" version="1.15.2" scope="test"/>
+            </dependencies>
+
+    </product>
+</products>

@@ -1,0 +1,16 @@
+<products>
+    <product name="c2mon-server-cacheloading" directory="c2mon/server/c2mon-server-cacheloading">
+        <desc></desc>
+            <dependencies>
+                <dep groupId="org.springframework" product="spring-tx" version="5.1.2.RELEASE"/>
+                <dep groupId="org.springframework" product="spring-test" version="5.1.2.RELEASE" scope="test"/>
+                <dep groupId="net.sf.ehcache" product="ehcache-core" version="2.6.6"/>
+                <dep groupId="org.mybatis" product="mybatis" version="3.5.6"/>
+                <dep groupId="org.projectlombok" product="lombok" version="1.18.12"/>
+                <dep groupId="junit" product="junit" version="4.12" scope="test"/>
+                <dep groupId="org.easymock" product="easymock" version="3.4" scope="test"/>
+                <dep groupId="mysql" product="mysql-connector-java" version="6.0.6"/>
+            </dependencies>
+
+    </product>
+</products>

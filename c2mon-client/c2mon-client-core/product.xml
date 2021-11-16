@@ -1,0 +1,42 @@
+<products>
+    <product name="c2mon-client-core" directory="c2mon/client/c2mon-client-core">
+        <desc>The C2MON Client API which handles the communication to the C2MON server.
+        </desc>
+        <dependencies>
+            <!-- 3rd party dependencies -->
+            <dep groupId="org.springframework" product="spring-jms" version="5.1.2.RELEASE"/>
+            <dep groupId="org.apache.activemq" product="activemq-client" version="5.15.2"/>
+            <dep groupId="org.apache.activemq" product="activemq-http" version="5.15.2" />
+            <dep groupId="org.eclipse.jetty" product="jetty-server" version="9.2.14.v20151106" />
+            <dep groupId="org.apache.httpcomponents" product="httpclient" version="4.5.10" />
+
+            <!-- 3rd party dependencies -->
+            <dep groupId="org.springframework" product="spring-context" version="5.1.2.RELEASE"/>
+            <dep groupId="org.springframework.boot" product="spring-boot-configuration-processor" version="2.1.0.RELEASE"/>
+            <dep groupId="org.springframework.boot" product="spring-boot-autoconfigure" version="2.1.0.RELEASE"/>
+            <dep groupId="io.searchbox" product="jest" version="2.0.3"/>
+            <dep groupId="org.projectlombok" product="lombok" version="1.18.12"/>
+
+            <!-- Test dependencies -->
+            <dep groupId="junit" product="junit" scope="test"/>
+            <dep groupId="org.junit.platform" product="junit-platform-launcher" version="1.6.0" scope="test"/>
+            <dep groupId="org.junit.jupiter" product="junit-jupiter" version="5.6.0" scope="test"/>
+            <dep groupId="org.junit.jupiter" product="junit-jupiter-engine" version="5.6.0" scope="test"/>
+            <dep groupId="org.junit.vintage" product="junit-vintage-engine" version="5.6.0" scope="test"/>
+            <dep groupId="org.easymock" product="easymock" version="3.4" scope="test"/>
+            <dep groupId="org.springframework" product="spring-test" version="5.1.2.RELEASE" scope="test"/>
+            <dep groupId="org.springframework.boot" product="spring-boot-starter-test" version="2.1.0.RELEASE" scope="test"/>
+            <dep groupId="org.apache.activemq" product="activemq-broker" version="5.15.2" />
+            <dep groupId="com.fasterxml.jackson.core" product="jackson-databind" version="2.9.2"/>
+            <dep groupId="org.powermock" product="powermock-api-easymock" version="1.6.3" scope="test"/>
+            <dep groupId="org.powermock" product="powermock-core" version="1.6.3" scope="test"/>
+            <dep groupId="org.powermock" product="powermock-module-junit4" version="1.6.3" scope="test"/>
+            <dep groupId="org.awaitility" product="awaitility" version="" scope="test"/>
+            <dep groupId="org.testcontainers" product="testcontainers" version="1.15.2" scope="test"/>
+            <dep groupId="org.testcontainers" product="junit-jupiter" version="1.15.2" scope="test"/>
+            <dep groupId="org.testcontainers" product="elasticsearch" version="1.15.2" scope="test"/>
+
+            
+        </dependencies>
+    </product>
+</products>

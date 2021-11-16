@@ -1,0 +1,9 @@
+<products>
+    <product name="c2mon-daq-parent" directory="c2mon/daq/c2mon-daq-parent">
+
+        <dependencies>
+            <dep groupId="org.springframework.boot" product="spring-boot-starter-logging" version="2.1.0.RELEASE"/>
+            <dep groupId="javax.jms" product="javax.jms-api" version="2.0.1"/>
+        </dependencies>
+    </product>
+</products>

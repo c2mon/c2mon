@@ -1,0 +1,37 @@
+<products>
+    <product name="c2mon-daq-core" directory="c2mon/daq/c2mon-daq-core">
+        <dependencies>
+
+            <!-- 3rd party dependencies -->
+            <dep groupId="org.springframework.boot" product="spring-boot-starter-logging" version="2.1.0.RELEASE"/>
+            <dep groupId="org.slf4j" product="slf4j-api" version="1.7.30"/>
+            <dep groupId="xerces" product="xercesImpl" version="2.11.0"/>
+            <dep groupId="org.springframework.boot" product="spring-boot-starter" version="2.1.0.RELEASE"/>
+            <dep groupId="org.springframework.boot" product="spring-boot-configuration-processor" version="2.1.0.RELEASE"/>
+            <dep groupId="commons-cli" product="commons-cli" version="1.3.1"/>
+            <dep groupId="org.apache.activemq" product="activemq-client" version="5.15.2"/>
+            <dep groupId="org.springframework" product="spring-jms" version="5.1.2.RELEASE"/>
+            <dep groupId="javax.jms" product="javax.jms-api" version="2.0.1"/>
+            <dep groupId="com.fasterxml.jackson.core" product="jackson-databind" version="2.9.2"/>
+
+            <!-- Runtime dependencies required to support HTTP via ActiveMQ -->
+            <dep groupId="org.apache.activemq" product="activemq-http" version="5.15.2" />
+            <dep groupId="org.eclipse.jetty" product="jetty-server" version="9.2.14.v20151106" />
+            <dep groupId="org.apache.httpcomponents" product="httpclient" version="4.5.10" />
+
+            <dep groupId="org.projectlombok" product="lombok" version="1.18.12"/>
+
+            <!-- Test dependencies -->
+            <dep groupId="junit" product="junit" version="4.12" scope = "test"/>
+            <dep groupId="org.easymock" product="easymock" version="3.4" scope = "test"/>
+            <dep groupId="org.easymock" product="easymockclassextension" version="3.0" scope = "test"/>
+            <dep groupId="org.springframework" product="spring-test" version="5.1.2.RELEASE" scope = "test"/>
+            <dep groupId="org.apache.activemq" product="activemq-broker" version="5.15.2" scope = "test"/>
+        </dependencies>
+
+        <exclusions>
+            <dep groupId="org.slf4j" artifactId="jul-to-slf4j" />
+            <dep groupId="org.apache.logging.log4j" artifactId="log4j-to-slf4j" />
+        </exclusions>
+    </product>
+</products>

@@ -1,0 +1,30 @@
+<products>
+    <product name="c2mon-shared-client" directory="c2mon/shared/c2mon-shared-client">
+        <desc>Classes shared across the server and client tiers of the C2MON system.</desc>
+        <dependencies>
+            <dep groupId="org.springframework.boot" product="spring-boot-starter-logging" version="2.1.0.RELEASE"/>
+
+            <!-- 3rd party dependencies -->
+            <dep groupId="org.springframework" product="spring-context" version="5.1.2.RELEASE"/>
+            <dep groupId="org.simpleframework" product="simple-xml" version="2.6.1"/>
+            <dep groupId="com.google.code.gson" product="gson" version="2.8.4"/>
+            <dep groupId="org.mybatis" product="mybatis" version="3.5.6" scope="provided"/>
+            <dep groupId="com.fasterxml.jackson.core" product="jackson-core" version="2.9.2"/>
+            <dep groupId="com.fasterxml.jackson.core" product="jackson-databind" version="2.9.2"/>
+            <dep groupId="javax.annotation" product="javax.annotation-api" version="1.3.2"/>
+            <dep groupId="org.projectlombok" product="lombok" version="1.18.12"/>
+
+            <!-- Bean Validation provider -->
+            <dep groupId="com.fasterxml.jackson.core" product="jackson-annotations" version="2.9.2"/>
+
+            <!-- Test dependencies -->
+            <dep groupId="junit" product="junit" scope="test"/>
+            <dep groupId="org.easymock" product="easymock" scope="test"/>
+        </dependencies>
+
+        <exclusions>
+            <dep groupId="org.slf4j" artifactId="jul-to-slf4j" />
+            <dep groupId="org.apache.logging.log4j" artifactId="log4j-to-slf4j" />
+        </exclusions>
+    </product>
+</products>

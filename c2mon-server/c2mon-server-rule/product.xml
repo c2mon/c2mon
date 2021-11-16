@@ -1,0 +1,16 @@
+<products>
+    <product name="c2mon-server-rule" directory="c2mon/server/c2mon-server-rule">
+        <desc>
+            C2MON server module managing rule evaluation (cache listener module)</desc>
+            <dependencies>
+                <dep groupId="org.springframework" product="spring-context" version="5.1.2.RELEASE"/>
+                <dep groupId="org.projectlombok" product="lombok" version="1.18.12"/>
+                <dep groupId="org.springframework" product="spring-test" version="5.1.2.RELEASE" scope="test"/>
+                <dep groupId="junit" product="junit" version="4.12" scope="test"/>
+                <dep groupId="org.easymock" product="easymock" version="3.4" scope="test"/>
+                <dep groupId="org.easymock" product="easymockclassextension" version="3.0" scope="test"/>
+                <dep groupId="net.sf.ehcache" product="ehcache-core" version="2.6.6" scope="test"/>
+            </dependencies>
+
+    </product>
+</products>

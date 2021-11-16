@@ -1,0 +1,6 @@
+<products>
+    <product name="c2mon-daq-distribution-parent" directory="c2mon/daq/c2mon-daq-distribution-parent">
+        <dependencies>
+        </dependencies>
+    </product>
+</products>

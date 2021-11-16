@@ -1,0 +1,27 @@
+<products>
+    <product name="c2mon-shared-common" directory="c2mon/shared/c2mon-shared-common">
+        <desc>Classes shared across all 3 tiers of the C2MON system: DAQ, server and client.</desc>
+        <dependencies>
+            <dep groupId="org.springframework.boot" product="spring-boot-starter-logging" version="2.1.0.RELEASE"/>
+
+            <!-- 3rd party dependencies -->
+            <dep groupId="org.slf4j" product="slf4j-api" version="1.7.30"/>
+            <dep groupId="commons-lang" product="commons-lang" version="2.5"/>
+            <dep groupId="org.simpleframework" product="simple-xml" version="2.6.1"/>
+            <dep groupId="com.fasterxml.jackson.core" product="jackson-core" version="2.9.2"/>
+            <dep groupId="com.fasterxml.jackson.core" product="jackson-databind" version="2.9.2"/>
+            <dep groupId="com.fasterxml.jackson.core" product="jackson-annotations" version="2.9.2"/>
+            <dep groupId="org.projectlombok" product="lombok" version="1.18.12"/>
+            <dep groupId="javax.xml.bind" product="jaxb-api" version="2.3.0"/>
+            <dep groupId="com.google.code.gson" product="gson" version="2.8.4" scope="test"/>
+
+            <!-- Test dependencies -->
+            <dep groupId="junit" product="junit" scope="test"/>
+        </dependencies>
+
+        <exclusions>
+            <dep groupId="org.slf4j" artifactId="jul-to-slf4j" />
+            <dep groupId="org.apache.logging.log4j" artifactId="log4j-to-slf4j" />
+        </exclusions>
+    </product>
+</products>

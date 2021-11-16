@@ -1,0 +1,11 @@
+<products>
+    <product name="c2mon-daq-test" directory="c2mon/daq/c2mon-daq-test">
+        <dependencies>
+
+            <!-- Test dependencies -->
+            <dep groupId="junit" product="junit" version="4.12"/>
+            <dep groupId="org.easymock" product="easymock" version="3.4" />
+            <dep groupId="org.easymock" product="easymockclassextension" version="3.0"/>
+        </dependencies>
+    </product>
+</products>

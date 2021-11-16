@@ -1,0 +1,55 @@
+<products>
+    <product name="c2mon-server-lifecycle" directory="c2mon/server/c2mon-server-lifecycle">
+        <desc>C2MON module managing the lifecycle of the server</desc>
+            <dependencies>
+                <dep groupId="org.springframework" product="spring-context" version="5.1.2.RELEASE"/>
+                <dep groupId="org.springframework" product="spring-beans" version="5.1.2.RELEASE"/>
+                <dep groupId="org.springframework.boot" product="spring-boot-starter" version="2.1.0.RELEASE"/>
+                <dep groupId="org.hsqldb" product="hsqldb" version="2.3.2"/>
+                <dep groupId="mysql" product="mysql-connector-java" version="5.1.38"/>
+                <dep groupId="org.aspectj" product="aspectjweaver" version="1.8.8"/>
+                <dep groupId="org.projectlombok" product="lombok" version="1.18.12"/>
+                <dep groupId="net.sf.ehcache" product="ehcache-core" version="2.6.6"/>
+                <dep groupId="org.springframework" product="spring-jms" version="5.1.2.RELEASE"/>
+                <dep groupId="org.springframework.boot" product="spring-boot-starter-test" version="2.1.0.RELEASE" scope="test"/>
+                <dep groupId="junit" product="junit" version="4.12" scope="test"/>
+
+                <!-- Runtime dependencies required to support HTTP via ActiveMQ -->
+                <dep groupId="org.apache.activemq" product="activemq-http" version="5.15.2"/>
+                <dep groupId="org.eclipse.jetty" product="jetty-server" version="9.2.14.v20151106"/>
+                <dep groupId="org.apache.httpcomponents" product="httpclient" version="4.5.10"/>
+
+                <dep product="ojdbc8" groupId="com.oracle" version="PRO" />
+            </dependencies>
+
+        <application runtimeJvm="jdk1.8" name="c2mon-server-cbng">
+            <main-class name="cern.c2mon.server.ServerStartup"/>
+
+            <property name="logging.config" value="conf/logback.xml"/>
+            <property name="logging.path" value="log"/>
+
+            <property name="c2mon.server.properties" value="conf/c2mon-server.properties"/>
+
+            <property name="oracle.net.tns_admin" value="/etc/"/>
+
+            <initial-heap-size>2G</initial-heap-size>
+            <max-heap-size>2G</max-heap-size>
+
+            <java-vm-args>-XX:NewRatio=3 -XX:+UseParallelGC -XX:MaxGCPauseMillis=100</java-vm-args>
+
+            <deployment installLocation="/opt/laser-lw2/c2mon-server-cbng">
+                <directory name="tmp" mask="750"/>
+                <directory name="reports" mask="750"/>
+                <directory name="log" mask="750"/>
+                <directory name="conf" mask="644">
+                    <file name="logback.xml" source="../distribution/tar/conf/logback.xml"/>
+                    <file name="c2mon-server.properties" source="/user/copera/laser-lw/.keystore/c2mon-server.properties"/>
+                </directory>
+                <backupPolicy keepBackups="5">
+                    <preserve name="log" type="dir"/>
+                    <preserve name="conf" type="dir"/>
+                </backupPolicy>
+            </deployment>
+        </application>
+    </product>
+</products>

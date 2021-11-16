@@ -1,0 +1,16 @@
+<products>
+    <product name="c2mon-server-client" directory="c2mon/server/c2mon-server-client">
+        <desc>
+            The C2MON server Client module handles the communication to the client layer API.</desc>
+            <dependencies>
+                <dep groupId="org.projectlombok" product="lombok" version="1.18.12" scope="provided"/>
+                <dep groupId="org.springframework" product="spring-context" version="5.1.2.RELEASE"/>
+                <dep groupId="org.apache.activemq" product="activemq-client" version="5.15.2"/>
+                <dep groupId="net.sf.ehcache" product="ehcache-core" version="2.6.6"/>
+                <dep groupId="org.springframework" product="spring-test" version="5.1.2.RELEASE" scope="test"/>
+                <dep groupId="junit" product="junit" version="4.12" scope="test"/>
+                <dep groupId="org.easymock" product="easymock" version="3.4" scope="test"/>
+            </dependencies>
+
+    </product>
+</products>

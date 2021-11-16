@@ -1,0 +1,20 @@
+<products>
+    <product name="c2mon-client-config-shell" directory="c2mon/client/c2mon-client-config-shell">
+        <desc>The C2MON Client Config Shell can be used as an autonomous command line to access methods to access the
+            C2MON Service Gateway via JMX and HTTP.
+        </desc>
+        <dependencies>
+
+            <!-- 3rd party dependencies -->
+            <dep groupId="org.springframework.boot" product="spring-boot-autoconfigure" version="2.1.0.RELEASE"/>
+            <dep groupId="org.springframework.boot" product="spring-boot-starter" version="2.1.0.RELEASE"/>
+            <dep groupId="org.springframework.boot" product="spring-boot-starter-actuator" version="2.1.0.RELEASE"/>
+            <dep groupId="org.springframework.boot" product="spring-boot-starter-web" version="2.1.0.RELEASE"/>
+            <dep groupId="org.springframework.shell" product="spring-shell-starter" version="2.0.1.RELEASE"/>
+            <dep groupId="io.github.anand1st" product="sshd-shell-spring-boot-starter" version="4.1"/>
+            <dep groupId="org.jolokia" product="jolokia-spring" version="1.1.0"/>
+            <dep groupId="org.projectlombok" product="lombok" version="1.18.12"/>
+
+        </dependencies>
+    </product>
+</products>

@@ -1,0 +1,29 @@
+<products>
+    <product name="c2mon-server-cachedbaccess" directory="c2mon/server/c2mon-server-cachedbaccess">
+        <desc>
+            The C2MON server core module managing all DB access for the cache.        </desc>
+            <dependencies>
+                <dep groupId="org.springframework" product="spring-core" version="5.1.2.RELEASE"/>
+                <dep groupId="org.springframework" product="spring-tx" version="5.1.2.RELEASE"/>
+                <dep groupId="org.springframework" product="spring-test" version="5.1.2.RELEASE" scope="test"/>
+                <dep groupId="org.springframework" product="spring-jms" version="5.1.2.RELEASE"/>
+                <dep groupId="org.springframework.boot" product="spring-boot-starter-data-jpa" version="2.1.0.RELEASE"/>
+                <dep groupId="com.google.guava" product="guava" version="20.0"/>
+                <dep groupId="cglib" product="cglib" version="2.2.2"/>
+                <dep groupId="org.mybatis" product="mybatis" version="3.5.6"/>
+                <dep groupId="org.mybatis" product="mybatis-spring" version="2.0.6"/>
+                <dep groupId="commons-dbcp" product="commons-dbcp" version="1.4"/>
+                <dep groupId="org.projectlombok" product="lombok" version="1.18.12"/>
+                <dep groupId="junit" product="junit" version="4.12" scope="test"/>
+                <dep groupId="org.hsqldb" product="hsqldb" version="2.3.2"/>
+                <dep groupId="org.easymock" product="easymock" version="3.4" scope="test"/>
+                <dep groupId="org.springframework.boot" product="spring-boot-starter-test" version="2.1.0.RELEASE" scope="test"/>
+            </dependencies>
+
+            <exclusions>
+                <dep groupId="org.slf4j" artifactId="jul-to-slf4j" />
+                <dep groupId="org.apache.logging.log4j" artifactId="log4j-to-slf4j" />
+            </exclusions>
+
+    </product>
+</products>
