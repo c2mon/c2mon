@@ -38,11 +38,11 @@ import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.control.ControlTagCacheObject;
 import cern.c2mon.server.common.process.Process;
 import cern.c2mon.shared.common.ConfigurationException;
-import net.sf.ehcache.Ehcache;
-import net.sf.ehcache.loader.CacheLoader;
-import net.sf.ehcache.search.Attribute;
-import net.sf.ehcache.search.Query;
-import net.sf.ehcache.search.Results;
+import cern.c2mon.server.ehcache.Ehcache;
+import cern.c2mon.server.ehcache.loader.CacheLoader;
+import cern.c2mon.server.ehcache.search.Attribute;
+import cern.c2mon.server.ehcache.search.Query;
+import cern.c2mon.server.ehcache.search.Results;
 
 /**
  * Implementation of the Process cache.

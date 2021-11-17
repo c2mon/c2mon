@@ -21,7 +21,7 @@ import java.io.Serializable;
 import javax.annotation.PostConstruct;
 
 import cern.c2mon.server.cache.config.CacheProperties;
-import net.sf.ehcache.Ehcache;
+import cern.c2mon.server.ehcache.Ehcache;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;

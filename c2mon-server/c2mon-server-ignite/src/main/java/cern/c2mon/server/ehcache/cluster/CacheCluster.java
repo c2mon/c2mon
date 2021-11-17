@@ -4,8 +4,6 @@
 
 package cern.c2mon.server.ehcache.cluster;
 
-import cern.c2mon.server.lifecycle.ClusterTopologyListener;
-
 public interface CacheCluster {
 
     /**

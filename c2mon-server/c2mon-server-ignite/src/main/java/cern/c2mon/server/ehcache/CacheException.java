@@ -4,7 +4,7 @@
 
 package cern.c2mon.server.ehcache;
 
-public class CacheException extends Exception {
+public class CacheException extends RuntimeException {
     //
 
 }

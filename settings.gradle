@@ -25,6 +25,7 @@ include '/c2mon-server/c2mon-server-history'
 include '/c2mon-server/c2mon-server-lifecycle'
 include '/c2mon-server/c2mon-server-rule'
 include '/c2mon-server/c2mon-server-supervision'
+include '/c2mon-server/c2mon-server-ignite'
 include '/c2mon-server/c2mon-server-test'
 
 include '/c2mon-shared/c2mon-shared-client'

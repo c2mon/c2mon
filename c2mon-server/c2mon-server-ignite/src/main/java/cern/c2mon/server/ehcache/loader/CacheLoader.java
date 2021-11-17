@@ -8,6 +8,9 @@ import cern.c2mon.server.ehcache.CacheException;
 import cern.c2mon.server.ehcache.Ehcache;
 import cern.c2mon.server.ehcache.Status;
 
+import java.util.Collection;
+import java.util.Map;
+
 public interface CacheLoader {
 
     /**
@@ -36,5 +39,13 @@ public interface CacheLoader {
      * 
      */
     void init();
+
+    Object load(Object key) throws CacheException;
+
+    Object load(Object key, Object argument);
+
+    Map loadAll(Collection keys, Object argument);
+
+    Map loadAll(Collection keys);
 
 }

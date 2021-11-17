@@ -17,9 +17,9 @@
 package cern.c2mon.server.cache.datatag;
 
 import cern.c2mon.server.cache.config.CacheProperties;
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.event.RegisteredEventListeners;
-import net.sf.ehcache.loader.CacheLoader;
+import cern.c2mon.server.ehcache.Cache;
+import cern.c2mon.server.ehcache.event.RegisteredEventListeners;
+import cern.c2mon.server.ehcache.loader.CacheLoader;
 
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;

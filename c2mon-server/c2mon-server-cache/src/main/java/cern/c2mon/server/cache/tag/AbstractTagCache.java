@@ -34,12 +34,12 @@ import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
 import cern.c2mon.server.cache.loading.SimpleCacheLoaderDAO;
 import cern.c2mon.server.common.tag.AbstractTagCacheObject;
 import cern.c2mon.server.common.tag.Tag;
-import net.sf.ehcache.Ehcache;
-import net.sf.ehcache.loader.CacheLoader;
-import net.sf.ehcache.search.Attribute;
-import net.sf.ehcache.search.Query;
-import net.sf.ehcache.search.Result;
-import net.sf.ehcache.search.Results;
+import cern.c2mon.server.ehcache.Ehcache;
+import cern.c2mon.server.ehcache.loader.CacheLoader;
+import cern.c2mon.server.ehcache.search.Attribute;
+import cern.c2mon.server.ehcache.search.Query;
+import cern.c2mon.server.ehcache.search.Result;
+import cern.c2mon.server.ehcache.search.Results;
 
 /**
  * Common methods used by all tag caches (data, control and rule tags).

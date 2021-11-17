@@ -1,0 +1,8 @@
+<products>
+    <product name="c2mon-server-ignite" directory="c2mon/server/c2mon-server-ignite">
+        <desc></desc>
+            <dependencies>
+            </dependencies>
+
+    </product>
+</products>

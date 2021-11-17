@@ -4,6 +4,11 @@
 
 package cern.c2mon.server.ehcache;
 
+import cern.c2mon.server.ehcache.event.RegisteredEventListeners;
+import cern.c2mon.server.ehcache.loader.CacheLoader;
+import cern.c2mon.server.ehcache.search.Attribute;
+import cern.c2mon.server.ehcache.search.Query;
+
 import java.util.List;
 
 public interface Ehcache<K> {
@@ -91,5 +96,17 @@ public interface Ehcache<K> {
      * @param element
      */
     void putQuiet(Element element);
+
+    <T> Attribute<T> getSearchAttribute(String attributeName) throws CacheException;
+
+    Query createQuery();
+
+    void registerCacheLoader(CacheLoader cacheLoader);
+
+    RegisteredEventListeners getCacheEventNotificationService();
+
+    void removeAll() throws IllegalStateException, CacheException;
+
+    void setNodeBulkLoadEnabled(boolean enabledBulkLoad) throws UnsupportedOperationException;
 
 }

@@ -21,8 +21,8 @@ import java.util.HashSet;
 import javax.annotation.PostConstruct;
 
 import lombok.extern.slf4j.Slf4j;
-import net.sf.ehcache.Ehcache;
-import net.sf.ehcache.loader.CacheLoader;
+import cern.c2mon.server.ehcache.Ehcache;
+import cern.c2mon.server.ehcache.loader.CacheLoader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jmx.export.annotation.ManagedResource;

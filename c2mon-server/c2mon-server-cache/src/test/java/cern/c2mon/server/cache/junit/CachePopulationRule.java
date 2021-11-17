@@ -13,7 +13,7 @@ import cern.c2mon.server.cache.process.ProcessCacheImpl;
 import cern.c2mon.server.cache.rule.RuleTagCacheImpl;
 import cern.c2mon.server.cache.subequipment.SubEquipmentCacheImpl;
 import cern.c2mon.server.test.DatabasePopulationRule;
-import net.sf.ehcache.CacheManager;
+import cern.c2mon.server.ehcache.CacheManager;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.SQLException;

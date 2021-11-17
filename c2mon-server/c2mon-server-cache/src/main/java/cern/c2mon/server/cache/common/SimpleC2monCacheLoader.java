@@ -29,8 +29,8 @@ import cern.c2mon.server.cache.loading.common.BatchCacheLoader;
 import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
 
 import lombok.extern.slf4j.Slf4j;
-import net.sf.ehcache.Ehcache;
-import net.sf.ehcache.Element;
+import cern.c2mon.server.ehcache.Ehcache;
+import cern.c2mon.server.ehcache.Element;
 
 import org.springframework.beans.factory.annotation.Autowired;
 

@@ -22,11 +22,11 @@ import java.util.Collection;
 import javax.annotation.PostConstruct;
 
 import lombok.extern.slf4j.Slf4j;
-import net.sf.ehcache.Ehcache;
-import net.sf.ehcache.loader.CacheLoader;
-import net.sf.ehcache.search.Attribute;
-import net.sf.ehcache.search.Query;
-import net.sf.ehcache.search.Result;
+import cern.c2mon.server.ehcache.Ehcache;
+import cern.c2mon.server.ehcache.loader.CacheLoader;
+import cern.c2mon.server.ehcache.search.Attribute;
+import cern.c2mon.server.ehcache.search.Query;
+import cern.c2mon.server.ehcache.search.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

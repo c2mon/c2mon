@@ -1,6 +1,6 @@
 package cern.c2mon.server.cache.config;
 
-import net.sf.ehcache.CacheManager;
+import cern.c2mon.server.ehcache.CacheManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.ehcache.EhCacheFactoryBean;
 import org.springframework.context.annotation.Bean;

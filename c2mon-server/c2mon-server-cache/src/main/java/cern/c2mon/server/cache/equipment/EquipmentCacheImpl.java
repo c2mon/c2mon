@@ -36,8 +36,8 @@ import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.control.ControlTagCacheObject;
 import cern.c2mon.server.common.equipment.Equipment;
 import cern.c2mon.shared.common.ConfigurationException;
-import net.sf.ehcache.Ehcache;
-import net.sf.ehcache.loader.CacheLoader;
+import cern.c2mon.server.ehcache.Ehcache;
+import cern.c2mon.server.ehcache.loader.CacheLoader;
 
 /**
  * Implementation of the Equipment cache.
