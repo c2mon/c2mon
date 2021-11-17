@@ -99,6 +99,7 @@ Publish:
     - mvn $MAVEN_CLI_OPTS -DskipTests deploy
   only:
     - master
+    - ignite-branch-update-with-master
 
 # Publish docker images?
 
