@@ -1,7 +1,6 @@
 package cern.c2mon.server.cache.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.ehcache.EhCacheFactoryBean;
 import org.springframework.context.annotation.Bean;
 
 import cern.c2mon.server.cache.loading.AlarmLoaderDAO;

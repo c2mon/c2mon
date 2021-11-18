@@ -2,7 +2,7 @@ package cern.c2mon.server.cache.config;
 
 import cern.c2mon.server.ehcache.CacheManager;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.ehcache.EhCacheFactoryBean;
+import cern.c2mon.server.ehcache.CacheFactory;
 import org.springframework.context.annotation.Bean;
 
 /**
@@ -14,8 +14,8 @@ public class ClusterCacheConfig {
   private CacheManager cacheManager;
 
   @Bean
-  public EhCacheFactoryBean clusterEhcache() {
-    EhCacheFactoryBean factory = new EhCacheFactoryBean();
+  public CacheFactory clusterEhcache() {
+    CacheFactory factory = new CacheFactory();
     factory.setCacheName("clusterCache");
     factory.setCacheManager(cacheManager);
     return factory;

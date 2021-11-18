@@ -8,7 +8,7 @@ import cern.c2mon.server.cache.loading.config.CacheLoadingProperties;
 import cern.c2mon.server.ehcache.CacheManager;
 import cern.c2mon.server.ehcache.Ehcache;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.ehcache.EhCacheFactoryBean;
+import cern.c2mon.server.ehcache.CacheFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 
@@ -21,8 +21,8 @@ public class DataTagCacheConfig {
   private CacheLoadingProperties properties;
 
   @Bean
-  public EhCacheFactoryBean dataTagEhcache(CacheManager cacheManager) {
-    EhCacheFactoryBean factory = new EhCacheFactoryBean();
+  public CacheFactory dataTagEhcache(CacheManager cacheManager) {
+    CacheFactory factory = new CacheFactory();
     factory.setCacheName("tagCache");
     factory.setCacheManager(cacheManager);
     return factory;

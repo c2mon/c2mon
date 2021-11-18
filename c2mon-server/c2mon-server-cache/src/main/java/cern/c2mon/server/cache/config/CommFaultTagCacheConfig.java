@@ -6,7 +6,7 @@ import cern.c2mon.server.cache.common.SimpleC2monCacheLoader;
 import cern.c2mon.server.cache.loading.CommFaultTagDAO;
 import cern.c2mon.server.ehcache.CacheManager;
 import cern.c2mon.server.ehcache.Ehcache;
-import org.springframework.cache.ehcache.EhCacheFactoryBean;
+import cern.c2mon.server.ehcache.CacheFactory;
 import org.springframework.context.annotation.Bean;
 
 /**
@@ -15,8 +15,8 @@ import org.springframework.context.annotation.Bean;
 public class CommFaultTagCacheConfig {
 
   @Bean
-  public EhCacheFactoryBean commFaultTagEhcache(CacheManager cacheManager) {
-    EhCacheFactoryBean factory = new EhCacheFactoryBean();
+  public CacheFactory commFaultTagEhcache(CacheManager cacheManager) {
+    CacheFactory factory = new CacheFactory();
     factory.setCacheName("commFaultTagCache");
     factory.setCacheManager(cacheManager);
     return factory;

@@ -17,7 +17,7 @@
 package cern.c2mon.server.cache.datatag;
 
 import cern.c2mon.server.cache.config.CacheProperties;
-import cern.c2mon.server.ehcache.Cache;
+import cern.c2mon.server.ehcache.Ehcache;
 import cern.c2mon.server.ehcache.event.RegisteredEventListeners;
 import cern.c2mon.server.ehcache.loader.CacheLoader;
 
@@ -53,7 +53,7 @@ public class DataTagCacheRegistrationTest {
    */
   private IMocksControl mockControl = EasyMock.createControl();
   private ClusterCache clusterCache;
-  private Cache cache;
+  private Ehcache cache;
   private CacheLoader cacheLoader;
   private C2monCacheLoader c2monCacheLoader;
   private CacheLoaderDAO cacheLoaderDAO;
@@ -63,7 +63,7 @@ public class DataTagCacheRegistrationTest {
   @Before
   public void init() {
     clusterCache = mockControl.createMock(ClusterCache.class);
-    cache = mockControl.createMock(Cache.class);
+    cache = mockControl.createMock(Ehcache.class);
     cacheLoader = mockControl.createMock(CacheLoader.class);
     c2monCacheLoader = mockControl.createMock(C2monCacheLoader.class);
     cacheLoaderDAO = mockControl.createMock(CacheLoaderDAO.class);
