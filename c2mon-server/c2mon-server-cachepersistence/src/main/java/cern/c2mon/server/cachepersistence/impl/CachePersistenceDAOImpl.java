@@ -87,7 +87,7 @@ public class CachePersistenceDAOImpl<T extends Cacheable> implements CachePersis
         }
       } catch (CacheElementNotFoundException ex) {
         log.warn("Cache element with id {} could not be persisted as not found in cache " +
-            "(may have been removed in the meantime by a re-configuration). Cache is {}", key, cache.getClass().getSimpleName(), ex);
+            "(may have been removed in the meantime by a re-configuration). Cache is {}", key, cache.getClass().getSimpleName());
       }
     }
   }

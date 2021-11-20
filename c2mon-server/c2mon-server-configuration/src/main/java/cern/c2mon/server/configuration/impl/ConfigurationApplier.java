@@ -103,7 +103,7 @@ final class ConfigurationApplier {
         configProgressMonitor.resetCounter();
       }
 
-      log.info(configId + " Reconfiguring " + processLists.keySet().size()+ " processes ...");
+      log.info("{} - Reconfiguring {} process(es) ...", configId, processLists.keySet().size());
 
       sendReconfigurationReports(configId, configProgressMonitor, report, daqReportPlaceholder, elementPlaceholder, processLists);
     } else {
@@ -126,7 +126,7 @@ final class ConfigurationApplier {
       configurationDAO.markAsApplied(configId);
     }
 
-    log.info("Finished applying configuration " + configId);
+    log.info("{} - Finished applying configuration", configId);
 
     report.normalize();
 
@@ -143,12 +143,12 @@ final class ConfigurationApplier {
       List<Change> processChangeEvents = entry.getValue();
       if (processService.isRunning(processId) && !processService.isRebootRequired(processId)) {
         try {
-          log.trace(configId + " Sending " + processChangeEvents.size() + " change events to process " + processId + "...");
+          log.trace("{} - Sending {} change events to process {}...", configId, processChangeEvents.size(), processId);
           ConfigurationChangeEventReport processReport = processCommunicationManager.sendConfiguration(processId, processChangeEvents);
           if (!processReport.getChangeReports().isEmpty()) {
-            log.trace(configId + " Received " + processReport.getChangeReports().size() + " back from process.");
+            log.trace("{} - Received {} back from process", configId, processReport.getChangeReports().size());
           } else {
-            log.trace(configId + " Received 0 reports back from process");
+            log.trace("{} - Received 0 reports back from process", configId);
           }
           for (ChangeReport changeReport : processReport.getChangeReports()) {
             ConfigurationElementReport convertedReport =
@@ -160,7 +160,7 @@ final class ConfigurationApplier {
               elementPlaceholder.get(changeReport.getChangeId()).setDaqStatus(ConfigConstants.Status.RESTART);
               //TODO set flag & tag to indicate that process restart is needed
             } else if (changeReport.isFail()) {
-              log.debug(configId + " changeRequest failed at process " + processCache.get(processId).getName());
+              log.debug("{} - changeRequest failed at process {}",configId, processCache.get(processId).getName());
               report.addStatus(ConfigConstants.Status.FAILURE);
               report.setStatusDescription("Failed to apply the configuration successfully. See details in the report below.");
               elementPlaceholder.get(changeReport.getChangeId()).setDaqStatus(ConfigConstants.Status.FAILURE);
@@ -173,7 +173,7 @@ final class ConfigurationApplier {
           }
         } catch (Exception e) {
           String errorMessage = "Error during DAQ reconfiguration: unsuccessful application of configuration (possible timeout) to Process " + processCache.get(processId).getName();
-          log.error(errorMessage, e);
+          log.error("{} - {}", configId, errorMessage, e);
           processService.setRequiresReboot(processId, true);
           report.addProcessToReboot(processCache.get(processId).getName());
           report.addStatus(ConfigConstants.Status.FAILURE);
@@ -202,12 +202,12 @@ final class ConfigurationApplier {
       ).get(300, TimeUnit.SECONDS);
     } catch (TimeoutException e) {
       String errorMessage = "Error applying configuration elements in parallel, timeout after 5 minutes";
-      log.error(errorMessage, e);
+      log.error("{} - {}", configId, errorMessage, e);
       report.addStatus(ConfigConstants.Status.FAILURE);
       report.setStatusDescription(report.getStatusDescription() + errorMessage + "\n");
     } catch (InterruptedException | ExecutionException e) {
       String errorMessage = "Error applying configuration elements in parallel";
-      log.error(errorMessage, e);
+      log.error("{} - {}", configId, errorMessage, e);
       report.addStatus(ConfigConstants.Status.FAILURE);
       report.setStatusDescription(report.getStatusDescription() + errorMessage + "\n");
     }
@@ -307,7 +307,7 @@ final class ConfigurationApplier {
       //default to restart; if successful on DAQ layer switch to OK
       element.setDaqStatus(ConfigConstants.Status.RESTART);
     } else if (processChange.requiresReboot()) {
-      log.debug(configId + " RESTART for " + processChange.getProcessId() + " required");
+      log.debug("{} - RESTART for {} required", configId, processChange.getProcessId());
       element.setDaqStatus(ConfigConstants.Status.RESTART);
       report.addStatus(ConfigConstants.Status.RESTART);
       report.addProcessToReboot(processCache.get(processId).getName());
