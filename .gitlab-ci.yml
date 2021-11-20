@@ -77,6 +77,20 @@ publish image:
   only:
     - master
     - develop
+    
+publish image manually:
+  stage: publish
+  cache:
+    key: "$CI_PROJECT_NAME"
+    paths:
+      - "$CI_PROJECT_DIR/.m2"
+    policy: pull
+  script:
+    - mvn $MAVEN_CLI_OPTS deploy -DskipTests=true
+  when: manual
+  except:
+    - master
+    - develop
 
 "Build docs":
   stage: publish
