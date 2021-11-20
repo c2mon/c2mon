@@ -31,13 +31,18 @@ public class AlarmQueryTest extends AbstractCacheTest<Alarm, AlarmCacheObject> {
 
   @Test
   public void testGetActiveAlarms() {
-    AlarmCacheObject toChange = (AlarmCacheObject) cache.get(350000L);
-    toChange.setActive(true);
-
-    cache.put(toChange.getId(), toChange);
-    Collection<Alarm> result = cache.query(Alarm::isActive);
-    assertNotNull(result);
-    assertEquals("Search result != 1", 1, result.size());
+    long alarmId = 350000L;
+    int count = 1;
+    
+    while (alarmId <= 350003L) {
+      AlarmCacheObject toChange = (AlarmCacheObject) cache.get(alarmId++);
+      toChange.setActive(true);
+      cache.put(toChange.getId(), toChange);
+      
+      Collection<Alarm> result = cache.query(Alarm::isActive);
+      assertNotNull(result);
+      assertEquals("Search result != " + count, count++, result.size());
+    }
   }
 
   @Test
