@@ -270,7 +270,7 @@ public class FallbackFileController {
             String line;
             line = dInput.readLine();
             if (line != null) {
-                counter = new Integer(line).intValue();
+                counter = Integer.parseInt(line);
                 // Put the reading descriptor in the first line that has not
                 // been yet processed
                 goToLine(counter);
