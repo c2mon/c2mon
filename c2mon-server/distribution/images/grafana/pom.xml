@@ -5,7 +5,7 @@
   <parent>
     <groupId>cern.c2mon.server</groupId>
     <artifactId>c2mon-docker-parent</artifactId>
-    <version>1.10.3-SNAPSHOT</version>
+    <version>1.11.1</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 

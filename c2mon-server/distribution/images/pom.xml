@@ -5,7 +5,7 @@
   <parent>
     <groupId>cern.c2mon.server</groupId>
     <artifactId>distribution</artifactId>
-    <version>1.10.3-SNAPSHOT</version>
+    <version>1.11.1</version>
   </parent>
 
   <artifactId>c2mon-docker-parent</artifactId>
@@ -54,7 +54,7 @@
         <artifactId>jib-maven-plugin</artifactId>
         <version>2.5.2</version>
         <executions>
-          <execution>
+          <!-- <execution>
             <phase>deploy</phase>
             <id>build-dockerhub</id>
             <goals>
@@ -66,7 +66,7 @@
                 <image>${dockerhub}/${dockerhub-repo}</image>
               </to>
             </configuration>
-          </execution>
+          </execution> -->
           <execution>
             <phase>deploy</phase>
             <id>build-gitlab</id>
@@ -86,6 +86,7 @@
             <image>${image.base}</image>
           </from>
           <to>
+            <image>${gitlab}/${gitlab-repo}</image>
             <tags>
               <tag>${image.tag}</tag>
             </tags>

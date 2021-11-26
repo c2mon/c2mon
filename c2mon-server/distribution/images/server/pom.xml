@@ -5,7 +5,7 @@
   <parent>
     <groupId>cern.c2mon.server</groupId>
     <artifactId>c2mon-docker-parent</artifactId>
-    <version>1.10.3-SNAPSHOT</version>
+    <version>1.11.1</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
@@ -14,7 +14,7 @@
   <packaging>jar</packaging>
 
   <properties>
-    <image.base>openjdk:11-jdk-slim</image.base>
+    <image.base>adoptopenjdk:11-jre</image.base>
     <image.tag>${project.version}</image.tag>
     <c2mon.home>/c2mon-server-${project.version}</c2mon.home>
     <gitlab-repo>c2mon</gitlab-repo>
