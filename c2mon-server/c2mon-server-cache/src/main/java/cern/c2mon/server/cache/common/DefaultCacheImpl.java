@@ -28,9 +28,6 @@ import cern.c2mon.server.cache.config.CacheProperties;
 import lombok.extern.slf4j.Slf4j;
 import cern.c2mon.server.ehcache.Ehcache;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import cern.c2mon.server.cache.C2monCache;
 import cern.c2mon.server.cache.ClusterCache;
 

@@ -11,7 +11,7 @@
                 <dep groupId="com.fasterxml.jackson.core" product="jackson-databind" version="2.9.2"/>
                 <dep groupId="org.springframework.boot" product="spring-boot-configuration-processor" version="2.1.0.RELEASE"/>
                 <dep groupId="org.slf4j" product="slf4j-api" version="1.7.30"/>
-                <dep groupId="org.hsqldb" product="hsqldb" version="2.3.2"/>
+                <dep groupId="org.hsqldb" product="hsqldb" version="2.3.4"/>
                 <dep groupId="org.projectlombok" product="lombok" version="1.18.12"/>
                 <dep groupId="junit" product="junit" version="4.12" scope="test"/>
                 <dep groupId="org.easymock" product="easymock" version="3.4" scope="test"/>

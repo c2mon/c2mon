@@ -23,7 +23,7 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.TimeZone;
 
-import cern.c2mon.server.cache.config.CacheModule;
+import cern.c2mon.server.cache.config.inmemory.CacheModule;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.cache.loading.config.CacheLoadingModule;
 import cern.c2mon.server.command.config.CommandModule;
@@ -38,7 +38,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import cern.c2mon.shared.client.command.CommandExecutionStatus;

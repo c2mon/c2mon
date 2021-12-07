@@ -18,6 +18,7 @@ package cern.c2mon.server.common.alarm;
 
 import java.sql.Timestamp;
 import java.util.LinkedList;
+import java.util.Objects;
 
 import lombok.Data;
 

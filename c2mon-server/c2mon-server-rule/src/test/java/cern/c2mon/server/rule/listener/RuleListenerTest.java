@@ -30,7 +30,7 @@ import cern.c2mon.server.cache.C2monCacheListener;
 import cern.c2mon.server.cache.DataTagCache;
 import cern.c2mon.server.cache.DataTagFacade;
 import cern.c2mon.server.cache.RuleTagCache;
-import cern.c2mon.server.cache.config.CacheModule;
+import cern.c2mon.server.cache.config.inmemory.CacheModule;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.cache.loading.config.CacheLoadingModule;
 import cern.c2mon.server.common.config.CommonModule;

@@ -20,6 +20,7 @@ import java.util.HashSet;
 
 import javax.annotation.PostConstruct;
 
+import cern.c2mon.server.cache.tag.query.TagQuery;
 import lombok.extern.slf4j.Slf4j;
 import cern.c2mon.server.ehcache.Ehcache;
 import cern.c2mon.server.ehcache.loader.CacheLoader;
@@ -62,8 +63,9 @@ public class RuleTagCacheImpl extends AbstractTagCache<RuleTag> implements RuleT
                           @Qualifier("ruleTagCacheLoader") final C2monCacheLoader c2monCacheLoader,
                           @Qualifier("ruleTagLoaderDAO") final SimpleCacheLoaderDAO<RuleTag> cacheLoaderDAO,
                           @Qualifier("dataTagCache") final DataTagCache dataTagCache,
-                          final CacheProperties properties) {
-    super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO, properties);
+                          final CacheProperties properties,
+                          @Qualifier("abstractRuleTagQuery") final TagQuery<RuleTag> tagQuery) {
+    super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO, properties, tagQuery);
     this.dataTagCache = dataTagCache;
   }
 

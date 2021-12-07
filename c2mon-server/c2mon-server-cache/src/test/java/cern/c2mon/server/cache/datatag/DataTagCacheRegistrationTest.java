@@ -69,7 +69,7 @@ public class DataTagCacheRegistrationTest {
     cacheLoaderDAO = mockControl.createMock(CacheLoaderDAO.class);
     supervisionAppender = mockControl.createMock(SupervisionAppender.class);
     registeredEventListeners = new RegisteredEventListeners(cache);
-    dataTagCache = new DataTagCacheImpl(clusterCache, cache, cacheLoader, c2monCacheLoader, cacheLoaderDAO, new CacheProperties());
+    //dataTagCache = new DataTagCacheImpl(clusterCache, cache, cacheLoader, c2monCacheLoader, cacheLoaderDAO, new CacheProperties());
   }
 
   /**

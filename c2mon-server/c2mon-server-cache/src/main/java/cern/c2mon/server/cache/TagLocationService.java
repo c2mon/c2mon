@@ -70,7 +70,6 @@ public interface TagLocationService {
    * @param name The unique name of a tag
    * @return The corresponding cache object or <code>null</code>, if
    *         the cache does not contain any tag with this name
-   * @see #get(Object)
    * @see #findByNameWildcard(String)
    * @see Tag#getName()
    */
@@ -91,7 +90,6 @@ public interface TagLocationService {
    * @return All tags where the tag name is matching the regular expression.
    * Please note, that the result is limited to 100'000 in order to avoid a
    * OutOfMemory exception!
-   * @see net.sf.ehcache.search.expression.ILike
    * @see #get(String)
    */
   Collection<Tag> findByNameWildcard(String regex);

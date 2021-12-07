@@ -21,8 +21,7 @@ import javax.annotation.PostConstruct;
 import cern.c2mon.server.cache.*;
 import cern.c2mon.server.cache.config.CacheProperties;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jmx.export.annotation.ManagedResource;

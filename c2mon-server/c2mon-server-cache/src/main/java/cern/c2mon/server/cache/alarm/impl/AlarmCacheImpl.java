@@ -16,33 +16,29 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.alarm.impl;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
-import javax.annotation.PostConstruct;
-
-import lombok.extern.slf4j.Slf4j;
-import cern.c2mon.server.ehcache.Ehcache;
-import cern.c2mon.server.ehcache.loader.CacheLoader;
-import cern.c2mon.server.ehcache.search.Attribute;
-import cern.c2mon.server.ehcache.search.Query;
-import cern.c2mon.server.ehcache.search.Result;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.jmx.export.annotation.ManagedResource;
-import org.springframework.stereotype.Service;
-
 import cern.c2mon.server.cache.AlarmCache;
 import cern.c2mon.server.cache.ClusterCache;
+import cern.c2mon.server.cache.alarm.query.AlarmQuery;
 import cern.c2mon.server.cache.common.AbstractCache;
 import cern.c2mon.server.cache.config.CacheProperties;
 import cern.c2mon.server.cache.loading.AlarmLoaderDAO;
 import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.config.C2monCacheName;
-import cern.c2mon.shared.client.alarm.AlarmQuery;
+import cern.c2mon.server.ehcache.Ehcache;
+import cern.c2mon.server.ehcache.loader.CacheLoader;
+import cern.c2mon.shared.client.alarm.AlarmQueryFilter;
+import lombok.extern.slf4j.Slf4j;
+
+import javax.annotation.PostConstruct;
+import java.util.Collection;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jmx.export.annotation.ManagedResource;
+import org.springframework.stereotype.Service;
 
 /**
  * Implementation of the TIM Alarm cache.
@@ -58,14 +54,18 @@ public class AlarmCacheImpl extends AbstractCache<Long, Alarm> implements AlarmC
   /** A special logger that can be used later to store alarm updates in a separate log file */
   private static final Logger ALARM_LOGGER = LoggerFactory.getLogger("AlarmLogger");
 
+  private final AlarmQuery alarmQuery;
+
   @Autowired
   public AlarmCacheImpl(@Qualifier("clusterCache") final ClusterCache clusterCache,
                         @Qualifier("alarmEhcache") final Ehcache ehcache,
                         @Qualifier("alarmEhcacheLoader") final CacheLoader cacheLoader,
                         @Qualifier("alarmCacheLoader") final C2monCacheLoader c2monCacheLoader,
                         @Qualifier("alarmLoaderDAO") final AlarmLoaderDAO cacheLoaderDAO,
-                        final CacheProperties properties) {
+                        final CacheProperties properties,
+                        @Qualifier("alarmQuery") final AlarmQuery alarmQuery) {
     super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO, properties);
+    this.alarmQuery = alarmQuery;
   }
 
   /**
@@ -97,43 +97,9 @@ public class AlarmCacheImpl extends AbstractCache<Long, Alarm> implements AlarmC
   }
 
   @Override
-  public Collection<Long> findAlarm(AlarmQuery query) {
+  public Collection<Long> findAlarm(AlarmQueryFilter query) {
 
-    Ehcache ehcache = getCache();
-    ArrayList<Long> result = new ArrayList<>();
-
-    Query cacheQuery = ehcache.createQuery();
-
-    if (query.getFaultCode() != 0) {
-        Attribute<Integer> fc = ehcache.getSearchAttribute("faultCode");
-        cacheQuery.addCriteria(fc.eq(query.getFaultCode()));
-    }
-    if (query.getFaultFamily() != null && !"".equals(query.getFaultFamily())) {
-        Attribute<String> ff = ehcache.getSearchAttribute("faultFamily");
-        cacheQuery.addCriteria(ff.ilike(query.getFaultFamily()));
-    }
-    if (query.getFaultMember() != null && !"".equals(query.getFaultMember())) {
-        Attribute<String> fm = ehcache.getSearchAttribute("faultMember");
-        cacheQuery.addCriteria(fm.ilike(query.getFaultMember()));
-    }
-    if (query.getPriority() != 0) {
-        Attribute<Integer> prio = ehcache.getSearchAttribute("priority");
-        cacheQuery.addCriteria(prio.eq(query.getPriority()));
-    }
-    if (query.getActive() != null) {
-      Attribute<Boolean> active = ehcache.getSearchAttribute("isActive");
-      cacheQuery.addCriteria(active.eq(query.getActive()));
-    }
-    if (query.getOscillating() != null) {
-      Attribute<Boolean> active = ehcache.getSearchAttribute("isOscillating");
-      cacheQuery.addCriteria(active.eq(query.getOscillating()));
-    }
-
-    for (Result res: cacheQuery.maxResults(query.getMaxResultSize()).includeKeys().execute().all()) {
-        result.add((Long) res.getKey());
-    }
-
-    return result;
+    return alarmQuery.findAlarm(query);
   }
 
   @Override

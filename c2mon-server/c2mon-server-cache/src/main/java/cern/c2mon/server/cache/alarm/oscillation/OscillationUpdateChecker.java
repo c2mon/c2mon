@@ -35,7 +35,7 @@ import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.common.alarm.AlarmCacheUpdater;
 import cern.c2mon.server.common.config.ServerConstants;
 import cern.c2mon.server.common.tag.Tag;
-import cern.c2mon.shared.client.alarm.AlarmQuery;
+import cern.c2mon.shared.client.alarm.AlarmQueryFilter;
 
 /**
  * Timer that regularly checks all the active alive timers monitoring the
@@ -93,7 +93,7 @@ public class OscillationUpdateChecker extends TimerTask implements SmartLifecycl
 
   private final TagFacadeGateway tagFacadeGateway;
 
-  protected final AlarmQuery alarmCacheQuery = AlarmQuery.builder().oscillating(true).build();
+  protected final AlarmQueryFilter alarmCacheQuery = AlarmQueryFilter.builder().oscillating(true).build();
   
   private final AlarmFacade alarmFacade;
 

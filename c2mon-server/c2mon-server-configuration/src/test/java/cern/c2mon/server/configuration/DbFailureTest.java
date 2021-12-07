@@ -17,7 +17,7 @@
 package cern.c2mon.server.configuration;
 
 import cern.c2mon.server.cache.*;
-import cern.c2mon.server.cache.config.CacheModule;
+import cern.c2mon.server.cache.config.inmemory.CacheModule;
 import cern.c2mon.server.cache.dbaccess.*;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.cache.loading.config.CacheLoadingModule;
@@ -46,7 +46,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.junit.Assert.*;

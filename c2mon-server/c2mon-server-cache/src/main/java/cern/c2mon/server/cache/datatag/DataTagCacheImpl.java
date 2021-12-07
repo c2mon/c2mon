@@ -16,30 +16,27 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.datatag;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import javax.annotation.PostConstruct;
-
+import cern.c2mon.server.cache.ClusterCache;
+import cern.c2mon.server.cache.DataTagCache;
 import cern.c2mon.server.cache.config.CacheProperties;
-import lombok.extern.slf4j.Slf4j;
+import cern.c2mon.server.cache.datatag.query.DataTagQuery;
+import cern.c2mon.server.cache.loading.SimpleCacheLoaderDAO;
+import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
+import cern.c2mon.server.cache.tag.AbstractTagCache;
+import cern.c2mon.server.cache.tag.query.TagQuery;
+import cern.c2mon.server.common.config.C2monCacheName;
+import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.ehcache.Ehcache;
 import cern.c2mon.server.ehcache.loader.CacheLoader;
-import cern.c2mon.server.ehcache.search.Attribute;
-import cern.c2mon.server.ehcache.search.Results;
+import lombok.extern.slf4j.Slf4j;
+
+import javax.annotation.PostConstruct;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Service;
-
-import cern.c2mon.server.cache.ClusterCache;
-import cern.c2mon.server.cache.DataTagCache;
-import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
-import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
-import cern.c2mon.server.cache.loading.SimpleCacheLoaderDAO;
-import cern.c2mon.server.cache.tag.AbstractTagCache;
-import cern.c2mon.server.common.config.C2monCacheName;
-import cern.c2mon.server.common.datatag.DataTag;
 
 /**
  * Implementation of the DataTag cache.
@@ -52,14 +49,19 @@ import cern.c2mon.server.common.datatag.DataTag;
 @ManagedResource(objectName="cern.c2mon:type=cache,name=dataTagCache")
 public class DataTagCacheImpl extends AbstractTagCache<DataTag> implements DataTagCache {
 
+  private DataTagQuery dataTagQuery;
+
   @Autowired
   public DataTagCacheImpl(@Qualifier("clusterCache") final ClusterCache clusterCache,
-                          @Qualifier("dataTagEhcache") final Ehcache ehcache,
+                          @Qualifier("dataTagEhcache") final Ehcache<Long, DataTag> ehcache,
                           @Qualifier("dataTagEhcacheLoader") final CacheLoader cacheLoader,
                           @Qualifier("dataTagCacheLoader") final C2monCacheLoader c2monCacheLoader,
                           @Qualifier("dataTagLoaderDAO") final SimpleCacheLoaderDAO<DataTag> cacheLoaderDAO,
-                          final CacheProperties properties) {
-    super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO, properties);
+                          final CacheProperties properties,
+                          @Qualifier("dataTagQuery") final DataTagQuery dataTagQuery,
+                          @Qualifier("abstractDataTagQuery") final TagQuery<DataTag> tagQuery) {
+    super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO, properties, tagQuery);
+    this.dataTagQuery = dataTagQuery;
   }
 
   /**
@@ -78,49 +80,13 @@ public class DataTagCacheImpl extends AbstractTagCache<DataTag> implements DataT
 
   @Override
   public List<Long> getDataTagIdsByEquipmentId(Long equipmentId) {
-    return getDataTagIds(equipmentId, "equipmentId");
+    return dataTagQuery.findDataTagIdsByEquipmentId(equipmentId);
   }
 
   @Override
   public List<Long> getDataTagIdsBySubEquipmentId(Long subEquipmentId) {
-    return getDataTagIds(subEquipmentId, "subEquipmentId");
+    return dataTagQuery.findDataTagIdsBySubEquipmentId(subEquipmentId);
   }
-
-  /**
-   * Receives a list of all DataTag ids which are attached to the given equipment or sub-equipment.
-   * @param id The id of the (sub-)equipment
-   * @param searchAttribute The ehcache search attribute, which is specified in the wrapper method
-   * @return A list of all DataTag ids belonging to the given (sub-)equipment
-   */
-  private List<Long> getDataTagIds(Long id, String searchAttribute) {
-    List<Long> tagIds = new LinkedList<>();
-    Results results = null;
-
-    if (id == null) {
-      throw new IllegalArgumentException("Attempting to retrieve a List of DataTag ids from the cache with a NULL " +
-          "parameter.");
-    }
-
-    try {
-      Attribute<Long> cacheEquipmentId = getCache().getSearchAttribute(searchAttribute);
-      results = getCache().createQuery().includeKeys().addCriteria(cacheEquipmentId.eq(id)).execute();
-
-      if (results == null) {
-        throw new CacheElementNotFoundException("Failed to execute query with (sub)EquipmentId " + id + " : " +
-            "Result is null.");
-      }
-
-      results.all().forEach(r -> tagIds.add((Long) r.getKey()));
-
-    } finally {
-      if (results != null) {
-        // Discard the results when done to free up cache resources.
-        results.discard();
-      }
-    }
-    return tagIds;
-  }
-
 
   @Override
   protected void doPostDbLoading(DataTag cacheObject) {

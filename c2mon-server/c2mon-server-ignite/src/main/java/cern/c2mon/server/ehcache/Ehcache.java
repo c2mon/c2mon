@@ -6,40 +6,53 @@ package cern.c2mon.server.ehcache;
 
 import cern.c2mon.server.ehcache.event.RegisteredEventListeners;
 import cern.c2mon.server.ehcache.loader.CacheLoader;
-import cern.c2mon.server.ehcache.search.Attribute;
-import cern.c2mon.server.ehcache.search.Query;
 
 import java.util.List;
 
-public interface Ehcache<K> {
+/**
+ * An interface for Ehcache.
+ * <p/>
+ * Ehcache is the central interface. Caches have {@link Element}s and are managed
+ * by the {@link CacheManager}.
+ */
+public interface Ehcache<T, K> {
 
     /**
      * @param id
      * @return
      */
-    boolean isKeyInCache(K id);
+    boolean isKeyInCache(T id);
 
     /**
      * @param id
      * @return
      */
-    Element get(K id) throws CacheException;
+    K get(T id) throws CacheException;
 
     /**
      * @return
      */
-    List<K> getKeys();
+    List<T> getKeys();
 
     /**
-     * @param element
+     *
+     * @param key
+     * @param value
      */
-    void put(Element element);
+    void put(T key, K value);
+
+    /**
+     *
+     * @param key
+     * @param value
+     */
+    void putQuiet(T key, K value);
 
     /**
      * @param id
      * @return
      */
-    boolean remove(K id);
+    boolean remove(T id);
 
     /**
      * @return
@@ -49,57 +62,48 @@ public interface Ehcache<K> {
     /**
      * @param id
      */
-    void acquireReadLockOnKey(K id);
+    void acquireReadLockOnKey(T id);
 
     /**
      * @param id
      */
-    void releaseReadLockOnKey(K id);
+    void releaseReadLockOnKey(T id);
 
     /**
      * @param id
      */
-    void acquireWriteLockOnKey(K id);
+    void acquireWriteLockOnKey(T id);
 
     /**
      * @param id
      */
-    void releaseWriteLockOnKey(K id);
+    void releaseWriteLockOnKey(T id);
 
     /**
      * @param id
      * @return
      */
-    boolean isWriteLockedByCurrentThread(K id);
+    boolean isWriteLockedByCurrentThread(T id);
 
     /**
      * @param id
      * @param timeout
      * @return
      */
-    boolean tryReadLockOnKey(K id, Long timeout) throws InterruptedException;
+    boolean tryReadLockOnKey(T id, Long timeout) throws InterruptedException;
 
     /**
      * @param id
      * @param timeout
      * @return
      */
-    boolean tryWriteLockOnKey(K id, Long timeout)throws InterruptedException;
+    boolean tryWriteLockOnKey(T id, Long timeout)throws InterruptedException;
 
     /**
      * @param id
      * @return
      */
-    boolean isReadLockedByCurrentThread(K id);
-
-    /**
-     * @param element
-     */
-    void putQuiet(Element element);
-
-    <T> Attribute<T> getSearchAttribute(String attributeName) throws CacheException;
-
-    Query createQuery();
+    boolean isReadLockedByCurrentThread(T id);
 
     void registerCacheLoader(CacheLoader cacheLoader);
 
@@ -107,6 +111,5 @@ public interface Ehcache<K> {
 
     void removeAll() throws IllegalStateException, CacheException;
 
-    void setNodeBulkLoadEnabled(boolean enabledBulkLoad) throws UnsupportedOperationException;
-
+    void setNodeBulkLoadEnabled(boolean b);
 }

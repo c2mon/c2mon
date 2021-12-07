@@ -124,7 +124,7 @@ public class EhcacheLoaderImpl<T extends Cacheable> implements CacheLoader {
    * is returned.
    *
    * <p>Notice that the returned null is never returned by a direct query to a
-   * {@link C2monCache}, in which case a {@link CacheElementNotFoundException} is
+   * cache, in which case a {@link CacheException} is
    * thrown.
    */
   @Override
@@ -137,7 +137,7 @@ public class EhcacheLoaderImpl<T extends Cacheable> implements CacheLoader {
 
     //put in cache if found something
     if (result != null) {
-      cache.putQuiet(new Element(key, result));
+      cache.putQuiet(key, result);
     }
 
     return result;

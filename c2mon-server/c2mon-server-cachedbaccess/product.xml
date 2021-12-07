@@ -15,7 +15,7 @@
                 <dep groupId="commons-dbcp" product="commons-dbcp" version="1.4"/>
                 <dep groupId="org.projectlombok" product="lombok" version="1.18.12"/>
                 <dep groupId="junit" product="junit" version="4.12" scope="test"/>
-                <dep groupId="org.hsqldb" product="hsqldb" version="2.3.2"/>
+                <dep groupId="org.hsqldb" product="hsqldb" version="2.3.4"/>
                 <dep groupId="org.easymock" product="easymock" version="3.4" scope="test"/>
                 <dep groupId="org.springframework.boot" product="spring-boot-starter-test" version="2.1.0.RELEASE" scope="test"/>
             </dependencies>

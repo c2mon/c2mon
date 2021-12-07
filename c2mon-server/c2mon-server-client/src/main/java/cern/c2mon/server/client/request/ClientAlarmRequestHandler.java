@@ -18,7 +18,6 @@ package cern.c2mon.server.client.request;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +29,7 @@ import cern.c2mon.server.cache.TagLocationService;
 import cern.c2mon.server.client.util.TransferObjectFactory;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.tag.Tag;
-import cern.c2mon.shared.client.alarm.AlarmQuery;
+import cern.c2mon.shared.client.alarm.AlarmQueryFilter;
 import cern.c2mon.shared.client.alarm.AlarmValue;
 import cern.c2mon.shared.client.request.ClientRequest;
 import cern.c2mon.shared.client.request.ClientRequestResult;
@@ -72,7 +71,7 @@ class ClientAlarmRequestHandler {
 
     final Collection<AlarmValue> activeAlarms = new ArrayList<>();
 
-    AlarmQuery query = AlarmQuery.builder().active(true).build();
+    AlarmQueryFilter query = AlarmQueryFilter.builder().active(true).build();
     
     Collection<Long> result = alarmCache.findAlarm(query);
     

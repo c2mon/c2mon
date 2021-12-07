@@ -18,7 +18,7 @@ package cern.c2mon.server.daq.update;
 
 import cern.c2mon.server.cache.ControlTagCache;
 import cern.c2mon.server.cache.DataTagCache;
-import cern.c2mon.server.cache.config.CacheModule;
+import cern.c2mon.server.cache.config.inmemory.CacheModule;
 import cern.c2mon.server.cache.dbaccess.ControlTagMapper;
 import cern.c2mon.server.cache.dbaccess.DataTagMapper;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;

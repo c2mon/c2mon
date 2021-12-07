@@ -16,33 +16,30 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.process;
 
-import javax.annotation.PostConstruct;
-
-import cern.c2mon.server.cache.config.CacheProperties;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.jmx.export.annotation.ManagedResource;
-import org.springframework.stereotype.Service;
-
 import cern.c2mon.server.cache.ClusterCache;
 import cern.c2mon.server.cache.ControlTagCache;
 import cern.c2mon.server.cache.ProcessCache;
 import cern.c2mon.server.cache.common.AbstractCache;
-import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
-import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
+import cern.c2mon.server.cache.config.CacheProperties;
 import cern.c2mon.server.cache.loading.ProcessDAO;
 import cern.c2mon.server.cache.loading.SimpleCacheLoaderDAO;
+import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
+import cern.c2mon.server.cache.process.query.ProcessQuery;
 import cern.c2mon.server.common.config.C2monCacheName;
 import cern.c2mon.server.common.control.ControlTag;
 import cern.c2mon.server.common.control.ControlTagCacheObject;
 import cern.c2mon.server.common.process.Process;
-import cern.c2mon.shared.common.ConfigurationException;
 import cern.c2mon.server.ehcache.Ehcache;
 import cern.c2mon.server.ehcache.loader.CacheLoader;
-import cern.c2mon.server.ehcache.search.Attribute;
-import cern.c2mon.server.ehcache.search.Query;
-import cern.c2mon.server.ehcache.search.Results;
+import cern.c2mon.shared.common.ConfigurationException;
+import lombok.extern.slf4j.Slf4j;
+
+import javax.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jmx.export.annotation.ManagedResource;
+import org.springframework.stereotype.Service;
 
 /**
  * Implementation of the Process cache.
@@ -62,6 +59,8 @@ public class ProcessCacheImpl extends AbstractCache<Long, Process>implements Pro
   /** Used to post configure the associated control tags */
   private final ControlTagCache controlCache;
 
+  private final ProcessQuery processQuery;
+
   @Autowired
   public ProcessCacheImpl(final ClusterCache clusterCache,
                           @Qualifier("processEhcache") final Ehcache ehcache,
@@ -69,11 +68,13 @@ public class ProcessCacheImpl extends AbstractCache<Long, Process>implements Pro
                           @Qualifier("processCacheLoader") final C2monCacheLoader c2monCacheLoader,
                           @Qualifier("processDAO") final SimpleCacheLoaderDAO<Process> cacheLoaderDAO,
                           @Qualifier("controlTagCache") final ControlTagCache controlCache,
-                          final CacheProperties properties) {
+                          final CacheProperties properties,
+                          @Qualifier("processQuery") ProcessQuery processQuery) {
 
     super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO, properties);
     this.processDAO = (ProcessDAO) cacheLoaderDAO;
     this.controlCache = controlCache;
+    this.processQuery = processQuery;
   }
 
   /**
@@ -123,13 +124,13 @@ public class ProcessCacheImpl extends AbstractCache<Long, Process>implements Pro
       }
       else {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
-            String.format("No Alive tag (%d) found for Process %s (#%d).", aliveTagId, process.getName(), process.getId()));
+                String.format("No Alive tag (%d) found for Process %s (#%d).", aliveTagId, process.getName(), process.getId()));
       }
 
     }
     else {
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
-          String.format("No Alive tag for Process %s (#%d) defined.", process.getName(), process.getId()));
+              String.format("No Alive tag for Process %s (#%d) defined.", process.getName(), process.getId()));
     }
 
     Long statusTagId = process.getStateTagId();
@@ -141,13 +142,13 @@ public class ProcessCacheImpl extends AbstractCache<Long, Process>implements Pro
       }
       else {
         throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
-            String.format("No Status tag (%d) found for Process %s (#%d).", statusTagId, process.getName(), process.getId()));
+                String.format("No Status tag (%d) found for Process %s (#%d).", statusTagId, process.getName(), process.getId()));
       }
 
     }
     else {
       throw new ConfigurationException(ConfigurationException.INVALID_PARAMETER_VALUE,
-          String.format("No Status tag for Process %s (#%d) defined.", process.getName(), process.getId()));
+              String.format("No Status tag for Process %s (#%d) defined.", process.getName(), process.getId()));
     }
   }
 
@@ -163,38 +164,7 @@ public class ProcessCacheImpl extends AbstractCache<Long, Process>implements Pro
 
   @Override
   public Long getProcessId(final String name) {
-    Long processKey = null;
-    Results results = null;
-
-    if (name == null || name.equalsIgnoreCase("")) {
-      throw new IllegalArgumentException("Attempting to retrieve a Process from the cache with a NULL or empty name parameter.");
-    }
-
-    try {
-      Attribute<String> processName = getCache().getSearchAttribute("processName");
-      // By limiting the query result list to 1 it is up to the administrator to
-      // make
-      // sure that the process name is unique. Otherwise this will result in an
-      // unpredictable behaviour.
-      Query query = getCache().createQuery();
-      results = query.includeKeys().addCriteria(processName.eq(name)).maxResults(1).execute();
-
-      // Find the number of results -- the number of hits.
-      int size = results.size();
-      if (size == 0) {
-        throw new CacheElementNotFoundException("Failed to find a process with name " + name + " in the cache.");
-      }
-
-      processKey = (Long) results.all().get(0).getKey();
-    }
-    finally {
-      if (results != null) {
-        // Discard the results when done to free up cache resources.
-        results.discard();
-      }
-    }
-
-    return processKey;
+    return processQuery.findProcessIdByName(name);
   }
 
   @Override

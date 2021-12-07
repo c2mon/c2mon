@@ -19,7 +19,7 @@ package cern.c2mon.server.client.publish;
 import cern.c2mon.server.cache.TagFacadeGateway;
 import cern.c2mon.server.cache.TagLocationService;
 import cern.c2mon.server.cache.alarm.config.AlarmModule;
-import cern.c2mon.server.cache.config.CacheModule;
+import cern.c2mon.server.cache.config.inmemory.CacheModule;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.client.config.ClientModule;
 import cern.c2mon.server.common.config.CommonModule;

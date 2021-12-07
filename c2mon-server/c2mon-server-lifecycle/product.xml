@@ -5,7 +5,7 @@
                 <dep groupId="org.springframework" product="spring-context" version="5.1.2.RELEASE"/>
                 <dep groupId="org.springframework" product="spring-beans" version="5.1.2.RELEASE"/>
                 <dep groupId="org.springframework.boot" product="spring-boot-starter" version="2.1.0.RELEASE"/>
-                <dep groupId="org.hsqldb" product="hsqldb" version="2.3.2"/>
+                <dep groupId="org.hsqldb" product="hsqldb" version="2.3.4"/>
                 <dep groupId="mysql" product="mysql-connector-java" version="5.1.38"/>
                 <dep groupId="org.aspectj" product="aspectjweaver" version="1.8.8"/>
                 <dep groupId="org.projectlombok" product="lombok" version="1.18.12"/>
@@ -22,7 +22,7 @@
                 <dep product="ojdbc8" groupId="com.oracle" version="PRO" />
             </dependencies>
 
-        <application runtimeJvm="jdk1.8" name="c2mon-server-cbng">
+        <application runtimeJvm="jdk1.8" name="laser-c2-server">
             <main-class name="cern.c2mon.server.ServerStartup"/>
 
             <property name="logging.config" value="conf/logback.xml"/>
@@ -37,12 +37,12 @@
 
             <java-vm-args>-XX:NewRatio=3 -XX:+UseParallelGC -XX:MaxGCPauseMillis=100</java-vm-args>
 
-            <deployment installLocation="/opt/laser-lw2/c2mon-server-cbng">
+            <deployment installLocation="/opt/laser-c2/server">
                 <directory name="tmp" mask="750"/>
                 <directory name="reports" mask="750"/>
                 <directory name="log" mask="750"/>
                 <directory name="conf" mask="644">
-                    <file name="logback.xml" source="../distribution/tar/conf/logback.xml"/>
+<!--                    <file name="logback.xml" source="../distribution/tar/conf/logback.xml"/>-->
                     <file name="c2mon-server.properties" source="/user/copera/laser-lw/.keystore/c2mon-server.properties"/>
                 </directory>
                 <backupPolicy keepBackups="5">

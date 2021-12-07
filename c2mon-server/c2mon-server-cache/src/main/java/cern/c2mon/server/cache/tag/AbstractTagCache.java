@@ -16,30 +16,24 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.tag;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-
-import cern.c2mon.server.cache.config.CacheProperties;
-import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import cern.c2mon.server.cache.C2monCacheWithSupervision;
 import cern.c2mon.server.cache.CacheSupervisionListener;
 import cern.c2mon.server.cache.ClusterCache;
 import cern.c2mon.server.cache.common.AbstractCache;
-import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
+import cern.c2mon.server.cache.config.CacheProperties;
 import cern.c2mon.server.cache.loading.SimpleCacheLoaderDAO;
+import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
+import cern.c2mon.server.cache.tag.query.TagQuery;
 import cern.c2mon.server.common.tag.AbstractTagCacheObject;
 import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.ehcache.Ehcache;
 import cern.c2mon.server.ehcache.loader.CacheLoader;
-import cern.c2mon.server.ehcache.search.Attribute;
-import cern.c2mon.server.ehcache.search.Query;
-import cern.c2mon.server.ehcache.search.Result;
-import cern.c2mon.server.ehcache.search.Results;
+import lombok.extern.slf4j.Slf4j;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Common methods used by all tag caches (data, control and rule tags).
@@ -65,6 +59,8 @@ public abstract class AbstractTagCache<T extends Tag> extends AbstractCache<Long
   private final List<CacheSupervisionListener< ? super T>> listenersWithSupervision;
   private final ReentrantReadWriteLock listenerLock;
 
+  private final TagQuery<T> tagQuery;
+
   /**
    * Constructor.
    */
@@ -73,10 +69,12 @@ public abstract class AbstractTagCache<T extends Tag> extends AbstractCache<Long
                           final CacheLoader cacheLoader,
                           final C2monCacheLoader c2monCacheLoader,
                           final SimpleCacheLoaderDAO<T> cacheLoaderDAO,
-                          final CacheProperties properties) {
+                          final CacheProperties properties,
+                          final TagQuery<T> tagQuery) {
     super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO, properties);
     listenersWithSupervision = new ArrayList<>();
     listenerLock = new ReentrantReadWriteLock();
+    this.tagQuery = tagQuery;
   }
 
 
@@ -131,24 +129,9 @@ public abstract class AbstractTagCache<T extends Tag> extends AbstractCache<Long
       name = name.replace("?", "\\?");
     }
 
-    Results results = null;
+    List<T> tagsFound = tagQuery.findTagsByWildcard(name, 1);
 
-    try {
-      Ehcache ehcache = getCache();
-      Attribute<String> tagName = ehcache.getSearchAttribute("tagName");
-
-      Query query = ehcache.createQuery();
-      results = query.includeKeys().addCriteria(tagName.ilike(name)).maxResults(1).execute();
-
-      return results.hasKeys();
-    }
-    finally {
-      if (results != null) {
-        // Discard the results when done to free up cache resources.
-        results.discard();
-      }
-    }
-
+    return !tagsFound.isEmpty();
   }
 
   @Override
@@ -193,11 +176,10 @@ public abstract class AbstractTagCache<T extends Tag> extends AbstractCache<Long
    * @param maxResults the maximum amount of results that shall be returned
    * @return All tags where the tag name is matching the regular expression.
    * Please note, that the result is limited by {@code maxResults}
-   * @see net.sf.ehcache.search.expression.ILike
+   * @see
    * @see #get(String)
    */
   private Collection<T> findByNameWildcard(String regex, int maxResults) {
-    Results results = null;
     Collection<T> resultList = new ArrayList<>();
 
     if (regex == null || regex.equalsIgnoreCase("")) {
@@ -217,32 +199,7 @@ public abstract class AbstractTagCache<T extends Tag> extends AbstractCache<Long
       }
     }
     else {
-      try {
-        Ehcache ehcache = getCache();
-        Attribute<String> tagName = ehcache.getSearchAttribute("tagName");
-
-        Query query = ehcache.createQuery();
-        results = query.includeKeys().addCriteria(tagName.ilike(regex)).maxResults(maxResults).execute();
-
-        log.debug(String.format("findByNameWildcard() - Got %d results for regex \"%s\"", results.size(), regex));
-
-        Long key;
-        for (Result result : results.all()) {
-          key = (Long) result.getKey();
-          if (key != null) {
-            resultList.add(get(key));
-          }
-          else {
-            log.warn(String.format("findByNameWildcard() - Regex \"%s\" returned a null key for cache %s", regex, getCacheName()));
-          }
-        }
-      }
-      finally {
-        if (results != null) {
-          // Discard the results when done to free up cache resources.
-          results.discard();
-        }
-      }
+      resultList = tagQuery.findTagsByWildcard(regex, 1);
     }
 
     log.debug(String.format("findByNameWildcard() - Found %d (maxResultSize = %d) tags in %s cache where tag names are matching wildcard \"%s\"", resultList.size(), maxResults, getCacheName(), regex));

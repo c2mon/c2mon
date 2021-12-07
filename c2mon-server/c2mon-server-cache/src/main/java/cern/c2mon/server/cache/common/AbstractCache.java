@@ -31,8 +31,7 @@ import cern.c2mon.server.ehcache.Ehcache;
 import cern.c2mon.server.ehcache.Element;
 import cern.c2mon.server.ehcache.event.RegisteredEventListeners;
 import cern.c2mon.server.ehcache.loader.CacheLoader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.springframework.jmx.export.annotation.ManagedOperation;
 
 import cern.c2mon.server.cache.C2monBufferedCacheListener;
@@ -233,7 +232,7 @@ private final CacheProperties properties;
    * Wraps the call to the underlying Ehcache.
    */
   public void putQuiet(T value) {
-    cache.putQuiet(new Element(value.getId(), value));
+    cache.putQuiet((K) value.getId(), value);
   }
 
   /**

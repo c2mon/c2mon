@@ -18,7 +18,7 @@ package cern.c2mon.server.daq;
 
 import cern.c2mon.server.cache.ClusterCache;
 import cern.c2mon.server.cache.ProcessCache;
-import cern.c2mon.server.cache.config.CacheModule;
+import cern.c2mon.server.cache.config.inmemory.CacheModule;
 import cern.c2mon.server.cache.dbaccess.config.CacheDbAccessModule;
 import cern.c2mon.server.common.config.CommonModule;
 import cern.c2mon.server.common.process.Process;
@@ -37,7 +37,6 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.listener.SessionAwareMessageListener;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.jms.ConnectionFactory;

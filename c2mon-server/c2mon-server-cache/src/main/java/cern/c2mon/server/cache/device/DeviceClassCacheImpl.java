@@ -16,28 +16,25 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.device;
 
-import javax.annotation.PostConstruct;
-
-import lombok.extern.slf4j.Slf4j;
-import cern.c2mon.server.ehcache.Ehcache;
-import cern.c2mon.server.ehcache.loader.CacheLoader;
-import cern.c2mon.server.ehcache.search.Attribute;
-import cern.c2mon.server.ehcache.search.Query;
-import cern.c2mon.server.ehcache.search.Results;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.jmx.export.annotation.ManagedResource;
-import org.springframework.stereotype.Service;
-
 import cern.c2mon.server.cache.ClusterCache;
 import cern.c2mon.server.cache.DeviceClassCache;
 import cern.c2mon.server.cache.common.AbstractCache;
 import cern.c2mon.server.cache.config.CacheProperties;
-import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
+import cern.c2mon.server.cache.device.query.DeviceClassQuery;
 import cern.c2mon.server.cache.loading.SimpleCacheLoaderDAO;
 import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
 import cern.c2mon.server.common.config.C2monCacheName;
 import cern.c2mon.server.common.device.DeviceClass;
+import cern.c2mon.server.ehcache.Ehcache;
+import cern.c2mon.server.ehcache.loader.CacheLoader;
+import lombok.extern.slf4j.Slf4j;
+
+import javax.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jmx.export.annotation.ManagedResource;
+import org.springframework.stereotype.Service;
 
 /**
  * Implementation of the Device class cache.
@@ -49,14 +46,18 @@ import cern.c2mon.server.common.device.DeviceClass;
 @ManagedResource(objectName = "cern.c2mon:type=cache,name=deviceClassCache")
 public class DeviceClassCacheImpl extends AbstractCache<Long, DeviceClass> implements DeviceClassCache {
 
+  private final DeviceClassQuery deviceClassQuery;
+
   @Autowired
   public DeviceClassCacheImpl(final ClusterCache clusterCache,
                               @Qualifier("deviceClassEhcache") final Ehcache ehcache,
                               @Qualifier("deviceClassEhcacheLoader") final CacheLoader cacheLoader,
                               @Qualifier("deviceClassCacheLoader") final C2monCacheLoader c2monCacheLoader,
                               @Qualifier("deviceClassDAO") final SimpleCacheLoaderDAO<DeviceClass> cacheLoaderDAO,
-                              final CacheProperties properties) {
+                              final CacheProperties properties,
+                              @Qualifier("deviceClassQuery") final DeviceClassQuery deviceClassQuery) {
     super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO, properties);
+    this.deviceClassQuery = deviceClassQuery;
   }
 
   /**
@@ -86,30 +87,12 @@ public class DeviceClassCacheImpl extends AbstractCache<Long, DeviceClass> imple
 
   @Override
   public Long getDeviceClassIdByName(String deviceClassName) {
-    Long deviceClassId;
 
     if (deviceClassName == null || deviceClassName.equalsIgnoreCase("")) {
       throw new IllegalArgumentException("Attempting to retrieve a DeviceClass from the cache with a NULL or empty name parameter.");
     }
 
-    Results results = null;
-    try {
-      Attribute<String> className = getCache().getSearchAttribute("deviceClassName");
-      Query query = getCache().createQuery();
-      results = query.includeKeys().addCriteria(className.eq(deviceClassName)).maxResults(1).execute();
-
-      if (results.size() == 0) {
-        throw new CacheElementNotFoundException("Failed to find a device class with name " + deviceClassName + " in the cache.");
-      }
-
-      deviceClassId = (long) results.all().get(0).getKey();
-    } finally {
-      if (results != null) {
-        results.discard();
-      }
-    }
-
-    return deviceClassId;
+    return deviceClassQuery.findDeviceByName(deviceClassName);
   }
 
   @Override

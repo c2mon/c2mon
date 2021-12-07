@@ -23,8 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 import cern.c2mon.server.ehcache.Ehcache;
 import cern.c2mon.server.ehcache.loader.CacheLoader;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;

@@ -16,29 +16,24 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.command;
 
-import javax.annotation.PostConstruct;
-
+import cern.c2mon.server.cache.ClusterCache;
+import cern.c2mon.server.cache.CommandTagCache;
+import cern.c2mon.server.cache.command.query.CommandTagQuery;
+import cern.c2mon.server.cache.common.AbstractCache;
 import cern.c2mon.server.cache.config.CacheProperties;
-import lombok.extern.slf4j.Slf4j;
+import cern.c2mon.server.cache.loading.SimpleCacheLoaderDAO;
+import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
+import cern.c2mon.server.common.config.C2monCacheName;
 import cern.c2mon.server.ehcache.Ehcache;
 import cern.c2mon.server.ehcache.loader.CacheLoader;
+import cern.c2mon.shared.common.command.CommandTag;
+import lombok.extern.slf4j.Slf4j;
 
-import cern.c2mon.server.ehcache.search.Attribute;
-import cern.c2mon.server.ehcache.search.Query;
-import cern.c2mon.server.ehcache.search.Results;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-
-import cern.c2mon.server.cache.ClusterCache;
-import cern.c2mon.server.cache.CommandTagCache;
-import cern.c2mon.server.cache.common.AbstractCache;
-import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
-import cern.c2mon.server.cache.loading.SimpleCacheLoaderDAO;
-import cern.c2mon.server.common.config.C2monCacheName;
-import cern.c2mon.shared.common.command.CommandTag;
 
 /**
  * Implementation of the CommandTag cache.
@@ -50,14 +45,18 @@ import cern.c2mon.shared.common.command.CommandTag;
 @Service
 public class CommandTagCacheImpl extends AbstractCache<Long, CommandTag> implements CommandTagCache {
 
+  private CommandTagQuery commandTagQuery;
+
   @Autowired
   public CommandTagCacheImpl(final ClusterCache clusterCache,
                              @Qualifier("commandTagEhcache") final Ehcache ehcache,
                              @Qualifier("commandTagEhcacheLoader") final CacheLoader cacheLoader,
                              @Qualifier("commandTagCacheLoader") final C2monCacheLoader c2monCacheLoader,
                              @Qualifier("commandTagDAO") final SimpleCacheLoaderDAO<CommandTag> cacheLoaderDAO,
-                             final CacheProperties properties) {
+                             final CacheProperties properties,
+                             @Qualifier("commandTagQuery") final CommandTagQuery commandTagQuery) {
     super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO, properties);
+    this.commandTagQuery = commandTagQuery;
   }
 
   @PostConstruct
@@ -79,34 +78,12 @@ public class CommandTagCacheImpl extends AbstractCache<Long, CommandTag> impleme
 
   @Override
   public Long getCommandTagId(final String name) {
-    Long commandTagKey = null;
-    Results results = null;
 
     if (name == null || name.equalsIgnoreCase("")) {
       throw new IllegalArgumentException("Attempting to retrieve a CommandTag from the cache with a NULL or empty name parameter.");
     }
 
-    try {
-      Attribute<String> commandTagName = getCache().getSearchAttribute("commandTagName");
-      Query query = getCache().createQuery();
-      results = query.includeKeys().addCriteria(commandTagName.eq(name)).maxResults(1).execute();
-
-      // Find the number of results -- the number of hits.
-      int size = results.size();
-      if (size == 0) {
-        log.info("Failed to find a command tag with name " + name + " in the cache.");
-      }
-
-      commandTagKey = results.all().size() > 0 ? (Long) results.all().get(0).getKey() : null;
-    }
-    finally {
-      if (results != null) {
-        // Discard the results when done to free up cache resources.
-        results.discard();
-      }
-    }
-
-    return commandTagKey;
+    return commandTagQuery.findCommandTagIdByName(name);
   }
 
   @Override

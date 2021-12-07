@@ -19,12 +19,11 @@ package cern.c2mon.server.cache.control;
 import javax.annotation.PostConstruct;
 
 import cern.c2mon.server.cache.config.CacheProperties;
+import cern.c2mon.server.cache.tag.query.TagQuery;
 import lombok.extern.slf4j.Slf4j;
 import cern.c2mon.server.ehcache.Ehcache;
 import cern.c2mon.server.ehcache.loader.CacheLoader;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jmx.export.annotation.ManagedResource;
@@ -56,8 +55,9 @@ public class ControlTagCacheImpl extends AbstractTagCache<ControlTag> implements
                              @Qualifier("controlTagEhcacheLoader") final CacheLoader cacheLoader,
                              @Qualifier("controlTagCacheLoader") final C2monCacheLoader c2monCacheLoader,
                              @Qualifier("controlTagLoaderDAO") final SimpleCacheLoaderDAO<ControlTag> cacheLoaderDAO,
-                             final CacheProperties properties) {
-    super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO, properties);
+                             final CacheProperties properties,
+                             @Qualifier("abstractControlTagQuery") final TagQuery<ControlTag> tagQuery) {
+    super(clusterCache, ehcache, cacheLoader, c2monCacheLoader, cacheLoaderDAO, properties, tagQuery);
   }
 
   /**

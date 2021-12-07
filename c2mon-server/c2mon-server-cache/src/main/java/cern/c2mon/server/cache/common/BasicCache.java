@@ -16,19 +16,17 @@
  *****************************************************************************/
 package cern.c2mon.server.cache.common;
 
-import java.io.Serializable;
-import java.util.List;
-
-import javax.annotation.PreDestroy;
-
-import org.springframework.context.support.ApplicationObjectSupport;
-import org.springframework.jmx.export.annotation.ManagedOperation;
-
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.ehcache.CacheException;
 import cern.c2mon.server.ehcache.Ehcache;
-import cern.c2mon.server.ehcache.Element;
 import lombok.extern.slf4j.Slf4j;
+
+import javax.annotation.PreDestroy;
+import java.io.Serializable;
+import java.util.List;
+
+import org.springframework.context.support.ApplicationObjectSupport;
+import org.springframework.jmx.export.annotation.ManagedOperation;
 
 /**
  * Provides all core functionalities that are required to manage a cache. This
@@ -46,7 +44,7 @@ public abstract class BasicCache<K, T extends Serializable> extends ApplicationO
   /**
    * Reference to the wrapped Ehcache.
    */
-  protected Ehcache cache;
+  protected Ehcache<K, T> cache;
 
   /**
    * Length of time (in milliseconds) to wait for a lock to be acquired.
@@ -120,10 +118,8 @@ public abstract class BasicCache<K, T extends Serializable> extends ApplicationO
 
       acquireReadLockOnKey(id);
       try {
-        Element element = cache.get(id);
-        if (element != null) {
-          result = (T) element.getObjectValue();
-        } else {
+        result = cache.get(id);
+        if (result == null) {
           throw new CacheElementNotFoundException("Failed to locate cache element with id " + id + " (Cache is " + this.getClass() + ")");
         }
       } catch (CacheException cacheException) {
@@ -153,7 +149,7 @@ public abstract class BasicCache<K, T extends Serializable> extends ApplicationO
   }
 
   public void put(K key, T value) {
-    cache.put(new Element(key, value));
+    cache.put(key, value);
   }
 
   /**

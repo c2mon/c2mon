@@ -30,7 +30,7 @@ import cern.c2mon.server.cache.dbaccess.AlarmMapper;
 import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.common.alarm.AlarmCacheObject;
 import cern.c2mon.server.test.CacheObjectComparison;
-import cern.c2mon.shared.client.alarm.AlarmQuery;
+import cern.c2mon.shared.client.alarm.AlarmQueryFilter;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -88,7 +88,7 @@ public class AlarmCacheTest extends AbstractCacheIntegrationTest {
 
   @Test
   public void testFindAlarms() {
-    AlarmQuery query = AlarmQuery.builder().faultFamily("TEST_*").build();
+    AlarmQueryFilter query = AlarmQueryFilter.builder().faultFamily("TEST_*").build();
 
     Collection<Long> result = alarmCache.findAlarm(query);
     assertNotNull(result);
@@ -97,7 +97,7 @@ public class AlarmCacheTest extends AbstractCacheIntegrationTest {
 
   @Test
   public void testFindOscillatingAlarms() {
-    AlarmQuery query = AlarmQuery.builder().oscillating(true).build();
+    AlarmQueryFilter query = AlarmQueryFilter.builder().oscillating(true).build();
 
     Collection<Long> result = alarmCache.findAlarm(query);
     assertNotNull(result);
@@ -106,7 +106,7 @@ public class AlarmCacheTest extends AbstractCacheIntegrationTest {
 
   @Test
   public void testGetActiveAlarms() {
-    AlarmQuery query = AlarmQuery.builder().active(true).build();
+    AlarmQueryFilter query = AlarmQueryFilter.builder().active(true).build();
     AlarmCacheObject toChange = (AlarmCacheObject) alarmCache.get(350000L);
     toChange.setActive(true);
 
@@ -118,7 +118,7 @@ public class AlarmCacheTest extends AbstractCacheIntegrationTest {
 
   @Test
   public void testGetAlarmsByCodeAndFamily() {
-    AlarmQuery query = AlarmQuery.builder().faultFamily("TEST_*").faultCode(20).build();
+    AlarmQueryFilter query = AlarmQueryFilter.builder().faultFamily("TEST_*").faultCode(20).build();
     Collection<Long> result = alarmCache.findAlarm(query);
     assertNotNull(result);
     assertEquals("Search result != 4", 4, result.size());

@@ -6,21 +6,30 @@ package cern.c2mon.server.ehcache;
 
 import java.io.Serializable;
 
+/**
+ * A Cache Element, consisting of a key, value and attributes.
+ */
 public class Element implements Serializable, Cloneable {
+
+    private final Object key;
+
+    private final Object value;
 
     /**
      * @param key
      * @param value
      */
-    public Element(Object key, Object value) {
-        // TODO Auto-generated constructor stub
+    public Element(final Object key, final Object value) {
+       this.key = key;
+       this.value = value;
     }
 
-    /**
-     * @return
-     */
-    public Serializable getObjectValue() {
-        return null;
+    public Object getKey() {
+        return key;
+    }
+
+    public Object getObjectValue() {
+        return value;
     }
 
 }

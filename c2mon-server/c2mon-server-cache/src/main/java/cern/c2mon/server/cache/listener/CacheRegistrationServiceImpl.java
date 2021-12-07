@@ -18,7 +18,6 @@ package cern.c2mon.server.cache.listener;
 
 import cern.c2mon.server.cache.config.CacheProperties;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.cache.AlarmCache;

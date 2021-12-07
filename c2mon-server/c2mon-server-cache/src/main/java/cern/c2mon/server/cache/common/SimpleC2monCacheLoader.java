@@ -230,8 +230,8 @@ public class SimpleC2monCacheLoader<T extends Cacheable> implements C2monCacheLo
     public void run() {
       while (!keyList.isEmpty()) {
           Object key = keyList.pollFirst();
-          cache.putQuiet(new Element(key, preloadBuffer.get(key)));
-          cache.putQuiet(new Element(key, preloadBuffer.get(key)));
+          cache.putQuiet(key, preloadBuffer.get(key));
+          cache.putQuiet(key, preloadBuffer.get(key));
       }
     }
   }
