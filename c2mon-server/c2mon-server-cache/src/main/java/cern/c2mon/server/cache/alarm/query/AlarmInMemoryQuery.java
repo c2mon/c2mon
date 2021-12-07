@@ -8,6 +8,7 @@ import cern.c2mon.shared.client.alarm.AlarmQueryFilter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -30,10 +31,12 @@ public class AlarmInMemoryQuery implements AlarmQuery {
             predicates.add(alarm -> alarm.getFaultCode() == query.getFaultCode());
         }
         if (query.getFaultFamily() != null && !"".equals(query.getFaultFamily())) {
-            predicates.add(alarm -> alarm.getFaultFamily() == query.getFaultFamily());
+            Pattern pattern = Pattern.compile(query.getFaultFamily());
+            predicates.add(alarm -> pattern.matcher(alarm.getFaultFamily()).find());
         }
         if (query.getFaultMember() != null && !"".equals(query.getFaultMember())) {
-            predicates.add(alarm -> alarm.getFaultMember() == query.getFaultMember());
+            Pattern pattern = Pattern.compile(query.getFaultMember());
+            predicates.add(alarm -> pattern.matcher(alarm.getFaultMember()).find());
         }
         if (query.getPriority() != 0) {
             //TODO this attribute isn't used ? Does not appear in cern.c2mon.server.cache.dbaccess.AlarmMapper
