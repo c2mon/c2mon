@@ -17,23 +17,23 @@
 package cern.c2mon.shared.client.alarm.condition;
 
 
+import cern.c2mon.shared.common.type.TypeConverter;
+import cern.c2mon.shared.util.parser.SimpleXMLParser;
+
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import org.apache.commons.lang.ArrayUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import cern.c2mon.shared.common.type.TypeConverter;
-import cern.c2mon.shared.util.parser.SimpleXMLParser;
 
 
 /**
@@ -203,15 +203,26 @@ public abstract class AlarmCondition implements Serializable {
   }
 
   private static Field[] getAllFields(Class<?> conditionClass) {
-    Field[] fields = conditionClass.getDeclaredFields();
+    List<Field> fields = new ArrayList<>();
+
+    for(Field f : conditionClass.getDeclaredFields()){
+      if(!f.isSynthetic()){
+        fields.add(f);
+      }
+    }
 
     Class<?> superClass = conditionClass.getSuperclass();
     while (superClass != null && superClass != AlarmCondition.class && superClass != Object.class) {
-      fields = (Field[]) ArrayUtils.addAll(fields, superClass.getDeclaredFields());
+
+      for(Field f : superClass.getDeclaredFields()) {
+        if (!f.isSynthetic()) {
+          fields.add(f);
+        }
+      }
       superClass = superClass.getSuperclass();
     }
 
-    return fields;
+    return fields.toArray(new Field[fields.size()]);
   }
 
   private static Map<String, Field> getAllFieldsAsMap(Class<?> conditionClass) {

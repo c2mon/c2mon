@@ -1,6 +1,5 @@
 package cern.c2mon.server.cache.command.query;
 
-import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
 import cern.c2mon.server.ehcache.Ehcache;
 import cern.c2mon.server.ehcache.impl.IgniteCacheImpl;
 import cern.c2mon.shared.common.command.CommandTag;
@@ -25,15 +24,15 @@ public class CommandTagIgniteQuery implements CommandTagQuery {
     }
 
     @Override
-    public Long findCommandTagIdByName(String name) throws CacheElementNotFoundException {
-        IgniteBiPredicate<Long, CommandTag> predicate = (id, tag) -> tag.getName().equals(name);
+    public Long findCommandTagIdByName(String name) {
+        IgniteBiPredicate<Long, CommandTag> predicate = (id, tag) -> tag.getName().equalsIgnoreCase(name);
 
         List<Long> result = cache.getCache().query(new ScanQuery<>(predicate),
                 (IgniteClosure<Cache.Entry<Long, CommandTag>, Long>) Cache.Entry::getKey).getAll();
 
-        if(result.size() == 0){
-            LOG.warn("No CommandTag with name {} was found", name);
-            throw new CacheElementNotFoundException();
+        if(result.isEmpty()){
+            LOG.info("Failed to find a command tag with name " + name + " in the cache.");
+            return null;
         }
 
         return result.get(0);

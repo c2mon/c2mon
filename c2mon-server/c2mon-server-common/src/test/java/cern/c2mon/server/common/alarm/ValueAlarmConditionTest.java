@@ -23,6 +23,7 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 
 import cern.c2mon.shared.client.alarm.condition.AlarmCondition;
+import cern.c2mon.shared.client.alarm.condition.ValueAlarmCondition;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
 import cern.c2mon.shared.util.parser.SimpleXMLParser;
 
@@ -84,6 +85,8 @@ public class ValueAlarmConditionTest {
   public void testDeserialization() throws ParserConfigurationException {
     AlarmCondition valueAlarmCondition = new ValueAlarmCondition("DOWN");
     String xmlString = valueAlarmCondition.toConfigXML();
+
+    System.out.println(xmlString);
 
     SimpleXMLParser parser = new SimpleXMLParser();
     Document document = parser.parse(xmlString);
