@@ -6,6 +6,7 @@ import cern.c2mon.server.ehcache.Ehcache;
 import cern.c2mon.server.ehcache.impl.InMemoryCache;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -28,7 +29,7 @@ public class DataTagInMemoryQuery implements DataTagQuery {
 
         List<Long> tagIds;
 
-        Predicate<DataTag> filter = dataTag -> dataTag.getEquipmentId().equals(equipmentId);
+        Predicate<DataTag> filter = dataTag -> Objects.equals(dataTag.getEquipmentId(), equipmentId);
 
 
         try(Stream<DataTag> stream = cache.getCache().values().stream()){
@@ -53,7 +54,7 @@ public class DataTagInMemoryQuery implements DataTagQuery {
 
         List<Long> tagIds;
 
-        Predicate<DataTag> filter = dataTag -> dataTag.getSubEquipmentId().equals(subEquipmentId);
+        Predicate<DataTag> filter = dataTag -> Objects.equals(dataTag.getSubEquipmentId(), subEquipmentId);
 
         try(Stream<DataTag> stream = cache.getCache().values().stream()){
 

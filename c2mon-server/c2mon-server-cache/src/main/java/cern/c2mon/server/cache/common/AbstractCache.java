@@ -316,6 +316,9 @@ private final CacheProperties properties;
     return bufferedKeyCacheListener;
   }
 
+  public void removeAll(){
+    cache.removeAll();
+  }
 
   //***************************
   // GETTERS AND SETTERS

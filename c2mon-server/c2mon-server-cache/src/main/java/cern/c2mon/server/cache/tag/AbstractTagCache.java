@@ -129,7 +129,7 @@ public abstract class AbstractTagCache<T extends Tag> extends AbstractCache<Long
       name = name.replace("?", "\\?");
     }
 
-    List<T> tagsFound = tagQuery.findTagsByWildcard(name, 1);
+    List<T> tagsFound = tagQuery.findTagsByName(name, 1);
 
     return !tagsFound.isEmpty();
   }
@@ -148,7 +148,7 @@ public abstract class AbstractTagCache<T extends Tag> extends AbstractCache<Long
       name = name.replace("?", "\\?");
     }
 
-    Collection<T> results = findByNameWildcard(name, 1);
+    Collection<T> results = tagQuery.findTagsByName(name, 1);
     for (T tag : results) {
       return tag;
     }
@@ -199,7 +199,7 @@ public abstract class AbstractTagCache<T extends Tag> extends AbstractCache<Long
       }
     }
     else {
-      resultList = tagQuery.findTagsByWildcard(regex, 1);
+      resultList = tagQuery.findTagsByWildcard(regex, maxResults);
     }
 
     log.debug(String.format("findByNameWildcard() - Found %d (maxResultSize = %d) tags in %s cache where tag names are matching wildcard \"%s\"", resultList.size(), maxResults, getCacheName(), regex));

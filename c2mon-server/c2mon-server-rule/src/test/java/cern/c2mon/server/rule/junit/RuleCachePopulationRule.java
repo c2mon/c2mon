@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import cern.c2mon.server.cache.alarm.impl.AlarmCacheImpl;
 import cern.c2mon.server.cache.alive.AliveTimerCacheImpl;
+import cern.c2mon.server.cache.cluster.ClusterCacheImpl;
 import cern.c2mon.server.cache.command.CommandTagCacheImpl;
 import cern.c2mon.server.cache.commfault.CommFaultTagCacheImpl;
 import cern.c2mon.server.cache.control.ControlTagCacheImpl;
@@ -65,10 +66,28 @@ public class RuleCachePopulationRule extends DatabasePopulationRule {
   @Autowired
   private DeviceCacheImpl deviceCache;
 
+  @Autowired
+  private ClusterCacheImpl clusterCache;
+
   @Override
   protected void before() throws SQLException {
     super.before();
-    CacheManager.getInstance().clearAll();
+//    //CacheManager.getInstance().clearAll();
+    clusterCache.removeAll();
+    controlTagCache.removeAll();
+    processCache.removeAll();
+    dataTagCache.removeAll();
+    equipmentCache.removeAll();
+    aliveTimerCache.removeAll();
+    commFaultTagCache.removeAll();
+    subEquipmentCache.removeAll();
+    alarmCache.removeAll();
+    ruleTagCache.removeAll();
+    commandTagCache.removeAll();
+    deviceClassCache.removeAll();
+    deviceCache.removeAll();
+
+    clusterCache.init();
     controlTagCache.init();
     processCache.init();
     dataTagCache.init();

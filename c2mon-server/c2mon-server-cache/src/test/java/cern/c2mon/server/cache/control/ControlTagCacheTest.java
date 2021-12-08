@@ -97,7 +97,7 @@ public class ControlTagCacheTest extends AbstractCacheIntegrationTest {
   
   @Test
   public void testSearchWithNameWildcard() {
-    Collection<ControlTag> resultList = controlTagCache.findByNameWildcard("*does_not_exist*");
+    Collection<ControlTag> resultList = controlTagCache.findByNameWildcard("does_not_exist*");
     Assert.assertNotNull(resultList);
     Assert.assertEquals(0, resultList.size());
     

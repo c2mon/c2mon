@@ -7,6 +7,7 @@ import cern.c2mon.server.ehcache.impl.IgniteCacheImpl;
 
 import javax.cache.Cache;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.ignite.cache.query.ScanQuery;
 import org.apache.ignite.lang.IgniteBiPredicate;
@@ -28,7 +29,7 @@ public class DataTagIgniteQuery implements DataTagQuery {
                     "parameter.");
         }
 
-        IgniteBiPredicate<Long, DataTag> predicate = (id, dataTag) -> dataTag.getEquipmentId() == equipmentId;
+        IgniteBiPredicate<Long, DataTag> predicate = (id, dataTag) -> Objects.equals(dataTag.getEquipmentId(), equipmentId);
 
         List<Long> tagIds = cache.getCache().query(new ScanQuery<>(
                 predicate),
@@ -50,7 +51,7 @@ public class DataTagIgniteQuery implements DataTagQuery {
                     "parameter.");
         }
 
-        IgniteBiPredicate<Long, DataTag> predicate = (id, dataTag) -> dataTag.getSubEquipmentId() == subEquipmentId;
+        IgniteBiPredicate<Long, DataTag> predicate = (id, dataTag) -> Objects.equals(dataTag.getSubEquipmentId(), subEquipmentId);
 
         List<Long> tagIds = cache.getCache().query(new ScanQuery<>(
                         predicate),

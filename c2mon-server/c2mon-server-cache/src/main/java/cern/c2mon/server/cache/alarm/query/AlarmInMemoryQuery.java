@@ -12,8 +12,13 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 public class AlarmInMemoryQuery implements AlarmQuery {
+
+    private static final Logger LOG = LoggerFactory.getLogger(AlarmInMemoryQuery.class);
 
     private final InMemoryCache cache;
 
@@ -31,12 +36,12 @@ public class AlarmInMemoryQuery implements AlarmQuery {
             predicates.add(alarm -> alarm.getFaultCode() == query.getFaultCode());
         }
         if (query.getFaultFamily() != null && !"".equals(query.getFaultFamily())) {
-            Pattern pattern = Pattern.compile(query.getFaultFamily());
-            predicates.add(alarm -> pattern.matcher(alarm.getFaultFamily()).find());
+            Pattern pattern = Pattern.compile(replaceWildcardSymbols(query.getFaultFamily()), Pattern.CASE_INSENSITIVE);
+            predicates.add(alarm -> pattern.matcher(alarm.getFaultFamily()).matches());
         }
         if (query.getFaultMember() != null && !"".equals(query.getFaultMember())) {
-            Pattern pattern = Pattern.compile(query.getFaultMember());
-            predicates.add(alarm -> pattern.matcher(alarm.getFaultMember()).find());
+            Pattern pattern = Pattern.compile(replaceWildcardSymbols(query.getFaultMember()), Pattern.CASE_INSENSITIVE);
+            predicates.add(alarm -> pattern.matcher(alarm.getFaultMember()).matches());
         }
         if (query.getPriority() != 0) {
             //TODO this attribute isn't used ? Does not appear in cern.c2mon.server.cache.dbaccess.AlarmMapper
@@ -55,5 +60,20 @@ public class AlarmInMemoryQuery implements AlarmQuery {
         }
 
         return result;
+    }
+
+    /**
+     * Method to replace the character '*' by '.*' and '?' by '.?' to work with the Java Pattern
+     * @param wildcard
+     * @return
+     */
+    private String replaceWildcardSymbols(String wildcard){
+        if(wildcard.contains("*") || wildcard.contains("?")) {
+            String result = wildcard.replace("*", ".*").replace("?", ".?");
+            LOG.debug("Replaced wildcard symbols on wildcard {}. Result: {}", wildcard, result);
+            return result;
+        }else{
+            return wildcard;
+        }
     }
 }

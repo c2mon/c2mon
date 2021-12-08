@@ -62,4 +62,8 @@ public class ClusterCacheImpl extends DefaultCacheImpl<String, Serializable> imp
       cache.releaseWriteLockOnKey(clusterInitializedKey);
     }
   }
+
+  public void removeAll(){
+    cache.removeAll();
+  }
 }
