@@ -62,25 +62,6 @@ public class IgniteCacheImpl<T, K> implements Ehcache<T, K> {
         Ignite ignite = Ignition.getOrStart(igniteConfig);
         cache = ignite.getOrCreateCache(cacheCfg);
     }
-/*
-    public IgniteCacheImpl(String cacheName){
-        this.registeredEventListeners = new RegisteredEventListeners(this);
-        this.registeredCacheLoaders = new ArrayList<>();
-        
-        this.cacheName = cacheName;
-
-        //ADD TO CONFIG CLASS
-        CacheConfiguration cacheCfg = new CacheConfiguration();
-        cacheCfg.setName(cacheName);
-        cacheCfg.setAtomicityMode(CacheAtomicityMode.TRANSACTIONAL);
-
-        IgniteConfiguration cfg = new IgniteConfiguration();
-        cfg.setCacheConfiguration(cacheCfg);
-        cfg.setIgniteInstanceName("c2mon-ignite");
-
-        Ignite ignite = Ignition.getOrStart(cfg);;
-        cache = ignite.getOrCreateCache(cacheCfg);
-    }*/
 
     private IgniteConfiguration getIgniteConfiguration(){
 
@@ -171,8 +152,11 @@ public class IgniteCacheImpl<T, K> implements Ehcache<T, K> {
 
     @Override
     public boolean remove(T id) {
-        if(locks.containsKey(id)){
-           return cache.remove(id);
+        if(cache.containsKey(id)){
+           lock(id);
+           boolean removed = cache.remove(id);
+           unlock(id);
+           return removed;
         }
         return false;
     }
