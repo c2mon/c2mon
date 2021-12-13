@@ -4,6 +4,8 @@
             <dependencies>
                 <dep groupId="org.springframework" product="spring-tx" version="5.1.2.RELEASE"/>
                 <dep groupId="org.projectlombok" product="lombok" version="1.18.12"/>
+
+                <!-- Test dependencies -->
                 <dep groupId="junit" product="junit" version="4.12" scope="test"/>
             </dependencies>
 

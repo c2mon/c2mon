@@ -13,6 +13,8 @@
                 <dep groupId="com.fasterxml.jackson.core" product="jackson-core" version="2.9.2"/>
                 <dep groupId="com.fasterxml.jackson.core" product="jackson-databind" version="2.9.2"/>
 <!--                 <dep groupId="net.sf.ehcache" product="ehcache-core" version="2.6.6" scope="test"/> -->
+
+                <!-- Test dependencies -->
                 <dep groupId="junit" product="junit" version="4.12" scope="test"/>
                 <dep groupId="org.easymock" product="easymock" version="3.4" scope="test"/>
                 <dep groupId="org.springframework" product="spring-test" version="5.1.2.RELEASE" scope="test"/>

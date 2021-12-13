@@ -11,8 +11,6 @@
                 <dep groupId="org.projectlombok" product="lombok" version="1.18.12"/>
 <!--                 <dep groupId="net.sf.ehcache" product="ehcache-core" version="2.6.6"/>  -->
                 <dep groupId="org.springframework" product="spring-jms" version="5.1.2.RELEASE"/>
-                <dep groupId="org.springframework.boot" product="spring-boot-starter-test" version="2.1.0.RELEASE" scope="test"/>
-                <dep groupId="junit" product="junit" version="4.12" scope="test"/>
 
                 <!-- Runtime dependencies required to support HTTP via ActiveMQ -->
                 <dep groupId="org.apache.activemq" product="activemq-http" version="5.15.2"/>
@@ -20,6 +18,10 @@
                 <dep groupId="org.apache.httpcomponents" product="httpclient" version="4.5.10"/>
 
                 <dep product="ojdbc8" groupId="com.oracle" version="PRO" />
+
+                <!-- Test dependencies -->
+                <dep groupId="org.springframework.boot" product="spring-boot-starter-test" version="2.1.0.RELEASE" scope="test"/>
+                <dep groupId="junit" product="junit" version="4.12" scope="test"/>
             </dependencies>
 
         <application runtimeJvm="jdk1.8" name="laser-c2-server">

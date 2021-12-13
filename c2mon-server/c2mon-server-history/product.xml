@@ -8,9 +8,11 @@
                 <dep groupId="org.springframework" product="spring-context" version="5.1.2.RELEASE"/>
                 <dep groupId="org.springframework" product="spring-beans" version="5.1.2.RELEASE"/>
                 <dep groupId="org.springframework" product="spring-tx" version="5.1.2.RELEASE"/>
-                <dep groupId="org.springframework" product="spring-test" version="5.1.2.RELEASE" scope="test"/>
                 <dep groupId="org.springframework.boot" product="spring-boot-starter" version="2.1.0.RELEASE"/>
                 <dep groupId="org.projectlombok" product="lombok" version="1.18.12"/>
+
+                <!-- Test dependencies -->
+                <dep groupId="org.springframework" product="spring-test" version="5.1.2.RELEASE" scope="test"/>
                 <dep groupId="junit" product="junit" version="4.12" scope="test"/>
                 <dep groupId="org.easymock" product="easymock" version="3.4" scope="test"/>
             </dependencies>

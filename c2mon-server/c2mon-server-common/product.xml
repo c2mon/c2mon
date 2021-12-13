@@ -4,7 +4,6 @@
             Classes that are shared across the server modules (but not outside the server).</desc>
             <dependencies>
                 <dep groupId="org.springframework" product="spring-tx" version="5.1.2.RELEASE"/>
-                <dep groupId="org.springframework" product="spring-test" version="5.1.2.RELEASE" scope="test"/>
                 <dep groupId="org.springframework.boot" product="spring-boot-starter-data-jpa" version="2.1.0.RELEASE"/>
                 <dep groupId="org.springframework.boot" product="spring-boot-starter-activemq" version="2.1.0.RELEASE"/>
                 <dep groupId="org.apache.activemq" product="activemq-broker" version="5.15.2"/>
@@ -13,6 +12,9 @@
                 <dep groupId="org.slf4j" product="slf4j-api" version="1.7.30"/>
                 <dep groupId="org.hsqldb" product="hsqldb" version="2.3.4"/>
                 <dep groupId="org.projectlombok" product="lombok" version="1.18.12"/>
+
+                <!-- Test dependencies -->
+                <dep groupId="org.springframework" product="spring-test" version="5.1.2.RELEASE" scope="test"/>
                 <dep groupId="junit" product="junit" version="4.12" scope="test"/>
                 <dep groupId="org.easymock" product="easymock" version="3.4" scope="test"/>
             </dependencies>
