@@ -23,6 +23,11 @@ public class ServerProperties {
   private String home = "/tmp";
 
   /**
+   * Archive configuration reports on disk
+   */
+  private boolean archiveReports = true;
+
+  /**
    * Enable/disable test mode. In test mode, all DAQ connections are accepted
    * regardless of whether another DAQ with the same name is already connected
    */

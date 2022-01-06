@@ -115,8 +115,12 @@ class RepublisherImpl<T> implements Republisher<T> {
 
   @Override
   public void stop() {
-    if (isRunning())
+    long methodStartTime = System.nanoTime();
+    if (isRunning()) {
       timer.cancel();
+    }
+    long methodEndTime = System.nanoTime();
+    LOGGER.info("RepublisherImpl stop method took {} ms", ((methodEndTime - methodStartTime) / 1000000));
   }
 
   /**

@@ -130,6 +130,7 @@ public final class CacheListener<T extends Cacheable> extends ApplicationObjectS
    */
   @Override
   public void stop() {
+    long methodStartTime = System.nanoTime();
     if (running) {
       running = false;
       if (log.isDebugEnabled()) {
@@ -138,6 +139,8 @@ public final class CacheListener<T extends Cacheable> extends ApplicationObjectS
       notifyUpdateThreadHandler.shutdown();
       statusConfirmationHandler.shutdown();
     }
+    long methodEndTime = System.nanoTime();
+    log.info("CacheListener stop method took {} ms", ((methodEndTime - methodStartTime) / 1000000));
   }
 
 

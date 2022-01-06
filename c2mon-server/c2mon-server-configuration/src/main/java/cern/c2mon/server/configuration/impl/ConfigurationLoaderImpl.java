@@ -139,6 +139,11 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
   private String reportDirectory;
 
   /**
+   * Archive configuration reports on disk flag
+   */
+  private boolean archiveReports;
+
+  /**
    * Flag indicating if a cancel request has been made.
    */
   private volatile boolean cancelRequested = false;
@@ -190,6 +195,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
     this.sequenceDAO = sequenceDAO;
     this.daqConfigEnabled = properties.isDaqConfigEnabled();
     this.reportDirectory = serverProperties.getHome() + "/reports";
+    this.archiveReports = serverProperties.isArchiveReports();
   }
 
   @Override
@@ -650,17 +656,19 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
    * @param xmlReport the XML report in String format
    */
   private void archiveReport(String configId, String xmlReport) {
-    new File(reportDirectory).mkdirs();
+    if(archiveReports){
+      new File(reportDirectory).mkdirs();
 
-    try {
-      File outFile = new File(reportDirectory, "report_" + configId + "_" + System.currentTimeMillis() + ".xml");
-      FileWriter fileWriter;
-      fileWriter = new FileWriter(outFile);
-      BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-      bufferedWriter.write(xmlReport);
-      bufferedWriter.close();
-    } catch (Exception e) {
-      log.error("Exception caught while writing configuration report to directory: {}", reportDirectory, e);
+      try {
+        File outFile = new File(reportDirectory, "report_" + configId + "_" + System.currentTimeMillis() + ".xml");
+        FileWriter fileWriter;
+        fileWriter = new FileWriter(outFile);
+        BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+        bufferedWriter.write(xmlReport);
+        bufferedWriter.close();
+      } catch (Exception e) {
+        log.error("Exception caught while writing configuration report to directory: {}", reportDirectory, e);
+      }
     }
   }
 
