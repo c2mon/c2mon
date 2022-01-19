@@ -157,11 +157,14 @@ public abstract class AbstractBufferedCacheListener<T extends Cacheable, S> impl
 
   @Override
   public synchronized void stop() {
+    long methodStartTime = System.nanoTime();
     if (enabled) {
       log.info("Shutting down BufferedKeyCacheListener for {}", bufferedCacheListener.getThreadName());
       enabled = false;
       flush();
     }
+    long methodEndTime = System.nanoTime();
+    log.info("AbstractBufferedCacheListener stop method took {} ms", ((methodEndTime - methodStartTime) / 1000000));
   }
 
   private synchronized void flush() {

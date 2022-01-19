@@ -20,6 +20,9 @@ import java.util.concurrent.ExecutorService;
 
 import cern.c2mon.shared.daq.lifecycle.Lifecycle;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Allows executor shutdown via the C2MON {@link Lifecycle} interface.
  * Used in particular for listeners to be able to shutdown notification
@@ -31,6 +34,8 @@ import cern.c2mon.shared.daq.lifecycle.Lifecycle;
  *
  */
 public class ExecutorLifecycleHandle implements Lifecycle {
+
+  private static final Logger LOG = LoggerFactory.getLogger(ExecutorLifecycleHandle.class);
 
   /**
    * Service to manage.
@@ -58,7 +63,10 @@ public class ExecutorLifecycleHandle implements Lifecycle {
 
   @Override
   public void stop() {
+    long methodStartTime = System.nanoTime();
     executor.shutdown();
+    long methodEndTime = System.nanoTime();
+    LOG.info("ExecutorLifecycleHandle stop method took {} ms", ((methodEndTime - methodStartTime) / 1000000));
   }
 
 }

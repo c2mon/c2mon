@@ -157,6 +157,7 @@ public class MultiThreadedCacheListener<T extends Cacheable> implements C2monCac
    */
   @Override
   public synchronized void stop() {
+    long methodStartTime = System.nanoTime();
     if (running) {
       log.debug("Shutting down Multithreaded cache listener.");
       running = false;      
@@ -175,7 +176,9 @@ public class MultiThreadedCacheListener<T extends Cacheable> implements C2monCac
       } catch (InterruptedException ex) {
         log.error("Interrupted while waiting for shutdown to complete", ex);
       }
-    }    
+    }
+    long methodEndTime = System.nanoTime();
+    log.info("MultiThreadedCacheListener stop method took {} ms", ((methodEndTime - methodStartTime) / 1000000));
   }
   
   /**
