@@ -3,6 +3,7 @@
         <desc></desc>
             <dependencies>
                 <dep groupId="org.apache.ignite" product="ignite-core" version="2.11.1"/>
+                <dep groupId="org.apache.ignite" product="ignite-indexing" version="2.11.1"/>
                 <dep groupId="org.slf4j" product="slf4j-api" version="1.7.30"/>
                 <dep groupId="org.slf4j" product="slf4j-simple" version="1.7.30"/>
                 <dep groupId="org.springframework.boot" product="spring-boot-starter" version="2.1.0.RELEASE"/>

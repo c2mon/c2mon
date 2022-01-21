@@ -1,20 +1,14 @@
 package cern.c2mon.server.cache.alarm.query;
 
-import cern.c2mon.server.common.alarm.Alarm;
 import cern.c2mon.server.ehcache.Ehcache;
 import cern.c2mon.server.ehcache.impl.IgniteCacheImpl;
 import cern.c2mon.shared.client.alarm.AlarmQueryFilter;
 
-import javax.cache.Cache;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import org.apache.ignite.cache.query.ScanQuery;
-import org.apache.ignite.lang.IgniteBiPredicate;
-import org.apache.ignite.lang.IgniteClosure;
+import org.apache.ignite.cache.query.QueryCursor;
+import org.apache.ignite.cache.query.SqlFieldsQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,49 +25,59 @@ public class AlarmIgniteQuery implements AlarmQuery {
     @Override
     public List<Long> findAlarm(AlarmQueryFilter query) {
 
-        ArrayList<IgniteBiPredicate<Long, Alarm>> predicates = new ArrayList<>();
+        List<String> conditions = new ArrayList<>();
 
         if (query.getFaultCode() != 0) {
-            predicates.add((id, alarm) -> alarm.getFaultCode() == query.getFaultCode());
+            conditions.add("FAULTCODE = " + query.getFaultCode());
         }
         if (query.getFaultFamily() != null && !"".equals(query.getFaultFamily())) {
-            Pattern pattern = Pattern.compile(replaceWildcardSymbols(query.getFaultFamily()), Pattern.CASE_INSENSITIVE);
-            predicates.add((id, alarm) -> pattern.matcher(alarm.getFaultFamily()).matches());
+            conditions.add("upper(FAULTFAMILY) like upper('" + replaceWildcardSymbols(query.getFaultFamily()) + "')");
         }
         if (query.getFaultMember() != null && !"".equals(query.getFaultMember())) {
-            Pattern pattern = Pattern.compile(replaceWildcardSymbols(query.getFaultMember()), Pattern.CASE_INSENSITIVE);
-            predicates.add((id, alarm) -> pattern.matcher(alarm.getFaultMember()).matches());
+            conditions.add("upper(FAULTMEMBER) like upper('" + replaceWildcardSymbols(query.getFaultMember()) + "')");
         }
         if (query.getPriority() != 0) {
             //TODO this attribute isn't used ? Does not appear in cern.c2mon.server.cache.dbaccess.AlarmMapper
         }
         if (query.getActive() != null) {
-            predicates.add((id, alarm) -> alarm.isActive() == query.getActive());
+            conditions.add("ACTIVE = " + query.getActive());
         }
         if (query.getOscillating() != null) {
-            predicates.add((id, alarm) -> alarm.isOscillating() == query.getOscillating());
+            conditions.add("OSCILLATING = " + query.getOscillating());
         }
 
-        IgniteBiPredicate<Long, Alarm> compositePredicate = predicates.stream().reduce((z, w) -> true, IgniteBiPredicate::and);
+        StringBuilder findAlarmQuery = new StringBuilder();
 
-        List<Long> result = cache.getCache().query(new ScanQuery<>(compositePredicate),
-                (IgniteClosure<Cache.Entry<Long, Alarm>, Long>) Cache.Entry::getKey).getAll();
+        findAlarmQuery.append("select _key from AlarmCacheObject");
 
-        try(Stream<Long> stream = result.stream()) {
-            result = stream.limit(query.getMaxResultSize()).collect(Collectors.toList());
+        for(int i = 0; i < conditions.size(); i++){
+            if(i==0){
+                findAlarmQuery.append(" where " + conditions.get(i));
+            }else{
+                findAlarmQuery.append(" and " + conditions.get(i));
+            }
         }
 
-        return result;
+        SqlFieldsQuery sql = new SqlFieldsQuery(findAlarmQuery.toString());
+
+        List<Long> alarmIds = new ArrayList<>();
+
+        try (QueryCursor<List<?>> cursor = cache.getCache().query(sql)) {
+            for (List<?> row : cursor) {
+                alarmIds.add((Long) row.get(0));
+            }
+        }
+        return alarmIds;
     }
 
     /**
-     * Method to replace the character '*' by '.*' and '?' by '.?' to work with the Java Pattern
+     * Method to replace the character '*' by '%' and '?' by '_' to work with the Java Pattern
      * @param wildcard
      * @return
      */
     private String replaceWildcardSymbols(String wildcard){
         if(wildcard.contains("*") || wildcard.contains("?")) {
-            String result = wildcard.replace("*", ".*").replace("?", ".?");
+            String result = wildcard.replace("*", "%").replace("?", "_");
             LOG.debug("Replaced wildcard symbols on wildcard {}. Result: {}", wildcard, result);
             return result;
         }else{

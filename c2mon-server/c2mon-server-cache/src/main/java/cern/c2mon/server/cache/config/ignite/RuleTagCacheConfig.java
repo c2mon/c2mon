@@ -8,10 +8,12 @@ import cern.c2mon.server.cache.loading.config.CacheLoadingProperties;
 import cern.c2mon.server.cache.tag.query.TagIgniteQuery;
 import cern.c2mon.server.cache.tag.query.TagQuery;
 import cern.c2mon.server.common.rule.RuleTag;
+import cern.c2mon.server.common.rule.RuleTagCacheObject;
 import cern.c2mon.server.ehcache.Ehcache;
 import cern.c2mon.server.ehcache.config.IgniteCacheProperties;
 import cern.c2mon.server.ehcache.impl.IgniteCacheImpl;
 
+import org.apache.ignite.configuration.CacheConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 
@@ -28,7 +30,9 @@ public class RuleTagCacheConfig {
 
   @Bean
   public Ehcache ruleTagEhcache(){
-    return new IgniteCacheImpl("ruleTagCache", igniteCacheProperties);
+    CacheConfiguration cacheCfg = new CacheConfiguration();
+    cacheCfg.setIndexedTypes(Long.class, RuleTagCacheObject.class);
+    return new IgniteCacheImpl("ruleTagCache", igniteCacheProperties, cacheCfg);
   }
 
   @Bean

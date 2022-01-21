@@ -21,6 +21,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import cern.c2mon.server.common.metadata.Metadata;
+
+import org.apache.ignite.cache.query.annotations.QuerySqlField;
 import org.simpleframework.xml.Transient;
 
 import cern.c2mon.shared.client.command.RbacAuthorizationDetails;
@@ -43,11 +45,13 @@ public final class CommandTagCacheObject<T> implements CommandTag<T>, Cacheable,
     /**
      * Unique numeric identifier of the CommandTag
      */
+    @QuerySqlField(name = "ID", index = true)
     private Long id;
 
     /**
      * Unique name of the CommandTag
      */
+    @QuerySqlField(name = "NAME", index = true)
     private String name;
 
     /**

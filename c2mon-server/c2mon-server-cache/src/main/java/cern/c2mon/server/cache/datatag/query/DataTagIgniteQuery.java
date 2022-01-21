@@ -5,13 +5,11 @@ import cern.c2mon.server.common.datatag.DataTag;
 import cern.c2mon.server.ehcache.Ehcache;
 import cern.c2mon.server.ehcache.impl.IgniteCacheImpl;
 
-import javax.cache.Cache;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
-import org.apache.ignite.cache.query.ScanQuery;
-import org.apache.ignite.lang.IgniteBiPredicate;
-import org.apache.ignite.lang.IgniteClosure;
+import org.apache.ignite.cache.query.QueryCursor;
+import org.apache.ignite.cache.query.SqlFieldsQuery;
 
 public class DataTagIgniteQuery implements DataTagQuery {
 
@@ -29,16 +27,18 @@ public class DataTagIgniteQuery implements DataTagQuery {
                     "parameter.");
         }
 
-        IgniteBiPredicate<Long, DataTag> predicate = (id, dataTag) -> Objects.equals(dataTag.getEquipmentId(), equipmentId);
+        SqlFieldsQuery sql = new SqlFieldsQuery("select _key from DataTagCacheObject where EQUIPMENTID = ?").setArgs(equipmentId);
 
-        List<Long> tagIds = cache.getCache().query(new ScanQuery<>(
-                predicate),
-                (IgniteClosure<Cache.Entry<Long, DataTag>, Long>) Cache.Entry::getKey).getAll();
+        List<Long> tagIds = new ArrayList<>();
 
+        try (QueryCursor<List<?>> cursor = cache.getCache().query(sql)) {
+            for (List<?> row : cursor) {
+               tagIds.add((Long) row.get(0));
+            }
+        }
          /*TODO query can't fail ?
             throw new CacheElementNotFoundException("Failed to execute query with EquipmentId " + equipmentId + " : " +
                     "Result is null.");*/
-
 
         return tagIds;
     }
@@ -51,17 +51,20 @@ public class DataTagIgniteQuery implements DataTagQuery {
                     "parameter.");
         }
 
-        IgniteBiPredicate<Long, DataTag> predicate = (id, dataTag) -> Objects.equals(dataTag.getSubEquipmentId(), subEquipmentId);
+        SqlFieldsQuery sql = new SqlFieldsQuery("select _key from DataTagCacheObject where SUBEQUIPMENTID = ?").setArgs(subEquipmentId);
 
-        List<Long> tagIds = cache.getCache().query(new ScanQuery<>(
-                        predicate),
-                (IgniteClosure<Cache.Entry<Long, DataTag>, Long>) Cache.Entry::getKey).getAll();
+        List<Long> tagIds = new ArrayList<>();
+
+        try (QueryCursor<List<?>> cursor = cache.getCache().query(sql)) {
+            for (List<?> row : cursor) {
+                tagIds.add((Long) row.get(0));
+            }
+        }
 
         /*TODO query can't fail ?
             throw new CacheElementNotFoundException("Failed to execute query with (sub)EquipmentId " + subEquipmentId + " : " +
                     "Result is null.");
                     */
-
 
         return tagIds;
     }

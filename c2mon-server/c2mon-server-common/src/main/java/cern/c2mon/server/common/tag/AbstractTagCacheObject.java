@@ -22,6 +22,7 @@ import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 import cern.c2mon.server.common.metadata.Metadata;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ignite.cache.query.annotations.QuerySqlField;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
@@ -56,11 +57,13 @@ public abstract class AbstractTagCacheObject implements DataTagConstants, Clonea
   /**
    * Unique datatag identifier (unique across all types of tags: control, datatag and rules).
    */
+  @QuerySqlField(name = "ID", index = true)
   private Long id;
 
   /**
    * Unique tag name.
    */
+  @QuerySqlField(name = "NAME", index = true)
   private String name;
 
   /**

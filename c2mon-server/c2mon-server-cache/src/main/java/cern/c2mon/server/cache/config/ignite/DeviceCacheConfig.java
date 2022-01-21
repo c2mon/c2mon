@@ -6,10 +6,12 @@ import cern.c2mon.server.cache.device.query.DeviceQuery;
 import cern.c2mon.server.cache.loading.DeviceDAO;
 import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
 import cern.c2mon.server.cache.loading.common.EhcacheLoaderImpl;
+import cern.c2mon.server.common.device.DeviceCacheObject;
 import cern.c2mon.server.ehcache.Ehcache;
 import cern.c2mon.server.ehcache.config.IgniteCacheProperties;
 import cern.c2mon.server.ehcache.impl.IgniteCacheImpl;
 
+import org.apache.ignite.configuration.CacheConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 
@@ -23,7 +25,9 @@ public class DeviceCacheConfig {
 
   @Bean
   public Ehcache deviceEhcache(){
-    return new IgniteCacheImpl("deviceCache", igniteCacheProperties);
+    CacheConfiguration cacheCfg = new CacheConfiguration();
+    cacheCfg.setIndexedTypes(Long.class, DeviceCacheObject.class);
+    return new IgniteCacheImpl("deviceCache", igniteCacheProperties, cacheCfg);
   }
 
   @Bean

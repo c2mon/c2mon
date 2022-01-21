@@ -4,10 +4,12 @@ import cern.c2mon.server.cache.common.SimpleC2monCacheLoader;
 import cern.c2mon.server.cache.loading.CommFaultTagDAO;
 import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
 import cern.c2mon.server.cache.loading.common.EhcacheLoaderImpl;
+import cern.c2mon.server.common.commfault.CommFaultTagCacheObject;
 import cern.c2mon.server.ehcache.Ehcache;
 import cern.c2mon.server.ehcache.config.IgniteCacheProperties;
 import cern.c2mon.server.ehcache.impl.IgniteCacheImpl;
 
+import org.apache.ignite.configuration.CacheConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 
@@ -21,7 +23,9 @@ public class CommFaultTagCacheConfig {
 
   @Bean
   public Ehcache commFaultTagEhcache(){
-    return new IgniteCacheImpl("commFaultTagCache", igniteCacheProperties);
+    CacheConfiguration cacheCfg = new CacheConfiguration();
+    cacheCfg.setIndexedTypes(Long.class, CommFaultTagCacheObject.class);
+    return new IgniteCacheImpl("commFaultTagCache", igniteCacheProperties, cacheCfg);
   }
 
   @Bean

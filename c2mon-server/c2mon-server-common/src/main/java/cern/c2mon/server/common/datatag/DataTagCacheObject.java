@@ -26,6 +26,8 @@ import cern.c2mon.shared.common.Cacheable;
 import cern.c2mon.shared.common.datatag.DataTagAddress;
 import cern.c2mon.shared.common.datatag.DataTagQualityImpl;
 
+import org.apache.ignite.cache.query.annotations.QuerySqlField;
+
 
 /**
  * Represents the data tag objects stored in the cache. These contain both the
@@ -83,11 +85,13 @@ public class DataTagCacheObject extends AbstractTagCacheObject implements DataTa
   /**
    * Reference to equipment the Datatag is attached to.
    */
+  @QuerySqlField(name = "EQUIPMENTID", index = true)
   private Long equipmentId = null;
 
   /**
    * Reference to sub equipment the DataTag is attached to.
    */
+  @QuerySqlField(name = "SUBEQUIPMENTID", index = true)
   private Long subEquipmentId = null;
 
   /**

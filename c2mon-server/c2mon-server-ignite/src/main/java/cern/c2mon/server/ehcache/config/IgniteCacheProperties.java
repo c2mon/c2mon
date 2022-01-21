@@ -39,6 +39,22 @@ public class IgniteCacheProperties {
      */
     private String partitionLossPolicy = "IGNORE";
 
+    /**
+     * https://ignite.apache.org/docs/latest/configuring-caches/atomicity-modes
+     */
+    private String atomicityMode = "ATOMIC";
+
+    /**
+     * Read more : https://ignite.apache.org/docs/latest/key-value-api/transactions#long-running-transactions-termination
+     * Default is 20 seconds
+     */
+    private Integer setTxTimeoutOnPartitionMapExchange = 20000;
+
+    /**
+     * Sets frequency of metrics log print out.
+     * If 0, metrics print out is disabled.
+     */
+    private long metricsLogFrequency = 0;
 
     public boolean isEmbedded() {
         return embedded;
@@ -102,5 +118,29 @@ public class IgniteCacheProperties {
 
     public void setIpFinderAddresses(List<String> ipFinderAddresses) {
         this.ipFinderAddresses = ipFinderAddresses;
+    }
+
+    public String getAtomicityMode() {
+        return atomicityMode;
+    }
+
+    public void setAtomicityMode(String atomicityMode) {
+        this.atomicityMode = atomicityMode;
+    }
+
+    public Integer getSetTxTimeoutOnPartitionMapExchange() {
+        return setTxTimeoutOnPartitionMapExchange;
+    }
+
+    public void setSetTxTimeoutOnPartitionMapExchange(Integer setTxTimeoutOnPartitionMapExchange) {
+        this.setTxTimeoutOnPartitionMapExchange = setTxTimeoutOnPartitionMapExchange;
+    }
+
+    public long getMetricsLogFrequency() {
+        return metricsLogFrequency;
+    }
+
+    public void setMetricsLogFrequency(long metricsLogFrequency) {
+        this.metricsLogFrequency = metricsLogFrequency;
     }
 }

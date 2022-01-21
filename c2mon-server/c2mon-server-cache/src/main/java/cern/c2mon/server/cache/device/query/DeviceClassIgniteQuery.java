@@ -1,17 +1,14 @@
 package cern.c2mon.server.cache.device.query;
 
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
-import cern.c2mon.server.common.device.DeviceClass;
 import cern.c2mon.server.ehcache.Ehcache;
 import cern.c2mon.server.ehcache.impl.IgniteCacheImpl;
 
-import javax.cache.Cache;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
-import org.apache.ignite.cache.query.ScanQuery;
-import org.apache.ignite.lang.IgniteBiPredicate;
-import org.apache.ignite.lang.IgniteClosure;
+import org.apache.ignite.cache.query.QueryCursor;
+import org.apache.ignite.cache.query.SqlFieldsQuery;
 
 
 public class DeviceClassIgniteQuery implements DeviceClassQuery {
@@ -24,13 +21,16 @@ public class DeviceClassIgniteQuery implements DeviceClassQuery {
 
     @Override
     public Long findDeviceByName(String deviceClassName) throws CacheElementNotFoundException {
-        Optional<Long> deviceClassId;
 
-        IgniteBiPredicate<Long, DeviceClass> predicate = (id, deviceClass) -> deviceClass.getName().equals(deviceClassName);
+        SqlFieldsQuery sql = new SqlFieldsQuery("select _key from DeviceClassCacheObject where NAME = ?").setArgs(deviceClassName);
 
-        List<Long> deviceClassIds = cache.getCache().query(new ScanQuery<>(
-                        predicate),
-                (IgniteClosure<Cache.Entry<Long, DeviceClass>, Long>) Cache.Entry::getKey).getAll();
+        List<Long> deviceClassIds = new ArrayList<>();
+
+        try (QueryCursor<List<?>> cursor = cache.getCache().query(sql)) {
+            for (List<?> row : cursor) {
+                deviceClassIds.add((Long) row.get(0));
+            }
+        }
 
         if (deviceClassIds.isEmpty()) {
             throw new CacheElementNotFoundException("Failed to find a device class with name " + deviceClassName + " in the cache.");

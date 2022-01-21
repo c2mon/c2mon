@@ -1,24 +1,19 @@
 package cern.c2mon.server.cache.tag.query;
 
-import cern.c2mon.server.common.tag.Tag;
 import cern.c2mon.server.ehcache.Ehcache;
 import cern.c2mon.server.ehcache.impl.IgniteCacheImpl;
 
-import javax.cache.Cache;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import org.apache.ignite.cache.query.ScanQuery;
-import org.apache.ignite.lang.IgniteBiPredicate;
-import org.apache.ignite.lang.IgniteClosure;
+import org.apache.ignite.cache.query.QueryCursor;
+import org.apache.ignite.cache.query.SqlFieldsQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class TagIgniteQuery<T> implements TagQuery<T> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TagInMemoryQuery.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TagIgniteQuery.class);
 
     private final IgniteCacheImpl cache;
 
@@ -30,55 +25,97 @@ public class TagIgniteQuery<T> implements TagQuery<T> {
     @Override
     public List<T> findTagsByName(String name, int maxResults) {
 
-        IgniteBiPredicate<Long, Tag> predicate = (id, tag) -> ((Tag) tag).getName().equalsIgnoreCase(name);
+        List<T> tagList = new ArrayList<>();
 
-        List<Tag> tagList = cache.getCache().query(new ScanQuery<>(
-                        predicate),
-                (IgniteClosure<Cache.Entry<Long, Tag>, Tag>) Cache.Entry::getValue).getAll();
+        switch(cache.getCache().getName()) {
+            case "controlTagCache":
+                SqlFieldsQuery controlTagSql = new SqlFieldsQuery("select _val from ControlTagCacheObject  where UPPER(NAME) = UPPER(?) LIMIT ?").setArgs(name, maxResults);
 
-        List<T> resultList;
+                try (QueryCursor<List<?>> cursor = cache.getCache().query(controlTagSql)) {
+                    for (List<?> row : cursor) {
+                        tagList.add((T) row.get(0));
+                    }
+                }
+            break;
 
-        try(Stream<Tag> stream = tagList.stream()){
+            case "dataTagCache":
+            SqlFieldsQuery dataTagSql = new SqlFieldsQuery("select _val from DataTagCacheObject  where UPPER(NAME) = UPPER(?) LIMIT ?").setArgs(name, maxResults);
 
-            resultList = stream.map(t -> (T) t).limit(maxResults).collect(Collectors.toList());
+            try (QueryCursor<List<?>> cursor = cache.getCache().query(dataTagSql)) {
+                for (List<?> row : cursor) {
+                    tagList.add((T) row.get(0));
+                }
+            }
+            break;
 
-            LOG.debug(String.format("findTagsByName() - Got %d results for name \"%s\"", resultList.size(), name));
+            case "ruleTagCache":
+            SqlFieldsQuery ruleTagSql = new SqlFieldsQuery("select _val from RuleTagCacheObject  where UPPER(NAME) = UPPER(?) LIMIT ?").setArgs(name, maxResults);
+
+            try (QueryCursor<List<?>> cursor = cache.getCache().query(ruleTagSql)) {
+                for (List<?> row : cursor) {
+                    tagList.add((T) row.get(0));
+                }
+            }
+                break;
         }
+        LOG.info(String.format("findTagsByName() - Got %d results for name \"%s\"", tagList.size(), name));
 
-        return resultList;
+        return tagList;
     }
 
     @Override
     public List<T> findTagsByWildcard(String wildcard, int maxResults){
 
-        Pattern pattern = Pattern.compile(replaceWildcardSymbols(wildcard), Pattern.CASE_INSENSITIVE);
-        IgniteBiPredicate<Long, Tag> predicate = (id, tag) -> pattern.matcher(tag.getName()).matches();
+        String sqlWildcard = replaceWildcardSymbols(wildcard);
 
-        List<Tag> tagList = cache.getCache().query(new ScanQuery<>(
-                predicate),
-                (IgniteClosure<Cache.Entry<Long, Tag>, Tag>) Cache.Entry::getValue).getAll();
+        List<T> tagList = new ArrayList<>();
 
-        List<T> resultList;
+        switch(cache.getCache().getName()){
+            case "dataTagCache":
+                SqlFieldsQuery dataTagSql = new SqlFieldsQuery("select _val from DataTagCacheObject  where UPPER(NAME) LIKE UPPER(?) LIMIT ?").setArgs(sqlWildcard, maxResults);
 
-        try(Stream<Tag> stream = tagList.stream()){
+                try (QueryCursor<List<?>> cursor = cache.getCache().query(dataTagSql)) {
+                    for (List<?> row : cursor) {
+                        tagList.add((T) row.get(0));
+                    }
+                }
+            break;
 
-            resultList = stream.map(t -> (T) t).limit(maxResults).collect(Collectors.toList());
+            case "ruleTagCache":
+                SqlFieldsQuery ruleTagSql = new SqlFieldsQuery("select _val from RuleTagCacheObject  where UPPER(NAME) LIKE UPPER(?) LIMIT ?").setArgs(sqlWildcard, maxResults);
 
-            LOG.debug(String.format("findByNameWildcard() - Got %d results for regex \"%s\"", resultList.size(), wildcard));
+                try (QueryCursor<List<?>> cursor = cache.getCache().query(ruleTagSql)) {
+                    for (List<?> row : cursor) {
+                        tagList.add((T) row.get(0));
+                    }
+                }
+            break;
+
+            case "controlTagCache":
+                SqlFieldsQuery controlTagSql = new SqlFieldsQuery("select _val from ControlTagCacheObject  where UPPER(NAME) LIKE UPPER(?) LIMIT ?").setArgs(sqlWildcard, maxResults);
+
+                try (QueryCursor<List<?>> cursor = cache.getCache().query(controlTagSql)) {
+                    for (List<?> row : cursor) {
+                        tagList.add((T) row.get(0));
+                    }
+                }
+            break;
         }
 
-        return resultList;
+        LOG.debug(String.format("findByNameWildcard() - Got %d results for regex \"%s\"", tagList.size(), wildcard));
+
+        return tagList;
     }
 
 
     /**
-     * Method to replace the character '*' by '.*' and '?' by '.?' to work with the Java Pattern
+     * Method to replace the character '*' by '%' and '?' by '_' to work with the Java Pattern
      * @param wildcard
      * @return
      */
     private String replaceWildcardSymbols(String wildcard){
         if(wildcard.contains("*") || wildcard.contains("?")) {
-            String result = wildcard.replace("*", ".*").replace("?", ".?");
+            String result = wildcard.replace("*", "%").replace("?", "_");
             LOG.debug("Replaced wildcard symbols on wildcard {}. Result: {}", wildcard, result);
             return result;
         }else{

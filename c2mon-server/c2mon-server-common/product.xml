@@ -3,6 +3,7 @@
         <desc>
             Classes that are shared across the server modules (but not outside the server).</desc>
             <dependencies>
+                <dep groupId="org.apache.ignite" product="ignite-core" version="2.11.1"/>
                 <dep groupId="org.springframework" product="spring-tx" version="5.1.2.RELEASE"/>
                 <dep groupId="org.springframework.boot" product="spring-boot-starter-data-jpa" version="2.1.0.RELEASE"/>
                 <dep groupId="org.springframework.boot" product="spring-boot-starter-activemq" version="2.1.0.RELEASE"/>

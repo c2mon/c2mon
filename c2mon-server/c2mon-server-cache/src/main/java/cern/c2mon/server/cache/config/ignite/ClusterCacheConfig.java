@@ -5,6 +5,7 @@ import cern.c2mon.server.ehcache.Ehcache;
 import cern.c2mon.server.ehcache.config.IgniteCacheProperties;
 import cern.c2mon.server.ehcache.impl.IgniteCacheImpl;
 
+import org.apache.ignite.configuration.CacheConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 
@@ -21,6 +22,7 @@ public class ClusterCacheConfig {
 
   @Bean
   public Ehcache clusterEhcache(){
-    return new IgniteCacheImpl("clusterCache", igniteCacheProperties);
+    CacheConfiguration cacheCfg = new CacheConfiguration();
+    return new IgniteCacheImpl("clusterCache", igniteCacheProperties, cacheCfg);
   }
 }

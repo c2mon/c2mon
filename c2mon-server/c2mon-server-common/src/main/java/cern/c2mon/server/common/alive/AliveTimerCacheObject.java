@@ -22,6 +22,8 @@ import java.util.Collection;
 
 import cern.c2mon.shared.common.Cacheable;
 
+import org.apache.ignite.cache.query.annotations.QuerySqlField;
+
 public class AliveTimerCacheObject implements AliveTimer, Cacheable, Cloneable {
 
     private static final long serialVersionUID = 2151886747282763819L;
@@ -29,6 +31,7 @@ public class AliveTimerCacheObject implements AliveTimer, Cacheable, Cloneable {
     /**
      * Unique id of the alive tag.
      */
+    @QuerySqlField(name = "ID", index = true)
     private Long aliveTagId;
 
     /**

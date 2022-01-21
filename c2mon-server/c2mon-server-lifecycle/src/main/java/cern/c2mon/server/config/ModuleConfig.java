@@ -45,7 +45,7 @@ public class ModuleConfig {
   @Bean
   public DefaultLifecycleProcessor lifecycleProcessor() {
     DefaultLifecycleProcessor lifecycleProcessor = new DefaultLifecycleProcessor();
-    //lifecycleProcessor.setTimeoutPerShutdownPhase(20000);
+    lifecycleProcessor.setTimeoutPerShutdownPhase(0);
     return lifecycleProcessor;
   }
 }

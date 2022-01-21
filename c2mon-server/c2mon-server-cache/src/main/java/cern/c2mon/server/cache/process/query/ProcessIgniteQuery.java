@@ -1,16 +1,14 @@
 package cern.c2mon.server.cache.process.query;
 
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
-import cern.c2mon.server.common.process.Process;
 import cern.c2mon.server.ehcache.Ehcache;
 import cern.c2mon.server.ehcache.impl.IgniteCacheImpl;
 
-import javax.cache.Cache;
+import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.ignite.cache.query.ScanQuery;
-import org.apache.ignite.lang.IgniteBiPredicate;
-import org.apache.ignite.lang.IgniteClosure;
+import org.apache.ignite.cache.query.QueryCursor;
+import org.apache.ignite.cache.query.SqlFieldsQuery;
 
 public class ProcessIgniteQuery implements ProcessQuery {
 
@@ -28,17 +26,21 @@ public class ProcessIgniteQuery implements ProcessQuery {
                     "parameter.");
         }
 
-        IgniteBiPredicate<Long, Process> predicate = (id, process) -> process.getName().equals(processName);
+        SqlFieldsQuery sql = new SqlFieldsQuery("select _key from ProcessCacheObject where NAME = ?").setArgs(processName);
 
-        List<Long> deviceCacheObjects = cache.getCache().query(new ScanQuery<>(
-                predicate),
-                (IgniteClosure<Cache.Entry<Long, Process>, Long>) Cache.Entry::getKey).getAll();
+        List<Long> processIds = new ArrayList<>();
 
-        if (deviceCacheObjects.isEmpty()) {
+        try (QueryCursor<List<?>> cursor = cache.getCache().query(sql)) {
+            for (List<?> row : cursor) {
+                processIds.add((Long) row.get(0));
+            }
+        }
+
+        if (processIds.isEmpty()) {
             throw new CacheElementNotFoundException("Failed to find a process with name " + processName + " in the cache.");
         }
 
-        return deviceCacheObjects.get(0);
+        return processIds.get(0);
     }
 }
 

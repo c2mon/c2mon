@@ -4,10 +4,12 @@ import cern.c2mon.server.cache.common.SimpleC2monCacheLoader;
 import cern.c2mon.server.cache.loading.SubEquipmentDAO;
 import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
 import cern.c2mon.server.cache.loading.common.EhcacheLoaderImpl;
+import cern.c2mon.server.common.subequipment.SubEquipmentCacheObject;
 import cern.c2mon.server.ehcache.Ehcache;
 import cern.c2mon.server.ehcache.config.IgniteCacheProperties;
 import cern.c2mon.server.ehcache.impl.IgniteCacheImpl;
 
+import org.apache.ignite.configuration.CacheConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 
@@ -21,7 +23,9 @@ public class SubEquipmentCacheConfig {
 
   @Bean
   public Ehcache subEquipmentEhcache(){
-    return new IgniteCacheImpl("subEquipmentCache", igniteCacheProperties);
+    CacheConfiguration cacheCfg = new CacheConfiguration();
+    cacheCfg.setIndexedTypes(Long.class, SubEquipmentCacheObject.class);
+    return new IgniteCacheImpl("subEquipmentCache", igniteCacheProperties, cacheCfg);
   }
 
   @Bean

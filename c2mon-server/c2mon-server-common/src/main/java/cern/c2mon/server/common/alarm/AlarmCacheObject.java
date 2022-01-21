@@ -16,15 +16,15 @@
  *****************************************************************************/
 package cern.c2mon.server.common.alarm;
 
-import java.sql.Timestamp;
-import java.util.LinkedList;
-import java.util.Objects;
-
-import lombok.Data;
-
 import cern.c2mon.server.common.metadata.Metadata;
 import cern.c2mon.shared.client.alarm.condition.AlarmCondition;
 import cern.c2mon.shared.common.Cacheable;
+import lombok.Data;
+
+import java.sql.Timestamp;
+import java.util.LinkedList;
+
+import org.apache.ignite.cache.query.annotations.QuerySqlField;
 
 /**
  * Alarm object held in the cache.
@@ -44,6 +44,7 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
   /**
    * Internal identifier of the AlarmCacheObject.
    */
+  @QuerySqlField(name = "ID", index = true)
   private Long id;
 
   /**
@@ -51,21 +52,25 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
    * The Alarm is activated or terminated depending on the current value of this
    * data tag.
    */
+  @QuerySqlField(name = "DATATAGID", index = true)
   private Long dataTagId;
 
   /**
    * Fault family of the alarm.
    **/
+  @QuerySqlField(name = "FAULTFAMILY", index = true)
   private String faultFamily;
 
   /**
    * Fault member of the alarm.
    **/
+  @QuerySqlField(name = "FAULTMEMBER", index = true)
   private String faultMember;
 
   /**
    * Fault code of the alarm.
    **/
+  @QuerySqlField(name = "FAULTCODE", index = true)
   private int faultCode;
 
   /**
@@ -84,6 +89,7 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
    * <code>true</code>, if the alarm state is active as published to listeners
    * (may be forced to <code>true</code> and silenced in case of oscillation)
    */
+  @QuerySqlField(name = "ACTIVE", index = true)
   private boolean active = false;
 
   /** Same as the server timestamp of the tag, that triggered the alarm state change */
@@ -113,6 +119,7 @@ public class AlarmCacheObject implements Cloneable, Cacheable, Alarm {
   private LinkedList<Long> fifoSourceTimestamps = new LinkedList<>();
 
   /** Set to <code>true</code>, if alarm starts oscillating */
+  @QuerySqlField(name = "OSCILLATING", index = true)
   private boolean oscillating;
 
 

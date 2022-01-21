@@ -6,10 +6,12 @@ import cern.c2mon.server.cache.loading.common.C2monCacheLoader;
 import cern.c2mon.server.cache.loading.common.EhcacheLoaderImpl;
 import cern.c2mon.server.cache.process.query.ProcessIgniteQuery;
 import cern.c2mon.server.cache.process.query.ProcessQuery;
+import cern.c2mon.server.common.process.ProcessCacheObject;
 import cern.c2mon.server.ehcache.Ehcache;
 import cern.c2mon.server.ehcache.config.IgniteCacheProperties;
 import cern.c2mon.server.ehcache.impl.IgniteCacheImpl;
 
+import org.apache.ignite.configuration.CacheConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 
@@ -23,7 +25,9 @@ public class ProcessCacheConfig {
 
   @Bean
   public Ehcache processEhcache(){
-    return new IgniteCacheImpl("processCache", igniteCacheProperties);
+    CacheConfiguration cacheCfg = new CacheConfiguration();
+    cacheCfg.setIndexedTypes(Long.class, ProcessCacheObject.class);
+    return new IgniteCacheImpl("processCache", igniteCacheProperties, cacheCfg);
   }
 
   @Bean

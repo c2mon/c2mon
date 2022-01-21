@@ -6,12 +6,10 @@ import cern.c2mon.server.ehcache.config.IgniteCacheProperties;
 import cern.c2mon.server.ehcache.event.RegisteredEventListeners;
 import cern.c2mon.server.ehcache.loader.CacheLoader;
 
-import javax.cache.Cache;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
-import java.util.stream.Stream;
 
 import org.apache.ignite.Ignite;
 import org.apache.ignite.IgniteCache;
@@ -24,8 +22,8 @@ import org.apache.ignite.cache.PartitionLossPolicy;
 import org.apache.ignite.cache.query.ScanQuery;
 import org.apache.ignite.configuration.CacheConfiguration;
 import org.apache.ignite.configuration.IgniteConfiguration;
-import org.apache.ignite.lang.IgniteBiPredicate;
-import org.apache.ignite.lang.IgniteClosure;
+import org.apache.ignite.configuration.TransactionConfiguration;
+import org.apache.ignite.spi.communication.tcp.TcpCommunicationSpi;
 import org.apache.ignite.spi.discovery.tcp.TcpDiscoverySpi;
 import org.apache.ignite.spi.discovery.tcp.ipfinder.vm.TcpDiscoveryVmIpFinder;
 import org.slf4j.Logger;
@@ -46,18 +44,36 @@ public class IgniteCacheImpl<T, K> implements Ehcache<T, K> {
 
     private final IgniteCacheProperties properties;
 
-    public IgniteCacheImpl(String cacheName, IgniteCacheProperties properties){
+    public IgniteCacheImpl(String cacheName, IgniteCacheProperties properties, CacheConfiguration cacheCfg){
         this.cacheName = cacheName;
         this.properties = properties;
 
         this.registeredEventListeners = new RegisteredEventListeners(this);
         this.registeredCacheLoaders = new ArrayList<>();
 
+        cacheCfg.setName(cacheName);
+        cacheCfg.setAtomicityMode(CacheAtomicityMode.valueOf(properties.getAtomicityMode()));
 
-        CacheConfiguration cacheCfg = getCacheConfiguration();
+        /**
+         * Configurable properties
+         */
+        cacheCfg.setOnheapCacheEnabled(properties.isOnHeapCacheEnabled());
+        cacheCfg.setCacheMode(CacheMode.valueOf(properties.getCacheMode()));
+        cacheCfg.setBackups(properties.getNumberOfBackups());
+        cacheCfg.setRebalanceMode(CacheRebalanceMode.valueOf(properties.getCacheRebalanceMode()));
+        cacheCfg.setWriteSynchronizationMode(CacheWriteSynchronizationMode.valueOf(properties.getCacheWriteSynchronizationMode()));
+        cacheCfg.setPartitionLossPolicy(PartitionLossPolicy.valueOf(properties.getPartitionLossPolicy()));
 
         IgniteConfiguration igniteConfig = getIgniteConfiguration();
         igniteConfig.setCacheConfiguration(cacheCfg);
+        igniteConfig.setMetricsLogFrequency(properties.getMetricsLogFrequency());
+
+        if(properties.getAtomicityMode().equals("TRANSACTIONAL")) {
+            // Transactional mode configuration
+            TransactionConfiguration txCfg = new TransactionConfiguration();
+            txCfg.setTxTimeoutOnPartitionMapExchange(20000);
+            igniteConfig.setTransactionConfiguration(txCfg);
+        }
 
         Ignite ignite = Ignition.getOrStart(igniteConfig);
         cache = ignite.getOrCreateCache(cacheCfg);
@@ -71,38 +87,23 @@ public class IgniteCacheImpl<T, K> implements Ehcache<T, K> {
         if(!properties.isEmbedded()){
             igniteConfig.setClientMode(properties.isEmbedded());
 
-            igniteConfig.setPeerClassLoadingEnabled(true);
+            igniteConfig.setMetricsLogFrequency(0);
 
-            TcpDiscoverySpi spi = new TcpDiscoverySpi();
+            igniteConfig.setPeerClassLoadingEnabled(true);
+            TcpDiscoverySpi tcpDiscoverySpi = new TcpDiscoverySpi();
             TcpDiscoveryVmIpFinder ipFinder = new TcpDiscoveryVmIpFinder();
             ipFinder.setAddresses(properties.getIpFinderAddresses());
-            spi.setIpFinder(ipFinder);
+            tcpDiscoverySpi.setIpFinder(ipFinder);
+            igniteConfig.setDiscoverySpi(tcpDiscoverySpi);
 
-            igniteConfig.setDiscoverySpi(spi);
+            TcpCommunicationSpi tcpCommunicationSpi = new TcpCommunicationSpi();
+            tcpCommunicationSpi.setSlowClientQueueLimit(1024);
+            igniteConfig.setCommunicationSpi(tcpCommunicationSpi);
 
         }
 
         return igniteConfig;
     }
-
-    private CacheConfiguration getCacheConfiguration(){
-        CacheConfiguration cacheCfg = new CacheConfiguration();
-        cacheCfg.setName(cacheName);
-        cacheCfg.setAtomicityMode(CacheAtomicityMode.TRANSACTIONAL);
-
-        /**
-         * Configurable properties
-         */
-        cacheCfg.setOnheapCacheEnabled(properties.isOnHeapCacheEnabled());
-        cacheCfg.setCacheMode(CacheMode.valueOf(properties.getCacheMode()));
-        cacheCfg.setBackups(properties.getNumberOfBackups());
-        cacheCfg.setRebalanceMode(CacheRebalanceMode.valueOf(properties.getCacheRebalanceMode()));
-        cacheCfg.setWriteSynchronizationMode(CacheWriteSynchronizationMode.valueOf(properties.getCacheWriteSynchronizationMode()));
-        cacheCfg.setPartitionLossPolicy(PartitionLossPolicy.valueOf(properties.getPartitionLossPolicy()));
-
-        return cacheCfg;
-    }
-
 
     @Override
     public boolean isKeyInCache(T id) {
@@ -141,10 +142,6 @@ public class IgniteCacheImpl<T, K> implements Ehcache<T, K> {
         unlock(id);
     }
 
-    public Stream createStream(IgniteBiPredicate<T, K> filter, int maxResults){
-        return cache.query(new ScanQuery<>(filter),
-        (IgniteClosure<Cache.Entry<T, K>, K>) Cache.Entry::getValue).getAll().stream().limit(maxResults);
-    }
 
     public IgniteCache<T, K> getCache(){
         return this.cache;
@@ -166,23 +163,33 @@ public class IgniteCacheImpl<T, K> implements Ehcache<T, K> {
         return cacheName;
     }
 
+    /**
+     * In Ignite, locks are supported only for the TRANSACTIONAL atomicity mode
+     */
     private void lock(T id){
-        if(locks.containsKey(id)){
-            LOGGER.warn("Lock with id {} already acquired", id);
-        }else{
-            Lock lock = cache.lock(id);
-            lock.lock();
-            locks.put(id, lock);
+        if(properties.getAtomicityMode().equals("TRANSACTIONAL")) {
+            if (locks.containsKey(id)) {
+                LOGGER.warn("Lock with id {} already acquired", id);
+            } else {
+                Lock lock = cache.lock(id);
+                lock.lock();
+                locks.put(id, lock);
+            }
         }
     }
 
+    /**
+     * In Ignite, locks are supported only for the TRANSACTIONAL atomicity mode
+     */
     private void unlock(T id){
-        if(locks.containsKey(id)){
-            Lock lock = locks.get(id);
-            lock.unlock();
-            locks.remove(id);
-        }else{
-            LOGGER.warn("Lock with id {} already acquired", id);
+        if(properties.getAtomicityMode().equals("TRANSACTIONAL")) {
+            if (locks.containsKey(id)) {
+                Lock lock = locks.get(id);
+                lock.unlock();
+                locks.remove(id);
+            } else {
+                LOGGER.warn("Lock with id {} already acquired", id);
+            }
         }
     }
 
@@ -242,7 +249,8 @@ public class IgniteCacheImpl<T, K> implements Ehcache<T, K> {
 
     @Override
     public void removeAll() throws IllegalStateException, CacheException {
-        cache.clear();
+        cache.removeAll();
+        cache.destroy();
     }
 
     @Override

@@ -19,6 +19,8 @@ package cern.c2mon.server.common.device;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.ignite.cache.query.annotations.QuerySqlField;
+
 /**
  * This class implements the <code>DeviceClass</code> interface and resides in
  * the server DeviceClass cache.
@@ -35,11 +37,13 @@ public class DeviceClassCacheObject implements DeviceClass, Cloneable {
   /**
    * The unique ID of the device class.
    */
+  @QuerySqlField(name = "ID", index = true)
   private final Long id;
 
   /**
    * The name of the device class.
    */
+  @QuerySqlField(name = "NAME", index = true)
   private String name;
 
   /**

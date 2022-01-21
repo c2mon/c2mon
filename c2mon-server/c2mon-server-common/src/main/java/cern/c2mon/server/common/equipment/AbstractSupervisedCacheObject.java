@@ -21,6 +21,8 @@ import java.sql.Timestamp;
 import cern.c2mon.server.common.supervision.Supervised;
 import cern.c2mon.shared.common.supervision.SupervisionConstants.SupervisionStatus;
 
+import org.apache.ignite.cache.query.annotations.QuerySqlField;
+
 /**
  * Common part of all cache objects that need supervising by the server. Supervision involves an alive timer, with
  * associated alive and state tags, as well as a current status and status description.
@@ -44,11 +46,13 @@ public abstract class AbstractSupervisedCacheObject implements Supervised, Clone
     /**
      * Unique identifier of the equipment.
      */
+    @QuerySqlField(name = "ID", index = true)
     private Long id;
 
     /**
      * Unique name of the equipment.
      */
+    @QuerySqlField(name = "NAME", index = true)
     private String name;
 
     /**
@@ -74,6 +78,7 @@ public abstract class AbstractSupervisedCacheObject implements Supervised, Clone
     /**
      * Identifier of the equipment's alive tag (if any).
      */
+    @QuerySqlField(name = "ALIVETAGID", index = true)
     private Long aliveTagId;
 
     
