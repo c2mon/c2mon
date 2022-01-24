@@ -84,23 +84,20 @@ public class IgniteCacheImpl<T, K> implements Ehcache<T, K> {
         IgniteConfiguration igniteConfig = new IgniteConfiguration();
         igniteConfig.setIgniteInstanceName("c2mon-ignite");
 
-        if(!properties.isEmbedded()){
-            igniteConfig.setClientMode(properties.isEmbedded());
+        igniteConfig.setClientMode(!properties.isEmbedded());
 
-            igniteConfig.setMetricsLogFrequency(0);
+        igniteConfig.setMetricsLogFrequency(0);
 
-            igniteConfig.setPeerClassLoadingEnabled(true);
-            TcpDiscoverySpi tcpDiscoverySpi = new TcpDiscoverySpi();
-            TcpDiscoveryVmIpFinder ipFinder = new TcpDiscoveryVmIpFinder();
-            ipFinder.setAddresses(properties.getIpFinderAddresses());
-            tcpDiscoverySpi.setIpFinder(ipFinder);
-            igniteConfig.setDiscoverySpi(tcpDiscoverySpi);
+        igniteConfig.setPeerClassLoadingEnabled(true);
+        TcpDiscoverySpi tcpDiscoverySpi = new TcpDiscoverySpi();
+        TcpDiscoveryVmIpFinder ipFinder = new TcpDiscoveryVmIpFinder();
+        ipFinder.setAddresses(properties.getIpFinderAddresses());
+        tcpDiscoverySpi.setIpFinder(ipFinder);
+        igniteConfig.setDiscoverySpi(tcpDiscoverySpi);
 
-            TcpCommunicationSpi tcpCommunicationSpi = new TcpCommunicationSpi();
-            tcpCommunicationSpi.setSlowClientQueueLimit(1024);
-            igniteConfig.setCommunicationSpi(tcpCommunicationSpi);
-
-        }
+        TcpCommunicationSpi tcpCommunicationSpi = new TcpCommunicationSpi();
+        tcpCommunicationSpi.setSlowClientQueueLimit(1024);
+        igniteConfig.setCommunicationSpi(tcpCommunicationSpi);
 
         return igniteConfig;
     }
