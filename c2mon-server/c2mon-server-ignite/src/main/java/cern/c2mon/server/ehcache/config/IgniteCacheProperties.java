@@ -51,6 +51,12 @@ public class IgniteCacheProperties {
     private Integer setTxTimeoutOnPartitionMapExchange = 20000;
 
     /**
+     * Message queue limit is set to 0 (by default) which may lead to potential OOMEs when running cache operations in FULL_ASYNC or
+     * PRIMARY_SYNC modes due to message queues growth on sender and receiver sides.
+     */
+    private Integer messageQueueLimit = 1024;
+
+    /**
      * Sets frequency of metrics log print out.
      * If 0, metrics print out is disabled.
      */
@@ -134,6 +140,14 @@ public class IgniteCacheProperties {
 
     public void setSetTxTimeoutOnPartitionMapExchange(Integer setTxTimeoutOnPartitionMapExchange) {
         this.setTxTimeoutOnPartitionMapExchange = setTxTimeoutOnPartitionMapExchange;
+    }
+
+    public Integer getMessageQueueLimit() {
+        return messageQueueLimit;
+    }
+
+    public void setMessageQueueLimit(Integer messageQueueLimit) {
+        this.messageQueueLimit = messageQueueLimit;
     }
 
     public long getMetricsLogFrequency() {

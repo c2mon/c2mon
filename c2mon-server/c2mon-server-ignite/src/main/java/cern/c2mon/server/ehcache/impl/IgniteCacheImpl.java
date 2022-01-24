@@ -88,7 +88,7 @@ public class IgniteCacheImpl<T, K> implements Ehcache<T, K> {
 
         igniteConfig.setMetricsLogFrequency(0);
 
-        igniteConfig.setPeerClassLoadingEnabled(true);
+        igniteConfig.setPeerClassLoadingEnabled(false);
         TcpDiscoverySpi tcpDiscoverySpi = new TcpDiscoverySpi();
         TcpDiscoveryVmIpFinder ipFinder = new TcpDiscoveryVmIpFinder();
         ipFinder.setAddresses(properties.getIpFinderAddresses());
@@ -96,7 +96,8 @@ public class IgniteCacheImpl<T, K> implements Ehcache<T, K> {
         igniteConfig.setDiscoverySpi(tcpDiscoverySpi);
 
         TcpCommunicationSpi tcpCommunicationSpi = new TcpCommunicationSpi();
-        tcpCommunicationSpi.setSlowClientQueueLimit(1024);
+        tcpCommunicationSpi.setMessageQueueLimit(properties.getMessageQueueLimit());
+        tcpCommunicationSpi.setSlowClientQueueLimit(properties.getMessageQueueLimit() - 1);
         igniteConfig.setCommunicationSpi(tcpCommunicationSpi);
 
         return igniteConfig;
