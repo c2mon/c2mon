@@ -15,6 +15,9 @@ public class IgniteCacheProperties {
      */
     private List<String> ipFinderAddresses = Arrays.asList("localhost", "localhost:47500..47509");
 
+    /**
+     * Read more : https://ignite.apache.org/docs/latest/configuring-caches/on-heap-caching
+     */
     private boolean onHeapCacheEnabled = false;
 
     /**
@@ -22,7 +25,11 @@ public class IgniteCacheProperties {
      */
     private String cacheMode = "PARTITIONED";
 
-    private int numberOfBackups = 0;
+    /**
+     * Read more : https://ignite.apache.org/docs/latest/configuring-caches/configuring-backups
+     * Should be at least 1 otherwise data is lost if one node of the cluster becomes unavailable
+     */
+    private int numberOfBackups = 1;
 
     /**
      * Read more : https://ignite.apache.org/docs/latest/configuring-caches/configuration-overview
