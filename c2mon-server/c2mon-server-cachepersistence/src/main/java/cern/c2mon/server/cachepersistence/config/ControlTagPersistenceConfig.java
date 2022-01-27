@@ -31,7 +31,10 @@ public class ControlTagPersistenceConfig extends AbstractPersistenceConfig {
 
   @Bean
   public BatchPersistenceManager controlTagPersistenceManager() {
-    return new BatchPersistenceManagerImpl<>(controlTagPersistenceDAO(), controlTagCache, clusterCache, cachePersistenceThreadPoolTaskExecutor);
+    BatchPersistenceManagerImpl manager = new BatchPersistenceManagerImpl<>(controlTagPersistenceDAO(), controlTagCache,
+            clusterCache, cachePersistenceThreadPoolTaskExecutor);
+    manager.setTimeoutPerBatch(properties.getTimeoutPerBatch());
+    return manager;
   }
 
   @Bean
