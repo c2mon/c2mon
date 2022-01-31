@@ -146,6 +146,7 @@ class EquipmentSenderValid {
   private boolean doUpdate(final SourceDataTag currentSourceDataTag, final ValueUpdate update) {
     // do a validation check on the new value:
     if (!checkValidation(currentSourceDataTag, update)) {
+      log.info("Value update for tag #{} was filtered out and has not been sent to server as it didn't pass the validation check", currentSourceDataTag.getId());
       return false;
     }
 
@@ -159,13 +160,15 @@ class EquipmentSenderValid {
 
     // do a filtering on the new value:
     if (!checkFiltering(currentSourceDataTag, update)) {
-      log.trace("Value update for tag #{} was filtered out and has not been sent to server. Redundant or old value?: {}", currentSourceDataTag.getId(), update.toString());
+      //log.trace("Value update for tag #{} was filtered out and has not been sent to server. Redundant or old value?: {}", currentSourceDataTag.getId(), update.toString());
+      log.info("Value update for tag #{} was filtered out and has not been sent to server. Redundant or old value", currentSourceDataTag.getId());
       return false;
     }
 
     // check if the new value is in a time deadband:
     if (!checkTimeDeadband(currentSourceDataTag, update)) {
-      log.trace("Value update for tag #{} was passed to the static time deadband scheduler and has not (yet) been sent to server: {}", currentSourceDataTag.getId(), update.toString());
+      //log.trace("Value update for tag #{} was passed to the static time deadband scheduler and has not (yet) been sent to server: {}", currentSourceDataTag.getId(), update.toString());
+      log.info("Value update for tag #{} was passed to the static time deadband scheduler and has not (yet) been sent to server", currentSourceDataTag.getId());
       return false;
     }
 
