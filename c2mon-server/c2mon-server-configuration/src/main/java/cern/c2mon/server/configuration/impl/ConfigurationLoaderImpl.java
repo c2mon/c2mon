@@ -398,7 +398,7 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
               log.error(errorMessage, e);
               processFacade.requiresReboot(processId, true);
               report.addProcessToReboot(processCache.get(processId).getName());
-              report.addStatus(Status.FAILURE);
+              report.addStatus(Status.RESTART);
               report.setStatusDescription(report.getStatusDescription() + errorMessage + "\n");
             }
           } else {

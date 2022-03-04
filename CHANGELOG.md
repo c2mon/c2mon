@@ -13,6 +13,13 @@ For more details on a given release, please check also the [version planning](ht
 
 ### Fixed
 
+## 1.11.4 - 2022-03-03
+### Changed
+- Active alarms are now re-evaluated after change in operational status
+
+### Fixed
+- Server: Listeners are now notified every time a data tag field is updated
+
 ## 1.11.2 - 2021-09-27
 ### Changed
 - Changes on the GitLab CI to speedup the pipeline
