@@ -31,7 +31,7 @@ public class DataTagIgniteQuery implements DataTagQuery {
 
         List<Long> tagIds = new ArrayList<>();
 
-        try (QueryCursor<List<?>> cursor = cache.getCache().query(sql)) {
+        try (QueryCursor<List<?>> cursor = cache.sqlQueryCache(sql)) {
             for (List<?> row : cursor) {
                tagIds.add((Long) row.get(0));
             }
@@ -55,7 +55,7 @@ public class DataTagIgniteQuery implements DataTagQuery {
 
         List<Long> tagIds = new ArrayList<>();
 
-        try (QueryCursor<List<?>> cursor = cache.getCache().query(sql)) {
+        try (QueryCursor<List<?>> cursor = cache.sqlQueryCache(sql)) {
             for (List<?> row : cursor) {
                 tagIds.add((Long) row.get(0));
             }

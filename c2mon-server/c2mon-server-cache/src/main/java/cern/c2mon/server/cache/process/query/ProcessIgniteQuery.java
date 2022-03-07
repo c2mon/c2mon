@@ -30,7 +30,7 @@ public class ProcessIgniteQuery implements ProcessQuery {
 
         List<Long> processIds = new ArrayList<>();
 
-        try (QueryCursor<List<?>> cursor = cache.getCache().query(sql)) {
+        try (QueryCursor<List<?>> cursor = cache.sqlQueryCache(sql)) {
             for (List<?> row : cursor) {
                 processIds.add((Long) row.get(0));
             }

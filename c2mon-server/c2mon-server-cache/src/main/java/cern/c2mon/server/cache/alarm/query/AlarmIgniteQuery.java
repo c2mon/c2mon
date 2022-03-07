@@ -62,7 +62,7 @@ public class AlarmIgniteQuery implements AlarmQuery {
 
         List<Long> alarmIds = new ArrayList<>();
 
-        try (QueryCursor<List<?>> cursor = cache.getCache().query(sql)) {
+        try (QueryCursor<List<?>> cursor = cache.sqlQueryCache(sql)) {
             for (List<?> row : cursor) {
                 alarmIds.add((Long) row.get(0));
             }

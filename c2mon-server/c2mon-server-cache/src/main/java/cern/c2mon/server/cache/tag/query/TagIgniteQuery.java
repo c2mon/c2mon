@@ -27,11 +27,11 @@ public class TagIgniteQuery<T> implements TagQuery<T> {
 
         List<T> tagList = new ArrayList<>();
 
-        switch(cache.getCache().getName()) {
+        switch(cache.getName()) {
             case "controlTagCache":
                 SqlFieldsQuery controlTagSql = new SqlFieldsQuery("select _val from ControlTagCacheObject  where UPPER(NAME) = UPPER(?) LIMIT ?").setArgs(name, maxResults);
 
-                try (QueryCursor<List<?>> cursor = cache.getCache().query(controlTagSql)) {
+                try (QueryCursor<List<?>> cursor = cache.sqlQueryCache(controlTagSql)) {
                     for (List<?> row : cursor) {
                         tagList.add((T) row.get(0));
                     }
@@ -41,7 +41,7 @@ public class TagIgniteQuery<T> implements TagQuery<T> {
             case "dataTagCache":
             SqlFieldsQuery dataTagSql = new SqlFieldsQuery("select _val from DataTagCacheObject  where UPPER(NAME) = UPPER(?) LIMIT ?").setArgs(name, maxResults);
 
-            try (QueryCursor<List<?>> cursor = cache.getCache().query(dataTagSql)) {
+            try (QueryCursor<List<?>> cursor = cache.sqlQueryCache(dataTagSql)) {
                 for (List<?> row : cursor) {
                     tagList.add((T) row.get(0));
                 }
@@ -51,14 +51,14 @@ public class TagIgniteQuery<T> implements TagQuery<T> {
             case "ruleTagCache":
             SqlFieldsQuery ruleTagSql = new SqlFieldsQuery("select _val from RuleTagCacheObject  where UPPER(NAME) = UPPER(?) LIMIT ?").setArgs(name, maxResults);
 
-            try (QueryCursor<List<?>> cursor = cache.getCache().query(ruleTagSql)) {
+            try (QueryCursor<List<?>> cursor = cache.sqlQueryCache(ruleTagSql)) {
                 for (List<?> row : cursor) {
                     tagList.add((T) row.get(0));
                 }
             }
                 break;
         }
-        LOG.info(String.format("findTagsByName() - Got %d results for name \"%s\"", tagList.size(), name));
+        LOG.debug(String.format("findTagsByName() - Got %d results for name \"%s\"", tagList.size(), name));
 
         return tagList;
     }
@@ -70,11 +70,11 @@ public class TagIgniteQuery<T> implements TagQuery<T> {
 
         List<T> tagList = new ArrayList<>();
 
-        switch(cache.getCache().getName()){
+        switch(cache.getName()){
             case "dataTagCache":
                 SqlFieldsQuery dataTagSql = new SqlFieldsQuery("select _val from DataTagCacheObject  where UPPER(NAME) LIKE UPPER(?) LIMIT ?").setArgs(sqlWildcard, maxResults);
 
-                try (QueryCursor<List<?>> cursor = cache.getCache().query(dataTagSql)) {
+                try (QueryCursor<List<?>> cursor = cache.sqlQueryCache(dataTagSql)) {
                     for (List<?> row : cursor) {
                         tagList.add((T) row.get(0));
                     }
@@ -84,7 +84,7 @@ public class TagIgniteQuery<T> implements TagQuery<T> {
             case "ruleTagCache":
                 SqlFieldsQuery ruleTagSql = new SqlFieldsQuery("select _val from RuleTagCacheObject  where UPPER(NAME) LIKE UPPER(?) LIMIT ?").setArgs(sqlWildcard, maxResults);
 
-                try (QueryCursor<List<?>> cursor = cache.getCache().query(ruleTagSql)) {
+                try (QueryCursor<List<?>> cursor = cache.sqlQueryCache(ruleTagSql)) {
                     for (List<?> row : cursor) {
                         tagList.add((T) row.get(0));
                     }
@@ -94,7 +94,7 @@ public class TagIgniteQuery<T> implements TagQuery<T> {
             case "controlTagCache":
                 SqlFieldsQuery controlTagSql = new SqlFieldsQuery("select _val from ControlTagCacheObject  where UPPER(NAME) LIKE UPPER(?) LIMIT ?").setArgs(sqlWildcard, maxResults);
 
-                try (QueryCursor<List<?>> cursor = cache.getCache().query(controlTagSql)) {
+                try (QueryCursor<List<?>> cursor = cache.sqlQueryCache(controlTagSql)) {
                     for (List<?> row : cursor) {
                         tagList.add((T) row.get(0));
                     }

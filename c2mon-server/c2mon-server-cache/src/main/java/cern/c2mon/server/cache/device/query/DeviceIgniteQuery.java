@@ -32,7 +32,7 @@ public class DeviceIgniteQuery implements DeviceQuery {
 
         List<Device> deviceCacheObjects = new ArrayList<>();
 
-        try (QueryCursor<List<?>> cursor = cache.getCache().query(sql)) {
+        try (QueryCursor<List<?>> cursor = cache.sqlQueryCache(sql)) {
             for (List<?> row : cursor) {
                 deviceCacheObjects.add((DeviceCacheObject) row.get(0));
             }

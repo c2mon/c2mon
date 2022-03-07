@@ -26,7 +26,7 @@ public class DeviceClassIgniteQuery implements DeviceClassQuery {
 
         List<Long> deviceClassIds = new ArrayList<>();
 
-        try (QueryCursor<List<?>> cursor = cache.getCache().query(sql)) {
+        try (QueryCursor<List<?>> cursor = cache.sqlQueryCache(sql)) {
             for (List<?> row : cursor) {
                 deviceClassIds.add((Long) row.get(0));
             }
