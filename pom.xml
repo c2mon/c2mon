@@ -39,7 +39,7 @@
     <java.version>8</java.version>
     <org.slf4j.version>1.7.30</org.slf4j.version>
     <logback.version>1.2.3</logback.version>
-    <org.apache.activemq.version>5.15.2</org.apache.activemq.version>
+    <org.apache.activemq.version>5.16.4</org.apache.activemq.version>
     <elasticsearch.version>7.12.0</elasticsearch.version>
     <mockito-all.version>1.10.19</mockito-all.version>
     <com.fasterxml.jackson.core>2.9.2</com.fasterxml.jackson.core>
@@ -223,13 +223,13 @@
       <dependency>
         <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-server</artifactId>
-        <version>9.2.14.v20151106</version>
+        <version>9.4.41.v20210516</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpclient</artifactId>
-        <version>4.5.12</version>
+        <version>4.5.13</version>
         <scope>runtime</scope>
       </dependency>
       <dependency>
