@@ -190,7 +190,7 @@ public class DataTagConfigTransactedImpl extends TagConfigTransactedImpl<DataTag
         listener.onConfigurationEvent(dataTagCopy, Action.UPDATE);
       }
 
-      tagCache.putQuiet(dataTagCopy);
+      tagCache.put(id, dataTagCopy);
       if (!dataTagUpdate.hasChanged()) {
         return new ProcessChange();
       } else {
