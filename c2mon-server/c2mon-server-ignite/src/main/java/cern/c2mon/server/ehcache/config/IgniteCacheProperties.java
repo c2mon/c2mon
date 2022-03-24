@@ -8,7 +8,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "c2mon.server.cache.ignite")
 public class IgniteCacheProperties {
 
-    private boolean embedded = true;
+    private boolean clientMode = false;
 
     /**
      * Read more : https://ignite.apache.org/docs/latest/clustering/tcp-ip-discovery
@@ -47,7 +47,17 @@ public class IgniteCacheProperties {
     private String partitionLossPolicy = "IGNORE";
 
     /**
-     * https://ignite.apache.org/docs/latest/configuring-caches/atomicity-modes
+     * Read more : https://ignite.apache.org/docs/latest/monitoring-metrics/configuring-metrics
+     */
+    private boolean statisticsEnabled = false;
+
+    /**
+     * Read more : https://ignite.apache.org/docs/latest/monitoring-metrics/new-metrics-system
+     */
+    private boolean enableJmxMetrics = false;
+
+    /**
+     * Read more : https://ignite.apache.org/docs/latest/configuring-caches/atomicity-modes
      */
     private String atomicityMode = "ATOMIC";
 
@@ -55,7 +65,43 @@ public class IgniteCacheProperties {
      * Read more : https://ignite.apache.org/docs/latest/key-value-api/transactions#long-running-transactions-termination
      * Default is 20 seconds
      */
-    private Integer setTxTimeoutOnPartitionMapExchange = 20000;
+    private Integer txTimeoutOnPartitionMapExchange = 20000;
+
+    /**
+     * Default data region name
+     * Read more : https://ignite.apache.org/docs/latest/memory-configuration/data-regions#configuring-data-regions
+     */
+    private String defaultRegionName = "Default_Region";
+
+    /**
+     * Default data region initial size (500 MB initial size)
+     * Read more : https://ignite.apache.org/docs/latest/memory-configuration/data-regions#configuring-data-regions
+     */
+    private long defaultRegionInitialSize = 500L * 1024 * 1024;
+
+    /**
+     * Default data region max size (20 GB maximum size).
+     * Read more : https://ignite.apache.org/docs/latest/memory-configuration/data-regions#configuring-data-regions
+     */
+    private long defaultRegionMaxSize = 20L * 1024 * 1024 * 1024;
+
+    /**
+     * Default data region persistence enabled
+     * Read more : https://ignite.apache.org/docs/latest/persistence/native-persistence
+     */
+    private boolean defaultRegionPersistenceEnabled = false;
+
+    /**
+     * Default data region page eviction mode
+     * Read more : https://ignite.apache.org/docs/latest/memory-configuration/eviction-policies#eviction-policies
+     */
+    private String defaultRegionPageEvictionMode = "DISABLED";
+
+    /**
+     * Default data region metrics enabled
+     * Read more : https://ignite.apache.org/docs/latest/monitoring-metrics/configuring-metrics
+     */
+    private boolean defaultRegionMetricsEnabled = false;
 
     /**
      * Message queue limit is set to 0 (by default) which may lead to potential OOMEs when running cache operations in FULL_ASYNC or
@@ -69,12 +115,12 @@ public class IgniteCacheProperties {
      */
     private long metricsLogFrequency = 0;
 
-    public boolean isEmbedded() {
-        return embedded;
+    public boolean isClientMode() {
+        return clientMode;
     }
 
-    public void setEmbedded(boolean embedded) {
-        this.embedded = embedded;
+    public void setClientMode(boolean clientMode) {
+        this.clientMode = clientMode;
     }
 
     public boolean isOnHeapCacheEnabled() {
@@ -125,6 +171,22 @@ public class IgniteCacheProperties {
         this.partitionLossPolicy = partitionLossPolicy;
     }
 
+    public boolean isStatisticsEnabled() {
+        return statisticsEnabled;
+    }
+
+    public void setStatisticsEnabled(boolean statisticsEnabled) {
+        this.statisticsEnabled = statisticsEnabled;
+    }
+
+    public boolean isEnableJmxMetrics() {
+        return enableJmxMetrics;
+    }
+
+    public void setEnableJmxMetrics(boolean enableJmxMetrics) {
+        this.enableJmxMetrics = enableJmxMetrics;
+    }
+
     public List<String> getIpFinderAddresses() {
         return ipFinderAddresses;
     }
@@ -141,12 +203,60 @@ public class IgniteCacheProperties {
         this.atomicityMode = atomicityMode;
     }
 
-    public Integer getSetTxTimeoutOnPartitionMapExchange() {
-        return setTxTimeoutOnPartitionMapExchange;
+    public Integer getTxTimeoutOnPartitionMapExchange() {
+        return txTimeoutOnPartitionMapExchange;
     }
 
-    public void setSetTxTimeoutOnPartitionMapExchange(Integer setTxTimeoutOnPartitionMapExchange) {
-        this.setTxTimeoutOnPartitionMapExchange = setTxTimeoutOnPartitionMapExchange;
+    public void setTxTimeoutOnPartitionMapExchange(Integer txTimeoutOnPartitionMapExchange) {
+        this.txTimeoutOnPartitionMapExchange = txTimeoutOnPartitionMapExchange;
+    }
+
+    public String getDefaultRegionName() {
+        return defaultRegionName;
+    }
+
+    public void setDefaultRegionName(String defaultRegionName) {
+        this.defaultRegionName = defaultRegionName;
+    }
+
+    public long getDefaultRegionInitialSize() {
+        return defaultRegionInitialSize;
+    }
+
+    public void setDefaultRegionInitialSize(long defaultRegionInitialSize) {
+        this.defaultRegionInitialSize = defaultRegionInitialSize;
+    }
+
+    public long getDefaultRegionMaxSize() {
+        return defaultRegionMaxSize;
+    }
+
+    public void setDefaultRegionMaxSize(long defaultRegionMaxSize) {
+        this.defaultRegionMaxSize = defaultRegionMaxSize;
+    }
+
+    public boolean isDefaultRegionPersistenceEnabled() {
+        return defaultRegionPersistenceEnabled;
+    }
+
+    public void setDefaultRegionPersistenceEnabled(boolean defaultRegionPersistenceEnabled) {
+        this.defaultRegionPersistenceEnabled = defaultRegionPersistenceEnabled;
+    }
+
+    public String getDefaultRegionPageEvictionMode() {
+        return defaultRegionPageEvictionMode;
+    }
+
+    public void setDefaultRegionPageEvictionMode(String defaultRegionPageEvictionMode) {
+        this.defaultRegionPageEvictionMode = defaultRegionPageEvictionMode;
+    }
+
+    public boolean isDefaultRegionMetricsEnabled() {
+        return defaultRegionMetricsEnabled;
+    }
+
+    public void setDefaultRegionMetricsEnabled(boolean defaultRegionMetricsEnabled) {
+        this.defaultRegionMetricsEnabled = defaultRegionMetricsEnabled;
     }
 
     public Integer getMessageQueueLimit() {

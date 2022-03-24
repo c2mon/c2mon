@@ -3,7 +3,7 @@ SET DATABASE SQL SYNTAX ORA TRUE;
 CREATE TABLE IF NOT EXISTS SHORTTERMLOG (
   logdate           DATE         NOT NULL,
   tagid             INTEGER      NOT NULL,
-  tagname           VARCHAR(60),
+  tagname           VARCHAR(200),
   tagvalue          VARCHAR(4000),
   tagvaluedesc      VARCHAR(1000),
   tagdatatype       VARCHAR(200),

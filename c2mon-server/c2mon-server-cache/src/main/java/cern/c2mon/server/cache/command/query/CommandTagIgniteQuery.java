@@ -28,7 +28,7 @@ public class CommandTagIgniteQuery implements CommandTagQuery {
 
         List<Long> result = new ArrayList<>();
 
-        try (QueryCursor<List<?>> cursor = cache.getCache().query(sql)) {
+        try (QueryCursor<List<?>> cursor = cache.sqlQueryCache(sql)) {
             for (List<?> row : cursor) {
                 result.add((Long) row.get(0));
             }
