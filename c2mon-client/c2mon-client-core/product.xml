@@ -7,7 +7,7 @@
             <dep groupId="org.springframework" product="spring-jms" version="5.1.2.RELEASE"/>
             <dep groupId="org.apache.activemq" product="activemq-client" version="5.15.2"/>
             <dep groupId="org.apache.activemq" product="activemq-http" version="5.15.2" />
-            <dep groupId="org.eclipse.jetty" product="jetty-server" version="9.2.14.v20151106" />
+            <dep groupId="org.eclipse.jetty" product="jetty-server" version="9.2.14.v20151106" scope="provided"/>
             <dep groupId="org.apache.httpcomponents" product="httpclient" version="4.5.10" />
 
             <!-- 3rd party dependencies -->
