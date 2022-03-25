@@ -16,28 +16,6 @@
  *****************************************************************************/
 package cern.c2mon.server.configuration.impl;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
-import lombok.extern.slf4j.Slf4j;
-import org.simpleframework.xml.Serializer;
-import org.simpleframework.xml.convert.AnnotationStrategy;
-import org.simpleframework.xml.core.Persister;
-import org.simpleframework.xml.strategy.Strategy;
-import org.simpleframework.xml.transform.RegistryMatcher;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Component;
-
 import cern.c2mon.server.cache.ClusterCache;
 import cern.c2mon.server.cache.ProcessCache;
 import cern.c2mon.server.cache.ProcessFacade;
@@ -47,19 +25,59 @@ import cern.c2mon.server.configuration.ConfigProgressMonitor;
 import cern.c2mon.server.configuration.ConfigurationLoader;
 import cern.c2mon.server.configuration.config.ConfigurationProperties;
 import cern.c2mon.server.configuration.dao.ConfigurationDAO;
-import cern.c2mon.server.configuration.handler.*;
+import cern.c2mon.server.configuration.handler.AlarmConfigHandler;
+import cern.c2mon.server.configuration.handler.ControlTagConfigHandler;
+import cern.c2mon.server.configuration.handler.DataTagConfigHandler;
+import cern.c2mon.server.configuration.handler.DeviceClassConfigHandler;
+import cern.c2mon.server.configuration.handler.DeviceConfigHandler;
+import cern.c2mon.server.configuration.handler.EquipmentConfigHandler;
+import cern.c2mon.server.configuration.handler.ProcessConfigHandler;
+import cern.c2mon.server.configuration.handler.RuleTagConfigHandler;
+import cern.c2mon.server.configuration.handler.SubEquipmentConfigHandler;
 import cern.c2mon.server.configuration.handler.impl.CommandTagConfigHandler;
 import cern.c2mon.server.configuration.parser.ConfigurationParser;
 import cern.c2mon.server.daq.JmsContainerManager;
 import cern.c2mon.server.daq.out.ProcessCommunicationManager;
-import cern.c2mon.shared.client.configuration.*;
+import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Action;
 import cern.c2mon.shared.client.configuration.ConfigConstants.Status;
+import cern.c2mon.shared.client.configuration.ConfigurationElement;
+import cern.c2mon.shared.client.configuration.ConfigurationElementReport;
+import cern.c2mon.shared.client.configuration.ConfigurationException;
+import cern.c2mon.shared.client.configuration.ConfigurationReport;
+import cern.c2mon.shared.client.configuration.ConfigurationReportFileFilter;
+import cern.c2mon.shared.client.configuration.ConfigurationReportHeader;
 import cern.c2mon.shared.client.configuration.api.Configuration;
 import cern.c2mon.shared.client.configuration.converter.DateFormatConverter;
 import cern.c2mon.shared.daq.config.Change;
 import cern.c2mon.shared.daq.config.ChangeReport;
 import cern.c2mon.shared.daq.config.ConfigurationChangeEventReport;
+import lombok.extern.slf4j.Slf4j;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
+import org.simpleframework.xml.Serializer;
+import org.simpleframework.xml.convert.AnnotationStrategy;
+import org.simpleframework.xml.core.Persister;
+import org.simpleframework.xml.strategy.Strategy;
+import org.simpleframework.xml.transform.RegistryMatcher;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
 
 /**
  * Implementation of the server ConfigurationLoader bean.
@@ -313,11 +331,11 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
     ConfigurationReport report = new ConfigurationReport(configId, configName, "");
 
     //map of element reports that need a DAQ child report adding
-    Map<Long, ConfigurationElementReport> daqReportPlaceholder = new HashMap<>();
+    Map<Long, ConfigurationElementReport> daqReportPlaceholder = new ConcurrentHashMap<>();
     //map of elements themselves elt_seq_id -> element
-    Map<Long, ConfigurationElement> elementPlaceholder = new HashMap<>();
+    Map<Long, ConfigurationElement> elementPlaceholder = new ConcurrentHashMap<>();
     //map of lists, where each list needs sending to a particular DAQ (processId -> List of events)
-    Map<Long, List<Change>> processLists = new HashMap<>();
+    Map<Long, List<Change>> processLists = new ConcurrentHashMap<>();
 
     if (configProgressMonitor != null){
       configProgressMonitor.serverTotalParts(configElements.size());
