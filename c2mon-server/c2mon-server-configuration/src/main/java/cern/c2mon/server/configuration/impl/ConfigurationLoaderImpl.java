@@ -173,6 +173,8 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
    */
   private ConfigurationParser configParser;
 
+  private static ForkJoinPool forkJoinPool = new ForkJoinPool(10);
+
   @Autowired
   public ConfigurationLoaderImpl(ProcessCommunicationManager processCommunicationManager,
                                  ConfigurationDAO configurationDAO,
@@ -347,7 +349,6 @@ public class ConfigurationLoaderImpl implements ConfigurationLoader {
       clusterCache.acquireWriteLockOnKey(this.cachePersistenceLock);
       if (!isDBConfig && runInParallel(configElements)) {
         log.debug("Enter parallel configuration");
-        ForkJoinPool forkJoinPool = ForkJoinPool.commonPool();
         try {
           //https://blog.krecan.net/2014/03/18/how-to-specify-thread-pool-for-java-8-parallel-streams/
           forkJoinPool.submit(() ->
