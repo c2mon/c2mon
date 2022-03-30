@@ -20,6 +20,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.ActiveMQPrefetchPolicy;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,7 @@ import cern.c2mon.shared.util.jms.JmsSender;
  * @author Justin Lewis Salmon
  */
 @Configuration
+@Slf4j
 public class JmsConfig {
 
   @Autowired
@@ -45,11 +47,13 @@ public class JmsConfig {
     ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory(properties.getJms().getUrl());
     factory.setConnectionIDPrefix(properties.getJms().getConnectionIDPrefix() + properties.getJms().getClientIdPrefix());
     factory.setTrustAllPackages(true);
-    
+
     ActiveMQPrefetchPolicy prefetchPolicy = new ActiveMQPrefetchPolicy();
-    prefetchPolicy.setAll(100);
+    prefetchPolicy.setAll(properties.getPrefetchLimit());
     factory.setPrefetchPolicy(prefetchPolicy);
-    
+
+    log.info("Setting ActiveMQ prefetch limit : {}", properties.getPrefetchLimit());
+
     return factory;
   }
 
@@ -67,7 +71,7 @@ public class JmsConfig {
     jmsTemplate.setDeliveryPersistent(false);
     return jmsTemplate;
   }
-  
+
   /**
    * Threads used for polling topic queues.
    * @return The topic polling Executor Service
@@ -75,9 +79,9 @@ public class JmsConfig {
   @Bean
   public ExecutorService topicPollingExecutor() {
     return Executors.newCachedThreadPool(new ThreadFactory() {
-      
+
       ThreadFactory defaultFactory = Executors.defaultThreadFactory();
-      
+
       @Override
       public Thread newThread(final Runnable r) {
         Thread returnThread = defaultFactory.newThread(r);

@@ -16,27 +16,20 @@
  *****************************************************************************/
 package cern.c2mon.client.core.jms.impl;
 
-import java.util.concurrent.ExecutorService;
+import cern.c2mon.client.core.config.C2monClientProperties;
+import cern.c2mon.client.core.jms.EnqueuingEventListener;
+import lombok.Getter;
 
-import javax.jms.*;
+import javax.jms.Connection;
+import javax.jms.Destination;
+import javax.jms.JMSException;
+import javax.jms.MessageConsumer;
+import javax.jms.Session;
+import java.util.concurrent.ExecutorService;
 
 import org.apache.activemq.command.ActiveMQTopic;
 
-import lombok.Getter;
-
 abstract class AbstractTopicWrapper<T, U> {
-
-  /**
-   * Buffer before warnings for slow consumers are sent. Value for topics with few
-   * updates (heartbeat, admin message)
-   */
-  static final int DEFAULT_LISTENER_QUEUE_SIZE = 100;
-
-  /**
-   * Buffer before warnings for slow consumers are sent, for tags, alarms (where
-   * larger buffer is desirable).
-   */
-  static final int HIGH_LISTENER_QUEUE_SIZE = 10000;
 
   /**
    * Topic on which server heartbeat messages are arriving.
@@ -47,17 +40,18 @@ abstract class AbstractTopicWrapper<T, U> {
   @Getter
   private final AbstractListenerWrapper<T, U> listenerWrapper;
 
-  public AbstractTopicWrapper(final SlowConsumerListener slowConsumerListener, final ExecutorService topicPollingExecutor, String topicName) {
+  public AbstractTopicWrapper(final SlowConsumerListener slowConsumerListener, final EnqueuingEventListener enqueuingEventListener, final ExecutorService topicPollingExecutor, String topicName, C2monClientProperties properties) {
     this.topic = new ActiveMQTopic(topicName);
-    listenerWrapper = createListenerWrapper(slowConsumerListener, topicPollingExecutor);
+    listenerWrapper = createListenerWrapper(properties, slowConsumerListener, enqueuingEventListener, topicPollingExecutor);
     listenerWrapper.start();
   }
 
-  abstract AbstractListenerWrapper<T, U> createListenerWrapper(SlowConsumerListener slowConsumerListener, final ExecutorService topicPollingExecutor);
+  abstract AbstractListenerWrapper<T, U> createListenerWrapper(C2monClientProperties properties, SlowConsumerListener slowConsumerListener,
+                                                               EnqueuingEventListener enqueuingEventListener, final ExecutorService topicPollingExecutor);
 
   /**
    * Subscribes to the topic. Called when refreshing all subscriptions.
-   * 
+   *
    * @param connection
    *          The JMS connection
    * @throws JMSException

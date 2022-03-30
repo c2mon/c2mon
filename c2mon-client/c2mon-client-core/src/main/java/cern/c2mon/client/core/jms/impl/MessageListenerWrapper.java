@@ -25,6 +25,7 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.TextMessage;
 
+import cern.c2mon.client.core.jms.EnqueuingEventListener;
 import lombok.extern.slf4j.Slf4j;
 
 import cern.c2mon.client.core.listener.TagUpdateListener;
@@ -64,10 +65,12 @@ class MessageListenerWrapper extends AbstractQueuedWrapper<TagValueUpdate> {
      * @param executorService thread pool polling the queue
      */
     public MessageListenerWrapper(final Long tagId, final TagUpdateListener serverUpdateListener,
-            final int queueCapacity, final SlowConsumerListener slowConsumerListener,
-            final ExecutorService executorService) {
-        super(queueCapacity, slowConsumerListener, executorService);
+                                  final int queueCapacity, final SlowConsumerListener slowConsumerListener,
+                                  final EnqueuingEventListener enqueuingEventListener,
+                                  final ExecutorService executorService) {
+        super(queueCapacity, slowConsumerListener, enqueuingEventListener, executorService);
         addListener(serverUpdateListener, tagId);
+        log.info("MessageListenerWrapper queue size : " + queueCapacity);
     }
 
     /**
@@ -103,38 +106,43 @@ class MessageListenerWrapper extends AbstractQueuedWrapper<TagValueUpdate> {
 
     @Override
     protected TagValueUpdate convertMessage(Message message) throws JMSException {
-      return TransferTagSerializer.fromJson(((TextMessage) message).getText(), TransferTagValueImpl.class);
+        return TransferTagSerializer.fromJson(((TextMessage) message).getText(), TransferTagValueImpl.class);
     }
 
     @Override
     protected synchronized void notifyListeners(TagValueUpdate tagValueUpdate) {
-      if (listeners.containsKey(tagValueUpdate.getId())) {
-        if (!filterout(tagValueUpdate)) {
-          log.trace("notifying listener about TagValueUpdate event. tag id: {}, value: {}, timestamp: {}",
-              tagValueUpdate.getId(), tagValueUpdate.getValue(), tagValueUpdate.getServerTimestamp());
-          listeners.get(tagValueUpdate.getId()).onUpdate(tagValueUpdate);
+        if (listeners.containsKey(tagValueUpdate.getId())) {
+            if (!filterout(tagValueUpdate)) {
+                log.trace("notifying listener about TagValueUpdate event. tag id: {}, value: {}, timestamp: {}",
+                        tagValueUpdate.getId(), tagValueUpdate.getValue(), tagValueUpdate.getServerTimestamp());
+                listeners.get(tagValueUpdate.getId()).onUpdate(tagValueUpdate);
+            }
+        } else {
+            log.trace("no subscribed listener for TagValueUpdate event. tag id: {}, value: {}, timestamp: {} - filtering out",
+                    tagValueUpdate.getId(), tagValueUpdate.getValue(), tagValueUpdate.getServerTimestamp());
         }
-      } else {
-        log.trace("no subscribed listener for TagValueUpdate event. tag id: {}, value: {}, timestamp: {} - filtering out",
-            tagValueUpdate.getId(), tagValueUpdate.getValue(), tagValueUpdate.getServerTimestamp());
-      }
     }
 
     private boolean filterout(TagValueUpdate tagValueUpdate) {
-      Long oldTime = eventTimes.get(tagValueUpdate.getId());
-      Long newTime = tagValueUpdate.getServerTimestamp().getTime();
-      if (oldTime == null || oldTime <= newTime) {
-        eventTimes.put(tagValueUpdate.getId(), newTime);
-        return false;
-      } else {
-        log.warn("Filtering out tag update as newer update already received (tag id: {}, value: {})", tagValueUpdate.getId(), tagValueUpdate.getValue());
-        return true;
-      }
+        Long oldTime = eventTimes.get(tagValueUpdate.getId());
+        Long newTime = tagValueUpdate.getServerTimestamp().getTime();
+        if (oldTime == null || oldTime <= newTime) {
+            eventTimes.put(tagValueUpdate.getId(), newTime);
+            return false;
+        } else {
+            log.warn("Filtering out tag update as newer update already received (tag id: {}, value: {})", tagValueUpdate.getId(), tagValueUpdate.getValue());
+            return true;
+        }
     }
 
     @Override
     protected String getDescription(TagValueUpdate event) {
         return "Update for tag " + event.getId() + " (value: " + event.getValue() + ")";
+    }
+
+    @Override
+    protected String getQueueName() {
+        return "Tag";
     }
 
 }

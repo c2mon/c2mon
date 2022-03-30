@@ -22,6 +22,7 @@ import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
 import javax.jms.Session;
 
+import cern.c2mon.client.core.jms.EnqueuingEventListener;
 import lombok.extern.slf4j.Slf4j;
 
 import cern.c2mon.client.core.config.C2monClientProperties;
@@ -30,8 +31,8 @@ import cern.c2mon.shared.client.tag.TagUpdate;
 
 /**
  * Implementation of an {@link AbstractTopicWrapper} for receiving live alarms updates,
- * nested in a normal {@link TagUpdate} object. 
- * 
+ * nested in a normal {@link TagUpdate} object.
+ *
  * @author Matthias Braeger
  */
 @Slf4j
@@ -41,17 +42,22 @@ public class AlarmTopicWrapper extends AbstractTopicWrapper<AlarmListener, TagUp
 
   private MessageConsumer alarmConsumer;
 
+
   public AlarmTopicWrapper(final SlowConsumerListener slowConsumerListener,
+                           final EnqueuingEventListener enqueuingEventListener,
                            final ExecutorService topicPollingExecutor,
                            final C2monClientProperties properties) {
-    super(slowConsumerListener, topicPollingExecutor, properties.getJms().getAlarmWithTagTopic());
+    super(slowConsumerListener, enqueuingEventListener, topicPollingExecutor, properties.getJms().getAlarmWithTagTopic(), properties);
   }
-  
+
   @Override
-  protected AbstractListenerWrapper<AlarmListener, TagUpdate> createListenerWrapper(SlowConsumerListener slowConsumerListener, final ExecutorService topicPollingExecutor) {
-    return new AlarmListenerWrapper(HIGH_LISTENER_QUEUE_SIZE, slowConsumerListener, topicPollingExecutor);
+  protected AbstractListenerWrapper<AlarmListener, TagUpdate> createListenerWrapper(C2monClientProperties properties,
+                                                                                    SlowConsumerListener slowConsumerListener,
+                                                                                    EnqueuingEventListener enqueuingEventListener,
+                                                                                    final ExecutorService topicPollingExecutor) {
+    return new AlarmListenerWrapper(properties.getHighListenerQueueSize(), slowConsumerListener, enqueuingEventListener, topicPollingExecutor);
   }
-  
+
   /**
    * Unsubscribes from the alarm topic.
    * @throws JMSException if problem subscribing

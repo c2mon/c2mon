@@ -19,6 +19,7 @@ package cern.c2mon.client.core.jms.impl;
 import java.util.HashSet;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import cern.c2mon.client.core.jms.EnqueuingEventListener;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +28,7 @@ import cern.c2mon.client.core.jms.ClientHealthMonitor;
 
 @Slf4j
 @Service
-public class ClientHealthMonitorImpl implements ClientHealthMonitor, SlowConsumerListener {
+public class ClientHealthMonitorImpl implements ClientHealthMonitor, SlowConsumerListener, EnqueuingEventListener {
 
   /**
    * Listeners.
@@ -80,4 +81,17 @@ public class ClientHealthMonitorImpl implements ClientHealthMonitor, SlowConsume
     }
   }
 
+  @Override
+  public void onEnqueuingEvent(String details) {
+    log.warn("Enqueuing event: {}", details);
+    listenerLock.writeLock().lock();
+    try {
+      for (ClientHealthListener listener : listeners) {
+        listener.onEnqueuingEventListener(details);
+      }
+    } finally {
+      listenerLock.writeLock().unlock();
+    }
+
+  }
 }

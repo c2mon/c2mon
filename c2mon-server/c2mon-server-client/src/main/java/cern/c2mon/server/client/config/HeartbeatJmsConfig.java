@@ -43,7 +43,9 @@ public class HeartbeatJmsConfig {
 
   @Bean
   public SingleConnectionFactory heartbeatSingleConnectionFactory() {
-    return new SingleConnectionFactory(heartbeatConnectionFactory());
+    SingleConnectionFactory singleConnectionFactory = new SingleConnectionFactory(heartbeatConnectionFactory());
+    singleConnectionFactory.setReconnectOnException(true);
+    return singleConnectionFactory;
   }
 
   @Bean
