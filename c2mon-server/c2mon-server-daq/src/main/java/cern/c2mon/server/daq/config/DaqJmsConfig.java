@@ -54,7 +54,9 @@ public class DaqJmsConfig {
 
   @Bean
   public SingleConnectionFactory processOutConnectionFactory() {
-    return new SingleConnectionFactory(daqOutActiveMQConnectionFactory());
+    SingleConnectionFactory singleConnectionFactory = new SingleConnectionFactory(daqOutActiveMQConnectionFactory());
+    singleConnectionFactory.setReconnectOnException(true);
+    return singleConnectionFactory;
   }
 
   @Bean
