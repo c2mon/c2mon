@@ -62,4 +62,4 @@ if [ -n "${RUN_FOREGROUND+set}" ] ; then
 fi
 
 exec -a `basename $0` $JAVA -cp "$CLASSPATH" -Dc2mon.server.home="$C2MON_HOME" -Dc2mon.server.properties="file://$C2MON_HOME/conf/c2mon-server.properties" \
-  $LOGGING_CONFIG  $JVM_MEM "${JVM_OTHER_OPTS[@]}" cern.c2mon.server.ServerStartup
+  $LOGGING_CONFIG  $JVM_MEM "${JVM_OTHER_OPTS[@]}" cern.c2mon.server.ServerStartup > log/c2mon.log 2>&1
