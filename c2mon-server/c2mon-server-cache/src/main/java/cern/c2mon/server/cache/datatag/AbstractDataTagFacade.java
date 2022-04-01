@@ -176,6 +176,22 @@ public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractT
       }
     }
 
+    if ((tmpStr = properties.getProperty("dataType")) != null) {
+      if (!tmpStr.equals("null")) {
+        if(dataTagCacheObject.getMinValue() != null){
+          Comparable comparableMin = (Comparable) TypeConverter.cast(dataTagCacheObject.getMinValue(), properties.getProperty("dataType"));
+          dataTagCacheObject.setMinValue(comparableMin);
+          dataTagUpdate.setMinValue((Number) comparableMin);
+        }
+
+        if(dataTagCacheObject.getMaxValue() != null){
+          Comparable comparableMax = (Comparable) TypeConverter.cast(dataTagCacheObject.getMaxValue(), properties.getProperty("dataType"));
+          dataTagCacheObject.setMaxValue(comparableMax);
+          dataTagUpdate.setMaxValue((Number) comparableMax);
+        }
+      }
+    }
+
     if ((tmpStr = properties.getProperty("minValue")) != null) {
       if (tmpStr.equals("null")) {
         dataTagCacheObject.setMinValue(null);

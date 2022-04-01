@@ -370,6 +370,67 @@ public class ConfigurationLoaderTest {
   }
 
   @Test
+  public void updateDataTagDataTypeFromIntegerToFloat() throws ParserConfigurationException, IllegalAccessException, NoSimpleValueParseException, TransformerException, NoSuchFieldException, InstantiationException {
+    // called once when updating the equipment;
+    // mock returns a list with the correct number of SUCCESS ChangeReports
+    expect(communicationManager.sendConfiguration(eq(5L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
+    expect(communicationManager.sendConfiguration(eq(5L), isA(List.class))).andReturn(new ConfigurationChangeEventReport());
+    replay(communicationManager);
+
+    // SETUP:
+    Configuration createProcess = TestConfigurationProvider.createProcess();
+    configurationLoader.applyConfiguration(createProcess);
+    Configuration newEquipmentConfig = TestConfigurationProvider.createEquipment();
+    configurationLoader.applyConfiguration(newEquipmentConfig);
+    processFacade.start(5L, "hostname", new Timestamp(System.currentTimeMillis()));
+
+    DataTag dataTag = DataTag.create("DataTag",
+            Integer.class,
+            new DataTagAddress())
+            .id(1000L)
+            .minValue(2)
+            .maxValue(10)
+            .build();
+    dataTag.setEquipmentId(15L);
+
+    Configuration configuration = new Configuration();
+    configuration.addEntity(dataTag);
+
+    //apply the configuration to the server
+    configurationLoader.applyConfiguration(configuration);
+
+    DataTag updatedDataTag = DataTag.update(1000L)
+            .dataType(Float.class)
+            .build();
+
+    configuration = new Configuration();
+    configuration.addEntity(updatedDataTag);
+
+    //apply the configuration to the server
+    ConfigurationReport report = configurationLoader.applyConfiguration(configuration);
+
+    // check report result
+    assertEquals(ConfigConstants.Status.OK, report.getStatus());
+    assertTrue(report.getProcessesToReboot().isEmpty());
+    assertTrue(report.getElementReports().size() == 1);
+    assertTrue(report.getElementReports().get(0).getAction().equals(ConfigConstants.Action.UPDATE));
+    assertTrue(report.getElementReports().get(0).getEntity().equals(ConfigConstants.Entity.DATATAG));
+
+    DataTagCacheObject expectedCacheObjectData = new DataTagCacheObject();
+    expectedCacheObjectData.setDataType(Float.class.getName());
+    expectedCacheObjectData.setMinValue(2.0f);
+    expectedCacheObjectData.setMaxValue(10.0f);
+
+    // get cacheObject from the cache and compare to the an expected cacheObject
+    DataTagCacheObject cacheObjectData = (DataTagCacheObject) dataTagCache.get(1000L);
+    assertEquals(expectedCacheObjectData.getDataType(), cacheObjectData.getDataType());
+    assertEquals(expectedCacheObjectData.getMinValue(), cacheObjectData.getMinValue());
+    assertEquals(expectedCacheObjectData.getMaxValue(), cacheObjectData.getMaxValue());
+
+    verify(communicationManager);
+  }
+
+  @Test
   public void updateProcess() throws IllegalAccessException, TransformerException, InstantiationException, NoSimpleValueParseException, ParserConfigurationException, NoSuchFieldException {
     // called once when updating the equipment;
     // mock returns a list with the correct number of SUCCESS ChangeReports
