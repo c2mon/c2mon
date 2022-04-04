@@ -40,5 +40,5 @@ public interface ClientHealthListener {
    */
   void onSlowUpdateListener(String diagnosticMessage);
 
-  void onEnqueuingEventListener(String diagnosticMessage);
+  void onEnqueuingEventListener(String diagnosticMessage, int percentage);
 }

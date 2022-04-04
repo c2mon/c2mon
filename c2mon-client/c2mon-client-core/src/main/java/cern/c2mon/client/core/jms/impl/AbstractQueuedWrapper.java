@@ -175,20 +175,19 @@ public abstract class AbstractQueuedWrapper<U> implements Lifecycle, MessageList
 
         float currentQueueSizePercentage = (float) getQueueSize() /  (float) queueCapacity;
         if(queueSizeThresholdReached(currentQueueSizePercentage)){
+          int currentQueueSizePercentage100 = (int)(currentQueueSizePercentage * 100);
           String warning = "New enqueuing event for " + getQueueName() + " queue. " +
                   "Queue capacity : " + queueCapacity + ". " +
                   "Current number of elements in the queue : " + getQueueSize() + ". " +
-                  "Filling percentage: " + (currentQueueSizePercentage * 100) + "%";
-          log.warn(warning);
-          enqueuingEventListener.onEnqueuingEvent(warning);
+                  "Filling percentage: " + currentQueueSizePercentage100 + "%";
+          enqueuingEventListener.onEnqueuingEvent(warning, currentQueueSizePercentage100);
         }
 
         if (lastNotificationTime != 0 && (System.currentTimeMillis() - lastNotificationTime) > notificationTimeBeforeWarning.get()) {
           String warning = "Slow consumer class: " + this.getClass().getSimpleName() + ". "
                               + "C2MON client is not consuming updates correctly and should be restarted! "
+                              + "No returning call from listener since " + new Timestamp(lastNotificationTime)
                               + " Event type: " + getDescription(event);
-          log.warn(warning);
-          log.warn("No returning call from listener since {}", new Timestamp(lastNotificationTime));
           slowConsumerListener.onSlowConsumer(warning);
         }
         eventQueue.put(event);
