@@ -42,7 +42,9 @@ public class JmsConfig {
 
   @Bean
   public SingleConnectionFactory singleConnectionFactory() {
-    return new SingleConnectionFactory(activeMQConnectionFactory());
+    SingleConnectionFactory singleConnectionFactory = new SingleConnectionFactory(activeMQConnectionFactory());
+    singleConnectionFactory.setReconnectOnException(true);
+    return singleConnectionFactory;
   }
 
   @Bean
@@ -79,7 +81,9 @@ public class JmsConfig {
 
   @Bean
   public SingleConnectionFactory filterConnectionFactory() {
-    return new SingleConnectionFactory(filterActiveMQConnectionFactory());
+    SingleConnectionFactory singleConnectionFactory = new SingleConnectionFactory(filterActiveMQConnectionFactory());
+    singleConnectionFactory.setReconnectOnException(true);
+    return singleConnectionFactory;
   }
 
   @Bean
@@ -102,7 +106,9 @@ public class JmsConfig {
 
   @Bean
   public SingleConnectionFactory secondSingleConnectionFactory() {
-    return new SingleConnectionFactory(secondActiveMQConnectionFactory());
+    SingleConnectionFactory singleConnectionFactory = new SingleConnectionFactory(secondActiveMQConnectionFactory());
+    singleConnectionFactory.setReconnectOnException(true);
+    return singleConnectionFactory;
   }
 
   @Bean
