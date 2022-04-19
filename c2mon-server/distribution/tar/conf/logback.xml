@@ -9,7 +9,7 @@
   <property name="RULE_LOG_FILE"     value="${LOG_PATH:-/tmp}/c2mon.ruletag.log"/>
   <property name="ERROR_LOG_FILE"    value="${LOG_PATH:-/tmp}/c2mon.error.log"/>
   <property name="FALLBACK_LOG_FILE" value="${LOG_PATH:-/tmp}/c2mon.fallback.log"/>
-
+  <property name="FILTEROUT_LOG_FILE" value="${LOG_PATH:-/tmp}/c2mon.filterout.log"/>
 
   <appender name="FileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <file>${LOG_FILE}</file>
@@ -92,6 +92,19 @@
     </triggeringPolicy>
   </appender>
 
+  <appender name="FilteroutLogAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${FILTEROUT_LOG_FILE}</file>
+    <encoder>
+      <pattern>${FILE_LOG_PATTERN}</pattern>
+    </encoder>
+    <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+      <fileNamePattern>${FILTEROUT_LOG_FILE}.%i</fileNamePattern>
+    </rollingPolicy>
+    <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+      <MaxFileSize>10MB</MaxFileSize>
+    </triggeringPolicy>
+  </appender>
+
 
   <logger name="AlarmLogger" level="INFO" additivity="false">
     <appender-ref ref="AlarmAppender"/>
@@ -108,6 +121,10 @@
   <!-- Used within c2mon-shared-persistence-manager to trace activities of the history fallback mechanism -->
   <logger name="HistoryFallbackLogger" level="INFO" additivity="false">
     <appender-ref ref="FallbackLogAppender"/>
+  </logger>
+
+  <logger name="FilteroutLogger" level="INFO" additivity="false">
+    <appender-ref ref="FilteroutLogAppender"/>
   </logger>
 
   <logger name="cern.c2mon" level="DEBUG"/>
