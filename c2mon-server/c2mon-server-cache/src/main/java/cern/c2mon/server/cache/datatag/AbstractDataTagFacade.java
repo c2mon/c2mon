@@ -288,7 +288,8 @@ public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractT
       if (dataTag.getDataTagQuality() == null || dataTag.getDataTagQuality().isAccessible()) {
 
         log.debug("update() : older timestamp and not inaccessible -> reject update");
-        FILTEROUT_LOGGER.info("Data tag with id {} filtered out : older timestamp and not inaccessible", dataTag.getId());
+        FILTEROUT_LOGGER.info("Data tag with id {} name {} source timestamp {} value {} filtered out : older timestamp and not inaccessible",
+                dataTag.getId(), dataTag.getName(), dataTag.getSourceTimestamp(), dataTag.getValue());
         return true;
 
       }
@@ -310,7 +311,8 @@ public abstract class AbstractDataTagFacade<T extends DataTag> extends AbstractT
         && sourceDataTagValue.getQuality() != null  && sourceDataTagValue.getQuality().isValid()) {
 
       log.debug("update() : values and timestamps are equal, so nothing to update -> reject update");
-      FILTEROUT_LOGGER.info("Data tag with id {} filtered out : values and timestamps are equal, so nothing to update", dataTag.getId());
+      FILTEROUT_LOGGER.info("Data tag with id {} name {} source timestamp {} value {} filtered out : values and timestamps are equal, so nothing to update",
+              dataTag.getId(), dataTag.getName(), dataTag.getSourceTimestamp(), dataTag.getValue());
       return true;
     }
 
