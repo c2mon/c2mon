@@ -34,7 +34,7 @@
 
 
   <properties>
-    <org.springframework.version>5.1.2.RELEASE</org.springframework.version>
+    <org.springframework.version>5.3.19</org.springframework.version>
     <org.springframework.boot.version>2.1.0.RELEASE</org.springframework.boot.version>
     <java.version>8</java.version>
     <org.slf4j.version>1.7.30</org.slf4j.version>
