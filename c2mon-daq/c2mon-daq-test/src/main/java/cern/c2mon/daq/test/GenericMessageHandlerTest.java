@@ -152,6 +152,7 @@ public abstract class GenericMessageHandlerTest {
       pconf.setProcessName(TEST_PROCESS_NAME);
 
       pconf.setAliveTagID(1000L);
+      pconf.setStateTagID(1005L);
       pconf.setAliveInterval(20000);
 
       if (log.isDebugEnabled()) {

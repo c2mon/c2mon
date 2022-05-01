@@ -61,6 +61,12 @@ public interface IEquipmentConfiguration {
     long getAliveTagId();
 
     /**
+     * Returns the id of the Equipment state tag
+     * @return the state id
+     */
+    long getStateTagId();
+
+    /**
      * This method sets the Equipment unit's address
      *
      * @return The address of this equipment. (key value pairs separated with ';')

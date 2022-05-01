@@ -75,6 +75,13 @@ public class ProcessConfiguration {
   private String jmsDaqCommandQueue;
 
   /**
+   * Identifier of the data tag that shall be used as an status tag for this
+   * process
+   */
+  @Element(name = "state-tag-id")
+  private long stateTagId;
+
+  /**
    * Identifier of the data tag that shall be used as an alive tag for this
    * process
    */
@@ -168,6 +175,24 @@ public class ProcessConfiguration {
    */
   public long getAliveTagID() {
     return aliveTagId;
+  }
+
+  /**
+   * This method sets the State Tag identifier
+   *
+   * @param id the State Tag identifier
+   */
+  public void setStateTagID(final long id) {
+    stateTagId = id;
+  }
+
+  /**
+   * This method gets the StateTag identifier
+   *
+   * @return The id of the state tag of this DAQ.
+   */
+  public long getStateTagID() {
+    return stateTagId;
   }
 
   /**

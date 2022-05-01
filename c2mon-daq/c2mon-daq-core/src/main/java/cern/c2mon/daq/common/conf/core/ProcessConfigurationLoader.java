@@ -218,6 +218,8 @@ public class ProcessConfigurationLoader extends XMLTagValueExtractor implements 
       processConfiguration.setJmsDaqCommandQueue(jmsDaqQueue);
       log.trace("createProcessConfiguration - jms Daq Queue: " + jmsDaqQueue);
 
+      processConfiguration.setStateTagID(Long.parseLong(getTagValue(rootElem, STATE_TAG_ID_ELEMENT)));
+
       processConfiguration.setAliveTagID(Long.parseLong(getTagValue(rootElem, ALIVE_TAG_ID_ELEMENT)));
 
       processConfiguration.setAliveInterval(Integer.parseInt(getTagValue(rootElem, ALIVE_INTERVAL_ELEMENT)));

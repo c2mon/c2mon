@@ -84,6 +84,12 @@ public class EquipmentConfiguration implements IEquipmentConfiguration, Cloneabl
   private boolean commfaultTagValue;
 
   /**
+   * Identifier of the equipment state-tag
+   */
+  @Element(name = "state-tag-id", required = false)
+  private long stateTagId;
+
+  /**
    * Identifier of the equipment alive-tag
    */
   @Element(name = "alive-tag-id", required = false)
@@ -200,6 +206,25 @@ public class EquipmentConfiguration implements IEquipmentConfiguration, Cloneabl
    */
   public void setCommFaultTagId(final long id) {
     commfaultTagId = id;
+  }
+
+  /**
+   * Sets the id of the state tag.
+   *
+   * @param id The new id of the state tag.
+   */
+  public void setStateTagId(final long id) {
+    stateTagId = id;
+  }
+
+  /**
+   * Returns the id of the state tag.
+   *
+   * @return The id of the state tag.
+   */
+  @Override
+  public long getStateTagId() {
+    return stateTagId;
   }
 
   /**

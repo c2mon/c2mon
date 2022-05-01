@@ -82,6 +82,10 @@ public interface ConfigurationXMLConstants {
    */
   String HW_CLASS_ATTRIBUTE = "class";
   /**
+   * The status tag id element.
+   */
+  String STATE_TAG_ID_ELEMENT = "state-tag-id";
+  /**
    * The alive tag id element.
    */
   String ALIVE_TAG_ID_ELEMENT = "alive-tag-id";

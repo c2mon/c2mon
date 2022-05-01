@@ -62,7 +62,7 @@ class ClientCommandRequestHandler {
     switch (commandRequest.getResultType()) {
     case TRANSFER_COMMAND_HANDLES_LIST:
 
-      return commandExecutionManager.processRequest(commandRequest.getTagIds());
+      return commandExecutionManager.processRequest(commandRequest.getIds());
     default:
       LOG.error("handleCommandHandleRequest() - Could not generate response message. Unknown enum ResultType " + commandRequest.getResultType());
     }
