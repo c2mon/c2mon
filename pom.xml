@@ -42,7 +42,7 @@
     <org.apache.activemq.version>5.15.2</org.apache.activemq.version>
     <elasticsearch.version>7.12.0</elasticsearch.version>
     <mockito-all.version>1.10.19</mockito-all.version>
-    <com.fasterxml.jackson.core>2.9.2</com.fasterxml.jackson.core>
+    <com.fasterxml.jackson.core>2.12.6.1</com.fasterxml.jackson.core>
     <com.oracle.version>19.8.0.0</com.oracle.version>
     <!-- Start: Used for K8S distributions -->
     <grafana.version>6.1.2</grafana.version>
