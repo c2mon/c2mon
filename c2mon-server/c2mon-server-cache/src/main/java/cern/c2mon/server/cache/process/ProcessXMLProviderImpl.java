@@ -91,10 +91,6 @@ public class ProcessXMLProviderImpl implements ProcessXMLProvider {
       str.append(processCacheObject.getId());
       str.append("\" type=\"initialise\"").append(" name=\"").append(processCacheObject.getName()).append("\">\n");
 
-      str.append("  <state-tag-id>");
-      str.append(processCacheObject.getStateTagId());
-      str.append("</state-tag-id>\n");
-
       str.append("  <alive-tag-id>");
       str.append(processCacheObject.getAliveTagId());
       str.append("</alive-tag-id>\n");
@@ -155,12 +151,6 @@ public class ProcessXMLProviderImpl implements ProcessXMLProvider {
       str.append("  <commfault-tag-value>");
       str.append(equipment.getCommFaultTagValue());
       str.append("</commfault-tag-value>\n");
-
-      if (equipment.getStateTagId() != null) {
-        str.append("  <state-tag-id>");
-        str.append(equipment.getStateTagId());
-        str.append("</state-tag-id>\n");
-      }
 
       if (equipment.getAliveTagId() != null) {
         str.append("  <alive-tag-id>");

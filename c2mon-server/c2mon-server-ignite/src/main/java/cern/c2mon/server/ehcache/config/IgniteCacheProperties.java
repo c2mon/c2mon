@@ -95,7 +95,7 @@ public class IgniteCacheProperties {
      * Default data region page eviction mode
      * Read more : https://ignite.apache.org/docs/latest/memory-configuration/eviction-policies#eviction-policies
      */
-    private String defaultRegionPageEvictionMode = "DISABLED";
+    private String defaultRegionPageEvictionMode = "RANDOM_LRU";
 
     /**
      * Default data region metrics enabled
