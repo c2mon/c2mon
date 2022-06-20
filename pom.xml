@@ -38,7 +38,7 @@
     <org.springframework.boot.version>2.1.0.RELEASE</org.springframework.boot.version>
     <java.version>8</java.version>
     <org.slf4j.version>1.7.30</org.slf4j.version>
-    <logback.version>1.2.3</logback.version>
+    <logback.version>1.2.9</logback.version>
     <org.apache.activemq.version>5.15.2</org.apache.activemq.version>
     <elasticsearch.version>7.12.0</elasticsearch.version>
     <mockito-all.version>1.10.19</mockito-all.version>
