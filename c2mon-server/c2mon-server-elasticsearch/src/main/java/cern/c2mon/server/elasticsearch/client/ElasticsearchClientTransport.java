@@ -70,7 +70,10 @@ public final class ElasticsearchClientTransport implements ElasticsearchClient {
 
   private final ElasticsearchProperties properties;
 
+  // todo deprecated
   private TransportClient client;
+
+  private BulkProcessor bulkProcessor;
 
   /**
    * Elasticsearch Transport client constructor
@@ -88,12 +91,11 @@ public final class ElasticsearchClientTransport implements ElasticsearchClient {
 
   @Override
   public BulkProcessor getBulkProcessor(BulkProcessor.Listener listener) {
-    return BulkProcessor.builder(client, listener)
-        .setBulkActions(properties.getBulkActions())
-        .setBulkSize(new ByteSizeValue(properties.getBulkSize(), ByteSizeUnit.MB))
-        .setFlushInterval(TimeValue.timeValueSeconds(properties.getBulkFlushInterval()))
-        .setConcurrentRequests(properties.getConcurrentRequests())
-        .build();
+    if (bulkProcessor == null) {
+      bulkProcessor = BulkProcessor.builder(client, listener).setBulkActions(properties.getBulkActions()).setBulkSize(new ByteSizeValue(properties.getBulkSize(), ByteSizeUnit.MB))
+              .setFlushInterval(TimeValue.timeValueSeconds(properties.getBulkFlushInterval())).setConcurrentRequests(properties.getConcurrentRequests()).build();
+    }
+    return bulkProcessor;
   }
 
   @Override

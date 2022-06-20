@@ -1,4 +1,5 @@
 .gradle
+*.log
 
 
 # Build files
@@ -6,6 +7,8 @@
 build/
 target/
 temp.json
+.gradle/
+.run/
 
 # IDE files
 *.iml
