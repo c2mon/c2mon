@@ -58,7 +58,9 @@ public class AdminJmsConfig {
 
   @Bean
   public SingleConnectionFactory adminSingleConnectionFactory() {
-    return new SingleConnectionFactory(adminActiveMQConnectionFactory());
+    SingleConnectionFactory singleConnectionFactory =  new SingleConnectionFactory(adminActiveMQConnectionFactory());
+    singleConnectionFactory.setReconnectOnException(true);
+    return singleConnectionFactory;
   }
 
   @Bean

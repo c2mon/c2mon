@@ -52,10 +52,11 @@ public class ClientJmsConfig {
     connectionFactory.setTrustAllPackages(true);
     return connectionFactory;
   }
-
   @Bean
   public SingleConnectionFactory clientSingleConnectionFactory() {
-    return new SingleConnectionFactory(clientActiveMQConnectionFactory());
+    SingleConnectionFactory singleConnectionFactory = new SingleConnectionFactory(clientActiveMQConnectionFactory());
+    singleConnectionFactory.setReconnectOnException(true);
+    return singleConnectionFactory;
   }
 
   @Bean

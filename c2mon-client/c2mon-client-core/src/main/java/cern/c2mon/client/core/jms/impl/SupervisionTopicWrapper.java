@@ -19,19 +19,25 @@ package cern.c2mon.client.core.jms.impl;
 import java.util.concurrent.ExecutorService;
 
 import cern.c2mon.client.core.config.C2monClientProperties;
+import cern.c2mon.client.core.jms.EnqueuingEventListener;
 import cern.c2mon.client.core.jms.SupervisionListener;
 import cern.c2mon.shared.client.supervision.SupervisionEvent;
 
 public class SupervisionTopicWrapper extends AbstractTopicWrapper<SupervisionListener, SupervisionEvent> {
 
+
   public SupervisionTopicWrapper(final SlowConsumerListener slowConsumerListener,
+                                 final EnqueuingEventListener enqueuingEventListener,
                                  final ExecutorService topicPollingExecutor,
                                  final C2monClientProperties properties) {
-    super(slowConsumerListener, topicPollingExecutor, properties.getJms().getSupervisionTopic());
+    super(slowConsumerListener, enqueuingEventListener, topicPollingExecutor, properties.getJms().getSupervisionTopic(), properties);
   }
-  
+
   @Override
-  protected AbstractListenerWrapper<SupervisionListener, SupervisionEvent> createListenerWrapper(SlowConsumerListener slowConsumerListener, final ExecutorService topicPollingExecutor) {
-    return new SupervisionListenerWrapper(HIGH_LISTENER_QUEUE_SIZE, slowConsumerListener, topicPollingExecutor);
+  protected AbstractListenerWrapper<SupervisionListener, SupervisionEvent> createListenerWrapper(C2monClientProperties properties,
+                                                                                                 SlowConsumerListener slowConsumerListener,
+                                                                                                 EnqueuingEventListener enqueuingEventListener,
+                                                                                                 final ExecutorService topicPollingExecutor) {
+    return new SupervisionListenerWrapper(properties.getHighListenerQueueSize(), slowConsumerListener, enqueuingEventListener, topicPollingExecutor);
   }
 }

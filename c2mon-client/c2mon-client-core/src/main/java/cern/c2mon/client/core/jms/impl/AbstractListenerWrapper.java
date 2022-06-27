@@ -16,6 +16,8 @@
  *****************************************************************************/
 package cern.c2mon.client.core.jms.impl;
 
+import cern.c2mon.client.core.jms.EnqueuingEventListener;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.ExecutorService;
@@ -79,8 +81,9 @@ public abstract class AbstractListenerWrapper<T, U> extends AbstractQueuedWrappe
    * @param queueCapacity size of queue of events waiting to be processed (exceptions thrown if full)
    * @param slowConsumerListener listener that will be called when a slow consumer is detected (slow event consumption)
    */
-  public AbstractListenerWrapper(final int queueCapacity, final SlowConsumerListener slowConsumerListener, final ExecutorService executorService) {
-    super(queueCapacity, slowConsumerListener, executorService);
+  public AbstractListenerWrapper(final int queueCapacity, final SlowConsumerListener slowConsumerListener,
+                                 final EnqueuingEventListener enqueuingEventListener, final ExecutorService executorService) {
+    super(queueCapacity, slowConsumerListener, enqueuingEventListener, executorService);
   }
 
   /**

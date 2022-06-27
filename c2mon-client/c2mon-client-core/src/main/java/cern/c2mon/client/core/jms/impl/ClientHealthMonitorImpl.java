@@ -16,18 +16,19 @@
  *****************************************************************************/
 package cern.c2mon.client.core.jms.impl;
 
+import cern.c2mon.client.core.jms.ClientHealthListener;
+import cern.c2mon.client.core.jms.ClientHealthMonitor;
+import cern.c2mon.client.core.jms.EnqueuingEventListener;
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.HashSet;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import cern.c2mon.client.core.jms.ClientHealthListener;
-import cern.c2mon.client.core.jms.ClientHealthMonitor;
 
 @Slf4j
 @Service
-public class ClientHealthMonitorImpl implements ClientHealthMonitor, SlowConsumerListener {
+public class ClientHealthMonitorImpl implements ClientHealthMonitor, SlowConsumerListener, EnqueuingEventListener {
 
   /**
    * Listeners.
@@ -66,8 +67,8 @@ public class ClientHealthMonitorImpl implements ClientHealthMonitor, SlowConsume
 
   @Override
   public void onSlowConsumer(String details) {
-    log.warn("Slow update consumer detected: {}", details);
     if (!slowConsumerNotified) {
+      log.warn("Slow update consumer detected: {}", details);
       listenerLock.writeLock().lock();
       try {
         for (ClientHealthListener listener : listeners) {
@@ -80,4 +81,17 @@ public class ClientHealthMonitorImpl implements ClientHealthMonitor, SlowConsume
     }
   }
 
+  @Override
+  public void onEnqueuingEvent(String details, int percentage) {
+    log.warn("Enqueuing event: {}", details);
+    listenerLock.writeLock().lock();
+    try {
+      for (ClientHealthListener listener : listeners) {
+        listener.onEnqueuingEventListener(details, percentage);
+      }
+    } finally {
+      listenerLock.writeLock().unlock();
+    }
+
+  }
 }

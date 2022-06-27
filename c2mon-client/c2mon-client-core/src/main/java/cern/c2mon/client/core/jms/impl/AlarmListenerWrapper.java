@@ -23,6 +23,7 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.TextMessage;
 
+import cern.c2mon.client.core.jms.EnqueuingEventListener;
 import com.google.gson.Gson;
 
 import lombok.extern.slf4j.Slf4j;
@@ -56,8 +57,10 @@ class AlarmListenerWrapper extends AbstractListenerWrapper<AlarmListener, TagUpd
    * @param slowConsumerListener listener registered for JMS problem callbacks
    * @param executorService threads pooling queue
    */
-  public AlarmListenerWrapper(int queueCapacity, SlowConsumerListener slowConsumerListener, final ExecutorService executorService) {
-    super(queueCapacity, slowConsumerListener, executorService);
+  public AlarmListenerWrapper(int queueCapacity, SlowConsumerListener slowConsumerListener,
+                              EnqueuingEventListener enqueuingEventListener, final ExecutorService executorService) {
+    super(queueCapacity, slowConsumerListener, enqueuingEventListener, executorService);
+    log.info("AlarmListenerWrapper queue size : " + queueCapacity);
   }
 
   @Override
@@ -68,7 +71,7 @@ class AlarmListenerWrapper extends AbstractListenerWrapper<AlarmListener, TagUpd
   @Override
   protected void invokeListener(final AlarmListener listener, final TagUpdate tagWithAlarmChange) {
     log.debug("invoke listener class {} for tag id: {}", listener.getClass(), tagWithAlarmChange.getId());
-    
+
     TagController controller = new TagController(tagWithAlarmChange.getId());
     try {
       controller.update(tagWithAlarmChange);
@@ -83,6 +86,11 @@ class AlarmListenerWrapper extends AbstractListenerWrapper<AlarmListener, TagUpd
   @Override
   protected String getDescription(TagUpdate event) {
     return "Tag #" + event.getId() + " got alarm value change";
+  }
+
+  @Override
+  protected String getQueueName() {
+    return "Alarm";
   }
 
   @Override

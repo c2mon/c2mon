@@ -67,9 +67,9 @@ public final class JmsProxyImpl implements JmsProxy, JmsSubscriptionHandler {
    * quite large to account for unsynchronized clients.
    */
   private final long messageTimeToLive;
-  
+
   private final JmsConnectionHandler jmsConnectionHandler;
-  
+
   private final AbstractTopicWrapper<HeartbeatListener, Heartbeat> heartbeatTopicWrapper;
 
   private final AbstractTopicWrapper<SupervisionListener, SupervisionEvent> supervisionTopicWrapper;
@@ -81,19 +81,20 @@ public final class JmsProxyImpl implements JmsProxy, JmsSubscriptionHandler {
   @Autowired
   public JmsProxyImpl(final JmsConnectionHandler jmsConnectionHandler,
                       final SlowConsumerListener slowConsumerListener,
+                      final EnqueuingEventListener enqueuingEventListener,
                       @Qualifier("topicPollingExecutor") final ExecutorService topicPollingExecutor,
                       final C2monClientProperties properties) {
 
     this.jmsConnectionHandler = jmsConnectionHandler;
     jmsConnectionHandler.setJmsSubscriptionHandler(this);
-    
-    heartbeatTopicWrapper = new HeartbeatTopicWrapper(slowConsumerListener, topicPollingExecutor, properties);
-    supervisionTopicWrapper = new SupervisionTopicWrapper(slowConsumerListener, topicPollingExecutor, properties);
-    broadcastTopicWrapper = new BroadcastTopicWrapper(slowConsumerListener, topicPollingExecutor, properties);
-    alarmTopicWrapper = new AlarmTopicWrapper(slowConsumerListener, topicPollingExecutor, properties);
+
+    heartbeatTopicWrapper = new HeartbeatTopicWrapper(slowConsumerListener, enqueuingEventListener, topicPollingExecutor, properties);
+    supervisionTopicWrapper = new SupervisionTopicWrapper(slowConsumerListener, enqueuingEventListener, topicPollingExecutor, properties);
+    broadcastTopicWrapper = new BroadcastTopicWrapper(slowConsumerListener, enqueuingEventListener, topicPollingExecutor, properties);
+    alarmTopicWrapper = new AlarmTopicWrapper(slowConsumerListener, enqueuingEventListener, topicPollingExecutor, properties);
     messageTimeToLive = properties.getJms().getMessageTimeToLive();
   }
-  
+
   @Override
   public void refreshAllSubscriptions(Connection connection) throws JMSException {
     if (alarmTopicWrapper.getListenerWrapper().getListenerCount() > 0) {
@@ -141,8 +142,8 @@ public final class JmsProxyImpl implements JmsProxy, JmsSubscriptionHandler {
 
   @Override
   public <T extends ClientRequestResult> Collection<T> sendRequest(
-      final JsonRequest<T> jsonRequest, final String queueName, final int timeout,
-      final ClientRequestReportListener reportListener) throws JMSException {
+          final JsonRequest<T> jsonRequest, final String queueName, final int timeout,
+          final ClientRequestReportListener reportListener) throws JMSException {
 
     if (queueName == null) {
       throw new NullPointerException("sendRequest(..) method called with null queue name argument");
@@ -159,11 +160,11 @@ public final class JmsProxyImpl implements JmsProxy, JmsSubscriptionHandler {
 
         Message message = null;
 
-        if (jsonRequest.isObjectRequest()) { 
+        if (jsonRequest.isObjectRequest()) {
           // used for EXECUTE_COMMAND_REQUESTS
           // send only the object
           message = session.createObjectMessage((Serializable) jsonRequest.getObjectParameter());
-        } else { 
+        } else {
           // used for all other request types
           // send the Client Request as a Json Text Message
           message = session.createTextMessage(jsonRequest.toJson());
@@ -178,7 +179,7 @@ public final class JmsProxyImpl implements JmsProxy, JmsSubscriptionHandler {
           producer.setTimeToLive(messageTimeToLive);
           producer.send(message);
 
-          while (jmsConnectionHandler.isConnected() && !jmsConnectionHandler.isShutdownRequested()) { 
+          while (jmsConnectionHandler.isConnected() && !jmsConnectionHandler.isShutdownRequested()) {
             // until we receive the result
             // (it is possible to receive progress and / or error reports during this process)
 
@@ -221,10 +222,10 @@ public final class JmsProxyImpl implements JmsProxy, JmsSubscriptionHandler {
    */
   @Override
   public <T extends ClientRequestResult> Collection<T> sendRequest(
-      final JsonRequest<T> jsonRequest, final String queueName, final int timeout)
-      throws JMSException {
+          final JsonRequest<T> jsonRequest, final String queueName, final int timeout)
+          throws JMSException {
     // we don't care about reports!
-    ClientRequestReportListener reportListener = null; 
+    ClientRequestReportListener reportListener = null;
     return sendRequest(jsonRequest, queueName, timeout, reportListener);
   }
 
@@ -240,8 +241,8 @@ public final class JmsProxyImpl implements JmsProxy, JmsSubscriptionHandler {
    * @throws JMSException if problem subscribing
    */
   private <T extends ClientRequestResult> Collection<T> handleJsonResponse(
-      final TextMessage jsonMessage, final JsonRequest<T> jsonRequest, final ClientRequestReportListener reportListener)
-      throws JsonSyntaxException, JMSException {
+          final TextMessage jsonMessage, final JsonRequest<T> jsonRequest, final ClientRequestReportListener reportListener)
+          throws JsonSyntaxException, JMSException {
 
     Collection<T> resultCollection = jsonRequest.fromJsonResponse(jsonMessage.getText());
     if (resultCollection.isEmpty()) {
@@ -250,17 +251,17 @@ public final class JmsProxyImpl implements JmsProxy, JmsSubscriptionHandler {
     }
 
     // lets take the first element and check if it is a report
-    ClientRequestResult result = resultCollection.iterator().next(); 
-    
-    if ((result instanceof ClientRequestReport)) { 
+    ClientRequestResult result = resultCollection.iterator().next();
+
+    if ((result instanceof ClientRequestReport)) {
       // this can either be a Report or the actual Result
       ClientRequestReport report = (ClientRequestReport) result;
       if (isResult(report)) {
         // received the result!
         return resultCollection;
-      } else { 
+      } else {
         // received a report -> let's handle the report! still waiting for the result though
-        handleJsonReportResponse(report, reportListener); 
+        handleJsonReportResponse(report, reportListener);
         return null;
       }
     }
@@ -274,7 +275,7 @@ public final class JmsProxyImpl implements JmsProxy, JmsSubscriptionHandler {
    */
   private void handleJsonReportResponse(final ClientRequestReport report, final ClientRequestReportListener reportListener) {
 
-    if (reportListener == null) { 
+    if (reportListener == null) {
       // is someone waiting for the report?
       log.debug("handleJsonReportResponse(): Received a report, but no reportListener is registered. Ignoring..");
       return;
@@ -300,7 +301,7 @@ public final class JmsProxyImpl implements JmsProxy, JmsSubscriptionHandler {
   private boolean isResult(final ClientRequestReport clientRequestReport) {
     return clientRequestReport.isResult();
   }
-  
+
   @Override
   public void registerUpdateListener(TagUpdateListener serverUpdateListener, TopicRegistrationDetails topicRegistrationDetails) throws JMSException {
     jmsConnectionHandler.registerUpdateListener(serverUpdateListener, topicRegistrationDetails);
@@ -349,7 +350,7 @@ public final class JmsProxyImpl implements JmsProxy, JmsSubscriptionHandler {
 
     jmsConnectionHandler.ensureConnection();
 
-    if (alarmTopicWrapper.getListenerWrapper().getListenerCount() == 0) { 
+    if (alarmTopicWrapper.getListenerWrapper().getListenerCount() == 0) {
       // this is our first listener!
       // -> it's time to subscribe to the alarm topic
       try {
@@ -368,7 +369,7 @@ public final class JmsProxyImpl implements JmsProxy, JmsSubscriptionHandler {
       throw new NullPointerException("Trying to unregister null alarm listener from JmsProxy.");
     }
 
-    if (alarmTopicWrapper.getListenerWrapper().getListenerCount() == 1) { 
+    if (alarmTopicWrapper.getListenerWrapper().getListenerCount() == 1) {
       // this is our last listener! -> it's time to unsubscribe from the topic
       try {
         alarmTopicWrapper.unsubscribeFromAlarmTopic();
@@ -416,7 +417,7 @@ public final class JmsProxyImpl implements JmsProxy, JmsSubscriptionHandler {
     returnMap.put(supervisionTopicWrapper.getTopic().toString(), supervisionTopicWrapper.getQueueSize());
     returnMap.put(alarmTopicWrapper.getTopic().toString(), alarmTopicWrapper.getQueueSize());
     returnMap.put(broadcastTopicWrapper.getTopic().toString(), broadcastTopicWrapper.getQueueSize());
-    
+
     returnMap.put(heartbeatTopicWrapper.getTopic().toString(), heartbeatTopicWrapper.getQueueSize());
     return returnMap;
   }

@@ -40,6 +40,12 @@ public class C2monClientProperties {
    */
   private int maxRequestThreads = 5;
 
+  private int defaultListenerQueueSize = 100;
+
+  private int highListenerQueueSize = 10000;
+
+  private int prefetchLimit = 1000;
+
   /**
    * JMS properties
    */

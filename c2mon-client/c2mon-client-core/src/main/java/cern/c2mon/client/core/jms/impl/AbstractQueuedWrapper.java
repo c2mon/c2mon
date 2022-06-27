@@ -28,6 +28,7 @@ import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.TextMessage;
 
+import cern.c2mon.client.core.jms.EnqueuingEventListener;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.Lifecycle;
 
@@ -57,10 +58,14 @@ public abstract class AbstractQueuedWrapper<U> implements Lifecycle, MessageList
    */
   private SlowConsumerListener slowConsumerListener;
 
+  private EnqueuingEventListener enqueuingEventListener;
+
   /**
    * Poll timeout.
    */
   private static final int POLL_TIMEOUT = 2;
+
+  private static final float QUEUE_SIZE_THRESHOLD = 0.10f;
 
   /**
    * Time given for the notification to subscribed listeners before
@@ -77,6 +82,17 @@ public abstract class AbstractQueuedWrapper<U> implements Lifecycle, MessageList
    * Lifecycle flag.
    */
   private volatile boolean running = false;
+
+
+  /**
+   * Last queue size percentage notified to the listeners
+   */
+  private volatile float lastQueueCapacityPercentageNotified = 0f;
+
+  /**
+   * THe current queueCapacity
+   */
+  private final int queueCapacity;
 
   /**
    * Time the last notification started. Will notify as slow if
@@ -100,6 +116,8 @@ public abstract class AbstractQueuedWrapper<U> implements Lifecycle, MessageList
    */
   protected abstract String getDescription(U event);
 
+  protected abstract String getQueueName();
+
   /**
    * Notifies the listeners of this event.
    * @param event the incoming event
@@ -107,9 +125,11 @@ public abstract class AbstractQueuedWrapper<U> implements Lifecycle, MessageList
   protected abstract void notifyListeners(U event);
 
   public AbstractQueuedWrapper(final int queueCapacity, final SlowConsumerListener slowConsumerListener,
-                                    final ExecutorService executorService) {
+                               final EnqueuingEventListener enqueuingEventListener, final ExecutorService executorService) {
     super();
     this.slowConsumerListener = slowConsumerListener;
+    this.enqueuingEventListener = enqueuingEventListener;
+    this.queueCapacity = queueCapacity;
     eventQueue = new ArrayBlockingQueue<>(queueCapacity);
     //notice the slow consumer notification only works for a single listener thread here: if change would need a map U->notificationTime as field
     executorService.submit(new Callable<Boolean>() {
@@ -152,12 +172,22 @@ public abstract class AbstractQueuedWrapper<U> implements Lifecycle, MessageList
 
         U event = convertMessage(message);
         long lastNotificationTime = notificationTime.get();
+
+        float currentQueueSizePercentage = (float) getQueueSize() /  (float) queueCapacity;
+        if(queueSizeThresholdReached(currentQueueSizePercentage)){
+          int currentQueueSizePercentage100 = (int)(currentQueueSizePercentage * 100);
+          String warning = "New enqueuing event for " + getQueueName() + " queue. " +
+                  "Queue capacity : " + queueCapacity + ". " +
+                  "Current number of elements in the queue : " + getQueueSize() + ". " +
+                  "Filling percentage: " + currentQueueSizePercentage100 + "%";
+          enqueuingEventListener.onEnqueuingEvent(warning, currentQueueSizePercentage100);
+        }
+
         if (lastNotificationTime != 0 && (System.currentTimeMillis() - lastNotificationTime) > notificationTimeBeforeWarning.get()) {
           String warning = "Slow consumer class: " + this.getClass().getSimpleName() + ". "
                               + "C2MON client is not consuming updates correctly and should be restarted! "
+                              + "No returning call from listener since " + new Timestamp(lastNotificationTime)
                               + " Event type: " + getDescription(event);
-          log.warn(warning);
-          log.warn("No returning call from listener since {}", new Timestamp(lastNotificationTime));
           slowConsumerListener.onSlowConsumer(warning);
         }
         eventQueue.put(event);
@@ -166,6 +196,21 @@ public abstract class AbstractQueuedWrapper<U> implements Lifecycle, MessageList
       }
     } catch (Exception e) {
       log.error("Exception caught while processing incoming server event with " + this.getClass().getSimpleName(), e);
+    }
+  }
+
+
+  private boolean queueSizeThresholdReached(float currentQueueSizePercentage){
+    //true if the current queue size percentage increased or decreased 10% since the last sent percentage notification
+    if(currentQueueSizePercentage >= lastQueueCapacityPercentageNotified + QUEUE_SIZE_THRESHOLD) {
+      lastQueueCapacityPercentageNotified += QUEUE_SIZE_THRESHOLD;
+      return true;
+    }else
+    if(currentQueueSizePercentage <= lastQueueCapacityPercentageNotified - QUEUE_SIZE_THRESHOLD){
+      lastQueueCapacityPercentageNotified -= QUEUE_SIZE_THRESHOLD;
+      return true;
+    }else{
+      return false;
     }
   }
 
