@@ -60,6 +60,11 @@ public interface AlarmCacheUpdater {
         additionalInfo = additionalInfo + "[SIM]";
       }
     }
+
+    if(System.getProperty("evaluate.value.description", "false").equals("true") && tag != null){
+      additionalInfo += tag.getValueDescription();
+    }
+
     return additionalInfo;
   }
 }
