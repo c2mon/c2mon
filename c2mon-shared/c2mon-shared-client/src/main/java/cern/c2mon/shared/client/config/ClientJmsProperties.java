@@ -76,7 +76,7 @@ public class ClientJmsProperties extends CommonJmsProperties{
   /**
    * Timeout of client request in milliseconds for waiting for an answer. 
    */
-  private int requestTimeout = 15_000;
+  private int requestTimeout = Integer.parseInt(System.getProperty("c2mon.client.default_timeout", "15000"));
   
   /**
    * Time to live in milliseconds used for all topic and queue messages sent with the Client API.

@@ -91,6 +91,7 @@ public class ClientRequestImpl<T extends ClientRequestResult> implements ClientR
   @Getter
   private Object objectParameter;
 
+  
   /**
    * Hidden constructor for Json
    */

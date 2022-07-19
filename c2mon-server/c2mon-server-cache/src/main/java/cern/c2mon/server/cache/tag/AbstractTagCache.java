@@ -51,8 +51,9 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public abstract class AbstractTagCache<T extends Tag> extends AbstractCache<Long, T> implements C2monCacheWithSupervision<Long, T> {
 
   /** The max result size should avoid to run into an OutOfMemory Exception when doing a wildcard search */
-  private static final int MAX_RESULT_SIZE = 100000;
-
+  private static final int DEFAULT_MAX_RESULT_SIZE = 100000;
+  private int maxResultSize;
+  
   /**
    * Synchronized list.
    */
@@ -75,6 +76,7 @@ public abstract class AbstractTagCache<T extends Tag> extends AbstractCache<Long
     listenersWithSupervision = new ArrayList<>();
     listenerLock = new ReentrantReadWriteLock();
     this.tagQuery = tagQuery;
+    this.maxResultSize = Integer.parseInt(System.getProperty("c2mon.cache.max_result_size","" + DEFAULT_MAX_RESULT_SIZE));
   }
 
 
@@ -158,7 +160,7 @@ public abstract class AbstractTagCache<T extends Tag> extends AbstractCache<Long
 
   @Override
   public Collection<T> findByNameWildcard(String regex) {
-    return findByNameWildcard(regex, MAX_RESULT_SIZE);
+    return findByNameWildcard(regex, maxResultSize);
   }
 
   /**

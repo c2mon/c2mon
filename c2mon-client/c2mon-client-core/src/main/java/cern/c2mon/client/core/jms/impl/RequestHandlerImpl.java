@@ -115,6 +115,7 @@ public class RequestHandlerImpl implements RequestHandler {
     this.maxRequestSize = properties.getMaxTagsPerRequest();
     this.corePoolSize = properties.getMaxRequestThreads();
     this.requestTimeout = properties.getJms().getRequestTimeout();
+    log.warn("Request timeout SET TO {}", this.requestTimeout);
     executor.allowCoreThreadTimeOut(true);
   }
 

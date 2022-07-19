@@ -11,6 +11,7 @@ temp.json
 *.iml
 .idea/
 .settings/
+.gradle/*
 .classpath
 .project
 .factorypath
@@ -29,6 +30,7 @@ hs_err_pid*
 activemq-data/
 .CounterDataTagFallback.log
 DataTagFallback.log
+cbng-*.log
 
 *~
 *.orig
