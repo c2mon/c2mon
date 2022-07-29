@@ -141,6 +141,7 @@
     <terracotta clustered="true" consistency="strong" />
     <searchable>
         <searchAttribute name="deviceClassId" expression="value.getDeviceClassId()"/>
+        <searchAttribute name="deviceName" expression="value.getName()"/>
     </searchable>
   </cache>
 

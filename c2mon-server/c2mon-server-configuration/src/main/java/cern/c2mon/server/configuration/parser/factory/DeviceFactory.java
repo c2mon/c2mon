@@ -17,6 +17,14 @@
 
 package cern.c2mon.server.configuration.parser.factory;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import cern.c2mon.server.cache.DeviceCache;
 import cern.c2mon.server.cache.DeviceClassCache;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
@@ -27,13 +35,6 @@ import cern.c2mon.shared.client.configuration.ConfigConstants;
 import cern.c2mon.shared.client.configuration.ConfigurationElement;
 import cern.c2mon.shared.client.configuration.api.device.Device;
 import cern.c2mon.shared.client.device.*;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 
 /**
@@ -102,6 +103,15 @@ public class DeviceFactory extends EntityFactory<Device> {
     }
 
     private Long loadIdFromCache(Device entity) {
+      if (entity.isDeleted() && entity.getId() == null) {
+        try {
+          entity.setId(deviceCache.getDeviceIdByName(entity.getName()));
+        } catch (CacheElementNotFoundException e) {
+          log.debug("A device with name {} does not exist on the server: ", entity.getName(), e);
+        }
+      } else if (entity.isUpdated() && entity.getId() == null) {
+        entity.setId(deviceCache.getDeviceIdByName(entity.getName()));
+      } else {
         Long deviceClassId = entity.getClassId() == null ?
                 deviceClassCache.getDeviceClassIdByName(entity.getClassName()) :
                 entity.getClassId();
@@ -116,14 +126,16 @@ public class DeviceFactory extends EntityFactory<Device> {
                         .filter(d -> d.getName().equalsIgnoreCase(entity.getName()))
                         .findFirst();
                 if (existingDevice.isPresent()) {
-                    return existingDevice.get().getId();
+                  entity.setId(existingDevice.get().getId());
                 }
             }
         } catch (CacheElementNotFoundException e) {
           log.debug("A device with name {} does not exist yet on the server: ", entity.getName(), e);
             // new device, not in cache
         }
-        return null;
+      }
+
+      return entity.getId();
     }
 
     /**

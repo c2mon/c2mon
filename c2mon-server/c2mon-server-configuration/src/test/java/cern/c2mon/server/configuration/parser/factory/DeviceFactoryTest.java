@@ -1,5 +1,12 @@
 package cern.c2mon.server.configuration.parser.factory;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import org.junit.Before;
+import org.junit.Test;
+
 import cern.c2mon.server.cache.DeviceCache;
 import cern.c2mon.server.cache.DeviceClassCache;
 import cern.c2mon.server.cache.exception.CacheElementNotFoundException;
@@ -8,16 +15,14 @@ import cern.c2mon.server.common.device.DeviceCacheObject;
 import cern.c2mon.server.common.device.DeviceClassCacheObject;
 import cern.c2mon.server.configuration.parser.exception.ConfigurationParseException;
 import cern.c2mon.shared.client.configuration.api.device.Device;
-import cern.c2mon.shared.client.device.*;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import cern.c2mon.shared.client.device.Command;
+import cern.c2mon.shared.client.device.DeviceElement;
+import cern.c2mon.shared.client.device.DeviceProperty;
+import cern.c2mon.shared.client.device.Property;
 
 import static org.easymock.EasyMock.*;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class DeviceFactoryTest {
 
@@ -47,6 +52,14 @@ public class DeviceFactoryTest {
                 .id(20L)
                 .build();
         assertEquals(20L, (long) factory.getId(deviceWithClassId));
+    }
+
+    @Test
+    public void getIdShouldReturnINullIfDeleteRequestForNonExistantdevice() {
+        Device deviceWithNoClassId = Device.create("minimal Device", "TestClass")
+                .build();
+        deviceWithNoClassId.setDeleted(true);
+        assertNull(factory.getId(deviceWithNoClassId));
     }
 
     @Test(expected = CacheElementNotFoundException.class)
