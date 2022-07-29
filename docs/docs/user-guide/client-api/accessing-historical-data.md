@@ -30,7 +30,7 @@ compile "cern.c2mon.client:c2mon-client-ext-history:__insert_version_here__"
 The history module requires a few extra properties in order to work. If you are running a local C2MON server, simply point the module to its database:
 
 ```bash
-c2mon.client.history.jdbc.url=jdbc:hsqldb:hsql://localhost/c2mondb;sql.syntax_ora=true
+c2mon.client.history.jdbc.url=jdbc:hsqldb:file:c2mondb;sql.syntax_ora=true
 c2mon.client.history.jdbc.username=sa
 c2mon.client.history.jdbc.password=
 ```
