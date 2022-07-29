@@ -112,4 +112,35 @@ public class DeviceCacheImpl extends AbstractCache<Long, Device> implements Devi
 
     return deviceCacheObjects;
   }
+
+  @Override
+  public Long getDeviceIdByName(String deviceName) {
+    Long deviceId;
+
+    if (deviceName == null || deviceName.equalsIgnoreCase("")) {
+      throw new IllegalArgumentException("Attempting to retrieve a Device from the cache with a NULL or empty name parameter.");
+    }
+    if (deviceName.contains("*") || deviceName.contains("?")) {
+      throw new IllegalArgumentException("Attempting to retrieve a single Device from the cache with wildcard '*' or '?', which is not supported.");
+    }
+
+    Results results = null;
+    try {
+      Attribute<String> className = getCache().getSearchAttribute("deviceName");
+      Query query = getCache().createQuery();
+      results = query.includeKeys().addCriteria(className.eq(deviceName)).maxResults(1).execute();
+
+      if (results.size() == 0) {
+        throw new CacheElementNotFoundException("Failed to find a device with name " + deviceName + " in the cache.");
+      }
+
+      deviceId = (long) results.all().get(0).getKey();
+    } finally {
+      if (results != null) {
+        results.discard();
+      }
+    }
+
+    return deviceId;
+  }
 }
