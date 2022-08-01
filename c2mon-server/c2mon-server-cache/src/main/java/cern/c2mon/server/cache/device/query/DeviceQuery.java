@@ -8,5 +8,13 @@ import java.util.List;
 public interface DeviceQuery {
 
     List<Device> findDevicesByDeviceClassId(Long deviceClassId) throws CacheElementNotFoundException;
-
+    
+    /**
+     * Retrieves a particular <code>Device</code> ID from the cache by
+     * specifying its name.
+     *
+     * @param deviceName the name of the device
+     * @return the corresponding device ID, or null if no instance exists in the cache
+     */
+    Long findDeviceIdByName(String deviceName) throws CacheElementNotFoundException;
 }

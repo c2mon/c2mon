@@ -33,7 +33,7 @@ public interface DeviceCache extends C2monCacheWithListeners<Long, Device> {
   List<Device> getByDeviceClassId(Long deviceClassId);
 
   /**
-   * Retrieve a particular <code>Device</code> instance from the cache by
+   * Retrieves a particular <code>Device</code> ID from the cache by
    * specifying its name.
    *
    * @param deviceName the name of the device
