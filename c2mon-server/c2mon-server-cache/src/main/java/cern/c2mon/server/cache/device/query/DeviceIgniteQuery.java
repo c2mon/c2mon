@@ -14,10 +14,10 @@ import org.apache.ignite.cache.query.SqlFieldsQuery;
 
 public class DeviceIgniteQuery implements DeviceQuery {
 
-    private final IgniteCacheImpl cache;
+    private final IgniteCacheImpl<Long, Device> cache;
 
-    public DeviceIgniteQuery(final Ehcache cache){
-        this.cache = (IgniteCacheImpl) cache;
+    public DeviceIgniteQuery(final Ehcache<Long, Device> cache){
+        this.cache = (IgniteCacheImpl<Long, Device>) cache;
     }
 
     @Override
@@ -43,6 +43,34 @@ public class DeviceIgniteQuery implements DeviceQuery {
         }
 
         return deviceCacheObjects;
+    }
+
+    @Override
+    public Long findDeviceIdByName(String deviceName) throws CacheElementNotFoundException {
+        if (deviceName == null || deviceName.equalsIgnoreCase("")) {
+            throw new IllegalArgumentException(
+                    "Attempting to retrieve a Device from the cache with a NULL or empty name parameter.");
+        }
+        if (deviceName.contains("*") || deviceName.contains("?")) {
+            throw new IllegalArgumentException(
+                    "Attempting to retrieve a single Device from the cache with wildcard '*' or '?', which is not supported.");
+        }
+        
+        SqlFieldsQuery sql = new SqlFieldsQuery("select _key from DeviceCacheObject where NAME = ?").setArgs(deviceName);
+
+        List<Long> deviceIds = new ArrayList<>();
+
+        try (QueryCursor<List<?>> cursor = cache.sqlQueryCache(sql)) {
+            for (List<?> row : cursor) {
+                deviceIds.add((Long) row.get(0));
+            }
+        }
+
+        if (deviceIds.isEmpty()) {
+            throw new CacheElementNotFoundException("Failed to find a device class with name " + deviceName + " in the cache.");
+        }
+
+        return deviceIds.get(0);
     }
 }
 
