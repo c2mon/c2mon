@@ -5,6 +5,7 @@
 *.class
 build/
 target/
+bin/
 temp.json
 
 # CBNG files
