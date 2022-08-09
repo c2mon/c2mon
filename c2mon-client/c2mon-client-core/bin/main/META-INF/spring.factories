@@ -1,2 +1,0 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=cern.c2mon.client.core.config.C2monAutoConfiguration
-org.springframework.context.ApplicationListener=cern.c2mon.client.core.config.C2monApplicationListener
