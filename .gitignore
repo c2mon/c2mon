@@ -1,11 +1,15 @@
-.gradle
+*.hprof
 
+# log files
+*.log
 
 # Build files
 *.class
 build/
 target/
 temp.json
+.gradle/
+.run/
 
 # IDE files
 *.iml

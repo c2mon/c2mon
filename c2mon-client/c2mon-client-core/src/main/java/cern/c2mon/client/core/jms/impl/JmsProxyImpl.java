@@ -29,12 +29,14 @@ import org.apache.activemq.command.ActiveMQQueue;
 import org.apache.activemq.command.ActiveMQTopic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Component;
 
 import com.google.gson.JsonSyntaxException;
 
+import cern.c2mon.client.common.listener.TagListener;
 import lombok.extern.slf4j.Slf4j;
 
 import cern.c2mon.client.common.admin.BroadcastMessage;
@@ -78,12 +80,15 @@ public final class JmsProxyImpl implements JmsProxy, JmsSubscriptionHandler {
 
   private final AlarmTopicWrapper alarmTopicWrapper;
 
+  private final TagTopicWrapper tagTopicWrapper;
+
   @Autowired
   public JmsProxyImpl(final JmsConnectionHandler jmsConnectionHandler,
                       final SlowConsumerListener slowConsumerListener,
                       final EnqueuingEventListener enqueuingEventListener,
                       @Qualifier("topicPollingExecutor") final ExecutorService topicPollingExecutor,
-                      final C2monClientProperties properties) {
+                      final C2monClientProperties properties,
+                      @Value("${c2mon.domain}") String domain) {
 
     this.jmsConnectionHandler = jmsConnectionHandler;
     jmsConnectionHandler.setJmsSubscriptionHandler(this);
@@ -92,6 +97,7 @@ public final class JmsProxyImpl implements JmsProxy, JmsSubscriptionHandler {
     supervisionTopicWrapper = new SupervisionTopicWrapper(slowConsumerListener, enqueuingEventListener, topicPollingExecutor, properties);
     broadcastTopicWrapper = new BroadcastTopicWrapper(slowConsumerListener, enqueuingEventListener, topicPollingExecutor, properties);
     alarmTopicWrapper = new AlarmTopicWrapper(slowConsumerListener, enqueuingEventListener, topicPollingExecutor, properties);
+    tagTopicWrapper = new TagTopicWrapper(slowConsumerListener, enqueuingEventListener, topicPollingExecutor, properties, domain);
     messageTimeToLive = properties.getJms().getMessageTimeToLive();
   }
 
@@ -342,6 +348,25 @@ public final class JmsProxyImpl implements JmsProxy, JmsSubscriptionHandler {
     broadcastTopicWrapper.removeListener(broadcastMessageListener);
   }
 
+  public void registerTagListener(final TagListener tagListener) throws JMSException {
+    if (tagListener == null) {
+      throw new NullPointerException("Trying to register null alarm listener with JmsProxy.");
+    }
+
+    jmsConnectionHandler.ensureConnection();
+
+    if (tagTopicWrapper.getListenerWrapper().getListenerCount() == 0) {
+      // this is our first listener!
+      // -> it's time to subscribe to the alarm topic
+      try {
+        tagTopicWrapper.subscribeToTopic(jmsConnectionHandler.getConnection());
+      } catch (JMSException e) {
+        log.error("Did not manage to subscribe To Alarm Topic.", e);
+        throw e;
+      }
+    }
+    tagTopicWrapper.addListener(tagListener);
+  }
   @Override
   public void registerAlarmListener(final AlarmListener alarmListener) throws JMSException {
     if (alarmListener == null) {

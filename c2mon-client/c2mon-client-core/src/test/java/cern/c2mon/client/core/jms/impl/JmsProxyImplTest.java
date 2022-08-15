@@ -70,7 +70,7 @@ public class JmsProxyImplTest {
     ExecutorService topicPollingExecutor = jmsConfig.topicPollingExecutor();
     connetionHandler = new JmsConnectionHandler(connectionFactory, slowConsumerListener, enqueuingEventListener, topicPollingExecutor, new C2monClientProperties());
 
-    jmsProxy = new JmsProxyImpl(connetionHandler, slowConsumerListener, enqueuingEventListener, topicPollingExecutor, new C2monClientProperties());
+    jmsProxy = new JmsProxyImpl(connetionHandler, slowConsumerListener, enqueuingEventListener, topicPollingExecutor, new C2monClientProperties(), "c2mon");
   }
 
   /**

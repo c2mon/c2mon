@@ -21,6 +21,7 @@ import java.util.Collection;
 import javax.jms.JMSException;
 
 import cern.c2mon.client.common.listener.ClientRequestReportListener;
+import cern.c2mon.client.common.listener.TagListener;
 import cern.c2mon.client.core.listener.TagUpdateListener;
 import cern.c2mon.shared.client.request.ClientRequestResult;
 import cern.c2mon.shared.client.request.JsonRequest;
@@ -194,7 +195,9 @@ public interface JmsProxy {
    * @param supervisionListener the listener to remove
    */
   void unregisterSupervisionListener(SupervisionListener supervisionListener);
-  
+
+  void registerTagListener(final TagListener tagListener) throws JMSException;
+
   /**
    * Register a listener to be notified of alarm messages received
    * from the server.
