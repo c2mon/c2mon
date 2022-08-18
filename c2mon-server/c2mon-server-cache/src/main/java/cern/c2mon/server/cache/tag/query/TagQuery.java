@@ -8,4 +8,10 @@ public interface TagQuery<T> {
 
     List<T> findTagsByWildcard(String wildcard, int maxResults);
 
+    List<T> findTagsByProcessId(Long processId, int maxResults);
+
+    List<T> findTagsByEquipmentId(Long equipmentId, int maxResults);
+
+    List<T> findTagsBySubEquipmentId(Long subEquipmentId, int maxResults);
+
 }

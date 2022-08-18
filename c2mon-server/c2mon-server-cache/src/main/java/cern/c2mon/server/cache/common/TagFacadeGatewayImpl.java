@@ -174,6 +174,45 @@ public class TagFacadeGatewayImpl implements TagFacadeGateway {
   }
 
   @Override
+  public Collection<TagWithAlarms> getTagsWithAlarmsByProcessId(Long processId) {
+
+    Collection<TagWithAlarms> tagWithAlarms = new ArrayList<>();
+
+    Collection<Tag> tags = tagLocationService.findByProcessId(processId);
+    for (Tag tag : tags) {
+      tagWithAlarms.add(getFacade(tag).getTagWithAlarms(tag.getId()));
+    }
+
+    return tagWithAlarms;
+  }
+
+  @Override
+  public Collection<TagWithAlarms> getTagsWithAlarmsByEquipmentId(Long equipmentId) {
+
+    Collection<TagWithAlarms> tagWithAlarms = new ArrayList<>();
+
+    Collection<Tag> tags = tagLocationService.findByEquipmentId(equipmentId);
+    for (Tag tag : tags) {
+      tagWithAlarms.add(getFacade(tag).getTagWithAlarms(tag.getId()));
+    }
+
+    return tagWithAlarms;
+  }
+
+  @Override
+  public Collection<TagWithAlarms> getTagsWithAlarmsBySubEquipmentId(Long subEquipmentId) {
+
+    Collection<TagWithAlarms> tagWithAlarms = new ArrayList<>();
+
+    Collection<Tag> tags = tagLocationService.findBySubEquipmentId(subEquipmentId);
+    for (Tag tag : tags) {
+      tagWithAlarms.add(getFacade(tag).getTagWithAlarms(tag.getId()));
+    }
+
+    return tagWithAlarms;
+  }
+
+  @Override
   public void setQuality(Long tagId, Collection<TagQualityStatus> flagsToAdd,
       Collection<TagQualityStatus> flagsToRemove, Map<TagQualityStatus, String> qualityDescriptions, Timestamp timestamp) {
     

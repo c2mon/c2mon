@@ -79,6 +79,15 @@ public class ClientRequestImpl<T extends ClientRequestResult> implements ClientR
   @Getter
   private final Collection<Long> tagIds = new HashSet<>();
 
+  @Getter
+  private final Collection<Long> tagProcessIds = new HashSet<>();
+
+  @Getter
+  private final Collection<Long> tagEquipmentIds = new HashSet<>();
+
+  @Getter
+  private final Collection<Long> tagSubEquipmentIds = new HashSet<>();
+
   /** List of regular expressions, which is e.g. used to search via tag name */
   @Getter
   private final Collection<String> regexList = new HashSet<>();
@@ -210,6 +219,21 @@ public class ClientRequestImpl<T extends ClientRequestResult> implements ClientR
     return this.tagIds;
   }
 
+  @Override
+  public Collection<Long> getTagProcessIds() {
+    return this.tagProcessIds;
+  }
+
+  @Override
+  public Collection<Long> getTagEquipmentIds() {
+    return this.tagEquipmentIds;
+  }
+
+  @Override
+  public Collection<Long> getTagSubEquipmentIds() {
+    return this.tagSubEquipmentIds;
+  }
+
   /**
    * @return The Gson parser singleton instance
    */
@@ -236,6 +260,47 @@ public class ClientRequestImpl<T extends ClientRequestResult> implements ClientR
     return false;
   }
 
+  /**
+   * Adds the given process id to this request.
+   * @param processId A tag id
+   * @return <code>true</code>, if the request did not already contain the
+   *         specified tag id and if the tag id is bigger than <code>zero</code>.
+   */
+  public boolean addTagProcessId(final Long processId) {
+    if (processId != null && processId > 0) {
+      return tagProcessIds.add(processId);
+    }
+
+    return false;
+  }
+
+  /**
+   * Adds the given equipment id to this request.
+   * @param equipmentId A tag id
+   * @return <code>true</code>, if the request did not already contain the
+   *         specified tag id and if the tag id is bigger than <code>zero</code>.
+   */
+  public boolean addTagEquipmentId(final Long equipmentId) {
+    if (equipmentId != null && equipmentId > 0) {
+      return tagEquipmentIds.add(equipmentId);
+    }
+
+    return false;
+  }
+
+  /**
+   * Adds the given sub equipment id to this request.
+   * @param subEquipmentId A tag id
+   * @return <code>true</code>, if the request did not already contain the
+   *         specified tag id and if the tag id is bigger than <code>zero</code>.
+   */
+  public boolean addTagSubEquipmentId(final Long subEquipmentId) {
+    if (subEquipmentId != null && subEquipmentId > 0) {
+      return tagSubEquipmentIds.add(subEquipmentId);
+    }
+
+    return false;
+  }
 
   /**
    * Adds the given tag ids to this request.

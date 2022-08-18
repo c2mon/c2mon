@@ -327,6 +327,21 @@ public class ClientDataTagCacheImpl implements ClientDataTagCache {
   }
 
   @Override
+  public <T extends BaseTagListener> void subscribeByProcessIds(Set<Long> processIds, T listener) throws CacheSynchronizationException {
+    tagSubscriptionHandler.subscribeByProcessIds(processIds, listener, (listener instanceof TagListener));
+  }
+
+  @Override
+  public <T extends BaseTagListener> void subscribeByEquipmentIds(Set<Long> equipmentIds, T listener) throws CacheSynchronizationException {
+    tagSubscriptionHandler.subscribeByEquipmentIds(equipmentIds, listener, (listener instanceof TagListener));
+  }
+
+  @Override
+  public <T extends BaseTagListener> void subscribeBySubEquipmentIds(Set<Long> subEquipmentIds, T listener) throws CacheSynchronizationException {
+    tagSubscriptionHandler.subscribeBySubEquipmentIds(subEquipmentIds, listener, (listener instanceof TagListener));
+  }
+
+  @Override
   public Collection<TagController> getAllTagControllers() {
     return controller.getActiveCache().values();
   }

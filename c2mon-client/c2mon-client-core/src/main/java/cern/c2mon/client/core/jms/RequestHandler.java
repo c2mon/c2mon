@@ -138,7 +138,49 @@ public interface RequestHandler {
    * @throws RuntimeException if the response from the server is null (probable timeout)
    */
   Collection<TagUpdate> requestTagsByRegex(final Collection<String> regexList) throws JMSException;
-  
+
+  /**
+   * Queries the server for the latest values and configuration
+   * details for the request tags.
+   *
+   * <p>If called with an empty collection returns an empty collection.
+   *
+   * @param processIds the ids of the process
+   * @return a collection of transfer objects with the values/configuration information
+   * @throws JMSException if not currently connected or if a JMS problem occurs while making the request
+   * @throws NullPointerException if called with a null argument
+   * @throws RuntimeException if the response from the server is null (probable timeout)
+   */
+  Collection<TagUpdate> requestTagsByProcessIds(Collection<Long> processIds) throws JMSException;
+
+  /**
+   * Queries the server for the latest values and configuration
+   * details for the request tags.
+   *
+   * <p>If called with an empty collection returns an empty collection.
+   *
+   * @param equipmentIds the ids of the equipment
+   * @return a collection of transfer objects with the values/configuration information
+   * @throws JMSException if not currently connected or if a JMS problem occurs while making the request
+   * @throws NullPointerException if called with a null argument
+   * @throws RuntimeException if the response from the server is null (probable timeout)
+   */
+  Collection<TagUpdate> requestTagsByEquipmentIds(Collection<Long> equipmentIds) throws JMSException;
+
+  /**
+   * Queries the server for the latest values and configuration
+   * details for the request tags.
+   *
+   * <p>If called with an empty collection returns an empty collection.
+   *
+   * @param subEquipmentIds the ids of the sub equipment
+   * @return a collection of transfer objects with the values/configuration information
+   * @throws JMSException if not currently connected or if a JMS problem occurs while making the request
+   * @throws NullPointerException if called with a null argument
+   * @throws RuntimeException if the response from the server is null (probable timeout)
+   */
+  Collection<TagUpdate> requestTagsBySubEquipmentIds(Collection<Long> subEquipmentIds) throws JMSException;
+
   /**
    * Queries the server for the latest values for the request tags.
    *

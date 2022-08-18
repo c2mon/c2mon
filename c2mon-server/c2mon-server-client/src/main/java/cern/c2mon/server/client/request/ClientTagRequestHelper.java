@@ -112,7 +112,11 @@ class ClientTagRequestHelper {
 
     transferTags.addAll(getTagsById(tagRequest));
     transferTags.addAll(getTagsByRegex(tagRequest));
-    
+
+    transferTags.addAll(getTagsByProcessIds(tagRequest));
+    transferTags.addAll(getTagsByEquipmentIds(tagRequest));
+    transferTags.addAll(getTagsBySubEquipmentIds(tagRequest));
+
     if (LOG.isDebugEnabled()) {
       LOG.debug("Finished processing Tag request (values only): returning " + transferTags.size() + " Tags");
     }
@@ -149,6 +153,96 @@ class ClientTagRequestHelper {
       }
     } // end while
     
+    return transferTags;
+  }
+
+  public Collection<TagValueUpdate> getTagsByProcessIds(final ClientRequest tagRequest){
+    final Collection<TagValueUpdate> transferTags = new ArrayList<>(tagRequest.getIds().size());
+
+    for(Long id : tagRequest.getTagProcessIds()){
+      try {
+        final Collection<TagWithAlarms> tagsWithAlarms = tagFacadeGateway.getTagsWithAlarmsByProcessId(id);
+
+        for (TagWithAlarms tagWithAlarms : tagsWithAlarms) {
+          switch (tagRequest.getResultType()) {
+          case TRANSFER_TAG_LIST:
+            transferTags.add(TransferObjectFactory.createTransferTag(tagWithAlarms,
+                    aliveTimerFacade.isRegisteredAliveTimer(tagWithAlarms.getTag().getId()),
+                    TopicProvider.topicFor(tagWithAlarms.getTag(), properties)));
+            break;
+          case TRANSFER_TAG_VALUE_LIST:
+            transferTags.add(TransferObjectFactory.createTransferTagValue(tagWithAlarms));
+            break;
+          default:
+            LOG.error("getTagsByProcessIds() - Could not generate response message. Unknown enum ResultType " + tagRequest.getResultType());
+          }
+        }
+      }
+      catch (CacheElementNotFoundException ex) {
+        LOG.warn(String.format("getTagsByProcessIds() - Received client request (TagRequest) where the requested process ids is not matching to any Tag cache entry."));
+      }
+    }
+
+    return transferTags;
+  }
+
+  public Collection<TagValueUpdate> getTagsByEquipmentIds(final ClientRequest tagRequest){
+    final Collection<TagValueUpdate> transferTags = new ArrayList<>(tagRequest.getIds().size());
+
+    for(Long id : tagRequest.getTagEquipmentIds()){
+      try {
+        final Collection<TagWithAlarms> tagsWithAlarms = tagFacadeGateway.getTagsWithAlarmsByEquipmentId(id);
+
+        for (TagWithAlarms tagWithAlarms : tagsWithAlarms) {
+          switch (tagRequest.getResultType()) {
+          case TRANSFER_TAG_LIST:
+            transferTags.add(TransferObjectFactory.createTransferTag(tagWithAlarms,
+                    aliveTimerFacade.isRegisteredAliveTimer(tagWithAlarms.getTag().getId()),
+                    TopicProvider.topicFor(tagWithAlarms.getTag(), properties)));
+            break;
+          case TRANSFER_TAG_VALUE_LIST:
+            transferTags.add(TransferObjectFactory.createTransferTagValue(tagWithAlarms));
+            break;
+          default:
+            LOG.error("getTagsByEquipmentIds() - Could not generate response message. Unknown enum ResultType " + tagRequest.getResultType());
+          }
+        }
+      }
+      catch (CacheElementNotFoundException ex) {
+        LOG.warn(String.format("getTagsByEquipmentIds() - Received client request (TagRequest) where the requested equipment ids is not matching to any Tag cache entry."));
+      }
+    }
+
+    return transferTags;
+  }
+
+  public Collection<TagValueUpdate> getTagsBySubEquipmentIds(final ClientRequest tagRequest){
+    final Collection<TagValueUpdate> transferTags = new ArrayList<>(tagRequest.getIds().size());
+
+    for(Long id : tagRequest.getTagSubEquipmentIds()){
+      try {
+        final Collection<TagWithAlarms> tagsWithAlarms = tagFacadeGateway.getTagsWithAlarmsBySubEquipmentId(id);
+
+        for (TagWithAlarms tagWithAlarms : tagsWithAlarms) {
+          switch (tagRequest.getResultType()) {
+          case TRANSFER_TAG_LIST:
+            transferTags.add(TransferObjectFactory.createTransferTag(tagWithAlarms,
+                    aliveTimerFacade.isRegisteredAliveTimer(tagWithAlarms.getTag().getId()),
+                    TopicProvider.topicFor(tagWithAlarms.getTag(), properties)));
+            break;
+          case TRANSFER_TAG_VALUE_LIST:
+            transferTags.add(TransferObjectFactory.createTransferTagValue(tagWithAlarms));
+            break;
+          default:
+            LOG.error("getTagsBySubEquipmentIds() - Could not generate response message. Unknown enum ResultType " + tagRequest.getResultType());
+          }
+        }
+      }
+      catch (CacheElementNotFoundException ex) {
+        LOG.warn(String.format("getTagsBySubEquipmentIds() - Received client request (TagRequest) where the requested sub equipment ids is not matching to any Tag cache entry."));
+      }
+    }
+
     return transferTags;
   }
   

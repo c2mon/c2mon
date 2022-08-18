@@ -234,6 +234,150 @@ public class CacheSynchronizerImpl implements CacheSynchronizer, HeartbeatListen
     return newTags;
   }
 
+  @Override
+  public Set<Long> initTagsByProcessIds(final Set<Long> processIds, final Set<Long> allMatchingTags) throws CacheSynchronizationException {
+    final Set<Long> newTags = new HashSet<>();
+
+    try {
+      Collection<TagUpdate> tagUpdates = tagRequestHandler.requestTagsByProcessIds(processIds);
+
+      for (TagUpdate tagUpdate : tagUpdates) {
+
+        try {
+
+          controller.getWriteLock().lock();
+          try {
+            if (!liveCache.containsKey(tagUpdate.getId())) {
+              TagController cdt = new TagController(tagUpdate.getId());
+
+              cdt.update(tagUpdate);
+              subscribeToSupervisionManager(cdt);
+              liveCache.put(cdt.getTagImpl().getId(), cdt);
+
+              newTags.add(cdt.getTagImpl().getId());
+            }
+          } finally {
+            controller.getWriteLock().unlock();
+          }
+
+          allMatchingTags.add(tagUpdate.getId());
+
+        } catch (RuleFormatException e) {
+          LOG.error("Received an incorrect rule tag from the server. Please check tag with id " + tagUpdate.getId(), e);
+          throw new RuntimeException("Received an incorrect rule tag from the server for tag id " + tagUpdate.getId());
+        }
+
+      }
+    } catch (JMSException e) {
+      LOG.error("JMS connection lost -> Could not retrieve missing tags from the C2MON server.", e);
+    }
+
+    if (!newTags.isEmpty()) {
+      // Checks, if we need to synchonize the
+      if (controller.isHistoryModeEnabled()) {
+        synchronizeHistoryCache(newTags);
+      }
+    }
+
+    return newTags;
+  }
+
+  @Override
+  public Set<Long> initTagsByEquipmentIds(final Set<Long> equipmentIds, final Set<Long> allMatchingTags) throws CacheSynchronizationException {
+    final Set<Long> newTags = new HashSet<>();
+
+    try {
+      Collection<TagUpdate> tagUpdates = tagRequestHandler.requestTagsByEquipmentIds(equipmentIds);
+
+      for (TagUpdate tagUpdate : tagUpdates) {
+
+        try {
+
+          controller.getWriteLock().lock();
+          try {
+            if (!liveCache.containsKey(tagUpdate.getId())) {
+              TagController cdt = new TagController(tagUpdate.getId());
+
+              cdt.update(tagUpdate);
+              subscribeToSupervisionManager(cdt);
+              liveCache.put(cdt.getTagImpl().getId(), cdt);
+
+              newTags.add(cdt.getTagImpl().getId());
+            }
+          } finally {
+            controller.getWriteLock().unlock();
+          }
+
+          allMatchingTags.add(tagUpdate.getId());
+
+        } catch (RuleFormatException e) {
+          LOG.error("Received an incorrect rule tag from the server. Please check tag with id " + tagUpdate.getId(), e);
+          throw new RuntimeException("Received an incorrect rule tag from the server for tag id " + tagUpdate.getId());
+        }
+
+      }
+    } catch (JMSException e) {
+      LOG.error("JMS connection lost -> Could not retrieve missing tags from the C2MON server.", e);
+    }
+
+    if (!newTags.isEmpty()) {
+      // Checks, if we need to synchonize the
+      if (controller.isHistoryModeEnabled()) {
+        synchronizeHistoryCache(newTags);
+      }
+    }
+
+    return newTags;
+  }
+
+  @Override
+  public Set<Long> initTagsBySubEquipmentIds(final Set<Long> subEquipmentIds, final Set<Long> allMatchingTags) throws CacheSynchronizationException {
+    final Set<Long> newTags = new HashSet<>();
+
+    try {
+      Collection<TagUpdate> tagUpdates = tagRequestHandler.requestTagsBySubEquipmentIds(subEquipmentIds);
+
+      for (TagUpdate tagUpdate : tagUpdates) {
+
+        try {
+
+          controller.getWriteLock().lock();
+          try {
+            if (!liveCache.containsKey(tagUpdate.getId())) {
+              TagController cdt = new TagController(tagUpdate.getId());
+
+              cdt.update(tagUpdate);
+              subscribeToSupervisionManager(cdt);
+              liveCache.put(cdt.getTagImpl().getId(), cdt);
+
+              newTags.add(cdt.getTagImpl().getId());
+            }
+          } finally {
+            controller.getWriteLock().unlock();
+          }
+
+          allMatchingTags.add(tagUpdate.getId());
+
+        } catch (RuleFormatException e) {
+          LOG.error("Received an incorrect rule tag from the server. Please check tag with id " + tagUpdate.getId(), e);
+          throw new RuntimeException("Received an incorrect rule tag from the server for tag id " + tagUpdate.getId());
+        }
+
+      }
+    } catch (JMSException e) {
+      LOG.error("JMS connection lost -> Could not retrieve missing tags from the C2MON server.", e);
+    }
+
+    if (!newTags.isEmpty()) {
+      // Checks, if we need to synchonize the
+      if (controller.isHistoryModeEnabled()) {
+        synchronizeHistoryCache(newTags);
+      }
+    }
+
+    return newTags;
+  }
+
   /**
    * Inner method to which removes all <code>Tag</code> references
    * with the given id from the cache. At the same time it unsubscribes the live

@@ -143,6 +143,21 @@ public class RequestHandlerImpl implements RequestHandler {
   }
 
   @Override
+  public Collection<TagUpdate> requestTagsByProcessIds(final Collection<Long> processIds) throws JMSException {
+    return executeProcessIdsRequest(processIds, TagUpdate.class, null, defaultRequestQueue);
+  }
+
+  @Override
+  public Collection<TagUpdate> requestTagsByEquipmentIds(final Collection<Long> equipmentIds) throws JMSException {
+    return executeEquipmentIdsRequest(equipmentIds, TagUpdate.class, null, defaultRequestQueue);
+  }
+
+  @Override
+  public Collection<TagUpdate> requestTagsBySubEquipmentIds(final Collection<Long> subEquipmentIds) throws JMSException {
+    return executeSubEquipmentIdsRequest(subEquipmentIds, TagUpdate.class, null, defaultRequestQueue);
+  }
+
+  @Override
   public Collection<AlarmValue> requestAlarms(final Collection<Long> alarmIds) throws JMSException {
     if (alarmIds == null) {
       throw new NullPointerException("requestAlarms(..) method called with null parameter.");
@@ -238,6 +253,108 @@ public class RequestHandlerImpl implements RequestHandler {
     while (it.hasNext()) {
       while (it.hasNext() && counter < maxRequestSize) {
         clientRequest.addTagId(it.next());
+        counter++;
+      }
+      RequestValuesTask<T> task = new RequestValuesTask<>(clientRequest, reportListener, requestQueue);
+      results.add(executor.submit(task));
+      clientRequest = new ClientRequestImpl<>(clazz, requestTimeout);
+      counter = 0;
+    }
+    Collection<T> finalCollection = new ArrayList<>();
+    for (Future<Collection<T>> result : results) {
+      try {
+        finalCollection.addAll(result.get());
+      } catch (InterruptedException e) {
+        log.error("InterruptedException caught while executing RequestValuesTask", e);
+        throw new RuntimeException(e);
+      } catch (ExecutionException e) {
+        log.error("ExecutionException caught while executing RequestValuesTask", e);
+        throw new RuntimeException(e);
+      }
+    }
+    log.debug("Client request completed");
+    return finalCollection;
+  }
+
+  private <T extends ClientRequestResult> Collection<T> executeProcessIdsRequest(
+          final Collection<Long> ids, final Class<T> clazz, final ClientRequestReportListener reportListener, final String requestQueue) {
+
+    log.debug("Initiating client request");
+    ClientRequestImpl<T> clientRequest = new ClientRequestImpl<>(clazz, requestTimeout);
+    Iterator<Long> it = ids.iterator();
+    Collection<Future<Collection<T>>> results = new ArrayList<>();
+    int counter = 0;
+    while (it.hasNext()) {
+      while (it.hasNext() && counter < maxRequestSize) {
+        clientRequest.addTagProcessId(it.next());
+        counter++;
+      }
+      RequestValuesTask<T> task = new RequestValuesTask<>(clientRequest, reportListener, requestQueue);
+      results.add(executor.submit(task));
+      clientRequest = new ClientRequestImpl<>(clazz, requestTimeout);
+      counter = 0;
+    }
+    Collection<T> finalCollection = new ArrayList<>();
+    for (Future<Collection<T>> result : results) {
+      try {
+        finalCollection.addAll(result.get());
+      } catch (InterruptedException e) {
+        log.error("InterruptedException caught while executing RequestValuesTask", e);
+        throw new RuntimeException(e);
+      } catch (ExecutionException e) {
+        log.error("ExecutionException caught while executing RequestValuesTask", e);
+        throw new RuntimeException(e);
+      }
+    }
+    log.debug("Client request completed");
+    return finalCollection;
+  }
+
+  private <T extends ClientRequestResult> Collection<T> executeEquipmentIdsRequest(
+          final Collection<Long> ids, final Class<T> clazz, final ClientRequestReportListener reportListener, final String requestQueue) {
+
+    log.debug("Initiating client request");
+    ClientRequestImpl<T> clientRequest = new ClientRequestImpl<>(clazz, requestTimeout);
+    Iterator<Long> it = ids.iterator();
+    Collection<Future<Collection<T>>> results = new ArrayList<>();
+    int counter = 0;
+    while (it.hasNext()) {
+      while (it.hasNext() && counter < maxRequestSize) {
+        clientRequest.addTagEquipmentId(it.next());
+        counter++;
+      }
+      RequestValuesTask<T> task = new RequestValuesTask<>(clientRequest, reportListener, requestQueue);
+      results.add(executor.submit(task));
+      clientRequest = new ClientRequestImpl<>(clazz, requestTimeout);
+      counter = 0;
+    }
+    Collection<T> finalCollection = new ArrayList<>();
+    for (Future<Collection<T>> result : results) {
+      try {
+        finalCollection.addAll(result.get());
+      } catch (InterruptedException e) {
+        log.error("InterruptedException caught while executing RequestValuesTask", e);
+        throw new RuntimeException(e);
+      } catch (ExecutionException e) {
+        log.error("ExecutionException caught while executing RequestValuesTask", e);
+        throw new RuntimeException(e);
+      }
+    }
+    log.debug("Client request completed");
+    return finalCollection;
+  }
+
+  private <T extends ClientRequestResult> Collection<T> executeSubEquipmentIdsRequest(
+          final Collection<Long> ids, final Class<T> clazz, final ClientRequestReportListener reportListener, final String requestQueue) {
+
+    log.debug("Initiating client request");
+    ClientRequestImpl<T> clientRequest = new ClientRequestImpl<>(clazz, requestTimeout);
+    Iterator<Long> it = ids.iterator();
+    Collection<Future<Collection<T>>> results = new ArrayList<>();
+    int counter = 0;
+    while (it.hasNext()) {
+      while (it.hasNext() && counter < maxRequestSize) {
+        clientRequest.addTagSubEquipmentId(it.next());
         counter++;
       }
       RequestValuesTask<T> task = new RequestValuesTask<>(clientRequest, reportListener, requestQueue);

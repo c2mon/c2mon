@@ -64,8 +64,52 @@ public interface ClientDataTagCache extends BasicCacheHandler {
    * @see #getHistoryModeSyncLock();
    */
   <T extends BaseTagListener> void subscribeByRegex(Set<String> regexList, T listener) throws CacheSynchronizationException;
-  
-  
+
+  /**
+   * Adds the given listener to the tags with the respective process ids
+   * If the tag is not yet known to the client API it will fetch it from the server.
+   * <p>
+   * <b>Please note, that this method is synchronizing on the history lock.</b>
+   * @param processIds List of process ids
+   * @param listener The listener to be added to the <code>ClientDataTag</code> references
+   * @throws NullPointerException If one of the parameter is <code>null</code> or if one of
+   *                              the tags is not present in the cache
+   * @throws CacheSynchronizationException In case of communication problems with the C2MON
+   *         server during the refresh process.
+   * @see #getHistoryModeSyncLock();
+   */
+  <T extends BaseTagListener> void subscribeByProcessIds(Set<Long> processIds, T listener) throws CacheSynchronizationException;
+
+  /**
+   * Adds the given listener to the tags with the respective equipment ids
+   * If the tag is not yet known to the client API it will fetch it from the server.
+   * <p>
+   * <b>Please note, that this method is synchronizing on the history lock.</b>
+   * @param equipmentIds List of process ids
+   * @param listener The listener to be added to the <code>ClientDataTag</code> references
+   * @throws NullPointerException If one of the parameter is <code>null</code> or if one of
+   *                              the tags is not present in the cache
+   * @throws CacheSynchronizationException In case of communication problems with the C2MON
+   *         server during the refresh process.
+   * @see #getHistoryModeSyncLock();
+   */
+  <T extends BaseTagListener> void subscribeByEquipmentIds(Set<Long> equipmentIds, T listener) throws CacheSynchronizationException;
+
+  /**
+   * Adds the given listener to the tags with the respective sub equipment ids
+   * If the tag is not yet known to the client API it will fetch it from the server.
+   * <p>
+   * <b>Please note, that this method is synchronizing on the history lock.</b>
+   * @param subEquipmentIds List of process ids
+   * @param listener The listener to be added to the <code>ClientDataTag</code> references
+   * @throws NullPointerException If one of the parameter is <code>null</code> or if one of
+   *                              the tags is not present in the cache
+   * @throws CacheSynchronizationException In case of communication problems with the C2MON
+   *         server during the refresh process.
+   * @see #getHistoryModeSyncLock();
+   */
+  <T extends BaseTagListener> void subscribeBySubEquipmentIds(Set<Long> subEquipmentIds, T listener) throws CacheSynchronizationException;
+
   /**
    * This method synchronizes subscribed data tags with the server.
    * It will ask the server to send the actual tag information for all subscribed data tags.

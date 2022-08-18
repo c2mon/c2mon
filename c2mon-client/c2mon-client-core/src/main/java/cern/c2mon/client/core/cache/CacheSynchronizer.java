@@ -55,7 +55,50 @@ interface CacheSynchronizer {
    *         the C2MON server during the tag creation.
    */
   Set<Long> initTags(final Set<String> regexList, Set<Long> allMatchingTags) throws CacheSynchronizationException;
-  
+
+  /**
+   * Checks if all tags known by the server and with the respective process ids
+   * are present in the local cache. Otherwise it will fetch it from the server.
+   *
+   * @param processIds List of process ids to fetch all tags where the
+   *                  process ids are attached
+   * @param allMatchingTags A list of all tag ids in the cache, with the respective process ids
+   *
+   * @return id list of all tags, which were newly created.
+   * @throws CacheSynchronizationException In case of communication problems with
+   *         the C2MON server during the tag creation.
+   */
+  Set<Long> initTagsByProcessIds(final Set<Long> processIds, Set<Long> allMatchingTags) throws CacheSynchronizationException;
+
+  /**
+   * Checks if all tags known by the server and with the respective equipment ids
+   * are present in the local cache. Otherwise it will fetch it from the server.
+   *
+   * @param equipmentIds List of equipment ids to fetch all tags where the
+   *                  equipment ids are attached
+   * @param allMatchingTags A list of all tag ids in the cache, with the respective equipment ids
+   *
+   * @return id list of all tags, which were newly created.
+   * @throws CacheSynchronizationException In case of communication problems with
+   *         the C2MON server during the tag creation.
+   */
+  Set<Long> initTagsByEquipmentIds(final Set<Long> equipmentIds, Set<Long> allMatchingTags) throws CacheSynchronizationException;
+
+  /**
+   * Checks if all tags known by the server and with the respective sub equipment ids
+   * are present in the local cache. Otherwise it will fetch it from the server.
+   *
+   * @param subEquipmentIds List of sub equipment ids to fetch all tags where the
+   *                  sub equipment ids are attached
+   * @param allMatchingTags A list of all tag ids in the cache, with the respective sub equipment ids
+   *
+   * @return id list of all tags, which were newly created.
+   * @throws CacheSynchronizationException In case of communication problems with
+   *         the C2MON server during the tag creation.
+   */
+  Set<Long> initTagsBySubEquipmentIds(final Set<Long> subEquipmentIds, Set<Long> allMatchingTags) throws CacheSynchronizationException;
+
+
   /**
    * This method handles the subscription of the <code>ClientDataTag</code> to
    * the <code>JmsProxy</code> and <code>SupervisionManager</code>.

@@ -107,6 +107,96 @@ public class TagIgniteQuery<T> implements TagQuery<T> {
         return tagList;
     }
 
+    @Override
+    public List<T> findTagsByProcessId(Long processId, int maxResults) {
+        List<T> tagList = new ArrayList<>();
+
+        switch(cache.getName()) {
+        case "controlTagCache":
+            SqlFieldsQuery controlTagSql = new SqlFieldsQuery("select _val from ControlTagCacheObject where PROCESSID = ? LIMIT ?").setArgs(processId, maxResults);
+
+            try (QueryCursor<List<?>> cursor = cache.sqlQueryCache(controlTagSql)) {
+                for (List<?> row : cursor) {
+                    tagList.add((T) row.get(0));
+                }
+            }
+            break;
+
+        case "dataTagCache":
+            SqlFieldsQuery dataTagSql = new SqlFieldsQuery("select _val from DataTagCacheObject where PROCESSID = ? LIMIT ?").setArgs(processId, maxResults);
+
+            try (QueryCursor<List<?>> cursor = cache.sqlQueryCache(dataTagSql)) {
+                for (List<?> row : cursor) {
+                    tagList.add((T) row.get(0));
+                }
+            }
+            break;
+        }
+        LOG.debug(String.format("findTagsByProcessId() - Got %d results for process id \"%s\"", tagList.size(), processId));
+
+        return tagList;
+    }
+
+    @Override
+    public List<T> findTagsByEquipmentId(Long equipmentId, int maxResults) {
+        List<T> tagList = new ArrayList<>();
+
+        switch(cache.getName()) {
+        case "controlTagCache":
+            SqlFieldsQuery controlTagSql = new SqlFieldsQuery("select _val from ControlTagCacheObject where EQUIPMENTID = ? LIMIT ?").setArgs(equipmentId, maxResults);
+
+            try (QueryCursor<List<?>> cursor = cache.sqlQueryCache(controlTagSql)) {
+                for (List<?> row : cursor) {
+                    tagList.add((T) row.get(0));
+                }
+            }
+            break;
+
+        case "dataTagCache":
+            SqlFieldsQuery dataTagSql = new SqlFieldsQuery("select _val from DataTagCacheObject where EQUIPMENTID = ? LIMIT ?").setArgs(equipmentId, maxResults);
+
+            try (QueryCursor<List<?>> cursor = cache.sqlQueryCache(dataTagSql)) {
+                for (List<?> row : cursor) {
+                    tagList.add((T) row.get(0));
+                }
+            }
+            break;
+        }
+        LOG.debug(String.format("findTagsByEquipmentId() - Got %d results for equipment id \"%s\"", tagList.size(), equipmentId));
+
+        return tagList;
+    }
+
+    @Override
+    public List<T> findTagsBySubEquipmentId(Long subEquipmentId, int maxResults) {
+        List<T> tagList = new ArrayList<>();
+
+        switch(cache.getName()) {
+        case "controlTagCache":
+            SqlFieldsQuery controlTagSql = new SqlFieldsQuery("select _val from ControlTagCacheObject where SUBEQUIPMENTID = ? LIMIT ?").setArgs(subEquipmentId, maxResults);
+
+            try (QueryCursor<List<?>> cursor = cache.sqlQueryCache(controlTagSql)) {
+                for (List<?> row : cursor) {
+                    tagList.add((T) row.get(0));
+                }
+            }
+            break;
+
+        case "dataTagCache":
+            SqlFieldsQuery dataTagSql = new SqlFieldsQuery("select _val from DataTagCacheObject where SUBEQUIPMENTID = ? LIMIT ?").setArgs(subEquipmentId, maxResults);
+
+            try (QueryCursor<List<?>> cursor = cache.sqlQueryCache(dataTagSql)) {
+                for (List<?> row : cursor) {
+                    tagList.add((T) row.get(0));
+                }
+            }
+            break;
+        }
+        LOG.debug(String.format("findTagsBySubEquipmentId() - Got %d results for sub equipment id \"%s\"", tagList.size(), subEquipmentId));
+
+        return tagList;
+    }
+
 
     /**
      * Method to replace the character '*' by '%' and '?' by '_' to work with the Java Pattern

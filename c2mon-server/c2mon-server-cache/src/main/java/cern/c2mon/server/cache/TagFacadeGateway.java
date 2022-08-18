@@ -39,7 +39,37 @@ public interface TagFacadeGateway extends CommonTagFacade<Tag> {
    * @return A list of Tags and Alarms, with corresponding values (no longer residing in cache)
    */
   Collection<TagWithAlarms> getTagsWithAlarms(String regex);
-  
+
+  /**
+   * Return a list of Tags with the respective process id,
+   * with associated evaluated Alarms corresponding to the Tag value.
+   * A frozen copy is returned.
+   *
+   * @param processId Tag process id to match
+   * @return A list of Tags and Alarms, with corresponding values (no longer residing in cache)
+   */
+  Collection<TagWithAlarms> getTagsWithAlarmsByProcessId(Long processId);
+
+  /**
+   * Return a list of Tags with the respective equipment id,
+   * with associated evaluated Alarms corresponding to the Tag value.
+   * A frozen copy is returned.
+   *
+   * @param equipmentId Tag equipment id to match
+   * @return A list of Tags and Alarms, with corresponding values (no longer residing in cache)
+   */
+  Collection<TagWithAlarms> getTagsWithAlarmsByEquipmentId(Long equipmentId);
+
+  /**
+   * Return a list of Tags with the respective sub equipment id,
+   * with associated evaluated Alarms corresponding to the Tag value.
+   * A frozen copy is returned.
+   *
+   * @param subEquipmentId Tag sub equipment id to match
+   * @return A list of Tags and Alarms, with corresponding values (no longer residing in cache)
+   */
+  Collection<TagWithAlarms> getTagsWithAlarmsBySubEquipmentId(Long subEquipmentId);
+
   /**
    * Determines whether one of the tag caches already contains
    * an element with the specified id (looks in rule, control
