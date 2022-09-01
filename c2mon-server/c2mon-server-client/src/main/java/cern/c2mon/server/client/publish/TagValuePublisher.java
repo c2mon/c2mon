@@ -184,7 +184,9 @@ public class TagValuePublisher implements AlarmAggregatorListener, Configuration
 
   @Override
   public void publish(final TagWithAlarms tagWithAlarms) {
-    TransferTagValueImpl tagValue = TransferObjectFactory.createTransferTagValue(tagWithAlarms);
+    String topic = TopicProvider.topicFor(tagWithAlarms.getTag(), properties);
+    TransferTagImpl tagValue = TransferObjectFactory.createTransferTag(tagWithAlarms, aliveTimerFacade.isRegisteredAliveTimer(tagWithAlarms.getTag()
+            .getId()), topic);
     log.trace("publish - Publishing tag update to client: " + TransferTagSerializer.toJson(tagValue));
 
     jmsSender.sendToTopic(TransferTagSerializer.toJson(tagValue), TopicProvider.topicFor(tagWithAlarms.getTag(), properties));

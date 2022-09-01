@@ -18,14 +18,19 @@ package cern.c2mon.client.core.jms.impl;
 
 import java.util.concurrent.ExecutorService;
 
+import javax.jms.Connection;
+import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
 import javax.jms.Session;
 
+import org.apache.activemq.command.ActiveMQTopic;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import cern.c2mon.client.common.listener.TagListener;
 import cern.c2mon.client.core.config.C2monClientProperties;
-import cern.c2mon.client.core.jms.AlarmListener;
 import cern.c2mon.client.core.jms.EnqueuingEventListener;
+import cern.c2mon.client.core.service.CoreSupervisionService;
 import cern.c2mon.shared.client.tag.TagUpdate;
 import lombok.extern.slf4j.Slf4j;
 
@@ -42,6 +47,7 @@ public class TagTopicWrapper extends AbstractTopicWrapper<TagListener, TagUpdate
 
   private MessageConsumer tagConsumer;
 
+  private Destination[] topics;
 
   public TagTopicWrapper(final SlowConsumerListener slowConsumerListener,
                            final EnqueuingEventListener enqueuingEventListener,
@@ -49,6 +55,16 @@ public class TagTopicWrapper extends AbstractTopicWrapper<TagListener, TagUpdate
                            final C2monClientProperties properties,
                            final String domain) {
     super(slowConsumerListener, enqueuingEventListener, topicPollingExecutor, domain + ".client.tag.*", properties);
+    this.topics = new Destination[]{new ActiveMQTopic("c2mon.client.tag.*"), new ActiveMQTopic("c2mon.client.controltag")};
+  }
+
+  @Override
+  public void subscribeToTopic(Connection connection) throws JMSException {
+    Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+    for (Destination topic : this.topics) {
+      MessageConsumer consumer = session.createConsumer(topic);
+      consumer.setMessageListener(this.getListenerWrapper());
+    }
   }
 
   @Override

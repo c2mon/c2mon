@@ -16,6 +16,7 @@
  *****************************************************************************/
 package cern.c2mon.client.core.jms.impl;
 
+import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 
@@ -23,10 +24,11 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.TextMessage;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.google.gson.Gson;
 
 import cern.c2mon.client.common.listener.TagListener;
-import cern.c2mon.client.core.jms.AlarmListener;
 import cern.c2mon.client.core.jms.EnqueuingEventListener;
 import cern.c2mon.client.core.tag.TagController;
 import cern.c2mon.shared.client.tag.TagUpdate;
@@ -36,7 +38,7 @@ import cern.c2mon.shared.util.json.GsonFactory;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Wrapper JMS listener to register to the alarm messages topic. This
+ * Wrapper JMS listener to register to the tag messages topic. This
  * class then notifies all registered listeners.<br/>
  * <br/>
  */
@@ -60,7 +62,7 @@ class TagListenerWrapper extends AbstractListenerWrapper<TagListener, TagUpdate>
   public TagListenerWrapper(int queueCapacity, SlowConsumerListener slowConsumerListener,
                               EnqueuingEventListener enqueuingEventListener, final ExecutorService executorService) {
     super(queueCapacity, slowConsumerListener, enqueuingEventListener, executorService);
-    log.info("AlarmListenerWrapper queue size : " + queueCapacity);
+    log.info("TagListenerWrapper queue size : " + queueCapacity);
   }
 
   @Override
@@ -68,29 +70,31 @@ class TagListenerWrapper extends AbstractListenerWrapper<TagListener, TagUpdate>
     return GSON.fromJson(((TextMessage) message).getText(), TransferTagImpl.class);
   }
 
-  @Override
-  protected void invokeListener(final TagListener listener, final TagUpdate tagWithAlarmChange) {
-    log.debug("invoke listener class {} for tag id: {}", listener.getClass(), tagWithAlarmChange.getId());
 
-    TagController controller = new TagController(tagWithAlarmChange.getId());
+  @Override
+  protected void invokeListener(final TagListener listener, final TagUpdate tagUpdate) {
+    log.debug("Invoke listener class {} for tag id: {}", listener.getClass(), tagUpdate.getId());
+
+    TagController controller = new TagController(tagUpdate.getId());
     try {
-      controller.update(tagWithAlarmChange);
+      controller.update(tagUpdate);
       listener.onUpdate(controller.getTagImpl());
     } catch (RuleFormatException e) {
-      log.error("Rule format error. Cannot inform listeners about alarm change on tag #{}", tagWithAlarmChange.getId(), e);
+      log.error("Rule format error. Cannot inform listeners about tag update on tag #{}", tagUpdate.getId(),
+              e);
     } catch (Exception ex) {
-      log.error("Error caught on alarm notification!", ex);
+      log.error("Error caught on tag notification!", ex);
     }
   }
 
   @Override
   protected String getDescription(TagUpdate event) {
-    return "Tag #" + event.getId() + " got alarm value change";
+    return "Tag #" + event.getId() + " got tag value change";
   }
 
   @Override
   protected String getQueueName() {
-    return "Alarm";
+    return "Tag";
   }
 
   @Override
