@@ -6,12 +6,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 All issues referenced in parentheses can be consulted under [CERN JIRA](https://its.cern.ch/jira/projects/CM).
 For more details on a given release, please check also the [version planning](https://its.cern.ch/jira/projects/CM/versions).
 
-## Unreleased
+## 1.20.4 - 2022-09-13
 ### Added
+- First stable C2MON version based on CBNG and Ignite cache
 
 ### Changed
 
 ### Fixed
+
 
 ## 1.11.2 - 2021-09-27
 ### Changed
