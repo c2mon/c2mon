@@ -1,9 +1,9 @@
 dependencies {
-	compile project (':c2mon-server-common')
-	compile project (':c2mon-shared-util')
-	compile project (':c2mon-shared-client')
-	compile project (':c2mon-shared-common')
-	testCompile project (':c2mon-server-test')
+	api project (':c2mon-server-common')
+	api project (':c2mon-shared-util')
+	api project (':c2mon-shared-client')
+	api project (':c2mon-shared-common')
+	testImplementation project (':c2mon-server-test')
 
 	compileOnly 'org.projectlombok:lombok:1.18.12'
 	annotationProcessor 'org.projectlombok:lombok:1.18.12'

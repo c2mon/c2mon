@@ -1,9 +1,13 @@
+plugins {
+        id 'java-library'
+}
+
 dependencies {
-	compile project (':c2mon-server-cacheloading')
-	compile project (':c2mon-shared-common')
-	compile project (':c2mon-shared-daq')
-	compile project (':c2mon-server-ignite')
-	testCompile project (':c2mon-server-test')
+	api project (':c2mon-server-cacheloading')
+	api project (':c2mon-shared-common')
+	api project (':c2mon-shared-daq')
+	api project (':c2mon-server-ignite')
+	testImplementation project (':c2mon-server-test')
 
 	compileOnly 'org.projectlombok:lombok:1.18.12'
 	annotationProcessor 'org.projectlombok:lombok:1.18.12'

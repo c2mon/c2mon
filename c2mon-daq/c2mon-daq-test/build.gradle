@@ -1,4 +1,4 @@
 dependencies {
-    compile project(':c2mon-daq-core')
-    compile project (':c2mon-shared-common')
+    api project(':c2mon-daq-core')
+    api project (':c2mon-shared-common')
 }
