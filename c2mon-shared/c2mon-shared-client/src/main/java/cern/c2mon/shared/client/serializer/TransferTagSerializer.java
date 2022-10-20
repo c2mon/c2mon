@@ -17,22 +17,23 @@
 
 package cern.c2mon.shared.client.serializer;
 
-import cern.c2mon.shared.client.request.ClientRequestResult;
-import cern.c2mon.shared.client.tag.TagValueUpdate;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.extern.slf4j.Slf4j;
+import static cern.c2mon.shared.common.type.TypeConverter.cast;
+import static cern.c2mon.shared.common.type.TypeConverter.getType;
+import static cern.c2mon.shared.common.type.TypeConverter.isKnownClass;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 
-import static cern.c2mon.shared.common.type.TypeConverter.cast;
-import static cern.c2mon.shared.common.type.TypeConverter.getType;
-import static cern.c2mon.shared.common.type.TypeConverter.isKnownClass;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import cern.c2mon.shared.client.request.ClientRequestResult;
+import cern.c2mon.shared.client.tag.TagValueUpdate;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * This class is responsible to serialize and deserialize {@link TagValueUpdate}s into json Strings.
@@ -123,31 +124,52 @@ public class TransferTagSerializer {
    * Otherwise the type caster from {@link cern.c2mon.shared.common.type.TypeConverter} is used.
    * @param tag The tag with the tag value and the class name information.
    * @return The converted value.
+   * 
+   * @version: this method changed according to to stale branch cm-304-fix-string-tags-parsing
    */
   public static Object convertTagValue(TagValueUpdate tag) {
-    Object newTagValue = tag.getValue();
+//    Object newTagValue = tag.getValue();
+//
+//    if (isKnownClass(tag.getValueClassName())
+//        && getType(tag.getValueClassName()) != String.class
+//        && newTagValue != null
+//        && (newTagValue.getClass() == LinkedHashMap.class)
+//        || isJsonString(newTagValue)) {
+//      // determine which type the value have and try to convert the value to the correct type:
+//      if(newTagValue.getClass() == LinkedHashMap.class){
+//        newTagValue = hashMapToObject((LinkedHashMap) tag.getValue(), getType(tag.getValueClassName()));
+//
+//      } else {
+//        newTagValue = stringToObject((String) tag.getValue(), getType(tag.getValueClassName()));
+//      }
+//
+//      // if convention fails call the type converter cast method, because this mus be a normal type:
+//      newTagValue = newTagValue == null ? cast(tag.getValue(), tag.getValueClassName()) : newTagValue;
+      if (tag.getValue() == null || !isKnownClass(tag.getValueClassName())) {
+          return tag.getValue();
+        }
 
-    if (isKnownClass(tag.getValueClassName())
-        && getType(tag.getValueClassName()) != String.class
-        && newTagValue != null
-        && (newTagValue.getClass() == LinkedHashMap.class)
-        || isJsonString(newTagValue)) {
-      // determine which type the value have and try to convert the value to the correct type:
-      if(newTagValue.getClass() == LinkedHashMap.class){
-        newTagValue = hashMapToObject((LinkedHashMap) tag.getValue(), getType(tag.getValueClassName()));
-
-      } else {
-        newTagValue = stringToObject((String) tag.getValue(), getType(tag.getValueClassName()));
+//    } else if (isKnownClass(tag.getValueClassName())) {
+//      newTagValue = cast(newTagValue, tag.getValueClassName());
+      Class<?> tagClass = getType(tag.getValueClassName());
+      if (tagClass == String.class) {
+        return tag.getValue().toString();
       }
-
-      // if convention fails call the type converter cast method, because this mus be a normal type:
-      newTagValue = newTagValue == null ? cast(tag.getValue(), tag.getValueClassName()) : newTagValue;
-
-    } else if (isKnownClass(tag.getValueClassName())) {
-      newTagValue = cast(newTagValue, tag.getValueClassName());
+      
+//    return newTagValue;
+  if (tag.getValue().getClass() == LinkedHashMap.class) {
+      Object result = hashMapToObject((LinkedHashMap<?, ?>) tag.getValue(), tagClass);
+      if (result != null) {
+        return result;
+      }
+    } else if (isJsonString(tag.getValue())) {
+      Object result = stringToObject((String) tag.getValue(), tagClass);
+      if (result != null) {
+        return result;
+      }
     }
 
-    return newTagValue;
+    return cast(tag.getValue(), tag.getValueClassName());
 
   }
 
@@ -203,5 +225,6 @@ public class TransferTagSerializer {
       }
     } catch (IOException ignored) {}
     return valid;
+
   }
 }
