@@ -35,10 +35,8 @@ import cern.c2mon.shared.client.tag.TagUpdate;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Implementation of an {@link AbstractTopicWrapper} for receiving live alarms updates,
+ * Implementation of an {@link AbstractTopicWrapper} for receiving live tag updates,
  * nested in a normal {@link TagUpdate} object.
- *
- * @author Matthias Braeger
  */
 @Slf4j
 public class TagTopicWrapper extends AbstractTopicWrapper<TagListener, TagUpdate> {
@@ -47,15 +45,15 @@ public class TagTopicWrapper extends AbstractTopicWrapper<TagListener, TagUpdate
 
   private MessageConsumer tagConsumer;
 
-  private Destination[] topics;
+  private final Destination[] topics;
 
   public TagTopicWrapper(final SlowConsumerListener slowConsumerListener,
                            final EnqueuingEventListener enqueuingEventListener,
                            final ExecutorService topicPollingExecutor,
                            final C2monClientProperties properties,
-                           final String domain) {
-    super(slowConsumerListener, enqueuingEventListener, topicPollingExecutor, domain + ".client.tag.*", properties);
-    this.topics = new Destination[]{new ActiveMQTopic("c2mon.client.tag.*"), new ActiveMQTopic("c2mon.client.controltag")};
+                           final String tagTopicPrefix) {
+    super(slowConsumerListener, enqueuingEventListener, topicPollingExecutor, tagTopicPrefix, properties);
+    this.topics = new Destination[]{new ActiveMQTopic(tagTopicPrefix + ".*"), new ActiveMQTopic(properties.getJms().getControlTagTopic())};
   }
 
   @Override
@@ -76,7 +74,7 @@ public class TagTopicWrapper extends AbstractTopicWrapper<TagListener, TagUpdate
   }
 
   /**
-   * Unsubscribes from the alarm topic.
+   * Unsubscribes from the tag topic.
    * @throws JMSException if problem subscribing
    */
   protected void unsubscribeFromTagTopic() throws JMSException {

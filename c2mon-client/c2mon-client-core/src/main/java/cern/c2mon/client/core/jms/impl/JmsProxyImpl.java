@@ -88,7 +88,7 @@ public final class JmsProxyImpl implements JmsProxy, JmsSubscriptionHandler {
                       final EnqueuingEventListener enqueuingEventListener,
                       @Qualifier("topicPollingExecutor") final ExecutorService topicPollingExecutor,
                       final C2monClientProperties properties,
-                      @Value("${c2mon.domain}") String domain) {
+                      @Value("${tagTopicPrefix}") String domain) {
 
     this.jmsConnectionHandler = jmsConnectionHandler;
     jmsConnectionHandler.setJmsSubscriptionHandler(this);
@@ -106,6 +106,7 @@ public final class JmsProxyImpl implements JmsProxy, JmsSubscriptionHandler {
     if (alarmTopicWrapper.getListenerWrapper().getListenerCount() > 0) {
       alarmTopicWrapper.subscribeToTopic(connection);
     }
+    tagTopicWrapper.subscribeToTopic(connection);
     supervisionTopicWrapper.subscribeToTopic(connection);
     heartbeatTopicWrapper.subscribeToTopic(connection);
     broadcastTopicWrapper.subscribeToTopic(connection);
@@ -350,23 +351,24 @@ public final class JmsProxyImpl implements JmsProxy, JmsSubscriptionHandler {
 
   public void registerTagListener(final TagListener tagListener) throws JMSException {
     if (tagListener == null) {
-      throw new NullPointerException("Trying to register null alarm listener with JmsProxy.");
+      throw new NullPointerException("Trying to register null tag listener with JmsProxy.");
     }
 
     jmsConnectionHandler.ensureConnection();
-
     if (tagTopicWrapper.getListenerWrapper().getListenerCount() == 0) {
       // this is our first listener!
-      // -> it's time to subscribe to the alarm topic
+      // -> it's time to subscribe to the tag topic
       try {
+        //jmsConnectionHandler.startReconnectThread();
         tagTopicWrapper.subscribeToTopic(jmsConnectionHandler.getConnection());
       } catch (JMSException e) {
-        log.error("Did not manage to subscribe To Alarm Topic.", e);
+        log.error("Did not manage to subscribe To Tag Topic.", e);
         throw e;
       }
     }
     tagTopicWrapper.addListener(tagListener);
   }
+
   @Override
   public void registerAlarmListener(final AlarmListener alarmListener) throws JMSException {
     if (alarmListener == null) {
