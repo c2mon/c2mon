@@ -87,8 +87,7 @@ public final class JmsProxyImpl implements JmsProxy, JmsSubscriptionHandler {
                       final SlowConsumerListener slowConsumerListener,
                       final EnqueuingEventListener enqueuingEventListener,
                       @Qualifier("topicPollingExecutor") final ExecutorService topicPollingExecutor,
-                      final C2monClientProperties properties,
-                      @Value("${tagTopicPrefix}") String domain) {
+                      final C2monClientProperties properties) {
 
     this.jmsConnectionHandler = jmsConnectionHandler;
     jmsConnectionHandler.setJmsSubscriptionHandler(this);
@@ -97,12 +96,13 @@ public final class JmsProxyImpl implements JmsProxy, JmsSubscriptionHandler {
     supervisionTopicWrapper = new SupervisionTopicWrapper(slowConsumerListener, enqueuingEventListener, topicPollingExecutor, properties);
     broadcastTopicWrapper = new BroadcastTopicWrapper(slowConsumerListener, enqueuingEventListener, topicPollingExecutor, properties);
     alarmTopicWrapper = new AlarmTopicWrapper(slowConsumerListener, enqueuingEventListener, topicPollingExecutor, properties);
-    tagTopicWrapper = new TagTopicWrapper(slowConsumerListener, enqueuingEventListener, topicPollingExecutor, properties, domain);
+    tagTopicWrapper = new TagTopicWrapper(slowConsumerListener, enqueuingEventListener, topicPollingExecutor, properties);
     messageTimeToLive = properties.getJms().getMessageTimeToLive();
   }
 
   @Override
   public void refreshAllSubscriptions(Connection connection) throws JMSException {
+    log.debug("Refreshing all subscriptions");
     if (alarmTopicWrapper.getListenerWrapper().getListenerCount() > 0) {
       alarmTopicWrapper.subscribeToTopic(connection);
     }

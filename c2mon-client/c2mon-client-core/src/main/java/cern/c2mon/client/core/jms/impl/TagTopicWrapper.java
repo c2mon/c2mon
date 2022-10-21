@@ -25,12 +25,10 @@ import javax.jms.MessageConsumer;
 import javax.jms.Session;
 
 import org.apache.activemq.command.ActiveMQTopic;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import cern.c2mon.client.common.listener.TagListener;
 import cern.c2mon.client.core.config.C2monClientProperties;
 import cern.c2mon.client.core.jms.EnqueuingEventListener;
-import cern.c2mon.client.core.service.CoreSupervisionService;
 import cern.c2mon.shared.client.tag.TagUpdate;
 import lombok.extern.slf4j.Slf4j;
 
@@ -50,16 +48,25 @@ public class TagTopicWrapper extends AbstractTopicWrapper<TagListener, TagUpdate
   public TagTopicWrapper(final SlowConsumerListener slowConsumerListener,
                            final EnqueuingEventListener enqueuingEventListener,
                            final ExecutorService topicPollingExecutor,
-                           final C2monClientProperties properties,
-                           final String tagTopicPrefix) {
-    super(slowConsumerListener, enqueuingEventListener, topicPollingExecutor, tagTopicPrefix, properties);
-    this.topics = new Destination[]{new ActiveMQTopic(tagTopicPrefix + ".*"), new ActiveMQTopic(properties.getJms().getControlTagTopic())};
+                           final C2monClientProperties properties) {
+    // TODO this gives compilation error, don't know how to up
+    //super(slowConsumerListener, enqueuingEventListener, topicPollingExecutor, properties.getJms().getDataTagTopic(), properties);
+    //this.topics = new Destination[]{new ActiveMQTopic(properties.getJms().getDataTagTopic()),
+    //        new ActiveMQTopic(properties.getJms().getControlTagTopic())};
+    super(slowConsumerListener, enqueuingEventListener, topicPollingExecutor,
+            properties.getJms().getAlarmTopic().substring(0, properties.getJms().getAlarmTopic().indexOf(".")) + ".client.tag.*",
+            properties);
+    String domain = properties.getJms().getAlarmTopic().substring(0, properties.getJms().getAlarmTopic().indexOf("."));
+
+    this.topics = new Destination[]{new ActiveMQTopic(domain + ".client.tag.*"),
+            new ActiveMQTopic(properties.getJms().getControlTagTopic())};
   }
 
   @Override
   public void subscribeToTopic(Connection connection) throws JMSException {
     Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
     for (Destination topic : this.topics) {
+      log.debug("Subscribing TagTopicWrapper to topic {}", topic);
       MessageConsumer consumer = session.createConsumer(topic);
       consumer.setMessageListener(this.getListenerWrapper());
     }
