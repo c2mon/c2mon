@@ -46,6 +46,7 @@ public class ClientJmsProperties extends CommonJmsProperties{
    */
   private String alarmTopic = "c2mon.client.alarm";
 
+  private String dataTagTopic = "c2mon.client.tag.*";
   
   /**
    * Name of the topic on which the server is publishing the full {@link TransferTagImpl} object, 

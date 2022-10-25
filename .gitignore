@@ -1,4 +1,6 @@
-.gradle
+.gradle/
+*.hprof
+.run/
 
 
 # Build files
