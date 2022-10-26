@@ -163,6 +163,24 @@ public abstract class AbstractTagCache<T extends Tag> extends AbstractCache<Long
     return findByNameWildcard(regex, maxResultSize);
   }
 
+  @Override
+  public Collection<T> findByTagProcessId(Long processId) {
+    return findByProcessId(processId, maxResultSize);
+
+  }
+
+  @Override
+  public Collection<T> findByTagEquipmentId(Long equipmentId) {
+    return findByEquipmentId(equipmentId, maxResultSize);
+
+  }
+
+  @Override
+  public Collection<T> findByTagSubEquipmentId(Long subEquipmentId) {
+    return findBySubEquipmentId(subEquipmentId, maxResultSize);
+
+  }
+
   /**
    * Searches for all {@link Tag} instances in the given cache, where
    * the {@link Tag#getName()} attribute matches the given regular
@@ -208,4 +226,47 @@ public abstract class AbstractTagCache<T extends Tag> extends AbstractCache<Long
 
     return resultList;
   }
+  
+  private Collection<T> findByProcessId(Long processId, int maxResults) {
+      Collection<T> resultList = new ArrayList<>();
+
+      if (processId == null) {
+        throw new IllegalArgumentException("Attempting to retrieve a Tag from the cache with a NULL process id parameter.");
+      }
+
+      resultList = tagQuery.findTagsByProcessId(processId, maxResults);
+
+      log.debug(String.format("findByProcessId() - Found %d (maxResultSize = %d) tags in %s cache where tag names are matching process id \"%s\"", resultList.size(), maxResults, getCacheName(), processId));
+
+      return resultList;
+    }
+
+    private Collection<T> findByEquipmentId(Long equipmentId, int maxResults) {
+      Collection<T> resultList = new ArrayList<>();
+
+      if (equipmentId == null) {
+        throw new IllegalArgumentException("Attempting to retrieve a Tag from the cache with a NULL equipment id parameter.");
+      }
+
+      resultList = tagQuery.findTagsByEquipmentId(equipmentId, maxResults);
+
+      log.debug(String.format("findByEquipmentId() - Found %d (maxResultSize = %d) tags in %s cache where tag names are matching equipment id \"%s\"", resultList.size(), maxResults, getCacheName(), equipmentId));
+
+      return resultList;
+    }
+
+    private Collection<T> findBySubEquipmentId(Long subEquipmentId, int maxResults) {
+      Collection<T> resultList = new ArrayList<>();
+
+      if (subEquipmentId == null) {
+        throw new IllegalArgumentException("Attempting to retrieve a Tag from the cache with a NULL sub equipment id parameter.");
+      }
+
+      resultList = tagQuery.findTagsBySubEquipmentId(subEquipmentId, maxResults);
+
+      log.debug(String.format("findBySubEquipmentId() - Found %d (maxResultSize = %d) tags in %s cache where tag names are matching sub equipment id \"%s\"", resultList.size(), maxResults, getCacheName(), subEquipmentId));
+
+      return resultList;
+    }
+
 }

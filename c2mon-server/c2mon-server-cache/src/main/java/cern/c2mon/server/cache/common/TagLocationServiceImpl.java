@@ -66,9 +66,6 @@ public class TagLocationServiceImpl implements TagLocationService {
    * @param dataTagCache
    * @param controlTagCache
    * @param ruleTagCache
-   * @param dataTagFacade
-   * @param controlTagFacade
-   * @param ruleTagFacade
    */
   @Autowired
   public TagLocationServiceImpl(DataTagCache dataTagCache, ControlTagCache controlTagCache, RuleTagCache ruleTagCache) {
@@ -125,6 +122,40 @@ public class TagLocationServiceImpl implements TagLocationService {
     return resultList;
   }
   
+  @Override
+  public Collection<Tag> findByProcessId(Long processId) {
+    Collection<Tag> resultList = new ArrayList<>();
+
+    resultList.addAll(dataTagCache.findByTagProcessId(processId));
+    resultList.addAll(controlTagCache.findByTagProcessId(processId));
+    resultList.addAll(ruleTagCache.findByTagProcessId(processId));
+
+    return resultList;
+  }
+
+  @Override
+  public Collection<Tag> findByEquipmentId(Long equipmentId) {
+    Collection<Tag> resultList = new ArrayList<>();
+
+    resultList.addAll(dataTagCache.findByTagEquipmentId(equipmentId));
+    resultList.addAll(controlTagCache.findByTagEquipmentId(equipmentId));
+    resultList.addAll(ruleTagCache.findByTagProcessId(equipmentId));
+
+    return resultList;
+  }
+
+  @Override
+  public Collection<Tag> findBySubEquipmentId(Long subEquipmentId) {
+    Collection<Tag> resultList = new ArrayList<>();
+
+    resultList.addAll(dataTagCache.findByTagSubEquipmentId(subEquipmentId));
+    resultList.addAll(controlTagCache.findByTagSubEquipmentId(subEquipmentId));
+    resultList.addAll(ruleTagCache.findByTagSubEquipmentId(subEquipmentId));
+
+    return resultList;
+  }
+
+
   @Override
   public void put(Tag tag) {
     getCache(tag.getId()).put(tag.getId(), tag);

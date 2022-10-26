@@ -172,6 +172,27 @@ public interface ClientRequest {
   Collection<Long> getIds();
   
   /**
+   * Returns a list of process ids
+   *
+   * @return A list of process ids
+   */
+  Collection<Long> getTagProcessIds();
+
+  /**
+   * Returns a list of equipment ids
+   *
+   * @return A list of equipment ids
+   */
+  Collection<Long> getTagEquipmentIds();
+
+  /**
+   * Returns a list of equipment ids
+   *
+   * @return A list of equipment ids
+   */
+  Collection<Long> getTagSubEquipmentIds();
+
+  /**
    * Returns a list of string and/or regular expressions
    *
    * This is actually used to search for tags by their tag name.

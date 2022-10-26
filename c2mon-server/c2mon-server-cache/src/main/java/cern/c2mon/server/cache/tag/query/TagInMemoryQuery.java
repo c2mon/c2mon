@@ -57,6 +57,53 @@ public class TagInMemoryQuery<T> implements TagQuery<T> {
         return resultList;
     }
 
+    @Override
+    public List<T> findTagsByProcessId(Long processId, int maxResults) {
+        List<T> resultList;
+        Predicate<T> filter = tag -> ((Tag) tag).getProcessIds().contains(processId);
+
+        try(Stream<T> stream = cache.getCache().values().stream()){
+
+            resultList = stream.filter(filter).map(t -> (T) t).limit(maxResults).collect(Collectors.toList());
+
+            LOG.debug(String.format("findTagsByProcessId() - Got %d results for process id \"%s\"", resultList.size(), processId));
+        }
+
+        return resultList;
+    }
+
+    @Override
+    public List<T> findTagsByEquipmentId(Long equipmentId, int maxResults) {
+        List<T> resultList;
+
+        Predicate<T> filter = tag -> ((Tag) tag).getEquipmentIds().contains(equipmentId);
+
+        try(Stream<T> stream = cache.getCache().values().stream()){
+
+            resultList = stream.filter(filter).map(t -> (T) t).limit(maxResults).collect(Collectors.toList());
+
+            LOG.debug(String.format("findTagsByProcessId() - Got %d results for equipment id \"%s\"", resultList.size(), equipmentId));
+        }
+
+        return resultList;
+    }
+
+    @Override
+    public List<T> findTagsBySubEquipmentId(Long subEquipmentId, int maxResults) {
+        List<T> resultList;
+
+        Predicate<T> filter = tag -> ((Tag) tag).getSubEquipmentIds().contains(subEquipmentId);
+
+        try(Stream<T> stream = cache.getCache().values().stream()){
+
+            resultList = stream.filter(filter).map(t -> (T) t).limit(maxResults).collect(Collectors.toList());
+
+            LOG.debug(String.format("findTagsByProcessId() - Got %d results for sub equipment id \"%s\"", resultList.size(), subEquipmentId));
+        }
+
+        return resultList;
+    }
+
     /**
      * Method to replace the character '*' by '.*' and '?' by '.?' to work with the Java Pattern
      * @param wildcard

@@ -81,4 +81,41 @@ public interface ControlTagCache extends C2monCacheWithListeners<Long, ControlTa
    * @see #get(String)
    */
   Collection<ControlTag> findByNameWildcard(String regex);
+  
+  /**
+   * Searches for all {@link Tag} instances, where
+   * the {@link Tag#getProcessIds()} attribute contains the given
+   * process id
+   *
+   * @param processId The process id
+   * @return All tags where the tag process matches the process id
+   * Please note, that the result is limited to 100'000 in order to avoid a
+   * OutOfMemory exception!
+   */
+  Collection<ControlTag> findByTagProcessId(Long processId);
+
+  /**
+   * Searches for all {@link Tag} instances, where
+   * the {@link Tag#getEquipmentIds()} attribute contains the given
+   * equipment id
+   *
+   * @param equipmentId The equipment id
+   * @return All tags where the tag equipment matches the equipment id
+   * Please note, that the result is limited to 100'000 in order to avoid a
+   * OutOfMemory exception!
+   */
+  Collection<ControlTag> findByTagEquipmentId(Long equipmentId);
+
+  /**
+   * Searches for all {@link Tag} instances, where
+   * the {@link Tag#getSubEquipmentIds()} attribute contains the given
+   * sub equipment id
+   *
+   * @param subEquipmentId The sub equipment id
+   * @return All tags where the tag sub equipment matches the sub equipment id
+   * Please note, that the result is limited to 100'000 in order to avoid a
+   * OutOfMemory exception!
+   */
+  Collection<ControlTag> findByTagSubEquipmentId(Long subEquipmentId);
+
 }

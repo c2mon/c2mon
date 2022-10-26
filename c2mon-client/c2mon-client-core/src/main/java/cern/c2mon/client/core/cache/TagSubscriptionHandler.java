@@ -103,6 +103,37 @@ class TagSubscriptionHandler {
     handleTagSubscription(allMatchingTags, newTagIds, listener, sendInitialUpdateSeperately);
   }
 
+  void subscribeByProcessIds(final Set<Long> processIds, final BaseTagListener listener, final boolean sendInitialUpdateSeperately) throws CacheSynchronizationException {
+      // list of all matching tags, filled during createMissingTags
+      final Set<Long> allMatchingTags = new HashSet<Long>();
+
+      // Create the uninitialized tags
+      Set<Long> newTagIds = cacheSynchronizer.initTagsByProcessIds(processIds, allMatchingTags);
+
+      handleTagSubscription(allMatchingTags, newTagIds, listener, sendInitialUpdateSeperately);
+    }
+
+    void subscribeByEquipmentIds(final Set<Long> equipmentIds, final BaseTagListener listener, final boolean sendInitialUpdateSeperately) throws CacheSynchronizationException {
+      // list of all matching tags, filled during createMissingTags
+      final Set<Long> allMatchingTags = new HashSet<Long>();
+
+      // Create the uninitialized tags
+      Set<Long> newTagIds = cacheSynchronizer.initTagsByEquipmentIds(equipmentIds, allMatchingTags);
+
+      handleTagSubscription(allMatchingTags, newTagIds, listener, sendInitialUpdateSeperately);
+    }
+
+    void subscribeBySubEquipmentIds(final Set<Long> subEquipmentIds, final BaseTagListener listener, final boolean sendInitialUpdateSeperately) throws CacheSynchronizationException {
+      // list of all matching tags, filled during createMissingTags
+      final Set<Long> allMatchingTags = new HashSet<Long>();
+
+      // Create the uninitialized tags
+      Set<Long> newTagIds = cacheSynchronizer.initTagsBySubEquipmentIds(subEquipmentIds, allMatchingTags);
+
+      handleTagSubscription(allMatchingTags, newTagIds, listener, sendInitialUpdateSeperately);
+    }
+
+
   /**
    * Handles the listener subscription to the tags. Furthermore it triggers the topic subscription for new tag points
    * @param subscriptionList list of tag ids to which the listner shall be subscribed to

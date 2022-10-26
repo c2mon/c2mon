@@ -97,6 +97,7 @@ public class DataTagCacheObject extends AbstractTagCacheObject implements DataTa
   /**
    * Id of the Process this DataTag is attached to (loaded from DB also during cache loading).
    */
+  @QuerySqlField(name = "PROCESSID", index = true)
   private Long processId;
 
   /**

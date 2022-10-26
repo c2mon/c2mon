@@ -371,6 +371,22 @@ public class TagServiceImpl implements AdvancedTagService {
   }
 
   @Override
+  public void subscribeByProcessIds(Set<Long> processIds, TagListener listener) throws CacheSynchronizationException {
+    doSubscriptionByProcessIds(processIds, listener);
+  }
+
+  @Override
+  public void subscribeByEquipmentIds(Set<Long> equipmentIds, TagListener listener) throws CacheSynchronizationException {
+    doSubscriptionByEquipmentIds(equipmentIds, listener);
+  }
+
+  @Override
+  public void subscribeBySubEquipmentIds(Set<Long> subEquipmentIds, TagListener listener) throws CacheSynchronizationException {
+    doSubscriptionBySubEquipmentIds(subEquipmentIds, listener);
+  }
+
+
+  @Override
   public void subscribeByName(Set<String> regexList, BaseTagListener listener) throws CacheSynchronizationException {
     doSubscriptionByName(regexList, listener);
   }
@@ -448,7 +464,115 @@ public class TagServiceImpl implements AdvancedTagService {
 
     return resultList;
   }
+  private synchronized <T extends BaseTagListener> void doSubscriptionByProcessIds(final Set<Long> processIds, final T listener) {
+      if (processIds == null) {
+        String error = "Called with null parameter (id collection). Ignoring request.";
+        log.warn("doSubscriptionByProcessIds() : " + error);
+        throw new IllegalArgumentException(error);
+      }
 
+      if (listener == null) {
+        String error = "Called with null parameter (BaseTagListener). Ignoring request.";
+        log.warn("doSubscriptionByProcessIds() : " + error);
+        throw new IllegalArgumentException(error);
+      }
+
+      if (processIds.isEmpty()) {
+        String info = "Called with empty process id list. Ignoring request.";
+        log.info("doSubscriptionByProcessIds() : " + info);
+        return;
+      }
+
+      if (log.isDebugEnabled()) {
+        log.debug(String.format("doSubscriptionByProcessIds() : called for %d processes.", processIds.size()));
+      }
+
+      try {
+        // add listener to tags and subscribe them to the live topics
+        cache.subscribeByProcessIds(processIds, listener);
+        // Add listener to set
+        tagUpdateListeners.add(listener);
+      }
+      catch (CacheSynchronizationException cse) {
+        // Rollback the subscription
+        log.error("doSubscriptionByProcessIds() : Cache error occurred while subscribing to data tags.", cse);
+        throw cse;
+      }
+    }
+
+    private synchronized <T extends BaseTagListener> void doSubscriptionByEquipmentIds(final Set<Long> equipmentIds, final T listener) {
+      if (equipmentIds == null) {
+        String error = "Called with null parameter (id collection). Ignoring request.";
+        log.warn("doSubscriptionByEquipmentIds() : " + error);
+        throw new IllegalArgumentException(error);
+      }
+
+      if (listener == null) {
+        String error = "Called with null parameter (BaseTagListener). Ignoring request.";
+        log.warn("doSubscriptionByEquipmentIds() : " + error);
+        throw new IllegalArgumentException(error);
+      }
+
+      if (equipmentIds.isEmpty()) {
+        String info = "Called with empty equipment id list. Ignoring request.";
+        log.info("doSubscriptionByEquipmentIds() : " + info);
+        return;
+      }
+
+      if (log.isDebugEnabled()) {
+        log.debug(String.format("doSubscriptionByEquipmentIds() : called for %d equipments.", equipmentIds.size()));
+      }
+
+      try {
+        // add listener to tags and subscribe them to the live topics
+        cache.subscribeByEquipmentIds(equipmentIds, listener);
+        // Add listener to set
+        tagUpdateListeners.add(listener);
+      }
+      catch (CacheSynchronizationException cse) {
+        // Rollback the subscription
+        log.error("doSubscriptionByEquipmentIds() : Cache error occurred while subscribing to data tags.", cse);
+        throw cse;
+      }
+    }
+
+    private synchronized <T extends BaseTagListener> void doSubscriptionBySubEquipmentIds(final Set<Long> subEquipmentIds, final T listener) {
+      if (subEquipmentIds == null) {
+        String error = "Called with null parameter (id collection). Ignoring request.";
+        log.warn("doSubscriptionBySubEquipmentIds() : " + error);
+        throw new IllegalArgumentException(error);
+      }
+
+      if (listener == null) {
+        String error = "Called with null parameter (BaseTagListener). Ignoring request.";
+        log.warn("doSubscriptionBySubEquipmentIds() : " + error);
+        throw new IllegalArgumentException(error);
+      }
+
+      if (subEquipmentIds.isEmpty()) {
+        String info = "Called with empty sub equipment id list. Ignoring request.";
+        log.info("doSubscriptionBySubEquipmentIds() : " + info);
+        return;
+      }
+
+      if (log.isDebugEnabled()) {
+        log.debug(String.format("doSubscriptionBySubEquipmentIds() : called for %d sub equipments.", subEquipmentIds.size()));
+      }
+
+      try {
+        // add listener to tags and subscribe them to the live topics
+        cache.subscribeBySubEquipmentIds(subEquipmentIds, listener);
+        // Add listener to set
+        tagUpdateListeners.add(listener);
+      }
+      catch (CacheSynchronizationException cse) {
+        // Rollback the subscription
+        log.error("doSubscriptionBySubEquipmentIds() : Cache error occurred while subscribing to data tags.", cse);
+        throw cse;
+      }
+    }
+
+  
   @Override
   public Collection<Tag> findByMetadata(String key, String value) {
     return get(elasticsearchService.findTagsByMetadata(key, value));

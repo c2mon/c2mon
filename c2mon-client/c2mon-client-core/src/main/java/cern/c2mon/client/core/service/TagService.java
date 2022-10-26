@@ -147,7 +147,82 @@ public interface TagService {
    */
   void subscribeByName(final String regex, final TagListener listener) throws CacheSynchronizationException;
 
+  /**
+   * Registers a listener to receive the current (initial) values and updates for all tags with the
+   * given process id.
+   * <p>
+   * <b>Please note</b>, that the call is NOT constantly checking in the background whether new tags have been
+   * configured on the server that would match the given list!
+   * <p>
+   * The method will return the initial value(s) of the subscribed tag(s) to {@link TagListener#onInitialUpdate(Collection)}. <b>Please note</b>
+   * that the {@link TagListener#onUpdate(Tag)} method will then not receive the initial value.
+   * <p>
+   * The C2MON client API will handle for you in the background the initialization of the data
+   * tags with the C2MON server, if this was not already done before.
+   * <p>
+   * Your listener will be informed about new updates via the <code>onUpdate(Tag)</code>
+   * method.
+   * <p>
+   * @param processIds A set of process ids, which shall be used to subscribe to all data tags belonging to that process
+   * @param listener the listener which shall be registered and which will receive the initial values in
+   *                 a separate method
+   * @throws CacheSynchronizationException In case a communication problem with the C2MON server
+   *         occurs while subscribing to the tag. In that case the {@link TagService} will
+   *         rollback the subscription.
+   */
+  void subscribeByProcessIds(final Set<Long> processIds, final TagListener listener) throws CacheSynchronizationException;
 
+  /**
+   * Registers a listener to receive the current (initial) values and updates for all tags with the
+   * given equipment id.
+   * <p>
+   * <b>Please note</b>, that the call is NOT constantly checking in the background whether new tags have been
+   * configured on the server that would match the given list!
+   * <p>
+   * The method will return the initial value(s) of the subscribed tag(s) to {@link TagListener#onInitialUpdate(Collection)}. <b>Please note</b>
+   * that the {@link TagListener#onUpdate(Tag)} method will then not receive the initial value.
+   * <p>
+   * The C2MON client API will handle for you in the background the initialization of the data
+   * tags with the C2MON server, if this was not already done before.
+   * <p>
+   * Your listener will be informed about new updates via the <code>onUpdate(Tag)</code>
+   * method.
+   * <p>
+   * @param equipmentIds A set of equipment ids, which shall be used to subscribe to all data tags belonging to that equipment
+   * @param listener the listener which shall be registered and which will receive the initial values in
+   *                 a separate method
+   * @throws CacheSynchronizationException In case a communication problem with the C2MON server
+   *         occurs while subscribing to the tag. In that case the {@link TagService} will
+   *         rollback the subscription.
+   */
+  void subscribeByEquipmentIds(final Set<Long> equipmentIds, final TagListener listener) throws CacheSynchronizationException;
+
+  /**
+   * Registers a listener to receive the current (initial) values and updates for all tags with the
+   * given subequipment id.
+   * <p>
+   * <b>Please note</b>, that the call is NOT constantly checking in the background whether new tags have been
+   * configured on the server that would match the given list!
+   * <p>
+   * The method will return the initial value(s) of the subscribed tag(s) to {@link TagListener#onInitialUpdate(Collection)}. <b>Please note</b>
+   * that the {@link TagListener#onUpdate(Tag)} method will then not receive the initial value.
+   * <p>
+   * The C2MON client API will handle for you in the background the initialization of the data
+   * tags with the C2MON server, if this was not already done before.
+   * <p>
+   * Your listener will be informed about new updates via the <code>onUpdate(Tag)</code>
+   * method.
+   * <p>
+   * @param subEquipmentIds A set of sub equipment ids, which shall be used to subscribe to all data tags belonging to that subequipment
+   * @param listener the listener which shall be registered and which will receive the initial values in
+   *                 a separate method
+   * @throws CacheSynchronizationException In case a communication problem with the C2MON server
+   *         occurs while subscribing to the tag. In that case the {@link TagService} will
+   *         rollback the subscription.
+   */
+  void subscribeBySubEquipmentIds(final Set<Long> subEquipmentIds, final TagListener listener) throws CacheSynchronizationException;
+
+  
   /**
    * Registers a listener to receive the current (initial) values and updates for all tags, where the
    * name matches the regular expression.
