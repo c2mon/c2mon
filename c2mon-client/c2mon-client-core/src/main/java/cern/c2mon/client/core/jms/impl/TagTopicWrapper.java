@@ -54,11 +54,11 @@ public class TagTopicWrapper extends AbstractTopicWrapper<TagListener, TagUpdate
     //this.topics = new Destination[]{new ActiveMQTopic(properties.getJms().getDataTagTopic()),
     //        new ActiveMQTopic(properties.getJms().getControlTagTopic())};
     super(slowConsumerListener, enqueuingEventListener, topicPollingExecutor,
-            properties.getJms().getAlarmTopic().substring(0, properties.getJms().getAlarmTopic().indexOf(".")) + ".client.tag.*",
+            properties.getJms().getAlarmTopic().substring(0, properties.getJms().getAlarmTopic().indexOf(".")) + ".client.tag.>",
             properties);
     String domain = properties.getJms().getAlarmTopic().substring(0, properties.getJms().getAlarmTopic().indexOf("."));
 
-    this.topics = new Destination[]{new ActiveMQTopic(domain + ".client.tag.*"),
+    this.topics = new Destination[]{new ActiveMQTopic(domain + ".client.tag.>"),
             new ActiveMQTopic(properties.getJms().getControlTagTopic())};
   }
 
