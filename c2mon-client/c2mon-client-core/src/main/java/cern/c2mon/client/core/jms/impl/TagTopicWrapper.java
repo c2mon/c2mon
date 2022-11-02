@@ -49,17 +49,11 @@ public class TagTopicWrapper extends AbstractTopicWrapper<TagListener, TagUpdate
                            final EnqueuingEventListener enqueuingEventListener,
                            final ExecutorService topicPollingExecutor,
                            final C2monClientProperties properties) {
-    // TODO this gives compilation error, don't know how to up
-    //super(slowConsumerListener, enqueuingEventListener, topicPollingExecutor, properties.getJms().getDataTagTopic(), properties);
-    //this.topics = new Destination[]{new ActiveMQTopic(properties.getJms().getDataTagTopic()),
-    //        new ActiveMQTopic(properties.getJms().getControlTagTopic())};
-    super(slowConsumerListener, enqueuingEventListener, topicPollingExecutor,
-            properties.getJms().getAlarmTopic().substring(0, properties.getJms().getAlarmTopic().indexOf(".")) + ".client.tag.>",
-            properties);
-    String domain = properties.getJms().getAlarmTopic().substring(0, properties.getJms().getAlarmTopic().indexOf("."));
-
-    this.topics = new Destination[]{new ActiveMQTopic(domain + ".client.tag.>"),
-            new ActiveMQTopic(properties.getJms().getControlTagTopic())};
+    super(slowConsumerListener, enqueuingEventListener, topicPollingExecutor, properties.getJms().getTagTopicPrefix() + ".>", properties);
+    this.topics = new Destination[]{
+            new ActiveMQTopic(properties.getJms().getTagTopicPrefix() + ".>"),
+            new ActiveMQTopic(properties.getJms().getControlTagTopic())
+          };
   }
 
   @Override

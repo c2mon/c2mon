@@ -35,6 +35,11 @@ public class ClientJmsProperties extends CommonJmsProperties{
    * Name of the topic on which the server is publishing its heartbeat
    */
   private String heartbeatTopic = "c2mon.client.heartbeat";
+
+  /**
+   * Name of the topic which the server is publishing its heartbeat, the process ID will be appended
+   */
+  private String tagTopicPrefix = "c2mon.client.tag";
   
   /**
    * The broadcast topic channel to which the messages shall be sent
@@ -45,8 +50,6 @@ public class ClientJmsProperties extends CommonJmsProperties{
    * Name of the topic on which the server is publishing {@link AlarmValue} objects as JSON string
    */
   private String alarmTopic = "c2mon.client.alarm";
-
-  private String dataTagTopic = "c2mon.client.tag.*";
 
   /**
    * Name of the topic on which the server is publishing the full {@link TransferTagImpl} object, 
